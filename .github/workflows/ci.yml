@@ -16,10 +16,11 @@ env:
 
 jobs:
   verify:
-    # The CI_RUNNER repository variable routes verification to a self-hosted runner (label
-    # `ap-reelume`) when hosted minutes are unavailable; unset, it falls back to the hosted
-    # image. The label is dedicated so no other project's runner can take these jobs.
-    runs-on: ${{ vars.CI_RUNNER || 'windows-2025' }}
+    # Hosted runners only. The private era once routed verification to a self-hosted runner via a
+    # repository variable; on a public repository that mechanism is a standing invitation for fork
+    # pull requests to execute on a personal machine the moment the variable reappears, so the
+    # workflow no longer consults it. Hosted minutes are free on public repositories.
+    runs-on: windows-2025
     # The verification now seals the package and builds the payload twice more to compare them.
     timeout-minutes: 60
     steps:
@@ -35,13 +36,14 @@ jobs:
       # The runner image used to ship ffmpeg and stopped; without it no media sample is generated,
       # the codec matrix and the segment corpus go unmeasured, and the package lifecycle cannot
       # exercise the file association. Installing it keeps those gates real in CI.
-      # A machine that already carries ffmpeg — a self-hosted runner — is left untouched; the
-      # system-wide install only happens on hosted images, which arrive without it.
+      # A machine that already carries ffmpeg is left untouched; the system-wide install only
+      # happens on hosted images, which arrive without it. The version is pinned so a floating
+      # community tag cannot change what runs here between one build and the next.
       - name: Install ffmpeg
         shell: pwsh
         run: |
           if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.' }
-          else { choco install ffmpeg -y --no-progress }
+          else { choco install ffmpeg --version 9.0.0 -y --no-progress }
       # This builds and seals both architectures. The separate ARM64 restore check that used to live
       # below was weaker than what replaced it: a restore resolves packages without ever compiling,
       # which is why `-r win-arm64` passed here for months while the build itself failed outright.

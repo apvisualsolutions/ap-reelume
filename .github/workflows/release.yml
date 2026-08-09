@@ -40,10 +40,12 @@ jobs:
           cache-dependency-path: '**/packages.lock.json'
 
       # The runner image used to ship ffmpeg and stopped; the lifecycle's file-association phase
-      # needs a generated sample, and the media gates need the whole matrix.
+      # needs a generated sample, and the media gates need the whole matrix. The version is pinned
+      # like the action SHAs: this is the only third-party executable that runs on the machine that
+      # seals and signs the release, so it moves only by a deliberate edit, never by a floating tag.
       - name: Install ffmpeg
         shell: pwsh
-        run: choco install ffmpeg -y --no-progress
+        run: choco install ffmpeg --version 9.0.0 -y --no-progress
 
       - name: Build the x64 package
         shell: pwsh
