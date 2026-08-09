@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!--
+      The Windows adapters this project exercises - media keys, the tray, and the Run key - only
+      exist on the Windows target, so the integration suite targets it too.
+    -->
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Application\ApSolutions.LocalMedia.Application.csproj" />
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Domain\ApSolutions.LocalMedia.Domain.csproj" />
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Infrastructure\ApSolutions.LocalMedia.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Presentation\ApSolutions.LocalMedia.Presentation.csproj" />
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Windows\ApSolutions.LocalMedia.Windows.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+      One fake update server, shared with the packaging suite. Two copies of a TLS listener would be
+      two places for the interruption behaviour to drift apart, and the drift would be invisible.
+    -->
+    <Compile Include="..\Shared\FakeReleaseServer.cs" Link="Updates\FakeReleaseServer.cs" />
+    <Compile Include="..\Shared\TestReleaseSigning.cs" Link="Updates\TestReleaseSigning.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Headless.XUnit" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+    <PackageReference Include="NSubstitute" />
+  </ItemGroup>
+</Project>

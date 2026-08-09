@@ -1,0 +1,126 @@
+[
+  {
+    "fileName": "Northern.Chronicles.S01E02.1080p.mkv",
+    "folders": ["Northern Chronicles", "Season 1"],
+    "kind": "Episode",
+    "cleanTitle": "Northern Chronicles",
+    "season": 1,
+    "episode": 2,
+    "isSpecial": false,
+    "noiseTags": ["1080p"],
+    "warnings": []
+  },
+  {
+    "fileName": "northern_chronicles_s1e2_WEB-DL.mkv",
+    "folders": ["Northern Chronicles"],
+    "kind": "Episode",
+    "cleanTitle": "northern chronicles",
+    "season": 1,
+    "episode": 2,
+    "isSpecial": false,
+    "noiseTags": ["WEB-DL"],
+    "warnings": []
+  },
+  {
+    "fileName": "Northern Chronicles 1x02 HDTV.avi",
+    "folders": ["Northern Chronicles", "Season 1"],
+    "kind": "Episode",
+    "cleanTitle": "Northern Chronicles",
+    "season": 1,
+    "episode": 2,
+    "isSpecial": false,
+    "noiseTags": ["HDTV"],
+    "warnings": []
+  },
+  {
+    "fileName": "Cronicas.del.Norte.Cap.803.mkv",
+    "folders": ["Cronicas del Norte", "Temporada 8"],
+    "kind": "Episode",
+    "cleanTitle": "Cronicas del Norte",
+    "season": 8,
+    "episode": 3,
+    "isSpecial": false,
+    "noiseTags": [],
+    "warnings": []
+  },
+  {
+    "fileName": "Cronicas.del.Norte.Cap.800.mkv",
+    "folders": ["Cronicas del Norte", "Temporada 8"],
+    "kind": "Unknown",
+    "cleanTitle": "Cronicas del Norte",
+    "season": 8,
+    "isSpecial": true,
+    "noiseTags": [],
+    "warnings": ["AmbiguousCompactEpisode"]
+  },
+  {
+    "fileName": "La.Casa.de.Papel.Temporada.2.Episodio.03.mkv",
+    "folders": ["La Casa de Papel"],
+    "kind": "Episode",
+    "cleanTitle": "La Casa de Papel",
+    "season": 2,
+    "episode": 3,
+    "isSpecial": false,
+    "noiseTags": [],
+    "warnings": []
+  },
+  {
+    "fileName": "The.Office.Season.4.Episode.8.mkv",
+    "folders": ["The Office"],
+    "kind": "Episode",
+    "cleanTitle": "The Office",
+    "season": 4,
+    "episode": 8,
+    "isSpecial": false,
+    "noiseTags": [],
+    "warnings": []
+  },
+  {
+    "fileName": "Dune (2021) [2160p][HEVC].mkv",
+    "folders": ["Movies"],
+    "kind": "Movie",
+    "cleanTitle": "Dune",
+    "year": 2021,
+    "isSpecial": false,
+    "noiseTags": ["2160p", "HEVC"],
+    "warnings": []
+  },
+  {
+    "fileName": "Amélie.2001.MULTi.1080p.mkv",
+    "folders": ["Películas"],
+    "kind": "Movie",
+    "cleanTitle": "Amélie",
+    "year": 2001,
+    "isSpecial": false,
+    "noiseTags": ["MULTi", "1080p"],
+    "warnings": []
+  },
+  {
+    "fileName": "東京物語 (1953).mkv",
+    "folders": ["Películas"],
+    "kind": "Movie",
+    "cleanTitle": "東京物語",
+    "year": 1953,
+    "isSpecial": false,
+    "noiseTags": [],
+    "warnings": []
+  },
+  {
+    "fileName": "[???].mkv",
+    "folders": [],
+    "kind": "Unknown",
+    "cleanTitle": "[???]",
+    "isSpecial": false,
+    "noiseTags": [],
+    "warnings": ["UnrecognizedName"]
+  },
+  {
+    "fileName": "Tomorrow.9999.mkv",
+    "folders": ["Movies"],
+    "kind": "Unknown",
+    "cleanTitle": "Tomorrow",
+    "isSpecial": false,
+    "noiseTags": [],
+    "warnings": ["UnrecognizedName"]
+  }
+]

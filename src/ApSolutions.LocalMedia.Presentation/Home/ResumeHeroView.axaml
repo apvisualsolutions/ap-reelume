@@ -1,0 +1,56 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Home.ResumeHeroView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    x:DataType="home:HomeViewModel"
+    IsVisible="{Binding HasResume}"
+    automation:AutomationProperties.Name="{DynamicResource HomeResumeAccessibleName}">
+  <Border
+      Padding="20"
+      Background="{DynamicResource CardSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="10">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+      <StackPanel Spacing="4">
+        <TextBlock
+            FontSize="14"
+            Text="{DynamicResource HomeResumeHeading}" />
+        <TextBlock
+            FontSize="24"
+            FontWeight="SemiBold"
+            Text="{Binding ResumeTitle}"
+            TextTrimming="CharacterEllipsis" />
+        <TextBlock
+            FontSize="14"
+            IsVisible="{Binding HasResumeSubtitle}"
+            Text="{Binding ResumeSubtitle}"
+            TextTrimming="CharacterEllipsis" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <ProgressBar
+              Width="220"
+              VerticalAlignment="Center"
+              Maximum="1"
+              Value="{Binding ResumeCompletedFraction}"
+              automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              Text="{Binding ResumeCompletedText}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              Text="{DynamicResource HomePercentSuffix}" />
+        </StackPanel>
+      </StackPanel>
+      <Button
+          x:Name="ResumeHeroAction"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          Classes="primary-action"
+          Command="{Binding ResumeCommand}"
+          Content="{DynamicResource HomeResumeAction}"
+          automation:AutomationProperties.Name="{DynamicResource HomeResumeAction}" />
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Review.CandidateCardView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
+    x:DataType="review:CandidateCardViewModel">
+  <Border
+      Margin="0,4"
+      Padding="12"
+      BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+      BorderThickness="1"
+      CornerRadius="6"
+      automation:AutomationProperties.Name="{Binding StableKey}"
+      automation:AutomationProperties.HelpText="{Binding ExplanationSummary}">
+    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
+      <TextBlock FontWeight="SemiBold" Text="{Binding StableKey}" />
+      <TextBlock Grid.Column="1" Text="{Binding ScorePercent}" />
+      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+        <TextBlock IsVisible="{Binding IsPending}" Text="{DynamicResource ReviewStatusPending}" />
+        <TextBlock IsVisible="{Binding IsSuggested}" Text="{DynamicResource ReviewStatusSuggested}" />
+        <TextBlock Text="{DynamicResource ReviewExplanationHeading}" />
+      </StackPanel>
+      <ItemsControl Grid.Row="2" Grid.ColumnSpan="2" ItemsSource="{Binding ExplanationCodes}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Grid>
+  </Border>
+</UserControl>

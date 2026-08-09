@@ -1,0 +1,20 @@
+AP Reelume by AP Solutions
+Copyright © AP Solutions 2026
+
+This product is licensed under GPL-3.0-or-later. See LICENSE.
+
+AP Reelume uses third-party components. The notices for the exact artifact are
+in licenses/THIRD-PARTY-NOTICES.en.md and licenses/THIRD-PARTY-NOTICES.es.md,
+which travel inside the package, and the bill of materials for the build you are
+running is in sbom/, in CycloneDX and SPDX formats.
+
+This product uses the TMDB API but is not endorsed or certified by TMDB. The
+attribution is readable in the application, under Settings.
+
+AP Reelume usa componentes de terceros. Los avisos del artefacto exacto están en
+licenses/THIRD-PARTY-NOTICES.es.md y licenses/THIRD-PARTY-NOTICES.en.md, que
+viajan dentro del paquete, y el inventario de materiales de la compilación que
+está ejecutando está en sbom/, en formatos CycloneDX y SPDX.
+
+Este producto usa la API de TMDB pero no está avalado ni certificado por TMDB.
+La atribución se lee en la aplicación, en Ajustes.

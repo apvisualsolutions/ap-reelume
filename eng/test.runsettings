@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!--
+      Several test hosts driving LibVLC at the same time destabilise the native library: the media
+      suite decodes real video while the integration suite probes media. Assemblies therefore run
+      one at a time. Tests inside an assembly still run in parallel.
+
+      This setting only bounds a single VSTest invocation that receives several assemblies. When
+      `dotnet test` is pointed at the solution, MSBuild schedules one VSTest invocation per project
+      and that scheduling is governed by the MSBuild node count instead, so every gate also passes
+      `-m:1`. Without it sixteen hosts started together and one of them died on its sixty-second
+      connection timeout.
+    -->
+    <MaxCpuCount>1</MaxCpuCount>
+  </RunConfiguration>
+</RunSettings>

@@ -1,0 +1,144 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Onboarding.RootOnboardingView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:discovery="clr-namespace:ApSolutions.LocalMedia.Domain.Discovery;assembly=ApSolutions.LocalMedia.Domain"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:onboarding="clr-namespace:ApSolutions.LocalMedia.Presentation.Onboarding"
+    x:DataType="onboarding:RootOnboardingViewModel"
+    automation:AutomationProperties.Name="{DynamicResource RootOnboardingAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="OnboardingResourceKey" />
+  </UserControl.Resources>
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel MaxWidth="720" Spacing="16">
+      <TextBlock
+          FontSize="28"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RootOnboardingTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RootOnboardingDescription}"
+          TextWrapping="Wrap" />
+      <TextBox
+          automation:AutomationProperties.Name="{DynamicResource RootPathLabel}"
+          Text="{Binding Path}" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource RootKindLocal}"
+            Command="{Binding SelectKindCommand}"
+            CommandParameter="{x:Static discovery:RootKind.Local}"
+            Content="{DynamicResource RootKindLocal}" />
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource RootKindUsb}"
+            Command="{Binding SelectKindCommand}"
+            CommandParameter="{x:Static discovery:RootKind.Usb}"
+            Content="{DynamicResource RootKindUsb}" />
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource RootKindUnc}"
+            Command="{Binding SelectKindCommand}"
+            CommandParameter="{x:Static discovery:RootKind.Unc}"
+            Content="{DynamicResource RootKindUnc}" />
+      </StackPanel>
+      <Button
+          HorizontalAlignment="Left"
+          automation:AutomationProperties.Name="{DynamicResource RootAddAction}"
+          Command="{Binding AddRootCommand}"
+          Content="{DynamicResource RootAddAction}" />
+      <Border
+          x:Name="RootAddFailureSurface"
+          IsVisible="{Binding HasFailure}"
+          Padding="12"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="8"
+          automation:AutomationProperties.Name="{DynamicResource RootAddFailureAccessibleName}"
+          automation:AutomationProperties.LiveSetting="Assertive">
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding FailureKey, Converter={StaticResource OnboardingResourceKey}}"
+            TextWrapping="Wrap" />
+      </Border>
+      <StackPanel Spacing="8" IsVisible="{Binding HasRoots}">
+        <TextBlock
+            FontSize="20"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource RootListTitle}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <ItemsControl ItemsSource="{Binding Roots}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="onboarding:LibraryRootRowViewModel">
+              <StackPanel Margin="0,2" Orientation="Horizontal" Spacing="12">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource TextPrimaryBrush}"
+                    Text="{Binding Path}" />
+                <Button
+                    automation:AutomationProperties.Name="{DynamicResource RootRemoveAction}"
+                    Command="{Binding $parent[ItemsControl].((onboarding:RootOnboardingViewModel)DataContext).RequestRemoveCommand}"
+                    CommandParameter="{Binding}"
+                    Content="{DynamicResource RootRemoveAction}" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+      <Border
+          x:Name="RootRemoveConfirmationSurface"
+          IsVisible="{Binding IsConfirmingRemoval}"
+          Padding="16"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="8"
+          automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}"
+          automation:AutomationProperties.LiveSetting="Assertive">
+        <StackPanel Spacing="12">
+          <TextBlock
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{Binding PendingRemovalPath}"
+              TextWrapping="Wrap" />
+          <TextBlock
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource RootRemoveConfirmDescription}"
+              TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAction}"
+                Command="{Binding ConfirmRemoveCommand}"
+                Content="{DynamicResource RootRemoveConfirmAction}" />
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource RootRemoveCancelAction}"
+                Command="{Binding CancelRemoveCommand}"
+                Content="{DynamicResource RootRemoveCancelAction}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border
+          IsVisible="{Binding InitialScanConsentRequired}"
+          Padding="16"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="8">
+        <StackPanel Spacing="12">
+          <TextBlock
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource RootScanConsentDescription}"
+              TextWrapping="Wrap" />
+          <Button
+              HorizontalAlignment="Left"
+              automation:AutomationProperties.Name="{DynamicResource RootScanConsentAction}"
+              Command="{Binding GrantInitialScanConsentCommand}"
+              Content="{DynamicResource RootScanConsentAction}" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>

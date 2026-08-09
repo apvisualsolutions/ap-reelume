@@ -1,0 +1,25 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.SegmentDetectionSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:SegmentDetectionSettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsAccessibleName}">
+  <StackPanel x:Name="SegmentDetectionSurface" Spacing="12">
+    <TextBlock
+        FontSize="24"
+        FontWeight="SemiBold"
+        Text="{DynamicResource SegmentDetectionSettingsTitle}"
+        automation:AutomationProperties.HeadingLevel="1" />
+    <TextBlock
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource SegmentDetectionSettingsDescription}"
+        TextWrapping="Wrap" />
+    <CheckBox
+        x:Name="SegmentDetectionSwitch"
+        automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsEnable}"
+        Content="{DynamicResource SegmentDetectionSettingsEnable}"
+        IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,9 @@
+# CI-004/SEC-006: the workflows pin every action by commit SHA, so a compromised tag can no
+# longer move what CI runs. Dependabot is the half that keeps the pins from fossilising: it opens
+# a pull request when an action publishes a new release, and the pin only moves by review.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

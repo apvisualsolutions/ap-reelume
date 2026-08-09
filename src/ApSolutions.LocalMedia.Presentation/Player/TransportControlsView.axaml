@@ -1,0 +1,79 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.TransportControlsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:TransportControlsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource TransportAccessibleName}">
+  <StackPanel x:Name="TransportSurface" Spacing="10">
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <Button
+          x:Name="SkipBackwardButton"
+          automation:AutomationProperties.Name="{DynamicResource TransportSkipBackward}"
+          automation:AutomationProperties.AcceleratorKey="Left"
+          automation:AutomationProperties.HelpText="{Binding BackwardSkipLabel}"
+          Command="{Binding SkipBackwardCommand}"
+          Content="{DynamicResource TransportSkipBackward}" />
+      <Button
+          x:Name="SkipForwardButton"
+          automation:AutomationProperties.Name="{DynamicResource TransportSkipForward}"
+          automation:AutomationProperties.AcceleratorKey="Right"
+          automation:AutomationProperties.HelpText="{Binding ForwardSkipLabel}"
+          Command="{Binding SkipForwardCommand}"
+          Content="{DynamicResource TransportSkipForward}" />
+      <Button
+          x:Name="MuteButton"
+          automation:AutomationProperties.Name="{DynamicResource TransportToggleMute}"
+          automation:AutomationProperties.AcceleratorKey="M"
+          Command="{Binding ToggleMuteCommand}"
+          Content="{DynamicResource TransportToggleMute}" />
+      <TextBlock
+          x:Name="SpeedReadout"
+          VerticalAlignment="Center"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}"
+          Text="{Binding SpeedLabel}" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource TransportVolumeLabel}" />
+      <Slider
+          x:Name="VolumeSlider"
+          Minimum="{x:Static player:TransportControlsViewModel.MinimumVolumePercent}"
+          Maximum="{x:Static player:TransportControlsViewModel.MaximumVolumePercent}"
+          TickFrequency="5"
+          IsSnapToTickEnabled="True"
+          automation:AutomationProperties.Name="{DynamicResource TransportVolumeLabel}"
+          automation:AutomationProperties.AcceleratorKey="Up"
+          Value="{Binding VolumePercent, Mode=OneWay}" />
+    </StackPanel>
+
+    <Border
+        x:Name="BoostWarningSurface"
+        IsVisible="{Binding RequiresBoostWarning}"
+        Padding="8"
+        Background="{DynamicResource AccentSubtleBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="6"
+        automation:AutomationProperties.Name="{DynamicResource TransportBoostWarningTitle}">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock
+            x:Name="BoostWarningIcon"
+            VerticalAlignment="Center"
+            FontWeight="Bold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="!" />
+        <TextBlock
+            x:Name="BoostWarningText"
+            VerticalAlignment="Center"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource TransportBoostWarningText}"
+            TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,99 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.AppearanceSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme"
+    x:DataType="settings:AppearanceSettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource AppearanceAccessibleName}">
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel MaxWidth="620" Spacing="16">
+      <TextBlock
+          FontSize="28"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource AppearanceTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource AppearanceDescription}"
+          TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button
+            Classes="theme-option"
+            automation:AutomationProperties.Name="{DynamicResource ThemeSystem}"
+            Command="{Binding ApplyThemeCommand}"
+            CommandParameter="{x:Static theme:ThemePreference.System}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding SystemStateCue}" />
+            <TextBlock Text="{DynamicResource ThemeSystem}" />
+          </StackPanel>
+        </Button>
+        <Button
+            Classes="theme-option"
+            automation:AutomationProperties.Name="{DynamicResource ThemeLight}"
+            Command="{Binding ApplyThemeCommand}"
+            CommandParameter="{x:Static theme:ThemePreference.Light}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding LightStateCue}" />
+            <TextBlock Text="{DynamicResource ThemeLight}" />
+          </StackPanel>
+        </Button>
+        <Button
+            Classes="theme-option"
+            automation:AutomationProperties.Name="{DynamicResource ThemeDark}"
+            Command="{Binding ApplyThemeCommand}"
+            CommandParameter="{x:Static theme:ThemePreference.Dark}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding DarkStateCue}" />
+            <TextBlock Text="{DynamicResource ThemeDark}" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+      <TextBlock
+          FontSize="20"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource LanguageTitle}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource LanguageDescription}"
+          TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button
+            Classes="theme-option"
+            automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
+            Command="{Binding ApplyLanguageCommand}"
+            CommandParameter="es">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding SpanishStateCue}" />
+            <TextBlock Text="{DynamicResource LanguageSpanish}" />
+          </StackPanel>
+        </Button>
+        <Button
+            Classes="theme-option"
+            automation:AutomationProperties.Name="{DynamicResource LanguageEnglish}"
+            Command="{Binding ApplyLanguageCommand}"
+            CommandParameter="en">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding EnglishStateCue}" />
+            <TextBlock Text="{DynamicResource LanguageEnglish}" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+      <Border
+          Padding="16"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="8">
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource ReducedMotionNotice}"
+            TextWrapping="Wrap" />
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>

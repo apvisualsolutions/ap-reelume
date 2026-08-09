@@ -1,0 +1,66 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.RecommendationSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:RecommendationSettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsAccessibleName}">
+  <StackPanel Spacing="8">
+    <TextBlock
+        FontSize="20"
+        FontWeight="SemiBold"
+        Text="{DynamicResource RecommendationSettingsTitle}"
+        automation:AutomationProperties.HeadingLevel="1" />
+    <TextBlock
+        MaxWidth="640"
+        Text="{DynamicResource RecommendationSettingsDescription}"
+        TextWrapping="Wrap" />
+    <CheckBox
+        Content="{DynamicResource RecommendationSettingsEnableLabel}"
+        IsChecked="{Binding IsEnabled}"
+        automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsEnableLabel}" />
+    <TextBlock
+        IsVisible="{Binding IsEnabled}"
+        Text="{DynamicResource RecommendationsOn}" />
+    <TextBlock
+        IsVisible="{Binding IsDisabled}"
+        Text="{DynamicResource RecommendationsOff}" />
+    <TextBlock
+        MaxWidth="640"
+        Text="{DynamicResource RecommendationSettingsPrivacyNotice}"
+        TextWrapping="Wrap" />
+    <StackPanel Spacing="8" IsVisible="{Binding HasWatchedThreshold}">
+      <TextBlock
+          FontSize="16"
+          FontWeight="SemiBold"
+          Text="{DynamicResource RecommendationSettingsThresholdLabel}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <TextBlock
+          MaxWidth="640"
+          Text="{DynamicResource RecommendationSettingsThresholdDescription}"
+          TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Slider
+            Width="240"
+            Minimum="{x:Static settings:RecommendationSettingsViewModel.MinimumWatchedThresholdPercent}"
+            Maximum="{x:Static settings:RecommendationSettingsViewModel.MaximumWatchedThresholdPercent}"
+            TickFrequency="1"
+            IsSnapToTickEnabled="True"
+            Value="{Binding WatchedThresholdPercent}"
+            automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsThresholdLabel}" />
+        <TextBlock
+            VerticalAlignment="Center"
+            Text="{Binding WatchedThresholdPercent, StringFormat={}{0:0} %}" />
+      </StackPanel>
+      <Button
+          Content="{DynamicResource RecommendationSettingsThresholdApply}"
+          Command="{Binding ApplyWatchedThresholdCommand}"
+          automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsThresholdApply}" />
+      <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasThresholdResult}">
+        <TextBlock Text="{DynamicResource RecommendationSettingsThresholdRecalculated}" />
+        <TextBlock Text="{Binding RecalculatedCount}" />
+      </StackPanel>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

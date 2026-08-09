@@ -1,0 +1,18 @@
+<Application
+    x:Class="ApSolutions.LocalMedia.Presentation.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    RequestedThemeVariant="Default">
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml" />
+  </Application.Styles>
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://ApSolutions.LocalMedia.Presentation/Resources/Brand.axaml" />
+        <ResourceInclude Source="avares://ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

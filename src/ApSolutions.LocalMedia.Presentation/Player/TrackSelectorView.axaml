@@ -1,0 +1,43 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.TrackSelectorView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:TrackSelectorViewModel"
+    automation:AutomationProperties.Name="{DynamicResource TrackSelectorAccessibleName}">
+  <StackPanel x:Name="TrackSelectorSurface" Spacing="12">
+    <StackPanel Spacing="4">
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource TrackSelectorAudioLabel}" />
+      <ComboBox
+          x:Name="AudioTrackSelector"
+          MinWidth="260"
+          automation:AutomationProperties.Name="{DynamicResource TrackSelectorAudioLabel}"
+          DisplayMemberBinding="{Binding Display}"
+          ItemsSource="{Binding AudioTracks}"
+          SelectedItem="{Binding SelectedAudio, Mode=TwoWay}" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource TrackSelectorSubtitleLabel}" />
+      <ComboBox
+          x:Name="SubtitleTrackSelector"
+          MinWidth="260"
+          automation:AutomationProperties.Name="{DynamicResource TrackSelectorSubtitleLabel}"
+          DisplayMemberBinding="{Binding Display}"
+          ItemsSource="{Binding SubtitleTracks}"
+          SelectedItem="{Binding SelectedSubtitle, Mode=TwoWay}" />
+    </StackPanel>
+
+    <CheckBox
+        x:Name="RememberForSeriesToggle"
+        IsEnabled="{Binding CanRememberForSeries}"
+        IsChecked="{Binding RememberForSeries, Mode=TwoWay}"
+        automation:AutomationProperties.Name="{DynamicResource TrackSelectorRememberForSeries}"
+        Content="{DynamicResource TrackSelectorRememberForSeries}" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,136 @@
+name: Release
+
+# Cutting a release is the same three commands documented in docs/release/RELEASING.en.md. This
+# workflow runs them so the published artifact comes from a clean checkout rather than from whichever
+# machine happened to tag it.
+#
+# It uses one secret: RELEASE_SIGNING_SECRET_KEY, the minisign key that signs SHA256SUMS.txt so the
+# updater can verify the published hashes against the public key embedded in the binary (SEC-003).
+# The artifact itself stays Authenticode-unsigned on purpose, and docs/release/SMARTSCREEN.en.md says
+# so rather than implying otherwise. It also does not create the GitHub release itself — publishing
+# stays a deliberate act by a person who has read the checks below.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+
+jobs:
+  package:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # The reproducibility comparison needs real history to make two clean checkouts from.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 10.0.302
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      # The runner image used to ship ffmpeg and stopped; the lifecycle's file-association phase
+      # needs a generated sample, and the media gates need the whole matrix.
+      - name: Install ffmpeg
+        shell: pwsh
+        run: choco install ffmpeg -y --no-progress
+
+      - name: Build the x64 package
+        shell: pwsh
+        env:
+          RELEASE_SIGNING_SECRET_KEY: ${{ secrets.RELEASE_SIGNING_SECRET_KEY }}
+        run: ./eng/package-x64.ps1 -Configuration Release
+
+      - name: Walk the lifecycle and compare two builds
+        shell: pwsh
+        run: ./eng/verify-package.ps1 -Mode Verify
+
+      - name: Build the ARM64 package
+        shell: pwsh
+        run: ./eng/package-arm64.ps1 -Configuration Release
+
+      - name: Verify the release
+        shell: pwsh
+        run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -SkipPackaging
+
+      - name: Confirm the artifact does not claim to be signed
+        shell: pwsh
+        run: |
+          $contents = Get-Content artifacts/package/contents.json -Raw | ConvertFrom-Json
+          if ($contents.signed) { throw 'The artifact claims a signature this release does not have.' }
+          if ($contents.secretScan.hits -ne 0) { throw 'The payload matched a secret pattern.' }
+          Write-Output "Unsigned as declared; $($contents.layoutFileCount) file(s) scanned clean."
+
+      # SEC-003: without this signature every installation refuses the release, and the symptom on
+      # every machine is "you already have the most recent version".
+      - name: Confirm the checksums are signed and verify
+        shell: pwsh
+        run: |
+          $sums = 'artifacts/package/SHA256SUMS.txt'
+          if (-not (Test-Path "$sums.minisig")) { throw 'SHA256SUMS.txt is not signed; is RELEASE_SIGNING_SECRET_KEY set?' }
+          dotnet run --project eng/tools/ReleaseSigning -- verify $sums "$sums.minisig" eng/release-signing.pub
+          if ($LASTEXITCODE -ne 0) { throw 'The signature does not verify against the embedded public key.' }
+
+      # The independent updater reads the release notes: without the bilingual summary and the
+      # published hash it refuses the version, and the symptom on every machine is the reassuring
+      # one — "you already have the most recent version". eng/package-x64.ps1 generates them from
+      # the two changelogs and the hashes it just computed, and ReleaseNotesTests, which the
+      # verification above runs, hands them to the real provider and asks the real policy whether
+      # this release would actually be offered.
+      - name: Confirm the notes are ones the updater would offer
+        shell: pwsh
+        run: |
+          $notes = 'artifacts/package/release-notes.md'
+          if (-not (Test-Path $notes)) { throw 'The release notes were not generated.' }
+          Write-Output "Release notes ready to paste: $((Get-Item $notes).Length) bytes."
+
+      - name: Upload the artifact and everything that verifies it
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: apreelume-win-x64
+          if-no-files-found: error
+          path: |
+            artifacts/package/*.msix
+            artifacts/package/*.zip
+            artifacts/package/SHA256SUMS.txt
+            artifacts/package/SHA256SUMS.txt.minisig
+            artifacts/package/release-notes.md
+            artifacts/package/winget/
+            artifacts/package/contents.json
+            artifacts/package/lifecycle.json
+            artifacts/package/reproducibility.json
+            artifacts/package/sbom/
+
+      # The ARM64 artifact travels with its matrix, never without it. Cross-building it proves the
+      # package; it proves nothing about running it, and arm64-matrix.json is where that distinction
+      # is written down for whoever decides what to publish.
+      - name: Upload the ARM64 artifact and its matrix
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: apreelume-win-arm64
+          if-no-files-found: error
+          path: |
+            artifacts/package-arm64/*.msix
+            artifacts/package-arm64/*.zip
+            artifacts/package-arm64/SHA256SUMS.txt
+            artifacts/package-arm64/contents.json
+            artifacts/package-arm64/arm64-matrix.json
+            artifacts/package-arm64/sbom/
+
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-test-results
+          path: artifacts/test-results
+          if-no-files-found: warn

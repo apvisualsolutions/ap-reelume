@@ -1,0 +1,44 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Metadata.MetadataEditorView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="using:Avalonia.Automation"
+    xmlns:metadata="using:ApSolutions.LocalMedia.Presentation.Metadata"
+    x:DataType="metadata:MetadataEditorViewModel"
+    automation:AutomationProperties.Name="{DynamicResource MetadataEditorAccessibleName}">
+  <ScrollViewer>
+    <Grid Margin="24" ColumnDefinitions="2*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="12">
+      <TextBlock Grid.ColumnSpan="2" FontSize="28" FontWeight="SemiBold" Text="{DynamicResource MetadataEditorTitle}" />
+
+      <TextBox Grid.Row="1" Text="{Binding Title}" automation:AutomationProperties.Name="{DynamicResource MetadataTitleLabel}" />
+      <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding LockTitle}" Content="{DynamicResource MetadataLockTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataLockTitle}" />
+
+      <TextBox Grid.Row="2" Text="{Binding OriginalTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataOriginalTitleLabel}" />
+      <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding LockOriginalTitle}" Content="{DynamicResource MetadataLockOriginalTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataLockOriginalTitle}" />
+
+      <TextBox Grid.Row="3" AcceptsReturn="True" MinHeight="72" Text="{Binding Overview}" automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+      <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding LockOverview}" Content="{DynamicResource MetadataLockOverview}" automation:AutomationProperties.Name="{DynamicResource MetadataLockOverview}" />
+
+      <TextBox Grid.Row="4" Text="{Binding ReleaseYear}" automation:AutomationProperties.Name="{DynamicResource MetadataReleaseYearLabel}" />
+      <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding LockReleaseYear}" Content="{DynamicResource MetadataLockReleaseYear}" automation:AutomationProperties.Name="{DynamicResource MetadataLockReleaseYear}" />
+
+      <TextBox Grid.Row="5" Text="{Binding Genres}" automation:AutomationProperties.Name="{DynamicResource MetadataGenresLabel}" />
+      <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding LockGenres}" Content="{DynamicResource MetadataLockGenres}" automation:AutomationProperties.Name="{DynamicResource MetadataLockGenres}" />
+
+      <TextBox Grid.Row="6" Text="{Binding PosterPath}" automation:AutomationProperties.Name="{DynamicResource MetadataPosterLabel}" />
+      <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding LockPosterPath}" Content="{DynamicResource MetadataLockPoster}" automation:AutomationProperties.Name="{DynamicResource MetadataLockPoster}" />
+
+      <TextBox Grid.Row="7" Text="{Binding BackdropPath}" automation:AutomationProperties.Name="{DynamicResource MetadataBackdropLabel}" />
+      <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding LockBackdropPath}" Content="{DynamicResource MetadataLockBackdrop}" automation:AutomationProperties.Name="{DynamicResource MetadataLockBackdrop}" />
+
+      <TextBox Name="ArtworkAlternativeText" Grid.Row="8" Grid.ColumnSpan="2" Text="{Binding ArtworkPicker.AlternativeText}" automation:AutomationProperties.Name="{DynamicResource ArtworkAlternativeTextLabel}" />
+
+      <TextBlock Grid.Row="9" Grid.ColumnSpan="2" IsVisible="{Binding HasConflict}" Text="{DynamicResource MetadataConflictMessage}" />
+      <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+        <Button Command="{Binding SaveCommand}" Content="{DynamicResource MetadataSaveAction}" automation:AutomationProperties.Name="{DynamicResource MetadataSaveAction}" />
+        <Button Command="{Binding RefreshProviderCommand}" Content="{DynamicResource MetadataRefreshAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRefreshAction}" />
+        <Button Name="RestoreProviderMetadata" Command="{Binding RestoreProviderCommand}" Content="{DynamicResource MetadataRestoreAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRestoreAction}" />
+      </StackPanel>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

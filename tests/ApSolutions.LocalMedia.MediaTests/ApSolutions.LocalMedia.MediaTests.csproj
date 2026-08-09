@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Application\ApSolutions.LocalMedia.Application.csproj" />
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Domain\ApSolutions.LocalMedia.Domain.csproj" />
+    <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Infrastructure\ApSolutions.LocalMedia.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Fixtures\media-manifest.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\segment-corpus-manifest.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,61 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Recovery.DatabaseRecoveryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:recovery="clr-namespace:ApSolutions.LocalMedia.Presentation.Recovery"
+    x:DataType="recovery:DatabaseRecoveryViewModel"
+    automation:AutomationProperties.Name="{DynamicResource RecoveryAccessibleName}">
+  <Border Padding="48" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel MaxWidth="720" Spacing="16">
+      <TextBlock
+          FontSize="30"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RecoveryTitle}" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RecoveryDescription}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RecoveryDatabasePathLabel}" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{Binding DatabasePath}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RecoveryBackupPathLabel}" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{Binding BackupPath}"
+          TextWrapping="Wrap" />
+      <Border
+          Padding="12"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="8">
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding FailureDetail}"
+            TextWrapping="Wrap" />
+      </Border>
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource RecoveryOpenBackupFolder}"
+            Command="{Binding RecoveryCommand}"
+            CommandParameter="{x:Static recovery:DatabaseRecoveryAction.OpenBackupFolder}"
+            Content="{DynamicResource RecoveryOpenBackupFolder}" />
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource RecoveryExit}"
+            Command="{Binding RecoveryCommand}"
+            CommandParameter="{x:Static recovery:DatabaseRecoveryAction.Exit}"
+            Content="{DynamicResource RecoveryExit}" />
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

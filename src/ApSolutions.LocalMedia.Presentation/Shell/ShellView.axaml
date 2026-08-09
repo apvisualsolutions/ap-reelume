@@ -1,0 +1,338 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Shell.ShellView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:about="clr-namespace:ApSolutions.LocalMedia.Presentation.About"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:backup="clr-namespace:ApSolutions.LocalMedia.Presentation.Backup"
+    xmlns:navigation="clr-namespace:ApSolutions.LocalMedia.Presentation.Navigation"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
+    xmlns:metadata="clr-namespace:ApSolutions.LocalMedia.Presentation.Metadata"
+    xmlns:onboarding="clr-namespace:ApSolutions.LocalMedia.Presentation.Onboarding"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    xmlns:shell="clr-namespace:ApSolutions.LocalMedia.Presentation.Shell"
+    xmlns:updates="clr-namespace:ApSolutions.LocalMedia.Presentation.Updates"
+    x:DataType="shell:ShellViewModel"
+    automation:AutomationProperties.Name="{DynamicResource ShellAccessibleName}">
+  <UserControl.Resources>
+    <navigation:RouteStateConverter x:Key="RouteGlyph" Kind="Glyph" />
+    <navigation:RouteStateConverter x:Key="RouteStatus" Kind="Status" />
+  </UserControl.Resources>
+  <Grid Background="{DynamicResource ShellSurfaceBrush}" ColumnDefinitions="248,*">
+    <Border
+        Padding="20"
+        Background="{DynamicResource NavigationSurfaceBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <TextBlock
+            FontSize="24"
+            FontWeight="SemiBold"
+            Text="{DynamicResource ProductDisplayName}"
+            automation:AutomationProperties.HeadingLevel="1" />
+
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,28,0,0"
+            Spacing="8"
+            automation:AutomationProperties.Name="{DynamicResource MainNavigationAccessibleName}">
+          <Button
+              Classes="navigation-destination"
+              HorizontalContentAlignment="Left"
+              automation:AutomationProperties.Name="{DynamicResource NavigationHome}"
+              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Home}}"
+              Command="{Binding NavigateCommand}"
+              CommandParameter="{x:Static navigation:AppRoute.Home}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
+              <TextBlock Text="{DynamicResource NavigationHome}" />
+            </StackPanel>
+          </Button>
+          <Button
+              Classes="navigation-destination"
+              HorizontalContentAlignment="Left"
+              automation:AutomationProperties.Name="{DynamicResource NavigationLibrary}"
+              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Library}}"
+              Command="{Binding NavigateCommand}"
+              CommandParameter="{x:Static navigation:AppRoute.Library}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
+              <TextBlock Text="{DynamicResource NavigationLibrary}" />
+            </StackPanel>
+          </Button>
+          <Button
+              Classes="navigation-destination"
+              HorizontalContentAlignment="Left"
+              automation:AutomationProperties.Name="{DynamicResource NavigationReview}"
+              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Review}}"
+              Command="{Binding NavigateCommand}"
+              CommandParameter="{x:Static navigation:AppRoute.Review}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
+              <TextBlock Text="{DynamicResource NavigationReview}" />
+            </StackPanel>
+          </Button>
+          <Button
+              Classes="navigation-destination"
+              HorizontalContentAlignment="Left"
+              automation:AutomationProperties.Name="{DynamicResource NavigationBackups}"
+              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Backups}}"
+              Command="{Binding NavigateCommand}"
+              CommandParameter="{x:Static navigation:AppRoute.Backups}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
+              <TextBlock Text="{DynamicResource NavigationBackups}" />
+            </StackPanel>
+          </Button>
+          <Button
+              Classes="navigation-destination"
+              HorizontalContentAlignment="Left"
+              automation:AutomationProperties.Name="{DynamicResource NavigationSettings}"
+              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Settings}}"
+              Command="{Binding NavigateCommand}"
+              CommandParameter="{x:Static navigation:AppRoute.Settings}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
+              <TextBlock Text="{DynamicResource NavigationSettings}" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+
+        <Border
+            x:Name="AboutBrandSurface"
+            Grid.Row="2"
+            Padding="12"
+            Background="{DynamicResource AccentSubtleBrush}"
+            CornerRadius="8"
+            automation:AutomationProperties.Name="{DynamicResource AboutAccessibleName}">
+          <StackPanel Spacing="2">
+            <TextBlock
+                FontWeight="SemiBold"
+                Text="{DynamicResource ProductDisplayName}" />
+            <TextBlock
+                FontSize="12"
+                Text="{DynamicResource PublisherSignature}" />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Border>
+
+    <Grid
+        Grid.Column="1"
+        Margin="48"
+        IsVisible="{Binding IsPrimaryContentVisible}"
+        RowDefinitions="Auto,Auto,*">
+      <TextBlock
+          FontSize="34"
+          FontWeight="SemiBold"
+          Text="{DynamicResource WelcomeTitle}" />
+      <TextBlock
+          Grid.Row="1"
+          MaxWidth="680"
+          Margin="0,14,0,0"
+          FontSize="17"
+          Text="{DynamicResource WelcomeDescription}"
+          TextWrapping="Wrap" />
+      <Border
+          Grid.Row="2"
+          Margin="0,36,0,0"
+          Padding="28"
+          Background="{DynamicResource CardSurfaceBrush}"
+          CornerRadius="12"
+          automation:AutomationProperties.Name="{DynamicResource CurrentAreaAccessibleName}">
+        <StackPanel VerticalAlignment="Center" Spacing="10">
+          <TextBlock
+              HorizontalAlignment="Center"
+              FontSize="22"
+              FontWeight="SemiBold"
+              Text="{DynamicResource EmptyLibraryTitle}" />
+          <TextBlock
+              MaxWidth="520"
+              HorizontalAlignment="Center"
+              Text="{DynamicResource EmptyLibraryDescription}"
+              TextAlignment="Center"
+              TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+    </Grid>
+    <ContentControl
+        Grid.Column="1"
+        IsVisible="{Binding IsHomeVisible}">
+      <home:HomeView DataContext="{Binding Home}" />
+    </ContentControl>
+    <ScrollViewer
+        Grid.Column="1"
+        IsVisible="{Binding IsSettingsVisible}">
+      <StackPanel Margin="0,0,0,24" Spacing="24">
+        <settings:AppearanceSettingsView DataContext="{Binding AppearanceSettings}" />
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasRecommendationSettings}">
+          <settings:RecommendationSettingsView DataContext="{Binding RecommendationSettings}" />
+        </ContentControl>
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasScanSettings}">
+          <settings:ScanSettingsView DataContext="{Binding ScanSettings}" />
+        </ContentControl>
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasShortcuts}">
+          <player:ShortcutSettingsView DataContext="{Binding Shortcuts}" />
+        </ContentControl>
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasSubtitleStyle}">
+          <player:SubtitleStyleView DataContext="{Binding SubtitleStyle}" />
+        </ContentControl>
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasSegmentDetection}">
+          <settings:SegmentDetectionSettingsView DataContext="{Binding SegmentDetection}" />
+        </ContentControl>
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasLifecycleSettings}">
+          <settings:LifecycleSettingsView DataContext="{Binding LifecycleSettings}" />
+        </ContentControl>
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasPrivacySettings}">
+          <settings:PrivacySettingsView DataContext="{Binding PrivacySettings}" />
+        </ContentControl>
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasUpdates}">
+          <updates:UpdateView DataContext="{Binding Updates}" />
+        </ContentControl>
+        <about:CreditsView x:Name="CreditsSurface" Margin="48,0" />
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer
+        Grid.Column="1"
+        Margin="48"
+        IsVisible="{Binding IsLibraryVisible}">
+      <StackPanel Spacing="24">
+        <ContentControl IsVisible="{Binding HasOnboarding}">
+          <onboarding:RootOnboardingView DataContext="{Binding Onboarding}" />
+        </ContentControl>
+        <library:LibraryView DataContext="{Binding Library}" />
+        <StackPanel
+            x:Name="TitleActionsSurface"
+            Orientation="Horizontal"
+            Spacing="8"
+            automation:AutomationProperties.Name="{DynamicResource TitleActionsAccessibleName}">
+          <Button
+              automation:AutomationProperties.Name="{DynamicResource TitleEditMetadataAction}"
+              Command="{Binding EditMetadataCommand}"
+              Content="{DynamicResource TitleEditMetadataAction}" />
+          <Button
+              automation:AutomationProperties.Name="{DynamicResource TitlePreviewRenameAction}"
+              Command="{Binding PreviewRenameCommand}"
+              Content="{DynamicResource TitlePreviewRenameAction}" />
+          <Button
+              automation:AutomationProperties.Name="{DynamicResource TitleReviewDuplicatesAction}"
+              Command="{Binding ReviewDuplicatesCommand}"
+              Content="{DynamicResource TitleReviewDuplicatesAction}" />
+        </StackPanel>
+        <ContentControl IsVisible="{Binding HasMetadataEditor}">
+          <metadata:MetadataEditorView DataContext="{Binding MetadataEditor}" />
+        </ContentControl>
+        <ContentControl IsVisible="{Binding HasRename}">
+          <metadata:RenamePreviewView DataContext="{Binding Rename}" />
+        </ContentControl>
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer
+        Grid.Column="1"
+        Margin="48"
+        IsVisible="{Binding IsReviewVisible}">
+      <StackPanel Spacing="24">
+        <review:ReviewInboxView DataContext="{Binding ReviewInbox}" />
+        <ContentControl IsVisible="{Binding HasDuplicates}">
+          <review:DuplicateReviewView DataContext="{Binding Duplicates}" />
+        </ContentControl>
+      </StackPanel>
+    </ScrollViewer>
+    <ScrollViewer
+        Grid.Column="1"
+        Margin="48"
+        IsVisible="{Binding IsBackupsVisible}">
+      <StackPanel Margin="0,0,0,24" Spacing="24">
+        <backup:BackupView DataContext="{Binding Backups}" />
+        <ContentControl IsVisible="{Binding HasRestore}">
+          <backup:RestoreWizardView DataContext="{Binding Restore}" />
+        </ContentControl>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Grid
+        x:Name="PlayerSurface"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
+        Background="{DynamicResource ShellSurfaceBrush}"
+        ColumnDefinitions="*,320"
+        IsVisible="{Binding IsPlayerVisible}"
+        automation:AutomationProperties.Name="{DynamicResource PlayerSessionAccessibleName}">
+      <ContentControl x:Name="PlayerHost">
+        <Panel x:Name="PlayerStage">
+        <player:PlayerView DataContext="{Binding Player.Player}" />
+        <ContentControl IsVisible="{Binding HasVideoStatus}">
+          <player:VideoStatusOverlay DataContext="{Binding Player.VideoStatus}" />
+        </ContentControl>
+        <ContentControl IsVisible="{Binding HasSkipMarker}">
+          <player:SkipMarkerButton DataContext="{Binding Player.Skip}" />
+        </ContentControl>
+        <ContentControl IsVisible="{Binding HasNextEpisode}">
+          <player:NextEpisodeOverlay DataContext="{Binding Player.NextEpisode}" />
+        </ContentControl>
+        <ContentControl IsVisible="{Binding HasResumePrompt}">
+          <player:ResumePromptView DataContext="{Binding Player.Resume}" />
+        </ContentControl>
+        <ContentControl IsVisible="{Binding HasVersionSwitch}">
+          <player:VersionSwitchDialog DataContext="{Binding Player.VersionSwitch}" />
+        </ContentControl>
+        <ContentControl IsVisible="{Binding HasLooseFile}">
+          <player:LooseFileBanner DataContext="{Binding Player.LooseFile}" />
+        </ContentControl>
+        </Panel>
+      </ContentControl>
+      <ScrollViewer Grid.Column="1" Margin="16">
+        <StackPanel Spacing="16">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource PlayerCloseAction}"
+                Command="{Binding ClosePlayerCommand}"
+                Content="{DynamicResource PlayerCloseAction}" />
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource PlayerMiniModeAction}"
+                Command="{Binding ToggleMiniPlayerCommand}"
+                Content="{DynamicResource PlayerMiniModeAction}" />
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource PlayerFullscreenAction}"
+                Command="{Binding ToggleFullscreenCommand}"
+                Content="{DynamicResource PlayerFullscreenAction}" />
+          </StackPanel>
+          <ContentControl IsVisible="{Binding HasTracks}">
+            <player:TrackSelectorView DataContext="{Binding Player.Tracks}" />
+          </ContentControl>
+          <ContentControl IsVisible="{Binding HasAudioOutput}">
+            <player:AudioOutputView DataContext="{Binding Player.AudioOutput}" />
+          </ContentControl>
+          <ContentControl IsVisible="{Binding HasMarkers}">
+            <player:MarkerEditorView DataContext="{Binding Player.Markers}" />
+          </ContentControl>
+          <ContentControl IsVisible="{Binding HasDetectedReview}">
+            <player:DetectedMarkerReviewView DataContext="{Binding Player.DetectedReview}" />
+          </ContentControl>
+          <ContentControl IsVisible="{Binding HasPlayerVersions}">
+            <player:PlayerVersionsView DataContext="{Binding Player.Versions}" />
+          </ContentControl>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Grid>
+</UserControl>

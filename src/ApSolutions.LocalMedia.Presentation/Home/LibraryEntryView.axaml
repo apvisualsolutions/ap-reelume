@@ -1,0 +1,45 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Home.LibraryEntryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    x:DataType="home:HomeViewModel"
+    automation:AutomationProperties.Name="{DynamicResource HomeLibraryEntryAccessibleName}">
+  <Border
+      Padding="16"
+      Background="{DynamicResource CardSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="10">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+      <StackPanel Spacing="2">
+        <TextBlock
+            FontSize="18"
+            FontWeight="SemiBold"
+            Text="{DynamicResource HomeLibraryHeading}" />
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="{Binding MovieCount}" />
+          <TextBlock Text="{DynamicResource HomeLibraryMoviesLabel}" />
+          <TextBlock Text="{DynamicResource HomeCountSeparator}" />
+          <TextBlock Text="{Binding ShowCount}" />
+          <TextBlock Text="{DynamicResource HomeLibraryShowsLabel}" />
+        </StackPanel>
+        <StackPanel
+            IsVisible="{Binding HasUnavailable}"
+            Orientation="Horizontal"
+            Spacing="6">
+          <TextBlock Text="{Binding UnavailableCount}" />
+          <TextBlock Text="{DynamicResource HomeLibraryUnavailableLabel}" />
+        </StackPanel>
+      </StackPanel>
+      <Button
+          x:Name="LibraryEntryAction"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          Command="{Binding OpenLibraryCommand}"
+          Content="{DynamicResource HomeLibraryAction}"
+          automation:AutomationProperties.Name="{DynamicResource HomeLibraryAction}" />
+    </Grid>
+  </Border>
+</UserControl>

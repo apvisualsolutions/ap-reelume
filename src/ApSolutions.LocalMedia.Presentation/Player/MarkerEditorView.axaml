@@ -1,0 +1,69 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.MarkerEditorView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:MarkerEditorViewModel"
+    automation:AutomationProperties.Name="{DynamicResource MarkerEditorAccessibleName}">
+  <StackPanel x:Name="MarkerEditorSurface" Spacing="12">
+    <TextBlock
+        x:Name="MarkerEditorHeadline"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource MarkerEditorDescription}"
+        TextWrapping="Wrap" />
+
+    <ListBox
+        x:Name="MarkerList"
+        MinHeight="96"
+        ItemsSource="{Binding Markers}"
+        SelectedItem="{Binding SelectedMarker, Mode=TwoWay}"
+        automation:AutomationProperties.Name="{DynamicResource MarkerEditorListName}" />
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <ComboBox
+          x:Name="MarkerKindSelector"
+          MinWidth="160"
+          ItemsSource="{x:Static player:MarkerEditorViewModel.Kinds}"
+          SelectedItem="{Binding SelectedKind, Mode=TwoWay}"
+          automation:AutomationProperties.Name="{DynamicResource MarkerEditorKindLabel}" />
+      <NumericUpDown
+          x:Name="MarkerStartSelector"
+          Minimum="0"
+          Value="{Binding StartSeconds, Mode=TwoWay}"
+          automation:AutomationProperties.Name="{DynamicResource MarkerEditorStartLabel}" />
+      <NumericUpDown
+          x:Name="MarkerEndSelector"
+          Minimum="0"
+          Value="{Binding EndSeconds, Mode=TwoWay}"
+          automation:AutomationProperties.Name="{DynamicResource MarkerEditorEndLabel}" />
+    </StackPanel>
+
+    <TextBlock
+        x:Name="MarkerRangeErrorText"
+        IsVisible="{Binding HasRangeError}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource MarkerEditorRangeError}"
+        TextWrapping="Wrap" />
+
+    <TextBlock
+        x:Name="MarkerOverlapErrorText"
+        IsVisible="{Binding HasOverlapError}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource MarkerEditorOverlapError}"
+        TextWrapping="Wrap" />
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <Button
+          x:Name="SaveMarkerButton"
+          Command="{Binding SaveCommand}"
+          Content="{DynamicResource MarkerEditorSave}"
+          automation:AutomationProperties.Name="{DynamicResource MarkerEditorSave}" />
+      <Button
+          x:Name="DeleteMarkerButton"
+          Command="{Binding DeleteCommand}"
+          Content="{DynamicResource MarkerEditorDelete}"
+          automation:AutomationProperties.Name="{DynamicResource MarkerEditorDelete}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

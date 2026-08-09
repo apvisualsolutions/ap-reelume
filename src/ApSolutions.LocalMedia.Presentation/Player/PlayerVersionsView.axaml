@@ -1,0 +1,29 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.PlayerVersionsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:PlayerVersionsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PlayerVersionsAccessibleName}">
+  <StackPanel Spacing="8" IsVisible="{Binding HasAlternatives}">
+    <TextBlock
+        FontSize="16"
+        FontWeight="SemiBold"
+        Text="{DynamicResource PlayerVersionsTitle}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <ItemsControl ItemsSource="{Binding Alternatives}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="player:PlayerVersionRowViewModel">
+          <StackPanel Margin="0,2" Orientation="Horizontal" Spacing="12">
+            <TextBlock VerticalAlignment="Center" Text="{Binding QualityLabel}" />
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource PlayerVersionsSwitchAction}"
+                Command="{Binding SwitchCommand}"
+                Content="{DynamicResource PlayerVersionsSwitchAction}" />
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>

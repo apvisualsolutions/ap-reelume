@@ -1,0 +1,79 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Catalog.PersonalActionsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:catalog="clr-namespace:ApSolutions.LocalMedia.Presentation.Catalog"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    x:DataType="catalog:PersonalActionsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PersonalActionsAccessibleName}">
+  <StackPanel Spacing="8">
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <ToggleButton
+          Command="{Binding ToggleFavoriteCommand}"
+          Content="{DynamicResource PersonalFavoriteAction}"
+          IsChecked="{Binding IsFavorite, Mode=OneWay}"
+          automation:AutomationProperties.Name="{DynamicResource PersonalFavoriteAction}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding IsFavorite}"
+          Text="{DynamicResource PersonalFavoriteOn}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding IsNotFavorite}"
+          Text="{DynamicResource PersonalFavoriteOff}" />
+    </WrapPanel>
+
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <ToggleButton
+          Command="{Binding ToggleWatchLaterCommand}"
+          Content="{DynamicResource PersonalWatchLaterAction}"
+          IsChecked="{Binding IsWatchLater, Mode=OneWay}"
+          automation:AutomationProperties.Name="{DynamicResource PersonalWatchLaterAction}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding IsWatchLater}"
+          Text="{DynamicResource PersonalWatchLaterOn}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding IsNotWatchLater}"
+          Text="{DynamicResource PersonalWatchLaterOff}" />
+    </WrapPanel>
+
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <TextBlock
+          VerticalAlignment="Center"
+          Text="{DynamicResource PersonalRatingLabel}" />
+      <ItemsControl ItemsSource="{Binding RatingChoices}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel ItemSpacing="4" LineSpacing="4" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sys:Int32">
+            <Button
+                MinWidth="36"
+                Click="OnRatingClick"
+                Content="{Binding}"
+                Tag="{Binding}"
+                automation:AutomationProperties.Name="{DynamicResource PersonalRatingLabel}"
+                automation:AutomationProperties.HelpText="{Binding}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding HasRating}"
+          Text="{Binding RatingText}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding HasNoRating}"
+          Text="{DynamicResource PersonalRatingNone}" />
+      <Button
+          Command="{Binding ClearRatingCommand}"
+          Content="{DynamicResource PersonalRatingClearAction}"
+          automation:AutomationProperties.Name="{DynamicResource PersonalRatingClearAction}" />
+    </WrapPanel>
+  </StackPanel>
+</UserControl>
