@@ -62,7 +62,7 @@ jobs:
         run: ./eng/run-recovery.ps1 -Mode Verify -Passes 2
       - name: Upload audit gate evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: audit-gates
           path: |
@@ -71,7 +71,7 @@ jobs:
           if-no-files-found: warn
       - name: Upload the ARM64 matrix
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: arm64-matrix
           path: |
@@ -81,7 +81,7 @@ jobs:
           if-no-files-found: warn
       - name: Upload test evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: test-results
           path: artifacts/test-results
