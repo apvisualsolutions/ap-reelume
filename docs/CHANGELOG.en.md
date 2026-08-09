@@ -53,6 +53,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Security
 
+- **Continuous integration can no longer reach a personal machine.** While the repository was
+  private, verification could be routed to a self-hosted runner through a repository variable; now
+  that it is public, that hatch was a standing invitation for a fork pull request's CI to run on the
+  owner's machine the moment the variable reappeared. The workflow no longer consults it and always
+  runs on hosted runners, which are free on public repositories.
+- **The one external tool that seals a release is pinned by version.** Every action was already
+  SHA-pinned and NuGet was locked, but ffmpeg was installed from the community feed at whatever the
+  latest version happened to be: it was the only unpinned third-party executable on the machine that
+  packages and signs. It now installs a specific version that moves only by a deliberate edit, just
+  like the action SHAs.
 - **The published digests are signed, and the updater demands the signature.** The hash an update
   is checked against travelled in the same unsigned answer as the package it vouches for: whoever
   altered the answer could alter both at once. Every release now signs its digests with a minisign

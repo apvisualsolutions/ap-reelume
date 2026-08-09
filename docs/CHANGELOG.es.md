@@ -54,6 +54,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Seguridad
 
+- **La integración continua ya no puede salir a una máquina personal.** Cuando el repositorio era
+  privado, la verificación podía enrutarse a un runner propio a través de una variable del
+  repositorio; ahora que es público, esa puerta era una invitación a que el CI de un pull request
+  ajeno se ejecutara en la máquina del propietario en cuanto la variable reapareciera. El flujo de
+  trabajo ya no la consulta y corre siempre en los runners hospedados, que son gratuitos en los
+  repositorios públicos.
+- **La única herramienta externa que sella la publicación queda fijada por versión.** Todas las
+  acciones ya iban ancladas por SHA y NuGet en modo bloqueado, pero ffmpeg se instalaba desde el
+  canal de la comunidad tomando siempre la última versión: era el único ejecutable de terceros sin
+  fijar en la máquina que empaqueta y firma. Ahora se instala una versión concreta que sólo se mueve
+  por una edición deliberada, igual que los SHA de las acciones.
 - **Las huellas publicadas van firmadas y el actualizador exige la firma.** El hash con el que se
   comprueba una actualización viajaba en la misma respuesta sin firmar que el paquete al que avala:
   quien alterase la respuesta podía alterar ambos a la vez. Ahora cada publicación firma sus
