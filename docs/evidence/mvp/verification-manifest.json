@@ -1,0 +1,945 @@
+{
+  "release": "MVP",
+  "version": "0.1.0",
+  "commit": "50a298221735a413171bddfe5b33b331ec97b448",
+  "runtime": "win-x64",
+  "signed": false,
+  "artifacts": [
+    {
+      "name": "APSolutions.LocalMedia_0.1.0_x64.msix",
+      "sha256": "d320a407b519593141e805cb57fee0e4948d64ad7101b34e52e200e2726d8c96"
+    },
+    {
+      "name": "ApReelume-0.1.0-win-x64.zip",
+      "sha256": "a3d900afec9a56077f658edf3fc3dac75a9c7082273cc0090fd45cfd72e160cf"
+    }
+  ],
+  "summary": {
+    "total": 46,
+    "verified": 43,
+    "outOfScope": 1,
+    "blocked": 2
+  },
+  "features": [
+    {
+      "id": "PRD-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T2",
+        "T36",
+        "T4",
+        "T41",
+        "T5"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.ArchitectureTests",
+        "ApSolutions.LocalMedia.DocumentationTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T2-shell-localization.md",
+        "docs/evidence/mvp/T36-backup-export.md",
+        "docs/evidence/mvp/T4-sqlite.md",
+        "docs/evidence/mvp/T41-release-gate.md",
+        "docs/evidence/mvp/T5-roots.md"
+      ]
+    },
+    {
+      "id": "PRD-002",
+      "status": "IMPLEMENTED",
+      "tasks": [
+        "T40"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.ArchitectureTests",
+        "ApSolutions.LocalMedia.DocumentationTests",
+        "ApSolutions.LocalMedia.PackagingTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T40-x64-packaging.md",
+        "docs/evidence/mvp/windows-lifecycle.json"
+      ],
+      "blocker": {
+        "reason": "El ciclo MSIX se verificó contra una copia resellada con un certificado desechable; el artefacto publicado no va firmado y Windows lo rechaza con 0x80073D2C en una máquina corriente. / The MSIX cycle was verified against a copy re-signed with a throwaway certificate; the published artifact is unsigned and Windows refuses it with 0x80073D2C on an ordinary machine.",
+        "owner": "Product Owner",
+        "unblockCondition": "Una decisión de firma (certificado, Store, o canal ZIP como única vía) y repetir el ciclo de instalación sobre el artefacto realmente publicado. / A signing decision (certificate, Store, or ZIP as the only channel) and a repeat of the install cycle on the artifact actually published."
+      }
+    },
+    {
+      "id": "PRD-004",
+      "status": "VERIFIED",
+      "tasks": [
+        "T1",
+        "T18",
+        "T4"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.ArchitectureTests",
+        "ApSolutions.LocalMedia.DocumentationTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T1-foundation.md",
+        "docs/evidence/mvp/T18-libvlc-spike.md",
+        "docs/evidence/mvp/T4-sqlite.md"
+      ]
+    },
+    {
+      "id": "PRD-005",
+      "status": "VERIFIED",
+      "tasks": [
+        "T1",
+        "T19",
+        "T39B",
+        "T40"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.ArchitectureTests",
+        "ApSolutions.LocalMedia.DocumentationTests",
+        "ApSolutions.LocalMedia.PackagingTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T1-foundation.md",
+        "docs/evidence/mvp/T19-codec-matrix.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/mvp/T40-x64-packaging.md"
+      ]
+    },
+    {
+      "id": "LIB-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "C2",
+        "T39B",
+        "T5"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/C2-library-gate.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/mvp/T5-roots.md"
+      ]
+    },
+    {
+      "id": "LIB-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "C2",
+        "T10",
+        "T39",
+        "T39B",
+        "T6",
+        "T9"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.PerformanceTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/C2-library-gate.md",
+        "docs/evidence/mvp/T10-10k-performance.md",
+        "docs/evidence/mvp/T39-recovery-load.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/mvp/T6-scan.md",
+        "docs/evidence/mvp/T9-watching.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "LIB-003",
+      "status": "VERIFIED",
+      "tasks": [
+        "T9"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T9-watching.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "LIB-004",
+      "status": "VERIFIED",
+      "tasks": [
+        "C2",
+        "T10",
+        "T6",
+        "T7"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.PerformanceTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/C2-library-gate.md",
+        "docs/evidence/mvp/T10-10k-performance.md",
+        "docs/evidence/mvp/T6-scan.md",
+        "docs/evidence/mvp/T7-catalog-search.md"
+      ]
+    },
+    {
+      "id": "LIB-005",
+      "status": "VERIFIED",
+      "tasks": [
+        "T11"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T11-name-parser.md"
+      ]
+    },
+    {
+      "id": "LIB-006",
+      "status": "VERIFIED",
+      "tasks": [
+        "T12",
+        "T13",
+        "T14",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T12-confidence.md",
+        "docs/evidence/mvp/T13-tmdb.md",
+        "docs/evidence/mvp/T14-review-inbox.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "LIB-007",
+      "status": "VERIFIED",
+      "tasks": [
+        "T12",
+        "T14",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T12-confidence.md",
+        "docs/evidence/mvp/T14-review-inbox.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "LIB-008",
+      "status": "VERIFIED",
+      "tasks": [
+        "T12",
+        "T15",
+        "T27",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T12-confidence.md",
+        "docs/evidence/mvp/T15-duplicates.md",
+        "docs/evidence/mvp/T27-version-progress.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "LIB-009",
+      "status": "VERIFIED",
+      "tasks": [
+        "T27",
+        "T37",
+        "T8"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T27-version-progress.md",
+        "docs/evidence/mvp/T37-disaster-recovery.md",
+        "docs/evidence/mvp/T8-identity-availability.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "LIB-010",
+      "status": "VERIFIED",
+      "tasks": [
+        "C2",
+        "T28",
+        "T37",
+        "T39",
+        "T5",
+        "T8",
+        "T9"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/C2-library-gate.md",
+        "docs/evidence/mvp/T28-next-episode.md",
+        "docs/evidence/mvp/T37-disaster-recovery.md",
+        "docs/evidence/mvp/T39-recovery-load.md",
+        "docs/evidence/mvp/T5-roots.md",
+        "docs/evidence/mvp/T8-identity-availability.md",
+        "docs/evidence/mvp/T9-watching.md"
+      ]
+    },
+    {
+      "id": "LIB-011",
+      "status": "VERIFIED",
+      "tasks": [
+        "T13",
+        "T16",
+        "T36",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T13-tmdb.md",
+        "docs/evidence/mvp/T16-metadata-editing.md",
+        "docs/evidence/mvp/T36-backup-export.md",
+        "docs/evidence/mvp/T39B-assembly.md"
+      ]
+    },
+    {
+      "id": "LIB-012",
+      "status": "VERIFIED",
+      "tasks": [
+        "T17",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T17-safe-rename.md",
+        "docs/evidence/mvp/T39B-assembly.md"
+      ]
+    },
+    {
+      "id": "PLY-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T18",
+        "T19",
+        "T24",
+        "T35",
+        "T39",
+        "T39B",
+        "T40"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.PackagingTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/adr/0003-assemble-the-application-before-packaging-it.md",
+        "docs/evidence/mvp/T18-libvlc-spike.md",
+        "docs/evidence/mvp/T19-codec-matrix.md",
+        "docs/evidence/mvp/T24-windows-input.md",
+        "docs/evidence/mvp/T35-open-with.md",
+        "docs/evidence/mvp/T39-recovery-load.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/mvp/T40-x64-packaging.md"
+      ]
+    },
+    {
+      "id": "PLY-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "T19"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T19-codec-matrix.md"
+      ]
+    },
+    {
+      "id": "PLY-003",
+      "status": "VERIFIED",
+      "tasks": [
+        "T22",
+        "T40"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/adr/0005-verify-the-video-matrix-on-available-adapters.md",
+        "docs/evidence/mvp/hardware-video-matrix.md",
+        "docs/evidence/mvp/T22-hdr-acceleration.md",
+        "docs/evidence/mvp/T40-x64-packaging.md"
+      ]
+    },
+    {
+      "id": "PLY-004",
+      "status": "BLOCKED",
+      "tasks": [
+        "T20",
+        "T23",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T20-tracks-subtitles.md",
+        "docs/evidence/mvp/T23-audio-output.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ],
+      "blocker": {
+        "reason": "Ningún endpoint de render activo declara más de dos canales, así que la selección de 5.1 y 7.1 no se ha ejercido sobre hardware real. Los auriculares conectados son estéreo con virtualización, que Windows expone como dos canales. / No active render endpoint declares more than two channels, so 5.1 and 7.1 selection has not been exercised on real hardware.",
+        "owner": "Engineering",
+        "unblockCondition": "Cualquier endpoint de render que declare seis u ocho canales, y repetir la matriz de salida de audio: un receptor A/V o una televisión por HDMI, una salida S/PDIF con codificación multicanal habilitada en el controlador, o unos auriculares USB que expongan 5.1 o 7.1 de verdad en lugar de virtualizarlo. / Any render endpoint declaring six or eight channels, and a repeat of the audio output matrix: an A/V receiver or television over HDMI, an S/PDIF output with multichannel encoding enabled in the driver, or USB headphones that expose real 5.1 or 7.1 rather than virtualising it."
+      }
+    },
+    {
+      "id": "PLY-005",
+      "status": "VERIFIED",
+      "tasks": [
+        "T20",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T20-tracks-subtitles.md",
+        "docs/evidence/mvp/T39B-assembly.md"
+      ]
+    },
+    {
+      "id": "PLY-006",
+      "status": "VERIFIED",
+      "tasks": [
+        "T21"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T21-controls-limiter.md"
+      ]
+    },
+    {
+      "id": "PLY-007",
+      "status": "VERIFIED",
+      "tasks": [
+        "T18",
+        "T24"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T18-libvlc-spike.md",
+        "docs/evidence/mvp/T24-windows-input.md"
+      ]
+    },
+    {
+      "id": "PLY-008",
+      "status": "VERIFIED",
+      "tasks": [
+        "T25",
+        "T39",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T25-progress-resume.md",
+        "docs/evidence/mvp/T39-recovery-load.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-wp1-playback.md"
+      ]
+    },
+    {
+      "id": "PLY-009",
+      "status": "VERIFIED",
+      "tasks": [
+        "T26"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T26-watch-status.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "PLY-010",
+      "status": "VERIFIED",
+      "tasks": [
+        "T15",
+        "T27",
+        "T8"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T15-duplicates.md",
+        "docs/evidence/mvp/T27-version-progress.md",
+        "docs/evidence/mvp/T8-identity-availability.md"
+      ]
+    },
+    {
+      "id": "PLY-011",
+      "status": "VERIFIED",
+      "tasks": [
+        "T28"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T28-next-episode.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "PLY-012",
+      "status": "VERIFIED",
+      "tasks": [
+        "T29",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T29-manual-markers.md",
+        "docs/evidence/mvp/T39B-assembly.md"
+      ]
+    },
+    {
+      "id": "PLY-014",
+      "status": "VERIFIED",
+      "tasks": [
+        "T21",
+        "T24",
+        "T28",
+        "T33",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.AccessibilityTests",
+        "ApSolutions.LocalMedia.Domain.Tests",
+        "ApSolutions.LocalMedia.MediaTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T21-controls-limiter.md",
+        "docs/evidence/mvp/T24-windows-input.md",
+        "docs/evidence/mvp/T28-next-episode.md",
+        "docs/evidence/mvp/T33-accessibility.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-wp2-assembly.md"
+      ]
+    },
+    {
+      "id": "UX-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T26",
+        "T30",
+        "T39B",
+        "T7"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T26-watch-status.md",
+        "docs/evidence/mvp/T30-home-details.md",
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/mvp/T7-catalog-search.md"
+      ]
+    },
+    {
+      "id": "UX-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "T2",
+        "T3",
+        "T30",
+        "T33"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T2-shell-localization.md",
+        "docs/evidence/mvp/T3-theme.md",
+        "docs/evidence/mvp/T30-home-details.md",
+        "docs/evidence/mvp/T33-accessibility.md"
+      ]
+    },
+    {
+      "id": "UX-003",
+      "status": "VERIFIED",
+      "tasks": [
+        "T3",
+        "T30",
+        "T33"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T3-theme.md",
+        "docs/evidence/mvp/T30-home-details.md",
+        "docs/evidence/mvp/T33-accessibility.md"
+      ]
+    },
+    {
+      "id": "UX-004",
+      "status": "VERIFIED",
+      "tasks": [
+        "T2",
+        "T3",
+        "T30",
+        "T7"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T2-shell-localization.md",
+        "docs/evidence/mvp/T3-theme.md",
+        "docs/evidence/mvp/T30-home-details.md",
+        "docs/evidence/mvp/T7-catalog-search.md"
+      ]
+    },
+    {
+      "id": "UX-005",
+      "status": "VERIFIED",
+      "tasks": [
+        "T31",
+        "T36"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T31-personal-state.md",
+        "docs/evidence/mvp/T36-backup-export.md"
+      ]
+    },
+    {
+      "id": "UX-006",
+      "status": "VERIFIED",
+      "tasks": [
+        "T32",
+        "T38"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T32-recommendations.md",
+        "docs/evidence/mvp/T38-privacy.md"
+      ]
+    },
+    {
+      "id": "UX-008",
+      "status": "OUT_OF_SCOPE",
+      "tasks": [
+        "T11"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T11-name-parser.md"
+      ]
+    },
+    {
+      "id": "A11Y-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T14",
+        "T2",
+        "T21",
+        "T24",
+        "T3",
+        "T33"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.AccessibilityTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/accessibility-report.md",
+        "docs/evidence/mvp/T14-review-inbox.md",
+        "docs/evidence/mvp/T2-shell-localization.md",
+        "docs/evidence/mvp/T21-controls-limiter.md",
+        "docs/evidence/mvp/T24-windows-input.md",
+        "docs/evidence/mvp/T3-theme.md",
+        "docs/evidence/mvp/T33-accessibility.md"
+      ]
+    },
+    {
+      "id": "A11Y-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "T20",
+        "T3",
+        "T33",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.AccessibilityTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T20-tracks-subtitles.md",
+        "docs/evidence/mvp/T3-theme.md",
+        "docs/evidence/mvp/T33-accessibility.md",
+        "docs/evidence/mvp/T39B-assembly.md"
+      ]
+    },
+    {
+      "id": "DAT-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T25",
+        "T39",
+        "T4",
+        "T40"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.PerformanceTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T25-progress-resume.md",
+        "docs/evidence/mvp/T39-recovery-load.md",
+        "docs/evidence/mvp/T4-sqlite.md",
+        "docs/evidence/mvp/T40-x64-packaging.md"
+      ]
+    },
+    {
+      "id": "DAT-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "T16",
+        "T31",
+        "T36",
+        "T37"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.Application.Tests",
+        "ApSolutions.LocalMedia.IntegrationTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T16-metadata-editing.md",
+        "docs/evidence/mvp/T31-personal-state.md",
+        "docs/evidence/mvp/T36-backup-export.md",
+        "docs/evidence/mvp/T37-disaster-recovery.md"
+      ]
+    },
+    {
+      "id": "PRI-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T13",
+        "T17",
+        "T31",
+        "T32",
+        "T34",
+        "T35",
+        "T38"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T13-tmdb.md",
+        "docs/evidence/mvp/T17-safe-rename.md",
+        "docs/evidence/mvp/T31-personal-state.md",
+        "docs/evidence/mvp/T32-recommendations.md",
+        "docs/evidence/mvp/T34-tray-startup.md",
+        "docs/evidence/mvp/T35-open-with.md",
+        "docs/evidence/mvp/T38-privacy.md"
+      ]
+    },
+    {
+      "id": "PRI-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "T38",
+        "T39B"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.IntegrationTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T38-privacy.md",
+        "docs/evidence/mvp/T39B-assembly.md"
+      ]
+    },
+    {
+      "id": "SYS-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T24",
+        "T34",
+        "T39"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.PackagingTests",
+        "ApSolutions.LocalMedia.PerformanceTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T24-windows-input.md",
+        "docs/evidence/mvp/T34-tray-startup.md",
+        "docs/evidence/mvp/T39-recovery-load.md"
+      ]
+    },
+    {
+      "id": "SYS-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "T35",
+        "T40"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.PackagingTests",
+        "ApSolutions.LocalMedia.UiTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T35-open-with.md",
+        "docs/evidence/mvp/T40-x64-packaging.md",
+        "docs/evidence/mvp/windows-lifecycle.json"
+      ]
+    },
+    {
+      "id": "REL-002",
+      "status": "VERIFIED",
+      "tasks": [
+        "T40"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.PackagingTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T40-x64-packaging.md",
+        "docs/release/RELEASING.es.md",
+        "docs/release/SMARTSCREEN.es.md"
+      ]
+    },
+    {
+      "id": "DOC-001",
+      "status": "VERIFIED",
+      "tasks": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T41"
+      ],
+      "tests": [
+        "ApSolutions.LocalMedia.DocumentationTests"
+      ],
+      "evidence": [
+        "docs/evidence/mvp/T1-foundation.md",
+        "docs/evidence/mvp/T2-shell-localization.md",
+        "docs/evidence/mvp/T3-theme.md",
+        "docs/evidence/mvp/T4-sqlite.md",
+        "docs/evidence/mvp/T41-release-gate.md"
+      ]
+    }
+  ]
+}

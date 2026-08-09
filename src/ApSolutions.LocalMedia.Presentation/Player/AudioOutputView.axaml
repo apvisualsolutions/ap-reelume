@@ -1,0 +1,56 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.AudioOutputView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:AudioOutputViewModel"
+    automation:AutomationProperties.Name="{DynamicResource AudioOutputAccessibleName}">
+  <StackPanel x:Name="AudioOutputSurface" Spacing="12">
+    <StackPanel Spacing="4">
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource AudioOutputDeviceLabel}" />
+      <ComboBox
+          x:Name="AudioDeviceSelector"
+          MinWidth="280"
+          automation:AutomationProperties.Name="{DynamicResource AudioOutputDeviceLabel}"
+          DisplayMemberBinding="{Binding Display}"
+          ItemsSource="{Binding Devices}"
+          SelectedItem="{Binding SelectedDevice, Mode=TwoWay}" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource AudioOutputLayoutLabel}" />
+      <ComboBox
+          x:Name="AudioLayoutSelector"
+          MinWidth="200"
+          automation:AutomationProperties.Name="{DynamicResource AudioOutputLayoutLabel}"
+          ItemsSource="{x:Static player:AudioOutputViewModel.Layouts}"
+          SelectedItem="{Binding SelectedLayout, Mode=TwoWay}" />
+    </StackPanel>
+
+    <TextBlock
+        x:Name="NoOutputNotice"
+        IsVisible="{Binding HasNoOutput}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource AudioOutputNoneAvailable}"
+        TextWrapping="Wrap" />
+
+    <TextBlock
+        x:Name="DegradedLayoutNotice"
+        IsVisible="{Binding LayoutWasDegraded}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource AudioOutputLayoutDegraded}"
+        TextWrapping="Wrap" />
+
+    <TextBlock
+        x:Name="DeviceFallbackNotice"
+        IsVisible="{Binding FellBackToDefaultDevice}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource AudioOutputDeviceFallback}"
+        TextWrapping="Wrap" />
+  </StackPanel>
+</UserControl>

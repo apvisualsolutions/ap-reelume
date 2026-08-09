@@ -1,0 +1,188 @@
+<#
+.SYNOPSIS
+    Writes the Windows Package Manager manifest for the published archive.
+
+.DESCRIPTION
+    winget is the one distribution channel that costs nothing, needs no certificate, and works today:
+    it accepts a zip carrying a portable executable, and it verifies the SHA-256 this repository
+    already publishes. What it does not accept is a description somebody typed: every value here is
+    read from something the build already produced or the repository already keeps paired — the
+    archive itself, its hash, the two READMEs, and the package manifest's display name.
+
+    Only x64 is written. The ARM64 artifact is built and verified on every run but is not published
+    until PRD-003 is settled, and a package manager entry is publication.
+
+    Nothing is submitted. The manifest is left in the package folder for a person to open a pull
+    request with, once a release exists at the address it names. Until then the address is a promise,
+    which is why `-Verify` exists.
+#>
+[CmdletBinding()]
+param(
+    [string]$PackageRoot = 'artifacts/package',
+
+    [string]$Owner = 'apvisualsolutions',
+
+    [string]$Repository = 'ap-reelume',
+
+    # Asks whether the address the manifest names actually serves the archive. It is off by default
+    # because building an artifact must not depend on the network.
+    [switch]$Verify
+)
+
+$ErrorActionPreference = 'Stop'
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$packageRootFull = [IO.Path]::GetFullPath($PackageRoot, $repoRoot)
+
+# The identity winget will know this by, and the folder layout its repository requires.
+$publisherId = 'APSolutions'
+$packageId = 'APReelume'
+$identifier = "$publisherId.$packageId"
+$schema = '1.10.0'
+
+[xml]$buildProps = Get-Content -LiteralPath (Join-Path $repoRoot 'Directory.Build.props') -Raw
+$version = ([string]$buildProps.Project.PropertyGroup.Version).Trim()
+
+$archiveName = "ApReelume-$version-win-x64.zip"
+$archivePath = Join-Path $packageRootFull $archiveName
+if (-not (Test-Path -LiteralPath $archivePath)) {
+    throw "There is no archive at $archiveName. Run eng/package-x64.ps1 first."
+}
+
+# The hash winget checks is the one that was published, read from the same file the release carries
+# rather than computed again here: two hashes that can disagree are one hash and one rumour.
+$sumsPath = Join-Path $packageRootFull 'SHA256SUMS.txt'
+$sha256 = (Get-Content -LiteralPath $sumsPath |
+    Where-Object { $_ -match [regex]::Escape($archiveName) } |
+    ForEach-Object { ($_ -split '\s+')[0].Trim().ToLowerInvariant() } |
+    Select-Object -First 1)
+if (-not $sha256) { throw "SHA256SUMS.txt publishes no hash for $archiveName." }
+
+# The executable winget will alias. It has to be a real entry of the real archive: a manifest naming
+# a file the archive does not contain installs nothing and reports success.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$archive = [IO.Compression.ZipFile]::OpenRead($archivePath)
+try {
+    $entry = $archive.Entries |
+        Where-Object { $_.FullName -eq 'ApSolutions.LocalMedia.Windows.exe' } |
+        Select-Object -First 1
+    if (-not $entry) { throw "$archiveName does not contain the host executable at its root." }
+    $relativePath = $entry.FullName
+}
+finally {
+    $archive.Dispose()
+}
+
+# What the product says about itself, in both languages, taken from the READMEs a documentation suite
+# already keeps paired. The first paragraph under the title is the description.
+function Get-Summary {
+    param([string]$Path)
+
+    $lines = Get-Content -LiteralPath $Path
+    $collected = [Collections.Generic.List[string]]::new()
+    $started = $false
+    foreach ($line in $lines) {
+        if ($line -match '^#\s') { $started = $true; continue }
+        if (-not $started) { continue }
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            if ($collected.Count -gt 0) { break }
+            continue
+        }
+
+        $collected.Add($line.Trim())
+    }
+
+    (($collected -join ' ') -replace '\*\*', '').Trim()
+}
+
+$english = Get-Summary (Join-Path $repoRoot 'README.en.md')
+$spanish = Get-Summary (Join-Path $repoRoot 'README.es.md')
+foreach ($summary in @($english, $spanish)) {
+    if (-not $summary) { throw 'A README has no description under its title.' }
+    if ($summary.Length -gt 256) { throw "A description is $($summary.Length) characters; winget allows 256." }
+}
+
+$displayName = ([xml](Get-Content -LiteralPath (Join-Path $repoRoot 'src/ApSolutions.LocalMedia.Windows.Package/Package.appxmanifest') -Raw)).Package.Properties.DisplayName
+$projectUrl = "https://github.com/$Owner/$Repository"
+$installerUrl = "$projectUrl/releases/download/v$version/$archiveName"
+
+$folder = Join-Path $packageRootFull ("winget/manifests/{0}/{1}/{2}/{3}" -f
+    $publisherId.Substring(0, 1).ToLowerInvariant(), $publisherId, $packageId, $version)
+New-Item -ItemType Directory -Force -Path $folder | Out-Null
+
+function Write-Manifest {
+    param([string]$Name, [string[]]$Lines)
+    # winget's repository requires UTF-8, and a BOM whenever the file carries anything outside ASCII.
+    Set-Content -LiteralPath (Join-Path $folder $Name) -Value ($Lines -join "`n") -Encoding utf8BOM
+}
+
+Write-Manifest "$identifier.yaml" @(
+    "# Generated by eng/build-winget-manifest.ps1. Do not edit by hand."
+    "PackageIdentifier: $identifier"
+    "PackageVersion: $version"
+    "DefaultLocale: en-US"
+    "ManifestType: version"
+    "ManifestVersion: $schema")
+
+Write-Manifest "$identifier.locale.en-US.yaml" @(
+    "# Generated by eng/build-winget-manifest.ps1. Do not edit by hand."
+    "PackageIdentifier: $identifier"
+    "PackageVersion: $version"
+    "PackageLocale: en-US"
+    "Publisher: AP Solutions"
+    "PublisherUrl: $projectUrl"
+    "PublisherSupportUrl: $projectUrl/issues"
+    "PackageName: $displayName"
+    "PackageUrl: $projectUrl"
+    "License: GPL-3.0-or-later"
+    "LicenseUrl: $projectUrl/blob/main/LICENSE"
+    "ShortDescription: $english"
+    "Tags:"
+    "- media"
+    "- video"
+    "- library"
+    "- player"
+    "- offline"
+    "- privacy"
+    "ManifestType: defaultLocale"
+    "ManifestVersion: $schema")
+
+Write-Manifest "$identifier.locale.es-ES.yaml" @(
+    "# Generated by eng/build-winget-manifest.ps1. Do not edit by hand."
+    "PackageIdentifier: $identifier"
+    "PackageVersion: $version"
+    "PackageLocale: es-ES"
+    "Publisher: AP Solutions"
+    "PackageName: $displayName"
+    "ShortDescription: $spanish"
+    "ManifestType: locale"
+    "ManifestVersion: $schema")
+
+Write-Manifest "$identifier.installer.yaml" @(
+    "# Generated by eng/build-winget-manifest.ps1. Do not edit by hand."
+    "PackageIdentifier: $identifier"
+    "PackageVersion: $version"
+    "MinimumOSVersion: 10.0.22621.0"
+    "InstallerType: zip"
+    "NestedInstallerType: portable"
+    "NestedInstallerFiles:"
+    "- RelativeFilePath: $relativePath"
+    "  PortableCommandAlias: apreelume"
+    "Installers:"
+    "- Architecture: x64"
+    "  InstallerUrl: $installerUrl"
+    "  InstallerSha256: $sha256"
+    "ManifestType: installer"
+    "ManifestVersion: $schema")
+
+Write-Output "winget manifest: $folder"
+Write-Output ("{0} {1}, x64 only; ARM64 stays unpublished until PRD-003 is settled." -f $identifier, $version)
+
+if ($Verify) {
+    try {
+        $response = Invoke-WebRequest -Uri $installerUrl -Method Head -MaximumRedirection 5 -TimeoutSec 30 -UseBasicParsing
+        Write-Output ("The address answers {0}; the manifest can be submitted." -f $response.StatusCode)
+    }
+    catch {
+        Write-Warning ("Nothing serves {0} yet, so this manifest is not submittable. A release has to exist first." -f $installerUrl)
+    }
+}

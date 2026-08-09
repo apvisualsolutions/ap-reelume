@@ -1,0 +1,2116 @@
+{
+  "formatVersion": 1,
+  "provenanceStatement": "Every episode is synthesised from deterministic tone sequences and colour frames by the local ffmpeg build, following the frozen subspec in docs/superpowers/specs/automatic-segment-detection.es.md. No user or third-party media is ever involved.",
+  "generator": {
+    "sampleRateHz": 22050,
+    "toneSeconds": 2.5,
+    "baseFrequencyHz": 180,
+    "frequencyStepHz": 35,
+    "frequencyCount": 48,
+    "videoWidth": 320,
+    "videoHeight": 180,
+    "videoFrameRate": 12,
+    "container": "mkv",
+    "requiredEncoders": [
+      "mpeg4",
+      "aac"
+    ]
+  },
+  "series": [
+    {
+      "id": "S01",
+      "split": "development",
+      "episodes": [
+        {
+          "id": "S01E01",
+          "relativePath": "segments/S01/S01E01.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 197.0,
+              "seed": 1015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E02",
+          "relativePath": "segments/S01/S01E02.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 152.0,
+              "seed": 1025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E03",
+          "relativePath": "segments/S01/S01E03.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 171.0,
+              "seed": 1035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E04",
+          "relativePath": "segments/S01/S01E04.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 166.0,
+              "seed": 1045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E05",
+          "relativePath": "segments/S01/S01E05.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 175.0,
+              "seed": 1055
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E06",
+          "relativePath": "segments/S01/S01E06.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 176.0,
+              "seed": 1065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E07",
+          "relativePath": "segments/S01/S01E07.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 164.0,
+              "seed": 1075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E08",
+          "relativePath": "segments/S01/S01E08.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 151.0,
+              "seed": 1085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E09",
+          "relativePath": "segments/S01/S01E09.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 198.0,
+              "seed": 1095
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        },
+        {
+          "id": "S01E10",
+          "relativePath": "segments/S01/S01E10.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 1001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 142.0,
+              "seed": 1105
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 1003
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "split": "development",
+      "episodes": [
+        {
+          "id": "S02E01",
+          "relativePath": "segments/S02/S02E01.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 30.0,
+              "seed": 2014
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 199.0,
+              "seed": 2015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E02",
+          "relativePath": "segments/S02/S02E02.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 25.0,
+              "seed": 2024
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 179.0,
+              "seed": 2025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E03",
+          "relativePath": "segments/S02/S02E03.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 26.0,
+              "seed": 2034
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 175.0,
+              "seed": 2035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E04",
+          "relativePath": "segments/S02/S02E04.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 11.0,
+              "seed": 2044
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 195.0,
+              "seed": 2045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E05",
+          "relativePath": "segments/S02/S02E05.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 32.0,
+              "seed": 2054
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 152.0,
+              "seed": 2055
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E06",
+          "relativePath": "segments/S02/S02E06.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 18.0,
+              "seed": 2064
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 143.0,
+              "seed": 2065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E07",
+          "relativePath": "segments/S02/S02E07.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 11.0,
+              "seed": 2074
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 122.0,
+              "seed": 2075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E08",
+          "relativePath": "segments/S02/S02E08.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 44.0,
+              "seed": 2084
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 122.0,
+              "seed": 2085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E09",
+          "relativePath": "segments/S02/S02E09.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 28.0,
+              "seed": 2094
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 158.0,
+              "seed": 2095
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        },
+        {
+          "id": "S02E10",
+          "relativePath": "segments/S02/S02E10.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 41.0,
+              "seed": 2104
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 25.0,
+              "seed": 2001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 180.0,
+              "seed": 2105
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 2003
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "split": "development",
+      "episodes": [
+        {
+          "id": "S03E01",
+          "relativePath": "segments/S03/S03E01.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 147.0,
+              "seed": 3015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E02",
+          "relativePath": "segments/S03/S03E02.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 146.0,
+              "seed": 3025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E03",
+          "relativePath": "segments/S03/S03E03.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 3002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 162.0,
+              "seed": 3035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E04",
+          "relativePath": "segments/S03/S03E04.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 126.0,
+              "seed": 3045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E05",
+          "relativePath": "segments/S03/S03E05.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 3002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 126.0,
+              "seed": 3055
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E06",
+          "relativePath": "segments/S03/S03E06.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 3002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 131.0,
+              "seed": 3065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E07",
+          "relativePath": "segments/S03/S03E07.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 3002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 163.0,
+              "seed": 3075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E08",
+          "relativePath": "segments/S03/S03E08.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 3002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 142.0,
+              "seed": 3085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        },
+        {
+          "id": "S03E09",
+          "relativePath": "segments/S03/S03E09.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 3002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 20.0,
+              "seed": 3001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 157.0,
+              "seed": 3095
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 25.0,
+              "seed": 3003
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "split": "development",
+      "episodes": [
+        {
+          "id": "S04E01",
+          "relativePath": "segments/S04/S04E01.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 21.0,
+              "seed": 4014
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 24.0,
+              "seed": 4001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 154.0,
+              "seed": 4015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 4003
+            }
+          ]
+        },
+        {
+          "id": "S04E02",
+          "relativePath": "segments/S04/S04E02.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 12.0,
+              "seed": 4024
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 24.0,
+              "seed": 4001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 133.0,
+              "seed": 4025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 4003
+            }
+          ]
+        },
+        {
+          "id": "S04E03",
+          "relativePath": "segments/S04/S04E03.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 10.0,
+              "seed": 4034
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 24.0,
+              "seed": 4001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 196.0,
+              "seed": 4035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 4003
+            }
+          ]
+        },
+        {
+          "id": "S04E04",
+          "relativePath": "segments/S04/S04E04.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 10.0,
+              "seed": 4044
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 24.0,
+              "seed": 4001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 168.0,
+              "seed": 4045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 4003
+            }
+          ]
+        },
+        {
+          "id": "S04E05",
+          "relativePath": "segments/S04/S04E05.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 185.0,
+              "seed": 4055
+            }
+          ]
+        },
+        {
+          "id": "S04E06",
+          "relativePath": "segments/S04/S04E06.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 23.0,
+              "seed": 4064
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 24.0,
+              "seed": 4001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 193.0,
+              "seed": 4065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 4003
+            }
+          ]
+        },
+        {
+          "id": "S04E07",
+          "relativePath": "segments/S04/S04E07.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 21.0,
+              "seed": 4074
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 24.0,
+              "seed": 4001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 196.0,
+              "seed": 4075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 4003
+            }
+          ]
+        },
+        {
+          "id": "S04E08",
+          "relativePath": "segments/S04/S04E08.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 31.0,
+              "seed": 4084
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 24.0,
+              "seed": 4001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 181.0,
+              "seed": 4085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 4003
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "split": "development",
+      "episodes": [
+        {
+          "id": "S05E01",
+          "relativePath": "segments/S05/S05E01.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 5002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 195.0,
+              "seed": 5015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E02",
+          "relativePath": "segments/S05/S05E02.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 5002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 166.0,
+              "seed": 5025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E03",
+          "relativePath": "segments/S05/S05E03.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 5002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 183.0,
+              "seed": 5035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E04",
+          "relativePath": "segments/S05/S05E04.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 5002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 178.0,
+              "seed": 5045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E05",
+          "relativePath": "segments/S05/S05E05.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 5002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 170.0,
+              "seed": 5055
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E06",
+          "relativePath": "segments/S05/S05E06.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 127.0,
+              "seed": 5065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E07",
+          "relativePath": "segments/S05/S05E07.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 155.0,
+              "seed": 5075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E08",
+          "relativePath": "segments/S05/S05E08.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 126.0,
+              "seed": 5085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E09",
+          "relativePath": "segments/S05/S05E09.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 139.0,
+              "seed": 5095
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E10",
+          "relativePath": "segments/S05/S05E10.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 5002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 183.0,
+              "seed": 5105
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E11",
+          "relativePath": "segments/S05/S05E11.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 141.0,
+              "seed": 5115
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        },
+        {
+          "id": "S05E12",
+          "relativePath": "segments/S05/S05E12.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 12.0,
+              "seed": 5001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 134.0,
+              "seed": 5125
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 45.0,
+              "seed": 5003
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "split": "development",
+      "episodes": [
+        {
+          "id": "S06E01",
+          "relativePath": "segments/S06/S06E01.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 179.0,
+              "seed": 6015
+            }
+          ]
+        },
+        {
+          "id": "S06E02",
+          "relativePath": "segments/S06/S06E02.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 219.0,
+              "seed": 6025
+            }
+          ]
+        },
+        {
+          "id": "S06E03",
+          "relativePath": "segments/S06/S06E03.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 179.0,
+              "seed": 6035
+            }
+          ]
+        },
+        {
+          "id": "S06E04",
+          "relativePath": "segments/S06/S06E04.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 158.0,
+              "seed": 6045
+            }
+          ]
+        },
+        {
+          "id": "S06E05",
+          "relativePath": "segments/S06/S06E05.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 162.0,
+              "seed": 6055
+            }
+          ]
+        },
+        {
+          "id": "S06E06",
+          "relativePath": "segments/S06/S06E06.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 205.0,
+              "seed": 6065
+            }
+          ]
+        },
+        {
+          "id": "S06E07",
+          "relativePath": "segments/S06/S06E07.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 153.0,
+              "seed": 6075
+            }
+          ]
+        },
+        {
+          "id": "S06E08",
+          "relativePath": "segments/S06/S06E08.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 189.0,
+              "seed": 6085
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "split": "heldOut",
+      "episodes": [
+        {
+          "id": "S07E01",
+          "relativePath": "segments/S07/S07E01.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 6.0,
+              "seed": 7014
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 165.0,
+              "seed": 7015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E02",
+          "relativePath": "segments/S07/S07E02.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 27.0,
+              "seed": 7024
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 168.0,
+              "seed": 7025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E03",
+          "relativePath": "segments/S07/S07E03.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 24.0,
+              "seed": 7034
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 149.0,
+              "seed": 7035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E04",
+          "relativePath": "segments/S07/S07E04.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 33.0,
+              "seed": 7044
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 155.0,
+              "seed": 7045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E05",
+          "relativePath": "segments/S07/S07E05.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 26.0,
+              "seed": 7054
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 121.0,
+              "seed": 7055
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E06",
+          "relativePath": "segments/S07/S07E06.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 32.0,
+              "seed": 7064
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 169.0,
+              "seed": 7065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E07",
+          "relativePath": "segments/S07/S07E07.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 7.0,
+              "seed": 7074
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 142.0,
+              "seed": 7075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E08",
+          "relativePath": "segments/S07/S07E08.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 44.0,
+              "seed": 7084
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 157.0,
+              "seed": 7085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E09",
+          "relativePath": "segments/S07/S07E09.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 40.0,
+              "seed": 7094
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 195.0,
+              "seed": 7095
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        },
+        {
+          "id": "S07E10",
+          "relativePath": "segments/S07/S07E10.mkv",
+          "pieces": [
+            {
+              "kind": "coldOpen",
+              "durationSeconds": 28.0,
+              "seed": 7104
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 22.0,
+              "seed": 7001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 149.0,
+              "seed": 7105
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 30.0,
+              "seed": 7003
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "split": "heldOut",
+      "episodes": [
+        {
+          "id": "S08E01",
+          "relativePath": "segments/S08/S08E01.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 8002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 125.0,
+              "seed": 8015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E02",
+          "relativePath": "segments/S08/S08E02.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 189.0,
+              "seed": 8025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E03",
+          "relativePath": "segments/S08/S08E03.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 190.0,
+              "seed": 8035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E04",
+          "relativePath": "segments/S08/S08E04.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 8002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 166.0,
+              "seed": 8045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E05",
+          "relativePath": "segments/S08/S08E05.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 8002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 172.0,
+              "seed": 8055
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E06",
+          "relativePath": "segments/S08/S08E06.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 8002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 133.0,
+              "seed": 8065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E07",
+          "relativePath": "segments/S08/S08E07.mkv",
+          "pieces": [
+            {
+              "kind": "recap",
+              "durationSeconds": 15.0,
+              "seed": 8002
+            },
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 133.0,
+              "seed": 8075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E08",
+          "relativePath": "segments/S08/S08E08.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 18.0,
+              "seed": 8001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 133.0,
+              "seed": 8085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 28.0,
+              "seed": 8003
+            }
+          ]
+        },
+        {
+          "id": "S08E09",
+          "relativePath": "segments/S08/S08E09.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 136.0,
+              "seed": 8095
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "split": "heldOut",
+      "episodes": [
+        {
+          "id": "S09E01",
+          "relativePath": "segments/S09/S09E01.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 171.0,
+              "seed": 9015
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E02",
+          "relativePath": "segments/S09/S09E02.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 133.0,
+              "seed": 9025
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E03",
+          "relativePath": "segments/S09/S09E03.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 142.0,
+              "seed": 9035
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E04",
+          "relativePath": "segments/S09/S09E04.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 162.0,
+              "seed": 9045
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E05",
+          "relativePath": "segments/S09/S09E05.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 157.0,
+              "seed": 9055
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E06",
+          "relativePath": "segments/S09/S09E06.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 127.0,
+              "seed": 9065
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E07",
+          "relativePath": "segments/S09/S09E07.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 147.0,
+              "seed": 9075
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E08",
+          "relativePath": "segments/S09/S09E08.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 186.0,
+              "seed": 9085
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E09",
+          "relativePath": "segments/S09/S09E09.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 171.0,
+              "seed": 9095
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E10",
+          "relativePath": "segments/S09/S09E10.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 186.0,
+              "seed": 9105
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        },
+        {
+          "id": "S09E11",
+          "relativePath": "segments/S09/S09E11.mkv",
+          "pieces": [
+            {
+              "kind": "intro",
+              "durationSeconds": 30.0,
+              "seed": 9001
+            },
+            {
+              "kind": "body",
+              "durationSeconds": 181.0,
+              "seed": 9115
+            },
+            {
+              "kind": "credits",
+              "durationSeconds": 35.0,
+              "seed": 9003
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "split": "heldOut",
+      "episodes": [
+        {
+          "id": "S10E01",
+          "relativePath": "segments/S10/S10E01.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 228.0,
+              "seed": 10015
+            }
+          ]
+        },
+        {
+          "id": "S10E02",
+          "relativePath": "segments/S10/S10E02.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 210.0,
+              "seed": 10025
+            }
+          ]
+        },
+        {
+          "id": "S10E03",
+          "relativePath": "segments/S10/S10E03.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 196.0,
+              "seed": 10035
+            }
+          ]
+        },
+        {
+          "id": "S10E04",
+          "relativePath": "segments/S10/S10E04.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 175.0,
+              "seed": 10045
+            }
+          ]
+        },
+        {
+          "id": "S10E05",
+          "relativePath": "segments/S10/S10E05.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 187.0,
+              "seed": 10055
+            }
+          ]
+        },
+        {
+          "id": "S10E06",
+          "relativePath": "segments/S10/S10E06.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 151.0,
+              "seed": 10065
+            }
+          ]
+        },
+        {
+          "id": "S10E07",
+          "relativePath": "segments/S10/S10E07.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 181.0,
+              "seed": 10075
+            }
+          ]
+        },
+        {
+          "id": "S10E08",
+          "relativePath": "segments/S10/S10E08.mkv",
+          "pieces": [
+            {
+              "kind": "body",
+              "durationSeconds": 192.0,
+              "seed": 10085
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

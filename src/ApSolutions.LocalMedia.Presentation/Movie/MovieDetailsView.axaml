@@ -1,0 +1,75 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Movie.MovieDetailsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:catalog="clr-namespace:ApSolutions.LocalMedia.Presentation.Catalog"
+    xmlns:movie="clr-namespace:ApSolutions.LocalMedia.Presentation.Movie"
+    x:DataType="movie:MovieDetailsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource MovieDetailsAccessibleName}">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+    <StackPanel Orientation="Horizontal" Spacing="12">
+      <TextBlock
+          FontSize="30"
+          FontWeight="SemiBold"
+          Text="{Binding Title}"
+          TextTrimming="CharacterEllipsis"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding HasYear}"
+          Text="{Binding YearText}" />
+      <Border
+          Padding="8,4"
+          VerticalAlignment="Center"
+          Background="{DynamicResource AccentSubtleBrush}"
+          CornerRadius="4"
+          IsVisible="{Binding !IsAvailable}"
+          automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
+        <TextBlock FontSize="12" Text="{DynamicResource MediaUnavailable}" />
+      </Border>
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+      <Button
+          Command="{Binding ResumeCommand}"
+          Content="{DynamicResource MovieResumeAction}"
+          IsVisible="{Binding CanResume}"
+          automation:AutomationProperties.Name="{DynamicResource MovieResumeAction}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding CanResume}"
+          Text="{Binding ResumePositionText}" />
+      <Button
+          Command="{Binding PlayCommand}"
+          Content="{DynamicResource MoviePlayAction}"
+          automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Spacing="8">
+      <catalog:WatchStatusControl DataContext="{Binding WatchStatus}" />
+      <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="3" IsVisible="{Binding HasVersions}" Spacing="6">
+      <TextBlock
+          FontSize="18"
+          FontWeight="SemiBold"
+          Text="{DynamicResource MovieVersionsHeading}" />
+      <ItemsControl ItemsSource="{Binding Versions}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="movie:MediaVersionRowViewModel">
+            <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <TextBlock Text="{Binding QualityLabel}" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <TextBlock IsVisible="{Binding IsEffective}" Text="{DynamicResource MovieVersionEffective}" />
+                <TextBlock IsVisible="{Binding IsPreferred}" Text="{DynamicResource MovieVersionPreferred}" />
+                <TextBlock IsVisible="{Binding !IsAvailable}" Text="{DynamicResource MediaUnavailable}" />
+              </StackPanel>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </Grid>
+</UserControl>

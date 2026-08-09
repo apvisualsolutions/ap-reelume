@@ -1,0 +1,425 @@
+# Cambios
+
+Todo cambio relevante de AP Reelume. La versión inglesa está en [CHANGELOG.en.md](CHANGELOG.en.md).
+
+El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado es
+[SemVer](https://semver.org/lang/es/). El registro canónico del alcance, con su estado y su
+evidencia, es [FEATURES.md](FEATURES.md).
+
+## [Sin publicar] / [Unreleased]
+
+### Añadido
+
+- **Actualizador independiente.** Comprueba si hay una versión nueva sólo cuando lo pides o lo has
+  permitido, te dice qué cambia en español y en inglés, descarga a una carpeta aparte comprobando el
+  hash y el tamaño publicados, y entrega el paquete a Windows únicamente tras una confirmación que
+  nombra esa versión. Una descarga que se corta se reanuda desde donde iba; una que no coincide se
+  borra. Tu biblioteca no participa en la descarga: se midió que la base de datos y el binario en uso
+  quedan intactos tras una actualización correcta, cancelada, manipulada e interrumpida. La Store
+  sigue usando su propio canal.
+- **Entrada para el gestor de paquetes de Windows.** Cada compilación deja el manifiesto de winget
+  generado desde el propio archivo: el hash es el publicado, el ejecutable que declara está
+  comprobado dentro del ZIP y las descripciones salen de los dos README. winget no cuesta nada y no
+  exige certificado, así que es la primera vía de instalación que estará disponible.
+- **Paquete ARM64 nativo.** MSIX y ZIP `win-arm64` construidos y verificados: cada binario del
+  payload lleva ARM64 en su cabecera, LibVLC viaja donde el cargador lo busca, y la aplicación es
+  idéntica a la de x64 archivo por archivo. Se construye en cada verificación y en cada publicación.
+- **Detección automática de introducciones, resúmenes y créditos.** Compara localmente los
+  episodios de cada serie entre sí y encuentra el audio que se repite; nada sale de la máquina y no
+  se abre una sola conexión. Las detecciones se guardan por episodio con su confianza, una marca
+  manual del mismo tipo las suprime siempre, y aceptar o corregir una la protege de todas las
+  ejecuciones posteriores. El trabajo cede el paso a la reproducción y la opción está desactivada
+  hasta que la enciendas. Evaluada contra un corpus retenido de series sintéticas: cada umbral
+  aprobado se cumplió en la primera medición, con cero detecciones espurias en los episodios sin
+  segmento.
+
+- **Una guardia permanente contra el defecto de la casa.** La auditoría encontró componentes
+  registrados que la aplicación nunca invoca, y cada caso se cazó a mano; ahora una prueba de
+  arquitectura exige que cada servicio registrado tenga al menos una resolución fuera de su propio
+  registro. Su primera ejecución enumeró 32 huérfanos —no los ~12 estimados— y destapó caras nuevas:
+  la selección de dispositivo de audio nunca llega al motor, las preferencias de reproducción
+  guardadas no se aplican, el conmutador de «visto» no está conectado a nada, no hay manera de
+  retirar una carpeta de la biblioteca, y elegir una versión duplicada no hace nada. Cada deuda vive
+  en la propia prueba con su identificador, y una segunda aserción expulsa la entrada en cuanto su
+  cableado aterriza: la lista sólo puede encoger.
+
+- **Preferencia de idioma.** En Ajustes → Apariencia puedes elegir español o inglés. La interfaz,
+  los resúmenes de las actualizaciones y los metadatos hablan el mismo idioma — antes la interfaz
+  iba fija en español mientras el resumen del actualizador y los metadatos seguían el idioma de la
+  máquina, y podían llegar en otro. Los metadatos usan el idioma nuevo al reiniciar.
+- **La ventana vuelve a donde estaba.** Posición, tamaño y estado (maximizada o no) sobreviven al
+  cierre por cualquier camino. Una posición guardada en un monitor que ya no está conectado se
+  descarta en vez de abrir la ventana fuera de toda pantalla, y una ventana cerrada maximizada
+  reabre maximizada sobre sus límites de restauración.
+
+### Seguridad
+
+- **Las huellas publicadas van firmadas y el actualizador exige la firma.** El hash con el que se
+  comprueba una actualización viajaba en la misma respuesta sin firmar que el paquete al que avala:
+  quien alterase la respuesta podía alterar ambos a la vez. Ahora cada publicación firma sus
+  huellas con una clave minisign cuya mitad pública viaja dentro del binario; el actualizador
+  verifica esa firma antes de creer ningún hash, lee el hash únicamente del bloque firmado, y una
+  versión sin firma —o con las líneas alteradas— se rechaza diciendo por qué. La clave privada vive
+  fuera del repositorio, la tubería de publicación firma y se niega a publicar sin firma, y la
+  declaración de privacidad explica qué prueba esta capa y qué sigue sin probar (la firma de código
+  de Windows es otra capa y sigue pendiente de su decisión económica).
+- **El actualizador sólo acepta bytes de los dominios declarados, en cada salto.** Las
+  redirecciones ya exigían HTTPS pero aceptaban cualquier destino; ahora cada salto tiene que
+  quedar dentro de la lista que la declaración de privacidad publica (GitHub y su almacenamiento),
+  un salto fuera se rechaza con su motivo en pantalla, y la declaración nombra por fin el dominio
+  de almacenamiento al que GitHub redirige — con una prueba que impide que código y promesa vuelvan
+  a divergir. El arte de los títulos queda igualmente limitado a su dominio declarado.
+- **Toda respuesta de red tiene techo.** Los metadatos de una versión se cortan en un megabyte, el
+  paquete se corta en cuanto llegan más bytes de los que la versión declaró (y el parcial
+  envenenado se borra), y un póster de más de diez megabytes se rehúsa a medio camino conservando
+  el arte anterior.
+
+### Corregido
+
+- **Las preferencias de reproducción guardadas se aplican de verdad.** La pista de audio y los
+  subtítulos que elegiste — por archivo, por serie o globales, con repliegue por idioma cuando una
+  pista no está — se resolvían y nunca se aplicaban: cada sesión abría con lo que el motor
+  eligiera. Ahora se aplican en cuanto el vídeo abre, y el selector de pistas muestra lo
+  efectivamente aplicado. De paso, seis registros muertos del contenedor (duplicados de lo que la
+  aplicación construye por otra vía) quedan retirados en vez de en silencio.
+- **Elegir el dispositivo de salida de audio ahora cambia dónde suena.** El selector existía y el
+  motor no se enteraba: tu elección se guardaba y el audio seguía saliendo por donde quisiera VLC.
+  Ahora elegir un dispositivo pausa, cambia la ruta y reanuda — sin reiniciar el vídeo —, la
+  elección global guardada se aplica al abrir cada sesión, y un dispositivo que desaparece a mitad
+  jamás corta la reproducción: se repliega al predeterminado sin olvidar tu preferencia.
+- **Cambiar de versión sin salir de la reproducción.** Si el título que estás viendo tiene más de
+  una versión (otra resolución, otro códec, HDR), el reproductor las lista y puedes saltar a otra
+  en plena sesión. Tu posición se guarda antes de nada; si las duraciones no permiten trasladar el
+  punto con seguridad, la aplicación te lo pregunta con el segundo propuesto a la vista — continuar
+  ahí, empezar de nuevo, o cancelar. Una versión que no está disponible no se ofrece como abierta.
+- **Mover un vídeo de carpeta ya no le hace perder su historia.** Cada escaneo captura una
+  identidad ligera de lo que cataloga (el identificador estable del disco y una huella acotada del
+  contenido) y reconcilia: un archivo que apareció en una ruta nueva y desapareció de la vieja
+  vuelve a ser la misma entrada, con su progreso y tus decisiones intactos. Una copia que convive
+  con la original sigue tratándose como copia (versiones, como siempre). Y cuando hay duda — dos
+  copias conocidas y una nueva idéntica — la bandeja de revisión te pregunta: «es el mismo,
+  reasignar» conserva la historia bajo la ruta nueva; «es un archivo nuevo» lo deja como entrada
+  propia. La oferta reaparece en cada escaneo hasta que decidas; nada se decide en silencio.
+- **Una carpeta puede retirarse de la biblioteca.** La biblioteca lista por fin sus carpetas, y
+  cada una tiene una acción de retirada con confirmación que dice la verdad: la carpeta se retira
+  del catálogo, ningún vídeo del disco se toca, y si vuelves a añadirla se cataloga de nuevo. El
+  catálogo en pantalla se recarga al momento.
+- **Marcar algo como visto ahora se guarda de verdad.** El conmutador de «visto» de la ficha se
+  construía sin manejador: cada marca iba a ninguna parte y la tarjeta la olvidaba al recargar.
+  Ahora una decisión tuya se guarda como manual — nada que el reproductor calcule después la
+  cambia — y quitarla devuelve el estado a las reglas automáticas. Además, el umbral de «visto»
+  (qué porcentaje hay que alcanzar) se configura por fin en los ajustes de recomendaciones, entre
+  el 50 y el 100 %; moverlo recalcula sólo los estados automáticos y te dice cuántos movió.
+- **Un vídeo que no abre ya no arrastra consigo a las preferencias.** Aplicar las preferencias
+  daba por hecha una sesión viva: con un archivo que el motor no pudo abrir, la selección de pista
+  estallaba por dentro después de que la pantalla ya mostrara el diagnóstico. Ahora una sesión que
+  no abrió, o que se cerró debajo, simplemente no tiene nada que aplicar; cualquier otro fallo
+  sigue avisando.
+- **Renombrar con el archivo abierto en otro programa ya dice qué hacer.** El fallo se guardaba en
+  la auditoría como «IOException» y la pantalla no decía nada: el renombrado simplemente no ocurría.
+  Ahora la superficie dice si otro programa tiene el archivo abierto, si Windows denegó el permiso o
+  si la unidad falló — cada caso con su acción — y la auditoría guarda el motivo con nombre útil.
+- **El diagnóstico dice lo que tu máquina hizo, no lo que una constante prometía.** La aceleración
+  de vídeo informada es la que el motor usó de verdad en el último vídeo, el tamaño de la
+  biblioteca es el real (en tramos, como siempre), y los errores son los que la aplicación registró
+  — sin rutas ni nombres de archivo, como exige la lista de lo permitido.
+- **El manual explica la entrada de arranque huérfana.** Si desinstalas con «iniciar con Windows»
+  activado, queda una entrada inocua en el registro; el manual dice por qué no hace nada, cómo
+  quitarla a mano y que reinstalar la repara sola.
+- **La pantalla sigue al motor durante toda la sesión.** El estado en pantalla sólo cambiaba al
+  abrir: la pausa pausaba el motor pero la interfaz seguía diciendo «reproduciendo» para siempre,
+  con los controles de reanudar inalcanzables. El método que aplicaba las transiciones existía y
+  estaba probado; en la aplicación ensamblada nadie lo llamaba. Lo encontró el paseo físico del
+  artefacto empaquetado —tres escenas re-ejecutables con disco, SQLite y decodificación reales:
+  vigilancia catalogando un archivo soltado y agrupando dos copias, las teclas operando un vídeo en
+  reproducción, y dos episodios encadenándose solos— que queda como guardia permanente.
+- **Rutas largas y escalado por monitor, declarados en vez de heredados.** La aplicación no traía
+  manifiesto propio: el límite de 260 caracteres seguía aplicándose aunque Windows ya lo hubiera
+  levantado —una biblioteca en una carpeta profunda perdía archivos en silencio— y la conciencia de
+  escalado era la que el runtime adivinara. Ahora ambas cosas están escritas en el manifiesto del
+  proceso.
+- **Una migración reescrita ya no pasa desapercibida, y la integridad se pregunta una vez.** El
+  arranque sólo comparaba números de versión: si el texto de una migración aplicada cambiaba, el
+  esquema del disco y el que el código asume divergían en silencio. Ahora cada checksum guardado se
+  compara con el del build y una discrepancia se rehúsa con nombre y apellidos. De paso, la
+  comprobación de integridad —la parte más lenta de abrir una biblioteca grande— corre una vez por
+  arranque, no dos.
+- **Una detección ya no puede salirse de su episodio.** Las marcas manuales siempre validaron
+  contra la duración; las detectadas se juzgaban a ciegas. Ahora el detector recorta lo que emite
+  al episodio en que lo midió y la política aplica a las detecciones la misma regla que a las
+  marcas manuales.
+- **El manual dice qué pasa con sus datos al desinstalar.** Nada se borra: catálogo, progreso y
+  copias siguen en su carpeta y una reinstalación los reencuentra; el manual explica también cómo
+  borrarlo todo de verdad.
+- **El coordinador de ventanas del reproductor tenía dos dueños.** Estaba registrado en el
+  contenedor de servicios y a la vez construido a mano por la vista principal: dos instancias, una
+  de ellas guardando geometría que nadie leería. La vista —que es quien posee la ventana del mini
+  reproductor— queda como único dueño y el registro muerto se retira.
+- **Una marca creada durante la reproducción no funcionaba hasta reabrir el episodio.** Las marcas
+  de la sesión eran una foto tomada al abrir: guardar, borrar, aceptar o corregir una marca
+  cambiaba lo almacenado y el botón de saltar seguía leyendo la foto vieja. Ahora cada cambio
+  recompone las marcas de la sesión al momento, así que el botón aparece (o desaparece) sin cerrar
+  nada.
+- **Dos copias de la misma película nunca se agrupaban solas.** La agrupación de versiones existía
+  con su repositorio, su política conservadora y sus pruebas, y nada la invocaba: los grupos sólo
+  se creaban en los tests. Ahora cada escaneo agrupa las copias que su nombre declara iguales, una
+  diferencia notable de duración espera confirmación en vez de agruparse en silencio, la
+  preferencia que fijes sobrevive a los reescaneos, el grupo se encuentra desde cualquiera de las
+  copias, y ningún archivo se borra ni se oculta jamás.
+- **Ni los atajos de teclado ni las teclas multimedia hacían nada.** Cada pieza existía —el mapa de
+  atajos con sus valores de fábrica, el editor que impide conflictos, el enrutador que evita
+  acciones duplicadas, el servicio de teclas multimedia— y ninguna tocaba a otra: el reproductor no
+  leía el teclado y el servicio nunca se arrancaba. Ahora el reproductor responde al mapa
+  compartido (espacio pausa, flechas saltan, M silencia, F pantalla completa…), las teclas
+  multimedia del hardware operan la sesión mientras existe y se sueltan al cerrarla, una tecla que
+  llega por dos caminos actúa una sola vez, y el editor de Ajustes edita el mismo mapa que las
+  teclas leen.
+- **Al terminar un episodio nunca se ofrecía el siguiente.** El motor ni siquiera se enteraba de
+  que el vídeo había terminado —el estado se quedaba en «reproduciendo» para siempre—, la cuenta
+  atrás probada de punta a punta no estaba registrada, y los botones del cartel no hacían nada.
+  Ahora el fin del medio es un estado de verdad, terminar un episodio ofrece el siguiente con su
+  cuenta atrás cancelable, «Reproducir ya» abre sin esperar, y si no hay siguiente episodio o su
+  archivo ya no está, se vuelve a la ficha.
+- **La vigilancia de carpetas nunca arrancaba.** El coordinador de vigilancia, el vigilante con
+  amortiguación y el planificador de respaldo existían, estaban probados y nada los arrancaba: la
+  aplicación sólo escaneaba al pulsar un botón. Ahora la vigilancia arranca con la ventana y se
+  detiene al salir, una carpeta recién añadida se sigue desde su primer escaneo sin reiniciar, una
+  raíz configurada como manual no se vigila a espaldas de su dueño, y el escaneo de respaldo para
+  USB y NAS recupera eventos perdidos cada quince minutos de verdad. Además, todo escaneo —del
+  vigilante o manual— entrega lo que encontró a la identificación, no sólo el manual.
+- **La identificación nunca se ejecutaba, así que la bandeja de revisión estaba siempre vacía.** El
+  caso de uso existía completo — analiza el nombre, puntúa candidatos, consulta el proveedor sólo si
+  hace falta y guarda el resultado — y nada lo invocaba jamás. Ahora cada escaneo entrega lo que
+  encontró a la identificación: lo seguro se resuelve solo, la duda aparece en la bandeja, un
+  archivo ya decidido se deja en paz en todos los escaneos siguientes, y los archivos que ningún
+  escaneo anterior identificó sanan en el próximo. Sin el token del proveedor todo queda local y no
+  se abre ninguna conexión.
+- **«Continuar donde lo dejaste» dejaba el vídeo en cero.** La decisión de reanudar se calculaba
+  después de abrir el medio, nadie pasaba la posición inicial al motor (que la acepta desde siempre)
+  y los botones del cartel no estaban conectados a nada. Ahora la decisión existe antes de abrir, el
+  medio se abre ya en la posición guardada, y «Empezar de nuevo» busca a cero de verdad. Tres pruebas
+  de ensamblado, una unitaria y una con decodificación real cubren la cadena completa.
+- **La detección en segundo plano no podía pararse y sobrevivía a la salida.** El caso de uso acepta
+  cancelación desde siempre y el planificador lo llamaba sin token; cerrar la aplicación podía dejar
+  un proceso decodificando en segundo plano. Ahora cada detección corre bajo un token de apagado y
+  salir de la aplicación la detiene, junto con el bucle de guardado de la sesión.
+- **Una respuesta ilegible del origen de actualizaciones podía tumbar la aplicación al arrancar.**
+  Un portal cautivo (el wifi de un hotel) responde `200` con una página de acceso; eso lanzaba una
+  excepción sin traducir que, en la comprobación automática del arranque, salía por el hilo de
+  interfaz. Ahora un cuerpo que no es una versión se lee como «origen inalcanzable», la pantalla de
+  actualizaciones siempre aterriza en un estado, y los tres trabajos de arranque (comprobación,
+  salida por bandeja, archivo suelto) observan sus excepciones en vez de entregárselas al hilo de
+  interfaz.
+- **El guardado periódico de la posición nunca arrancaba.** El bucle de los cinco segundos sólo lo
+  invocaban las pruebas: en la aplicación escribían únicamente el cierre ordenado y el cambio de
+  versión, así que un corte de luz perdía la sesión entera. Ahora la sesión arranca el bucle al
+  abrir y lo cancela al cerrar, pausar escribe la posición, y cada búsqueda —del transporte, de los
+  saltos o del botón de saltar— escribe el destino elegido. De paso, los manejadores de posición se
+  desenganchan del motor al terminar cada sesión, en vez de acumularse uno por episodio.
+- **La detección de segmentos liberaba LibVLC en el orden que estrella el proceso.** El extractor de
+  huellas paraba un player aún reproduciendo, lo liberaba antes que su media y disponía el media sin
+  ventana de quiescencia — las tres reglas que el propio código tiene escritas como modo de fallo
+  nativo, sobre la misma instancia que usa la reproducción. Ahora sigue el mismo orden que el motor,
+  con una cola de liberación diferida en la fábrica cuyo drenaje sobrevive a un fallo de liberación.
+  Un simulacro de veinte ciclos con diez episodios queda como prueba permanente.
+- **El empaquetado fallaba en máquinas con un solo SDK de Windows.** La búsqueda de `makeappx.exe`
+  devolvía un texto en lugar de una lista cuando había exactamente una versión instalada, e indexarlo
+  producía su primer carácter: el sellado intentaba ejecutar un programa llamado `C`. La búsqueda
+  estaba copiada en tres scripts (empaquetar x64, empaquetar ARM64 y verificar el paquete) y las tres
+  copias llevaban el mismo defecto. Es lo que rompía la verificación continua en el runner
+  actualizado; en local nunca se vio porque hay dos SDK. La misma actualización de imagen retiró
+  ffmpeg del runner, así que el flujo lo instala ahora explícitamente: la matriz de códecs, el corpus
+  de segmentos y la fase de asociación de archivos vuelven a medirse en cada push.
+- **La primera pasada completa de la suite en CI destapó siete supuestos de máquina.** Dos pruebas de
+  progreso de copia eran inestables por construcción (`Progress<T>` encola sus avisos y una máquina
+  cargada llega al assert antes que las últimas etapas; ahora reportan síncronamente). Las otras
+  cinco dependían del equipo: sin ningún endpoint de audio el catálogo se declara bloqueado en vez de
+  fallar, una muestra HDR generada sin metadatos de color declara su precondición rota, y la promesa
+  de ±5 s y el presupuesto de frame se declaran fuera del alcance de un runner compartido — sus
+  puertas siguen midiéndose en el arnés físico local, como siempre.
+- **La declaración de privacidad no mencionaba al actualizador.** La tabla de conexiones seguía
+  describiendo la aplicación anterior a T44: enumeraba los dos destinos de metadatos y negaba que
+  existiera comprobación de actualizaciones, cuando el actualizador —opcional y desactivado de
+  fábrica— habla con `api.github.com` y `github.com`. La tabla enumera ahora los cuatro destinos, el
+  resto de documentos acota «ninguna conexión» a los metadatos, y una prueba nueva falla si el
+  registro de propósitos de red y la tabla vuelven a divergir en cualquiera de los dos idiomas.
+- **Diez estados de la matriz decían más de lo demostrado.** La auditoría del 2026-08-08 encontró una
+  familia de un solo defecto: componentes construidos, registrados y probados que ningún camino de la
+  aplicación ensamblada invoca — la identificación, la vigilancia de carpetas, la agrupación de
+  duplicados, el bucle de guardado periódico, la reanudación, la cuenta atrás del siguiente episodio
+  y las teclas de atajo y multimedia — más un ciclo MSIX verificado sobre una copia resellada que el
+  artefacto sin firma no puede repetir. Esas filas (PRD-002, LIB-002/003/006/007/008, PLY-008/011/014
+  y REL-003) vuelven a `IMPLEMENTED`, cada una con su bloqueo, responsable y condición de desbloqueo
+  en el manifiesto de verificación. La evidencia por componente sigue siendo válida; lo que faltaba
+  era el ensamblaje, y ahora el registro lo dice.
+  pero ningún camino de la aplicación pedía nunca una comprobación automática: sólo se comprobaba al
+  pulsar el botón. Lo encontró la verificación física de T44, no las pruebas.
+- **El actualizador consultaba un repositorio que no existe.** Pedía `ap-solutions/ap-reelume` en vez
+  de `apvisualsolutions/ap-reelume`; GitHub habría respondido 404 y la aplicación habría dicho «ya
+  tienes la versión más reciente» indefinidamente. Ahora una prueba compara esa dirección con la que
+  publican los changelogs.
+- **Un resumen que empezara por un subtítulo llegaba vacío,** porque el lector de secciones cortaba
+  en `###` además de en `##`. Una versión así no se habría ofrecido a nadie.
+- **El aviso de que Windows no abrió el paquete decía «puedes intentarlo otra vez».** En una máquina
+  sin instalador de aplicaciones, reintentar no funciona nunca. Ahora dice que el archivo está
+  descargado y comprobado, y cómo instalarlo a mano.
+- **La puerta de recursos de reproducción fallaba una de cada tres ejecuciones sin regresión alguna.**
+  Comparaba el conjunto de trabajo del proceso entero —host de pruebas y recolector de cobertura
+  incluidos— con un margen de 32 MiB, y siete ejecuciones sin tocar el código dieron entre −7,9 y
+  +37,6 MiB. Ajustar una pendiente tampoco sirve: se midió y va de −170 a +1107 KiB por ciclo. El
+  límite pasa a 128 MiB, que es lo que corresponde a una regresión gruesa; lo que detecta una fuga
+  son los recuentos exactos que ya se comprueban en los cincuenta ciclos.
+- **La matriz de medios de prueba no se podía generar desde cero.** Varias muestras mezclan una pista
+  de subtítulos desde un archivo acompañante, y su receta lo nombraba con un marcador que el
+  generador nunca sustituía ni escribía. Estaba tapado por dos caminos a la vez: en una máquina que
+  ya tenía el árbol de salida, las muestras se reutilizaban en vez de producirse; y sin ffmpeg, el
+  guion termina antes de intentarlo. Lo descubrió mudar el proyecto de carpeta.
+- **Una redacción anterior de la biblioteca personal estaba incompleta.** Se había sustituido el
+  título de una serie en español y quedaba el mismo título en inglés, porque el patrón que se buscaba
+  estaba escrito en español. Ahora la comprobación no depende de que nadie se acuerde:
+  `RepositoryPrivacyTests` recorre los archivos versionados en cada ejecución y deriva lo que busca
+  de la máquina, sin escribir ningún dato personal en el código.
+- **Una prueba de recuperación fallaba una de cada dos ejecuciones,** porque esperaba a que el
+  archivo de señal *existiera* y lo leía acto seguido: existir y estar terminado son momentos
+  distintos, y leer entre ambos choca con el proceso que aún lo tiene abierto. Ahora la espera
+  consiste en leerlo.
+- **El botón de saltar marcas nunca recibía datos.** Estaba construido desde el MVP y ninguna
+  parte del ensamblado le entregaba las marcas ni la posición, así que el salto de introducciones
+  sólo existía en las pruebas. Ahora sigue al playhead con las marcas compuestas —manuales y
+  detectadas—, el editor carga las marcas reales de la serie, y un episodio resuelve su serie de
+  verdad en lugar de tratar cada archivo como serie propia.
+- **La rama por defecto ya no puede quedarse atrás al publicar.** La redacción de la biblioteca
+  personal vivía sólo en la rama de trabajo y el árbol de `main` siguió mostrando lo redactado
+  hasta que la auditoría lo encontró; `main` se avanzó hasta la rama y `prepare-release.ps1`
+  bloquea desde entonces cualquier publicación con `main` por detrás.
+- **La compilación ARM64 nunca había funcionado.** El proyecto de Windows fijaba `PlatformTarget` a
+  `x64` sin condición, así que `-r win-arm64` fallaba con `NETSDK1032`. La comprobación temprana que
+  existía para detectarlo era un `dotnet restore`, que resuelve paquetes sin compilar nada: daba
+  verde mientras el build era imposible. Ahora la CI construye el paquete ARM64, que contiene esa
+  comprobación y además la responde.
+
+### Nota
+
+- **Cuatro guardias del ensamblado dejaron de leer el código como texto.** Afirmaban su promesa
+  buscando caracteres en el archivo de composición — lo que un comentario o un registro muerto
+  puede satisfacer, y ya había pasado tres veces. Ahora afirman los descriptores registrados y,
+  en el caso del actualizador, la dirección del objeto que la aplicación construye de verdad,
+  comparada con la que publican los dos changelogs. Las dos mitades que ningún descriptor puede
+  expresar quedan declaradas como texto a la espera de la reforma del arranque.
+- **El código nuevo ya no puede llegar sin sus pruebas.** Cada verificación exige ahora que todo
+  archivo fuente nuevo respecto a `main` llegue con al menos el 96 % de sus líneas y ramas
+  cubiertas por las suites, con el veredicto por archivo escrito junto a los resultados. La
+  puerta se calibró contra la sesión anterior y encontró tres archivos reales por debajo del
+  listón —los caminos felices estaban paseados de punta a punta; sus ramas de error, no—, que
+  quedan nombrados como deuda visible en la evidencia en lugar de bajar el listón para taparlos.
+- **La mejora de calidad para vídeos de baja resolución queda aplazada con su medición.** Se
+  investigó con un spike medible sobre medios reales si los filtros de vídeo de VLC 3 (nitidez,
+  reducción de ruido, deblocking, escalado) pueden mejorar las series de menos de 720p: ninguno
+  procesa un solo fotograma en la ruta de vídeo de esta aplicación — el propio VLC monta la
+  cadena y la retira entera al no poder casar los formatos, con cualquier decodificador y
+  formato de salida. La función no se promete: su fila queda aplazada con la evidencia medida y
+  las alternativas reales (VLC 4, realce propio sobre los fotogramas ya decodificados u otro
+  motor) documentadas con su coste, para decidirse con conocimiento y no por intuición.
+- **Los presupuestos de rendimiento ya no bloquean en runners compartidos.** Dos presupuestos
+  fallaron en CI midiendo el ruido del vecino, nunca en local. La CI los sigue ejecutando y archiva
+  su veredicto con los resultados, pero no puede fallar por ellos; siguen bloqueando en el arnés
+  físico local, que es donde significan algo. La prueba de durabilidad WAL gana además un reintento
+  acotado (3 intentos / 1 s) solo en la reapertura posterior al kill: el «disk I/O error»
+  transitorio del disco del runner no es el fenómeno bajo prueba.
+- **Ni el actualizador ni winget funcionan mientras el repositorio sea privado.** Los dos leen la
+  dirección de publicaciones de GitHub, que para un repositorio privado no responde a nadie; como la
+  ausencia de publicación es una respuesta resuelta, la aplicación diría «ya tienes la versión más
+  reciente». Publicar el repositorio y cortar una versión son requisitos de que funcionen, no
+  adornos. `eng/build-winget-manifest.ps1 -Verify` lo comprueba preguntando a la dirección.
+- `PRD-003` queda **bloqueado**, no verificado: no hay máquina Windows 11 ARM64 donde certificar la
+  reproducción, y emularla mediría la emulación. Las seis fases físicas están declaradas en
+  `arm64-matrix.json` con su razón. Detalle en
+  [T42-arm64.md](evidence/stable/T42-arm64.md).
+- En ARM64 no existe la decodificación por Intel Quick Sync ni las salidas de vídeo OpenGL: VideoLAN
+  no las compila para esa arquitectura. Las quince diferencias de código nativo entre las dos
+  versiones quedan listadas en el informe del paquete.
+
+## [0.1.0] — 2026-08-04
+
+Primer artefacto instalable. Cataloga, identifica, reproduce y recuerda dónde se quedó, en español y
+en inglés, sin cuenta y sin enviar nada.
+
+### Añadido
+
+- **Biblioteca local.** Carpetas locales, USB y UNC/NAS en su ubicación original, sin copiar ni mover
+  ningún vídeo. Escaneo inicial, al iniciar, manual e incremental, cancelable y reanudable, con
+  vigilancia continua y escaneo de respaldo para unidades que la vigilancia no cubre.
+- **Identificación híbrida.** Detección de película, serie, temporada y episodio por nombre y
+  carpeta, con metadatos de TMDB en español e idioma alternativo. Umbrales de confianza: automático
+  desde el 90 %, sugerido entre el 60 % y el 89 %, pendiente por debajo. Lo dudoso va a una bandeja
+  de revisión.
+- **Duplicados como versiones.** Ningún archivo se borra ni se oculta; se elige versión por calidad y
+  disponibilidad.
+- **Edición protegida de metadatos y arte,** y renombrado opcional con previsualización, registro y
+  deshacer.
+- **Reproductor LibVLC integrado,** con apertura externa como alternativa. Contenedores y códecs
+  habituales, HDR10 con conversión de tono a SDR, pistas y subtítulos internos y externos, velocidad,
+  saltos y volumen amplificado con limitador, pantalla completa y mini reproductor.
+- **Continuidad.** Progreso exacto guardado cada cinco segundos y en pausa, búsqueda y cierre;
+  reanudación dentro de ±5 s; estados de visionado con umbral configurable; progreso trasladado entre
+  versiones compatibles; cuenta atrás cancelable para el siguiente episodio; marcas manuales de
+  introducción y créditos.
+- **Experiencia personal.** Inicio híbrido con reanudar y biblioteca, favoritos, ver más tarde,
+  valoración y recomendaciones locales que se explican y se pueden desactivar.
+- **Accesibilidad.** Teclado completo, foco visible, lectores de pantalla, escalado, alto contraste,
+  reducción de movimiento y subtítulos personalizables.
+- **Datos y privacidad.** SQLite local con WAL y migraciones versionadas, copias rotatorias con
+  manifiesto y exportación/importación ZIP sin vídeos. Cero telemetría sin consentimiento;
+  diagnósticos opt-in y sanitizados.
+- **Integración con Windows.** Bandeja e inicio automático configurables y desactivados por defecto,
+  teclas multimedia y «Abrir con…» que reproduce sin importar al catálogo.
+- **Distribución.** MSIX x64 y ZIP independiente, con SHA-256 publicado, SBOM en CycloneDX y SPDX,
+  licencia y avisos de terceros dentro del artefacto, y compilación reproducible.
+- **La aplicación puede decir dónde vive.** `AP_LOCALMEDIA_DATA_ROOT` nombra la carpeta de datos; se
+  lee una vez al arrancar y en blanco equivale a no ponerla.
+
+### Corregido
+
+Durante el ensamblado y el empaquetado, recorrer la aplicación real encontró defectos que ninguna
+prueba sin cabeza veía:
+
+- Consentir el primer escaneo no escaneaba nada, así que una instalación nueva se quedaba vacía para
+  siempre.
+- Añadir una carpeta repetida cerraba el proceso en lugar de rechazarla con una frase.
+- Un archivo escaneado y sin identificar abría la ficha de serie, que no ofrece reproducir.
+- Elegir una pista de audio ni la aplicaba ni la guardaba.
+- La sesión no alimentaba el registro de progreso, así que la oferta de reanudar no volvía.
+- Retirar el consentimiento de diagnósticos dejaba el informe exportado en el disco.
+- El indicador de estado del vídeo no se alimentaba nunca: quedaba en blanco mientras el motor
+  decodificaba por hardware.
+- Una versión antigua abría y escribía sobre una base que una versión posterior ya había migrado.
+- **Instalado como MSIX, los datos no iban donde esta documentación promete**: Windows redirigía las
+  escrituras al contenedor del paquete, y **desinstalarlo borraba la biblioteca entera**, copias
+  incluidas. El paquete desactiva ahora esa redirección, de modo que el MSIX y el ZIP comparten una
+  sola carpeta de datos y desinstalar retira sólo la aplicación.
+
+### Seguridad
+
+- El artefacto **no lleva ningún token de acceso**. La identificación remota exige poner uno a mano
+  en `AP_LOCALMEDIA_TMDB_TOKEN`, y sin él no se abre ninguna conexión.
+- El paquete declara una sola capacidad, `runFullTrust`, y ninguna de red, ubicación o biblioteca del
+  sistema.
+- El payload se examina antes de publicarse en busca de claves, tokens y rutas locales.
+
+### Limitaciones conocidas
+
+- **Sin firma de código.** Windows mostrará un aviso de SmartScreen, y la documentación no afirma lo
+  contrario. Compruebe el hash publicado; la compilación es reproducible.
+- **El MSIX sin firma no se instala.** Windows exige una firma en la que confíe, así que el MSIX de
+  esta publicación sirve para inspección y archivo; use el ZIP, que no necesita instalador.
+- **Una sola clase de adaptador de vídeo.** La matriz se ejecutó entera sobre el adaptador discreto
+  disponible; este equipo no tiene gráficos integrados, de modo que la ruta de decodificación de
+  Intel Quick Sync no se ha ejercido nunca.
+- **`PLY-004` bloqueado:** la selección de 5.1 y 7.1 no se ha ejercido porque ningún punto final de
+  audio declara más de dos canales.
+- **Sin ARM64,** sin Store y sin actualizador: llegan con la primera publicación estable.
+- **La agrupación automática de versiones no está cableada.** La comparación de versiones existe y
+  está probada, pero hoy nada crea grupos, de modo que en el artefacto sólo aparece si un grupo
+  llegara por otra vía.
+
+[0.1.0]: https://github.com/apvisualsolutions/ap-reelume/releases/tag/v0.1.0

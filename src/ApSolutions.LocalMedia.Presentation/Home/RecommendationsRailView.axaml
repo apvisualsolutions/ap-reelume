@@ -1,0 +1,78 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Home.RecommendationsRailView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    x:DataType="home:RecommendationsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource RecommendationsAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="ReasonTextConverter" />
+  </UserControl.Resources>
+  <Grid RowDefinitions="Auto,*" RowSpacing="8">
+    <WrapPanel ItemSpacing="12" LineSpacing="8">
+      <TextBlock
+          VerticalAlignment="Center"
+          FontSize="18"
+          FontWeight="SemiBold"
+          Text="{DynamicResource RecommendationsHeading}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <Button
+          VerticalAlignment="Center"
+          Command="{Binding ToggleCommand}"
+          Content="{DynamicResource RecommendationsToggleAction}"
+          automation:AutomationProperties.Name="{DynamicResource RecommendationsToggleAction}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding IsEnabled}"
+          Text="{DynamicResource RecommendationsOn}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding IsDisabled}"
+          Text="{DynamicResource RecommendationsOff}" />
+    </WrapPanel>
+
+    <TextBlock
+        Grid.Row="1"
+        IsVisible="{Binding !HasRecommendations}"
+        Text="{DynamicResource RecommendationsEmpty}"
+        TextWrapping="Wrap" />
+
+    <ListBox
+        Grid.Row="1"
+        IsVisible="{Binding HasRecommendations}"
+        ItemsSource="{Binding Items}"
+        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+        ScrollViewer.VerticalScrollBarVisibility="Disabled"
+        automation:AutomationProperties.Name="{DynamicResource RecommendationsHeading}">
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="home:RecommendationItemViewModel">
+          <Border Width="220" Padding="12">
+            <StackPanel Spacing="4">
+              <TextBlock
+                  FontWeight="SemiBold"
+                  Text="{Binding Title}"
+                  TextTrimming="CharacterEllipsis" />
+              <TextBlock
+                  FontSize="12"
+                  IsVisible="{Binding HasReasons}"
+                  Text="{DynamicResource RecommendationsWhyLabel}" />
+              <ItemsControl ItemsSource="{Binding ReasonKeys}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock FontSize="12" Text="{Binding Converter={StaticResource ReasonTextConverter}}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
+</UserControl>

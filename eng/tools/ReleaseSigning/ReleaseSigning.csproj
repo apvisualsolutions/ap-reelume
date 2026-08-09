@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ApSolutions.LocalMedia.ReleaseSigning</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!--
+      The same minisign implementation the product verifies with, compiled in as source the way the
+      test suites share the fake release server. The tool that signs and the binary that verifies
+      cannot drift apart, because they are the same file.
+    -->
+    <Compile Include="..\..\..\src\ApSolutions.LocalMedia.Infrastructure\Updates\Minisign.cs" Link="Minisign.cs" />
+    <PackageReference Include="BouncyCastle.Cryptography" />
+  </ItemGroup>
+</Project>

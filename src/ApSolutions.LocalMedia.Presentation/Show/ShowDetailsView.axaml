@@ -1,0 +1,78 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Show.ShowDetailsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:catalog="clr-namespace:ApSolutions.LocalMedia.Presentation.Catalog"
+    xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
+    x:DataType="show:ShowDetailsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource ShowDetailsAccessibleName}">
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="12">
+    <StackPanel Orientation="Horizontal" Spacing="12">
+      <TextBlock
+          FontSize="30"
+          FontWeight="SemiBold"
+          Text="{Binding Title}"
+          TextTrimming="CharacterEllipsis"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding HasYear}"
+          Text="{Binding YearText}" />
+      <Border
+          Padding="8,4"
+          VerticalAlignment="Center"
+          Background="{DynamicResource AccentSubtleBrush}"
+          CornerRadius="4"
+          IsVisible="{Binding !IsAvailable}"
+          automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
+        <TextBlock FontSize="12" Text="{DynamicResource MediaUnavailable}" />
+      </Border>
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Spacing="8">
+      <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
+      <TextBlock
+          IsVisible="{Binding IsEmpty}"
+          Text="{DynamicResource ShowDetailsEmpty}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="2" IsVisible="{Binding HasSeasons}">
+      <ItemsControl ItemsSource="{Binding Seasons}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="show:SeasonViewModel">
+            <StackPanel Margin="0,0,0,16" Spacing="6">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    IsVisible="{Binding IsRegular}"
+                    Text="{DynamicResource SeasonHeading}" />
+                <TextBlock
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    IsVisible="{Binding IsRegular}"
+                    Text="{Binding SeasonNumberText}" />
+                <TextBlock
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    IsVisible="{Binding IsSpecials}"
+                    Text="{DynamicResource SeasonSpecialsHeading}" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding EpisodeCountText}" />
+                <TextBlock VerticalAlignment="Center" Text="{DynamicResource SeasonEpisodeCountLabel}" />
+              </StackPanel>
+              <ItemsControl ItemsSource="{Binding Episodes}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="show:EpisodeRowViewModel">
+                    <show:EpisodeRowView Margin="0,2" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

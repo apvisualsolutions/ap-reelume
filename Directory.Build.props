@@ -1,0 +1,33 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);NU1605;NU1903;NU1904</WarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <!-- SEC-007: moderate advisories fail the build too; high alone let known issues ride. -->
+    <NuGetAuditLevel>moderate</NuGetAuditLevel>
+    <LocalMediaPackageIdentity>APSolutions.LocalMedia</LocalMediaPackageIdentity>
+    <LocalMediaUriScheme>apsolutions-localmedia</LocalMediaUriScheme>
+    <!--
+      One SemVer for the whole release. The package version is derived from it by appending the
+      revision MSIX reserves, so a manifest can never claim a release nobody built. It is a zero
+      major on purpose: this is the MVP artifact, not the stable publication.
+    -->
+    <Version>0.1.0</Version>
+    <Company>AP Solutions</Company>
+    <Authors>AP Solutions</Authors>
+    <Product>AP Reelume</Product>
+    <Copyright>Copyright © AP Solutions 2026</Copyright>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)eng\test.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+</Project>

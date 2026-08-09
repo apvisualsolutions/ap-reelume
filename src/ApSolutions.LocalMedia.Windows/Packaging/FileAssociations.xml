@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The file associations the packaged application declares.
+
+  This fragment is authored here so the list lives beside the code that honours it. The same list is
+  in ../../ApSolutions.LocalMedia.Windows.Package/Package.appxmanifest, which is the copy Windows
+  reads, and in Domain/Discovery/MediaFileExtensions.cs, which is the copy the scanner reads.
+  FileAssociationPackageTests compares all three, so a drift is a failing suite rather than a file
+  someone forgot.
+
+  The association is opt-in in the only sense that matters here: Windows offers the application in
+  "Open with…", and opening a file plays it without adding anything to the catalogue. Nothing here
+  claims the default handler for a container, because that decision belongs to whoever installs it.
+-->
+<Extensions xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+            xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10">
+  <uap:Extension Category="windows.fileTypeAssociation">
+    <uap:FileTypeAssociation Name="apsolutions-localmedia-video">
+      <uap:DisplayName>AP Reelume</uap:DisplayName>
+      <uap:SupportedFileTypes>
+        <uap:FileType>.mp4</uap:FileType>
+        <uap:FileType>.mkv</uap:FileType>
+        <uap:FileType>.avi</uap:FileType>
+        <uap:FileType>.mov</uap:FileType>
+        <uap:FileType>.webm</uap:FileType>
+        <uap:FileType>.m4v</uap:FileType>
+        <uap:FileType>.ts</uap:FileType>
+        <uap:FileType>.m2ts</uap:FileType>
+      </uap:SupportedFileTypes>
+    </uap:FileTypeAssociation>
+  </uap:Extension>
+</Extensions>

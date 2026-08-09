@@ -1,0 +1,57 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.VideoStatusOverlay"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:VideoStatusViewModel"
+    automation:AutomationProperties.Name="{DynamicResource VideoStatusAccessibleName}"
+    automation:AutomationProperties.LiveSetting="Polite">
+  <Border
+      x:Name="VideoStatusSurface"
+      IsVisible="{Binding HasStatus}"
+      Padding="10"
+      Background="{DynamicResource ShellSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8">
+    <StackPanel Spacing="4">
+      <TextBlock
+          x:Name="HdrPassthroughText"
+          IsVisible="{Binding IsHdrPassthrough}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource VideoStatusHdrPassthrough}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          x:Name="ToneMappedText"
+          IsVisible="{Binding IsToneMapped}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource VideoStatusToneMapped}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          x:Name="StandardRangeText"
+          IsVisible="{Binding IsStandardDynamicRange}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource VideoStatusStandardRange}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          x:Name="HardwareText"
+          IsVisible="{Binding IsHardwareAccelerated}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource VideoStatusHardware}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          x:Name="SoftwareFallbackText"
+          IsVisible="{Binding FellBackToSoftware}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource VideoStatusSoftwareFallback}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          x:Name="UnsupportedFormatText"
+          IsVisible="{Binding IsUnsupportedFormat}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource VideoStatusUnsupportedFormat}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+  </Border>
+</UserControl>

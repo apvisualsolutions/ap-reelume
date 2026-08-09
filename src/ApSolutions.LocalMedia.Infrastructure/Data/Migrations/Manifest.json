@@ -1,0 +1,101 @@
+{
+  "formatVersion": 1,
+  "migrations": [
+    {
+      "version": 1,
+      "name": "initial",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0001_initial.sql",
+      "sha256": "289957B02996FAEB2326A72A96C3D10F33236FAC569E9071262253F860F03D42"
+    },
+    {
+      "version": 2,
+      "name": "library_roots",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0002_library_roots.sql",
+      "sha256": "581BADF374206CB37F744914854E6EAC307BF3403C3539FB89E639CB441642DC"
+    },
+    {
+      "version": 3,
+      "name": "media_files_scans",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0003_media_files_scans.sql",
+      "sha256": "85693F026A7CCA110AFBEA003227AC40B0571EE11635844BAC9E8F1620CEC8FC"
+    },
+    {
+      "version": 4,
+      "name": "catalog_fts",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0004_catalog_fts.sql",
+      "sha256": "96FCD9758EDDE5EEBDE8F4F3A91CA1BD039EAD9CC44D5D2963AC6B4ADDC81B59"
+    },
+    {
+      "version": 5,
+      "name": "file_identity",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0005_file_identity.sql",
+      "sha256": "E735E8464EBDA99E9C42C9EFE68D81F32B39CD1FBDD600007700DCF7B59D8F01"
+    },
+    {
+      "version": 6,
+      "name": "scanned_catalog_projection",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0006_scanned_catalog_projection.sql",
+      "sha256": "F770E6B781E901AA0B691DDCAD779E60C997023EB722BE9298228D931E197223"
+    },
+    {
+      "version": 7,
+      "name": "match_candidates",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0007_match_candidates.sql",
+      "sha256": "04C427FDE69F4416037350AD1CEF7F94642DC7121846365D5B8AFDE9CEA92E64"
+    },
+    {
+      "version": 8,
+      "name": "metadata_cache",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0008_metadata_cache.sql",
+      "sha256": "DE322B19C7328070220E71D09DE158C5311CE42A1A83CDB44B152A3597B97FE9"
+    },
+    {
+      "version": 9,
+      "name": "rename_log",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0009_rename_log.sql",
+      "sha256": "81B787E5578050D71BA4E412C929F21CF3D53415A934977FE211E73EAE4D6E9B"
+    },
+    {
+      "version": 10,
+      "name": "playback_preferences",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0010_playback_preferences.sql",
+      "sha256": "44B3B218A8D983EAB924F3E1F07399EC5CA00C4E90E3E1AB634AB54CC0AEB5EA"
+    },
+    {
+      "version": 11,
+      "name": "watch_state",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0011_watch_state.sql",
+      "sha256": "CEEE6FA8759330AE9511D786881D04CBD1ED0D8417133E95E32EE884837F9657"
+    },
+    {
+      "version": 12,
+      "name": "intro_markers",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0012_intro_markers.sql",
+      "sha256": "9018CC767F4F9297121B3E38FB9E918796C869D3510ACC74D47B06F07C264EDD"
+    },
+    {
+      "version": 13,
+      "name": "personal_state",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0013_personal_state.sql",
+      "sha256": "7161C4C5B7E2364AFB7F342F43940145DFE27AA8C2CEE934B4AFAB3277F268BE"
+    },
+    {
+      "version": 14,
+      "name": "episode_media",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0014_episode_media.sql",
+      "sha256": "A8E74D59DADF6817B907C9092117088BFC12512F3C116C615F9C9362F2AAACE9"
+    },
+    {
+      "version": 15,
+      "name": "catalog_metadata_versions",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0015_catalog_metadata_versions.sql",
+      "sha256": "6DF3A4CB86D9E9681969CEA4A4973BF28B5B2226519D92545BAAF9DF9A6094AC"
+    },
+    {
+      "version": 16,
+      "name": "detected_markers",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0016_detected_markers.sql",
+      "sha256": "A45C68BCF07B57A903706071B2025596B76F65309FD02D1266A9A413EA5B17AD"
+    }
+  ]
+}

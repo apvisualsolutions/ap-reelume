@@ -1,0 +1,22 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Home.HomeView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    x:DataType="home:HomeViewModel"
+    automation:AutomationProperties.Name="{DynamicResource HomeAccessibleName}">
+  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+    <TextBlock
+        FontSize="26"
+        FontWeight="SemiBold"
+        Text="{DynamicResource HomeTitle}"
+        automation:AutomationProperties.HeadingLevel="1" />
+    <home:ResumeHeroView x:Name="ResumeHero" Grid.Row="1" />
+    <home:LibraryEntryView x:Name="LibraryEntry" Grid.Row="2" />
+    <home:InProgressRailView Grid.Row="3" />
+    <ContentControl Grid.Row="4" IsVisible="{Binding HasRecommendationsRail}">
+      <home:RecommendationsRailView DataContext="{Binding Recommendations}" />
+    </ContentControl>
+  </Grid>
+</UserControl>

@@ -1,0 +1,167 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.PlayerView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:PlayerViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PlayerAccessibleName}">
+  <Panel Background="Black">
+    <player:VideoFrameView
+        x:Name="VideoSurface"
+        FrameSource="{Binding FrameSource}"
+        automation:AutomationProperties.Name="{DynamicResource PlayerVideoSurfaceName}" />
+    <Border
+        IsVisible="{Binding HasFailed}"
+        Margin="24"
+        Padding="16"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Background="{DynamicResource ShellSurfaceBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8">
+      <StackPanel Spacing="8">
+        <TextBlock
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerStateFailed}" />
+        <TextBlock
+            IsVisible="{Binding FileWasNotFound}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerFailureFileNotFound}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            IsVisible="{Binding OpenFailed}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerFailureOpenFailed}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            IsVisible="{Binding EngineWasUnavailable}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerFailureEngineUnavailable}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            IsVisible="{Binding CodecIsUnsupported}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerFailureUnsupportedCodec}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            IsVisible="{Binding MediaWasCorrupted}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerFailureCorruptedMedia}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            IsVisible="{Binding HasNoPlayableTrack}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerFailureNoPlayableTrack}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            IsVisible="{Binding CanChooseAnotherVersion}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerRecoveryChooseAnotherVersion}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            IsVisible="{Binding ExternalLaunchFailed}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerRecoveryExternalFailed}"
+            TextWrapping="Wrap" />
+        <StackPanel
+            x:Name="RecoveryActionsSurface"
+            Orientation="Horizontal"
+            Spacing="8">
+          <Button
+              IsVisible="{Binding CanRetry}"
+              automation:AutomationProperties.Name="{DynamicResource PlayerRecoveryRetry}"
+              Command="{Binding RetryCommand}"
+              Content="{DynamicResource PlayerRecoveryRetry}" />
+          <Button
+              IsVisible="{Binding CanOpenExternally}"
+              automation:AutomationProperties.Name="{DynamicResource PlayerRecoveryOpenExternally}"
+              Command="{Binding OpenExternallyCommand}"
+              Content="{DynamicResource PlayerRecoveryOpenExternally}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+    <Border
+        x:Name="AudioAbsenceNotice"
+        IsVisible="{Binding HasNoAudioTrack}"
+        Margin="16"
+        Padding="10"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Top"
+        Background="{DynamicResource ShellSurfaceBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8"
+        Opacity="0.92">
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource PlayerNoticeNoAudioTrack}"
+          TextWrapping="Wrap" />
+    </Border>
+    <Border
+        x:Name="TransportControlsSurface"
+        Margin="16"
+        Padding="12"
+        VerticalAlignment="Bottom"
+        Background="{DynamicResource ShellSurfaceBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8"
+        Opacity="{Binding ControlsOpacity}"
+        automation:AutomationProperties.Name="{DynamicResource PlayerTransportName}">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button
+            IsVisible="{Binding CanResume}"
+            automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
+            Command="{Binding ResumeCommand}"
+            Content="{DynamicResource PlayerPlayAction}" />
+        <Button
+            IsVisible="{Binding CanPause}"
+            automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
+            Command="{Binding PauseCommand}"
+            Content="{DynamicResource PlayerPauseAction}" />
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
+            Command="{Binding StopCommand}"
+            Content="{DynamicResource PlayerStopAction}" />
+        <TextBlock
+            VerticalAlignment="Center"
+            IsVisible="{Binding IsIdle}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerStateIdle}" />
+        <TextBlock
+            VerticalAlignment="Center"
+            IsVisible="{Binding IsOpening}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerStateOpening}" />
+        <TextBlock
+            VerticalAlignment="Center"
+            IsVisible="{Binding IsPlaying}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerStatePlaying}" />
+        <TextBlock
+            VerticalAlignment="Center"
+            IsVisible="{Binding IsPaused}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerStatePaused}" />
+        <TextBlock
+            VerticalAlignment="Center"
+            IsVisible="{Binding IsStopped}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlayerStateStopped}" />
+        <ContentControl
+            x:Name="TransportControlsHost"
+            IsVisible="{Binding Transport, Converter={x:Static ObjectConverters.IsNotNull}}"
+            Content="{Binding Transport}">
+          <ContentControl.ContentTemplate>
+            <DataTemplate DataType="player:TransportControlsViewModel">
+              <player:TransportControlsView />
+            </DataTemplate>
+          </ContentControl.ContentTemplate>
+        </ContentControl>
+      </StackPanel>
+    </Border>
+  </Panel>
+</UserControl>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  What Windows reads about AP Reelume.
+
+  Three things in here are load-bearing and are pinned by tests rather than by review:
+
+  - `Identity/@Name` is the identity the product was designed around and never changes across
+    releases; changing it would make an upgrade look like a second application.
+  - `Identity/@Version` is the SemVer in Directory.Build.props with the revision MSIX reserves.
+    It is written here rather than substituted at build time so the file stays valid XML that a
+    test can read, and a test compares the two.
+  - The file type list is the one the domain approves. The same list is authored beside the code
+    that honours it, in ../ApSolutions.LocalMedia.Windows/Packaging/FileAssociations.xml, and the
+    two are compared so a drift is a failing suite.
+
+  The publisher is a test publisher. There is no paid certificate behind this release and the
+  documentation says so; see ../../docs/release/SMARTSCREEN.es.md.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
+  IgnorableNamespaces="uap rescap desktop6">
+
+  <Identity
+    Name="APSolutions.LocalMedia"
+    Publisher="CN=AP Solutions Test Publisher, O=AP Solutions"
+    Version="0.1.0.0"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>AP Reelume</DisplayName>
+    <PublisherDisplayName>AP Solutions</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <!--
+      Installing this package on a clean machine showed MSIX redirecting the application's writes
+      under AppData into the package container: the library landed in
+      ...\Packages\<family>\LocalCache\Local\... rather than where every document promises, and
+      uninstalling deleted the container — catalogue, progress, and backups with it.
+
+      The redirection happens below the application, so it would rewrite any path the code chose;
+      turning it off is a property of the package. With it disabled, the packaged application and the
+      archive share one data folder, and removing the package removes the application alone.
+    -->
+    <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
+    <desktop6:RegistryWriteVirtualization>disabled</desktop6:RegistryWriteVirtualization>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22621.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="es-ES" />
+    <Resource Language="en-US" />
+  </Resources>
+
+  <Applications>
+    <Application Id="APReelume" Executable="ApSolutions.LocalMedia.Windows.exe" EntryPoint="windows.fullTrustApplication">
+      <uap:VisualElements
+        DisplayName="AP Reelume"
+        Description="Biblioteca y reproductor de vídeo local / Local video library and player"
+        BackgroundColor="#111827"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#111827" />
+      </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="apsolutions-localmedia-video">
+            <uap:DisplayName>AP Reelume</uap:DisplayName>
+            <uap:SupportedFileTypes>
+              <uap:FileType>.mp4</uap:FileType>
+              <uap:FileType>.mkv</uap:FileType>
+              <uap:FileType>.avi</uap:FileType>
+              <uap:FileType>.mov</uap:FileType>
+              <uap:FileType>.webm</uap:FileType>
+              <uap:FileType>.m4v</uap:FileType>
+              <uap:FileType>.ts</uap:FileType>
+              <uap:FileType>.m2ts</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <!--
+    A full-trust desktop application already holds every right its process needs, so nothing further
+    is claimed here. That is what makes the privacy promise readable from the manifest alone: no
+    capability in this file grants the package anything the user did not install it to do.
+  -->
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <!--
+      Required to turn the write virtualisation above off. It grants no access to anything of the
+      user's: it lets the application write where it already writes when it runs from the archive,
+      instead of into a container the uninstall deletes.
+    -->
+    <rescap:Capability Name="unvirtualizedResources" />
+  </Capabilities>
+</Package>

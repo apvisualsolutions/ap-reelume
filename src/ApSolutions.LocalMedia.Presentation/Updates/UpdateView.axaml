@@ -1,0 +1,139 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Updates.UpdateView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:updates="clr-namespace:ApSolutions.LocalMedia.Presentation.Updates"
+    x:DataType="updates:UpdateViewModel"
+    automation:AutomationProperties.Name="{DynamicResource UpdateAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="UpdateResourceKey" />
+  </UserControl.Resources>
+  <StackPanel x:Name="UpdateSurface" Spacing="12">
+    <TextBlock
+        FontSize="20"
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource UpdateTitle}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <TextBlock
+        MaxWidth="640"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource UpdateDescription}"
+        TextWrapping="Wrap" />
+
+    <CheckBox
+        x:Name="UpdateAutomaticCheckBox"
+        Content="{DynamicResource UpdateAutomaticCheckLabel}"
+        IsChecked="{Binding AutomaticCheckEnabled}"
+        automation:AutomationProperties.Name="{DynamicResource UpdateAutomaticCheckLabel}" />
+
+    <Border
+        x:Name="UpdateStatusSurface"
+        Padding="16"
+        Background="{DynamicResource AccentSubtleBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8"
+        automation:AutomationProperties.Name="{DynamicResource UpdateStatusAccessibleName}"
+        automation:AutomationProperties.LiveSetting="Polite">
+      <StackPanel Spacing="8">
+        <TextBlock
+            x:Name="UpdateStatusText"
+            MaxWidth="600"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding StatusKey, Converter={StaticResource UpdateResourceKey}}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="UpdateDetailText"
+            MaxWidth="600"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            IsVisible="{Binding DetailKey, Converter={x:Static ObjectConverters.IsNotNull}}"
+            Text="{Binding DetailKey, Converter={StaticResource UpdateResourceKey}}"
+            TextWrapping="Wrap" />
+        <ProgressBar
+            x:Name="UpdateProgressBar"
+            Maximum="{Binding Total}"
+            Minimum="0"
+            IsVisible="{Binding IsBusy}"
+            Value="{Binding Completed}"
+            automation:AutomationProperties.Name="{DynamicResource UpdateProgressAccessibleName}" />
+      </StackPanel>
+    </Border>
+
+    <!--
+      What changed, in both languages. The one the interface speaks is what somebody reads before
+      confirming; the other stays on the surface because a release note is worth being able to quote.
+    -->
+    <Border
+        x:Name="UpdateOfferSurface"
+        Padding="16"
+        Background="{DynamicResource CardSurfaceBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8"
+        IsVisible="{Binding HasOffer}"
+        automation:AutomationProperties.Name="{DynamicResource UpdateOfferAccessibleName}">
+      <StackPanel Spacing="6">
+        <TextBlock
+            x:Name="UpdateOfferedVersion"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding OfferedVersion}"
+            automation:AutomationProperties.HeadingLevel="3" />
+        <TextBlock
+            x:Name="UpdateSummarySpanish"
+            MaxWidth="600"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding SummarySpanish}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="UpdateSummaryEnglish"
+            MaxWidth="600"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding SummaryEnglish}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="UpdatePackageName"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            IsVisible="{Binding IsReadyToInstall}"
+            Text="{Binding PackageName}"
+            TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <Button
+          x:Name="UpdateCheckButton"
+          Command="{Binding CheckCommand}"
+          Content="{DynamicResource UpdateCheckLabel}"
+          IsEnabled="{Binding IsIdle}"
+          automation:AutomationProperties.Name="{DynamicResource UpdateCheckLabel}" />
+      <Button
+          x:Name="UpdateDownloadButton"
+          Command="{Binding DownloadCommand}"
+          Content="{DynamicResource UpdateDownloadLabel}"
+          IsVisible="{Binding HasOffer}"
+          automation:AutomationProperties.Name="{DynamicResource UpdateDownloadLabel}" />
+      <Button
+          x:Name="UpdateInstallButton"
+          Command="{Binding InstallCommand}"
+          Content="{DynamicResource UpdateInstallLabel}"
+          IsVisible="{Binding IsReadyToInstall}"
+          automation:AutomationProperties.Name="{DynamicResource UpdateInstallLabel}" />
+      <Button
+          x:Name="UpdateCancelButton"
+          Command="{Binding CancelCommand}"
+          Content="{DynamicResource UpdateCancelLabel}"
+          IsEnabled="{Binding IsBusy}"
+          automation:AutomationProperties.Name="{DynamicResource UpdateCancelLabel}" />
+    </WrapPanel>
+
+    <TextBlock
+        MaxWidth="640"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource UpdateConfirmationNotice}"
+        TextWrapping="Wrap" />
+  </StackPanel>
+</UserControl>

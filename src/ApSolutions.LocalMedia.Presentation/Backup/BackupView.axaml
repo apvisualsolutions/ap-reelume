@@ -1,0 +1,86 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Backup.BackupView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:backup="clr-namespace:ApSolutions.LocalMedia.Presentation.Backup"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    x:DataType="backup:BackupViewModel"
+    automation:AutomationProperties.Name="{DynamicResource BackupAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="BackupResourceKey" />
+  </UserControl.Resources>
+  <StackPanel x:Name="BackupSurface" Spacing="12">
+    <TextBlock
+        FontSize="20"
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource BackupTitle}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <TextBlock
+        MaxWidth="640"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource BackupDescription}"
+        TextWrapping="Wrap" />
+
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <Button
+          x:Name="CreateCopyButton"
+          Command="{Binding CreateCopyCommand}"
+          Content="{DynamicResource BackupCreateCopyLabel}"
+          IsEnabled="{Binding IsIdle}"
+          automation:AutomationProperties.Name="{DynamicResource BackupCreateCopyLabel}" />
+      <Button
+          x:Name="ExportButton"
+          Command="{Binding ExportCommand}"
+          Content="{DynamicResource BackupExportLabel}"
+          IsEnabled="{Binding IsIdle}"
+          automation:AutomationProperties.Name="{DynamicResource BackupExportLabel}" />
+      <Button
+          x:Name="CancelBackupButton"
+          Command="{Binding CancelCommand}"
+          Content="{DynamicResource BackupCancelLabel}"
+          IsEnabled="{Binding IsRunning}"
+          automation:AutomationProperties.Name="{DynamicResource BackupCancelLabel}" />
+    </WrapPanel>
+
+    <Border
+        x:Name="BackupStatusSurface"
+        Padding="16"
+        Background="{DynamicResource AccentSubtleBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8"
+        automation:AutomationProperties.Name="{DynamicResource BackupStatusAccessibleName}"
+        automation:AutomationProperties.LiveSetting="Polite">
+      <StackPanel Spacing="8">
+        <TextBlock
+            x:Name="BackupStatusText"
+            MaxWidth="600"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding StatusKey, Converter={StaticResource BackupResourceKey}}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="BackupStageText"
+            MaxWidth="600"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            IsVisible="{Binding IsRunning}"
+            Text="{Binding StageKey, Converter={StaticResource BackupResourceKey}}"
+            TextWrapping="Wrap" />
+        <ProgressBar
+            x:Name="BackupProgressBar"
+            Maximum="{Binding Total}"
+            Minimum="0"
+            IsVisible="{Binding IsRunning}"
+            Value="{Binding Completed}"
+            automation:AutomationProperties.Name="{DynamicResource BackupProgressAccessibleName}" />
+      </StackPanel>
+    </Border>
+
+    <TextBlock
+        MaxWidth="640"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource BackupExcludedNotice}"
+        TextWrapping="Wrap" />
+  </StackPanel>
+</UserControl>

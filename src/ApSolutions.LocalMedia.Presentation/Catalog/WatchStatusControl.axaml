@@ -1,0 +1,70 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Catalog.WatchStatusControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:catalog="clr-namespace:ApSolutions.LocalMedia.Presentation.Catalog"
+    x:DataType="catalog:WatchStatusViewModel"
+    automation:AutomationProperties.Name="{DynamicResource WatchStatusAccessibleName}">
+  <StackPanel x:Name="WatchStatusSurface" Spacing="8">
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <TextBlock
+          x:Name="NotStartedGlyph"
+          IsVisible="{Binding IsNotStarted}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="○" />
+      <TextBlock
+          x:Name="NotStartedText"
+          IsVisible="{Binding IsNotStarted}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource WatchStatusNotStarted}" />
+
+      <TextBlock
+          x:Name="InProgressGlyph"
+          IsVisible="{Binding IsInProgress}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="◐" />
+      <TextBlock
+          x:Name="InProgressText"
+          IsVisible="{Binding IsInProgress}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource WatchStatusInProgress}" />
+
+      <TextBlock
+          x:Name="WatchedGlyph"
+          IsVisible="{Binding IsWatched}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="●" />
+      <TextBlock
+          x:Name="WatchedText"
+          IsVisible="{Binding IsWatched}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource WatchStatusWatched}" />
+    </StackPanel>
+
+    <TextBlock
+        x:Name="ManualOverrideText"
+        IsVisible="{Binding IsManualOverride}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource WatchStatusManualOverride}"
+        TextWrapping="Wrap" />
+
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <Button
+          x:Name="MarkWatchedButton"
+          Command="{Binding MarkWatchedCommand}"
+          Content="{DynamicResource WatchStatusMarkWatched}"
+          automation:AutomationProperties.Name="{DynamicResource WatchStatusMarkWatched}" />
+      <Button
+          x:Name="MarkNotStartedButton"
+          Command="{Binding MarkNotStartedCommand}"
+          Content="{DynamicResource WatchStatusMarkNotStarted}"
+          automation:AutomationProperties.Name="{DynamicResource WatchStatusMarkNotStarted}" />
+      <Button
+          x:Name="ClearOverrideButton"
+          Command="{Binding ClearOverrideCommand}"
+          Content="{DynamicResource WatchStatusClearOverride}"
+          automation:AutomationProperties.Name="{DynamicResource WatchStatusClearOverride}" />
+    </WrapPanel>
+  </StackPanel>
+</UserControl>

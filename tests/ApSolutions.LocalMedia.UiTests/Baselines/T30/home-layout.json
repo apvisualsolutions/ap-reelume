@@ -1,0 +1,722 @@
+[
+  {
+    "Id": "1366x768@100-Light-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1,
+    "Theme": "Light",
+    "Language": "es",
+    "ViewportWidth": 1366,
+    "ViewportHeight": 768,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@100-Light-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1,
+    "Theme": "Light",
+    "Language": "en",
+    "ViewportWidth": 1366,
+    "ViewportHeight": 768,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@100-Dark-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1,
+    "Theme": "Dark",
+    "Language": "es",
+    "ViewportWidth": 1366,
+    "ViewportHeight": 768,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@100-Dark-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1,
+    "Theme": "Dark",
+    "Language": "en",
+    "ViewportWidth": 1366,
+    "ViewportHeight": 768,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@100-HighContrast-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1,
+    "Theme": "HighContrast",
+    "Language": "es",
+    "ViewportWidth": 1366,
+    "ViewportHeight": 768,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@100-HighContrast-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1,
+    "Theme": "HighContrast",
+    "Language": "en",
+    "ViewportWidth": 1366,
+    "ViewportHeight": 768,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@150-Light-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1.5,
+    "Theme": "Light",
+    "Language": "es",
+    "ViewportWidth": 911,
+    "ViewportHeight": 512,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@150-Light-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1.5,
+    "Theme": "Light",
+    "Language": "en",
+    "ViewportWidth": 911,
+    "ViewportHeight": 512,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@150-Dark-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1.5,
+    "Theme": "Dark",
+    "Language": "es",
+    "ViewportWidth": 911,
+    "ViewportHeight": 512,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@150-Dark-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1.5,
+    "Theme": "Dark",
+    "Language": "en",
+    "ViewportWidth": 911,
+    "ViewportHeight": 512,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@150-HighContrast-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1.5,
+    "Theme": "HighContrast",
+    "Language": "es",
+    "ViewportWidth": 911,
+    "ViewportHeight": 512,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@150-HighContrast-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 1.5,
+    "Theme": "HighContrast",
+    "Language": "en",
+    "ViewportWidth": 911,
+    "ViewportHeight": 512,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@200-Light-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 2,
+    "Theme": "Light",
+    "Language": "es",
+    "ViewportWidth": 683,
+    "ViewportHeight": 384,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@200-Light-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 2,
+    "Theme": "Light",
+    "Language": "en",
+    "ViewportWidth": 683,
+    "ViewportHeight": 384,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@200-Dark-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 2,
+    "Theme": "Dark",
+    "Language": "es",
+    "ViewportWidth": 683,
+    "ViewportHeight": 384,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@200-Dark-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 2,
+    "Theme": "Dark",
+    "Language": "en",
+    "ViewportWidth": 683,
+    "ViewportHeight": 384,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@200-HighContrast-es",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 2,
+    "Theme": "HighContrast",
+    "Language": "es",
+    "ViewportWidth": 683,
+    "ViewportHeight": 384,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "1366x768@200-HighContrast-en",
+    "WidthPixels": 1366,
+    "HeightPixels": 768,
+    "Scale": 2,
+    "Theme": "HighContrast",
+    "Language": "en",
+    "ViewportWidth": 683,
+    "ViewportHeight": 384,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@100-Light-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1,
+    "Theme": "Light",
+    "Language": "es",
+    "ViewportWidth": 3840,
+    "ViewportHeight": 2160,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@100-Light-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1,
+    "Theme": "Light",
+    "Language": "en",
+    "ViewportWidth": 3840,
+    "ViewportHeight": 2160,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@100-Dark-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1,
+    "Theme": "Dark",
+    "Language": "es",
+    "ViewportWidth": 3840,
+    "ViewportHeight": 2160,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@100-Dark-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1,
+    "Theme": "Dark",
+    "Language": "en",
+    "ViewportWidth": 3840,
+    "ViewportHeight": 2160,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@100-HighContrast-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1,
+    "Theme": "HighContrast",
+    "Language": "es",
+    "ViewportWidth": 3840,
+    "ViewportHeight": 2160,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@100-HighContrast-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1,
+    "Theme": "HighContrast",
+    "Language": "en",
+    "ViewportWidth": 3840,
+    "ViewportHeight": 2160,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@150-Light-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1.5,
+    "Theme": "Light",
+    "Language": "es",
+    "ViewportWidth": 2560,
+    "ViewportHeight": 1440,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@150-Light-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1.5,
+    "Theme": "Light",
+    "Language": "en",
+    "ViewportWidth": 2560,
+    "ViewportHeight": 1440,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@150-Dark-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1.5,
+    "Theme": "Dark",
+    "Language": "es",
+    "ViewportWidth": 2560,
+    "ViewportHeight": 1440,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@150-Dark-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1.5,
+    "Theme": "Dark",
+    "Language": "en",
+    "ViewportWidth": 2560,
+    "ViewportHeight": 1440,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@150-HighContrast-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1.5,
+    "Theme": "HighContrast",
+    "Language": "es",
+    "ViewportWidth": 2560,
+    "ViewportHeight": 1440,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@150-HighContrast-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 1.5,
+    "Theme": "HighContrast",
+    "Language": "en",
+    "ViewportWidth": 2560,
+    "ViewportHeight": 1440,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 283,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@200-Light-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 2,
+    "Theme": "Light",
+    "Language": "es",
+    "ViewportWidth": 1920,
+    "ViewportHeight": 1080,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@200-Light-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 2,
+    "Theme": "Light",
+    "Language": "en",
+    "ViewportWidth": 1920,
+    "ViewportHeight": 1080,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@200-Dark-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 2,
+    "Theme": "Dark",
+    "Language": "es",
+    "ViewportWidth": 1920,
+    "ViewportHeight": 1080,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@200-Dark-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 2,
+    "Theme": "Dark",
+    "Language": "en",
+    "ViewportWidth": 1920,
+    "ViewportHeight": 1080,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@200-HighContrast-es",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 2,
+    "Theme": "HighContrast",
+    "Language": "es",
+    "ViewportWidth": 1920,
+    "ViewportHeight": 1080,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  },
+  {
+    "Id": "3840x2160@200-HighContrast-en",
+    "WidthPixels": 3840,
+    "HeightPixels": 2160,
+    "Scale": 2,
+    "Theme": "HighContrast",
+    "Language": "en",
+    "ViewportWidth": 1920,
+    "ViewportHeight": 1080,
+    "FirstFocus": "ResumeHeroAction",
+    "FocusOrder": [
+      "ResumeHeroAction",
+      "LibraryEntryAction"
+    ],
+    "ResumeHeroVisible": true,
+    "LibraryEntryVisible": true,
+    "LibraryEntryBottom": 284,
+    "LibraryEntryWithinFirstViewport": true,
+    "RecommendationsRailVisible": true
+  }
+]

@@ -1,0 +1,25 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.ScanSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:ScanSettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource ScanSettingsAccessibleName}">
+  <StackPanel Spacing="12">
+    <TextBlock
+        FontSize="24"
+        FontWeight="SemiBold"
+        Text="{DynamicResource ScanSettingsTitle}"
+        automation:AutomationProperties.HeadingLevel="1" />
+    <CheckBox
+        automation:AutomationProperties.Name="{DynamicResource ScanSettingsWatchLocal}"
+        Content="{DynamicResource ScanSettingsWatchLocal}"
+        IsChecked="{Binding WatchLocalRoots}" />
+    <NumericUpDown
+        automation:AutomationProperties.Name="{DynamicResource ScanSettingsFallbackMinutes}"
+        Minimum="1"
+        Maximum="1440"
+        Value="{Binding FallbackIntervalMinutes}" />
+  </StackPanel>
+</UserControl>

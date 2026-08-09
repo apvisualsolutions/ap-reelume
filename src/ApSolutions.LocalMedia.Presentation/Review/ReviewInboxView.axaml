@@ -1,0 +1,126 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Review.ReviewInboxView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
+    x:DataType="review:ReviewInboxViewModel"
+    KeyDown="OnReviewKeyDown"
+    automation:AutomationProperties.Name="{DynamicResource ReviewInboxAccessibleName}">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Escape" Command="{Binding ClearSelectionCommand}" />
+  </UserControl.KeyBindings>
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+    <TextBlock
+        FontSize="32"
+        FontWeight="SemiBold"
+        Text="{DynamicResource ReviewInboxTitle}"
+        automation:AutomationProperties.HeadingLevel="1" />
+    <StackPanel
+        Grid.Row="1"
+        Spacing="8"
+        IsVisible="{Binding HasReassignments}"
+        automation:AutomationProperties.Name="{DynamicResource ReassignmentSectionAccessibleName}">
+      <TextBlock
+          FontSize="20"
+          FontWeight="SemiBold"
+          Text="{DynamicResource ReassignmentSectionTitle}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <TextBlock
+          MaxWidth="720"
+          Text="{DynamicResource ReassignmentSectionDescription}"
+          TextWrapping="Wrap" />
+      <ItemsControl ItemsSource="{Binding Reassignments}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="review:PendingReassignmentViewModel">
+            <Border
+                Margin="0,4"
+                Padding="12"
+                Background="{DynamicResource AccentSubtleBrush}"
+                BorderBrush="{DynamicResource ShellBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+              <StackPanel Spacing="8">
+                <TextBlock FontWeight="SemiBold" Text="{Binding NewPath}" TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding Candidates}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="review:ReassignmentCandidateViewModel">
+                      <StackPanel Margin="0,2" Orientation="Horizontal" Spacing="12">
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Path}" TextWrapping="Wrap" />
+                        <Button
+                            automation:AutomationProperties.Name="{DynamicResource ReassignmentConfirmAction}"
+                            Command="{Binding ConfirmCommand}"
+                            Content="{DynamicResource ReassignmentConfirmAction}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button
+                    HorizontalAlignment="Left"
+                    automation:AutomationProperties.Name="{DynamicResource ReassignmentKeepAction}"
+                    Command="{Binding KeepAsNewCommand}"
+                    Content="{DynamicResource ReassignmentKeepAction}" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+      <TextBox
+          x:Name="ManualSearchBox"
+          automation:AutomationProperties.Name="{DynamicResource ReviewManualSearchLabel}"
+          Text="{Binding ManualSearch}"
+          PlaceholderText="{DynamicResource ReviewManualSearchPlaceholder}" />
+      <Button
+          x:Name="ManualSearchAction"
+          Grid.Column="1"
+          automation:AutomationProperties.Name="{DynamicResource ReviewManualSearchAction}"
+          Command="{Binding SearchManuallyCommand}"
+          Content="{DynamicResource ReviewManualSearchAction}" />
+    </Grid>
+    <ListBox
+        x:Name="ReviewCandidates"
+        Grid.Row="3"
+        automation:AutomationProperties.Name="{DynamicResource ReviewCandidateListName}"
+        ItemsSource="{Binding Items}"
+        SelectedItem="{Binding SelectedItem}">
+      <ListBox.KeyBindings>
+        <KeyBinding Gesture="Enter" Command="{Binding AcceptSelectedCommand}" />
+      </ListBox.KeyBindings>
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="review:CandidateCardViewModel">
+          <review:CandidateCardView />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <WrapPanel Grid.Row="4" ItemSpacing="8" LineSpacing="8">
+      <Button
+          x:Name="AcceptReviewAction"
+          automation:AutomationProperties.Name="{DynamicResource ReviewAcceptAction}"
+          Command="{Binding AcceptSelectedCommand}"
+          Content="{DynamicResource ReviewAcceptAction}" />
+      <Button
+          x:Name="RejectReviewAction"
+          automation:AutomationProperties.Name="{DynamicResource ReviewRejectAction}"
+          Command="{Binding RejectSelectedCommand}"
+          Content="{DynamicResource ReviewRejectAction}" />
+      <Button
+          x:Name="LoadMoreReviewAction"
+          automation:AutomationProperties.Name="{DynamicResource ReviewLoadMoreAction}"
+          Command="{Binding LoadMoreCommand}"
+          Content="{DynamicResource ReviewLoadMoreAction}"
+          IsVisible="{Binding HasMore}" />
+      <TextBlock
+          VerticalAlignment="Center"
+          IsVisible="{Binding HasConflict}"
+          Text="{DynamicResource ReviewConflictMessage}"
+          TextWrapping="Wrap" />
+    </WrapPanel>
+  </Grid>
+</UserControl>

@@ -1,0 +1,96 @@
+{
+  "version": "0.1.0",
+  "manifestSha256": "402ae30c4a3c9e07520f5fa9d70cd81883421ddeec230c9f08bc527a6309d1e9",
+  "runner": "Windows Sandbox",
+  "note": "Run inside Windows Sandbox: a clean, disposable Windows created at launch and destroyed when the window closed. The package was signed by a throwaway certificate carrying the manifest published publisher, trusted inside the sandbox and nowhere else; the published artifact remains unsigned. The report expires when Package.appxmanifest changes, because the manifest is what governs installation, associations, and write virtualisation.",
+  "machine": {
+    "cleanVirtualMachine": true,
+    "elevated": true,
+    "sandbox": true,
+    "os": "Microsoft Windows 11 Enterprise",
+    "build": "10.0.26100"
+  },
+  "phases": [
+    {
+      "id": "developer-mode",
+      "outcome": "Passed",
+      "detail": "Developer mode enabled inside the sandbox; it dies with the window."
+    },
+    {
+      "id": "trust-test-certificate",
+      "outcome": "Passed",
+      "detail": "The throwaway certificate is trusted inside the sandbox only."
+    },
+    {
+      "id": "windows-install",
+      "outcome": "Passed",
+      "detail": "Windows registered APSolutions.LocalMedia 0.1.0.0",
+      "family": "APSolutions.LocalMedia_8sg7nj2tbse8g",
+      "version": "0.1.0.0",
+      "installLocation": "C:\\Program Files\\WindowsApps\\APSolutions.LocalMedia_0.1.0.0_x64__8sg7nj2tbse8g"
+    },
+    {
+      "id": "file-association",
+      "outcome": "Passed",
+      "detail": "8 of 8 containers registered an Open-with entry",
+      "registered": [
+        ".mp4",
+        ".mkv",
+        ".avi",
+        ".mov",
+        ".webm",
+        ".m4v",
+        ".ts",
+        ".m2ts"
+      ],
+      "locations": [
+        ".mp4 -> HKCU:\\SOFTWARE\\Classes\\.mp4\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+        ".mkv -> HKCU:\\SOFTWARE\\Classes\\.mkv\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+        ".avi -> HKCU:\\SOFTWARE\\Classes\\.avi\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+        ".mov -> HKCU:\\SOFTWARE\\Classes\\.mov\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+        ".webm -> HKCU:\\SOFTWARE\\Classes\\.webm\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+        ".m4v -> HKCU:\\SOFTWARE\\Classes\\.m4v\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+        ".ts -> HKCU:\\SOFTWARE\\Classes\\.ts\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+        ".m2ts -> HKCU:\\SOFTWARE\\Classes\\.m2ts\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf"
+      ]
+    },
+    {
+      "id": "windows-launch",
+      "outcome": "Passed",
+      "detail": "Window shown: True; database at the documented path: True; virtualised copy: False",
+      "databaseAtDocumented": true,
+      "virtualisedPath": "C:\\Users\\WDAGUtilityAccount\\AppData\\Local\\Packages\\APSolutions.LocalMedia_8sg7nj2tbse8g\\LocalCache\\Local\\APSolutions\\LocalMedia",
+      "databaseAtVirtualised": false,
+      "documentedPath": "C:\\Users\\WDAGUtilityAccount\\AppData\\Local\\APSolutions\\LocalMedia"
+    },
+    {
+      "id": "windows-upgrade",
+      "outcome": "Passed",
+      "detail": "0.1.0.0 replaced by 0.2.0.0; the database survived at 356352 bytes, was 356352",
+      "databaseAfter": 356352,
+      "version": "0.2.0.0",
+      "databaseBefore": 356352
+    },
+    {
+      "id": "windows-downgrade-refused",
+      "outcome": "Passed",
+      "detail": "Windows refused the older package and kept 0.2.0.0",
+      "version": "0.2.0.0",
+      "refusal": "Deployment failed with HRESULT: 0x80073D06, No se pudo instalar el paquete porque ya hay instalada una versión superior de este paquete.\r\n\r\nWindows no puede instalar el paquete APSolutions.LocalMedia_0.1.0.0_x64__8sg7nj2tbse8g porque tiene la versión 0.1.0.0. Ya está instalada una versión superior 0.2.0.0 de este paquete.\n\nNOTE: For additional information, look for [ActivityId] 054f2348-2367-0003-3793-4f056723dd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID 054f2348-2367-0003-3793-4f056723dd01\n"
+    },
+    {
+      "id": "windows-repair",
+      "outcome": "Passed",
+      "detail": "Re-registered 0.2.0.0 from the package Windows holds",
+      "version": "0.2.0.0"
+    },
+    {
+      "id": "windows-uninstall",
+      "outcome": "Passed",
+      "detail": "Package gone: True; library survived: True, existed before: True",
+      "packageGone": true,
+      "dataBefore": true,
+      "dataAfter": true
+    }
+  ]
+}

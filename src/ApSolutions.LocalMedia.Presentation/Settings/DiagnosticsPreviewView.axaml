@@ -1,0 +1,38 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.DiagnosticsPreviewView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:PrivacySettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource DiagnosticsPreviewAccessibleName}">
+  <Border
+      x:Name="DiagnosticsPreviewSurface"
+      Padding="16"
+      Background="{DynamicResource CardSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8">
+    <StackPanel Spacing="8">
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource DiagnosticsPreviewTitle}"
+          automation:AutomationProperties.HeadingLevel="3" />
+      <TextBlock
+          MaxWidth="600"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource DiagnosticsPreviewDescription}"
+          TextWrapping="Wrap" />
+      <TextBox
+          x:Name="DiagnosticsPreviewText"
+          MaxHeight="320"
+          AcceptsReturn="True"
+          FontFamily="Consolas,Cascadia Mono,monospace"
+          IsReadOnly="True"
+          Text="{Binding PreviewJson, Mode=OneWay}"
+          TextWrapping="NoWrap"
+          automation:AutomationProperties.Name="{DynamicResource DiagnosticsPreviewTitle}" />
+    </StackPanel>
+  </Border>
+</UserControl>

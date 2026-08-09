@@ -1,0 +1,29 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.SkipMarkerButton"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:SkipMarkerViewModel"
+    automation:AutomationProperties.Name="{DynamicResource SkipMarkerAccessibleName}">
+  <Button
+      x:Name="SkipMarkerButtonControl"
+      IsVisible="{Binding IsVisible}"
+      Command="{Binding SkipCommand}"
+      automation:AutomationProperties.Name="{DynamicResource SkipMarkerAccessibleName}">
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <TextBlock
+          x:Name="SkipIntroText"
+          IsVisible="{Binding IsIntro}"
+          Text="{DynamicResource SkipMarkerIntro}" />
+      <TextBlock
+          x:Name="SkipRecapText"
+          IsVisible="{Binding IsRecap}"
+          Text="{DynamicResource SkipMarkerRecap}" />
+      <TextBlock
+          x:Name="SkipCreditsText"
+          IsVisible="{Binding IsCredits}"
+          Text="{DynamicResource SkipMarkerCredits}" />
+    </StackPanel>
+  </Button>
+</UserControl>

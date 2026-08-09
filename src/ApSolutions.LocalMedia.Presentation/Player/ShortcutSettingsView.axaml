@@ -1,0 +1,63 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.ShortcutSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:ShortcutSettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsAccessibleName}">
+  <StackPanel x:Name="ShortcutSettingsSurface" Spacing="12">
+    <TextBlock
+        FontSize="20"
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource ShortcutSettingsAccessibleName}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <TextBlock
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource ShortcutSettingsDescription}"
+        TextWrapping="Wrap" />
+
+    <ItemsControl
+        x:Name="ShortcutList"
+        ItemsSource="{Binding Bindings}"
+        automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsListName}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="player:ShortcutRow">
+          <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4">
+            <TextBlock
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{Binding CommandLabel}" />
+            <TextBlock
+                Grid.Column="1"
+                Margin="12,0"
+                VerticalAlignment="Center"
+                FontFamily="Consolas"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{Binding GestureLabel}" />
+            <TextBlock
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                IsVisible="{Binding IsCustomised}"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{DynamicResource ShortcutSettingsCustomised}" />
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <TextBlock
+        x:Name="ConflictNotice"
+        IsVisible="{Binding HasConflict}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{Binding ConflictMessage}"
+        TextWrapping="Wrap" />
+
+    <Button
+        x:Name="RestoreDefaultsButton"
+        automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsRestore}"
+        Command="{Binding RestoreDefaultsCommand}"
+        Content="{DynamicResource ShortcutSettingsRestore}" />
+  </StackPanel>
+</UserControl>

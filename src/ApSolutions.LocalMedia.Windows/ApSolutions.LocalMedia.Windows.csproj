@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <!--
+      Only when nothing else decides it. A build without a RuntimeIdentifier — the solution build,
+      and every test run — has to be x64 rather than AnyCPU, because the native engine it loads is.
+      With a RuntimeIdentifier the SDK infers the platform from it, and stating x64 here as well made
+      `-r win-arm64` fail outright with NETSDK1032: the ARM64 build was blocked by one line that was
+      never asked whether it applied.
+    -->
+    <PlatformTarget Condition="'$(RuntimeIdentifier)' == ''">x64</PlatformTarget>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- WIN-002: long paths and per-monitor DPI are declared, not inherited. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ApSolutions.LocalMedia.Application\ApSolutions.LocalMedia.Application.csproj" />
+    <ProjectReference Include="..\ApSolutions.LocalMedia.Domain\ApSolutions.LocalMedia.Domain.csproj" />
+    <ProjectReference Include="..\ApSolutions.LocalMedia.Infrastructure\ApSolutions.LocalMedia.Infrastructure.csproj" />
+    <ProjectReference Include="..\ApSolutions.LocalMedia.Presentation\ApSolutions.LocalMedia.Presentation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+</Project>

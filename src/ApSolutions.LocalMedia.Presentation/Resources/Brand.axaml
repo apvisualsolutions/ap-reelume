@@ -1,0 +1,7 @@
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="ProductDisplayName">AP Reelume</x:String>
+  <x:String x:Key="PublisherSignature">by AP Solutions</x:String>
+  <x:String x:Key="ProductFullPresentation">AP Reelume by AP Solutions</x:String>
+</ResourceDictionary>

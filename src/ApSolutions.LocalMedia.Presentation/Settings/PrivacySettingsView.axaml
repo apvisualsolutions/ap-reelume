@@ -1,0 +1,100 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.PrivacySettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:privacy="clr-namespace:ApSolutions.LocalMedia.Application.Privacy;assembly=ApSolutions.LocalMedia.Application"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:PrivacySettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PrivacyAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="PrivacyResourceKey" />
+  </UserControl.Resources>
+  <StackPanel x:Name="PrivacySurface" Spacing="12">
+    <TextBlock
+        FontSize="20"
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource PrivacyTitle}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <TextBlock
+        MaxWidth="640"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource PrivacyDescription}"
+        TextWrapping="Wrap" />
+
+    <CheckBox
+        x:Name="DiagnosticsCheckBox"
+        Content="{DynamicResource PrivacyDiagnosticsLabel}"
+        IsChecked="{Binding DiagnosticsEnabled}"
+        automation:AutomationProperties.Name="{DynamicResource PrivacyDiagnosticsLabel}" />
+
+    <Border
+        x:Name="PrivacyStatusSurface"
+        Padding="16"
+        Background="{DynamicResource AccentSubtleBrush}"
+        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="8"
+        automation:AutomationProperties.Name="{DynamicResource PrivacyStatusAccessibleName}"
+        automation:AutomationProperties.LiveSetting="Polite">
+      <StackPanel Spacing="8">
+        <TextBlock
+            x:Name="PrivacyStatusText"
+            MaxWidth="600"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding StatusKey, Converter={StaticResource PrivacyResourceKey}}"
+            TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <Button
+          x:Name="PrivacyPreviewButton"
+          Command="{Binding PreviewCommand}"
+          Content="{DynamicResource PrivacyPreviewLabel}"
+          automation:AutomationProperties.Name="{DynamicResource PrivacyPreviewLabel}" />
+      <Button
+          x:Name="PrivacyExportButton"
+          Command="{Binding ExportCommand}"
+          Content="{DynamicResource PrivacyExportLabel}"
+          IsEnabled="{Binding DiagnosticsEnabled}"
+          automation:AutomationProperties.Name="{DynamicResource PrivacyExportLabel}" />
+    </WrapPanel>
+
+    <settings:DiagnosticsPreviewView x:Name="PrivacyPreviewSurface" IsVisible="{Binding HasPreview}" />
+
+    <TextBlock
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource PrivacyNetworkTitle}"
+        automation:AutomationProperties.HeadingLevel="3" />
+    <ItemsControl
+        x:Name="PrivacyNetworkList"
+        ItemsSource="{Binding NetworkPurposes}"
+        automation:AutomationProperties.Name="{DynamicResource PrivacyNetworkTitle}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="privacy:NetworkPurpose">
+          <StackPanel Margin="0,0,0,8" Spacing="2">
+            <TextBlock
+                FontWeight="SemiBold"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{Binding Host}" />
+            <TextBlock
+                MaxWidth="600"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{Binding Reason}"
+                TextWrapping="Wrap" />
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <TextBlock
+        MaxWidth="640"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource PrivacyOfflineNotice}"
+        TextWrapping="Wrap" />
+  </StackPanel>
+</UserControl>

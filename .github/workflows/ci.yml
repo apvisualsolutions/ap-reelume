@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - codex/**
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+
+jobs:
+  verify:
+    # The CI_RUNNER repository variable routes verification to a self-hosted runner (label
+    # `ap-reelume`) when hosted minutes are unavailable; unset, it falls back to the hosted
+    # image. The label is dedicated so no other project's runner can take these jobs.
+    runs-on: ${{ vars.CI_RUNNER || 'windows-2025' }}
+    # The verification now seals the package and builds the payload twice more to compare them.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # Two clean checkouts are made from this history to compare the payload against itself.
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 10.0.302
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      # The runner image used to ship ffmpeg and stopped; without it no media sample is generated,
+      # the codec matrix and the segment corpus go unmeasured, and the package lifecycle cannot
+      # exercise the file association. Installing it keeps those gates real in CI.
+      # A machine that already carries ffmpeg — a self-hosted runner — is left untouched; the
+      # system-wide install only happens on hosted images, which arrive without it.
+      - name: Install ffmpeg
+        shell: pwsh
+        run: |
+          if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.' }
+          else { choco install ffmpeg -y --no-progress }
+      # This builds and seals both architectures. The separate ARM64 restore check that used to live
+      # below was weaker than what replaced it: a restore resolves packages without ever compiling,
+      # which is why `-r win-arm64` passed here for months while the build itself failed outright.
+      # -NonBlockingPerformance: the budgets run and their verdict is archived with the test
+      # results, but a shared runner's noise cannot fail the build (CI-003/CI-005). They stay
+      # blocking on the physical harness, which is where they mean something.
+      - name: Verify both architectures
+        shell: pwsh
+        run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -NonBlockingPerformance
+      # The two audit gates used to be manual-only (CI-001/CI-002): the accessibility journey and
+      # the recovery matrix could regress and CI would stay green. Verify mode fails on any
+      # critical or major finding, and each gate has to pass twice in a row to be called clean.
+      - name: Accessibility gate
+        shell: pwsh
+        run: ./eng/run-accessibility.ps1 -Mode Verify -Passes 2
+      - name: Recovery gate
+        shell: pwsh
+        run: ./eng/run-recovery.ps1 -Mode Verify -Passes 2
+      - name: Upload audit gate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: audit-gates
+          path: |
+            artifacts/accessibility
+            artifacts/recovery
+          if-no-files-found: warn
+      - name: Upload the ARM64 matrix
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: arm64-matrix
+          path: |
+            artifacts/package-arm64/contents.json
+            artifacts/package-arm64/arm64-matrix.json
+            artifacts/package-arm64/SHA256SUMS.txt
+          if-no-files-found: warn
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: test-results
+          path: artifacts/test-results
+          if-no-files-found: warn

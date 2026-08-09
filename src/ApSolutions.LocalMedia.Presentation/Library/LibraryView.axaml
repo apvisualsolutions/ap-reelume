@@ -1,0 +1,122 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Library.LibraryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:catalog="clr-namespace:ApSolutions.LocalMedia.Application.Catalog;assembly=ApSolutions.LocalMedia.Application"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
+    xmlns:movie="clr-namespace:ApSolutions.LocalMedia.Presentation.Movie"
+    xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
+    x:DataType="library:LibraryViewModel"
+    automation:AutomationProperties.Name="{DynamicResource LibraryAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="CatalogResourceKey" />
+  </UserControl.Resources>
+  <Grid>
+    <Grid IsVisible="{Binding IsBrowsing}" RowDefinitions="Auto,Auto,Auto,*">
+      <TextBlock
+          FontSize="32"
+          FontWeight="SemiBold"
+          Text="{DynamicResource LibraryTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <StackPanel
+          x:Name="ScanProgressSurface"
+          Grid.Row="1"
+          Margin="0,12,0,0"
+          DataContext="{Binding ScanProgress}"
+          Orientation="Horizontal"
+          Spacing="8"
+          automation:AutomationProperties.Name="{DynamicResource ScanProgressAccessibleName}"
+          automation:AutomationProperties.LiveSetting="Polite">
+        <TextBlock
+            x:Name="ScanProgressRunningText"
+            IsVisible="{Binding IsRunning}"
+            Text="{DynamicResource ScanProgressRunning}" />
+        <TextBlock
+            x:Name="ScanProgressIdleText"
+            IsVisible="{Binding !IsRunning}"
+            Text="{DynamicResource ScanProgressIdle}" />
+        <TextBlock IsVisible="{Binding IsRunning}" Text="{Binding EnumeratedCount}" />
+        <TextBlock IsVisible="{Binding IsRunning}" Text="{DynamicResource ScanProgressFilesLabel}" />
+      </StackPanel>
+      <Grid Grid.Row="2" Margin="0,16,0,12" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+        <TextBox
+            automation:AutomationProperties.Name="{DynamicResource LibrarySearchLabel}"
+            Text="{Binding Search}"
+            PlaceholderText="{DynamicResource LibrarySearchPlaceholder}" />
+        <ComboBox
+            Grid.Column="1"
+            automation:AutomationProperties.Name="{DynamicResource LibraryFilterLabel}"
+            SelectedValue="{Binding Filters}"
+            SelectedValueBinding="{ReflectionBinding Tag}">
+          <ComboBoxItem Content="{DynamicResource LibraryFilterAll}" Tag="{x:Static catalog:CatalogFilter.None}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterMovies}" Tag="{x:Static catalog:CatalogFilter.Movie}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterShows}" Tag="{x:Static catalog:CatalogFilter.Show}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterAvailable}" Tag="{x:Static catalog:CatalogFilter.Available}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterProgress}" Tag="{x:Static catalog:CatalogFilter.Progress}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterPersonal}" Tag="{x:Static catalog:CatalogFilter.Personal}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterFavorite}" Tag="{x:Static catalog:CatalogFilter.Favorite}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterWatchLater}" Tag="{x:Static catalog:CatalogFilter.WatchLater}" />
+          <ComboBoxItem Content="{DynamicResource LibraryFilterRated}" Tag="{x:Static catalog:CatalogFilter.Rated}" />
+        </ComboBox>
+        <ComboBox
+            Grid.Column="2"
+            automation:AutomationProperties.Name="{DynamicResource LibrarySortLabel}"
+            SelectedValue="{Binding Sort}"
+            SelectedValueBinding="{ReflectionBinding Tag}">
+          <ComboBoxItem Content="{DynamicResource LibrarySortTitle}" Tag="{x:Static catalog:CatalogSort.Title}" />
+          <ComboBoxItem Content="{DynamicResource LibrarySortYear}" Tag="{x:Static catalog:CatalogSort.Year}" />
+          <ComboBoxItem Content="{DynamicResource LibrarySortAdded}" Tag="{x:Static catalog:CatalogSort.Added}" />
+          <ComboBoxItem Content="{DynamicResource LibrarySortLastPlayed}" Tag="{x:Static catalog:CatalogSort.LastPlayed}" />
+        </ComboBox>
+        <Button
+            Grid.Column="3"
+            automation:AutomationProperties.Name="{DynamicResource LibraryApplyAction}"
+            Command="{Binding RefreshCommand}"
+            Content="{DynamicResource LibraryApplyAction}" />
+      </Grid>
+      <ListBox
+          Grid.Row="3"
+          ItemsSource="{Binding Items}"
+          automation:AutomationProperties.Name="{DynamicResource LibraryResultsListName}">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <VirtualizingStackPanel />
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="library:CatalogItemViewModel">
+            <Button
+                HorizontalContentAlignment="Stretch"
+                Click="OnCatalogItemClick"
+                automation:AutomationProperties.Name="{Binding Title}"
+                automation:AutomationProperties.HelpText="{Binding AvailabilityKey, Converter={StaticResource CatalogResourceKey}}">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Text="{Binding Title}" />
+                <library:UnavailableBadge Grid.Column="1" />
+              </Grid>
+            </Button>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Grid>
+    <Grid IsVisible="{Binding IsMovieDetails}" RowDefinitions="Auto,*" RowSpacing="12">
+      <Button
+          HorizontalAlignment="Left"
+          Click="OnBackClick"
+          Content="{DynamicResource LibraryBackAction}"
+          automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
+      <movie:MovieDetailsView Grid.Row="1" DataContext="{Binding MovieDetails}" />
+    </Grid>
+
+    <Grid IsVisible="{Binding IsShowDetails}" RowDefinitions="Auto,*" RowSpacing="12">
+      <Button
+          HorizontalAlignment="Left"
+          Click="OnBackClick"
+          Content="{DynamicResource LibraryBackAction}"
+          automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
+      <show:ShowDetailsView Grid.Row="1" DataContext="{Binding ShowDetails}" />
+    </Grid>
+  </Grid>
+</UserControl>

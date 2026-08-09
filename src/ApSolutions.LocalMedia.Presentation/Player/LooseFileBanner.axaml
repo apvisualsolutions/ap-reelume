@@ -1,0 +1,74 @@
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.LooseFileBanner"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:LooseFileViewModel"
+    IsVisible="{Binding IsLooseSession}"
+    automation:AutomationProperties.Name="{DynamicResource LooseFileAccessibleName}"
+    automation:AutomationProperties.LiveSetting="Polite">
+  <Border
+      x:Name="LooseFileSurface"
+      Padding="16"
+      Background="{DynamicResource CardSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8">
+    <StackPanel Spacing="8">
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource LooseFileHeading}" />
+      <TextBlock
+          x:Name="LooseFileName"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{Binding DisplayName}"
+          TextTrimming="CharacterEllipsis" />
+      <TextBlock
+          MaxWidth="640"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource LooseFileDescription}"
+          TextWrapping="Wrap" />
+
+      <WrapPanel ItemSpacing="8" LineSpacing="8">
+        <Button
+            x:Name="AddContainingFolderButton"
+            Command="{Binding AddFolderCommand}"
+            Content="{DynamicResource LooseFileAddFolderAction}"
+            IsVisible="{Binding !IsAddFolderConfirmationPending}"
+            automation:AutomationProperties.Name="{DynamicResource LooseFileAddFolderAction}" />
+      </WrapPanel>
+
+      <Border
+          x:Name="AddFolderConfirmationSurface"
+          Padding="12"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="6"
+          IsVisible="{Binding IsAddFolderConfirmationPending}"
+          automation:AutomationProperties.Name="{DynamicResource LooseFileConfirmAccessibleName}"
+          automation:AutomationProperties.LiveSetting="Polite">
+        <StackPanel Spacing="8">
+          <TextBlock
+              MaxWidth="600"
+              Text="{DynamicResource LooseFileConfirmDescription}"
+              TextWrapping="Wrap" />
+          <WrapPanel ItemSpacing="8" LineSpacing="8">
+            <Button
+                x:Name="ConfirmAddFolderButton"
+                Command="{Binding ConfirmAddFolderCommand}"
+                Content="{DynamicResource LooseFileConfirmAction}"
+                automation:AutomationProperties.Name="{DynamicResource LooseFileConfirmAction}" />
+            <Button
+                x:Name="CancelAddFolderButton"
+                Command="{Binding CancelAddFolderCommand}"
+                Content="{DynamicResource LooseFileCancelAction}"
+                automation:AutomationProperties.Name="{DynamicResource LooseFileCancelAction}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>

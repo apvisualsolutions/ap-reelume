@@ -1,0 +1,128 @@
+<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <Color x:Key="CalmBlueColor">#1769AA</Color>
+
+      <Color x:Key="LightSurfaceColor">#F8FAFC</Color>
+      <Color x:Key="LightTextPrimaryColor">#111827</Color>
+      <Color x:Key="LightControlFillColor">#E2E8F0</Color>
+      <Color x:Key="LightControlBorderColor">#475569</Color>
+      <Color x:Key="LightFocusColor">#005A9C</Color>
+
+      <Color x:Key="DarkSurfaceColor">#111827</Color>
+      <Color x:Key="DarkTextPrimaryColor">#F8FAFC</Color>
+      <Color x:Key="DarkControlFillColor">#1F2937</Color>
+      <Color x:Key="DarkControlBorderColor">#94A3B8</Color>
+      <Color x:Key="DarkFocusColor">#7CC4FF</Color>
+
+      <Color x:Key="HighContrastLightSurfaceColor">#FFFFFF</Color>
+      <Color x:Key="HighContrastLightTextColor">#000000</Color>
+      <Color x:Key="HighContrastLightControlFillColor">#FFFFFF</Color>
+      <Color x:Key="HighContrastLightControlBorderColor">#000000</Color>
+      <Color x:Key="HighContrastLightFocusColor">#000000</Color>
+
+      <Color x:Key="HighContrastDarkSurfaceColor">#000000</Color>
+      <Color x:Key="HighContrastDarkTextColor">#FFFFFF</Color>
+      <Color x:Key="HighContrastDarkControlFillColor">#000000</Color>
+      <Color x:Key="HighContrastDarkControlBorderColor">#FFFFFF</Color>
+      <Color x:Key="HighContrastDarkFocusColor">#FFFF00</Color>
+
+      <Color x:Key="PlayerSurfaceColor">#0B0D10</Color>
+      <Color x:Key="PlayerTextColor">#FFFFFF</Color>
+      <Thickness x:Key="FocusStrokeThickness">2</Thickness>
+      <x:Double x:Key="ControlHeight">36</x:Double>
+      <x:Double x:Key="SpaceSmall">8</x:Double>
+      <x:Double x:Key="SpaceMedium">16</x:Double>
+      <x:Double x:Key="SpaceLarge">24</x:Double>
+      <x:Double x:Key="MotionDurationStandardMilliseconds">160</x:Double>
+      <x:Double x:Key="MotionDurationReducedMilliseconds">0</x:Double>
+      <x:String x:Key="SelectedStateGlyph">●</x:String>
+
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
+          <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ControlFillBrush" Color="#E2E8F0" />
+          <SolidColorBrush x:Key="ShellBorderBrush" Color="#64748B" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#111827" />
+          <SolidColorBrush x:Key="FocusStrokeBrush" Color="#005A9C" />
+          <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
+          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#DCEAF6" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
+          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
+          <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
+          <SolidColorBrush x:Key="ControlFillBrush" Color="#1F2937" />
+          <SolidColorBrush x:Key="ShellBorderBrush" Color="#94A3B8" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="FocusStrokeBrush" Color="#7CC4FF" />
+          <SolidColorBrush x:Key="AccentBrush" Color="#62AEE8" />
+          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#203B55" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrast}">
+          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="ControlFillBrush" Color="#000000" />
+          <SolidColorBrush x:Key="ShellBorderBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="FocusStrokeBrush" Color="#FFFF00" />
+          <SolidColorBrush x:Key="AccentBrush" Color="#FFFF00" />
+          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#000000" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <Style Selector="Button">
+    <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
+  </Style>
+  <!--
+    Every control type that can take keyboard focus is styled from the same token, so the focus ring
+    the contrast matrix measured is the ring the person actually sees. A type left out here would fall
+    back to whatever the base theme draws, which no check covers.
+  -->
+  <Style Selector="Button:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="ToggleButton:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="TextBox:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="ComboBox:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="CheckBox:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="Slider:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="NumericUpDown:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="ListBoxItem:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="Button.theme-option">
+    <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+</Styles>

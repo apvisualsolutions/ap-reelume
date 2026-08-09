@@ -1,0 +1,51 @@
+# Brainstorming companion and local agent state
+.superpowers/
+
+# Self-hosted CI runner living inside the project tree; never part of the sources
+.runner/
+
+# Build and IDE output
+.vs/
+.idea/
+bin/
+obj/
+artifacts/
+TestResults/
+*.trx
+*.coverage
+coverage.*.xml
+*.binlog
+.dotnet/
+*.user
+*.suo
+
+# Local application state and secrets
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+.cache/
+
+# User-owned media library files
+*.avi
+*.m2ts
+*.m4v
+*.mkv
+*.mov
+*.mp4
+*.mpeg
+*.mpg
+*.ts
+*.webm
+*.wmv
+*.ass
+*.ssa
+*.srt
+*.vtt
+
+# Local security reports and gstack state
+.gstack/
