@@ -180,12 +180,14 @@ try {
         a floor is a visible line in a diff rather than a quiet drift.
     #>
     $watched = @(
-        # The one still in debt. TST-001 named all three on 2026-08-09; two were paid off on
-        # 2026-08-10 and this one is held where it stands so it cannot slip further.
+        # TST-001 named all three on 2026-08-09 and all three are paid: two on 2026-08-10 and this
+        # one, the last, with unit tests aimed at its decisions rather than at the scans that
+        # already walked its happy path. The list stays whatever the numbers say — a file that
+        # reaches the bar is watched at the bar, not dropped.
         [pscustomobject]@{
             File     = 'src/ApSolutions.LocalMedia.Application/Discovery/ReconcileScannedFiles.cs'
-            Lines    = 86.73
-            Branches = 76.00
+            Lines    = 100.00
+            Branches = 100.00
         }
         [pscustomobject]@{
             File     = 'src/ApSolutions.LocalMedia.Infrastructure/FileSystem/CompositeFileIdentityProvider.cs'

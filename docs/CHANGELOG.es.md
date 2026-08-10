@@ -98,6 +98,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   modo que una deuda saldada no puede volver en silencio. Dos de los tres quedaron cubiertos por
   completo por el camino; el tercero queda vigilado con su nombre y su número a la vista en cada
   ejecución.
+- **La última deuda de cobertura está saldada.** Al que reconcilia lo que un escaneo encuentra —el
+  que hace que un vídeo cambiado de carpeta siga siendo la misma ficha— le estaba probado el camino
+  feliz y no sus decisiones: qué se niega a tocar, qué cuenta como fallo sin costarle el escaneo al
+  resto, y qué guarda. Ahora están probadas una a una, y el archivo pasa de 86,73 % de líneas y
+  76,00 % de ramas al 100 % de las dos, con el listón subido detrás. Medir la lista de huecos antes
+  de escribir nada la recortó en un tercio —cinco de los puntos anotados leyendo el código ya
+  estaban cubiertos— y destapó uno que ninguna lectura habría encontrado: el contador de archivos
+  intentados no lo leía ninguna prueba.
 - **La ventana ya no espera a que la base de datos esté lista para existir.** Al arrancar, la
   aplicación pone al día la base —y comprueba su integridad si eso reescribió el archivo— y hasta
   ahora hacía ese trabajo en el mismo hilo que dibuja: no había nada en pantalla hasta que

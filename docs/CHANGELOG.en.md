@@ -96,6 +96,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   fails; if it rises, it **also** fails until the new bar is recorded, so a debt that gets paid
   cannot quietly come back. Two of the three ended up fully covered along the way; the third stays
   watched, with its name and its number in view on every run.
+- **The last coverage debt is paid.** The use case that reconciles what a scan finds — the one that
+  keeps a video moved to another folder being the same entry — had its happy path tested and not its
+  decisions: what it refuses to touch, what it counts as a failure without costing the rest of the
+  scan, and what it stores. Those are tested one by one now, and the file goes from 86.73% of lines
+  and 76.00% of branches to 100% of both, with the bar raised behind it. Measuring the list of gaps
+  before writing anything cut it by a third — five of the entries noted by reading the code were
+  already covered — and turned up one no reading would have found: no test ever read the counter of
+  files attempted.
 - **The window no longer waits for the database to be ready before it exists.** On startup the
   application brings the database up to date — and checks its integrity if that rewrote the file —
   and until now it did that work on the very thread that draws: nothing was on screen until it

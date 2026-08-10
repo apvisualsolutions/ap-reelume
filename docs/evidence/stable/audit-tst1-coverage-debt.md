@@ -90,9 +90,11 @@ convierta en un tragadero: una excepción que **no** significa «no disponible»
 viajando, o un defecto se convierte en un escaneo silenciosamente incompleto. / Eleven new tests and
 twelve, including the one that stops the filter becoming a catch-all.
 
-**Lo que queda**: `ReconcileScannedFiles.cs`, 98 líneas y 50 ramas, a 9 puntos de líneas y 20 de
-ramas del umbral. Queda como deuda con nombre y con suelo, que es lo que la hace visible en cada
-ejecución en lugar de una vez al año. / What is left is named, floored, and visible on every run.
+**Lo que quedaba**: `ReconcileScannedFiles.cs`, 98 líneas y 50 ramas, a 9 puntos de líneas y 20 de
+ramas del umbral. Quedó como deuda con nombre y con suelo —que es lo que la hizo visible en cada
+ejecución en lugar de una vez al año— y se saldó el mismo día al 100 %/100 %:
+[audit-tst1-reconcile-coverage.md](audit-tst1-reconcile-coverage.md). / What was left was named,
+floored, and visible on every run; it was paid the same day at 100%/100%.
 
 ## Verde / Green
 

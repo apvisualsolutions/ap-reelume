@@ -63,9 +63,10 @@ real numbers:
 | `PlayerVersionsViewModel.cs` | 60,61 % | 27,27 % | FAIL |
 
 > **Actualización del 2026-08-10.** Estos tres se re-midieron, y uno de ellos había **empeorado**
-> sin que ninguna puerta lo notara. Dos quedaron al 100 % y el tercero pasó a estar vigilado con
-> suelo. Detalle en [audit-tst1-coverage-debt.md](audit-tst1-coverage-debt.md). / **Update:** they
-> were re-measured, one had got worse unnoticed, two are now at 100%, and the third is watched.
+> sin que ninguna puerta lo notara. Los tres quedaron al 100 % y vigilados con ese suelo: los dos
+> primeros en [audit-tst1-coverage-debt.md](audit-tst1-coverage-debt.md) y el tercero en
+> [audit-tst1-reconcile-coverage.md](audit-tst1-reconcile-coverage.md). / **Update:** they were
+> re-measured, one had got worse unnoticed, and all three now sit at 100% with that floor.
 
 Los tres rojos son los anticipados por el plan y son **verdaderos**: los paseos de punta a punta
 cubren el camino feliz de la reconciliación, la identidad compuesta y el cambio de versión, pero

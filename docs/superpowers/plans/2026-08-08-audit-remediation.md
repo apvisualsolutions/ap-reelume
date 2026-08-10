@@ -412,7 +412,7 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
       fallaban por lo mismo, que las pruebas cubrían el cableado y no el contenido. Evidencia en
       [audit-tst1-coverage-debt.md](../../evidence/stable/audit-tst1-coverage-debt.md). \ The gate now
       holds a watchlist with a ratchet; two of the three debts are paid.
-  - [ ] **`ReconcileScannedFiles.cs`, la deuda que queda**: 86,73 % de líneas y 76,00 % de ramas,
+  - [x] **`ReconcileScannedFiles.cs`, la deuda que queda**: 86,73 % de líneas y 76,00 % de ramas,
         sobre 98 líneas y 50 ramas. Ya está vigilado con ese suelo, así que no puede empeorar en
         silencio. **Decidido el 2026-08-10 (experto), para que no se re-delibere:**
         - **Dónde**: `tests/ApSolutions.LocalMedia.Application.Tests/Discovery/ReconcileScannedFilesTests.cs`,
@@ -435,6 +435,15 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
         - **Al terminar, subir el suelo** en `eng/check-coverage.ps1` al número medido — la puerta
           falla si no se hace, que es el punto del trinquete. \ Decided: unit tests with in-memory
           doubles, aimed at the decisions rather than the happy path, then raise the floor.
+        - **Hecho el 2026-08-10: 100 % de líneas y 100 % de ramas**, nueve pruebas, suelo subido a
+          100/100. **Medir la lista antes de escribir la recortó en un tercio**: cinco de sus puntos
+          —identidad ya almacenada, candidato visto en el mismo escaneo, decisión no exacta,
+          `KeepAsNewAsync` con y sin fila, identificador estable que apunta a uno mismo— ya estaban
+          cubiertos por los escaneos ensamblados. Y apareció uno que la lectura no da: la propiedad
+          `AttemptedCount` no la leía ninguna prueba, porque comparar registros enteros va por
+          campos. Evidencia en
+          [audit-tst1-reconcile-coverage.md](../../evidence/stable/audit-tst1-reconcile-coverage.md).
+          \ Done: 100%/100% with nine tests; measuring the list first cut it by a third.
 - [ ] **El rojo intermitente de `first-launch`, que sigue sin causa.** **Decidido el 2026-08-10
       (experto):** no se sube el plazo de 90 s, y tampoco se sale a buscarlo — es una carrera y no se
       reproduce aquí. Lo que se hace es **instrumentar el camino del fallo**, para que la próxima vez
