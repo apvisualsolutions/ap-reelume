@@ -113,6 +113,8 @@ What is known, measured from the log:
 - The first launch is the only one that actually **migrates** — sixteen migrations against a new
   database — and migrating **blocks the interface thread**. That is the candidate cause, and it is
   exactly what is left of ARQ-005.
+- **Observed frequency: one in four.** It did not recur across the three following runs carrying that
+  same code. That is the figure to compare against if it is seen again.
 
 **What is not done**: raising the 90 s deadline. That turns the only signal there is into silence,
 which is the mistake the media generator's `cancelled` runs already charged six runs for. If it comes

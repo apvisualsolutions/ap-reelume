@@ -116,6 +116,8 @@ Lo que se sabe, medido del registro:
 - El primer arranque es el único que **migra de verdad** —dieciséis migraciones sobre una base
   nueva— y migrar **bloquea el hilo de interfaz**. Ésa es la causa candidata, y es exactamente lo que
   queda pendiente en ARQ-005.
+- **Frecuencia observada: una de cuatro.** No se repitió en las tres ejecuciones siguientes que
+  llevaban ese mismo código. Es la cifra contra la que comparar si vuelve a verse.
 
 **Lo que no se hace**: subir el plazo de 90 s. Eso convierte la única señal que hay en silencio, que
 es el error que ya costó seis ejecuciones con los `cancelled` del generador de medios. Si vuelve a
