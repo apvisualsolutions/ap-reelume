@@ -209,7 +209,12 @@ Dos commits, cada uno con su ciclo, su evidencia bilingüe y su verificación co
   relee.
 - El **paseo físico manual de diez minutos**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
-- La **copia de seguridad cifrada** de la clave de firma.
+- La **copia de seguridad cifrada** de la clave de firma, que **hoy no existe**: medido el
+  2026-08-10, el archivo local es el ejemplar **único** y ninguna copia lo alcanza. El destino y el
+  cifrado están decididos fuera de este repositorio (bóveda de IT); lo que importa aquí es cómo se
+  comprueba que la copia sirve, y no es que el archivo descifre: se firma algo trivial con la copia
+  restaurada y se verifica contra [`eng/release-signing.pub`](../eng/release-signing.pub). Repetir
+  esa comprobación cada trimestre, porque un respaldo corrupto no avisa.
 - **La notificación de exportación** a `crypt@bis.doc.gov` y `enc@nsa.gov`: el texto está redactado
   entero en [LEGAL.es.md](legal/LEGAL.es.md) y sale de tu identidad, por eso es tuya.
 - **El dictamen jurídico profesional** (`REL-004`). Le quedan dos preguntas concretas de licencia, y

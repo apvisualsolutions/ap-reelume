@@ -48,12 +48,15 @@ warn on first run, exactly as [SMARTSCREEN](docs/release/SMARTSCREEN.en.md) docu
 separate layers on purpose.
 
 **Dónde vive la privada.** Fuera del repositorio, siempre: como secreto de GitHub Actions
-(`RELEASE_SIGNING_SECRET_KEY`) para la tubería, y como copia custodiada del propietario para
-firmar en local (`RELEASE_SIGNING_KEY_FILE`). Ningún archivo versionado ni ningún log la contiene;
-`prepare-release` bloquea una publicación sin firma. / **Where the private key lives.** Outside
-the repository, always: as a GitHub Actions secret for the pipeline and as the owner's custodied
-copy for local signing. No versioned file and no log contains it; `prepare-release` blocks an
-unsigned release.
+(`RELEASE_SIGNING_SECRET_KEY`) para la tubería, y como copia local del propietario para firmar a
+mano (`RELEASE_SIGNING_KEY_FILE`). Ningún archivo versionado ni ningún log la contiene;
+`prepare-release` bloquea una publicación sin firma. El secreto de Actions es de **sólo escritura**
+—GitHub no deja releerlo—, así que la copia del propietario es el único ejemplar recuperable y su
+respaldo cifrado se lleva fuera de este repositorio. / **Where the private key lives.** Outside the
+repository, always: as a GitHub Actions secret for the pipeline and as the owner's local copy for
+signing by hand. No versioned file and no log contains it; `prepare-release` blocks an unsigned
+release. The Actions secret is **write-only** — GitHub never lets it be read back — so the owner's
+copy is the only recoverable one, and its encrypted backup is handled outside this repository.
 
 **Cómo se rota.** Rotar (o revocar tras una sospecha de compromiso) es publicar: se genera un par
 nuevo, la clave pública embebida se sustituye en el código, y la versión siguiente viaja con ella.

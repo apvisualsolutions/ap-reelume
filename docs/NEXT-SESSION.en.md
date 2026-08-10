@@ -207,7 +207,12 @@ Two commits, each with its cycle, its bilingual evidence and its full verificati
   cannot be read back.
 - The **manual ten-minute physical walk**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
-- The **encrypted backup** of the signing key.
+- The **encrypted backup** of the signing key, which **does not exist today**: measured on
+  2026-08-10, the local file is the **only** copy and no backup reaches it. Destination and
+  encryption are decided outside this repository (the IT vault); what matters here is how the copy
+  is checked, and it is not that the file decrypts: sign something trivial with the restored copy
+  and verify it against [`eng/release-signing.pub`](../eng/release-signing.pub). Repeat that check
+  quarterly, because a corrupt backup does not announce itself.
 - **The export notification** to `crypt@bis.doc.gov` and `enc@nsa.gov`: the text is drafted in full in
   [LEGAL.en.md](legal/LEGAL.en.md) and goes from your identity, which is why it is yours.
 - **The professional legal opinion** (`REL-004`). Two concrete licence questions are left for it, and
