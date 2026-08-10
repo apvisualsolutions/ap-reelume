@@ -290,7 +290,7 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
       [audit-arq010-container-validation.md](../../evidence/stable/audit-arq010-container-validation.md). \
       Done: the build moved into its own method so a test can break it through the product's path;
       it exposed nothing, and covers 109 of 156 registrations.
-- [ ] **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores (hay ~24 `async void` sin red,
+- [x] **ARQ-004** (completo el 2026-08-10, las dos mitades): un único `AsyncRelayCommand` con manejo de errores (hay ~24 `async void` sin red,
       cobertura desigual entre ViewModels) + `UnhandledException`/`UnobservedTaskException` globales
       en `Program.cs`. **Límites decididos**: vive en `Presentation`, porque es una preocupación de
       los ViewModels y no del anfitrión; un fallo aterriza en el estado de error de su propia

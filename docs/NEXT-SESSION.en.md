@@ -1,7 +1,7 @@
 # Where to pick up
 
-The state of the project at the close of the second session of **2026-08-10**, the one that settled
-the legal debt. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
+The state of the project at the close of the **third** session of **2026-08-10**, the one that ran the
+architecture queue. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
 scope record is still [FEATURES.md](FEATURES.md); the audit's outstanding work lives in
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). This is only the
 place to resume from.
@@ -26,7 +26,7 @@ commit. The full development history stayed in `apvisualsolutions/ap-reelume-arc
 CI runs on hosted runners, free for public repositories. The self-hosted runner is still installed
 under `.runner/` (git-ignored) but **switched off**, and the workflow has no way to call it.
 
-## What this session finished
+## Finished on 2026-08-10 (second session, the legal one)
 
 Four commits, each with its full cycle and its bilingual evidence.
 
@@ -202,3 +202,21 @@ Four commits, each with its cycle, its bilingual evidence and its gates.
 - **The tests that read the composition as text break every time something moves.** Three times now.
   When code leaves `CompositionRoot`, updating `CompositionSourceText` and `CompositionGraph` is part
   of the move, not a fix afterwards.
+- **`AppDomain.UnhandledException` does not stop the process from ending**, it only records. That
+  inverted the order of ARQ-004's two halves: if a command cannot afford to let anything escape it
+  must always catch, and something that always catches always needs somewhere to put it — so the
+  somewhere comes first.
+- **Before writing "asynchronous", check that something yields the thread.**
+  `Microsoft.Data.Sqlite` implements much of its `Async` surface synchronously. An `await` on
+  something that never yields leaves the thread just as blocked **while looking fixed**, which is
+  worse than leaving it alone.
+- **Replacing N classes with one assumes the N did the same thing, and they did not.** Two of
+  twenty-four held behaviour of their own, and the suite caught it, not the reading: one checked
+  `CanExecute` inside `Execute` and a real validation hung off that. Never migrate without running the
+  whole suite.
+- **Inside an `async void`, a guard clause is not a guard**: it throws into the state machine and is
+  posted to the context, so the caller that got it wrong never hears. Split the method into a
+  synchronous one that checks and another that waits.
+- **Some reds are not reds, they are hangs.** A lock held by a thread that never returns produces a
+  suite that never ends, not a broken assertion. There is no "archived red" there, and the evidence
+  says so rather than inventing one.

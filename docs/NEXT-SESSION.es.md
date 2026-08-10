@@ -1,10 +1,10 @@
 # Dónde retomar
 
-Estado del proyecto al cerrar la segunda sesión del **2026-08-10**, la que saldó la deuda legal. La
-versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro canónico del alcance
-sigue siendo [FEATURES.md](FEATURES.md); el trabajo pendiente de la auditoría vive en
-[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). Esto es sólo el
-punto de retomada.
+Estado del proyecto al cerrar la **tercera** sesión del **2026-08-10**, la que ejecutó la cola de
+arquitectura. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
+canónico del alcance sigue siendo [FEATURES.md](FEATURES.md); el trabajo pendiente de la auditoría
+vive en [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). Esto es
+sólo el punto de retomada.
 
 ## Verificación de arranque
 
@@ -27,7 +27,7 @@ La CI corre en runners hospedados, gratuitos en repositorios públicos. El runne
 instalado en `.runner/` (ignorado por git) pero **apagado**, y el workflow ya no tiene forma de
 llamarlo.
 
-## Qué está terminado en esta sesión
+## Lo terminado el 2026-08-10 (segunda sesión, la legal)
 
 Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
 
@@ -204,3 +204,19 @@ Cuatro commits, cada uno con su ciclo, su evidencia bilingüe y sus puertas.
 - **Las pruebas que leen la composición como texto se rompen cada vez que algo se mueve.** Van tres.
   Al sacar código de `CompositionRoot`, actualizar `CompositionSourceText` y `CompositionGraph` es
   parte del traslado, no un arreglo posterior.
+- **`AppDomain.UnhandledException` no impide que el proceso termine**, sólo deja constancia. Eso
+  invirtió el orden de las dos mitades de ARQ-004: si un comando no puede permitirse dejar escapar
+  nada, tiene que capturar siempre — y algo que captura siempre necesita un destino siempre, así que
+  el destino va antes.
+- **Antes de escribir «asíncrono», comprobar que algo cede el hilo.** `Microsoft.Data.Sqlite`
+  implementa buena parte de su superficie `Async` de forma síncrona. Un `await` sobre algo que no cede
+  deja el hilo igual de bloqueado **con aspecto de arreglado**, que es peor que no tocarlo.
+- **Migrar N clases a una supone que las N hacían lo mismo, y no lo hacían.** Dos de veinticuatro
+  guardaban comportamiento propio, y lo cazó la suite, no la lectura: una comprobaba `CanExecute`
+  dentro de `Execute` y de ahí colgaba una validación real. Nunca se migra sin correr la suite entera.
+- **Dentro de un `async void`, una guarda de argumento no es una guarda**: lanza dentro de la máquina
+  de estados y se postea al contexto, de modo que quien se equivocó nunca se entera. Hay que partir el
+  método en uno síncrono que valida y otro que espera.
+- **Hay rojos que no son rojos, son cuelgues.** Un candado retenido por un hilo que no vuelve no
+  produce un aserto roto, produce una suite que no termina. Ahí el «rojo archivado» no existe, y se
+  dice en la evidencia en vez de fingir uno.
