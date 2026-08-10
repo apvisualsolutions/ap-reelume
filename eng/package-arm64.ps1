@@ -241,7 +241,7 @@ try {
 
     Get-ChildItem -LiteralPath $layoutRoot -Recurse -File -Filter '*.pdb' | Remove-Item -Force
 
-    Write-Output 'Carrying the licence and the notices into the payload …'
+    Write-Output 'Carrying the licence, the notices and the licence texts into the payload …'
     Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination (Join-Path $layoutRoot 'LICENSE') -Force
     Copy-Item -LiteralPath (Join-Path $repoRoot 'NOTICE') -Destination (Join-Path $layoutRoot 'NOTICE') -Force
     $licenceRoot = Join-Path $layoutRoot 'licenses'
@@ -252,6 +252,11 @@ try {
             -Destination (Join-Path $licenceRoot "THIRD-PARTY-NOTICES.$language.md") `
             -Force
     }
+
+    # Same as the x64 script, and for the same reason: the obligation belongs to shipping a binary,
+    # not to one architecture's build. The payload parity check compares the two file lists, so an
+    # omission here would surface as a difference rather than as a quiet gap.
+    Copy-Item -Path (Join-Path $repoRoot 'docs/release/licenses/*') -Destination $licenceRoot -Recurse -Force
 
     Write-Output 'Writing the bill of materials …'
     & (Join-Path $PSScriptRoot 'generate-sbom.ps1') -Output (Join-Path $outputRoot 'sbom') -Version $version

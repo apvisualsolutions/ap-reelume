@@ -318,6 +318,20 @@ public sealed class Arm64PackageTests
         }
     }
 
+    /// <summary>
+    /// And so does the text of each third-party licence. The obligation is a property of shipping a
+    /// binary, so the architecture that gets built second cannot be the one that ships without it.
+    /// </summary>
+    [Fact]
+    public void The_text_of_every_third_party_licence_travels_inside_the_arm64_artifact()
+    {
+        var missing = PackageEvidence.LicenceTextsMissingFrom(LayoutRoot());
+
+        Assert.True(
+            missing.Length == 0,
+            $"The ARM64 artifact names licences it does not accompany: {string.Join("; ", missing)}.");
+    }
+
     private static string LayoutRoot() => Path.Combine(PackageEvidence.Arm64PackageRoot(), "layout");
 
     private static IEnumerable<FileInfo> LayoutFiles()

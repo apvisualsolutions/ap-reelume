@@ -30,6 +30,7 @@ public sealed class BilingualHeadingTests
         "docs/release/RELEASING",
         "docs/release/SMARTSCREEN",
         "docs/release/THIRD-PARTY-NOTICES",
+        "docs/release/licenses/README",
         "docs/legal/LEGAL",
         "docs/CHANGELOG",
     ];

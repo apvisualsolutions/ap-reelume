@@ -16,8 +16,10 @@
     - It removes the LibVLC payloads for the architectures this package does not target. A
       self-contained win-x64 publish of this application ships win-x86 and win-arm64 as well, which
       is two thirds of half a gigabyte the loader will never open.
-    - It carries the licence and the third-party notices inside the payload, in both languages,
-      because that is a condition of shipping the binary rather than a nicety of the download page.
+    - It carries the licence, the third-party notices and the full text of every third-party licence
+      inside the payload, in both languages, because that is a condition of shipping the binary
+      rather than a nicety of the download page. VideoLAN's package carries no COPYING of its own, so
+      whatever this script does not copy, nobody supplies.
 
     Nothing here signs anything. The artifact is unsigned on purpose and says so in its own report;
     docs/release/SMARTSCREEN.es.md explains what that means for whoever downloads it.
@@ -104,7 +106,7 @@ try {
     # Symbols are not distributed, so anything the publish left behind goes.
     Get-ChildItem -LiteralPath $layoutRoot -Recurse -File -Filter '*.pdb' | Remove-Item -Force
 
-    Write-Output 'Carrying the licence and the notices into the payload …'
+    Write-Output 'Carrying the licence, the notices and the licence texts into the payload …'
     Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination (Join-Path $layoutRoot 'LICENSE') -Force
     Copy-Item -LiteralPath (Join-Path $repoRoot 'NOTICE') -Destination (Join-Path $layoutRoot 'NOTICE') -Force
     $licenceRoot = Join-Path $layoutRoot 'licenses'
@@ -115,6 +117,12 @@ try {
             -Destination (Join-Path $licenceRoot "THIRD-PARTY-NOTICES.$language.md") `
             -Force
     }
+
+    # The texts, not only the table that names them: LGPL-2.1 §6, GPL-2.0 §1 and Apache-2.0 §4a ask
+    # for the licence to accompany the binary, and MIT and BSD-3-Clause for the copyright notice to be
+    # reproduced. The folder is copied whole rather than file by file so that adding a dependency's
+    # notice needs no edit here — and ArtifactContentsTests compares the two, so it cannot go missing.
+    Copy-Item -Path (Join-Path $repoRoot 'docs/release/licenses/*') -Destination $licenceRoot -Recurse -Force
 
     Write-Output 'Writing the bill of materials …'
     & (Join-Path $PSScriptRoot 'generate-sbom.ps1') -Output (Join-Path $outputRoot 'sbom') -Version $version
