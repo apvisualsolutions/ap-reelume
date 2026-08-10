@@ -124,6 +124,34 @@ still unexplained.** Saving half a second does not close a ninety-second deadlin
 the cause is a launch that does not happen rather than a slow one — and now there is a series to
 compare against.
 
+## El rojo que encontró la integración continua, y no yo / The red CI found
+
+La primera versión de estas pruebas pasó entera en local y **falló en CI, en la rama y en `main`**,
+con el mismo commit. No en el arranque: en el desmontaje. / It passed locally and failed on CI, on
+both refs. Not in the startup — in the teardown.
+
+```
+The_window_is_given_something_to_show_before_the_database_is_ready [FAIL]
+  System.IO.IOException : The process cannot access the file 'library.db'
+  because it is being used by another process.
+     at ...AssembledStartupTests.Dispose()
+```
+
+La prueba afirma sobre un estado que es **transitorio por definición** —la vista de arranque antes
+de que el trabajo acabe— y luego se marchaba. El `Task.Run` seguía vivo con la base abierta, y el
+desmontaje borraba esa carpeta. En esta máquina el trabajo terminaba antes que el borrado y pasaba;
+en un runner más lento, no. **Observar un transitorio obliga a esperar a que termine antes de
+salir**, aunque la aserción no lo necesite. / The test asserted on a state that is transient by
+definition and then left, while the background work still held the file the teardown deletes.
+Observing a transient means waiting for it to end before leaving.
+
+Y lo que lo dejó pasar es tan útil como el defecto: **`eng/verify.ps1` no es lo que ejecuta CI**.
+CI corre además `eng/run-accessibility.ps1 -Mode Verify -Passes 2` y `eng/run-recovery.ps1` con dos
+pasadas, y **las dos pasadas existen justamente para cazar carreras**: la primera falló y la segunda
+pasó. Un ciclo local que sólo ejecuta `verify.ps1` tiene ese hueco. / What let it through matters as
+much: `verify.ps1` is not what CI runs. The two extra gates run twice each, precisely to catch
+races — pass 1 failed and pass 2 passed.
+
 ## Verde / Green
 
 | Suite | Resultado / Result |

@@ -44,6 +44,14 @@ public sealed class AssembledStartupTests : IDisposable
     /// The property the whole change exists for: something reaches the window before the database
     /// is ready, so the first frame has content rather than waiting for the work to end.
     /// </summary>
+    /// <remarks>
+    /// The assertion is on a state that is by definition temporary, and the wait afterwards is not
+    /// decoration: a test that observes a transient and then leaves is still holding the file the
+    /// background work has open, and the teardown deletes that folder. Locally the work finished
+    /// first and it passed; on a slower machine it did not, and the failure was an
+    /// <c>IOException</c> in <c>Dispose</c> rather than anything about the startup. Observing a
+    /// transient means waiting for it to end before leaving.
+    /// </remarks>
     [AvaloniaFact]
     public void The_window_is_given_something_to_show_before_the_database_is_ready()
     {
@@ -52,6 +60,7 @@ public sealed class AssembledStartupTests : IDisposable
         var container = Assert.IsType<ContentControl>(scope.Application.CreateShell());
 
         Assert.IsType<StartupView>(container.Content);
+        _ = AssembledStartup.FinalContent(container);
     }
 
     /// <summary>

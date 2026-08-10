@@ -178,6 +178,15 @@ Three commits, each with its cycle, its bilingual evidence and its full verifica
 
 ## Things learned worth not learning twice
 
+- **`eng/verify.ps1` is not what CI runs.** CI also runs
+  `eng/run-accessibility.ps1 -Mode Verify -Passes 2` and `eng/run-recovery.ps1 -Mode Verify
+  -Passes 2`, and **the two passes are there to catch races**. A local cycle that only runs
+  `verify.ps1` leaves that hole open, and on 2026-08-10 it did: a red reached `main` through it.
+- **Observing a transient state means waiting for it to end before leaving.** The test that checks
+  the startup view asserts on something that lasts as long as the background work, and it left
+  mid-way: the `Task.Run` still had the database open when the teardown deleted the folder. Here it
+  finished in time and passed; on a slower runner it did not. The assertion does not need the wait,
+  but the teardown does.
 - **A baseline of one measurement is not a baseline.** The phase that had to be watched turned out
   to be the noisiest of the three — 1245 ms of variation on the same code — and the signal came from
   the two controls added "unnecessarily". Measuring the subject with nothing to compare it against
