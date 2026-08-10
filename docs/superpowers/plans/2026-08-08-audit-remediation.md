@@ -301,7 +301,12 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
       **Hecho 2026-08-09 (tarde)**: ambos como pasos tras la verificación, con su evidencia subida
       como artefacto `audit-gates`; verificados en local en modo Verify con 2 pases antes de
       montarlos (0 hallazgos; matriz de recuperación 9/9 con salida explícita).
-- [ ] **CI-003**: rendimiento en CI como no-bloqueante primero (runners ruidosos; medir varianza).
+- [x] **CI-003**: rendimiento en CI como no-bloqueante primero (runners ruidosos; medir varianza).
+      **Hecho**: `ci.yml` invoca `eng/verify.ps1 … -NonBlockingPerformance`, que corre los
+      presupuestos, archiva su veredicto en `performance-nonblocking.json` y no deja que bloqueen.
+      Siguen bloqueando donde significan algo, que es el arnés físico. Verificado el 2026-08-10
+      leyendo el workflow, no supuesto. \ Done: CI passes the switch; the budgets still block on the
+      physical harness.
 - [x] **CI-004/SEC-006**: anclar las 9 acciones por SHA con comentario de versión + dependabot para
       `github-actions`. **Hecho 2026-08-09 (tarde)** en un commit: las nueve invocaciones
       (checkout v4.4.0, setup-dotnet v4.3.1, upload-artifact v4.6.2) ancladas por SHA de commit
@@ -385,8 +390,14 @@ reportar, cómo se rota), CLAUDE.md raíz, CONTRIBUTING.md, plantillas + CODEOWN
 (NuGet y github-actions juntos si CI-004 aterrizó antes), y después DOC-101/DOC-201/T44.x. El
 borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nada de lo anterior.
 
-- [ ] CLAUDE.md raíz (reglas de arranque/ejecución que hoy viven fuera del repo).
-- [ ] CONTRIBUTING.md y SECURITY.md; plantillas de issue/PR; CODEOWNERS; dependabot.
+- [x] CLAUDE.md raíz (reglas de arranque/ejecución que hoy viven fuera del repo). **Hecho 2026-08-10**
+      con WP-9; comprobado en el árbol el 2026-08-10 (tarde), no dado por hecho.
+- [x] CONTRIBUTING.md y SECURITY.md; plantillas de issue/PR; CODEOWNERS; dependabot.
+      **Completado 2026-08-10** con WP-9: `CONTRIBUTING.md`, `.github/CODEOWNERS`,
+      `.github/ISSUE_TEMPLATE`, `.github/pull_request_template.md` y `.github/dependabot.yml`
+      cubriendo NuGet y `github-actions`. Las casillas se cerraron el 2026-08-10 (tarde) tras
+      comprobar cada archivo: el plan llevaba una sesión diciendo que faltaba lo que ya existía, que
+      es el mismo defecto que este repositorio caza en el código.
       **SECURITY.md hecho 2026-08-09 (tarde)**, bilingüe en la raíz: canal de reporte privado
       (aviso de seguridad de GitHub, nunca un issue público), versiones con soporte, y la clave de
       firma documentada — qué cubre (minisign sobre `SHA256SUMS.txt`, verificada por el
