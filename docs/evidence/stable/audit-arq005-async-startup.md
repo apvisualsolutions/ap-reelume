@@ -91,28 +91,27 @@ over — which is the mechanism working.
 ## El antes y el después, que es para lo que estaba la línea base / Before and after
 
 Tiempo hasta que hay ventana, según
-[la línea base](audit-arq005-startup-baseline.md). Dos ejecuciones antes, una después, misma
-máquina. / Time until there is a window: two runs before, one after, same machine.
+[la línea base](audit-arq005-startup-baseline.md). Dos ejecuciones antes y tres después, misma
+máquina. / Time until there is a window: two runs before and three after, same machine.
 
 | Fase / Phase | Antes / Before | Después / After |
 |---|---|---|
-| `open-with` | 1233 ms, 1214 ms | **779 ms** |
-| `repair` | 2658 ms, 2779 ms | **2001 ms** |
-| `first-launch` | 2292 ms, 1527 ms | **2316 ms** |
+| `open-with` | 1233, 1214 | **779, 773, 776** |
+| `repair` | 2658, 2779 | **2001, 2493, 1567** |
+| `first-launch` | 2292, 1527 | **2316, 1071, 1092** |
 
-**Y aquí está lo que justifica haber medido tres y no uno.** Los dos ciclos que se repetían con poca
-dispersión bajan de forma clara —440 ms y 700 ms—, y el que ya variaba en 765 ms entre dos
-ejecuciones del mismo código **no dice nada**: su «después» cae dentro de su propio ruido. Si la
-línea base hubiera sido sólo `first-launch`, que era lo que pedía el plan, la conclusión habría sido
-«no cambió nada». / The two cycles that repeated tightly drop clearly; the one that already varied
-by 765 ms between two runs of the same code says nothing, because its "after" lands inside its own
-noise. A baseline of `first-launch` alone would have concluded that nothing changed.
+**Y aquí está lo que justifica haber medido tres fases y no una.** `open-with` se repite con una
+dispersión de **6 ms** y cae **438 ms**: es la señal limpia. `repair` baja, con ruido. Y
+`first-launch` —el que el plan pedía medir, y el único que se iba a medir— varía 1245 ms entre
+ejecuciones del mismo código, así que por sí solo **no habría podido decir nada**. Una línea base de
+una sola fase habría concluido «no cambió nada». / `open-with` repeats within 6 ms and drops 438;
+`first-launch`, the only phase the plan asked for, varies by 1245 ms between runs of the same code
+and on its own could not have said anything at all.
 
 La caída es mayor que los 140 ms que cuesta migrar medidos en local, y la explicación probable es
 que ahí se midió con los binarios calientes: en un paquete recién desempaquetado, migrar cuesta más.
-No se afirma más que eso — es **una** muestra después. / The drop is larger than the 140 ms the
-migration costs locally, most likely because that was measured with warm binaries. That is as far as
-one sample allows.
+/ The drop is larger than the 140 ms the migration costs locally, most likely because that was
+measured with warm binaries.
 
 ## Lo que esto no arregla / What this does not fix
 

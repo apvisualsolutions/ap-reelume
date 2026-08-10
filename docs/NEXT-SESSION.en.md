@@ -1,7 +1,7 @@
 # Where to pick up
 
-The state of the project at the close of the **third** session of **2026-08-10**, the one that ran the
-architecture queue. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
+The state of the project at the close of the **fourth** session of **2026-08-10**, the one that ran
+the baseline, the asynchronous startup and the coverage debt. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
 scope record is still [FEATURES.md](FEATURES.md); the audit's outstanding work lives in
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). This is only the
 place to resume from.
@@ -70,55 +70,20 @@ Four commits, each with its full cycle and its bilingual evidence.
   would have exploited it. Detail in
   [audit-hardening-launcher-and-restore.md](evidence/stable/audit-hardening-launcher-and-restore.md).
 
-## What comes next (in this order, and already decided)
+## What comes next
 
-The ARQ-010 → ARQ-004 → ARQ-005 queue was run on 2026-08-10. One half and the debt are left, and the
-design of both is decided in the plan: **it does not need re-deliberating, it needs running**.
+The three-part queue — baseline, ARQ-005's second half, TST-001's debt — **was run in full on
+2026-08-10** (fourth session). What is left, in order of value:
 
-1. **The baseline, which is half an hour and pays for the whole task after it.** Have
-   `eng/verify-package.ps1`'s `first-launch` phase report **the time until the window appears**, not
-   just a yes or a no. It turns the intermittent red below into a comparable series, and the same
-   number before and after point 2 is the proof that it fixed it. That is *why* it goes first.
-2. **ARQ-005, second half: the asynchronous startup.** `FinishShell` blocks the interface thread to
-   migrate the database and — only when that migration rewrote the file — to check its integrity. The
-   other four `GetAwaiter().GetResult()` calls in `CompositionRoot` are diagnostics-report reads on
-   demand, and the one in `Program.cs` is `Main`'s `finally`, which is legitimate.
-
-   **A measurement comes first, and it is not negotiable.** `MigrateAsync` is written with real
-   `await`s, but that does not mean it yields the thread: `Microsoft.Data.Sqlite` implements much of
-   its `Async` surface synchronously, because SQLite has no asynchronous I/O. If it does not yield,
-   swapping `GetAwaiter().GetResult()` for `await` leaves the window **just as blocked while looking
-   fixed**, which is worse than leaving it alone. Measure it by timing whether the calling thread is
-   free while it migrates; if it does not yield, the work goes to `Task.Run`.
-   `SqliteConnectionFactory` opens a connection per call and guards its configuration with a
-   semaphore, so it supports the move.
-
-   **The shape is decided**: `FinishShell` returns a `ContentControl` holding the startup view; `App`
-   already sets that control as the window's `Content`, so **the window appears on the first frame
-   without touching `App` or `ConfigureWindow`**. When the work ends the content is swapped for the
-   shell or the recovery view — which one is the same decision as today, only its timing changes. The
-   work's failure goes through `GuardedEvent`, which already exists. The view carries the product name
-   and a line of status, **with no indeterminate progress bar**: nobody knows how much is left, and a
-   bar moving without meaning anything is a visual lie. Strings in both languages and its automation
-   name.
-
-   **Only two sites call `CreateShell()`**, both in assembled walks and both asserting
-   `Assert.IsType<ShellView>`. They move to waiting for the final content with a ceiling, and their
-   failure message has to **name what was left in its place** — startup or recovery — because a
-   ceiling that only says "it never arrived" diagnoses nothing.
-3. **The coverage debt, and the guard it is missing.** The three are `ReconcileScannedFiles`,
-   `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`.
-   [The document's numbers are stale](evidence/stable/TST1-coverage-gate.md): an approximate
-   measurement on 2026-08-10 puts them considerably better on lines and still thin on branches, and
-   `PlayerVersionsViewModel` **got smaller** when it lost its command class in ARQ-004. Re-measure
-   with `eng/check-coverage.ps1` before anything else, and start with `PlayerVersionsViewModel`, the
-   one ARQ-004 has just touched.
-
-   **And what actually matters here**: the gate measures **only files that are new by content**
-   against `origin/main`, so these three, being old, **are watched by nobody**. Settling the debt
-   without closing that does not stop it coming back tomorrow. On settling it, `check-coverage.ps1`
-   gets an explicit watch-list measured every time, under the same rule as
-   `ServiceConsumptionTests`'s orphan list: **it can only shrink**.
+1. **`ReconcileScannedFiles.cs`, the last coverage debt.** 98 lines and 50 branches, at 86.73% and
+   76.00%. It cannot slip away now: it is in `eng/check-coverage.ps1`'s watchlist at that floor, so
+   getting worse fails and getting better **also** fails until the new number is recorded. The other
+   two were paid off, and the pattern that left them thin will repeat here: **the existing tests
+   cover the wiring and not the content**, so look for the error branches rather than the happy path.
+2. **The intermittent red, still without a cause.** See the section below: what it had been
+   attributed to was ruled out with numbers, and there is now a series of timings to compare with.
+3. **Whatever is left of the remediation plan** in
+   [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md).
 
 ## An intermittent red to watch, not to paper over
 
@@ -170,6 +135,29 @@ Four commits, each with its cycle, its bilingual evidence and its gates.
   the trapped thread was holding the very lock the cancellation needed.
   [audit-arq005-media-keys.md](evidence/stable/audit-arq005-media-keys.md).
 
+## Finished on 2026-08-10 (fourth session)
+
+Three commits, each with its cycle, its bilingual evidence and its full verification.
+
+- **The verification says how long the window keeps you waiting, not just that it arrived.** Its
+  first measurement refuted two things written here: **all five** cycles migrate a new database —
+  migrations counted in every folder — rather than only the first, and the first launch is not the
+  slowest of the three either. Three phases are measured rather than one **on purpose**, and that
+  decision paid for itself immediately: comparing before with after, `open-with` repeated within
+  6 ms while `first-launch` varied by 1245 ms between runs of the same code.
+  [audit-arq005-startup-baseline.md](evidence/stable/audit-arq005-startup-baseline.md).
+- **ARQ-005, second half: the window exists while it migrates.** The measurement came first and
+  ruled out the false correction: `MigrateAsync` **yields at none of its awaits** — 140 ms of
+  140 — so an await would have left the window just as blocked while looking fixed. The work goes to
+  a thread of its own and the window appears on the first frame. As a bonus, the orphan-surface test
+  caught `StartupView` on the spot and it became the graph's third root.
+  [audit-arq005-async-startup.md](evidence/stable/audit-arq005-async-startup.md).
+- **TST-001: the coverage gate now watches code that is not new.** Re-measuring came first and the
+  result was not the expected one: two files exactly where they were the day before, and the third
+  **fifteen points worse**, because ARQ-004 took its covered lines with it and nothing said a word.
+  There is a watchlist with a ratchet in both directions, and two of the three debts are at 100%.
+  [audit-tst1-coverage-debt.md](evidence/stable/audit-tst1-coverage-debt.md).
+
 ## Yours (only what an agent cannot do)
 
 - **Add the `RELEASE_SIGNING_SECRET_KEY` secret to the public repository.** It could not be copied —
@@ -189,6 +177,19 @@ Four commits, each with its cycle, its bilingual evidence and its gates.
 - The usual economic decisions: Authenticode certificate, Store, ARM64 hardware.
 
 ## Things learned worth not learning twice
+
+- **A baseline of one measurement is not a baseline.** The phase that had to be watched turned out
+  to be the noisiest of the three — 1245 ms of variation on the same code — and the signal came from
+  the two controls added "unnecessarily". Measuring the subject with nothing to compare it against
+  produces a number that cannot tell a change from the weather.
+- **A inherited number is re-measured even when it is taken for granted that it improved.** Of
+  TST-001's three, two were exactly where they were left and the third had **gone backwards**.
+- **A premise written in your own document has to be measured too.** "The first launch is the only
+  one that migrates" was in two places and was false; counting `schema_history` in each folder takes
+  a minute and ruled out the candidate cause of the one open red.
+- **A test that fails because the correction worked is not fixed in the code.** The accessible-name
+  one lost a race against the asynchronous startup itself: by the time it looked, the shell had
+  already taken over. What gets re-aimed there is the test.
 
 - **The coverage gate reads from `HEAD`, not from disk.** With new files only staged it announces "no
   new file" and exits green. Commit and re-run `eng/check-coverage.ps1` **before** pushing, or CI will

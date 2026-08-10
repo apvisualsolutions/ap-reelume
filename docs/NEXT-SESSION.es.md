@@ -1,7 +1,7 @@
 # Dónde retomar
 
-Estado del proyecto al cerrar la **tercera** sesión del **2026-08-10**, la que ejecutó la cola de
-arquitectura. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
+Estado del proyecto al cerrar la **cuarta** sesión del **2026-08-10**, la que ejecutó la cola de la
+línea base, el arranque asíncrono y la deuda de cobertura. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
 canónico del alcance sigue siendo [FEATURES.md](FEATURES.md); el trabajo pendiente de la auditoría
 vive en [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). Esto es
 sólo el punto de retomada.
@@ -72,55 +72,21 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
   habría explotado. Detalle en
   [audit-hardening-launcher-and-restore.md](evidence/stable/audit-hardening-launcher-and-restore.md).
 
-## Lo que sigue (en este orden, y ya decidido)
+## Lo que sigue
 
-La cola de ARQ-010 → ARQ-004 → ARQ-005 se ejecutó el 2026-08-10. Queda una mitad y la deuda, y el
-diseño de las dos está decidido en el plan: **no hay que re-deliberarlo, hay que ejecutarlo**.
+La cola de tres —línea base, ARQ-005 segunda mitad, deuda de TST-001— **se ejecutó entera el
+2026-08-10** (cuarta sesión). Lo que queda, en orden de valor:
 
-1. **La línea base, que es media hora y vale por toda la tarea siguiente.** Que la fase
-   `first-launch` de `eng/verify-package.ps1` informe **el tiempo hasta que aparece la ventana**, no
-   sólo un sí o un no. Convierte el rojo intermitente de abajo en una serie comparable, y el mismo
-   número antes y después del punto 2 es la prueba de que lo arregló. Va primero **por eso**.
-2. **ARQ-005, segunda mitad: el arranque asíncrono.** `FinishShell` bloquea el hilo de interfaz para
-   migrar la base de datos y —sólo si esa migración reescribió el archivo— para comprobar su
-   integridad. Los otros cuatro `GetAwaiter().GetResult()` de `CompositionRoot` son lecturas del
-   informe de diagnóstico bajo demanda, y el de `Program.cs` es el `finally` de `Main`, que es
-   legítimo.
-
-   **Primero una medición, y no es negociable.** `MigrateAsync` está escrita con `await`s de verdad,
-   pero eso no significa que ceda el hilo: `Microsoft.Data.Sqlite` implementa buena parte de sus
-   métodos `Async` de forma síncrona, porque SQLite no tiene E/S asíncrona. Si no cede, cambiar
-   `GetAwaiter().GetResult()` por `await` deja la ventana **igual de bloqueada y con aspecto de
-   arreglada**, que es peor que no tocarla. Se mide cronometrando si el hilo llamante queda libre
-   mientras migra; si no cede, el trabajo va a `Task.Run`. `SqliteConnectionFactory` abre una conexión
-   por llamada y protege su configuración con un semáforo, así que soporta el traslado.
-
-   **La forma está decidida**: `FinishShell` devuelve un `ContentControl` con la vista de arranque
-   dentro; `App` ya coloca ese control como `Content` de la ventana, así que **la ventana aparece en
-   el primer fotograma sin tocar `App` ni `ConfigureWindow`**. Al terminar, el contenido se sustituye
-   por el shell o por la vista de recuperación — la decisión de cuál es la misma de hoy, sólo cambia
-   cuándo se toma. El fallo del trabajo va por `GuardedEvent`, que ya existe. La vista lleva el nombre
-   del producto y una línea de estado, **sin barra de progreso indeterminada**: no se sabe cuánto
-   falta, y una barra que se mueve sin significar nada es una mentira visual. Cadenas en los dos
-   idiomas y su nombre de automatización.
-
-   **Sólo dos sitios llaman a `CreateShell()`**, los dos en recorridos ensamblados y los dos afirmando
-   `Assert.IsType<ShellView>`. Pasan a esperar el contenido final con tope, y su mensaje de fallo
-   tiene que **nombrar lo que quedó en su lugar** — arranque o recuperación—, porque un tope que sólo
-   dice «no llegó» no diagnostica nada.
-3. **La deuda de cobertura, y el guardián que le falta.** Las tres son `ReconcileScannedFiles`,
-   `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`.
-   [Los números del documento están caducados](evidence/stable/TST1-coverage-gate.md): una medición
-   aproximada del 2026-08-10 los sitúa bastante mejor en líneas y todavía flojos en ramas, y
-   `PlayerVersionsViewModel` **adelgazó** al perder su clase de comando en ARQ-004. Se **re-mide** con
-   `eng/check-coverage.ps1` antes de nada, y se empieza por `PlayerVersionsViewModel`, que es el que
-   ARQ-004 acaba de tocar.
-
-   **Y lo que de verdad importa aquí**: la puerta mide **sólo archivos nuevos por contenido** contra
-   `origin/main`, así que estos tres, por antiguos, **no los mira nadie**. Saldar la deuda sin cerrar
-   eso no impide que vuelva mañana. Al saldarla, `check-coverage.ps1` recibe una lista explícita de
-   archivos vigilados que se mide siempre, con la misma regla que la lista de huérfanos de
-   `ServiceConsumptionTests`: **sólo puede encoger**.
+1. **`ReconcileScannedFiles.cs`, la última deuda de cobertura.** 98 líneas y 50 ramas, a 86,73 % y
+   76,00 %. Ya no se puede escapar: está en la lista de vigilados de `eng/check-coverage.ps1` con
+   ese suelo, así que empeorar falla y mejorar **también** falla hasta que se anota el número nuevo.
+   Las otras dos se saldaron y el patrón que las tenía flojas se repetirá aquí: **las pruebas
+   existentes cubren el cableado y no el contenido**, así que hay que buscar las ramas de error, no
+   el camino feliz.
+2. **El rojo intermitente, que sigue sin causa.** Ver la sección de abajo: lo que se le atribuía
+   quedó descartado con números, y ahora hay una serie de tiempos con la que comparar.
+3. **Lo que quede del plan de remediación** en
+   [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md).
 
 ## Un rojo intermitente que hay que vigilar, no tapar
 
@@ -172,6 +138,29 @@ Cuatro commits, cada uno con su ciclo, su evidencia bilingüe y sus puertas.
   contestación el hilo atrapado sujetaba el candado que la cancelación necesitaba.
   [audit-arq005-media-keys.md](evidence/stable/audit-arq005-media-keys.md).
 
+## Lo terminado el 2026-08-10 (cuarta sesión)
+
+Tres commits, cada uno con su ciclo, su evidencia bilingüe y su verificación completa.
+
+- **La verificación dice cuánto se espera a la ventana, no sólo que llegó.** Y en su primera
+  medición desmintió dos cosas que estaban escritas aquí: los **cinco** ciclos migran una base nueva
+  —contadas las migraciones en cada carpeta—, no sólo el primero, y el primer arranque tampoco es el
+  más lento de los tres. Se miden tres fases y no una **a propósito**, y esa decisión se pagó sola:
+  al comparar el antes y el después, `open-with` se repitió con 6 ms de dispersión mientras
+  `first-launch` variaba 1245 ms entre ejecuciones del mismo código.
+  [audit-arq005-startup-baseline.md](evidence/stable/audit-arq005-startup-baseline.md).
+- **ARQ-005, segunda mitad: la ventana existe mientras migra.** La medición previa decidió la forma
+  y evitó la corrección falsa: `MigrateAsync` **no cede el hilo en ninguno de sus `await`s** —140 ms
+  de 140—, así que un `await` habría dejado la ventana igual de bloqueada con aspecto de arreglada.
+  El trabajo va a un hilo propio y la ventana sale en el primer fotograma. De regalo, la prueba de
+  superficies huérfanas cazó `StartupView` en el acto y pasó a ser la tercera raíz del grafo.
+  [audit-arq005-async-startup.md](evidence/stable/audit-arq005-async-startup.md).
+- **TST-001: la puerta de cobertura ya vigila código que no es nuevo.** Re-medir fue lo primero y
+  el resultado no era el esperado: dos archivos exactamente igual que el día anterior y el tercero
+  **quince puntos peor**, porque ARQ-004 se llevó por delante sus líneas cubiertas sin que nada
+  avisara. Hay una lista de vigilados con trinquete en los dos sentidos, y dos de las tres deudas
+  quedaron al 100 %. [audit-tst1-coverage-debt.md](evidence/stable/audit-tst1-coverage-debt.md).
+
 ## Pendiente tuyo (sólo lo que un agente no puede hacer)
 
 - **Añadir el secreto `RELEASE_SIGNING_SECRET_KEY` al repositorio público.** No se pudo copiar —los
@@ -191,6 +180,21 @@ Cuatro commits, cada uno con su ciclo, su evidencia bilingüe y sus puertas.
 - Las decisiones económicas de siempre: certificado Authenticode, Store, hardware ARM64.
 
 ## Cosas aprendidas que conviene no volver a aprender
+
+- **Una línea base de una sola medida no es una línea base.** La fase que había que vigilar resultó
+  ser la más ruidosa de las tres —1245 ms de variación con el mismo código—, y la señal la dieron
+  los dos controles que se añadieron «de más». Medir el sujeto sin medir nada con qué compararlo
+  produce un número que no puede distinguir el cambio del día que hacía.
+- **Un número heredado se re-mide aunque se dé por hecho que ha mejorado.** De los tres de TST-001,
+  dos estaban exactamente donde los dejaron y el tercero había **retrocedido**. Lo esperado era lo
+  contrario, y suponerlo habría dejado la deuda peor de como se creía.
+- **Una premisa escrita en un documento propio también hay que medirla.** «El primer arranque es el
+  único que migra» estaba en dos sitios y era falsa: contar `schema_history` en cada carpeta cuesta
+  un minuto y descartó la causa candidata del único rojo abierto.
+- **Una prueba que falla porque la corrección funcionó no se arregla en el código.** La del nombre
+  accesible perdió una carrera contra el propio arranque asíncrono: para cuando miraba, el shell ya
+  había ocupado el sitio. Ahí lo que se reapunta es la prueba, y decir por qué evita que la próxima
+  lectura la tome por un defecto.
 
 - **La puerta de cobertura lee de `HEAD`, no del disco.** Con los archivos nuevos sólo preparados en
   el índice declara «ningún archivo nuevo» y sale verde. Hay que confirmar el commit y volver a
