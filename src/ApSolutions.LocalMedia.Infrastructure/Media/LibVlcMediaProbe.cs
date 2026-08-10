@@ -1,21 +1,38 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-using System.Diagnostics;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.Infrastructure.Playback;
 using LibVLCSharp.Shared;
 using VlcMedia = LibVLCSharp.Shared.Media;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Media;
 
+/// <summary>
+/// Reads technical metadata by parsing the file with LibVLC, on the one native instance this
+/// process owns.
+/// </summary>
+/// <remarks>
+/// The instance and the deferred release both belong to <see cref="LibVlcFactory"/> (BUG-010). This
+/// class used to keep its own of each, which cost two things: the factory's "exactly one native
+/// instance per option set" was false in any process that both probes and plays — and the count that
+/// states it could not see the second one — and the private release worker had no guard around the
+/// native dispose, so one throwing release would end the worker for good and leak every media probed
+/// after it, silently. The factory's drain already survives that, and one hardened queue is worth
+/// more than two of them.
+/// <para>
+/// Probes stay serialised: LibVLC is asked to parse one file at a time, which is how this repository
+/// stopped crashing while cataloguing.
+/// </para>
+/// </remarks>
 public sealed class LibVlcMediaProbe : IMediaProbe
 {
-    private static readonly TimeSpan NativeMediaQuiescence = TimeSpan.FromSeconds(1);
     private static readonly SemaphoreSlim ProbeLock = new(1, 1);
-    private static readonly Queue<DeferredMedia> DeferredMediaReleases = new();
-    private static readonly Lazy<LibVLC> SharedLibVlc = new(CreateLibVlc);
-    private static bool releaseWorkerScheduled;
+    private readonly LibVlcFactory _factory;
+
+    public LibVlcMediaProbe(LibVlcFactory factory) =>
+        _factory = factory ?? throw new ArgumentNullException(nameof(factory));
 
     public async Task<TechnicalMetadata> ProbeAsync(
         string path,
@@ -30,7 +47,7 @@ public sealed class LibVlcMediaProbe : IMediaProbe
         await ProbeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var media = new VlcMedia(SharedLibVlc.Value, path, FromType.FromPath);
+            var media = _factory.CreateMedia(path);
             try
             {
                 var status = await media
@@ -56,8 +73,9 @@ public sealed class LibVlcMediaProbe : IMediaProbe
             }
             finally
             {
-                DeferredMediaReleases.Enqueue(new DeferredMedia(media, Stopwatch.GetTimestamp()));
-                ScheduleDeferredRelease();
+                // Releasing a media the instant its parse returns is the native failure mode behind
+                // the whole deferral; the factory holds it for its quiescence window.
+                _factory.DeferRelease(media);
             }
         }
         finally
@@ -71,58 +89,4 @@ public sealed class LibVlcMediaProbe : IMediaProbe
         .Where(description => !string.IsNullOrWhiteSpace(description))
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .ToArray();
-
-    private static LibVLC CreateLibVlc()
-    {
-        Core.Initialize();
-        return new LibVLC(
-            "--no-metadata-network-access",
-            "--no-sub-autodetect-file",
-            "--no-video-title-show");
-    }
-
-    private static void ScheduleDeferredRelease()
-    {
-        if (releaseWorkerScheduled)
-        {
-            return;
-        }
-
-        releaseWorkerScheduled = true;
-        _ = ReleaseWhenQuiescedAsync();
-    }
-
-    private static async Task ReleaseWhenQuiescedAsync()
-    {
-        while (true)
-        {
-            TimeSpan remaining;
-            await ProbeLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                if (!DeferredMediaReleases.TryPeek(out var pending))
-                {
-                    releaseWorkerScheduled = false;
-                    return;
-                }
-
-                remaining = NativeMediaQuiescence
-                    - Stopwatch.GetElapsedTime(pending.CompletedTimestamp);
-                if (remaining <= TimeSpan.Zero)
-                {
-                    _ = DeferredMediaReleases.Dequeue();
-                    pending.Media.Dispose();
-                    continue;
-                }
-            }
-            finally
-            {
-                ProbeLock.Release();
-            }
-
-            await Task.Delay(remaining).ConfigureAwait(false);
-        }
-    }
-
-    private sealed record DeferredMedia(VlcMedia Media, long CompletedTimestamp);
 }

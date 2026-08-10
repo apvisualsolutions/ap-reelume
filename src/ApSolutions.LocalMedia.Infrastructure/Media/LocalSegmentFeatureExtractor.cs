@@ -76,7 +76,7 @@ public sealed class LocalSegmentFeatureExtractor : ISegmentFeatureExtractor
     public LocalSegmentFeatureExtractor(LibVlcFactory factory, IMediaProbe? probe = null)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
-        _probe = probe ?? new LibVlcMediaProbe();
+        _probe = probe ?? new LibVlcMediaProbe(_factory);
     }
 
     public async Task<EpisodeAudioFingerprints> ExtractAsync(
