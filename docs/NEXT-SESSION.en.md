@@ -132,11 +132,15 @@ What is known, measured from the log:
   (45 s). Both ran out and the process was killed, hence the `exit code -1`.
 - In **that same run**, `repair`, `downgrade-refused`, `open-with` and the four `windows-*` phases
   started the application and watched it paint. Only the first launch failed.
-- The first launch is the only one that actually **migrates** — sixteen migrations against a new
-  database — and migrating **blocks the interface thread**. That is the candidate cause, and it is
-  exactly what is left of ARQ-005.
+- ~~The first launch is the only one that actually migrates, and migrating blocks the interface
+  thread.~~ **Measured on 2026-08-10 and refuted**: every cycle gets a data folder of its own, so all
+  five migrate a new database, and a whole launch with its sixteen migrations costs **2,292 ms**
+  against the **90,000 ms** of deadline that failure burned. What failed there was not a slow launch
+  but one that never happened, and the candidate cause is open again. Detail in
+  [audit-arq005-startup-baseline.md](evidence/stable/audit-arq005-startup-baseline.md).
 - **Observed frequency: one in four.** It did not recur across the three following runs carrying that
-  same code. That is the figure to compare against if it is seen again.
+  same code, nor across the eight after them up to `fa968de`. That is the figure to compare against
+  if it is seen again.
 
 **What is not done**: raising the 90 s deadline. That turns the only signal there is into silence,
 which is the mistake the media generator's `cancelled` runs already charged six runs for. If it comes

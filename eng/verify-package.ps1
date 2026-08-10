@@ -81,6 +81,14 @@ function Clear-ProfilerEnvironment {
 <#
     Starts the application the way an installed copy would start, waits for it to put a window on the
     screen, and closes it the way a person would. A run that has to be killed is a failed run.
+
+    It also times the wait. Whether a window appeared is a yes or a no, and a yes covers both a
+    launch that was instant and one that arrived a second before the deadline; only a number tells
+    those apart, and only a number can be compared with the next run. The clock starts before the
+    process does, because the runtime coming up is part of what someone waits through.
+
+    The window is polled rather than watched, so the figure carries the poll interval as its
+    resolution: 100 ms, small enough that a second of startup is reported to within a tenth.
 #>
 function Invoke-Application {
     param(
@@ -99,7 +107,9 @@ function Invoke-Application {
     Remove-Item 'Env:AP_LOCALMEDIA_TMDB_TOKEN' -ErrorAction SilentlyContinue
 
     $exe = Join-Path $InstallRoot 'ApSolutions.LocalMedia.Windows.exe'
+    $pollMilliseconds = 100
     try {
+        $waited = [Diagnostics.Stopwatch]::StartNew()
         $process = if ($Arguments.Count -gt 0) {
             Start-Process -FilePath $exe -ArgumentList $Arguments -PassThru
         }
@@ -109,11 +119,17 @@ function Invoke-Application {
 
         $deadline = [datetime]::UtcNow.AddSeconds($WindowTimeoutSeconds)
         $windowShown = $false
+        $windowMilliseconds = $null
         while ([datetime]::UtcNow -lt $deadline) {
             if ($process.HasExited) { break }
             $process.Refresh()
-            if ($process.MainWindowHandle -ne [IntPtr]::Zero) { $windowShown = $true; break }
-            Start-Sleep -Milliseconds 250
+            if ($process.MainWindowHandle -ne [IntPtr]::Zero) {
+                $windowShown = $true
+                $windowMilliseconds = [int]$waited.ElapsedMilliseconds
+                break
+            }
+
+            Start-Sleep -Milliseconds $pollMilliseconds
         }
 
         # Startup is asynchronous: the window appears before the first scan and the first write.
@@ -130,14 +146,28 @@ function Invoke-Application {
         }
 
         return [pscustomobject]@{
-            windowShown   = $windowShown
-            closedPolitely = $closedPolitely
-            exitCode      = $process.ExitCode
+            windowShown            = $windowShown
+            windowMilliseconds     = $windowMilliseconds
+            windowTimeoutMilliseconds = $WindowTimeoutSeconds * 1000
+            windowPollMilliseconds = $pollMilliseconds
+            closedPolitely         = $closedPolitely
+            exitCode               = $process.ExitCode
         }
     }
     finally {
         Remove-Item 'Env:AP_LOCALMEDIA_DATA_ROOT' -ErrorAction SilentlyContinue
     }
+}
+
+<#
+    Says the wait the way a person reads it, including when there was none to say: a launch that
+    reached the deadline has to report that rather than leave the sentence half-written.
+#>
+function Format-WindowWait {
+    param([Parameter(Mandatory)]$Run)
+
+    if ($null -ne $Run.windowMilliseconds) { "Window shown after $($Run.windowMilliseconds) ms" }
+    else { "No window inside $($Run.windowTimeoutMilliseconds) ms" }
 }
 
 # The application's own SQLite, loaded from the payload being verified rather than from anywhere
@@ -273,8 +303,10 @@ try {
         id       = 'first-launch'
         kind     = 'substitute'
         outcome  = if ($firstRun.windowShown -and $firstRun.exitCode -eq 0 -and $migrations -gt 0) { 'Passed' } else { 'Failed' }
-        detail   = "Window shown: $($firstRun.windowShown); exit code $($firstRun.exitCode); $migrations migration(s) applied to a new database."
+        detail   = "$(Format-WindowWait $firstRun); exit code $($firstRun.exitCode); $migrations migration(s) applied to a new database."
         dataRoot = $firstData
+        windowMilliseconds        = $firstRun.windowMilliseconds
+        windowTimeoutMilliseconds = $firstRun.windowTimeoutMilliseconds
     }
 
     # -------------------------------------------------------------- open with
@@ -297,11 +329,13 @@ try {
         id               = 'open-with'
         kind             = 'substitute'
         outcome          = if ($looseRun.windowShown -and $looseCounts.media_files -eq 0 -and $looseCounts.library_roots -eq 0) { 'Passed' } else { 'Failed' }
-        detail           = "Activated on $($sample.Extension); catalogue left at $($looseCounts.media_files) file(s) and $($looseCounts.library_roots) root(s)."
+        detail           = "Activated on $($sample.Extension); $(Format-WindowWait $looseRun); catalogue left at $($looseCounts.media_files) file(s) and $($looseCounts.library_roots) root(s)."
         dataRoot         = $looseData
         accepted         = [bool]$looseRun.windowShown
         mediaFilesAfter  = [int]$looseCounts.media_files
         libraryRootsAfter = [int]$looseCounts.library_roots
+        windowMilliseconds        = $looseRun.windowMilliseconds
+        windowTimeoutMilliseconds = $looseRun.windowTimeoutMilliseconds
     }
 
     # ---------------------------------------------------------------- upgrade
@@ -428,10 +462,12 @@ VALUES ($($newest + 1), 'from_a_later_release', '$([DateTimeOffset]::UtcNow.ToSt
         id                 = 'repair'
         kind               = 'substitute'
         outcome            = if ($missingAfterRepair -eq 0 -and $repairRun.windowShown -and $repairRun.exitCode -eq 0) { 'Passed' } else { 'Failed' }
-        detail             = "$($damaged.Count) file(s) removed and restored from the package; the application started again."
+        detail             = "$($damaged.Count) file(s) removed and restored from the package; the application started again. $(Format-WindowWait $repairRun)."
         dataRoot           = $repairData
         removedFiles       = $damaged.Count
         missingAfterRepair = $missingAfterRepair
+        windowMilliseconds        = $repairRun.windowMilliseconds
+        windowTimeoutMilliseconds = $repairRun.windowTimeoutMilliseconds
     }
 
     # -------------------------------------------------------------- uninstall

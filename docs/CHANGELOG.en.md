@@ -87,6 +87,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The package verification now says how long the window took to appear, not just that it did.** It
+  recorded a yes or a no, and that yes covered both an instant launch and one that arrived just
+  before the ninety-second deadline ran out, so a degradation stayed invisible until it was a
+  failure. It now reports the time — measured from before the process starts, because starting is
+  part of the wait — for the three cycles that open the application, and a test demands the figure
+  and bounds it against that deadline. Three numbers rather than one, because a single number cannot
+  say whether it was the launch that got worse or the machine. The first measurement settled two
+  things: all five cycles migrate a new database rather than only the first one, as had been
+  written, and the first launch is not the slowest of the three either.
 - **On the way out, the application lets go of what it took.** The native player, the database, the
   tray icon, the media-key registrations and the network clients lived in a static field that nothing
   ever released: the process ended and left Windows to reclaim its own, which is trusting rather than

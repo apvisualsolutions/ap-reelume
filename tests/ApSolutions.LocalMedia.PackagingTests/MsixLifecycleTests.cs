@@ -63,6 +63,41 @@ public sealed class MsixLifecycleTests
     }
 
     /// <summary>
+    /// How long someone waited before there was a window to look at. Whether one appeared is a yes or
+    /// a no, and a yes says nothing about a launch that is drifting towards the deadline: the two are
+    /// only distinguishable once the wait is a number that the next run can be compared against.
+    /// </summary>
+    /// <remarks>
+    /// The three are reported together because one number on its own cannot say what it measured.
+    /// Every cycle gets a data folder of its own, so all three migrate an empty database through the
+    /// same sixteen steps — measured, not assumed — which makes them directly comparable. What is
+    /// left over is the difference between them: <c>first-launch</c> is the only one starting
+    /// binaries that were unpacked moments earlier and never read, so a first launch that stays
+    /// slower than the other two is paying for a cold start rather than for the migration.
+    /// </remarks>
+    [Theory]
+    [InlineData("first-launch")]
+    [InlineData("open-with")]
+    [InlineData("repair")]
+    public void Every_launch_reports_how_long_its_window_took_to_appear(string id)
+    {
+        var phase = Phase(id);
+
+        Assert.True(
+            phase.TryGetProperty("windowMilliseconds", out var measured),
+            $"Phase {id} says whether a window appeared but not when, so no run of it can be compared "
+                + "with the next one.");
+        Assert.True(
+            measured.ValueKind == JsonValueKind.Number,
+            $"Phase {id} reached the deadline without a window, so there is no wait to report.");
+
+        var waited = measured.GetInt32();
+        var deadline = phase.GetProperty("windowTimeoutMilliseconds").GetInt32();
+
+        Assert.InRange(waited, 1, deadline);
+    }
+
+    /// <summary>
     /// The gate that keeps the substitution honest. While the machine is what it is, these phases are
     /// blocked and must say why; the moment a clean virtual machine runs this, they stop being
     /// allowed to be blocked at all.

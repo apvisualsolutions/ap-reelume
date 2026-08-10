@@ -134,11 +134,15 @@ Lo que se sabe, medido del registro:
   dos se agotaron y el proceso acabó matado, de ahí el `exit code -1`.
 - En **esa misma ejecución**, `repair`, `downgrade-refused`, `open-with` y las cuatro fases
   `windows-*` arrancaron la aplicación y la vieron pintar. Sólo falló el primer arranque.
-- El primer arranque es el único que **migra de verdad** —dieciséis migraciones sobre una base
-  nueva— y migrar **bloquea el hilo de interfaz**. Ésa es la causa candidata, y es exactamente lo que
-  queda pendiente en ARQ-005.
+- ~~El primer arranque es el único que migra de verdad, y migrar bloquea el hilo de interfaz.~~
+  **Medido el 2026-08-10 y desmentido**: cada ciclo recibe su propia carpeta, así que los cinco
+  migran una base nueva, y un arranque entero con sus dieciséis migraciones cuesta **2 292 ms**
+  frente a los **90 000 ms** de plazo que aquel fallo agotó. Lo que falló allí no fue un arranque
+  lento sino uno que no llegó a ocurrir, y la causa candidata sigue abierta. Detalle en
+  [audit-arq005-startup-baseline.md](evidence/stable/audit-arq005-startup-baseline.md).
 - **Frecuencia observada: una de cuatro.** No se repitió en las tres ejecuciones siguientes que
-  llevaban ese mismo código. Es la cifra contra la que comparar si vuelve a verse.
+  llevaban ese mismo código, ni en las ocho posteriores hasta `fa968de`. Es la cifra contra la que
+  comparar si vuelve a verse.
 
 **Lo que no se hace**: subir el plazo de 90 s. Eso convierte la única señal que hay en silencio, que
 es el error que ya costó seis ejecuciones con los `cancelled` del generador de medios. Si vuelve a

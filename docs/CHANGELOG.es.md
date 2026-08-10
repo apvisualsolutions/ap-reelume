@@ -88,6 +88,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La verificación del paquete ya dice cuánto tardó la ventana en aparecer, no sólo que apareció.**
+  Anotaba un sí o un no, y ese sí cubría por igual un arranque instantáneo y uno que llegó justo
+  antes de agotar el plazo de noventa segundos, así que una degradación no se veía hasta ser un
+  fallo. Ahora informa el tiempo —desde antes de arrancar el proceso, porque el arranque también se
+  espera— en los tres ciclos que abren la aplicación, y una prueba lo exige y lo acota contra ese
+  plazo. Tres cifras y no una, porque un número solo no dice si el que empeoró fue el arranque o la
+  máquina. La primera medición dejó dos cosas claras: los cinco ciclos migran una base nueva, no
+  sólo el primero como estaba escrito, y el primer arranque tampoco es el más lento de los tres.
 - **Al salir, la aplicación suelta lo que había tomado.** El reproductor nativo, la base de datos, el
   icono de bandeja, los registros de teclas multimedia y los clientes de red vivían en un campo
   estático que nada liberaba nunca: el proceso terminaba y le dejaba a Windows recoger lo suyo, que no
