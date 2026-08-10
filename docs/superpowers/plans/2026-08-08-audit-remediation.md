@@ -224,8 +224,26 @@ En este orden (el paso 1 desbloquea el resto):
       singleton are asserted on descriptors; the updater's address is asserted on the composed
       object against both changelogs. Two invocation halves no descriptor can express stay
       declared as textual until the startup path leaves the file.
-- [ ] **ARQ-006 pasos 2-3**: partir el registro en módulos (`AddData`, `AddPlayback`, …) y extraer
+- [x] **ARQ-006 pasos 2-3**: partir el registro en módulos (`AddData`, `AddPlayback`, …) y extraer
       `WindowsFilePickers`, `DatabaseStartup`, `WindowLifecycle` (el archivo ronda las 1.200 líneas).
+      **Hecho 2026-08-10**: el registro es ahora ocho módulos por área (`AddData`, `AddPlayback`,
+      `AddPersonalisation`, `AddLibrary`, `AddSettingsAndBackup`, `AddUpdates`,
+      `AddAppearanceAndLifecycle`, `AddIdentification` + `AddCatalogEditing`), repartidos en seis
+      parciales de 63 a 117 líneas; `CompositionRoot.cs` baja de 1.857 a 1.503. `DatabaseStartup` y
+      `WindowsFilePickers` salieron a sus propias clases, y la primera llegó con cinco pruebas —
+      `FindLatestBackup` no era alcanzable mientras fue privada. `WindowLifecycle` no se extrae:
+      `ConfigureWindow` está tejido con el arranque que ARQ-001 va a mover de todos modos, y sacarlo
+      ahora obligaría a moverlo dos veces. \ Done: the registration is eight area modules across six
+      partials; two classes extracted, one of them arriving with the tests its logic never had.
+      `WindowLifecycle` is deliberately left for ARQ-001, which moves the startup path anyway.
+- [x] **Deuda descubierta al partirlo**: las pruebas de cableado abrían `CompositionRoot.cs` por su
+      nombre, de modo que «la composición» significaba «un archivo» y ocho de ellas se pusieron rojas
+      sin que cambiara un solo cable. Ahora leen todos los `CompositionRoot*.cs` desde una fuente
+      única (`CompositionSourceText`), y `ServiceConsumptionTests` —la puerta contra el defecto de la
+      casa— hace lo mismo, porque leer un archivo habría encogido el grafo en silencio y dejado pasar
+      justo lo que existe para cazar. Verificado con una mutación: alterar el disparador de la
+      persistencia rompe su prueba y restaurarlo la devuelve a verde. \ The wiring tests opened one
+      file by name; they now read every partial from one source, and so does the consumption gate.
 - [ ] **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
       `ServiceProvider`; liberar en `ShutdownRequested` (LibVLC, SQLite, bandeja, hotkeys, HttpClients);
       retirar `DisableParallelization` de `AssembledShellSuites` como prueba.

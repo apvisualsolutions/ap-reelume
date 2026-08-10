@@ -57,6 +57,7 @@ using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.Windows.Accessibility;
 using ApSolutions.LocalMedia.Windows.MediaKeys;
 using ApSolutions.LocalMedia.Windows.Playback;
+using ApSolutions.LocalMedia.Windows.Shell;
 using ApSolutions.LocalMedia.Windows.Startup;
 using ApSolutions.LocalMedia.Windows.Tray;
 using ApSolutions.LocalMedia.Windows.Updates;
@@ -68,7 +69,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ApSolutions.LocalMedia.Windows;
 
-public static class CompositionRoot
+public static partial class CompositionRoot
 {
     /// <summary>
     /// Where the independent updater looks. The Store has its own update channel, and this one is
@@ -262,289 +263,15 @@ public static class CompositionRoot
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(shellHost);
         return services
-            .AddSingleton<INavigationService, NavigationService>()
-            .AddSingleton(paths)
-            .AddSingleton(shellHost)
-            .AddSingleton<SqliteConnectionFactory>()
-            .AddSingleton<MigrationRunner>(provider => new MigrationRunner(
-                provider.GetRequiredService<SqliteConnectionFactory>()))
-            .AddSingleton<IntegrityChecker>()
-            .AddSingleton<IDatabaseIntegrityChecker>(provider => provider.GetRequiredService<IntegrityChecker>())
-            .AddSingleton<ILibraryRootRepository, LibraryRootRepository>()
-            .AddSingleton<IMediaFileRepository, MediaFileRepository>()
-            .AddSingleton<CatalogRepository>()
-            // ICatalogRepository was a dead registration (LIB-002/003 follow-up): the application
-            // projects titles through the scan's own writes, and nothing ever resolved the
-            // interface. Removed rather than left silent, the ARQ-A01 rule.
-            .AddSingleton<ICatalogQueryService>(provider => provider.GetRequiredService<CatalogRepository>())
-            .AddSingleton<IPathNormalizer, WindowsPathNormalizer>()
-            .AddSingleton<IMediaFileEnumerator, MediaFileEnumerator>()
-            .AddSingleton<IMediaProbe, LibVlcMediaProbe>()
-            .AddSingleton<IClock, SystemClock>()
-            .AddSingleton<IRootWatcher>(provider => new DebouncedFileWatcher(
-                provider.GetRequiredService<IClock>()))
-            .AddSingleton<IFallbackScanScheduler>(provider => new FallbackScanScheduler(
-                provider.GetRequiredService<IClock>(),
-                FallbackScanScheduler.DefaultRecoveryInterval))
-            .AddSingleton<InProcessApplicationEventPublisher>()
-            .AddSingleton<IApplicationEventPublisher>(provider =>
-                provider.GetRequiredService<InProcessApplicationEventPublisher>())
-            .AddSingleton(_ => LibVlcFactory.CreateDefault())
-            .AddSingleton<IDisplayCapabilityProvider, WindowsDisplayCapabilityProvider>()
-            .AddSingleton<IAudioDeviceCatalog, WindowsAudioDeviceCatalog>()
-            .AddSingleton<LibVlcAudioOutputAdapter>()
-            .AddTransient<AudioOutputViewModel>()
-            .AddSingleton<LibVlcMediaPlayerEngine>()
-            .AddSingleton<IMediaPlayerEngine>(provider => provider.GetRequiredService<LibVlcMediaPlayerEngine>())
-            .AddSingleton<IVideoFrameSource>(provider => provider.GetRequiredService<LibVlcMediaPlayerEngine>())
-            .AddSingleton<IExternalPlaybackLauncher, ShellExternalPlaybackLauncher>()
-            .AddSingleton<PlaybackSessionCoordinator>()
-            .AddSingleton<IPlaybackSessionCoordinator>(provider =>
-                provider.GetRequiredService<PlaybackSessionCoordinator>())
-            .AddSingleton<IPlaybackPreferenceRepository, PlaybackPreferenceRepository>()
-            .AddSingleton<IWatchStateRepository, WatchStateRepository>()
-            .AddSingleton(provider => new PlaybackProgressTracker(
-                provider.GetRequiredService<IWatchStateRepository>(),
-                provider.GetRequiredService<IClock>()))
-            .AddTransient<ResumePlayback>()
-            .AddTransient<SetWatchStatus>()
-            .AddTransient<ConfigureWatchedThreshold>()
-            .AddTransient<SwitchMediaVersion>()
-            .AddSingleton<IEpisodeSequenceRepository, EpisodeSequenceRepository>()
-            .AddSingleton<IHomeReadModel, HomeReadModel>()
-            .AddSingleton<IPersonalStateRepository, PersonalStateRepository>()
-            .AddTransient<SetPersonalState>()
-            .AddTransient<GetPersonalFilters>()
-            .AddSingleton<IRecommendationReadModel, RecommendationReadModel>()
-            .AddTransient<GetRecommendations>()
-            .AddTransient<GetHome>()
-            .AddTransient<GetNextEpisode>()
-            .AddTransient<StartNextEpisodeCountdown>()
-            .AddSingleton<IIntroMarkerRepository, IntroMarkerRepository>()
-            .AddTransient<SaveManualMarker>()
-            .AddTransient<DeleteManualMarker>()
-            .AddSingleton<IDetectedMarkerRepository, DetectedMarkerRepository>()
-            .AddSingleton<ISegmentFeatureExtractor>(provider =>
-                new LocalSegmentFeatureExtractor(
-                    provider.GetRequiredService<LibVlcFactory>(),
-                    provider.GetRequiredService<IMediaProbe>()))
-            .AddSingleton<IPlaybackActivity, CoordinatorPlaybackActivity>()
-            .AddSingleton<IAutomaticSegmentDetector>(provider => new AutomaticSegmentDetector(
-                provider.GetRequiredService<ISegmentFeatureExtractor>(),
-                provider.GetRequiredService<IPlaybackActivity>()))
-            .AddTransient<DetectSeriesSegments>()
-            .AddTransient<ReviewDetectedSegments>()
-            .AddSingleton(provider => new SegmentDetectionScheduler(
-                () => provider.GetRequiredService<DetectSeriesSegments>()))
-            .AddTransient<OpenLooseFile>()
-            .AddSingleton(provider => new LooseFileViewModel(folder =>
-                provider.GetRequiredService<AddLibraryRoot>()
-                    .ExecuteAsync(
-                        new AddLibraryRootCommand(folder, RootKind.Local, ScanPolicy.Manual),
-                        CancellationToken.None)))
-            .AddTransient<SelectTrack>()
-            .AddTransient<ApplyPlaybackPreferences>()
-            // A seek is a moment the person chose on purpose; it is flushed so a crash right after
-            // costs nothing. The observation lands first so the flush writes the chosen position.
-            .AddSingleton(provider => new ControlPlayback(
-                provider.GetRequiredService<IMediaPlayerEngine>(),
-                async (position, duration, token) =>
-                {
-                    var tracker = provider.GetRequiredService<PlaybackProgressTracker>();
-                    tracker.Observe(position, duration);
-                    _ = await tracker.FlushAsync(PersistenceTrigger.Seek, token).ConfigureAwait(false);
-                }))
-            .AddSingleton<ChangePlaybackMode>()
-            .AddSingleton<IMediaKeySource, WindowsMediaKeyService>()
-            .AddSingleton<ShortcutMap>()
-            .AddTransient<ShortcutSettingsViewModel>()
-            .AddTransient<TransportControlsViewModel>()
-            .AddTransient<SubtitleStyleViewModel>()
-            .AddSingleton<ScanCoordinator>()
-            // Identification rides inside the shared coordinator: a watcher-triggered scan feeds
-            // the review inbox exactly like a manual one, instead of identification being a
-            // courtesy of whichever caller remembered it.
-            .AddSingleton<IScanCoordinator>(provider => new IdentifyingScanCoordinator(
-                provider.GetRequiredService<ScanCoordinator>(),
-                () => provider.GetRequiredService<ReconcileScannedFiles>(),
-                () => provider.GetRequiredService<IdentifyScannedFiles>(),
-                () => provider.GetRequiredService<GroupScannedVersions>()))
-            .AddSingleton<RootWatchCoordinator>()
-            .AddSingleton<RootWatchBackground>()
-            .AddSingleton<FileReconciliationPolicy>()
-            .AddSingleton<ReconcileScanResults>()
-            // The identity a scan captures is what lets a moved file keep being its entity: the
-            // stable NTFS id when the volume has one, the bounded fingerprint always.
-            .AddSingleton<IFileIdentityProvider>(_ => new CompositeFileIdentityProvider(
-                new NtfsFileIdentityProvider(),
-                new LightweightFingerprintProvider()))
-            .AddSingleton<PendingReassignments>()
-            .AddTransient<ReconcileScannedFiles>()
-            .AddTransient<AddLibraryRoot>()
-            .AddTransient<RemoveLibraryRoot>()
-            .AddTransient<RootOnboardingViewModel>()
-            .AddSingleton<ScanProgressViewModel>()
-            .AddTransient<ManualReassignmentViewModel>()
-            .AddTransient(CreateLibraryViewModel)
-            .AddTransient(provider => new RecommendationsViewModel(
-                provider.GetRequiredService<GetRecommendations>(),
-                provider.GetRequiredService<IRecommendationSettings>()))
-            .AddTransient(provider => new HomeViewModel(
-                provider.GetRequiredService<GetHome>(),
-                provider.GetRequiredService<INavigationService>(),
-                onResume: null,
-                provider.GetRequiredService<RecommendationsViewModel>()))
-            .AddSingleton<ISettingsStore>(provider => new JsonSettingsStore(
-                provider.GetRequiredService<IAppDataPaths>().SettingsPath))
-            .AddSingleton<MainWindowPlacement>()
-            .AddSingleton<IBackupSnapshotWriter>(provider => new SqliteBackupService(
-                provider.GetRequiredService<SqliteConnectionFactory>()))
-            .AddSingleton<IBackupStore>(provider => new RotatingBackupStore(
-                provider.GetRequiredService<IAppDataPaths>().BackupsDirectory))
-            .AddSingleton<IBackupArchiveWriter, ZipExportService>()
-            .AddSingleton(provider => new CreateBackup(
-                provider.GetRequiredService<IBackupSnapshotWriter>(),
-                provider.GetRequiredService<IBackupStore>(),
-                provider.GetRequiredService<IAppDataPaths>(),
-                provider.GetRequiredService<ILibraryRootRepository>(),
-                provider.GetRequiredService<IClock>(),
-                GetAppVersion()))
-            .AddSingleton<ExportLibrary>()
-            .AddSingleton<IPrivacySettings, StoredPrivacySettings>()
-            .AddSingleton<IDiagnosticsBuilder, AllowlistedDiagnosticsBuilder>()
-            .AddSingleton<CreateDiagnostics>()
-            .AddTransient(provider => new PrivacySettingsViewModel(
-                provider.GetRequiredService<IPrivacySettings>(),
-                provider.GetRequiredService<IDiagnosticsBuilder>(),
-                () => DescribeThisMachine(provider),
-                (consent, inputs, cancellationToken) => provider.GetRequiredService<CreateDiagnostics>()
-                    .ExportAsync(consent, inputs, cancellationToken),
-                () => provider.GetRequiredService<IClock>().UtcNow,
-                NetworkPurposeRegistry.Declared,
-                cancellationToken => provider.GetRequiredService<CreateDiagnostics>()
-                    .DiscardAsync(cancellationToken)))
-            .AddSingleton<IBackupValidator, BackupValidator>()
-            .AddSingleton<IStagedRestoreService>(provider => new StagedRestoreService(
-                provider.GetRequiredService<IAppDataPaths>()))
-            .AddSingleton<PreviewRestore>()
-            .AddSingleton<RestoreBackup>()
-            .AddTransient(provider => new RestoreWizardViewModel(
-                (archive, remaps, cancellationToken) => provider.GetRequiredService<PreviewRestore>()
-                    .ExecuteAsync(archive, remaps, cancellationToken),
-                (archive, remaps, progress, cancellationToken) => provider.GetRequiredService<RestoreBackup>()
-                    .ExecuteAsync(archive, remaps, progress, cancellationToken),
-                ChooseArchiveSourceAsync))
-            .AddTransient(provider => new BackupViewModel(
-                (progress, cancellationToken) => provider.GetRequiredService<CreateBackup>()
-                    .ExecuteAsync(progress, cancellationToken),
-                (destination, progress, cancellationToken) => provider.GetRequiredService<ExportLibrary>()
-                    .ExecuteAsync(destination, progress, cancellationToken),
-                ChooseArchiveDestinationAsync))
-            // Updates. The three steps are separate services because they answer to different acts:
-            // asking, fetching, and confirming. Nothing here runs on its own — the automatic check is
-            // off until somebody turns it on, and the launcher is only ever reached through a consent.
-            .AddSingleton<IUpdateSettings, StoredUpdateSettings>()
-            .AddSingleton(_ => new InstalledRelease(GetAppVersion(), GetRuntimeIdentifier()))
-            .AddSingleton<IUpdateSource>(_ => new GitHubReleaseUpdateProvider(
-                CreateUpdateClient(new Uri("https://api.github.com/")),
-                UpdateRepositoryOwner,
-                UpdateRepositoryName,
-                UpdateSigningKey.PublicKey))
-            .AddSingleton<IUpdateDownloader>(provider => new VerifiedUpdateDownloader(
-                CreateUpdateClient(baseAddress: null),
-                Path.Combine(provider.GetRequiredService<IAppDataPaths>().DataRoot, "updates")))
-            .AddSingleton<IUpdateLauncher>(_ => new WindowsUpdateLauncher(OpenWithWindows))
-            .AddSingleton<CheckForUpdates>()
-            .AddSingleton<ConfirmUpdate>()
-            // One instance, not one per resolution: the window starts the automatic check on the
-            // same surface the shell is showing. A transient here would check for updates on a view
-            // model nobody can see, which is indistinguishable from not checking at all.
-            .AddSingleton(provider => new UpdateViewModel(
-                (trigger, cancellationToken) => provider.GetRequiredService<CheckForUpdates>()
-                    .ExecuteAsync(trigger, cancellationToken),
-                (release, progress, cancellationToken) => provider.GetRequiredService<ConfirmUpdate>()
-                    .StageAsync(release, progress, cancellationToken),
-                (staged, consent, cancellationToken) => provider.GetRequiredService<ConfirmUpdate>()
-                    .ExecuteAsync(staged, consent, cancellationToken),
-                () => provider.GetRequiredService<IClock>().UtcNow,
-                provider.GetRequiredService<IUpdateSettings>()))
-            .AddSingleton<IRecommendationSettings, StoredRecommendationSettings>()
-            .AddTransient<RecommendationSettingsViewModel>()
-            .AddSingleton<ILifecycleSettings, StoredLifecycleSettings>()
-            .AddSingleton<IStartupService>(_ => new WindowsStartupService(GetExecutablePath()))
-            .AddSingleton<ITrayService>(_ => new WindowsTrayService(
-                ReadResource("ProductDisplayName"),
-                ReadResource("LifecycleTrayOpenAction"),
-                ReadResource("LifecycleTrayExitAction")))
-            .AddTransient<LifecycleSettingsViewModel>()
-            .AddSingleton<IBackdropService, MicaBackdropService>()
-            .AddSingleton<IReducedMotionService, WindowsReducedMotionService>()
-            .AddSingleton<IThemeService>(provider => new FluentThemeService(
-                Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized."),
-                provider.GetRequiredService<ISettingsStore>(),
-                provider.GetRequiredService<IBackdropService>(),
-                provider.GetRequiredService<IReducedMotionService>()))
-            // One answer to "which language?" (BUG-011): the window, the updater's summary, and the
-            // metadata language all read what this service applied, never the machine's culture.
-            .AddSingleton<ILanguageService>(provider => new StoredLanguageService(
-                provider.GetRequiredService<ISettingsStore>(),
-                Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized.")))
-            .AddTransient<AppearanceSettingsViewModel>()
-            .AddTransient<ScanSettingsViewModel>()
-
-            // Identification. Without a provider and an artwork cache the review inbox has nothing to
-            // review, which is exactly the gap ADR-0003 found.
-            .AddSingleton<IMetadataCache, SqliteMetadataCache>()
-            .AddSingleton(_ => new TmdbOptions(
-                Environment.GetEnvironmentVariable(TmdbOptions.EnvironmentVariableName)))
-            .AddSingleton<TmdbRateLimiter>()
-            .AddSingleton<IMetadataProvider>(provider => new TmdbMetadataProvider(
-                CreateProviderClient(),
-                provider.GetRequiredService<IMetadataCache>(),
-                provider.GetRequiredService<TmdbOptions>(),
-                provider.GetRequiredService<TmdbRateLimiter>(),
-                TimeProvider.System))
-            // ArtworkCache left the container with ART-A01 (2026-08-09): nothing fetched art and
-            // no surface showed it, and wiring the whole chain — poster plumbing through the
-            // candidate store, two image surfaces, network tests — is out of proportion for an
-            // MVP whose remote identification ships disabled. The gap is documented in the plan
-            // and in FEATURES; the class stays for personal artwork and for the day the gap
-            // closes. Removed rather than left silent, the ARQ-A01 rule.
-            .AddSingleton<IIdentificationCandidateSource>(provider => new MetadataCandidateSource(
-                provider.GetRequiredService<IMetadataProvider>(),
-                provider.GetRequiredService<IMetadataCache>(),
-                CurrentMetadataLanguage(),
-                // No token, no connection. Putting the token in place is the deliberate, revocable act
-                // that consents to talking to the provider at all; the shipped artifact carries none.
-                () => provider.GetRequiredService<TmdbOptions>().AccessToken is not null))
-            .AddSingleton<IMediaNameParser, MediaNameParser>()
-            .AddSingleton<ICandidateScorer, CandidateScorer>()
-            .AddSingleton<IMatchCandidateRepository, MatchCandidateRepository>()
-            .AddTransient<IdentifyMediaFile>()
-            .AddTransient<IdentifyScannedFiles>()
-            .AddTransient<GetReviewInbox>()
-            .AddTransient<ResolveMatch>()
-            .AddTransient<RejectMatch>()
-            .AddTransient<ReviewInboxViewModel>()
-
-            // Metadata editing, renaming, and duplicates: the three surfaces a title card leads to.
-            .AddSingleton<ICatalogMetadataRepository, CatalogMetadataRepository>()
-            .AddSingleton<MetadataMergePolicy>()
-            .AddTransient<UpdateMetadata>()
-            .AddTransient<RefreshMetadata>()
-            .AddTransient<ArtworkPickerViewModel>()
-            .AddSingleton<RenamePolicy>()
-            .AddSingleton<PreviewRename>()
-            .AddSingleton<ISafeFileRenamer>(provider => new SafeFileRenamer(
-                provider.GetRequiredService<SqliteConnectionFactory>()))
-            .AddTransient<ExecuteRename>()
-            .AddTransient<UndoRename>()
-            .AddSingleton<IMediaVersionGroupRepository, MediaVersionGroupRepository>()
-            .AddSingleton<MediaVersionSelectionPolicy>()
-            .AddSingleton<DuplicateGroupingPolicy>()
-            .AddTransient<GroupMediaVersions>()
-            .AddTransient<GroupScannedVersions>()
-            .AddTransient<SetPreferredVersion>()
+            .AddData(paths, shellHost)
+            .AddPlayback()
+            .AddPersonalisation()
+            .AddLibrary()
+            .AddSettingsAndBackup()
+            .AddUpdates()
+            .AddAppearanceAndLifecycle()
+            .AddIdentification()
+            .AddCatalogEditing()
 
             .AddTransient(CreateShellSurfaces)
             .AddTransient(provider =>
@@ -1403,57 +1130,8 @@ public static class CompositionRoot
     private static DatabaseRecoveryView CreateRecoveryView(
         string databasePath,
         string? migrationBackupPath,
-        string failureDetail)
-    {
-        var backupPath = FindLatestBackup(databasePath, migrationBackupPath);
-        return new DatabaseRecoveryView
-        {
-            DataContext = new DatabaseRecoveryViewModel(
-                databasePath,
-                backupPath,
-                failureDetail,
-                action => HandleRecoveryAction(action, backupPath)),
-        };
-    }
-
-    private static string FindLatestBackup(string databasePath, string? migrationBackupPath)
-    {
-        if (!string.IsNullOrWhiteSpace(migrationBackupPath) && File.Exists(migrationBackupPath))
-        {
-            return migrationBackupPath;
-        }
-
-        var directory = Path.GetDirectoryName(databasePath)
-            ?? throw new InvalidOperationException("The database path has no directory.");
-        var pattern = $"{Path.GetFileName(databasePath)}.pre-migration-*.bak";
-        return Directory.Exists(directory)
-            ? Directory.EnumerateFiles(directory, pattern)
-                .OrderByDescending(File.GetLastWriteTimeUtc)
-                .FirstOrDefault()
-                ?? Path.Combine(directory, "no-pre-migration-copy-available")
-            : Path.Combine(directory, "no-pre-migration-copy-available");
-    }
-
-    private static void HandleRecoveryAction(DatabaseRecoveryAction action, string backupPath)
-    {
-        if (action == DatabaseRecoveryAction.OpenBackupFolder)
-        {
-            var folder = Path.GetDirectoryName(backupPath);
-            if (!string.IsNullOrWhiteSpace(folder) && Directory.Exists(folder))
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = folder,
-                    UseShellExecute = true,
-                });
-            }
-        }
-        else if (action == DatabaseRecoveryAction.Exit
-            && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.Shutdown();
-        }
-    }
+        string failureDetail) =>
+        DatabaseStartup.CreateRecoveryView(databasePath, migrationBackupPath, failureDetail);
 
     /// <summary>
     /// What this machine can say about itself, and nothing else. The counts are exact here and become
@@ -1567,50 +1245,18 @@ public static class CompositionRoot
     private static string GetAppVersion() =>
         typeof(CompositionRoot).Assembly.GetName().Version?.ToString() ?? "0.0.0";
 
-    /// <summary>
-    /// Asks where the archive should go. The picker belongs to Windows, so the application never sees a
-    /// folder it was not handed, and a cancelled dialog simply means nothing is exported.
-    /// </summary>
-    private static async Task<string?> ChooseArchiveDestinationAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        if (Avalonia.Application.Current?.ApplicationLifetime
-            is not IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
-        {
-            return null;
-        }
+    /// <summary>Asks Windows where the exported archive should go.</summary>
+    private static Task<string?> ChooseArchiveDestinationAsync(CancellationToken cancellationToken) =>
+        WindowsFilePickers.ChooseArchiveDestinationAsync(
+            ReadResource("BackupExportLabel"),
+            DateTimeOffset.UtcNow,
+            cancellationToken);
 
-        var file = await window.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = ReadResource("BackupExportLabel"),
-            SuggestedFileName = $"apsolutions-localmedia-{DateTime.UtcNow:yyyyMMdd'T'HHmmss'Z'}.zip",
-            DefaultExtension = "zip",
-            ShowOverwritePrompt = true,
-        }).ConfigureAwait(true);
-        return file?.TryGetLocalPath();
-    }
-
-    /// <summary>
-    /// Asks which archive to restore from. As with the export, the folder comes from the Windows picker
-    /// and never from anything the application composed on its own.
-    /// </summary>
-    private static async Task<string?> ChooseArchiveSourceAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        if (Avalonia.Application.Current?.ApplicationLifetime
-            is not IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
-        {
-            return null;
-        }
-
-        var files = await window.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = ReadResource("RestoreChooseArchiveLabel"),
-            AllowMultiple = false,
-            FileTypeFilter = [new FilePickerFileType("ZIP") { Patterns = ["*.zip"] }],
-        }).ConfigureAwait(true);
-        return files.Count == 0 ? null : files[0].TryGetLocalPath();
-    }
+    /// <summary>Asks Windows which archive to restore from.</summary>
+    private static Task<string?> ChooseArchiveSourceAsync(CancellationToken cancellationToken) =>
+        WindowsFilePickers.ChooseArchiveSourceAsync(
+            ReadResource("RestoreChooseArchiveLabel"),
+            cancellationToken);
 
     /// <summary>
     /// The path Windows would launch at sign-in. It is read from the running process rather than

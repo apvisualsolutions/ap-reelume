@@ -16,11 +16,7 @@ public sealed class WindowCoordinatorOwnershipTests
     [Fact]
     public void The_shell_view_owns_the_window_coordinator_and_the_container_stays_out()
     {
-        var composition = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
-            "src",
-            "ApSolutions.LocalMedia.Windows",
-            "CompositionRoot.cs"));
+        var composition = CompositionSourceText.Read();
         var shellView = File.ReadAllText(Path.Combine(
             RepositoryRoot(),
             "src",

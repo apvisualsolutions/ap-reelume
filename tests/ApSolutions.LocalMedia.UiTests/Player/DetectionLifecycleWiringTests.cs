@@ -29,11 +29,7 @@ public sealed class DetectionLifecycleWiringTests
     [Fact]
     public void Leaving_the_application_stops_the_detection_still_running()
     {
-        var source = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
-            "src",
-            "ApSolutions.LocalMedia.Windows",
-            "CompositionRoot.cs"));
+        var source = CompositionSourceText.Read();
 
         // Without this, closing the window leaves a process decoding through LibVLC and writing to
         // SQLite with nobody watching it.

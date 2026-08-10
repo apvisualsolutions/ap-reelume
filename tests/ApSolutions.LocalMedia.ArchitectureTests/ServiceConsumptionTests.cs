@@ -115,10 +115,17 @@ public sealed class ServiceConsumptionTests
 
         public static CompositionGraph Load()
         {
-            var compositionPath = RepositoryLayout.PathFromRoot(
-                "src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs");
-            Assert.True(File.Exists(compositionPath), "CompositionRoot.cs was not found where the host keeps it.");
-            var text = File.ReadAllText(compositionPath);
+            // The composition is spread across partials by area (ARQ-006 step 2), so this reads all
+            // of them. Reading one file would silently shrink the graph and let a registration that
+            // nothing consumes pass unnoticed — the exact defect this gate exists to catch.
+            var compositionDirectory = RepositoryLayout.PathFromRoot("src/ApSolutions.LocalMedia.Windows");
+            var compositionFiles = Directory.GetFiles(compositionDirectory, "CompositionRoot*.cs")
+                .OrderBy(path => path, StringComparer.Ordinal)
+                .ToArray();
+            Assert.True(
+                compositionFiles.Length > 0,
+                "No CompositionRoot source was found where the host keeps it.");
+            var text = string.Join("\n", compositionFiles.Select(File.ReadAllText));
 
             var registrations = ParseRegistrations(text);
             var services = registrations.Select(registration => registration.Service)

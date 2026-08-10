@@ -51,6 +51,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   discarded instead of opening the window off every screen, and a window closed maximized reopens
   maximized over its restore bounds.
 
+### Changed
+
+- **The application's registration stops being a three-hundred-line list.** Everything the
+  application assembles was declared in one chain, and finding out what a piece depended on meant
+  reading all of it. There are now eight modules by area — data, playback, personalisation, library,
+  settings and backups, updates, appearance, and identification — each short enough that a missing
+  piece is visible. Behaviour is unchanged, and the tests that walk the genuinely assembled
+  application are what say so.
+- **The logic that picks which copy to offer when the library will not open can now be measured.** It
+  lived inside the composition file, where the only way to reach it was to make a real database fail,
+  and it decides what you are offered on the worst day your library has. It is now a piece of its own
+  with five tests, two of them covering what nobody checked before: that a copy the record names but
+  which is not on disk is not offered, and that another database's copy is not mistaken for yours.
+
 ### Legal
 
 - **Every source file states the licence it is under.** The licence lived only in `LICENSE`, and a

@@ -52,6 +52,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
   descarta en vez de abrir la ventana fuera de toda pantalla, y una ventana cerrada maximizada
   reabre maximizada sobre sus límites de restauración.
 
+### Cambiado
+
+- **El registro de la aplicación deja de ser una lista de trescientas líneas.** Todo lo que la
+  aplicación monta se declaraba en una sola cadena, y averiguar de qué dependía una pieza obligaba a
+  leerla entera. Ahora hay ocho módulos por área —datos, reproducción, personalización, biblioteca,
+  ajustes y copias, actualizaciones, apariencia e identificación— cada uno lo bastante corto como para
+  que una pieza que falta se vea. El comportamiento es el mismo: lo garantizan las pruebas que
+  recorren la aplicación ensamblada de verdad.
+- **La lógica que elige qué copia ofrecerte cuando la biblioteca no abre ya se puede medir.** Vivía
+  dentro del archivo de composición, donde la única forma de alcanzarla era hacer fallar una base de
+  datos real; decide qué se te ofrece el peor día que tiene tu biblioteca. Ahora es una pieza aparte
+  con cinco pruebas, entre ellas las dos que antes nadie comprobaba: que una copia que el registro
+  nombra pero que no está en el disco no se ofrezca, y que la copia de otra base de datos no se
+  confunda con la tuya.
+
 ### Legal
 
 - **Cada archivo fuente dice bajo qué licencia está.** La licencia vivía solo en `LICENSE`, y una

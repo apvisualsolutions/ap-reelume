@@ -123,11 +123,7 @@ public sealed class SurfaceReachabilityTests
     [Fact]
     public void The_composition_root_tells_the_video_status_overlay_what_the_engine_decided()
     {
-        var composition = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
-            "src",
-            "ApSolutions.LocalMedia.Windows",
-            "CompositionRoot.cs"));
+        var composition = CompositionSourceText.Read();
 
         Assert.Contains("videoStatus.Apply(", composition, StringComparison.Ordinal);
         Assert.Contains("HardwareAccelerationRequested", composition, StringComparison.Ordinal);
@@ -142,11 +138,7 @@ public sealed class SurfaceReachabilityTests
     [Fact]
     public void The_window_startup_asks_the_update_surface_for_its_automatic_check()
     {
-        var composition = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
-            "src",
-            "ApSolutions.LocalMedia.Windows",
-            "CompositionRoot.cs"));
+        var composition = CompositionSourceText.Read();
 
         Assert.Contains("CheckAutomaticallyAsync", composition, StringComparison.Ordinal);
     }
