@@ -195,8 +195,13 @@ public sealed class DetectedMarkerReviewViewModel : INotifyPropertyChanged
     /// <remarks>
     /// Kept because the class this replaced did it and a test says so, not because it earns its keep:
     /// these three can always execute, so nothing that re-asks can get a different answer. ARQ-004 is
-    /// a move, and a move that quietly changes what a surface does is not a move. Whether the
-    /// announcement should exist at all is a question for whoever next has a reason to open this file.
+    /// a move, and a move that quietly changes what a surface does is not a move.
+    /// <para>
+    /// Decided 2026-08-10, so it is not left as an open question: this goes, along with the assertion
+    /// that pins it, the next time somebody opens this file for a reason of their own. Not before —
+    /// editing a green test with no functional change behind it is worse than the noise it removes,
+    /// and this noise costs nothing but a line.
+    /// </para>
     /// </remarks>
     private static AsyncRelayCommand Announcing(Func<Task> execute)
     {
