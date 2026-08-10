@@ -30,20 +30,49 @@ hacerlos públicos o a pasarlos como delegados, es decir, a ampliar la superfici
 para conseguir un efecto de lectura. Los parciales dan el mismo efecto sin pagar ese precio. / Partial
 classes give the same readability without widening the host's public surface.
 
-## Las dos clases extraídas / The two extracted classes
+## Lo que se extrajo, y lo que la puerta de cobertura devolvió / What was extracted, and what the coverage gate sent back
 
-`DatabaseStartup` (`Startup/`) y `WindowsFilePickers` (`Shell/`) salieron del archivo con sus
-comentarios intactos. La primera **llegó con las pruebas que su lógica nunca tuvo**: `FindLatestBackup`
-elige qué copia se te ofrece cuando la base de datos no abre, y mientras fue un método privado dentro
-de la composición la única forma de ejercitarla era hacer fallar una base de datos real. Dos de las
-cinco pruebas cubren casos que nadie había comprobado: una ruta de migración que nombra un archivo que
-no está en el disco (se descarta en vez de prometer una restauración imposible) y la copia de **otra**
-base de datos en la misma carpeta (no se ofrece). / The first arrived with the tests its logic never
-had.
+`DatabaseStartup` (`Startup/`) se queda con **una sola función**: `FindLatestBackup`, que elige qué
+copia se te ofrece cuando la base de datos no abre. **Llegó con las pruebas que su lógica nunca
+tuvo**, porque mientras fue un método privado dentro de la composición la única forma de ejercitarla
+era hacer fallar una base de datos real. Dos de las cinco cubren casos que nadie había comprobado: una
+ruta de migración que nombra un archivo que no está en el disco (se descarta en vez de prometer una
+restauración imposible) y la copia de **otra** base de datos en la misma carpeta (no se ofrece). / It
+arrived with the tests its logic never had.
+
+**`WindowsFilePickers` se intentó y se devolvió.** Los dos diálogos salieron a su propia clase, y la
+puerta de cobertura los midió al **0 %**: no se pueden ejercitar sin una ventana real, y al reescribir
+sus firmas dejaron de ser código movido para ser código nuevo. La puerta tenía razón y no había nada
+que corregirle, así que los pickers volvieron a `CompositionRoot.cs`, de donde no debieron salir sin
+poder probarse. Lo mismo con `CreateRecoveryView` y `HandleRecoveryAction`, que necesitan ventana y
+`Process.Start`. La regla que queda escrita: **se extrae lo que se puede sostener con pruebas.** / The
+gate measured them at 0 % and they went back; the rule that stands is that a class is extracted when
+its tests can follow it.
 
 `WindowLifecycle` **no** se extrae. `ConfigureWindow` está tejido con el arranque que ARQ-001 va a
 mover de todas formas; sacarlo ahora significaría moverlo dos veces. Queda dicho aquí para que la
 omisión sea una decisión y no un olvido. / `WindowLifecycle` is deliberately left for ARQ-001.
+
+## La puerta de cobertura confundía ruta nueva con código nuevo / The gate confused a new path with new code
+
+Partir el archivo hizo fallar `check-coverage.ps1`: decide qué es «nuevo» con
+`git diff --diff-filter=A`, es decir, **por ruta**, y un módulo lleno de líneas que llevan meses
+publicadas aparecía como código recién escrito al 46 % de cobertura. Sostenerlo habría significado que
+la puerta empuja contra la limpieza que existe para hacer segura.
+
+Ahora «nuevo» se decide por contenido: se construye el corpus de líneas de código del `BaseRef` —sin
+comentarios ni `using`, que no llevan cobertura— y un archivo cuyo código ya existía en un 85 % es un
+movimiento, **anunciado en la salida** archivo por archivo en vez de exento en silencio. No se
+debilita nada: para colar código sin cubrir por esa vía habría que haberlo escrito antes en el árbol
+base, donde esta misma puerta lo habría retenido. El 85 % en vez de un 90 % más redondo es porque el
+andamiaje inevitable de una partición —la declaración de clase parcial y una firma por módulo— es
+texto genuinamente nuevo y pesa más cuanto más pequeño es el módulo. / "New" is now decided by
+content, announced rather than silent.
+
+Que la puerta siguió mordiendo después del arreglo lo demuestra ella misma: con la nueva regla dejó
+pasar los módulos movidos y **retuvo** `WindowsFilePickers` y `DatabaseStartup`, que era exactamente
+donde había código nuevo sin cubrir. / The gate proved it still bites by holding the two files that
+genuinely carried new uncovered code.
 
 ## La deuda que la partición destapó / The debt the split exposed
 

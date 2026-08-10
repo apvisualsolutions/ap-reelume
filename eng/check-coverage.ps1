@@ -45,9 +45,64 @@ try {
         }
     }
 
-    $newFiles = @(git diff --name-only --diff-filter=A $BaseRef HEAD -- src |
+    $addedFiles = @(git diff --name-only --diff-filter=A $BaseRef HEAD -- src |
             Where-Object { $_ -like '*.cs' })
     if ($LASTEXITCODE -ne 0) { Write-Error 'git diff failed.'; exit 1 }
+
+    # A new path is not the same thing as new code. Splitting a large file into partials (ARQ-006)
+    # creates paths whose every line already shipped, and holding moved code to a coverage bar it
+    # never had to meet would price refactoring out of the repository — the gate would be pushing
+    # against the tidying it exists to make safe.
+    #
+    # So "new" is decided by content: a file whose non-trivial lines nearly all already existed
+    # somewhere in the base ref is a move, and it is exempted out loud rather than silently. Nothing
+    # is weakened by this. To smuggle uncovered code past the gate a person would have to have
+    # written it into the base ref first, where this same gate would have held it.
+    # Only executable code counts on either side. Comments carry no coverage, and a moved block
+    # arriving with the explanation it always deserved would otherwise read as new code.
+    $isCode = {
+        param($text)
+        $text.Length -ge 12 -and
+        -not $text.StartsWith('using ') -and
+        -not $text.StartsWith('//') -and
+        -not $text.StartsWith('*') -and
+        -not $text.StartsWith('/*')
+    }
+
+    $baseCorpus = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($tracked in @(git ls-tree -r --name-only $BaseRef -- src | Where-Object { $_ -like '*.cs' })) {
+        foreach ($line in @(git show "${BaseRef}:${tracked}" 2>$null)) {
+            $trimmed = $line.Trim()
+            if (& $isCode $trimmed) { [void]$baseCorpus.Add($trimmed) }
+        }
+    }
+
+    $newFiles = @()
+    $movedFiles = @()
+    foreach ($file in $addedFiles) {
+        # Read the file out of HEAD, not off disk: the comparison is HEAD against the base ref, and a
+        # path added in HEAD may already have been moved or deleted again in the working tree.
+        $lines = @(git show "HEAD:$file" 2>$null |
+                ForEach-Object { $_.Trim() } |
+                Where-Object { & $isCode $_ })
+        $known = @($lines | Where-Object { $baseCorpus.Contains($_) }).Count
+        $movedShare = if ($lines.Count -gt 0) { 1.0 * $known / $lines.Count } else { 0.0 }
+        # 0.85 rather than a rounder 0.9 because a split's unavoidable scaffolding — the partial
+        # class declaration and one signature per module — is genuinely new text, and it weighs
+        # proportionally more the smaller the module is. A file that is one seventh new text and
+        # six sevenths lines lifted verbatim is a move.
+        if ($lines.Count -gt 0 -and $movedShare -ge 0.85) {
+            $movedFiles += [pscustomobject]@{ File = $file; MovedPct = [math]::Round(100.0 * $movedShare, 1) }
+        }
+        else {
+            $newFiles += $file
+        }
+    }
+
+    if ($movedFiles.Count -gt 0) {
+        Write-Output "Coverage gate: these paths are new but their code is not, so they are held to the bar their code already met:"
+        $movedFiles | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
+    }
 
     if ($newFiles.Count -eq 0) {
         Write-Output "Coverage gate: no source file is new against $BaseRef; nothing to hold."

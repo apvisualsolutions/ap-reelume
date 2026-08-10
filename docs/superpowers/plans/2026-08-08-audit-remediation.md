@@ -229,9 +229,12 @@ En este orden (el paso 1 desbloquea el resto):
       **Hecho 2026-08-10**: el registro es ahora ocho módulos por área (`AddData`, `AddPlayback`,
       `AddPersonalisation`, `AddLibrary`, `AddSettingsAndBackup`, `AddUpdates`,
       `AddAppearanceAndLifecycle`, `AddIdentification` + `AddCatalogEditing`), repartidos en seis
-      parciales de 63 a 117 líneas; `CompositionRoot.cs` baja de 1.857 a 1.503. `DatabaseStartup` y
-      `WindowsFilePickers` salieron a sus propias clases, y la primera llegó con cinco pruebas —
-      `FindLatestBackup` no era alcanzable mientras fue privada. `WindowLifecycle` no se extrae:
+      parciales; `CompositionRoot.cs` baja de 1.857 líneas. `DatabaseStartup` salió con
+      `FindLatestBackup` y **cinco pruebas** — no era alcanzable mientras fue privada.
+      `WindowsFilePickers` se intentó y se devolvió: la puerta de cobertura lo midió al 0 % (no hay
+      forma de ejercitar un diálogo de Windows sin ventana) y los pickers volvieron a
+      `CompositionRoot.cs`, igual que `CreateRecoveryView` y `HandleRecoveryAction`. Regla que queda:
+      se extrae lo que se puede sostener con pruebas. `WindowLifecycle` no se extrae:
       `ConfigureWindow` está tejido con el arranque que ARQ-001 va a mover de todos modos, y sacarlo
       ahora obligaría a moverlo dos veces. \ Done: the registration is eight area modules across six
       partials; two classes extracted, one of them arriving with the tests its logic never had.
@@ -244,6 +247,14 @@ En este orden (el paso 1 desbloquea el resto):
       justo lo que existe para cazar. Verificado con una mutación: alterar el disparador de la
       persistencia rompe su prueba y restaurarlo la devuelve a verde. \ The wiring tests opened one
       file by name; they now read every partial from one source, and so does the consumption gate.
+- [x] **La puerta de cobertura confundía ruta nueva con código nuevo.** `check-coverage.ps1` decidía
+      con `git diff --diff-filter=A`, así que un módulo lleno de líneas publicadas hacía meses
+      aparecía como código recién escrito al 46 %; sostenerlo habría significado que la puerta empuja
+      contra la limpieza que existe para hacer segura. Ahora compara el **código** (sin comentarios ni
+      `using`) contra el corpus del `BaseRef` y anuncia archivo por archivo lo que exime por movido.
+      No se debilita: para colar código sin cubrir habría que haberlo escrito antes en el árbol base,
+      donde la misma puerta lo habría retenido — y lo demostró reteniendo `WindowsFilePickers`. \ The
+      gate decided by path rather than by content; it now compares code and announces what it exempts.
 - [ ] **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
       `ServiceProvider`; liberar en `ShutdownRequested` (LibVLC, SQLite, bandeja, hotkeys, HttpClients);
       retirar `DisableParallelization` de `AssembledShellSuites` como prueba.

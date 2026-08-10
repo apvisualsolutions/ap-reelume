@@ -52,11 +52,21 @@ repositorio público la convierte en un riesgo.
   filtrar y fallaba en cualquier máquina que tuviese el runner instalado dentro del árbol, mientras
   seguía verde en CI. Roja en local y verde en la tubería es la peor forma de que una puerta esté
   equivocada.
+- **ARQ-006 pasos 2-3.** El registro es ahora nueve módulos repartidos en seis parciales, y
+  `DatabaseStartup` salió con las cinco pruebas que su lógica nunca tuvo. La partición destapó dos
+  cosas: las pruebas de cableado abrían `CompositionRoot.cs` por su nombre (ocho se pusieron rojas sin
+  cambiar un cable; ahora leen todos los parciales, y la puerta contra el defecto de la casa también),
+  y la puerta de cobertura decidía «nuevo» por ruta en vez de por contenido. Al arreglarla siguió
+  mordiendo: retuvo `WindowsFilePickers`, que salió con 0 % porque no hay forma de ejercitar un
+  diálogo de Windows sin ventana, y por eso volvió a su sitio. Detalle en
+  [audit-arq006-modules.md](evidence/stable/audit-arq006-modules.md).
 
 ## Lo que sigue (en este orden)
 
-1. **ARQ-006 pasos 2-3**: módulos `AddData`/`AddPlayback`/…, y extraer `WindowsFilePickers`,
-   `DatabaseStartup` y `WindowLifecycle` de `CompositionRoot`. Después ARQ-001/004/005/010.
+1. **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
+   `ServiceProvider` y libere en `ShutdownRequested`. Es también el momento de extraer
+   `WindowLifecycle`, que ARQ-006 dejó a propósito para no moverlo dos veces. Después
+   ARQ-004/005/010.
 2. **La deuda de cobertura** nombrada en [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md)
    (ramas de error de tres archivos): se salda cuando se toque esa zona; la puerta no la exige
    retroactivamente.

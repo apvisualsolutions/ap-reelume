@@ -50,11 +50,21 @@ it into a risk.
 - **A gate that lied, fixed.** `PinnedDependencyTests` scanned `*.csproj` from the root without
   filtering and failed on any machine with the runner installed inside the tree, while staying green
   in CI. Red locally and green in the pipeline is the worst way for a gate to be wrong.
+- **ARQ-006 steps 2-3.** The registration is now nine modules across six partials, and
+  `DatabaseStartup` left with the five tests its logic never had. The split exposed two things: the
+  wiring tests opened `CompositionRoot.cs` by name (eight went red without a wire changing; they now
+  read every partial, and so does the gate against the house defect), and the coverage gate decided
+  "new" by path rather than by content. Fixing it did not stop it biting: it held
+  `WindowsFilePickers`, which came out at 0 % because a Windows dialog cannot be exercised without a
+  window, and that is why it went back. Detail in
+  [audit-arq006-modules.md](evidence/stable/audit-arq006-modules.md).
 
 ## What comes next (in this order)
 
-1. **ARQ-006 steps 2-3**: `AddData`/`AddPlayback`/… modules, and extracting `WindowsFilePickers`,
-   `DatabaseStartup`, and `WindowLifecycle` out of `CompositionRoot`. Then ARQ-001/004/005/010.
+1. **ARQ-001 / WIN-005 / the rest of BUG-004**: an `ApplicationHost : IAsyncDisposable` owning the
+   `ServiceProvider` and releasing on `ShutdownRequested`. It is also the moment to extract
+   `WindowLifecycle`, which ARQ-006 deliberately left so as not to move it twice. Then
+   ARQ-004/005/010.
 2. **The coverage debt** named in [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md)
    (error branches in three files): settle it when that area is touched; the gate does not demand it
    retroactively.

@@ -57,7 +57,6 @@ using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.Windows.Accessibility;
 using ApSolutions.LocalMedia.Windows.MediaKeys;
 using ApSolutions.LocalMedia.Windows.Playback;
-using ApSolutions.LocalMedia.Windows.Shell;
 using ApSolutions.LocalMedia.Windows.Startup;
 using ApSolutions.LocalMedia.Windows.Tray;
 using ApSolutions.LocalMedia.Windows.Updates;
@@ -1127,11 +1126,46 @@ public static partial class CompositionRoot
         }
     }
 
+    /// <summary>
+    /// The recovery screen, pointed at whichever copy <see cref="DatabaseStartup.FindLatestBackup"/>
+    /// judged the best chance of being the one the person wants back.
+    /// </summary>
     private static DatabaseRecoveryView CreateRecoveryView(
         string databasePath,
         string? migrationBackupPath,
-        string failureDetail) =>
-        DatabaseStartup.CreateRecoveryView(databasePath, migrationBackupPath, failureDetail);
+        string failureDetail)
+    {
+        var backupPath = DatabaseStartup.FindLatestBackup(databasePath, migrationBackupPath);
+        return new DatabaseRecoveryView
+        {
+            DataContext = new DatabaseRecoveryViewModel(
+                databasePath,
+                backupPath,
+                failureDetail,
+                action => HandleRecoveryAction(action, backupPath)),
+        };
+    }
+
+    private static void HandleRecoveryAction(DatabaseRecoveryAction action, string backupPath)
+    {
+        if (action == DatabaseRecoveryAction.OpenBackupFolder)
+        {
+            var folder = Path.GetDirectoryName(backupPath);
+            if (!string.IsNullOrWhiteSpace(folder) && Directory.Exists(folder))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = folder,
+                    UseShellExecute = true,
+                });
+            }
+        }
+        else if (action == DatabaseRecoveryAction.Exit
+            && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.Shutdown();
+        }
+    }
 
     /// <summary>
     /// What this machine can say about itself, and nothing else. The counts are exact here and become
@@ -1245,18 +1279,50 @@ public static partial class CompositionRoot
     private static string GetAppVersion() =>
         typeof(CompositionRoot).Assembly.GetName().Version?.ToString() ?? "0.0.0";
 
-    /// <summary>Asks Windows where the exported archive should go.</summary>
-    private static Task<string?> ChooseArchiveDestinationAsync(CancellationToken cancellationToken) =>
-        WindowsFilePickers.ChooseArchiveDestinationAsync(
-            ReadResource("BackupExportLabel"),
-            DateTimeOffset.UtcNow,
-            cancellationToken);
+    /// <summary>
+    /// Asks where the archive should go. The picker belongs to Windows, so the application never sees a
+    /// folder it was not handed, and a cancelled dialog simply means nothing is exported.
+    /// </summary>
+    private static async Task<string?> ChooseArchiveDestinationAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (Avalonia.Application.Current?.ApplicationLifetime
+            is not IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+        {
+            return null;
+        }
 
-    /// <summary>Asks Windows which archive to restore from.</summary>
-    private static Task<string?> ChooseArchiveSourceAsync(CancellationToken cancellationToken) =>
-        WindowsFilePickers.ChooseArchiveSourceAsync(
-            ReadResource("RestoreChooseArchiveLabel"),
-            cancellationToken);
+        var file = await window.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = ReadResource("BackupExportLabel"),
+            SuggestedFileName = $"apsolutions-localmedia-{DateTime.UtcNow:yyyyMMdd'T'HHmmss'Z'}.zip",
+            DefaultExtension = "zip",
+            ShowOverwritePrompt = true,
+        }).ConfigureAwait(true);
+        return file?.TryGetLocalPath();
+    }
+
+    /// <summary>
+    /// Asks which archive to restore from. As with the export, the folder comes from the Windows picker
+    /// and never from anything the application composed on its own.
+    /// </summary>
+    private static async Task<string?> ChooseArchiveSourceAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (Avalonia.Application.Current?.ApplicationLifetime
+            is not IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+        {
+            return null;
+        }
+
+        var files = await window.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = ReadResource("RestoreChooseArchiveLabel"),
+            AllowMultiple = false,
+            FileTypeFilter = [new FilePickerFileType("ZIP") { Patterns = ["*.zip"] }],
+        }).ConfigureAwait(true);
+        return files.Count == 0 ? null : files[0].TryGetLocalPath();
+    }
 
     /// <summary>
     /// The path Windows would launch at sign-in. It is read from the running process rather than
