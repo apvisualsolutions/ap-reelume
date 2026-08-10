@@ -52,9 +52,33 @@ public sealed class StagedRestoreService : IStagedRestoreService
         try
         {
             using var archive = ZipFile.OpenRead(archivePath);
+            var unpacked = 0L;
             foreach (var entry in archive.Entries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // The same ceilings the validator applies, applied again here.
+                //
+                // They were only ever enforced by whoever remembered to inspect the archive first,
+                // and this method is public: an entry declaring four gigabytes reached the disk
+                // whole if a caller skipped that step. The framework already refuses to hand back
+                // more bytes than an entry declares — measured on a forged archive whose central
+                // directory understated its payload, which came back truncated rather than
+                // overflowing — so the declaration is the whole exposure, and this is where it stops
+                // being taken on trust by a step that unpacks.
+                if (entry.Length > BackupValidator.MaximumEntryBytes)
+                {
+                    throw new InvalidDataException(
+                        $"The archive declares an entry larger than a restore may unpack: {entry.FullName}");
+                }
+
+                unpacked += entry.Length;
+                if (unpacked > BackupValidator.MaximumTotalBytes)
+                {
+                    throw new InvalidDataException(
+                        $"The archive declares more than a restore may unpack in total: {entry.FullName}");
+                }
+
                 if (!BackupContentPolicy.IsAllowed(entry.FullName))
                 {
                     throw new InvalidDataException($"The archive holds an entry a restore may not unpack: {entry.FullName}");
@@ -84,6 +108,7 @@ public sealed class StagedRestoreService : IStagedRestoreService
             throw;
         }
     }
+
 
     public async Task<RestoreDatabaseFacts> InspectDatabaseAsync(
         string stagingDirectory,
