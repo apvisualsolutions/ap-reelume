@@ -8,13 +8,15 @@ in licenses/THIRD-PARTY-NOTICES.en.md and licenses/THIRD-PARTY-NOTICES.es.md,
 which travel inside the package, and the bill of materials for the build you are
 running is in sbom/, in CycloneDX and SPDX formats.
 
-This product uses the TMDB API but is not endorsed or certified by TMDB. The
-attribution is readable in the application, under Settings.
+This product uses TMDB and the TMDB APIs but is not endorsed, certified, or
+otherwise approved by TMDB. The attribution is readable in the application,
+under Settings.
 
 AP Reelume usa componentes de terceros. Los avisos del artefacto exacto están en
 licenses/THIRD-PARTY-NOTICES.es.md y licenses/THIRD-PARTY-NOTICES.en.md, que
 viajan dentro del paquete, y el inventario de materiales de la compilación que
 está ejecutando está en sbom/, en formatos CycloneDX y SPDX.
 
-Este producto usa la API de TMDB pero no está avalado ni certificado por TMDB.
-La atribución se lee en la aplicación, en Ajustes.
+Este producto usa TMDB y las API de TMDB, pero no está avalado, certificado ni
+aprobado de ningún otro modo por TMDB. La atribución se lee en la aplicación, en
+Ajustes.

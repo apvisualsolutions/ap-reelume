@@ -1,32 +1,87 @@
 # Third-party notices
 
 AP Reelume by AP Solutions is released under `GPL-3.0-or-later`. This document records the
-third-party components the solution consumes today and the licence declared by the restored package.
-This file is updated by every increment that adds or removes a dependency, and **travels inside the
-artifact**, under `licenses/`, alongside its Spanish version.
+third-party components the published artifact carries and the licence each one declares. This file is
+updated by every increment that adds or removes a dependency, and **travels inside the artifact**,
+under `licenses/`, alongside its Spanish version.
 
 The bill of materials for the exact build you are running is in `sbom/`, inside the same artifact, in
 CycloneDX 1.5 and SPDX 2.3 formats. It is generated from the lock files, so it describes what the
-build resolved rather than what the projects ask for.
+build resolved rather than what the projects ask for. The tables below are checked against that bill
+of materials by `ThirdPartyNoticeTests`, so a dependency cannot enter the artifact without appearing
+here.
 
 ## Components distributed with the application
+
+### Managed libraries and their native assets
+
+Every component in this table ships inside the `win-x64` and `win-arm64` artifacts. Transitive
+dependencies are listed by name because a licence obligation does not care whether a package was
+asked for directly.
 
 | Component | Version | Declared licence |
 |---|---|---|
 | Avalonia | 12.1.1 | MIT |
 | Avalonia.Desktop | 12.1.1 | MIT |
 | Avalonia.Themes.Fluent | 12.1.1 | MIT |
+| Avalonia.BuildServices | 11.3.2 | MIT |
+| Avalonia.FreeDesktop | 12.1.1 | MIT |
+| Avalonia.FreeDesktop.AtSpi | 12.1.1 | MIT |
+| Avalonia.HarfBuzz | 12.1.1 | MIT |
+| Avalonia.Native | 12.1.1 | MIT |
+| Avalonia.Remote.Protocol | 12.1.1 | MIT |
+| Avalonia.Skia | 12.1.1 | MIT |
+| Avalonia.Win32 | 12.1.1 | MIT |
+| Avalonia.X11 | 12.1.1 | MIT |
+| Avalonia.Angle.Windows.Natives | 2.1.27548.20260419 | BSD-3-Clause, by The ANGLE Project Authors |
+| SkiaSharp | 3.119.4 | MIT |
+| SkiaSharp.NativeAssets.Win32 | 3.119.4 | MIT, over Skia, which is BSD-3-Clause by Google |
+| HarfBuzzSharp | 8.3.1.3 | MIT |
+| HarfBuzzSharp.NativeAssets.Win32 | 8.3.1.3 | MIT, over HarfBuzz, which is MIT |
+| MicroCom.Runtime | 0.11.6 | MIT |
+| Tmds.DBus.Protocol | 0.94.1 | MIT |
+| BouncyCastle.Cryptography | 2.7.0 | MIT |
 | LibVLCSharp | 3.10.0 | LGPL-2.1-or-later |
-| VideoLAN.LibVLC.Windows | 3.0.23.1 | LGPL-2.1-or-later |
+| VideoLAN.LibVLC.Windows | 3.0.23.1 | LGPL-2.1-or-later for the core; see the plugins below |
 | Microsoft.Data.Sqlite | 10.0.10 | MIT |
+| Microsoft.Data.Sqlite.Core | 10.0.10 | MIT |
+| SQLitePCLRaw.bundle_e_sqlite3 | 2.1.11 | Apache-2.0 |
+| SQLitePCLRaw.core | 2.1.11 | Apache-2.0 |
+| SQLitePCLRaw.provider.e_sqlite3 | 2.1.11 | Apache-2.0 |
 | SQLitePCLRaw.lib.e_sqlite3 | 3.53.3 | Apache-2.0 over SQLite, which is public domain |
 | Microsoft.Extensions.DependencyInjection | 10.0.10 | MIT |
+| Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.10 | MIT |
 
-`GPL-3.0-or-later` is compatible with incorporating `LGPL-2.1-or-later`, `MIT`, and `Apache-2.0`
-components. The native LibVLC library is distributed unmodified and keeps its own licence notice
-inside the package; the MVP artifact must ship it in full.
+`GPL-3.0-or-later` is compatible with incorporating `LGPL-2.1-or-later`, `MIT`, `Apache-2.0`, and
+`BSD-3-Clause` components. The MIT and BSD-3-Clause licences require their copyright notice to travel
+with the binary, which is what this file and the `licenses/` folder inside the artifact are for.
+
+### The .NET runtime
+
+The artifact is self-contained: it carries its own copy of the .NET 10 runtime and base class
+library (`coreclr.dll`, `System.*.dll`, `mscorlib.dll` and their companions), plus the Windows SDK
+projection (`Microsoft.Windows.SDK.NET.dll`, `WinRT.Runtime.dll`). All of it is published by
+Microsoft under `MIT`. Nobody has to install a runtime to run AP Reelume, and that convenience is
+what puts several hundred Microsoft-licensed files inside the package.
+
+### LibVLC, its core and its plugins
+
+The `VideoLAN.LibVLC.Windows` package declares `LGPL-2.1-or-later`, which covers `libvlc.dll` and
+`libvlccore.dll`. It also ships roughly three hundred plugins in `plugins/`, and **those carry their
+own licences**, some of which are `GPL-2.0-or-later` rather than LGPL — the x264 encoder behind
+`libx26410b_plugin.dll` is the clearest example. The library is distributed unmodified and keeps
+VideoLAN's own licence notice inside the package, which the artifact must ship in full.
+
+For a program released under `GPL-3.0-or-later`, a `GPL-2.0-or-later` plugin is compatible: the
+"or later" is what makes the two meet at GPL-3.0. A plugin licensed `GPL-2.0-only` would not be, and
+confirming that none is, in the exact VideoLAN build this package pins, is a question for the
+professional legal opinion recorded under [REL-004 in the feature matrix](../FEATURES.md), not for
+this document. The practical lever, if that opinion asks for one, is to trim the plugin set to what
+playback actually loads.
 
 ## Components used only during development and testing
+
+These never enter an artifact. They build it, test it, or measure it.
 
 | Component | Version | Declared licence |
 |---|---|---|
@@ -63,3 +118,12 @@ content incorporates no third-party work.
 
 No video, audio, or subtitle file is version-controlled. The personal library is never read or
 copied during the tests.
+
+## What this document does not settle
+
+This file states what each component declares and how those declarations fit together. It is written
+by the people who assembled the software, not by a lawyer, and two questions stay open until the
+professional legal opinion under REL-004 answers them: whether every VideoLAN plugin shipped in the
+pinned build is compatible with `GPL-3.0-or-later`, and whether any component's own notice file must
+be reproduced in full rather than referenced. Neither question blocks development; both are named
+here so nobody mistakes this document for the opinion.

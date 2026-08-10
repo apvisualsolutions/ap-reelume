@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 
@@ -70,6 +73,27 @@ public sealed class SqliteMetadataCache : IMetadataCache
         command.Parameters.AddWithValue("$etag", (object?)entry.ETag ?? DBNull.Value);
         command.Parameters.AddWithValue("$storedUtc", entry.StoredUtc.ToString("O"));
         command.Parameters.AddWithValue("$expiresUtc", entry.ExpiresUtc.ToString("O"));
+        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task RemoveAsync(
+        MetadataCacheKey key,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
+        using var transaction = connection.BeginTransaction();
+        await using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = """
+            DELETE FROM metadata_cache
+            WHERE provider = $provider
+              AND cache_key = $cacheKey
+              AND language = $language
+              AND provider_version = $providerVersion;
+            """;
+        AddKeyParameters(command, key);
         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
     }

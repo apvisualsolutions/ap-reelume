@@ -64,6 +64,7 @@ was.
 | [Roadmap](docs/roadmap/README.en.md) | What is coming and what will not be done |
 | [Feature matrix](docs/FEATURES.md) | The canonical scope record |
 | [Privacy](docs/privacy/PRIVACY.en.md) | What is stored and what never leaves |
+| [Legal status](docs/legal/LEGAL.en.md) | Licence, third parties, and what stays open |
 | [Changelog](docs/CHANGELOG.en.md) | What changed in each release |
 | [Development guide](docs/development/README.en.md) | How to build and verify |
 | [Releasing](docs/release/RELEASING.en.md) | How a release is cut |
@@ -72,5 +73,9 @@ was.
 ## Licence
 
 GPL-3.0-or-later. See [LICENSE](LICENSE), [NOTICE](NOTICE), and the
-[third-party notices](docs/release/THIRD-PARTY-NOTICES.en.md). This product uses the TMDB API but is
-not endorsed or certified by TMDB.
+[third-party notices](docs/release/THIRD-PARTY-NOTICES.en.md). This product uses TMDB and the TMDB
+APIs but is not endorsed, certified, or otherwise approved by TMDB.
+
+The program comes with **no warranty whatsoever**, to the extent permitted by applicable law: see
+sections 15 to 17 of the [licence](LICENSE). The legal limits that remain open — among them the
+professional opinion under `REL-004` — are named in [the legal status](docs/legal/LEGAL.en.md).

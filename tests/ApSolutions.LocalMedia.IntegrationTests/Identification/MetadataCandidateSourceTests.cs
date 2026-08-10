@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using ApSolutions.LocalMedia.Domain.Identification;
 using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
@@ -215,6 +218,9 @@ public sealed class MetadataCandidateSourceTests
 
         public Task StoreAsync(MetadataCacheEntry entry, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+
+        public Task RemoveAsync(MetadataCacheKey key, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 
     private sealed class SeededCache(string provider, string key, string language, int version) : IMetadataCache
@@ -233,6 +239,9 @@ public sealed class MetadataCandidateSourceTests
                     : null);
 
         public Task StoreAsync(MetadataCacheEntry entry, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task RemoveAsync(MetadataCacheKey requested, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
     }
 }

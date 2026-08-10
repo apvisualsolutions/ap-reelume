@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
@@ -102,6 +105,14 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
     {
         var cached = await _cache.GetAsync(key, cancellationToken).ConfigureAwait(false);
         var now = _timeProvider.GetUtcNow();
+        if (cached is not null && now - cached.StoredUtc >= TmdbOptions.RetentionLimit)
+        {
+            // TMDB's API terms cap how long their content may be kept. Past that, the copy is not
+            // merely stale — it may not exist, so it goes before anything decides to serve it.
+            await _cache.RemoveAsync(key, cancellationToken).ConfigureAwait(false);
+            cached = null;
+        }
+
         if (cached is not null && cached.ExpiresUtc > now)
         {
             return cached.Payload;

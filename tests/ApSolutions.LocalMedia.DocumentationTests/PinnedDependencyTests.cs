@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using System.Text.Json;
 using System.Xml.Linq;
 
@@ -35,7 +38,7 @@ public sealed class PinnedDependencyTests
             Assert.Matches(@"^\d+\.\d+\.\d+(?:\.\d+)?$", version!);
         }
 
-        var projectVersionAttributes = Directory.GetFiles(RepositoryLayout.Root, "*.csproj", SearchOption.AllDirectories)
+        var projectVersionAttributes = RepositoryLayout.ProjectFiles()
             .SelectMany(path => XDocument.Load(path).Descendants("PackageReference"))
             .Where(reference => reference.Attribute("Version") is not null)
             .ToArray();
@@ -45,9 +48,7 @@ public sealed class PinnedDependencyTests
     [Fact]
     public void Every_project_has_a_dependency_lock_file()
     {
-        var projectPaths = Directory.GetFiles(RepositoryLayout.Root, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
-            .ToArray();
+        var projectPaths = RepositoryLayout.ProjectFiles();
         Assert.NotEmpty(projectPaths);
 
         foreach (var projectPath in projectPaths)
