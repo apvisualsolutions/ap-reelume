@@ -14,6 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="NavigationSettings">Settings</x:String>
   <x:String x:Key="AboutAccessibleName">About AP Reelume</x:String>
   <x:String x:Key="AboutCreditsHeading">Credits</x:String>
+  <x:String x:Key="AboutTmdbLogoAlt">TMDB logo</x:String>
   <x:String x:Key="AboutTmdbAttribution">This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.</x:String>
   <x:String x:Key="WelcomeTitle">Your library, on your PC</x:String>
   <x:String x:Key="WelcomeDescription">Organize and review local videos without accounts, cloud services, or synchronization.</x:String>
