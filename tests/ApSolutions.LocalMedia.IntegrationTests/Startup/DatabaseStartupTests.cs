@@ -77,6 +77,34 @@ public sealed class DatabaseStartupTests : IDisposable
         Assert.False(File.Exists(answer));
     }
 
+    /// <summary>
+    /// A folder that is not there is not a folder with no copies in it: it answers the same way,
+    /// without touching the disk twice to find out.
+    /// </summary>
+    [Fact]
+    public void A_folder_that_does_not_exist_answers_the_same_as_one_with_no_copies()
+    {
+        var missing = Path.Combine(_root, "gone");
+        var database = Path.Combine(missing, "library.db");
+
+        Assert.Equal(
+            Path.Combine(missing, "no-pre-migration-copy-available"),
+            DatabaseStartup.FindLatestBackup(database, migrationBackupPath: null));
+    }
+
+    /// <summary>
+    /// A path with no directory at all — a bare drive root — cannot be searched, and saying so beats
+    /// answering with something that looks like a file.
+    /// </summary>
+    [Fact]
+    public void A_path_without_a_directory_is_refused_rather_than_answered()
+    {
+        var root = Path.GetPathRoot(Path.GetTempPath())!;
+
+        Assert.Throws<InvalidOperationException>(
+            () => DatabaseStartup.FindLatestBackup(root, migrationBackupPath: null));
+    }
+
     /// <summary>Backups of a different database are not this database's backups.</summary>
     [Fact]
     public void A_copy_belonging_to_another_database_is_not_offered()
