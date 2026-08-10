@@ -43,13 +43,7 @@ public sealed class ProgressWiringTests
 
     private static string CompositionRootSource()
     {
-        var path = Path.Combine(
-            RepositoryRoot(),
-            "src",
-            "ApSolutions.LocalMedia.Windows",
-            "CompositionRoot.cs");
-        Assert.True(File.Exists(path), "CompositionRoot.cs was not found where the assembly keeps it.");
-        return File.ReadAllText(path);
+        return CompositionSourceText.Read();
     }
 
     private static string RepositoryRoot()

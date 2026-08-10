@@ -16,14 +16,7 @@ public sealed class DispatcherWiringTests
     [Fact]
     public void No_dispatcher_post_carries_a_bare_async_lambda()
     {
-        var path = Path.Combine(
-            RepositoryRoot(),
-            "src",
-            "ApSolutions.LocalMedia.Windows",
-            "CompositionRoot.cs");
-        Assert.True(File.Exists(path), "CompositionRoot.cs was not found where the assembly keeps it.");
-
-        Assert.DoesNotContain("Post(async", File.ReadAllText(path), StringComparison.Ordinal);
+        Assert.DoesNotContain("Post(async", CompositionSourceText.Read(), StringComparison.Ordinal);
     }
 
     private static string RepositoryRoot()
