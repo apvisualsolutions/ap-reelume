@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.Presentation.Commands;
 using Avalonia.Controls;
 
 namespace ApSolutions.LocalMedia.Presentation.Library;
@@ -12,13 +13,13 @@ public sealed partial class LibraryView : UserControl
         InitializeComponent();
     }
 
-    private async void OnCatalogItemClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void OnCatalogItemClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         _ = e;
         if (DataContext is LibraryViewModel viewModel &&
             sender is Button { DataContext: CatalogItemViewModel item })
         {
-            await viewModel.OpenDetailsAsync(item).ConfigureAwait(true);
+            GuardedEvent.Run(() => viewModel.OpenDetailsAsync(item));
         }
     }
 

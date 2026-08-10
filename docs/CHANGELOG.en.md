@@ -42,6 +42,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   version does nothing. Each debt lives inside the test under its own identifier, and a second
   assertion evicts the entry the moment its wiring lands: the list can only shrink.
 
+- **No button can close the application by failing any more.** Every surface with buttons brought a
+  hand-written command class of its own — twenty-four of them — and not one picked up a failure, so an
+  error in the work behind a button ended the program. There is one class now, and it always picks the
+  failure up: two places in the whole codebase are left where an await can end with nobody watching,
+  and both of them catch. Unifying them surfaced two behaviours only one surface had: the rating on a
+  card checked the value before storing it — a check that would have been lost in silence had a test
+  not been there — and the player's skips refuse the next one while one is under way. Both stayed.
+
 - **A failure can no longer take the application down with it.** Until now, when the work behind a
   button went wrong, the exception was returned to nobody: it was rethrown on the interface thread,
   where the only thing waiting for it was the end of the program. There is a net now — what reaches

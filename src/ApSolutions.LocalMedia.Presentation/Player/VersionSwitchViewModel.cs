@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -30,9 +31,9 @@ public sealed class VersionSwitchViewModel : INotifyPropertyChanged
     public VersionSwitchViewModel(Func<VersionSwitchChoice, Task>? onChosen = null)
     {
         _onChosen = onChosen;
-        ConfirmCommand = new ChoiceCommand(() => ChooseAsync(VersionSwitchChoice.Confirm));
-        RestartCommand = new ChoiceCommand(() => ChooseAsync(VersionSwitchChoice.Restart));
-        CancelCommand = new ChoiceCommand(() => ChooseAsync(VersionSwitchChoice.Cancel));
+        ConfirmCommand = new AsyncRelayCommand(() => ChooseAsync(VersionSwitchChoice.Confirm));
+        RestartCommand = new AsyncRelayCommand(() => ChooseAsync(VersionSwitchChoice.Restart));
+        CancelCommand = new AsyncRelayCommand(() => ChooseAsync(VersionSwitchChoice.Cancel));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -104,17 +105,4 @@ public sealed class VersionSwitchViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class ChoiceCommand(Func<Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => true;
-
-        public async void Execute(object? parameter)
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            await execute().ConfigureAwait(true);
-        }
-    }
 }

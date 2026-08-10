@@ -8,6 +8,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Domain.Identification;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Library;
 
 namespace ApSolutions.LocalMedia.Presentation.Review;
@@ -26,7 +27,7 @@ public sealed class ReassignmentCandidateViewModel
     {
         Candidate = candidate ?? throw new ArgumentNullException(nameof(candidate));
         _confirm = confirm ?? throw new ArgumentNullException(nameof(confirm));
-        ConfirmCommand = new ReassignmentCommand(() => _confirm(Candidate));
+        ConfirmCommand = new AsyncRelayCommand(() => _confirm(Candidate));
     }
 
     public ReassignmentCandidate Candidate { get; }
@@ -53,7 +54,7 @@ public sealed class PendingReassignmentViewModel
         ArgumentNullException.ThrowIfNull(keepAsNew);
         Candidates = [.. pending.Candidates.Select(candidate =>
             new ReassignmentCandidateViewModel(candidate, confirm))];
-        KeepAsNewCommand = new ReassignmentCommand(keepAsNew);
+        KeepAsNewCommand = new AsyncRelayCommand(keepAsNew);
     }
 
     public PendingReassignment Pending { get; }
@@ -63,35 +64,6 @@ public sealed class PendingReassignmentViewModel
     public IReadOnlyList<ReassignmentCandidateViewModel> Candidates { get; }
 
     public ICommand KeepAsNewCommand { get; }
-}
-
-internal sealed class ReassignmentCommand(Func<Task> execute) : ICommand
-{
-    private bool _isRunning;
-
-    public event EventHandler? CanExecuteChanged;
-
-    public bool CanExecute(object? parameter) => !_isRunning;
-
-    public async void Execute(object? parameter)
-    {
-        if (_isRunning)
-        {
-            return;
-        }
-
-        _isRunning = true;
-        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        try
-        {
-            await execute().ConfigureAwait(true);
-        }
-        finally
-        {
-            _isRunning = false;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-    }
 }
 
 public sealed class CandidateCardViewModel(MatchCandidate candidate)
@@ -143,9 +115,9 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         _reassignmentQueue = reassignmentQueue;
         _reassignment = reassignment;
         _reconciliation = reconciliation;
-        LoadMoreCommand = new AsyncCommand(() => LoadMoreAsync(CancellationToken.None));
-        AcceptSelectedCommand = new AsyncCommand(() => AcceptSelectedAsync(CancellationToken.None));
-        RejectSelectedCommand = new AsyncCommand(() => RejectSelectedAsync(CancellationToken.None));
+        LoadMoreCommand = new AsyncRelayCommand(() => LoadMoreAsync(CancellationToken.None));
+        AcceptSelectedCommand = new AsyncRelayCommand(() => AcceptSelectedAsync(CancellationToken.None));
+        RejectSelectedCommand = new AsyncRelayCommand(() => RejectSelectedAsync(CancellationToken.None));
         SearchManuallyCommand = new RelayCommand(
             _ => RequestManualSearch(),
             _ => !string.IsNullOrWhiteSpace(ManualSearch));
@@ -370,34 +342,5 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         public bool CanExecute(object? parameter) => canExecute(parameter);
 
         public void Execute(object? parameter) => execute(parameter);
-    }
-
-    private sealed class AsyncCommand(Func<Task> execute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning;
-
-        public async void Execute(object? parameter)
-        {
-            if (_isRunning)
-            {
-                return;
-            }
-
-            _isRunning = true;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
     }
 }

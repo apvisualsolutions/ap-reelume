@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Onboarding;
 
@@ -50,7 +51,7 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
                 SelectedKind = kind;
             }
         });
-        AddRootCommand = new AsyncCommand(() => AddAsync(CancellationToken.None));
+        AddRootCommand = new AsyncRelayCommand(() => AddAsync(CancellationToken.None));
         GrantInitialScanConsentCommand = new RelayCommand(_ => GrantInitialScanConsent());
         RequestRemoveCommand = new RelayCommand(parameter =>
         {
@@ -60,7 +61,7 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
             }
         });
         CancelRemoveCommand = new RelayCommand(_ => PendingRemoval = null);
-        ConfirmRemoveCommand = new AsyncCommand(() => ConfirmRemoveAsync(CancellationToken.None));
+        ConfirmRemoveCommand = new AsyncRelayCommand(() => ConfirmRemoveAsync(CancellationToken.None));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -276,34 +277,5 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         public bool CanExecute(object? parameter) => true;
 
         public void Execute(object? parameter) => execute(parameter);
-    }
-
-    private sealed class AsyncCommand(Func<Task> execute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning;
-
-        public async void Execute(object? parameter)
-        {
-            if (_isRunning)
-            {
-                return;
-            }
-
-            _isRunning = true;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
     }
 }

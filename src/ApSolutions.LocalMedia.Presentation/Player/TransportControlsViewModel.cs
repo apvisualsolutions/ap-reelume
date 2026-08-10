@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Playback;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -18,6 +19,7 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
 {
     private readonly ControlPlayback _control;
     private PlaybackControlState _state;
+    private bool _isRunning;
 
     public TransportControlsViewModel(ControlPlayback control)
     {
@@ -29,9 +31,14 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
             VolumeBoostPolicy.Decide(VolumeBoostPolicy.MaximumNormalPercent, muted: false),
             PlaybackControlPolicy.DefaultBackwardSkip,
             PlaybackControlPolicy.DefaultForwardSkip);
-        SkipBackwardCommand = new RelayCommand(() => _control.SkipBackwardAsync(), Apply);
-        SkipForwardCommand = new RelayCommand(() => _control.SkipForwardAsync(), Apply);
-        ToggleMuteCommand = new RelayCommand(() => _control.ToggleMuteAsync(), Apply);
+        // These three keep something the other command surfaces never had: a skip already in flight
+        // refuses the next one. Pressing skip twice quickly would otherwise send two seeks the engine
+        // has to reconcile, and the second would be measured from a position the first had not
+        // reached yet. The guard is here rather than in AsyncRelayCommand because it is this bar's
+        // rule, not every button's.
+        SkipBackwardCommand = Transport(() => _control.SkipBackwardAsync());
+        SkipForwardCommand = Transport(() => _control.SkipForwardAsync());
+        ToggleMuteCommand = Transport(() => _control.ToggleMuteAsync());
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -112,37 +119,33 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// One transport button: it runs, it applies whatever state came back, and while it is in flight
+    /// it cannot be pressed again. The command is asked twice about that — once to refuse the press,
+    /// and once more when the work ends so the button comes back.
+    /// </summary>
+    private AsyncRelayCommand Transport(Func<Task<PlaybackControlState>> execute)
+    {
+        AsyncRelayCommand? command = null;
+        command = new AsyncRelayCommand(
+            async () =>
+            {
+                _isRunning = true;
+                command!.RaiseCanExecuteChanged();
+                try
+                {
+                    Apply(await execute().ConfigureAwait(true));
+                }
+                finally
+                {
+                    _isRunning = false;
+                    command!.RaiseCanExecuteChanged();
+                }
+            },
+            () => !_isRunning);
+        return command;
+    }
+
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class RelayCommand(
-        Func<Task<PlaybackControlState>> execute,
-        Action<PlaybackControlState> onCompleted) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning;
-
-        public async void Execute(object? parameter)
-        {
-            if (_isRunning)
-            {
-                return;
-            }
-
-            _isRunning = true;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            try
-            {
-                onCompleted(await execute().ConfigureAwait(true));
-            }
-            finally
-            {
-                _isRunning = false;
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-    }
 }

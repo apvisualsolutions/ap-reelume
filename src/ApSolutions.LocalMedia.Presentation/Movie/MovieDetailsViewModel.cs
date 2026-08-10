@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation.Catalog;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Movie;
 
@@ -39,8 +40,8 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         _onPlay = onPlay;
         WatchStatus = new WatchStatusViewModel(onWatchStatusChanged);
         PersonalActions = new PersonalActionsViewModel(onPersonalActionChanged);
-        PlayCommand = new DetailsCommand(() => PlayAsync(fromStart: true), () => CanPlay);
-        ResumeCommand = new DetailsCommand(() => PlayAsync(fromStart: false), () => CanResume);
+        PlayCommand = new AsyncRelayCommand(() => PlayAsync(fromStart: true), () => CanPlay);
+        ResumeCommand = new AsyncRelayCommand(() => PlayAsync(fromStart: false), () => CanResume);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -124,8 +125,8 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
             OnPropertyChanged(name);
         }
 
-        (PlayCommand as DetailsCommand)?.RaiseCanExecuteChanged();
-        (ResumeCommand as DetailsCommand)?.RaiseCanExecuteChanged();
+        (PlayCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (ResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     internal static string FormatPosition(TimeSpan position) =>
@@ -177,17 +178,6 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class DetailsCommand(Func<Task> execute, Func<bool>? canExecute = null) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => canExecute?.Invoke() ?? true;
-
-        public async void Execute(object? parameter) => await execute().ConfigureAwait(true);
-
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-    }
 }
 
 /// <summary>

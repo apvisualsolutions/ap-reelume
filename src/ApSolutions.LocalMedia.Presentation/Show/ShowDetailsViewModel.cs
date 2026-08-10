@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation.Catalog;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Movie;
 
 namespace ApSolutions.LocalMedia.Presentation.Show;
@@ -31,7 +32,11 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     {
         _onPlay = onPlay;
         PersonalActions = new PersonalActionsViewModel(onPersonalActionChanged);
-        PlayEpisodeCommand = new EpisodeCommand(PlayAsync);
+        // The parameter is the row the view bound, and only a playable one gets through — an episode
+        // with no file behind it is a row that is shown but cannot be started.
+        PlayEpisodeCommand = new AsyncRelayCommand(
+            parameter => parameter is EpisodeRowViewModel episode ? PlayAsync(episode) : Task.CompletedTask,
+            parameter => parameter is EpisodeRowViewModel { IsPlayable: true });
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -122,23 +127,4 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class EpisodeCommand(Func<EpisodeRowViewModel, Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
-
-        public bool CanExecute(object? parameter) => parameter is EpisodeRowViewModel { IsPlayable: true };
-
-        public async void Execute(object? parameter)
-        {
-            if (parameter is EpisodeRowViewModel episode)
-            {
-                await execute(episode).ConfigureAwait(true);
-            }
-        }
-    }
 }

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Personalization;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Home;
 
@@ -29,7 +30,7 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
         _getRecommendations = getRecommendations ?? throw new ArgumentNullException(nameof(getRecommendations));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _titleLookup = titleLookup ?? (_ => string.Empty);
-        ToggleCommand = new RecommendationCommand(
+        ToggleCommand = new AsyncRelayCommand(
             () => SetEnabledAsync(!IsEnabled, CancellationToken.None));
     }
 
@@ -81,19 +82,6 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class RecommendationCommand(Func<Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
-
-        public bool CanExecute(object? parameter) => true;
-
-        public async void Execute(object? parameter) => await execute().ConfigureAwait(true);
-    }
 }
 
 /// <summary>One suggestion, with the resource keys that explain it.</summary>

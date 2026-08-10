@@ -309,11 +309,16 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
         disco y ningún manejador formatea texto propio. Evidencia en
         [audit-arq004-failure-net.md](../../evidence/stable/audit-arq004-failure-net.md). \
         First half: the net, because a command that must always catch always needs somewhere to put it.
-  - [ ] **Segunda mitad, el comando único**: reemplazar las 24 clases de comando privadas con
-        `async void Execute` por un `AsyncRelayCommand` en `Presentation` que capture siempre. Medido:
-        **38** clases de comando escritas a mano, **6** formas distintas de constructor, y **0** de los
-        24 `Execute` asíncronos captura nada. `CommandFailureTests` fija hoy el defecto en verde y se
-        invierte cuando esto aterrice. \ Second half: one command class replacing twenty-four.
+  - [x] **Segunda mitad, el comando único** (2026-08-10). De **27 `async void` a 2**, y los dos
+        capturan: `AsyncRelayCommand.Execute` y `GuardedEvent`, porque ni un `ICommand` ni un manejador
+        de evento devuelven tarea que nadie pueda esperar — en algún sitio la espera para, y ahora para
+        dentro de un `catch`. −582/+227 líneas. Las 13 clases `ICommand` que quedan son síncronas y
+        nunca estuvieron en el alcance. La migración rompió dos pruebas y **eso fue lo mejor**: una
+        superficie comprobaba `CanExecute` dentro de `Execute` y de ahí colgaba la validación de la
+        valoración (ahora es la regla del comando, y está fijada), y la barra de transporte llevaba una
+        guarda de re-entrada propia (reconstruida en su ViewModel, porque es su regla). Evidencia en
+        [audit-arq004-single-command.md](../../evidence/stable/audit-arq004-single-command.md). \
+        Second half: 27 async void down to 2, and the two that remain both catch.
 - [ ] **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de UI (migración+integridad);
       sacar el bloqueo del `lock` en `WindowsMediaKeyService`. **Límite decidido**: la ventana no
       puede quedarse en blanco mientras migra. Lo que hoy bloquea el hilo devuelve una vista y sólo

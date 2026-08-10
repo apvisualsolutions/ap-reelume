@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -29,8 +30,8 @@ public sealed class NextEpisodeViewModel : INotifyPropertyChanged
     public NextEpisodeViewModel(Func<NextEpisodeAction, Task>? onAction = null)
     {
         _onAction = onAction;
-        PlayNowCommand = new OverlayCommand(() => ActAsync(NextEpisodeAction.PlayNow));
-        CancelCommand = new OverlayCommand(() => ActAsync(NextEpisodeAction.Cancel));
+        PlayNowCommand = new AsyncRelayCommand(() => ActAsync(NextEpisodeAction.PlayNow));
+        CancelCommand = new AsyncRelayCommand(() => ActAsync(NextEpisodeAction.Cancel));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -103,17 +104,4 @@ public sealed class NextEpisodeViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class OverlayCommand(Func<Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => true;
-
-        public async void Execute(object? parameter)
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            await execute().ConfigureAwait(true);
-        }
-    }
 }

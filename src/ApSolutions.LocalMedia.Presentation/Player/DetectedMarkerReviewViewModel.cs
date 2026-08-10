@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -36,9 +37,9 @@ public sealed class DetectedMarkerReviewViewModel : INotifyPropertyChanged
         _onCorrect = onCorrect;
         _onDelete = onDelete;
         _hasRangeError = false;
-        AcceptCommand = new ReviewCommand(AcceptAsync);
-        CorrectCommand = new ReviewCommand(CorrectAsync);
-        DeleteCommand = new ReviewCommand(DeleteAsync);
+        AcceptCommand = Announcing(AcceptAsync);
+        CorrectCommand = Announcing(CorrectAsync);
+        DeleteCommand = Announcing(DeleteAsync);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -187,19 +188,27 @@ public sealed class DetectedMarkerReviewViewModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
     }
 
+    /// <summary>
+    /// One review button, which announces that the answer to <c>CanExecute</c> may have changed each
+    /// time it runs.
+    /// </summary>
+    /// <remarks>
+    /// Kept because the class this replaced did it and a test says so, not because it earns its keep:
+    /// these three can always execute, so nothing that re-asks can get a different answer. ARQ-004 is
+    /// a move, and a move that quietly changes what a surface does is not a move. Whether the
+    /// announcement should exist at all is a question for whoever next has a reason to open this file.
+    /// </remarks>
+    private static AsyncRelayCommand Announcing(Func<Task> execute)
+    {
+        AsyncRelayCommand? command = null;
+        command = new AsyncRelayCommand(() =>
+        {
+            command!.RaiseCanExecuteChanged();
+            return execute();
+        });
+        return command;
+    }
+
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class ReviewCommand(Func<Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => true;
-
-        public async void Execute(object? parameter)
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            await execute().ConfigureAwait(true);
-        }
-    }
 }

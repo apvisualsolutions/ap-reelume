@@ -43,6 +43,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   en la propia prueba con su identificador, y una segunda aserción expulsa la entrada en cuanto su
   cableado aterriza: la lista sólo puede encoger.
 
+- **Ningún botón puede ya cerrar la aplicación al fallar.** Cada superficie con botones traía su
+  propia clase de comando escrita a mano —veinticuatro— y ninguna recogía un fallo, así que un error
+  en el trabajo de detrás terminaba el programa. Ahora hay una sola, y recoge siempre: quedan dos
+  sitios en todo el código donde una espera puede terminar sin dueño, y los dos capturan. Al
+  unificarlas aparecieron dos comportamientos que sólo una superficie tenía: la valoración de una
+  ficha comprobaba el valor antes de guardarlo —y esa comprobación se habría perdido en silencio si
+  una prueba no llega a estar ahí—, y los saltos del reproductor rechazan el siguiente mientras uno
+  está en curso. Los dos siguen.
+
 - **Un fallo deja de poder llevarse la aplicación por delante.** Hasta ahora, si algo salía mal en el
   trabajo que hay detrás de un botón, la excepción no volvía a nadie: se relanzaba sobre el hilo de la
   interfaz, y ahí lo único que esperaba era el final del programa. Ahora hay una red: lo que llega a lo
