@@ -48,6 +48,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ThemeLight">Light</x:String>
   <x:String x:Key="ThemeDark">Dark</x:String>
   <x:String x:Key="ReducedMotionNotice">AP Reelume respects the Windows reduced-motion preference.</x:String>
+  <x:String x:Key="StartupAccessibleName">AP Reelume startup</x:String>
+  <x:String x:Key="StartupStatus">Preparing your library…</x:String>
   <x:String x:Key="RecoveryAccessibleName">Safe library recovery</x:String>
   <x:String x:Key="RecoveryTitle">The library needs attention</x:String>
   <x:String x:Key="RecoveryDescription">The active database and pre-migration copy remain intact. Review both paths before continuing.</x:String>

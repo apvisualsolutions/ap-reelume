@@ -88,6 +88,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La ventana ya no espera a que la base de datos esté lista para existir.** Al arrancar, la
+  aplicación pone al día la base —y comprueba su integridad si eso reescribió el archivo— y hasta
+  ahora hacía ese trabajo en el mismo hilo que dibuja: no había nada en pantalla hasta que
+  terminaba, y en una biblioteca grande la comprobación crece con el archivo. Ahora la ventana
+  aparece de inmediato con una pantalla de inicio, el trabajo ocurre aparte, y al acabar su sitio lo
+  ocupa la biblioteca o, si la base no se puede abrir, la misma pantalla de recuperación de siempre:
+  cambia cuándo se decide, no qué se decide. No hay barra de progreso, y es a propósito — nada en
+  ese momento sabe cuánto falta, y una barra que se mueve sin significar nada es una imagen de
+  progreso en lugar de progreso. La medición que lo decidió: escribir «espera» en el código no basta
+  para que el hilo quede libre, así que se comprobó, y no quedaba libre ni un milisegundo.
 - **La verificación del paquete ya dice cuánto tardó la ventana en aparecer, no sólo que apareció.**
   Anotaba un sí o un no, y ese sí cubría por igual un arranque instantáneo y uno que llegó justo
   antes de agotar el plazo de noventa segundos, así que una degradación no se veía hasta ser un

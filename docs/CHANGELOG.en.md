@@ -87,6 +87,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The window no longer waits for the database to be ready before it exists.** On startup the
+  application brings the database up to date — and checks its integrity if that rewrote the file —
+  and until now it did that work on the very thread that draws: nothing was on screen until it
+  finished, and on a large library the check grows with the file. The window now appears
+  immediately with a startup screen, the work happens elsewhere, and when it ends the library takes
+  its place, or, if the database cannot be opened, the same recovery screen as always: what changes
+  is when the decision is taken, not what is decided. There is no progress bar, on purpose —
+  nothing at that moment knows how much is left, and a bar that moves without meaning anything is a
+  picture of progress rather than progress. The measurement that settled it: writing "await" in the
+  code is not enough to free the thread, so it was checked, and the thread was not free for a
+  single millisecond.
 - **The package verification now says how long the window took to appear, not just that it did.** It
   recorded a yes or a no, and that yes covered both an instant launch and one that arrived just
   before the ninety-second deadline ran out, so a degradation stayed invisible until it was a

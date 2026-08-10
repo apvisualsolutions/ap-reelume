@@ -39,6 +39,7 @@ using ApSolutions.LocalMedia.Infrastructure.Time;
 using ApSolutions.LocalMedia.Infrastructure.Updates;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Presentation.Catalog;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Home;
 using ApSolutions.LocalMedia.Presentation.Language;
 using ApSolutions.LocalMedia.Presentation.Library;
@@ -52,6 +53,7 @@ using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Show;
+using ApSolutions.LocalMedia.Presentation.Startup;
 using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.Windows.Accessibility;
@@ -284,37 +286,78 @@ public static partial class CompositionRoot
         // speaks it and the thread culture the updater and the metadata read agrees with it.
         ((StoredLanguageService)services.GetRequiredService<ILanguageService>()).ApplyCurrent();
         var migrationRunner = services.GetRequiredService<MigrationRunner>();
-        try
-        {
-            migrationRunner.MigrateAsync(CancellationToken.None).GetAwaiter().GetResult();
+        var integrityChecker = services.GetRequiredService<IDatabaseIntegrityChecker>();
 
-            // The runner already proved integrity before touching anything, on this very start.
-            // Asking SQLite the same question twice doubles the slowest part of opening a large
-            // library; the second check only runs when a migration actually rewrote the file
-            // (BUG-012).
-            if (migrationRunner.AppliedMigrationCount > 0)
+        // What the window is handed now, so it can be shown now. The decision between the shell and
+        // the recovery screen is the same one as before; only when it is taken has changed.
+        var host = new ContentControl { Content = new StartupView() };
+        GuardedEvent.Run(
+            async () =>
             {
-                var integrity = services.GetRequiredService<IDatabaseIntegrityChecker>()
-                    .CheckAsync(CancellationToken.None)
-                    .GetAwaiter()
-                    .GetResult();
-                if (!integrity.IsValid)
-                {
-                    return CreateRecoveryView(paths.DatabasePath, migrationRunner.LastBackupPath, integrity.Detail);
-                }
-            }
-        }
-        catch (Exception exception) when (
-            exception is Microsoft.Data.Sqlite.SqliteException
-                or InvalidDataException
-                or IOException
-                or UnauthorizedAccessException)
-        {
-            return CreateRecoveryView(paths.DatabasePath, migrationRunner.LastBackupPath, exception.Message);
-        }
+                var refusal = await PrepareDatabaseAsync(migrationRunner, integrityChecker).ConfigureAwait(true);
+                host.Content = refusal is null
+                    ? services.GetRequiredService<ShellView>()
+                    : CreateRecoveryView(paths.DatabasePath, migrationRunner.LastBackupPath, refusal);
+            },
+            // Nothing else can report a failure here: the window is already on screen with a startup
+            // view in it, and leaving that view up for good would be the one outcome that says
+            // nothing at all.
+            exception => host.Content =
+                CreateRecoveryView(paths.DatabasePath, migrationRunner.LastBackupPath, exception.Message));
 
-        return services.GetRequiredService<ShellView>();
+        return host;
     }
+
+    /// <summary>
+    /// Makes the database ready off the interface thread, and says why not when it will not be.
+    /// </summary>
+    /// <remarks>
+    /// ARQ-005. <see cref="MigrationRunner.MigrateAsync"/> is written with real awaits and yields at
+    /// none of them — <c>Microsoft.Data.Sqlite</c> implements its <c>Async</c> surface synchronously
+    /// because SQLite has no asynchronous I/O — so awaiting it here would leave the interface thread
+    /// exactly as blocked as the <c>GetAwaiter().GetResult()</c> it replaced, while looking fixed.
+    /// <c>MigrationYieldTests</c> measures that rather than assuming it. Hence a thread of its own:
+    /// <see cref="SqliteConnectionFactory"/> opens a connection per call, so the work travels.
+    /// <para>
+    /// The four exceptions caught are the ones that mean the file cannot be used, and they become
+    /// the recovery screen. Anything else is a defect rather than a refusal, and is left to the
+    /// caller's guard so it is not dressed up as a database problem.
+    /// </para>
+    /// </remarks>
+    private static Task<string?> PrepareDatabaseAsync(
+        MigrationRunner migrationRunner,
+        IDatabaseIntegrityChecker integrityChecker) =>
+        Task.Run<string?>(async () =>
+        {
+            try
+            {
+                await migrationRunner.MigrateAsync(CancellationToken.None).ConfigureAwait(false);
+
+                // The runner already proved integrity before touching anything, on this very start.
+                // Asking SQLite the same question twice doubles the slowest part of opening a large
+                // library; the second check only runs when a migration actually rewrote the file
+                // (BUG-012).
+                if (migrationRunner.AppliedMigrationCount > 0)
+                {
+                    var integrity = await integrityChecker.CheckAsync(CancellationToken.None)
+                        .ConfigureAwait(false);
+                    if (!integrity.IsValid)
+                    {
+                        return integrity.Detail;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception exception) when (
+                exception is Microsoft.Data.Sqlite.SqliteException
+                    or InvalidDataException
+                    or IOException
+                    or UnauthorizedAccessException)
+            {
+                return exception.Message;
+            }
+        });
 
     /// <summary>
     /// Wires the library to the two detail surfaces and to the reads they need. The library itself
