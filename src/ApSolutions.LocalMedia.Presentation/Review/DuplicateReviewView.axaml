@@ -1,3 +1,7 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
 <UserControl
     x:Class="ApSolutions.LocalMedia.Presentation.Review.DuplicateReviewView"
     xmlns="https://github.com/avaloniaui"

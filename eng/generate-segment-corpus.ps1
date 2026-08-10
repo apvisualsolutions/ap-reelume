@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 AP Solutions
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 <#
 .SYNOPSIS
     Materialises the frozen segment-detection evaluation corpus from its manifest.

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Parameters;

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 AP Solutions
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 <#
 .SYNOPSIS
     Builds the Windows x64 MSIX and the independent ZIP from the current checkout.

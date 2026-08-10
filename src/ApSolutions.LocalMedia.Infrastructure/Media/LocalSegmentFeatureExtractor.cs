@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using System.Collections.Concurrent;
 using System.Globalization;
 using ApSolutions.LocalMedia.Domain.Catalog;

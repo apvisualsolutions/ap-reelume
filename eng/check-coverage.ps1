@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 AP Solutions
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 <#
 .SYNOPSIS
     TST-001: the automated coverage gate. Every source file that is new against the base ref

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 AP Solutions
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 <#
 .SYNOPSIS
     Writes the bill of materials for the artifact, in both formats.
