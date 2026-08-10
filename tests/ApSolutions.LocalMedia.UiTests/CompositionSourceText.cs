@@ -15,24 +15,41 @@ namespace ApSolutions.LocalMedia.UiTests;
 /// which quietly made "the composition" mean "one file": splitting the registration into modules
 /// (ARQ-006 step 2) turned eight of those tests red without a single wire changing. Reading every
 /// `CompositionRoot*.cs` keeps the assertions about the composition rather than about its filing.
+/// <para>
+/// It happened a second time, and the same way. ARQ-001 moved the application's ownership out to
+/// `Shell/ApplicationHost.cs`, so tests about wires that had not moved went red. The lesson stuck
+/// rather than the patch: what this returns is everything that composes the application, and adding
+/// a file to that set is part of moving code out of the root.
+/// </para>
 /// </remarks>
 internal static class CompositionSourceText
 {
+    /// <summary>
+    /// Where composition lives, relative to the host project. Order is stable so a failure message
+    /// points at the same place twice.
+    /// </summary>
+    private static readonly (string Directory, string Pattern)[] Sources =
+    [
+        (".", "CompositionRoot*.cs"),
+        ("Shell", "ApplicationHost.cs"),
+    ];
+
     private static readonly Lazy<string> Cached = new(Load);
 
-    /// <summary>Every partial of the composition, concatenated in a stable order.</summary>
+    /// <summary>Every file the application is composed from, concatenated in a stable order.</summary>
     public static string Read() => Cached.Value;
 
     private static string Load()
     {
-        var directory = Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Windows");
-        var files = Directory.GetFiles(directory, "CompositionRoot*.cs")
+        var host = Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Windows");
+        var files = Sources
+            .SelectMany(source => Directory.GetFiles(Path.Combine(host, source.Directory), source.Pattern))
             .OrderBy(path => path, StringComparer.Ordinal)
             .ToArray();
 
         Assert.True(
-            files.Length > 0,
-            "No CompositionRoot source was found where the host keeps it.");
+            files.Length >= Sources.Length,
+            $"Only {files.Length} composition source(s) were found where the host keeps them.");
         return string.Join("\n", files.Select(File.ReadAllText));
     }
 

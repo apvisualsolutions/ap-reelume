@@ -18,6 +18,7 @@ using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.Windows;
+using ApSolutions.LocalMedia.Windows.Shell;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -415,26 +416,41 @@ public sealed class AssembledJourneyTests : IDisposable
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
         Directory.CreateDirectory(_dataRoot);
-        var shell = Assert.IsType<ShellView>(CompositionRoot.CreateShell(new AppDataPaths(_dataRoot)));
+        var application = ApplicationHost.Create(new AppDataPaths(_dataRoot));
+        var shell = Assert.IsType<ShellView>(application.CreateShell());
         var window = new Window { Width = 1600, Height = 1000, Content = shell };
         window.Show();
         Dispatcher.UIThread.RunJobs();
         window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
-        return new ShellHost(window, shell, Assert.IsType<ShellViewModel>(shell.DataContext));
+        return new ShellHost(application, window, shell, Assert.IsType<ShellViewModel>(shell.DataContext));
     }
 
-    private sealed record ShellHost(Window Window, ShellView Shell, ShellViewModel ViewModel) : IDisposable
+    private sealed record ShellHost(
+        ApplicationHost Application,
+        Window Window,
+        ShellView Shell,
+        ShellViewModel ViewModel) : IDisposable
     {
-        public void Dispose() => Window.Close();
+        public void Dispose()
+        {
+            Window.Close();
+            Application.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        }
     }
 }
 
 /// <summary>
-/// The composition root keeps its services in a static field, so two suites building it at once
-/// would each see the other's application. They run one after another instead.
+/// The two suites that build the whole application, kept together.
 /// </summary>
-[CollectionDefinition(Name, DisableParallelization = true)]
+/// <remarks>
+/// This collection used to disable parallelisation, and the reason was a defect rather than a
+/// property of the tests: the composition root kept its services in a static field, so two
+/// applications in one process each saw the other's. ARQ-001 gave the provider an owner, one per
+/// host, and the switch came off — which is the proof that the ownership is real and not just
+/// tidier. If it ever has to go back, the question to ask first is what became shared again.
+/// </remarks>
+[CollectionDefinition(Name)]
 public sealed class AssembledShellSuites
 {
     public const string Name = "AssembledShell";

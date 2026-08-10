@@ -13,6 +13,7 @@ using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Windows;
+using ApSolutions.LocalMedia.Windows.Shell;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -79,7 +80,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var factory = await SeedRootAsync(watched, ScanPolicy.Startup | ScanPolicy.Continuous);
 
         using var host = ShowShell();
-        CompositionRoot.ConfigureWindow(host.Window);
+        host.Application.ConfigureWindow(host.Window);
 
         await WaitForAsync(
             async () => await CountAsync(factory, "media_files") == 1,
@@ -325,21 +326,26 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             Avalonia.Application.Current,
             CultureInfo.GetCultureInfo("es-ES"));
         Directory.CreateDirectory(_dataRoot);
-        var shell = Assert.IsType<ShellView>(CompositionRoot.CreateShell(new AppDataPaths(_dataRoot)));
+        var application = ApplicationHost.Create(new AppDataPaths(_dataRoot));
+        var shell = Assert.IsType<ShellView>(application.CreateShell());
         var window = new Window { Width = 1600, Height = 1000, Content = shell };
         window.Show();
         Dispatcher.UIThread.RunJobs();
         window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
-        return new ShellHost(window, shell, Assert.IsType<ShellViewModel>(shell.DataContext));
+        return new ShellHost(application, window, shell, Assert.IsType<ShellViewModel>(shell.DataContext));
     }
 
-    private sealed record ShellHost(Window Window, ShellView Shell, ShellViewModel ViewModel) : IDisposable
+    private sealed record ShellHost(
+        ApplicationHost Application,
+        Window Window,
+        ShellView Shell,
+        ShellViewModel ViewModel) : IDisposable
     {
         public void Dispose()
         {
-            // The close walks the assembled path: ConfigureWindow's handler flushes and stops the
-            // background work, and it needs the dispatcher pumped to finish before the directory
+            // The close walks the assembled path: the window lifecycle's handler flushes and stops
+            // the background work, and it needs the dispatcher pumped to finish before the directory
             // underneath it is deleted.
             Window.Close();
             for (var attempt = 0; attempt < 20; attempt++)
@@ -347,6 +353,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 Dispatcher.UIThread.RunJobs();
                 Thread.Sleep(50);
             }
+
+            // And then the application lets go of what it built, which is what a real exit does.
+            Application.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
     }
 
