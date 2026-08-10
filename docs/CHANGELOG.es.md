@@ -52,6 +52,32 @@ evidencia, es [FEATURES.md](FEATURES.md).
   descarta en vez de abrir la ventana fuera de toda pantalla, y una ventana cerrada maximizada
   reabre maximizada sobre sus límites de restauración.
 
+### Legal
+
+- **Cada archivo fuente dice bajo qué licencia está.** La licencia vivía solo en `LICENSE`, y una
+  licencia que solo vive ahí deja de estar unida al archivo en cuanto alguien lo copia fuera del
+  árbol. Los 556 archivos de código, los 51 de interfaz y los 17 de compilación llevan ahora su
+  cabecera `SPDX-License-Identifier: GPL-3.0-or-later` junto al titular del copyright, y la puerta de
+  formato que ya se ejecutaba rechaza un archivo nuevo que llegue sin ella.
+- **Los avisos de terceros nombran lo que el paquete lleva de verdad.** Listaban ocho componentes —
+  los que alguien recordaba haber pedido— mientras el artefacto transportaba treinta, entre ellos
+  ANGLE bajo BSD-3-Clause, Skia, HarfBuzz, BouncyCastle y el propio motor de .NET, todos con avisos
+  que deben viajar con el binario. Ahora la lista sale del inventario real de la compilación, explica
+  aparte el motor autocontenido y los complementos de VideoLAN, y una prueba impide que una
+  dependencia entre en el artefacto sin aparecer en los avisos de los dos idiomas.
+- **La atribución de TMDB dice la frase que TMDB exige.** Mostraba un resumen de la frase obligatoria;
+  ahora dice la exigida —«usa TMDB y las API de TMDB, pero no está avalado, certificado ni aprobado de
+  ningún otro modo»— en Créditos, en el aviso y en los dos README, con una prueba que la fija palabra
+  por palabra en ambos idiomas.
+- **Nada de TMDB se conserva más de seis meses.** Sus términos lo prohíben y la caducidad de la caché
+  no lo garantizaba: cuando la red fallaba o usted quitaba el token, el programa seguía sirviendo la
+  copia guardada por vieja que fuera. Ahora hay un suelo duro de 180 días; pasado ese plazo la entrada
+  no se sirve y se borra del disco.
+- **Un estado legal que dice también lo que falta.** Una página nueva en los dos idiomas reúne la
+  licencia, el descargo de garantía, los terceros, los términos de TMDB y de GitHub y la nota de
+  exportación por la criptografía que el paquete lleva, y nombra sin adornos los cinco puntos que
+  siguen siendo del propietario, entre ellos el dictamen jurídico profesional.
+
 ### Seguridad
 
 - **La integración continua ya no puede salir a una máquina personal.** Cuando el repositorio era
@@ -60,6 +86,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   ajeno se ejecutara en la máquina del propietario en cuanto la variable reapareciera. El flujo de
   trabajo ya no la consulta y corre siempre en los runners hospedados, que son gratuitos en los
   repositorios públicos.
+- **Las tres acciones de la tubería suben a su versión mayor vigente.** `checkout` 7.0.1,
+  `setup-dotnet` 6.0.0 y `upload-artifact` 7.0.1, con cada SHA comprobado contra la etiqueta que dice
+  representar. El cambio de ruptura de `checkout` endurece precisamente los disparadores que este
+  proyecto no usa, y el de `upload-artifact` sólo altera el nombrado cuando se desactiva el
+  empaquetado, que aquí no se desactiva.
 - **La única herramienta externa que sella la publicación queda fijada por versión.** Todas las
   acciones ya iban ancladas por SHA y NuGet en modo bloqueado, pero ffmpeg se instalaba desde el
   canal de la comunidad tomando siempre la última versión: era el único ejecutable de terceros sin

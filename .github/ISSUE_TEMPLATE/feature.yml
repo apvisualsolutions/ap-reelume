@@ -1,0 +1,41 @@
+name: "Propuesta / Proposal"
+description: "Una idea para el programa, dentro de su alcance. / An idea for the program, within its scope."
+labels: ["proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Puedes escribir en español o en inglés. / Write in Spanish or English.
+
+        Antes de escribir, dos lecturas de dos minutos que pueden ahorrarte el resto:
+        [FEATURES.md](../blob/main/docs/FEATURES.md) dice qué existe ya, y
+        [la hoja de ruta](../blob/main/docs/roadmap/README.es.md) dice **qué no se hará**. AP Reelume
+        es local, para Windows 11, sin cuentas y sin servidor. / Two two-minute reads first: the
+        feature matrix says what exists, and the roadmap says what will not be done.
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Qué problema tienes / What problem you have"
+      description: "El problema, no la solución. Qué intentabas hacer y con qué te topaste. / The problem, not the solution."
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Qué propones / What you propose"
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: "Cómo lo resuelves hoy / How you work around it today"
+      description: "Si hay una forma torpe de conseguirlo, decirla ayuda a medir cuánto vale arreglarlo. / A clumsy workaround helps measure what a fix is worth."
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: "Alcance / Scope"
+      options:
+        - label: "He leído la hoja de ruta y esta propuesta no está en la lista de lo que no se hará. / I read the roadmap and this is not on the will-not-do list."
+          required: true
+        - label: "No requiere cuentas, servidor, telemetría ni conexión permanente. / It needs no accounts, server, telemetry, or permanent connection."
+          required: true

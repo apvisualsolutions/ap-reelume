@@ -51,6 +51,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   discarded instead of opening the window off every screen, and a window closed maximized reopens
   maximized over its restore bounds.
 
+### Legal
+
+- **Every source file states the licence it is under.** The licence lived only in `LICENSE`, and a
+  licence that lives only there stops being attached to a file the moment somebody copies it out of
+  the tree. All 556 code files, 51 interface files, and 17 build scripts now carry their
+  `SPDX-License-Identifier: GPL-3.0-or-later` header next to the copyright holder, and the formatting
+  gate that already ran rejects a new file that arrives without one.
+- **The third-party notices name what the package actually carries.** They listed eight components —
+  the ones somebody remembered asking for — while the artifact carried thirty, among them ANGLE under
+  BSD-3-Clause, Skia, HarfBuzz, BouncyCastle, and the .NET runtime itself, all with notices that must
+  travel with the binary. The list now comes from the build's real inventory, explains the
+  self-contained runtime and VideoLAN's plugins separately, and a test stops a dependency from
+  entering the artifact without appearing in both languages' notices.
+- **The TMDB attribution says the sentence TMDB requires.** It displayed a summary of the mandated
+  sentence; it now states the required one — "uses TMDB and the TMDB APIs but is not endorsed,
+  certified, or otherwise approved" — in Credits, in the notice, and in both READMEs, with a test
+  pinning it word for word in both languages.
+- **Nothing from TMDB is kept longer than six months.** Their terms forbid it and the cache's expiry
+  did not guarantee it: when the network failed or you removed the token, the program kept serving the
+  stored copy however old it was. There is now a hard floor of 180 days; past it the entry is not
+  served and is deleted from disk.
+- **A legal status that also states what is missing.** A new page in both languages gathers the
+  licence, the warranty disclaimer, third parties, TMDB's and GitHub's terms, and the export note for
+  the cryptography the package carries, and names without decoration the five points that remain the
+  owner's, the professional legal opinion among them.
+
 ### Security
 
 - **Continuous integration can no longer reach a personal machine.** While the repository was
@@ -58,6 +84,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   that it is public, that hatch was a standing invitation for a fork pull request's CI to run on the
   owner's machine the moment the variable reappeared. The workflow no longer consults it and always
   runs on hosted runners, which are free on public repositories.
+- **The pipeline's three actions move up to their current major.** `checkout` 7.0.1, `setup-dotnet`
+  6.0.0, and `upload-artifact` 7.0.1, with every SHA checked against the tag it claims to be.
+  `checkout`'s breaking change hardens exactly the triggers this project does not use, and
+  `upload-artifact`'s only alters naming when archiving is turned off, which here it is not.
 - **The one external tool that seals a release is pinned by version.** Every action was already
   SHA-pinned and NuGet was locked, but ffmpeg was installed from the community feed at whatever the
   latest version happened to be: it was the only unpinned third-party executable on the machine that

@@ -7,3 +7,27 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  # NuGet packages are centrally pinned and restored in locked mode, and NuGetAudit fails the build
+  # on a moderate advisory. That guards the day an advisory lands; it does nothing for the months
+  # before one, where the repository simply sits on an old version. Dependabot is the other half:
+  # it proposes the move, and the lock files travel in the same pull request, so a version only
+  # changes with a green verification behind it.
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      # Avalonia's packages move as a set; separate pull requests would each fail against the
+      # others' pinned versions.
+      avalonia:
+        patterns:
+          - "Avalonia*"
+      test-tooling:
+        patterns:
+          - "xunit*"
+          - "Microsoft.NET.Test.Sdk"
+          - "coverlet.collector"
+          - "NSubstitute"
+          - "FsCheck"
+          - "FlaUI*"

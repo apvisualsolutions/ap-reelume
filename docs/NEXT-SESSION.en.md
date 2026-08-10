@@ -1,93 +1,102 @@
 # Where to pick up
 
-Project state at the close of the **2026-08-09 (night)** session, and what comes next. The
-Spanish version is [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical scope record remains
-[FEATURES.md](FEATURES.md); the audit's remaining work lives in
-[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). This is
-only the pick-up point.
+Project state at the close of the **2026-08-10** session, the first with the repository already
+public. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical scope record
+is still [FEATURES.md](FEATURES.md); the audit's remaining work lives in
+[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). This is only the
+pick-up point.
 
-## Startup verification
+## Startup check
 
 ```powershell
 $env:DOTNET_ROOT="$env:USERPROFILE\.dotnet"; $env:PATH="$env:DOTNET_ROOT;$env:PATH"
 dotnet --version                                        # 10.0.302
-git status --short --branch                             # clean
+git status --short --branch                             # clean, on origin/codex/ap-reelume-mvp-x64
 git merge-base --is-ancestor main HEAD; $LASTEXITCODE   # 0
 ```
 
-## ⚠ First thing: GitHub Actions billing is broken
+## Where the code lives now
 
-**Almost no CI run from this session could execute.** Jobs die without starting a single step,
-annotated: "The job was not started because recent account payments have failed or your spending
-limit needs to be increased. Please check the 'Billing & plans' section in your settings." This
-is an account decision (yours): fix the payment or the spending limit under GitHub → Billing &
-plans. The quota was intermittent: one run got a runner (the spike's on `main`, left watched at
-close); the rest died instantly, and several on `main` no longer accept `gh run rerun`. **After
-fixing billing**: rerun the `aa930d1` runs (both branches) if allowed, or let the next push
-verify the full state — `aa930d1` contains everything from today. Every gate passed **locally**
-today (format, `-warnaserror`, affected suites, verify-docs, personal-pattern guard). The
-watcher-storm flake run (31319008700) stays red in the history with no retry possible; its
-occurrence is already recorded under CI-005.
+`apvisualsolutions/ap-reelume` has been **public** since 2026-08-10, as a fresh cut with a single root
+commit. The full development history stayed in `apvisualsolutions/ap-reelume-archive` (private), so
+**the SHAs the evidence documents cite resolve in the archive, not here**. The local remotes are
+`origin` (public) and `archive` (the history), and the old branches are kept as `archived/main` and
+`archived/codex/…` pointing at the archive.
 
-## What is finished (this session: `dec5ac3`, `230602e`, `aa930d1`)
+CI runs on hosted runners, free on public repositories. **Billing stopped mattering**: it was the
+previous session's blocker and it is gone. The self-hosted runner is still installed under `.runner/`
+(git-ignored) but **switched off**, and the workflow no longer has a way to call it: the
+repository-variable escape hatch was removed this session precisely because a public repository turns
+it into a risk.
 
-- **PLY-016 resolved the honest way: `DEFERRED` with its measurement.** The spike measured the
-  plan's four candidates as media options (hardware **and** software decoding) plus two
-  instance-level controls (RV32 and I420): **no VLC 3 video filter processes a single frame on
-  the callback video path** — VLC builds the chain and removes it whole with `Failed to
-  compensate for the format changes, removing all filters`, captured from the native log. The
-  metric (Laplacian variance) proved sensitive: hw vs sw differ (1169→927). The spike stays
-  re-runnable (`LowResEnhancementSpikeTests`, MediaTests, with its own noisy 480p MPEG-2
-  sample); re-running it after a future LibVLC upgrade answers whether the blocker persists.
-  Phase 2 did not run (its condition failed); the alternatives (VLC 4, managed enhancement over
-  the BGRA frames, another engine) are named with their cost in
-  [PLY16-low-res-spike.md](evidence/stable/PLY16-low-res-spike.md) — reopening is an owner scope
-  decision.
-- **TST-001 (WP-7 complete): the coverage gate exists and bites.** `eng/check-coverage.ps1` as a
-  blocking step of `verify.ps1`: every source file new against `origin/main` must arrive with
-  ≥96% lines and branches (tree comparison — CI's shallow checkout cannot break it; an
-  unreachable base is a loud red; `*.g.cs` excluded). `reportgenerator` in
-  `.config/dotnet-tools.json` and `CoverageGateTests` pinning script, thresholds, and
-  invocation. Calibrated against `797c8cb`: three **true** reds from the previous session
-  (`ReconcileScannedFiles` 86.7% lines, `CompositeFileIdentityProvider` 66.7%,
-  `PlayerVersionsViewModel` 60.6% — happy paths walked, error branches not), named as visible
-  debt in [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md) without lowering the
-  bar. Its teeth are local (main fast-forwards with the branch, so the CI diff is usually empty
-  and says so).
-- **ARQ-006 step 1 complete.** The four remaining textual assertions over `CompositionRoot.cs`
-  are now descriptor assertions in `CompositionDescriptorTests`: the migration runner's explicit
-  constructor, the single session coordinator, the update surface's singleton, and the updater's
-  address asserted on the composed **object** (`GitHubReleaseUpdateProvider` exposes
-  `RepositoryOwner/Name`) against both changelogs. Two invocation halves stay declared as text
-  (the automatic check's startup; `videoStatus.Apply` in `OpenPlayerAsync`) until the startup
-  path leaves the file (steps 2-3/ARQ-001).
+## What this session finished
+
+- **Full security audit over the public repository.** Fifteen phases, two independent explorations,
+  and every finding verified. **Zero critical, zero high.** Three medium, all applied or scheduled:
+  the self-hosted runner hatch (removed), unpinned ffmpeg in both pipelines (pinned to a specific
+  version), and dependabot not covering NuGet (covered in WP-9, below). What the audit found **clean**
+  is worth recording because it took building: fully parameterised SQL, triple zip-slip defence,
+  updater verification in the correct order, and the host allowlist enforced on **every** redirect
+  hop. The report is in `.gstack/security-reports/2026-08-10-comprehensive.json` (local, git-ignored).
+- **Full legal review, correcting rather than reporting.** All 624 source files now carry an SPDX
+  header and the formatting gate demands it; the third-party notices went from naming 8 components to
+  naming the 30 the package actually carries, with a test keeping it so; the TMDB attribution states
+  the exact sentence their terms require; and **nothing from TMDB is kept beyond 180 days**, which was
+  a real deviation from those terms. Evidence in
+  [audit-legal-public.md](evidence/stable/audit-legal-public.md), status in
+  [LEGAL.en.md](legal/LEGAL.en.md).
+- **WP-9 complete.** `CONTRIBUTING.md`, a root `CLAUDE.md`, issue and pull request templates,
+  `CODEOWNERS`, and dependabot covering NuGet with groups for Avalonia and the test tooling.
+- **A gate that lied, fixed.** `PinnedDependencyTests` scanned `*.csproj` from the root without
+  filtering and failed on any machine with the runner installed inside the tree, while staying green
+  in CI. Red locally and green in the pipeline is the worst way for a gate to be wrong.
 
 ## What comes next (in this order)
 
-1. **WP-9**: CONTRIBUTING.md, root CLAUDE.md, issue/PR templates, CODEOWNERS, dependabot NuGet
-   (SECURITY.md is done). None of it depends on billing.
-2. **ARQ-006 steps 2-3** (modules `AddData`/`AddPlayback`/…, extract `WindowsFilePickers`,
-   `DatabaseStartup`, `WindowLifecycle`), then ARQ-001/004/005/010.
-3. The coverage debt named under TST-001 (the three files' error branches) can be paid when that
-   area is next touched; the gate does not demand it retroactively.
+1. **ARQ-006 steps 2-3**: `AddData`/`AddPlayback`/… modules, and extracting `WindowsFilePickers`,
+   `DatabaseStartup`, and `WindowLifecycle` out of `CompositionRoot`. Then ARQ-001/004/005/010.
+2. **The coverage debt** named in [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md)
+   (error branches in three files): settle it when that area is touched; the gate does not demand it
+   retroactively.
+3. **Optional hardening the audit recorded as not exploitable**, should that area ever be touched:
+   bound the backup ZIP copy to the declared size (today the caps rest on a figure the archive
+   declares about itself), and revalidate the extension inside `ShellExternalPlaybackLauncher` rather
+   than trusting that every caller already filters.
 
-## Yours, not the agent's
+## Yours (only what an agent cannot do)
 
-- **Fix GitHub Billing & plans** (blocks all CI).
-- The ten-minute manual physical walk
+Technical review does not belong on this list: it gets done and decided inside the session. This
+round's dependabot pull requests — `checkout` 7.0.1, `setup-dotnet` 6.0.0, and `upload-artifact`
+7.0.1 — were reviewed by checking every SHA against the tag it claims and reading each major's
+breaking changes, then applied on the working branch, which is where the house convention wants them;
+dependabot closes its own once it sees the dependency already updated.
+
+
+- **Add the `RELEASE_SIGNING_SECRET_KEY` secret to the public repository.** It could not be copied —
+  secrets cannot be read — and **without it the release pipeline fails on purpose**: `release.yml`
+  checks that `SHA256SUMS.txt.minisig` exists and verifies, and stops if it does not. It is the only
+  thing standing between the project and cutting its first public release. The copy is where you left
+  it (see `SECURITY.md`).
+- The **ten-minute manual physical walk**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
-- The encrypted backup of the signing key.
-- Reviewing the three dependabot PRs (checkout/upload-artifact v7, setup-dotnet v6).
-- The standing economic decisions (certificate, Store, ARM64, legal, `.superpowers/` logs).
+- The **encrypted backup** of the signing key.
+- **The professional legal opinion** (`REL-004`) and the five points [LEGAL.en.md](legal/LEGAL.en.md)
+  names: VideoLAN's plugins, the TMDB logo, the export notification for the cryptography the package
+  carries, and trademark and domain.
+- The usual economic decisions: Authenticode certificate, Store, ARM64 hardware.
 
-## Things learned that should stay learned
+## Things learned worth not learning twice
 
-- **A CI failure with the job in `failure` and 0 steps is not code**: it is billing; the
-  check-run annotation says so. There is nothing to fix in the tree.
-- **VLC 3's vout filters are inert with callback output** (vmem), regardless of chroma, decoder,
-  or activation route; measuring frames (not accepted options) is what exposed it. The native
-  log (`libVlc.Log`) names the cause.
-- **Laplacian variance tells decoders apart** (hw vs sw differ on the same sample): if a filter
-  runs, the metric sees it.
-- **The coverage gate reads the diff before the reports**, so the empty case (CI after the
-  fast-forward) costs nothing and demands no coverage where there is nothing to hold.
+- **A gate green in CI and red locally is not an annoyance: it is the gate being wrong.** If it fails
+  only on your machine, check whether it scans from the root without filtering what git ignores.
+- **`dotnet format` knows how to place licence headers.** `file_header_template` in `.editorconfig`
+  plus `IDE0073` turns a gate that already existed into the one demanding the header; no new gate was
+  needed.
+- **Avalonia's XAML compiler accepts a comment before the root element.** Confirmed by compiling one
+  file before touching the other fifty, which is the only way to know.
+- **A cache limit is not a retention limit.** The TTL decides when to ask again; retention decides
+  when the data may no longer exist. The degraded paths — no credential, no network — are exactly
+  where the second one gets forgotten.
+- **Hand-written third-party notices fall behind silently.** How far behind only became known by
+  comparing three sources that had to agree: the SBOM, the lock file closure, and the binaries that
+  actually travel in the package.

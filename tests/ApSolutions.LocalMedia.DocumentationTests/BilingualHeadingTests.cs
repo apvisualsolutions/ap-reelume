@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using System.Text.RegularExpressions;
 
 namespace ApSolutions.LocalMedia.DocumentationTests;
@@ -27,6 +30,7 @@ public sealed class BilingualHeadingTests
         "docs/release/RELEASING",
         "docs/release/SMARTSCREEN",
         "docs/release/THIRD-PARTY-NOTICES",
+        "docs/legal/LEGAL",
         "docs/CHANGELOG",
     ];
 

@@ -65,6 +65,7 @@ donde estaban.
 | [Hoja de ruta](docs/roadmap/README.es.md) | Qué viene y qué no se hará |
 | [Matriz de funcionalidades](docs/FEATURES.md) | El registro canónico del alcance |
 | [Privacidad](docs/privacy/PRIVACY.es.md) | Qué se guarda y qué no sale de aquí |
+| [Estado legal](docs/legal/LEGAL.es.md) | Licencia, terceros y qué sigue abierto |
 | [Cambios](docs/CHANGELOG.es.md) | Qué cambió en cada versión |
 | [Guía de desarrollo](docs/development/README.es.md) | Cómo compilar y verificar |
 | [Publicación](docs/release/RELEASING.es.md) | Cómo se corta una versión |
@@ -73,5 +74,10 @@ donde estaban.
 ## Licencia
 
 GPL-3.0-or-later. Vea [LICENSE](LICENSE), [NOTICE](NOTICE) y los
-[avisos de terceros](docs/release/THIRD-PARTY-NOTICES.es.md). Este producto usa la API de TMDB pero
-no está avalado ni certificado por TMDB.
+[avisos de terceros](docs/release/THIRD-PARTY-NOTICES.es.md). Este producto usa TMDB y las API de
+TMDB, pero no está avalado, certificado ni aprobado de ningún otro modo por TMDB.
+
+El programa se entrega **sin garantía alguna**, en la medida en que lo permita la ley aplicable:
+véanse las secciones 15 a 17 de la [licencia](LICENSE). Los límites jurídicos que siguen abiertos
+—entre ellos el dictamen profesional de `REL-004`— están nombrados en
+[el estado legal](docs/legal/LEGAL.es.md).

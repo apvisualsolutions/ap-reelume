@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "Vulnerabilidad de seguridad / Security vulnerability"
+    url: https://github.com/apvisualsolutions/ap-reelume/security/advisories/new
+    about: "Aviso privado. No abras un issue público con los detalles. / Private advisory. Do not open a public issue with the details."
+  - name: "Problema legal o de atribución / Legal or attribution problem"
+    url: https://github.com/apvisualsolutions/ap-reelume/security/advisories/new
+    about: "Mismo canal privado; ver docs/legal/LEGAL.es.md. / Same private channel; see the legal status page."
+  - name: "Cómo se usa / How to use it"
+    url: https://github.com/apvisualsolutions/ap-reelume/blob/main/docs/user-guide/README.es.md
+    about: "Manual de uso y solución de problemas. / User guide and troubleshooting."

@@ -1,0 +1,77 @@
+name: "Fallo / Bug"
+description: "Algo no funciona como promete la documentación. / Something does not work as documented."
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Puedes escribir en español o en inglés. / Write in Spanish or English, whichever you prefer.
+
+        **¿Es una vulnerabilidad de seguridad?** No la describas aquí: usa el aviso privado que
+        explica [SECURITY.md](../blob/main/SECURITY.md). / **A security vulnerability?** Do not
+        describe it here; use the private advisory.
+  - type: textarea
+    id: what-happens
+    attributes:
+      label: "Qué ocurre / What happens"
+      description: "Lo observado, no la causa que sospechas. / What you observed, not the cause you suspect."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Pasos para reproducirlo / Steps to reproduce"
+      description: "Desde abrir la aplicación hasta ver el fallo. Un fallo sin pasos es una intuición. / From opening the application to seeing the failure."
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Qué esperabas / What you expected"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "Versión / Version"
+      description: "La que muestra Acerca de, o el commit si compilas desde fuentes. / The one About shows, or the commit if you build from source."
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: "Windows"
+      description: "Edición y compilación (winver). / Edition and build."
+    validations:
+      required: true
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: "Arquitectura / Architecture"
+      options:
+        - x64
+        - ARM64
+        - "No lo sé / I don't know"
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: "Diagnóstico / Diagnostics"
+      description: >
+        Opcional. Ajustes → Privacidad → generar diagnóstico produce un archivo local que no contiene
+        rutas, ni nombres de tus archivos, ni mensajes de error en crudo: sólo campos de una lista
+        cerrada. Puedes leerlo antes de pegarlo. / Optional. The generated diagnostics file contains
+        no paths, no file names, and no raw error messages. Read it before pasting it.
+      render: json
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: "Antes de enviar / Before submitting"
+      options:
+        - label: "He revisado que no incluyo rutas ni nombres de mis archivos personales. / I checked that I am not including personal paths or file names."
+          required: true

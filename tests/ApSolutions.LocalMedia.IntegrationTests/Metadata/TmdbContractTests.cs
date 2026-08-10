@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using System.Net;
 using System.Text;
 using ApSolutions.LocalMedia.Domain.Metadata;
@@ -95,6 +98,72 @@ public sealed class TmdbContractTests
             TestContext.Current.CancellationToken);
 
         Assert.Equal("La llegada", Assert.Single(results).Title);
+    }
+
+    /// <summary>
+    /// The TMDB API terms forbid keeping anything obtained from the API for longer than six months.
+    /// The soft time-to-live does not enforce that on its own: when the network fails, or the token
+    /// is removed, the provider falls back to whatever the cache holds, and an entry stored two years
+    /// ago would still be served and kept. Retention is the hard floor under the soft expiry.
+    /// </summary>
+    [Fact]
+    public async Task Content_kept_longer_than_the_TMDB_retention_limit_is_neither_served_nor_kept()
+    {
+        var clock = new MutableTimeProvider(DateTimeOffset.Parse(
+            "2026-08-03T10:00:00Z",
+            System.Globalization.CultureInfo.InvariantCulture));
+        var cache = new MemoryMetadataCache();
+        var key = new MetadataCacheKey("tmdb", "search:movie:arrival:2016", "es-ES", 3);
+        var storedUtc = clock.GetUtcNow() - TmdbOptions.RetentionLimit - TimeSpan.FromDays(1);
+        await cache.StoreAsync(new MetadataCacheEntry(
+            key,
+            "{\"results\":[{\"id\":329865,\"title\":\"La llegada\",\"original_title\":\"Arrival\",\"release_date\":\"2016-11-11\"}]}",
+            null,
+            storedUtc,
+            storedUtc.AddDays(1)), TestContext.Current.CancellationToken);
+        var handler = new ScriptedHttpHandler([]) { ThrowWhenEmpty = true };
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://api.themoviedb.org/") };
+        var provider = Provider(client, cache, "test-token", clock);
+
+        var results = await provider.SearchAsync(
+            new MetadataSearchQuery("Arrival", 2016, MetadataContentKind.Movie),
+            new MetadataLanguage("es-ES", "en-US"),
+            TestContext.Current.CancellationToken);
+
+        Assert.Empty(results);
+        Assert.Null(await cache.GetAsync(key, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// Without a token there is no request to fall back from, and the expired copy must still go.
+    /// </summary>
+    [Fact]
+    public async Task Expired_retention_is_enforced_even_when_no_token_is_configured()
+    {
+        var clock = new MutableTimeProvider(DateTimeOffset.Parse(
+            "2026-08-03T10:00:00Z",
+            System.Globalization.CultureInfo.InvariantCulture));
+        var cache = new MemoryMetadataCache();
+        var key = new MetadataCacheKey("tmdb", "search:movie:arrival:2016", "es-ES", 3);
+        var storedUtc = clock.GetUtcNow() - TmdbOptions.RetentionLimit - TimeSpan.FromDays(30);
+        await cache.StoreAsync(new MetadataCacheEntry(
+            key,
+            "{\"results\":[{\"id\":329865,\"title\":\"La llegada\",\"original_title\":\"Arrival\",\"release_date\":\"2016-11-11\"}]}",
+            null,
+            storedUtc,
+            clock.GetUtcNow().AddYears(5)), TestContext.Current.CancellationToken);
+        var handler = new ScriptedHttpHandler([]) { ThrowWhenEmpty = true };
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://api.themoviedb.org/") };
+        var provider = Provider(client, cache, token: null, clock);
+
+        var results = await provider.SearchAsync(
+            new MetadataSearchQuery("Arrival", 2016, MetadataContentKind.Movie),
+            new MetadataLanguage("es-ES", "en-US"),
+            TestContext.Current.CancellationToken);
+
+        Assert.Empty(results);
+        Assert.Empty(handler.Requests);
+        Assert.Null(await cache.GetAsync(key, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -197,6 +266,33 @@ public sealed class TmdbContractTests
         Assert.Contains("AboutTmdbAttribution", credits, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// TMDB dictates the wording, not the gist of it.
+    /// </summary>
+    /// <remarks>
+    /// The attribution read "uses the TMDB API but is not endorsed or certified", which is a summary
+    /// of the required sentence rather than the sentence. Their terms name the phrase to display, so
+    /// the check pins the parts that were missing — the APIs in the plural, and the third verb — in
+    /// both languages, because half a product's users read the other one.
+    /// </remarks>
+    [Theory]
+    [InlineData("Strings.en.axaml", "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.")]
+    [InlineData("Strings.es.axaml", "Este producto usa TMDB y las API de TMDB, pero no está avalado, certificado ni aprobado de ningún otro modo por TMDB.")]
+    public void The_attribution_string_matches_the_wording_TMDB_requires(string resourceFile, string required)
+    {
+        var resources = File.ReadAllText(Path.Combine(
+            DatabaseTestHarness.GetRepositoryRoot(),
+            "src",
+            "ApSolutions.LocalMedia.Presentation",
+            "Resources",
+            resourceFile));
+
+        Assert.Contains(
+            $"<x:String x:Key=\"AboutTmdbAttribution\">{required}</x:String>",
+            resources,
+            StringComparison.Ordinal);
+    }
+
     private static TmdbMetadataProvider Provider(
         HttpClient client,
         IMetadataCache cache,
@@ -275,6 +371,12 @@ public sealed class TmdbContractTests
         public Task StoreAsync(MetadataCacheEntry entry, CancellationToken cancellationToken = default)
         {
             _entries[entry.Key] = entry;
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveAsync(MetadataCacheKey key, CancellationToken cancellationToken = default)
+        {
+            _entries.Remove(key);
             return Task.CompletedTask;
         }
     }

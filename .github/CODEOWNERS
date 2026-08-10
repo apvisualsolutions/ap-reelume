@@ -1,0 +1,22 @@
+# Every path has one owner, and the paths that decide what runs and what ships say so twice.
+#
+# A CODEOWNERS entry does not block a merge on its own; branch protection is what gives it teeth.
+# It is here so that a pull request touching the pipeline, the signing tool, or the licence never
+# reaches review without the person who is accountable for it being asked.
+
+* @apvisualsolutions
+
+# The pipeline and its pins: a change here changes what executes on a machine that holds the
+# release signing secret.
+/.github/ @apvisualsolutions
+
+# The build, packaging, and signing scripts, and the embedded public key the updater trusts.
+/eng/ @apvisualsolutions
+
+# Licence, attribution, and the legal surface.
+/LICENSE @apvisualsolutions
+/NOTICE @apvisualsolutions
+/SECURITY.md @apvisualsolutions
+/docs/legal/ @apvisualsolutions
+/docs/release/ @apvisualsolutions
+/docs/privacy/ @apvisualsolutions
