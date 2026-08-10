@@ -1,10 +1,10 @@
 # Where to pick up
 
-Project state at the close of the **2026-08-10** session, the first with the repository already
-public. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical scope record
-is still [FEATURES.md](FEATURES.md); the audit's remaining work lives in
+The state of the project at the close of the second session of **2026-08-10**, the one that settled
+the legal debt. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
+scope record is still [FEATURES.md](FEATURES.md); the audit's outstanding work lives in
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). This is only the
-pick-up point.
+place to resume from.
 
 ## Startup check
 
@@ -19,104 +19,92 @@ git merge-base --is-ancestor main HEAD; $LASTEXITCODE   # 0
 
 `apvisualsolutions/ap-reelume` has been **public** since 2026-08-10, as a fresh cut with a single root
 commit. The full development history stayed in `apvisualsolutions/ap-reelume-archive` (private), so
-**the SHAs the evidence documents cite resolve in the archive, not here**. The local remotes are
-`origin` (public) and `archive` (the history), and the old branches are kept as `archived/main` and
+**the SHAs the evidence documents cite resolve there, not here**. The local remotes are `origin`
+(public) and `archive` (the history), and the old branches are kept as `archived/main` and
 `archived/codex/…` pointing at the archive.
 
-CI runs on hosted runners, free on public repositories. **Billing stopped mattering**: it was the
-previous session's blocker and it is gone. The self-hosted runner is still installed under `.runner/`
-(git-ignored) but **switched off**, and the workflow no longer has a way to call it: the
-repository-variable escape hatch was removed this session precisely because a public repository turns
-it into a risk.
+CI runs on hosted runners, free for public repositories. The self-hosted runner is still installed
+under `.runner/` (git-ignored) but **switched off**, and the workflow has no way to call it.
 
 ## What this session finished
 
-- **Full security audit over the public repository.** Fifteen phases, two independent explorations,
-  and every finding verified. **Zero critical, zero high.** Three medium, all applied or scheduled:
-  the self-hosted runner hatch (removed), unpinned ffmpeg in both pipelines (pinned to a specific
-  version), and dependabot not covering NuGet (covered in WP-9, below). What the audit found **clean**
-  is worth recording because it took building: fully parameterised SQL, triple zip-slip defence,
-  updater verification in the correct order, and the host allowlist enforced on **every** redirect
-  hop. The report is in `.gstack/security-reports/2026-08-10-comprehensive.json` (local, git-ignored).
-- **Full legal review, correcting rather than reporting.** All 624 source files now carry an SPDX
-  header and the formatting gate demands it; the third-party notices went from naming 8 components to
-  naming the 30 the package actually carries, with a test keeping it so; the TMDB attribution states
-  the exact sentence their terms require; and **nothing from TMDB is kept beyond 180 days**, which was
-  a real deviation from those terms. Evidence in
-  [audit-legal-public.md](evidence/stable/audit-legal-public.md), status in
-  [LEGAL.en.md](legal/LEGAL.en.md).
-- **WP-9 complete.** `CONTRIBUTING.md`, a root `CLAUDE.md`, issue and pull request templates,
-  `CODEOWNERS`, and dependabot covering NuGet with groups for Avalonia and the test tooling.
-- **A gate that lied, fixed.** `PinnedDependencyTests` scanned `*.csproj` from the root without
-  filtering and failed on any machine with the runner installed inside the tree, while staying green
-  in CI. Red locally and green in the pipeline is the worst way for a gate to be wrong.
-- **ARQ-006 steps 2-3.** The registration is now nine modules across six partials, and
-  `DatabaseStartup` left with the five tests its logic never had. The split exposed two things: the
-  wiring tests opened `CompositionRoot.cs` by name (eight went red without a wire changing; they now
-  read every partial, and so does the gate against the house defect), and the coverage gate decided
-  "new" by path rather than by content. Fixing it did not stop it biting: it held
-  `WindowsFilePickers`, which came out at 0 % because a Windows dialog cannot be exercised without a
-  window, and that is why it went back. Detail in
-  [audit-arq006-modules.md](evidence/stable/audit-arq006-modules.md).
+Four commits, each with its full cycle and its bilingual evidence.
+
+- **The artifact delivers the licences it names.** It was the one open legal breach. `licenses/`,
+  inside both artifacts, carries the five canonical texts — LGPL-2.1, GPL-2.0, Apache-2.0, MIT,
+  BSD-3-Clause — and the copyright notices of ANGLE, SkiaSharp, HarfBuzzSharp, BouncyCastle, SQLite,
+  SQLitePCLRaw and VideoLAN: fifteen files, 209 KiB. The Skia and HarfBuzz native notice turned up
+  **twenty-odd libraries** that `libSkiaSharp.dll` carries — freetype, ICU, libpng, libwebp, zlib —
+  and that appeared in no project document. Nothing is transcribed: `LicenceTextTests` compares every
+  copy byte for byte against the NuGet package the build consumed, and reads every copyright out of
+  the restored `.nuspec`. Detail in
+  [audit-legal-licence-texts.md](evidence/stable/audit-legal-licence-texts.md).
+- **TMDB's logo is in Credits**, which closes the last open point of their terms. The file is the one
+  TMDB publishes and that can be shown: the SHA-256 they embed in the asset's address matches the
+  versioned file's. They publish SVG only and Avalonia draws no SVG, so the view carries the file's
+  geometry — a test compares the two character for character — rather than pulling in a renderer and
+  half a dozen packages with their licences. The specification said 24 px against a 48 px product
+  name; that 48 existed in no view, so it was measured and settled at 16 against 24. Detail in
+  [audit-legal-tmdb-logo.md](evidence/stable/audit-legal-tmdb-logo.md).
+- **ARQ-001 / WIN-005 / the rest of BUG-004.** The service provider has an owner and is released on
+  exit; `PendingActivationPath` and the playback session's state left the statics.
+  `DisableParallelization` came off `AssembledShellSuites` and the seventy accessibility tests pass
+  without it, which is the proof the ownership is real. `WindowLifecycle` was extracted, the coverage
+  gate put it at 70.89% of lines and 28.57% of branches, and it **went back**, like
+  `WindowsFilePickers` before it. Detail in
+  [audit-arq001-application-host.md](evidence/stable/audit-arq001-application-host.md).
+- **The two hardenings the audit filed as "not exploitable".** One was far less so than noted: the
+  external launcher handed the Windows shell a `.ps1`, a `.txt` and a file with no extension. The
+  other did not exist in the form described, and that was only learned by forging the archive that
+  would have exploited it. Detail in
+  [audit-hardening-launcher-and-restore.md](evidence/stable/audit-hardening-launcher-and-restore.md).
 
 ## What comes next (in this order)
 
-1. **The licence texts have to travel in the artifact.** It is the only item here that is an
-   obligation rather than an improvement. The package carries AP Reelume's `LICENSE` and the notices
-   but not the text of the other licences, and VideoLAN's NuGet package was found to carry no
-   `COPYING` either: nobody is supplying it. LGPL-2.1 §6, GPL-2.0 §1, and Apache-2.0 §4a require the
-   copy to accompany; MIT and BSD-3-Clause require the notice reproduced. The texts are canonical,
-   `licenses/` already ships, and `ArtifactContentsTests` is where their arrival gets pinned. Detail
-   in [LEGAL.en.md](legal/LEGAL.en.md).
-2. **The TMDB logo**, to the specification already settled in [LEGAL.en.md](legal/LEGAL.en.md)
-   (version-controlled file, 24 px in Credits, alternative text, a test pinning it). It closes the
-   last open point of their terms.
-3. **ARQ-001 / WIN-005 / the rest of BUG-004**: an `ApplicationHost : IAsyncDisposable` owning the
-   `ServiceProvider` and releasing on `ShutdownRequested`. It is also the moment to extract
-   `WindowLifecycle`, which ARQ-006 deliberately left so as not to move it twice. Then
-   ARQ-004/005/010.
-2. **The coverage debt** named in [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md)
-   (error branches in three files): settle it when that area is touched; the gate does not demand it
-   retroactively.
-3. **Optional hardening the audit recorded as not exploitable**, should that area ever be touched:
-   bound the backup ZIP copy to the declared size (today the caps rest on a figure the archive
-   declares about itself), and revalidate the extension inside `ShellExternalPlaybackLauncher` rather
-   than trusting that every caller already filters.
+1. **ARQ-004**: a single `AsyncRelayCommand` with error handling — there are some twenty-four
+   unguarded `async void` methods and coverage across view models is uneven — plus global
+   `UnhandledException` and `UnobservedTaskException` handlers in `Program.cs`.
+2. **ARQ-005**: startup without `GetAwaiter().GetResult()` on the interface thread (migration and
+   integrity), and taking the blocking call out of the `lock` in `WindowsMediaKeyService`.
+3. **ARQ-010**: `ValidateOnBuild = true`.
+4. **The coverage debt** named in
+   [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): the error branches of
+   `ReconcileScannedFiles`, `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`. It stays
+   debt on purpose: it is settled when that area is touched, and this session did not touch it.
 
 ## Yours (only what an agent cannot do)
 
-Technical review does not belong on this list: it gets done and decided inside the session. This
-round's dependabot pull requests — `checkout` 7.0.1, `setup-dotnet` 6.0.0, and `upload-artifact`
-7.0.1 — were reviewed by checking every SHA against the tag it claims and reading each major's
-breaking changes, then applied on the working branch, which is where the house convention wants them;
-dependabot closes its own once it sees the dependency already updated.
-
-
 - **Add the `RELEASE_SIGNING_SECRET_KEY` secret to the public repository.** It could not be copied —
-  secrets cannot be read — and **without it the release pipeline fails on purpose**: `release.yml`
+  secrets cannot be read — and **without it the publishing pipeline fails on purpose**: `release.yml`
   checks that `SHA256SUMS.txt.minisig` exists and verifies, and stops if it does not. It is the only
-  thing standing between the project and cutting its first public release. The copy is where you left
-  it (see `SECURITY.md`).
-- The **ten-minute manual physical walk**
+  thing between the project and cutting its first public release. The copy is where you left it (see
+  `SECURITY.md`).
+- The **manual ten-minute physical walk**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
 - The **encrypted backup** of the signing key.
-- **The professional legal opinion** (`REL-004`) and the five points [LEGAL.en.md](legal/LEGAL.en.md)
-  names: VideoLAN's plugins, the TMDB logo, the export notification for the cryptography the package
-  carries, and trademark and domain.
+- **The export notification** to `crypt@bis.doc.gov` and `enc@nsa.gov`: the text is drafted in full in
+  [LEGAL.en.md](legal/LEGAL.en.md) and goes from your identity, which is why it is yours.
+- **The professional legal opinion** (`REL-004`). Two concrete licence questions are left for it, and
+  both are about form rather than delivery: which subsection of LGPL-2.1 §6 covers the way LibVLC
+  travels here, and whether the written offer of corresponding source recorded in
+  `NOTICE-VideoLAN.txt` is enough as the accompaniment GPL-2.0 §3 asks for.
 - The usual economic decisions: Authenticode certificate, Store, ARM64 hardware.
 
 ## Things learned worth not learning twice
 
-- **A gate green in CI and red locally is not an annoyance: it is the gate being wrong.** If it fails
-  only on your machine, check whether it scans from the root without filtering what git ignores.
-- **`dotnet format` knows how to place licence headers.** `file_header_template` in `.editorconfig`
-  plus `IDE0073` turns a gate that already existed into the one demanding the header; no new gate was
-  needed.
-- **Avalonia's XAML compiler accepts a comment before the root element.** Confirmed by compiling one
-  file before touching the other fifty, which is the only way to know.
-- **A cache limit is not a retention limit.** The TTL decides when to ask again; retention decides
-  when the data may no longer exist. The degraded paths — no credential, no network — are exactly
-  where the second one gets forgotten.
-- **Hand-written third-party notices fall behind silently.** How far behind only became known by
-  comparing three sources that had to agree: the SBOM, the lock file closure, and the binaries that
-  actually travel in the package.
+- **The coverage gate reads from `HEAD`, not from disk.** With new files only staged it announces "no
+  new file" and exits green. Commit and re-run `eng/check-coverage.ps1` **before** pushing, or CI will
+  be the one to find the red.
+- **A finding filed as "not exploitable" is a finding that was never measured.** Of the two the audit
+  left noted, one was a direct hand-off to the Windows shell and the other did not exist. Neither was
+  known until the test that would have exploited it was written.
+- **A test that passes before the fix is not good news**, it is the hypothesis announcing it was
+  wrong. That is where to stop and measure again.
+- **`eng/verify-package.ps1` compares two clean checkouts**, so it refuses to run with unstaged files.
+  A `git add -A` before `eng/verify.ps1` saves half an hour.
+- **A class comes out when its tests can follow it**, and the coverage gate decides that, not
+  intuition. `WindowLifecycle` compiled and the assembled walks were green; it went back anyway, like
+  `WindowsFilePickers` before it.
+- **The tests that read the composition as text break every time something moves.** Three times now.
+  When code leaves `CompositionRoot`, updating `CompositionSourceText` and `CompositionGraph` is part
+  of the move, not a fix afterwards.

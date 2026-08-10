@@ -1,7 +1,7 @@
 # Dónde retomar
 
-Estado del proyecto al cerrar la sesión del **2026-08-10**, la primera con el repositorio ya público.
-La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro canónico del alcance
+Estado del proyecto al cerrar la segunda sesión del **2026-08-10**, la que saldó la deuda legal. La
+versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro canónico del alcance
 sigue siendo [FEATURES.md](FEATURES.md); el trabajo pendiente de la auditoría vive en
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). Esto es sólo el
 punto de retomada.
@@ -23,75 +23,58 @@ commit raíz. El historial completo de desarrollo quedó en `apvisualsolutions/a
 aquí**. Los remotos locales son `origin` (público) y `archive` (el histórico), y las ramas viejas se
 conservan como `archived/main` y `archived/codex/…` apuntando al archivo.
 
-La CI corre en runners hospedados, gratuitos en repositorios públicos. **La facturación dejó de
-importar**: era el bloqueo de la sesión anterior y ya no existe. El runner self-hosted sigue instalado
-en `.runner/` (ignorado por git) pero **apagado**, y el workflow ya no tiene forma de llamarlo: la
-puerta de escape por variable de repositorio se retiró en esta sesión precisamente porque un
-repositorio público la convierte en un riesgo.
+La CI corre en runners hospedados, gratuitos en repositorios públicos. El runner self-hosted sigue
+instalado en `.runner/` (ignorado por git) pero **apagado**, y el workflow ya no tiene forma de
+llamarlo.
 
 ## Qué está terminado en esta sesión
 
-- **Auditoría de seguridad completa sobre el repositorio público.** Quince fases, dos exploraciones
-  independientes y verificación de cada hallazgo. **Cero críticos, cero altos.** Tres medios, los tres
-  aplicados o programados: la puerta al runner self-hosted (retirada), ffmpeg sin anclar en las dos
-  tuberías (anclado a una versión concreta) y dependabot sin cubrir NuGet (cubierto en WP-9, abajo).
-  Lo que la auditoría encontró **limpio** merece anotarse porque costó construirlo: SQL enteramente
-  parametrizado, triple defensa contra zip-slip, verificación del actualizador en el orden correcto y
-  allowlist de host aplicada en **cada** salto de redirección. El informe está en
-  `.gstack/security-reports/2026-08-10-comprehensive.json` (local, ignorado por git).
-- **Revisión legal completa, corrigiendo.** Los 624 archivos fuente llevan ahora cabecera SPDX y la
-  puerta de formato la exige; los avisos de terceros pasaron de nombrar 8 componentes a nombrar los 30
-  que el paquete transporta de verdad, con una prueba que lo mantiene; la atribución de TMDB dice la
-  frase exacta que sus términos exigen; y **nada de TMDB se conserva más de 180 días**, que era una
-  desviación real de sus términos. Evidencia en
-  [audit-legal-public.md](evidence/stable/audit-legal-public.md), estado en
-  [LEGAL.es.md](legal/LEGAL.es.md).
-- **WP-9 completo.** `CONTRIBUTING.md`, `CLAUDE.md` en la raíz, plantillas de issue y de pull request,
-  `CODEOWNERS` y dependabot cubriendo NuGet con grupos para Avalonia y las herramientas de prueba.
-- **Una puerta que mentía, arreglada.** `PinnedDependencyTests` escaneaba `*.csproj` desde la raíz sin
-  filtrar y fallaba en cualquier máquina que tuviese el runner instalado dentro del árbol, mientras
-  seguía verde en CI. Roja en local y verde en la tubería es la peor forma de que una puerta esté
-  equivocada.
-- **ARQ-006 pasos 2-3.** El registro es ahora nueve módulos repartidos en seis parciales, y
-  `DatabaseStartup` salió con las cinco pruebas que su lógica nunca tuvo. La partición destapó dos
-  cosas: las pruebas de cableado abrían `CompositionRoot.cs` por su nombre (ocho se pusieron rojas sin
-  cambiar un cable; ahora leen todos los parciales, y la puerta contra el defecto de la casa también),
-  y la puerta de cobertura decidía «nuevo» por ruta en vez de por contenido. Al arreglarla siguió
-  mordiendo: retuvo `WindowsFilePickers`, que salió con 0 % porque no hay forma de ejercitar un
-  diálogo de Windows sin ventana, y por eso volvió a su sitio. Detalle en
-  [audit-arq006-modules.md](evidence/stable/audit-arq006-modules.md).
+Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
+
+- **El artefacto entrega las licencias que nombra.** Era el único incumplimiento legal abierto.
+  `licenses/`, dentro de los dos artefactos, lleva los cinco textos canónicos —LGPL-2.1, GPL-2.0,
+  Apache-2.0, MIT, BSD-3-Clause— y los avisos de copyright de ANGLE, SkiaSharp, HarfBuzzSharp,
+  BouncyCastle, SQLite, SQLitePCLRaw y VideoLAN: quince archivos, 209 KiB. El aviso nativo de Skia y
+  HarfBuzz destapó **veintitantas bibliotecas** que `libSkiaSharp.dll` transporta —freetype, ICU,
+  libpng, libwebp, zlib— y que no aparecían en ningún documento del proyecto. Nada está transcrito:
+  `LicenceTextTests` compara cada copia byte a byte contra el paquete NuGet que la compilación
+  consumió, y lee cada copyright del `.nuspec` restaurado. Detalle en
+  [audit-legal-licence-texts.md](evidence/stable/audit-legal-licence-texts.md).
+- **El logotipo de TMDB está en Créditos**, que cierra el último punto abierto de sus términos. El
+  archivo es el que TMDB publica y se puede demostrar: la huella SHA-256 que ellos incrustan en la
+  dirección del recurso coincide con la del archivo versionado. Sólo publican SVG y Avalonia no dibuja
+  SVG, así que la vista lleva la geometría del archivo —una prueba las compara carácter a carácter—
+  en vez de traer un renderizador y media docena de paquetes con sus licencias. La especificación
+  decía 24 px frente a 48 px del nombre del producto; ese 48 no existía en ninguna vista, así que se
+  midió y quedó en 16 frente a 24. Detalle en
+  [audit-legal-tmdb-logo.md](evidence/stable/audit-legal-tmdb-logo.md).
+- **ARQ-001 / WIN-005 / resto de BUG-004.** El proveedor de servicios tiene dueño y se libera al
+  salir; `PendingActivationPath` y el estado de la sesión de reproducción salieron de los estáticos.
+  `DisableParallelization` se retiró de `AssembledShellSuites` y las 70 pruebas de accesibilidad pasan
+  sin él, que es la prueba de que la propiedad es real. `WindowLifecycle` se extrajo, la puerta de
+  cobertura lo midió al 70,89 % de líneas y 28,57 % de ramas, y **volvió** igual que
+  `WindowsFilePickers`. Detalle en
+  [audit-arq001-application-host.md](evidence/stable/audit-arq001-application-host.md).
+- **Los dos endurecimientos que la auditoría archivó como «no explotables».** Uno lo era mucho menos
+  de lo anotado: el lanzador externo entregaba al shell de Windows un `.ps1`, un `.txt` y un archivo
+  sin extensión. El otro no existía en la forma descrita, y sólo se supo forjando el archivo que lo
+  habría explotado. Detalle en
+  [audit-hardening-launcher-and-restore.md](evidence/stable/audit-hardening-launcher-and-restore.md).
 
 ## Lo que sigue (en este orden)
 
-1. **Los textos de licencia deben viajar en el artefacto.** Es lo único de esta lista que es una
-   obligación y no una mejora. El paquete lleva la `LICENSE` de AP Reelume y los avisos, pero no el
-   texto de las licencias ajenas, y se comprobó que el paquete NuGet de VideoLAN tampoco trae
-   `COPYING`: nadie lo está aportando. LGPL-2.1 §6, GPL-2.0 §1 y Apache-2.0 §4a exigen acompañar la
-   copia; MIT y BSD-3-Clause, reproducir el aviso. Los textos son canónicos, `licenses/` ya viaja, y
-   `ArtifactContentsTests` es donde se fija que llegan. Detalle en [LEGAL.es.md](legal/LEGAL.es.md).
-2. **El logotipo de TMDB**, con la especificación ya decidida en [LEGAL.es.md](legal/LEGAL.es.md)
-   (archivo versionado, 24 px en Créditos, texto alternativo, prueba que lo fija). Cierra el último
-   punto de sus términos que quedaba abierto.
-3. **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
-   `ServiceProvider` y libere en `ShutdownRequested`. Es también el momento de extraer
-   `WindowLifecycle`, que ARQ-006 dejó a propósito para no moverlo dos veces. Después
-   ARQ-004/005/010.
-2. **La deuda de cobertura** nombrada en [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md)
-   (ramas de error de tres archivos): se salda cuando se toque esa zona; la puerta no la exige
-   retroactivamente.
-3. **Endurecimientos opcionales que la auditoría dejó anotados como no explotables**, si algún día se
-   toca esa zona: acotar la copia del ZIP de backup al tamaño declarado (hoy los topes se apoyan en un
-   dato que el archivo declara de sí mismo) y revalidar la extensión en
-   `ShellExternalPlaybackLauncher` en vez de confiar en que todos los llamantes ya filtran.
+1. **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores —hay unas veinticuatro
+   `async void` sin red y la cobertura entre ViewModels es desigual— más `UnhandledException` y
+   `UnobservedTaskException` globales en `Program.cs`.
+2. **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de interfaz (migración e
+   integridad), y sacar el bloqueo del `lock` en `WindowsMediaKeyService`.
+3. **ARQ-010**: `ValidateOnBuild = true`.
+4. **La deuda de cobertura** que nombra
+   [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): las ramas de error de
+   `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`. Sigue siendo
+   deuda a propósito: se salda cuando se toque esa zona, y esta sesión no la tocó.
 
 ## Pendiente tuyo (sólo lo que un agente no puede hacer)
-
-Aquí no van tareas de revisión técnica: ésas se hacen y se deciden en la sesión. Los PR de dependabot
-de esta tanda —`checkout` 7.0.1, `setup-dotnet` 6.0.0 y `upload-artifact` 7.0.1— se revisaron
-comprobando cada SHA contra su etiqueta y leyendo los cambios de ruptura de cada salto mayor, y se
-aplicaron en la rama de trabajo, que es donde la convención de la casa los quiere; dependabot cierra
-los suyos al ver la dependencia ya actualizada.
-
 
 - **Añadir el secreto `RELEASE_SIGNING_SECRET_KEY` al repositorio público.** No se pudo copiar —los
   secretos no se leen—, y **sin él la tubería de publicación falla a propósito**: `release.yml`
@@ -101,23 +84,29 @@ los suyos al ver la dependencia ya actualizada.
 - El **paseo físico manual de diez minutos**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
 - La **copia de seguridad cifrada** de la clave de firma.
-- **El dictamen jurídico profesional** (`REL-004`) y los cinco puntos que
-  [LEGAL.es.md](legal/LEGAL.es.md) nombra: los complementos de VideoLAN, el logotipo de TMDB, la
-  notificación de exportación por la criptografía que el paquete lleva, y marca y dominio.
+- **La notificación de exportación** a `crypt@bis.doc.gov` y `enc@nsa.gov`: el texto está redactado
+  entero en [LEGAL.es.md](legal/LEGAL.es.md) y sale de tu identidad, por eso es tuya.
+- **El dictamen jurídico profesional** (`REL-004`). Le quedan dos preguntas concretas de licencia, y
+  las dos son de forma y no de entrega: bajo qué apartado del §6 de la LGPL-2.1 queda amparada la
+  manera en que LibVLC viaja aquí, y si la oferta escrita de código correspondiente que recoge
+  `NOTICE-VideoLAN.txt` basta como el acompañamiento que pide el §3 de la GPL-2.0.
 - Las decisiones económicas de siempre: certificado Authenticode, Store, hardware ARM64.
 
 ## Cosas aprendidas que conviene no volver a aprender
 
-- **Una puerta verde en CI y roja en local no es un incordio: es la puerta estando equivocada.** Si
-  falla sólo en tu máquina, mira si escanea desde la raíz sin filtrar lo que git ignora.
-- **`dotnet format` sabe poner cabeceras de licencia.** `file_header_template` en `.editorconfig` más
-  `IDE0073` convierte una puerta que ya existía en la que exige la cabecera; no hizo falta inventar
-  ninguna.
-- **El compilador de XAML de Avalonia acepta un comentario antes del elemento raíz.** Se comprobó
-  compilando un archivo antes de tocar los otros cincuenta, que es la única forma de saberlo.
-- **Un límite de caché no es un límite de retención.** El TTL decide cuándo volver a preguntar; la
-  retención decide cuándo el dato ya no puede existir. Los caminos degradados —sin credencial, sin
-  red— son exactamente donde el segundo se olvida.
-- **Los avisos de terceros escritos a mano se quedan atrás en silencio.** Sólo se supo cuánto
-  contrastando tres fuentes que tenían que coincidir: el SBOM, el cierre del lock file y los binarios
-  que de verdad viajan en el paquete.
+- **La puerta de cobertura lee de `HEAD`, no del disco.** Con los archivos nuevos sólo preparados en
+  el índice declara «ningún archivo nuevo» y sale verde. Hay que confirmar el commit y volver a
+  ejecutar `eng/check-coverage.ps1` **antes** del push, o CI será quien encuentre el rojo.
+- **Un hallazgo archivado como «no explotable» es un hallazgo sin medir.** De los dos que la auditoría
+  dejó anotados, uno era una entrega directa al shell de Windows y el otro no existía. No se supo
+  hasta escribir la prueba que lo habría explotado.
+- **Una prueba que sale verde antes de la corrección no es una buena noticia**, es la hipótesis
+  avisando de que estaba mal. Ahí es donde hay que parar y volver a medir.
+- **`eng/verify-package.ps1` compara dos checkouts limpios**, así que se niega a correr con archivos
+  sin preparar en el índice. Un `git add -A` antes de `eng/verify.ps1` ahorra media hora.
+- **Se extrae una clase cuando sus pruebas pueden seguirla**, y la puerta de cobertura es quien lo
+  decide, no la intuición. `WindowLifecycle` compilaba y los recorridos ensamblados estaban en verde;
+  aun así volvió, como `WindowsFilePickers` antes.
+- **Las pruebas que leen la composición como texto se rompen cada vez que algo se mueve.** Van tres.
+  Al sacar código de `CompositionRoot`, actualizar `CompositionSourceText` y `CompositionGraph` es
+  parte del traslado, no un arreglo posterior.
