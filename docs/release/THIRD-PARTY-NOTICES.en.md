@@ -56,6 +56,10 @@ asked for directly.
 `BSD-3-Clause` components. The MIT and BSD-3-Clause licences require their copyright notice to travel
 with the binary, which is what this file and the `licenses/` folder inside the artifact are for.
 
+That folder also carries **the full text of every licence** and the copyright notices each package
+publishes. What is in it and where each text came from is in
+[licenses/README.en.md](licenses/README.en.md), which travels with them.
+
 ### The .NET runtime
 
 The artifact is self-contained: it carries its own copy of the .NET 10 runtime and base class
@@ -69,9 +73,9 @@ what puts several hundred Microsoft-licensed files inside the package.
 The `VideoLAN.LibVLC.Windows` package declares `LGPL-2.1-or-later`, which covers `libvlc.dll` and
 `libvlccore.dll`. It also ships roughly three hundred plugins in `plugins/`, and **those carry their
 own licences**, some of which are `GPL-2.0-or-later` rather than LGPL — the x264 encoder behind
-`libx26410b_plugin.dll` is the clearest example. The library is distributed unmodified and keeps
-distributed unmodified. VideoLAN's NuGet package carries **no `COPYING` file at all**, so the notice
-has to be supplied here: it is part of what is missing, below.
+`libx26410b_plugin.dll` is the clearest example. The library is distributed unmodified. VideoLAN's
+NuGet package carries **no `COPYING` file at all**, so nobody supplies the text but this artifact: it
+carries it as `licenses/LGPL-2.1.txt`, `licenses/GPL-2.0.txt` and `licenses/NOTICE-VideoLAN.txt`.
 
 For a program released under `GPL-3.0-or-later`, a `GPL-2.0-or-later` plugin is compatible: the
 "or later" is what makes the two meet at GPL-3.0. A plugin licensed `GPL-2.0-only` would not be.
@@ -80,11 +84,14 @@ of the License, or (at your option) any later version" clause, so the set is `GP
 sits under GPL-3.0. Trimming the plugin set stays available as a way to reduce surface, but licensing
 does not require it.
 
-**What is missing, and it is a real obligation**: this artifact does **not yet carry the text** of the
-third-party licences. LGPL-2.1 (§6), GPL-2.0 (§1), and Apache-2.0 (§4a) each require a copy of the
-licence to accompany a binary distribution, and MIT and BSD-3-Clause require their copyright notice to
-be reproduced. Naming the component and its licence, which is what this document does, is not the same
-as accompanying it. The package's `licenses/` folder must carry the full texts alongside these notices.
+**The licence texts now travel.** LGPL-2.1 (§6), GPL-2.0 (§1), and Apache-2.0 (§4a) each require a
+copy of the licence to accompany a binary distribution, and MIT and BSD-3-Clause require their
+copyright notice to be reproduced. Naming the component and its licence, which is what this document
+does, is not the same as accompanying it, so the package's `licenses/` folder carries the full texts
+alongside these notices. The ones a package publishes are copied verbatim from it and a test compares
+them byte for byte against the package the build consumed; the canonical ones were taken from a source
+that already distributed them and contrasted with a second, independent copy. The detail is in
+[licenses/README.en.md](licenses/README.en.md).
 
 ## Components used only during development and testing
 
@@ -131,6 +138,6 @@ copied during the tests.
 This file states what each component declares and how those declarations fit together. It is written
 by the people who assembled the software, not by a lawyer, and two questions stay open until the
 professional legal opinion under REL-004 answers them: whether every VideoLAN plugin shipped in the
-pinned build is compatible with `GPL-3.0-or-later`, and whether any component's own notice file must
-be reproduced in full rather than referenced. Neither question blocks development; both are named
-here so nobody mistakes this document for the opinion.
+pinned build is compatible with `GPL-3.0-or-later`, and which subsection of LGPL-2.1 §6 covers the way
+LibVLC travels here. Neither question blocks development; both are named here so nobody mistakes this
+document for the opinion.

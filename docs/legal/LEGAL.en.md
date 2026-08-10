@@ -46,14 +46,25 @@ Compatibility: `GPL-3.0-or-later` allows incorporating `LGPL-2.1-or-later`, `MIT
 carries the GPL version 2 **with** the "either version 2 of the License, or (at your option) any later
 version" clause, so the set is `GPL-2.0-or-later` and sits under GPL-3.0. The point leaves the list.
 
-**The licence texts do not travel yet — pending and first in line.** The artifact carries AP Reelume's
-`LICENSE` and the third-party notices, but **not the text of the other licences**. VideoLAN's NuGet
-package was also found to carry no `COPYING` at all, so nobody is supplying it. The obligations are
-explicit and a table naming the component does not meet them: LGPL-2.1 §6, GPL-2.0 §1, and
-Apache-2.0 §4a each require a copy of the licence to **accompany** the binary distribution, and MIT
-and BSD-3-Clause require their copyright notice to be reproduced. The fix is mechanical — the texts
-are canonical and `licenses/` already ships in the package — and it is the first thing to do next
-session.
+**The licence texts now travel — closed on 2026-08-10.** This was the open breach: the artifact
+carried AP Reelume's `LICENSE` and the third-party notices, but **not the text of the other
+licences**, and VideoLAN's NuGet package carries no `COPYING` at all, so nobody was supplying it. The
+obligations are explicit and a table naming the component does not meet them: LGPL-2.1 §6, GPL-2.0 §1,
+and Apache-2.0 §4a each require a copy of the licence to **accompany** the binary distribution, and
+MIT and BSD-3-Clause require their copyright notice to be reproduced. `licenses/`, inside both
+artifacts, now carries the full text of LGPL-2.1, GPL-2.0, Apache-2.0, MIT and BSD-3-Clause, plus the
+copyright notices of ANGLE, Skia, HarfBuzz, BouncyCastle, SQLitePCLRaw, SQLite and VideoLAN. The ones
+a package publishes are copied verbatim from it — `LicenceTextTests` compares them byte for byte
+against the package the build consumed, so a version bump that changes a notice turns the test red —
+and the canonical ones were taken from a source that already distributed them and contrasted with a
+second, independent copy. The inventory and the provenance of each text are in
+[licenses/README.en.md](../release/licenses/README.en.md), and what was measured is in
+[audit-legal-licence-texts.md](../evidence/stable/audit-legal-licence-texts.md).
+
+One question stays for the opinion, and it is about form rather than delivery: which subsection of
+LGPL-2.1 §6 covers the way LibVLC travels here — an unmodified, replaceable dynamic library — and
+whether the written offer of corresponding source recorded in `NOTICE-VideoLAN.txt`, valid for three
+years, is enough as the accompaniment GPL-2.0 §3 asks for on behalf of the plugins.
 
 ## The TMDB API
 

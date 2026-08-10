@@ -59,6 +59,42 @@ internal static class PackageEvidence
             ? Path.GetFullPath(named)
             : Path.Combine(RepositoryRoot(), "artifacts", "package-arm64");
 
+    /// <summary>
+    /// What the versioned licence folder says the artifact has to carry, checked against a layout.
+    /// </summary>
+    /// <remarks>
+    /// Both architectures are held to the same list from one place, because the failure to guard
+    /// against is one packaging script updated and the other forgotten. Contents are compared, not
+    /// just names: a licence that arrives truncated is not a copy of the licence.
+    /// </remarks>
+    public static string[] LicenceTextsMissingFrom(string layoutRoot)
+    {
+        var source = new DirectoryInfo(Path.Combine(RepositoryRoot(), "docs", "release", "licenses"));
+        if (!source.Exists)
+        {
+            throw new DirectoryNotFoundException(
+                $"The versioned licence texts are not at {source.FullName}, so nothing states what the "
+                    + "artifact owes.");
+        }
+
+        var problems = new List<string>();
+        foreach (var file in source.EnumerateFiles("*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(source.FullName, file.FullName);
+            var shipped = Path.Combine(layoutRoot, "licenses", relative);
+            if (!File.Exists(shipped))
+            {
+                problems.Add($"licenses/{relative} is not in the artifact");
+            }
+            else if (!File.ReadAllBytes(shipped).SequenceEqual(File.ReadAllBytes(file.FullName)))
+            {
+                problems.Add($"licenses/{relative} in the artifact is not the versioned text");
+            }
+        }
+
+        return [.. problems.Order(StringComparer.Ordinal)];
+    }
+
     /// <summary>The packaging project's directory, which is versioned and always present.</summary>
     public static string PackageProjectRoot() =>
         Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Windows.Package");

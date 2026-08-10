@@ -47,14 +47,26 @@ el `COPYING` del árbol de VLC es la GPL versión 2 **con** la cláusula «eithe
 License, or (at your option) any later version», así que el conjunto es `GPL-2.0-or-later` y encaja
 bajo GPL-3.0. El punto sale de la lista de pendientes.
 
-**Los textos de las licencias no viajan todavía — pendiente y prioritario.** El artefacto lleva la
-`LICENSE` de AP Reelume y los avisos de terceros, pero **no el texto de las licencias ajenas**. Se
-comprobó además que el paquete NuGet de VideoLAN no incluye ningún `COPYING`, de modo que nadie lo
-está aportando. Las obligaciones son explícitas y no las cumple una tabla que nombre el componente:
+**Los textos de las licencias ya viajan — cerrado el 2026-08-10.** Era el incumplimiento abierto: el
+artefacto llevaba la `LICENSE` de AP Reelume y los avisos de terceros, pero **no el texto de las
+licencias ajenas**, y el paquete NuGet de VideoLAN tampoco incluye ningún `COPYING`, así que nadie lo
+aportaba. Las obligaciones son explícitas y no las cumple una tabla que nombre el componente:
 LGPL-2.1 §6, GPL-2.0 §1 y Apache-2.0 §4a exigen **acompañar** una copia de la licencia con la
-distribución binaria, y MIT y BSD-3-Clause exigen reproducir su aviso de copyright. La corrección es
-mecánica —los textos son canónicos y `licenses/` ya viaja en el paquete— y es lo primero que debe
-hacerse en la próxima sesión.
+distribución binaria, y MIT y BSD-3-Clause exigen reproducir su aviso de copyright. Ahora
+`licenses/`, dentro de los dos artefactos, lleva el texto íntegro de la LGPL-2.1, la GPL-2.0, la
+Apache-2.0, la MIT y la BSD-3-Clause, más los avisos de copyright de ANGLE, Skia, HarfBuzz,
+BouncyCastle, SQLitePCLRaw, SQLite y VideoLAN. Los que un paquete publica se copian literalmente de
+él —`LicenceTextTests` los compara byte a byte contra el paquete que la compilación consumió, de modo
+que una subida de versión que cambie un aviso pone la prueba en rojo—; los canónicos se tomaron de
+una fuente que ya los distribuía y se contrastaron con una segunda copia independiente. El inventario
+y la procedencia de cada texto están en [licenses/README.es.md](../release/licenses/README.es.md), y
+lo medido en
+[audit-legal-licence-texts.md](../evidence/stable/audit-legal-licence-texts.md).
+
+Queda una pregunta para el dictamen, y es de forma, no de entrega: bajo qué apartado del §6 de la
+LGPL-2.1 queda amparada la manera en que LibVLC viaja aquí —biblioteca dinámica sin modificar y
+sustituible— y si la oferta escrita de código correspondiente que recoge `NOTICE-VideoLAN.txt`, válida
+tres años, basta como el acompañamiento que el §3 de la GPL-2.0 pide por los complementos.
 
 ## API de TMDB
 

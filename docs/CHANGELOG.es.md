@@ -69,6 +69,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Legal
 
+- **El texto de cada licencia ajena viaja dentro del paquete.** Nombrar un componente y su licencia no
+  es entregar la licencia, y varias lo exigen: la LGPL-2.1, la GPL-2.0 y la Apache-2.0 piden acompañar
+  una copia con el binario, y la MIT y la BSD-3-Clause, reproducir su aviso de copyright. El paquete de
+  VideoLAN no trae ninguno, así que nadie los aportaba. La carpeta `licenses/` de los dos artefactos
+  lleva ahora los cinco textos íntegros y los avisos de ANGLE, Skia, HarfBuzz, BouncyCastle,
+  SQLitePCLRaw, SQLite y VideoLAN —incluido el archivo de Microsoft que cubre las veintitantas
+  bibliotecas que Skia y HarfBuzz llevan dentro, de freetype a zlib, que hasta ahora no aparecían en
+  ningún sitio—. Los avisos que un paquete publica se copian de él y una prueba los compara byte a byte
+  contra el paquete que la compilación consumió, de modo que una subida de versión que cambie un aviso
+  se pone en rojo en vez de distribuir en silencio el aviso anterior. Los textos canónicos se tomaron
+  de una fuente que ya los distribuía y se contrastaron con una segunda copia independiente; el de la
+  GPL-2.0 salió del propio árbol de VLC, que es la licencia que obliga a sus complementos.
 - **Cada archivo fuente dice bajo qué licencia está.** La licencia vivía solo en `LICENSE`, y una
   licencia que solo vive ahí deja de estar unida al archivo en cuanto alguien lo copia fuera del
   árbol. Los 556 archivos de código, los 51 de interfaz y los 17 de compilación llevan ahora su
@@ -92,8 +104,8 @@ evidencia, es [FEATURES.md](FEATURES.md).
   un dictamen: si alguno fuera `GPL-2.0-only` chocaría con la licencia de este programa. Se comprobó
   en la fuente y llevan la cláusula «o cualquier versión posterior», así que encajan. En el mismo
   repaso apareció lo contrario de una buena noticia: el paquete de VideoLAN no trae ningún archivo de
-  licencia, y el artefacto tampoco incluye todavía el texto de las licencias ajenas, que varias de
-  ellas exigen acompañar. Queda dicho aquí y es lo primero de la próxima tanda.
+  licencia, y el artefacto tampoco incluía el texto de las licencias ajenas, que varias de ellas
+  exigen acompañar. Ese hueco es el que cierra la primera entrada de esta sección.
 - **Un estado legal que dice también lo que falta.** Una página nueva en los dos idiomas reúne la
   licencia, el descargo de garantía, los terceros, los términos de TMDB y de GitHub y la nota de
   exportación por la criptografía que el paquete lleva, y nombra sin adornos los cinco puntos que

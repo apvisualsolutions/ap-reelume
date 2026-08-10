@@ -1,0 +1,53 @@
+The MIT License
+===============
+
+This file carries the text of the MIT License together with the copyright notices of the components
+AP Reelume ships under it that publish no licence file of their own. Both halves are here because the
+licence asks for both: naming a component is not reproducing its notice.
+
+Components that do publish their own MIT notice are not repeated here. Their file travels verbatim in
+this folder: NOTICE-SkiaSharp.txt, NOTICE-HarfBuzzSharp.txt and NOTICE-BouncyCastle.txt.
+
+
+Copyright notices
+-----------------
+
+Copyright 2013-2026 © The AvaloniaUI Project
+    Avalonia, Avalonia.Desktop, Avalonia.Themes.Fluent, Avalonia.BuildServices,
+    Avalonia.FreeDesktop, Avalonia.FreeDesktop.AtSpi, Avalonia.HarfBuzz, Avalonia.Native,
+    Avalonia.Remote.Protocol, Avalonia.Skia, Avalonia.Win32, Avalonia.X11.
+
+Copyright 2021 © Nikita Tsukanov
+    MicroCom.Runtime.
+
+Tom Deseyn
+    Tmds.DBus.Protocol. The package declares MIT and names this copyright holder in its metadata and
+    ships no licence file, so this is the notice exactly as its publisher states it.
+
+© Microsoft Corporation. All rights reserved.
+    Microsoft.Data.Sqlite, Microsoft.Data.Sqlite.Core, Microsoft.Extensions.DependencyInjection,
+    Microsoft.Extensions.DependencyInjection.Abstractions, and the .NET 10 runtime and base class
+    library this self-contained artifact carries — coreclr.dll, System.*.dll, mscorlib.dll and their
+    companions, plus Microsoft.Windows.SDK.NET.dll and WinRT.Runtime.dll.
+
+
+Licence text
+------------
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

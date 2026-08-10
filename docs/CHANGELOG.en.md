@@ -67,6 +67,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Legal
 
+- **The text of every third-party licence travels inside the package.** Naming a component and its
+  licence is not delivering the licence, and several of them require it: LGPL-2.1, GPL-2.0 and
+  Apache-2.0 ask for a copy to accompany the binary, and MIT and BSD-3-Clause for their copyright
+  notice to be reproduced. VideoLAN's package carries none, so nobody was supplying them. The
+  `licenses/` folder of both artifacts now carries the five full texts and the notices of ANGLE, Skia,
+  HarfBuzz, BouncyCastle, SQLitePCLRaw, SQLite and VideoLAN — including Microsoft's own file covering
+  the twenty-odd libraries Skia and HarfBuzz carry inside them, from freetype to zlib, which appeared
+  nowhere until now. Notices a package publishes are copied from it and a test compares them byte for
+  byte against the package the build consumed, so a version bump that changes a notice turns red
+  instead of quietly distributing the previous one. The canonical texts were taken from a source that
+  already distributed them and contrasted with a second, independent copy; GPL-2.0 came from VLC's own
+  tree, which is the licence binding its plugins.
 - **Every source file states the licence it is under.** The licence lived only in `LICENSE`, and a
   licence that lives only there stops being attached to a file the moment somebody copies it out of
   the tree. All 556 code files, 51 interface files, and 17 build scripts now carry their
@@ -89,9 +101,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **VideoLAN's plugins are confirmed compatible.** This was recorded as a question for an opinion: a
   `GPL-2.0-only` plugin would clash with this program's licence. It was checked at the source and they
   carry the "or any later version" clause, so they fit. The same pass turned up the opposite of good
-  news: VideoLAN's package carries no licence file at all, and the artifact does not yet carry the
-  text of the other licences either, which several of them require to accompany it. It is stated here
-  and it is first in the next round.
+  news: VideoLAN's package carries no licence file at all, and the artifact did not carry the text of
+  the other licences either, which several of them require to accompany it. That is the gap the first
+  entry in this section closes.
 - **A legal status that also states what is missing.** A new page in both languages gathers the
   licence, the warranty disclaimer, third parties, TMDB's and GitHub's terms, and the export note for
   the cryptography the package carries, and names without decoration the five points that remain the

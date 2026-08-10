@@ -56,6 +56,10 @@ el paquete se pidió directamente o llegó arrastrado.
 `Apache-2.0` y `BSD-3-Clause`. Las licencias MIT y BSD-3-Clause exigen que su aviso de copyright
 viaje con el binario, y para eso están este archivo y la carpeta `licenses/` dentro del artefacto.
 
+Esa carpeta lleva además **el texto íntegro de cada licencia** y los avisos de copyright que cada
+paquete publica. Qué contiene y de dónde salió cada texto está en
+[licenses/README.es.md](licenses/README.es.md), que viaja con ellos.
+
 ### El motor de ejecución de .NET
 
 El artefacto es autocontenido: lleva su propia copia del motor de ejecución de .NET 10 y de su
@@ -69,9 +73,10 @@ comodidad es lo que mete varios cientos de archivos con licencia de Microsoft de
 El paquete `VideoLAN.LibVLC.Windows` declara `LGPL-2.1-or-later`, que cubre `libvlc.dll` y
 `libvlccore.dll`. Además transporta unos trescientos complementos en `plugins/`, y **esos llevan sus
 propias licencias**, algunas `GPL-2.0-or-later` en lugar de LGPL — el codificador x264 que hay detrás
-de `libx26410b_plugin.dll` es el ejemplo más claro. La biblioteca se distribuye sin modificar y
-se distribuye sin modificar. El paquete NuGet de VideoLAN **no trae ningún archivo `COPYING`**, así
-que el aviso hay que aportarlo aquí: es parte de lo que falta, más abajo.
+de `libx26410b_plugin.dll` es el ejemplo más claro. La biblioteca se distribuye sin modificar. El
+paquete NuGet de VideoLAN **no trae ningún archivo `COPYING`**, así que nadie aporta el texto salvo
+este artefacto: lo lleva en `licenses/LGPL-2.1.txt`, `licenses/GPL-2.0.txt` y
+`licenses/NOTICE-VideoLAN.txt`.
 
 Para un programa publicado bajo `GPL-3.0-or-later`, un complemento `GPL-2.0-or-later` es compatible:
 el «o posterior» es lo que hace que ambos se encuentren en GPL-3.0. Uno licenciado `GPL-2.0-only` no
@@ -80,11 +85,14 @@ con la cláusula «either version 2 of the License, or (at your option) any late
 el conjunto es `GPL-2.0-or-later` y encaja bajo GPL-3.0. La palanca de recortar complementos queda
 disponible por si algún día conviene reducir la superficie, pero no hace falta por licencia.
 
-**Lo que sí falta, y es una obligación real**: este artefacto **no incluye todavía el texto** de las
-licencias de terceros. La LGPL-2.1 (§6), la GPL-2.0 (§1) y la Apache-2.0 (§4a) exigen entregar una
-copia de la licencia con la distribución binaria, y MIT y BSD-3-Clause exigen reproducir su aviso de
-copyright. Nombrar el componente y su licencia, que es lo que hace este documento, no sustituye a
-acompañarla. La carpeta `licenses/` del paquete debe llevar los textos íntegros junto a estos avisos.
+**El texto de las licencias ya viaja.** La LGPL-2.1 (§6), la GPL-2.0 (§1) y la Apache-2.0 (§4a)
+exigen entregar una copia de la licencia con la distribución binaria, y MIT y BSD-3-Clause exigen
+reproducir su aviso de copyright. Nombrar el componente y su licencia, que es lo que hace este
+documento, no sustituye a acompañarla, así que la carpeta `licenses/` del paquete lleva los textos
+íntegros junto a estos avisos. Los que un paquete publica se copian literalmente de él y una prueba
+los compara byte a byte contra el paquete que la compilación consumió; los canónicos se tomaron de
+una fuente que ya los distribuía y se contrastaron con una segunda copia independiente. El detalle
+está en [licenses/README.es.md](licenses/README.es.md).
 
 ## Componentes usados solo durante el desarrollo y las pruebas
 
@@ -132,6 +140,6 @@ se copia durante las pruebas.
 Este archivo dice qué declara cada componente y cómo encajan esas declaraciones entre sí. Lo escriben
 quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas hasta que el dictamen
 jurídico profesional de REL-004 las responda: si todos los complementos de VideoLAN que viajan en la
-compilación fijada son compatibles con `GPL-3.0-or-later`, y si el aviso propio de algún componente
-debe reproducirse íntegro en vez de referenciarse. Ninguna de las dos frena el desarrollo; ambas se
+compilación fijada son compatibles con `GPL-3.0-or-later`, y bajo qué apartado del §6 de la LGPL-2.1
+queda amparada la forma en que LibVLC viaja aquí. Ninguna de las dos frena el desarrollo; ambas se
 nombran aquí para que nadie confunda este documento con el dictamen.

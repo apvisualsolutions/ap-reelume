@@ -143,6 +143,24 @@ public sealed class ArtifactContentsTests
     }
 
     /// <summary>
+    /// The text of every third-party licence travels too, not only a table naming them.
+    /// </summary>
+    /// <remarks>
+    /// LGPL-2.1 §6, GPL-2.0 §1 and Apache-2.0 §4a each require a copy of the licence to accompany the
+    /// binary, and MIT and BSD-3-Clause require the copyright notice to be reproduced. VideoLAN's
+    /// NuGet package carries no <c>COPYING</c>, so what this artifact does not carry, nobody carries.
+    /// </remarks>
+    [Fact]
+    public void The_text_of_every_third_party_licence_travels_inside_the_artifact()
+    {
+        var missing = PackageEvidence.LicenceTextsMissingFrom(LayoutRoot());
+
+        Assert.True(
+            missing.Length == 0,
+            $"The artifact names licences it does not accompany: {string.Join("; ", missing)}.");
+    }
+
+    /// <summary>
     /// Nothing in the artifact may name the machine that built it or carry a credential. Only files
     /// this repository produces are read: a third-party binary can hold any byte sequence, and the
     /// promise being kept here is about what this project ships, not what it depends on.
