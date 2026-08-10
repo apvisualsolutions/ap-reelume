@@ -199,11 +199,12 @@ Two commits, each with its cycle, its bilingual evidence and its full verificati
 
 ## Yours (only what an agent cannot do)
 
-- **Add the `RELEASE_SIGNING_SECRET_KEY` secret to the public repository.** It could not be copied —
-  secrets cannot be read — and **without it the publishing pipeline fails on purpose**: `release.yml`
-  checks that `SHA256SUMS.txt.minisig` exists and verifies, and stops if it does not. It is the only
-  thing between the project and cutting its first public release. The copy is where you left it (see
-  `SECURITY.md`).
+- ~~Add the `RELEASE_SIGNING_SECRET_KEY` secret to the public repository.~~ **Done on 2026-08-10
+  (22:46 UTC)**, and it was the only thing between the project and cutting its first public release:
+  `release.yml` requires `SHA256SUMS.txt.minisig` to exist and verify, and stopped there. Confirmed by
+  name and date with `gh secret list`, which never shows the value. The copy is still where you left
+  it (see `SECURITY.md`), and **the encrypted backup is still the only net**: an Actions secret
+  cannot be read back.
 - The **manual ten-minute physical walk**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
 - The **encrypted backup** of the signing key.

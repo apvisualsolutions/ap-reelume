@@ -201,11 +201,12 @@ Dos commits, cada uno con su ciclo, su evidencia bilingüe y su verificación co
 
 ## Pendiente tuyo (sólo lo que un agente no puede hacer)
 
-- **Añadir el secreto `RELEASE_SIGNING_SECRET_KEY` al repositorio público.** No se pudo copiar —los
-  secretos no se leen—, y **sin él la tubería de publicación falla a propósito**: `release.yml`
-  comprueba que `SHA256SUMS.txt.minisig` existe y verifica, y se detiene si no. Es lo único que separa
-  al proyecto de poder cortar su primera versión pública. La copia está donde la dejaste (ver
-  `SECURITY.md`).
+- ~~Añadir el secreto `RELEASE_SIGNING_SECRET_KEY` al repositorio público.~~ **Hecho el 2026-08-10
+  (22:46 UTC)**, y era lo único que impedía cortar la primera versión pública: `release.yml` exige
+  que `SHA256SUMS.txt.minisig` exista y verifique, y se detenía ahí. Comprobado por nombre y fecha
+  con `gh secret list`, que nunca enseña el valor. La copia sigue donde la dejaste (ver
+  `SECURITY.md`), y **el respaldo cifrado sigue siendo la única red**: un secreto de Actions no se
+  relee.
 - El **paseo físico manual de diez minutos**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
 - La **copia de seguridad cifrada** de la clave de firma.
