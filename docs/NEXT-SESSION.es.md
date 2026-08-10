@@ -72,34 +72,55 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
   habría explotado. Detalle en
   [audit-hardening-launcher-and-restore.md](evidence/stable/audit-hardening-launcher-and-restore.md).
 
-## Lo que sigue (en este orden)
+## Lo que sigue (en este orden, y ya decidido)
 
-La cola de ARQ-010 → ARQ-004 → ARQ-005 se ejecutó el 2026-08-10. Queda una mitad y la deuda.
+La cola de ARQ-010 → ARQ-004 → ARQ-005 se ejecutó el 2026-08-10. Queda una mitad y la deuda, y el
+diseño de las dos está decidido en el plan: **no hay que re-deliberarlo, hay que ejecutarlo**.
 
-1. **ARQ-005, segunda mitad: el arranque asíncrono.** Ya medido, así que no hace falta explorarlo
-   otra vez. `FinishShell` bloquea el hilo de interfaz para migrar la base de datos y —sólo si esa
-   migración reescribió el archivo— para comprobar su integridad. Los otros cuatro
-   `GetAwaiter().GetResult()` de `CompositionRoot` son lecturas del informe de diagnóstico bajo
-   demanda, y el de `Program.cs` es el `finally` de `Main`, que es legítimo. El límite escrito sigue
-   en pie: la ventana no puede quedarse en blanco mientras migra, así que hay que mostrar algo desde
-   el primer fotograma y cambiarlo al terminar. **Lo que hace la tarea abordable**: sólo dos sitios
-   llaman a `CreateShell()`, los dos en recorridos ensamblados y los dos afirmando
-   `Assert.IsType<ShellView>`. Hará falta una vista de arranque, y por tanto cadenas en los dos
-   idiomas y su nombre de automatización.
+1. **La línea base, que es media hora y vale por toda la tarea siguiente.** Que la fase
+   `first-launch` de `eng/verify-package.ps1` informe **el tiempo hasta que aparece la ventana**, no
+   sólo un sí o un no. Convierte el rojo intermitente de abajo en una serie comparable, y el mismo
+   número antes y después del punto 2 es la prueba de que lo arregló. Va primero **por eso**.
+2. **ARQ-005, segunda mitad: el arranque asíncrono.** `FinishShell` bloquea el hilo de interfaz para
+   migrar la base de datos y —sólo si esa migración reescribió el archivo— para comprobar su
+   integridad. Los otros cuatro `GetAwaiter().GetResult()` de `CompositionRoot` son lecturas del
+   informe de diagnóstico bajo demanda, y el de `Program.cs` es el `finally` de `Main`, que es
+   legítimo.
 
-   **Primero, una medición, y no es opcional.** `MigrateAsync` está escrita con `await`s de verdad,
+   **Primero una medición, y no es negociable.** `MigrateAsync` está escrita con `await`s de verdad,
    pero eso no significa que ceda el hilo: `Microsoft.Data.Sqlite` implementa buena parte de sus
    métodos `Async` de forma síncrona, porque SQLite no tiene E/S asíncrona. Si no cede, cambiar
-   `GetAwaiter().GetResult()` por `await` deja la ventana **igual de bloqueada** y con aspecto de
-   arreglada, que es peor. Hay que medirlo antes de escribir nada — cronometrar si el hilo llamante
-   queda libre mientras migra— y, si no cede, el trabajo va a `Task.Run`. `SqliteConnectionFactory`
-   abre una conexión por llamada y protege su configuración con un semáforo, así que soporta ese
-   traslado; lo que hay que comprobar entonces es que nada más del arranque toque el hilo de interfaz
-   desde dentro de esa tarea.
-2. **La deuda de cobertura** que nombra
-   [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): las ramas de error de
-   `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`. Sigue siendo
-   deuda a propósito: se salda cuando se toque esa zona.
+   `GetAwaiter().GetResult()` por `await` deja la ventana **igual de bloqueada y con aspecto de
+   arreglada**, que es peor que no tocarla. Se mide cronometrando si el hilo llamante queda libre
+   mientras migra; si no cede, el trabajo va a `Task.Run`. `SqliteConnectionFactory` abre una conexión
+   por llamada y protege su configuración con un semáforo, así que soporta el traslado.
+
+   **La forma está decidida**: `FinishShell` devuelve un `ContentControl` con la vista de arranque
+   dentro; `App` ya coloca ese control como `Content` de la ventana, así que **la ventana aparece en
+   el primer fotograma sin tocar `App` ni `ConfigureWindow`**. Al terminar, el contenido se sustituye
+   por el shell o por la vista de recuperación — la decisión de cuál es la misma de hoy, sólo cambia
+   cuándo se toma. El fallo del trabajo va por `GuardedEvent`, que ya existe. La vista lleva el nombre
+   del producto y una línea de estado, **sin barra de progreso indeterminada**: no se sabe cuánto
+   falta, y una barra que se mueve sin significar nada es una mentira visual. Cadenas en los dos
+   idiomas y su nombre de automatización.
+
+   **Sólo dos sitios llaman a `CreateShell()`**, los dos en recorridos ensamblados y los dos afirmando
+   `Assert.IsType<ShellView>`. Pasan a esperar el contenido final con tope, y su mensaje de fallo
+   tiene que **nombrar lo que quedó en su lugar** — arranque o recuperación—, porque un tope que sólo
+   dice «no llegó» no diagnostica nada.
+3. **La deuda de cobertura, y el guardián que le falta.** Las tres son `ReconcileScannedFiles`,
+   `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`.
+   [Los números del documento están caducados](evidence/stable/TST1-coverage-gate.md): una medición
+   aproximada del 2026-08-10 los sitúa bastante mejor en líneas y todavía flojos en ramas, y
+   `PlayerVersionsViewModel` **adelgazó** al perder su clase de comando en ARQ-004. Se **re-mide** con
+   `eng/check-coverage.ps1` antes de nada, y se empieza por `PlayerVersionsViewModel`, que es el que
+   ARQ-004 acaba de tocar.
+
+   **Y lo que de verdad importa aquí**: la puerta mide **sólo archivos nuevos por contenido** contra
+   `origin/main`, así que estos tres, por antiguos, **no los mira nadie**. Saldar la deuda sin cerrar
+   eso no impide que vuelva mañana. Al saldarla, `check-coverage.ps1` recibe una lista explícita de
+   archivos vigilados que se mide siempre, con la misma regla que la lista de huérfanos de
+   `ServiceConsumptionTests`: **sólo puede encoger**.
 
 ## Un rojo intermitente que hay que vigilar, no tapar
 

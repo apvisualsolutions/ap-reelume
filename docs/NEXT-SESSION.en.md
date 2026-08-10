@@ -70,33 +70,55 @@ Four commits, each with its full cycle and its bilingual evidence.
   would have exploited it. Detail in
   [audit-hardening-launcher-and-restore.md](evidence/stable/audit-hardening-launcher-and-restore.md).
 
-## What comes next (in this order)
+## What comes next (in this order, and already decided)
 
-The ARQ-010 → ARQ-004 → ARQ-005 queue was run on 2026-08-10. One half and the debt are left.
+The ARQ-010 → ARQ-004 → ARQ-005 queue was run on 2026-08-10. One half and the debt are left, and the
+design of both is decided in the plan: **it does not need re-deliberating, it needs running**.
 
-1. **ARQ-005, second half: the asynchronous startup.** Already measured, so it needs no exploring
-   again. `FinishShell` blocks the interface thread to migrate the database and — only when that
-   migration rewrote the file — to check its integrity. The other four `GetAwaiter().GetResult()`
-   calls in `CompositionRoot` are diagnostics-report reads on demand, and the one in `Program.cs` is
-   `Main`'s `finally`, which is legitimate. The written limit still stands: the window cannot go blank
-   while it migrates, so something must show from the first frame and change when the work ends.
-   **What makes it tractable**: only two sites call `CreateShell()`, both in assembled walks and both
-   asserting `Assert.IsType<ShellView>`. A startup view will be needed, and therefore strings in both
-   languages and its automation name.
+1. **The baseline, which is half an hour and pays for the whole task after it.** Have
+   `eng/verify-package.ps1`'s `first-launch` phase report **the time until the window appears**, not
+   just a yes or a no. It turns the intermittent red below into a comparable series, and the same
+   number before and after point 2 is the proof that it fixed it. That is *why* it goes first.
+2. **ARQ-005, second half: the asynchronous startup.** `FinishShell` blocks the interface thread to
+   migrate the database and — only when that migration rewrote the file — to check its integrity. The
+   other four `GetAwaiter().GetResult()` calls in `CompositionRoot` are diagnostics-report reads on
+   demand, and the one in `Program.cs` is `Main`'s `finally`, which is legitimate.
 
-   **A measurement comes first, and it is not optional.** `MigrateAsync` is written with real
+   **A measurement comes first, and it is not negotiable.** `MigrateAsync` is written with real
    `await`s, but that does not mean it yields the thread: `Microsoft.Data.Sqlite` implements much of
    its `Async` surface synchronously, because SQLite has no asynchronous I/O. If it does not yield,
-   swapping `GetAwaiter().GetResult()` for `await` leaves the window just as blocked while looking
-   fixed, which is worse. Measure before writing anything — time whether the calling thread is free
-   while it migrates — and if it does not yield, the work goes to `Task.Run`.
+   swapping `GetAwaiter().GetResult()` for `await` leaves the window **just as blocked while looking
+   fixed**, which is worse than leaving it alone. Measure it by timing whether the calling thread is
+   free while it migrates; if it does not yield, the work goes to `Task.Run`.
    `SqliteConnectionFactory` opens a connection per call and guards its configuration with a
-   semaphore, so it supports that move; what then needs checking is that nothing else in startup
-   touches the interface thread from inside that task.
-2. **The coverage debt** named in
-   [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): the error branches of
-   `ReconcileScannedFiles`, `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`. It stays
-   debt on purpose: it is settled when that area is touched.
+   semaphore, so it supports the move.
+
+   **The shape is decided**: `FinishShell` returns a `ContentControl` holding the startup view; `App`
+   already sets that control as the window's `Content`, so **the window appears on the first frame
+   without touching `App` or `ConfigureWindow`**. When the work ends the content is swapped for the
+   shell or the recovery view — which one is the same decision as today, only its timing changes. The
+   work's failure goes through `GuardedEvent`, which already exists. The view carries the product name
+   and a line of status, **with no indeterminate progress bar**: nobody knows how much is left, and a
+   bar moving without meaning anything is a visual lie. Strings in both languages and its automation
+   name.
+
+   **Only two sites call `CreateShell()`**, both in assembled walks and both asserting
+   `Assert.IsType<ShellView>`. They move to waiting for the final content with a ceiling, and their
+   failure message has to **name what was left in its place** — startup or recovery — because a
+   ceiling that only says "it never arrived" diagnoses nothing.
+3. **The coverage debt, and the guard it is missing.** The three are `ReconcileScannedFiles`,
+   `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`.
+   [The document's numbers are stale](evidence/stable/TST1-coverage-gate.md): an approximate
+   measurement on 2026-08-10 puts them considerably better on lines and still thin on branches, and
+   `PlayerVersionsViewModel` **got smaller** when it lost its command class in ARQ-004. Re-measure
+   with `eng/check-coverage.ps1` before anything else, and start with `PlayerVersionsViewModel`, the
+   one ARQ-004 has just touched.
+
+   **And what actually matters here**: the gate measures **only files that are new by content**
+   against `origin/main`, so these three, being old, **are watched by nobody**. Settling the debt
+   without closing that does not stop it coming back tomorrow. On settling it, `check-coverage.ps1`
+   gets an explicit watch-list measured every time, under the same rule as
+   `ServiceConsumptionTests`'s orphan list: **it can only shrink**.
 
 ## An intermittent red to watch, not to paper over
 

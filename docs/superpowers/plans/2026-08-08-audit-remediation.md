@@ -349,6 +349,28 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
         `SqliteConnectionFactory` abre una conexión por llamada y soporta el traslado. \ Second half:
         measure whether the migration actually yields before assuming await is enough.
 
+        **Diseño decidido el 2026-08-10 (experto), para que no se re-delibere:**
+        - **La forma**: `FinishShell` devuelve un `ContentControl` cuyo contenido inicial es la vista
+          de arranque. `App` ya coloca ese control como `Content` de la ventana, así que **la ventana
+          aparece en el primer fotograma sin tocar `App` ni `ConfigureWindow`**. El trabajo va detrás
+          y sustituye el contenido por `ShellView` o por la de recuperación; **la decisión de cuál es
+          la misma de hoy**, sólo cambia cuándo se toma.
+        - **El fallo del trabajo va por `GuardedEvent`**, que ya existe: nunca mata el proceso y
+          aterriza en `ISessionFailureLog`. No hace falta inventar nada para eso.
+        - **La vista de arranque** vive en `Presentation/Shell/`, con el nombre del producto y una
+          línea de estado. **Sin barra de progreso indeterminada**: no se sabe cuánto falta, y una
+          barra que se mueve sin significar nada es una mentira visual. Cadenas en los dos idiomas y
+          `AutomationProperties.Name`, como todo lo demás.
+        - **Las dos pruebas ensambladas** pasan de afirmar el tipo devuelto a esperar el contenido
+          final bombeando el despachador **con tope**, y su mensaje de fallo tiene que **nombrar lo
+          que quedó en su lugar** — arranque o recuperación. Un tope que sólo dice «no llegó» no
+          diagnostica nada.
+        - **Antes de todo eso, una medición barata que da la línea base**: que la fase `first-launch`
+          informe **el tiempo hasta la ventana**, no sólo un booleano. Convierte el intermitente en
+          una serie comparable, y el mismo número antes y después de esta tarea es la prueba de que la
+          arregló. \ Decided design: a ContentControl swapped when the work ends; measure the
+          time-to-window first so the fix has a baseline.
+
 ## WP-7 — CI/CD y puertas
 
 **Orden decidido el 2026-08-09 (experto)**: SEC-007 primero (una línea, riesgo cero), después
@@ -366,6 +388,23 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
       sesión, tres rojos verdaderos (ramas de error sin cubrir) nombrados como deuda visible en la
       evidencia — el umbral no se bajó. Evidencia en
       [TST1-coverage-gate.md](../../evidence/stable/TST1-coverage-gate.md).
+- [ ] **La deuda que TST-001 dejó anotada, y el guardián que le falta.** Las tres son
+      `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`.
+      **Decidido el 2026-08-10 (experto):**
+      - **Los números del documento están caducados.** Una medición aproximada del 2026-08-10 (el
+        máximo por informe, no la unión) los sitúa bastante mejor en líneas y todavía flojos en ramas,
+        y `PlayerVersionsViewModel` **adelgazó** al perder su clase de comando en ARQ-004. El primer
+        paso es **re-medir con `eng/check-coverage.ps1`**, no partir de los números viejos.
+      - **Empezar por `PlayerVersionsViewModel`**, porque ARQ-004 acaba de tocarlo y es el momento
+        natural: la regla de la casa es que la deuda se salda cuando se toca la zona.
+      - **El hueco estructural, que es lo que de verdad importa**: la puerta mide **sólo archivos
+        nuevos por contenido** contra `origin/main`, así que estos tres, por antiguos, **no los mira
+        nadie**. Saldar la deuda sin cerrar eso no impide que vuelva mañana. Al saldarla,
+        `check-coverage.ps1` recibe una **lista explícita de archivos vigilados** que se mide siempre,
+        además de los nuevos, con la misma regla que la lista de huérfanos de `ServiceConsumptionTests`
+        —que este repositorio ya aceptó—: **sólo puede encoger**. \ Decided: re-measure first, start
+        with the file ARQ-004 already touched, and give the gate a watch-list, because it only ever
+        looks at new files and these three are old.
 - [x] **CI-001/CI-002**: `run-accessibility.ps1 -Mode Verify -Passes 2` y
       `run-recovery.ps1 -Mode Verify -Passes 2` como pasos de `ci.yml` (hoy solo manuales).
       **Hecho 2026-08-09 (tarde)**: ambos como pasos tras la verificación, con su evidencia subida
