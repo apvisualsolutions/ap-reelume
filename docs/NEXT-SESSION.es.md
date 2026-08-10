@@ -63,7 +63,16 @@ repositorio público la convierte en un riesgo.
 
 ## Lo que sigue (en este orden)
 
-1. **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
+1. **Los textos de licencia deben viajar en el artefacto.** Es lo único de esta lista que es una
+   obligación y no una mejora. El paquete lleva la `LICENSE` de AP Reelume y los avisos, pero no el
+   texto de las licencias ajenas, y se comprobó que el paquete NuGet de VideoLAN tampoco trae
+   `COPYING`: nadie lo está aportando. LGPL-2.1 §6, GPL-2.0 §1 y Apache-2.0 §4a exigen acompañar la
+   copia; MIT y BSD-3-Clause, reproducir el aviso. Los textos son canónicos, `licenses/` ya viaja, y
+   `ArtifactContentsTests` es donde se fija que llegan. Detalle en [LEGAL.es.md](legal/LEGAL.es.md).
+2. **El logotipo de TMDB**, con la especificación ya decidida en [LEGAL.es.md](legal/LEGAL.es.md)
+   (archivo versionado, 24 px en Créditos, texto alternativo, prueba que lo fija). Cierra el último
+   punto de sus términos que quedaba abierto.
+3. **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
    `ServiceProvider` y libere en `ShutdownRequested`. Es también el momento de extraer
    `WindowLifecycle`, que ARQ-006 dejó a propósito para no moverlo dos veces. Después
    ARQ-004/005/010.

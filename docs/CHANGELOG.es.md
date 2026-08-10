@@ -88,6 +88,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   no lo garantizaba: cuando la red fallaba o usted quitaba el token, el programa seguía sirviendo la
   copia guardada por vieja que fuera. Ahora hay un suelo duro de 180 días; pasado ese plazo la entrada
   no se sirve y se borra del disco.
+- **Los complementos de VideoLAN quedan confirmados como compatibles.** Estaba anotado como duda para
+  un dictamen: si alguno fuera `GPL-2.0-only` chocaría con la licencia de este programa. Se comprobó
+  en la fuente y llevan la cláusula «o cualquier versión posterior», así que encajan. En el mismo
+  repaso apareció lo contrario de una buena noticia: el paquete de VideoLAN no trae ningún archivo de
+  licencia, y el artefacto tampoco incluye todavía el texto de las licencias ajenas, que varias de
+  ellas exigen acompañar. Queda dicho aquí y es lo primero de la próxima tanda.
 - **Un estado legal que dice también lo que falta.** Una página nueva en los dos idiomas reúne la
   licencia, el descargo de garantía, los terceros, los términos de TMDB y de GitHub y la nota de
   exportación por la criptografía que el paquete lleva, y nombra sin adornos los cinco puntos que

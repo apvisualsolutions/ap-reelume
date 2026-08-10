@@ -39,10 +39,22 @@ El inventario contrastado con la compilación real, con la licencia de cada comp
 una dependencia entre en el artefacto sin aparecer allí.
 
 Compatibilidad: `GPL-3.0-or-later` admite incorporar `LGPL-2.1-or-later`, `MIT`, `Apache-2.0` y
-`BSD-3-Clause`, que es todo lo que el paquete transporta salvo un punto abierto: los complementos de
-VideoLAN llevan sus propias licencias, algunas `GPL-2.0-or-later`. Compatible mientras sean «o
-posterior»; un `GPL-2.0-only` no lo sería. Confirmarlo complemento por complemento en la compilación
-fijada es trabajo del dictamen profesional.
+`BSD-3-Clause`, que es todo lo que el paquete transporta.
+
+**Complementos de VideoLAN — cerrado el 2026-08-10.** Estaba anotado como pregunta para el dictamen:
+si algún complemento fuera `GPL-2.0-only` sería incompatible con GPL-3.0. Se comprobó en la fuente:
+el `COPYING` del árbol de VLC es la GPL versión 2 **con** la cláusula «either version 2 of the
+License, or (at your option) any later version», así que el conjunto es `GPL-2.0-or-later` y encaja
+bajo GPL-3.0. El punto sale de la lista de pendientes.
+
+**Los textos de las licencias no viajan todavía — pendiente y prioritario.** El artefacto lleva la
+`LICENSE` de AP Reelume y los avisos de terceros, pero **no el texto de las licencias ajenas**. Se
+comprobó además que el paquete NuGet de VideoLAN no incluye ningún `COPYING`, de modo que nadie lo
+está aportando. Las obligaciones son explícitas y no las cumple una tabla que nombre el componente:
+LGPL-2.1 §6, GPL-2.0 §1 y Apache-2.0 §4a exigen **acompañar** una copia de la licencia con la
+distribución binaria, y MIT y BSD-3-Clause exigen reproducir su aviso de copyright. La corrección es
+mecánica —los textos son canónicos y `licenses/` ya viaja en el paquete— y es lo primero que debe
+hacerse en la próxima sesión.
 
 ## API de TMDB
 
@@ -105,11 +117,38 @@ Ninguno de estos puntos lo puede cerrar quien escribe código, y ninguno frena e
 | Punto | Qué falta | Dónde vive |
 |---|---|---|
 | Dictamen jurídico profesional | Encargo a un profesional que cubra licencia, terceros, TMDB, exportación y marca | `REL-004` |
-| Complementos de VideoLAN | Confirmar que ninguno es `GPL-2.0-only` en la compilación fijada | avisos de terceros |
-| Logotipo de TMDB | Decidir e incorporar la marca en Créditos | esta página |
-| Notificación de exportación | Correo a BIS/ENC con la URL del repositorio | esta página |
+| Notificación de exportación | Correo a BIS y a ENC con la URL del repositorio. Va desde su identidad, por eso es suyo; el texto está abajo, listo para copiar | esta página |
 | Marca y dominio | Informe formal de `REL-004` | `REL-004`, ADR-0001 |
 | Firma Authenticode | Decisión económica pospuesta, ya documentada | SMARTSCREEN |
+
+Salieron de esta lista el 2026-08-10, resueltos en vez de delegados: los **complementos de VideoLAN**
+(comprobado que son `GPL-2.0-or-later`, compatible) y el **logotipo de TMDB**, que no era una decisión
+sino un requisito de sus términos: se incorpora, y la especificación está abajo para que la ejecución
+sea mecánica.
+
+### El logotipo de TMDB, decidido
+
+Sus términos piden identificar el uso de TMDB con su logotipo, «menos prominente» que el del propio
+producto. No es una elección de marca que corresponda posponer: es parte de la condición bajo la que
+se usa la API, igual que la frase de atribución. Se incorpora, con esta forma:
+
+- El archivo oficial se toma de la página de marca de TMDB y viaja versionado en
+  `src/ApSolutions.LocalMedia.Presentation/Assets/tmdb-logo.svg`, no se descarga en ejecución.
+- Va en Créditos, encima de la frase de atribución que ya está, con un alto de 24 px — la mitad del
+  espacio que ocupa el nombre del producto en esa misma vista, que es como se cumple «menos
+  prominente» de forma verificable.
+- Lleva texto alternativo para el lector de pantalla y no es un enlace: identifica el origen de los
+  datos, no invita a navegar.
+- Una prueba fija su presencia en `CreditsView.axaml`, igual que la que fija la frase.
+
+### La notificación de exportación, redactada
+
+Enviar el correo es suyo porque sale de su identidad. El contenido no tiene nada que decidir:
+destinatarios `crypt@bis.doc.gov` y `enc@nsa.gov`, asunto «TSU notification — publicly available
+encryption source code», cuerpo con el nombre del proyecto, la URL
+`https://github.com/apvisualsolutions/ap-reelume` y la frase de que el código fuente que incorpora
+criptografía (Ed25519 y Blake2b vía BouncyCastle, para verificar firmas de publicación) está
+disponible públicamente en esa dirección, conforme a §740.13(e) del EAR.
 
 ## Cómo informar de un problema legal
 

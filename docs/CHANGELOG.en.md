@@ -86,6 +86,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   did not guarantee it: when the network failed or you removed the token, the program kept serving the
   stored copy however old it was. There is now a hard floor of 180 days; past it the entry is not
   served and is deleted from disk.
+- **VideoLAN's plugins are confirmed compatible.** This was recorded as a question for an opinion: a
+  `GPL-2.0-only` plugin would clash with this program's licence. It was checked at the source and they
+  carry the "or any later version" clause, so they fit. The same pass turned up the opposite of good
+  news: VideoLAN's package carries no licence file at all, and the artifact does not yet carry the
+  text of the other licences either, which several of them require to accompany it. It is stated here
+  and it is first in the next round.
 - **A legal status that also states what is missing.** A new page in both languages gathers the
   licence, the warranty disclaimer, third parties, TMDB's and GitHub's terms, and the export note for
   the cryptography the package carries, and names without decoration the five points that remain the

@@ -39,10 +39,21 @@ The inventory checked against the real build, with each component's licence, is 
 dependency from entering the artifact without appearing there.
 
 Compatibility: `GPL-3.0-or-later` allows incorporating `LGPL-2.1-or-later`, `MIT`, `Apache-2.0`, and
-`BSD-3-Clause`, which covers everything the package carries except one open point: VideoLAN's plugins
-carry their own licences, some of them `GPL-2.0-or-later`. Compatible as long as they are "or later";
-a `GPL-2.0-only` one would not be. Confirming that plugin by plugin in the pinned build is work for
-the professional opinion.
+`BSD-3-Clause`, which covers everything the package carries.
+
+**VideoLAN's plugins — closed on 2026-08-10.** This was recorded as a question for the opinion: a
+`GPL-2.0-only` plugin would be incompatible with GPL-3.0. It was checked at the source: VLC's tree
+carries the GPL version 2 **with** the "either version 2 of the License, or (at your option) any later
+version" clause, so the set is `GPL-2.0-or-later` and sits under GPL-3.0. The point leaves the list.
+
+**The licence texts do not travel yet — pending and first in line.** The artifact carries AP Reelume's
+`LICENSE` and the third-party notices, but **not the text of the other licences**. VideoLAN's NuGet
+package was also found to carry no `COPYING` at all, so nobody is supplying it. The obligations are
+explicit and a table naming the component does not meet them: LGPL-2.1 §6, GPL-2.0 §1, and
+Apache-2.0 §4a each require a copy of the licence to **accompany** the binary distribution, and MIT
+and BSD-3-Clause require their copyright notice to be reproduced. The fix is mechanical — the texts
+are canonical and `licenses/` already ships in the package — and it is the first thing to do next
+session.
 
 ## The TMDB API
 
@@ -104,11 +115,36 @@ None of these can be closed by whoever writes code, and none of them blocks deve
 | Point | What is missing | Where it lives |
 |---|---|---|
 | Professional legal opinion | Engage a professional covering licence, third parties, TMDB, export, and trademark | `REL-004` |
-| VideoLAN plugins | Confirm none is `GPL-2.0-only` in the pinned build | third-party notices |
-| TMDB logo | Decide on and incorporate the mark in Credits | this page |
-| Export notification | Email BIS/ENC with the repository URL | this page |
+| Export notification | Email BIS and ENC with the repository URL. It goes from your identity, which is why it is yours; the text is below, ready to copy | this page |
 | Trademark and domain | Formal `REL-004` report | `REL-004`, ADR-0001 |
 | Authenticode signing | Postponed economic decision, already documented | SMARTSCREEN |
+
+Two points left this list on 2026-08-10, settled rather than delegated: **VideoLAN's plugins**
+(checked to be `GPL-2.0-or-later`, which is compatible) and the **TMDB logo**, which was never a
+decision but a condition of their terms: it goes in, and the specification below makes the work
+mechanical.
+
+### The TMDB logo, decided
+
+Their terms ask that TMDB's use be identified with their logo, "less prominent" than the product's
+own. That is not a branding choice worth postponing: it is part of the condition under which the API
+is used, exactly like the attribution sentence. It goes in, in this shape:
+
+- The official file comes from TMDB's brand page and ships version-controlled at
+  `src/ApSolutions.LocalMedia.Presentation/Assets/tmdb-logo.svg`; it is never fetched at runtime.
+- It sits in Credits, above the attribution sentence already there, at 24 px tall — half the space the
+  product name occupies in that same view, which is how "less prominent" becomes verifiable.
+- It carries alternative text for the screen reader and is not a link: it identifies where the data
+  comes from, it does not invite navigation.
+- A test pins its presence in `CreditsView.axaml`, like the one that pins the sentence.
+
+### The export notification, drafted
+
+Sending it is yours because it goes from your identity. Nothing in the content is open: recipients
+`crypt@bis.doc.gov` and `enc@nsa.gov`, subject "TSU notification — publicly available encryption
+source code", body naming the project, the URL `https://github.com/apvisualsolutions/ap-reelume`, and
+the statement that source code incorporating cryptography (Ed25519 and Blake2b via BouncyCastle, to
+verify release signatures) is publicly available at that address under EAR §740.13(e).
 
 ## How to report a legal problem
 

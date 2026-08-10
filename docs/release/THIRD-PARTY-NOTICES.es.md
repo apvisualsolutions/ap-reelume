@@ -70,14 +70,21 @@ El paquete `VideoLAN.LibVLC.Windows` declara `LGPL-2.1-or-later`, que cubre `lib
 `libvlccore.dll`. Además transporta unos trescientos complementos en `plugins/`, y **esos llevan sus
 propias licencias**, algunas `GPL-2.0-or-later` en lugar de LGPL — el codificador x264 que hay detrás
 de `libx26410b_plugin.dll` es el ejemplo más claro. La biblioteca se distribuye sin modificar y
-conserva el aviso de licencia de VideoLAN dentro del paquete, que el artefacto debe incluir íntegro.
+se distribuye sin modificar. El paquete NuGet de VideoLAN **no trae ningún archivo `COPYING`**, así
+que el aviso hay que aportarlo aquí: es parte de lo que falta, más abajo.
 
 Para un programa publicado bajo `GPL-3.0-or-later`, un complemento `GPL-2.0-or-later` es compatible:
 el «o posterior» es lo que hace que ambos se encuentren en GPL-3.0. Uno licenciado `GPL-2.0-only` no
-lo sería, y confirmar que ninguno lo está, en la compilación exacta de VideoLAN que este paquete
-fija, es asunto del dictamen jurídico profesional registrado como
-[REL-004 en la matriz de alcance](../FEATURES.md), no de este documento. La palanca práctica, si ese
-dictamen la pide, es recortar el conjunto de complementos a los que la reproducción carga de verdad.
+lo sería. **Comprobado el 2026-08-10 y cerrado**: el `COPYING` del árbol de VLC lleva la GPL versión 2
+con la cláusula «either version 2 of the License, or (at your option) any later version», de modo que
+el conjunto es `GPL-2.0-or-later` y encaja bajo GPL-3.0. La palanca de recortar complementos queda
+disponible por si algún día conviene reducir la superficie, pero no hace falta por licencia.
+
+**Lo que sí falta, y es una obligación real**: este artefacto **no incluye todavía el texto** de las
+licencias de terceros. La LGPL-2.1 (§6), la GPL-2.0 (§1) y la Apache-2.0 (§4a) exigen entregar una
+copia de la licencia con la distribución binaria, y MIT y BSD-3-Clause exigen reproducir su aviso de
+copyright. Nombrar el componente y su licencia, que es lo que hace este documento, no sustituye a
+acompañarla. La carpeta `licenses/` del paquete debe llevar los textos íntegros junto a estos avisos.
 
 ## Componentes usados solo durante el desarrollo y las pruebas
 
