@@ -105,8 +105,7 @@ try {
     }
 
     if ($newFiles.Count -eq 0) {
-        Write-Output "Coverage gate: no source file is new against $BaseRef; nothing to hold."
-        exit 0
+        Write-Output "Coverage gate: no source file is new against $BaseRef."
     }
 
     $reports = @(Get-ChildItem -LiteralPath $resultsRoot -Recurse -Filter 'coverage.cobertura.xml' -ErrorAction SilentlyContinue)
@@ -151,6 +150,89 @@ try {
         }
     }
 
+    # Per file, the same arithmetic the gate uses, so a watched file and a new one are judged alike.
+    function Measure-File {
+        param([hashtable]$Coverage, [string]$Path)
+
+        $normalised = $Path -replace '\\', '/'
+        $key = $Coverage.Keys | Where-Object { $_.EndsWith($normalised, [StringComparison]::OrdinalIgnoreCase) } | Select-Object -First 1
+        if (-not $key) { return $null }
+
+        $entry = $Coverage[$key]
+        $totalLines = $entry.Lines.Count
+        $coveredLines = @($entry.Lines.Values | Where-Object { $_ }).Count
+        return [pscustomobject]@{
+            LinePct   = if ($totalLines -gt 0) { 100.0 * $coveredLines / $totalLines } else { 100.0 }
+            BranchPct = if ($entry.BranchesTotal -gt 0) { 100.0 * $entry.BranchesCovered / $entry.BranchesTotal } else { 100.0 }
+        }
+    }
+
+    # ------------------------------------------------------------- watched files
+    <#
+        What the gate above cannot see. Newness is decided against the base ref, so a file that
+        shipped long ago and gets worse is watched by nobody — and that is measured, not feared:
+        ARQ-004 thinned PlayerVersionsViewModel, took its covered lines with it, and dropped it from
+        60.61/27.27 to 45.45/14.29 without a single gate saying a word.
+
+        Each entry carries the floor its code meets today, so the list works like the orphan list in
+        ServiceConsumptionTests: a file below its floor fails, and so does one above it, because the
+        floor has to be raised to what was actually measured. The debt can only shrink, and lowering
+        a floor is a visible line in a diff rather than a quiet drift.
+    #>
+    $watched = @(
+        # The one still in debt. TST-001 named all three on 2026-08-09; two were paid off on
+        # 2026-08-10 and this one is held where it stands so it cannot slip further.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Application/Discovery/ReconcileScannedFiles.cs'
+            Lines    = 86.73
+            Branches = 76.00
+        }
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Infrastructure/FileSystem/CompositeFileIdentityProvider.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Presentation/Player/PlayerVersionsViewModel.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
+    )
+
+    $watchRows = @()
+    $watchFailures = @()
+    foreach ($entry in $watched) {
+        $measured = Measure-File -Coverage $coverageByFile -Path $entry.File
+        if (-not $measured) {
+            $watchFailures += "$($entry.File) is watched but absent from the coverage report; a watched file that cannot be measured is not watched."
+            $watchRows += [pscustomobject]@{ File = $entry.File; LinePct = 'absent'; BranchPct = 'absent'; Floor = "$($entry.Lines)/$($entry.Branches)"; Verdict = 'FAIL' }
+            continue
+        }
+
+        $linePct = [math]::Round($measured.LinePct, 2)
+        $branchPct = [math]::Round($measured.BranchPct, 2)
+        $verdict = 'PASS'
+        if ($linePct -lt $entry.Lines -or $branchPct -lt $entry.Branches) {
+            $verdict = 'FAIL (below its floor)'
+            $watchFailures += "$($entry.File) fell to $linePct% lines / $branchPct% branches, below the $($entry.Lines)/$($entry.Branches) floor it is held to."
+        }
+        elseif ($linePct -gt $entry.Lines -or $branchPct -gt $entry.Branches) {
+            $verdict = 'FAIL (raise the floor)'
+            $watchFailures += "$($entry.File) now reaches $linePct% lines / $branchPct% branches; raise its floor in eng/check-coverage.ps1 so the debt cannot come back."
+        }
+
+        $watchRows += [pscustomobject]@{
+            File      = $entry.File
+            LinePct   = $linePct
+            BranchPct = $branchPct
+            Floor     = "$($entry.Lines)/$($entry.Branches)"
+            Verdict   = $verdict
+        }
+    }
+
+    Write-Output "Coverage gate: watched files, held at every run whatever their age:"
+    $watchRows | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
+
     $rows = @()
     $failures = @()
     foreach ($file in $newFiles) {
@@ -177,17 +259,23 @@ try {
         }
     }
 
-    $rows | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
-    $rows | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $resultsRoot 'coverage-gate.json') -Encoding utf8NoBOM
+    if ($rows.Count -gt 0) {
+        $rows | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
+    }
 
+    @{ new = $rows; watched = $watchRows } | ConvertTo-Json -Depth 4 |
+        Set-Content -LiteralPath (Join-Path $resultsRoot 'coverage-gate.json') -Encoding utf8NoBOM
+
+    foreach ($problem in $watchFailures) { Write-Error $problem }
     if ($failures.Count -gt 0) {
         Write-Error ("New files below {0}% lines / {1}% branches against {2}: {3}" -f
             $MinimumLinePercent, $MinimumBranchPercent, $BaseRef, ($failures -join ', '))
-        exit 1
     }
 
-    Write-Output ("Coverage gate: {0} new file(s) against {1} all reach {2}% lines / {3}% branches." -f
-        $newFiles.Count, $BaseRef, $MinimumLinePercent, $MinimumBranchPercent)
+    if ($watchFailures.Count -gt 0 -or $failures.Count -gt 0) { exit 1 }
+
+    Write-Output ("Coverage gate: {0} new file(s) against {1} and {2} watched file(s) are where they have to be." -f
+        $newFiles.Count, $BaseRef, $watched.Count)
     exit 0
 }
 finally {

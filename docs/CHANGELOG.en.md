@@ -87,6 +87,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The coverage gate now watches code that is not new.** It only looked at files appearing for the
+  first time, so an old one that got worse was watched by nobody — and that is not a hypothesis: on
+  re-measuring the three files carrying debt, two were exactly where they were a day earlier and the
+  third had **gone backwards** by fifteen points, because an earlier tidy-up removed code from it
+  and took the tested parts with it. Nothing said a word. There is now an explicit list of watched
+  files measured on every run, each with the bar its code meets today: if it drops, the verification
+  fails; if it rises, it **also** fails until the new bar is recorded, so a debt that gets paid
+  cannot quietly come back. Two of the three ended up fully covered along the way; the third stays
+  watched, with its name and its number in view on every run.
 - **The window no longer waits for the database to be ready before it exists.** On startup the
   application brings the database up to date — and checks its integrity if that rewrote the file —
   and until now it did that work on the very thread that draws: nothing was on screen until it

@@ -88,6 +88,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La puerta de cobertura ya vigila código que no es nuevo.** Sólo miraba los archivos que
+  aparecían por primera vez, así que uno antiguo que empeorase no lo miraba nadie — y no es una
+  hipótesis: al re-medir los tres archivos que arrastraban deuda, dos estaban igual que hace un día
+  y el tercero había **retrocedido** quince puntos, porque una limpieza anterior le quitó código y
+  se llevó por delante justo las partes que sí estaban probadas. Nada avisó. Ahora hay una lista
+  explícita de archivos vigilados que se miden siempre, cada uno con el listón que cumple hoy: si
+  baja, la verificación falla; si sube, **también** falla hasta que se anota el nuevo listón, de
+  modo que una deuda saldada no puede volver en silencio. Dos de los tres quedaron cubiertos por
+  completo por el camino; el tercero queda vigilado con su nombre y su número a la vista en cada
+  ejecución.
 - **La ventana ya no espera a que la base de datos esté lista para existir.** Al arrancar, la
   aplicación pone al día la base —y comprueba su integridad si eso reescribió el archivo— y hasta
   ahora hacía ese trabajo en el mismo hilo que dibuja: no había nada en pantalla hasta que

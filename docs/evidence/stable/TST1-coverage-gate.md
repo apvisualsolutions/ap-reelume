@@ -62,6 +62,11 @@ real numbers:
 | `PlayerVersionsView.axaml.cs` | 100,00 % | 100,00 % | PASS |
 | `PlayerVersionsViewModel.cs` | 60,61 % | 27,27 % | FAIL |
 
+> **Actualización del 2026-08-10.** Estos tres se re-midieron, y uno de ellos había **empeorado**
+> sin que ninguna puerta lo notara. Dos quedaron al 100 % y el tercero pasó a estar vigilado con
+> suelo. Detalle en [audit-tst1-coverage-debt.md](audit-tst1-coverage-debt.md). / **Update:** they
+> were re-measured, one had got worse unnoticed, two are now at 100%, and the third is watched.
+
 Los tres rojos son los anticipados por el plan y son **verdaderos**: los paseos de punta a punta
 cubren el camino feliz de la reconciliación, la identidad compuesta y el cambio de versión, pero
 no sus ramas de error. Esos archivos ya están en `main`, así que quedan fuera del alcance de la
