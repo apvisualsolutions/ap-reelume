@@ -67,6 +67,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Legal
 
+- **Credits shows TMDB's logo, not only their name.** Their terms ask that TMDB's use be identified
+  with their mark, less prominent than the product's own; it was the last point of those terms left
+  open. The file is the one TMDB publishes, and that it is can be checked: the SHA-256 they embed in
+  the asset's address matches the versioned file's, and a test compares them. What is drawn is their
+  vector rather than an imitation — another test contrasts the view's geometry against the file's,
+  character for character — and it is drawn at 16 px against the 24 px of the product name. The
+  specification said 48 px for that name; it was measured, it did not exist, and the figure was
+  corrected instead of inherited. It carries alternative text in both languages and is not a link.
 - **The text of every third-party licence travels inside the package.** Naming a component and its
   licence is not delivering the licence, and several of them require it: LGPL-2.1, GPL-2.0 and
   Apache-2.0 ask for a copy to accompany the binary, and MIT and BSD-3-Clause for their copyright

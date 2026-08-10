@@ -12,6 +12,13 @@
   </ItemGroup>
   <ItemGroup>
     <!-- The tray icon travels with the presentation assembly so the host loads it by avares URI. -->
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\tmdb-logo.svg" />
+    <!--
+      TMDB's logo is versioned as the file they publish, which is how its authenticity can be
+      checked, but Avalonia draws no SVG: the credits carry its geometry directly and TmdbLogoTests
+      compares the two. Embedding it as well would ship two kilobytes nothing ever loads, which is
+      the defect this repository keeps catching.
+    -->
+    <None Include="Assets\tmdb-logo.svg" />
   </ItemGroup>
 </Project>

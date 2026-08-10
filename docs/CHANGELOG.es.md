@@ -69,6 +69,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Legal
 
+- **Créditos muestra el logotipo de TMDB, no sólo su nombre.** Sus términos piden identificar el uso
+  de TMDB con su marca, menos prominente que la del propio producto; era el último punto de esos
+  términos que quedaba abierto. El archivo es el que TMDB publica y se puede comprobar que lo es: la
+  huella SHA-256 que ellos incrustan en la dirección del recurso coincide con la del archivo
+  versionado, y una prueba las compara. Lo que se dibuja es su vector, no una imitación —otra prueba
+  contrasta la geometría de la vista contra la del archivo carácter a carácter—, y se dibuja a 16 px
+  frente a los 24 px del nombre del producto. La especificación decía 48 px para ese nombre; se midió
+  y no existía, así que se corrigió la cifra en vez de heredarla. Lleva texto alternativo en los dos
+  idiomas y no es un enlace.
 - **El texto de cada licencia ajena viaja dentro del paquete.** Nombrar un componente y su licencia no
   es entregar la licencia, y varias lo exigen: la LGPL-2.1, la GPL-2.0 y la Apache-2.0 piden acompañar
   una copia con el binario, y la MIT y la BSD-3-Clause, reproducir su aviso de copyright. El paquete de

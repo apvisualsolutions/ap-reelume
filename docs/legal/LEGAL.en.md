@@ -82,10 +82,12 @@ The application queries `api.themoviedb.org` only if you place a token in
 - **Commercial use.** The terms reserve it for a separate written agreement. AP Reelume is free
   software and derives no revenue from TMDB or its content, so it does not apply today. If the
   program were ever charged for, this point changes and must be read again first.
-- **Logo — pending.** The terms ask that TMDB's use be identified **with their logo**, less prominent
-  than the product's own. Credits today shows the word "TMDB" and the attribution sentence, but not
-  the logo. Incorporating a third party's mark is the owner's decision, not the programmer's, and it
-  is named here as a pending action.
+- **Logo — closed on 2026-08-10.** The terms ask that TMDB's use be identified **with their logo**,
+  less prominent than the product's own. Credits shows it as of this session, above the attribution
+  sentence, with alternative text and no link: it identifies where the data comes from, it does not
+  invite navigation. The file is the one TMDB publishes — its SHA-256 matches the digest they
+  themselves embed in the asset's address, and a test checks it — and what the view draws is their
+  vector rather than an imitation.
 
 ## GitHub's terms
 
@@ -132,22 +134,32 @@ None of these can be closed by whoever writes code, and none of them blocks deve
 
 Two points left this list on 2026-08-10, settled rather than delegated: **VideoLAN's plugins**
 (checked to be `GPL-2.0-or-later`, which is compatible) and the **TMDB logo**, which was never a
-decision but a condition of their terms: it goes in, and the specification below makes the work
-mechanical.
+decision but a condition of their terms. It has been in since that same date; below is how, and what
+was measured to correct the figure the specification carried wrong.
 
-### The TMDB logo, decided
+### The TMDB logo, incorporated
 
 Their terms ask that TMDB's use be identified with their logo, "less prominent" than the product's
-own. That is not a branding choice worth postponing: it is part of the condition under which the API
-is used, exactly like the attribution sentence. It goes in, in this shape:
+own. That was not a branding choice worth postponing: it is part of the condition under which the API
+is used, exactly like the attribution sentence. This is how it landed:
 
-- The official file comes from TMDB's brand page and ships version-controlled at
-  `src/ApSolutions.LocalMedia.Presentation/Assets/tmdb-logo.svg`; it is never fetched at runtime.
-- It sits in Credits, above the attribution sentence already there, at 24 px tall — half the space the
-  product name occupies in that same view, which is how "less prominent" becomes verifiable.
-- It carries alternative text for the screen reader and is not a link: it identifies where the data
-  comes from, it does not invite navigation.
-- A test pins its presence in `CreditsView.axaml`, like the one that pins the sentence.
+- The official file came from TMDB's brand page and ships version-controlled at
+  `src/ApSolutions.LocalMedia.Presentation/Assets/tmdb-logo.svg`; it is never fetched at runtime. Its
+  authenticity is checkable without trusting whoever downloaded it: TMDB embeds the asset's SHA-256
+  in its own address, and `TmdbLogoTests` compares the file against it.
+- It sits in Credits, above the attribution sentence. **It is drawn at 16 px against the 24 px the
+  navigation rail draws the product name at.** The specification said "24 px against 48 px": that 48
+  existed in no view — the product name is drawn at 24 — and with the logo at 24, "less prominent"
+  would have stopped being checkable. It was measured and corrected; both numbers are read out of the
+  AXAML by the tests, and another compares the two once rendered.
+- Avalonia draws no SVG, and pulling in a renderer for one 16-pixel mark would have put half a dozen
+  packages — and their licences — inside the artifact. The view carries the file's geometry, and a
+  test compares the two character for character: an approximation of somebody's trademark would
+  survive a screenshot review and dies here.
+- It carries alternative text in both languages for the screen reader and is not a link: it
+  identifies where the data comes from, it does not invite navigation.
+
+What was measured is in [audit-legal-tmdb-logo.md](../evidence/stable/audit-legal-tmdb-logo.md).
 
 ### The export notification, drafted
 

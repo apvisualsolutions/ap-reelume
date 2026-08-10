@@ -84,10 +84,12 @@ La aplicación consulta `api.themoviedb.org` únicamente si usted pone un token 
 - **Uso comercial.** Los términos lo reservan a un acuerdo escrito aparte. AP Reelume es software
   libre y no obtiene ingresos de TMDB ni de su contenido, así que hoy no aplica. Si algún día se
   cobrara por el programa, este punto cambia y hay que releerlo antes.
-- **Logotipo — pendiente.** Los términos piden identificar el uso de TMDB **con su logotipo**, menos
-  prominente que el del propio producto. Hoy Créditos muestra el texto «TMDB» y la frase de
-  atribución, pero no el logotipo. Incorporar la marca de un tercero es una decisión del propietario,
-  no de quien programa, y queda nombrada aquí como acción pendiente.
+- **Logotipo — cerrado el 2026-08-10.** Los términos piden identificar el uso de TMDB **con su
+  logotipo**, menos prominente que el del propio producto. Créditos lo muestra desde esta sesión,
+  encima de la frase de atribución, con texto alternativo y sin enlace: identifica el origen de los
+  datos, no invita a navegar. El archivo es el que TMDB publica —su huella SHA-256 coincide con la
+  que ellos mismos incrustan en la dirección del recurso, y una prueba lo comprueba— y el dibujo de
+  la vista es su vector, no una imitación.
 
 ## Términos de GitHub
 
@@ -135,23 +137,32 @@ Ninguno de estos puntos lo puede cerrar quien escribe código, y ninguno frena e
 
 Salieron de esta lista el 2026-08-10, resueltos en vez de delegados: los **complementos de VideoLAN**
 (comprobado que son `GPL-2.0-or-later`, compatible) y el **logotipo de TMDB**, que no era una decisión
-sino un requisito de sus términos: se incorpora, y la especificación está abajo para que la ejecución
-sea mecánica.
+sino un requisito de sus términos. Está incorporado desde esa misma fecha; abajo queda cómo, y qué se
+midió para corregir la cifra que la especificación traía mal.
 
-### El logotipo de TMDB, decidido
+### El logotipo de TMDB, incorporado
 
 Sus términos piden identificar el uso de TMDB con su logotipo, «menos prominente» que el del propio
-producto. No es una elección de marca que corresponda posponer: es parte de la condición bajo la que
-se usa la API, igual que la frase de atribución. Se incorpora, con esta forma:
+producto. No era una elección de marca que correspondiera posponer: es parte de la condición bajo la
+que se usa la API, igual que la frase de atribución. Quedó así:
 
-- El archivo oficial se toma de la página de marca de TMDB y viaja versionado en
-  `src/ApSolutions.LocalMedia.Presentation/Assets/tmdb-logo.svg`, no se descarga en ejecución.
-- Va en Créditos, encima de la frase de atribución que ya está, con un alto de 24 px — la mitad del
-  espacio que ocupa el nombre del producto en esa misma vista, que es como se cumple «menos
-  prominente» de forma verificable.
-- Lleva texto alternativo para el lector de pantalla y no es un enlace: identifica el origen de los
-  datos, no invita a navegar.
-- Una prueba fija su presencia en `CreditsView.axaml`, igual que la que fija la frase.
+- El archivo oficial se tomó de la página de marca de TMDB y viaja versionado en
+  `src/ApSolutions.LocalMedia.Presentation/Assets/tmdb-logo.svg`; nunca se descarga en ejecución. Su
+  autenticidad es comprobable sin creerle a nadie: TMDB incrusta la huella SHA-256 del recurso en su
+  propia dirección, y `TmdbLogoTests` compara el archivo contra ella.
+- Va en Créditos, encima de la frase de atribución. **Se dibuja a 16 px frente a los 24 px a los que
+  el raíl de navegación dibuja el nombre del producto.** La especificación decía «24 px frente a
+  48 px»: ese 48 no existía en ninguna vista —el nombre del producto se dibuja a 24— y con el
+  logotipo a 24 «menos prominente» habría dejado de ser comprobable. Se midió y se corrigió; las dos
+  cifras las leen las pruebas de los propios AXAML, y otra las compara ya renderizadas.
+- Avalonia no dibuja SVG, y traer un renderizador para una marca de 16 px habría metido media docena
+  de paquetes —y sus licencias— dentro del artefacto. La vista lleva la geometría del archivo, y una
+  prueba compara las dos carácter a carácter: una aproximación de una marca ajena sobreviviría a una
+  revisión por captura y muere aquí.
+- Lleva texto alternativo en los dos idiomas para el lector de pantalla y no es un enlace: identifica
+  el origen de los datos, no invita a navegar.
+
+Lo medido está en [audit-legal-tmdb-logo.md](../evidence/stable/audit-legal-tmdb-logo.md).
 
 ### La notificación de exportación, redactada
 
