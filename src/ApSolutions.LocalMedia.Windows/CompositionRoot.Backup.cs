@@ -47,6 +47,10 @@ public static partial class CompositionRoot
                 GetAppVersion()))
             .AddSingleton<ExportLibrary>()
             .AddSingleton<IPrivacySettings, StoredPrivacySettings>()
+
+            // ARQ-004. One per application, so two of them in one process do not write each other's
+            // failures into a log the other owns. It is read where the diagnostics inputs are built.
+            .AddSingleton<ISessionFailureLog, InMemorySessionFailureLog>()
             .AddSingleton<IDiagnosticsBuilder, AllowlistedDiagnosticsBuilder>()
             .AddSingleton<CreateDiagnostics>()
             .AddTransient(provider => new PrivacySettingsViewModel(

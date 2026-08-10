@@ -42,6 +42,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   version does nothing. Each debt lives inside the test under its own identifier, and a second
   assertion evicts the entry the moment its wiring lands: the list can only shrink.
 
+- **A failure can no longer take the application down with it.** Until now, when the work behind a
+  button went wrong, the exception was returned to nobody: it was rethrown on the interface thread,
+  where the only thing waiting for it was the end of the program. There is a net now — what reaches
+  the top of the process is written down as a code instead of ending it, and a task that fails with
+  nobody watching is caught before it becomes a shutdown. And the diagnostics report, which has
+  existed for a while and could only ever talk about renames, finally covers the rest: until now, in a
+  session where nobody renamed anything, an application that was failing looked like a healthy one.
+  What is written down lives in memory and only for that session: nothing is written to your disk, and
+  what travels from an exception is its type, never its message.
+
 - **The application checks its own wiring as it is built.** A component asking for something nobody
   registered used to be a failure that waited for the first screen that needed it — possibly yours,
   in a corner no test opened. That check now happens as the application is assembled, so the failure

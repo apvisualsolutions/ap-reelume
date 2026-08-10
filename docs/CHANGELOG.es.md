@@ -43,6 +43,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   en la propia prueba con su identificador, y una segunda aserción expulsa la entrada en cuanto su
   cableado aterriza: la lista sólo puede encoger.
 
+- **Un fallo deja de poder llevarse la aplicación por delante.** Hasta ahora, si algo salía mal en el
+  trabajo que hay detrás de un botón, la excepción no volvía a nadie: se relanzaba sobre el hilo de la
+  interfaz, y ahí lo único que esperaba era el final del programa. Ahora hay una red: lo que llega a lo
+  alto del proceso queda anotado como un código en vez de tumbarlo, y una tarea que falla sin dueño se
+  recoge antes de que se convierta en un cierre. Y el informe de diagnóstico —que existe desde hace
+  tiempo y sólo sabía hablar de renombrados— por fin cuenta lo demás: hasta ahora, en una sesión donde
+  nadie renombraba nada, una aplicación que fallaba parecía sana. Lo anotado vive en memoria y sólo
+  durante esa sesión: nada se escribe en tu disco, y de una excepción viaja su tipo, nunca su mensaje.
+
 - **La aplicación revisa sus propios cables al construirse.** Un componente que pide algo que nadie
   registró era hasta ahora un fallo que esperaba a la primera pantalla que lo necesitara —quizá la
   tuya, en un rincón que ninguna prueba abrió—. Ahora esa revisión ocurre al montar la aplicación, de

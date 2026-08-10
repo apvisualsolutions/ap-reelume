@@ -298,6 +298,22 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
       lista blanca de diagnóstico — registran un código, jamás un mensaje libre, que es por donde se
       escapa una ruta o un nombre. El diseño fino se decide **midiendo** los ~24 sitios, no aquí:
       inventarlo sin leerlos sería exactamente lo que este repositorio castiga.
+  - [x] **Primera mitad, la red** (2026-08-10). La medición cambió el orden de las dos mitades:
+        `AppDomain.UnhandledException` **no** impide que el proceso termine, sólo deja constancia, así
+        que un comando no puede permitirse dejar escapar nada — tiene que capturar siempre, y algo que
+        captura siempre necesita un destino siempre. Ese destino no existía: **2 de las 24 superficies**
+        tienen estado de fallo, y el informe de diagnóstico se construía de **una sola fuente**, la
+        auditoría de renombrados, así que en una sesión sin renombrados una aplicación que fallaba
+        parecía sana. Ahora hay `ISessionFailureLog` (en memoria, una por aplicación, tope de 32
+        códigos) y `ProcessFailureHandlers`, y el informe lee de las dos fuentes. Nada se escribe en
+        disco y ningún manejador formatea texto propio. Evidencia en
+        [audit-arq004-failure-net.md](../../evidence/stable/audit-arq004-failure-net.md). \
+        First half: the net, because a command that must always catch always needs somewhere to put it.
+  - [ ] **Segunda mitad, el comando único**: reemplazar las 24 clases de comando privadas con
+        `async void Execute` por un `AsyncRelayCommand` en `Presentation` que capture siempre. Medido:
+        **38** clases de comando escritas a mano, **6** formas distintas de constructor, y **0** de los
+        24 `Execute` asíncronos captura nada. `CommandFailureTests` fija hoy el defecto en verde y se
+        invierte cuando esto aterrice. \ Second half: one command class replacing twenty-four.
 - [ ] **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de UI (migración+integridad);
       sacar el bloqueo del `lock` en `WindowsMediaKeyService`. **Límite decidido**: la ventana no
       puede quedarse en blanco mientras migra. Lo que hoy bloquea el hilo devuelve una vista y sólo

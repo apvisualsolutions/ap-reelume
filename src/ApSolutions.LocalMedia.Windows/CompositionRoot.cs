@@ -1211,7 +1211,16 @@ public static partial class CompositionRoot
     /// happened. The builder buckets the counts; nothing here carries a path or a name. A probe
     /// that cannot read contributes nothing, like every other optional reading here.
     /// </summary>
-    private static IReadOnlyList<DiagnosticsErrorSample> ReadRecordedErrors(IServiceProvider provider)
+    /// <summary>
+    /// What went wrong, from the two places that know: the rename audit the database keeps between
+    /// runs, and this session's own failures (ARQ-004) — the commands whose surface had nowhere to
+    /// show a failure, and whatever reached the top of the process. Before ARQ-004 the report could
+    /// only ever describe renames, which made a quiet application look like a healthy one.
+    /// </summary>
+    private static IReadOnlyList<DiagnosticsErrorSample> ReadRecordedErrors(IServiceProvider provider) =>
+        [.. ReadRenameFailures(provider), .. provider.GetRequiredService<ISessionFailureLog>().Samples()];
+
+    private static IReadOnlyList<DiagnosticsErrorSample> ReadRenameFailures(IServiceProvider provider)
     {
         try
         {
