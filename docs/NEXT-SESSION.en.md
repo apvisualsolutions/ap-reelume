@@ -83,6 +83,16 @@ The ARQ-010 → ARQ-004 → ARQ-005 queue was run on 2026-08-10. One half and th
    **What makes it tractable**: only two sites call `CreateShell()`, both in assembled walks and both
    asserting `Assert.IsType<ShellView>`. A startup view will be needed, and therefore strings in both
    languages and its automation name.
+
+   **A measurement comes first, and it is not optional.** `MigrateAsync` is written with real
+   `await`s, but that does not mean it yields the thread: `Microsoft.Data.Sqlite` implements much of
+   its `Async` surface synchronously, because SQLite has no asynchronous I/O. If it does not yield,
+   swapping `GetAwaiter().GetResult()` for `await` leaves the window just as blocked while looking
+   fixed, which is worse. Measure before writing anything — time whether the calling thread is free
+   while it migrates — and if it does not yield, the work goes to `Task.Run`.
+   `SqliteConnectionFactory` opens a connection per call and guards its configuration with a
+   semaphore, so it supports that move; what then needs checking is that nothing else in startup
+   touches the interface thread from inside that task.
 2. **The coverage debt** named in
    [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): the error branches of
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`. It stays

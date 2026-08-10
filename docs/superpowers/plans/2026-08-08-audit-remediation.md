@@ -342,7 +342,12 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
         diagnóstico bajo demanda, y el de `Program.cs` es el `finally` de `Main` y es legítimo. **Sólo
         dos sitios llaman a `CreateShell()`**, los dos en recorridos ensamblados y los dos afirmando
         `Assert.IsType<ShellView>`, así que el coste de mostrar una vista de arranque y cambiarla al
-        terminar está acotado. \ Second half: the asynchronous startup, measured and ready.
+        terminar está acotado. **Empieza por medir si `MigrateAsync` cede el hilo**: está escrita con
+        `await`s de verdad, pero `Microsoft.Data.Sqlite` implementa buena parte de su superficie
+        `Async` de forma síncrona, y cambiar `GetAwaiter().GetResult()` por `await` sobre algo que no
+        cede deja la ventana igual de bloqueada con aspecto de arreglada. Si no cede, va a `Task.Run`;
+        `SqliteConnectionFactory` abre una conexión por llamada y soporta el traslado. \ Second half:
+        measure whether the migration actually yields before assuming await is enough.
 
 ## WP-7 — CI/CD y puertas
 

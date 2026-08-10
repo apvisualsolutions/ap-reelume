@@ -86,6 +86,16 @@ La cola de ARQ-010 → ARQ-004 → ARQ-005 se ejecutó el 2026-08-10. Queda una 
    llaman a `CreateShell()`, los dos en recorridos ensamblados y los dos afirmando
    `Assert.IsType<ShellView>`. Hará falta una vista de arranque, y por tanto cadenas en los dos
    idiomas y su nombre de automatización.
+
+   **Primero, una medición, y no es opcional.** `MigrateAsync` está escrita con `await`s de verdad,
+   pero eso no significa que ceda el hilo: `Microsoft.Data.Sqlite` implementa buena parte de sus
+   métodos `Async` de forma síncrona, porque SQLite no tiene E/S asíncrona. Si no cede, cambiar
+   `GetAwaiter().GetResult()` por `await` deja la ventana **igual de bloqueada** y con aspecto de
+   arreglada, que es peor. Hay que medirlo antes de escribir nada — cronometrar si el hilo llamante
+   queda libre mientras migra— y, si no cede, el trabajo va a `Task.Run`. `SqliteConnectionFactory`
+   abre una conexión por llamada y protege su configuración con un semáforo, así que soporta ese
+   traslado; lo que hay que comprobar entonces es que nada más del arranque toque el hilo de interfaz
+   desde dentro de esa tarea.
 2. **La deuda de cobertura** que nombra
    [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): las ramas de error de
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`. Sigue siendo
