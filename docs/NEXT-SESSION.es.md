@@ -101,6 +101,26 @@ La cola de ARQ-010 → ARQ-004 → ARQ-005 se ejecutó el 2026-08-10. Queda una 
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`. Sigue siendo
    deuda a propósito: se salda cuando se toque esa zona.
 
+## Un rojo intermitente que hay que vigilar, no tapar
+
+El 2026-08-10, la fase `first-launch` de `verify-package.ps1` **falló una vez** en la rama y **pasó
+con el mismo commit** en `main`. Mismo código, mismo flujo de trabajo, resultado distinto: es
+intermitente, y por eso no es un defecto que se pueda encontrar leyendo.
+
+Lo que se sabe, medido del registro:
+
+- La fase duró **137 s**, que es exactamente el plazo de ventana (90 s) más el de cierre (45 s). Los
+  dos se agotaron y el proceso acabó matado, de ahí el `exit code -1`.
+- En **esa misma ejecución**, `repair`, `downgrade-refused`, `open-with` y las cuatro fases
+  `windows-*` arrancaron la aplicación y la vieron pintar. Sólo falló el primer arranque.
+- El primer arranque es el único que **migra de verdad** —dieciséis migraciones sobre una base
+  nueva— y migrar **bloquea el hilo de interfaz**. Ésa es la causa candidata, y es exactamente lo que
+  queda pendiente en ARQ-005.
+
+**Lo que no se hace**: subir el plazo de 90 s. Eso convierte la única señal que hay en silencio, que
+es el error que ya costó seis ejecuciones con los `cancelled` del generador de medios. Si vuelve a
+aparecer, deja de ser trabajo pendiente y pasa a ser la corrección urgente.
+
 ## Lo terminado el 2026-08-10 (tercera sesión)
 
 Cuatro commits, cada uno con su ciclo, su evidencia bilingüe y sus puertas.

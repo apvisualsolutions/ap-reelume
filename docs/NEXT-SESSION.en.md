@@ -98,6 +98,26 @@ The ARQ-010 → ARQ-004 → ARQ-005 queue was run on 2026-08-10. One half and th
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`. It stays
    debt on purpose: it is settled when that area is touched.
 
+## An intermittent red to watch, not to paper over
+
+On 2026-08-10 the `first-launch` phase of `verify-package.ps1` **failed once** on the branch and
+**passed on the same commit** on `main`. Same code, same workflow, different outcome: it is
+intermittent, which is why it is not a defect anybody can find by reading.
+
+What is known, measured from the log:
+
+- The phase took **137 s**, which is exactly the window deadline (90 s) plus the close deadline
+  (45 s). Both ran out and the process was killed, hence the `exit code -1`.
+- In **that same run**, `repair`, `downgrade-refused`, `open-with` and the four `windows-*` phases
+  started the application and watched it paint. Only the first launch failed.
+- The first launch is the only one that actually **migrates** — sixteen migrations against a new
+  database — and migrating **blocks the interface thread**. That is the candidate cause, and it is
+  exactly what is left of ARQ-005.
+
+**What is not done**: raising the 90 s deadline. That turns the only signal there is into silence,
+which is the mistake the media generator's `cancelled` runs already charged six runs for. If it comes
+back, it stops being pending work and becomes the urgent fix.
+
 ## Finished on 2026-08-10 (third session)
 
 Four commits, each with its cycle, its bilingual evidence and its gates.
