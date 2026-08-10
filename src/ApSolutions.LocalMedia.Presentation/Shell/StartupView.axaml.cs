@@ -4,7 +4,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace ApSolutions.LocalMedia.Presentation.Startup;
+namespace ApSolutions.LocalMedia.Presentation.Shell;
 
 /// <summary>
 /// What the window holds while the database is being made ready.

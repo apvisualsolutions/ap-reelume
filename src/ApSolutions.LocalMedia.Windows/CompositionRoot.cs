@@ -53,7 +53,6 @@ using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Show;
-using ApSolutions.LocalMedia.Presentation.Startup;
 using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.Windows.Accessibility;

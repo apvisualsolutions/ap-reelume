@@ -4,7 +4,6 @@
 using System.Globalization;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Shell;
-using ApSolutions.LocalMedia.Presentation.Startup;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Shell;
 using Avalonia.Automation;

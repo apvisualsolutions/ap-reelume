@@ -319,7 +319,7 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
         guarda de re-entrada propia (reconstruida en su ViewModel, porque es su regla). Evidencia en
         [audit-arq004-single-command.md](../../evidence/stable/audit-arq004-single-command.md). \
         Second half: 27 async void down to 2, and the two that remain both catch.
-- [ ] **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de UI (migración+integridad);
+- [x] **ARQ-005** (completo el 2026-08-10): arranque sin `GetAwaiter().GetResult()` en el hilo de UI (migración+integridad);
       sacar el bloqueo del `lock` en `WindowsMediaKeyService`. **Límite decidido**: la ventana no
       puede quedarse en blanco mientras migra. Lo que hoy bloquea el hilo devuelve una vista y sólo
       después decide si esa vista es el shell o la de recuperación, así que la versión asíncrona tiene
@@ -336,7 +336,20 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
         techo que nadie sabe si funciona. Evidencia en
         [audit-arq005-media-keys.md](../../evidence/stable/audit-arq005-media-keys.md). \
         First half: the wait left the lock and got a ceiling.
-  - [ ] **Segunda mitad, el arranque asíncrono**. Medido y listo para empezar: `FinishShell` bloquea
+  - [x] **Segunda mitad, el arranque asíncrono** (2026-08-10). **La medición previa era el punto**:
+        `MigrateAsync` **no cede el hilo en ninguno de sus `await`s** —retuvo al llamante 140 ms de
+        los 140 ms que tardó—, así que el `await` habría dejado la ventana igual de bloqueada con
+        aspecto de arreglada. El trabajo fue a `Task.Run` y `MigrationYieldTests` fija la medición,
+        de modo que fallará el día que el proveedor de SQLite gane E/S asíncrona de verdad. La forma
+        se implementó como estaba decidida, vista de arranque en `Presentation/Shell/` incluida.
+        Efecto medido contra la línea base: `open-with` de 1233/1214 ms a 779/773/776 —dispersión de
+        6 ms, la señal limpia—, `repair` baja con ruido y `first-launch` varía 1245 ms entre
+        ejecuciones del mismo código y por sí solo no habría dicho nada. **Lo que no arregló**: el
+        rojo intermitente, que se le atribuía y quedó descartado con números. Evidencia en
+        [audit-arq005-async-startup.md](../../evidence/stable/audit-arq005-async-startup.md) y
+        [audit-arq005-startup-baseline.md](../../evidence/stable/audit-arq005-startup-baseline.md). \
+        Second half: the migration yields at none of its awaits, so the work went to its own thread.
+  - [x] **Lo que era, antes de medirlo**: `FinishShell` bloquea
         para migrar y, sólo si una migración reescribió el archivo, para comprobar integridad; los
         otros cuatro `GetAwaiter().GetResult()` de `CompositionRoot` son lecturas del informe de
         diagnóstico bajo demanda, y el de `Program.cs` es el `finally` de `Main` y es legítimo. **Sólo
@@ -388,9 +401,22 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
       sesión, tres rojos verdaderos (ramas de error sin cubrir) nombrados como deuda visible en la
       evidencia — el umbral no se bajó. Evidencia en
       [TST1-coverage-gate.md](../../evidence/stable/TST1-coverage-gate.md).
-- [ ] **La deuda que TST-001 dejó anotada, y el guardián que le falta.** Las tres son
-      `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`.
-      **Decidido el 2026-08-10 (experto):**
+- [x] **El guardián que le faltaba a TST-001, y dos de las tres deudas** (2026-08-10).
+      `eng/check-coverage.ps1` lleva una lista explícita de vigilados que se miden **siempre**, cada
+      uno con el suelo que su código cumple hoy, y con trinquete en los dos sentidos: por debajo
+      falla, y por encima **también**, pidiendo subir el número. **Re-medir fue lo primero y desmintió
+      la premisa**: los números no estaban caducados —dos eran idénticos un día después— y el tercero
+      había **retrocedido** de 60,61/27,27 a 45,45/14,29, porque ARQ-004 se llevó por delante sus
+      líneas cubiertas sin que ninguna puerta lo notara. Ésa es la demostración medida del hueco.
+      `PlayerVersionsViewModel` y `CompositeFileIdentityProvider` quedaron al **100 %/100 %**; las dos
+      fallaban por lo mismo, que las pruebas cubrían el cableado y no el contenido. Evidencia en
+      [audit-tst1-coverage-debt.md](../../evidence/stable/audit-tst1-coverage-debt.md). \ The gate now
+      holds a watchlist with a ratchet; two of the three debts are paid.
+  - [ ] **`ReconcileScannedFiles.cs`, la deuda que queda**: 86,73 % de líneas y 76,00 % de ramas,
+        sobre 98 líneas y 50 ramas. Ya está vigilado con ese suelo, así que no puede empeorar en
+        silencio. Buscar las ramas de error, no el camino feliz. \ The one debt left, already
+        floored.
+- [x] **Lo que se decidió el 2026-08-10 (experto), antes de ejecutarlo:**
       - **Los números del documento están caducados.** Una medición aproximada del 2026-08-10 (el
         máximo por informe, no la unión) los sitúa bastante mejor en líneas y todavía flojos en ramas,
         y `PlayerVersionsViewModel` **adelgazó** al perder su clase de comando en ARQ-004. El primer
