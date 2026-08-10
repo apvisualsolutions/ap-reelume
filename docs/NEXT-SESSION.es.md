@@ -80,9 +80,12 @@ auditoría dejó en la cabecera del plan; lo que queda son las entradas sueltas 
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md), que ya no
 están decididas de antemano y hay que diseñarlas antes de ejecutarlas:
 
-1. **`BUG-010`**: unificar `LibVlcMediaProbe` sobre `LibVlcFactory.DeferRelease`. Es el único de los
-   pendientes que toca código nativo, y por tanto el de más valor: su cola propia puede morir para
-   siempre y mantiene una segunda instancia nativa fuera del contador.
+1. **`BUG-011`**, que salió de hacer `BUG-010` y hereda su puesto: `LibVlcMediaPlayerEngine` guarda
+   la **tercera** cola de liberación diferida, con el mismo `Dispose` sin guarda. No es el mismo
+   cambio: su `DisposeAsync` espera a su propio drenaje **antes** de soltar el reproductor, y ese
+   orden es lo que evita que la destrucción nativa se lleve el proceso, así que unificarlo pide que
+   `LibVlcFactory` sepa vaciar a petición. Está en la lista que sólo puede encoger de
+   `NativeInstanceOwnershipTests`, a la vista en cada ejecución.
 2. **`ARQ-012`, `ARQ-013`, `ARQ-014`**: `RepositoryLayout`/`TestAppBuilder` duplicados con dos
    anclas, la regex de la puerta de alcanzabilidad que acepta comentarios, y el User-Agent con la
    versión desincronizada. Tres arreglos pequeños con la misma forma que los ya hechos.
@@ -179,7 +182,17 @@ Tres commits, cada uno con su ciclo, su evidencia bilingüe y su verificación c
 
 ## Lo terminado el 2026-08-10 (quinta sesión)
 
-Dos commits, cada uno con su ciclo, su evidencia bilingüe y su verificación completa.
+Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su verificación completa.
+
+- **`BUG-010`: la instancia nativa tiene un dueño.** El sondeo de medios levantaba su propia LibVLC
+  con las mismas tres opciones que la de reproducción, así que un proceso que catalogaba y
+  reproducía mantenía dos motores nativos — y el contador que afirma «una por juego de opciones» no
+  podía ver el segundo. Con la cola pasó lo mismo y era peor: desechaba el medio **sin guarda** y
+  dejaba su bandera en alto, de modo que un único fallo al liberar habría matado al trabajador para
+  siempre. La regla es de código fuente a propósito, porque en ejecución la segunda instancia es
+  invisible; y encontró la clase donde el plan nombraba un caso, con una **tercera** cola en el motor
+  de reproducción anotada como `BUG-011`.
+  [audit-bug010-native-instance.md](evidence/stable/audit-bug010-native-instance.md).
 
 - **TST-001 queda saldado: la última deuda pasa de 86,73 %/76,00 % al 100 % de líneas y de ramas**,
   con nueve unitarias que apuntan a lo que `ReconcileScannedFiles` **decide** —un escaneo cancelado,

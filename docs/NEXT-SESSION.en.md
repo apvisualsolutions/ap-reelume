@@ -78,9 +78,12 @@ of the plan; what remains are the loose entries in
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md), none of them
 decided in advance, so each needs designing before it is run:
 
-1. **`BUG-010`**: put `LibVlcMediaProbe` on `LibVlcFactory.DeferRelease`. The only one of these that
-   touches native code and therefore the most valuable: its own queue can die for good and it keeps a
-   second native instance outside the count.
+1. **`BUG-011`**, which came out of doing `BUG-010` and inherits its place:
+   `LibVlcMediaPlayerEngine` keeps the **third** deferred-release queue, with the same unguarded
+   dispose. It is not the same change: its `DisposeAsync` awaits its own drain **before** releasing
+   the player, and that order is what keeps the native teardown from crashing, so unifying it asks
+   `LibVlcFactory` to be able to flush on request. It sits on the shrink-only list in
+   `NativeInstanceOwnershipTests`, in view on every run.
 2. **`ARQ-012`, `ARQ-013`, `ARQ-014`**: duplicated `RepositoryLayout`/`TestAppBuilder` with two
    anchors, the reachability gate's regex accepting comments, and the User-Agent whose version has
    drifted. Three small fixes shaped like the ones already done.
@@ -176,7 +179,16 @@ Three commits, each with its cycle, its bilingual evidence and its full verifica
 
 ## Finished on 2026-08-10 (fifth session)
 
-Two commits, each with its cycle, its bilingual evidence and its full verification.
+Three code commits, each with its cycle, its bilingual evidence and its full verification.
+
+- **`BUG-010`: the native instance has one owner.** The media probe built its own LibVLC with the
+  same three options as the playback one, so a process that catalogued and played kept two native
+  engines — and the count that states "one per option set" could not see the second. The queue was
+  the same story and worse: it disposed the media **unguarded** and left its flag raised, so a single
+  failing release would have killed the worker for good. The rule is a source rule on purpose,
+  because at runtime the second instance is invisible; and it found the class where the plan named a
+  case, with a **third** queue in the playback engine filed as `BUG-011`.
+  [audit-bug010-native-instance.md](evidence/stable/audit-bug010-native-instance.md).
 
 - **TST-001 is paid off: the last debt goes from 86.73%/76.00% to 100% of lines and branches**, with
   nine unit tests aimed at what `ReconcileScannedFiles` **decides** — a cancelled scan, a result the
