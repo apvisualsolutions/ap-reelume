@@ -14,13 +14,19 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// </summary>
 /// <remarks>
 /// Reachability is read from what the application is made of: a surface reaches another when its XAML
-/// instantiates it or when its code-behind names its type. The two roots are the two controls the
-/// composition root can hand to the main window — the shell, and the recovery screen it shows instead
-/// when the database cannot be opened.
+/// instantiates it or when its code-behind names its type. The roots are the controls the composition
+/// root can hand to the main window — the startup view it shows while the database is being made
+/// ready, the shell, and the recovery screen it shows instead when the database cannot be opened.
+/// <para>
+/// ARQ-005 added the third one, and this suite is what noticed: a view was built with an accessible
+/// name and nothing in the presentation project reached it, which is this repository's characteristic
+/// defect. It is a root rather than an orphan because the window holds it directly, the same way it
+/// holds the other two.
+/// </para>
 /// </remarks>
 public sealed class SurfaceReachabilityTests
 {
-    private static readonly string[] Roots = ["ShellView", "DatabaseRecoveryView"];
+    private static readonly string[] Roots = ["StartupView", "ShellView", "DatabaseRecoveryView"];
 
     /// <summary>
     /// The fourteen surfaces ADR-0003 found built, tested, and unreachable. Each one is named on its

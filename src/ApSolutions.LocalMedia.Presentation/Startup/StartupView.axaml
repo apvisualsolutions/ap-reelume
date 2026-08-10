@@ -1,0 +1,32 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Startup.StartupView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    automation:AutomationProperties.Name="{DynamicResource StartupAccessibleName}">
+  <Border Padding="48" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel
+        MaxWidth="720"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Spacing="12">
+      <TextBlock
+          FontSize="30"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource ProductDisplayName}" />
+      <!--
+        A status line and no progress bar. Nothing here knows how much is left, and a bar that
+        moves without meaning anything is a picture of progress rather than progress.
+      -->
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource StartupStatus}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+  </Border>
+</UserControl>

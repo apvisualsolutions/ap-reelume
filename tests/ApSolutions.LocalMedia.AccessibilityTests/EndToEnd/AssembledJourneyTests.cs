@@ -417,7 +417,10 @@ public sealed class AssembledJourneyTests : IDisposable
         App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
         Directory.CreateDirectory(_dataRoot);
         var application = ApplicationHost.Create(new AppDataPaths(_dataRoot));
-        var shell = Assert.IsType<ShellView>(application.CreateShell());
+
+        // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
+        // for it. The wait names what stood in its place if it never comes.
+        var shell = Assert.IsType<ShellView>(AssembledStartup.FinalContent(application.CreateShell()));
         var window = new Window { Width = 1600, Height = 1000, Content = shell };
         window.Show();
         Dispatcher.UIThread.RunJobs();
