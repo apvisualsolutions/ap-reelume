@@ -129,4 +129,65 @@ public sealed class ApplicationHostTests : IDisposable
 
         Assert.Null(second.PendingActivationPath);
     }
+
+    /// <summary>
+    /// ARQ-010. A registration naming a dependency nobody registered is a defect whether or not the
+    /// container is asked about it, so the only question is when it gets heard. Left to resolution it
+    /// waits for the first screen that happens to need it — which is a person's screen, in a corner no
+    /// test opened. This asserts the container refuses to hand back a provider it already knows is
+    /// broken, and it goes through <see cref="ApplicationHost.BuildProvider"/> rather than a private
+    /// copy of the options, because a copy would only prove itself.
+    /// </summary>
+    [Fact]
+    public void A_registration_whose_dependency_nobody_registered_fails_at_build_not_at_resolution()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<NeedsSomethingNobodyRegistered>();
+
+        var failure = Assert.Throws<AggregateException>(() => ApplicationHost.BuildProvider(services));
+
+        Assert.Contains(
+            nameof(UnregisteredDependency),
+            failure.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The check that was already on before ARQ-010, pinned here because it now travels in the same
+    /// options object as the new one: a singleton that captures a scoped service outlives what it
+    /// captured, and the container is the only thing positioned to notice.
+    /// </summary>
+    [Fact]
+    public void A_scoped_service_resolved_from_the_root_is_still_refused()
+    {
+        var services = new ServiceCollection();
+        services.AddScoped<UnregisteredDependency>();
+        using var provider = ApplicationHost.BuildProvider(services);
+
+        Assert.Throws<InvalidOperationException>(
+            () => provider.GetRequiredService<UnregisteredDependency>());
+    }
+
+    /// <summary>
+    /// And the point of the whole exercise: the application the product actually ships passes that
+    /// check, every time any test builds it. This is the assertion that turns a broken registration
+    /// into a red build instead of a bug report.
+    /// </summary>
+    [Fact]
+    public async Task Every_registration_the_product_ships_survives_that_check()
+    {
+        await using var host = ApplicationHost.Create(
+            new AppDataPaths(Path.Combine(_dataRoot, "validated")));
+
+        Assert.NotNull(host.Services);
+    }
+
+    /// <summary>A dependency deliberately left out of the collection under test.</summary>
+    private sealed class UnregisteredDependency;
+
+    /// <summary>A registration that names it anyway, which is the defect ARQ-010 wants heard early.</summary>
+    private sealed class NeedsSomethingNobodyRegistered(UnregisteredDependency dependency)
+    {
+        public UnregisteredDependency Dependency { get; } = dependency;
+    }
 }

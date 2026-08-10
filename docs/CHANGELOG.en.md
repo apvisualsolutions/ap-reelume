@@ -42,6 +42,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   version does nothing. Each debt lives inside the test under its own identifier, and a second
   assertion evicts the entry the moment its wiring lands: the list can only shrink.
 
+- **The application checks its own wiring as it is built.** A component asking for something nobody
+  registered used to be a failure that waited for the first screen that needed it — possibly yours,
+  in a corner no test opened. That check now happens as the application is assembled, so the failure
+  shows up at any test's startup instead of in front of somebody. It covers 109 of the 156
+  registrations: the 45 built through a function of their own stay opaque to the check, and saying so
+  beats letting anyone believe they are covered. It costs 0.22 milliseconds per startup. On its first
+  run it found not one broken wire.
+
 - **Language preference.** Settings → Appearance lets you choose Spanish or English. The interface,
   the update summaries, and the metadata speak the same language — the interface used to be pinned
   to Spanish while the updater's summary and the metadata followed the machine's language, and

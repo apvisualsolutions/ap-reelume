@@ -280,8 +280,16 @@ grandes. ARQ-004 va antes que ARQ-005 porque el arranque asíncrono va a produci
 de fallo que ARQ-004 existe para no perder: si se invierte el orden, ARQ-005 aterriza sobre un suelo
 que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ-004, then ARQ-005.
 
-- [ ] **ARQ-010**: `ValidateOnBuild = true`. Una línea en `ApplicationHost.Create`. Cuenta como hecho
+- [x] **ARQ-010**: `ValidateOnBuild = true`. Una línea en `ApplicationHost.Create`. Cuenta como hecho
       cuando una prueba fije que la validación está encendida — si no, se apaga sin que nadie lo note.
+      Hecho el 2026-08-10. La construcción salió a `ApplicationHost.BuildProvider` para que la prueba
+      pase una colección rota **por la ruta del producto**; afirmar sobre una copia de las opciones
+      sólo demuestra la copia. **No destapó ningún registro roto** (73/73, 18/18, 382/382 a la
+      primera), y el límite quedó medido: valida 109 de 156 registros, porque los 45 por factoría son
+      opacos por construcción. Cuesta +0,22 ms por contenedor. Evidencia en
+      [audit-arq010-container-validation.md](../../evidence/stable/audit-arq010-container-validation.md). \
+      Done: the build moved into its own method so a test can break it through the product's path;
+      it exposed nothing, and covers 109 of 156 registrations.
 - [ ] **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores (hay ~24 `async void` sin red,
       cobertura desigual entre ViewModels) + `UnhandledException`/`UnobservedTaskException` globales
       en `Program.cs`. **Límites decididos**: vive en `Presentation`, porque es una preocupación de

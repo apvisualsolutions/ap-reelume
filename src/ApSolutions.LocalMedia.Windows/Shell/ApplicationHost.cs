@@ -67,12 +67,36 @@ public sealed class ApplicationHost : IAsyncDisposable
     {
         ArgumentNullException.ThrowIfNull(paths);
         var shellHost = new CompositionRoot.ShellHost();
-        var services = new ServiceCollection()
-            .AddLocalMedia(paths, shellHost)
-            .BuildServiceProvider(validateScopes: true);
+        var services = BuildProvider(new ServiceCollection().AddLocalMedia(paths, shellHost));
         var host = new ApplicationHost(services, paths);
         services.GetRequiredService<Accessor>().Host = host;
         return host;
+    }
+
+    /// <summary>
+    /// Turns a set of registrations into the container this application runs on, under the two checks
+    /// the product wants: no singleton may capture a scoped service, and no registration may name a
+    /// dependency nobody registered.
+    /// </summary>
+    /// <remarks>
+    /// ARQ-010. Both checks answer the same question — not whether a defect exists, but when it is
+    /// heard. Without them a broken registration waits for whichever resolution first happens to touch
+    /// it, and in a desktop application that means a screen, in front of somebody, in a corner no test
+    /// opened. Validating at build moves the whole class of defect to startup, which every test in this
+    /// repository already pays for and can therefore report.
+    /// <para>
+    /// It is a separate method so a test can build a deliberately broken collection through the very
+    /// path the product uses. Asserting on a copy of the options would only prove the copy.
+    /// </para>
+    /// </remarks>
+    public static ServiceProvider BuildProvider(IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        return services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateScopes = true,
+            ValidateOnBuild = true,
+        });
     }
 
     /// <summary>

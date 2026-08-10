@@ -43,6 +43,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   en la propia prueba con su identificador, y una segunda aserción expulsa la entrada en cuanto su
   cableado aterriza: la lista sólo puede encoger.
 
+- **La aplicación revisa sus propios cables al construirse.** Un componente que pide algo que nadie
+  registró era hasta ahora un fallo que esperaba a la primera pantalla que lo necesitara —quizá la
+  tuya, en un rincón que ninguna prueba abrió—. Ahora esa revisión ocurre al montar la aplicación, de
+  modo que el fallo aparece al arrancar cualquier prueba en vez de delante de alguien. Cubre 109 de
+  los 156 registros: los 45 que se construyen con una función propia siguen siendo opacos a la
+  revisión, y decirlo es mejor que dejar creer que están cubiertos. Cuesta 0,22 milisegundos por
+  arranque. En su primera ejecución no encontró ni un cable roto.
+
 - **Preferencia de idioma.** En Ajustes → Apariencia puedes elegir español o inglés. La interfaz,
   los resúmenes de las actualizaciones y los metadatos hablan el mismo idioma — antes la interfaz
   iba fija en español mientras el resumen del actualizador y los metadatos seguían el idioma de la
