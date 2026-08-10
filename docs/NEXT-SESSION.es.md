@@ -1,7 +1,7 @@
 # Dónde retomar
 
-Estado del proyecto al cerrar la **cuarta** sesión del **2026-08-10**, la que ejecutó la cola de la
-línea base, el arranque asíncrono y la deuda de cobertura. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
+Estado del proyecto al cerrar la **quinta** sesión del **2026-08-10**, la que saldó la última deuda
+de cobertura e instrumentó el camino del fallo del rojo intermitente. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
 canónico del alcance sigue siendo [FEATURES.md](FEATURES.md); el trabajo pendiente de la auditoría
 vive en [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). Esto es
 sólo el punto de retomada.
@@ -74,20 +74,22 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
 
 ## Lo que sigue
 
-La cola de tres —línea base, ARQ-005 segunda mitad, deuda de TST-001— **se ejecutó entera el
-2026-08-10** (cuarta sesión). Lo que queda, en orden de valor:
+La cola de dos —la última deuda de cobertura y la instrumentación del rojo intermitente— **se
+ejecutó entera el 2026-08-10** (quinta sesión). Con ella se cierran TST-001 y el trabajo que la
+auditoría dejó en la cabecera del plan; lo que queda son las entradas sueltas de
+[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md), que ya no
+están decididas de antemano y hay que diseñarlas antes de ejecutarlas:
 
-1. **`ReconcileScannedFiles.cs`, la última deuda de cobertura.** 98 líneas y 50 ramas, a 86,73 % y
-   76,00 %, ya vigilado con ese suelo. **La forma está decidida en el plan**: unitarias con dobles
-   en memoria en `Application.Tests/Discovery/ReconcileScannedFilesTests.cs`, apuntando a las
-   **decisiones** y no al camino feliz —que ya cubren los recorridos de escaneo, y por eso las
-   líneas van al 87 % y las ramas al 76 %—, con la lista de ramas que faltan escrita una a una. Al
-   terminar hay que **subir el suelo**, o la puerta falla: eso es el trinquete.
-2. **El rojo intermitente, que sigue sin causa.** Decidido: **no** salir a buscarlo —es una carrera
-   y no se reproduce aquí— sino **instrumentar su camino**, para que la próxima vez deje diagnóstico
-   en vez de un `exit code -1` mudo. Detalle y forma en el plan.
-3. **Lo que quede del plan de remediación** en
-   [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md).
+1. **`BUG-010`**: unificar `LibVlcMediaProbe` sobre `LibVlcFactory.DeferRelease`. Es el único de los
+   pendientes que toca código nativo, y por tanto el de más valor: su cola propia puede morir para
+   siempre y mantiene una segunda instancia nativa fuera del contador.
+2. **`ARQ-012`, `ARQ-013`, `ARQ-014`**: `RepositoryLayout`/`TestAppBuilder` duplicados con dos
+   anclas, la regex de la puerta de alcanzabilidad que acepta comentarios, y el User-Agent con la
+   versión desincronizada. Tres arreglos pequeños con la misma forma que los ya hechos.
+3. **`QA-001`**: barrido de `Parse`/`ToString` sin cultura en `src/`.
+4. **Documentación**: `DOC-101` (evidencia de UX-007), `DOC-201` (justificar la promoción de
+   SYS-001), las casillas `T44.1`-`T44.6` del plan MVP, y el manual de usuario, al que le faltan el
+   actualizador y la detección de segmentos.
 
 ## Un rojo intermitente que hay que vigilar, no tapar
 
@@ -110,10 +112,23 @@ Lo que se sabe, medido del registro:
 - **Frecuencia observada: una de cuatro.** No se repitió en las tres ejecuciones siguientes que
   llevaban ese mismo código, ni en las ocho posteriores hasta `fa968de`. Es la cifra contra la que
   comparar si vuelve a verse.
+- **Y media pregunta ya estaba contestada en el registro archivado, sin que nadie lo hubiera
+  leído.** La línea entera de aquella fase decía `16 migration(s) applied to a new database`: el
+  proceso vivió lo suficiente para aplicar las dieciséis, así que «murió antes de migrar» estaba
+  descartado desde el principio y las dos hipótesis nunca fueron dos. Lo que no dice ningún registro
+  es la otra mitad —si al llegar el plazo quedaba algo vivo que pintar—, porque `exit code -1` es el
+  matarile del propio arnés.
+
+**Lo que ya no falta**: desde el 2026-08-10 la verificación **deja diagnóstico** cuando la ventana no
+llega. Antes de matar el proceso anota si seguía vivo, cuánto procesador gastó y en cuántos hilos —lo
+que separa girar de esperar—, el estado de `library.db` y de `schema_history`, y qué hay en la
+carpeta de datos, todo en la misma línea que CI imprime. Detalle en
+[audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
 
 **Lo que no se hace**: subir el plazo de 90 s. Eso convierte la única señal que hay en silencio, que
 es el error que ya costó seis ejecuciones con los `cancelled` del generador de medios. Si vuelve a
-aparecer, deja de ser trabajo pendiente y pasa a ser la corrección urgente.
+aparecer, deja de ser trabajo pendiente y pasa a ser la corrección urgente — y ahora dirá algo al
+hacerlo.
 
 ## Lo terminado el 2026-08-10 (tercera sesión)
 
@@ -162,6 +177,28 @@ Tres commits, cada uno con su ciclo, su evidencia bilingüe y su verificación c
   avisara. Hay una lista de vigilados con trinquete en los dos sentidos, y dos de las tres deudas
   quedaron al 100 %. [audit-tst1-coverage-debt.md](evidence/stable/audit-tst1-coverage-debt.md).
 
+## Lo terminado el 2026-08-10 (quinta sesión)
+
+Dos commits, cada uno con su ciclo, su evidencia bilingüe y su verificación completa.
+
+- **TST-001 queda saldado: la última deuda pasa de 86,73 %/76,00 % al 100 % de líneas y de ramas**,
+  con nueve unitarias que apuntan a lo que `ReconcileScannedFiles` **decide** —un escaneo cancelado,
+  un resultado que el escaneo no pudo catalogar, una ruta sin fila, una identidad ilegible que cuenta
+  como fallo sin costarle el escaneo al resto, contenido `Updated` que refresca la identidad, un
+  catálogo que lanza, una cancelación que no es un fallo—. Medir la lista antes de escribir la
+  recortó en un tercio: cinco de los puntos anotados leyendo el código ya estaban cubiertos. Y
+  apareció uno que la lectura no da: la propiedad `AttemptedCount` no la leía **ninguna** prueba,
+  porque comparar registros enteros va por campos y no por propiedades. El suelo de la puerta sube a
+  100/100. [audit-tst1-reconcile-coverage.md](evidence/stable/audit-tst1-reconcile-coverage.md).
+- **El rojo intermitente ya deja diagnóstico.** Y lo primero fue leer el registro archivado de la
+  única ejecución que falló, que contestaba media pregunta: `16 migration(s) applied to a new
+  database`. Lo que se instrumenta es la mitad que sigue sin recogerse, más el procesador y los
+  hilos, que separan girar de esperar. Nada del diagnóstico puede lanzar —sustituiría al fallo que
+  viene a explicar—, así que cada lectura va guardada y lo que salga mal se cuenta dentro de la
+  frase. `LaunchDiagnosisTests` saca las funciones del guion publicado **parseándolo** y las ejerce
+  contra procesos de estado conocido, incluida una `library.db` que no es una base de datos.
+  [audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
+
 ## Pendiente tuyo (sólo lo que un agente no puede hacer)
 
 - **Añadir el secreto `RELEASE_SIGNING_SECRET_KEY` al repositorio público.** No se pudo copiar —los
@@ -209,6 +246,14 @@ Tres commits, cada uno con su ciclo, su evidencia bilingüe y su verificación c
   había ocupado el sitio. Ahí lo que se reapunta es la prueba, y decir por qué evita que la próxima
   lectura la tome por un defecto.
 
+- **Antes de instrumentar un fallo, léelo entero donde quedó archivado.** Las dos hipótesis del rojo
+  intermitente se daban por indistinguibles en dos documentos, y la línea de aquella ejecución
+  —`16 migration(s) applied to a new database`— descartaba una de las dos desde el primer día. Costó
+  un `gh run view --log` filtrado. Un registro que nadie ha leído no es una pregunta abierta.
+- **Una lista de huecos escrita leyendo el código es una hipótesis.** La de las ramas que faltaban en
+  `ReconcileScannedFiles` se recortó **un tercio** al medirla, y el hueco que no estaba en ella
+  —una propiedad que ninguna prueba leía— era el que ninguna lectura podía dar, porque la igualdad
+  de un registro va por campos.
 - **La puerta de cobertura lee de `HEAD`, no del disco.** Con los archivos nuevos sólo preparados en
   el índice declara «ningún archivo nuevo» y sale verde. Hay que confirmar el commit y volver a
   ejecutar `eng/check-coverage.ps1` **antes** del push, o CI será quien encuentre el rojo.

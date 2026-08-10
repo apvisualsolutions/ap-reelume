@@ -1,7 +1,7 @@
 # Where to pick up
 
-The state of the project at the close of the **fourth** session of **2026-08-10**, the one that ran
-the baseline, the asynchronous startup and the coverage debt. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
+The state of the project at the close of the **fifth** session of **2026-08-10**, the one that paid
+the last coverage debt and instrumented the intermittent red's failure path. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
 scope record is still [FEATURES.md](FEATURES.md); the audit's outstanding work lives in
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). This is only the
 place to resume from.
@@ -72,20 +72,22 @@ Four commits, each with its full cycle and its bilingual evidence.
 
 ## What comes next
 
-The three-part queue — baseline, ARQ-005's second half, TST-001's debt — **was run in full on
-2026-08-10** (fourth session). What is left, in order of value:
+The two-part queue — the last coverage debt and the intermittent red's instrumentation — **was run
+in full on 2026-08-10** (fifth session). That closes TST-001 and the work the audit left at the head
+of the plan; what remains are the loose entries in
+[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md), none of them
+decided in advance, so each needs designing before it is run:
 
-1. **`ReconcileScannedFiles.cs`, the last coverage debt.** 98 lines and 50 branches, at 86.73% and
-   76.00%, already watched at that floor. **The shape is decided in the plan**: unit tests with
-   in-memory doubles in `Application.Tests/Discovery/ReconcileScannedFilesTests.cs`, aimed at the
-   **decisions** rather than the happy path — which the scan walks already cover, which is why lines
-   sit at 87% and branches at 76% — with the missing branches listed one by one. Raise the floor
-   afterwards, or the gate fails: that is the ratchet.
-2. **The intermittent red, still without a cause.** Decided: do **not** go hunting it — it is a race
-   and it does not reproduce here — but **instrument its path**, so the next occurrence leaves a
-   diagnosis instead of a silent `exit code -1`. Shape in the plan.
-3. **Whatever is left of the remediation plan** in
-   [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md).
+1. **`BUG-010`**: put `LibVlcMediaProbe` on `LibVlcFactory.DeferRelease`. The only one of these that
+   touches native code and therefore the most valuable: its own queue can die for good and it keeps a
+   second native instance outside the count.
+2. **`ARQ-012`, `ARQ-013`, `ARQ-014`**: duplicated `RepositoryLayout`/`TestAppBuilder` with two
+   anchors, the reachability gate's regex accepting comments, and the User-Agent whose version has
+   drifted. Three small fixes shaped like the ones already done.
+3. **`QA-001`**: a sweep for culture-less `Parse`/`ToString` in `src/`.
+4. **Documentation**: `DOC-101` (evidence for UX-007), `DOC-201` (justifying SYS-001's promotion),
+   boxes `T44.1`-`T44.6` of the MVP plan, and the user manual, which is still missing the updater and
+   the segment detection.
 
 ## An intermittent red to watch, not to paper over
 
@@ -108,10 +110,22 @@ What is known, measured from the log:
 - **Observed frequency: one in four.** It did not recur across the three following runs carrying that
   same code, nor across the eight after them up to `fa968de`. That is the figure to compare against
   if it is seen again.
+- **And half the question was already answered in the archived log, unread.** That phase's full line
+  said `16 migration(s) applied to a new database`: the process lived long enough to apply all
+  sixteen, so "died before migrating" was ruled out from the start and the two hypotheses were never
+  two. What no record says is the other half — whether anything was still alive to paint when the
+  deadline came — because `exit code -1` is the harness's own kill.
+
+**What is no longer missing**: since 2026-08-10 the verification **leaves a diagnosis** when the
+window does not arrive. Before killing the process it records whether it was still alive, how much
+processor time across how many threads — which separates spinning from waiting — the state of
+`library.db` and `schema_history`, and what the data folder holds, all in the line CI prints. Detail
+in [audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
 
 **What is not done**: raising the 90 s deadline. That turns the only signal there is into silence,
 which is the mistake the media generator's `cancelled` runs already charged six runs for. If it comes
-back, it stops being pending work and becomes the urgent fix.
+back, it stops being pending work and becomes the urgent fix — and now it will say something when it
+does.
 
 ## Finished on 2026-08-10 (third session)
 
@@ -160,6 +174,29 @@ Three commits, each with its cycle, its bilingual evidence and its full verifica
   There is a watchlist with a ratchet in both directions, and two of the three debts are at 100%.
   [audit-tst1-coverage-debt.md](evidence/stable/audit-tst1-coverage-debt.md).
 
+## Finished on 2026-08-10 (fifth session)
+
+Two commits, each with its cycle, its bilingual evidence and its full verification.
+
+- **TST-001 is paid off: the last debt goes from 86.73%/76.00% to 100% of lines and branches**, with
+  nine unit tests aimed at what `ReconcileScannedFiles` **decides** — a cancelled scan, a result the
+  scan could not catalogue, a path with no row, an unreadable identity that counts as a failure
+  without costing the rest of the scan, `Updated` content refreshing the identity, a catalogue that
+  throws, a cancellation that is not a failure. Measuring the list before writing anything cut it by
+  a third: five of the entries noted by reading the code were already covered. And one turned up that
+  reading does not give: **no** test had ever read the `AttemptedCount` property, because whole-record
+  comparisons go through fields rather than properties. The gate's floor rises to 100/100.
+  [audit-tst1-reconcile-coverage.md](evidence/stable/audit-tst1-reconcile-coverage.md).
+- **The intermittent red now leaves a diagnosis.** The first move was reading the archived log of the
+  only run that ever failed, which answered half the question: `16 migration(s) applied to a new
+  database`. What gets instrumented is the half still unrecorded, plus processor time and thread
+  count, which separate spinning from waiting. Nothing in the diagnosis may throw — it would replace
+  the failure it explains — so every read is guarded and whatever goes wrong is reported inside the
+  sentence. `LaunchDiagnosisTests` takes the functions out of the shipped script by **parsing** it and
+  exercises them against processes whose state is known, including a `library.db` that is not a
+  database.
+  [audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
+
 ## Yours (only what an agent cannot do)
 
 - **Add the `RELEASE_SIGNING_SECRET_KEY` secret to the public repository.** It could not be copied —
@@ -205,6 +242,14 @@ Three commits, each with its cycle, its bilingual evidence and its full verifica
   one lost a race against the asynchronous startup itself: by the time it looked, the shell had
   already taken over. What gets re-aimed there is the test.
 
+- **Before instrumenting a failure, read the whole of it where it was archived.** Two documents
+  recorded the intermittent red's two hypotheses as indistinguishable, and that run's line —
+  `16 migration(s) applied to a new database` — ruled one of them out from day one. It cost one
+  filtered `gh run view --log`. A log nobody has read is not an open question.
+- **A gap list written by reading the code is a hypothesis.** The one for the missing branches in
+  `ReconcileScannedFiles` shrank by **a third** when measured, and the gap that was not on it — a
+  property no test ever read — was the one no reading could give, because record equality goes
+  through fields.
 - **The coverage gate reads from `HEAD`, not from disk.** With new files only staged it announces "no
   new file" and exits green. Commit and re-run `eng/check-coverage.ps1` **before** pushing, or CI will
   be the one to find the red.
