@@ -132,6 +132,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Seguridad
 
+- **Reproducir fuera de la aplicación sólo abre vídeo.** El botón que entrega un archivo al
+  reproductor que tengas registrado en Windows confiaba en que quien lo llamara ya hubiese filtrado
+  por la lista de contenedores. Se midió qué pasaba si no: de cinco tipos de archivo que la biblioteca
+  no cataloga, **tres abrieron su manejador**, entre ellos un `.ps1` y un archivo sin extensión. Ahora
+  la comprobación está donde se hace la llamada, contra la misma lista que decide qué entra en tu
+  biblioteca.
+- **Restaurar una copia aplica sus propios límites de tamaño.** Los topes —512 MB por archivo, 2 GB en
+  total— los ponía el paso de inspección, que es un paso que hay que acordarse de dar; desempaquetar
+  ahora los aplica también. De paso se comprobó, forjando un archivo que declara un byte donde guarda
+  una base de datos entera, que ninguna entrada puede entregar más de lo que declara: el riesgo estaba
+  en la declaración, no en la copia, y ahí es donde se corta.
 - **La integración continua ya no puede salir a una máquina personal.** Cuando el repositorio era
   privado, la verificación podía enrutarse a un runner propio a través de una variable del
   repositorio; ahora que es público, esa puerta era una invitación a que el CI de un pull request

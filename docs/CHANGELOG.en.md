@@ -129,6 +129,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Security
 
+- **Playing outside the application opens video and nothing else.** The button that hands a file to
+  whatever player Windows has registered trusted its callers to have filtered by the container list
+  already. What happened otherwise was measured: of five file types the library does not catalogue,
+  **three opened their handler**, among them a `.ps1` and a file with no extension. The check now sits
+  where the call is made, against the same list that decides what enters your library.
+- **Restoring a backup applies its own size limits.** The ceilings — 512 MB per file, 2 GB in total —
+  were set by the inspection step, which is a step somebody has to remember; unpacking now applies
+  them too. Along the way it was checked, by forging an archive that declares one byte where it holds
+  a whole database, that no entry can hand back more than it declares: the risk was in the
+  declaration, not in the copy, and that is where it is now cut off.
 - **Continuous integration can no longer reach a personal machine.** While the repository was
   private, verification could be routed to a self-hosted runner through a repository variable; now
   that it is public, that hatch was a standing invitation for a fork pull request's CI to run on the

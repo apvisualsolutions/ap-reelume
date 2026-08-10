@@ -391,4 +391,94 @@ public sealed class RestoreValidationTests
         Assert.Equal(0, preview.PathChangeCount);
         Assert.True(preview.CanRestore);
     }
+
+    /// <summary>
+    /// The size ceilings a restore enforces are the validator's, and the validator is a step a caller
+    /// has to remember. Unpacking now applies them itself, so an archive that reaches this method
+    /// without having been inspected is still bounded.
+    /// </summary>
+    /// <remarks>
+    /// The declaration is the whole exposure and nothing more: an entry that <em>understates</em> its
+    /// payload was forged and measured, and the framework hands back the declared byte and stops
+    /// rather than overflowing. So there is nothing to guard on that side, and this guards the side
+    /// that is real — a declaration large enough to fill a disk, believed by a step that writes.
+    /// </remarks>
+    [Fact]
+    public async Task An_entry_larger_than_a_restore_may_unpack_is_refused_without_being_written()
+    {
+        using var fixture = await RestoreFixture.CreateAsync();
+        var overstated = Path.Combine(fixture.WorkingDirectory, "overstated.zip");
+        var declared = BackupValidator.MaximumEntryBytes + 1;
+        RewriteDeclaredSize(
+            fixture.ArchivePath,
+            overstated,
+            BackupContentPolicy.DatabaseEntryName,
+            (uint)Math.Min(declared, uint.MaxValue));
+
+        var staging = new StagedRestoreService(fixture.Paths);
+        var failure = await Assert.ThrowsAsync<InvalidDataException>(
+            () => staging.ExtractAsync(overstated, TestContext.Current.CancellationToken));
+
+        Assert.Contains(BackupContentPolicy.DatabaseEntryName, failure.Message, StringComparison.Ordinal);
+        Assert.Empty(fixture.StagingLeftovers());
+    }
+
+    /// <summary>
+    /// A framework behaviour this repository leans on, so it is measured rather than assumed: an
+    /// entry cannot hand back more bytes than its central directory declares.
+    /// </summary>
+    [Fact]
+    public async Task An_entry_cannot_hand_back_more_bytes_than_it_declares()
+    {
+        using var fixture = await RestoreFixture.CreateAsync();
+        var understated = Path.Combine(fixture.WorkingDirectory, "understated.zip");
+        RewriteDeclaredSize(fixture.ArchivePath, understated, BackupContentPolicy.DatabaseEntryName, 1);
+
+        using var forged = ZipFile.OpenRead(understated);
+        var entry = forged.Entries.Single(candidate => candidate.FullName == BackupContentPolicy.DatabaseEntryName);
+        Assert.Equal(1, entry.Length);
+
+        await using var payload = entry.Open();
+        using var drained = new MemoryStream();
+        await payload.CopyToAsync(drained, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, drained.Length);
+    }
+
+    /// <summary>
+    /// Rewrites one entry's uncompressed size, in both places a ZIP records it, so the payload is
+    /// untouched and only the archive's description of it changes.
+    /// </summary>
+    private static void RewriteDeclaredSize(
+        string source,
+        string destination,
+        string entryName,
+        uint declaredSize)
+    {
+        var bytes = File.ReadAllBytes(source);
+        var name = Encoding.UTF8.GetBytes(entryName);
+        for (var index = 0; index + 46 < bytes.Length; index++)
+        {
+            // The central directory record: signature, then the name at a fixed offset from it.
+            if (bytes[index] != 'P' || bytes[index + 1] != 'K' || bytes[index + 2] != 1 || bytes[index + 3] != 2)
+            {
+                continue;
+            }
+
+            var nameLength = BitConverter.ToUInt16(bytes, index + 28);
+            if (nameLength != name.Length
+                || !bytes.AsSpan(index + 46, nameLength).SequenceEqual(name))
+            {
+                continue;
+            }
+
+            var localHeader = (int)BitConverter.ToUInt32(bytes, index + 42);
+            BitConverter.GetBytes(declaredSize).CopyTo(bytes, index + 24);
+            BitConverter.GetBytes(declaredSize).CopyTo(bytes, localHeader + 22);
+            File.WriteAllBytes(destination, bytes);
+            return;
+        }
+
+        Assert.Fail($"The fixture archive has no central directory record for {entryName}.");
+    }
 }
