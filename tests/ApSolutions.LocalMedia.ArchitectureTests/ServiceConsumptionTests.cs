@@ -115,16 +115,18 @@ public sealed class ServiceConsumptionTests
 
         public static CompositionGraph Load()
         {
-            // The composition is spread across partials by area (ARQ-006 step 2), so this reads all
-            // of them. Reading one file would silently shrink the graph and let a registration that
-            // nothing consumes pass unnoticed — the exact defect this gate exists to catch.
-            var compositionDirectory = RepositoryLayout.PathFromRoot("src/ApSolutions.LocalMedia.Windows");
-            var compositionFiles = Directory.GetFiles(compositionDirectory, "CompositionRoot*.cs")
+            // The composition is spread across partials by area (ARQ-006 step 2) and, since ARQ-001,
+            // across the host that owns it. Reading fewer files than this would silently shrink the
+            // graph and let a registration that nothing consumes pass unnoticed — the exact defect
+            // this gate exists to catch, and the exact way it has twice been caught out itself.
+            var host = RepositoryLayout.PathFromRoot("src/ApSolutions.LocalMedia.Windows");
+            var compositionFiles = Directory.GetFiles(host, "CompositionRoot*.cs")
+                .Concat(Directory.GetFiles(Path.Combine(host, "Shell"), "ApplicationHost.cs"))
                 .OrderBy(path => path, StringComparer.Ordinal)
                 .ToArray();
             Assert.True(
-                compositionFiles.Length > 0,
-                "No CompositionRoot source was found where the host keeps it.");
+                compositionFiles.Length >= 2,
+                $"Only {compositionFiles.Length} composition source(s) were found where the host keeps them.");
             var text = string.Join("\n", compositionFiles.Select(File.ReadAllText));
 
             var registrations = ParseRegistrations(text);
@@ -146,7 +148,7 @@ public sealed class ServiceConsumptionTests
                 RegexOptions.None,
                 TimeSpan.FromSeconds(2)).Cast<Match>())
             {
-                var resolved = resolution.Groups[1].Value;
+                var resolved = Simplify(resolution.Groups[1].Value);
                 var owner = registrations.FirstOrDefault(registration =>
                     registration.BodyStart <= resolution.Index && resolution.Index < registration.BodyEnd);
                 if (owner is null)
@@ -207,6 +209,16 @@ public sealed class ServiceConsumptionTests
         /// <summary>One registration: the service it promises, the type that fulfils it, and the span of its arguments.</summary>
         private sealed record Registration(string Service, string? Implementation, int BodyStart, int BodyEnd);
 
+        /// <summary>
+        /// A type by its own name, whatever it is nested in. A nested type is written qualified where
+        /// it is registered from outside and bare where it is resolved from within, and the graph has
+        /// to see one name for one service; every service in this composition already has a distinct
+        /// simple name, so dropping the qualifier costs nothing and reading two names for one service
+        /// cost a false orphan.
+        /// </summary>
+        private static string Simplify(string typeName) =>
+            typeName[(typeName.LastIndexOf('.') + 1)..];
+
         private static List<Registration> ParseRegistrations(string text)
         {
             var registrations = new List<Registration>();
@@ -230,7 +242,11 @@ public sealed class ServiceConsumptionTests
                 var body = text[(cursor + 1)..bodyEnd].Trim();
 
                 var (service, implementation) = Describe(text, genericArguments, body);
-                registrations.Add(new Registration(service, implementation, cursor + 1, bodyEnd));
+                registrations.Add(new Registration(
+                    Simplify(service),
+                    implementation is null ? null : Simplify(implementation),
+                    cursor + 1,
+                    bodyEnd));
             }
 
             return registrations;
@@ -286,10 +302,12 @@ public sealed class ServiceConsumptionTests
                 return (method.Groups[1].Value, method.Groups[1].Value);
             }
 
-            // A captured instance: its declared type is what the container hands out.
+            // A captured instance: its declared type is what the container hands out. The name may be
+            // qualified — a nested type built from outside the class that declares it — so the dot is
+            // part of what is read and <see cref="Simplify"/> takes it off again.
             var declaration = Regex.Match(
                 text,
-                $@"var {Regex.Escape(body)} = new (\w+)",
+                $@"var {Regex.Escape(body)} = new ([\w.]+)",
                 RegexOptions.None,
                 TimeSpan.FromSeconds(1));
             if (declaration.Success)

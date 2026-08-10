@@ -16,6 +16,7 @@ using ApSolutions.LocalMedia.Infrastructure.Media;
 using ApSolutions.LocalMedia.Infrastructure.Time;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using ApSolutions.LocalMedia.Windows.Shell;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ApSolutions.LocalMedia.Windows;
@@ -40,6 +41,9 @@ public static partial class CompositionRoot
             .AddSingleton<INavigationService, NavigationService>()
             .AddSingleton(paths)
             .AddSingleton(shellHost)
+            // ARQ-001: one per container rather than a static, so two applications in one process
+            // never reach each other's session. The host publishes itself here once it exists.
+            .AddSingleton<ApplicationHost.Accessor>()
             .AddSingleton<SqliteConnectionFactory>()
             .AddSingleton<MigrationRunner>(provider => new MigrationRunner(
                 provider.GetRequiredService<SqliteConnectionFactory>()))

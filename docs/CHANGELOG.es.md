@@ -54,6 +54,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Al salir, la aplicación suelta lo que había tomado.** El reproductor nativo, la base de datos, el
+  icono de bandeja, los registros de teclas multimedia y los clientes de red vivían en un campo
+  estático que nada liberaba nunca: el proceso terminaba y le dejaba a Windows recoger lo suyo, que no
+  es cerrar sino confiar. Ahora la aplicación es un objeto con dueño y se libera al salir, venga la
+  salida de la ventana o de la bandeja. Tiene un segundo efecto que se nota en las pruebas más que en
+  la pantalla: dos aplicaciones pueden existir a la vez en un proceso sin verse la una a la otra, y la
+  cláusula que obligaba a las dos suites de recorrido completo a ejecutarse en fila se retiró — que es
+  la manera de comprobar que la propiedad es real y no sólo más ordenada. Lo que sigue sin liberarse,
+  a propósito y documentado, es la instancia nativa de LibVLC: crearla y destruirla repetidamente es
+  un modo de fallo conocido, así que vive lo que vive el proceso.
 - **El registro de la aplicación deja de ser una lista de trescientas líneas.** Todo lo que la
   aplicación monta se declaraba en una sola cadena, y averiguar de qué dependía una pieza obligaba a
   leerla entera. Ahora hay ocho módulos por área —datos, reproducción, personalización, biblioteca,

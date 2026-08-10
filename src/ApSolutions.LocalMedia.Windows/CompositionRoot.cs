@@ -57,6 +57,7 @@ using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.Windows.Accessibility;
 using ApSolutions.LocalMedia.Windows.MediaKeys;
 using ApSolutions.LocalMedia.Windows.Playback;
+using ApSolutions.LocalMedia.Windows.Shell;
 using ApSolutions.LocalMedia.Windows.Startup;
 using ApSolutions.LocalMedia.Windows.Tray;
 using ApSolutions.LocalMedia.Windows.Updates;
@@ -85,30 +86,26 @@ public static partial class CompositionRoot
 
     private const string UpdateRepositoryName = "ap-reelume";
 
-    private static IServiceProvider? _services;
-
-    // The live playback session's teardown: the save loop's cancellation and the engine handlers'
-    // detachment. One session at a time is the product's own rule.
-    private static PlaybackSessionHooks? _playbackSessionHooks;
-
     /// <summary>
-    /// The loose file this launch was asked to open, if any. It is a path and nothing more; no entity
-    /// is created for it, in the catalogue or anywhere else.
+    /// Attaches the lifecycle behaviour to the main window: where it reappears, what closing it
+    /// means, and what stops when it goes. With every default in place this changes nothing visible —
+    /// closing closes.
     /// </summary>
-    public static string? PendingActivationPath { get; set; }
-
-    /// <summary>
-    /// Attaches the lifecycle behaviour to the main window: the close button asks the policy what it
-    /// means, and the tray only appears once someone has turned it on. With every default in place
-    /// this changes nothing — closing closes.
-    /// </summary>
-    public static void ConfigureWindow(Window window)
+    /// <remarks>
+    /// ARQ-006 left this here on purpose, and ARQ-001 took it out and put it back. The extraction
+    /// compiled and the assembled walks stayed green, and then the coverage gate measured it:
+    /// 70,89 % of lines and 28,57 % of branches. It resolves ten services from the container, so
+    /// reaching the tray path, both closing branches and the loose-activation catch means handing it
+    /// a purpose-built provider full of fakes, and several of those services are sealed classes with
+    /// dependencies of their own. That is the same verdict `WindowsFilePickers` got, and the same
+    /// rule applies: a class comes out when its tests can follow it. This one cannot yet, so it stays
+    /// where the walks already reach it, and what it costs is written down rather than hidden.
+    /// </remarks>
+    internal static void ConfigureWindow(ApplicationHost host, IServiceProvider services, Window window)
     {
+        ArgumentNullException.ThrowIfNull(host);
+        ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(window);
-        if (_services is not { } services)
-        {
-            return;
-        }
 
         // Where the window was is part of what the application remembers (WIN-003): the stored
         // placement is applied before anything shows, followed while the window moves, and written
@@ -136,7 +133,7 @@ public static partial class CompositionRoot
                 // outlive the application.
                 services.GetRequiredService<SegmentDetectionScheduler>().Stop();
                 services.GetRequiredService<RootWatchBackground>().Stop();
-                EndPlaybackSessionHooks();
+                host.EndPlaybackSession();
                 if (Avalonia.Application.Current?.ApplicationLifetime
                     is IClassicDesktopStyleApplicationLifetime desktop)
                 {
@@ -190,7 +187,7 @@ public static partial class CompositionRoot
         PostSafely(() => services.GetRequiredService<UpdateViewModel>()
             .CheckAutomaticallyAsync(CancellationToken.None));
 
-        if (PendingActivationPath is { Length: > 0 } activation)
+        if (host.PendingActivationPath is { Length: > 0 } activation)
         {
             var open = services.GetRequiredService<OpenLooseFile>();
             var banner = services.GetRequiredService<LooseFileViewModel>();
@@ -215,7 +212,7 @@ public static partial class CompositionRoot
     /// Post rethrows its exception on the dispatcher and takes the application down for whatever the
     /// work happened to hit — a network answer, a missing file, a refused launch.
     /// </summary>
-    private static void PostSafely(Func<Task> work) =>
+    internal static void PostSafely(Func<Task> work) =>
         Avalonia.Threading.Dispatcher.UIThread.Post(() => _ = RunQuietlyAsync(work));
 
     private static async Task RunQuietlyAsync(Func<Task> work)
@@ -229,22 +226,6 @@ public static partial class CompositionRoot
             // Observed on purpose: the surfaces these jobs feed already land on their own error
             // states, and an entry-point job must never be the reason the process dies.
         }
-    }
-
-    public static Control CreateShell() => CreateShell(new AppDataPaths());
-
-    /// <summary>
-    /// Builds the application against one set of paths. Everything the product declares is registered
-    /// here and handed to the shell: a component nobody registers is a screen nobody can open.
-    /// </summary>
-    public static Control CreateShell(IAppDataPaths paths)
-    {
-        ArgumentNullException.ThrowIfNull(paths);
-        var shellHost = new ShellHost();
-        var services = new ServiceCollection()
-            .AddLocalMedia(paths, shellHost)
-            .BuildServiceProvider(validateScopes: true);
-        return FinishShell(services, paths);
     }
 
     /// <summary>
@@ -288,11 +269,15 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
-    /// Continues <see cref="CreateShell(IAppDataPaths)"/> after the registrations are built.
+    /// Continues <see cref="ApplicationHost.CreateShell"/> after the registrations are built.
     /// </summary>
-    private static Control FinishShell(ServiceProvider services, IAppDataPaths paths)
+    /// <remarks>
+    /// The host is not a parameter here and does not need to be: the surfaces that have to reach it
+    /// take it from the accessor its own container publishes, which is what replaced the static field
+    /// ARQ-001 removed.
+    /// </remarks>
+    internal static Control FinishShell(IServiceProvider services, IAppDataPaths paths)
     {
-        _services = services;
         _ = services.GetRequiredService<IThemeService>();
 
         // The stored language is applied before any surface is built, so the first window already
@@ -445,53 +430,57 @@ public static partial class CompositionRoot
     /// Everything the shell is handed. The long-lived surfaces arrive built; the ones that describe
     /// one title, one plan, or one playing session arrive as the request that builds them.
     /// </summary>
-    private static ShellSurfaces CreateShellSurfaces(IServiceProvider provider) => new()
+    private static ShellSurfaces CreateShellSurfaces(IServiceProvider provider)
     {
-        AppearanceSettings = provider.GetRequiredService<AppearanceSettingsViewModel>(),
-        Library = provider.GetRequiredService<LibraryViewModel>(),
-        Home = provider.GetRequiredService<HomeViewModel>(),
-        RecommendationSettings = provider.GetRequiredService<RecommendationSettingsViewModel>(),
-        LifecycleSettings = provider.GetRequiredService<LifecycleSettingsViewModel>(),
-        Backups = provider.GetRequiredService<BackupViewModel>(),
-        Restore = provider.GetRequiredService<RestoreWizardViewModel>(),
-        PrivacySettings = provider.GetRequiredService<PrivacySettingsViewModel>(),
-        Updates = provider.GetRequiredService<UpdateViewModel>(),
-        Onboarding = provider.GetRequiredService<RootOnboardingViewModel>(),
-        StartScan = (rootId, cancellationToken) => ScanRootAsync(provider, rootId, cancellationToken),
-        ReviewInbox = provider.GetRequiredService<ReviewInboxViewModel>(),
-        ScanSettings = provider.GetRequiredService<ScanSettingsViewModel>(),
-        Shortcuts = provider.GetRequiredService<ShortcutSettingsViewModel>(),
-        SubtitleStyle = provider.GetRequiredService<SubtitleStyleViewModel>(),
-        SegmentDetection = new SegmentDetectionSettingsViewModel(
+        var host = provider.GetRequiredService<ApplicationHost.Accessor>().Required;
+        return new ShellSurfaces
+        {
+            AppearanceSettings = provider.GetRequiredService<AppearanceSettingsViewModel>(),
+            Library = provider.GetRequiredService<LibraryViewModel>(),
+            Home = provider.GetRequiredService<HomeViewModel>(),
+            RecommendationSettings = provider.GetRequiredService<RecommendationSettingsViewModel>(),
+            LifecycleSettings = provider.GetRequiredService<LifecycleSettingsViewModel>(),
+            Backups = provider.GetRequiredService<BackupViewModel>(),
+            Restore = provider.GetRequiredService<RestoreWizardViewModel>(),
+            PrivacySettings = provider.GetRequiredService<PrivacySettingsViewModel>(),
+            Updates = provider.GetRequiredService<UpdateViewModel>(),
+            Onboarding = provider.GetRequiredService<RootOnboardingViewModel>(),
+            StartScan = (rootId, cancellationToken) => ScanRootAsync(provider, rootId, cancellationToken),
+            ReviewInbox = provider.GetRequiredService<ReviewInboxViewModel>(),
+            ScanSettings = provider.GetRequiredService<ScanSettingsViewModel>(),
+            Shortcuts = provider.GetRequiredService<ShortcutSettingsViewModel>(),
+            SubtitleStyle = provider.GetRequiredService<SubtitleStyleViewModel>(),
+            SegmentDetection = new SegmentDetectionSettingsViewModel(
             () => provider.GetRequiredService<DetectSeriesSegments>().IsEnabled,
             enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)),
-        OpenMetadataEditor = (titleId, cancellationToken) =>
-            OpenMetadataEditorAsync(provider, titleId, cancellationToken),
-        OpenRename = (titleId, cancellationToken) => OpenRenameAsync(provider, titleId, cancellationToken),
-        OpenDuplicates = (titleId, cancellationToken) => OpenDuplicatesAsync(provider, titleId, cancellationToken),
-        OpenPlayer = (request, cancellationToken) => OpenPlayerAsync(provider, request, cancellationToken),
-        // Closing the player writes the position before it stops the media: a session that ends
-        // without persisting is a resume offer that never appears.
-        ClosePlayer = async cancellationToken =>
-        {
-            // The loop and the handlers go first, so no tick races the final write and no dead
-            // session keeps feeding the singleton engine's events.
-            EndPlaybackSessionHooks();
+            OpenMetadataEditor = (titleId, cancellationToken) =>
+                OpenMetadataEditorAsync(provider, titleId, cancellationToken),
+            OpenRename = (titleId, cancellationToken) => OpenRenameAsync(provider, titleId, cancellationToken),
+            OpenDuplicates = (titleId, cancellationToken) => OpenDuplicatesAsync(provider, titleId, cancellationToken),
+            OpenPlayer = (request, cancellationToken) => OpenPlayerAsync(host, provider, request, cancellationToken),
+            // Closing the player writes the position before it stops the media: a session that ends
+            // without persisting is a resume offer that never appears.
+            ClosePlayer = async cancellationToken =>
+            {
+                // The loop and the handlers go first, so no tick races the final write and no dead
+                // session keeps feeding the singleton engine's events.
+                host.EndPlaybackSession();
 
-            // The write is not cancellable on purpose: a cancelled close would leave the position
-            // half written, and losing it is exactly what this call exists to prevent.
-            await provider.GetRequiredService<PlaybackProgressTracker>()
-                .FlushAsync(PersistenceTrigger.Close, CancellationToken.None)
-                .ConfigureAwait(true);
-            await provider.GetRequiredService<IPlaybackSessionCoordinator>()
-                .StopAsync(cancellationToken)
-                .ConfigureAwait(true);
-        },
-        ChangePlaybackMode = async (mode, cancellationToken) =>
-            (await provider.GetRequiredService<ChangePlaybackMode>()
-                .ExecuteAsync(mode, cancellationToken)
-                .ConfigureAwait(false)).To,
-    };
+                // The write is not cancellable on purpose: a cancelled close would leave the position
+                // half written, and losing it is exactly what this call exists to prevent.
+                await provider.GetRequiredService<PlaybackProgressTracker>()
+                    .FlushAsync(PersistenceTrigger.Close, CancellationToken.None)
+                    .ConfigureAwait(true);
+                await provider.GetRequiredService<IPlaybackSessionCoordinator>()
+                    .StopAsync(cancellationToken)
+                    .ConfigureAwait(true);
+            },
+            ChangePlaybackMode = async (mode, cancellationToken) =>
+                (await provider.GetRequiredService<ChangePlaybackMode>()
+                    .ExecuteAsync(mode, cancellationToken)
+                    .ConfigureAwait(false)).To,
+        };
+    }
 
     /// <summary>
     /// Scans one root and announces the progress on the library screen. The scan is cancellable from
@@ -618,6 +607,7 @@ public static partial class CompositionRoot
     /// device, and the resume offer are read here so the surface never has to query anything itself.
     /// </summary>
     private static async Task<PlayerSurfaces?> OpenPlayerAsync(
+        ApplicationHost host,
         IServiceProvider provider,
         PlayDetailsRequest request,
         CancellationToken cancellationToken)
@@ -680,7 +670,7 @@ public static partial class CompositionRoot
 
         // The overlay's buttons reach the countdown that is actually running: "play now" skips the
         // wait and "cancel" ends it. Resolved bare, both buttons only hid the card (PLY-011).
-        var nextEpisode = new NextEpisodeViewModel(HandleNextEpisodeActionAsync);
+        var nextEpisode = new NextEpisodeViewModel(action => HandleNextEpisodeActionAsync(host, action));
 
         // One router per session: keyboard and media keys resolve into the same action exactly
         // once, which is what stops a media key the focused window also sees as a key press from
@@ -723,7 +713,7 @@ public static partial class CompositionRoot
         // One session's handlers and its save loop end before the next session's begin: the engine
         // is a singleton, and a subscription per open with no unsubscribe stacks every dead
         // session's work onto the live one.
-        EndPlaybackSessionHooks();
+        host.EndPlaybackSession();
         engine.PositionChanged += OnPositionChanged;
         engine.StateChanged += OnStateChanged;
 
@@ -741,7 +731,7 @@ public static partial class CompositionRoot
         // The loop is what makes the five-second promise true: without it only an orderly close
         // writes, and a crash costs the whole session instead of one interval.
         var progressLoopTask = RunProgressLoopAsync(tracker, progressLoop.Token);
-        _playbackSessionHooks = new PlaybackSessionHooks(progressLoop, progressLoopTask, () =>
+        host.BeginPlaybackSession(progressLoop, progressLoopTask, () =>
         {
             engine.PositionChanged -= OnPositionChanged;
             engine.StateChanged -= OnStateChanged;
@@ -812,7 +802,7 @@ public static partial class CompositionRoot
             // arrives on LibVLC's thread, so the whole offer runs through the dispatcher.
             if (args.CurrentState == PlaybackState.Ended && episodeEntry is not null)
             {
-                PostSafely(() => OfferNextEpisodeAsync(provider, episodeEntry, nextEpisode));
+                PostSafely(() => OfferNextEpisodeAsync(host, provider, episodeEntry, nextEpisode));
             }
         }
 
@@ -1407,16 +1397,13 @@ public static partial class CompositionRoot
         }
     }
 
-    /// <summary>The countdown in flight, so the overlay's buttons can reach it.</summary>
-    private static NextEpisodeOffer? _nextEpisodeOffer;
-
     /// <summary>
     /// What the overlay's buttons do: both stop the wait, and "play now" remembers that the person
     /// wants the episode without it.
     /// </summary>
-    private static Task HandleNextEpisodeActionAsync(NextEpisodeAction action)
+    private static Task HandleNextEpisodeActionAsync(ApplicationHost host, NextEpisodeAction action)
     {
-        if (_nextEpisodeOffer is { } offer)
+        if (host.NextEpisode is { } offer)
         {
             offer.PlayNowRequested = action == NextEpisodeAction.PlayNow;
             offer.Countdown.Cancel();
@@ -1431,6 +1418,7 @@ public static partial class CompositionRoot
     /// chosen so the new session gets its tracker, markers, and tracks like any other.
     /// </summary>
     private static async Task OfferNextEpisodeAsync(
+        ApplicationHost host,
         IServiceProvider provider,
         EpisodeSequenceEntry currentEpisode,
         NextEpisodeViewModel overlay)
@@ -1459,8 +1447,8 @@ public static partial class CompositionRoot
         }
 
         overlay.Offer($"T{candidate.SeasonNumber} E{candidate.EpisodeNumber}", countdown.CountdownSeconds);
-        var offer = new NextEpisodeOffer(countdown);
-        _nextEpisodeOffer = offer;
+        var offer = new ApplicationHost.NextEpisodeOffer(countdown);
+        host.NextEpisode = offer;
         void OnTicked(object? sender, int remaining) =>
             Avalonia.Threading.Dispatcher.UIThread.Post(() => overlay.Tick(remaining));
         countdown.Ticked += OnTicked;
@@ -1474,7 +1462,7 @@ public static partial class CompositionRoot
         finally
         {
             countdown.Ticked -= OnTicked;
-            _nextEpisodeOffer = null;
+            host.NextEpisode = null;
         }
 
         overlay.Hide();
@@ -1500,20 +1488,6 @@ public static partial class CompositionRoot
             // details rather than pretending.
             await shell.ClosePlayerAsync(CancellationToken.None).ConfigureAwait(true);
         }
-    }
-
-    private sealed class NextEpisodeOffer(StartNextEpisodeCountdown countdown)
-    {
-        public StartNextEpisodeCountdown Countdown { get; } = countdown;
-
-        public bool PlayNowRequested { get; set; }
-    }
-
-    /// <summary>Ends the live session's save loop and detaches its engine handlers, if any.</summary>
-    private static void EndPlaybackSessionHooks()
-    {
-        _playbackSessionHooks?.End();
-        _playbackSessionHooks = null;
     }
 
     /// <summary>
@@ -1544,20 +1518,6 @@ public static partial class CompositionRoot
         {
             // The close flush remains the last line of defence; a failed opportunistic write is
             // strictly better than a crashed event handler.
-        }
-    }
-
-    private sealed class PlaybackSessionHooks(
-        CancellationTokenSource loopCancellation,
-        Task loopTask,
-        Action detachHandlers)
-    {
-        public void End()
-        {
-            loopCancellation.Cancel();
-            loopCancellation.Dispose();
-            _ = loopTask;
-            detachHandlers();
         }
     }
 

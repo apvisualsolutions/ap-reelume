@@ -53,6 +53,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **On the way out, the application lets go of what it took.** The native player, the database, the
+  tray icon, the media-key registrations and the network clients lived in a static field that nothing
+  ever released: the process ended and left Windows to reclaim its own, which is trusting rather than
+  closing. The application is now an object with an owner and it is released on exit, whether the exit
+  comes from the window or from the tray. There is a second effect, more visible in the tests than on
+  screen: two applications can exist at once in one process without seeing each other, and the clause
+  forcing the two full-journey suites to run one after another came off — which is how the ownership
+  is shown to be real rather than merely tidier. What is still not released, on purpose and written
+  down, is the native LibVLC instance: creating and destroying it repeatedly is a known failure mode,
+  so it lives as long as the process does.
 - **The application's registration stops being a three-hundred-line list.** Everything the
   application assembles was declared in one chain, and finding out what a piece depended on meant
   reading all of it. There are now eight modules by area — data, playback, personalisation, library,

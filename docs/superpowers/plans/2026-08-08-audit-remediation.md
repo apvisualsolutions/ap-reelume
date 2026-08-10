@@ -255,9 +255,23 @@ En este orden (el paso 1 desbloquea el resto):
       No se debilita: para colar código sin cubrir habría que haberlo escrito antes en el árbol base,
       donde la misma puerta lo habría retenido — y lo demostró reteniendo `WindowsFilePickers`. \ The
       gate decided by path rather than by content; it now compares code and announces what it exempts.
-- [ ] **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
+- [x] **ARQ-001 / WIN-005 / resto de BUG-004**: `ApplicationHost : IAsyncDisposable` que posea el
       `ServiceProvider`; liberar en `ShutdownRequested` (LibVLC, SQLite, bandeja, hotkeys, HttpClients);
-      retirar `DisableParallelization` de `AssembledShellSuites` como prueba.
+      retirar `DisableParallelization` de `AssembledShellSuites` como prueba. **Hecho 2026-08-10**: el
+      proveedor tiene dueño, y `PendingActivationPath` y el estado de la sesión de reproducción
+      salieron de los estáticos. `DisableParallelization` **retirado** y las 70 pruebas de
+      accesibilidad en verde, que es la prueba. `WindowLifecycle` —lo que ARQ-006 dejó a propósito—
+      se extrajo, la puerta de cobertura lo midió al 70,89 % de líneas y 28,57 % de ramas, y **volvió**
+      igual que `WindowsFilePickers`: resuelve diez servicios del contenedor y sus ramas no se
+      alcanzan sin fabricar un proveedor entero de dobles. `ConfigureWindow` sí perdió todo estático.
+      Dos desviaciones más, ambas razonadas en la evidencia: se libera en el `finally` de `Main`
+      en vez de en `ShutdownRequested` (estrictamente más tarde y más seguro, y cubre la salida por
+      bandeja), y la instancia **nativa** de LibVLC sigue viviendo lo que vive el proceso a propósito.
+      Destapó de paso un defecto de la puerta de consumo: leía `new (\w+)`, así que un tipo anidado
+      calificado se registraba con el nombre de su contenedor. Evidencia en
+      [audit-arq001-application-host.md](../../evidence/stable/audit-arq001-application-host.md). \
+      Done: the provider has an owner, the window lifecycle came out with the move, and the
+      parallelisation switch came off.
 - [ ] **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores (hay ~24 `async void` sin red,
       cobertura desigual entre ViewModels) + `UnhandledException`/`UnobservedTaskException` globales
       en `Program.cs`.
