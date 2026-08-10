@@ -272,12 +272,31 @@ En este orden (el paso 1 desbloquea el resto):
       [audit-arq001-application-host.md](../../evidence/stable/audit-arq001-application-host.md). \
       Done: the provider has an owner, the window lifecycle came out with the move, and the
       parallelisation switch came off.
+**Orden decidido el 2026-08-10 (experto), para que la siguiente sesión no re-delibere**: ARQ-010
+primero, ARQ-004 después, ARQ-005 al final. ARQ-010 es una línea y **es una medición**: enciende la
+validación del contenedor al construirlo, de modo que cualquier registro roto sale en el arranque de
+cada prueba en vez de en la resolución que lo tocara. Barato, y da señal antes de dos refactores
+grandes. ARQ-004 va antes que ARQ-005 porque el arranque asíncrono va a producir precisamente el tipo
+de fallo que ARQ-004 existe para no perder: si se invierte el orden, ARQ-005 aterriza sobre un suelo
+que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ-004, then ARQ-005.
+
+- [ ] **ARQ-010**: `ValidateOnBuild = true`. Una línea en `ApplicationHost.Create`. Cuenta como hecho
+      cuando una prueba fije que la validación está encendida — si no, se apaga sin que nadie lo note.
 - [ ] **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores (hay ~24 `async void` sin red,
       cobertura desigual entre ViewModels) + `UnhandledException`/`UnobservedTaskException` globales
-      en `Program.cs`.
+      en `Program.cs`. **Límites decididos**: vive en `Presentation`, porque es una preocupación de
+      los ViewModels y no del anfitrión; un fallo aterriza en el estado de error de su propia
+      superficie y **nunca** mata el proceso; y los manejadores globales de `Program.cs` respetan la
+      lista blanca de diagnóstico — registran un código, jamás un mensaje libre, que es por donde se
+      escapa una ruta o un nombre. El diseño fino se decide **midiendo** los ~24 sitios, no aquí:
+      inventarlo sin leerlos sería exactamente lo que este repositorio castiga.
 - [ ] **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de UI (migración+integridad);
-      sacar el bloqueo del `lock` en `WindowsMediaKeyService`.
-- [ ] **ARQ-010**: `ValidateOnBuild = true`.
+      sacar el bloqueo del `lock` en `WindowsMediaKeyService`. **Límite decidido**: la ventana no
+      puede quedarse en blanco mientras migra. Lo que hoy bloquea el hilo devuelve una vista y sólo
+      después decide si esa vista es el shell o la de recuperación, así que la versión asíncrona tiene
+      que mostrar algo desde el primer fotograma y cambiarlo al terminar — y `AssembledJourneyTests`
+      tiene que seguir viendo el shell al final, que es la prueba de que el cambio no rompió el
+      arranque.
 
 ## WP-7 — CI/CD y puertas
 

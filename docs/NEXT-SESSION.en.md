@@ -72,12 +72,18 @@ Four commits, each with its full cycle and its bilingual evidence.
 
 ## What comes next (in this order)
 
-1. **ARQ-004**: a single `AsyncRelayCommand` with error handling — there are some twenty-four
-   unguarded `async void` methods and coverage across view models is uneven — plus global
-   `UnhandledException` and `UnobservedTaskException` handlers in `Program.cs`.
-2. **ARQ-005**: startup without `GetAwaiter().GetResult()` on the interface thread (migration and
-   integrity), and taking the blocking call out of the `lock` in `WindowsMediaKeyService`.
-3. **ARQ-010**: `ValidateOnBuild = true`.
+The order is decided in the plan and needs no re-deliberating; so are each one's limits.
+
+1. **ARQ-010**: `ValidateOnBuild = true`. One line, and it is a measurement: any broken registration
+   surfaces at every test's startup instead of at whichever resolution happened to touch it. Cheap
+   signal before the two large refactors. It only counts as done if a test pins that it is on.
+2. **ARQ-004**: a single `AsyncRelayCommand` with error handling — there are some twenty-four
+   unguarded `async void` methods — plus global `UnhandledException` and `UnobservedTaskException`
+   handlers in `Program.cs`. It comes before ARQ-005 deliberately: async startup will produce exactly
+   the kind of failure ARQ-004 exists to keep.
+3. **ARQ-005**: startup without `GetAwaiter().GetResult()` on the interface thread (migration and
+   integrity), and taking the blocking call out of the `lock` in `WindowsMediaKeyService`. The window
+   cannot go blank while it migrates.
 4. **The coverage debt** named in
    [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): the error branches of
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`. It stays

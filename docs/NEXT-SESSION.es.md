@@ -74,12 +74,18 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
 
 ## Lo que sigue (en este orden)
 
-1. **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores —hay unas veinticuatro
-   `async void` sin red y la cobertura entre ViewModels es desigual— más `UnhandledException` y
-   `UnobservedTaskException` globales en `Program.cs`.
-2. **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de interfaz (migración e
-   integridad), y sacar el bloqueo del `lock` en `WindowsMediaKeyService`.
-3. **ARQ-010**: `ValidateOnBuild = true`.
+El orden está decidido en el plan y no hace falta re-deliberarlo; los límites de cada uno también.
+
+1. **ARQ-010**: `ValidateOnBuild = true`. Una línea, y es una medición: cualquier registro roto sale
+   en el arranque de cada prueba en vez de en la resolución que lo tocara. Da señal barata antes de
+   los dos refactores grandes. Sólo cuenta como hecho si una prueba fija que está encendido.
+2. **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores —hay unas veinticuatro
+   `async void` sin red— más `UnhandledException` y `UnobservedTaskException` globales en
+   `Program.cs`. Va antes que ARQ-005 a propósito: el arranque asíncrono producirá justo el tipo de
+   fallo que ARQ-004 existe para no perder.
+3. **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de interfaz (migración e
+   integridad), y sacar el bloqueo del `lock` en `WindowsMediaKeyService`. La ventana no puede
+   quedarse en blanco mientras migra.
 4. **La deuda de cobertura** que nombra
    [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): las ramas de error de
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`. Sigue siendo
