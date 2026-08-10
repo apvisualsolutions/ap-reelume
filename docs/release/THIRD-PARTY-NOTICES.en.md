@@ -70,14 +70,21 @@ The `VideoLAN.LibVLC.Windows` package declares `LGPL-2.1-or-later`, which covers
 `libvlccore.dll`. It also ships roughly three hundred plugins in `plugins/`, and **those carry their
 own licences**, some of which are `GPL-2.0-or-later` rather than LGPL — the x264 encoder behind
 `libx26410b_plugin.dll` is the clearest example. The library is distributed unmodified and keeps
-VideoLAN's own licence notice inside the package, which the artifact must ship in full.
+distributed unmodified. VideoLAN's NuGet package carries **no `COPYING` file at all**, so the notice
+has to be supplied here: it is part of what is missing, below.
 
 For a program released under `GPL-3.0-or-later`, a `GPL-2.0-or-later` plugin is compatible: the
-"or later" is what makes the two meet at GPL-3.0. A plugin licensed `GPL-2.0-only` would not be, and
-confirming that none is, in the exact VideoLAN build this package pins, is a question for the
-professional legal opinion recorded under [REL-004 in the feature matrix](../FEATURES.md), not for
-this document. The practical lever, if that opinion asks for one, is to trim the plugin set to what
-playback actually loads.
+"or later" is what makes the two meet at GPL-3.0. A plugin licensed `GPL-2.0-only` would not be.
+**Checked on 2026-08-10 and closed**: VLC's tree carries the GPL version 2 with the "either version 2
+of the License, or (at your option) any later version" clause, so the set is `GPL-2.0-or-later` and
+sits under GPL-3.0. Trimming the plugin set stays available as a way to reduce surface, but licensing
+does not require it.
+
+**What is missing, and it is a real obligation**: this artifact does **not yet carry the text** of the
+third-party licences. LGPL-2.1 (§6), GPL-2.0 (§1), and Apache-2.0 (§4a) each require a copy of the
+licence to accompany a binary distribution, and MIT and BSD-3-Clause require their copyright notice to
+be reproduced. Naming the component and its licence, which is what this document does, is not the same
+as accompanying it. The package's `licenses/` folder must carry the full texts alongside these notices.
 
 ## Components used only during development and testing
 
