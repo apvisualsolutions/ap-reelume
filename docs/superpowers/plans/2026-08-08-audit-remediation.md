@@ -598,8 +598,23 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
 - [ ] Manual de usuario: documentar actualizador y detección de segmentos.
 - [ ] ARQ-012 (RepositoryLayout/TestAppBuilder duplicados, dos anclas), ARQ-013 (regex de la puerta
       de alcanzabilidad acepta comentarios), ARQ-014 (User-Agent con marca y versión desincronizada).
-- [ ] **BUG-010**: unificar `LibVlcMediaProbe` sobre `LibVlcFactory.DeferRelease` (su cola propia
+- [x] **BUG-010**: unificar `LibVlcMediaProbe` sobre `LibVlcFactory.DeferRelease` (su cola propia
       puede morir para siempre y mantiene una segunda instancia nativa fuera del contador).
+      **Hecho el 2026-08-11**: el sondeo recibe la fábrica; fuera su instancia, su cola, su
+      trabajador y su bandera (−67/+40). La regla queda como prueba de arquitectura sobre `src/`
+      —`NativeInstanceOwnershipTests`— porque en ejecución la segunda instancia es invisible, que es
+      el defecto. **Y la regla encontró la clase donde el plan nombraba un caso**: hay una tercera
+      cola en `LibVlcMediaPlayerEngine`, anotada abajo. Evidencia en
+      [audit-bug010-native-instance.md](../../evidence/stable/audit-bug010-native-instance.md).
+      \ Done; the rule found a third queue the plan did not name.
+- [ ] **BUG-011** (nuevo, medido el 2026-08-11): `LibVlcMediaPlayerEngine` mantiene la tercera cola
+      de liberación diferida, con el mismo `Dispose` sin guarda —un fallo al liberar deja su
+      trabajador muerto y filtra en silencio a partir de ahí—. **No es el mismo cambio que BUG-010**:
+      su `DisposeAsync` espera a su propio drenaje **antes** de soltar el reproductor, y ese orden es
+      lo que evita que la destrucción nativa se lleve el proceso, así que unificarlo exige que
+      `LibVlcFactory` sepa vaciar a petición. Está en la lista que sólo puede encoger de
+      `NativeInstanceOwnershipTests`, visible en cada ejecución. \ New: the engine's queue needs a
+      flush-on-request on the factory before it can move.
 - [ ] QA-001: barrido de `Parse/ToString` sin cultura en `src/`.
 
 ## Pendiente transversal / Cross-cutting pending

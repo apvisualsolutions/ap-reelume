@@ -124,6 +124,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   say whether it was the launch that got worse or the machine. The first measurement settled two
   things: all five cycles migrate a new database rather than only the first one, as had been
   written, and the first launch is not the slowest of the three either.
+- **Cataloguing and playing share the native engine instead of starting one each.** Reading a file's
+  technical data spun up its own LibVLC instance with the same options as the playback one, so a
+  process that catalogued and played kept two native engines open — and the count that says "one per
+  option set" could not see the second. There is one owner now, and a test that fails the moment
+  another appears. The second media-release queue goes with it: the probe's did not guard its own
+  disposal, so a single failing release would have left its worker dead for good and everything
+  catalogued afterwards would have leaked with nothing saying a word. The one that remains already
+  carries that guard.
 - **A launch that never paints now leaves a diagnosis instead of a mute exit code.** The
   verification kills the process when the window deadline runs out, and the only thing written down
   was that kill — `exit code -1` — which says nothing about the launch. Now, **before** killing it,

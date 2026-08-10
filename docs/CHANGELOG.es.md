@@ -124,6 +124,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   plazo. Tres cifras y no una, porque un número solo no dice si el que empeoró fue el arranque o la
   máquina. La primera medición dejó dos cosas claras: los cinco ciclos migran una base nueva, no
   sólo el primero como estaba escrito, y el primer arranque tampoco es el más lento de los tres.
+- **Catalogar y reproducir comparten el motor nativo, en lugar de arrancar uno cada uno.** Leer los
+  datos técnicos de un archivo levantaba su propia instancia de LibVLC con las mismas opciones que la
+  de reproducción, así que un proceso que catalogaba y reproducía mantenía dos motores nativos
+  abiertos — y el contador que dice «uno por juego de opciones» no podía ver el segundo. Ahora hay un
+  dueño y una prueba que falla si aparece otro. De paso desaparece la segunda cola de liberación de
+  medios: la que tenía el sondeo no protegía su propio cierre, de modo que un único fallo al liberar
+  habría dejado su trabajador muerto para siempre y todo lo catalogado después se habría ido
+  filtrando sin que nada avisara. La que queda ya vive protegida contra eso.
 - **Un arranque que no llega a pintar ya deja diagnóstico en vez de un código de salida mudo.** La
   verificación mata el proceso cuando agota el plazo de la ventana, y lo único que quedaba escrito
   era ese matarile —`exit code -1`—, que no habla del arranque. Ahora, **antes** de matarlo, la

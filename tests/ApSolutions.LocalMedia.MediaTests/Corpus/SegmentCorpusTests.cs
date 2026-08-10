@@ -3,6 +3,7 @@
 
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Infrastructure.Media;
+using ApSolutions.LocalMedia.Infrastructure.Playback;
 using ApSolutions.LocalMedia.MediaTests.Fixtures;
 using Xunit;
 
@@ -224,7 +225,9 @@ public sealed class SegmentCorpusTests
         var path = await SegmentCorpus.MaterialiseAsync(episode, TestContext.Current.CancellationToken);
 
         Assert.True(File.Exists(path), $"The corpus generator produced nothing at '{path}'.");
-        var metadata = await new LibVlcMediaProbe().ProbeAsync(path, TestContext.Current.CancellationToken);
+        await using var factory = LibVlcFactory.CreateHeadless();
+        var metadata = await new LibVlcMediaProbe(factory)
+            .ProbeAsync(path, TestContext.Current.CancellationToken);
         Assert.NotNull(metadata.Duration);
         Assert.InRange(
             metadata.Duration!.Value.TotalSeconds,

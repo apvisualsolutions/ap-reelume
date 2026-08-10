@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Media;
+using ApSolutions.LocalMedia.Infrastructure.Playback;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
 using Microsoft.Data.Sqlite;
 using Xunit;
@@ -36,7 +37,10 @@ public sealed class IncrementalScanTests
 
         Assert.NotNull(repository.GetConstructor([factory.GetType()]));
         Assert.NotNull(enumerator.GetConstructor(Type.EmptyTypes));
-        Assert.NotNull(probe.GetConstructor(Type.EmptyTypes));
+        // The probe takes the factory that owns the one native instance (BUG-010); a parameterless
+        // one would be a probe that built a second.
+        Assert.NotNull(probe.GetConstructor(
+            [RequireType("ApSolutions.LocalMedia.Infrastructure.Playback.LibVlcFactory")]));
 
         await using var connection = await DatabaseTestHarness.OpenAsync(factory);
         var tables = await ReadNamesAsync(connection);
@@ -116,7 +120,8 @@ public sealed class IncrementalScanTests
             invalidMediaPath,
             "not a media container",
             TestContext.Current.CancellationToken);
-        var probe = new LibVlcMediaProbe();
+        await using var vlc = LibVlcFactory.CreateHeadless();
+        var probe = new LibVlcMediaProbe(vlc);
 
         await Assert.ThrowsAsync<InvalidDataException>(
             () => probe.ProbeAsync(invalidMediaPath, TestContext.Current.CancellationToken));
@@ -132,7 +137,8 @@ public sealed class IncrementalScanTests
         await CreatePcmWaveAsync(firstPath);
         await CreatePcmWaveAsync(secondPath);
         await CreatePcmWaveAsync(thirdPath);
-        var probe = new LibVlcMediaProbe();
+        await using var vlc = LibVlcFactory.CreateHeadless();
+        var probe = new LibVlcMediaProbe(vlc);
 
         var first = await probe.ProbeAsync(firstPath, TestContext.Current.CancellationToken);
         var second = await probe.ProbeAsync(secondPath, TestContext.Current.CancellationToken);
