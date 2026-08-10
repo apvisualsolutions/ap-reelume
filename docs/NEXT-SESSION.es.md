@@ -78,13 +78,14 @@ La cola de tres —línea base, ARQ-005 segunda mitad, deuda de TST-001— **se 
 2026-08-10** (cuarta sesión). Lo que queda, en orden de valor:
 
 1. **`ReconcileScannedFiles.cs`, la última deuda de cobertura.** 98 líneas y 50 ramas, a 86,73 % y
-   76,00 %. Ya no se puede escapar: está en la lista de vigilados de `eng/check-coverage.ps1` con
-   ese suelo, así que empeorar falla y mejorar **también** falla hasta que se anota el número nuevo.
-   Las otras dos se saldaron y el patrón que las tenía flojas se repetirá aquí: **las pruebas
-   existentes cubren el cableado y no el contenido**, así que hay que buscar las ramas de error, no
-   el camino feliz.
-2. **El rojo intermitente, que sigue sin causa.** Ver la sección de abajo: lo que se le atribuía
-   quedó descartado con números, y ahora hay una serie de tiempos con la que comparar.
+   76,00 %, ya vigilado con ese suelo. **La forma está decidida en el plan**: unitarias con dobles
+   en memoria en `Application.Tests/Discovery/ReconcileScannedFilesTests.cs`, apuntando a las
+   **decisiones** y no al camino feliz —que ya cubren los recorridos de escaneo, y por eso las
+   líneas van al 87 % y las ramas al 76 %—, con la lista de ramas que faltan escrita una a una. Al
+   terminar hay que **subir el suelo**, o la puerta falla: eso es el trinquete.
+2. **El rojo intermitente, que sigue sin causa.** Decidido: **no** salir a buscarlo —es una carrera
+   y no se reproduce aquí— sino **instrumentar su camino**, para que la próxima vez deje diagnóstico
+   en vez de un `exit code -1` mudo. Detalle y forma en el plan.
 3. **Lo que quede del plan de remediación** en
    [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md).
 

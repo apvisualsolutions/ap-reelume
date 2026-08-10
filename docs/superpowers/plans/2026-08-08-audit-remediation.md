@@ -414,8 +414,40 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
       holds a watchlist with a ratchet; two of the three debts are paid.
   - [ ] **`ReconcileScannedFiles.cs`, la deuda que queda**: 86,73 % de líneas y 76,00 % de ramas,
         sobre 98 líneas y 50 ramas. Ya está vigilado con ese suelo, así que no puede empeorar en
-        silencio. Buscar las ramas de error, no el camino feliz. \ The one debt left, already
-        floored.
+        silencio. **Decidido el 2026-08-10 (experto), para que no se re-delibere:**
+        - **Dónde**: `tests/ApSolutions.LocalMedia.Application.Tests/Discovery/ReconcileScannedFilesTests.cs`,
+          **unitarias con dobles en memoria** de `IMediaFileRepository` e `IFileIdentityProvider`.
+          `ReconcileScanResults`, `FileReconciliationPolicy` y `PendingReassignments` son clases
+          concretas: se construyen de verdad, no se sustituyen.
+        - **Por qué ahí y no en un recorrido**: el camino feliz ya lo cubre
+          `ScanReconciliationTests` (IntegrationTests) y por eso las líneas están al 87 % y las
+          ramas al 76 %. Lo que falta son **decisiones**, y una decisión se prueba más barata y más
+          clara desde fuera que montando un escaneo que la provoque.
+        - **Las ramas que faltan**, que son la lista de trabajo: escaneo cancelado; un resultado con
+          `Outcome` fuera de Added/Updated/Unchanged; fila inexistente; identidad ya almacenada en
+          una fila no `Updated`; identidad ilegible (cuenta como fallida y sigue); `Updated` que
+          refresca la identidad porque el fingerprint viejo describe bytes que ya no están; un
+          candidato **visto en el mismo escaneo**, que es una copia y no un movimiento; decisión no
+          exacta o más de un candidato, que se retiene para la bandeja; la excepción que cuenta y
+          continúa frente a la cancelación que se relanza; `KeepAsNewAsync` con y sin fila; y las
+          cinco guardas del constructor. En `FindCandidatesAsync`: con identificador estable que
+          apunta a uno mismo, sin fingerprint, y el filtrado de uno mismo entre los impresos.
+        - **Al terminar, subir el suelo** en `eng/check-coverage.ps1` al número medido — la puerta
+          falla si no se hace, que es el punto del trinquete. \ Decided: unit tests with in-memory
+          doubles, aimed at the decisions rather than the happy path, then raise the floor.
+- [ ] **El rojo intermitente de `first-launch`, que sigue sin causa.** **Decidido el 2026-08-10
+      (experto):** no se sube el plazo de 90 s, y tampoco se sale a buscarlo — es una carrera y no se
+      reproduce aquí. Lo que se hace es **instrumentar el camino del fallo**, para que la próxima vez
+      que ocurra deje diagnóstico en vez de un `exit code -1` mudo: cuando `Invoke-Application` agota
+      el plazo de ventana, **antes de matar el proceso**, anotar en la fase si el proceso seguía
+      vivo y volcar el estado de la carpeta de datos — si `library.db` existe y cuántas filas tiene
+      `schema_history`. Eso separa las dos hipótesis que hoy no se pueden distinguir: **murió antes
+      de migrar** o **migró y nunca pintó**.
+      **Y un dato que cambia el análisis**: desde ARQ-005 la ventana aparece **antes** de migrar, así
+      que si el plazo de ventana vuelve a agotarse, la migración ya no puede ser la causa y el fallo
+      está por debajo — Avalonia, el arranque del runtime o el propio proceso. \ Decided: instrument
+      the failure path instead of hunting the race; the window now precedes the migration, so a
+      repeat rules the migration out by construction.
 - [x] **Lo que se decidió el 2026-08-10 (experto), antes de ejecutarlo:**
       - **Los números del documento están caducados.** Una medición aproximada del 2026-08-10 (el
         máximo por informe, no la unión) los sitúa bastante mejor en líneas y todavía flojos en ramas,

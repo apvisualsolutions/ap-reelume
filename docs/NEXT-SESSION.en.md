@@ -76,12 +76,14 @@ The three-part queue — baseline, ARQ-005's second half, TST-001's debt — **w
 2026-08-10** (fourth session). What is left, in order of value:
 
 1. **`ReconcileScannedFiles.cs`, the last coverage debt.** 98 lines and 50 branches, at 86.73% and
-   76.00%. It cannot slip away now: it is in `eng/check-coverage.ps1`'s watchlist at that floor, so
-   getting worse fails and getting better **also** fails until the new number is recorded. The other
-   two were paid off, and the pattern that left them thin will repeat here: **the existing tests
-   cover the wiring and not the content**, so look for the error branches rather than the happy path.
-2. **The intermittent red, still without a cause.** See the section below: what it had been
-   attributed to was ruled out with numbers, and there is now a series of timings to compare with.
+   76.00%, already watched at that floor. **The shape is decided in the plan**: unit tests with
+   in-memory doubles in `Application.Tests/Discovery/ReconcileScannedFilesTests.cs`, aimed at the
+   **decisions** rather than the happy path — which the scan walks already cover, which is why lines
+   sit at 87% and branches at 76% — with the missing branches listed one by one. Raise the floor
+   afterwards, or the gate fails: that is the ratchet.
+2. **The intermittent red, still without a cause.** Decided: do **not** go hunting it — it is a race
+   and it does not reproduce here — but **instrument its path**, so the next occurrence leaves a
+   diagnosis instead of a silent `exit code -1`. Shape in the plan.
 3. **Whatever is left of the remediation plan** in
    [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md).
 
