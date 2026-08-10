@@ -30,6 +30,15 @@ $resultsDirectory = Join-Path $repoRoot "artifacts/test-results/verify-$Runtime"
 
 Push-Location $repoRoot
 try {
+    # A fresh results directory per run, because the coverage gate merges every report it finds
+    # here. Left to accumulate, a local machine that verifies repeatedly ends up measuring code that
+    # no longer exists — a line covered by a run from an hour ago counts as covered today — and the
+    # merge command eventually outgrows the command line and fails with a message about a filename
+    # being too long, which says nothing about the cause. CI never saw this because it starts clean.
+    if (Test-Path -LiteralPath $resultsDirectory) {
+        Remove-Item -LiteralPath $resultsDirectory -Recurse -Force
+    }
+
     dotnet tool restore
     if ($LASTEXITCODE -ne 0) { throw 'dotnet tool restore failed.' }
 
