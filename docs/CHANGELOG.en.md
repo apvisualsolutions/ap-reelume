@@ -124,6 +124,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   say whether it was the launch that got worse or the machine. The first measurement settled two
   things: all five cycles migrate a new database rather than only the first one, as had been
   written, and the first launch is not the slowest of the three either.
+- **A launch that never paints now leaves a diagnosis instead of a mute exit code.** The
+  verification kills the process when the window deadline runs out, and the only thing written down
+  was that kill — `exit code -1` — which says nothing about the launch. Now, **before** killing it,
+  the verification records whether the process was still alive, how much processor time it had used
+  across how many threads — which is what separates spinning from waiting — whether the database
+  exists and how many migrations it has been through, and what the data folder holds. All of it
+  lands in the same line CI prints when the phase fails. None of those reads can break anything: a
+  diagnosis that fails would replace the failure it was called to explain, so whatever goes wrong is
+  reported inside the sentence itself. The ninety-second deadline has not been raised, which would
+  turn the only signal there is into silence.
 - **On the way out, the application lets go of what it took.** The native player, the database, the
   tray icon, the media-key registrations and the network clients lived in a static field that nothing
   ever released: the process ended and left Windows to reclaim its own, which is trusting rather than

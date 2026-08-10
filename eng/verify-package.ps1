@@ -79,6 +79,116 @@ function Clear-ProfilerEnvironment {
 }
 
 <#
+    What was true at the moment a window failed to arrive, read before the harness kills the process.
+
+    A launch that reaches its deadline reports `exit code -1` afterwards, and that code is this
+    harness's own kill: it says nothing about the launch. Two states that a later reading cannot tell
+    apart are still distinguishable here — a process that had already died on its own, and one still
+    running with nothing to show — and so is the difference between a process that is spinning and
+    one that is waiting. The data folder is read for the same reason: after a kill, a half-written
+    database and one that was never written look alike.
+
+    The 2026-08-10 failure is what this is measured against. All it left behind was
+    `Window shown: False; exit code -1; 16 migration(s) applied to a new database`, and those sixteen
+    migrations already rule out the death-before-migrating half of the question. What was never
+    recorded is the other half: whether anything was still alive to paint. Since ARQ-005 the window
+    is created before the migration runs, so a repeat also rules the migration out by construction.
+
+    Nothing in here may throw. A diagnosis that fails takes the place of the failure it was called to
+    explain, which is the one outcome worse than no diagnosis at all.
+#>
+function Get-LaunchDiagnosis {
+    param(
+        [Parameter(Mandatory)]$Process,
+        [Parameter(Mandatory)][string]$DataRoot
+    )
+
+    $diagnosis = [ordered]@{
+        processAlive      = $null
+        exitCode          = $null
+        processorSeconds  = $null
+        threads           = $null
+        databaseExists    = $false
+        databaseBytes     = 0
+        schemaHistoryRows = $null
+        dataRootEntries   = @()
+        notes             = @()
+    }
+
+    try {
+        $Process.Refresh()
+        $diagnosis.processAlive = -not $Process.HasExited
+        if ($Process.HasExited) {
+            $diagnosis.exitCode = $Process.ExitCode
+        }
+        else {
+            $diagnosis.processorSeconds = [math]::Round($Process.TotalProcessorTime.TotalSeconds, 2)
+            $diagnosis.threads = $Process.Threads.Count
+        }
+    }
+    catch {
+        $diagnosis.notes += "the process could not be inspected: $($_.Exception.Message)"
+    }
+
+    try {
+        $diagnosis.dataRootEntries = @(Get-ChildItem -LiteralPath $DataRoot -Force -ErrorAction Stop |
+                ForEach-Object { $_.Name })
+    }
+    catch {
+        $diagnosis.notes += "the data folder could not be listed: $($_.Exception.Message)"
+    }
+
+    try {
+        $database = Join-Path $DataRoot 'library.db'
+        if (Test-Path -LiteralPath $database) {
+            $diagnosis.databaseExists = $true
+            $diagnosis.databaseBytes = [int64](Get-Item -LiteralPath $database).Length
+            $diagnosis.schemaHistoryRows =
+                [int](Get-TableCounts -DatabasePath $database -Tables @('schema_history')).schema_history
+        }
+    }
+    catch {
+        $diagnosis.notes += "library.db could not be read: $($_.Exception.Message)"
+    }
+
+    return [pscustomobject]$diagnosis
+}
+
+<#
+    The diagnosis as one sentence, so a failing phase names what it saw in the line CI prints rather
+    than only in a report somebody has to go and download.
+#>
+function Format-LaunchDiagnosis {
+    param([Parameter(Mandatory)]$Diagnosis)
+
+    $parts = @()
+    $parts += if ($null -eq $Diagnosis.processAlive) { 'the process could not be inspected' }
+    elseif ($Diagnosis.processAlive) {
+        "the process was still running ($($Diagnosis.processorSeconds) s of processor time across " +
+        "$($Diagnosis.threads) thread(s))"
+    }
+    else { "the process had already exited with code $($Diagnosis.exitCode)" }
+
+    $parts += if (-not $Diagnosis.databaseExists) { 'no library.db' }
+    elseif ($null -eq $Diagnosis.schemaHistoryRows) {
+        "library.db of $($Diagnosis.databaseBytes) byte(s), schema_history unread"
+    }
+    else {
+        "library.db of $($Diagnosis.databaseBytes) byte(s) with $($Diagnosis.schemaHistoryRows) " +
+        'row(s) in schema_history'
+    }
+
+    $parts += if ($Diagnosis.dataRootEntries.Count -gt 0) {
+        "the data folder holds $($Diagnosis.dataRootEntries -join ', ')"
+    }
+    else { 'the data folder is empty' }
+
+    $sentence = $parts -join '; '
+    if ($Diagnosis.notes.Count -gt 0) { $sentence += " [$($Diagnosis.notes -join '; ')]" }
+    return $sentence
+}
+
+<#
     Starts the application the way an installed copy would start, waits for it to put a window on the
     screen, and closes it the way a person would. A run that has to be killed is a failed run.
 
@@ -120,6 +230,7 @@ function Invoke-Application {
         $deadline = [datetime]::UtcNow.AddSeconds($WindowTimeoutSeconds)
         $windowShown = $false
         $windowMilliseconds = $null
+        $launchDiagnosis = $null
         while ([datetime]::UtcNow -lt $deadline) {
             if ($process.HasExited) { break }
             $process.Refresh()
@@ -133,7 +244,10 @@ function Invoke-Application {
         }
 
         # Startup is asynchronous: the window appears before the first scan and the first write.
+        # A launch with no window is the only one worth interrogating, and it has to be interrogated
+        # now: the kill below is what erases the answer.
         if ($windowShown) { Start-Sleep -Seconds $SettleSeconds }
+        else { $launchDiagnosis = Get-LaunchDiagnosis -Process $process -DataRoot $DataRoot }
 
         $closedPolitely = $false
         if (-not $process.HasExited) {
@@ -150,6 +264,7 @@ function Invoke-Application {
             windowMilliseconds     = $windowMilliseconds
             windowTimeoutMilliseconds = $WindowTimeoutSeconds * 1000
             windowPollMilliseconds = $pollMilliseconds
+            launchDiagnosis        = $launchDiagnosis
             closedPolitely         = $closedPolitely
             exitCode               = $process.ExitCode
         }
@@ -161,12 +276,16 @@ function Invoke-Application {
 
 <#
     Says the wait the way a person reads it, including when there was none to say: a launch that
-    reached the deadline has to report that rather than leave the sentence half-written.
+    reached the deadline has to report that rather than leave the sentence half-written — and, since
+    that is the only sentence a failed phase leaves in the log, it carries the diagnosis with it.
 #>
 function Format-WindowWait {
     param([Parameter(Mandatory)]$Run)
 
     if ($null -ne $Run.windowMilliseconds) { "Window shown after $($Run.windowMilliseconds) ms" }
+    elseif ($null -ne $Run.launchDiagnosis) {
+        "No window inside $($Run.windowTimeoutMilliseconds) ms — $(Format-LaunchDiagnosis $Run.launchDiagnosis)"
+    }
     else { "No window inside $($Run.windowTimeoutMilliseconds) ms" }
 }
 

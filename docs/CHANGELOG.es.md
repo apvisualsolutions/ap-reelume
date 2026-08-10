@@ -124,6 +124,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   plazo. Tres cifras y no una, porque un número solo no dice si el que empeoró fue el arranque o la
   máquina. La primera medición dejó dos cosas claras: los cinco ciclos migran una base nueva, no
   sólo el primero como estaba escrito, y el primer arranque tampoco es el más lento de los tres.
+- **Un arranque que no llega a pintar ya deja diagnóstico en vez de un código de salida mudo.** La
+  verificación mata el proceso cuando agota el plazo de la ventana, y lo único que quedaba escrito
+  era ese matarile —`exit code -1`—, que no habla del arranque. Ahora, **antes** de matarlo, la
+  verificación anota si el proceso seguía vivo, cuánto procesador había gastado y en cuántos hilos
+  —que es lo que separa girar de esperar—, si la base de datos existe y por cuántas migraciones ha
+  pasado, y qué hay en la carpeta de datos. Todo eso va en la misma línea que CI imprime al fallar.
+  Ninguna de esas lecturas puede romper nada: un diagnóstico que falla sustituiría al fallo que venía
+  a explicar, así que lo que salga mal se cuenta dentro de la propia frase. No se ha subido el plazo
+  de noventa segundos, que sería convertir la única señal que hay en silencio.
 - **Al salir, la aplicación suelta lo que había tomado.** El reproductor nativo, la base de datos, el
   icono de bandeja, los registros de teclas multimedia y los clientes de red vivían en un campo
   estático que nada liberaba nunca: el proceso terminaba y le dejaba a Windows recoger lo suyo, que no

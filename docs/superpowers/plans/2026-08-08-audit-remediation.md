@@ -444,7 +444,7 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
           campos. Evidencia en
           [audit-tst1-reconcile-coverage.md](../../evidence/stable/audit-tst1-reconcile-coverage.md).
           \ Done: 100%/100% with nine tests; measuring the list first cut it by a third.
-- [ ] **El rojo intermitente de `first-launch`, que sigue sin causa.** **Decidido el 2026-08-10
+- [x] **El rojo intermitente de `first-launch`, que sigue sin causa.** **Decidido el 2026-08-10
       (experto):** no se sube el plazo de 90 s, y tampoco se sale a buscarlo — es una carrera y no se
       reproduce aquí. Lo que se hace es **instrumentar el camino del fallo**, para que la próxima vez
       que ocurra deje diagnóstico en vez de un `exit code -1` mudo: cuando `Invoke-Application` agota
@@ -457,6 +457,16 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
       está por debajo — Avalonia, el arranque del runtime o el propio proceso. \ Decided: instrument
       the failure path instead of hunting the race; the window now precedes the migration, so a
       repeat rules the migration out by construction.
+      **Hecho el 2026-08-10, y el registro archivado contestó media pregunta antes de escribir
+      nada**: la línea de aquella ejecución decía `16 migration(s) applied to a new database`, así
+      que «murió antes de migrar» estaba descartada desde el principio y las dos hipótesis nunca
+      fueron dos. Lo que sigue sin recogerse es la otra mitad —si quedaba algo vivo que pintar—, y
+      eso es lo que se instrumenta, junto con el procesador y los hilos, que separan girar de
+      esperar. `LaunchDiagnosisTests` saca las funciones del guion publicado parseándolo y las
+      ejerce contra procesos de estado conocido, incluida una base ilegible, porque la propiedad que
+      hay que sostener es que el diagnóstico **no lance**. Evidencia en
+      [audit-first-launch-instrumentation.md](../../evidence/stable/audit-first-launch-instrumentation.md).
+      \ Done: the archived log already ruled out half the question; the other half is now recorded.
 - [x] **Lo que se decidió el 2026-08-10 (experto), antes de ejecutarlo:**
       - **Los números del documento están caducados.** Una medición aproximada del 2026-08-10 (el
         máximo por informe, no la unión) los sitúa bastante mejor en líneas y todavía flojos en ramas,
