@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Avalonia.Controls;

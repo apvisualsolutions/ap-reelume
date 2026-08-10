@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using ApSolutions.LocalMedia.Infrastructure.Updates;
 
 namespace ApSolutions.LocalMedia.Tests.Updates;

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Events;
 using ApSolutions.LocalMedia.Application.Playback;

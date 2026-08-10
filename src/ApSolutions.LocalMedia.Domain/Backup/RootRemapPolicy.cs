@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 namespace ApSolutions.LocalMedia.Domain.Backup;
 
 /// <summary>One answer to "the library used to be here; where is it now?".</summary>
