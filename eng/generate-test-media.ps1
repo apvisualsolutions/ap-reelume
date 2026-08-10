@@ -12,12 +12,25 @@
 
     A sample whose encoder the local FFmpeg build cannot provide is reported as skipped with the
     exact missing encoder. It is never replaced by a substitute.
+
+    Every call to FFmpeg is bounded and every sample is announced before it is produced. Six of the
+    ten CI runs of 2026-08-10 were cancelled at the sixty-minute ceiling with nothing in the log
+    between "Build succeeded" and the cancellation fifty-six minutes later: this step had started an
+    encoder that never came back, and an unbounded wait turned one wedged encode into an hour of
+    silence reported as an infrastructure hiccup. The whole matrix takes 1,6 seconds to produce on a
+    development machine, so the ceiling below is not a performance budget — it is the difference
+    between a named failure and a job that dies without saying why.
 #>
 [CmdletBinding()]
 param(
     [string]$Output = 'artifacts/test-media',
 
-    [switch]$Force
+    [switch]$Force,
+
+    # Six hundred times the measured cost of the slowest sample. Anything that reaches it is wedged,
+    # not slow.
+    [ValidateRange(1, 3600)]
+    [int]$SampleTimeoutSeconds = 60
 )
 
 $ErrorActionPreference = 'Stop'
@@ -46,12 +59,57 @@ if (-not $encoder) {
     exit 0
 }
 
-$availableEncoders = @{}
-& $encoder -hide_banner -loglevel error -encoders 2>$null | ForEach-Object {
-    $fields = $_ -split '\s+' | Where-Object { $_ }
-    if ($fields.Count -ge 2 -and $fields[0].Length -eq 6) {
-        $availableEncoders[$fields[1]] = $true
+function Invoke-Encoder {
+    <#
+    .SYNOPSIS
+        Runs FFmpeg with a ceiling, and kills the whole tree when it is reached.
+    .DESCRIPTION
+        `Start-Process -Wait` has no timeout, so a child that never exits is indistinguishable from
+        one still working — which is exactly how a job spends an hour saying nothing. The tree is
+        killed rather than the process alone: FFmpeg's own children would otherwise outlive it and
+        keep the file handles that the next attempt needs.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$Arguments,
+        [Parameter(Mandatory)][string]$What,
+        [string]$StandardOutputPath
+    )
+
+    $startOptions = @{
+        FilePath     = $encoder
+        ArgumentList = $Arguments
+        NoNewWindow  = $true
+        PassThru     = $true
     }
+    if ($StandardOutputPath) { $startOptions['RedirectStandardOutput'] = $StandardOutputPath }
+
+    $process = Start-Process @startOptions
+    if (-not $process.WaitForExit($SampleTimeoutSeconds * 1000)) {
+        try { $process.Kill($true) } catch { }
+        throw "The encoder did not finish $What within $SampleTimeoutSeconds s and was killed. Arguments: $Arguments"
+    }
+
+    return $process.ExitCode
+}
+
+$availableEncoders = @{}
+$encoderList = [IO.Path]::GetTempFileName()
+try {
+    # Bounded like everything else here: a probe that never returns is the same hour of silence as an
+    # encode that never returns, and it happens before a single sample has been named.
+    $null = Invoke-Encoder `
+        -Arguments '-hide_banner -loglevel error -encoders' `
+        -What 'listing the encoders it provides' `
+        -StandardOutputPath $encoderList
+    foreach ($line in Get-Content -LiteralPath $encoderList) {
+        $fields = $line -split '\s+' | Where-Object { $_ }
+        if ($fields.Count -ge 2 -and $fields[0].Length -eq 6) {
+            $availableEncoders[$fields[1]] = $true
+        }
+    }
+}
+finally {
+    Remove-Item -LiteralPath $encoderList -Force -ErrorAction SilentlyContinue
 }
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
@@ -118,10 +176,13 @@ function New-Sample([object]$sample) {
         throw "The recipe for $($sample.id) still carries an unresolved placeholder."
     }
 
+    # Named before it is produced, not after. A build that dies mid-matrix has to say which recipe it
+    # was on; the table at the end only prints for a run that finished.
+    Write-Host "  encoding $($sample.id) …"
     $arguments = "-hide_banner -loglevel error -nostdin -y $recipe `"$destination`""
-    $process = Start-Process -FilePath $encoder -ArgumentList $arguments -NoNewWindow -Wait -PassThru
-    if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $destination)) {
-        throw "The encoder failed to produce $($sample.id) (exit $($process.ExitCode))."
+    $exitCode = Invoke-Encoder -Arguments $arguments -What "sample $($sample.id)"
+    if ($exitCode -ne 0 -or -not (Test-Path -LiteralPath $destination)) {
+        throw "The encoder failed to produce $($sample.id) (exit $exitCode)."
     }
 
     $script:generated++

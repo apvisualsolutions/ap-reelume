@@ -175,6 +175,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A verification that wedged no longer spends an hour saying nothing.** Six of the ten continuous
+  integration runs of 10 August died at the sixty-minute ceiling, and the log said nothing between
+  "build succeeded" and the cancellation fifty-six minutes later. The step after the build produces
+  the container matrix with FFmpeg and started it with no bound: one wedged encode burned the whole
+  job and reported as an infrastructure hiccup. Every call to the encoder now has a ceiling, every
+  sample is announced before it is produced, and a process that does not come back is killed with the
+  recipe it was on named. Producing all sixteen samples costs 1.6 seconds, so that ceiling is not a
+  performance budget: it is the difference between a named failure and a job that dies without saying
+  why.
 - **Stored playback preferences are actually applied.** The audio track and subtitles you chose —
   per file, per series, or globally, falling back by language when a track is absent — were
   resolved and never applied: every session opened with whatever the engine picked. They now apply

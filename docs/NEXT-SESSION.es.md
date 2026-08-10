@@ -55,6 +55,13 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
   cobertura lo midió al 70,89 % de líneas y 28,57 % de ramas, y **volvió** igual que
   `WindowsFilePickers`. Detalle en
   [audit-arq001-application-host.md](evidence/stable/audit-arq001-application-host.md).
+- **La integración continua dejaba de hablar durante una hora.** Seis de las diez ejecuciones de esta
+  sesión murieron al techo de sesenta minutos, con el registro mudo desde «compilación correcta»
+  hasta la cancelación cincuenta y seis minutos después. El paso siguiente,
+  `eng/generate-test-media.ps1`, arrancaba FFmpeg sin ningún tope. Ahora cada llamada tiene techo,
+  cada muestra se anuncia antes de producirse, y una prueba con un codificador que nunca vuelve
+  comprueba que el guion muere en segundos nombrando la receta. Producir la matriz entera cuesta
+  1,6 s medidos, así que el techo no es un presupuesto de rendimiento.
 - **Los dos endurecimientos que la auditoría archivó como «no explotables».** Uno lo era mucho menos
   de lo anotado: el lanzador externo entregaba al shell de Windows un `.ps1`, un `.txt` y un archivo
   sin extensión. El otro no existía en la forma descrita, y sólo se supo forjando el archivo que lo

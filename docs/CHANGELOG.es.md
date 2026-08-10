@@ -181,6 +181,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una verificación que se colgaba ya no se lleva una hora en silencio.** Seis de las diez
+  ejecuciones de integración continua del 10 de agosto murieron al llegar al techo de sesenta
+  minutos, y el registro no decía nada entre «compilación correcta» y la cancelación cincuenta y seis
+  minutos después. El paso siguiente genera la matriz de contenedores con FFmpeg y lo arrancaba sin
+  ningún tope: un encode atascado se comía el trabajo entero y se reportaba como un hipo de
+  infraestructura. Ahora cada llamada al codificador tiene techo, cada muestra se anuncia antes de
+  producirse y un proceso que no vuelve se mata nombrando la receta en la que estaba. Producir las
+  dieciséis muestras cuesta 1,6 segundos, así que ese techo no es un presupuesto de rendimiento: es
+  la diferencia entre un fallo con nombre y un trabajo que se muere sin decir por qué.
 - **Las preferencias de reproducción guardadas se aplican de verdad.** La pista de audio y los
   subtítulos que elegiste — por archivo, por serie o globales, con repliegue por idioma cuando una
   pista no está — se resolvían y nunca se aplicaban: cada sesión abría con lo que el motor

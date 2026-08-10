@@ -53,6 +53,12 @@ Four commits, each with its full cycle and its bilingual evidence.
   gate put it at 70.89% of lines and 28.57% of branches, and it **went back**, like
   `WindowsFilePickers` before it. Detail in
   [audit-arq001-application-host.md](evidence/stable/audit-arq001-application-host.md).
+- **Continuous integration went quiet for an hour at a time.** Six of this session's ten runs died at
+  the sixty-minute ceiling, with the log silent from "build succeeded" to the cancellation fifty-six
+  minutes later. The step after it, `eng/generate-test-media.ps1`, started FFmpeg with no bound.
+  Every call now has a ceiling, every sample is announced before it is produced, and a test with an
+  encoder that never returns checks that the script dies in seconds naming the recipe. Producing the
+  whole matrix costs a measured 1.6 s, so the ceiling is not a performance budget.
 - **The two hardenings the audit filed as "not exploitable".** One was far less so than noted: the
   external launcher handed the Windows shell a `.ps1`, a `.txt` and a file with no extension. The
   other did not exist in the form described, and that was only learned by forging the archive that
