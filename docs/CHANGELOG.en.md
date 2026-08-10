@@ -184,6 +184,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   recipe it was on named. Producing all sixteen samples costs 1.6 seconds, so that ceiling is not a
   performance budget: it is the difference between a named failure and a job that dies without saying
   why.
+- **And with the name in front of us, the recipe that wedged.** The first run with the ceiling in
+  place failed in four minutes instead of dying at sixty, and pointed at
+  `mkv-dual-audio-english-first`. The eleven recipes that ended in `-shortest` now bound their output
+  duration explicitly: `-shortest` has a documented deadlock where interleaving and flushing cross,
+  which is exactly what made some runs take twenty-two minutes and others hang forever. Every input
+  already lasted three seconds, so the file is the same one: the 114 container-matrix tests confirm it
+  property by property.
 - **Stored playback preferences are actually applied.** The audio track and subtitles you chose —
   per file, per series, or globally, falling back by language when a track is absent — were
   resolved and never applied: every session opened with whatever the engine picked. They now apply

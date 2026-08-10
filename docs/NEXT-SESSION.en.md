@@ -58,7 +58,12 @@ Four commits, each with its full cycle and its bilingual evidence.
   minutes later. The step after it, `eng/generate-test-media.ps1`, started FFmpeg with no bound.
   Every call now has a ceiling, every sample is announced before it is produced, and a test with an
   encoder that never returns checks that the script dies in seconds naming the recipe. Producing the
-  whole matrix costs a measured 1.6 s, so the ceiling is not a performance budget.
+  whole matrix costs a measured 1.6 s, so the ceiling is not a performance budget. The first run with
+  the ceiling in place failed in four minutes and named the culprit:
+  `mkv-dual-audio-english-first`. The eleven recipes that used `-shortest` — a documented FFmpeg
+  deadlock — now bound their output duration explicitly. **The hang never reproduced locally**: it is
+  a race, and what was removed is the class of hazard, not a reproduction. If it comes back, it will
+  now say which recipe.
 - **The two hardenings the audit filed as "not exploitable".** One was far less so than noted: the
   external launcher handed the Windows shell a `.ps1`, a `.txt` and a file with no extension. The
   other did not exist in the form described, and that was only learned by forging the archive that

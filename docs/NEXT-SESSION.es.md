@@ -61,7 +61,11 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
   `eng/generate-test-media.ps1`, arrancaba FFmpeg sin ningún tope. Ahora cada llamada tiene techo,
   cada muestra se anuncia antes de producirse, y una prueba con un codificador que nunca vuelve
   comprueba que el guion muere en segundos nombrando la receta. Producir la matriz entera cuesta
-  1,6 s medidos, así que el techo no es un presupuesto de rendimiento.
+  1,6 s medidos, así que el techo no es un presupuesto de rendimiento. La primera ejecución con el
+  techo puesto falló en cuatro minutos y nombró al culpable: `mkv-dual-audio-english-first`. Las once
+  recetas que usaban `-shortest` —un bloqueo documentado de FFmpeg— fijan ahora la duración de salida
+  de forma explícita. **El cuelgue nunca se reprodujo en local**: es una carrera, y lo que se retiró
+  es la clase de riesgo, no una reproducción. Si vuelve a aparecer, ahora dirá en qué receta.
 - **Los dos endurecimientos que la auditoría archivó como «no explotables».** Uno lo era mucho menos
   de lo anotado: el lanzador externo entregaba al shell de Windows un `.ps1`, un `.txt` y un archivo
   sin extensión. El otro no existía en la forma descrita, y sólo se supo forjando el archivo que lo

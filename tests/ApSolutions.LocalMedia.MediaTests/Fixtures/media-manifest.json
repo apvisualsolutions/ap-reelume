@@ -21,7 +21,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx264", "aac" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -b:a 64k -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -b:a 64k -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -38,7 +38,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx265", "eac3" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx265 -preset ultrafast -x265-params log-level=error -pix_fmt yuv420p -c:a eac3 -b:a 192k -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx265 -preset ultrafast -x265-params log-level=error -pix_fmt yuv420p -c:a eac3 -b:a 192k -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -55,7 +55,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "mpeg4", "libmp3lame" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v mpeg4 -vtag XVID -c:a libmp3lame -b:a 128k -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v mpeg4 -vtag XVID -c:a libmp3lame -b:a 128k -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -72,7 +72,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx264", "pcm_s16le" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a pcm_s16le -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a pcm_s16le -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -89,7 +89,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libvpx-vp9", "libopus" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libvpx-vp9 -b:v 200k -deadline realtime -cpu-used 8 -pix_fmt yuv420p -c:a libopus -b:a 64k -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libvpx-vp9 -b:v 200k -deadline realtime -cpu-used 8 -pix_fmt yuv420p -c:a libopus -b:a 64k -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -106,7 +106,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libsvtav1", "libopus" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libsvtav1 -preset 12 -crf 50 -pix_fmt yuv420p -c:a libopus -b:a 64k -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libsvtav1 -preset 12 -crf 50 -pix_fmt yuv420p -c:a libopus -b:a 64k -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -143,7 +143,7 @@
       "requiredEncoders": [ "libx264", "eac3", "aac", "srt" ],
       "companionTextPath": "T20/spanish-first.srt",
       "companionText": "1\n00:00:00,500 --> 00:00:02,500\nPista interna en español\n",
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -f lavfi -i sine=frequency=880:duration=3 -i \"{{companion}}\" -map 0:v -map 1:a -map 2:a -map 3:s -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a:0 eac3 -ac:a:0 6 -c:a:1 aac -b:a:1 64k -c:s srt -metadata:s:a:0 language=spa -metadata:s:a:1 language=eng -metadata:s:s:0 language=spa -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -f lavfi -i sine=frequency=880:duration=3 -i \"{{companion}}\" -map 0:v -map 1:a -map 2:a -map 3:s -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a:0 eac3 -ac:a:0 6 -c:a:1 aac -b:a:1 64k -c:s srt -metadata:s:a:0 language=spa -metadata:s:a:1 language=eng -metadata:s:s:0 language=spa -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null,
       "notes": "The Spanish 5.1 track is announced first."
@@ -164,7 +164,7 @@
       "requiredEncoders": [ "libx264", "eac3", "aac", "srt" ],
       "companionTextPath": "T20/english-first.srt",
       "companionText": "1\n00:00:00,500 --> 00:00:02,500\nInternal Spanish track\n",
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=880:duration=3 -f lavfi -i sine=frequency=440:duration=3 -i \"{{companion}}\" -map 0:v -map 1:a -map 2:a -map 3:s -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a:0 aac -b:a:0 64k -c:a:1 eac3 -ac:a:1 6 -c:s srt -metadata:s:a:0 language=eng -metadata:s:a:1 language=spa -metadata:s:s:0 language=spa -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=880:duration=3 -f lavfi -i sine=frequency=440:duration=3 -i \"{{companion}}\" -map 0:v -map 1:a -map 2:a -map 3:s -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a:0 aac -b:a:0 64k -c:a:1 eac3 -ac:a:1 6 -c:s srt -metadata:s:a:0 language=eng -metadata:s:a:1 language=spa -metadata:s:s:0 language=spa -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null,
       "notes": "The same two languages, announced in the opposite order, so an index-based selection would pick the wrong one."
@@ -182,7 +182,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx264", "aac" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -ac 2 -b:a 96k -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -ac 2 -b:a 96k -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -199,7 +199,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx264", "eac3" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a eac3 -ac 6 -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a eac3 -ac 6 -t 3",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null
     },
@@ -216,7 +216,7 @@
       "audioTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx264", "flac" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a flac -ac 8 -shortest",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a flac -ac 8 -t 3",
       "notes": "E-AC-3 in this FFmpeg build refuses 7.1, so the eight-channel row uses FLAC, which carries the layout losslessly.",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null

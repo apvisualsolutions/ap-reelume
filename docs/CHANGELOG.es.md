@@ -190,6 +190,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   producirse y un proceso que no vuelve se mata nombrando la receta en la que estaba. Producir las
   dieciséis muestras cuesta 1,6 segundos, así que ese techo no es un presupuesto de rendimiento: es
   la diferencia entre un fallo con nombre y un trabajo que se muere sin decir por qué.
+- **Y con el nombre delante, la receta que se atascaba.** La primera ejecución con el techo puesto
+  falló en cuatro minutos en vez de morir a los sesenta, y señaló a `mkv-dual-audio-english-first`.
+  Las once recetas que terminaban con `-shortest` pasan a fijar la duración de salida de forma
+  explícita: `-shortest` tiene un bloqueo documentado cuando la mezcla de flujos y el vaciado se
+  cruzan, que es justo lo que hacía que unas ejecuciones tardaran veintidós minutos y otras se
+  colgaran para siempre. Todas las entradas ya duraban tres segundos, así que el resultado es el
+  mismo archivo: las 114 pruebas de la matriz de contenedores lo confirman propiedad por propiedad.
 - **Las preferencias de reproducción guardadas se aplican de verdad.** La pista de audio y los
   subtítulos que elegiste — por archivo, por serie o globales, con repliegue por idioma cuando una
   pista no está — se resolvían y nunca se aplicaban: cada sesión abría con lo que el motor
