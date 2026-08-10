@@ -72,22 +72,45 @@ Four commits, each with its full cycle and its bilingual evidence.
 
 ## What comes next (in this order)
 
-The order is decided in the plan and needs no re-deliberating; so are each one's limits.
+The ARQ-010 → ARQ-004 → ARQ-005 queue was run on 2026-08-10. One half and the debt are left.
 
-1. **ARQ-010**: `ValidateOnBuild = true`. One line, and it is a measurement: any broken registration
-   surfaces at every test's startup instead of at whichever resolution happened to touch it. Cheap
-   signal before the two large refactors. It only counts as done if a test pins that it is on.
-2. **ARQ-004**: a single `AsyncRelayCommand` with error handling — there are some twenty-four
-   unguarded `async void` methods — plus global `UnhandledException` and `UnobservedTaskException`
-   handlers in `Program.cs`. It comes before ARQ-005 deliberately: async startup will produce exactly
-   the kind of failure ARQ-004 exists to keep.
-3. **ARQ-005**: startup without `GetAwaiter().GetResult()` on the interface thread (migration and
-   integrity), and taking the blocking call out of the `lock` in `WindowsMediaKeyService`. The window
-   cannot go blank while it migrates.
-4. **The coverage debt** named in
+1. **ARQ-005, second half: the asynchronous startup.** Already measured, so it needs no exploring
+   again. `FinishShell` blocks the interface thread to migrate the database and — only when that
+   migration rewrote the file — to check its integrity. The other four `GetAwaiter().GetResult()`
+   calls in `CompositionRoot` are diagnostics-report reads on demand, and the one in `Program.cs` is
+   `Main`'s `finally`, which is legitimate. The written limit still stands: the window cannot go blank
+   while it migrates, so something must show from the first frame and change when the work ends.
+   **What makes it tractable**: only two sites call `CreateShell()`, both in assembled walks and both
+   asserting `Assert.IsType<ShellView>`. A startup view will be needed, and therefore strings in both
+   languages and its automation name.
+2. **The coverage debt** named in
    [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): the error branches of
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` and `PlayerVersionsViewModel`. It stays
-   debt on purpose: it is settled when that area is touched, and this session did not touch it.
+   debt on purpose: it is settled when that area is touched.
+
+## Finished on 2026-08-10 (third session)
+
+Four commits, each with its cycle, its bilingual evidence and its gates.
+
+- **ARQ-010 — the container checks itself as it is built.** `ValidateOnBuild` on, with a test that
+  hands it a broken collection **through the product's own path**; asserting on a copy of the options
+  would only prove the copy. **It exposed no broken registration**, which is what the plan expected,
+  and the limit was measured: it validates 109 of 156 registrations, because the 45 built through a
+  factory are opaque by construction. It costs +0.22 ms.
+  [audit-arq010-container-validation.md](evidence/stable/audit-arq010-container-validation.md).
+- **ARQ-004 — a failure has somewhere to land, and can no longer close the application.** Measuring
+  inverted the order of its two halves: `AppDomain.UnhandledException` does **not** stop the process
+  from ending, it only records, so a command must always catch — and something that always catches
+  always needs somewhere to put it. That somewhere did not exist (2 of 24 surfaces own failure state),
+  and looking for it turned up that **the diagnostics report was built from one source**, the rename
+  audit: in a session with no renames, an application that was failing looked healthy. Then, from
+  **27 `async void` to 2**, and both of those catch. −582/+227 lines.
+  [audit-arq004-failure-net.md](evidence/stable/audit-arq004-failure-net.md) and
+  [audit-arq004-single-command.md](evidence/stable/audit-arq004-single-command.md).
+- **ARQ-005, first half — the lock nobody could open.** The wait for the media keys left the `lock`
+  and got a ceiling. It blocked the interface thread on **every video opening**, and with no answer
+  the trapped thread was holding the very lock the cancellation needed.
+  [audit-arq005-media-keys.md](evidence/stable/audit-arq005-media-keys.md).
 
 ## Yours (only what an agent cannot do)
 

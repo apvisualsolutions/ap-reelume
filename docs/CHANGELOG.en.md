@@ -42,6 +42,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   version does nothing. Each debt lives inside the test under its own identifier, and a second
   assertion evicts the entry the moment its wiring lands: the list can only shrink.
 
+- **Opening a video can no longer leave the window sitting still waiting on the keyboard.** As each
+  playback starts, the application claims the keyboard's media keys, and it stood still — the thread
+  that draws the window included — until that registration answered, with no deadline at all. If it
+  never answered there was no way out: the same trapped thread was holding the latch needed to cancel
+  it. The wait now has a deadline and happens outside the latch, and if it runs out playback starts
+  anyway: the keyboard's media keys are an extra, and a session without them beats a session that does
+  not start.
+
 - **No button can close the application by failing any more.** Every surface with buttons brought a
   hand-written command class of its own — twenty-four of them — and not one picked up a failure, so an
   error in the work behind a button ended the program. There is one class now, and it always picks the

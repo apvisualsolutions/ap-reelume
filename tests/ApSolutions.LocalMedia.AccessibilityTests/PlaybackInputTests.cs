@@ -167,6 +167,73 @@ public sealed class PlaybackInputTests
         Assert.Equal(0, service.RegisteredKeyCount);
     }
 
+    /// <summary>
+    /// ARQ-005. Starting used to block on the pump's signal with no ceiling and while holding the
+    /// lock, from the interface thread, every time a video opened. A pump that never answered took
+    /// the window with it — and the stop that could have rescued it could not get in, because the
+    /// thread that would never return was holding the door.
+    /// </summary>
+    /// <remarks>
+    /// The pump here never signals, which is the case that used to hang forever. What is asserted is
+    /// that starting returns anyway: the hardware keys are an extra, and a session that starts
+    /// without them beats a session that does not start.
+    /// </remarks>
+    [Fact]
+    public async Task A_pump_that_never_answers_does_not_take_the_caller_with_it()
+    {
+        var released = new ManualResetEventSlim(false);
+        using var service = new WindowsMediaKeyService(
+            startTimeout: TimeSpan.FromMilliseconds(200),
+            stopTimeout: TimeSpan.FromMilliseconds(200),
+            pump: _ => released.Wait(TimeSpan.FromSeconds(10)));
+
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        await service.StartAsync(TestContext.Current.CancellationToken);
+        clock.Stop();
+
+        Assert.True(
+            clock.Elapsed < TimeSpan.FromSeconds(5),
+            $"Starting took {clock.Elapsed}, so the ceiling did not hold.");
+        Assert.True(service.IsListening);
+        released.Set();
+        await service.StopAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>
+    /// And the half that the ceiling alone would not fix: while one caller is waiting for a pump that
+    /// will not answer, another can still stop the service. That was impossible when the wait
+    /// happened inside the lock.
+    /// </summary>
+    [Fact]
+    public async Task Stopping_gets_through_while_somebody_is_waiting_for_the_pump()
+    {
+        var released = new ManualResetEventSlim(false);
+        using var service = new WindowsMediaKeyService(
+            startTimeout: TimeSpan.FromSeconds(10),
+            stopTimeout: TimeSpan.FromMilliseconds(200),
+            pump: _ => released.Wait(TimeSpan.FromSeconds(10)));
+
+        var starting = service.StartAsync(TestContext.Current.CancellationToken);
+
+        // The start is still in flight: nobody has answered it and its ceiling is ten seconds away.
+        Assert.False(starting.IsCompleted);
+        await service.StopAsync(TestContext.Current.CancellationToken);
+
+        Assert.False(service.IsListening);
+        released.Set();
+        await starting;
+    }
+
+    /// <summary>A ceiling of nothing is not a ceiling, and the service says so rather than taking it.</summary>
+    [Fact]
+    public void A_ceiling_that_is_not_a_ceiling_is_refused()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => new WindowsMediaKeyService(TimeSpan.Zero, TimeSpan.FromSeconds(1)));
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => new WindowsMediaKeyService(TimeSpan.FromSeconds(1), TimeSpan.Zero));
+    }
+
     [Fact]
     public void The_service_claims_only_transport_keys_and_maps_each_to_one_action()
     {

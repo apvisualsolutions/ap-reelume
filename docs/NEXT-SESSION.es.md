@@ -74,22 +74,46 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
 
 ## Lo que sigue (en este orden)
 
-El orden está decidido en el plan y no hace falta re-deliberarlo; los límites de cada uno también.
+La cola de ARQ-010 → ARQ-004 → ARQ-005 se ejecutó el 2026-08-10. Queda una mitad y la deuda.
 
-1. **ARQ-010**: `ValidateOnBuild = true`. Una línea, y es una medición: cualquier registro roto sale
-   en el arranque de cada prueba en vez de en la resolución que lo tocara. Da señal barata antes de
-   los dos refactores grandes. Sólo cuenta como hecho si una prueba fija que está encendido.
-2. **ARQ-004**: un único `AsyncRelayCommand` con manejo de errores —hay unas veinticuatro
-   `async void` sin red— más `UnhandledException` y `UnobservedTaskException` globales en
-   `Program.cs`. Va antes que ARQ-005 a propósito: el arranque asíncrono producirá justo el tipo de
-   fallo que ARQ-004 existe para no perder.
-3. **ARQ-005**: arranque sin `GetAwaiter().GetResult()` en el hilo de interfaz (migración e
-   integridad), y sacar el bloqueo del `lock` en `WindowsMediaKeyService`. La ventana no puede
-   quedarse en blanco mientras migra.
-4. **La deuda de cobertura** que nombra
+1. **ARQ-005, segunda mitad: el arranque asíncrono.** Ya medido, así que no hace falta explorarlo
+   otra vez. `FinishShell` bloquea el hilo de interfaz para migrar la base de datos y —sólo si esa
+   migración reescribió el archivo— para comprobar su integridad. Los otros cuatro
+   `GetAwaiter().GetResult()` de `CompositionRoot` son lecturas del informe de diagnóstico bajo
+   demanda, y el de `Program.cs` es el `finally` de `Main`, que es legítimo. El límite escrito sigue
+   en pie: la ventana no puede quedarse en blanco mientras migra, así que hay que mostrar algo desde
+   el primer fotograma y cambiarlo al terminar. **Lo que hace la tarea abordable**: sólo dos sitios
+   llaman a `CreateShell()`, los dos en recorridos ensamblados y los dos afirmando
+   `Assert.IsType<ShellView>`. Hará falta una vista de arranque, y por tanto cadenas en los dos
+   idiomas y su nombre de automatización.
+2. **La deuda de cobertura** que nombra
    [TST1-coverage-gate.md](evidence/stable/TST1-coverage-gate.md): las ramas de error de
    `ReconcileScannedFiles`, `CompositeFileIdentityProvider` y `PlayerVersionsViewModel`. Sigue siendo
-   deuda a propósito: se salda cuando se toque esa zona, y esta sesión no la tocó.
+   deuda a propósito: se salda cuando se toque esa zona.
+
+## Lo terminado el 2026-08-10 (tercera sesión)
+
+Cuatro commits, cada uno con su ciclo, su evidencia bilingüe y sus puertas.
+
+- **ARQ-010 — el contenedor se revisa al construirse.** `ValidateOnBuild` encendido, con una prueba
+  que le pasa una colección rota **por la ruta del producto**; afirmar sobre una copia de las opciones
+  sólo demuestra la copia. **No destapó ningún registro roto**, que era lo que el plan esperaba, y el
+  límite quedó medido: valida 109 de 156 registros, porque los 45 construidos con una factoría son
+  opacos por construcción. Cuesta +0,22 ms.
+  [audit-arq010-container-validation.md](evidence/stable/audit-arq010-container-validation.md).
+- **ARQ-004 — un fallo tiene dónde caer, y ya no puede cerrar la aplicación.** La medición invirtió
+  el orden de sus dos mitades: `AppDomain.UnhandledException` **no** impide que el proceso termine,
+  sólo deja constancia, así que un comando tiene que capturar siempre — y algo que captura siempre
+  necesita un destino siempre. Ese destino no existía (2 de 24 superficies tienen estado de fallo), y
+  buscándolo apareció que **el informe de diagnóstico se construía de una sola fuente**, la auditoría
+  de renombrados: en una sesión sin renombrados, una aplicación que fallaba parecía sana. Luego, de
+  **27 `async void` a 2**, y los dos capturan. −582/+227 líneas.
+  [audit-arq004-failure-net.md](evidence/stable/audit-arq004-failure-net.md) y
+  [audit-arq004-single-command.md](evidence/stable/audit-arq004-single-command.md).
+- **ARQ-005, primera mitad — el candado que nadie podía abrir.** La espera de las teclas multimedia
+  salió del `lock` y recibió techo. Bloqueaba el hilo de interfaz en **cada apertura de vídeo**, y sin
+  contestación el hilo atrapado sujetaba el candado que la cancelación necesitaba.
+  [audit-arq005-media-keys.md](evidence/stable/audit-arq005-media-keys.md).
 
 ## Pendiente tuyo (sólo lo que un agente no puede hacer)
 

@@ -43,6 +43,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   en la propia prueba con su identificador, y una segunda aserción expulsa la entrada en cuanto su
   cableado aterriza: la lista sólo puede encoger.
 
+- **Abrir un vídeo ya no puede dejar la ventana quieta esperando al teclado.** Al empezar cada
+  reproducción, la aplicación reclama las teclas multimedia del teclado, y se quedaba parada —el hilo
+  que dibuja la ventana incluido— hasta que ese registro contestaba, sin ningún plazo. Si no
+  contestaba, no había salida: el mismo hilo atrapado sujetaba el cerrojo que hacía falta para
+  cancelarlo. Ahora la espera tiene plazo y ocurre fuera del cerrojo, y si se agota la reproducción
+  empieza igual: las teclas del teclado son un extra, y una sesión sin ellas es mejor que una sesión
+  que no arranca.
+
 - **Ningún botón puede ya cerrar la aplicación al fallar.** Cada superficie con botones traía su
   propia clase de comando escrita a mano —veinticuatro— y ninguna recogía un fallo, así que un error
   en el trabajo de detrás terminaba el programa. Ahora hay una sola, y recoge siempre: quedan dos

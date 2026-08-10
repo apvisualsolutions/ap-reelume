@@ -326,6 +326,23 @@ que todavía se traga excepciones. \ Order decided 2026-08-10: ARQ-010, then ARQ
       que mostrar algo desde el primer fotograma y cambiarlo al terminar — y `AssembledJourneyTests`
       tiene que seguir viendo el shell al final, que es la prueba de que el cambio no rompió el
       arranque.
+  - [x] **Primera mitad, las teclas multimedia** (2026-08-10). La espera salió del `lock` y recibió
+        techo (5 s al arrancar, 2 s al parar). El defecto tenía dos caras: el hilo de interfaz se
+        paraba en **cada apertura de vídeo** hasta que un hilo con código nativo contestaba, y si no
+        contestaba nunca, **el mismo hilo atrapado sujetaba el candado** que `StopAsync` necesitaba.
+        `IsListening` pasa a ser cierto en cuanto la bomba existe, no cuando contesta, para cerrar la
+        ventana en la que un `Stop` no encontraba nada que parar. **El rojo aquí no fue un rojo, fue
+        un cuelgue**, y por eso la bomba es sustituible: un techo que nadie ha visto expirar es un
+        techo que nadie sabe si funciona. Evidencia en
+        [audit-arq005-media-keys.md](../../evidence/stable/audit-arq005-media-keys.md). \
+        First half: the wait left the lock and got a ceiling.
+  - [ ] **Segunda mitad, el arranque asíncrono**. Medido y listo para empezar: `FinishShell` bloquea
+        para migrar y, sólo si una migración reescribió el archivo, para comprobar integridad; los
+        otros cuatro `GetAwaiter().GetResult()` de `CompositionRoot` son lecturas del informe de
+        diagnóstico bajo demanda, y el de `Program.cs` es el `finally` de `Main` y es legítimo. **Sólo
+        dos sitios llaman a `CreateShell()`**, los dos en recorridos ensamblados y los dos afirmando
+        `Assert.IsType<ShellView>`, así que el coste de mostrar una vista de arranque y cambiarla al
+        terminar está acotado. \ Second half: the asynchronous startup, measured and ready.
 
 ## WP-7 — CI/CD y puertas
 
