@@ -145,12 +145,21 @@ salir**, aunque la aserción no lo necesite. / The test asserted on a state that
 definition and then left, while the background work still held the file the teardown deletes.
 Observing a transient means waiting for it to end before leaving.
 
-Y lo que lo dejó pasar es tan útil como el defecto: **`eng/verify.ps1` no es lo que ejecuta CI**.
-CI corre además `eng/run-accessibility.ps1 -Mode Verify -Passes 2` y `eng/run-recovery.ps1` con dos
-pasadas, y **las dos pasadas existen justamente para cazar carreras**: la primera falló y la segunda
-pasó. Un ciclo local que sólo ejecuta `verify.ps1` tiene ese hueco. / What let it through matters as
-much: `verify.ps1` is not what CI runs. The two extra gates run twice each, precisely to catch
-races — pass 1 failed and pass 2 passed.
+**Por qué se escapó, dicho con precisión.** La tentación es concluir que faltó correr las puertas
+que CI añade —`eng/run-accessibility.ps1` y `eng/run-recovery.ps1`, ambas con dos pasadas—, y es
+verdad que `eng/verify.ps1` **no es lo que ejecuta CI**. Pero los tres commits afectados fallaron en
+**tres sitios distintos**: la pasada 1 de accesibilidad, la pasada 2, y la suite **dentro de
+`verify.ps1`**. Así que no era una puerta la que faltaba: la carrera simplemente **no se reproduce
+en esta máquina**, que termina el trabajo de fondo antes que el desmontaje. Correr las otras dos
+puertas sube las probabilidades de verla —dos pasadas más son dos tiradas más— pero no convierte
+una carrera en algo determinista. / Said precisely: the three affected commits failed in three
+different places, including inside `verify.ps1` itself. No single missing gate explains it — the
+race does not reproduce on this machine at all. Running the extra gates is more rolls of the dice,
+not determinism.
+
+Lo que sí es determinista es la corrección: la prueba ya no puede terminar mientras el trabajo sigue
+vivo, así que no queda carrera que ganar o perder. / What is deterministic is the fix: there is no
+longer a race to win or lose.
 
 ## Verde / Green
 

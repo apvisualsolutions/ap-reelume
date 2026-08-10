@@ -181,11 +181,13 @@ Tres commits, cada uno con su ciclo, su evidencia bilingüe y su verificación c
 
 ## Cosas aprendidas que conviene no volver a aprender
 
-- **`eng/verify.ps1` no es lo que ejecuta CI.** CI corre además
-  `eng/run-accessibility.ps1 -Mode Verify -Passes 2` y `eng/run-recovery.ps1 -Mode Verify -Passes 2`,
-  y **las dos pasadas están ahí para cazar carreras**. Un ciclo local que sólo ejecuta `verify.ps1`
-  deja ese hueco abierto, y el 2026-08-10 lo dejó: un rojo llegó a `main` por ahí. Antes de empujar
-  código que toque el arranque o la recuperación, esas dos puertas también se corren.
+- **`eng/verify.ps1` no es lo que ejecuta CI**: CI corre además
+  `eng/run-accessibility.ps1 -Mode Verify -Passes 2` y `eng/run-recovery.ps1 -Mode Verify -Passes 2`.
+  Conviene correrlas. Pero **cuidado con la conclusión fácil**: el rojo que llegó a `main` el
+  2026-08-10 apareció en **tres sitios distintos** en tres ejecuciones —pasada 1, pasada 2, y la
+  suite dentro de `verify.ps1`—, así que no faltaba una puerta: **la carrera no se reproduce en
+  esta máquina**. Más pasadas son más tiradas, no determinismo. Contra una carrera, lo que vale es
+  quitarla, no buscarla.
 - **Observar un estado transitorio obliga a esperar a que termine antes de salir.** La prueba que
   comprueba la vista de arranque afirma sobre algo que dura lo que dura el trabajo de fondo, y se
   marchaba en mitad: el `Task.Run` seguía con la base abierta cuando el desmontaje borraba la

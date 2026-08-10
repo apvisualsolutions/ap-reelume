@@ -178,10 +178,13 @@ Three commits, each with its cycle, its bilingual evidence and its full verifica
 
 ## Things learned worth not learning twice
 
-- **`eng/verify.ps1` is not what CI runs.** CI also runs
+- **`eng/verify.ps1` is not what CI runs**: CI also runs
   `eng/run-accessibility.ps1 -Mode Verify -Passes 2` and `eng/run-recovery.ps1 -Mode Verify
-  -Passes 2`, and **the two passes are there to catch races**. A local cycle that only runs
-  `verify.ps1` leaves that hole open, and on 2026-08-10 it did: a red reached `main` through it.
+  -Passes 2`, and they are worth running. But **beware the easy conclusion**: the red that reached
+  `main` on 2026-08-10 appeared in **three different places** across three runs — pass 1, pass 2,
+  and the suite inside `verify.ps1` — so no single gate was missing: **the race does not reproduce
+  on this machine**. More passes are more rolls, not determinism. Against a race, what works is
+  removing it, not hunting it.
 - **Observing a transient state means waiting for it to end before leaving.** The test that checks
   the startup view asserts on something that lasts as long as the background work, and it left
   mid-way: the `Task.Run` still had the database open when the teardown deleted the folder. Here it
