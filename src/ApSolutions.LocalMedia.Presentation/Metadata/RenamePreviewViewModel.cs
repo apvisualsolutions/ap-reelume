@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Metadata;
 
@@ -25,8 +26,8 @@ public sealed class RenamePreviewViewModel : INotifyPropertyChanged
         _plan = plan ?? throw new ArgumentNullException(nameof(plan));
         _executeRename = executeRename ?? throw new ArgumentNullException(nameof(executeRename));
         _undoRename = undoRename ?? throw new ArgumentNullException(nameof(undoRename));
-        ExecuteCommand = new AsyncCommand(ExecuteAsync, () => IsConfirmed && Plan.CanExecute);
-        UndoCommand = new AsyncCommand(UndoAsync, () => IsConfirmed && Plan.CanUndo);
+        ExecuteCommand = new AsyncRelayCommand(ExecuteAsync, () => IsConfirmed && Plan.CanExecute);
+        UndoCommand = new AsyncRelayCommand(UndoAsync, () => IsConfirmed && Plan.CanUndo);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -116,8 +117,8 @@ public sealed class RenamePreviewViewModel : INotifyPropertyChanged
 
     private void RaiseCommandStates()
     {
-        ((AsyncCommand)ExecuteCommand).RaiseCanExecuteChanged();
-        ((AsyncCommand)UndoCommand).RaiseCanExecuteChanged();
+        ((AsyncRelayCommand)ExecuteCommand).RaiseCanExecuteChanged();
+        ((AsyncRelayCommand)UndoCommand).RaiseCanExecuteChanged();
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
@@ -134,35 +135,4 @@ public sealed class RenamePreviewViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class AsyncCommand(Func<Task> execute, Func<bool> canExecute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning && canExecute();
-
-        public async void Execute(object? parameter)
-        {
-            if (!CanExecute(parameter))
-            {
-                return;
-            }
-
-            _isRunning = true;
-            RaiseCanExecuteChanged();
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                RaiseCanExecuteChanged();
-            }
-        }
-
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-    }
 }

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Presentation.Backup;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Home;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Metadata;
@@ -26,12 +27,12 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly INavigationService _navigationService;
     private readonly IReadOnlyList<AppRoute> _routes;
     private readonly ShellSurfaces _surfaces;
-    private readonly SurfaceCommand _editMetadata;
-    private readonly SurfaceCommand _previewRename;
-    private readonly SurfaceCommand _reviewDuplicates;
-    private readonly SurfaceCommand _closePlayer;
-    private readonly SurfaceCommand _toggleMini;
-    private readonly SurfaceCommand _toggleFullscreen;
+    private readonly AsyncRelayCommand _editMetadata;
+    private readonly AsyncRelayCommand _previewRename;
+    private readonly AsyncRelayCommand _reviewDuplicates;
+    private readonly AsyncRelayCommand _closePlayer;
+    private readonly AsyncRelayCommand _toggleMini;
+    private readonly AsyncRelayCommand _toggleFullscreen;
     private MetadataEditorViewModel? _metadataEditor;
     private RenamePreviewViewModel? _rename;
     private DuplicateReviewViewModel? _duplicates;
@@ -157,22 +158,22 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         _routes = ApprovedRoutes;
         _navigationService.Navigated += OnNavigated;
         NavigateCommand = new RouteNavigationCommand(_navigationService);
-        _editMetadata = new SurfaceCommand(
+        _editMetadata = new AsyncRelayCommand(
             () => OpenMetadataEditorAsync(CancellationToken.None),
             () => _surfaces.OpenMetadataEditor is not null && SelectedTitleId is not null);
-        _previewRename = new SurfaceCommand(
+        _previewRename = new AsyncRelayCommand(
             () => OpenRenamePreviewAsync(CancellationToken.None),
             () => _surfaces.OpenRename is not null && SelectedTitleId is not null);
-        _reviewDuplicates = new SurfaceCommand(
+        _reviewDuplicates = new AsyncRelayCommand(
             () => OpenDuplicatesAsync(CancellationToken.None),
             () => _surfaces.OpenDuplicates is not null && SelectedTitleId is not null);
-        _closePlayer = new SurfaceCommand(
+        _closePlayer = new AsyncRelayCommand(
             () => ClosePlayerAsync(CancellationToken.None),
             () => _player is not null);
-        _toggleMini = new SurfaceCommand(
+        _toggleMini = new AsyncRelayCommand(
             () => TogglePlaybackModeAsync(PlaybackMode.Mini, CancellationToken.None),
             () => _player is not null && _surfaces.ChangePlaybackMode is not null);
-        _toggleFullscreen = new SurfaceCommand(
+        _toggleFullscreen = new AsyncRelayCommand(
             () => TogglePlaybackModeAsync(PlaybackMode.Fullscreen, CancellationToken.None),
             () => _player is not null && _surfaces.ChangePlaybackMode is not null);
 
@@ -477,7 +478,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// Consenting to the first scan starts it, and the library reloads when it is done. Recording the
     /// answer and doing nothing with it is how a new install adds a folder and stays empty.
     /// </summary>
-    private async void OnOnboardingChanged(object? sender, PropertyChangedEventArgs args)
+    private void OnOnboardingChanged(object? sender, PropertyChangedEventArgs args) =>
+        GuardedEvent.Run(() => OnboardingChangedAsync(args));
+
+    private async Task OnboardingChangedAsync(PropertyChangedEventArgs args)
     {
         // A removed folder leaves the catalog, so the library on screen reloads to say so
         // (LIB-A01); the videos on disk were never part of the removal.
@@ -503,7 +507,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         }
     }
 
-    private async void OnNavigated(object? sender, AppRoute route)
+    private void OnNavigated(object? sender, AppRoute route) =>
+        GuardedEvent.Run(() => NavigatedAsync(route));
+
+    private async Task NavigatedAsync(AppRoute route)
     {
         OnPropertyChanged(nameof(CurrentRoute));
         OnPropertyChanged(nameof(IsSettingsVisible));
@@ -573,34 +580,4 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// A command that opens one surface and says when it became possible. Without the event a button
     /// stays as it was built, however many titles are opened afterwards.
     /// </summary>
-    private sealed class SurfaceCommand(Func<Task> execute, Func<bool> canExecute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning && canExecute();
-
-        public async void Execute(object? parameter)
-        {
-            if (!CanExecute(parameter))
-            {
-                return;
-            }
-
-            _isRunning = true;
-            RaiseCanExecuteChanged();
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                RaiseCanExecuteChanged();
-            }
-        }
-
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-    }
 }

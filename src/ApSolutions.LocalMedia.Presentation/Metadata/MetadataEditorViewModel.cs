@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Metadata;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Metadata;
 
@@ -41,9 +42,9 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         _updateMetadata = updateMetadata ?? throw new ArgumentNullException(nameof(updateMetadata));
         _refreshMetadata = refreshMetadata ?? throw new ArgumentNullException(nameof(refreshMetadata));
         ArtworkPicker = artworkPicker ?? throw new ArgumentNullException(nameof(artworkPicker));
-        SaveCommand = new AsyncCommand(SaveAsync);
-        RefreshProviderCommand = new AsyncCommand(() => RefreshAsync(restoreProviderFields: false));
-        RestoreProviderCommand = new AsyncCommand(() => RefreshAsync(restoreProviderFields: true));
+        SaveCommand = new AsyncRelayCommand(SaveAsync);
+        RefreshProviderCommand = new AsyncRelayCommand(() => RefreshAsync(restoreProviderFields: false));
+        RestoreProviderCommand = new AsyncRelayCommand(() => RefreshAsync(restoreProviderFields: true));
         ApplyCatalog(catalog);
     }
 
@@ -185,34 +186,5 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         field = value;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         return true;
-    }
-
-    private sealed class AsyncCommand(Func<Task> execute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning;
-
-        public async void Execute(object? parameter)
-        {
-            if (_isRunning)
-            {
-                return;
-            }
-
-            _isRunning = true;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
     }
 }

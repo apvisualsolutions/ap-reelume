@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -19,7 +20,7 @@ public sealed class PlayerVersionRowViewModel
     {
         _version = version ?? throw new ArgumentNullException(nameof(version));
         ArgumentNullException.ThrowIfNull(onSwitch);
-        SwitchCommand = new SwitchRowCommand(() => onSwitch(_version), () => _version.IsAvailable);
+        SwitchCommand = new AsyncRelayCommand(() => onSwitch(_version), () => _version.IsAvailable);
     }
 
     public MediaVersion Version => _version;
@@ -38,35 +39,6 @@ public sealed class PlayerVersionRowViewModel
             string.IsNullOrWhiteSpace(_version.VideoCodec) ? null : _version.VideoCodec,
             _version.IsHdr ? "HDR" : null,
         }.Where(part => !string.IsNullOrWhiteSpace(part)));
-
-    private sealed class SwitchRowCommand(Func<Task> execute, Func<bool> canExecute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning && canExecute();
-
-        public async void Execute(object? parameter)
-        {
-            if (!CanExecute(parameter))
-            {
-                return;
-            }
-
-            _isRunning = true;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-    }
 }
 
 /// <summary>

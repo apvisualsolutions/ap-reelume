@@ -8,6 +8,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -23,7 +24,7 @@ public sealed class SkipMarkerViewModel : INotifyPropertyChanged
     public SkipMarkerViewModel(Func<TimeSpan, Task>? onSkip = null)
     {
         _onSkip = onSkip;
-        SkipCommand = new SkipCommandImplementation(SkipAsync);
+        SkipCommand = new AsyncRelayCommand(SkipAsync);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -61,19 +62,6 @@ public sealed class SkipMarkerViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class SkipCommandImplementation(Func<Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => true;
-
-        public async void Execute(object? parameter)
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            await execute().ConfigureAwait(true);
-        }
-    }
 }
 
 /// <summary>
@@ -99,8 +87,8 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
     {
         _onSave = onSave;
         _onDelete = onDelete;
-        SaveCommand = new EditorCommand(SaveAsync);
-        DeleteCommand = new EditorCommand(DeleteAsync);
+        SaveCommand = new AsyncRelayCommand(SaveAsync);
+        DeleteCommand = new AsyncRelayCommand(DeleteAsync);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -252,17 +240,4 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class EditorCommand(Func<Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => true;
-
-        public async void Execute(object? parameter)
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            await execute().ConfigureAwait(true);
-        }
-    }
 }

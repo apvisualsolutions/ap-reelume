@@ -8,6 +8,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Home;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 
 namespace ApSolutions.LocalMedia.Presentation.Home;
@@ -35,9 +36,9 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         _navigation = navigation;
         _onResume = onResume;
         Recommendations = recommendations;
-        ResumeCommand = new HomeCommand(ResumeAsync, () => HasResume);
-        OpenLibraryCommand = new HomeCommand(OpenLibraryAsync);
-        RefreshCommand = new HomeCommand(() => LoadAsync(CancellationToken.None));
+        ResumeCommand = new AsyncRelayCommand(ResumeAsync, () => HasResume);
+        OpenLibraryCommand = new AsyncRelayCommand(OpenLibraryAsync);
+        RefreshCommand = new AsyncRelayCommand(() => LoadAsync(CancellationToken.None));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -135,7 +136,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
             OnPropertyChanged(name);
         }
 
-        (ResumeCommand as HomeCommand)?.RaiseCanExecuteChanged();
+        (ResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     internal static string FormatPercentage(double fraction) =>
@@ -165,17 +166,6 @@ public sealed class HomeViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class HomeCommand(Func<Task> execute, Func<bool>? canExecute = null) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => canExecute?.Invoke() ?? true;
-
-        public async void Execute(object? parameter) => await execute().ConfigureAwait(true);
-
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-    }
 }
 
 /// <summary>One card of the in-progress rail. An unreachable file is shown, never quietly dropped.</summary>

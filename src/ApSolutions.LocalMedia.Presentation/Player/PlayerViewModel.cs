@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Playback;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -35,11 +36,11 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         _coordinator = coordinator ?? throw new ArgumentNullException(nameof(coordinator));
         _externalLauncher = externalLauncher;
         FrameSource = frameSource;
-        PauseCommand = new AsyncCommand(() => _coordinator.PauseAsync(CancellationToken.None), () => CanPause);
-        ResumeCommand = new AsyncCommand(() => _coordinator.ResumeAsync(CancellationToken.None), () => CanResume);
-        StopCommand = new AsyncCommand(() => _coordinator.StopAsync(CancellationToken.None), () => CanStop);
-        RetryCommand = new AsyncCommand(RetryAsync, () => CanRetry);
-        OpenExternallyCommand = new AsyncCommand(OpenExternallyAsync, () => CanOpenExternally);
+        PauseCommand = new AsyncRelayCommand(() => _coordinator.PauseAsync(CancellationToken.None), () => CanPause);
+        ResumeCommand = new AsyncRelayCommand(() => _coordinator.ResumeAsync(CancellationToken.None), () => CanResume);
+        StopCommand = new AsyncRelayCommand(() => _coordinator.StopAsync(CancellationToken.None), () => CanStop);
+        RetryCommand = new AsyncRelayCommand(RetryAsync, () => CanRetry);
+        OpenExternallyCommand = new AsyncRelayCommand(OpenExternallyAsync, () => CanOpenExternally);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -239,33 +240,4 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class AsyncCommand(Func<Task> execute, Func<bool> canExecute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning && canExecute();
-
-        public async void Execute(object? parameter)
-        {
-            if (_isRunning)
-            {
-                return;
-            }
-
-            _isRunning = true;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-    }
 }

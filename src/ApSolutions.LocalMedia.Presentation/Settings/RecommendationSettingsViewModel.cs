@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Settings;
 
@@ -32,7 +33,7 @@ public sealed class RecommendationSettingsViewModel : INotifyPropertyChanged
         _watchedThreshold = watchedThreshold;
         _watchedThresholdPercent = Math.Round(
             (watchedThreshold?.Current ?? WatchStatePolicy.DefaultWatchedThreshold) * 100);
-        ApplyWatchedThresholdCommand = new ThresholdCommand(ApplyWatchedThresholdAsync);
+        ApplyWatchedThresholdCommand = new AsyncRelayCommand(ApplyWatchedThresholdAsync);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -123,17 +124,4 @@ public sealed class RecommendationSettingsViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class ThresholdCommand(Func<Task> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
-
-        public bool CanExecute(object? parameter) => true;
-
-        public async void Execute(object? parameter) => await execute().ConfigureAwait(true);
-    }
 }

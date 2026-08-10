@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Catalog;
 
@@ -22,9 +23,9 @@ public sealed class WatchStatusViewModel : INotifyPropertyChanged
     public WatchStatusViewModel(Func<WatchStatus?, Task>? onChanged = null)
     {
         _onChanged = onChanged;
-        MarkWatchedCommand = new StatusCommand(() => RequestAsync(WatchStatus.Watched));
-        MarkNotStartedCommand = new StatusCommand(() => RequestAsync(WatchStatus.NotStarted));
-        ClearOverrideCommand = new StatusCommand(() => RequestAsync(null), () => IsManualOverride);
+        MarkWatchedCommand = new AsyncRelayCommand(() => RequestAsync(WatchStatus.Watched));
+        MarkNotStartedCommand = new AsyncRelayCommand(() => RequestAsync(WatchStatus.NotStarted));
+        ClearOverrideCommand = new AsyncRelayCommand(() => RequestAsync(null), () => IsManualOverride);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -63,22 +64,11 @@ public sealed class WatchStatusViewModel : INotifyPropertyChanged
             OnPropertyChanged(name);
         }
 
-        (ClearOverrideCommand as StatusCommand)?.RaiseCanExecuteChanged();
+        (ClearOverrideCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     private Task RequestAsync(WatchStatus? status) => _onChanged?.Invoke(status) ?? Task.CompletedTask;
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class StatusCommand(Func<Task> execute, Func<bool>? canExecute = null) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => canExecute?.Invoke() ?? true;
-
-        public async void Execute(object? parameter) => await execute().ConfigureAwait(true);
-
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-    }
 }

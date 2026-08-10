@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Show;
 
@@ -40,8 +41,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         MovieDetails = movieDetails ?? new MovieDetailsViewModel();
         ShowDetails = showDetails ?? new ShowDetailsViewModel();
         ScanProgress = scanProgress ?? new ScanProgressViewModel();
-        RefreshCommand = new AsyncCommand(() => LoadAsync(CancellationToken.None));
-        LoadMoreCommand = new AsyncCommand(() => LoadMoreAsync(CancellationToken.None));
+        RefreshCommand = new AsyncRelayCommand(() => LoadAsync(CancellationToken.None));
+        LoadMoreCommand = new AsyncRelayCommand(() => LoadMoreAsync(CancellationToken.None));
         OpenDetailsCommand = new RelayCommand(
             parameter => OpenDetails((CatalogItemViewModel)parameter!),
             parameter => parameter is CatalogItemViewModel);
@@ -224,34 +225,5 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         public bool CanExecute(object? parameter) => canExecute(parameter);
 
         public void Execute(object? parameter) => execute(parameter);
-    }
-
-    private sealed class AsyncCommand(Func<Task> execute) : ICommand
-    {
-        private bool _isRunning;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => !_isRunning;
-
-        public async void Execute(object? parameter)
-        {
-            if (_isRunning)
-            {
-                return;
-            }
-
-            _isRunning = true;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            try
-            {
-                await execute().ConfigureAwait(true);
-            }
-            finally
-            {
-                _isRunning = false;
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
     }
 }

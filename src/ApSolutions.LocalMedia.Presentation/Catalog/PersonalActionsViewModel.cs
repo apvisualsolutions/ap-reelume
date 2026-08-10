@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Personalization;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Catalog;
 
@@ -37,16 +38,16 @@ public sealed class PersonalActionsViewModel : INotifyPropertyChanged
     public PersonalActionsViewModel(Func<PersonalActionRequest, Task>? onChanged = null)
     {
         _onChanged = onChanged;
-        ToggleFavoriteCommand = new PersonalCommand(
+        ToggleFavoriteCommand = new AsyncRelayCommand(
             _ => RequestAsync(new PersonalActionRequest(PersonalActionKind.ToggleFavorite, null)));
-        ToggleWatchLaterCommand = new PersonalCommand(
+        ToggleWatchLaterCommand = new AsyncRelayCommand(
             _ => RequestAsync(new PersonalActionRequest(PersonalActionKind.ToggleWatchLater, null)));
-        SetRatingCommand = new PersonalCommand(
+        SetRatingCommand = new AsyncRelayCommand(
             parameter => RequestAsync(new PersonalActionRequest(
                 PersonalActionKind.SetRating,
                 ReadRating(parameter))),
             parameter => ReadRating(parameter) is not null);
-        ClearRatingCommand = new PersonalCommand(
+        ClearRatingCommand = new AsyncRelayCommand(
             _ => RequestAsync(new PersonalActionRequest(PersonalActionKind.SetRating, null)),
             _ => HasRating);
     }
@@ -102,7 +103,7 @@ public sealed class PersonalActionsViewModel : INotifyPropertyChanged
             OnPropertyChanged(name);
         }
 
-        (ClearRatingCommand as PersonalCommand)?.RaiseCanExecuteChanged();
+        (ClearRatingCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     /// <summary>A value outside one to ten, or anything that is not a number, is not a rating.</summary>
@@ -122,23 +123,4 @@ public sealed class PersonalActionsViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class PersonalCommand(
-        Func<object?, Task> execute,
-        Func<object?, bool>? canExecute = null) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter) => canExecute?.Invoke(parameter) ?? true;
-
-        public async void Execute(object? parameter)
-        {
-            if (CanExecute(parameter))
-            {
-                await execute(parameter).ConfigureAwait(true);
-            }
-        }
-
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-    }
 }
