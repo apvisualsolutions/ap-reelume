@@ -75,10 +75,12 @@ Cuatro commits, cada uno con su ciclo completo y su evidencia bilingüe.
 ## Lo que sigue
 
 La cola de dos —la última deuda de cobertura y la instrumentación del rojo intermitente— **se
-ejecutó entera el 2026-08-10** (quinta sesión). Con ella se cierran TST-001 y el trabajo que la
-auditoría dejó en la cabecera del plan; lo que queda son las entradas sueltas de
-[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md), que ya no
-están decididas de antemano y hay que diseñarlas antes de ejecutarlas:
+ejecutó entera el 2026-08-10** (quinta sesión), y `BUG-010` cayó detrás. **La cola siguiente está
+decidida entera en
+[el plan](superpowers/plans/2026-08-08-audit-remediation.md): forma, sitio, primera medición y
+criterio de aceptación de cada una.** Se ejecuta en este orden y no se re-delibera; lo que sí se
+hace en cada una es **medir antes de corregir**, porque tres premisas escritas se han caído esta
+semana al medirlas.
 
 1. **`BUG-011`**, que salió de hacer `BUG-010` y hereda su puesto: `LibVlcMediaPlayerEngine` guarda
    la **tercera** cola de liberación diferida, con el mismo `Dispose` sin guarda. No es el mismo
@@ -86,13 +88,28 @@ están decididas de antemano y hay que diseñarlas antes de ejecutarlas:
    orden es lo que evita que la destrucción nativa se lleve el proceso, así que unificarlo pide que
    `LibVlcFactory` sepa vaciar a petición. Está en la lista que sólo puede encoger de
    `NativeInstanceOwnershipTests`, a la vista en cada ejecución.
-2. **`ARQ-012`, `ARQ-013`, `ARQ-014`**: `RepositoryLayout`/`TestAppBuilder` duplicados con dos
-   anclas, la regex de la puerta de alcanzabilidad que acepta comentarios, y el User-Agent con la
-   versión desincronizada. Tres arreglos pequeños con la misma forma que los ya hechos.
-3. **`QA-001`**: barrido de `Parse`/`ToString` sin cultura en `src/`.
-4. **Documentación**: `DOC-101` (evidencia de UX-007), `DOC-201` (justificar la promoción de
-   SYS-001), las casillas `T44.1`-`T44.6` del plan MVP, y el manual de usuario, al que le faltan el
-   actualizador y la detección de segmentos.
+   Decidido: `LibVlcFactory` gana un vaciado a petición **con techo** que no lanza al agotarse, el
+   motor cambia dos líneas de orden, y la ventana de reposo de 1 s **no se toca**.
+2. **`ARQ-013`**, la puerta de alcanzabilidad que se cree un comentario: una referencia comentada
+   cuenta como alcanzada, así que la superficie huérfana que esa prueba existe para cazar se esconde
+   detrás de `<!-- -->`. Es el de más valor de los tres pequeños, porque el defecto está **en una
+   puerta**. Decidido: quitar comentarios antes de buscar, y **el rojo primero**.
+3. **`ARQ-014`**, el User-Agent que anuncia `1.0` mientras la versión declarada es `0.1.0`: la marca
+   se queda y la versión sale del ensamblado, fijada contra el `<Version>` de
+   `Directory.Build.props`.
+4. **`ARQ-012`**, una raíz del repositorio y un ancla: hoy hay **dos** —`docs/FEATURES.md` y el
+   `.sln`— y una docena de copias del mismo `while`. Decidido: ancla el `.sln`, archivo compartido
+   en `tests/Shared/`, y una regla que sólo puede encoger.
+5. **`QA-001`**, cultura: **no se escribe un regex**, se encienden `CA1305`/`CA1304`/`CA1310` como
+   error. Primero se cuentan los avisos por proyecto, y el criterio al corregir es invariante para
+   lo que se guarda o viaja, cultura de la interfaz para lo que lee una persona.
+6. **Documentación al final**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se
+   escribe desde la aplicación construida y no desde el código.
+
+**Decisión sobre la primera publicación**: la tubería ya no está bloqueada —el secreto de firma está
+puesto—, pero **no se corta `v0.1.0` todavía**. Faltan dos cosas que no son de código y no las
+decide un agente: el dictamen `REL-004` y el paseo físico. Publicar antes sería cambiar una
+verificación pendiente por una fecha.
 
 ## Un rojo intermitente que hay que vigilar, no tapar
 

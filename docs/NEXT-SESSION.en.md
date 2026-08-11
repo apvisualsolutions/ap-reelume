@@ -73,10 +73,11 @@ Four commits, each with its full cycle and its bilingual evidence.
 ## What comes next
 
 The two-part queue — the last coverage debt and the intermittent red's instrumentation — **was run
-in full on 2026-08-10** (fifth session). That closes TST-001 and the work the audit left at the head
-of the plan; what remains are the loose entries in
-[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md), none of them
-decided in advance, so each needs designing before it is run:
+in full on 2026-08-10** (fifth session), and `BUG-010` fell right after. **The next queue is decided
+in full in [the plan](superpowers/plans/2026-08-08-audit-remediation.md): shape, place, first
+measurement and acceptance for each.** It runs in this order without re-deliberating; what each one
+does do is **measure before fixing**, because three written premises collapsed this week when they
+were measured.
 
 1. **`BUG-011`**, which came out of doing `BUG-010` and inherits its place:
    `LibVlcMediaPlayerEngine` keeps the **third** deferred-release queue, with the same unguarded
@@ -84,13 +85,28 @@ decided in advance, so each needs designing before it is run:
    the player, and that order is what keeps the native teardown from crashing, so unifying it asks
    `LibVlcFactory` to be able to flush on request. It sits on the shrink-only list in
    `NativeInstanceOwnershipTests`, in view on every run.
-2. **`ARQ-012`, `ARQ-013`, `ARQ-014`**: duplicated `RepositoryLayout`/`TestAppBuilder` with two
-   anchors, the reachability gate's regex accepting comments, and the User-Agent whose version has
-   drifted. Three small fixes shaped like the ones already done.
-3. **`QA-001`**: a sweep for culture-less `Parse`/`ToString` in `src/`.
-4. **Documentation**: `DOC-101` (evidence for UX-007), `DOC-201` (justifying SYS-001's promotion),
-   boxes `T44.1`-`T44.6` of the MVP plan, and the user manual, which is still missing the updater and
-   the segment detection.
+   Decided: `LibVlcFactory` gains a flush on request **with a ceiling** that does not throw when it
+   runs out, the engine changes two ordering lines, and the 1 s quiescence window **stays put**.
+2. **`ARQ-013`**, the reachability gate that believes a comment: a commented-out reference counts as
+   reached, so the orphan surface that test exists to catch hides behind `<!-- -->`. The most
+   valuable of the three small ones, because the defect is **in a gate**. Decided: strip comments
+   before matching, and **the red first**.
+3. **`ARQ-014`**, the User-Agent announcing `1.0` while the declared version is `0.1.0`: the brand
+   stays and the version comes from the assembly, pinned against `Directory.Build.props`'s
+   `<Version>`.
+4. **`ARQ-012`**, one repository root and one anchor: there are **two** today — `docs/FEATURES.md`
+   and the `.sln` — plus a dozen copies of the same `while`. Decided: the `.sln` is the anchor, one
+   shared file in `tests/Shared/`, and a shrink-only rule.
+5. **`QA-001`**, culture: **no hand-rolled regex** — turn `CA1305`/`CA1304`/`CA1310` into errors.
+   Count the warnings per project first; when fixing, invariant for what is stored or sent, interface
+   culture for what a person reads.
+6. **Documentation last**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, which is
+   written from the built application rather than from the code.
+
+**Decision on the first release**: the pipeline is no longer blocked — the signing secret is in
+place — but **`v0.1.0` is not cut yet**. Two things are missing that are not code and are not an
+agent's to decide: the `REL-004` opinion and the physical walk. Releasing before them would trade a
+pending verification for a date.
 
 ## An intermittent red to watch, not to paper over
 

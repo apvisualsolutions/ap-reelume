@@ -593,11 +593,52 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
       falta el ecosistema NuGet. Queda: CLAUDE.md raíz, CONTRIBUTING.md, plantillas, CODEOWNERS.
 - [ ] **Borrar los logs de `.superpowers/brainstorm/*/state/`** (rutas de la máquina anterior;
       gitignorados pero higiene). **Acción destructiva: la ejecuta o la aprueba el propietario.**
-- [ ] DOC-101 (evidencia de UX-007), DOC-201 (justificar la promoción de SYS-001), casillas
-      T44.1-T44.6 del plan MVP.
-- [ ] Manual de usuario: documentar actualizador y detección de segmentos.
-- [ ] ARQ-012 (RepositoryLayout/TestAppBuilder duplicados, dos anclas), ARQ-013 (regex de la puerta
-      de alcanzabilidad acepta comentarios), ARQ-014 (User-Agent con marca y versión desincronizada).
+- [ ] **DOC-101 (evidencia de UX-007), DOC-201 (promoción de SYS-001), casillas T44.1-T44.6.**
+      **Decidido el 2026-08-11 (experto): van juntas y van al final**, después del código. Las tres
+      son la misma tarea —un estado declarado que no enseña con qué se declaró— y la regla de la casa
+      ya dice cómo se cierra: o hay evidencia enlazada que lo sostiene, o la fila baja de estado. **No
+      se escribe evidencia nueva para justificar un estado: se mide y se escribe lo que salga**, que
+      es lo que hizo caer dos premisas esta semana. Antes de redactar, `eng/verify-docs.ps1` y
+      `EvidenceLinkTests` dicen exactamente qué falta.
+- [ ] **Manual de usuario: actualizador y detección de segmentos.** **Decidido:** es lo último de
+      todo, y se escribe **desde la aplicación construida**, no desde el código —una pantalla que el
+      manual describe y que no existe es un defecto que ninguna puerta caza—. Los dos idiomas a la
+      vez, como todo lo público.
+- [ ] **ARQ-012 — una raíz del repositorio, un ancla.** **Diseño decidido el 2026-08-11 (experto),
+      para que no se re-delibere:** hay **dos anclas** (`docs/FEATURES.md` en
+      `ArchitectureTests.RepositoryLayout`, `ApSolutions.LocalMedia.sln` en
+      `PackageEvidence.RepositoryRoot` y en una docena de copias sueltas dentro de `UiTests`), y cada
+      copia es un `while` idéntico pegado en el archivo que lo necesitaba.
+      - **Ancla única: `ApSolutions.LocalMedia.sln`**, porque es la definición de «este checkout» y
+        es la que ya usan casi todas las copias; `docs/FEATURES.md` es contenido, y un documento que
+        se mueva rompería la localización de la raíz.
+      - **Dónde**: `tests/Shared/RepositoryLayout.cs`, `internal static` en el espacio de nombres
+        `ApSolutions.LocalMedia.TestSupport`, incluido en cada proyecto de pruebas desde
+        `tests/Directory.Build.targets` con un `<Compile Include=…>`; nada de proyecto nuevo ni de
+        paquete.
+      - **Primera medición, antes de tocar**: contar las copias (`rg -n "ApSolutions.LocalMedia.sln\""
+        tests/`) y dejar el número en la evidencia; es la deuda que se salda.
+      - **Aceptación**: una regla de código fuente, con la lista que sólo puede encoger que esta casa
+        ya usa, que falla si un archivo de `tests/` vuelve a buscar el ancla por su cuenta.
+        `TestAppBuilder` se mide igual antes de unificarlo: el plan lo da por duplicado y eso hay que
+        verlo. \ Decided: one anchor (the solution file), one shared file linked from every test
+        project, and a shrink-only rule.
+- [ ] **ARQ-013 — la puerta de alcanzabilidad no puede creerse un comentario.** El regex de
+      `SurfaceReachabilityTests` busca el nombre de la vista en el marcado y en el código, así que
+      una referencia **comentada** la da por alcanzada: la superficie huérfana que esto existe para
+      cazar se esconde detrás de `<!-- -->`. **Decidido:** quitar los comentarios del texto antes de
+      buscar —`<!--…-->` en AXAML, `//` y `/*…*/` en C#— y **empezar por el rojo**: una vista cuya
+      única referencia está comentada tiene que salir huérfana, y hoy no sale. \ Decided: strip
+      comments before matching, red test first.
+- [ ] **ARQ-014 — el User-Agent dice una versión que no existe.**
+      `GitHubReleaseUpdateProvider` envía `AP-Reelume-Updater/1.0` mientras `Directory.Build.props`
+      declara `0.1.0`: una cadena escrita a mano que nadie sincroniza. **Decidido:** la marca se
+      queda —es el nombre público— y la versión sale del ensamblado
+      (`AssemblyInformationalVersionAttribute`, cortada en `+`), con una prueba que la compara contra
+      el `<Version>` del `Directory.Build.props`, que es la única fuente de la versión en este
+      repositorio. **Comprobar antes** si `NetworkPurposeRegistry` o alguna prueba fijan el texto del
+      User-Agent, porque entonces el cambio es de dos sitios. \ Decided: keep the brand, take the
+      version from the assembly, pin it against the single version source.
 - [x] **BUG-010**: unificar `LibVlcMediaProbe` sobre `LibVlcFactory.DeferRelease` (su cola propia
       puede morir para siempre y mantiene una segunda instancia nativa fuera del contador).
       **Hecho el 2026-08-11**: el sondeo recibe la fábrica; fuera su instancia, su cola, su
@@ -615,7 +656,38 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
       `LibVlcFactory` sepa vaciar a petición. Está en la lista que sólo puede encoger de
       `NativeInstanceOwnershipTests`, visible en cada ejecución. \ New: the engine's queue needs a
       flush-on-request on the factory before it can move.
-- [ ] QA-001: barrido de `Parse/ToString` sin cultura en `src/`.
+      **Diseño decidido el 2026-08-11 (experto):**
+      - **`LibVlcFactory` gana `FlushDeferredReleasesAsync(TimeSpan ceiling)`**, que espera a que la
+        cola quede vacía y **tiene techo**, porque toda espera de esta casa lo tiene: agotarlo no
+        lanza, devuelve `false` y quien llama sigue con su desmontaje. Esperar por medios de otro
+        componente es aceptable —cada uno cuesta su ventana de reposo de 1 s— y es más barato que dos
+        colas.
+      - **El motor cambia dos líneas de orden**: `DeferRelease` propio → `_factory.DeferRelease`, y
+        en `DisposeAsync`, `await DrainDeferredReleasesAsync()` → `await _factory.Flush…`, **antes**
+        de `ReleaseMediaPlayer`. Ese orden es lo único que no se puede tocar: soltar el reproductor
+        antes que sus medios revienta la destrucción nativa.
+      - **No se toca `MediaQuiescence`** (1 s). Es el número que dejó de crashear y no hay medición
+        nueva que lo discuta.
+      - **Aceptación**: la lista de `NativeInstanceOwnershipTests` **encoge sola** —la prueba falla
+        si un archivo declarado deja de tener cola, así que obliga a quitarlo— más una prueba de
+        resistencia que abra y cierre el motor N veces y afirme `PendingDeferredReleaseCount == 0` y
+        los manejadores del proceso sin crecer, al modo de `HandleGrowthTests`. \ Decided: a flush
+        with a ceiling on the factory, two ordering lines in the engine, quiescence untouched.
+- [ ] **QA-001 — cultura invariante donde el formato es dato, no idioma.** **Decidido el 2026-08-11
+      (experto): no se escribe un regex propio.** El compilador ya sabe hacer este barrido y esta
+      solución ya compila con `-warnaserror`, así que la puerta son los analizadores:
+      **CA1305** (`IFormatProvider`), **CA1304** y **CA1310** (comparación y `ToUpper`/`ToLower`
+      dependientes de cultura), subidos a `error` en `.editorconfig`. Una regla casera acertaría
+      menos y habría que mantenerla.
+      - **Primera medición**: encenderlos como `warning`, compilar y **contar los avisos por
+        proyecto**. Ese número decide si se salda de una vez o por capas; va a la evidencia antes de
+        corregir nada.
+      - **Criterio al corregir**: lo que se guarda, se compara o viaja por la red va en
+        `CultureInfo.InvariantCulture`; lo que **lee una persona** va en la cultura de la interfaz.
+        No es un `InvariantCulture` a todo: una duración en pantalla con punto decimal inglés sería
+        un defecto nuevo, no una corrección. \ Decided: turn on CA1305/CA1304/CA1310 as errors rather
+        than hand-rolling a regex; measure the warning count first; invariant for stored and wire
+        values, interface culture for what a person reads.
 
 ## Pendiente transversal / Cross-cutting pending
 
