@@ -61,10 +61,26 @@ second, independent copy. The inventory and the provenance of each text are in
 [licenses/README.en.md](../release/licenses/README.en.md), and what was measured is in
 [audit-legal-licence-texts.md](../evidence/stable/audit-legal-licence-texts.md).
 
-One question stays for the opinion, and it is about form rather than delivery: which subsection of
-LGPL-2.1 §6 covers the way LibVLC travels here — an unmodified, replaceable dynamic library — and
-whether the written offer of corresponding source recorded in `NOTICE-VideoLAN.txt`, valid for three
-years, is enough as the accompaniment GPL-2.0 §3 asks for on behalf of the plugins.
+**This question was closed on 2026-08-14, by choosing the option that needs no interpreting rather
+than by commissioning someone to interpret.** It asked which subsection of LGPL-2.1 §6 covers the way
+LibVLC travels here, and whether the written offer is enough for GPL-2.0 §3. Subsection 6(b) — the one
+you would expect for a dynamic library — wants a mechanism that uses "a copy of the library already
+present on the user's computer system", and here the DLLs arrive with the artifact, so its first
+condition is not **literally** met. But 6(d) and the last paragraph of §3 say the same thing and say
+it unconditionally: where the executable is offered for download from a designated place, offering the
+source from that same place is distributing it.
+
+That is what the release does now: `eng/fetch-corresponding-source.ps1` fetches `vlc-3.0.23.tar.xz` —
+verified against the digest VideoLAN publishes — and the `LibVLCSharp 3.10.0` archive, and attaches
+them beside the binaries. The written offer stays for channels where "the same place" means nothing,
+such as a store, and it now explicitly stands for any third party. Two things were corrected along the
+way: the notice named `libvlc 3.0.23.1` — a version whose source **does not exist**, that fourth digit
+belonging to the NuGet package — and it did not mention that the work using the library is this
+program, public under `GPL-3.0-or-later`, which is what 6(a) asks for so the library can be relinked.
+Measured in [audit-corresponding-source.md](../evidence/stable/audit-corresponding-source.md).
+
+None of this is a legal opinion or a substitute for one: it is compliance checkable against the text of
+the licences, and what it achieves is that no interpretation is needed.
 
 ## The TMDB API
 

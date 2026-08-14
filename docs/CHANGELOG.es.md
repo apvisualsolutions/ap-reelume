@@ -95,6 +95,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   saltado era una publicación real, en el paso que comprueba que la firma sirve. Ahora el proyecto
   está dentro, con lo que todas las comprobaciones que ya existían pasan a cubrirlo, y una prueba
   nueva falla en cuanto aparezca otro proyecto fuera.
+- **Cada versión publicada lleva al lado el código fuente de las bibliotecas que reproduce el vídeo.**
+  Las licencias de LibVLC y de sus complementos obligan a que ese código esté a tu alcance, y la forma
+  más clara de cumplirlo es la que ellas mismas describen: ofrecerlo desde el mismo sitio del que te
+  descargas el programa. Así que la versión adjunta `vlc-3.0.23.tar.xz` —comprobado contra la huella
+  que publica VideoLAN— y el de LibVLCSharp, además de la oferta por escrito que ya existía, que se
+  mantiene para quien reciba el programa por otra vía. De paso se corrigió que el aviso nombraba una
+  versión de VLC que no existe: el `3.0.23.1` del paquete es su propia numeración, y el código fuente
+  se publica como `3.0.23`.
 - **Y si el tráiler no lo tienes, la ficha te lo abre en el navegador.** Cuando TMDB conoce uno,
   aparece un botón en la ficha de la película o de la serie que lo abre en tu navegador de siempre.
   **La aplicación no se conecta a YouTube**: le pasa la dirección a Windows y quien entra es tu

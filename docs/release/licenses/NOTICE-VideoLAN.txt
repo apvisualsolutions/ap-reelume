@@ -21,14 +21,40 @@ for itself. It carries the "either version 2 of the License, or (at your option)
 clause, which is what lets a GPL-2.0-or-later plugin sit inside a program released under
 GPL-3.0-or-later.
 
-Nothing in these binaries has been modified. They are the files VideoLAN publishes for
-libvlc 3.0.23.1, placed in the payload as separate dynamic libraries that the program loads at run
-time; replacing them with another build of the same library is a matter of overwriting the files.
+Nothing in these binaries has been modified. They are the files VideoLAN publishes, placed in the
+payload as separate dynamic libraries that the program loads at run time; replacing them with another
+build of the same library is a matter of overwriting the files, and the program will use the
+replacement as long as it is interface-compatible.
 
-The corresponding source of the exact versions above is published by VideoLAN at
-https://code.videolan.org/videolan/vlc and https://code.videolan.org/videolan/LibVLCSharp, and its
-releases are mirrored at https://download.videolan.org/vlc/. In addition, and valid for three years
-from the date of the release this artifact belongs to, AP Solutions offers to supply the complete
-corresponding machine-readable source code of LibVLC and LibVLCSharp as distributed here, for no more
-than the cost of performing the distribution. Requests go through the private channel described in
-SECURITY.md.
+A note on the version numbers, because they are not the same number. The NuGet package is
+VideoLAN.LibVLC.Windows 3.0.23.1, whose fourth digit is that package's own packaging revision.
+libvlc.dll declares file version 3.0.23, and vlc 3.0.23 is the tree VideoLAN publishes source for;
+there is no vlc-3.0.23.1. The corresponding source is therefore the 3.0.23 one.
+
+
+Where to get the corresponding source
+-------------------------------------
+
+It travels with the release. Every release that carries these binaries also carries, as attachments
+alongside them, the corresponding source archives:
+
+    vlc-3.0.23.tar.xz           https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz
+    LibVLCSharp-3.10.0.tar.gz   https://code.videolan.org/videolan/LibVLCSharp/-/archive/3.10.0/LibVLCSharp-3.10.0.tar.gz
+
+That is the point of section 6(d) of the LGPL-2.1 and of the last paragraph of section 3 of the
+GPL-2.0: where an executable is offered for download from a designated place, offering equivalent
+access to copy the source from that same place is distribution of the source. The archives are
+fetched during the release with their digests recorded in SHA256SUMS.txt, which the release signs, and
+the digest of the VLC archive is checked against the one VideoLAN publishes for it.
+
+The work that uses the library is this program itself, and it is source code: AP Reelume is
+GPL-3.0-or-later and its complete source is public at https://github.com/apvisualsolutions/ap-reelume.
+Anyone who wants to modify LibVLC and use the result has both halves — the library's source above and
+the program's — and does not have to relink anything, because the libraries are separate files.
+
+For any channel where "the same place" means nothing — a store, a mirror, a copy passed on by hand —
+this offer stands instead, and it stands for any third party, not only for whoever received the
+binary: valid for three years from the date of the release this artifact belongs to, AP Solutions
+will supply the complete corresponding machine-readable source code of LibVLC, of its plugins and of
+LibVLCSharp as distributed here, on a medium customarily used for software interchange, for no more
+than the cost of performing the distribution. Write to the address in SECURITY.md.

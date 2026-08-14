@@ -63,10 +63,26 @@ y la procedencia de cada texto están en [licenses/README.es.md](../release/lice
 lo medido en
 [audit-legal-licence-texts.md](../evidence/stable/audit-legal-licence-texts.md).
 
-Queda una pregunta para el dictamen, y es de forma, no de entrega: bajo qué apartado del §6 de la
-LGPL-2.1 queda amparada la manera en que LibVLC viaja aquí —biblioteca dinámica sin modificar y
-sustituible— y si la oferta escrita de código correspondiente que recoge `NOTICE-VideoLAN.txt`, válida
-tres años, basta como el acompañamiento que el §3 de la GPL-2.0 pide por los complementos.
+**Esta pregunta se cerró el 2026-08-14, y se cerró eligiendo la opción que no admite interpretación
+en vez de encargando quién interpretaba.** Preguntaba bajo qué apartado del §6 de la LGPL-2.1 queda
+amparada la manera en que LibVLC viaja aquí, y si la oferta escrita basta para el §3 de la GPL-2.0.
+El §6(b) —el que uno esperaría para una biblioteca dinámica— pide un mecanismo que use «una copia ya
+presente en el sistema del usuario», y aquí las DLL las trae el artefacto, así que su primera
+condición no se cumple **literalmente**. Pero el §6(d) y el último párrafo del §3 dicen lo mismo y sin
+condiciones: si el ejecutable se ofrece para descarga desde un lugar designado, ofrecer el fuente
+**desde ese mismo lugar** es distribuirlo.
+
+Eso es lo que hace ahora la versión: `eng/fetch-corresponding-source.ps1` trae `vlc-3.0.23.tar.xz`
+—verificado contra la huella que VideoLAN publica— y el archivo de `LibVLCSharp 3.10.0`, y los adjunta
+junto a los binarios. La oferta escrita se queda para los canales donde «el mismo sitio» no significa
+nada, como una tienda, y ahora vale explícitamente para cualquier tercero. De paso se corrigieron dos
+cosas: el aviso nombraba `libvlc 3.0.23.1` —una versión cuyo fuente **no existe**, porque ese cuarto
+dígito es del paquete NuGet— y no mencionaba que el trabajo que usa la biblioteca es este programa,
+público bajo `GPL-3.0-or-later`, que es lo que el §6(a) pide para poder relinkar. Medido en
+[audit-corresponding-source.md](../evidence/stable/audit-corresponding-source.md).
+
+Nada de esto es un dictamen ni lo sustituye: es cumplimiento comprobable contra el texto de las
+licencias, y lo que consigue es que no haga falta interpretar.
 
 ## API de TMDB
 

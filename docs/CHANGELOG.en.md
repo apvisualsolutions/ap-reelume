@@ -93,6 +93,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   built it. The first place it would have surfaced was a real publication, at the step that verifies
   the signature is good. The project is inside now, so every check that already existed covers it,
   and a new test fails the moment another project appears outside.
+- **Every published release now carries, beside it, the source code of the libraries that play your
+  video.** LibVLC's licence and its plugins' require that code to be within your reach, and the
+  clearest way to do that is the one they describe themselves: offer it from the same place you
+  download the program from. So the release attaches `vlc-3.0.23.tar.xz` — checked against the digest
+  VideoLAN publishes — and the LibVLCSharp archive, on top of the written offer that already existed,
+  which stays for anyone who receives the program by another route. It also corrected a notice that
+  named a VLC version which does not exist: the package's `3.0.23.1` is its own numbering, and the
+  source is published as `3.0.23`.
 - **And if you do not have the trailer, the card opens it in your browser.** When TMDB knows one, a
   button appears on the film's or the series' card and opens it in the browser you already use.
   **The application does not connect to YouTube**: it hands the address to Windows and your browser
