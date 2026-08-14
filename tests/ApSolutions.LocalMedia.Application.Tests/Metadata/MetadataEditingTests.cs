@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Tests.Identification;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Metadata;
 using Xunit;
@@ -55,15 +56,18 @@ public sealed class MetadataEditingTests
         var titleId = new TitleId(Guid.Parse("60000000-0000-0000-0000-000000000001"));
         var repository = new MemoryMetadataRepository(Catalog(
             revision: 4,
-            locked: [MetadataField.Title, MetadataField.PosterPath]));
-        var refresh = new RefreshMetadata(repository, new MetadataMergePolicy());
-        var remote = RemoteDetails(titleId, "La llegada", "/remote-poster.jpg");
+            locked: [MetadataField.Title, MetadataField.PosterPath]) with
+        {
+            Provider = "tmdb",
+            ProviderKey = ProviderKey,
+        });
+        var refresh = Refresh(repository, RemoteDetails(titleId, "La llegada", "/remote-poster.jpg"));
 
         var preserved = await refresh.ExecuteAsync(
-            new RefreshMetadataCommand(titleId, remote, ExpectedRevision: 4, RestoreProviderFields: false),
+            new RefreshMetadataCommand(titleId, ExpectedRevision: 4, RestoreProviderFields: false),
             TestContext.Current.CancellationToken);
         var restored = await refresh.ExecuteAsync(
-            new RefreshMetadataCommand(titleId, remote, ExpectedRevision: 5, RestoreProviderFields: true),
+            new RefreshMetadataCommand(titleId, ExpectedRevision: 5, RestoreProviderFields: true),
             TestContext.Current.CancellationToken);
 
         Assert.Equal("Manual title", preserved.Catalog?.Metadata.Title);
@@ -77,7 +81,11 @@ public sealed class MetadataEditingTests
     [Fact]
     public async Task Stale_edit_conflicts_and_three_edit_refresh_restart_cycles_keep_manual_fields()
     {
-        var repository = new MemoryMetadataRepository(Catalog(revision: 0, locked: []));
+        var repository = new MemoryMetadataRepository(Catalog(revision: 0, locked: []) with
+        {
+            Provider = "tmdb",
+            ProviderKey = ProviderKey,
+        });
         var updater = new UpdateMetadata(repository);
         var first = await updater.ExecuteAsync(
             new UpdateMetadataCommand(
@@ -100,11 +108,12 @@ public sealed class MetadataEditingTests
 
         for (var cycle = 0; cycle < 3; cycle++)
         {
-            var restartedRefresh = new RefreshMetadata(repository, new MetadataMergePolicy());
+            var restartedRefresh = Refresh(
+                repository,
+                RemoteDetails(repository.Value.TitleId, $"Remote {cycle}", $"/poster-{cycle}.jpg"));
             var refreshed = await restartedRefresh.ExecuteAsync(
                 new RefreshMetadataCommand(
                     repository.Value.TitleId,
-                    RemoteDetails(repository.Value.TitleId, $"Remote {cycle}", $"/poster-{cycle}.jpg"),
                     repository.Value.Revision,
                     RestoreProviderFields: false),
                 TestContext.Current.CancellationToken);
@@ -112,6 +121,20 @@ public sealed class MetadataEditingTests
             Assert.Equal("Locked title", repository.Value.Metadata.Title);
         }
     }
+
+    private const string ProviderKey = "movie:6289";
+
+    /// <summary>
+    /// The refresh wired the way the composition root wires it: it resolves the provider entry from
+    /// the row rather than being handed one, which is what stopped the editor's buttons being inert.
+    /// </summary>
+    private static RefreshMetadata Refresh(ICatalogMetadataRepository repository, MetadataDetails remote) =>
+        new(
+            repository,
+            new StubMetadataProvider(remote),
+            new MetadataMergePolicy(),
+            TestIdentification.Language,
+            TimeProvider.System);
 
     private static CatalogMetadata Catalog(int revision, HashSet<MetadataField> locked) => new(
         new TitleId(Guid.Parse("60000000-0000-0000-0000-000000000001")),
@@ -128,7 +151,7 @@ public sealed class MetadataEditingTests
         revision);
 
     private static MetadataDetails RemoteDetails(TitleId titleId, string title, string poster) => new(
-        new MetadataReference("tmdb", $"movie:{titleId.Value:N}", MetadataContentKind.Movie),
+        new MetadataReference("tmdb", ProviderKey, MetadataContentKind.Movie),
         "es-ES",
         title,
         "Arrival",

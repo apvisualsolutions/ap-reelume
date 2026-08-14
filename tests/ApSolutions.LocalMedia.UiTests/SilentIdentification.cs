@@ -22,9 +22,20 @@ internal static class SilentIdentification
         new MetadataLanguage("es-ES", "en-US"),
         TimeProvider.System);
 
+    /// <summary>The refresh wired as the composition root wires it, over a provider with no answers.</summary>
+    public static RefreshMetadata Refresh(ICatalogMetadataRepository repository) => new(
+        repository,
+        new SilentProvider(),
+        new MetadataMergePolicy(),
+        new MetadataLanguage("es-ES", "en-US"),
+        TimeProvider.System);
+
     private sealed class SilentProvider : IMetadataProvider
     {
         public string Name => "tmdb";
+
+        public MetadataReference? TryCreateReference(string key) =>
+            new(Name, key, MetadataContentKind.Movie);
 
         public Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
             MetadataSearchQuery query,
@@ -48,6 +59,8 @@ internal static class SilentIdentification
             CatalogMetadata catalog,
             int expectedRevision,
             CancellationToken cancellationToken = default) =>
-            Task.FromResult(new MetadataWriteResult(MetadataWriteOutcome.Applied, catalog));
+            Task.FromResult(new MetadataWriteResult(
+                MetadataWriteOutcome.Applied,
+                catalog is null ? null : catalog with { Revision = expectedRevision + 1 }));
     }
 }

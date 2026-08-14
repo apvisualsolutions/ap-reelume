@@ -87,7 +87,7 @@ public sealed class ApplyIdentification(
             new CatalogMetadata(
                 titleId,
                 merged,
-                expectedRevision + 1,
+                expectedRevision,
                 details.Reference.Provider,
                 details.Reference.Key,
                 timeProvider.GetUtcNow()),

@@ -329,6 +329,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The editor's two provider buttons now do something.** "Refresh from provider" and "Restore
+  provider fields" were visible and enabled and could not work: they waited on details only a test
+  ever gave them. The refresh now works out for itself which provider entry the title is, from what
+  was stored when it was identified. And when it can do nothing, it says so: an unidentified entry
+  and a provider with no answer are different things, and neither is an error.
+- **Saving a freshly added entry now saves.** Editing a title nobody had touched did not create its
+  row, so Save was pressed and nothing happened, with no warning.
+- **Two windows editing the same entry can no longer both win.** The check that stops one person
+  overwriting another's work was comparing against a number that never changed, so the second window
+  silently overwrote the first. The second one is now told its copy is stale, which is what should
+  always have happened.
 - **Identifying a film now changes what the library shows.** Until now it did not: accepting a match
   in the inbox marked the review and nothing else, so the entry went on showing whatever the parser
   pulled out of the file name. The synopsis and the trailer key existed end to end and were only ever

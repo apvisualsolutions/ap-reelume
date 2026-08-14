@@ -39,6 +39,18 @@ public enum MetadataWriteOutcome
     Applied,
     Conflict,
     NotFound,
+
+    /// <summary>
+    /// Nobody has identified this title, so there is no provider entry to refresh it against. It is
+    /// a state to explain, not a fault to report.
+    /// </summary>
+    NotIdentified,
+
+    /// <summary>
+    /// The title is identified but the provider had no answer to give — which, with no consented
+    /// connection, is what an entry that is not already cached looks like.
+    /// </summary>
+    Unavailable,
 }
 
 public sealed record MetadataWriteResult(
@@ -65,16 +77,30 @@ public sealed record UpdateMetadataCommand(
 
 public sealed class UpdateMetadata(ICatalogMetadataRepository repository)
 {
+    private static readonly EditableMetadata Empty = new(
+        string.Empty,
+        OriginalTitle: null,
+        Overview: null,
+        ReleaseYear: null,
+        Genres: [],
+        PosterPath: null,
+        BackdropPath: null,
+        TrailerKey: null,
+        LockedFields: new HashSet<MetadataField>());
+
+
     public async Task<MetadataWriteResult> ExecuteAsync(
         UpdateMetadataCommand command,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        var current = await repository.GetAsync(command.TitleId, cancellationToken).ConfigureAwait(false);
-        if (current is null)
-        {
-            return new MetadataWriteResult(MetadataWriteOutcome.NotFound, null);
-        }
+
+        // A title nobody has edited has no row yet, and its first edit is what creates one — which is
+        // what CompositionRoot's own comment always claimed happened. It did not: this returned
+        // NotFound, the editor turned that into neither a conflict nor a change, and Save on a fresh
+        // title was a button that did nothing.
+        var current = await repository.GetAsync(command.TitleId, cancellationToken).ConfigureAwait(false)
+            ?? new CatalogMetadata(command.TitleId, Empty, Revision: 0);
 
         var changes = command.FieldChanges;
         var updated = current.Metadata with

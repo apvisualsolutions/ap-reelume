@@ -172,6 +172,47 @@ public sealed class CatalogMetadataRepositoryTests
         new EditableMetadata(title, null, null, null, [], null, null, null, new HashSet<MetadataField>()),
         revision);
 
+    /// <summary>
+    /// Two windows editing the same title from the same copy: the first wins and the second is told
+    /// its copy is stale. Measured against the real repository on purpose — the in-memory doubles
+    /// this suite's unit counterparts use raise the revision themselves, so they were the only
+    /// reason the revision looked like it moved at all.
+    /// </summary>
+    [Fact]
+    public async Task Two_windows_editing_from_the_same_copy_cannot_both_win()
+    {
+        await using var fixture = await MetadataFixture.CreateAsync();
+        _ = await fixture.Repository.TrySaveAsync(
+            new CatalogMetadata(
+                Title,
+                new EditableMetadata("Base", null, null, null, [], null, null, null, new HashSet<MetadataField>()),
+                Revision: 1),
+            expectedRevision: 0,
+            TestContext.Current.CancellationToken);
+
+        var useCase = new UpdateMetadata(fixture.Repository);
+        var first = await useCase.ExecuteAsync(
+            new UpdateMetadataCommand(
+                Title,
+                new MetadataFieldChanges(Title: "Primera ventana"),
+                new HashSet<MetadataField>(),
+                ExpectedRevision: 1),
+            TestContext.Current.CancellationToken);
+        var second = await useCase.ExecuteAsync(
+            new UpdateMetadataCommand(
+                Title,
+                new MetadataFieldChanges(Title: "Segunda ventana, copia vieja"),
+                new HashSet<MetadataField>(),
+                ExpectedRevision: 1),
+            TestContext.Current.CancellationToken);
+
+        var stored = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+        Assert.Equal(MetadataWriteOutcome.Applied, first.Outcome);
+        Assert.Equal(2, stored!.Revision);
+        Assert.Equal(MetadataWriteOutcome.Conflict, second.Outcome);
+        Assert.Equal("Primera ventana", stored.Metadata.Title);
+    }
+
     private sealed class MetadataFixture : IAsyncDisposable
     {
         private readonly DatabaseTestDirectory _directory;

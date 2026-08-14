@@ -336,6 +336,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los dos botones del proveedor en el editor ya hacen algo.** «Actualizar desde el proveedor» y
+  «Restaurar campos del proveedor» estaban visibles y activos, y no podían funcionar: esperaban unos
+  datos que sólo una prueba les daba. Ahora el refresco averigua por sí mismo a qué ficha del
+  proveedor corresponde el título, con lo que quedó guardado al identificarlo. Y cuando no puede
+  hacer nada, lo dice: una ficha sin identificar y un proveedor sin respuesta son cosas distintas, y
+  ninguna es un error.
+- **Guardar en una ficha recién añadida ya guarda.** Editar por primera vez un título que nunca se
+  había tocado no creaba su ficha, así que el botón Guardar se pulsaba y no ocurría nada, sin aviso.
+- **Dos ventanas editando la misma ficha ya no pueden ganar las dos.** La comprobación que impide
+  pisar el trabajo ajeno comparaba contra un número que nunca cambiaba, de modo que la segunda
+  ventana sobrescribía a la primera en silencio. Ahora la segunda recibe el aviso de que su copia
+  está anticuada, que es lo que siempre debió pasar.
 - **Identificar una película ahora cambia lo que la biblioteca enseña.** Hasta aquí no lo cambiaba:
   aceptar una coincidencia en la bandeja marcaba la revisión y nada más, de modo que la ficha seguía
   mostrando lo que el analizador sacó del nombre del archivo. La sinopsis y la clave de tráiler

@@ -131,6 +131,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MetadataLockBackdrop">Lock backdrop</x:String>
   <x:String x:Key="ArtworkAlternativeTextLabel">Artwork alternative text</x:String>
   <x:String x:Key="MetadataConflictMessage">Metadata changed in another operation. Review the current values.</x:String>
+  <x:String x:Key="MetadataUnidentifiedMessage">This entry is not identified yet, so there is nothing to refresh. Accept a match for it in the review inbox.</x:String>
+  <x:String x:Key="MetadataNoProviderAnswerMessage">The provider has no details for this entry right now. With no consented connection only what is already stored is used.</x:String>
   <x:String x:Key="MetadataSaveAction">Save changes</x:String>
   <x:String x:Key="MetadataRefreshAction">Refresh from provider</x:String>
   <x:String x:Key="MetadataRestoreAction">Restore provider fields</x:String>

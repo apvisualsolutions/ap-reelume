@@ -12,6 +12,15 @@ namespace ApSolutions.LocalMedia.Infrastructure.Metadata;
 public sealed class TmdbMetadataProvider : IMetadataProvider
 {
     private const string ProviderName = "tmdb";
+
+    // The one place that says which prefix means which kind. Both the key reader above and the
+    // details address below spend it, so a third spelling of "movie:" cannot drift from the others.
+    private static readonly (string Prefix, MetadataContentKind Kind)[] KeyPrefixes =
+    [
+        ("movie:", MetadataContentKind.Movie),
+        ("tv:", MetadataContentKind.Show),
+    ];
+
     private readonly HttpClient _httpClient;
     private readonly IMetadataCache _cache;
     private readonly TmdbOptions _options;
@@ -33,6 +42,30 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
     }
 
     public string Name => ProviderName;
+
+    /// <summary>
+    /// A TMDB key is its kind and its number, and both have to be there: <c>movie:6289</c> or
+    /// <c>tv:1396</c>. Anything else belongs to somebody else, or to nobody.
+    /// </summary>
+    public MetadataReference? TryCreateReference(string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        foreach (var (prefix, kind) in KeyPrefixes)
+        {
+            if (key.StartsWith(prefix, StringComparison.Ordinal)
+                && long.TryParse(
+                    key[prefix.Length..],
+                    NumberStyles.None,
+                    CultureInfo.InvariantCulture,
+                    out var id)
+                && id > 0)
+            {
+                return new MetadataReference(ProviderName, key, kind);
+            }
+        }
+
+        return null;
+    }
 
     public async Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
         MetadataSearchQuery query,
@@ -229,7 +262,7 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
 
     private static string BuildDetailsUri(MetadataReference reference, string language)
     {
-        var expectedPrefix = reference.Kind == MetadataContentKind.Movie ? "movie:" : "tv:";
+        var expectedPrefix = KeyPrefixes.First(entry => entry.Kind == reference.Kind).Prefix;
         if (!reference.Key.StartsWith(expectedPrefix, StringComparison.Ordinal)
             || !long.TryParse(reference.Key[expectedPrefix.Length..], NumberStyles.None, CultureInfo.InvariantCulture, out var id)
             || id <= 0)

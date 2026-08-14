@@ -145,6 +145,9 @@ public sealed class ScanIdentificationTests
     {
         public string Name => "tmdb";
 
+        public MetadataReference? TryCreateReference(string key) =>
+            new("tmdb", key, MetadataContentKind.Movie);
+
         public Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
             MetadataSearchQuery query,
             MetadataLanguage language,

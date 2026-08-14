@@ -77,6 +77,11 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 refreshed_utc = excluded.refreshed_utc
             WHERE catalog_metadata.revision = $expected;
             """;
+        // The next revision is computed here rather than taken from the caller. Every caller used to
+        // pass the row back unchanged, so the stored revision never moved and two windows editing
+        // the same title could both win — the check was running against a number that never changed.
+        // The in-memory doubles raised it themselves, which is why no unit test could see it.
+        var nextRevision = expectedRevision + 1;
         var metadata = catalog.Metadata;
         _ = command.Parameters.AddWithValue("$id", catalog.TitleId.Value.ToString("D"));
         _ = command.Parameters.AddWithValue("$title", metadata.Title);
@@ -90,7 +95,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         _ = command.Parameters.AddWithValue(
             "$locked",
             Join(metadata.LockedFields.Select(field => field.ToString()).ToArray()));
-        _ = command.Parameters.AddWithValue("$revision", catalog.Revision);
+        _ = command.Parameters.AddWithValue("$revision", nextRevision);
         _ = command.Parameters.AddWithValue("$provider", (object?)catalog.Provider ?? DBNull.Value);
         _ = command.Parameters.AddWithValue("$providerKey", (object?)catalog.ProviderKey ?? DBNull.Value);
         _ = command.Parameters.AddWithValue(
@@ -104,7 +109,9 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
             ? new MetadataWriteResult(
                 MetadataWriteOutcome.Conflict,
                 await GetAsync(catalog.TitleId, cancellationToken).ConfigureAwait(false))
-            : new MetadataWriteResult(MetadataWriteOutcome.Applied, catalog);
+            : new MetadataWriteResult(
+                MetadataWriteOutcome.Applied,
+                catalog with { Revision = nextRevision });
     }
 
     private static CatalogMetadata Read(SqliteDataReader reader) => new(

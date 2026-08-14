@@ -131,6 +131,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MetadataLockBackdrop">Bloquear imagen de fondo</x:String>
   <x:String x:Key="ArtworkAlternativeTextLabel">Texto alternativo de la imagen</x:String>
   <x:String x:Key="MetadataConflictMessage">Los metadatos cambiaron en otra operación. Revisa los valores actuales.</x:String>
+  <x:String x:Key="MetadataUnidentifiedMessage">Esta ficha no está identificada todavía, así que no hay nada que actualizar. Acéptale una coincidencia en la bandeja de revisión.</x:String>
+  <x:String x:Key="MetadataNoProviderAnswerMessage">El proveedor no tiene ahora mismo datos de esta ficha. Sin conexión consentida sólo se usa lo ya guardado.</x:String>
   <x:String x:Key="MetadataSaveAction">Guardar cambios</x:String>
   <x:String x:Key="MetadataRefreshAction">Actualizar desde el proveedor</x:String>
   <x:String x:Key="MetadataRestoreAction">Restaurar campos del proveedor</x:String>
