@@ -32,17 +32,20 @@ public sealed class IdentifyScannedFiles
     private readonly IMediaFileRepository _mediaFiles;
     private readonly IMatchCandidateRepository _candidates;
     private readonly IdentifyMediaFile _identify;
+    private readonly ApplyIdentification _applyIdentification;
 
     public IdentifyScannedFiles(
         ILibraryRootRepository roots,
         IMediaFileRepository mediaFiles,
         IMatchCandidateRepository candidates,
-        IdentifyMediaFile identify)
+        IdentifyMediaFile identify,
+        ApplyIdentification applyIdentification)
     {
         _roots = roots ?? throw new ArgumentNullException(nameof(roots));
         _mediaFiles = mediaFiles ?? throw new ArgumentNullException(nameof(mediaFiles));
         _candidates = candidates ?? throw new ArgumentNullException(nameof(candidates));
         _identify = identify ?? throw new ArgumentNullException(nameof(identify));
+        _applyIdentification = applyIdentification ?? throw new ArgumentNullException(nameof(applyIdentification));
     }
 
     public async Task<IdentifyScannedFilesResult> ExecuteAsync(
@@ -95,10 +98,11 @@ public sealed class IdentifyScannedFiles
             attempted++;
             try
             {
-                _ = await _identify.ExecuteAsync(
+                var result = await _identify.ExecuteAsync(
                         new IdentifyMediaFileCommand(file.Id, CreateContext(root.Path, item.Path)),
                         cancellationToken)
                     .ConfigureAwait(false);
+                await ApplyConfidentMatchAsync(file.Id, result, cancellationToken).ConfigureAwait(false);
                 identified++;
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -112,6 +116,32 @@ public sealed class IdentifyScannedFiles
         }
 
         return new IdentifyScannedFilesResult(attempted, identified, failed);
+    }
+
+    /// <summary>
+    /// The automatic half of LIB-007, which until now was calculated and thrown away. A candidate
+    /// the scorer trusted on its own is applied without asking, because the whole point of the
+    /// threshold is that nobody should have to confirm what is not in doubt; anything below it stays
+    /// in the inbox for a person. Only one candidate can reach that state, since it takes a score
+    /// no second entry can also hold.
+    /// </summary>
+    private async Task ApplyConfidentMatchAsync(
+        MediaFileId mediaFileId,
+        IdentifyMediaFileResult result,
+        CancellationToken cancellationToken)
+    {
+        if (result.Candidates.FirstOrDefault(candidate => candidate.ReviewState == ReviewState.Automatic)
+            is not { } confident)
+        {
+            return;
+        }
+
+        _ = await _applyIdentification.ExecuteAsync(
+            new ApplyIdentificationCommand(
+                mediaFileId,
+                confident.StableKey,
+                ResolveMatch.ToMetadataKind(confident.Kind)),
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

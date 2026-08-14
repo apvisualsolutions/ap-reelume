@@ -4,6 +4,7 @@
 using ApSolutions.LocalMedia.Application.Events;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Identification;
+using ApSolutions.LocalMedia.Domain.Metadata;
 
 namespace ApSolutions.LocalMedia.Application.Identification;
 
@@ -27,13 +28,16 @@ public sealed class ResolveMatch
 {
     private readonly IMatchCandidateRepository _repository;
     private readonly IApplicationEventPublisher _eventPublisher;
+    private readonly ApplyIdentification _applyIdentification;
 
     public ResolveMatch(
         IMatchCandidateRepository repository,
-        IApplicationEventPublisher eventPublisher)
+        IApplicationEventPublisher eventPublisher,
+        ApplyIdentification applyIdentification)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
+        _applyIdentification = applyIdentification ?? throw new ArgumentNullException(nameof(applyIdentification));
     }
 
     public async Task<ReviewDecisionResult> ExecuteAsync(
@@ -66,6 +70,16 @@ public sealed class ResolveMatch
         var result = new ReviewDecisionResult(Map(write.Outcome), write.Candidate);
         if (write is { Outcome: MatchDecisionWriteOutcome.Applied, Candidate: not null })
         {
+            // Accepting is what the person meant, so it is what the catalogue must show. A provider
+            // failure is not swallowed here: this is an explicit action, and somebody who pressed
+            // accept is owed the error rather than a row that silently stayed as the parser left it.
+            // The decision above is already stored, so a later refresh finishes what this could not.
+            await _applyIdentification.ExecuteAsync(
+                new ApplyIdentificationCommand(
+                    mediaFileId,
+                    write.Candidate.StableKey,
+                    ToMetadataKind(write.Candidate.Kind)),
+                cancellationToken).ConfigureAwait(false);
             await _eventPublisher.PublishAsync(
                 new ReviewInboxChanged(
                     mediaFileId,
@@ -77,6 +91,13 @@ public sealed class ResolveMatch
 
         return result;
     }
+
+    /// <summary>
+    /// A candidate's kind in the provider's terms. An episode belongs to a show, which is the entry
+    /// the provider holds details for.
+    /// </summary>
+    internal static MetadataContentKind ToMetadataKind(CandidateContentKind kind) =>
+        kind == CandidateContentKind.Movie ? MetadataContentKind.Movie : MetadataContentKind.Show;
 
     internal static ReviewDecisionOutcome Map(MatchDecisionWriteOutcome outcome) => outcome switch
     {

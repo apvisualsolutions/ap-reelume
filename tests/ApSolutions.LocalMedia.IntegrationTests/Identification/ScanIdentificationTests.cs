@@ -67,7 +67,18 @@ public sealed class ScanIdentificationTests
                 Spanish,
                 () => true),
             candidates);
-        var useCase = new IdentifyScannedFiles(rootRepository, mediaFiles, candidates, identify);
+        var catalogMetadata = new CatalogMetadataRepository(factory);
+        var useCase = new IdentifyScannedFiles(
+            rootRepository,
+            mediaFiles,
+            candidates,
+            identify,
+            new ApplyIdentification(
+                catalogMetadata,
+                new TitleKeyedProvider(),
+                new MetadataMergePolicy(),
+                Spanish,
+                TimeProvider.System));
         var coordinator = new ScanCoordinator(
             rootRepository,
             mediaFiles,
@@ -94,6 +105,30 @@ public sealed class ScanIdentificationTests
         Assert.Equal("movie:dune", duneCandidate.StableKey);
         Assert.Equal(ReviewState.Automatic, duneCandidate.ReviewState);
 
+        // The half nobody was measuring: what the confident match knows has to be in the row the
+        // catalogue reads, under the media file's own id, or the identification changed nothing a
+        // person can see.
+        var stored = await catalogMetadata.GetAsync(
+            new TitleId(dune.Id.Value),
+            TestContext.Current.CancellationToken);
+        Assert.NotNull(stored);
+        Assert.Equal("Dune", stored.Metadata.Title);
+        Assert.Equal("Paul Atreides llega a Arrakis.", stored.Metadata.Overview);
+        Assert.Equal(2021, stored.Metadata.ReleaseYear);
+        Assert.Equal(["Ciencia ficción"], stored.Metadata.Genres);
+        Assert.Equal("tmdb", stored.Provider);
+        Assert.Equal("movie:dune", stored.ProviderKey);
+        Assert.NotNull(stored.RefreshedUtc);
+
+        var arrival = await mediaFiles.FindByPathAsync(
+            root.Id,
+            Path.Combine(mediaPath, "Arrival.2016.mkv"),
+            TestContext.Current.CancellationToken);
+        Assert.NotNull(arrival);
+        Assert.Null(await catalogMetadata.GetAsync(
+            new TitleId(arrival.Id.Value),
+            TestContext.Current.CancellationToken));
+
         var inbox = await new GetReviewInbox(candidates).ExecuteAsync(
             new GetReviewInboxQuery(PageSize: 10),
             TestContext.Current.CancellationToken);
@@ -108,6 +143,8 @@ public sealed class ScanIdentificationTests
 
     private sealed class TitleKeyedProvider : IMetadataProvider
     {
+        public string Name => "tmdb";
+
         public Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
             MetadataSearchQuery query,
             MetadataLanguage language,
@@ -139,7 +176,23 @@ public sealed class ScanIdentificationTests
         public Task<MetadataDetails?> GetDetailsAsync(
             MetadataReference reference,
             MetadataLanguage language,
-            CancellationToken cancellationToken = default) => Task.FromResult<MetadataDetails?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(reference);
+            return Task.FromResult(reference.Key == "movie:dune"
+                ? new MetadataDetails(
+                    reference,
+                    "es-ES",
+                    "Dune",
+                    "Dune",
+                    "Paul Atreides llega a Arrakis.",
+                    2021,
+                    ["Ciencia ficción"],
+                    "/dune-poster.jpg",
+                    "/dune-backdrop.jpg",
+                    TrailerKey: null)
+                : null);
+        }
     }
 
     private sealed class StubProbe : IMediaProbe

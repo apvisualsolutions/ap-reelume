@@ -28,7 +28,8 @@ public sealed class IdentifyingScanCoordinatorTests
             roots,
             new UntouchedMediaFiles(),
             candidates,
-            new IdentifyMediaFile(new MediaNameParser(), new CandidateScorer(), new EmptySource(), candidates));
+            new IdentifyMediaFile(new MediaNameParser(), new CandidateScorer(), new EmptySource(), candidates),
+            TestIdentification.Silent());
         var grouping = new GroupScannedVersions(
             roots,
             new UntouchedMediaFiles(),

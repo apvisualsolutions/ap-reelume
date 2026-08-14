@@ -60,6 +60,14 @@ public sealed record MetadataDetails(
 
 public interface IMetadataProvider
 {
+    /// <summary>
+    /// The name this provider stamps on every reference it produces, and the one a stored
+    /// identification is recorded under. It is exposed rather than repeated as a literal because a
+    /// reference whose provider does not match is rejected by the provider itself, so two copies of
+    /// the same string are two chances to write rows that can never be refreshed.
+    /// </summary>
+    string Name { get; }
+
     Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
         MetadataSearchQuery query,
         MetadataLanguage language,

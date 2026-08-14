@@ -190,6 +190,8 @@ public sealed class MetadataCandidateSourceTests
 
     private sealed class CountingProvider(params MetadataSearchResult[] results) : IMetadataProvider
     {
+        public string Name => "tmdb";
+
         public int Searches { get; private set; }
 
         public MetadataSearchQuery? LastQuery { get; private set; }

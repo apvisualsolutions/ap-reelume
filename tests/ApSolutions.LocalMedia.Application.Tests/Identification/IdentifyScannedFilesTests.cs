@@ -6,6 +6,7 @@ using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.Application.Tests.Identification;
@@ -110,6 +111,62 @@ public sealed class IdentifyScannedFilesTests
         Assert.Empty(fixture.Candidates.Read(file));
     }
 
+    /// <summary>
+    /// The automatic half of LIB-007. A match the scorer trusts on its own reaches the catalogue
+    /// without anybody confirming it — which is the whole reason the threshold exists, and the half
+    /// that until now was calculated and dropped.
+    /// </summary>
+    [Fact]
+    public async Task A_match_above_the_automatic_threshold_reaches_the_catalogue_unattended()
+    {
+        var fixture = new Fixture(known: Details("local:Dune"));
+        var file = fixture.AddFile(@"Movies\Dune.2021.mkv");
+
+        _ = await fixture.UseCase.ExecuteAsync(
+            fixture.Summary(ScanItemOutcome.Added),
+            TestContext.Current.CancellationToken);
+
+        var candidate = Assert.Single(fixture.Candidates.Read(file));
+        Assert.Equal(ReviewState.Automatic, candidate.ReviewState);
+        Assert.True(candidate.Score >= ConfidencePolicy.AutomaticThreshold);
+        var stored = Assert.Single(fixture.Catalog.Rows.Values);
+        Assert.Equal(new TitleId(file.Value), stored.TitleId);
+        Assert.Equal("Dune", stored.Metadata.Title);
+        Assert.Equal("local:Dune", stored.ProviderKey);
+    }
+
+    /// <summary>
+    /// A scan of a thousand files must not lose its identification to one title whose details the
+    /// provider refuses to serve, so the failure is counted where every other one is.
+    /// </summary>
+    [Fact]
+    public async Task A_provider_that_throws_costs_that_file_alone()
+    {
+        var fixture = new Fixture(known: Details("local:Dune"));
+        fixture.Provider.ThrowOnKey = "local:Dune";
+        _ = fixture.AddFile(@"Movies\Dune.2021.mkv");
+        var healthy = fixture.AddFile(@"Movies\Arrival.2016.mkv");
+
+        var result = await fixture.UseCase.ExecuteAsync(
+            fixture.Summary(ScanItemOutcome.Added),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(new IdentifyScannedFilesResult(2, 1, 1), result);
+        Assert.NotEmpty(fixture.Candidates.Read(healthy));
+    }
+
+    private static MetadataDetails Details(string key) => new(
+        new MetadataReference("tmdb", key, MetadataContentKind.Movie),
+        "es-ES",
+        "Dune",
+        OriginalTitle: null,
+        Overview: null,
+        ReleaseYear: 2021,
+        Genres: [],
+        PosterPath: null,
+        BackdropPath: null,
+        TrailerKey: null);
+
     private static MatchCandidate Candidate(MediaFileId mediaFileId, string stableKey) => new(
         CandidateId.FromStableKey(stableKey),
         mediaFileId,
@@ -127,22 +184,28 @@ public sealed class IdentifyScannedFilesTests
         private readonly List<ScanItemResult> _items = [];
         private readonly Dictionary<string, MediaFile> _filesByPath = new(StringComparer.OrdinalIgnoreCase);
 
-        public Fixture(string? throwOnTitle = null, bool rootExists = true)
+        public Fixture(string? throwOnTitle = null, bool rootExists = true, params MetadataDetails[] known)
         {
             Source = new RecordingSource(throwOnTitle);
             Candidates = new InMemoryCandidateRepository();
+            Provider = new StubMetadataProvider(known);
             UseCase = new IdentifyScannedFiles(
                 new SingleRootRepository(rootExists
                     ? new LibraryRoot(RootId, RootPath, RootKind.Local, RootAvailability.Available, ScanPolicy.Manual)
                     : null),
                 new PathOnlyMediaFileRepository(_filesByPath),
                 Candidates,
-                new IdentifyMediaFile(new MediaNameParser(), new CandidateScorer(), Source, Candidates));
+                new IdentifyMediaFile(new MediaNameParser(), new CandidateScorer(), Source, Candidates),
+                TestIdentification.Apply(Catalog, Provider));
         }
 
         public RecordingSource Source { get; }
 
         public InMemoryCandidateRepository Candidates { get; }
+
+        public StubMetadataProvider Provider { get; }
+
+        public MemoryCatalogMetadataRepository Catalog { get; } = new();
 
         public IdentifyScannedFiles UseCase { get; }
 

@@ -15,10 +15,24 @@ public sealed record MetadataFieldChanges(
     string? PosterPath = null,
     string? BackdropPath = null);
 
+/// <param name="Provider">
+/// Which provider identified this title, or nothing when nobody has. Stored beside its key rather
+/// than as a <see cref="MetadataReference"/> because the kind that reference also carries belongs to
+/// the provider's own key format: reconstructing it is the provider's job, not the database's.
+/// </param>
+/// <param name="ProviderKey">
+/// The provider's own identifier for this title. It is what lets a refresh resolve on its own
+/// instead of waiting for a caller to hand it details that no caller ever handed it — the defect
+/// that made both provider buttons inert.
+/// </param>
+/// <param name="RefreshedUtc">When the provider last answered for this title.</param>
 public sealed record CatalogMetadata(
     TitleId TitleId,
     EditableMetadata Metadata,
-    int Revision);
+    int Revision,
+    string? Provider = null,
+    string? ProviderKey = null,
+    DateTimeOffset? RefreshedUtc = null);
 
 public enum MetadataWriteOutcome
 {

@@ -80,7 +80,7 @@ public sealed class MetadataCandidateSource : IIdentificationCandidateSource
     {
         foreach (var language in _language.OrderedValues())
         {
-            var key = new MetadataCacheKey("tmdb", BuildSearchCacheKey(query), language, ProviderVersion);
+            var key = new MetadataCacheKey(_provider.Name, BuildSearchCacheKey(query), language, ProviderVersion);
             if (await _cache.GetAsync(key, cancellationToken).ConfigureAwait(false) is not null)
             {
                 return true;

@@ -46,7 +46,7 @@ public sealed class ReviewWorkflowTests
         var repository = new ReviewRepository([accepted, rejected]);
         var publisher = new RecordingPublisher();
 
-        var resolved = await new ResolveMatch(repository, publisher).ExecuteAsync(
+        var resolved = await new ResolveMatch(repository, publisher, TestIdentification.Silent()).ExecuteAsync(
             new ResolveMatchCommand(accepted.MediaFileId, accepted.Id, ExpectedRevision: 0),
             TestContext.Current.CancellationToken);
         var rejectedResult = await new RejectMatch(repository, publisher).ExecuteAsync(
@@ -68,7 +68,7 @@ public sealed class ReviewWorkflowTests
         var candidate = Candidate("concurrent", 0.75, ReviewState.Suggested);
         var repository = new ReviewRepository([candidate]);
         var publisher = new RecordingPublisher();
-        var resolver = new ResolveMatch(repository, publisher);
+        var resolver = new ResolveMatch(repository, publisher, TestIdentification.Silent());
 
         var first = await resolver.ExecuteAsync(
             new ResolveMatchCommand(candidate.MediaFileId, candidate.Id, ExpectedRevision: 0),
