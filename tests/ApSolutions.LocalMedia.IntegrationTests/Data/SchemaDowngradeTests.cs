@@ -72,7 +72,7 @@ public sealed class SchemaDowngradeTests
         await using var command = connection.CreateCommand();
         command.CommandText = "SELECT COUNT(*) FROM schema_history;";
         Assert.Equal(
-            16L,
+            DatabaseTestHarness.MigrationCount,
             Convert.ToInt64(
                 await command.ExecuteScalarAsync(TestContext.Current.CancellationToken),
                 CultureInfo.InvariantCulture));

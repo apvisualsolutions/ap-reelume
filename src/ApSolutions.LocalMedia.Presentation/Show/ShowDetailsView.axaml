@@ -36,6 +36,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <StackPanel Grid.Row="1" Spacing="8">
       <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
+      <Button
+          HorizontalAlignment="Left"
+          Command="{Binding OpenTrailerLinkCommand}"
+          Content="{DynamicResource DetailsTrailerLinkAction}"
+          IsVisible="{Binding HasTrailerLink}"
+          automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
       <TextBlock
           IsVisible="{Binding IsEmpty}"
           Text="{DynamicResource ShowDetailsEmpty}"

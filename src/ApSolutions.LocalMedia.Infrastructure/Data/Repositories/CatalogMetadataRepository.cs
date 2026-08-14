@@ -22,7 +22,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
 {
     private const string Columns =
         "title_id, title, original_title, overview, release_year, genres, poster_path, backdrop_path, "
-        + "locked_fields, revision";
+        + "trailer_key, locked_fields, revision";
 
     // A unit separator cannot occur inside a genre name or a field name, so no stored value can be
     // cut in half by the character that joins them.
@@ -59,7 +59,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         await using var command = connection.CreateCommand();
         command.CommandText = $"""
             INSERT INTO catalog_metadata ({Columns})
-            VALUES ($id, $title, $originalTitle, $overview, $year, $genres, $poster, $backdrop, $locked, $revision)
+            VALUES ($id, $title, $originalTitle, $overview, $year, $genres, $poster, $backdrop, $trailer, $locked, $revision)
             ON CONFLICT (title_id) DO UPDATE SET
                 title = excluded.title,
                 original_title = excluded.original_title,
@@ -68,6 +68,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 genres = excluded.genres,
                 poster_path = excluded.poster_path,
                 backdrop_path = excluded.backdrop_path,
+                trailer_key = excluded.trailer_key,
                 locked_fields = excluded.locked_fields,
                 revision = excluded.revision
             WHERE catalog_metadata.revision = $expected;
@@ -81,6 +82,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         _ = command.Parameters.AddWithValue("$genres", Join(metadata.Genres));
         _ = command.Parameters.AddWithValue("$poster", (object?)metadata.PosterPath ?? DBNull.Value);
         _ = command.Parameters.AddWithValue("$backdrop", (object?)metadata.BackdropPath ?? DBNull.Value);
+        _ = command.Parameters.AddWithValue("$trailer", (object?)metadata.TrailerKey ?? DBNull.Value);
         _ = command.Parameters.AddWithValue(
             "$locked",
             Join(metadata.LockedFields.Select(field => field.ToString()).ToArray()));
@@ -104,8 +106,9 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
             Split(reader.GetString(5)),
             reader.IsDBNull(6) ? null : reader.GetString(6),
             reader.IsDBNull(7) ? null : reader.GetString(7),
-            ReadLockedFields(reader.GetString(8))),
-        reader.GetInt32(9));
+            reader.IsDBNull(8) ? null : reader.GetString(8),
+            ReadLockedFields(reader.GetString(9))),
+        reader.GetInt32(10));
 
     private static string Join(IReadOnlyList<string> values) => string.Join(FieldSeparator, values);
 

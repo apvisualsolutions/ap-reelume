@@ -44,6 +44,34 @@ public static class NetworkPurposeRegistry
             ]),
     ];
 
+    /// <summary>
+    /// Hosts this application hands to another application and never connects to itself.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A separate list because it is a separate promise. <see cref="Declared"/> answers "what does
+    /// this process open?", and putting a trailer's host in it would answer that question wrongly in
+    /// the dangerous direction — claiming a connection that is never made, and widening
+    /// <see cref="IsDeclaredHost"/>, which is what the network canary trusts.
+    /// </para>
+    /// <para>
+    /// Naming them somewhere is not optional either: an address that reaches a browser is still
+    /// somewhere a person ends up because of this application, and the source-tree check exists
+    /// precisely so no host appears in the code without a reason written next to it. So: declared
+    /// here, absent from the connection list, and named in the privacy statement under its own
+    /// heading.
+    /// </para>
+    /// </remarks>
+    public static IReadOnlyList<HandedOffDestination> HandedOff { get; } =
+    [
+        new HandedOffDestination(
+            "TrailerLinkPolicy",
+            "www.youtube.com",
+            "Opens the trailer of a title in the browser, when somebody presses the button for it. "
+            + "The application makes no connection: the address goes to the operating system and the "
+            + "browser is what goes there."),
+    ];
+
     /// <summary>The purpose declared for a component, or null when it has none.</summary>
     public static NetworkPurpose? Find(string client) =>
         string.IsNullOrWhiteSpace(client)
@@ -56,7 +84,22 @@ public static class NetworkPurposeRegistry
             $"'{client}' opens connections without a declared network purpose.");
 
     /// <summary>True for a host some declared purpose owns, and false for every other host.</summary>
+    /// <remarks>
+    /// Deliberately blind to <see cref="HandedOff"/>: a host this application never connects to must
+    /// not widen the check that says which connections are allowed.
+    /// </remarks>
     public static bool IsDeclaredHost(string host) =>
         !string.IsNullOrWhiteSpace(host)
         && Declared.Any(purpose => purpose.Allows(host));
+
+    /// <summary>True for a host that is handed to another application rather than connected to.</summary>
+    public static bool IsHandedOffHost(string host) =>
+        !string.IsNullOrWhiteSpace(host)
+        && HandedOff.Any(destination =>
+            destination.Host.Equals(host.Trim(), StringComparison.OrdinalIgnoreCase));
 }
+
+/// <summary>
+/// One address this application can ask the operating system to open, with what opens it and why.
+/// </summary>
+public sealed record HandedOffDestination(string Client, string Host, string Purpose);

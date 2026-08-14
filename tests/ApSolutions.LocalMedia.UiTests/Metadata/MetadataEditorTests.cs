@@ -34,6 +34,7 @@ public sealed class MetadataEditorTests
                 ["Ciencia ficción"],
                 "/poster.jpg",
                 "/backdrop.jpg",
+                null,
                 new HashSet<MetadataField> { MetadataField.Title }),
             Revision: 2);
         var repository = new UiMetadataRepository(catalog);
@@ -159,6 +160,7 @@ public sealed class MetadataEditorTests
             ["Ciencia ficción"],
             "/poster.jpg",
             "/backdrop.jpg",
+            null,
             new HashSet<MetadataField> { MetadataField.Title }),
         Revision: 2);
 
@@ -171,7 +173,8 @@ public sealed class MetadataEditorTests
         2016,
         ["Science fiction"],
         "/provider-poster.jpg",
-        "/provider-backdrop.jpg");
+        "/provider-backdrop.jpg",
+        TrailerKey: null);
 
     private sealed class UiMetadataRepository(CatalogMetadata initial) : ICatalogMetadataRepository
     {

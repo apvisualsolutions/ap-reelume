@@ -30,6 +30,13 @@ public sealed class NetworkPurposeDocumentationTests
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(2));
 
+    // A destination handed to the browser is not a connection, and it is still a place a person ends
+    // up because of this application, so the statement names it under its own heading.
+    private static readonly Regex HandedOffHostPattern = new(
+        @"new HandedOffDestination\(\s*""[^""]+"",\s*""(?<host>[^""]+)""",
+        RegexOptions.Compiled,
+        TimeSpan.FromSeconds(2));
+
     private static readonly Regex QuotedHostPattern = new(
         @"""(?<host>[^""]+)""",
         RegexOptions.Compiled,
@@ -68,6 +75,15 @@ public sealed class NetworkPurposeDocumentationTests
             $"{statement} names hosts the registry never declared: {string.Join(", ", invented)}.");
     }
 
+    /// <summary>
+    /// Every host the registry writes down, connected to or handed off.
+    /// </summary>
+    /// <remarks>
+    /// The handed-off ones are a separate list in the registry because they are a separate promise —
+    /// the application never connects to them — but the statement still has to name them, and it
+    /// still may not name anything else. Reading both lists is what keeps a destination from
+    /// appearing in one place and not the other.
+    /// </remarks>
     private static HashSet<string> DeclaredHosts()
     {
         var source = File.ReadAllText(RepositoryLayout.PathFromRoot(
@@ -75,6 +91,9 @@ public sealed class NetworkPurposeDocumentationTests
         var hosts = DeclaredHostPattern
             .Matches(source)
             .Select(match => match.Groups["host"].Value)
+            .Concat(HandedOffHostPattern
+                .Matches(source)
+                .Select(match => match.Groups["host"].Value))
             .Concat(AdditionalHostsPattern
                 .Matches(source)
                 .SelectMany(block => QuotedHostPattern

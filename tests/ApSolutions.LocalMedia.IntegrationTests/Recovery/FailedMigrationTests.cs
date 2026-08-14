@@ -76,7 +76,7 @@ public sealed class FailedMigrationTests
 
         await using var connection = await factory.OpenAsync(TestContext.Current.CancellationToken);
         Assert.Equal(
-            16L,
+            DatabaseTestHarness.MigrationCount,
             await SqliteBootstrapTests.ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
         Assert.Equal("ok", await SqliteBootstrapTests.ScalarTextAsync(connection, "PRAGMA integrity_check;"));
     }

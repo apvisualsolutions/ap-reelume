@@ -45,6 +45,7 @@ public sealed class CatalogMetadataRepositoryTests
                 ["Ciencia ficción", "Drama"],
                 "/poster.jpg",
                 "/backdrop.jpg",
+                "dQw4w9WgXcQ",
                 new HashSet<MetadataField> { MetadataField.Title, MetadataField.Genres }),
             Revision: 1);
 
@@ -63,6 +64,7 @@ public sealed class CatalogMetadataRepositoryTests
         Assert.Equal(["Ciencia ficción", "Drama"], stored.Metadata.Genres);
         Assert.Equal("/poster.jpg", stored.Metadata.PosterPath);
         Assert.Equal("/backdrop.jpg", stored.Metadata.BackdropPath);
+        Assert.Equal("dQw4w9WgXcQ", stored.Metadata.TrailerKey);
         Assert.Equal(1, stored.Revision);
         Assert.Contains(MetadataField.Title, stored.Metadata.LockedFields);
         Assert.Contains(MetadataField.Genres, stored.Metadata.LockedFields);
@@ -75,7 +77,7 @@ public sealed class CatalogMetadataRepositoryTests
         await using var fixture = await MetadataFixture.CreateAsync();
         var catalog = new CatalogMetadata(
             Title,
-            new EditableMetadata("Sólo el título", null, null, null, [], null, null, new HashSet<MetadataField>()),
+            new EditableMetadata("Sólo el título", null, null, null, [], null, null, null, new HashSet<MetadataField>()),
             Revision: 1);
 
         _ = await fixture.Repository.TrySaveAsync(catalog, 0, TestContext.Current.CancellationToken);
@@ -87,6 +89,7 @@ public sealed class CatalogMetadataRepositoryTests
         Assert.Null(stored.Metadata.ReleaseYear);
         Assert.Null(stored.Metadata.PosterPath);
         Assert.Null(stored.Metadata.BackdropPath);
+        Assert.Null(stored.Metadata.TrailerKey);
         Assert.Empty(stored.Metadata.Genres);
         Assert.Empty(stored.Metadata.LockedFields);
     }
@@ -166,7 +169,7 @@ public sealed class CatalogMetadataRepositoryTests
 
     private static CatalogMetadata Catalog(string title, int revision) => new(
         Title,
-        new EditableMetadata(title, null, null, null, [], null, null, new HashSet<MetadataField>()),
+        new EditableMetadata(title, null, null, null, [], null, null, null, new HashSet<MetadataField>()),
         revision);
 
     private sealed class MetadataFixture : IAsyncDisposable

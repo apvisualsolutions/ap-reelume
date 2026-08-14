@@ -55,8 +55,8 @@ $featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
 $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
-if ($featureIds.Count -ne 56) {
-    $errors.Add("Expected 56 feature IDs, found $($featureIds.Count).")
+if ($featureIds.Count -ne 57) {
+    $errors.Add("Expected 57 feature IDs, found $($featureIds.Count).")
 }
 if ($mvpIds.Count -ne 46) {
     $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")
@@ -67,4 +67,6 @@ if ($errors.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Documentation verification passed: $($markdownFiles.Count) Markdown files, $($localizedFiles.Count) localized files, 56 feature IDs, 46 MVP IDs."
+# The counts are read back from what was just measured. They used to be written into the sentence by
+# hand, so raising the ratchet to 57 left the gate checking one number and announcing another.
+Write-Output "Documentation verification passed: $($markdownFiles.Count) Markdown files, $($localizedFiles.Count) localized files, $($featureIds.Count) feature IDs, $($mvpIds.Count) MVP IDs."

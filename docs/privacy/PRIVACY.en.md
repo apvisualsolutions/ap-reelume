@@ -27,6 +27,20 @@ These never leave the machine, with consent or without it:
 | `objects.githubusercontent.com` | Only as the redirect target of that same download; it is GitHub's storage | Receiving the bytes of the confirmed package |
 | `*.githubusercontent.com` | Only if GitHub's storage redirects to another of its subdomains; no other domain is accepted | The same confirmed package, from another GitHub subdomain |
 
+## What addresses it can open in your browser
+
+This is not a connection the application makes: the address is handed to Windows and the browser you
+already use is what goes there, with your settings, your extensions and your session. The
+application sees nothing of what happens there.
+
+| Destination | When | For what |
+|---|---|---|
+| `www.youtube.com` | Only when you press the trailer button on a film's or a series' card | Watching that trailer in your browser |
+
+What is stored for a trailer is the video's key, never an address, and only a key with the exact
+shape YouTube uses ever composes a link. The trailer **does not play inside** the application, and
+that is not a technical limitation: doing so would break YouTube's terms.
+
 There is no other connection. There is no telemetry and no background report. The update check is
 **off out of the box**: no installation ships with it enabled, and until you turn it on in Settings —
 or press the button yourself — the application asks nobody anything. Every component that can open a

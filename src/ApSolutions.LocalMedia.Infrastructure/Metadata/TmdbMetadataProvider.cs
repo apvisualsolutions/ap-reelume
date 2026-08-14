@@ -236,7 +236,8 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
         }
 
         var kind = reference.Kind == MetadataContentKind.Movie ? "movie" : "tv";
-        return $"3/{kind}/{id.ToString(CultureInfo.InvariantCulture)}?language={Uri.EscapeDataString(language)}";
+        return $"3/{kind}/{id.ToString(CultureInfo.InvariantCulture)}?language={Uri.EscapeDataString(language)}"
+            + "&append_to_response=videos";
     }
 
     private static List<MetadataSearchResult> ParseSearchResults(
@@ -299,7 +300,60 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
             ReadYear(root, dateProperty),
             genres,
             ReadOptionalString(root, "poster_path"),
-            ReadOptionalString(root, "backdrop_path"));
+            ReadOptionalString(root, "backdrop_path"),
+            ReadTrailerKey(root, language));
+    }
+
+    /// <summary>
+    /// Picks the trailer to offer out of what came appended to the details request.
+    /// </summary>
+    /// <remarks>
+    /// Three passes, most specific first: the official trailer in the language that was asked for,
+    /// then any trailer in that language, then any trailer at all. Only YouTube, because that is the
+    /// one site this application knows how to hand to a browser. The key is taken as the provider
+    /// gave it — validating it here would be the second of two places that decide what a remote
+    /// string may become, and there is exactly one: <c>TrailerLinkPolicy</c>, which every caller has
+    /// to go through to obtain an address.
+    /// </remarks>
+    private static string? ReadTrailerKey(JsonElement root, string language)
+    {
+        if (!root.TryGetProperty("videos", out var videos)
+            || !videos.TryGetProperty("results", out var results)
+            || results.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        var trailers = results.EnumerateArray()
+            .Where(video => string.Equals(ReadOptionalString(video, "site"), "YouTube", StringComparison.Ordinal))
+            .Where(video => string.Equals(ReadOptionalString(video, "type"), "Trailer", StringComparison.Ordinal))
+            .Where(video => !string.IsNullOrWhiteSpace(ReadOptionalString(video, "key")))
+            .ToArray();
+        var spokenLanguage = language.Split('-', 2)[0];
+        bool InRequestedLanguage(JsonElement video) => string.Equals(
+            ReadOptionalString(video, "iso_639_1"),
+            spokenLanguage,
+            StringComparison.OrdinalIgnoreCase);
+        static bool IsOfficial(JsonElement video) =>
+            video.TryGetProperty("official", out var official) && official.ValueKind == JsonValueKind.True;
+
+        var chosen = FirstOrNone(trailers, video => InRequestedLanguage(video) && IsOfficial(video))
+            ?? FirstOrNone(trailers, InRequestedLanguage)
+            ?? FirstOrNone(trailers, _ => true);
+        return chosen is null ? null : ReadOptionalString(chosen.Value, "key");
+    }
+
+    private static JsonElement? FirstOrNone(JsonElement[] videos, Func<JsonElement, bool> predicate)
+    {
+        foreach (var video in videos)
+        {
+            if (predicate(video))
+            {
+                return video;
+            }
+        }
+
+        return null;
     }
 
     private static MetadataDetails ParseDetails(

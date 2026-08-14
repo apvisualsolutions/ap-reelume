@@ -457,7 +457,15 @@ public static partial class CompositionRoot
             // become (LIB-014). Nothing is downloaded and nothing is streamed.
             onPlayTrailer: path => provider
                 .GetRequiredService<OpenLooseFile>()
-                .ExecuteAsync(path, CancellationToken.None));
+                .ExecuteAsync(path, CancellationToken.None),
+
+            // The provider's trailer goes the other way (LIB-015): out of the application and into
+            // whatever browser the person uses. The address arrives already composed by
+            // TrailerLinkPolicy from a key that passed its alphabet and its length, and the launcher
+            // refuses anything that is not https on its own host. Nothing here connects to YouTube.
+            onOpenTrailerLink: link => provider
+                .GetRequiredService<IExternalLinkLauncher>()
+                .TryLaunchAsync(link, CancellationToken.None));
         ShowDetailsViewModel? showDetails = null;
         showDetails = new ShowDetailsViewModel(
             onPlay: request => host.Shell is { } shell
@@ -469,7 +477,10 @@ public static partial class CompositionRoot
                 await ApplyPersonalActionAsync(setPersonalState, content, request).ConfigureAwait(true);
                 showDetails.PersonalActions.Apply(
                     await personalFilters.GetAsync(content, CancellationToken.None).ConfigureAwait(true));
-            });
+            },
+            onOpenTrailerLink: link => provider
+                .GetRequiredService<IExternalLinkLauncher>()
+                .TryLaunchAsync(link, CancellationToken.None));
         var library = new LibraryViewModel(
             provider.GetRequiredService<ICatalogQueryService>(),
             movieDetails,
@@ -481,6 +492,7 @@ public static partial class CompositionRoot
                 .GetAsync(item.Item.Id, CancellationToken.None)
                 .ConfigureAwait(true);
             var overview = stored?.Metadata.Overview;
+            var trailerKey = stored?.Metadata.TrailerKey;
             if (item.Item.Kind == CatalogTitleKind.Show)
             {
                 var sequence = await episodes
@@ -500,7 +512,13 @@ public static partial class CompositionRoot
                 var showPersonal = await personalFilters
                     .GetAsync(showKey, CancellationToken.None)
                     .ConfigureAwait(true);
-                showDetails.Apply(item.Item, sequence, states, showPersonal, overview: overview);
+                showDetails.Apply(
+                    item.Item,
+                    sequence,
+                    states,
+                    showPersonal,
+                    overview: overview,
+                    trailerKey: trailerKey);
             }
             else
             {
@@ -519,7 +537,8 @@ public static partial class CompositionRoot
                     versions,
                     personal,
                     overview: overview,
-                    trailerPath: FindTrailer(versions));
+                    trailerPath: FindTrailer(versions),
+                    trailerKey: trailerKey);
             }
         };
         return library;
@@ -632,6 +651,7 @@ public static partial class CompositionRoot
                 Genres: [],
                 PosterPath: null,
                 BackdropPath: null,
+                TrailerKey: null,
                 LockedFields: new HashSet<MetadataField>()),
             Revision: 0);
         return new MetadataEditorViewModel(
