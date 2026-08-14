@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
+using ApSolutions.LocalMedia.TestSupport;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
@@ -173,7 +174,7 @@ public sealed class ForcedShutdownTests
     private static Process StartProgressWriter(string databasePath, string signalPath)
     {
         var projectPath = Path.Combine(
-            DatabaseTestHarness.GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "tests",
             "ApSolutions.LocalMedia.IntegrationTests",
             "ApSolutions.LocalMedia.IntegrationTests.csproj");

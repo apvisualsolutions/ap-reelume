@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests;
@@ -285,7 +286,7 @@ public sealed class ArtifactContentsTests
     [Fact]
     public void The_packaging_script_cannot_quietly_skip_that_validation()
     {
-        var script = File.ReadAllText(Path.Combine(PackageEvidence.RepositoryRoot(), "eng", "package-x64.ps1"));
+        var script = File.ReadAllText(Path.Combine(RepositoryLayout.Root, "eng", "package-x64.ps1"));
         var sealing = script
             .Split('\n')
             .Where(line => line.Contains("makeAppx pack", StringComparison.Ordinal)

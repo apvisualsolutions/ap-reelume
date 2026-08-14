@@ -3,6 +3,7 @@
 
 using System.Xml.Linq;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests;
@@ -73,7 +74,7 @@ public sealed class FileAssociationPackageTests
     public void The_authored_fragment_and_the_manifest_do_not_drift_apart()
     {
         var fragment = XDocument.Load(Path.Combine(
-            PackageEvidence.RepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Windows",
             "Packaging",

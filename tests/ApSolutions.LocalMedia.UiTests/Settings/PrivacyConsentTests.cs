@@ -5,6 +5,7 @@ using System.Xml.Linq;
 using ApSolutions.LocalMedia.Application.Privacy;
 using ApSolutions.LocalMedia.Infrastructure.Privacy;
 using ApSolutions.LocalMedia.Presentation.Settings;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Settings;
@@ -291,7 +292,7 @@ public sealed class PrivacyConsentTests
     [Fact]
     public void Every_visible_string_comes_from_the_resource_dictionary()
     {
-        var presentationRoot = GetPresentationRoot();
+        var presentationRoot = RepositoryLayout.PathFromRoot("src", "ApSolutions.LocalMedia.Presentation");
         var spanish = LoadResourceKeys(Path.Combine(presentationRoot, "Resources", "Strings.es.axaml"));
         foreach (var view in new[] { "PrivacySettingsView.axaml", "DiagnosticsPreviewView.axaml" })
         {
@@ -359,19 +360,6 @@ public sealed class PrivacyConsentTests
             .Select(element => element.Attribute(xNamespace + "Key")?.Value)
             .Where(value => value is not null)
             .Select(value => value!)];
-    }
-
-    private static string GetPresentationRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return Path.Combine(directory.FullName, "src", "ApSolutions.LocalMedia.Presentation");
     }
 
     private sealed class InMemoryPrivacySettings : IPrivacySettings

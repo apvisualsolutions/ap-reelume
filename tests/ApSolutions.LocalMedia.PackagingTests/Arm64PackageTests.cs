@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Xml.Linq;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests;
@@ -27,7 +28,7 @@ public sealed class Arm64PackageTests
     [Fact]
     public void The_arm64_packaging_script_exists_and_is_the_one_the_evidence_names()
     {
-        var script = Path.Combine(PackageEvidence.RepositoryRoot(), "eng", "package-arm64.ps1");
+        var script = Path.Combine(RepositoryLayout.Root, "eng", "package-arm64.ps1");
 
         Assert.True(
             File.Exists(script),
@@ -42,7 +43,7 @@ public sealed class Arm64PackageTests
     [Fact]
     public void The_arm64_packaging_script_cannot_quietly_skip_the_install_validation()
     {
-        var script = Path.Combine(PackageEvidence.RepositoryRoot(), "eng", "package-arm64.ps1");
+        var script = Path.Combine(RepositoryLayout.Root, "eng", "package-arm64.ps1");
         Assert.True(File.Exists(script), "eng/package-arm64.ps1 does not exist.");
 
         var sealing = File.ReadAllText(script)

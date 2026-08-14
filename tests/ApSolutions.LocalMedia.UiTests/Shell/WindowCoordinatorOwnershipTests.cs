@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Shell;
@@ -18,7 +19,7 @@ public sealed class WindowCoordinatorOwnershipTests
     {
         var composition = CompositionSourceText.Read();
         var shellView = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Shell",
@@ -28,17 +29,5 @@ public sealed class WindowCoordinatorOwnershipTests
         // and a container registration would only ever produce a second, unread instance.
         Assert.DoesNotContain("PlayerWindowCoordinator", composition, StringComparison.Ordinal);
         Assert.Contains("PlayerWindowCoordinator _windowCoordinator = new()", shellView, StringComparison.Ordinal);
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

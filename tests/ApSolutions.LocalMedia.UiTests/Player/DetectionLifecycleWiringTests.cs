@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Player;
@@ -42,24 +43,12 @@ public sealed class DetectionLifecycleWiringTests
     private static string SchedulerSource()
     {
         var path = Path.Combine(
-            RepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Windows",
             "Playback",
             "SegmentDetectionBackground.cs");
         Assert.True(File.Exists(path), "SegmentDetectionBackground.cs was not found where the assembly keeps it.");
         return File.ReadAllText(path);
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

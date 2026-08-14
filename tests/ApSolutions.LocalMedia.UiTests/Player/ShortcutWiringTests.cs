@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Player;
@@ -53,7 +54,7 @@ public sealed class ShortcutWiringTests
     {
         var composition = CompositionSource();
         var playerView = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Player",
@@ -78,7 +79,7 @@ public sealed class ShortcutWiringTests
     public void The_settings_surface_edits_the_map_the_player_reads()
     {
         var settings = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Player",
@@ -93,17 +94,5 @@ public sealed class ShortcutWiringTests
     private static string CompositionSource()
     {
         return CompositionSourceText.Read();
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

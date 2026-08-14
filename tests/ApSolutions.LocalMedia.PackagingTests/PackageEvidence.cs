@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Text.Json;
 using System.Xml.Linq;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.PackagingTests;
 
 /// <summary>
@@ -31,23 +33,10 @@ internal static class PackageEvidence
     /// <summary>The same instruction for the ARM64 artifact.</summary>
     public const string HowToProduceArm64 = "Run `pwsh ./eng/package-arm64.ps1`.";
 
-    public static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        return directory?.FullName
-            ?? throw new InvalidOperationException("The repository root is not above the test assembly.");
-    }
-
     public static string PackageRoot() =>
         Environment.GetEnvironmentVariable(RootVariable) is { } named && !string.IsNullOrWhiteSpace(named)
             ? Path.GetFullPath(named)
-            : Path.Combine(RepositoryRoot(), "artifacts", "package");
+            : Path.Combine(RepositoryLayout.Root, "artifacts", "package");
 
     /// <summary>
     /// Where the ARM64 artifact and its reports are. It is a directory of its own rather than a
@@ -57,7 +46,7 @@ internal static class PackageEvidence
     public static string Arm64PackageRoot() =>
         Environment.GetEnvironmentVariable(Arm64RootVariable) is { } named && !string.IsNullOrWhiteSpace(named)
             ? Path.GetFullPath(named)
-            : Path.Combine(RepositoryRoot(), "artifacts", "package-arm64");
+            : Path.Combine(RepositoryLayout.Root, "artifacts", "package-arm64");
 
     /// <summary>
     /// What the versioned licence folder says the artifact has to carry, checked against a layout.
@@ -69,7 +58,7 @@ internal static class PackageEvidence
     /// </remarks>
     public static string[] LicenceTextsMissingFrom(string layoutRoot)
     {
-        var source = new DirectoryInfo(Path.Combine(RepositoryRoot(), "docs", "release", "licenses"));
+        var source = new DirectoryInfo(Path.Combine(RepositoryLayout.Root, "docs", "release", "licenses"));
         if (!source.Exists)
         {
             throw new DirectoryNotFoundException(
@@ -97,7 +86,7 @@ internal static class PackageEvidence
 
     /// <summary>The packaging project's directory, which is versioned and always present.</summary>
     public static string PackageProjectRoot() =>
-        Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Windows.Package");
+        Path.Combine(RepositoryLayout.Root, "src", "ApSolutions.LocalMedia.Windows.Package");
 
     public static XDocument Manifest() =>
         XDocument.Load(Path.Combine(PackageProjectRoot(), "Package.appxmanifest"));
@@ -105,7 +94,7 @@ internal static class PackageEvidence
     /// <summary>The single SemVer the whole release is cut from.</summary>
     public static string DeclaredVersion()
     {
-        var properties = XDocument.Load(Path.Combine(RepositoryRoot(), "Directory.Build.props"));
+        var properties = XDocument.Load(Path.Combine(RepositoryLayout.Root, "Directory.Build.props"));
         var version = properties
             .Descendants()
             .FirstOrDefault(element => element.Name.LocalName == "Version")?.Value;

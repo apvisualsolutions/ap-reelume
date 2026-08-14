@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Text.RegularExpressions;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests;
@@ -43,7 +44,7 @@ public sealed class UpdateSourceTests
 
     private static (string Owner, string Name) PublishedSource(string changelog)
     {
-        var path = Path.Combine(PackageEvidence.RepositoryRoot(), changelog);
+        var path = Path.Combine(RepositoryLayout.Root, changelog);
         Assert.True(File.Exists(path), $"{changelog} is missing.");
         var match = ReleasePattern.Match(File.ReadAllText(path));
         Assert.True(match.Success, $"{changelog} publishes no release address for anybody to follow.");

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.ArchitectureTests;
@@ -10,7 +11,7 @@ public sealed class SqliteIsolationTests
     [Fact]
     public void Core_and_presentation_contracts_do_not_expose_SQLite_types()
     {
-        var repositoryRoot = GetRepositoryRoot();
+        var repositoryRoot = RepositoryLayout.Root;
         var coreRoots = new[]
         {
             System.IO.Path.Combine(repositoryRoot, "src", "ApSolutions.LocalMedia.Domain"),
@@ -31,7 +32,7 @@ public sealed class SqliteIsolationTests
     [Fact]
     public void Required_data_contracts_exist_under_stable_internal_namespaces()
     {
-        var repositoryRoot = GetRepositoryRoot();
+        var repositoryRoot = RepositoryLayout.Root;
         var applicationRoot = System.IO.Path.Combine(
             repositoryRoot,
             "src",
@@ -59,7 +60,7 @@ public sealed class SqliteIsolationTests
     [Fact]
     public void Windows_app_data_path_uses_only_the_stable_internal_identity()
     {
-        var repositoryRoot = GetRepositoryRoot();
+        var repositoryRoot = RepositoryLayout.Root;
         var path = System.IO.Path.Combine(
             repositoryRoot,
             "src",
@@ -77,16 +78,4 @@ public sealed class SqliteIsolationTests
     // lived here as a match on the source text — satisfiable by a comment or a coincidence of
     // characters. It moved to CompositionDescriptorTests (AccessibilityTests), which asserts the
     // registered descriptor's factory instead (ARQ-006).
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(System.IO.Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
-    }
 }

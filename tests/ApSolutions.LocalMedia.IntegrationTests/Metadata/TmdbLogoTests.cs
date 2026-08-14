@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Metadata;
@@ -139,7 +140,7 @@ public sealed class TmdbLogoTests
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
 
     private static string FromRoot(string relativePath) => Path.Combine(
-        DatabaseTestHarness.GetRepositoryRoot(),
+        RepositoryLayout.Root,
         relativePath.Replace('/', Path.DirectorySeparatorChar));
 
     private static string Attribute(string markup, string name) =>

@@ -1,0 +1,10 @@
+<Project>
+  <!--
+    ARQ-012: one anchor for the repository root, linked into every test project rather than pasted
+    into every file that needed it. A shared file, not a project and not a package: the tests are
+    the only consumer and a package would be ceremony around thirty lines.
+  -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\RepositoryLayout.cs" Link="RepositoryLayout.cs" />
+  </ItemGroup>
+</Project>

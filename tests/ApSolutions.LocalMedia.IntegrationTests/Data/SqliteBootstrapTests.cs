@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Reflection;
+using ApSolutions.LocalMedia.TestSupport;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
@@ -285,7 +286,7 @@ public sealed class SqliteBootstrapTests
     private static Process StartCrashWriter(string databasePath, string signalPath)
     {
         var projectPath = System.IO.Path.Combine(
-            DatabaseTestHarness.GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "tests",
             "ApSolutions.LocalMedia.IntegrationTests",
             "ApSolutions.LocalMedia.IntegrationTests.csproj");
@@ -408,18 +409,6 @@ internal static class DatabaseTestHarness
         var type = Assembly.Load(InfrastructureAssemblyName).GetType(fullName, throwOnError: false);
         Assert.NotNull(type);
         return type;
-    }
-
-    public static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(System.IO.Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }
 

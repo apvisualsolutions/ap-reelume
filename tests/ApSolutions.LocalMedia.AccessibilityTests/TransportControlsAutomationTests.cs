@@ -6,6 +6,7 @@ using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -55,7 +56,7 @@ public sealed class TransportControlsAutomationTests
             Assert.All(controls, control => Assert.True(control.Focusable, $"{control.Name} cannot take focus."));
 
             var treePath = Path.Combine(
-                GetRepositoryRoot(),
+                RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
                 "T21",
@@ -144,18 +145,6 @@ public sealed class TransportControlsAutomationTests
         Assert.False(viewModel.LimiterEngaged);
         Assert.Equal(0.25, engine.LastSpeed);
         Assert.False(engine.LastVolume!.IsBoosted);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed class StubEngine : IMediaPlayerEngine

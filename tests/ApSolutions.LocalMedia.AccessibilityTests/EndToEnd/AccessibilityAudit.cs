@@ -3,6 +3,7 @@
 
 using System.Text;
 using System.Text.Json;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
@@ -69,18 +70,6 @@ public sealed class AuditLog
     public IReadOnlyList<AccessibilityDefect> Defects => _defects;
 
     /// <summary>Finds the repository root from the test binary, without hard-coding any path.</summary>
-    public static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
-    }
-
     public void Add(
         string step,
         string surface,
@@ -119,7 +108,7 @@ public sealed class AuditLog
     {
         var directory = Environment.GetEnvironmentVariable(ResultsVariable) is { Length: > 0 } configured
             ? configured
-            : Path.Combine(GetRepositoryRoot(), "artifacts", "accessibility", "local");
+            : Path.Combine(RepositoryLayout.Root, "artifacts", "accessibility", "local");
         Directory.CreateDirectory(directory);
         File.WriteAllText(
             Path.Combine(directory, $"{_suite}.json"),

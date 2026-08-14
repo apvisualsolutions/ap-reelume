@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Player;
@@ -17,7 +18,7 @@ public sealed class NextEpisodeWiringTests
     public void The_engine_reports_the_end_of_the_media_as_a_state()
     {
         var engine = File.ReadAllText(Path.Combine(
-            RepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Infrastructure",
             "Playback",
@@ -68,17 +69,5 @@ public sealed class NextEpisodeWiringTests
     private static string CompositionSource()
     {
         return CompositionSourceText.Read();
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

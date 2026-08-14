@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Domain.Catalog;
@@ -242,29 +243,62 @@ public sealed class GetRecommendationsTests
     /// </summary>
     private sealed class CanaryServer : IDisposable
     {
-        private readonly HttpListener _listener = new();
+        private readonly HttpListener _listener;
         private int _requestCount;
 
+        /// <summary>
+        /// Listens on a port the operating system hands out, which is the only way to ask for one
+        /// that is actually available.
+        /// </summary>
+        /// <remarks>
+        /// This used to walk a fixed range from 51000, and on 2026-08-14 every port in it failed at
+        /// once: Windows reserves 50996-51095 for its virtualisation stack on this machine, and a
+        /// reserved port refuses a listener with the same error a busy one does. A fixed range is a
+        /// bet that nothing else claimed it, and that bet is settled by whatever the host booted
+        /// with — so the range is gone. Each attempt also gets its own <see cref="HttpListener"/>,
+        /// because one whose <c>Start</c> throws closes itself: reusing it turned the retry into an
+        /// <see cref="ObjectDisposedException"/> that said nothing about the real cause.
+        /// </remarks>
         public CanaryServer()
         {
-            for (var port = 51_000; port < 51_050; port++)
+            for (var attempt = 0; attempt < 8; attempt++)
             {
+                var candidate = new HttpListener();
+                candidate.Prefixes.Add($"http://127.0.0.1:{FreePort()}/");
                 try
                 {
-                    _listener.Prefixes.Clear();
-                    _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
-                    _listener.Start();
-                    break;
+                    candidate.Start();
+                    _listener = candidate;
+                    _ = AcceptAsync();
+                    return;
                 }
                 catch (HttpListenerException)
                 {
-                    // The port was taken; try the next one.
+                    // Somebody took the port between the probe and the start; the next attempt needs
+                    // a listener of its own, because this one closed itself on the way out.
+                    candidate.Close();
                 }
             }
 
-            if (_listener.IsListening)
+            throw new InvalidOperationException(
+                "No loopback port stayed free long enough to watch for a connection.");
+        }
+
+        /// <summary>
+        /// A port the operating system says is free. Asking for port zero is what makes this a
+        /// question rather than a guess, and the probe is closed before the answer is used.
+        /// </summary>
+        private static int FreePort()
+        {
+            var probe = new TcpListener(IPAddress.Loopback, 0);
+            probe.Start();
+            try
             {
-                _ = AcceptAsync();
+                return ((IPEndPoint)probe.LocalEndpoint).Port;
+            }
+            finally
+            {
+                probe.Stop();
             }
         }
 

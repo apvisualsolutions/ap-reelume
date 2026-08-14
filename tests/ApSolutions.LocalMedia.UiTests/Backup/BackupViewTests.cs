@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Xml.Linq;
 using ApSolutions.LocalMedia.Application.Backup;
 using ApSolutions.LocalMedia.Presentation.Backup;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Backup;
@@ -323,7 +324,7 @@ public sealed class BackupViewTests
     [Fact]
     public void Every_visible_string_on_the_view_comes_from_the_resource_dictionary()
     {
-        var presentationRoot = GetPresentationRoot();
+        var presentationRoot = RepositoryLayout.PathFromRoot("src", "ApSolutions.LocalMedia.Presentation");
         var view = XDocument.Load(Path.Combine(presentationRoot, "Backup", "BackupView.axaml"));
         var spanish = LoadResourceKeys(Path.Combine(presentationRoot, "Resources", "Strings.es.axaml"));
 
@@ -390,18 +391,5 @@ public sealed class BackupViewTests
             .Select(element => element.Attribute(xNamespace + "Key")?.Value)
             .Where(value => value is not null)
             .Select(value => value!)];
-    }
-
-    private static string GetPresentationRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return Path.Combine(directory.FullName, "src", "ApSolutions.LocalMedia.Presentation");
     }
 }

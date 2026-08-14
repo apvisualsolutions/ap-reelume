@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Updates;
 using ApSolutions.LocalMedia.Presentation.Updates;
+using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -119,15 +120,7 @@ public sealed class CompositionDescriptorTests
 
     private static (string Owner, string Name) PublishedReleaseAddress(string changelog)
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        var path = Path.Combine(directory.FullName, changelog);
+        var path = Path.Combine(RepositoryLayout.Root, changelog);
         Assert.True(File.Exists(path), $"{changelog} is missing.");
         var match = Regex.Match(
             File.ReadAllText(path),

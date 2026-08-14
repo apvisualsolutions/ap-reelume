@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Globalization;
+using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows.Playback;
 using Xunit;
 
@@ -24,7 +25,7 @@ public sealed class WindowsDisplayCapabilityTests
         Assert.False(capabilities.HdrEnabled && !capabilities.SupportsHdr10);
 
         var report = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "artifacts",
             "test-results",
             "T22",
@@ -51,17 +52,5 @@ public sealed class WindowsDisplayCapabilityTests
         var second = provider.GetCurrentDisplay();
 
         Assert.Equal(first, second);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

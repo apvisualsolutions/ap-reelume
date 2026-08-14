@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Media;
@@ -65,7 +66,7 @@ public sealed class TestMediaGeneratorTests
     {
         var startInfo = new ProcessStartInfo("pwsh")
         {
-            WorkingDirectory = DatabaseTestHarness.GetRepositoryRoot(),
+            WorkingDirectory = RepositoryLayout.Root,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -74,7 +75,7 @@ public sealed class TestMediaGeneratorTests
         {
             "-NoProfile",
             "-File",
-            Path.Combine(DatabaseTestHarness.GetRepositoryRoot(), "eng", "generate-test-media.ps1"),
+            Path.Combine(RepositoryLayout.Root, "eng", "generate-test-media.ps1"),
             "-Output",
             outputRoot,
             "-Force",

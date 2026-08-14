@@ -5,6 +5,7 @@ using System.Globalization;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -128,7 +129,7 @@ public sealed class VersionSwitchDialogTests
     public void The_dialog_is_captured_in_both_languages()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(GetRepositoryRoot(), "artifacts", "ui-captures", "T27");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T27");
         _ = Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })
@@ -164,17 +165,5 @@ public sealed class VersionSwitchDialogTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return view;
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

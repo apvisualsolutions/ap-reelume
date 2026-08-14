@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Text.Json;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests;
@@ -123,7 +124,7 @@ public sealed class UpdateHandoverTests
     private static JsonElement Report()
     {
         var path = Path.Combine(
-            PackageEvidence.RepositoryRoot(),
+            RepositoryLayout.Root,
             "docs",
             "evidence",
             "stable",

@@ -3,6 +3,7 @@
 
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Shell;
@@ -149,19 +150,6 @@ public sealed class SurfaceReachabilityTests
         Assert.Contains("CheckAutomaticallyAsync", composition, StringComparison.Ordinal);
     }
 
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
-    }
-
     /// <summary>One declared surface and what it is made of.</summary>
     private sealed record Surface(string Name, string? ClassName, bool HasAccessibleName, string[] References);
 
@@ -183,7 +171,7 @@ public sealed class SurfaceReachabilityTests
 
         public static SurfaceGraph Load()
         {
-            var presentationRoot = Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Presentation");
+            var presentationRoot = Path.Combine(RepositoryLayout.Root, "src", "ApSolutions.LocalMedia.Presentation");
             var files = Directory
                 .EnumerateFiles(presentationRoot, "*.axaml", SearchOption.AllDirectories)
                 .Where(IsSurfaceFile)

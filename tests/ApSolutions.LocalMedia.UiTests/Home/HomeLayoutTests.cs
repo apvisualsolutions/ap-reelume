@@ -12,6 +12,7 @@ using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Home;
 using ApSolutions.LocalMedia.Presentation.Navigation;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -107,7 +108,7 @@ public sealed class HomeLayoutTests
     public async Task Home_matches_its_approved_structural_baseline_across_every_combination()
     {
         var actual = new List<LayoutRecord>();
-        var captures = Path.Combine(GetRepositoryRoot(), "artifacts", "ui-captures", "T30");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T30");
         Directory.CreateDirectory(captures);
 
         foreach (var (widthPixels, heightPixels) in new[] { (1366, 768), (3840, 2160) })
@@ -131,7 +132,7 @@ public sealed class HomeLayoutTests
         }
 
         var actualPath = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "artifacts",
             "test-results",
             "T30",
@@ -143,7 +144,7 @@ public sealed class HomeLayoutTests
             TestContext.Current.CancellationToken);
 
         var baselinePath = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "tests",
             "ApSolutions.LocalMedia.UiTests",
             "Baselines",
@@ -303,7 +304,7 @@ public sealed class HomeLayoutTests
     public void Every_visible_string_on_home_and_details_comes_from_a_resource()
     {
         var presentationRoot = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation");
         var views = SurfaceFolders
@@ -482,18 +483,6 @@ public sealed class HomeLayoutTests
         var bytes = new byte[16];
         BitConverter.GetBytes(seed).CopyTo(bytes, 0);
         return new Guid(bytes);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     public sealed record LayoutRecord(
