@@ -31,6 +31,8 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
     private bool _lockPosterPath;
     private bool _lockBackdropPath;
     private bool _hasConflict;
+    private bool _isUnidentified;
+    private bool _hasNoProviderAnswer;
 
     public MetadataEditorViewModel(
         CatalogMetadata catalog,
@@ -49,8 +51,6 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    public MetadataDetails? ProviderMetadata { get; set; }
 
     public ArtworkPickerViewModel ArtworkPicker { get; }
 
@@ -90,6 +90,16 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
 
     public bool HasConflict { get => _hasConflict; private set => SetField(ref _hasConflict, value); }
 
+    /// <summary>Nobody has identified this title, so there is nothing to refresh it against.</summary>
+    public bool IsUnidentified { get => _isUnidentified; private set => SetField(ref _isUnidentified, value); }
+
+    /// <summary>It is identified, but the provider had no answer to give right now.</summary>
+    public bool HasNoProviderAnswer
+    {
+        get => _hasNoProviderAnswer;
+        private set => SetField(ref _hasNoProviderAnswer, value);
+    }
+
     private async Task SaveAsync()
     {
         var releaseYear = int.TryParse(ReleaseYear, NumberStyles.None, CultureInfo.InvariantCulture, out var parsedYear)
@@ -114,14 +124,8 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
 
     private async Task RefreshAsync(bool restoreProviderFields)
     {
-        if (ProviderMetadata is null)
-        {
-            return;
-        }
-
         var result = await _refreshMetadata.ExecuteAsync(new RefreshMetadataCommand(
             _catalog.TitleId,
-            ProviderMetadata,
             _catalog.Revision,
             restoreProviderFields)).ConfigureAwait(true);
         ApplyResult(result);
@@ -151,6 +155,12 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
     private void ApplyResult(MetadataWriteResult result)
     {
         HasConflict = result.Outcome == MetadataWriteOutcome.Conflict;
+
+        // A refresh that found nothing to refresh against says so. Leaving it silent is what made
+        // both provider buttons look broken: they were pressed, nothing happened, and nothing
+        // explained why.
+        IsUnidentified = result.Outcome == MetadataWriteOutcome.NotIdentified;
+        HasNoProviderAnswer = result.Outcome == MetadataWriteOutcome.Unavailable;
         if (result.Outcome == MetadataWriteOutcome.Applied && result.Catalog is not null)
         {
             ApplyCatalog(result.Catalog);

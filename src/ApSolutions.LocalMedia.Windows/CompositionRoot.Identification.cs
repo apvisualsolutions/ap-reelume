@@ -90,7 +90,15 @@ public static partial class CompositionRoot
             // declared network purposes are unchanged for that exact reason.
             .AddSingleton<IExternalLinkLauncher, ShellExternalLinkLauncher>()
             .AddTransient<UpdateMetadata>()
-            .AddTransient<RefreshMetadata>()
+
+            // The refresh resolves the provider entry from the row itself, so it needs the provider
+            // — which is what the editor's two buttons were missing all along.
+            .AddTransient(provider => new RefreshMetadata(
+                provider.GetRequiredService<ICatalogMetadataRepository>(),
+                provider.GetRequiredService<IMetadataProvider>(),
+                provider.GetRequiredService<MetadataMergePolicy>(),
+                CurrentMetadataLanguage(),
+                TimeProvider.System))
             .AddTransient<ArtworkPickerViewModel>()
             .AddSingleton<RenamePolicy>()
             .AddSingleton<PreviewRename>()

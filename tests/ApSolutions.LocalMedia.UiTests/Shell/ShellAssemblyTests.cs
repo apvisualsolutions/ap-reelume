@@ -480,7 +480,7 @@ public sealed class ShellAssemblyTests
             new EditableMetadata("Título", null, null, null, [], null, null, null, new HashSet<MetadataField>()),
             Revision: 0),
         new UpdateMetadata(new StubMetadata()),
-        new RefreshMetadata(new StubMetadata(), new MetadataMergePolicy()),
+        SilentIdentification.Refresh(new StubMetadata()),
         new ArtworkPickerViewModel());
 
     private static RenamePreviewViewModel BuildRename() => new(

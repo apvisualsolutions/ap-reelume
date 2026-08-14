@@ -192,6 +192,9 @@ public sealed class MetadataCandidateSourceTests
     {
         public string Name => "tmdb";
 
+        public MetadataReference? TryCreateReference(string key) =>
+            new("tmdb", key, MetadataContentKind.Movie);
+
         public int Searches { get; private set; }
 
         public MetadataSearchQuery? LastQuery { get; private set; }

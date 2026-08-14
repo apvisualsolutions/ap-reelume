@@ -68,6 +68,17 @@ public interface IMetadataProvider
     /// </summary>
     string Name { get; }
 
+    /// <summary>
+    /// The reference a stored key stands for, or nothing when the key is not one of this provider's.
+    /// <para>
+    /// A reference carries a content kind that the catalogue does not store, because which kind a key
+    /// belongs to is written inside the key's own format — and that format is the provider's, not the
+    /// database's. Reading it here is what keeps a refresh from having to know that a TMDB film key
+    /// starts with <c>movie:</c>.
+    /// </para>
+    /// </summary>
+    MetadataReference? TryCreateReference(string key);
+
     Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
         MetadataSearchQuery query,
         MetadataLanguage language,

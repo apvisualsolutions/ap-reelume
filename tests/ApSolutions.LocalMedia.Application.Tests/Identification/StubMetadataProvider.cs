@@ -25,6 +25,22 @@ internal sealed class StubMetadataProvider(params MetadataDetails[] details) : I
     /// <summary>A key the provider refuses to answer for, the way a request that fails behaves.</summary>
     public string? ThrowOnKey { get; set; }
 
+    /// <summary>Keys this provider disowns, for titles identified by somebody else.</summary>
+    public string? DisownedKey { get; set; }
+
+    public MetadataReference? TryCreateReference(string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        return string.Equals(DisownedKey, key, StringComparison.Ordinal)
+            ? null
+            : new MetadataReference(
+                Name,
+                key,
+                key.StartsWith("tv:", StringComparison.Ordinal)
+                    ? MetadataContentKind.Show
+                    : MetadataContentKind.Movie);
+    }
+
     public Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
         MetadataSearchQuery query,
         MetadataLanguage language,
@@ -80,8 +96,11 @@ internal sealed class MemoryCatalogMetadataRepository : ICatalogMetadataReposito
             return Task.FromResult(new MetadataWriteResult(MetadataWriteOutcome.Conflict, stored));
         }
 
-        Rows[catalog.TitleId] = catalog;
-        return Task.FromResult(new MetadataWriteResult(MetadataWriteOutcome.Applied, catalog));
+        // The repository owns the next revision, so the double has to as well: a double that keeps
+        // whatever the caller passed is exactly how the revision defect stayed invisible.
+        var written = catalog with { Revision = expectedRevision + 1 };
+        Rows[catalog.TitleId] = written;
+        return Task.FromResult(new MetadataWriteResult(MetadataWriteOutcome.Applied, written));
     }
 }
 
