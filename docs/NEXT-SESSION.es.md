@@ -242,7 +242,16 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    `www.youtube.com` en `src/`, resuelto con una **segunda lista cerrada** (`HandedOff`) en vez de
    declarar una conexión que no existe.
    [audit-lib015-provider-trailer.md](evidence/stable/audit-lib015-provider-trailer.md).
-2. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
+2. **El eslabón que falta, antes de `LIB-016`.** La primera medición de `LIB-016` destapó que **nada
+   convierte una identificación en metadata guardada**: `catalog_metadata` sólo lo escriben el editor
+   y un `RefreshMetadata` que nadie alimenta —la única asignación de su entrada en todo el
+   repositorio está **en una prueba**—, `ResolveMatch` publica un evento que no escucha nadie, y
+   `ReviewState.Automatic` sólo se calcula. La sinopsis de `LIB-013` y la clave de `LIB-015` sólo
+   llegan a la base a mano. Forma decidida y orden en
+   [audit-identification-never-reaches-the-catalogue.md](evidence/stable/audit-identification-never-reaches-the-catalogue.md).
+   **Toca el estado de la matriz**: `LIB-006` y `LIB-007` figuran como `VERIFIED` y ninguna de sus
+   evidencias midió que el resultado llegara al catálogo.
+3. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
    pasada. **El texto del propósito de red declarado cambia con el código**, no después.
 3. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe
    desde la aplicación construida y no desde el código — por eso va detrás del bloque.
