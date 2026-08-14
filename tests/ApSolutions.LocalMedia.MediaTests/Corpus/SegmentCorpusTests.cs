@@ -214,15 +214,25 @@ public sealed class SegmentCorpusTests
 
         // Lesson from the media generator: a machine with previous artifacts reuses them, which
         // hides a generator that cannot start from nothing. Delete first, then produce.
+        //
+        // Into a folder of its own, though. The corpus is shared with the other suites here, and one
+        // of them can be probing S03E03 while this test deletes it — an IOException CI recorded on
+        // 2026-08-09 and again on 2026-08-14, both times on this exact file. What this test is about
+        // is that the generator can start from nothing, not which folder it writes to, so the race
+        // is removed rather than retried against.
+        var relativePath = "segments-from-nothing/" + Path.GetFileName(episode.RelativePath);
         var destination = Path.Combine(
             MediaToolchain.OutputRoot,
-            episode.RelativePath.Replace('/', Path.DirectorySeparatorChar));
+            relativePath.Replace('/', Path.DirectorySeparatorChar));
         if (File.Exists(destination))
         {
             File.Delete(destination);
         }
 
-        var path = await SegmentCorpus.MaterialiseAsync(episode, TestContext.Current.CancellationToken);
+        var path = await MediaToolchain.EnsureSampleAsync(
+            relativePath,
+            SegmentCorpus.BuildRecipe(episode),
+            TestContext.Current.CancellationToken);
 
         Assert.True(File.Exists(path), $"The corpus generator produced nothing at '{path}'.");
         await using var factory = LibVlcFactory.CreateHeadless();
