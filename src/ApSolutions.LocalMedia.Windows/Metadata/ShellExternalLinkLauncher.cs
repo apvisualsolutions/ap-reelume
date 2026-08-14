@@ -29,6 +29,26 @@ namespace ApSolutions.LocalMedia.Windows.Metadata;
 /// </remarks>
 public sealed class ShellExternalLinkLauncher : IExternalLinkLauncher
 {
+    private readonly Func<ProcessStartInfo, Process?> _start;
+
+    public ShellExternalLinkLauncher()
+        : this(Process.Start)
+    {
+    }
+
+    /// <summary>
+    /// Takes the call to the shell as a parameter so the accepting path can be exercised.
+    /// </summary>
+    /// <remarks>
+    /// The coverage gate is what asked for this. Left with <see cref="Process.Start(ProcessStartInfo)"/>
+    /// hard-wired, everything past the refusals was unreachable from a test — driving it would open a
+    /// real browser on the machine measuring it — and the file sat at 43.75% of lines. Handing the
+    /// call in covers the rest and buys a second thing: what reaches the shell can be asserted, which
+    /// is the whole point of this class existing.
+    /// </remarks>
+    public ShellExternalLinkLauncher(Func<ProcessStartInfo, Process?> start) =>
+        _start = start ?? throw new ArgumentNullException(nameof(start));
+
     public Task<bool> TryLaunchAsync(string link, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(link);
@@ -48,8 +68,11 @@ public sealed class ShellExternalLinkLauncher : IExternalLinkLauncher
 
         try
         {
-            using var process = Process.Start(startInfo);
-            return Task.FromResult(process is not null || startInfo.UseShellExecute);
+            // A null process is success, not failure: the shell hands the address to a browser that
+            // is already running — a new tab in a window somebody already had open — and there is no
+            // child of this process to report.
+            using var process = _start(startInfo);
+            return Task.FromResult(true);
         }
         catch (System.ComponentModel.Win32Exception)
         {
