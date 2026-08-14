@@ -362,6 +362,40 @@ public static partial class CompositionRoot
     /// Wires the library to the two detail surfaces and to the reads they need. The library itself
     /// still knows only the catalogue; watch states, episodes, and versions arrive through this hook.
     /// </summary>
+    /// <summary>
+    /// The trailer sitting next to the film, if there is one. The listing happens here because the
+    /// policy that decides is pure and touches no disk; a folder that cannot be read is not a
+    /// failure worth reporting — it is simply a film with no trailer offered.
+    /// </summary>
+    private static string? FindTrailer(MediaVersionGroup? versions)
+    {
+        if (versions?.Versions.FirstOrDefault(version => version.IsAvailable)?.Path is not { } path)
+        {
+            return null;
+        }
+
+        try
+        {
+            var folder = Path.GetDirectoryName(Path.GetFullPath(path));
+            if (folder is null || !Directory.Exists(folder))
+            {
+                return null;
+            }
+
+            var trailers = Path.Combine(folder, TrailerDiscoveryPolicy.FolderName);
+            string[] candidates =
+            [
+                .. Directory.EnumerateFiles(folder),
+                .. Directory.Exists(trailers) ? Directory.EnumerateFiles(trailers) : [],
+            ];
+            return TrailerDiscoveryPolicy.Select(path, candidates);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
     private static LibraryViewModel CreateLibraryViewModel(IServiceProvider provider)
     {
         var watchStates = provider.GetRequiredService<IWatchStateRepository>();
@@ -415,7 +449,15 @@ public static partial class CompositionRoot
                 await ApplyPersonalActionAsync(setPersonalState, content, request).ConfigureAwait(true);
                 movieDetails.PersonalActions.Apply(
                     await personalFilters.GetAsync(content, CancellationToken.None).ConfigureAwait(true));
-            });
+            },
+
+            // A trailer is a file the person already has, so it opens the way a file dropped on the
+            // application opens: as a loose session. That use case refuses an extension outside the
+            // approved list and writes no catalogue row, which is exactly what a trailer must not
+            // become (LIB-014). Nothing is downloaded and nothing is streamed.
+            onPlayTrailer: path => provider
+                .GetRequiredService<OpenLooseFile>()
+                .ExecuteAsync(path, CancellationToken.None));
         ShowDetailsViewModel? showDetails = null;
         showDetails = new ShowDetailsViewModel(
             onPlay: request => host.Shell is { } shell
@@ -471,7 +513,13 @@ public static partial class CompositionRoot
                     ?? await versionGroups
                         .FindByMemberAsync(new MediaFileId(item.Item.Id.Value), CancellationToken.None)
                         .ConfigureAwait(true);
-                movieDetails.Apply(item.Item, state, versions, personal, overview: overview);
+                movieDetails.Apply(
+                    item.Item,
+                    state,
+                    versions,
+                    personal,
+                    overview: overview,
+                    trailerPath: FindTrailer(versions));
             }
         };
         return library;
