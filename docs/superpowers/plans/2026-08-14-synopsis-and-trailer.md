@@ -63,21 +63,58 @@ local file; a YouTube key opens the browser, which is the use their terms allow.
         documentan las suyas— y cuáles de esos nombres pasan hoy la lista de extensiones.
       - **Aceptación**: la política se prueba con nombres, no con disco; el botón sólo existe cuando
         hay tráiler; la sesión de reproducción es la única que ya existe, sin segunda instancia.
-- [ ] **LIB-015 — el tráiler remoto abre el navegador.**
-      - **Forma**: TMDB ya devuelve los vídeos con `append_to_response=videos`; se guarda **la clave**
-        (no una URL construida a mano) y el botón la abre con el lanzador externo endurecido, que es
-        el único sitio de este repositorio con `Process.Start`.
-      - **Coste real, que decide si entra**: campo nuevo en `MetadataDetails`, **migración** de la
-        base, y un cambio en la petición a TMDB. No hay host nuevo: la clave viaja en la respuesta
-        que ya se pide.
-      - **Aceptación**: lo que se abre es la dirección oficial del reproductor de YouTube y nada
-        construido con datos del proveedor sin validar; una prueba fija esa forma.
-- [ ] **LIB-016 — el refresco automático, y sólo si lo enciendes.**
-      - **Forma**: ajuste **apagado por defecto**; una política pura decide cuándo una ficha está
-        rancia (contra el techo de 180 días que ya existe, nunca por encima); el trabajo respeta el
-        consentimiento de red que ya hay y **el texto del propósito declarado cambia**, porque hoy
-        dice «explicitly asked» y dejaría de ser verdad.
-      - **Primera medición**: cuántas peticiones costaría una biblioteca real al encenderlo, contra
-        el limitador de TMDB que ya existe.
-      - **Aceptación**: con el ajuste apagado, **cero** conexiones —lo comprueba la prueba de canario
-        de red que ya existe—; con él encendido, sólo las fichas rancias.
+- [ ] **LIB-015 — el tráiler remoto abre el navegador. Decidido entero el 2026-08-14.**
+      - **Qué se guarda**: la **clave**, nunca una URL. Campo `TrailerKey` en `MetadataDetails`,
+        columna `trailer_key` en `catalog_metadata`, migración **`0017_trailer_key.sql`** con su
+        entrada en `Manifest.json` y su SHA-256 — el manifiesto se recalcula, no se escribe a mano, o
+        el arranque rehúsa antes de escribir.
+      - **No es campo bloqueable en esta pasada**, y se dice por qué: `MetadataField` es la lista de
+        lo que una persona puede editar y proteger, y no hay superficie que edite una clave de vídeo.
+        La fusión es la de un dato del proveedor: lo remoto gana salvo que venga vacío. El día que
+        exista un editor para ella, pasa a bloqueable **y a la lista de `MetadataMergePolicy`**.
+      - **Qué se pide a TMDB**: `append_to_response=videos` sobre la petición de detalles que **ya se
+        hace** — ni una llamada más, ni un host nuevo. De la lista se elige, en este orden:
+        `type=Trailer` + `site=YouTube` + `official=true` en el idioma de la interfaz; luego el mismo
+        sin `official`; luego cualquiera con `type=Trailer` y `site=YouTube`. Si no hay ninguno, no
+        hay clave y no hay botón.
+      - **La decisión de seguridad, que es la que importa**: una política de dominio
+        —`TrailerLinkPolicy`— valida la clave contra `^[A-Za-z0-9_-]{11}$` **antes** de construir
+        nada, y compone `https://www.youtube.com/watch?v=<clave>`. Una cadena del proveedor no puede
+        construir una dirección arbitraria, y el lanzador externo endurecido —único sitio con
+        `Process.Start`— sigue exigiendo `https`. Dos capas, porque el dato viene de fuera.
+      - **La aplicación no abre ninguna conexión a YouTube**: la abre el navegador de quien pulsa. Por
+        eso `NetworkPurposeRegistry` **no cambia**, y conviene decirlo en la evidencia para que nadie
+        lo "arregle" añadiendo un propósito que no existe.
+      - **Aceptación**: la política rechaza clave vacía, con longitud distinta de 11, con caracteres
+        fuera del alfabeto y con cualquier cosa que parezca una URL; el botón sólo existe con clave;
+        y una prueba fija la dirección exacta que se abre.
+      - **Orden dentro de la entrada**: primero la migración con su prueba de esquema, después el
+        proveedor, después la política, y la interfaz al final. Así ningún commit deja la base por
+        delante del código que la lee.
+- [ ] **LIB-016 — el refresco automático, y sólo si lo enciendes. Decidido entero el 2026-08-14.**
+      - **Apagado por defecto**, en Ajustes → Privacidad, junto al consentimiento de red que ya
+        existe y **subordinado a él**: si no hay consentimiento, el interruptor ni siquiera se ofrece.
+        Cadena bilingüe nueva, como todo lo visible.
+      - **Qué es «rancio»: 90 días.** Ni 30 —una sinopsis no cambia cada mes y sería tráfico por
+        deporte— ni 180, que es el **techo duro de retención** que los términos de TMDB imponen a la
+        caché: el umbral tiene que quedar **por debajo** del techo para que el refresco ocurra antes
+        de que el dato caduque, no después. Constante en el dominio, junto al techo, con una prueba
+        que afirme la desigualdad `rancio < techo` — porque el día que alguien toque uno de los dos
+        números, el otro tiene que enterarse.
+      - **Cuánto se refresca de una vez: 20 fichas por pasada**, las más rancias primero, y sólo
+        títulos ya identificados. El limitador de TMDB ya existe y se respeta; el tope está para que
+        una biblioteca de miles no se convierta en una ráfaga la primera vez que se enciende.
+      - **Cuándo**: al arrancar, después de que la ventana esté pintada, en el trabajo de fondo que
+        ya cede el paso a la reproducción. Nunca durante un escaneo ni con una sesión de vídeo
+        abierta.
+      - **El texto del propósito declarado cambia con el código, no después.** Hoy
+        `NetworkPurposeRegistry` dice «Fetches the metadata a person explicitly asked to identify or
+        refresh», y con esto deja de ser verdad. Pasa a nombrar las dos formas —lo que se pide a mano
+        y el refresco automático que alguien encendió—, y `NetworkPurposeDocumentationTests` obliga a
+        que el documento y el registro digan lo mismo.
+      - **Primera medición, antes de escribir el trabajo de fondo**: cuántas fichas de una biblioteca
+        identificada tendrían más de 90 días, y cuántas peticiones son con el tope de 20 por pasada.
+        Ese número va a la evidencia antes de encender nada.
+      - **Aceptación**: con el ajuste apagado, **cero** conexiones —lo demuestra el canario de red que
+        ya existe, no una lectura del código—; con él encendido, sólo las rancias y nunca más de 20;
+        y una prueba de que el interruptor no aparece sin consentimiento de red.

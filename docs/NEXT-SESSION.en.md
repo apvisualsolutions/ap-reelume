@@ -226,6 +226,17 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
   database.
   [audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
 
+## Where it continues (decided, not re-deliberated)
+
+1. **`LIB-015`** — the YouTube key opens the browser. Decided in full in the block's plan, including
+   the `0017_trailer_key.sql` migration and validating the key before any address is built. **The
+   order inside the entry matters**: migration → provider → policy → interface, so no commit leaves
+   the database ahead of the code that reads it.
+2. **`LIB-016`** — the automatic refresh, off by default, stale at 90 days, 20 titles per pass. **The
+   declared network purpose's text changes with the code**, not after it.
+3. **Documentation**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, written from the
+   built application rather than from the code — which is why it comes after the block.
+
 ## Finished on 2026-08-14 (sixth session)
 
 - **`BUG-011`: one deferred-release queue for the whole process.** The playback engine kept the
@@ -241,6 +252,20 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
   it. And that column **could not have been red before**, which the evidence says rather than
   presenting it as proof.
   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
+
+- **The audit queue was closed in full**: `ARQ-013`, `ARQ-012` (−836/+196 across 88 files), `ARQ-014`
+  and `QA-001` — the last with **zero** violations to fix: a gate, not a debt. Plus two unrelated
+  reds found on the way: the network canary asked for a port from a range the system reserves
+  ([audit-canary-port.md](evidence/stable/audit-canary-port.md)) and a corpus test deleted a file
+  another suite could be reading
+  ([audit-corpus-shared-file-race.md](evidence/stable/audit-corpus-shared-file-race.md)).
+- **And a red that would have surfaced at the first publication**: the signing tool **did not
+  compile** — the licence header was missing and its project sat **outside the solution**, so no gate
+  built it — and `release.yml` runs it with `dotnet run` at the step that verifies the signature.
+  Fixed; the project is in the solution and a new rule stops another one from staying outside. **No
+  gate of this repository found it**: the owner's IT session did, while running the signing key's
+  restore check.
+  [audit-release-signing-tool-build.md](evidence/stable/audit-release-signing-tool-build.md).
 
 ## The new block: synopsis and trailer (2026-08-14)
 

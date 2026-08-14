@@ -230,6 +230,17 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
   contra procesos de estado conocido, incluida una `library.db` que no es una base de datos.
   [audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
 
+## Por dónde se sigue (decidido, no se re-delibera)
+
+1. **`LIB-015`** — la clave de YouTube abre el navegador. Decidido entero en el plan del bloque,
+   incluida la migración `0017_trailer_key.sql` y la validación de la clave antes de construir
+   ninguna dirección. **El orden dentro de la entrada importa**: migración → proveedor → política →
+   interfaz, para que ningún commit deje la base por delante del código que la lee.
+2. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
+   pasada. **El texto del propósito de red declarado cambia con el código**, no después.
+3. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe
+   desde la aplicación construida y no desde el código — por eso va detrás del bloque.
+
 ## Lo terminado el 2026-08-14 (sexta sesión)
 
 - **`BUG-011`: una sola cola de liberación en todo el proceso.** El motor de reproducción guardaba
@@ -245,6 +256,20 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
   escriban en él. Y esa columna **no podía ser roja antes**, lo que se dice en la evidencia en vez
   de presentarla como prueba.
   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
+
+- **La cola de la auditoría quedó cerrada entera**: `ARQ-013`, `ARQ-012` (−836/+196 en 88 archivos),
+  `ARQ-014` y `QA-001` —esta última con **cero** violaciones que corregir: era puerta, no deuda—.
+  Más dos rojos ajenos que aparecieron por el camino: el canario de red pedía un puerto de un rango
+  que el sistema reserva ([audit-canary-port.md](evidence/stable/audit-canary-port.md)) y una prueba
+  del corpus borraba un archivo que otra suite podía estar leyendo
+  ([audit-corpus-shared-file-race.md](evidence/stable/audit-corpus-shared-file-race.md)).
+- **Y un rojo que habría aparecido en la primera publicación**: la herramienta que firma **no
+  compilaba** —faltaba el encabezado de licencia y su proyecto estaba **fuera de la solución**, así
+  que ninguna puerta lo construía—, y `release.yml` la ejecuta con `dotnet run` en el paso que
+  verifica la firma. Corregido; el proyecto entra en la solución y una regla nueva impide que otro se
+  quede fuera. **No lo encontró una puerta de este repositorio**: lo encontró la sesión de IT del
+  propietario ejecutando la prueba de restauración de la clave.
+  [audit-release-signing-tool-build.md](evidence/stable/audit-release-signing-tool-build.md).
 
 ## El bloque nuevo: sinopsis y tráiler (2026-08-14)
 
