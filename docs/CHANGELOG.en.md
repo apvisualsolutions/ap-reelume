@@ -132,6 +132,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   disposal, so a single failing release would have left its worker dead for good and everything
   catalogued afterwards would have leaked with nothing saying a word. The one that remains already
   carries that guard.
+- **The tests find the project root in one place.** The same walk upwards was pasted into fifty-nine
+  files, and it was not even the same walk: two of them looked for a document and the rest for the
+  solution file, so the repository held two definitions of its own root. There is one now, shared,
+  and a test that fails if anybody writes their own again. Eight hundred lines lighter.
 - **The test that watches for unreachable screens no longer believes a comment.** It looked for the
   view's name in the files' text, so a **commented-out** reference counted as if the screen could be
   opened: the very orphan screen that test exists to find could hide behind a comment while the gate

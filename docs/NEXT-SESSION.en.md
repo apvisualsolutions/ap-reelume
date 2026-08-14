@@ -92,9 +92,11 @@ were measured.
 3. **`ARQ-014`**, the User-Agent announcing `1.0` while the declared version is `0.1.0`: the brand
    stays and the version comes from the assembly, pinned against `Directory.Build.props`'s
    `<Version>`.
-4. **`ARQ-012`**, one repository root and one anchor: there are **two** today — `docs/FEATURES.md`
-   and the `.sln` — plus a dozen copies of the same `while`. Decided: the `.sln` is the anchor, one
-   shared file in `tests/Shared/`, and a shrink-only rule.
+4. ~~**`ARQ-012`**~~ **Done on 2026-08-14**, and brought forward past `ARQ-014` because that one
+   needs to read `Directory.Build.props` from the root and would have written one more copy of the
+   walk. The plan's estimate was **five times short**: 59 files found the root themselves and 56
+   named the anchor.
+   [audit-arq012-repository-anchor.md](evidence/stable/audit-arq012-repository-anchor.md).
 5. **`QA-001`**, culture: **no hand-rolled regex** — turn `CA1305`/`CA1304`/`CA1310` into errors.
    Count the warnings per project first; when fixing, invariant for what is stored or sent, interface
    culture for what a person reads.
@@ -238,6 +240,21 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
   it. And that column **could not have been red before**, which the evidence says rather than
   presenting it as proof.
   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
+
+## Two things learned on 2026-08-14 that came dear
+
+- **A mechanical replacement verified only by "it compiles" is an unmeasured change.** The script
+  that migrated the 59 copies of the root finder removed the **wrong method in fourteen files**,
+  because it matched the first method of the right shape instead of the one containing the walk. None
+  reached a commit, and not by luck: the compiler caught two, **the new rule caught thirteen** — the
+  very gate that work was adding measured its own damage — and the suites caught three more, which
+  returned `…/src/…Presentation` rather than the root. What closed the gap was not waiting for
+  something to fail but searching the diff for **every** return of a subdirectory.
+- **An error about the harness hides the host's.** The network canary failed with an
+  `ObjectDisposedException` in its own constructor, which says nothing. The first fix did not make
+  the test pass: it made it **tell the truth** — "no free port in the range" — and that sentence was
+  measured in one command: Windows reserves 50996-51095 and the test's fixed range sat entirely
+  inside it. Not intermittent; the exclusions are assigned when the host boots.
 
 ## Yours (only what an agent cannot do)
 

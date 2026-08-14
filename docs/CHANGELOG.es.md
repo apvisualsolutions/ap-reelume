@@ -132,6 +132,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   medios: la que tenía el sondeo no protegía su propio cierre, de modo que un único fallo al liberar
   habría dejado su trabajador muerto para siempre y todo lo catalogado después se habría ido
   filtrando sin que nada avisara. La que queda ya vive protegida contra eso.
+- **Las pruebas encuentran la raíz del proyecto en un solo sitio.** El mismo recorrido hacia arriba
+  estaba pegado en cincuenta y nueve archivos, y ni siquiera era el mismo: dos de ellos buscaban un
+  documento y el resto el archivo de solución, así que el repositorio tenía dos definiciones de su
+  propia raíz. Ahora hay una, compartida, y una prueba que falla si alguien vuelve a escribir la
+  suya. Ochocientas líneas menos.
 - **La prueba que vigila que ninguna pantalla quede inalcanzable ya no se cree un comentario.**
   Buscaba el nombre de la vista en el texto de los archivos, así que una referencia **comentada**
   contaba como si la pantalla se pudiera abrir: justo la pantalla huérfana que esa prueba existe para

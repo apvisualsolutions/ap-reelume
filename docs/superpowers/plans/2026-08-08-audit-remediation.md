@@ -604,7 +604,7 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
       todo, y se escribe **desde la aplicación construida**, no desde el código —una pantalla que el
       manual describe y que no existe es un defecto que ninguna puerta caza—. Los dos idiomas a la
       vez, como todo lo público.
-- [ ] **ARQ-012 — una raíz del repositorio, un ancla.** **Diseño decidido el 2026-08-11 (experto),
+- [x] **ARQ-012 — una raíz del repositorio, un ancla.** **Diseño decidido el 2026-08-11 (experto),
       para que no se re-delibere:** hay **dos anclas** (`docs/FEATURES.md` en
       `ArchitectureTests.RepositoryLayout`, `ApSolutions.LocalMedia.sln` en
       `PackageEvidence.RepositoryRoot` y en una docena de copias sueltas dentro de `UiTests`), y cada
@@ -623,6 +623,14 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
         `TestAppBuilder` se mide igual antes de unificarlo: el plan lo da por duplicado y eso hay que
         verlo. \ Decided: one anchor (the solution file), one shared file linked from every test
         project, and a shrink-only rule.
+      - **Hecho el 2026-08-14.** La medición desmintió el «una docena» por **cinco veces**: la regla,
+        escrita antes de tocar nada, contó **59** archivos buscando la raíz y **56** nombrando el
+        ancla — y destapó que dos de ellos anclaban en `docs/FEATURES.md` y el resto en el `.sln`,
+        o sea **dos definiciones de la raíz**. `tests/Shared/RepositoryLayout.cs` enlazado desde
+        `tests/Directory.Build.targets`, regla de dos mitades, **−836/+196** en 88 archivos.
+        Evidencia en
+        [audit-arq012-repository-anchor.md](../../evidence/stable/audit-arq012-repository-anchor.md).
+        \ Done; the estimate was five times short.
 - [x] **ARQ-013 — la puerta de alcanzabilidad no puede creerse un comentario.** **Hecho el
       2026-08-14**: la lectura salió a `SurfaceReferences` sin cambiar comportamiento, cinco pruebas
       la midieron —tres rojas, y las dos verdes de guarda contra pasarse—, y ahora se quitan

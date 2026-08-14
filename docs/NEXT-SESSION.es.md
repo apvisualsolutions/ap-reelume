@@ -95,9 +95,11 @@ semana al medirlas.
 3. **`ARQ-014`**, el User-Agent que anuncia `1.0` mientras la versión declarada es `0.1.0`: la marca
    se queda y la versión sale del ensamblado, fijada contra el `<Version>` de
    `Directory.Build.props`.
-4. **`ARQ-012`**, una raíz del repositorio y un ancla: hoy hay **dos** —`docs/FEATURES.md` y el
-   `.sln`— y una docena de copias del mismo `while`. Decidido: ancla el `.sln`, archivo compartido
-   en `tests/Shared/`, y una regla que sólo puede encoger.
+4. ~~**`ARQ-012`**~~ **Hecho el 2026-08-14**, y adelantado a `ARQ-014` porque ese necesita leer
+   `Directory.Build.props` desde la raíz y sin ancla compartida habría escrito una copia más. La
+   estimación del plan se quedó **cinco veces corta**: 59 archivos buscaban la raíz y 56 nombraban
+   el ancla.
+   [audit-arq012-repository-anchor.md](evidence/stable/audit-arq012-repository-anchor.md).
 5. **`QA-001`**, cultura: **no se escribe un regex**, se encienden `CA1305`/`CA1304`/`CA1310` como
    error. Primero se cuentan los avisos por proyecto, y el criterio al corregir es invariante para
    lo que se guarda o viaja, cultura de la interfaz para lo que lee una persona.
@@ -242,6 +244,21 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
   escriban en él. Y esa columna **no podía ser roja antes**, lo que se dice en la evidencia en vez
   de presentarla como prueba.
   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
+
+## Dos cosas aprendidas el 2026-08-14 que salieron caras
+
+- **Un reemplazo mecánico validado sólo con «compila» es un cambio sin medir.** El guion que migró
+  las 59 copias del buscador de raíz se llevó el método **equivocado en catorce archivos**, porque
+  buscaba el primero con la forma correcta en vez del que contiene el paseo. Ninguno llegó a un
+  commit, y no por suerte: dos los cazó el compilador, **trece los cazó la regla nueva** —la propia
+  puerta que ese trabajo añadía midió su propio destrozo— y tres más las suites, porque devolvían
+  `…/src/…Presentation` y no la raíz. Lo que cerró el hueco no fue esperar a que algo fallara sino
+  buscar en el diff **toda** devolución de un subdirectorio.
+- **Un error que habla del arnés esconde el del sistema.** El canario de red falló con un
+  `ObjectDisposedException` en su propio constructor, que no dice nada. La primera corrección no hizo
+  pasar la prueba: la hizo **decir la verdad** —«ningún puerto libre en el rango»—, y esa frase se
+  midió en un comando: Windows reserva 50996-51095 y el rango fijo de la prueba estaba entero dentro.
+  No era intermitente; las exclusiones se asignan al arrancar el anfitrión.
 
 ## Pendiente tuyo (sólo lo que un agente no puede hacer)
 
