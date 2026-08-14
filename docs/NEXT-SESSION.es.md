@@ -82,14 +82,12 @@ criterio de aceptación de cada una.** Se ejecuta en este orden y no se re-delib
 hace en cada una es **medir antes de corregir**, porque tres premisas escritas se han caído esta
 semana al medirlas.
 
-1. **`BUG-011`**, que salió de hacer `BUG-010` y hereda su puesto: `LibVlcMediaPlayerEngine` guarda
-   la **tercera** cola de liberación diferida, con el mismo `Dispose` sin guarda. No es el mismo
-   cambio: su `DisposeAsync` espera a su propio drenaje **antes** de soltar el reproductor, y ese
-   orden es lo que evita que la destrucción nativa se lleve el proceso, así que unificarlo pide que
-   `LibVlcFactory` sepa vaciar a petición. Está en la lista que sólo puede encoger de
-   `NativeInstanceOwnershipTests`, a la vista en cada ejecución.
-   Decidido: `LibVlcFactory` gana un vaciado a petición **con techo** que no lanza al agotarse, el
-   motor cambia dos líneas de orden, y la ventana de reposo de 1 s **no se toca**.
+1. ~~**`BUG-011`**~~ **Hecho el 2026-08-14**: una sola cola de liberación para el proceso. La
+   fábrica aprendió a vaciar a petición con techo que no lanza; el motor soltó su cola, su candado,
+   su bandera, su drenaje y su constante de reposo; la lista que sólo puede encoger de
+   `NativeInstanceOwnershipTests` quedó **vacía**. El orden «medios antes que reproductor» y la
+   ventana de 1 s siguen intactos.
+   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
 2. **`ARQ-013`**, la puerta de alcanzabilidad que se cree un comentario: una referencia comentada
    cuenta como alcanzada, así que la superficie huérfana que esa prueba existe para cazar se esconde
    detrás de `<!-- -->`. Es el de más valor de los tres pequeños, porque el defecto está **en una
@@ -228,6 +226,22 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
   frase. `LaunchDiagnosisTests` saca las funciones del guion publicado **parseándolo** y las ejerce
   contra procesos de estado conocido, incluida una `library.db` que no es una base de datos.
   [audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
+
+## Lo terminado el 2026-08-14 (sexta sesión)
+
+- **`BUG-011`: una sola cola de liberación en todo el proceso.** El motor de reproducción guardaba
+  la tercera, y desechaba el medio nativo **dentro de su candado y sin guarda**: una excepción allí
+  salía del bucle con la bandera del trabajador en alto, así que un único fallo lo mataba para
+  siempre y todo lo abierto después se filtraba en silencio. El rojo fue **doble a propósito** —la
+  regla de origen, que se satisface moviendo texto, y una prueba de comportamiento que mide desde
+  fuera dónde descansa el medio cuando el motor lo suelta—. `LibVlcFactory` ganó un vaciado con
+  techo que **no lanza** al agotarse, el motor soltó cola, candado, bandera, drenaje y constante de
+  reposo (−52/+27), y la lista que sólo puede encoger quedó **vacía**. La prueba de resistencia no
+  se escribió de cero: `HandleGrowthTests` ya abría y cerraba el motor treinta veces en un proceso
+  hijo, que es el único sitio donde un contador de proceso se puede leer sin que las demás suites
+  escriban en él. Y esa columna **no podía ser roja antes**, lo que se dice en la evidencia en vez
+  de presentarla como prueba.
+  [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
 
 ## Pendiente tuyo (sólo lo que un agente no puede hacer)
 

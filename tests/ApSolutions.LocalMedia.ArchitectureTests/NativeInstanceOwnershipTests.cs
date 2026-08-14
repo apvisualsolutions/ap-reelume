@@ -56,16 +56,16 @@ public sealed class NativeInstanceOwnershipTests
     /// </summary>
     /// <remarks>
     /// The list works like the orphan list in <see cref="ServiceConsumptionTests"/>: it may only
-    /// shrink. <c>LibVlcMediaPlayerEngine</c> is on it because its unification is not the same
-    /// change — its <c>DisposeAsync</c> awaits its own drain before releasing the player, and that
-    /// order is what keeps the native teardown from crashing, so moving it to the shared queue needs
-    /// the factory to be able to flush on request. It was found by this rule, not by reading, and it
-    /// is named rather than exempted quietly.
+    /// shrink, and it is empty. <c>LibVlcMediaPlayerEngine</c> was its one entry — found by this
+    /// rule rather than by reading, and named rather than exempted quietly — because its unification
+    /// was not the same change: its <c>DisposeAsync</c> awaits the release of its media before it
+    /// lets go of the player, and that order is what keeps the native teardown from crashing. It
+    /// left the list on 2026-08-14 (BUG-011), once the factory learnt to flush on request.
     /// </remarks>
     [Fact]
     public void The_deferred_release_queue_has_one_implementation_and_it_survives_a_throwing_dispose()
     {
-        string[] stillOwnTheirOwn = ["src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs"];
+        string[] stillOwnTheirOwn = [];
 
         var offenders = SourceFilesMatching(@"Queue<\s*DeferredMedia\s*>");
 

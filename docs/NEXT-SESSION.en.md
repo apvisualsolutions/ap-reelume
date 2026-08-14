@@ -79,14 +79,12 @@ measurement and acceptance for each.** It runs in this order without re-delibera
 does do is **measure before fixing**, because three written premises collapsed this week when they
 were measured.
 
-1. **`BUG-011`**, which came out of doing `BUG-010` and inherits its place:
-   `LibVlcMediaPlayerEngine` keeps the **third** deferred-release queue, with the same unguarded
-   dispose. It is not the same change: its `DisposeAsync` awaits its own drain **before** releasing
-   the player, and that order is what keeps the native teardown from crashing, so unifying it asks
-   `LibVlcFactory` to be able to flush on request. It sits on the shrink-only list in
-   `NativeInstanceOwnershipTests`, in view on every run.
-   Decided: `LibVlcFactory` gains a flush on request **with a ceiling** that does not throw when it
-   runs out, the engine changes two ordering lines, and the 1 s quiescence window **stays put**.
+1. ~~**`BUG-011`**~~ **Done on 2026-08-14**: one deferred-release queue for the process. The factory
+   learnt to flush on request with a ceiling that does not throw; the engine let go of its queue, its
+   lock, its flag, its drain and its quiescence constant; the shrink-only list in
+   `NativeInstanceOwnershipTests` is now **empty**. The media-before-player order and the 1 s window
+   are untouched.
+   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
 2. **`ARQ-013`**, the reachability gate that believes a comment: a commented-out reference counts as
    reached, so the orphan surface that test exists to catch hides behind `<!-- -->`. The most
    valuable of the three small ones, because the defect is **in a gate**. Decided: strip comments
@@ -224,6 +222,22 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
   exercises them against processes whose state is known, including a `library.db` that is not a
   database.
   [audit-first-launch-instrumentation.md](evidence/stable/audit-first-launch-instrumentation.md).
+
+## Finished on 2026-08-14 (sixth session)
+
+- **`BUG-011`: one deferred-release queue for the whole process.** The playback engine kept the
+  third, and disposed the native media **inside its lock and with no guard**: an exception there left
+  the loop with the worker flag raised, so a single failure killed it for good and everything opened
+  afterwards leaked in silence. The red was **deliberately double** — the source rule, which can be
+  satisfied by moving text, and a behaviour test that measures from outside where the media rests
+  once the engine lets go of it. `LibVlcFactory` gained a flush with a ceiling that **does not
+  throw** when exhausted, the engine let go of queue, lock, flag, drain and quiescence constant
+  (−52/+27), and the shrink-only list is now **empty**. The resistance test was not written from
+  scratch: `HandleGrowthTests` already opened and closed the engine thirty times in a child process,
+  which is the only place a process-wide counter can be read without the other suites writing into
+  it. And that column **could not have been red before**, which the evidence says rather than
+  presenting it as proof.
+  [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
 
 ## Yours (only what an agent cannot do)
 

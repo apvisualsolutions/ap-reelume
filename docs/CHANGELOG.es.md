@@ -132,6 +132,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   medios: la que tenía el sondeo no protegía su propio cierre, de modo que un único fallo al liberar
   habría dejado su trabajador muerto para siempre y todo lo catalogado después se habría ido
   filtrando sin que nada avisara. La que queda ya vive protegida contra eso.
+- **Y el reproductor tampoco guarda ya la suya.** Quedaba una tercera cola, la del propio motor de
+  vídeo, con el mismo desecho sin proteger: un solo fallo al liberar habría acabado con su trabajador
+  y todo lo abierto a partir de ahí se habría filtrado en silencio. Ahora hay **una** cola para todo
+  el proceso, la que ya vive protegida. Cerrar el reproductor espera a que sus vídeos estén sueltos
+  antes de devolverlo —ese orden es lo que impide que la destrucción nativa se lleve el proceso por
+  delante— y esa espera tiene techo, así que una biblioteca ocupada catalogando no puede retener una
+  salida. El segundo de reposo antes de soltar un vídeo, que es el número que dejó de hacer crashear,
+  no se ha tocado.
 - **Un arranque que no llega a pintar ya deja diagnóstico en vez de un código de salida mudo.** La
   verificación mata el proceso cuando agota el plazo de la ventana, y lo único que quedaba escrito
   era ese matarile —`exit code -1`—, que no habla del arranque. Ahora, **antes** de matarlo, la

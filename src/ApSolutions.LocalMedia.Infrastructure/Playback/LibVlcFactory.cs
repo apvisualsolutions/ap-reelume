@@ -30,6 +30,9 @@ public sealed class LibVlcFactory : IAsyncDisposable
     // Releasing a media the instant its player lets go is the native failure mode this repository
     // keeps relearning; a media rests for this window before its handle is disposed.
     private static readonly TimeSpan MediaQuiescence = TimeSpan.FromSeconds(1);
+
+    // How often a flush looks at the queue. The drain does the releasing; this only watches it empty.
+    private static readonly TimeSpan FlushPollInterval = TimeSpan.FromMilliseconds(25);
     private static readonly Lock ReleaseSync = new();
     private static readonly Queue<DeferredMedia> DeferredReleases = new();
     private static bool isDrainScheduled;
@@ -130,6 +133,30 @@ public sealed class LibVlcFactory : IAsyncDisposable
         }
 
         _ = DrainDeferredReleasesAsync();
+    }
+
+    /// <summary>
+    /// Waits for the deferred releases to finish, so a caller can let go of the player its media
+    /// referenced. The wait has a ceiling and exhausting it returns <see langword="false"/> rather
+    /// than throwing: a teardown that cannot complete is worse than a media that rests a moment
+    /// longer, and the drain releases it either way. Waiting on another component's media is the
+    /// price of one hardened queue, and it costs that media's quiescence window.
+    /// </summary>
+    public static async Task<bool> FlushDeferredReleasesAsync(TimeSpan ceiling)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(ceiling, TimeSpan.Zero);
+        var started = Stopwatch.GetTimestamp();
+        while (PendingDeferredReleaseCount > 0)
+        {
+            if (Stopwatch.GetElapsedTime(started) >= ceiling)
+            {
+                return false;
+            }
+
+            await Task.Delay(FlushPollInterval).ConfigureAwait(false);
+        }
+
+        return true;
     }
 
     /// <summary>Returns a borrowed media player. Callers must release every media first.</summary>

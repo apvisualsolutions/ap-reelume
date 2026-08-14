@@ -132,6 +132,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   disposal, so a single failing release would have left its worker dead for good and everything
   catalogued afterwards would have leaked with nothing saying a word. The one that remains already
   carries that guard.
+- **And the player no longer keeps one of its own either.** A third queue was left, the video
+  engine's, with the same unguarded disposal: one failing release would have ended its worker and
+  everything opened from then on would have leaked in silence. There is **one** queue for the whole
+  process now, the one that already carries the guard. Closing the player waits for its videos to be
+  let go before handing it back — that order is what keeps the native teardown from taking the
+  process with it — and that wait has a ceiling, so a library busy cataloguing cannot hold up an
+  exit. The one-second rest before a video is released, which is the number that stopped the
+  crashes, is untouched.
 - **A launch that never paints now leaves a diagnosis instead of a mute exit code.** The
   verification kills the process when the window deadline runs out, and the only thing written down
   was that kill — `exit code -1` — which says nothing about the launch. Now, **before** killing it,

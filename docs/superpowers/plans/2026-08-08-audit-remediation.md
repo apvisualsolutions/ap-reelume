@@ -648,9 +648,18 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
       cola en `LibVlcMediaPlayerEngine`, anotada abajo. Evidencia en
       [audit-bug010-native-instance.md](../../evidence/stable/audit-bug010-native-instance.md).
       \ Done; the rule found a third queue the plan did not name.
-- [ ] **BUG-011** (nuevo, medido el 2026-08-11): `LibVlcMediaPlayerEngine` mantiene la tercera cola
+- [x] **BUG-011** (nuevo, medido el 2026-08-11). **Hecho el 2026-08-14**: la fábrica aprendió a
+      vaciar a petición con techo que no lanza, el motor soltó su cola, su candado, su bandera, su
+      drenaje y su constante de reposo (−52/+27), y la lista de `NativeInstanceOwnershipTests` quedó
+      **vacía**. El orden «medios antes que reproductor» y la ventana de 1 s, intactos. El rojo fue
+      doble —la regla de origen y una prueba de comportamiento sobre dónde descansa el medio—, y la
+      resistencia se midió donde ya había un proceso hijo con treinta ciclos. Evidencia en
+      [audit-bug011-engine-release-queue.md](../../evidence/stable/audit-bug011-engine-release-queue.md).
+      \ Done: one queue for the process, ordering and quiescence untouched.
+      El enunciado, que explica por qué no fue el mismo cambio que `BUG-010`:
+      `LibVlcMediaPlayerEngine` mantenía la tercera cola
       de liberación diferida, con el mismo `Dispose` sin guarda —un fallo al liberar deja su
-      trabajador muerto y filtra en silencio a partir de ahí—. **No es el mismo cambio que BUG-010**:
+      trabajador muerto y filtra en silencio a partir de ahí—. **No era el mismo cambio que BUG-010**:
       su `DisposeAsync` espera a su propio drenaje **antes** de soltar el reproductor, y ese orden es
       lo que evita que la destrucción nativa se lleve el proceso, así que unificarlo exige que
       `LibVlcFactory` sepa vaciar a petición. Está en la lista que sólo puede encoger de

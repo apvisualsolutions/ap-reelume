@@ -20,12 +20,19 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 /// collector and whatever the earlier media tests left behind, and that noise is larger than the
 /// signal being measured.
 /// </para>
+/// <para>
+/// The same child answers a second question since BUG-011: thirty opens and closes leave the shared
+/// deferred-release queue empty, which is what states that the engine's teardown actually waited for
+/// its media instead of walking away from them. The counter is process-wide, so this child is the
+/// only place it can be read without the other media suites writing into the same number.
+/// </para>
 /// </summary>
 [Trait("Category", "RealMedia")]
 public sealed class HandleGrowthTests
 {
     private const string PhaseVariable = "AP_LOCALMEDIA_HANDLE_PHASE";
     private const string ReportVariable = "AP_LOCALMEDIA_HANDLE_REPORT";
+    private const string AfterDisposeRow = "after-dispose";
     private const int Cycles = 30;
 
     /// <summary>
@@ -49,17 +56,19 @@ public sealed class HandleGrowthTests
     [Fact]
     public async Task Opening_media_without_playing_holds_no_handles_once_collected()
     {
-        var growth = await MeasureInChildAsync("open-only");
+        var measurement = await MeasureInChildAsync("open-only");
 
-        Assert.InRange(growth, double.MinValue, AllowedHandlesPerCycle);
+        Assert.InRange(measurement.HandlesPerCycle, double.MinValue, AllowedHandlesPerCycle);
+        Assert.Equal(0, measurement.PendingReleasesAfterDispose);
     }
 
     [Fact]
     public async Task Software_decoding_holds_no_handles_across_cycles()
     {
-        var growth = await MeasureInChildAsync("software-play");
+        var measurement = await MeasureInChildAsync("software-play");
 
-        Assert.InRange(growth, double.MinValue, AllowedHandlesPerCycle);
+        Assert.InRange(measurement.HandlesPerCycle, double.MinValue, AllowedHandlesPerCycle);
+        Assert.Equal(0, measurement.PendingReleasesAfterDispose);
     }
 
     /// <summary>Runs one phase in this process. Only the child started above enters here.</summary>
@@ -119,11 +128,18 @@ public sealed class HandleGrowthTests
             }
         }
 
+        // Read after the engine let go: its teardown flushes the shared queue before releasing the
+        // player, so anything still resting here is a media the flush walked away from.
+        process.Refresh();
+        rows.Add(string.Create(
+            CultureInfo.InvariantCulture,
+            $"{AfterDisposeRow},{LibVlcFactory.PendingDeferredReleaseCount},{process.WorkingSet64}"));
+
         _ = Directory.CreateDirectory(Path.GetDirectoryName(report)!);
         await File.WriteAllLinesAsync(report, rows, TestContext.Current.CancellationToken);
     }
 
-    private static async Task<double> MeasureInChildAsync(string phase)
+    private static async Task<Measurement> MeasureInChildAsync(string phase)
     {
         var report = Path.Combine(
             MediaToolchain.RepositoryRoot,
@@ -173,17 +189,24 @@ public sealed class HandleGrowthTests
         var error = await errorTask;
 
         Assert.True(File.Exists(report), $"The child produced no measurement. stdout={output}; stderr={error}");
-        var handles = File.ReadAllLines(report)
-            .Skip(1)
-            .Select(line => int.Parse(line.Split(',')[1], CultureInfo.InvariantCulture))
+        var rows = File.ReadAllLines(report).Skip(1).Select(line => line.Split(',')).ToArray();
+        var handles = rows
+            .Where(columns => char.IsAsciiDigit(columns[0][0]))
+            .Select(columns => int.Parse(columns[1], CultureInfo.InvariantCulture))
             .ToArray();
         Assert.Equal(Cycles, handles.Length);
+        var pending = int.Parse(
+            rows.Single(columns => columns[0] == AfterDisposeRow)[1],
+            CultureInfo.InvariantCulture);
 
         // Two settled windows are compared rather than the first sample against the last, because the
         // first cycles pay the one-time cost of loading the decoders for four different formats.
         const int window = 10;
         var early = handles.Skip(5).Take(window).Average();
         var late = handles.TakeLast(window).Average();
-        return (late - early) / (Cycles - 5 - window);
+        return new Measurement((late - early) / (Cycles - 5 - window), pending);
     }
+
+    /// <summary>What one child run reports: handle growth per cycle, and media left resting.</summary>
+    private sealed record Measurement(double HandlesPerCycle, int PendingReleasesAfterDispose);
 }
