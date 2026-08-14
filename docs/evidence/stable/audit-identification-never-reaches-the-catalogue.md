@@ -96,9 +96,17 @@ double filled exactly the hole production has.
 Orden intocable, el mismo criterio que `LIB-015`: la base primero, y la interfaz al final. / The same
 order: the database first, the interface last.
 
-1. **Migración `0018`**: `catalog_metadata` gana el proveedor, su clave y `refreshed_utc`. Nulos,
-   porque las filas que ya existen no los tienen y eso no es un error: es una ficha que nadie
-   identificó.
+1. ~~**Migración `0018`**~~ **Hecha**: `catalog_metadata` gana el proveedor, su clave y
+   `refreshed_utc`. Nulos, porque las filas que ya existen no los tienen y eso no es un error: es una
+   ficha que nadie identificó. El proveedor se guarda **junto a** su clave a propósito:
+   `match_candidates` guarda la clave sola, así que el único sitio que registraba una referencia no
+   podía decir de quién era.
+   **De paso, una medición que cobra una corrección anterior**: la migración 17 puso en rojo cuatro
+   pruebas de tres suites que no tenían nada que ver —copia de seguridad, rechazo de versión anterior,
+   recuperación—, porque cada una repetía el conteo como literal. La 18 pone en rojo **cinco pruebas
+   y las cinco están en la suite del esquema**, que es la única cuyo trabajo es fijarlo. / The
+   seventeenth migration turned four tests red across three unrelated suites; the eighteenth turns
+   five red and all five are in the schema suite, which is the only one whose job that is.
 2. **Quien escribe**: una identificación aceptada —automática o de la bandeja— guarda la metadata del
    proveedor con su referencia y su fecha. Es el eslabón que falta y es el trabajo de verdad.
 3. **`RefreshMetadata` resuelve** por la referencia guardada en vez de recibir un `MetadataDetails`

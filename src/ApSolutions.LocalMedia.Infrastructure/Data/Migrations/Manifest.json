@@ -102,6 +102,12 @@
       "name": "trailer_key",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0017_trailer_key.sql",
       "sha256": "3B6D319571A04DF137803167B4229514445998D02637B4E694D7FE9315012D49"
+    },
+    {
+      "version": 18,
+      "name": "provider_reference",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0018_provider_reference.sql",
+      "sha256": "2718049238EA3399855F4D41BBB57291F4AE49CF9CBD1975CD90673D86F47FE0"
     }
   ]
 }

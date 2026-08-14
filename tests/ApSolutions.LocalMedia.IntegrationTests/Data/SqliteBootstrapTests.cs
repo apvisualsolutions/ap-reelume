@@ -43,10 +43,10 @@ public sealed class SqliteBootstrapTests
         Assert.Equal(1L, await ScalarInt64Async(connection, "PRAGMA foreign_keys;"));
         Assert.True(await ScalarInt64Async(connection, "PRAGMA busy_timeout;") >= 5000L);
         Assert.Equal("ok", await ScalarTextAsync(connection, "PRAGMA integrity_check;"));
-        Assert.Equal(17L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
-        Assert.Equal(17L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
+        Assert.Equal(18L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(18L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
         Assert.Equal(
-            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers,trailer_key",
+            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers,trailer_key,provider_reference",
             await ScalarTextAsync(connection, "SELECT group_concat(name, ',') FROM schema_history ORDER BY version;"));
 
         var tables = await ReadStringsAsync(
@@ -121,6 +121,38 @@ public sealed class SqliteBootstrapTests
                 """));
     }
 
+    /// <summary>
+    /// What a title was identified as, and when that answer was last taken.
+    /// </summary>
+    /// <remarks>
+    /// Both nullable, because a title nobody identified has neither, and that is an absence rather
+    /// than a defect. The provider is stored beside its key on purpose: <c>match_candidates</c> keeps
+    /// the key alone, so the one place that recorded a reference could not say whose it was.
+    /// </remarks>
+    [Theory]
+    [InlineData("provider", "TEXT")]
+    [InlineData("provider_key", "TEXT")]
+    [InlineData("refreshed_utc", "TEXT")]
+    public async Task The_metadata_row_records_who_answered_and_when(string column, string type)
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = DatabaseTestHarness.CreateFactory(directory.DatabasePath);
+        var runner = DatabaseTestHarness.CreateDefaultRunner(factory);
+
+        await DatabaseTestHarness.MigrateAsync(runner);
+        await using var connection = await DatabaseTestHarness.OpenAsync(factory);
+
+        Assert.Equal(
+            $"{column}|{type}|0|",
+            await ScalarTextAsync(
+                connection,
+                $"""
+                SELECT name || '|' || type || '|' || "notnull" || '|' || COALESCE(dflt_value, '')
+                FROM pragma_table_info('catalog_metadata')
+                WHERE name = '{column}';
+                """));
+    }
+
     [Fact]
     public async Task Migration_is_idempotent_and_creates_one_valid_copy_per_new_migration()
     {
@@ -132,14 +164,14 @@ public sealed class SqliteBootstrapTests
         var backupPath = Assert.IsType<string>(runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.True(File.Exists(backupPath));
         var backups = Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray();
-        Assert.Equal(17, backups.Length);
+        Assert.Equal(18, backups.Length);
 
         await DatabaseTestHarness.MigrateAsync(runner);
         Assert.Equal(backupPath, runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.Equal(backups, Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray());
 
         await using var active = await DatabaseTestHarness.OpenAsync(factory);
-        Assert.Equal(17L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(18L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
         Assert.Equal("ok", await ScalarTextAsync(active, "PRAGMA integrity_check;"));
 
         foreach (var path in backups)
