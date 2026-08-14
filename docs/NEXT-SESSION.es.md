@@ -88,10 +88,10 @@ semana al medirlas.
    `NativeInstanceOwnershipTests` quedó **vacía**. El orden «medios antes que reproductor» y la
    ventana de 1 s siguen intactos.
    [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
-2. **`ARQ-013`**, la puerta de alcanzabilidad que se cree un comentario: una referencia comentada
-   cuenta como alcanzada, así que la superficie huérfana que esa prueba existe para cazar se esconde
-   detrás de `<!-- -->`. Es el de más valor de los tres pequeños, porque el defecto está **en una
-   puerta**. Decidido: quitar comentarios antes de buscar, y **el rojo primero**.
+2. ~~**`ARQ-013`**~~ **Hecho el 2026-08-14**: la lectura de referencias salió a `SurfaceReferences`
+   y ahora quita los comentarios antes de casar. Medido antes de tocar: **nada** se escondía detrás
+   de un comentario, así que la puerta era ciega pero no estaba tapando ningún huérfano.
+   [audit-arq013-reachability-comments.md](evidence/stable/audit-arq013-reachability-comments.md).
 3. **`ARQ-014`**, el User-Agent que anuncia `1.0` mientras la versión declarada es `0.1.0`: la marca
    se queda y la versión sale del ensamblado, fijada contra el `<Version>` de
    `Directory.Build.props`.

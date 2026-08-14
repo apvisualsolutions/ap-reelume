@@ -85,10 +85,10 @@ were measured.
    `NativeInstanceOwnershipTests` is now **empty**. The media-before-player order and the 1 s window
    are untouched.
    [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
-2. **`ARQ-013`**, the reachability gate that believes a comment: a commented-out reference counts as
-   reached, so the orphan surface that test exists to catch hides behind `<!-- -->`. The most
-   valuable of the three small ones, because the defect is **in a gate**. Decided: strip comments
-   before matching, and **the red first**.
+2. ~~**`ARQ-013`**~~ **Done on 2026-08-14**: the reference reading moved out to `SurfaceReferences`
+   and strips comments before matching. Measured before touching it: **nothing** was hiding behind a
+   comment, so the gate was blind but was not covering an orphan.
+   [audit-arq013-reachability-comments.md](evidence/stable/audit-arq013-reachability-comments.md).
 3. **`ARQ-014`**, the User-Agent announcing `1.0` while the declared version is `0.1.0`: the brand
    stays and the version comes from the assembly, pinned against `Directory.Build.props`'s
    `<Version>`.

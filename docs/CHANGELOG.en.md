@@ -132,6 +132,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   disposal, so a single failing release would have left its worker dead for good and everything
   catalogued afterwards would have leaked with nothing saying a word. The one that remains already
   carries that guard.
+- **The test that watches for unreachable screens no longer believes a comment.** It looked for the
+  view's name in the files' text, so a **commented-out** reference counted as if the screen could be
+  opened: the very orphan screen that test exists to find could hide behind a comment while the gate
+  stayed green. Comments are stripped before matching now. Whether anything was already hiding that
+  way was measured first — nothing was — and the trimming errs the safe way: cutting too much loses a
+  reference and produces a loud warning, never a silent pass.
 - **And the player no longer keeps one of its own either.** A third queue was left, the video
   engine's, with the same unguarded disposal: one failing release would have ended its worker and
   everything opened from then on would have leaked in silence. There is **one** queue for the whole

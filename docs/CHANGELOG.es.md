@@ -132,6 +132,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   medios: la que tenía el sondeo no protegía su propio cierre, de modo que un único fallo al liberar
   habría dejado su trabajador muerto para siempre y todo lo catalogado después se habría ido
   filtrando sin que nada avisara. La que queda ya vive protegida contra eso.
+- **La prueba que vigila que ninguna pantalla quede inalcanzable ya no se cree un comentario.**
+  Buscaba el nombre de la vista en el texto de los archivos, así que una referencia **comentada**
+  contaba como si la pantalla se pudiera abrir: justo la pantalla huérfana que esa prueba existe para
+  encontrar podía esconderse detrás de un comentario y la puerta seguía en verde. Ahora se quitan los
+  comentarios antes de buscar. Se comprobó primero si algo se estaba escondiendo ya de esa forma —no
+  lo había—, y el recorte se hizo hacia el lado seguro: quitar de más pierde una referencia y produce
+  un aviso ruidoso, nunca un permiso silencioso.
 - **Y el reproductor tampoco guarda ya la suya.** Quedaba una tercera cola, la del propio motor de
   vídeo, con el mismo desecho sin proteger: un solo fallo al liberar habría acabado con su trabajador
   y todo lo abierto a partir de ahí se habría filtrado en silencio. Ahora hay **una** cola para todo

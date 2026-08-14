@@ -623,7 +623,15 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
         `TestAppBuilder` se mide igual antes de unificarlo: el plan lo da por duplicado y eso hay que
         verlo. \ Decided: one anchor (the solution file), one shared file linked from every test
         project, and a shrink-only rule.
-- [ ] **ARQ-013 — la puerta de alcanzabilidad no puede creerse un comentario.** El regex de
+- [x] **ARQ-013 — la puerta de alcanzabilidad no puede creerse un comentario.** **Hecho el
+      2026-08-14**: la lectura salió a `SurfaceReferences` sin cambiar comportamiento, cinco pruebas
+      la midieron —tres rojas, y las dos verdes de guarda contra pasarse—, y ahora se quitan
+      `<!--…-->`, `/*…*/` y `//…` antes de casar, con la forma de línea guardada contra `://`. Medido
+      antes: **nada se escondía** detrás de un comentario, así que la corrección no destapó huérfanos
+      y el verde de después significa eso y no otra cosa. Evidencia en
+      [audit-arq013-reachability-comments.md](../../evidence/stable/audit-arq013-reachability-comments.md).
+      \ Done: comments stripped before matching, red first, nothing was hidden.
+      El enunciado: El regex de
       `SurfaceReachabilityTests` busca el nombre de la vista en el marcado y en el código, así que
       una referencia **comentada** la da por alcanzada: la superficie huérfana que esto existe para
       cazar se esconde detrás de `<!-- -->`. **Decidido:** quitar los comentarios del texto antes de
