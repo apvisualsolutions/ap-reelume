@@ -352,10 +352,14 @@ pediría un WebView con hosts sin declarar, publicidad y cookies.
   - Repetir la prueba **cada trimestre**, porque un respaldo corrupto no avisa.
 - **La notificación de exportación** a `crypt@bis.doc.gov` y `enc@nsa.gov`: el texto está redactado
   entero en [LEGAL.es.md](legal/LEGAL.es.md) y sale de tu identidad, por eso es tuya.
-- **El dictamen jurídico profesional** (`REL-004`). Le quedan dos preguntas concretas de licencia, y
-  las dos son de forma y no de entrega: bajo qué apartado del §6 de la LGPL-2.1 queda amparada la
-  manera en que LibVLC viaja aquí, y si la oferta escrita de código correspondiente que recoge
-  `NOTICE-VideoLAN.txt` basta como el acompañamiento que pide el §3 de la GPL-2.0.
+- **El dictamen jurídico profesional** (`REL-004`), **reducido el 2026-08-14**. Sus dos preguntas de
+  licencia están cerradas por ingeniería, no por dictamen: en vez de encargar quién interpretaba el
+  §6 de la LGPL-2.1, la versión pasó a la opción que ambas licencias enuncian **sin condiciones**
+  —§6(d) y el último párrafo del §3 de la GPL-2.0: ofrecer el fuente desde el mismo sitio del que se
+  descarga el binario—, y `release.yml` adjunta ahora `vlc-3.0.23.tar.xz` verificado y el archivo de
+  LibVLCSharp. **Lo que queda del encargo es marca, dominio y la notificación de exportación**, que es
+  donde el criterio ajeno aporta algo.
+  [audit-corresponding-source.md](evidence/stable/audit-corresponding-source.md).
 - Las decisiones económicas de siempre: certificado Authenticode, Store, hardware ARM64.
 
 ## Cosas aprendidas que conviene no volver a aprender

@@ -348,10 +348,14 @@ hosts, advertising and cookies.
   - Repeat the check **quarterly**, because a corrupt backup does not announce itself.
 - **The export notification** to `crypt@bis.doc.gov` and `enc@nsa.gov`: the text is drafted in full in
   [LEGAL.en.md](legal/LEGAL.en.md) and goes from your identity, which is why it is yours.
-- **The professional legal opinion** (`REL-004`). Two concrete licence questions are left for it, and
-  both are about form rather than delivery: which subsection of LGPL-2.1 §6 covers the way LibVLC
-  travels here, and whether the written offer of corresponding source recorded in
-  `NOTICE-VideoLAN.txt` is enough as the accompaniment GPL-2.0 §3 asks for.
+- **The professional legal opinion** (`REL-004`), **narrowed on 2026-08-14**. Its two licence
+  questions are closed by engineering rather than by opinion: instead of commissioning someone to
+  interpret LGPL-2.1 §6, the release moved to the option both licences state **unconditionally** —
+  §6(d) and the last paragraph of GPL-2.0 §3, offering the source from the same place the binary is
+  downloaded from — and `release.yml` now attaches a verified `vlc-3.0.23.tar.xz` and the LibVLCSharp
+  archive. **What is left of the engagement is trademark, domain and the export notification**, which
+  is where outside judgement adds something.
+  [audit-corresponding-source.md](evidence/stable/audit-corresponding-source.md).
 - The usual economic decisions: Authenticode certificate, Store, ARM64 hardware.
 
 ## Things learned worth not learning twice
