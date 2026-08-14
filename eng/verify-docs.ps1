@@ -55,8 +55,8 @@ $featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
 $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
-if ($featureIds.Count -ne 54) {
-    $errors.Add("Expected 54 feature IDs, found $($featureIds.Count).")
+if ($featureIds.Count -ne 55) {
+    $errors.Add("Expected 55 feature IDs, found $($featureIds.Count).")
 }
 if ($mvpIds.Count -ne 46) {
     $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")
@@ -67,4 +67,4 @@ if ($errors.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Documentation verification passed: $($markdownFiles.Count) Markdown files, $($localizedFiles.Count) localized files, 54 feature IDs, 46 MVP IDs."
+Write-Output "Documentation verification passed: $($markdownFiles.Count) Markdown files, $($localizedFiles.Count) localized files, 55 feature IDs, 46 MVP IDs."
