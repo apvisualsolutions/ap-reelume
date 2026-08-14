@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Reflection;
+using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.TestSupport;
 using Microsoft.Data.Sqlite;
 using Xunit;
@@ -42,10 +43,10 @@ public sealed class SqliteBootstrapTests
         Assert.Equal(1L, await ScalarInt64Async(connection, "PRAGMA foreign_keys;"));
         Assert.True(await ScalarInt64Async(connection, "PRAGMA busy_timeout;") >= 5000L);
         Assert.Equal("ok", await ScalarTextAsync(connection, "PRAGMA integrity_check;"));
-        Assert.Equal(16L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
-        Assert.Equal(16L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
+        Assert.Equal(17L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(17L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
         Assert.Equal(
-            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers",
+            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers,trailer_key",
             await ScalarTextAsync(connection, "SELECT group_concat(name, ',') FROM schema_history ORDER BY version;"));
 
         var tables = await ReadStringsAsync(
@@ -93,6 +94,33 @@ public sealed class SqliteBootstrapTests
             tables);
     }
 
+    /// <summary>
+    /// The YouTube key rides on the metadata row, and it is nullable on purpose: a title nobody has
+    /// identified and a title TMDB has no trailer for both end up without one, and neither is a
+    /// failure. What is stored is the key alone — never an address — so nothing that came off the
+    /// network can decide where a browser goes.
+    /// </summary>
+    [Fact]
+    public async Task The_metadata_row_carries_a_nullable_trailer_key()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = DatabaseTestHarness.CreateFactory(directory.DatabasePath);
+        var runner = DatabaseTestHarness.CreateDefaultRunner(factory);
+
+        await DatabaseTestHarness.MigrateAsync(runner);
+        await using var connection = await DatabaseTestHarness.OpenAsync(factory);
+
+        Assert.Equal(
+            "trailer_key|TEXT|0|",
+            await ScalarTextAsync(
+                connection,
+                """
+                SELECT name || '|' || type || '|' || "notnull" || '|' || COALESCE(dflt_value, '')
+                FROM pragma_table_info('catalog_metadata')
+                WHERE name = 'trailer_key';
+                """));
+    }
+
     [Fact]
     public async Task Migration_is_idempotent_and_creates_one_valid_copy_per_new_migration()
     {
@@ -104,14 +132,14 @@ public sealed class SqliteBootstrapTests
         var backupPath = Assert.IsType<string>(runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.True(File.Exists(backupPath));
         var backups = Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray();
-        Assert.Equal(16, backups.Length);
+        Assert.Equal(17, backups.Length);
 
         await DatabaseTestHarness.MigrateAsync(runner);
         Assert.Equal(backupPath, runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.Equal(backups, Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray());
 
         await using var active = await DatabaseTestHarness.OpenAsync(factory);
-        Assert.Equal(16L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(17L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
         Assert.Equal("ok", await ScalarTextAsync(active, "PRAGMA integrity_check;"));
 
         foreach (var path in backups)
@@ -352,6 +380,22 @@ internal static class DatabaseTestHarness
 {
     private const string InfrastructureAssemblyName = "ApSolutions.LocalMedia.Infrastructure";
 
+    /// <summary>
+    /// Every migration this build carries, read from the embedded manifest.
+    /// </summary>
+    /// <remarks>
+    /// Three suites that have nothing to do with schemas — backup, downgrade, recovery — assert that
+    /// every migration was applied, and each held its own literal count. Adding migration 17 turned
+    /// four tests red across three files that the change had not touched, which is the same number
+    /// written down in five places. Those three read it from here now.
+    /// <see cref="SqliteBootstrapTests"/> keeps its literals on purpose: pinning the exact schema,
+    /// by count and by name, is what that suite is for.
+    /// </remarks>
+    public static SqlMigration[] EmbeddedMigrations { get; } = LoadEmbeddedMigrations();
+
+    /// <summary>How many migrations a fully migrated database should record.</summary>
+    public static long MigrationCount => EmbeddedMigrations.Length;
+
     public static object CreateFactory(string databasePath)
     {
         var factoryType = RequireType("ApSolutions.LocalMedia.Infrastructure.Data.SqliteConnectionFactory");
@@ -409,6 +453,25 @@ internal static class DatabaseTestHarness
         var type = Assembly.Load(InfrastructureAssemblyName).GetType(fullName, throwOnError: false);
         Assert.NotNull(type);
         return type;
+    }
+
+    private static SqlMigration[] LoadEmbeddedMigrations()
+    {
+        var assembly = typeof(SqlMigration).Assembly;
+        using var manifestStream = assembly.GetManifestResourceStream(
+            "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.Manifest.json");
+        Assert.NotNull(manifestStream);
+        using var manifest = System.Text.Json.JsonDocument.Parse(manifestStream);
+        return [.. manifest.RootElement.GetProperty("migrations").EnumerateArray().Select(entry =>
+        {
+            using var sqlStream = assembly.GetManifestResourceStream(entry.GetProperty("resource").GetString()!);
+            Assert.NotNull(sqlStream);
+            using var reader = new StreamReader(sqlStream);
+            return new SqlMigration(
+                entry.GetProperty("version").GetInt32(),
+                entry.GetProperty("name").GetString()!,
+                reader.ReadToEnd());
+        })];
     }
 }
 

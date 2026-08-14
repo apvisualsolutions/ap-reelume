@@ -63,7 +63,16 @@ local file; a YouTube key opens the browser, which is the use their terms allow.
         documentan las suyas— y cuáles de esos nombres pasan hoy la lista de extensiones.
       - **Aceptación**: la política se prueba con nombres, no con disco; el botón sólo existe cuando
         hay tráiler; la sesión de reproducción es la única que ya existe, sin segunda instancia.
-- [ ] **LIB-015 — el tráiler remoto abre el navegador. Decidido entero el 2026-08-14.**
+- [x] **LIB-015 — el tráiler remoto abre el navegador. Hecho el 2026-08-14**, en el orden que fija
+      esta entrada. Tres mediciones cambiaron el trabajo: el lanzador endurecido que se iba a
+      reutilizar **no existía** —ninguno de los tres `Process.Start` del árbol abre una dirección—;
+      la clave de la caché **no incluye la dirección**, así que `append_to_response` habría servido
+      el payload anterior como si fuera la respuesta nueva, y subir `ProviderVersion` habría dejado
+      filas que nada volvería a leer y que por tanto nada podría borrar nunca —el techo de 180 días
+      se aplica al leer esa misma clave—, de modo que la migración vacía lo de TMDB; y la política
+      sin validar aceptaba **quince** formas, entre ellas un `javascript:` y un `https://` enteros.
+      Evidencia en
+      [audit-lib015-provider-trailer.md](../../evidence/stable/audit-lib015-provider-trailer.md).
       - **Qué se guarda**: la **clave**, nunca una URL. Campo `TrailerKey` en `MetadataDetails`,
         columna `trailer_key` en `catalog_metadata`, migración **`0017_trailer_key.sql`** con su
         entrada en `Manifest.json` y su SHA-256 — el manifiesto se recalcula, no se escribe a mano, o

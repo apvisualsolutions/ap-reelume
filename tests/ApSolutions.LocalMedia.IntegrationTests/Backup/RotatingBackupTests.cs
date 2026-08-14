@@ -70,7 +70,7 @@ public sealed class RotatingBackupTests
         await snapshot.OpenAsync(TestContext.Current.CancellationToken);
         Assert.Equal("ok", await SqliteBootstrapTests.ScalarTextAsync(snapshot, "PRAGMA integrity_check;"));
         Assert.Equal(
-            16L,
+            DatabaseTestHarness.MigrationCount,
             await SqliteBootstrapTests.ScalarInt64Async(snapshot, "SELECT COUNT(*) FROM schema_history;"));
     }
 

@@ -96,6 +96,12 @@
       "name": "detected_markers",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0016_detected_markers.sql",
       "sha256": "A45C68BCF07B57A903706071B2025596B76F65309FD02D1266A9A413EA5B17AD"
+    },
+    {
+      "version": 17,
+      "name": "trailer_key",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0017_trailer_key.sql",
+      "sha256": "3B6D319571A04DF137803167B4229514445998D02637B4E694D7FE9315012D49"
     }
   ]
 }

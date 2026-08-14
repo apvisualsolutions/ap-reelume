@@ -8,6 +8,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation.Catalog;
 using ApSolutions.LocalMedia.Presentation.Commands;
@@ -29,7 +30,9 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     private static readonly MediaVersionSelectionPolicy SelectionPolicy = new();
     private readonly Func<PlayDetailsRequest, Task>? _onPlay;
     private readonly Func<string, Task>? _onPlayTrailer;
+    private readonly Func<string, Task>? _onOpenTrailerLink;
     private string? _trailerPath;
+    private string? _trailerLink;
     private CatalogItem? _item;
     private string? _overview;
     private WatchState? _watchState;
@@ -39,11 +42,14 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         Func<PlayDetailsRequest, Task>? onPlay = null,
         Func<ApSolutions.LocalMedia.Domain.Continuity.WatchStatus?, Task>? onWatchStatusChanged = null,
         Func<PersonalActionRequest, Task>? onPersonalActionChanged = null,
-        Func<string, Task>? onPlayTrailer = null)
+        Func<string, Task>? onPlayTrailer = null,
+        Func<string, Task>? onOpenTrailerLink = null)
     {
         _onPlay = onPlay;
         _onPlayTrailer = onPlayTrailer;
+        _onOpenTrailerLink = onOpenTrailerLink;
         PlayTrailerCommand = new AsyncRelayCommand(PlayTrailerAsync, () => HasTrailer);
+        OpenTrailerLinkCommand = new AsyncRelayCommand(OpenTrailerLinkAsync, () => HasTrailerLink);
         WatchStatus = new WatchStatusViewModel(onWatchStatusChanged);
         PersonalActions = new PersonalActionsViewModel(onPersonalActionChanged);
         PlayCommand = new AsyncRelayCommand(() => PlayAsync(fromStart: true), () => CanPlay);
@@ -67,8 +73,23 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     /// </summary>
     public ICommand PlayTrailerCommand { get; }
 
+    /// <summary>
+    /// Opens the provider's trailer in the browser (LIB-015). This is a separate offer from the one
+    /// above and it leaves the application on purpose: playing YouTube inside would need a route
+    /// their terms do not allow. The address was composed by <see cref="TrailerLinkPolicy"/> when
+    /// the key arrived, so what travels from here is already the only shape this application builds.
+    /// </summary>
+    public ICommand OpenTrailerLinkCommand { get; }
+
     /// <summary>True only when a file on the disk was found to be this film's trailer.</summary>
     public bool HasTrailer => !string.IsNullOrWhiteSpace(_trailerPath);
+
+    /// <summary>
+    /// True only when the stored key was well formed. A key that is not — the provider changed the
+    /// shape, the row was edited by hand — offers nothing, rather than offering a button that opens
+    /// something unknown.
+    /// </summary>
+    public bool HasTrailerLink => _trailerLink is not null;
 
     /// <summary>Which title is shown, so the host can key personal marks to the content.</summary>
     public TitleId TitleId => _item?.Id ?? default;
@@ -128,11 +149,13 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         MediaVersionGroup? versions,
         PersonalState? personalState = null,
         string? overview = null,
-        string? trailerPath = null)
+        string? trailerPath = null,
+        string? trailerKey = null)
     {
         _item = item ?? throw new ArgumentNullException(nameof(item));
         _overview = overview;
         _trailerPath = trailerPath;
+        _trailerLink = TrailerLinkPolicy.TryBuildWatchLink(trailerKey);
         _watchState = watchState;
         Versions = BuildVersions(versions);
         PersonalActions.Apply(
@@ -155,6 +178,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
             nameof(ResumePositionText),
             nameof(HasVersions),
             nameof(HasTrailer),
+            nameof(HasTrailerLink),
         })
         {
             OnPropertyChanged(name);
@@ -163,6 +187,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         (PlayCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (ResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (PlayTrailerCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (OpenTrailerLinkCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     internal static string FormatPosition(TimeSpan position) =>
@@ -191,6 +216,11 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         _onPlayTrailer is null || _trailerPath is not { Length: > 0 } path
             ? Task.CompletedTask
             : _onPlayTrailer(path);
+
+    private Task OpenTrailerLinkAsync() =>
+        _onOpenTrailerLink is null || _trailerLink is not { Length: > 0 } link
+            ? Task.CompletedTask
+            : _onOpenTrailerLink(link);
 
     private Task PlayAsync(bool fromStart)
     {

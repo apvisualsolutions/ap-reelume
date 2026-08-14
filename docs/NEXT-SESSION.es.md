@@ -232,10 +232,16 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
 
 ## Por dónde se sigue (decidido, no se re-delibera)
 
-1. **`LIB-015`** — la clave de YouTube abre el navegador. Decidido entero en el plan del bloque,
-   incluida la migración `0017_trailer_key.sql` y la validación de la clave antes de construir
-   ninguna dirección. **El orden dentro de la entrada importa**: migración → proveedor → política →
-   interfaz, para que ningún commit deje la base por delante del código que la lee.
+1. ~~**`LIB-015`**~~ **Hecho el 2026-08-14**, en el orden que fijaba el plan. Tres cosas cambiaron al
+   medirlas: el lanzador endurecido que se iba a reutilizar **no existía** —los tres `Process.Start`
+   del árbol abren un `.msix`, una carpeta y un archivo de medios, y ninguno una dirección—; la clave
+   de la caché **no incluye la dirección**, así que `append_to_response` habría servido el payload
+   anterior como respuesta nueva, y **subir `ProviderVersion` habría sido peor** —esas filas dejarían
+   de leerse y el techo de 180 días sólo se aplica al leer esa misma clave, así que nada podría
+   borrarlas nunca—, de modo que la migración vacía lo de TMDB; y la puerta de red cazó
+   `www.youtube.com` en `src/`, resuelto con una **segunda lista cerrada** (`HandedOff`) en vez de
+   declarar una conexión que no existe.
+   [audit-lib015-provider-trailer.md](evidence/stable/audit-lib015-provider-trailer.md).
 2. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
    pasada. **El texto del propósito de red declarado cambia con el código**, no después.
 3. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe

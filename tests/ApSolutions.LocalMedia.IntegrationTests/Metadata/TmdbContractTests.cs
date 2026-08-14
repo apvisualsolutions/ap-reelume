@@ -252,6 +252,95 @@ public sealed class TmdbContractTests
         Assert.Equal("es-ES", Assert.Single(handler.Requests).Language);
     }
 
+    /// <summary>
+    /// The trailer key arrives on the details request that was already being made. Appending the
+    /// videos to it is the whole of the network change: no second call, and no host that
+    /// <c>NetworkPurposeRegistry</c> does not already declare.
+    /// </summary>
+    [Fact]
+    public async Task The_videos_ride_on_the_details_request_instead_of_adding_a_second_one()
+    {
+        var handler = new ScriptedHttpHandler([
+            Json(HttpStatusCode.OK, "{\"id\":329865,\"title\":\"La llegada\",\"release_date\":\"2016-11-11\"}"),
+        ]);
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://api.themoviedb.org/") };
+        var provider = Provider(client, new MemoryMetadataCache(), "test-token");
+
+        _ = await provider.GetDetailsAsync(
+            new MetadataReference("tmdb", "movie:329865", MetadataContentKind.Movie),
+            new MetadataLanguage("es-ES", "en-US"),
+            TestContext.Current.CancellationToken);
+
+        var request = Assert.Single(handler.Requests);
+        Assert.Contains("append_to_response=videos", request.Uri, StringComparison.Ordinal);
+        Assert.StartsWith("https://api.themoviedb.org/3/movie/329865?", request.Uri, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Which of the appended videos becomes the trailer button: the official one in the language
+    /// that was asked for, then any in that language, then any at all — and only ever YouTube, which
+    /// is the one site this application knows how to hand to a browser.
+    /// </summary>
+    [Theory]
+    [InlineData(
+        "[{\"site\":\"YouTube\",\"type\":\"Trailer\",\"iso_639_1\":\"es\",\"official\":false,\"key\":\"unofficialES\"},{\"site\":\"YouTube\",\"type\":\"Trailer\",\"iso_639_1\":\"es\",\"official\":true,\"key\":\"officialESxx\"}]",
+        "officialESxx")]
+    [InlineData(
+        "[{\"site\":\"YouTube\",\"type\":\"Trailer\",\"iso_639_1\":\"en\",\"official\":true,\"key\":\"officialENxx\"},{\"site\":\"YouTube\",\"type\":\"Trailer\",\"iso_639_1\":\"es\",\"official\":false,\"key\":\"unofficialES\"}]",
+        "unofficialES")]
+    [InlineData(
+        "[{\"site\":\"YouTube\",\"type\":\"Trailer\",\"iso_639_1\":\"en\",\"official\":true,\"key\":\"officialENxx\"}]",
+        "officialENxx")]
+    [InlineData(
+        "[{\"site\":\"Vimeo\",\"type\":\"Trailer\",\"iso_639_1\":\"es\",\"official\":true,\"key\":\"vimeoKeyxxx\"}]",
+        null)]
+    [InlineData(
+        "[{\"site\":\"YouTube\",\"type\":\"Teaser\",\"iso_639_1\":\"es\",\"official\":true,\"key\":\"teaserKeyxx\"}]",
+        null)]
+    [InlineData("[]", null)]
+    public async Task The_trailer_chosen_is_the_most_specific_YouTube_trailer_on_offer(
+        string videos,
+        string? expected)
+    {
+        var handler = new ScriptedHttpHandler([
+            Json(
+                HttpStatusCode.OK,
+                $"{{\"id\":329865,\"title\":\"La llegada\",\"release_date\":\"2016-11-11\",\"videos\":{{\"results\":{videos}}}}}"),
+        ]);
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://api.themoviedb.org/") };
+        var provider = Provider(client, new MemoryMetadataCache(), "test-token");
+
+        var details = await provider.GetDetailsAsync(
+            new MetadataReference("tmdb", "movie:329865", MetadataContentKind.Movie),
+            new MetadataLanguage("es-ES", "en-US"),
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(details);
+        Assert.Equal(expected, details.TrailerKey);
+    }
+
+    /// <summary>
+    /// A response with no videos at all is the ordinary case for a title TMDB has nothing for, and
+    /// it is an absence rather than a failure.
+    /// </summary>
+    [Fact]
+    public async Task Details_without_any_videos_simply_have_no_trailer()
+    {
+        var handler = new ScriptedHttpHandler([
+            Json(HttpStatusCode.OK, "{\"id\":329865,\"title\":\"La llegada\",\"release_date\":\"2016-11-11\"}"),
+        ]);
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://api.themoviedb.org/") };
+        var provider = Provider(client, new MemoryMetadataCache(), "test-token");
+
+        var details = await provider.GetDetailsAsync(
+            new MetadataReference("tmdb", "movie:329865", MetadataContentKind.Movie),
+            new MetadataLanguage("es-ES", "en-US"),
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(details);
+        Assert.Null(details.TrailerKey);
+    }
+
     [Fact]
     public void Credits_surface_contains_required_TMDB_attribution()
     {

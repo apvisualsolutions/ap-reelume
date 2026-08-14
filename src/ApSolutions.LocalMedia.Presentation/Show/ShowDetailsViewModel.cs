@@ -8,6 +8,7 @@ using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation.Catalog;
 using ApSolutions.LocalMedia.Presentation.Commands;
@@ -23,15 +24,20 @@ namespace ApSolutions.LocalMedia.Presentation.Show;
 public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 {
     private readonly Func<PlayDetailsRequest, Task>? _onPlay;
+    private readonly Func<string, Task>? _onOpenTrailerLink;
     private CatalogItem? _item;
     private string? _overview;
+    private string? _trailerLink;
     private IReadOnlyList<SeasonViewModel> _seasons = [];
 
     public ShowDetailsViewModel(
         Func<PlayDetailsRequest, Task>? onPlay = null,
-        Func<PersonalActionRequest, Task>? onPersonalActionChanged = null)
+        Func<PersonalActionRequest, Task>? onPersonalActionChanged = null,
+        Func<string, Task>? onOpenTrailerLink = null)
     {
         _onPlay = onPlay;
+        _onOpenTrailerLink = onOpenTrailerLink;
+        OpenTrailerLinkCommand = new AsyncRelayCommand(OpenTrailerLinkAsync, () => HasTrailerLink);
         PersonalActions = new PersonalActionsViewModel(onPersonalActionChanged);
         // The parameter is the row the view bound, and only a playable one gets through — an episode
         // with no file behind it is a row that is shown but cannot be started.
@@ -43,6 +49,13 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand PlayEpisodeCommand { get; }
+
+    /// <summary>
+    /// Opens the provider's trailer in the browser (LIB-015). A series has no single file to hang a
+    /// local trailer on, so unlike a film this card offers only this one — and it leaves the
+    /// application, because playing YouTube inside would need a route their terms do not allow.
+    /// </summary>
+    public ICommand OpenTrailerLinkCommand { get; }
 
     /// <summary>Favourite, watch later, and rating for the series as a whole.</summary>
     public PersonalActionsViewModel PersonalActions { get; }
@@ -60,6 +73,9 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     /// <summary>True only for a synopsis with something in it; blank is absent.</summary>
     public bool HasOverview => !string.IsNullOrWhiteSpace(_overview);
+
+    /// <summary>True only when the stored key was well formed; anything else offers nothing.</summary>
+    public bool HasTrailerLink => _trailerLink is not null;
 
     public int? Year => _item?.Year;
 
@@ -86,10 +102,12 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         IReadOnlyList<EpisodeSequenceEntry> episodes,
         IReadOnlyDictionary<ContentKey, WatchState> watchStates,
         PersonalState? personalState = null,
-        string? overview = null)
+        string? overview = null,
+        string? trailerKey = null)
     {
         _item = item ?? throw new ArgumentNullException(nameof(item));
         _overview = overview;
+        _trailerLink = TrailerLinkPolicy.TryBuildWatchLink(trailerKey);
         ArgumentNullException.ThrowIfNull(episodes);
         ArgumentNullException.ThrowIfNull(watchStates);
 
@@ -117,15 +135,23 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
             nameof(IsAvailable),
             nameof(IsEmpty),
             nameof(HasSeasons),
+            nameof(HasTrailerLink),
         })
         {
             OnPropertyChanged(name);
         }
+
+        (OpenTrailerLinkCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     private Task PlayAsync(EpisodeRowViewModel episode) => _onPlay is null || !episode.IsPlayable
         ? Task.CompletedTask
         : _onPlay(new PlayDetailsRequest(episode.MediaFileId, TimeSpan.Zero));
+
+    private Task OpenTrailerLinkAsync() =>
+        _onOpenTrailerLink is null || _trailerLink is not { Length: > 0 } link
+            ? Task.CompletedTask
+            : _onOpenTrailerLink(link);
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {

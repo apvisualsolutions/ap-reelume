@@ -477,7 +477,7 @@ public sealed class ShellAssemblyTests
     private static MetadataEditorViewModel BuildEditor(TitleId titleId) => new(
         new CatalogMetadata(
             titleId,
-            new EditableMetadata("Título", null, null, null, [], null, null, new HashSet<MetadataField>()),
+            new EditableMetadata("Título", null, null, null, [], null, null, null, new HashSet<MetadataField>()),
             Revision: 0),
         new UpdateMetadata(new StubMetadata()),
         new RefreshMetadata(new StubMetadata(), new MetadataMergePolicy()),

@@ -123,6 +123,7 @@ public sealed class MetadataEditingTests
             ["Drama"],
             "/manual-poster.jpg",
             "/old-backdrop.jpg",
+            null,
             locked),
         revision);
 
@@ -135,7 +136,8 @@ public sealed class MetadataEditingTests
         2016,
         ["Ciencia ficción"],
         poster,
-        "/remote-backdrop.jpg");
+        "/remote-backdrop.jpg",
+        TrailerKey: null);
 
     private sealed class MemoryMetadataRepository(CatalogMetadata initial) : ICatalogMetadataRepository
     {

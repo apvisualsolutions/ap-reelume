@@ -27,6 +27,20 @@ Nunca salen del equipo, con consentimiento o sin él:
 | `objects.githubusercontent.com` | Sólo como destino de la redirección de esa misma descarga; es el almacenamiento de GitHub | Recibir los bytes del paquete confirmado |
 | `*.githubusercontent.com` | Sólo si el almacenamiento de GitHub redirige a otro de sus subdominios; ningún otro dominio se acepta | El mismo paquete confirmado, desde otro subdominio de GitHub |
 
+## Qué direcciones puede abrir en tu navegador
+
+Esto no es una conexión de la aplicación: la dirección se entrega a Windows y quien entra es tu
+navegador de siempre, con tus ajustes, tus extensiones y tu sesión. La aplicación no ve nada de lo
+que ocurra allí.
+
+| Destino | Cuándo | Para qué |
+|---|---|---|
+| `www.youtube.com` | Sólo cuando pulsas el botón del tráiler en la ficha de una película o una serie | Ver ese tráiler en tu navegador |
+
+Lo que se guarda de un tráiler es la clave del vídeo, nunca una dirección, y sólo una clave con la
+forma exacta que usa YouTube llega a componer un enlace. El tráiler **no se reproduce dentro** de la
+aplicación, y no es una limitación técnica: hacerlo incumpliría los términos de YouTube.
+
 No hay ninguna otra conexión. No hay telemetría ni envío de informes en segundo plano. La
 comprobación de actualizaciones está **desactivada de fábrica**: ninguna instalación la trae
 encendida, y hasta que la actives en Ajustes —o pulses tú el botón— la aplicación no pregunta nada a

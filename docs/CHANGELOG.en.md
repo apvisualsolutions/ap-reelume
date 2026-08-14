@@ -93,6 +93,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   built it. The first place it would have surfaced was a real publication, at the step that verifies
   the signature is good. The project is inside now, so every check that already existed covers it,
   and a new test fails the moment another project appears outside.
+- **And if you do not have the trailer, the card opens it in your browser.** When TMDB knows one, a
+  button appears on the film's or the series' card and opens it in the browser you already use.
+  **The application does not connect to YouTube**: it hands the address to Windows and your browser
+  is what goes there, with your settings and your extensions — which is why the list of connections
+  this application declares does not grow by a single host. What is stored is the video's key and
+  never an address, and only a key with the exact shape YouTube uses ever composes a link: anything
+  else offers no button. The value rides on the same metadata request that was already being made,
+  so there is no extra call. It does not play inside the application, and that is not a technical
+  limitation: doing so would break YouTube's terms.
 - **If you keep the trailer next to the film, the card plays it.** The convention Plex, Jellyfin and
   Kodi already use works: a `<film>-trailer.<extension>` file beside it, or a `Trailers` folder inside
   the film's own. The button only appears when that file really exists, it opens the way a video you

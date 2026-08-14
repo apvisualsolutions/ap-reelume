@@ -191,12 +191,23 @@ public sealed class NetworkPrivacyTests
             TestContext.Current.CancellationToken);
     }
 
+    /// <summary>
+    /// A host in the source is either connected to, handed to another application, or neither.
+    /// </summary>
+    /// <remarks>
+    /// The third list is the boring one: XML namespaces and licence addresses that nothing ever
+    /// opens. The second arrived with the provider trailer (LIB-015), and it is separate from the
+    /// first on purpose — declaring <c>www.youtube.com</c> as a network purpose would claim a
+    /// connection this application never makes and would widen the check the network canary trusts,
+    /// while leaving it out of the registry entirely would put a real privacy decision in a list of
+    /// markup details.
+    /// </remarks>
     [Fact]
-    public void No_source_file_names_a_host_the_registry_never_declared()
+    public void No_source_file_names_a_host_that_is_neither_declared_nor_handed_off()
     {
         var sourceRoot = Path.Combine(RepositoryLayout.Root, "src");
         var hostPattern = new Regex(@"https?://(?<host>[a-z0-9.\-]+)", RegexOptions.IgnoreCase);
-        var allowed = new[] { "github.com", "schemas.microsoft.com", "learn.microsoft.com", "www.gnu.org", "avaloniaui.net" };
+        var openedByNobody = new[] { "github.com", "schemas.microsoft.com", "learn.microsoft.com", "www.gnu.org", "avaloniaui.net" };
 
         foreach (var file in Directory.EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories))
         {
@@ -204,9 +215,28 @@ public sealed class NetworkPrivacyTests
             {
                 var host = match.Groups["host"].Value;
                 Assert.True(
-                    NetworkPurposeRegistry.IsDeclaredHost(host) || allowed.Contains(host, StringComparer.OrdinalIgnoreCase),
+                    NetworkPurposeRegistry.IsDeclaredHost(host)
+                        || NetworkPurposeRegistry.IsHandedOffHost(host)
+                        || openedByNobody.Contains(host, StringComparer.OrdinalIgnoreCase),
                     $"{Path.GetFileName(file)} names an undeclared host: {host}");
             }
+        }
+    }
+
+    /// <summary>
+    /// The two lists must stay apart. A destination that is only handed to a browser must never
+    /// answer yes to "is this a host this application may connect to?" — that question is what the
+    /// canary and the client construction rely on.
+    /// </summary>
+    [Fact]
+    public void A_handed_off_destination_is_not_a_host_this_application_may_connect_to()
+    {
+        Assert.NotEmpty(NetworkPurposeRegistry.HandedOff);
+        foreach (var destination in NetworkPurposeRegistry.HandedOff)
+        {
+            Assert.False(NetworkPurposeRegistry.IsDeclaredHost(destination.Host));
+            Assert.True(NetworkPurposeRegistry.IsHandedOffHost(destination.Host));
+            Assert.NotEmpty(destination.Purpose);
         }
     }
 

@@ -14,6 +14,12 @@ public enum MetadataField
     BackdropPath,
 }
 
+/// <param name="TrailerKey">
+/// Provider data, and deliberately absent from <see cref="MetadataField"/>: that enumeration is the
+/// list of what a person can edit and lock, and no surface edits a video identifier. A refresh
+/// therefore replaces it whenever the provider offers one, the same way it would replace any field
+/// nobody locked. The day an editor for it exists, it becomes lockable — and joins the merge above.
+/// </param>
 public sealed record EditableMetadata(
     string Title,
     string? OriginalTitle,
@@ -22,6 +28,7 @@ public sealed record EditableMetadata(
     IReadOnlyList<string> Genres,
     string? PosterPath,
     string? BackdropPath,
+    string? TrailerKey,
     IReadOnlySet<MetadataField> LockedFields);
 
 public sealed class MetadataMergePolicy
@@ -62,6 +69,9 @@ public sealed class MetadataMergePolicy
                 current.BackdropPath,
                 remote.BackdropPath,
                 current.LockedFields),
+            TrailerKey = string.IsNullOrWhiteSpace(remote.TrailerKey)
+                ? current.TrailerKey
+                : remote.TrailerKey,
         };
     }
 

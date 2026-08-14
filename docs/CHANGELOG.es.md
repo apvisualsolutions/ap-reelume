@@ -95,6 +95,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   saltado era una publicación real, en el paso que comprueba que la firma sirve. Ahora el proyecto
   está dentro, con lo que todas las comprobaciones que ya existían pasan a cubrirlo, y una prueba
   nueva falla en cuanto aparezca otro proyecto fuera.
+- **Y si el tráiler no lo tienes, la ficha te lo abre en el navegador.** Cuando TMDB conoce uno,
+  aparece un botón en la ficha de la película o de la serie que lo abre en tu navegador de siempre.
+  **La aplicación no se conecta a YouTube**: le pasa la dirección a Windows y quien entra es tu
+  navegador, con tus ajustes y tus extensiones — por eso la lista de conexiones que esta aplicación
+  declara no crece ni un host. Lo que se guarda es la clave del vídeo y nunca una dirección, y sólo
+  una clave con la forma exacta que usa YouTube llega a componer un enlace: cualquier otra cosa no
+  ofrece botón. El dato viaja en la misma consulta de metadatos que ya se hacía, así que no hay una
+  petición más. Dentro de la aplicación **no se reproduce**, y no es una limitación técnica: hacerlo
+  incumpliría los términos de YouTube.
 - **Si tienes el tráiler junto a la película, la ficha lo reproduce.** Sirve la convención que ya
   usan Plex, Jellyfin y Kodi: un archivo `<película>-trailer.<extensión>` al lado, o una carpeta
   `Trailers` dentro de la de la película. El botón sólo aparece cuando ese archivo existe de verdad,

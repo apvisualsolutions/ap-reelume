@@ -15,6 +15,7 @@ using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
 using ApSolutions.LocalMedia.Presentation.Metadata;
 using ApSolutions.LocalMedia.Presentation.Review;
+using ApSolutions.LocalMedia.Windows.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ApSolutions.LocalMedia.Windows;
@@ -73,6 +74,12 @@ public static partial class CompositionRoot
         services
             .AddSingleton<ICatalogMetadataRepository, CatalogMetadataRepository>()
             .AddSingleton<MetadataMergePolicy>()
+
+            // The trailer this application does not play (LIB-015). The provider's trailer is a
+            // YouTube key, and the browser is the use YouTube's terms allow — so what is registered
+            // is something that hands an address to the shell, not something that connects. The
+            // declared network purposes are unchanged for that exact reason.
+            .AddSingleton<IExternalLinkLauncher, ShellExternalLinkLauncher>()
             .AddTransient<UpdateMetadata>()
             .AddTransient<RefreshMetadata>()
             .AddTransient<ArtworkPickerViewModel>()

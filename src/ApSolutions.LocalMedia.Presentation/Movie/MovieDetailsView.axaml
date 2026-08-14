@@ -53,6 +53,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Content="{DynamicResource MovieTrailerAction}"
           IsVisible="{Binding HasTrailer}"
           automation:AutomationProperties.Name="{DynamicResource MovieTrailerAction}" />
+      <Button
+          Command="{Binding OpenTrailerLinkCommand}"
+          Content="{DynamicResource DetailsTrailerLinkAction}"
+          IsVisible="{Binding HasTrailerLink}"
+          automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
     </StackPanel>
 
     <StackPanel Grid.Row="2" Spacing="8">

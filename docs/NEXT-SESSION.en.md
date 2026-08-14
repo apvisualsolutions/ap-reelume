@@ -228,10 +228,16 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
 
 ## Where it continues (decided, not re-deliberated)
 
-1. **`LIB-015`** — the YouTube key opens the browser. Decided in full in the block's plan, including
-   the `0017_trailer_key.sql` migration and validating the key before any address is built. **The
-   order inside the entry matters**: migration → provider → policy → interface, so no commit leaves
-   the database ahead of the code that reads it.
+1. ~~**`LIB-015`**~~ **Done on 2026-08-14**, in the order the plan fixed. Three things changed on
+   being measured: the hardened launcher meant to be reused **did not exist** — the tree's three
+   `Process.Start` calls open a `.msix`, a folder and a media file, and none of them an address; the
+   cache key **does not include the address**, so `append_to_response` would have served the previous
+   payload as the new answer, and **raising `ProviderVersion` would have been worse** — those rows
+   would stop being read and the 180-day limit is only enforced on the read of that same key, so
+   nothing could ever delete them — which is why the migration empties what belongs to TMDB; and the
+   network gate caught `www.youtube.com` in `src/`, settled with a **second closed list**
+   (`HandedOff`) rather than by declaring a connection that is never made.
+   [audit-lib015-provider-trailer.md](evidence/stable/audit-lib015-provider-trailer.md).
 2. **`LIB-016`** — the automatic refresh, off by default, stale at 90 days, 20 titles per pass. **The
    declared network purpose's text changes with the code**, not after it.
 3. **Documentation**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, written from the
