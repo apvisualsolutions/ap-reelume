@@ -291,12 +291,24 @@ hosts, advertising and cookies.
   cannot be read back.
 - The **manual ten-minute physical walk**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
-- The **encrypted backup** of the signing key, which **does not exist today**: measured on
-  2026-08-10, the local file is the **only** copy and no backup reaches it. Destination and
-  encryption are decided outside this repository (the IT vault); what matters here is how the copy
-  is checked, and it is not that the file decrypts: sign something trivial with the restored copy
-  and verify it against [`eng/release-signing.pub`](../eng/release-signing.pub). Repeat that check
-  quarterly, because a corrupt backup does not announce itself.
+- The **encrypted backup** of the signing key. Destination and encryption are decided outside this
+  repository (the IT vault); what matters here is how the copy is checked, and **it is not that the
+  file decrypts**: sign something trivial with the restored copy and verify it against
+  [`eng/release-signing.pub`](../eng/release-signing.pub). Repeat quarterly, because a corrupt backup
+  does not announce itself.
+  - **Measured on 2026-08-14, and the criterion is not met.** The encrypted disaster backup **exists
+    and runs nightly on its own**, but it weighs **exactly** the threshold set to detect that it had
+    grown — not more — and the same size to the byte three nights running. The owner expected it in
+    the project's folder inside the vault and it lives in the recovery one, so the custody note
+    points somewhere other than the folder in use.
+  - **The question that settles it, to be put to the owner next session**: the project's folder in
+    the vault holds, next to the custody note, a file named after the signing key and **58 bytes**
+    long. A minisign secret key does not fit in 58 bytes — they run to about 200 — so **it is either
+    a pointer or something truncated**, and everything else follows from which: were it the key, it
+    would be unencrypted on a network drive and probably already inside the nightly backup; were it a
+    pointer, the key still has **one single copy** and the backup does not contain it. **Neither file
+    is opened**: key material is the owner's to handle. Their answer updates this line with what was
+    measured.
 - **The export notification** to `crypt@bis.doc.gov` and `enc@nsa.gov`: the text is drafted in full in
   [LEGAL.en.md](legal/LEGAL.en.md) and goes from your identity, which is why it is yours.
 - **The professional legal opinion** (`REL-004`). Two concrete licence questions are left for it, and

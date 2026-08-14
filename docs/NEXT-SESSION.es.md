@@ -295,12 +295,24 @@ pediría un WebView con hosts sin declarar, publicidad y cookies.
   relee.
 - El **paseo físico manual de diez minutos**
   ([audit-physical-walk.md](evidence/stable/audit-physical-walk.md)).
-- La **copia de seguridad cifrada** de la clave de firma, que **hoy no existe**: medido el
-  2026-08-10, el archivo local es el ejemplar **único** y ninguna copia lo alcanza. El destino y el
-  cifrado están decididos fuera de este repositorio (bóveda de IT); lo que importa aquí es cómo se
-  comprueba que la copia sirve, y no es que el archivo descifre: se firma algo trivial con la copia
-  restaurada y se verifica contra [`eng/release-signing.pub`](../eng/release-signing.pub). Repetir
-  esa comprobación cada trimestre, porque un respaldo corrupto no avisa.
+- La **copia de seguridad cifrada** de la clave de firma. El destino y el cifrado están decididos
+  fuera de este repositorio (bóveda de IT); lo que importa aquí es cómo se comprueba que la copia
+  sirve, y **no es que el archivo descifre**: se firma algo trivial con la copia restaurada y se
+  verifica contra [`eng/release-signing.pub`](../eng/release-signing.pub). Repetir cada trimestre,
+  porque un respaldo corrupto no avisa.
+  - **Medido el 2026-08-14, y el criterio no se cumple.** El respaldo cifrado de desastre **existe y
+    corre solo cada noche**, pero pesa **exactamente** el umbral que se puso para detectar que había
+    crecido —no más—, y con el mismo tamaño al byte tres noches seguidas. El propietario esperaba
+    encontrarlo en la carpeta del proyecto dentro de la bóveda y está en la de recuperación, así que
+    la nota de custodia apunta a otro sitio del que se usa.
+  - **La pregunta que lo decide, y que hay que hacerle al propietario en la próxima sesión**: en la
+    carpeta del proyecto de la bóveda hay, junto a la nota de custodia, un archivo llamado como la
+    clave de firma **de 58 bytes**. Una clave secreta de minisign no cabe en 58 bytes —rondan los
+    200—, así que **o es un puntero o es algo truncado**, y de eso depende todo lo demás: si fuera la
+    clave, estaría sin cifrar en una unidad de red y probablemente ya dentro del respaldo nocturno;
+    si es un puntero, la clave sigue teniendo **un solo ejemplar** y el respaldo no la contiene.
+    **No se abre ninguno de los dos archivos**: el material de claves lo maneja el propietario. Con
+    su respuesta se actualiza esta línea con lo medido.
 - **La notificación de exportación** a `crypt@bis.doc.gov` y `enc@nsa.gov`: el texto está redactado
   entero en [LEGAL.es.md](legal/LEGAL.es.md) y sale de tu identidad, por eso es tuya.
 - **El dictamen jurídico profesional** (`REL-004`). Le quedan dos preguntas concretas de licencia, y
