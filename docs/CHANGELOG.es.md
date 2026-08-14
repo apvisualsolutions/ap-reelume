@@ -132,6 +132,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   medios: la que tenía el sondeo no protegía su propio cierre, de modo que un único fallo al liberar
   habría dejado su trabajador muerto para siempre y todo lo catalogado después se habría ido
   filtrando sin que nada avisara. La que queda ya vive protegida contra eso.
+- **El compilador vigila que un número guardado no dependa del idioma del sistema.** Un tamaño, una
+  fecha o una comparación escritos con las reglas del idioma de quien usa el programa se leen mal en
+  otra máquina, y ese error no avisa: aparece cuando ya está guardado. Tres comprobaciones que venían
+  apagadas quedan encendidas como error. No hubo nada que corregir —se midió antes: cero casos en
+  todo el proyecto—, y ese cero se comprobó compilando una violación deliberada de cada regla para
+  saber que las comprobaciones se estaban ejecutando de verdad.
 - **El actualizador se presenta con la versión que de verdad tienes.** Al preguntar si hay una
   versión nueva se identificaba como «1.0», un número escrito a mano que nunca existió: la versión
   declarada es 0.1.0. Ahora sale del propio programa, y una prueba la compara contra el único sitio

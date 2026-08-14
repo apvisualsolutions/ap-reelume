@@ -100,9 +100,10 @@ semana al medirlas.
    estimación del plan se quedó **cinco veces corta**: 59 archivos buscaban la raíz y 56 nombraban
    el ancla.
    [audit-arq012-repository-anchor.md](evidence/stable/audit-arq012-repository-anchor.md).
-5. **`QA-001`**, cultura: **no se escribe un regex**, se encienden `CA1305`/`CA1304`/`CA1310` como
-   error. Primero se cuentan los avisos por proyecto, y el criterio al corregir es invariante para
-   lo que se guarda o viaja, cultura de la interfaz para lo que lee una persona.
+5. ~~**`QA-001`**~~ **Hecho el 2026-08-14**, y la medición dio la vuelta a la tarea: **cero avisos**
+   en toda la solución, así que no era deuda sino puerta — y hacía falta igual, porque las tres
+   reglas vienen apagadas. El cero se comprobó con un canario antes de creérselo.
+   [audit-qa001-culture-gate.md](evidence/stable/audit-qa001-culture-gate.md).
 6. **Documentación al final**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se
    escribe desde la aplicación construida y no desde el código.
 

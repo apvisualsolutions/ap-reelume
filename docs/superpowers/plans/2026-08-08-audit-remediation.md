@@ -708,7 +708,14 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
         resistencia que abra y cierre el motor N veces y afirme `PendingDeferredReleaseCount == 0` y
         los manejadores del proceso sin crecer, al modo de `HandleGrowthTests`. \ Decided: a flush
         with a ceiling on the factory, two ordering lines in the engine, quiescence untouched.
-- [ ] **QA-001 — cultura invariante donde el formato es dato, no idioma.** **Decidido el 2026-08-11
+- [x] **QA-001 — cultura invariante donde el formato es dato, no idioma.** **Hecho el 2026-08-14**, y
+      la primera medición dio la vuelta a la tarea: **cero avisos** en toda la solución, así que no
+      había deuda que saldar sino **puerta que poner** —y hacía falta igual, porque las tres reglas
+      vienen **apagadas** en `latest-recommended`—. El cero se comprobó con un canario deliberado que
+      violaba las tres antes de creérselo. Quedan en `error` y no en `warning`, para que la puerta no
+      dependa de que `TreatWarningsAsErrors` siga puesto. Evidencia en
+      [audit-qa001-culture-gate.md](../../evidence/stable/audit-qa001-culture-gate.md).
+      \ Done: zero to fix, so this was a gate rather than a debt; the zero was proven with a canary. **Decidido el 2026-08-11
       (experto): no se escribe un regex propio.** El compilador ya sabe hacer este barrido y esta
       solución ya compila con `-warnaserror`, así que la puerta son los analizadores:
       **CA1305** (`IFormatProvider`), **CA1304** y **CA1310** (comparación y `ToUpper`/`ToLower`

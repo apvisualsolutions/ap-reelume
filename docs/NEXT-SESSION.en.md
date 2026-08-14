@@ -97,9 +97,10 @@ were measured.
    walk. The plan's estimate was **five times short**: 59 files found the root themselves and 56
    named the anchor.
    [audit-arq012-repository-anchor.md](evidence/stable/audit-arq012-repository-anchor.md).
-5. **`QA-001`**, culture: **no hand-rolled regex** — turn `CA1305`/`CA1304`/`CA1310` into errors.
-   Count the warnings per project first; when fixing, invariant for what is stored or sent, interface
-   culture for what a person reads.
+5. ~~**`QA-001`**~~ **Done on 2026-08-14**, and the measurement turned the task around: **zero
+   warnings** across the solution, so this was a gate rather than a debt — and it was needed all the
+   same, because the three rules ship switched off. The zero was proven with a canary before being
+   believed. [audit-qa001-culture-gate.md](evidence/stable/audit-qa001-culture-gate.md).
 6. **Documentation last**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, which is
    written from the built application rather than from the code.
 

@@ -132,6 +132,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   disposal, so a single failing release would have left its worker dead for good and everything
   catalogued afterwards would have leaked with nothing saying a word. The one that remains already
   carries that guard.
+- **The compiler watches that a stored number does not depend on the system's language.** A size, a
+  date or a comparison written with the rules of the reader's language is read wrongly on another
+  machine, and that error does not announce itself: it shows up once it is already stored. Three
+  checks that shipped switched off are on as errors now. There was nothing to fix — measured first:
+  zero cases across the project — and that zero was checked by compiling a deliberate violation of
+  each rule, to know the checks were actually running.
 - **The updater introduces itself with the version you actually have.** Asking whether a new release
   exists, it identified itself as "1.0", a number typed by hand that never existed: the declared
   version is 0.1.0. It comes from the program itself now, and a test compares it against the one

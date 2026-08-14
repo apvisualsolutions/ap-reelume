@@ -19,6 +19,15 @@ dotnet_diagnostic.IDE0005.severity = suggestion
 # fails the same check that already guards the rest of the style.
 file_header_template = SPDX-FileCopyrightText: 2026 AP Solutions\nSPDX-License-Identifier: GPL-3.0-or-later
 dotnet_diagnostic.IDE0073.severity = warning
+# QA-001: where a format is data rather than language, the culture has to be stated. These three are
+# off by default, so nothing was watching: CA1305 for a missing IFormatProvider, CA1304 and CA1310
+# for culture-dependent casing and comparison. Measured on 2026-08-14 before turning them on — the
+# whole solution produced zero of them, and a deliberate violation of each was compiled to prove the
+# zero was a measurement and not a rule that never ran. They are errors rather than warnings so the
+# gate survives somebody relaxing TreatWarningsAsErrors.
+dotnet_diagnostic.CA1305.severity = error
+dotnet_diagnostic.CA1304.severity = error
+dotnet_diagnostic.CA1310.severity = error
 
 [tests/**/*.cs]
 # Descriptive xUnit behavior names intentionally use underscores.
