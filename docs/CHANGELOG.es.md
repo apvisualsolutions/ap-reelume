@@ -88,6 +88,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Si tienes el tráiler junto a la película, la ficha lo reproduce.** Sirve la convención que ya
+  usan Plex, Jellyfin y Kodi: un archivo `<película>-trailer.<extensión>` al lado, o una carpeta
+  `Trailers` dentro de la de la película. El botón sólo aparece cuando ese archivo existe de verdad,
+  se abre igual que un vídeo que arrastras a la aplicación —sin añadirlo a tu biblioteca— y sólo
+  acepta los contenedores que esta versión reproduce. **No se descarga nada**: si tu tráiler está en
+  YouTube, eso no es un archivo tuyo y no se reproduce aquí dentro.
 - **La ficha de una película o una serie muestra su sinopsis.** El resumen ya se descargaba, se
   guardaba, se fusionaba respetando lo que hubieras bloqueado y se podía editar a mano — pero no se
   leía en ninguna parte: podías escribirlo en el editor y no encontrarlo después. Ahora aparece en

@@ -49,7 +49,12 @@ local file; a YouTube key opens the browser, which is the use their terms allow.
       - **Aceptación**: prueba de modelo de vista (hay sinopsis / no hay), prueba de que el marcado
         la enlaza y la anuncia, y prueba de cableado de que el cargador la lee. Ninguna conexión
         nueva: `NetworkPurposeRegistry` no cambia.
-- [ ] **LIB-014 — el tráiler local se reproduce dentro.**
+- [x] **LIB-014 — el tráiler local se reproduce dentro.** **Hecho el 2026-08-14.** La medición evitó
+      inventar un camino: `OpenLooseFile` ya valida la extensión aprobada, comprueba que el archivo
+      está y da un identificador de sesión que nunca es fila de catálogo, así que la forma quedó en
+      una política pura que **nombra** el candidato. Sólo películas: una serie no tiene un archivo
+      único al lado del que colgarlo. Evidencia en
+      [audit-lib014-local-trailer.md](../../evidence/stable/audit-lib014-local-trailer.md).
       - **Forma**: una política de dominio pura —`TrailerDiscoveryPolicy`— que, dadas la ruta de la
         película y los nombres hermanos, devuelve el tráiler si sigue la convención
         (`<nombre>-trailer.<ext>` o `Trailers/<algo>.<ext>`) y su extensión está en la lista aprobada

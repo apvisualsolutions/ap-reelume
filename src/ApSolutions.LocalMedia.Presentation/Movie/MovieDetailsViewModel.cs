@@ -28,6 +28,8 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 {
     private static readonly MediaVersionSelectionPolicy SelectionPolicy = new();
     private readonly Func<PlayDetailsRequest, Task>? _onPlay;
+    private readonly Func<string, Task>? _onPlayTrailer;
+    private string? _trailerPath;
     private CatalogItem? _item;
     private string? _overview;
     private WatchState? _watchState;
@@ -36,9 +38,12 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     public MovieDetailsViewModel(
         Func<PlayDetailsRequest, Task>? onPlay = null,
         Func<ApSolutions.LocalMedia.Domain.Continuity.WatchStatus?, Task>? onWatchStatusChanged = null,
-        Func<PersonalActionRequest, Task>? onPersonalActionChanged = null)
+        Func<PersonalActionRequest, Task>? onPersonalActionChanged = null,
+        Func<string, Task>? onPlayTrailer = null)
     {
         _onPlay = onPlay;
+        _onPlayTrailer = onPlayTrailer;
+        PlayTrailerCommand = new AsyncRelayCommand(PlayTrailerAsync, () => HasTrailer);
         WatchStatus = new WatchStatusViewModel(onWatchStatusChanged);
         PersonalActions = new PersonalActionsViewModel(onPersonalActionChanged);
         PlayCommand = new AsyncRelayCommand(() => PlayAsync(fromStart: true), () => CanPlay);
@@ -55,6 +60,15 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     public ICommand PlayCommand { get; }
 
     public ICommand ResumeCommand { get; }
+
+    /// <summary>
+    /// Opens the trailer that already exists next to the film. It is a loose session on purpose: a
+    /// trailer is not a catalogue row and must not become one, and nothing is downloaded to play it.
+    /// </summary>
+    public ICommand PlayTrailerCommand { get; }
+
+    /// <summary>True only when a file on the disk was found to be this film's trailer.</summary>
+    public bool HasTrailer => !string.IsNullOrWhiteSpace(_trailerPath);
 
     /// <summary>Which title is shown, so the host can key personal marks to the content.</summary>
     public TitleId TitleId => _item?.Id ?? default;
@@ -113,10 +127,12 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         WatchState? watchState,
         MediaVersionGroup? versions,
         PersonalState? personalState = null,
-        string? overview = null)
+        string? overview = null,
+        string? trailerPath = null)
     {
         _item = item ?? throw new ArgumentNullException(nameof(item));
         _overview = overview;
+        _trailerPath = trailerPath;
         _watchState = watchState;
         Versions = BuildVersions(versions);
         PersonalActions.Apply(
@@ -138,6 +154,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
             nameof(ResumePosition),
             nameof(ResumePositionText),
             nameof(HasVersions),
+            nameof(HasTrailer),
         })
         {
             OnPropertyChanged(name);
@@ -145,6 +162,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
         (PlayCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (ResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (PlayTrailerCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     internal static string FormatPosition(TimeSpan position) =>
@@ -168,6 +186,11 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
                 version.MediaFileId == effective?.MediaFileId))
         ];
     }
+
+    private Task PlayTrailerAsync() =>
+        _onPlayTrailer is null || _trailerPath is not { Length: > 0 } path
+            ? Task.CompletedTask
+            : _onPlayTrailer(path);
 
     private Task PlayAsync(bool fromStart)
     {

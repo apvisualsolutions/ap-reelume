@@ -87,6 +87,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **If you keep the trailer next to the film, the card plays it.** The convention Plex, Jellyfin and
+  Kodi already use works: a `<film>-trailer.<extension>` file beside it, or a `Trailers` folder inside
+  the film's own. The button only appears when that file really exists, it opens the way a video you
+  drag onto the application opens — without being added to your library — and it accepts only the
+  containers this release plays. **Nothing is downloaded**: if your trailer is on YouTube, that is
+  not a file of yours and it does not play in here.
 - **A film's or a series' card shows its synopsis.** The overview was already downloaded, stored,
   merged while respecting whatever you had locked, and editable by hand — but it was readable
   nowhere: you could write it in the editor and never find it again. It appears on both cards now,
