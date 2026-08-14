@@ -246,6 +246,30 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
   de presentarla como prueba.
   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
 
+## El bloque nuevo: sinopsis y tráiler (2026-08-14)
+
+Pedido por el propietario y **decidido entero** en
+[2026-08-14-synopsis-and-trailer.md](superpowers/plans/2026-08-14-synopsis-and-trailer.md). Va antes
+de la documentación a propósito: el manual se escribe desde la aplicación construida, y escribirlo
+antes de este bloque sería escribirlo dos veces.
+
+- **`LIB-013` hecho**: la sinopsis se lee en las dos fichas. Ya estaba guardada de punta a punta; lo
+  único que faltaba era el camino de lectura.
+- **`LIB-014` hecho**: el tráiler **local** se reproduce desde la ficha, con la convención de Plex,
+  Jellyfin y Kodi. No hizo falta camino de reproducción nuevo: `OpenLooseFile` ya valida extensión,
+  existencia y no escribe fila de catálogo.
+- **`LIB-015` pendiente**: la clave de YouTube al navegador. **Cuesta una migración** —campo nuevo en
+  `MetadataDetails` y columna—, más `append_to_response=videos` en la petición que ya se hace. No hay
+  host nuevo.
+- **`LIB-016` pendiente**: el refresco automático, apagado por defecto. **Toca un contrato de
+  privacidad**: hoy el propósito declarado de TMDB dice «the metadata a person explicitly asked to
+  identify or refresh», y con un refresco automático deja de ser verdad, así que ese texto cambia con
+  el código. El techo de 180 días de la caché no se sube nunca.
+
+**La decisión sobre el tráiler remoto no se re-delibera**: dentro de la aplicación sólo si es un
+archivo local. La vía de LibVLC contra YouTube incumple sus términos, y su incrustación oficial
+pediría un WebView con hosts sin declarar, publicidad y cookies.
+
 ## Dos cosas aprendidas el 2026-08-14 que salieron caras
 
 - **Un reemplazo mecánico validado sólo con «compila» es un cambio sin medir.** El guion que migró

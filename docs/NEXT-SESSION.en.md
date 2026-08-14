@@ -242,6 +242,30 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
   presenting it as proof.
   [audit-bug011-engine-release-queue.md](evidence/stable/audit-bug011-engine-release-queue.md).
 
+## The new block: synopsis and trailer (2026-08-14)
+
+Asked for by the owner and **decided in full** in
+[2026-08-14-synopsis-and-trailer.md](superpowers/plans/2026-08-14-synopsis-and-trailer.md). It runs
+before the documentation on purpose: the manual is written from the built application, and writing it
+before this block would mean writing it twice.
+
+- **`LIB-013` done**: the synopsis is read on both cards. It was stored end to end already; the read
+  path was all that was missing.
+- **`LIB-014` done**: the **local** trailer plays from the card, in the convention Plex, Jellyfin and
+  Kodi share. No new playback route was needed: `OpenLooseFile` already checks the extension and the
+  file, and writes no catalogue row.
+- **`LIB-015` pending**: the YouTube key to the browser. **It costs a migration** — a new field on
+  `MetadataDetails` and a column — plus `append_to_response=videos` on the request already made. No
+  new host.
+- **`LIB-016` pending**: the automatic refresh, off by default. **It touches a privacy contract**:
+  TMDB's declared purpose says "the metadata a person explicitly asked to identify or refresh", and
+  an automatic refresh makes that untrue, so the text changes with the code. The cache's 180-day
+  ceiling is never raised.
+
+**The remote-trailer decision is not re-deliberated**: in-app only for a local file. Going through
+LibVLC to YouTube breaks their terms, and the official embed would need a WebView with undeclared
+hosts, advertising and cookies.
+
 ## Two things learned on 2026-08-14 that came dear
 
 - **A mechanical replacement verified only by "it compiles" is an unmeasured change.** The script
