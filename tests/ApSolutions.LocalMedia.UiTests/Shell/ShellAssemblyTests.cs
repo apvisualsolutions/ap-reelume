@@ -454,7 +454,7 @@ public sealed class ShellAssemblyTests
         Onboarding = new RootOnboardingViewModel(new AddLibraryRoot(new StubRoots(), new StubNormalizer())),
         ReviewInbox = new ReviewInboxViewModel(
             new GetReviewInbox(new StubCandidates()),
-            new ResolveMatch(new StubCandidates(), new StubEvents()),
+            new ResolveMatch(new StubCandidates(), new StubEvents(), SilentIdentification.Create()),
             new RejectMatch(new StubCandidates(), new StubEvents())),
         ScanSettings = new ScanSettingsViewModel(),
         Shortcuts = new ShortcutSettingsViewModel(new ShortcutMap()),

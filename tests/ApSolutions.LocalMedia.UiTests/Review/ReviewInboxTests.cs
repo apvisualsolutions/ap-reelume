@@ -150,7 +150,7 @@ public sealed class ReviewInboxTests
         var publisher = new NullPublisher();
         return new ReviewInboxViewModel(
             new GetReviewInbox(repository),
-            new ResolveMatch(repository, publisher),
+            new ResolveMatch(repository, publisher, SilentIdentification.Create()),
             new RejectMatch(repository, publisher));
     }
 

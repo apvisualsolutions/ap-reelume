@@ -60,6 +60,15 @@ public static partial class CompositionRoot
             .AddSingleton<IMatchCandidateRepository, MatchCandidateRepository>()
             .AddTransient<IdentifyMediaFile>()
             .AddTransient<IdentifyScannedFiles>()
+
+            // What makes an identification visible. Both callers below resolve it, which is the
+            // point: registered with nobody resolving it is the shape of the defect it repairs.
+            .AddTransient(provider => new ApplyIdentification(
+                provider.GetRequiredService<ICatalogMetadataRepository>(),
+                provider.GetRequiredService<IMetadataProvider>(),
+                provider.GetRequiredService<MetadataMergePolicy>(),
+                CurrentMetadataLanguage(),
+                TimeProvider.System))
             .AddTransient<GetReviewInbox>()
             .AddTransient<ResolveMatch>()
             .AddTransient<RejectMatch>()

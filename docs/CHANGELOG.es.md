@@ -336,6 +336,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Identificar una película ahora cambia lo que la biblioteca enseña.** Hasta aquí no lo cambiaba:
+  aceptar una coincidencia en la bandeja marcaba la revisión y nada más, de modo que la ficha seguía
+  mostrando lo que el analizador sacó del nombre del archivo. La sinopsis y la clave de tráiler
+  existían de punta a punta y sólo se rellenaban escribiéndolas a mano. Ahora una identificación
+  —aceptada por ti, o automática cuando la confianza pasa del 90 %— pide los datos al proveedor y los
+  guarda junto con de quién son y cuándo se pidieron. **Lo que hayas bloqueado sigue ganando**: la
+  identificación se funde con lo que ya hubiera, igual que un refresco manual. Sin conexión
+  consentida el proveedor sólo sirve lo que tenga guardado, así que una biblioteca sin permiso de red
+  se queda exactamente como estaba, que no es un error.
 - **Una verificación que se colgaba ya no se lleva una hora en silencio.** Seis de las diez
   ejecuciones de integración continua del 10 de agosto murieron al llegar al techo de sesenta
   minutos, y el registro no decía nada entre «compilación correcta» y la cancelación cincuenta y seis

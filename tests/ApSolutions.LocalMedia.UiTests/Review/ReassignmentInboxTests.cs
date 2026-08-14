@@ -98,7 +98,7 @@ public sealed class ReassignmentInboxTests
     {
         var viewModel = new ReviewInboxViewModel(
             new GetReviewInbox(new EmptyCandidates()),
-            new ResolveMatch(new EmptyCandidates(), new NullPublisher()),
+            new ResolveMatch(new EmptyCandidates(), new NullPublisher(), SilentIdentification.Create()),
             new RejectMatch(new EmptyCandidates(), new NullPublisher()));
 
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
@@ -113,7 +113,7 @@ public sealed class ReassignmentInboxTests
         var reconcile = new ReconcileScanResults(repository, new FileReconciliationPolicy());
         return new ReviewInboxViewModel(
             new GetReviewInbox(new EmptyCandidates()),
-            new ResolveMatch(new EmptyCandidates(), new NullPublisher()),
+            new ResolveMatch(new EmptyCandidates(), new NullPublisher(), SilentIdentification.Create()),
             new RejectMatch(new EmptyCandidates(), new NullPublisher()),
             queue,
             new ManualReassignmentViewModel(reconcile),

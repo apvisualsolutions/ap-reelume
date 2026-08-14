@@ -329,6 +329,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Identifying a film now changes what the library shows.** Until now it did not: accepting a match
+  in the inbox marked the review and nothing else, so the entry went on showing whatever the parser
+  pulled out of the file name. The synopsis and the trailer key existed end to end and were only ever
+  filled in by hand. An identification — accepted by you, or automatic once confidence passes 90% —
+  now asks the provider for the details and stores them along with whose they are and when they were
+  asked for. **Anything you locked still wins**: the identification merges over what was already
+  there, exactly as a manual refresh does. With no consented connection the provider serves only what
+  it already holds, so a library without network permission stays exactly as it was, which is not an
+  error.
 - **A verification that wedged no longer spends an hour saying nothing.** Six of the ten continuous
   integration runs of 10 August died at the sixty-minute ceiling, and the log said nothing between
   "build succeeded" and the cancellation fifty-six minutes later. The step after the build produces

@@ -22,7 +22,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
 {
     private const string Columns =
         "title_id, title, original_title, overview, release_year, genres, poster_path, backdrop_path, "
-        + "trailer_key, locked_fields, revision";
+        + "trailer_key, locked_fields, revision, provider, provider_key, refreshed_utc";
 
     // A unit separator cannot occur inside a genre name or a field name, so no stored value can be
     // cut in half by the character that joins them.
@@ -59,7 +59,8 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         await using var command = connection.CreateCommand();
         command.CommandText = $"""
             INSERT INTO catalog_metadata ({Columns})
-            VALUES ($id, $title, $originalTitle, $overview, $year, $genres, $poster, $backdrop, $trailer, $locked, $revision)
+            VALUES ($id, $title, $originalTitle, $overview, $year, $genres, $poster, $backdrop, $trailer, $locked,
+                    $revision, $provider, $providerKey, $refreshedUtc)
             ON CONFLICT (title_id) DO UPDATE SET
                 title = excluded.title,
                 original_title = excluded.original_title,
@@ -70,7 +71,10 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 backdrop_path = excluded.backdrop_path,
                 trailer_key = excluded.trailer_key,
                 locked_fields = excluded.locked_fields,
-                revision = excluded.revision
+                revision = excluded.revision,
+                provider = excluded.provider,
+                provider_key = excluded.provider_key,
+                refreshed_utc = excluded.refreshed_utc
             WHERE catalog_metadata.revision = $expected;
             """;
         var metadata = catalog.Metadata;
@@ -87,6 +91,13 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
             "$locked",
             Join(metadata.LockedFields.Select(field => field.ToString()).ToArray()));
         _ = command.Parameters.AddWithValue("$revision", catalog.Revision);
+        _ = command.Parameters.AddWithValue("$provider", (object?)catalog.Provider ?? DBNull.Value);
+        _ = command.Parameters.AddWithValue("$providerKey", (object?)catalog.ProviderKey ?? DBNull.Value);
+        _ = command.Parameters.AddWithValue(
+            "$refreshedUtc",
+            catalog.RefreshedUtc is { } refreshed
+                ? refreshed.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture)
+                : DBNull.Value);
         _ = command.Parameters.AddWithValue("$expected", expectedRevision);
         var written = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         return written == 0
@@ -108,7 +119,12 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
             reader.IsDBNull(7) ? null : reader.GetString(7),
             reader.IsDBNull(8) ? null : reader.GetString(8),
             ReadLockedFields(reader.GetString(9))),
-        reader.GetInt32(10));
+        reader.GetInt32(10),
+        reader.IsDBNull(11) ? null : reader.GetString(11),
+        reader.IsDBNull(12) ? null : reader.GetString(12),
+        reader.IsDBNull(13)
+            ? null
+            : DateTimeOffset.Parse(reader.GetString(13), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
 
     private static string Join(IReadOnlyList<string> values) => string.Join(FieldSeparator, values);
 

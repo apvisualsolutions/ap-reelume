@@ -32,6 +32,8 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
+    public string Name => ProviderName;
+
     public async Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
         MetadataSearchQuery query,
         MetadataLanguage language,
