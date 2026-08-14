@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using ApSolutions.LocalMedia.Domain.Playback;
+using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows.Playback;
 using Xunit;
 
@@ -74,7 +75,7 @@ public sealed class WindowsAudioDeviceCatalogTests
             $"{device.Name},{device.SupportedLayouts.Max(layout => (int)layout)}")));
 
         var report = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "artifacts",
             "test-results",
             "T23",
@@ -84,17 +85,5 @@ public sealed class WindowsAudioDeviceCatalogTests
         await File.WriteAllLinesAsync(report, rows, TestContext.Current.CancellationToken);
 
         Assert.Contains(devices, device => device.SupportedLayouts.Contains(AudioChannelLayout.Stereo));
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

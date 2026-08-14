@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Diagnostics;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests;
@@ -91,7 +92,7 @@ public sealed class LaunchDiagnosisTests
         string emptyRoot,
         string databaseRoot)
     {
-        var repositoryRoot = PackageEvidence.RepositoryRoot();
+        var repositoryRoot = RepositoryLayout.Root;
         var layoutRoot = Path.Combine(PackageEvidence.PackageRoot(), "layout");
         Assert.True(
             Directory.Exists(layoutRoot),

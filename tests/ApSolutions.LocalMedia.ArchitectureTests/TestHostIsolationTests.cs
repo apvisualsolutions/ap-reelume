@@ -3,6 +3,8 @@
 
 using System.Xml.Linq;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>

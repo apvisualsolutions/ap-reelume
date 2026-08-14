@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Domain.Lifecycle;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Settings;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -182,7 +183,7 @@ public sealed class LifecycleSettingsTests
     public void Every_visible_string_on_the_lifecycle_screen_comes_from_a_resource()
     {
         var view = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Settings",
@@ -197,18 +198,6 @@ public sealed class LifecycleSettingsTests
             .ToArray();
 
         Assert.Empty(literals);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed class InMemorySettings(LifecyclePreferences preferences) : ILifecycleSettings

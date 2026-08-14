@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using System.Reflection;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -63,7 +64,7 @@ public sealed class DatabaseRecoveryViewTests
         var frame = window.CaptureRenderedFrame();
         Assert.NotNull(frame);
         var artifactPath = System.IO.Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "artifacts",
             "ui-captures",
             "T4",
@@ -88,17 +89,5 @@ public sealed class DatabaseRecoveryViewTests
         var type = assembly.GetType(fullName, throwOnError: false);
         Assert.NotNull(type);
         return type;
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(System.IO.Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

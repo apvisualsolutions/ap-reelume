@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -85,7 +86,7 @@ public sealed class SubtitleStyleTests
     public void Every_style_control_is_named_focusable_and_rendered_at_each_supported_scaling()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(GetRepositoryRoot(), "artifacts", "ui-captures", "T20");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T20");
         Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })
@@ -169,7 +170,7 @@ public sealed class SubtitleStyleTests
 
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var captures = Path.Combine(GetRepositoryRoot(), "artifacts", "ui-captures", "T20");
+            var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T20");
             Directory.CreateDirectory(captures);
             frame.Save(
                 Path.Combine(captures, "subtitle-style-high-contrast.png"),
@@ -303,18 +304,6 @@ public sealed class SubtitleStyleTests
             activeSubtitle: null);
 
         Assert.Null(engine.LastAudioTrackId);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed class RecordingEngine : IMediaPlayerEngine

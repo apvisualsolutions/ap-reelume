@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Privacy;
@@ -45,7 +46,7 @@ public sealed class RepositoryPrivacyTests
             ("the account name", Environment.UserName),
             ("the computer name", Environment.MachineName),
             ("the profile path", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),
-            ("the repository path", RepositoryRoot()),
+            ("the repository path", RepositoryLayout.Root),
         };
 
         var leaks = VersionedFiles()
@@ -93,8 +94,8 @@ public sealed class RepositoryPrivacyTests
         Assert.NotEmpty(VersionedFiles());
 
         // And the search itself works: the repository path is in this file's own location.
-        var probe = Path.Combine(RepositoryRoot(), "docs");
-        Assert.Contains(RepositoryRoot(), probe, StringComparison.Ordinal);
+        var probe = Path.Combine(RepositoryLayout.Root, "docs");
+        Assert.Contains(RepositoryLayout.Root, probe, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -103,7 +104,7 @@ public sealed class RepositoryPrivacyTests
     /// </summary>
     private static IReadOnlyList<string> IgnoredNeighbours()
     {
-        var root = RepositoryRoot();
+        var root = RepositoryLayout.Root;
         return [.. new DirectoryInfo(root)
             .EnumerateDirectories()
             .Select(directory => directory.Name)
@@ -114,7 +115,7 @@ public sealed class RepositoryPrivacyTests
 
     private static List<string> VersionedFiles()
     {
-        var root = RepositoryRoot();
+        var root = RepositoryLayout.Root;
         var files = new List<string>();
         foreach (var directory in VersionedDirectories.Select(name => Path.Combine(root, name)))
         {
@@ -142,18 +143,5 @@ public sealed class RepositoryPrivacyTests
     };
 
     private static string Relative(string path) =>
-        Path.GetRelativePath(RepositoryRoot(), path).Replace('\\', '/');
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
-    }
+        Path.GetRelativePath(RepositoryLayout.Root, path).Replace('\\', '/');
 }

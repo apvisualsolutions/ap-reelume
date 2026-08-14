@@ -12,6 +12,7 @@ using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Shell;
 using Avalonia.Controls;
@@ -372,7 +373,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.SkipWhen(
             encoder is null,
             "ffmpeg was not found. Set FFMPEG_PATH or install ffmpeg to generate the walk's media.");
-        var destination = Path.Combine(FindRepositoryRoot(), "artifacts", "test-media", "walk", name);
+        var destination = Path.Combine(RepositoryLayout.Root, "artifacts", "test-media", "walk", name);
         if (File.Exists(destination) && new FileInfo(destination).Length > 0)
         {
             return destination;
@@ -416,18 +417,5 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(directory => Path.Combine(directory, "ffmpeg.exe")));
         return candidates.FirstOrDefault(File.Exists);
-    }
-
-    private static string FindRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

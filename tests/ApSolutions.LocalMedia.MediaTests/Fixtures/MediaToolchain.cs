@@ -3,6 +3,8 @@
 
 using System.Diagnostics;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.MediaTests.Fixtures;
 
 /// <summary>
@@ -14,7 +16,7 @@ internal static class MediaToolchain
     private static readonly SemaphoreSlim GenerationLock = new(1, 1);
     private static readonly Lazy<HashSet<string>> AvailableEncoders = new(ReadEncoders);
 
-    public static string RepositoryRoot { get; } = FindRepositoryRoot();
+    public static string RepositoryRoot { get; } = RepositoryLayout.Root;
 
     public static string OutputRoot { get; } = Path.Combine(RepositoryRoot, "artifacts", "test-media");
 
@@ -201,21 +203,5 @@ internal static class MediaToolchain
             .Select(directory => Path.Combine(directory, OperatingSystem.IsWindows() ? "ffmpeg.exe" : "ffmpeg")));
 
         return candidates.FirstOrDefault(File.Exists);
-    }
-
-    private static string FindRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null)
-        {
-            if (File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-            {
-                return directory.FullName;
-            }
-
-            directory = directory.Parent;
-        }
-
-        throw new InvalidOperationException("The repository root containing the solution file was not found.");
     }
 }

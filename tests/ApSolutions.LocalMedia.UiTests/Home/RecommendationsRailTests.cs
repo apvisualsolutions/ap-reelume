@@ -9,6 +9,7 @@ using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Home;
 using ApSolutions.LocalMedia.Presentation.Settings;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -255,7 +256,7 @@ public sealed class RecommendationsRailTests
         })
         {
             var path = Path.Combine(
-                GetRepositoryRoot(),
+                RepositoryLayout.Root,
                 "src",
                 "ApSolutions.LocalMedia.Presentation",
                 view);
@@ -275,7 +276,7 @@ public sealed class RecommendationsRailTests
     public void Every_reason_code_has_a_resource_key_in_both_languages()
     {
         var presentationRoot = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Resources");
@@ -313,18 +314,6 @@ public sealed class RecommendationsRailTests
         var bytes = new byte[16];
         BitConverter.GetBytes(seed).CopyTo(bytes, 0);
         return new TitleId(new Guid(bytes));
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed class StubRecommendationSettings(bool enabled) : IRecommendationSettings

@@ -4,6 +4,8 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.DocumentationTests;
 
 /// <summary>One row of the canonical scope record.</summary>

@@ -4,6 +4,7 @@
 using System.Globalization;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Review;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -41,7 +42,7 @@ public sealed class ReviewInboxAutomationTests
             Assert.Contains(view.KeyBindings, binding => binding.Gesture is KeyGesture { Key: Key.Escape });
 
             var treePath = Path.Combine(
-                GetRepositoryRoot(),
+                RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
                 "T14",
@@ -56,7 +57,7 @@ public sealed class ReviewInboxAutomationTests
     [Fact]
     public void Candidate_card_exposes_textual_state_score_and_explanation_not_color_alone()
     {
-        var repositoryRoot = GetRepositoryRoot();
+        var repositoryRoot = RepositoryLayout.Root;
         var xaml = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
@@ -69,17 +70,5 @@ public sealed class ReviewInboxAutomationTests
         Assert.Contains("ScorePercent", xaml, StringComparison.Ordinal);
         Assert.Contains("ExplanationCodes", xaml, StringComparison.Ordinal);
         Assert.Contains("AutomationProperties.HelpText", xaml, StringComparison.Ordinal);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

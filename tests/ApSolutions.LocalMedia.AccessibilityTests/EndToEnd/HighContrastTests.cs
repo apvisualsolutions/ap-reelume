@@ -3,6 +3,7 @@
 
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Styling;
@@ -117,7 +118,7 @@ public sealed partial class HighContrastTests
 
     private static IReadOnlyList<string> ViewFiles() =>
         [.. Directory.EnumerateFiles(
-            Path.Combine(AuditLog.GetRepositoryRoot(), "src", "ApSolutions.LocalMedia.Presentation"),
+            Path.Combine(RepositoryLayout.Root, "src", "ApSolutions.LocalMedia.Presentation"),
             "*.axaml",
             SearchOption.AllDirectories)
             .Where(path => !path.Contains(Path.Combine("Theme", "DesignTokens"), StringComparison.Ordinal)

@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
+using ApSolutions.LocalMedia.TestSupport;
 using Microsoft.Data.Sqlite;
 using Xunit;
 
@@ -223,7 +224,7 @@ public sealed class CrashResumeTests
 
         rows.Add(string.Create(CultureInfo.InvariantCulture, $"worst,,,,{worstError:F0}"));
         var report = Path.Combine(
-            DatabaseTestHarness.GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "artifacts",
             "test-results",
             "T25",

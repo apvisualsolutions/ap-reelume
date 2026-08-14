@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -143,7 +144,7 @@ public sealed class LooseFileTests
     public void The_banner_shows_the_file_name_and_never_the_whole_path()
     {
         var path = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Player",
@@ -165,17 +166,5 @@ public sealed class LooseFileTests
             .Where(attribute => !attribute.Value.TrimStart().StartsWith('{'))
             .ToArray();
         Assert.Empty(literals);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

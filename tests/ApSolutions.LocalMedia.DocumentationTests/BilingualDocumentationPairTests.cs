@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.DocumentationTests;
 
 public sealed class BilingualDocumentationPairTests

@@ -5,6 +5,8 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.DocumentationTests;
 
 /// <summary>

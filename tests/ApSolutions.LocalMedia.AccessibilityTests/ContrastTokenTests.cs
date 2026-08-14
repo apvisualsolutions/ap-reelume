@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Xml.Linq;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.AccessibilityTests;
@@ -46,7 +47,7 @@ public sealed class ContrastTokenTests
                 && setter.Attribute("Value")?.Value.Contains("FocusStrokeThickness", StringComparison.Ordinal) is true);
 
         var appearancePath = System.IO.Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Settings",
@@ -76,7 +77,7 @@ public sealed class ContrastTokenTests
     [Fact]
     public void Mica_and_Windows_motion_detection_are_isolated_to_the_Windows_host()
     {
-        var repositoryRoot = GetRepositoryRoot();
+        var repositoryRoot = RepositoryLayout.Root;
         var presentationRoot = System.IO.Path.Combine(
             repositoryRoot,
             "src",
@@ -122,7 +123,7 @@ public sealed class ContrastTokenTests
     }
 
     private static string GetTokenPath() => System.IO.Path.Combine(
-        GetRepositoryRoot(),
+        RepositoryLayout.Root,
         "src",
         "ApSolutions.LocalMedia.Presentation",
         "Theme",
@@ -182,17 +183,5 @@ public sealed class ContrastTokenTests
         var type = assembly.GetType(fullName, throwOnError: false);
         Assert.NotNull(type);
         return type;
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(System.IO.Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

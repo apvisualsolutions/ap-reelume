@@ -3,6 +3,8 @@
 
 using System.Text.Json;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.DocumentationTests;
 
 /// <summary>

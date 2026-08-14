@@ -4,6 +4,7 @@
 using System.Globalization;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.About;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -13,7 +14,6 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
-
 // Avalonia's shape and the file-system helper share a name, and this file needs both.
 using VectorShape = Avalonia.Controls.Shapes.Path;
 
@@ -93,7 +93,7 @@ public sealed class CreditsViewTests
     public void The_credits_are_captured_in_both_languages()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(GetRepositoryRoot(), "artifacts", "ui-captures", "TMDB-logo");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "TMDB-logo");
         _ = Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })
@@ -121,17 +121,5 @@ public sealed class CreditsViewTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return view;
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 using ApSolutions.LocalMedia.Presentation.Catalog;
 using ApSolutions.LocalMedia.Presentation.Home;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
@@ -212,7 +213,7 @@ public sealed class KeyboardJourneyTests
     private static HashSet<string> FocusStyledTypes()
     {
         var document = XDocument.Load(Path.Combine(
-            AuditLog.GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Theme",
@@ -266,7 +267,7 @@ public sealed class KeyboardJourneyTests
 
     private static void WriteEvidence(string fileName, StringBuilder content)
     {
-        var directory = Path.Combine(AuditLog.GetRepositoryRoot(), "artifacts", "ui-captures", "T33");
+        var directory = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T33");
         Directory.CreateDirectory(directory);
         File.WriteAllText(Path.Combine(directory, fileName), content.ToString());
     }

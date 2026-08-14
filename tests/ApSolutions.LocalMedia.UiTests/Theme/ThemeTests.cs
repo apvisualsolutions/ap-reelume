@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -92,7 +93,7 @@ public sealed class ThemeTests
             presentation,
             "ApSolutions.LocalMedia.Presentation.Settings.AppearanceSettingsViewModel");
         var artifacts = System.IO.Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "artifacts",
             "ui-captures",
             "T3");
@@ -268,18 +269,6 @@ public sealed class ThemeTests
         var type = assembly.GetType(fullName, throwOnError: false);
         Assert.NotNull(type);
         return type;
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(System.IO.Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed record ThemeHarness(object Service, Type PreferenceType);

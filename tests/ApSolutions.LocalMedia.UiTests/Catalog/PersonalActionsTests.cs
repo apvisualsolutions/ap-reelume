@@ -8,6 +8,7 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Catalog;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -153,7 +154,7 @@ public sealed class PersonalActionsTests
     public void The_personal_actions_view_carries_no_literal_text()
     {
         var path = Path.Combine(
-            GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Catalog",
@@ -168,17 +169,5 @@ public sealed class PersonalActionsTests
             .Select(attribute => $"{attribute.Name.LocalName}={attribute.Value}")
             .ToArray();
         Assert.Empty(literals);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

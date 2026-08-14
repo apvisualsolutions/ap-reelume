@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests;
@@ -41,7 +42,7 @@ internal static class CompositionSourceText
 
     private static string Load()
     {
-        var host = Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Windows");
+        var host = Path.Combine(RepositoryLayout.Root, "src", "ApSolutions.LocalMedia.Windows");
         var files = Sources
             .SelectMany(source => Directory.GetFiles(Path.Combine(host, source.Directory), source.Pattern))
             .OrderBy(path => path, StringComparer.Ordinal)
@@ -53,15 +54,4 @@ internal static class CompositionSourceText
         return string.Join("\n", files.Select(File.ReadAllText));
     }
 
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory!.FullName;
-    }
 }

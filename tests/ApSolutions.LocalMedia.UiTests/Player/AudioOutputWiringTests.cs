@@ -3,6 +3,7 @@
 
 using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Player;
@@ -107,18 +108,6 @@ public sealed class AudioOutputWiringTests
     private static string CompositionSource()
     {
         return CompositionSourceText.Read();
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed class StubCatalog(params AudioOutputDevice[] devices) : IAudioDeviceCatalog

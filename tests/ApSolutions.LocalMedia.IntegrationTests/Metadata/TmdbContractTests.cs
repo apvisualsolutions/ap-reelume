@@ -6,6 +6,7 @@ using System.Text;
 using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Metadata;
@@ -254,7 +255,7 @@ public sealed class TmdbContractTests
     [Fact]
     public void Credits_surface_contains_required_TMDB_attribution()
     {
-        var repositoryRoot = DatabaseTestHarness.GetRepositoryRoot();
+        var repositoryRoot = RepositoryLayout.Root;
         var credits = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
@@ -281,7 +282,7 @@ public sealed class TmdbContractTests
     public void The_attribution_string_matches_the_wording_TMDB_requires(string resourceFile, string required)
     {
         var resources = File.ReadAllText(Path.Combine(
-            DatabaseTestHarness.GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Resources",

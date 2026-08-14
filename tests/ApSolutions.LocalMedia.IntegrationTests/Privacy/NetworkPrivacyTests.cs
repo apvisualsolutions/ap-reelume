@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.Application.Privacy;
 using ApSolutions.LocalMedia.Infrastructure.Privacy;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Privacy;
@@ -53,7 +54,7 @@ public sealed class NetworkPrivacyTests
         // that merely says the words is not a network client, and treating it as one would train
         // everybody to add exceptions to this test.
         var declaration = new Regex(@"(?<![/*\w])HttpClient\s+(?!\w*\()[_a-zA-Z]", RegexOptions.CultureInvariant);
-        var sourceRoot = Path.Combine(RepositoryRoot(), "src");
+        var sourceRoot = Path.Combine(RepositoryLayout.Root, "src");
         var owners = Directory
             .EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories)
             .Where(file => declaration.IsMatch(StripComments(File.ReadAllText(file))))
@@ -106,7 +107,7 @@ public sealed class NetworkPrivacyTests
     [Fact]
     public void The_application_owns_no_credential_store_of_its_own()
     {
-        var sourceRoot = Path.Combine(RepositoryRoot(), "src");
+        var sourceRoot = Path.Combine(RepositoryLayout.Root, "src");
         var offenders = Directory
             .EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories)
             .Where(file =>
@@ -193,7 +194,7 @@ public sealed class NetworkPrivacyTests
     [Fact]
     public void No_source_file_names_a_host_the_registry_never_declared()
     {
-        var sourceRoot = Path.Combine(RepositoryRoot(), "src");
+        var sourceRoot = Path.Combine(RepositoryLayout.Root, "src");
         var hostPattern = new Regex(@"https?://(?<host>[a-z0-9.\-]+)", RegexOptions.IgnoreCase);
         var allowed = new[] { "github.com", "schemas.microsoft.com", "learn.microsoft.com", "www.gnu.org", "avaloniaui.net" };
 
@@ -228,7 +229,7 @@ public sealed class NetworkPrivacyTests
         };
         startInfo.ArgumentList.Add("test");
         startInfo.ArgumentList.Add(Path.Combine(
-            RepositoryRoot(),
+            RepositoryLayout.Root,
             "tests",
             "ApSolutions.LocalMedia.IntegrationTests",
             "ApSolutions.LocalMedia.IntegrationTests.csproj"));
@@ -285,19 +286,6 @@ public sealed class NetworkPrivacyTests
         Errors: [],
         History: [],
         SearchTerms: []);
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
-    }
 
     /// <summary>
     /// Records every request, connection, and name resolution this process performs, from the .NET event

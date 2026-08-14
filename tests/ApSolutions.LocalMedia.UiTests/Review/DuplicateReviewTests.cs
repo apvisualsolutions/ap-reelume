@@ -6,6 +6,7 @@ using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Review;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -62,7 +63,7 @@ public sealed class DuplicateReviewTests
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
             var artifactPath = Path.Combine(
-                GetRepositoryRoot(),
+                RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
                 "T15",
@@ -94,18 +95,6 @@ public sealed class DuplicateReviewTests
             hdr,
             codec,
             seed * 1000L);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private static async Task WaitForAsync(Func<bool> condition)

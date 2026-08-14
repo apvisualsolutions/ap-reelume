@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using ApSolutions.LocalMedia.PerformanceTests.Fixtures;
+using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows.Tray;
 using Avalonia.Headless.XUnit;
 using Xunit;
@@ -129,7 +130,7 @@ public sealed class TrayIdleTests
         };
         startInfo.ArgumentList.Add("test");
         startInfo.ArgumentList.Add(Path.Combine(
-            RepositoryRoot(),
+            RepositoryLayout.Root,
             "tests",
             "ApSolutions.LocalMedia.PerformanceTests",
             "ApSolutions.LocalMedia.PerformanceTests.csproj"));
@@ -166,19 +167,6 @@ public sealed class TrayIdleTests
             int.Parse(values[1], CultureInfo.InvariantCulture),
             double.Parse(values[2], CultureInfo.InvariantCulture),
             Survived: child.ExitCode == 0);
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null
-            && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed record IdleMeasurement(

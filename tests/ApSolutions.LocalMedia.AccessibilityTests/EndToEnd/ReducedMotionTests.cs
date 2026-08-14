@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using System.Xml.Linq;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -71,7 +72,7 @@ public sealed class ReducedMotionTests
     public void The_reduced_motion_token_is_zero_and_the_standard_one_stays_short()
     {
         var tokens = XDocument.Load(Path.Combine(
-            AuditLog.GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "src",
             "ApSolutions.LocalMedia.Presentation",
             "Theme",
@@ -100,7 +101,7 @@ public sealed class ReducedMotionTests
         foreach (var overlayName in overlays)
         {
             var path = Directory.EnumerateFiles(
-                Path.Combine(AuditLog.GetRepositoryRoot(), "src", "ApSolutions.LocalMedia.Presentation"),
+                Path.Combine(RepositoryLayout.Root, "src", "ApSolutions.LocalMedia.Presentation"),
                 $"{overlayName}.axaml",
                 SearchOption.AllDirectories).SingleOrDefault();
             Assert.NotNull(path);
@@ -140,7 +141,7 @@ public sealed class ReducedMotionTests
 
     private static IReadOnlyList<string> ViewFiles() =>
         [.. Directory.EnumerateFiles(
-            Path.Combine(AuditLog.GetRepositoryRoot(), "src", "ApSolutions.LocalMedia.Presentation"),
+            Path.Combine(RepositoryLayout.Root, "src", "ApSolutions.LocalMedia.Presentation"),
             "*.axaml",
             SearchOption.AllDirectories)
             .OrderBy(path => path, StringComparer.Ordinal)];

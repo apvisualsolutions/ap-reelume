@@ -4,6 +4,8 @@
 using System.Text.Json;
 using System.Xml.Linq;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.DocumentationTests;
 
 public sealed class PinnedDependencyTests
@@ -38,7 +40,7 @@ public sealed class PinnedDependencyTests
             Assert.Matches(@"^\d+\.\d+\.\d+(?:\.\d+)?$", version!);
         }
 
-        var projectVersionAttributes = RepositoryLayout.ProjectFiles()
+        var projectVersionAttributes = RepositoryProjects.All()
             .SelectMany(path => XDocument.Load(path).Descendants("PackageReference"))
             .Where(reference => reference.Attribute("Version") is not null)
             .ToArray();
@@ -48,7 +50,7 @@ public sealed class PinnedDependencyTests
     [Fact]
     public void Every_project_has_a_dependency_lock_file()
     {
-        var projectPaths = RepositoryLayout.ProjectFiles();
+        var projectPaths = RepositoryProjects.All();
         Assert.NotEmpty(projectPaths);
 
         foreach (var projectPath in projectPaths)

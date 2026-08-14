@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -35,7 +36,7 @@ public sealed class PlayerOverlayTests
     {
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
-        var captures = Path.Combine(GetRepositoryRoot(), "artifacts", "ui-captures", "T18");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T18");
         Directory.CreateDirectory(captures);
 
         foreach (var (scaling, percentage) in SupportedScalings)
@@ -135,18 +136,6 @@ public sealed class PlayerOverlayTests
         var pixel = new byte[4];
         Marshal.Copy(buffer.Address + (row * buffer.RowBytes) + (column * 4), pixel, 0, 4);
         return (pixel[0], pixel[1], pixel[2]);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     /// <summary>Publishes one flat-coloured BGRA frame so overlay pixels are unambiguous.</summary>

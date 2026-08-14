@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Shell;
@@ -17,17 +18,5 @@ public sealed class DispatcherWiringTests
     public void No_dispatcher_post_carries_a_bare_async_lambda()
     {
         Assert.DoesNotContain("Post(async", CompositionSourceText.Read(), StringComparison.Ordinal);
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent!;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 }

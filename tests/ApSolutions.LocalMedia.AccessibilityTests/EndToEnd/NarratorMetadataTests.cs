@@ -13,6 +13,7 @@ using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Show;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
@@ -356,7 +357,7 @@ public sealed class NarratorMetadataTests
     private static void WriteTree(string fileName, StringBuilder tree)
     {
         var directory = Path.Combine(
-            AuditLog.GetRepositoryRoot(),
+            RepositoryLayout.Root,
             "artifacts",
             "ui-captures",
             "T33");

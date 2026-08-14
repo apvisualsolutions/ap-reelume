@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Xml.Linq;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -141,7 +142,7 @@ public sealed class ShellLocalizationTests
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
             var artifactPath = Path.Combine(
-                GetRepositoryRoot(),
+                RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
                 "T2",
@@ -190,17 +191,5 @@ public sealed class ShellLocalizationTests
     }
 
     private static string GetPresentationRoot() =>
-        Path.Combine(GetRepositoryRoot(), "src", PresentationAssemblyName);
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
-    }
+        Path.Combine(RepositoryLayout.Root, "src", PresentationAssemblyName);
 }

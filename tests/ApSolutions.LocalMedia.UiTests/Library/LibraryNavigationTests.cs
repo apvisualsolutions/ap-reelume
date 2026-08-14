@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Library;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -116,7 +117,7 @@ public sealed class LibraryNavigationTests
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
             var artifactPath = Path.Combine(
-                GetRepositoryRoot(),
+                RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
                 "T7",
@@ -144,18 +145,6 @@ public sealed class LibraryNavigationTests
         var bytes = new byte[16];
         BitConverter.GetBytes(seed).CopyTo(bytes, 0);
         return new Guid(bytes);
-    }
-
-    private static string GetRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory.FullName;
     }
 
     private sealed class RecordingQueryService(params CatalogPage[] pages) : ICatalogQueryService
