@@ -92,6 +92,27 @@ De paso: `eng/verify-docs.ps1` **comprobaba un número y anunciaba otro**. El me
 verificaba 57. Ahora el mensaje imprime lo que acaba de medir. / The docs gate checked one number and
 announced another, because the sentence had the count written into it by hand.
 
+### 6. La puerta de cobertura sólo ve lo confirmado / The coverage gate only sees what is committed
+
+Con los archivos nuevos preparados en el índice, la puerta anunció «no source file is new against
+origin/main» y salió verde. Confirmado el commit y reejecutada —que es el orden que este repositorio
+ya tiene escrito—, midió lo que había: / With the new files merely staged, the gate announced there
+was nothing new. Run again after the commit, it measured what was there:
+
+```
+src/…/Domain/Metadata/TrailerLinkPolicy.cs            100,00  100,00  PASS
+src/…/Application/Metadata/IExternalLinkLauncher.cs   n/a     n/a     PASS (no instrumentable lines)
+src/…/Windows/Metadata/ShellExternalLinkLauncher.cs    43,75   60,00  FAIL   (suelo 96/96)
+```
+
+La mitad que faltaba es la que habla con el shell, y era inalcanzable por construcción: conducirla
+abría un navegador de verdad en la máquina que mide. La corrección es entregarle la llamada como
+parámetro, con `Process.Start` por defecto, de modo que la ruta de aceptación se ejerce contra un
+doble que **registra lo que recibe**. Compra dos cosas: la cobertura y —lo que importa más— poder
+afirmar **qué llega al shell**: la dirección entera como única instrucción, `UseShellExecute` en
+verdadero, y ni un argumento compuesto alrededor. Siete pruebas nuevas. / The missing half was
+unreachable by construction; handing the call in covers it and buys the assertion that matters.
+
 ## El rojo / The red
 
 ```
@@ -158,13 +179,13 @@ que falle. / The trailer key is deliberately not lockable, and a test says so.
 |---|---|
 | `TrailerLinkPolicyTests` | 26 de 26 / of 26 |
 | `TrailerTests` | 9 de 9 / of 9 |
-| `ExternalLinkLauncherTests` | 12 de 12 / of 12 |
+| `ExternalLinkLauncherTests` | 19 de 19 / of 19 |
 | `MetadataMergePolicyTests` | 6 de 6 / of 6 |
 | `ApSolutions.LocalMedia.Domain.Tests` | 403 de 403 / of 403 |
 | `ApSolutions.LocalMedia.Application.Tests` | 204 de 204 / of 204 |
 | `ApSolutions.LocalMedia.IntegrationTests` | 431 de 431 (1 omitida: el fixture del proceso hijo) / of 431 (1 skipped: the child-process fixture) |
 | `ApSolutions.LocalMedia.UiTests` | 435 de 435 / of 435 |
-| `ApSolutions.LocalMedia.PackagingTests` | 129 de 129 / of 129 |
+| `ApSolutions.LocalMedia.PackagingTests` | 136 de 136 / of 136 |
 | `ApSolutions.LocalMedia.DocumentationTests` | 84 de 84 / of 84 |
 | `dotnet build -warnaserror` | 0 advertencias, 0 errores / 0 warnings, 0 errors |
 | `dotnet format --verify-no-changes` | limpio / clean |
