@@ -88,6 +88,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La herramienta que firma las publicaciones no compilaba, y nadie podía enterarse hasta publicar.**
+  Le faltaba el encabezado de licencia que este proyecto exige en cada archivo, y esa regla es un
+  error de compilación — pero su proyecto **no estaba en la solución**, así que ninguna de las
+  comprobaciones que se ejecutan en cada cambio llegaba a construirlo. El primer sitio donde habría
+  saltado era una publicación real, en el paso que comprueba que la firma sirve. Ahora el proyecto
+  está dentro, con lo que todas las comprobaciones que ya existían pasan a cubrirlo, y una prueba
+  nueva falla en cuanto aparezca otro proyecto fuera.
 - **Si tienes el tráiler junto a la película, la ficha lo reproduce.** Sirve la convención que ya
   usan Plex, Jellyfin y Kodi: un archivo `<película>-trailer.<extensión>` al lado, o una carpeta
   `Trailers` dentro de la de la película. El botón sólo aparece cuando ese archivo existe de verdad,

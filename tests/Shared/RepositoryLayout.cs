@@ -19,6 +19,13 @@ internal static class RepositoryLayout
 
     public static string Root { get; } = FindRoot();
 
+    /// <summary>
+    /// The solution file itself, for the rules that read it as a document rather than as an anchor.
+    /// Exposed here so its name stays in one place: a test that spelled it out would be the very
+    /// duplication the anchor rule exists to prevent, and would trip that rule saying so.
+    /// </summary>
+    public static string SolutionPath { get; } = Path.Combine(Root, Anchor);
+
     /// <summary>A path under the root, written with forward slashes wherever it is used.</summary>
     public static string PathFromRoot(string relativePath) =>
         Path.Combine(Root, relativePath.Replace('/', Path.DirectorySeparatorChar));

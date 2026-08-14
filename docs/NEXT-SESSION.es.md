@@ -300,19 +300,16 @@ pediría un WebView con hosts sin declarar, publicidad y cookies.
   sirve, y **no es que el archivo descifre**: se firma algo trivial con la copia restaurada y se
   verifica contra [`eng/release-signing.pub`](../eng/release-signing.pub). Repetir cada trimestre,
   porque un respaldo corrupto no avisa.
-  - **Medido el 2026-08-14, y el criterio no se cumple.** El respaldo cifrado de desastre **existe y
-    corre solo cada noche**, pero pesa **exactamente** el umbral que se puso para detectar que había
-    crecido —no más—, y con el mismo tamaño al byte tres noches seguidas. El propietario esperaba
-    encontrarlo en la carpeta del proyecto dentro de la bóveda y está en la de recuperación, así que
-    la nota de custodia apunta a otro sitio del que se usa.
-  - **La pregunta que lo decide, y que hay que hacerle al propietario en la próxima sesión**: en la
-    carpeta del proyecto de la bóveda hay, junto a la nota de custodia, un archivo llamado como la
-    clave de firma **de 58 bytes**. Una clave secreta de minisign no cabe en 58 bytes —rondan los
-    200—, así que **o es un puntero o es algo truncado**, y de eso depende todo lo demás: si fuera la
-    clave, estaría sin cifrar en una unidad de red y probablemente ya dentro del respaldo nocturno;
-    si es un puntero, la clave sigue teniendo **un solo ejemplar** y el respaldo no la contiene.
-    **No se abre ninguno de los dos archivos**: el material de claves lo maneja el propietario. Con
-    su respuesta se actualiza esta línea con lo medido.
+  - **Hecho el 2026-08-14**: la sesión de IT del propietario ejecutó la prueba que vale —restaurar,
+    firmar y verificar— y el respaldo **sirve**. Comprobado por ejecución, que es la única forma.
+  - **Y de paso, dos avisos sobre cómo se comprueba esto.** Desde aquí se midió el respaldo por
+    **tamaño** contra un umbral, y esa medición dio «no cumple» cuando la realidad era que sí: un
+    proxy puede estar exactamente en su umbral y no significar nada. Después se dedujo, de un archivo
+    de 58 bytes, que no podía ser la clave porque no cabe en el **formato de fichero de minisign** —
+    y este proyecto no usa ese formato de fichero, sólo su verificación. **Las dos veces el error fue
+    el mismo**: sustituir la ejecución por una deducción sobre metadatos. Del tamaño de un archivo
+    cifrado no se deduce su contenido, y de un formato que no se ha comprobado que se use, tampoco.
+  - Repetir la prueba **cada trimestre**, porque un respaldo corrupto no avisa.
 - **La notificación de exportación** a `crypt@bis.doc.gov` y `enc@nsa.gov`: el texto está redactado
   entero en [LEGAL.es.md](legal/LEGAL.es.md) y sale de tu identidad, por eso es tuya.
 - **El dictamen jurídico profesional** (`REL-004`). Le quedan dos preguntas concretas de licencia, y

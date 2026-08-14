@@ -87,6 +87,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The tool that signs releases did not compile, and nothing could say so until a publication.** It
+  was missing the licence header this project requires in every file, and that rule is a build error
+  — but its project **was not in the solution**, so none of the checks that run on every change ever
+  built it. The first place it would have surfaced was a real publication, at the step that verifies
+  the signature is good. The project is inside now, so every check that already existed covers it,
+  and a new test fails the moment another project appears outside.
 - **If you keep the trailer next to the film, the card plays it.** The convention Plex, Jellyfin and
   Kodi already use works: a `<film>-trailer.<extension>` file beside it, or a `Trailers` folder inside
   the film's own. The button only appears when that file really exists, it opens the way a video you
