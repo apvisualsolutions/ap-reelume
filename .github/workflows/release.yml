@@ -96,12 +96,22 @@ jobs:
           if (-not (Test-Path $notes)) { throw 'The release notes were not generated.' }
           Write-Output "Release notes ready to paste: $((Get-Item $notes).Length) bytes."
 
+      # LGPL-2.1 6(d) and the last paragraph of GPL-2.0 3: offering the source from the same place
+      # the executable is offered from IS distributing the source, and unlike 6(b) — whose first
+      # condition is a copy already present on the user's machine — it needs no interpreting. These
+      # archives are attached to the release beside the binaries, so whoever publishes must not drop
+      # them: without them the release falls back on a written offer alone.
+      - name: Fetch the corresponding source of the copyleft libraries
+        shell: pwsh
+        run: ./eng/fetch-corresponding-source.ps1
+
       - name: Upload the artifact and everything that verifies it
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: apreelume-win-x64
           if-no-files-found: error
           path: |
+            artifacts/package/source/
             artifacts/package/*.msix
             artifacts/package/*.zip
             artifacts/package/SHA256SUMS.txt

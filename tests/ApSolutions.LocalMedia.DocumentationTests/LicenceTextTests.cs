@@ -205,6 +205,56 @@ public sealed class LicenceTextTests
     }
 
     /// <summary>
+    /// The corresponding source on offer has to belong to the binaries that actually travel.
+    /// </summary>
+    /// <remarks>
+    /// LGPL-2.1 §6(d) and the last paragraph of GPL-2.0 §3 both let a release satisfy the obligation
+    /// by offering the source from the same place the executable is offered from — but only if it is
+    /// that executable's source. Raising a package version without raising this registry would offer
+    /// the source of something else, quietly, so the registry names the package each entry belongs
+    /// to and this compares it against what the build resolved.
+    /// </remarks>
+    [Theory]
+    [InlineData("VideoLAN.LibVLC.Windows")]
+    [InlineData("LibVLCSharp")]
+    public void The_corresponding_source_registry_belongs_to_the_binaries_that_travel(string package)
+    {
+        using var registry = JsonDocument.Parse(
+            File.ReadAllText(RepositoryLayout.PathFromRoot("eng/corresponding-source.json")));
+        var expected = $"{package} {ResolvedPackages()[package]}";
+
+        Assert.Contains(
+            registry.RootElement.GetProperty("sources").EnumerateArray(),
+            source => (source.GetProperty("carriedBy").GetString() ?? string.Empty)
+                .Contains(expected, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// The notice names a version whose source can actually be obtained.
+    /// </summary>
+    /// <remarks>
+    /// It named libvlc 3.0.23.1 — the NuGet package's version, whose fourth digit is that package's
+    /// own packaging revision. VideoLAN publishes no such tree: libvlc.dll declares file version
+    /// 3.0.23, and 3.0.23 is what the source archive is called. Pointing at corresponding source
+    /// that does not exist is the failure this catches.
+    /// </remarks>
+    [Fact]
+    public void The_videolan_notice_names_the_source_tree_rather_than_the_package_revision()
+    {
+        using var registry = JsonDocument.Parse(
+            File.ReadAllText(RepositoryLayout.PathFromRoot("eng/corresponding-source.json")));
+        var vlc = registry.RootElement.GetProperty("sources").EnumerateArray()
+            .Single(source => source.GetProperty("name").GetString() == "vlc");
+        var notice = File.ReadAllText(LicencePath("NOTICE-VideoLAN.txt"));
+
+        Assert.Contains(
+            $"vlc {vlc.GetProperty("version").GetString()}",
+            notice,
+            StringComparison.Ordinal);
+        Assert.Contains(vlc.GetProperty("url").GetString()!, notice, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Both packaging scripts carry the folder. One updated and the other forgotten is how the ARM64
     /// artifact would quietly ship without the texts the x64 one carries.
     /// </summary>
