@@ -216,27 +216,12 @@ public sealed class SurfaceReachabilityTests
             var codeBehind = File.Exists(codeBehindPath) ? File.ReadAllText(codeBehindPath) : string.Empty;
             var references = names
                 .Where(candidate => candidate != name
-                    && (ReferencesInMarkup(markup, candidate) || ReferencesInCode(codeBehind, candidate)))
+                    && (SurfaceReferences.InMarkup(markup, candidate)
+                        || SurfaceReferences.InCode(codeBehind, candidate)))
                 .Order(StringComparer.Ordinal)
                 .ToArray();
             return new Surface(name, ReadClassName(markup), HasAccessibleName(markup), references);
         }
-
-        // A surface instantiates another when its markup opens that element under any namespace prefix.
-        private static bool ReferencesInMarkup(string markup, string candidate) =>
-            Regex.IsMatch(
-                markup,
-                $@"<[A-Za-z0-9_]+:{Regex.Escape(candidate)}[\s/>]",
-                RegexOptions.None,
-                TimeSpan.FromSeconds(1));
-
-        private static bool ReferencesInCode(string code, string candidate) =>
-            code.Length > 0
-            && Regex.IsMatch(
-                code,
-                $@"\b{Regex.Escape(candidate)}\b",
-                RegexOptions.None,
-                TimeSpan.FromSeconds(1));
 
         private static string? ReadClassName(string markup)
         {
