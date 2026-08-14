@@ -92,9 +92,9 @@ semana al medirlas.
    y ahora quita los comentarios antes de casar. Medido antes de tocar: **nada** se escondía detrás
    de un comentario, así que la puerta era ciega pero no estaba tapando ningún huérfano.
    [audit-arq013-reachability-comments.md](evidence/stable/audit-arq013-reachability-comments.md).
-3. **`ARQ-014`**, el User-Agent que anuncia `1.0` mientras la versión declarada es `0.1.0`: la marca
-   se queda y la versión sale del ensamblado, fijada contra el `<Version>` de
-   `Directory.Build.props`.
+3. ~~**`ARQ-014`**~~ **Hecho el 2026-08-14**: la versión sale del ensamblado y la prueba afirma sobre
+   la cabecera que sale de verdad, con la versión esperada leída de `Directory.Build.props`.
+   [audit-arq014-updater-identity.md](evidence/stable/audit-arq014-updater-identity.md).
 4. ~~**`ARQ-012`**~~ **Hecho el 2026-08-14**, y adelantado a `ARQ-014` porque ese necesita leer
    `Directory.Build.props` desde la raíz y sin ancla compartida habría escrito una copia más. La
    estimación del plan se quedó **cinco veces corta**: 59 archivos buscaban la raíz y 56 nombraban

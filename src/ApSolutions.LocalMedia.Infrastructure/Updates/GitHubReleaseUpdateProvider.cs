@@ -3,6 +3,7 @@
 
 using System.Net;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.Application.Updates;
@@ -35,6 +36,21 @@ public sealed class GitHubReleaseUpdateProvider : IUpdateSource
         @"(?m)^\s*(?<hash>[0-9a-fA-F]{64})\s+\*?(?<name>\S+)\s*$",
         RegexOptions.CultureInvariant,
         TimeSpan.FromSeconds(1));
+
+    /// <summary>
+    /// How this application introduces itself to GitHub. The brand is the public name; the number is
+    /// read from the assembly rather than written here, because a version typed by hand drifts from
+    /// the one the product declares and nobody notices — it announced 1.0 against a declared 0.1.0
+    /// until ARQ-014. The build metadata after '+' is dropped: it identifies a commit, and the other
+    /// end is being told which release is asking.
+    /// </summary>
+    private static readonly ProductInfoHeaderValue Identity = new(
+        "AP-Reelume-Updater",
+        (typeof(GitHubReleaseUpdateProvider).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion
+            ?? typeof(GitHubReleaseUpdateProvider).Assembly.GetName().Version?.ToString()
+            ?? "0.0.0").Split('+')[0]);
 
     private readonly HttpClient _httpClient;
     private readonly string _owner;
@@ -73,7 +89,7 @@ public sealed class GitHubReleaseUpdateProvider : IUpdateSource
             HttpMethod.Get,
             $"repos/{Uri.EscapeDataString(_owner)}/{Uri.EscapeDataString(_repository)}/releases/latest");
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-        request.Headers.UserAgent.Add(new ProductInfoHeaderValue("AP-Reelume-Updater", "1.0"));
+        request.Headers.UserAgent.Add(Identity);
         request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
 
         HttpResponseMessage response;

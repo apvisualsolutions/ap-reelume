@@ -132,6 +132,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   disposal, so a single failing release would have left its worker dead for good and everything
   catalogued afterwards would have leaked with nothing saying a word. The one that remains already
   carries that guard.
+- **The updater introduces itself with the version you actually have.** Asking whether a new release
+  exists, it identified itself as "1.0", a number typed by hand that never existed: the declared
+  version is 0.1.0. It comes from the program itself now, and a test compares it against the one
+  place this project declares its version, reading the header that actually leaves rather than the
+  constant in the code.
 - **The tests find the project root in one place.** The same walk upwards was pasted into fifty-nine
   files, and it was not even the same walk: two of them looked for a document and the rest for the
   solution file, so the repository held two definitions of its own root. There is one now, shared,

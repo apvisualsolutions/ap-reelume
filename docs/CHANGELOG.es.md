@@ -132,6 +132,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   medios: la que tenía el sondeo no protegía su propio cierre, de modo que un único fallo al liberar
   habría dejado su trabajador muerto para siempre y todo lo catalogado después se habría ido
   filtrando sin que nada avisara. La que queda ya vive protegida contra eso.
+- **El actualizador se presenta con la versión que de verdad tienes.** Al preguntar si hay una
+  versión nueva se identificaba como «1.0», un número escrito a mano que nunca existió: la versión
+  declarada es 0.1.0. Ahora sale del propio programa, y una prueba la compara contra el único sitio
+  donde este proyecto declara su versión, leyendo la cabecera que sale de verdad y no la constante
+  del código.
 - **Las pruebas encuentran la raíz del proyecto en un solo sitio.** El mismo recorrido hacia arriba
   estaba pegado en cincuenta y nueve archivos, y ni siquiera era el mismo: dos de ellos buscaban un
   documento y el resto el archivo de solución, así que el repositorio tenía dos definiciones de su

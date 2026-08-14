@@ -89,9 +89,9 @@ were measured.
    and strips comments before matching. Measured before touching it: **nothing** was hiding behind a
    comment, so the gate was blind but was not covering an orphan.
    [audit-arq013-reachability-comments.md](evidence/stable/audit-arq013-reachability-comments.md).
-3. **`ARQ-014`**, the User-Agent announcing `1.0` while the declared version is `0.1.0`: the brand
-   stays and the version comes from the assembly, pinned against `Directory.Build.props`'s
-   `<Version>`.
+3. ~~**`ARQ-014`**~~ **Done on 2026-08-14**: the version comes from the assembly and the test asserts
+   on the header that actually leaves, with the expected version read from `Directory.Build.props`.
+   [audit-arq014-updater-identity.md](evidence/stable/audit-arq014-updater-identity.md).
 4. ~~**`ARQ-012`**~~ **Done on 2026-08-14**, and brought forward past `ARQ-014` because that one
    needs to read `Directory.Build.props` from the root and would have written one more copy of the
    walk. The plan's estimate was **five times short**: 59 files found the root themselves and 56

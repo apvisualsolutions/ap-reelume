@@ -519,7 +519,11 @@ es la más cara de calibrar y la única que puede dar falsos rojos al principio)
       `SegmentCorpusTests.An_episode_materialises_from_nothing_with_the_expected_duration`
       (`IOException`: el corpus recién generado seguía abierto por otro proceso; run 31307701534,
       rama, relanzado con `gh run rerun --failed` y en verde). Primera vez de esta prueba en la
-      familia. **Aparición 2026-08-09 (tarde)**:
+      familia. **Segunda aparición el 2026-08-14** (run 31780904840, `main`, mismo archivo
+      `S03/S03E03.mkv` y misma línea), y con dos deja de ser una aparición: **corregida** dándole a
+      esa prueba una carpeta propia, porque el corpus lo comparten cinco archivos de prueba y las
+      clases corren en paralelo. Evidencia en
+      [audit-corpus-shared-file-race.md](../../evidence/stable/audit-corpus-shared-file-race.md). **Aparición 2026-08-09 (tarde)**:
       `FileWatcherRecoveryTests.Create_change_rename_delete_storm_is_coalesced_by_final_path`
       (`InternalBufferOverflowException`: «too many changes at once» — el búfer del
       `FileSystemWatcher` se desbordó en un runner compartido cargado; run 31319008700, main,
@@ -646,7 +650,13 @@ borrado de logs de `.superpowers/` sigue siendo del propietario y no bloquea nad
       buscar —`<!--…-->` en AXAML, `//` y `/*…*/` en C#— y **empezar por el rojo**: una vista cuya
       única referencia está comentada tiene que salir huérfana, y hoy no sale. \ Decided: strip
       comments before matching, red test first.
-- [ ] **ARQ-014 — el User-Agent dice una versión que no existe.**
+- [x] **ARQ-014 — el User-Agent dice una versión que no existe.** **Hecho el 2026-08-14**: medido
+      primero —una sola aparición, y **ninguna prueba la miraba**, que es cómo se quedó en `1.0`—, la
+      marca se queda y el número sale del ensamblado cortado en `+`. La prueba afirma sobre la
+      cabecera que sale de verdad contra el servidor falso, y la versión esperada la lee de
+      `Directory.Build.props` en vez de repetirla. Evidencia en
+      [audit-arq014-updater-identity.md](../../evidence/stable/audit-arq014-updater-identity.md).
+      \ Done: brand kept, version from the assembly, asserted on the header that actually leaves.
       `GitHubReleaseUpdateProvider` envía `AP-Reelume-Updater/1.0` mientras `Directory.Build.props`
       declara `0.1.0`: una cadena escrita a mano que nadie sincroniza. **Decidido:** la marca se
       queda —es el nombre público— y la versión sale del ensamblado
