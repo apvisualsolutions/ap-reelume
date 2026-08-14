@@ -242,15 +242,23 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    `www.youtube.com` en `src/`, resuelto con una **segunda lista cerrada** (`HandedOff`) en vez de
    declarar una conexión que no existe.
    [audit-lib015-provider-trailer.md](evidence/stable/audit-lib015-provider-trailer.md).
-2. **El eslabón que falta, antes de `LIB-016`.** La primera medición de `LIB-016` destapó que **nada
-   convierte una identificación en metadata guardada**: `catalog_metadata` sólo lo escriben el editor
-   y un `RefreshMetadata` que nadie alimenta —la única asignación de su entrada en todo el
-   repositorio está **en una prueba**—, `ResolveMatch` publica un evento que no escucha nadie, y
-   `ReviewState.Automatic` sólo se calcula. La sinopsis de `LIB-013` y la clave de `LIB-015` sólo
-   llegan a la base a mano. Forma decidida y orden en
-   [audit-identification-never-reaches-the-catalogue.md](evidence/stable/audit-identification-never-reaches-the-catalogue.md).
-   **Toca el estado de la matriz**: `LIB-006` y `LIB-007` figuran como `VERIFIED` y ninguna de sus
-   evidencias midió que el resultado llegara al catálogo.
+2. **El eslabón que falta, y es lo siguiente que se hace.** La primera medición de `LIB-016` destapó
+   que **nada convierte una identificación en metadata guardada**: `catalog_metadata` sólo lo
+   escriben el editor y un `RefreshMetadata` que nadie alimenta —la única asignación de su entrada en
+   todo el repositorio está **en una prueba**—, `ResolveMatch` publica un evento que no escucha nadie,
+   y `ReviewState.Automatic` sólo se calcula. La sinopsis de `LIB-013` y la clave de `LIB-015` sólo
+   llegan a la base a mano.
+   **Decidido entero, con el orden de los commits**, en
+   [audit-identification-never-reaches-the-catalogue.md](evidence/stable/audit-identification-never-reaches-the-catalogue.md):
+   un caso de uso `ApplyIdentification` con sus dos llamantes, `RefreshMetadata` resolviendo por la
+   referencia guardada, el editor sin la propiedad que nadie rellena, y el paseo ensamblado llegando
+   al editor con clics. **La migración `0018` ya dejó la base preparada.**
+   **La primera medición, antes de escribir una línea**: cómo se llega del `media_file_id` de los
+   candidatos al `title_id` de `catalog_metadata`. Ese puente no está medido.
+   **Ya se corrigió el estado de la matriz**: `LIB-006` pasó a `BLOCKED` el 2026-08-14 con su bloqueo
+   en el manifiesto —42 verificados, 3 bloqueados—, y `LIB-007` **se queda `VERIFIED`** a propósito,
+   porque su criterio es de umbrales y de corrección persistente, y ambos se cumplen. `LIB-006` vuelve
+   a `VERIFIED` sólo cuando el recorrido con clics esté verde.
 3. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
    pasada. **El texto del propósito de red declarado cambia con el código**, no después.
 3. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe

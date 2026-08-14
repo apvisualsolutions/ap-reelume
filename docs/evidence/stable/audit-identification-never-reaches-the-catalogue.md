@@ -107,13 +107,47 @@ order: the database first, the interface last.
    y las cinco están en la suite del esquema**, que es la única cuyo trabajo es fijarlo. / The
    seventeenth migration turned four tests red across three unrelated suites; the eighteenth turns
    five red and all five are in the schema suite, which is the only one whose job that is.
-2. **Quien escribe**: una identificación aceptada —automática o de la bandeja— guarda la metadata del
-   proveedor con su referencia y su fecha. Es el eslabón que falta y es el trabajo de verdad.
+2. **Quien escribe: un caso de uso propio, `ApplyIdentification`.** Recibe el título y la referencia
+   del proveedor, pide los detalles, los fusiona con `MetadataMergePolicy` sobre lo que ya hubiera
+   —de modo que **lo que una persona bloqueó sigue ganando**— y guarda con la referencia y la fecha.
+   Va en `Application/Identification`.
+   - **Por qué un caso de uso y no otra cosa.** Meterlo dentro de `ResolveMatch` mezclaría marcar una
+     revisión con hablar por red. Colgarlo del `ReviewInboxChanged` que hoy nadie consume tiene el
+     atractivo de resolver dos defectos de una vez, pero pone trabajo de red y de escritura en un
+     manejador de notificación, donde un fallo no tiene a quién contárselo. Un caso de uso explícito
+     tiene entrada, salida y prueba.
+   - **Quién lo invoca, y son dos.** La aceptación de la bandeja, desde `ResolveMatch`; y el camino
+     automático, que hoy **no existe**: `IdentifyMediaFile` calcula `ReviewState.Automatic` para
+     decidir si hace falta la red y nadie lo aplica, que es la mitad de `LIB-007` que no se ve.
+   - **PRIMERA MEDICIÓN, antes de escribir una línea**: cómo se llega del `media_file_id` que llevan
+     los candidatos al `title_id` que lleva `catalog_metadata`. `match_candidates` está indexada por
+     archivo y `catalog_metadata` por título, y **ese puente no se ha medido**. Si no existe, es parte
+     de esta entrada y probablemente de la migración. No se escribe nada antes de tener ese número.
+   - **Sin consentimiento de red no se conecta**, y eso no lo decide este caso de uso: lo decide el
+     proveedor, que sin token devuelve lo que haya en caché. Aplicar lo cacheado es correcto.
 3. **`RefreshMetadata` resuelve** por la referencia guardada en vez de recibir un `MetadataDetails`
-   que nadie le da; sin referencia guardada, refrescar no es un fallo, es una ficha sin identificar.
+   que nadie le da; sin referencia guardada, refrescar no es un fallo, es una ficha sin identificar,
+   y el editor lo dice en vez de callarse. `RefreshMetadataCommand` pierde `ProviderMetadata` y gana
+   lo que ya tenía sentido: el título, la revisión esperada y si se restauran los campos del
+   proveedor.
 4. **El editor pierde `ProviderMetadata`**: una entrada que alguien tiene que acordarse de rellenar es
    la clase de defecto, no su instancia. Desaparece la propiedad y desaparece la clase entera.
+   `Refresh_without_provider_metadata_is_a_safe_no_op` cambia de sentido: pasa a decir que **un título
+   sin identificar no refresca nada**, que es la guarda legítima.
 5. **El paseo ensamblado alcanza el editor.** Hoy no llega, y por eso esto sobrevivió: las pruebas del
-   editor construyen su modelo de vista a mano. `AssembledPhysicalWalkTests` ya conduce la aplicación
-   real con `Window.KeyPress`; le faltan los clics —`Avalonia.Headless` los ofrece en 12.1.1 y nadie
-   los usa— y le falta esta superficie.
+   editor construyen su modelo de vista a mano y le rellenan el hueco. `AssembledPhysicalWalkTests` ya
+   conduce la aplicación real con `Window.KeyPress`; le faltan los **clics** —`Avalonia.Headless` los
+   ofrece en 12.1.1 y no los usa nadie en este repositorio— y le falta esta superficie. El recorrido
+   que cierra la entrada es: abrir la ficha de un título identificado, pulsar «Actualizar desde el
+   proveedor» **con el ratón**, y comprobar que la ficha cambia.
+
+### El orden de los commits / The order of the commits
+
+Cada uno con sus puertas, y el reparto no es arbitrario: el 2 es el trabajo y los demás dependen de
+él. / Each with its gates; the second is the work and the rest depend on it.
+
+1. `ApplyIdentification` con su medición del puente `media_file_id` → `title_id`, y sus dos llamantes.
+2. `RefreshMetadata` resolviendo, y el editor sin la propiedad.
+3. El paseo ensamblado con clics, que es la prueba de que lo anterior llega al usuario.
+4. `LIB-006` vuelve a `VERIFIED` **sólo** cuando (3) esté verde, y con el bloqueo retirado del
+   manifiesto: es la puerta que impide declararlo antes de tiempo.

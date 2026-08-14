@@ -1,24 +1,24 @@
 {
   "release": "MVP",
   "version": "0.1.0",
-  "commit": "50a298221735a413171bddfe5b33b331ec97b448",
+  "commit": "1a60b8ec068e8eb49d1b919331d82a55002d1e63",
   "runtime": "win-x64",
   "signed": false,
   "artifacts": [
     {
       "name": "APSolutions.LocalMedia_0.1.0_x64.msix",
-      "sha256": "d320a407b519593141e805cb57fee0e4948d64ad7101b34e52e200e2726d8c96"
+      "sha256": "6ad83eccd2a106f9e8c7c998ffd21956e20f4ba8c3a17fae0058210e8dc0da67"
     },
     {
       "name": "ApReelume-0.1.0-win-x64.zip",
-      "sha256": "a3d900afec9a56077f658edf3fc3dac75a9c7082273cc0090fd45cfd72e160cf"
+      "sha256": "e880a99495c5b854cc8d7e87fee8f2efa12a72b29c4f977be2a9ddd6a4cfa883"
     }
   ],
   "summary": {
     "total": 46,
-    "verified": 43,
+    "verified": 42,
     "outOfScope": 1,
-    "blocked": 2
+    "blocked": 3
   },
   "features": [
     {
@@ -209,7 +209,7 @@
     },
     {
       "id": "LIB-006",
-      "status": "VERIFIED",
+      "status": "BLOCKED",
       "tasks": [
         "T12",
         "T13",
@@ -227,8 +227,14 @@
         "docs/evidence/mvp/T13-tmdb.md",
         "docs/evidence/mvp/T14-review-inbox.md",
         "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-identification-never-reaches-the-catalogue.md",
         "docs/evidence/stable/audit-wp2-assembly.md"
-      ]
+      ],
+      "blocker": {
+        "reason": "El proveedor obtiene los metadatos y nada los escribe: `catalog_metadata` sólo lo escriben el editor manual y un `RefreshMetadata` cuya entrada asigna únicamente una prueba, `ResolveMatch` publica un evento que no consume nadie, y `ReviewState.Automatic` sólo se calcula. Una identificación —automática o aceptada a mano— no cambia nada de lo que la biblioteca muestra. / The provider fetches the metadata and nothing writes it: an identification changes nothing the library shows.",
+        "owner": "Engineering",
+        "unblockCondition": "Los pasos 2 a 5 de la cadena decidida en docs/evidence/stable/audit-identification-never-reaches-the-catalogue.md: quien escribe la metadata al aceptar una identificación, `RefreshMetadata` resolviendo por la referencia guardada, el editor sin una entrada que alguien deba rellenar, y el paseo ensamblado alcanzando el editor. La migración 0018 ya dejó la base preparada. / Steps 2 to 5 of the chain decided in the evidence; migration 0018 already prepared the database."
+      }
     },
     {
       "id": "LIB-007",

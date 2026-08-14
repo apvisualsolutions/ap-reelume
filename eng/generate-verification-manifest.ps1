@@ -69,6 +69,14 @@ $blockers = @{
         unblockCondition = 'Cualquier endpoint de render que declare seis u ocho canales, y repetir la matriz de salida de audio: un receptor A/V o una televisión por HDMI, una salida S/PDIF con codificación multicanal habilitada en el controlador, o unos auriculares USB que expongan 5.1 o 7.1 de verdad en lugar de virtualizarlo. / Any render endpoint declaring six or eight channels, and a repeat of the audio output matrix: an A/V receiver or television over HDMI, an S/PDIF output with multichannel encoding enabled in the driver, or USB headphones that expose real 5.1 or 7.1 rather than virtualising it.'
     }
 
+    # Measured on 2026-08-14 while preparing LIB-016, and it is the same family as the rows below:
+    # something built, tested and reachable that nothing in the assembled application ever feeds.
+    'LIB-006' = [ordered]@{
+        reason           = 'El proveedor obtiene los metadatos y nada los escribe: `catalog_metadata` sólo lo escriben el editor manual y un `RefreshMetadata` cuya entrada asigna únicamente una prueba, `ResolveMatch` publica un evento que no consume nadie, y `ReviewState.Automatic` sólo se calcula. Una identificación —automática o aceptada a mano— no cambia nada de lo que la biblioteca muestra. / The provider fetches the metadata and nothing writes it: an identification changes nothing the library shows.'
+        owner            = 'Engineering'
+        unblockCondition = 'Los pasos 2 a 5 de la cadena decidida en docs/evidence/stable/audit-identification-never-reaches-the-catalogue.md: quien escribe la metadata al aceptar una identificación, `RefreshMetadata` resolviendo por la referencia guardada, el editor sin una entrada que alguien deba rellenar, y el paseo ensamblado alcanzando el editor. La migración 0018 ya dejó la base preparada. / Steps 2 to 5 of the chain decided in the evidence; migration 0018 already prepared the database.'
+    }
+
     # The 2026-08-08 audit found a family of one defect: a component built, registered, and tested,
     # that nothing in the assembled application ever invokes. Each row below names its instance.
     'PRD-002' = [ordered]@{

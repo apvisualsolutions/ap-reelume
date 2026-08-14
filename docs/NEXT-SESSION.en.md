@@ -238,15 +238,23 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    network gate caught `www.youtube.com` in `src/`, settled with a **second closed list**
    (`HandedOff`) rather than by declaring a connection that is never made.
    [audit-lib015-provider-trailer.md](evidence/stable/audit-lib015-provider-trailer.md).
-2. **The missing link, before `LIB-016`.** That entry's first measurement uncovered that **nothing
-   turns an identification into stored metadata**: `catalog_metadata` is written only by the editor
-   and by a `RefreshMetadata` nobody feeds — the only assignment of its input in the whole repository
-   is **in a test** — `ResolveMatch` publishes an event nobody listens to, and `ReviewState.Automatic`
-   is only ever calculated. The synopsis of `LIB-013` and the key of `LIB-015` reach the database only
-   by hand. Shape and order decided in
-   [audit-identification-never-reaches-the-catalogue.md](evidence/stable/audit-identification-never-reaches-the-catalogue.md).
-   **It touches the matrix**: `LIB-006` and `LIB-007` are recorded as `VERIFIED` and none of their
-   evidence measured that the result reaches the catalogue.
+2. **The missing link, and it is what happens next.** That entry's first measurement uncovered that
+   **nothing turns an identification into stored metadata**: `catalog_metadata` is written only by the
+   editor and by a `RefreshMetadata` nobody feeds — the only assignment of its input in the whole
+   repository is **in a test** — `ResolveMatch` publishes an event nobody listens to, and
+   `ReviewState.Automatic` is only ever calculated. The synopsis of `LIB-013` and the key of `LIB-015`
+   reach the database only by hand.
+   **Decided in full, down to the order of the commits**, in
+   [audit-identification-never-reaches-the-catalogue.md](evidence/stable/audit-identification-never-reaches-the-catalogue.md):
+   an `ApplyIdentification` use case with its two callers, `RefreshMetadata` resolving from the stored
+   reference, the editor without the property nobody fills, and the assembled walk reaching the editor
+   with mouse clicks. **Migration `0018` already prepared the database.**
+   **The first measurement, before a line is written**: how one gets from the candidates'
+   `media_file_id` to `catalog_metadata`'s `title_id`. That bridge has not been measured.
+   **The matrix was already corrected**: `LIB-006` moved to `BLOCKED` on 2026-08-14 with its blocker
+   in the manifest — 42 verified, 3 blocked — and `LIB-007` **stays `VERIFIED`** deliberately, because
+   its criterion is about thresholds and a correction that persists, and both hold. `LIB-006` returns
+   to `VERIFIED` only when the click-driven walk is green.
 3. **`LIB-016`** — the automatic refresh, off by default, stale at 90 days, 20 titles per pass. **The
    declared network purpose's text changes with the code**, not after it.
 3. **Documentation**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, written from the

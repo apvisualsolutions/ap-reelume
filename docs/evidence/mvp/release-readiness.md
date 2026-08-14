@@ -395,3 +395,47 @@ each with its blocker, owner, and unblock condition in the verification manifest
 - `PLY-008` — the five-second save loop never starts and resume never hands the position to the engine.
 - `PLY-011` — the next-episode countdown is never offered.
 - `PLY-014` — media keys and shortcuts unwired in the player.
+
+## Adenda — el eslabón siguiente, 2026-08-14
+
+`LIB-006` vuelve a `BLOCKED`, y merece leerse junto a la adenda anterior porque es la misma familia
+un eslabón más allá. En agosto se anotó que «la identificación nunca se invoca»; eso se corrigió, el
+escaneo entrega lo hallado a la identificación y la bandeja se llena. Lo que **nunca existió** es el
+eslabón que sigue: nada convierte una identificación en metadata guardada.
+
+`catalog_metadata` sólo lo escriben el editor manual y un `RefreshMetadata` cuya entrada asigna
+únicamente una prueba; `ResolveMatch` marca el estado del candidato y publica un evento que no
+consume ningún archivo de `src/`; `ReviewState.Automatic` sólo se calcula, para decidir si hace falta
+la red. Así que una identificación —automática con ≥90 % de confianza o aceptada a mano— no cambia
+nada de lo que la biblioteca muestra, y ésta enseña lo que el analizador de nombres sacó del archivo.
+
+**`LIB-007` se queda `VERIFIED`, y es una decisión, no un descuido.** Su criterio es que los umbrales
+sean exactos y que la corrección persista, y las dos cosas están demostradas. Lo que falla es aplicar
+la metadata, que es la promesa de `LIB-006`; degradar también los umbrales culparía a la función
+equivocada y escondería dónde está el trabajo.
+
+La lección para la próxima verificación está en cómo sobrevivió: **la corrección anterior comprobó
+que la identificación se invocara y nadie comprobó que su resultado se aplicara**. Una cadena se
+verifica hasta lo que el usuario ve, no hasta el eslabón que se acababa de arreglar. Medición y forma
+en [audit-identification-never-reaches-the-catalogue.md](../stable/audit-identification-never-reaches-the-catalogue.md).
+
+## Addendum — the next link, 2026-08-14
+
+`LIB-006` returns to `BLOCKED`, and it is worth reading beside the addendum above because it is the
+same family one link further on. August recorded that "identification is never invoked"; that was
+fixed, the scan hands what it found to identification, and the inbox fills. What **never existed** is
+the link after it: nothing turns an identification into stored metadata.
+
+`catalog_metadata` is written only by the manual editor and by a `RefreshMetadata` whose input is
+assigned in a test and nowhere else; `ResolveMatch` marks the candidate's review state and publishes
+an event no source file consumes; `ReviewState.Automatic` is only ever calculated. An identification —
+automatic at 90% confidence or accepted by hand — changes nothing the library shows.
+
+**`LIB-007` stays `VERIFIED`, and that is a decision rather than an oversight.** Its criterion is that
+the thresholds are exact and a correction persists, and both are demonstrated. What fails is applying
+the metadata, which is `LIB-006`'s promise; demoting the thresholds too would blame the wrong feature
+and hide where the work is.
+
+The lesson is in how it survived: **the earlier fix checked that identification was invoked, and
+nobody checked that its result was applied.** A chain is verified as far as what the user sees, not as
+far as the link that was just repaired.
