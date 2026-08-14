@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using ApSolutions.LocalMedia.Domain.Playback;
@@ -13,16 +12,26 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 
 /// <summary>
 /// Minimal LibVLC adapter behind <see cref="IMediaPlayerEngine"/>. It borrows exactly one media
-/// player from the shared factory, holds at most one media at a time, and releases native media
-/// objects only after a quiescence window, which is the same discipline the media probe needed.
+/// player from the shared factory, holds at most one media at a time, and hands every native media
+/// to the factory's deferred release, which is the same discipline the media probe needed.
 /// </summary>
+/// <remarks>
+/// The queue used to live here too (BUG-011), and this copy disposed the native media inside its own
+/// lock with nothing to catch a throwing release: the worker flag stayed raised, so the first failure
+/// ended the drain for good and every media after it leaked in silence. Unifying it needs the factory
+/// to flush on request, because teardown here must release the media before the player that
+/// referenced them.
+/// </remarks>
 public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSource
 {
     private const int ParseTimeoutMilliseconds = 10_000;
     private const int DisabledTrack = -1;
     private const uint MaximumFrameWidth = 3840;
     private const uint MaximumFrameHeight = 2160;
-    private static readonly TimeSpan MediaQuiescence = TimeSpan.FromSeconds(1);
+
+    // Long enough for the quiescence window of this engine's media and of whatever else is resting
+    // in the shared queue; short enough that a busy catalogue scan cannot hold up a shutdown.
+    private static readonly TimeSpan ReleaseFlushCeiling = TimeSpan.FromSeconds(5);
 
     // A near-unity threshold with a limiter-grade ratio: transparent below the ceiling, hard above
     // it. These mirror PeakLimiterAudioFilter, which is the managed reference implementation.
@@ -42,8 +51,6 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     private readonly IDisplayCapabilityProvider _displays;
     private readonly HardwareAccelerationFallback _acceleration = new();
     private readonly SemaphoreSlim _gate = new(1, 1);
-    private readonly Lock _releaseSync = new();
-    private readonly Queue<DeferredMedia> _deferredReleases = new();
     private MediaPlayer? _mediaPlayer;
     private VlcMedia? _media;
     private IReadOnlyList<DomainMediaTrack> _tracks = [];
@@ -59,7 +66,6 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     private object? _lockCallback;
     private object? _displayCallback;
     private int _decodedFrameCount;
-    private bool _isDrainScheduled;
     private bool _isDisposed;
 
     public LibVlcMediaPlayerEngine(LibVlcFactory factory, IDisplayCapabilityProvider? displays = null)
@@ -175,14 +181,14 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
             }
             catch (PlaybackFailureException exception)
             {
-                DeferRelease(media);
+                _factory.DeferRelease(media);
                 Transition(PlaybackState.Failed);
                 Failure?.Invoke(this, new PlaybackFailureEventArgs(exception.Failure));
                 throw;
             }
             catch (OperationCanceledException)
             {
-                DeferRelease(media);
+                _factory.DeferRelease(media);
                 Transition(PlaybackState.Stopped);
                 throw;
             }
@@ -394,8 +400,10 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
         }
 
         // Every native media must be released before the player that referenced it, and only after
-        // the quiescence window; releasing the player first crashes the LibVLC teardown path.
-        await DrainDeferredReleasesAsync().ConfigureAwait(false);
+        // the quiescence window; releasing the player first crashes the LibVLC teardown path. An
+        // exhausted ceiling is not a failure to report: the drain still owns the media, and refusing
+        // to finish this teardown would be the worse outcome.
+        _ = await LibVlcFactory.FlushDeferredReleasesAsync(ReleaseFlushCeiling).ConfigureAwait(false);
         if (player is not null)
         {
             player.TimeChanged -= OnTimeChanged;
@@ -562,7 +570,7 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
         _media = null;
         _tracks = [];
         _duration = null;
-        DeferRelease(media);
+        _factory.DeferRelease(media);
     }
 
     private TimeSpan ReadPosition()
@@ -617,48 +625,6 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
                 PlaybackFailureCode.OpenFailed,
                 "LibVLC encountered an unrecoverable error for the active media.")));
 
-    private void DeferRelease(VlcMedia media)
-    {
-        lock (_releaseSync)
-        {
-            _deferredReleases.Enqueue(new DeferredMedia(media, Stopwatch.GetTimestamp()));
-            if (_isDrainScheduled)
-            {
-                return;
-            }
-
-            _isDrainScheduled = true;
-        }
-
-        _ = DrainDeferredReleasesAsync();
-    }
-
-    private async Task DrainDeferredReleasesAsync()
-    {
-        while (true)
-        {
-            TimeSpan remaining;
-            lock (_releaseSync)
-            {
-                if (!_deferredReleases.TryPeek(out var pending))
-                {
-                    _isDrainScheduled = false;
-                    return;
-                }
-
-                remaining = MediaQuiescence - Stopwatch.GetElapsedTime(pending.ReleasedTimestamp);
-                if (remaining <= TimeSpan.Zero)
-                {
-                    _ = _deferredReleases.Dequeue();
-                    pending.Media.Dispose();
-                    continue;
-                }
-            }
-
-            await Task.Delay(remaining).ConfigureAwait(false);
-        }
-    }
-
     private static DomainMediaTrack[] MapTracks(VlcMedia media) =>
     [
         .. media.Tracks
@@ -676,8 +642,6 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
                 track.TrackType == TrackType.Audio ? checked((int)track.Data.Audio.Channels) : null,
                 media.CodecDescription(track.TrackType, track.Codec))),
     ];
-
-    private sealed record DeferredMedia(VlcMedia Media, long ReleasedTimestamp);
 
     /// <summary>Used when no host provider is supplied: reports no HDR rather than guessing.</summary>
     private sealed class SdrOnlyDisplayProvider : IDisplayCapabilityProvider
