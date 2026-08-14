@@ -24,6 +24,7 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 {
     private readonly Func<PlayDetailsRequest, Task>? _onPlay;
     private CatalogItem? _item;
+    private string? _overview;
     private IReadOnlyList<SeasonViewModel> _seasons = [];
 
     public ShowDetailsViewModel(
@@ -51,6 +52,15 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     public string Title => _item?.Title ?? string.Empty;
 
+    /// <summary>
+    /// What this series is about, as the stored metadata has it. Handed in like everything else this
+    /// view model shows; it queries nothing.
+    /// </summary>
+    public string? Overview => _overview;
+
+    /// <summary>True only for a synopsis with something in it; blank is absent.</summary>
+    public bool HasOverview => !string.IsNullOrWhiteSpace(_overview);
+
     public int? Year => _item?.Year;
 
     public string YearText => Year is { } year ? year.ToString(CultureInfo.CurrentCulture) : string.Empty;
@@ -75,9 +85,11 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         CatalogItem item,
         IReadOnlyList<EpisodeSequenceEntry> episodes,
         IReadOnlyDictionary<ContentKey, WatchState> watchStates,
-        PersonalState? personalState = null)
+        PersonalState? personalState = null,
+        string? overview = null)
     {
         _item = item ?? throw new ArgumentNullException(nameof(item));
+        _overview = overview;
         ArgumentNullException.ThrowIfNull(episodes);
         ArgumentNullException.ThrowIfNull(watchStates);
 
@@ -97,6 +109,8 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         foreach (var name in new[]
         {
             nameof(Title),
+            nameof(Overview),
+            nameof(HasOverview),
             nameof(Year),
             nameof(YearText),
             nameof(HasYear),

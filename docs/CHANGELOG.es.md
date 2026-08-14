@@ -88,6 +88,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La ficha de una película o una serie muestra su sinopsis.** El resumen ya se descargaba, se
+  guardaba, se fusionaba respetando lo que hubieras bloqueado y se podía editar a mano — pero no se
+  leía en ninguna parte: podías escribirlo en el editor y no encontrarlo después. Ahora aparece en
+  las dos fichas, envuelto y acotado para que no empuje a las versiones o a las temporadas fuera de
+  la pantalla, y anunciado con su nombre para quien use un lector de pantalla. Un resumen en blanco
+  no ocupa sitio. No se abre ninguna conexión nueva: el texto ya estaba en tu disco.
+
 - **La puerta de cobertura ya vigila código que no es nuevo.** Sólo miraba los archivos que
   aparecían por primera vez, así que uno antiguo que empeorase no lo miraba nadie — y no es una
   hipótesis: al re-medir los tres archivos que arrastraban deuda, dos estaban igual que hace un día

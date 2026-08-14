@@ -369,6 +369,11 @@ public static partial class CompositionRoot
         var personalFilters = provider.GetRequiredService<GetPersonalFilters>();
         var setPersonalState = provider.GetRequiredService<SetPersonalState>();
         var versionGroups = provider.GetRequiredService<IMediaVersionGroupRepository>();
+
+        // The synopsis was stored, merged and editable long before any card could show it (LIB-013).
+        // It is read here, next to the watch state and the versions, because a details view model in
+        // this application never queries: it shows what somebody already read for it.
+        var catalogMetadata = provider.GetRequiredService<ICatalogMetadataRepository>();
         var host = provider.GetRequiredService<ShellHost>();
         MovieDetailsViewModel? movieDetails = null;
         movieDetails = new MovieDetailsViewModel(
@@ -430,6 +435,10 @@ public static partial class CompositionRoot
             provider.GetRequiredService<ScanProgressViewModel>());
         library.DetailsLoader = async item =>
         {
+            var stored = await catalogMetadata
+                .GetAsync(item.Item.Id, CancellationToken.None)
+                .ConfigureAwait(true);
+            var overview = stored?.Metadata.Overview;
             if (item.Item.Kind == CatalogTitleKind.Show)
             {
                 var sequence = await episodes
@@ -449,7 +458,7 @@ public static partial class CompositionRoot
                 var showPersonal = await personalFilters
                     .GetAsync(showKey, CancellationToken.None)
                     .ConfigureAwait(true);
-                showDetails.Apply(item.Item, sequence, states, showPersonal);
+                showDetails.Apply(item.Item, sequence, states, showPersonal, overview: overview);
             }
             else
             {
@@ -462,7 +471,7 @@ public static partial class CompositionRoot
                     ?? await versionGroups
                         .FindByMemberAsync(new MediaFileId(item.Item.Id.Value), CancellationToken.None)
                         .ConfigureAwait(true);
-                movieDetails.Apply(item.Item, state, versions, personal);
+                movieDetails.Apply(item.Item, state, versions, personal, overview: overview);
             }
         };
         return library;

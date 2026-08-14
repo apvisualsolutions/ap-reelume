@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:ShowDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource ShowDetailsAccessibleName}">
-  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="12">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
     <StackPanel Orientation="Horizontal" Spacing="12">
       <TextBlock
           FontSize="30"
@@ -42,7 +42,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
           TextWrapping="Wrap" />
     </StackPanel>
 
-    <ScrollViewer Grid.Row="2" IsVisible="{Binding HasSeasons}">
+    <!--
+      The synopsis is a paragraph, so it wraps and is capped: a card that grows without limit pushes
+      the seasons off the screen for the one series whose provider was talkative.
+    -->
+    <TextBlock
+        Grid.Row="2"
+        MaxHeight="160"
+        IsVisible="{Binding HasOverview}"
+        Text="{Binding Overview}"
+        TextTrimming="CharacterEllipsis"
+        TextWrapping="Wrap"
+        automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+
+    <ScrollViewer Grid.Row="3" IsVisible="{Binding HasSeasons}">
       <ItemsControl ItemsSource="{Binding Seasons}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="show:SeasonViewModel">

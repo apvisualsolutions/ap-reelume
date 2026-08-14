@@ -87,6 +87,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **A film's or a series' card shows its synopsis.** The overview was already downloaded, stored,
+  merged while respecting whatever you had locked, and editable by hand — but it was readable
+  nowhere: you could write it in the editor and never find it again. It appears on both cards now,
+  wrapped and capped so it cannot push the versions or the seasons off the screen, and announced by
+  name for anybody using a screen reader. A blank synopsis takes no room. No new connection is
+  opened: the text was already on your disk.
+
 - **The coverage gate now watches code that is not new.** It only looked at files appearing for the
   first time, so an old one that got worse was watched by nobody — and that is not a hypothesis: on
   re-measuring the three files carrying debt, two were exactly where they were a day earlier and the

@@ -29,6 +29,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     private static readonly MediaVersionSelectionPolicy SelectionPolicy = new();
     private readonly Func<PlayDetailsRequest, Task>? _onPlay;
     private CatalogItem? _item;
+    private string? _overview;
     private WatchState? _watchState;
     private IReadOnlyList<MediaVersionRowViewModel> _versions = [];
 
@@ -59,6 +60,19 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     public TitleId TitleId => _item?.Id ?? default;
 
     public string Title => _item?.Title ?? string.Empty;
+
+    /// <summary>
+    /// What this film is about, as the stored metadata has it. It is handed in rather than read here,
+    /// the same way the watch state and the versions are: this view model queries nothing.
+    /// </summary>
+    public string? Overview => _overview;
+
+    /// <summary>
+    /// True only for a synopsis with something in it. Blank is absent: a heading over an empty block
+    /// reads as a defect to somebody using a screen reader, and to everybody else as an application
+    /// pretending to show what it does not have.
+    /// </summary>
+    public bool HasOverview => !string.IsNullOrWhiteSpace(_overview);
 
     public int? Year => _item?.Year;
 
@@ -98,9 +112,11 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         CatalogItem item,
         WatchState? watchState,
         MediaVersionGroup? versions,
-        PersonalState? personalState = null)
+        PersonalState? personalState = null,
+        string? overview = null)
     {
         _item = item ?? throw new ArgumentNullException(nameof(item));
+        _overview = overview;
         _watchState = watchState;
         Versions = BuildVersions(versions);
         PersonalActions.Apply(
@@ -111,6 +127,8 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         foreach (var name in new[]
         {
             nameof(Title),
+            nameof(Overview),
+            nameof(HasOverview),
             nameof(Year),
             nameof(YearText),
             nameof(HasYear),

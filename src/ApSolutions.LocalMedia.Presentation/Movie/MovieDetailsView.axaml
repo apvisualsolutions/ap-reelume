@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:movie="clr-namespace:ApSolutions.LocalMedia.Presentation.Movie"
     x:DataType="movie:MovieDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource MovieDetailsAccessibleName}">
-  <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="12">
     <StackPanel Orientation="Horizontal" Spacing="12">
       <TextBlock
           FontSize="30"
@@ -55,7 +55,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
     </StackPanel>
 
-    <StackPanel Grid.Row="3" IsVisible="{Binding HasVersions}" Spacing="6">
+    <!--
+      The synopsis is a paragraph, so it wraps and is capped: a card that grows without limit pushes
+      the versions off the screen for the one title whose provider was talkative.
+    -->
+    <TextBlock
+        Grid.Row="3"
+        MaxHeight="160"
+        IsVisible="{Binding HasOverview}"
+        Text="{Binding Overview}"
+        TextTrimming="CharacterEllipsis"
+        TextWrapping="Wrap"
+        automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+
+    <StackPanel Grid.Row="4" IsVisible="{Binding HasVersions}" Spacing="6">
       <TextBlock
           FontSize="18"
           FontWeight="SemiBold"
