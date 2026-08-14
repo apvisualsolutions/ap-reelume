@@ -191,3 +191,4 @@ que falle. / The trailer key is deliberately not lockable, and a test says so.
 | `dotnet format --verify-no-changes` | limpio / clean |
 | `eng/verify-docs.ps1` | 130 documentos, 30 localizados, 57 IDs, 46 MVP / 130 docs, 30 localized, 57 IDs, 46 MVP |
 | `eng/verify.ps1` completo / full | verde / green |
+| `eng/check-coverage.ps1` sobre el commit / against the commit | `TrailerLinkPolicy` 100/100, `ShellExternalLinkLauncher` 100/100, `IExternalLinkLauncher` sin líneas instrumentables / no instrumentable lines |
