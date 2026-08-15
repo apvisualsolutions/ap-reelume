@@ -272,10 +272,43 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    in the manifest — 42 verified, 3 blocked — and `LIB-007` **stays `VERIFIED`** deliberately, because
    its criterion is about thresholds and a correction that persists, and both hold. `LIB-006` returns
    to `VERIFIED` only when the click-driven walk is green.
-3. **`LIB-016`** — the automatic refresh, off by default, stale at 90 days, 20 titles per pass. **The
-   declared network purpose's text changes with the code**, not after it.
-3. **Documentation**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, written from the
+3. **`BUG-012` — the watcher that dies when its buffer overflows. It jumps the queue, deliberately.**
+   An intermittent CI red on 2026-08-15 uncovered it (`InternalBufferOverflowException` in
+   `FileWatcherRecoveryTests`), and behind it is a defect that is not intermittent:
+   `DebouncedFileWatcher` treats the overflow as the end of the watcher —
+   `writer.TryComplete(exception)` closes the channel — `RootWatchCoordinator` degrades that to a
+   recovery scan, so **no files are lost**, and then `RootWatchBackground` releases the root, leaving
+   `Watch` to be called again only at application start or after a manual scan. **A folder set to
+   `Continuous` silently stops being watched** after the first large batch of files, which is exactly
+   when it is needed. It goes before `LIB-016` because it is short and breaks a shipped feature,
+   while `LIB-016` is new work that does not depend on it. Two things: `InternalBufferSize` is never
+   set (8 KiB by default, 64 KiB maximum), and an overflow has to mean "rescan and **keep
+   watching**". **The chain was read, not run**: the red proves the overflow, not the lost watching,
+   so the fix brings its own test.
+4. **`LIB-016`** — the automatic refresh, off by default, stale at 90 days, 20 titles per pass. **The
+   declared network purpose's text changes with the code**, not after it. No longer blocked:
+   `catalog_metadata` stores `provider`, `provider_key` and `refreshed_utc`, the two per-title facts
+   it was missing. **Decided on 2026-08-15: a null `refreshed_utc` counts as stale** — an entry with
+   no date was never refreshed, so it is as stale as it gets — with nulls **first** in the order and
+   the cap of 20 per pass containing the first pass over a whole library.
+5. **Documentation**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, written from the
    built application rather than from the code — which is why it comes after the block.
+
+## Finished on 2026-08-15 (eighth session)
+
+Four commits, and the chain that held `LIB-006` in `BLOCKED` is closed: the manifest reads **43
+verified, 2 blocked**. `ApplyIdentification` writes what the provider knows through both of its
+callers — the inbox and the automatic path above 90%, which did not exist — `RefreshMetadata`
+resolves through the stored reference, the editor lost the property nobody filled, and the assembled
+walk **presses the button with the mouse**. Detail in
+[audit-apply-identification.md](evidence/stable/audit-apply-identification.md),
+[audit-refresh-resolves-itself.md](evidence/stable/audit-refresh-resolves-itself.md) and
+[audit-walk-clicks-the-editor.md](evidence/stable/audit-walk-clicks-the-editor.md).
+
+**Two defects on nobody's list, both found by measuring**: the first save on an unedited entry
+returned `NotFound` in silence — the editor turned that into neither a conflict nor a change — and
+**no caller raised the revision when it saved**, so `WHERE revision = $expected` was comparing
+against a number that never moved and two windows could both win.
 
 ## Finished on 2026-08-14 (sixth session)
 
@@ -384,6 +417,18 @@ hosts, advertising and cookies.
 - The usual economic decisions: Authenticode certificate, Store, ARM64 hardware.
 
 ## Things learned worth not learning twice
+
+- **Verifying with the keyboard is not verifying with the mouse.** The assembled walk drove the
+  application with `Window.KeyPress` and **nobody used** `Avalonia.Headless`'s clicks. The first
+  click uncovered that the walk itself mounted the window in a way the application does not —
+  `AssembledStartup.FinalContent` **lifts** the `ShellView` out of its container and the walk
+  remounted it in a window of its own — leaving the shell **off the logical tree**. A `Button` only
+  consults its command's `CanExecute` once it is on the logical tree, so **every** command-bound
+  button reported itself disabled. Buttons wired with `Click=` did not, which is why it was invisible.
+- **`Window.InputHitTest` does not predict where a click goes** in Avalonia headless: it named the
+  `ScrollContentPresenter` while the click reached the button. The guard written to "make the click
+  safe" was the only thing failing, and believing it would have declared something broken that works.
+  Assert on the **effect**, with a click **beside** it as the control.
 
 - **`eng/verify.ps1` is not what CI runs**: CI also runs
   `eng/run-accessibility.ps1 -Mode Verify -Passes 2` and `eng/run-recovery.ps1 -Mode Verify

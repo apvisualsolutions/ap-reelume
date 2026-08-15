@@ -100,18 +100,18 @@ local file; a YouTube key opens the browser, which is the use their terms allow.
       - **Orden dentro de la entrada**: primero la migración con su prueba de esquema, después el
         proveedor, después la política, y la interfaz al final. Así ningún commit deja la base por
         delante del código que la lee.
-- [ ] **LIB-016 — el refresco automático, y sólo si lo enciendes. Decidido entero el 2026-08-14, y
-      BLOQUEADO por lo que destapó su primera medición.** El plan pedía medir cuántas fichas pasarían
-      de 90 días; para eso hacen falta, por título, la fecha del último refresco y la referencia del
-      proveedor, y **no existe ninguna de las dos**. Buscándolas apareció el motivo: **nada convierte
-      una identificación en metadata guardada**. `catalog_metadata` sólo lo escriben el editor y un
-      `RefreshMetadata` que nadie alimenta —su entrada la asigna **una prueba**, y es la única
-      asignación del repositorio—; `ResolveMatch` marca el estado del candidato y publica un evento
-      que no escucha nadie; `ReviewState.Automatic` sólo se calcula. Así que la sinopsis de `LIB-013`
-      y la clave de `LIB-015` sólo llegan a la base si alguien las escribe a mano, y un refresco
-      automático no tendría ni a quién preguntar ni qué ordenar. **Se corrige antes**, con la forma
-      ya decidida en
-      [audit-identification-never-reaches-the-catalogue.md](../../evidence/stable/audit-identification-never-reaches-the-catalogue.md).
+- [ ] **LIB-016 — el refresco automático, y sólo si lo enciendes. Decidido entero el 2026-08-14.**
+      ~~BLOQUEADO por lo que destapó su primera medición~~ **DESBLOQUEADO el 2026-08-15**: la cadena
+      que faltaba está construida y `catalog_metadata` ya guarda `provider`, `provider_key` y
+      `refreshed_utc`, que son exactamente los dos datos por título que esta entrada necesitaba y no
+      existían. Ver [audit-apply-identification.md](../../evidence/stable/audit-apply-identification.md)
+      y [audit-refresh-resolves-itself.md](../../evidence/stable/audit-refresh-resolves-itself.md).
+      - **Decidido el 2026-08-15: un `refreshed_utc` nulo cuenta como rancio.** Una ficha sin fecha
+        es una que nunca se refrescó, así que es la más rancia que hay, y ordenarla al final sería
+        dejar fuera precisamente a las que más lo necesitan. Toda biblioteca identificada antes de
+        esta versión entra por ahí, y quien contiene esa primera pasada es el tope de 20 por pasada,
+        no el umbral. `ORDER BY refreshed_utc IS NOT NULL, refreshed_utc` —nulos primero— y una
+        prueba que lo fije, porque el orden **es** la política.
       - **Apagado por defecto**, en Ajustes → Privacidad, junto al consentimiento de red que ya
         existe y **subordinado a él**: si no hay consentimiento, el interruptor ni siquiera se ofrece.
         Cadena bilingüe nueva, como todo lo visible.

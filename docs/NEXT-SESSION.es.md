@@ -276,10 +276,45 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    en el manifiesto —42 verificados, 3 bloqueados—, y `LIB-007` **se queda `VERIFIED`** a propósito,
    porque su criterio es de umbrales y de corrección persistente, y ambos se cumplen. `LIB-006` vuelve
    a `VERIFIED` sólo cuando el recorrido con clics esté verde.
-3. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
-   pasada. **El texto del propósito de red declarado cambia con el código**, no después.
-3. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe
+3. **`BUG-012` — el vigilante que muere al desbordar su buffer. Se cuela aquí, y es una decisión.**
+   Lo destapó un rojo intermitente de CI el 2026-08-15
+   (`InternalBufferOverflowException` en `FileWatcherRecoveryTests`), y detrás hay un defecto que no
+   es intermitente: `DebouncedFileWatcher` trata el desbordamiento como el fin del vigilante
+   —`writer.TryComplete(exception)` cierra el canal—, `RootWatchCoordinator` lo degrada a un escaneo
+   de recuperación —así que **no se pierden archivos**— y después `RootWatchBackground` suelta el
+   root, de modo que `Watch` sólo vuelve a llamarse al arrancar la aplicación o tras un escaneo
+   manual. **Una carpeta en `Continuous` deja de vigilarse en silencio** tras la primera tanda grande
+   de archivos, que es justo cuando más se la necesita. Va antes que `LIB-016` porque es corto y
+   rompe una función ya publicada, mientras que `LIB-016` es funcionalidad nueva que no depende de
+   él. Dos cosas: `InternalBufferSize` no se fija (8 KiB por defecto, 64 KiB de máximo), y un
+   desbordamiento tiene que significar «reescanea y **sigue vigilando**». **La cadena está leída, no
+   ejecutada**: el rojo prueba el desbordamiento, no la pérdida de vigilancia, así que la corrección
+   trae su propia prueba.
+4. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
+   pasada. **El texto del propósito de red declarado cambia con el código**, no después. Ya no está
+   bloqueado: `catalog_metadata` guarda `provider`, `provider_key` y `refreshed_utc`, que son los dos
+   datos por título que le faltaban. **Decidido el 2026-08-15: un `refreshed_utc` nulo cuenta como
+   rancio** —una ficha sin fecha nunca se refrescó, así que es la más rancia que hay—, con los nulos
+   **primero** en el orden y el tope de 20 por pasada conteniendo la primera pasada de una biblioteca
+   entera.
+5. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe
    desde la aplicación construida y no desde el código — por eso va detrás del bloque.
+
+## Lo terminado el 2026-08-15 (octava sesión)
+
+Cuatro commits, y la cadena que tenía `LIB-006` en `BLOCKED` quedó cerrada: el manifiesto lee **43
+verificados, 2 bloqueados**. `ApplyIdentification` escribe lo que el proveedor sabe por sus dos
+llamantes —la bandeja y el camino automático de ≥90 %, que no existía—, `RefreshMetadata` resuelve
+por la referencia guardada, el editor perdió la propiedad que nadie rellenaba, y el paseo ensamblado
+**pulsa el botón con el ratón**. Detalle en
+[audit-apply-identification.md](evidence/stable/audit-apply-identification.md),
+[audit-refresh-resolves-itself.md](evidence/stable/audit-refresh-resolves-itself.md) y
+[audit-walk-clicks-the-editor.md](evidence/stable/audit-walk-clicks-the-editor.md).
+
+**Dos defectos que no estaban en ninguna lista y salieron midiendo**: guardar por primera vez en una
+ficha sin editar devolvía `NotFound` en silencio —el editor traducía eso a nada, ni conflicto ni
+cambio—, y **ningún llamante subía la revisión al guardar**, de modo que `WHERE revision = $expected`
+comparaba contra un número que nunca se movía y dos ventanas podían ganar las dos.
 
 ## Lo terminado el 2026-08-14 (sexta sesión)
 
@@ -416,6 +451,17 @@ pediría un WebView con hosts sin declarar, publicidad y cookies.
   había ocupado el sitio. Ahí lo que se reapunta es la prueba, y decir por qué evita que la próxima
   lectura la tome por un defecto.
 
+- **Verificar con el teclado no es verificar con el ratón.** El paseo ensamblado conducía la
+  aplicación con `Window.KeyPress` y **nadie usaba los clics** de `Avalonia.Headless`. El primer clic
+  destapó que el propio paseo montaba la ventana de una forma que la aplicación no usa —
+  `AssembledStartup.FinalContent` **saca** el `ShellView` de su contenedor y el paseo lo remontaba en
+  otra ventana—, dejando el shell **fuera del árbol lógico**. Un `Button` sólo consulta el
+  `CanExecute` de su comando estando en el árbol lógico, así que **todos** los botones enlazados por
+  `Command` se declaraban deshabilitados. Los que usan `Click=` no, y por eso era invisible.
+- **`Window.InputHitTest` no predice a dónde va un clic** en Avalonia headless: nombraba el
+  `ScrollContentPresenter` mientras el clic llegaba al botón. La guarda escrita «para asegurar» el
+  clic era lo único que fallaba, y creerla habría declarado roto algo que funciona. Se afirma sobre
+  el **efecto**, con un clic **al lado** como control.
 - **Antes de instrumentar un fallo, léelo entero donde quedó archivado.** Las dos hipótesis del rojo
   intermitente se daban por indistinguibles en dos documentos, y la línea de aquella ejecución
   —`16 migration(s) applied to a new database`— descartaba una de las dos desde el primer día. Costó
