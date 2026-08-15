@@ -154,21 +154,6 @@ function Invoke-MediaSuite {
     }
 }
 
-function Get-MakeAppx {
-    # @() because a machine with exactly one SDK yields a bare string, and indexing a string
-    # returns its first character — the packaging step then tries to run a program called 'C'.
-    $candidates = @(Get-ChildItem -LiteralPath 'C:/Program Files (x86)/Windows Kits/10/bin' -Directory -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -match '^10\.' } |
-        Sort-Object Name -Descending |
-        ForEach-Object { Join-Path $_.FullName 'x64/makeappx.exe' } |
-        Where-Object { Test-Path -LiteralPath $_ })
-    if (-not $candidates) {
-        throw 'MakeAppx.exe was not found. Install the Windows 10/11 SDK to seal the package.'
-    }
-
-    return $candidates[0]
-}
-
 <#
     Splits a payload into the part that has to be identical across architectures and the part that
     cannot be.
@@ -281,6 +266,17 @@ try {
     $manifest.Package.Identity.ProcessorArchitecture = 'arm64'
     $manifest.Save((Join-Path $layoutRoot 'AppxManifest.xml'))
 
+    # Built from the ARM64 manifest rather than copied from the x64 build, for the same reason the
+    # manifest is rewritten here: a resource file carrying another package's identity resolves to
+    # nothing. The bytes come out identical anyway, because the identity name is what the two share.
+    Write-Output 'Building the described resources …'
+    $resources = & (Join-Path $PSScriptRoot 'build-package-resources.ps1') `
+        -ManifestPath (Join-Path $layoutRoot 'AppxManifest.xml') `
+        -StageRoot (Join-Path $outputRoot 'pri/stage') `
+        -RepoRoot $repoRoot
+    Copy-Item -LiteralPath $resources.Path -Destination (Join-Path $layoutRoot 'resources.pri') -Force
+    Write-Output "Described in $(@($resources.Described | ForEach-Object { $_.language }) -join ', ') under $($resources.MapName)."
+
     $layoutFiles = @(Get-ChildItem -LiteralPath $layoutRoot -Recurse -File)
     $layoutNames = @($layoutFiles | ForEach-Object {
             [IO.Path]::GetRelativePath($layoutRoot, $_.FullName).Replace('\', '/')
@@ -293,7 +289,7 @@ try {
     }
 
     Write-Output 'Sealing the package …'
-    $makeAppx = Get-MakeAppx
+    $makeAppx = & (Join-Path $PSScriptRoot 'find-sdk-tool.ps1') -Name 'makeappx.exe'
     $msixPath = Join-Path $outputRoot $msixName
     # No /nv, for the same reason as x64: that flag skips the validation that decides whether Windows
     # could install the package, and throwing it away would leave installability resting on nothing.

@@ -58,9 +58,20 @@
 
   <Applications>
     <Application Id="APReelume" Executable="ApSolutions.LocalMedia.Windows.exe" EntryPoint="windows.fullTrustApplication">
+      <!--
+        The description is a reference, not a string. It used to be one string with a slash inside
+        it — "Biblioteca y reproductor de vídeo local / Local video library and player" — which
+        Windows shows exactly like that to a Spanish reader and to an English one alike; declaring
+        the two languages under <Resources> does not localise anything by itself. eng/build-package-resources.ps1
+        builds one resource per declared language from the two READMEs, so the MSIX and the winget
+        entry say the same thing, and neither is typed twice.
+
+        The name stays a string: "AP Reelume" is the product's name in both languages, and a brand
+        that changes with the locale is a different product.
+      -->
       <uap:VisualElements
         DisplayName="AP Reelume"
-        Description="Biblioteca y reproductor de vídeo local / Local video library and player"
+        Description="ms-resource:AppDescription"
         BackgroundColor="#111827"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">

@@ -55,21 +55,6 @@ $packageVersion = "$version.0"
 $msixName = "APSolutions.LocalMedia_${version}_x64.msix"
 $zipName = "ApReelume-${version}-win-x64.zip"
 
-function Get-MakeAppx {
-    # @() because a machine with exactly one SDK yields a bare string, and indexing a string
-    # returns its first character — the packaging step then tries to run a program called 'C'.
-    $candidates = @(Get-ChildItem -LiteralPath 'C:/Program Files (x86)/Windows Kits/10/bin' -Directory -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -match '^10\.' } |
-        Sort-Object Name -Descending |
-        ForEach-Object { Join-Path $_.FullName 'x64/makeappx.exe' } |
-        Where-Object { Test-Path -LiteralPath $_ })
-    if (-not $candidates) {
-        throw 'MakeAppx.exe was not found. Install the Windows 10/11 SDK to seal the package.'
-    }
-
-    return $candidates[0]
-}
-
 Push-Location $repoRoot
 try {
     if (Test-Path -LiteralPath $outputRoot) { Remove-Item -LiteralPath $outputRoot -Recurse -Force }
@@ -139,6 +124,16 @@ try {
 
     Copy-Item -LiteralPath $manifestSource -Destination (Join-Path $layoutRoot 'AppxManifest.xml') -Force
 
+    # The description Windows shows is a reference now, so the resources it points at have to travel
+    # with the package or the reference resolves to nothing at all.
+    Write-Output 'Building the described resources …'
+    $resources = & (Join-Path $PSScriptRoot 'build-package-resources.ps1') `
+        -ManifestPath (Join-Path $layoutRoot 'AppxManifest.xml') `
+        -StageRoot (Join-Path $outputRoot 'pri/stage') `
+        -RepoRoot $repoRoot
+    Copy-Item -LiteralPath $resources.Path -Destination (Join-Path $layoutRoot 'resources.pri') -Force
+    Write-Output "Described in $(@($resources.Described | ForEach-Object { $_.language }) -join ', ') under $($resources.MapName)."
+
     $layoutFiles = @(Get-ChildItem -LiteralPath $layoutRoot -Recurse -File)
     $layoutNames = @($layoutFiles | ForEach-Object {
             [IO.Path]::GetRelativePath($layoutRoot, $_.FullName).Replace('\', '/')
@@ -151,7 +146,7 @@ try {
     }
 
     Write-Output 'Sealing the package …'
-    $makeAppx = Get-MakeAppx
+    $makeAppx = & (Join-Path $PSScriptRoot 'find-sdk-tool.ps1') -Name 'makeappx.exe'
     $msixPath = Join-Path $outputRoot $msixName
     # No /nv. That flag skips the validation that decides whether Windows could install the package —
     # the manifest's protocols and file type associations, and whether every declared file is there —
@@ -276,6 +271,12 @@ try {
         onlyInPackage   = $onlyInPackage
         packageOverhead = @($entryNames | Where-Object { $_ -in $overhead -or $_.StartsWith('AppxMetadata/') } | Sort-Object)
         removedForeignRuntimes = @($strays | ForEach-Object { $_.Name } | Sort-Object -Unique)
+        # What Windows will read the description from, dumped back out of the built resources rather
+        # than restated from what went in.
+        describedIn     = [ordered]@{
+            resourceMap = $resources.MapName
+            descriptions = @($resources.Described)
+        }
         secretScan      = [ordered]@{
             filesScanned = $scannable.Count
             hits         = $secretHits.Count
