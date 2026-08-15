@@ -50,6 +50,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         "APSolutions.LocalMedia.Tests",
         $"walk-{Guid.NewGuid():N}");
 
+    /// <summary>
+    /// What a scene's shutdown threw, raised here rather than where it happened. See
+    /// <see cref="ShellHost.Dispose"/>: a throw inside the using replaces the scene's own failure.
+    /// </summary>
+    private readonly List<Exception> _teardownFailures = [];
+
     public void Dispose()
     {
         // The watcher lets go of its directory handle asynchronously on the close path; the delete
@@ -68,6 +74,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             {
                 Thread.Sleep(200);
             }
+        }
+
+        // Raised after the scene has reported its own result, so a shutdown that goes wrong is still
+        // a failure and no longer speaks over the one the walk was written to find.
+        if (_teardownFailures.Count > 0)
+        {
+            throw new AggregateException(
+                "The assembled application failed to shut down after the scene finished.",
+                _teardownFailures);
         }
     }
 
@@ -494,6 +509,93 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The second batch: the player's transport, pressed with the mouse on a session the real engine
+    /// is decoding. Pause and resume, both skips, mute, the volume slider, and stop.
+    /// </summary>
+    /// <remarks>
+    /// The walk already drove this surface from the keyboard and the space bar; what it had never
+    /// done is press the buttons a person with a pointing device presses, which is the one thing a
+    /// keyboard route cannot stand in for.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_players_transport_is_operated_with_the_mouse()
+    {
+        // Long enough to survive a forward skip: the default is thirty seconds, and on a twelve-second
+        // sample the first skip ran off the end, so Stop was disabled by the time the walk reached it.
+        var sample = await RequireSampleAsync("walk-transport.mp4", durationSeconds: 90);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Transport.2024.mp4");
+        File.Copy(sample, mediaPath);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromSeconds(90));
+
+        using var host = ShowShell(height: 1200);
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(fileId), TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the session never reached the playing state on the real engine");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        var player = host.ViewModel.Player!.Player;
+        var transport = player.Transport;
+        Assert.NotNull(transport);
+
+        await PressAsync(
+            host,
+            "PlayerPauseAction",
+            () => player.IsPaused,
+            "clicking Pause never paused the session the engine was decoding");
+
+        await PressAsync(
+            host,
+            "PlayerPlayAction",
+            () => player.IsPlaying,
+            "clicking Play never resumed the paused session");
+
+        // The skips are the bar's own rule: one in flight refuses the next, so each press is given
+        // its answer before the following one.
+        await PressAsync(
+            host,
+            "TransportSkipForward",
+            () => transport!.Position,
+            "clicking the forward skip never moved the playhead");
+
+        await PressAsync(
+            host,
+            "TransportSkipBackward",
+            () => transport!.Position,
+            "clicking the backward skip never moved the playhead");
+
+        await PressAsync(
+            host,
+            "TransportToggleMute",
+            () => transport!.IsMuted,
+            "clicking Mute never muted the session");
+        Assert.True(transport!.IsMuted);
+
+        // The volume slider is a command control like any other, and pressing it has to reach the
+        // level the session is playing at - not only the thumb on the screen.
+        await PressAsync(
+            host,
+            "TransportVolumeLabel",
+            () => transport.VolumePercent,
+            "clicking the volume slider never changed the level the session plays at");
+
+        await PressAsync(
+            host,
+            "PlayerStopAction",
+            () => player.IsStopped,
+            "clicking Stop never stopped the session");
+
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>
     /// Finds one command control by its <b>anchor</b>: the resource key behind its accessible name,
     /// its <c>x:Name</c>, or — for the two controls named by their data — the name the walk itself
     /// seeded.
@@ -551,6 +653,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // brought into view, and a click there hits nothing at all. Two scroll viewers are nested
         // here, so the scroll and the layout settle over a few passes rather than one.
         var scrollers = control.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
+
+        // The middle, except on a range control, where the middle is usually where the value already
+        // is: the volume slider runs from 0 to 200 and starts at 100, so pressing its centre asks for
+        // exactly the level already playing and nothing changes. A quarter along asks for something
+        // else, which is what pressing a slider is for. Measured on 2026-08-15, after a press that
+        // did reach the control and still moved nothing.
+        var alongX = control is Slider ? 0.25 : 0.5;
         Point? centre = null;
         for (var settle = 0; settle < 24; settle++)
         {
@@ -558,7 +667,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host.Window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             centre = control.TranslatePoint(
-                new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
+                new Point(control.Bounds.Width * alongX, control.Bounds.Height / 2),
                 host.Window);
             if (centre is { } candidate && IsUnder(host, candidate, control))
             {
@@ -580,6 +689,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             $"{Describe(control)} is on screen but cannot be pressed: "
             + $"visible={control.IsEffectivelyVisible}, enabled={control.IsEffectivelyEnabled}.");
         Assert.True(centre.HasValue, $"{Describe(control)} has no position in the window.");
+
+        // A point outside the window is a click that lands on nothing, and without this the only
+        // symptom is the effect never arriving - sixty seconds of waiting and no word about where
+        // the press went.
+        Assert.True(
+            centre.Value.X >= 0
+                && centre.Value.Y >= 0
+                && centre.Value.X < host.Window.Bounds.Width
+                && centre.Value.Y < host.Window.Bounds.Height,
+            $"{Describe(control)} sits at {centre.Value} and the window is "
+                + $"{host.Window.Bounds.Width}x{host.Window.Bounds.Height}, so the press would land "
+                + "outside it.");
 
         host.Window.MouseMove(centre.Value, RawInputModifiers.None);
         host.Window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
@@ -915,14 +1036,20 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Dispatcher.UIThread.RunJobs();
         window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
-        return new ShellHost(application, window, shell, Assert.IsType<ShellViewModel>(shell.DataContext));
+        return new ShellHost(
+            application,
+            window,
+            shell,
+            Assert.IsType<ShellViewModel>(shell.DataContext),
+            _teardownFailures.Add);
     }
 
     private sealed record ShellHost(
         ApplicationHost Application,
         Window Window,
         ShellView Shell,
-        ShellViewModel ViewModel) : IDisposable
+        ShellViewModel ViewModel,
+        Action<Exception> ReportTeardownFailure) : IDisposable
     {
         public void Dispose()
         {
@@ -937,7 +1064,24 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             }
 
             // And then the application lets go of what it built, which is what a real exit does.
-            Application.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            //
+            // A throw here would not add a failure: inside a using statement it *replaces* the
+            // body's, so a scene that failed its own assertion reports whatever the teardown said
+            // instead. Measured on 2026-08-15: pressing Stop and then closing the player leaves the
+            // session coordinator stopping an engine that is already gone, and the
+            // ObjectDisposedException out of that shutdown took the place of the assertion the walk
+            // had just failed — sixty seconds of waiting, and not a word about what was waited for.
+            //
+            // So it is handed to the suite instead, which raises it after the scene has had its say.
+            // A teardown defect stays visible; it just stops speaking over the defect being hunted.
+            try
+            {
+                Application.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            }
+            catch (Exception exception) when (exception is not OutOfMemoryException)
+            {
+                ReportTeardownFailure(exception);
+            }
         }
     }
 
@@ -951,7 +1095,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.SkipWhen(
             encoder is null,
             "ffmpeg was not found. Set FFMPEG_PATH or install ffmpeg to generate the walk's media.");
-        var destination = Path.Combine(RepositoryLayout.Root, "artifacts", "test-media", "walk", name);
+        // The duration is part of the name because it is part of what was asked for. Keyed on the
+        // name alone, the cache hands back whatever length happened to be produced first: asking for
+        // ninety seconds after a twelve-second sample existed returned the twelve, and the scene
+        // failed on a forward skip that ran off the end of a file it thought was long enough.
+        var destination = Path.Combine(
+            RepositoryLayout.Root,
+            "artifacts",
+            "test-media",
+            "walk",
+            string.Create(
+                CultureInfo.InvariantCulture,
+                $"{Path.GetFileNameWithoutExtension(name)}-{durationSeconds}s{Path.GetExtension(name)}"));
         if (File.Exists(destination) && new FileInfo(destination).Length > 0)
         {
             return destination;

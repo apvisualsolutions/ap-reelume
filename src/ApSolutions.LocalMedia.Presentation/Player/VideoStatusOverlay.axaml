@@ -11,8 +11,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="player:VideoStatusViewModel"
     automation:AutomationProperties.Name="{DynamicResource VideoStatusAccessibleName}"
     automation:AutomationProperties.LiveSetting="Polite">
+  <!--
+    A status badge, and it has to be sized to its own text. Without these two alignments the border
+    stretches to whatever contains it, and in the shell that is the whole player stage: measured on
+    2026-08-15 at 1280x1200 over a 1280x1200 stage, opaque, on top of the video and on top of the
+    transport bar. Every click meant for play, pause, stop or the volume landed on this instead, and
+    nothing said so because the player answers the keyboard itself.
+  -->
   <Border
       x:Name="VideoStatusSurface"
+      HorizontalAlignment="Left"
+      VerticalAlignment="Top"
+      Margin="16"
       IsVisible="{Binding HasStatus}"
       Padding="10"
       Background="{DynamicResource ShellSurfaceBrush}"

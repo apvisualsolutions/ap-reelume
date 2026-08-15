@@ -51,11 +51,8 @@ MovieDetailsView#MovieTrailerAction                        # batch 1: shown only
 NextEpisodeOverlay#NextEpisodeCancel                       # batch 2
 NextEpisodeOverlay#NextEpisodePlayNow                      # batch 2
 PlayerVersionsView#PlayerVersionsSwitchAction              # batch 2
-PlayerView#PlayerPauseAction                               # batch 2
-PlayerView#PlayerPlayAction                                # batch 2
 PlayerView#PlayerRecoveryOpenExternally                    # batch 2
 PlayerView#PlayerRecoveryRetry                             # batch 2
-PlayerView#PlayerStopAction                                # batch 2
 PrivacySettingsView#PrivacyAutoRefreshLabel                # batch 4
 PrivacySettingsView#PrivacyDiagnosticsLabel                # batch 4
 PrivacySettingsView#PrivacyExportLabel                     # batch 4
@@ -109,10 +106,6 @@ SubtitleStyleView#SubtitleStyleSizeLabel                   # batch 2
 TrackSelectorView#TrackSelectorAudioLabel                  # batch 2
 TrackSelectorView#TrackSelectorRememberForSeries           # batch 2
 TrackSelectorView#TrackSelectorSubtitleLabel               # batch 2
-TransportControlsView#TransportSkipBackward                # batch 2
-TransportControlsView#TransportSkipForward                 # batch 2
-TransportControlsView#TransportToggleMute                  # batch 2
-TransportControlsView#TransportVolumeLabel                 # batch 2
 UpdateView#UpdateAutomaticCheckLabel                       # batch 7
 UpdateView#UpdateCancelLabel                               # batch 7
 UpdateView#UpdateCheckLabel                                # batch 7
