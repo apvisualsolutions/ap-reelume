@@ -272,19 +272,17 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    in the manifest — 42 verified, 3 blocked — and `LIB-007` **stays `VERIFIED`** deliberately, because
    its criterion is about thresholds and a correction that persists, and both hold. `LIB-006` returns
    to `VERIFIED` only when the click-driven walk is green.
-3. **`BUG-012` — the watcher that dies when its buffer overflows. It jumps the queue, deliberately.**
-   An intermittent CI red on 2026-08-15 uncovered it (`InternalBufferOverflowException` in
-   `FileWatcherRecoveryTests`), and behind it is a defect that is not intermittent:
-   `DebouncedFileWatcher` treats the overflow as the end of the watcher —
-   `writer.TryComplete(exception)` closes the channel — `RootWatchCoordinator` degrades that to a
-   recovery scan, so **no files are lost**, and then `RootWatchBackground` releases the root, leaving
-   `Watch` to be called again only at application start or after a manual scan. **A folder set to
-   `Continuous` silently stops being watched** after the first large batch of files, which is exactly
-   when it is needed. It goes before `LIB-016` because it is short and breaks a shipped feature,
-   while `LIB-016` is new work that does not depend on it. Two things: `InternalBufferSize` is never
-   set (8 KiB by default, 64 KiB maximum), and an overflow has to mean "rescan and **keep
-   watching**". **The chain was read, not run**: the red proves the overflow, not the lost watching,
-   so the fix brings its own test.
+3. ~~**`BUG-012` — the watcher that dies when its buffer overflows.**~~ **Done on 2026-08-15**, and the
+   first measurement disproved the last half of what was written here: a `Continuous` root **never
+   leaves** `_watching`, because `StartAsync` is a `Task.WhenAll` with the fallback scheduler and that
+   one **never ends**, so not even a manual scan could revive the watcher — only starting the
+   application again. An overflow now means "I have lost events" (`WatchErrorPolicy`, in the domain),
+   travels as `FileChangeBatch.EventsLost`, becomes **one** recovery scan, and **the watching goes
+   on**; the buffer is asked for at its 64 KiB ceiling; and a watcher that really dies is retried on
+   the next fallback pass, which is the heartbeat this slice already had. **A real overflow does not
+   reproduce on this machine** — 64 000 operations, zero overflows, at 8 KiB and at 64 KiB — so the
+   decision is tested in the domain and no deterministic integration test is pretended.
+   [audit-bug012-watcher-survives-overflow.md](evidence/stable/audit-bug012-watcher-survives-overflow.md).
 4. **`LIB-016`** — the automatic refresh, off by default, stale at 90 days, 20 titles per pass. **The
    declared network purpose's text changes with the code**, not after it. No longer blocked:
    `catalog_metadata` stores `provider`, `provider_key` and `refreshed_utc`, the two per-title facts

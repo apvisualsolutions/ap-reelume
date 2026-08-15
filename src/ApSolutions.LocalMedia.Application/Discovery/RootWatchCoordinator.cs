@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Collections.Concurrent;
+using System.Threading.Channels;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
 
@@ -31,13 +32,25 @@ public sealed class RootWatchCoordinator
     {
         ArgumentNullException.ThrowIfNull(root);
 
+        // A watcher that died is watched again on the next recovery pass: the fallback schedule is
+        // the heartbeat this slice already has, so a lost watcher costs at most one interval of
+        // live watching instead of costing it until the application is started again.
+        var retries = Channel.CreateBounded<byte>(new BoundedChannelOptions(1)
+        {
+            FullMode = BoundedChannelFullMode.DropWrite,
+            SingleReader = true,
+            SingleWriter = true,
+        });
+
         // The live file watcher is what Continuous means; a root whose owner chose Manual or
         // Startup is not followed behind their back. The fallback scheduler reads the policy on
         // its own, so it always gets the root.
         var watcher = root.ScanPolicy.HasFlag(ScanPolicy.Continuous)
-            ? ProcessWatcherAsync(root, cancellationToken)
+            ? ProcessWatcherAsync(root, retries.Reader, cancellationToken)
             : Task.CompletedTask;
-        await Task.WhenAll(watcher, ProcessFallbackScheduleAsync(root, cancellationToken))
+        await Task.WhenAll(
+                watcher,
+                ProcessFallbackScheduleAsync(root, retries.Writer, cancellationToken))
             .ConfigureAwait(false);
     }
 
@@ -55,43 +68,83 @@ public sealed class RootWatchCoordinator
         return RunScanAsync(root.Id, trigger, cancellationToken);
     }
 
-    private async Task ProcessWatcherAsync(LibraryRoot root, CancellationToken cancellationToken)
+    private async Task ProcessWatcherAsync(
+        LibraryRoot root,
+        ChannelReader<byte> retries,
+        CancellationToken cancellationToken)
     {
-        try
+        while (true)
         {
-            await foreach (var batch in _rootWatcher
-                               .StartAsync(root, cancellationToken)
-                               .WithCancellation(cancellationToken)
-                               .ConfigureAwait(false))
+            try
             {
-                if (batch.RootId != root.Id)
+                await foreach (var batch in _rootWatcher
+                                   .StartAsync(root, cancellationToken)
+                                   .WithCancellation(cancellationToken)
+                                   .ConfigureAwait(false))
                 {
-                    throw new InvalidDataException("The watcher returned a batch for a different root.");
+                    if (batch.RootId != root.Id)
+                    {
+                        throw new InvalidDataException("The watcher returned a batch for a different root.");
+                    }
+
+                    // Lost events are exactly what a full pass over the root recovers, and it covers
+                    // whatever else came in the same batch, so it replaces the incremental scan.
+                    if (batch.EventsLost)
+                    {
+                        await RunScanAsync(root.Id, ScanTrigger.Recovery, cancellationToken)
+                            .ConfigureAwait(false);
+                    }
+                    else if (batch.Changes.Count > 0)
+                    {
+                        await RunScanAsync(root.Id, ScanTrigger.Watcher, cancellationToken)
+                            .ConfigureAwait(false);
+                    }
                 }
 
-                if (batch.Changes.Count > 0)
-                {
-                    await RunScanAsync(root.Id, ScanTrigger.Watcher, cancellationToken).ConfigureAwait(false);
-                }
+                // The stream ran dry on its own: there is nothing left to watch, so nothing to
+                // start again either.
+                return;
             }
-        }
-        catch (Exception exception) when (
-            exception is IOException or UnauthorizedAccessException or NotSupportedException)
-        {
-            await RunScanAsync(root.Id, ScanTrigger.Recovery, cancellationToken).ConfigureAwait(false);
+            catch (Exception exception) when (
+                exception is IOException or UnauthorizedAccessException or NotSupportedException)
+            {
+                await RunScanAsync(root.Id, ScanTrigger.Recovery, cancellationToken).ConfigureAwait(false);
+            }
+
+            // The watcher died. Waiting for the next fallback pass is what keeps a broken root from
+            // being retried in a hot loop; when no pass is coming, there is nothing to wait for.
+            if (!await retries.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
+            {
+                return;
+            }
+
+            while (retries.TryRead(out _))
+            {
+            }
         }
     }
 
     private async Task ProcessFallbackScheduleAsync(
         LibraryRoot root,
+        ChannelWriter<byte> retries,
         CancellationToken cancellationToken)
     {
-        await foreach (var trigger in _fallbackScanScheduler
-                           .ScheduleAsync(root, cancellationToken)
-                           .WithCancellation(cancellationToken)
-                           .ConfigureAwait(false))
+        try
         {
-            await RunFallbackAsync(root, trigger, cancellationToken).ConfigureAwait(false);
+            await foreach (var trigger in _fallbackScanScheduler
+                               .ScheduleAsync(root, cancellationToken)
+                               .WithCancellation(cancellationToken)
+                               .ConfigureAwait(false))
+            {
+                await RunFallbackAsync(root, trigger, cancellationToken).ConfigureAwait(false);
+                _ = retries.TryWrite(0);
+            }
+        }
+        finally
+        {
+            // No more passes are coming, so a watcher waiting for one is released rather than left
+            // waiting for a heartbeat that stopped.
+            _ = retries.TryComplete();
         }
     }
 

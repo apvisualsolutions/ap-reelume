@@ -336,6 +336,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una carpeta vigilada ya no deja de vigilarse justo cuando le llegan muchos archivos.** Cuando
+  Windows avisaba de que había perdido cambios —lo que pasa al copiar una temporada entera de golpe—,
+  la vigilancia en vivo de esa carpeta terminaba en silencio y no volvía hasta el siguiente arranque
+  de la aplicación. No se perdía ningún archivo, porque se lanzaba un repaso completo, pero a partir
+  de ahí lo que se añadiera tardaba en aparecer hasta el repaso siguiente. Ahora un aviso de esa
+  clase significa «repasa la carpeta entera y sigue vigilando», el espacio que Windows usa para
+  avisar se pide al máximo que permite, y una vigilancia que se cae de verdad —un disco desconectado,
+  una carpeta de red que deja de contestar— se reintenta sola en el siguiente repaso.
 - **La verificación automática ya pulsa botones con el ratón.** El recorrido que conduce la
   aplicación construida sólo usaba el teclado, y por ese hueco pasaron unos botones que estaban a la
   vista y no hacían nada. Ahora abre la ficha de una película identificada, pulsa «Actualizar desde

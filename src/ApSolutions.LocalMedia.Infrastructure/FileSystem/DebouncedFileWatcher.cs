@@ -16,6 +16,14 @@ public sealed class DebouncedFileWatcher : IRootWatcher
 
     public static readonly TimeSpan DefaultDebounce = TimeSpan.FromMilliseconds(750);
 
+    /// <summary>
+    /// The buffer the operating system fills with change records while this process is busy. It
+    /// defaults to 8 KiB, which a folder receiving a season at once overflows; 64 KiB is the hard
+    /// ceiling the platform allows, and the whole point of asking for it is that overflowing costs
+    /// a full rescan.
+    /// </summary>
+    public const int InternalBufferBytes = 64 * 1024;
+
     public DebouncedFileWatcher(IClock clock, TimeSpan? debounce = null)
     {
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
@@ -31,7 +39,7 @@ public sealed class DebouncedFileWatcher : IRootWatcher
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(root);
-        var changes = Channel.CreateUnbounded<FileChange>(new UnboundedChannelOptions
+        var changes = Channel.CreateUnbounded<WatchSignal>(new UnboundedChannelOptions
         {
             SingleReader = true,
             SingleWriter = false,
@@ -42,7 +50,7 @@ public sealed class DebouncedFileWatcher : IRootWatcher
         while (await changes.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
         {
             var pending = new Dictionary<string, FileChange>(StringComparer.OrdinalIgnoreCase);
-            Drain(changes.Reader, pending);
+            var eventsLost = Drain(changes.Reader, pending);
             while (true)
             {
                 using var debounceCancellation =
@@ -61,7 +69,7 @@ public sealed class DebouncedFileWatcher : IRootWatcher
                     {
                     }
 
-                    Drain(changes.Reader, pending);
+                    eventsLost |= Drain(changes.Reader, pending);
                     continue;
                 }
 
@@ -69,40 +77,73 @@ public sealed class DebouncedFileWatcher : IRootWatcher
                 break;
             }
 
-            yield return new FileChangeBatch(root.Id, pending.Values.ToArray(), _clock.UtcNow);
+            yield return new FileChangeBatch(
+                root.Id,
+                pending.Values.ToArray(),
+                _clock.UtcNow,
+                eventsLost);
         }
     }
 
-    private static FileSystemWatcher CreateWatcher(string path, ChannelWriter<FileChange> writer)
+    private static FileSystemWatcher CreateWatcher(string path, ChannelWriter<WatchSignal> writer)
     {
         var watcher = new FileSystemWatcher(path)
         {
             IncludeSubdirectories = true,
+            InternalBufferSize = InternalBufferBytes,
             NotifyFilter = NotifyFilters.FileName |
                            NotifyFilters.DirectoryName |
                            NotifyFilters.LastWrite |
                            NotifyFilters.Size,
         };
         watcher.Created += (_, eventArgs) =>
-            writer.TryWrite(new FileChange(FileChangeKind.Created, eventArgs.FullPath));
+            writer.TryWrite(new WatchSignal(new FileChange(FileChangeKind.Created, eventArgs.FullPath)));
         watcher.Changed += (_, eventArgs) =>
-            writer.TryWrite(new FileChange(FileChangeKind.Changed, eventArgs.FullPath));
-        watcher.Renamed += (_, eventArgs) =>
-            writer.TryWrite(new FileChange(FileChangeKind.Renamed, eventArgs.FullPath, eventArgs.OldFullPath));
+            writer.TryWrite(new WatchSignal(new FileChange(FileChangeKind.Changed, eventArgs.FullPath)));
+        watcher.Renamed += (_, eventArgs) => writer.TryWrite(new WatchSignal(
+            new FileChange(FileChangeKind.Renamed, eventArgs.FullPath, eventArgs.OldFullPath)));
         watcher.Deleted += (_, eventArgs) =>
-            writer.TryWrite(new FileChange(FileChangeKind.Deleted, eventArgs.FullPath));
-        watcher.Error += (_, eventArgs) => writer.TryComplete(eventArgs.GetException());
+            writer.TryWrite(new WatchSignal(new FileChange(FileChangeKind.Deleted, eventArgs.FullPath)));
+        watcher.Error += (_, eventArgs) =>
+        {
+            // An overflow means "I have lost events", not "I cannot go on": the watcher keeps
+            // raising events afterwards, and what the lost ones need is a full pass over the root.
+            // Every other error is the end of this watcher, and the reader learns why.
+            var error = eventArgs.GetException();
+            _ = WatchErrorPolicy.MeansEventsWereLost(error)
+                ? writer.TryWrite(WatchSignal.EventsLost)
+                : writer.TryComplete(error);
+        };
         return watcher;
     }
 
-    private static void Drain(
-        ChannelReader<FileChange> reader,
+    private static bool Drain(
+        ChannelReader<WatchSignal> reader,
         IDictionary<string, FileChange> pending)
     {
-        while (reader.TryRead(out var change))
+        var eventsLost = false;
+        while (reader.TryRead(out var signal))
         {
-            Coalesce(pending, change);
+            if (signal.Change is { } change)
+            {
+                Coalesce(pending, change);
+            }
+            else
+            {
+                eventsLost = true;
+            }
         }
+
+        return eventsLost;
+    }
+
+    /// <summary>
+    /// A change the watcher saw, or — with no change in it — the news that the system dropped
+    /// changes nobody will ever see.
+    /// </summary>
+    private readonly record struct WatchSignal(FileChange? Change)
+    {
+        public static WatchSignal EventsLost { get; } = new((FileChange?)null);
     }
 
     private static void Coalesce(IDictionary<string, FileChange> pending, FileChange change)

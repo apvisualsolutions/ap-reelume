@@ -19,10 +19,16 @@ public sealed record FileChange(
     string Path,
     string? PreviousPath = null);
 
+/// <summary>
+/// What the watcher saw. <paramref name="EventsLost"/> says the operating system dropped changes
+/// the watcher never got to see — it means "I have lost events", never "I cannot go on", so the
+/// batch that carries it is a request to rescan and not the end of the watching.
+/// </summary>
 public sealed record FileChangeBatch(
     LibraryRootId RootId,
     IReadOnlyList<FileChange> Changes,
-    DateTimeOffset ObservedUtc);
+    DateTimeOffset ObservedUtc,
+    bool EventsLost = false);
 
 public interface IRootWatcher
 {

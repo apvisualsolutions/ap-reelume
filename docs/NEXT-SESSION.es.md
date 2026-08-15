@@ -276,20 +276,18 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    en el manifiesto —42 verificados, 3 bloqueados—, y `LIB-007` **se queda `VERIFIED`** a propósito,
    porque su criterio es de umbrales y de corrección persistente, y ambos se cumplen. `LIB-006` vuelve
    a `VERIFIED` sólo cuando el recorrido con clics esté verde.
-3. **`BUG-012` — el vigilante que muere al desbordar su buffer. Se cuela aquí, y es una decisión.**
-   Lo destapó un rojo intermitente de CI el 2026-08-15
-   (`InternalBufferOverflowException` en `FileWatcherRecoveryTests`), y detrás hay un defecto que no
-   es intermitente: `DebouncedFileWatcher` trata el desbordamiento como el fin del vigilante
-   —`writer.TryComplete(exception)` cierra el canal—, `RootWatchCoordinator` lo degrada a un escaneo
-   de recuperación —así que **no se pierden archivos**— y después `RootWatchBackground` suelta el
-   root, de modo que `Watch` sólo vuelve a llamarse al arrancar la aplicación o tras un escaneo
-   manual. **Una carpeta en `Continuous` deja de vigilarse en silencio** tras la primera tanda grande
-   de archivos, que es justo cuando más se la necesita. Va antes que `LIB-016` porque es corto y
-   rompe una función ya publicada, mientras que `LIB-016` es funcionalidad nueva que no depende de
-   él. Dos cosas: `InternalBufferSize` no se fija (8 KiB por defecto, 64 KiB de máximo), y un
-   desbordamiento tiene que significar «reescanea y **sigue vigilando**». **La cadena está leída, no
-   ejecutada**: el rojo prueba el desbordamiento, no la pérdida de vigilancia, así que la corrección
-   trae su propia prueba.
+3. ~~**`BUG-012` — el vigilante que muere al desbordar su buffer.**~~ **Hecho el 2026-08-15**, y la
+   primera medición desmintió la última mitad de lo que estaba escrito aquí: un root `Continuous`
+   **nunca sale** de `_watching`, porque `StartAsync` es un `Task.WhenAll` con el planificador de
+   reserva y ése **no termina nunca**, así que ni un escaneo manual podía revivir al vigilante —sólo
+   volver a arrancar la aplicación—. Un desbordamiento es ahora «he perdido eventos»
+   (`WatchErrorPolicy` en el dominio), viaja como `FileChangeBatch.EventsLost`, se convierte en **un**
+   escaneo de recuperación y **la vigilancia sigue**; el buffer se pide al techo de 64 KiB; y un
+   vigilante que muere de verdad se reintenta en la siguiente pasada de reserva, que es el latido que
+   esta parte ya tenía. **El desbordamiento real no se reproduce en esta máquina** —64 000
+   operaciones, cero desbordamientos, con 8 KiB y con 64 KiB—, así que la decisión se prueba en el
+   dominio y no se finge una prueba de integración determinista.
+   [audit-bug012-watcher-survives-overflow.md](evidence/stable/audit-bug012-watcher-survives-overflow.md).
 4. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
    pasada. **El texto del propósito de red declarado cambia con el código**, no después. Ya no está
    bloqueado: `catalog_metadata` guarda `provider`, `provider_key` y `refreshed_utc`, que son los dos

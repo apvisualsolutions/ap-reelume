@@ -329,6 +329,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A watched folder no longer stops being watched exactly when a lot of files arrive.** When Windows
+  reported that it had dropped changes — which is what happens when a whole season is copied in at
+  once — live watching of that folder ended in silence and did not come back until the application
+  was started again. No file was lost, because a full pass over the folder was run, but from then on
+  anything added took until the next pass to appear. A report like that now means "sweep the whole
+  folder and keep watching", the space Windows uses to report changes is asked for at the maximum it
+  allows, and watching that really does fall over — an unplugged disk, a network folder that stops
+  answering — starts itself again on the next pass.
 - **The automated verification now presses buttons with the mouse.** The walk that drives the built
   application only ever used the keyboard, and that gap is how a pair of buttons that were on screen
   and did nothing got through. It now opens an identified film's entry, clicks "Refresh from
