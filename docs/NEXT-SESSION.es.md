@@ -242,7 +242,24 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    `www.youtube.com` en `src/`, resuelto con una **segunda lista cerrada** (`HandedOff`) en vez de
    declarar una conexión que no existe.
    [audit-lib015-provider-trailer.md](evidence/stable/audit-lib015-provider-trailer.md).
-2. **El eslabón que falta, y es lo siguiente que se hace.** La primera medición de `LIB-016` destapó
+2. ~~**El eslabón que falta**~~ **Hecho el 2026-08-15**, en cuatro commits y con `LIB-006` de vuelta
+   en `VERIFIED` (43 verificados, 2 bloqueados). La primera medición que el plan exigía dio más de lo
+   esperado: el puente `media_file_id` → `title_id` **es la identidad del GUID** y no costó ninguna
+   migración —`titles` no lo escribe nadie en `src/`, así que todo título del catálogo es un archivo
+   escaneado—, y lo que sí faltaba era el **nombre del proveedor**, que no viaja con el candidato y
+   sin el cual `GetDetailsAsync` lanza.
+   [audit-apply-identification.md](evidence/stable/audit-apply-identification.md).
+   Detrás salieron **dos defectos que nadie buscaba**: guardar por primera vez en una ficha sin
+   editar devolvía `NotFound` en silencio, y **ningún llamante subía la revisión al guardar**, de modo
+   que el control optimista comparaba contra un número que nunca se movía y dos ventanas podían ganar
+   las dos. Los dobles en memoria sí la subían, que es por qué ninguna prueba unitaria podía verlo.
+   [audit-refresh-resolves-itself.md](evidence/stable/audit-refresh-resolves-itself.md).
+   Y el clic destapó el tercero: **el paseo ensamblado montaba la ventana de una forma que la
+   aplicación no usa**, dejando el shell fuera del árbol lógico y **todos** los botones enlazados por
+   `Command` declarándose deshabilitados. Sólo se veía haciendo clic, y nadie hacía clic.
+   [audit-walk-clicks-the-editor.md](evidence/stable/audit-walk-clicks-the-editor.md).
+
+   ~~**El eslabón que falta, tal como se describió el 2026-08-14.**~~ La primera medición de `LIB-016` destapó
    que **nada convierte una identificación en metadata guardada**: `catalog_metadata` sólo lo
    escriben el editor y un `RefreshMetadata` que nadie alimenta —la única asignación de su entrada en
    todo el repositorio está **en una prueba**—, `ResolveMatch` publica un evento que no escucha nadie,

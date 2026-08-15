@@ -1,24 +1,24 @@
 {
   "release": "MVP",
   "version": "0.1.0",
-  "commit": "1a60b8ec068e8eb49d1b919331d82a55002d1e63",
+  "commit": "06518e0d1880d3143b7da3300e0dc4e4eb5ca351",
   "runtime": "win-x64",
   "signed": false,
   "artifacts": [
     {
       "name": "APSolutions.LocalMedia_0.1.0_x64.msix",
-      "sha256": "6ad83eccd2a106f9e8c7c998ffd21956e20f4ba8c3a17fae0058210e8dc0da67"
+      "sha256": "a1606b70db3a5b8f5149073fb427dff5503e85d3ff59c1bcebe7f24e923d817c"
     },
     {
       "name": "ApReelume-0.1.0-win-x64.zip",
-      "sha256": "e880a99495c5b854cc8d7e87fee8f2efa12a72b29c4f977be2a9ddd6a4cfa883"
+      "sha256": "0b73534fbef3a0f0df6a743ceae7b6fd599d808c4b7f8cc27d010305ef1b47b1"
     }
   ],
   "summary": {
     "total": 46,
-    "verified": 42,
+    "verified": 43,
     "outOfScope": 1,
-    "blocked": 3
+    "blocked": 2
   },
   "features": [
     {
@@ -209,7 +209,7 @@
     },
     {
       "id": "LIB-006",
-      "status": "BLOCKED",
+      "status": "VERIFIED",
       "tasks": [
         "T12",
         "T13",
@@ -227,14 +227,12 @@
         "docs/evidence/mvp/T13-tmdb.md",
         "docs/evidence/mvp/T14-review-inbox.md",
         "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-apply-identification.md",
         "docs/evidence/stable/audit-identification-never-reaches-the-catalogue.md",
+        "docs/evidence/stable/audit-refresh-resolves-itself.md",
+        "docs/evidence/stable/audit-walk-clicks-the-editor.md",
         "docs/evidence/stable/audit-wp2-assembly.md"
-      ],
-      "blocker": {
-        "reason": "El proveedor obtiene los metadatos y nada los escribe: `catalog_metadata` sólo lo escriben el editor manual y un `RefreshMetadata` cuya entrada asigna únicamente una prueba, `ResolveMatch` publica un evento que no consume nadie, y `ReviewState.Automatic` sólo se calcula. Una identificación —automática o aceptada a mano— no cambia nada de lo que la biblioteca muestra. / The provider fetches the metadata and nothing writes it: an identification changes nothing the library shows.",
-        "owner": "Engineering",
-        "unblockCondition": "Los pasos 2 a 5 de la cadena decidida en docs/evidence/stable/audit-identification-never-reaches-the-catalogue.md: quien escribe la metadata al aceptar una identificación, `RefreshMetadata` resolviendo por la referencia guardada, el editor sin una entrada que alguien deba rellenar, y el paseo ensamblado alcanzando el editor. La migración 0018 ya dejó la base preparada. / Steps 2 to 5 of the chain decided in the evidence; migration 0018 already prepared the database."
-      }
+      ]
     },
     {
       "id": "LIB-007",

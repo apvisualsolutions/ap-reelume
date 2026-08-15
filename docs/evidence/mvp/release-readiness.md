@@ -419,6 +419,22 @@ que la identificación se invocara y nadie comprobó que su resultado se aplicar
 verifica hasta lo que el usuario ve, no hasta el eslabón que se acababa de arreglar. Medición y forma
 en [audit-identification-never-reaches-the-catalogue.md](../stable/audit-identification-never-reaches-the-catalogue.md).
 
+### Cierre — 2026-08-15
+
+`LIB-006` vuelve a `VERIFIED`, y la condición que se puso para desbloquearlo se cumplió tal cual: el
+recorrido ensamblado **pulsa el botón con el ratón** y la ficha cambia. La cadena entera está en pie
+—`ApplyIdentification` escribiendo por sus dos llamantes, la bandeja y el camino automático de ≥90 %;
+`RefreshMetadata` resolviendo por la referencia guardada; y el editor sin la entrada que nadie
+rellenaba—, y cada eslabón trae su medición:
+[quien escribe la identificación](../stable/audit-apply-identification.md),
+[el refresco se resuelve solo](../stable/audit-refresh-resolves-itself.md) y
+[el paseo pulsa el botón](../stable/audit-walk-clicks-the-editor.md).
+
+**Lo que costó saberlo, y conviene no repetirlo**: el clic destapó que el propio paseo montaba la
+ventana de una forma que la aplicación no usa, dejando el shell fuera del árbol lógico y **todos** los
+botones enlazados por `Command` declarándose deshabilitados. Nadie lo había visto porque hasta ahora
+nada hacía clic. Verificar con el teclado no es verificar con el ratón.
+
 ## Addendum — the next link, 2026-08-14
 
 `LIB-006` returns to `BLOCKED`, and it is worth reading beside the addendum above because it is the
@@ -439,3 +455,20 @@ and hide where the work is.
 The lesson is in how it survived: **the earlier fix checked that identification was invoked, and
 nobody checked that its result was applied.** A chain is verified as far as what the user sees, not as
 far as the link that was just repaired.
+
+
+### Closed — 2026-08-15
+
+`LIB-006` returns to `VERIFIED`, and the condition set for unblocking it was met as written: the
+assembled walk **clicks the button with the mouse** and the entry changes. The whole chain stands —
+`ApplyIdentification` writing through both of its callers, the inbox and the automatic path above
+90%; `RefreshMetadata` resolving through the stored reference; and the editor without the input
+nobody filled in — and each link carries its measurement:
+[what writes the identification](../stable/audit-apply-identification.md),
+[the refresh resolves itself](../stable/audit-refresh-resolves-itself.md) and
+[the walk presses the button](../stable/audit-walk-clicks-the-editor.md).
+
+**What it cost to find out**: the click uncovered that the walk itself mounted the window in a way
+the application does not, leaving the shell off the logical tree and **every** command-bound button
+reporting itself disabled. Nobody had seen it because until now nothing clicked. Verifying with the
+keyboard is not verifying with the mouse.

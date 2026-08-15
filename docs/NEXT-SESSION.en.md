@@ -238,7 +238,24 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    network gate caught `www.youtube.com` in `src/`, settled with a **second closed list**
    (`HandedOff`) rather than by declaring a connection that is never made.
    [audit-lib015-provider-trailer.md](evidence/stable/audit-lib015-provider-trailer.md).
-2. **The missing link, and it is what happens next.** That entry's first measurement uncovered that
+2. ~~**The missing link**~~ **Done on 2026-08-15**, in four commits, with `LIB-006` back in
+   `VERIFIED` (43 verified, 2 blocked). The first measurement the plan demanded gave more than it
+   asked for: the `media_file_id` → `title_id` bridge **is the GUID identity** and cost no migration
+   — nothing in `src/` writes `titles`, so every title the catalogue projects is a scanned file — and
+   what was actually missing was the **provider's own name**, which does not travel with the
+   candidate and without which `GetDetailsAsync` throws.
+   [audit-apply-identification.md](evidence/stable/audit-apply-identification.md).
+   Behind it came **two defects nobody was looking for**: the first save on an unedited entry
+   returned `NotFound` in silence, and **no caller raised the revision when it saved**, so the
+   optimistic check was comparing against a number that never moved and two windows could both win.
+   The in-memory doubles did raise it, which is why no unit test could see it.
+   [audit-refresh-resolves-itself.md](evidence/stable/audit-refresh-resolves-itself.md).
+   And the click uncovered the third: **the assembled walk mounted the window in a way the
+   application does not**, leaving the shell off the logical tree and **every** command-bound button
+   reporting itself disabled. It was only visible by clicking, and nothing clicked.
+   [audit-walk-clicks-the-editor.md](evidence/stable/audit-walk-clicks-the-editor.md).
+
+   ~~**The missing link, as described on 2026-08-14.**~~ That entry's first measurement uncovered that
    **nothing turns an identification into stored metadata**: `catalog_metadata` is written only by the
    editor and by a `RefreshMetadata` nobody feeds — the only assignment of its input in the whole
    repository is **in a test** — `ResolveMatch` publishes an event nobody listens to, and
