@@ -133,6 +133,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   la pantalla, y anunciado con su nombre para quien use un lector de pantalla. Un resumen en blanco
   no ocupa sitio. No se abre ninguna conexión nueva: el texto ya estaba en tu disco.
 
+- **Los mandos del reproductor ya se pueden usar con el ratón.** Tres cosas distintas los tenían
+  inservibles, y las tres se veían igual: un botón en pantalla que no hacía nada. El aviso de estado
+  del vídeo —el que dice si va por hardware o si el rango es estándar— **ocupaba toda la superficie
+  del reproductor**, opaco, encima del vídeo y encima de la barra de mandos, así que se tragaba cada
+  clic; ahora es un distintivo en una esquina. Los botones no volvían a comprobar si podían usarse,
+  de modo que **pausabas con el ratón y ya no podías reanudar**. Y el deslizador de volumen se movía
+  sin llegar a la reproducción: cambiaba el número en pantalla y nada que pudieras oír. Todo esto
+  seguía funcionando con el teclado, que es exactamente por qué nadie lo había visto.
+
 - **Windows ya describe la aplicación en tu idioma antes de que la abras.** El paquete declaraba
   español e inglés desde el principio, pero su descripción era **una sola frase con una barra en
   medio** —«Biblioteca y reproductor de vídeo local / Local video library and player»—, que Windows

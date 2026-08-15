@@ -225,6 +225,24 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(CanChooseAnotherVersion));
         OnPropertyChanged(nameof(CanOpenExternally));
         OnPropertyChanged(nameof(ExternalLaunchFailed));
+
+        // A button does not watch these properties. It asks its command, once, and then only asks
+        // again when the command says so - so without this the transport's enabled state freezes at
+        // whatever the first evaluation gave. Measured on 2026-08-15: pressing Pause worked and
+        // Resume stayed disabled for good, which is a session a mouse can stop and never restart.
+        // The keyboard was unaffected, because the player answers keys itself, and that is why it
+        // survived this long.
+        foreach (var command in new[]
+        {
+            PauseCommand,
+            ResumeCommand,
+            StopCommand,
+            RetryCommand,
+            OpenExternallyCommand,
+        })
+        {
+            (command as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        }
     }
 
     private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

@@ -131,6 +131,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   name for anybody using a screen reader. A blank synopsis takes no room. No new connection is
   opened: the text was already on your disk.
 
+- **The player's controls can be used with a mouse now.** Three separate things had them unusable,
+  and all three looked the same: a button on screen that did nothing. The video status notice — the
+  one saying whether it is running on hardware or at standard range — **covered the whole player
+  surface**, opaque, over the video and over the control bar, so it swallowed every click; it is a
+  badge in a corner now. The buttons never re-checked whether they could be used, so **you could
+  pause with the mouse and then not resume**. And the volume slider moved without reaching playback:
+  it changed a number on screen and nothing you could hear. All of it still worked from the keyboard,
+  which is exactly why nobody had seen it.
+
 - **Windows now describes the application in your language before you open it.** The package
   declared Spanish and English all along, but its description was **one sentence with a slash in the
   middle** — "Biblioteca y reproductor de vídeo local / Local video library and player" — which

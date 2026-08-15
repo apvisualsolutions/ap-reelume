@@ -356,6 +356,24 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
      `EpisodePlayAction` (the series card).
    - **Counting the 129 can be got wrong**: the first measurement read **142**, because
      `<ComboBoxItem>` matches `<ComboBox` without a word boundary.
+
+   **Batch 2 is done (2026-08-15): the player's transport.** From **15** to **22** pressed; the
+   ratchet drops to **106**. It is the batch that pays for the work: it found **three product
+   defects**, all of them visible, enabled and incapable of doing anything, and all three alive
+   because **the player answers the keyboard itself**. Detail in
+   [audit-walk-second-batch.md](evidence/stable/audit-walk-second-batch.md).
+   - **The video status badge covered the whole stage** — measured at 1280×1200 over 1280×1200,
+     opaque — over the video and over the bar, swallowing every click. It set no alignment; it is a
+     badge in a corner now. **The other five overlays set none either**: only the one the measurement
+     proved was in the way was corrected, and the rest will come with their own batches.
+   - **`PlayerViewModel` never called `RaiseCanExecuteChanged`**, so the buttons' enabled state froze:
+     you could pause with the mouse and **Resume stayed disabled for good**.
+   - **The volume slider was the only `OneWay` one of the five** and its view had no handler;
+     `SetVolumeAsync` had two callers and both were the keyboard.
+   - **And four harness traps**: teardown **replaced** the scene's failure inside the `using`; a click
+     outside the window said nothing; **the centre of a range control is usually where it already is**
+     (0–200 starting at 100); and the sample cache **ignored the requested duration**, so a 30 s skip
+     ran off a 12 s file and left Stop disabled for an unrelated reason.
 5. **`DES-001`, the agent's half: done on 2026-08-15.** The manifest's description is no longer a
    string with a slash in it: it is `ms-resource:AppDescription`, and
    `eng/build-package-resources.ps1` builds one resource per language **the manifest itself

@@ -44,6 +44,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource TransportVolumeLabel}" />
+      <!--
+        The binding stays one way on purpose: VolumePercent is what the session came back with, and
+        a two-way binding would write the thumb's position into a property that has no setter. What
+        carries a chosen level to the session is the handler, which is what this control did not have
+        until 2026-08-15 - it moved, and nothing heard it.
+      -->
       <Slider
           x:Name="VolumeSlider"
           Minimum="{x:Static player:TransportControlsViewModel.MinimumVolumePercent}"
@@ -52,6 +58,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           IsSnapToTickEnabled="True"
           automation:AutomationProperties.Name="{DynamicResource TransportVolumeLabel}"
           automation:AutomationProperties.AcceleratorKey="Up"
+          ValueChanged="OnVolumeChanged"
           Value="{Binding VolumePercent, Mode=OneWay}" />
     </StackPanel>
 

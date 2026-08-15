@@ -361,6 +361,26 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
      `EpisodePlayAction` (la ficha de serie).
    - **Al contar los 129 se puede contar mal**: la primera medición dio **142** porque
      `<ComboBoxItem>` casa con `<ComboBox` sin un límite de palabra.
+
+   **La tanda 2 está hecha (2026-08-15): el transporte del reproductor.** De **15** a **22**
+   pulsados; el trinquete baja a **106**. Es la tanda que justifica el trabajo: encontró **tres
+   defectos del producto**, los tres visibles, activos e incapaces de hacer nada, y los tres vivos
+   porque **el reproductor responde al teclado él mismo**. Detalle en
+   [audit-walk-second-batch.md](evidence/stable/audit-walk-second-batch.md).
+   - **El recuadro de estado de vídeo cubría todo el escenario** —medido en 1280×1200 sobre 1280×1200,
+     opaco— encima del vídeo y de la barra, tragándose cada clic. No fijaba alineación; ahora es un
+     distintivo en una esquina. **Los otros cinco superpuestos tampoco la fijan**: se corrigió sólo el
+     que la medición demostró que estorbaba, y los demás se verán en sus tandas.
+   - **`PlayerViewModel` no llamaba a `RaiseCanExecuteChanged` en ninguna parte**, así que el estado
+     habilitado de los botones se congelaba: se pausaba con el ratón y **Reanudar quedaba deshabilitado
+     para siempre**.
+   - **El deslizador de volumen era el único `OneWay` de los cinco** y su vista no tenía manejador;
+     `SetVolumeAsync` tenía dos llamantes y los dos eran teclado.
+   - **Y cuatro trampas del arnés**: el desmontaje **reemplazaba** el fallo de la escena dentro del
+     `using`; un clic fuera de la ventana no decía nada; **el centro de un control de rango suele ser
+     donde ya está** (0-200 arrancando en 100); y la caché de muestras **ignoraba la duración pedida**,
+     así que un salto de 30 s se salía de un archivo de 12 y dejaba Detener deshabilitado por una
+     razón ajena.
 5. **`DES-001`, la mitad del agente: hecha el 2026-08-15.** La descripción del manifiesto ya no es
    una cadena con una barra: es `ms-resource:AppDescription`, y `eng/build-package-resources.ps1`
    construye un recurso por idioma **declarado en el propio manifiesto**, con el texto leído del

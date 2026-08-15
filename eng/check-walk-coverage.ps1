@@ -36,9 +36,9 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $outputRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot $Output))
 $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 
-# Lowered by each batch of the walk and never raised. 113 is where the first batch — the library and
-# the film card — left it, from 126 before it.
-$maximumPending = 113
+# Lowered by each batch of the walk and never raised. 126 before the first batch, 113 after the
+# library and the film card, 106 after the player's transport.
+$maximumPending = 106
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)
