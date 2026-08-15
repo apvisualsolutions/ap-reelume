@@ -644,6 +644,12 @@ public sealed class ShellAssemblyTests
             int expectedRevision,
             CancellationToken cancellationToken = default) =>
             Task.FromResult(new MetadataWriteResult(MetadataWriteOutcome.Applied, catalog));
+
+        public Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+            DateTimeOffset staleBefore,
+            int limit,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<CatalogMetadata>>([]);
     }
 
     private sealed class StubGroups(MediaVersionGroup group) : IMediaVersionGroupRepository

@@ -20,7 +20,8 @@ public static class NetworkPurposeRegistry
         new NetworkPurpose(
             "TmdbMetadataProvider",
             "api.themoviedb.org",
-            "Fetches the metadata a person explicitly asked to identify or refresh.",
+            "Fetches the metadata a person asked to identify or refresh, and — only while the "
+            + "automatic refresh is switched on — the oldest stored entries, at most twenty per launch.",
             RequiresConsent: true),
         new NetworkPurpose(
             "ArtworkCache",

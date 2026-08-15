@@ -9,9 +9,10 @@ using ApSolutions.LocalMedia.Domain.Discovery;
 
 namespace ApSolutions.LocalMedia.Application.Discovery;
 
-public sealed class ScanCoordinator : IScanCoordinator
+public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
 {
     private readonly ConcurrentDictionary<LibraryRootId, SemaphoreSlim> _rootLocks = new();
+    private int _active;
     private readonly ILibraryRootRepository _rootRepository;
     private readonly IMediaFileRepository _mediaFileRepository;
     private readonly IMediaFileEnumerator _mediaFileEnumerator;
@@ -32,6 +33,13 @@ public sealed class ScanCoordinator : IScanCoordinator
         _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
     }
 
+    /// <summary>
+    /// True from the moment a scan takes its root's turn until it gives it back. Background work
+    /// that must not compete with a scan reads this, so it is counted here rather than inferred from
+    /// somewhere that would only see part of it.
+    /// </summary>
+    public bool IsScanActive => Volatile.Read(ref _active) > 0;
+
     public async Task<ScanSummary> StartAsync(
         StartScanCommand command,
         CancellationToken cancellationToken = default)
@@ -40,12 +48,14 @@ public sealed class ScanCoordinator : IScanCoordinator
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(command.BatchSize);
         var rootLock = _rootLocks.GetOrAdd(command.RootId, static _ => new SemaphoreSlim(1, 1));
         await rootLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        _ = Interlocked.Increment(ref _active);
         try
         {
             return await ScanRootAsync(command, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
+            _ = Interlocked.Decrement(ref _active);
             rootLock.Release();
         }
     }

@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Privacy;
 
 namespace ApSolutions.LocalMedia.Presentation.Settings;
@@ -24,6 +25,8 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
     private readonly Func<DiagnosticsConsent, DiagnosticsInputs, CancellationToken, Task<string?>> _export;
     private readonly Func<DateTimeOffset> _now;
     private readonly Func<CancellationToken, Task>? _discard;
+    private readonly IAutoRefreshSettings? _autoRefresh;
+    private readonly Func<bool> _hasConsentedConnection;
     private readonly PrivacyCommand _preview;
     private readonly PrivacyCommand _exportCommand;
     private string? _previewJson;
@@ -37,8 +40,12 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
         Func<DiagnosticsConsent, DiagnosticsInputs, CancellationToken, Task<string?>> export,
         Func<DateTimeOffset> now,
         IReadOnlyList<NetworkPurpose> purposes,
-        Func<CancellationToken, Task>? discard = null)
+        Func<CancellationToken, Task>? discard = null,
+        IAutoRefreshSettings? autoRefresh = null,
+        Func<bool>? hasConsentedConnection = null)
     {
+        _autoRefresh = autoRefresh;
+        _hasConsentedConnection = hasConsentedConnection ?? (() => false);
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _builder = builder ?? throw new ArgumentNullException(nameof(builder));
         _inputs = inputs ?? throw new ArgumentNullException(nameof(inputs));
@@ -61,6 +68,33 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
 
     /// <summary>Every connection the application can make, so the screen can list them rather than promise.</summary>
     public IReadOnlyList<NetworkPurpose> NetworkPurposes { get; }
+
+    /// <summary>
+    /// Whether the automatic refresh can be offered at all. It is subordinate to the consented
+    /// connection: without one, the provider serves only what it already cached, so a switch would
+    /// promise something that cannot happen — and a preference nobody can act on is worse than an
+    /// absent one.
+    /// </summary>
+    public bool CanRefreshAutomatically => _autoRefresh is not null && _hasConsentedConnection();
+
+    /// <summary>
+    /// Off until somebody turns it on, and off is also what it reads when there is nothing to read
+    /// it from.
+    /// </summary>
+    public bool AutomaticRefreshEnabled
+    {
+        get => _autoRefresh?.AutomaticRefreshEnabled ?? false;
+        set
+        {
+            if (_autoRefresh is not { } refresh || refresh.AutomaticRefreshEnabled == value)
+            {
+                return;
+            }
+
+            refresh.SetAutomaticRefreshEnabled(value);
+            OnPropertyChanged();
+        }
+    }
 
     public bool DiagnosticsEnabled
     {

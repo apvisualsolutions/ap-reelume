@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Catalog;
+using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Application.Metadata;
@@ -13,6 +14,7 @@ using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
+using ApSolutions.LocalMedia.Infrastructure.Settings;
 using ApSolutions.LocalMedia.Presentation.Metadata;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Windows.Metadata;
@@ -98,6 +100,17 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<IMetadataProvider>(),
                 provider.GetRequiredService<MetadataMergePolicy>(),
                 CurrentMetadataLanguage(),
+                TimeProvider.System))
+
+            // LIB-016. Off by default, and off means the repository is not even read. The pass runs
+            // once per launch, after the window is painted, and yields to a scan or to playback.
+            .AddSingleton<IAutoRefreshSettings, StoredAutoRefreshSettings>()
+            .AddTransient(provider => new RefreshStaleMetadata(
+                provider.GetRequiredService<ICatalogMetadataRepository>(),
+                provider.GetRequiredService<RefreshMetadata>(),
+                provider.GetRequiredService<IAutoRefreshSettings>(),
+                provider.GetRequiredService<IPlaybackActivity>(),
+                provider.GetRequiredService<IScanActivity>(),
                 TimeProvider.System))
             .AddTransient<ArtworkPickerViewModel>()
             .AddSingleton<RenamePolicy>()

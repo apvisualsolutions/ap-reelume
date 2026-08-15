@@ -48,3 +48,13 @@ public interface IScanCoordinator
         StartScanCommand command,
         CancellationToken cancellationToken = default);
 }
+
+/// <summary>Whether a scan is running right now.</summary>
+/// <remarks>
+/// Background work that competes with a scan for the same database and the same disk asks this
+/// first. It is the scan's own count of what it has in flight, not a guess from the outside.
+/// </remarks>
+public interface IScanActivity
+{
+    bool IsScanActive { get; }
+}

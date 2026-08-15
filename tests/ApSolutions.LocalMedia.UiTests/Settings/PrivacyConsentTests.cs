@@ -327,16 +327,65 @@ public sealed class PrivacyConsentTests
         }
     }
 
+    /// <summary>
+    /// LIB-016. The automatic refresh is subordinate to the consented connection: with no token in
+    /// place the provider can only serve what it already cached, so a switch would offer something
+    /// that cannot happen. It is not disabled — it is not there.
+    /// </summary>
+    [Fact]
+    public void The_automatic_refresh_is_not_offered_without_a_consented_connection()
+    {
+        var refresh = new InMemoryAutoRefresh();
+        var withoutConsent = CreateViewModel(new InMemoryPrivacySettings(), autoRefresh: refresh);
+        var withConsent = CreateViewModel(
+            new InMemoryPrivacySettings(),
+            autoRefresh: refresh,
+            hasConsentedConnection: true);
+
+        Assert.False(withoutConsent.CanRefreshAutomatically);
+        Assert.True(withConsent.CanRefreshAutomatically);
+    }
+
+    [Fact]
+    public void The_automatic_refresh_starts_switched_off_and_remembers_being_turned_on()
+    {
+        var refresh = new InMemoryAutoRefresh();
+        var viewModel = CreateViewModel(
+            new InMemoryPrivacySettings(),
+            autoRefresh: refresh,
+            hasConsentedConnection: true);
+
+        Assert.False(viewModel.AutomaticRefreshEnabled);
+        Assert.False(refresh.AutomaticRefreshEnabled);
+
+        viewModel.AutomaticRefreshEnabled = true;
+
+        Assert.True(refresh.AutomaticRefreshEnabled);
+        Assert.True(viewModel.AutomaticRefreshEnabled);
+    }
+
+    private sealed class InMemoryAutoRefresh : Application.Metadata.IAutoRefreshSettings
+    {
+        public bool AutomaticRefreshEnabled { get; private set; }
+
+        public void SetAutomaticRefreshEnabled(bool enabled) => AutomaticRefreshEnabled = enabled;
+    }
+
     private static PrivacySettingsViewModel CreateViewModel(
         InMemoryPrivacySettings settings,
-        Func<DiagnosticsConsent, DiagnosticsInputs, CancellationToken, Task<string?>>? export = null) =>
+        Func<DiagnosticsConsent, DiagnosticsInputs, CancellationToken, Task<string?>>? export = null,
+        Application.Metadata.IAutoRefreshSettings? autoRefresh = null,
+        bool hasConsentedConnection = false) =>
         new(
             settings,
             new AllowlistedDiagnosticsBuilder(),
             Inputs,
             export ?? ((_, _, _) => Task.FromResult<string?>(null)),
             () => Noon,
-            NetworkPurposeRegistry.Declared);
+            NetworkPurposeRegistry.Declared,
+            discard: null,
+            autoRefresh,
+            () => hasConsentedConnection);
 
     private static DiagnosticsInputs Inputs() => new(
         AppVersion: "1.0.0",

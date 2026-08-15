@@ -67,6 +67,16 @@ public interface ICatalogMetadataRepository
         CatalogMetadata catalog,
         int expectedRevision,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The identified entries whose provider answer predates <paramref name="staleBefore"/>, stalest
+    /// first and never more than <paramref name="limit"/> of them. An entry nobody identified is not
+    /// returned: there is no provider entry to ask about.
+    /// </summary>
+    Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+        DateTimeOffset staleBefore,
+        int limit,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed record UpdateMetadataCommand(

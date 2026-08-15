@@ -413,6 +413,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PrivacyTitle">Privacidad y diagnósticos</x:String>
   <x:String x:Key="PrivacyDescription">AP Reelume funciona sin conexión. No hay telemetría, no se envía nada automáticamente y los diagnósticos están desactivados hasta que los actives aquí.</x:String>
   <x:String x:Key="PrivacyDiagnosticsLabel">Permitir generar un informe de diagnóstico</x:String>
+  <x:String x:Key="PrivacyAutoRefreshLabel">Actualizar solo las fichas más antiguas</x:String>
+  <x:String x:Key="PrivacyAutoRefreshDescription">Al abrir la aplicación, y sólo si lo activas aquí, se vuelven a pedir al proveedor las fichas cuyos datos tienen más de 90 días: como mucho 20 por vez, las más antiguas primero y sólo las de títulos ya identificados. Nunca mientras se escanea ni con un vídeo abierto.</x:String>
   <x:String x:Key="PrivacyStatusAccessibleName">Estado de los diagnósticos</x:String>
   <x:String x:Key="PrivacyStatusOff">Los diagnósticos están desactivados. No se genera ni se guarda ningún informe.</x:String>
   <x:String x:Key="PrivacyStatusOn">Los diagnósticos están activados. Puedes ver exactamente qué contendría el informe antes de guardarlo.</x:String>

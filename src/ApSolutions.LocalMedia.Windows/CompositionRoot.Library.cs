@@ -27,6 +27,11 @@ public static partial class CompositionRoot
     private static IServiceCollection AddLibrary(this IServiceCollection services) =>
         services
             .AddSingleton<ScanCoordinator>()
+
+            // Whether a scan is running, answered by the one that runs them. Background work that
+            // must not compete with a scan reads this, so it has to be the same instance the
+            // coordinator counts in — not a second one that would always say no.
+            .AddSingleton<IScanActivity>(provider => provider.GetRequiredService<ScanCoordinator>())
             // Identification rides inside the shared coordinator: a watcher-triggered scan feeds
             // the review inbox exactly like a manual one, instead of identification being a
             // courtesy of whichever caller remembered it.

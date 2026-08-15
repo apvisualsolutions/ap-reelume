@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Backup;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Privacy;
 using ApSolutions.LocalMedia.Application.Settings;
 using ApSolutions.LocalMedia.Application.Storage;
@@ -9,6 +10,7 @@ using ApSolutions.LocalMedia.Domain.Common;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Infrastructure.Backup;
 using ApSolutions.LocalMedia.Infrastructure.Data;
+using ApSolutions.LocalMedia.Infrastructure.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Privacy;
 using ApSolutions.LocalMedia.Infrastructure.Settings;
 using ApSolutions.LocalMedia.Presentation.Backup;
@@ -62,7 +64,13 @@ public static partial class CompositionRoot
                 () => provider.GetRequiredService<IClock>().UtcNow,
                 NetworkPurposeRegistry.Declared,
                 cancellationToken => provider.GetRequiredService<CreateDiagnostics>()
-                    .DiscardAsync(cancellationToken)))
+                    .DiscardAsync(cancellationToken),
+                provider.GetRequiredService<IAutoRefreshSettings>(),
+
+                // LIB-016. The same consent the candidate source asks about, read the same way: the
+                // token in place is the deliberate, revocable act, and without it the automatic
+                // refresh has nothing it could do — so its switch is not offered.
+                () => provider.GetRequiredService<TmdbOptions>().AccessToken is not null))
             .AddSingleton<IBackupValidator, BackupValidator>()
             .AddSingleton<IStagedRestoreService>(provider => new StagedRestoreService(
                 provider.GetRequiredService<IAppDataPaths>()))
