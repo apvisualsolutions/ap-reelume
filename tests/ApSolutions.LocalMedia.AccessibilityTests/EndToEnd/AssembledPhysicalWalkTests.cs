@@ -11,6 +11,7 @@ using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
+using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
@@ -19,6 +20,7 @@ using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Shell;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -268,15 +270,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         // The control that makes the click mean something: pressing beside the button changes
         // nothing, so what changes afterwards can only have come from pressing the button itself.
-        ClickBeside(host, "RefreshProviderMetadata");
-        await Task.Delay(300, TestContext.Current.CancellationToken);
-        Dispatcher.UIThread.RunJobs();
-        Assert.NotEqual("La llegada", editor.Title);
-
-        Click(host, "RefreshProviderMetadata");
-        await WaitForAsync(
-            () => Task.FromResult(editor.Title == "La llegada"),
+        // Anchored on the key rather than on the x:Name the button also carries: the key is what the
+        // views declare and therefore what the coverage gate counts, and a control that answers to
+        // two names would otherwise be pressed under one and reported missing under the other.
+        await PressAsync(
+            host,
+            "MetadataRefreshAction",
+            () => editor.Title,
             "clicking Refresh from provider never brought the provider's answer into the editor");
+        Assert.Equal("La llegada", editor.Title);
 
         Assert.Equal("Una lingüista traduce a los visitantes.", editor.Overview);
         Assert.False(editor.IsUnidentified);
@@ -293,17 +295,208 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // found by the resource key behind its accessible name. This is the measurement that decides
         // whether the walk can cover the whole application without adding a name to every control.
         Assert.False(editor.LockTitle);
-        ClickBeside(host, "MetadataLockTitle");
-        Dispatcher.UIThread.RunJobs();
-        Assert.False(editor.LockTitle);
-
-        Click(host, "MetadataLockTitle");
+        await PressAsync(
+            host,
+            "MetadataLockTitle",
+            () => editor.LockTitle,
+            "clicking the title lock never locked the title");
         Assert.True(editor.LockTitle);
     }
 
     /// <summary>
-    /// Finds a control by the <b>resource key</b> behind its accessible name, resolved against the
-    /// dictionary the application itself uses.
+    /// The first batch of the whole-application walk: the browse surface, driven by the mouse alone.
+    /// The two drop-downs open, the apply button re-runs the query the search box was given, a card
+    /// opens from its own entry in the list, and the back button returns to exactly what was there.
+    /// </summary>
+    /// <remarks>
+    /// The entry in the list is one of the two command controls in the application whose accessible
+    /// name is not a resource key but its own data — so its anchor is the title the walk itself
+    /// seeded, which ties the click to something this test controls rather than to a string somebody
+    /// may reword. It is recorded under the shape it is declared with.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_library_is_browsed_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+
+        // No decoding happens on this surface, so the files only have to exist and be catalogued.
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        foreach (var title in new[] { "Arrival.2016.mp4", "Dune.2021.mp4" })
+        {
+            var path = Path.Combine(media, title);
+            await File.WriteAllBytesAsync(path, [0x41, 0x50], TestContext.Current.CancellationToken);
+            _ = await SeedMediaFileAsync(factory, media, path, TimeSpan.FromMinutes(116));
+        }
+
+        using var host = ShowShell();
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(2, library.Items.Count);
+
+        // A drop-down's effect is that it opens: what is chosen inside it lands in a popup root of
+        // its own, which is a separate top level and not this window's business.
+        await PressAsync(
+            host,
+            "LibraryFilterLabel",
+            () => Resolve(host, "LibraryFilterLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the filter never opened the list of filters");
+        host.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+        Dispatcher.UIThread.RunJobs();
+
+        await PressAsync(
+            host,
+            "LibrarySortLabel",
+            () => Resolve(host, "LibrarySortLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the sort order never opened the list of orders");
+        host.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+        Dispatcher.UIThread.RunJobs();
+
+        // The apply button is the one that runs the query, so the search has to already say something
+        // the result can be told apart by: two entries before it, one after.
+        library.Search = "Dune";
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "LibraryApplyAction",
+            () => library.Items.Count,
+            "clicking Apply never re-ran the query the search box was holding");
+        Assert.Equal("Dune.2021", Assert.Single(library.Items).Title);
+
+        await PressAsync(
+            host,
+            "Dune.2021",
+            () => library.Surface,
+            "clicking the entry in the list never opened its card",
+            recordAs: "{Binding Title}");
+        Assert.Equal(LibrarySurface.MovieDetails, library.Surface);
+
+        await PressAsync(
+            host,
+            "LibraryBackAction",
+            () => library.Surface,
+            "clicking Back never returned to the list");
+        Assert.Equal(LibrarySurface.Browse, library.Surface);
+
+        // Coming back lands on what was there, rather than on a library reloaded from scratch.
+        Assert.Equal("Dune", library.Search);
+        Assert.Equal("Dune.2021", Assert.Single(library.Items).Title);
+    }
+
+    /// <summary>
+    /// The first batch, second half: the film card operated by the mouse alone — the watch state
+    /// marked, cleared and handed back to the automatic rules, the three personal marks made and
+    /// unmade, and the film opened on the real engine by pressing Play.
+    /// </summary>
+    /// <remarks>
+    /// Every assertion here reads the surface <b>after</b> the repository answered, not the click's
+    /// hope: each of these controls hands its request to a use case and the control then shows what
+    /// came back. A toggle that only flipped its own bit would pass a test that asserted on the click.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_card_is_operated_with_the_mouse()
+    {
+        var sample = await RequireSampleAsync("walk-card.mp4", durationSeconds: 3);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Arrival.2016.mp4");
+        File.Copy(sample, mediaPath);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        _ = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromSeconds(3));
+
+        using var host = ShowShell(height: 1600);
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        var watch = library.MovieDetails.WatchStatus;
+        var personal = library.MovieDetails.PersonalActions;
+
+        await PressAsync(
+            host,
+            "WatchStatusMarkWatched",
+            () => watch.IsWatched,
+            "clicking Mark as watched never recorded the film as watched");
+        Assert.True(watch.IsManualOverride);
+
+        await PressAsync(
+            host,
+            "WatchStatusMarkNotStarted",
+            () => watch.IsNotStarted,
+            "clicking Mark as not started never took the film back to not started");
+
+        await PressAsync(
+            host,
+            "WatchStatusClearOverride",
+            () => watch.IsManualOverride,
+            "clicking Clear never handed the state back to the automatic rules");
+        Assert.False(watch.IsManualOverride);
+
+        await PressAsync(
+            host,
+            "PersonalFavoriteAction",
+            () => personal.IsFavorite,
+            "clicking Favourite never recorded the film as a favourite");
+        Assert.True(personal.IsFavorite);
+
+        await PressAsync(
+            host,
+            "PersonalWatchLaterAction",
+            () => personal.IsWatchLater,
+            "clicking Watch later never recorded the film for later");
+        Assert.True(personal.IsWatchLater);
+
+        // The ten scores share one accessible name by design and are told apart by the score itself,
+        // which is what a screen reader reads after the name.
+        await PressAsync(
+            host,
+            "PersonalRatingLabel",
+            () => personal.Rating,
+            "clicking a score never recorded the rating",
+            helpText: "7");
+        Assert.Equal(7, personal.Rating);
+
+        await PressAsync(
+            host,
+            "PersonalRatingClearAction",
+            () => personal.HasRating,
+            "clicking Clear rating never removed the score");
+        Assert.Null(personal.Rating);
+
+        // The control clicks land one control-height above their target, and on this card that strip
+        // is the row above — another command control's row. If any of them had reached a neighbour,
+        // these three marks would no longer be where their own presses left them. It is the check
+        // that keeps "the beside click did not do what the button does" from quietly becoming "the
+        // beside click did something else instead".
+        Assert.True(personal.IsFavorite, "A control click reached the favourite toggle.");
+        Assert.True(personal.IsWatchLater, "A control click reached the watch-later toggle.");
+        Assert.False(watch.IsManualOverride, "A control click reached one of the watch-state buttons.");
+
+        // And Play, which is where the card stops being a page and becomes a session: the real engine
+        // opens the real file the walk put on the disk.
+        await PressAsync(
+            host,
+            "MoviePlayAction",
+            () => host.ViewModel.Player is not null,
+            "clicking Play never opened a session on the film");
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the session Play opened never reached the playing state on the real engine");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>
+    /// Finds one command control by its <b>anchor</b>: the resource key behind its accessible name,
+    /// its <c>x:Name</c>, or — for the two controls named by their data — the name the walk itself
+    /// seeded.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -317,41 +510,47 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// The text is resolved rather than written down, so the walk does not break when a string is
     /// reworded and does not depend on which language is loaded.
     /// </para>
+    /// <para>
+    /// Only what is <b>on screen</b> is a candidate, and that is not a refinement: two of the 129 keys
+    /// are declared twice — the back button in each of the library's two mutually exclusive detail
+    /// branches, and the provider-trailer link on the film card and the series card. Both branches
+    /// live in the visual tree at once, so matching on the key alone finds two controls where a click
+    /// can only ever reach one. <paramref name="helpText"/> separates the rest: the ten rating buttons
+    /// share one accessible name by design and are told apart by the score they carry, which is what a
+    /// screen reader reads out after the name.
+    /// </para>
     /// </remarks>
-    private static Control FindByKey(ShellHost host, string resourceKey)
+    private static Control Resolve(ShellHost host, string anchor, string? helpText = null)
     {
-        Assert.True(
-            Avalonia.Application.Current!.TryFindResource(resourceKey, out var resolved) && resolved is string,
-            $"No resource named {resourceKey}, so no control can carry it as an accessible name.");
-        var expected = (string)resolved!;
+        var expected = Avalonia.Application.Current!.TryFindResource(anchor, out var resolved) && resolved is string text
+            ? text
+            : anchor;
         var matches = host.Shell.GetVisualDescendants()
             .OfType<Control>()
-            .Where(candidate => Avalonia.Automation.AutomationProperties.GetName(candidate) == expected)
+            .Where(candidate =>
+                candidate.Name == anchor || AutomationProperties.GetName(candidate) == expected)
+            .Where(candidate => candidate.IsEffectivelyVisible)
+            .Where(candidate => helpText is null || AutomationProperties.GetHelpText(candidate) == helpText)
             .ToArray();
 
         Assert.True(
             matches.Length == 1,
-            $"{resourceKey} matched {matches.Length} controls; a click needs exactly one.");
+            $"{anchor}{(helpText is null ? string.Empty : $" [{helpText}]")} matched {matches.Length} "
+                + "controls on screen; a click needs exactly one.");
         return matches[0];
     }
 
     /// <summary>
-    /// Presses a named control with the mouse, at its centre in window coordinates, the way a person
-    /// with a pointing device does.
+    /// Presses a control with the mouse, at its centre in window coordinates, the way a person with a
+    /// pointing device does.
     /// </summary>
-    private static void Click(ShellHost host, string controlName)
+    private static void Click(ShellHost host, Control control)
     {
-        var control = host.Shell.GetVisualDescendants()
-            .OfType<Control>()
-            .FirstOrDefault(candidate => candidate.Name == controlName)
-            ?? (Avalonia.Application.Current!.TryFindResource(controlName, out _) ? FindByKey(host, controlName) : null);
-        Assert.True(control is not null, $"The assembled shell has no control named {controlName}.");
-
         // Scrolling to it first is what a person does, and it is not optional: the editor sits far
         // enough down the shell that the button's centre lands outside the window until it is
         // brought into view, and a click there hits nothing at all. Two scroll viewers are nested
         // here, so the scroll and the layout settle over a few passes rather than one.
-        var scrollers = control!.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
+        var scrollers = control.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
         Point? centre = null;
         for (var settle = 0; settle < 24; settle++)
         {
@@ -377,10 +576,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         }
 
         Assert.True(
-            control!.IsEffectivelyVisible && control.IsEffectivelyEnabled,
-            $"{controlName} is on screen but cannot be pressed: "
+            control.IsEffectivelyVisible && control.IsEffectivelyEnabled,
+            $"{Describe(control)} is on screen but cannot be pressed: "
             + $"visible={control.IsEffectivelyVisible}, enabled={control.IsEffectivelyEnabled}.");
-        Assert.True(centre.HasValue, $"{controlName} has no position in the window.");
+        Assert.True(centre.HasValue, $"{Describe(control)} has no position in the window.");
 
         host.Window.MouseMove(centre.Value, RawInputModifiers.None);
         host.Window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
@@ -389,26 +588,145 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// Presses well clear of a control, on the empty strip above the row it sits in. It is the
+    /// Presses clear of a control, on a point that belongs to no command control at all. It is the
     /// control for the click: whatever the button does, this must not do it.
     /// </summary>
-    private static void ClickBeside(ShellHost host, string controlName)
+    private static void ClickBeside(ShellHost host, Control control)
     {
-        var control = host.Shell.GetVisualDescendants()
-            .OfType<Control>()
-            .FirstOrDefault(candidate => candidate.Name == controlName)
-            ?? FindByKey(host, controlName);
-        control.BringIntoView();
-        host.Window.UpdateLayout();
-        Dispatcher.UIThread.RunJobs();
-        var centre = control.TranslatePoint(
-            new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
-            host.Window);
-        Assert.True(centre.HasValue, $"{controlName} has no position in the window.");
-        var beside = centre!.Value.WithY(centre.Value.Y - control.Bounds.Height);
+        var beside = BesidePoint(host, control);
         host.Window.MouseMove(beside, RawInputModifiers.None);
         host.Window.MouseDown(beside, MouseButton.Left, RawInputModifiers.None);
         host.Window.MouseUp(beside, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>
+    /// Finds a point next to a control that lies inside <b>no</b> command control on screen.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This started as "one control-height above", and that was wrong in a way only a measurement
+    /// showed: on the film card the controls wrap into rows, so the strip above a button is the row
+    /// above it — another button. Measured on 2026-08-15, the control click for <c>Clear rating</c>
+    /// landed on the favourite toggle and turned it back off, and the walk said nothing, because the
+    /// assertion only asked whether the <em>rating</em> had changed. A control click that presses
+    /// something else is not a control; it is a second, unrecorded press.
+    /// </para>
+    /// <para>
+    /// So the point is chosen by geometry rather than hoped for: every command control on screen is
+    /// measured in window coordinates and the first candidate offset that falls inside none of them
+    /// wins. Geometry, and not <c>InputHitTest</c>, because that was already measured not to predict
+    /// where a click goes. If no such point exists the walk says so instead of clicking blind.
+    /// </para>
+    /// </remarks>
+    private static Point BesidePoint(ShellHost host, Control control)
+    {
+        control.BringIntoView();
+        host.Window.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var centre = control.TranslatePoint(
+            new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
+            host.Window);
+        Assert.True(centre.HasValue, $"{Describe(control)} has no position in the window.");
+
+        var occupied = host.Shell.GetVisualDescendants()
+            .OfType<Control>()
+            .Where(candidate => candidate is Button or ComboBox or Slider && candidate.IsEffectivelyVisible)
+            .Select(candidate => candidate.TranslatePoint(default, host.Window) is { } origin
+                ? new Rect(origin, candidate.Bounds.Size)
+                : (Rect?)null)
+            .OfType<Rect>()
+            .ToArray();
+
+        var step = new Vector(Math.Max(control.Bounds.Width, 8), Math.Max(control.Bounds.Height, 8));
+        foreach (var offset in new[]
+        {
+            new Vector(0, -step.Y), new Vector(0, step.Y),
+            new Vector(-step.X, 0), new Vector(step.X, 0),
+            new Vector(0, -step.Y * 2), new Vector(0, step.Y * 2),
+            new Vector(-step.X, -step.Y), new Vector(step.X, step.Y),
+        })
+        {
+            var candidate = centre!.Value + offset;
+            if (candidate.X < 0
+                || candidate.Y < 0
+                || candidate.X >= host.Window.Bounds.Width
+                || candidate.Y >= host.Window.Bounds.Height)
+            {
+                continue;
+            }
+
+            if (!occupied.Any(rect => rect.Contains(candidate)))
+            {
+                return candidate;
+            }
+        }
+
+        Assert.Fail(
+            $"{Describe(control)} is surrounded by other command controls, so there is nowhere to "
+                + "put the click that proves the press did the work.");
+        return default;
+    }
+
+    /// <summary>
+    /// Presses one command control the way a person does, and proves the press is what did it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Three things are required and all three happen here, which is why coverage is recorded by this
+    /// method and nowhere else: the click <b>beside</b> the control, which must change nothing; the
+    /// real click; and the <b>effect</b>, read through <paramref name="probe"/> rather than assumed.
+    /// A control is in the ledger only once all three have happened, so "pressed" cannot drift into
+    /// "a press was written down in the file".
+    /// </para>
+    /// <para>
+    /// The beside click is given the same time to work as the real one. Without that wait, "nothing
+    /// happened" would only ever mean "nothing has happened yet", and the control would be no control
+    /// at all.
+    /// </para>
+    /// </remarks>
+    private static async Task PressAsync<T>(
+        ShellHost host,
+        string anchor,
+        Func<T> probe,
+        string complaint,
+        string? helpText = null,
+        string? recordAs = null)
+    {
+        var control = Resolve(host, anchor, helpText);
+        var before = probe();
+
+        ClickBeside(host, control);
+        await SettleAsync();
+        Assert.True(
+            EqualityComparer<T>.Default.Equals(probe(), before),
+            $"Clicking beside {anchor} changed the very thing the press is meant to change, so "
+                + "pressing it would have proved nothing.");
+
+        Click(host, control);
+        await WaitForAsync(
+            () => Task.FromResult(!EqualityComparer<T>.Default.Equals(probe(), before)),
+            complaint);
+        WalkLedger.Record(control, recordAs ?? anchor);
+    }
+
+    /// <summary>Names a control in a complaint, by whatever it does carry.</summary>
+    private static string Describe(Control control) =>
+        control.Name ?? AutomationProperties.GetName(control) ?? control.GetType().Name;
+
+    /// <summary>
+    /// Pumps the dispatcher while a little real time passes, which is what an effect arriving on a
+    /// command's continuation needs in order to arrive at all.
+    /// </summary>
+    private static async Task SettleAsync()
+    {
+        for (var pass = 0; pass < 6; pass++)
+        {
+            Dispatcher.UIThread.RunJobs();
+            await Task.Delay(50, TestContext.Current.CancellationToken);
+        }
+
         Dispatcher.UIThread.RunJobs();
     }
 
