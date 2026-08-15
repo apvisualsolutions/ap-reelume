@@ -299,18 +299,40 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    interruptor apagado y **2** encendido, en el mismo proceso hijo.
    [audit-lib016-automatic-refresh.md](evidence/stable/audit-lib016-automatic-refresh.md).
 
-5. **El paseo autónomo de toda la aplicación, decidido el 2026-08-15, y va por delante de lo que
-   sigue**, porque es la red del rediseño y no un extra. Medido antes de prometer nada: hay **129
-   controles de mando** en las 48 vistas —95 `Button`, 18 `CheckBox`, 8 `ComboBox`, 5 `Slider`, 2
-   `ToggleButton`, 1 `RadioButton`— más 17 `ListBox`, y con **ratón de verdad se pulsa uno**:
-   `RefreshProviderMetadata`. `MouseDown`/`MouseUp` no aparecen en ningún otro archivo del
-   repositorio. **Sólo 60 de los 129 tienen `x:Name`**, que es el ancla de `Click(host, name)`; en
-   cambio **239 elementos llevan `AutomationProperties.Name`**, así que la localización va por
-   **clave de recurso** resuelta contra el diccionario que usa la aplicación: no añade superficie y
-   sobrevive al rediseño, que cambia la forma pero no quita el nombre. La forma es la de la casa: una
-   puerta que cuenta los clicables pulsados contra una **lista de pendientes que sólo puede
-   encoger**, y tandas por área. **Queda por medir, no por suponer**, si el reproductor es alcanzable
-   en headless con LibVLC nativo; si no lo es, se dice en la evidencia en vez de fingir cobertura.
+5. **El paseo autónomo de toda la aplicación. Decidido entero el 2026-08-15 y va por delante de
+   `DES-001` y del rediseño**, porque es su red y no un extra. Todo lo que sigue está medido, no
+   supuesto.
+
+   **Lo medido.** 129 controles de mando en las 48 vistas —95 `Button`, 18 `CheckBox`, 8 `ComboBox`,
+   5 `Slider`, 2 `ToggleButton`, 1 `RadioButton`— más 17 `ListBox`. Con ratón se pulsan **dos**:
+   `RefreshProviderMetadata` y el candado del título. `MouseDown`/`MouseUp` no aparecen en ningún
+   otro archivo.
+
+   **El ancla, ya probada.** Sólo 60 de los 129 tienen `x:Name`, así que el paseo localiza por la
+   **clave de recurso** tras `AutomationProperties.Name` —239 elementos la llevan, 80 pruebas la
+   exigen y un rediseño no la quita—. Probado contra un control sin `x:Name`. **Los dos que no tienen
+   clave sí tienen nombre**, por `{Binding}`: son elementos de lista —el título de la tarjeta, la
+   ruta del duplicado— y su ancla es **el dato que el propio paseo sembró**, que es mejor todavía
+   porque ata el clic a algo que la prueba controla. No hay defecto de accesibilidad ahí.
+
+   **Una premisa que se cayó al mirarla.** Aquí se escribió que estaba «por medir si el reproductor
+   es alcanzable en headless con LibVLC». Ya estaba contestado en el propio archivo del paseo: sus
+   escenas corren **con el motor real decodificando fotogramas**, y una de ellas reproduce, pausa con
+   la barra espaciadora y guarda un marcador a mitad de sesión. Lo que falta del reproductor no es
+   llegar: es **pulsar su transporte con el ratón**.
+
+   **La forma, decidida.** Una puerta que compara los controles de mando del árbol contra los que la
+   suite **pulsó de verdad**, con una lista de pendientes que **sólo puede encoger**. El registro es
+   **en ejecución** —el propio `Click` anota lo que pulsa y la puerta lee ese informe, como ya hacen
+   `run-accessibility.ps1` y `run-recovery.ps1`— y **no** leyendo el fuente como texto, que es lo que
+   ya se ha roto tres veces al mover código. Un control cuenta como cubierto sólo con las tres cosas:
+   clic real, afirmación **sobre el efecto**, y un clic **al lado** que no hace nada.
+
+   **El orden de las tandas**, por uso y por riesgo: (1) biblioteca y ficha —abrir, filtrar, ordenar,
+   favorito, visto, valoración—, (2) transporte del reproductor, (3) editor y renombrado, (4) ajustes
+   —incluido el interruptor de `LIB-016`—, (5) bandeja de revisión y duplicados, (6) copia y
+   restauración, (7) actualización y recuperación. Cada tanda cierra su área y saca sus entradas de
+   la lista.
 5. **`DES-001` — la instalación también se ve, y hoy no está diseñada.** Los cinco activos de
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` son marcadores de posición del 3 de agosto
    —de 576 B a 7 KiB— y son **lo primero que alguien ve del producto**, antes que ninguna vista. Y

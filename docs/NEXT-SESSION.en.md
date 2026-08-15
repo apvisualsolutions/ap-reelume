@@ -294,19 +294,39 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    child process.
    [audit-lib016-automatic-refresh.md](evidence/stable/audit-lib016-automatic-refresh.md).
 
-5. **The autonomous walk over the whole application, decided on 2026-08-15, and it goes ahead of
-   what follows**, because it is the redesign's safety net rather than an extra. Measured before
-   promising anything: there are **129 command controls** across the 48 views — 95 `Button`, 18
-   `CheckBox`, 8 `ComboBox`, 5 `Slider`, 2 `ToggleButton`, 1 `RadioButton` — plus 17 `ListBox`, and
-   **exactly one is pressed with a real mouse**: `RefreshProviderMetadata`. `MouseDown`/`MouseUp`
-   appear in no other file in the repository. **Only 60 of the 129 carry `x:Name`**, which is what
-   `Click(host, name)` anchors on; **239 elements do carry `AutomationProperties.Name`**, so lookup
-   goes by **resource key** resolved against the dictionary the application itself uses: it adds no
-   surface and survives the redesign, which changes the shape but does not remove the name. The shape
-   is the house's: a gate counting clickables actually pressed against a **shrink-only list of
-   outstanding ones**, area by area. **Left to measure rather than assume**: whether the player is
-   reachable headless with native LibVLC; if it is not, the evidence says so instead of pretending
-   coverage.
+5. **The autonomous walk over the whole application. Decided in full on 2026-08-15 and it goes ahead
+   of `DES-001` and the redesign**, because it is their safety net rather than an extra. Everything
+   below is measured, not assumed.
+
+   **What was measured.** 129 command controls across the 48 views — 95 `Button`, 18 `CheckBox`, 8
+   `ComboBox`, 5 `Slider`, 2 `ToggleButton`, 1 `RadioButton` — plus 17 `ListBox`. **Two** are pressed
+   with a mouse: `RefreshProviderMetadata` and the title lock. `MouseDown`/`MouseUp` appear in no
+   other file.
+
+   **The anchor, already proven.** Only 60 of the 129 carry an `x:Name`, so the walk looks controls up
+   by the **resource key** behind `AutomationProperties.Name` — 239 elements carry one, 80 tests
+   require it, and a redesign does not remove it. Proven against a control with no `x:Name`. **The two
+   without a key do have a name**, via `{Binding}`: they are list items — the card's title, the
+   duplicate's path — and their anchor is **the data the walk itself seeded**, which is better still
+   because it ties the click to something the test controls. There is no accessibility defect there.
+
+   **A premise that collapsed when looked at.** This document said it was "left to measure whether the
+   player is reachable headless with LibVLC". The walk's own file had already answered it: its scenes
+   run **with the real engine decoding frames**, and one of them plays, pauses with the space bar and
+   saves a marker mid-session. What the player is missing is not reach — it is **its transport being
+   pressed with a mouse**.
+
+   **The shape, decided.** A gate comparing the tree's command controls against the ones the suite
+   **actually pressed**, with a shrink-only list of outstanding ones. Recording happens **at runtime**
+   — `Click` itself notes what it presses and the gate reads that report, the way
+   `run-accessibility.ps1` and `run-recovery.ps1` already do — and **not** by reading source as text,
+   which has broken three times already when code moved. A control counts as covered only with all
+   three: a real click, an assertion **on the effect**, and a click **beside it** that does nothing.
+
+   **The order of the batches**, by use and by risk: (1) library and cards — open, filter, sort,
+   favourite, watched, rating — (2) the player's transport, (3) editor and rename, (4) settings —
+   including `LIB-016`'s switch — (5) review inbox and duplicates, (6) backup and restore, (7) update
+   and recovery. Each batch closes its area and takes its entries off the list.
 5. **`DES-001` — the installation is seen too, and today it is undesigned.** The five assets in
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` are placeholders from 3 August — 576 B to
    7 KiB — and they are **the first thing anyone sees of the product**, before any view. And there is
