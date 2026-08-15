@@ -133,6 +133,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
   la pantalla, y anunciado con su nombre para quien use un lector de pantalla. Un resumen en blanco
   no ocupa sitio. No se abre ninguna conexión nueva: el texto ya estaba en tu disco.
 
+- **Una puerta cuenta cuántos botones de la aplicación se pulsan de verdad con el ratón.** Hasta
+  ahora el recorrido automático conducía la aplicación con el teclado y **dos** de sus 129 controles
+  de mando llegaban a recibir un clic; el resto podía estar visible, activo e incapaz de hacer nada
+  sin que nada avisara — que es exactamente lo que le pasó a un par de botones que sobrevivieron a
+  una auditoría entera. Ahora hay un inventario de los 129, una lista de lo que aún no se pulsa
+  **con el motivo escrito al lado**, y un trinquete: esa lista sólo puede encoger. La primera tanda
+  cubre la biblioteca y la ficha —filtrar, ordenar, aplicar, abrir una entrada, volver, marcar
+  visto, favorito, ver más tarde, puntuar y reproducir—, y un control sólo cuenta cuando se ha
+  pulsado de verdad, se ha comprobado **lo que cambió** y un clic al lado no ha hecho nada. Lo que
+  se cuenta se anota mientras se ejecuta, no leyendo el código de las pruebas. Al estrenarla
+  aparecieron **tres** defectos del propio arnés: no sabía distinguir dos botones Atrás idénticos y
+  sólo uno visible; el mismo botón se pulsaba con un nombre y se contaba pendiente con otro; y el
+  clic de comprobación que debía no hacer nada **apagaba el botón de favorito** de la fila de
+  encima, sin que nada avisara.
+
 - **La puerta de cobertura ya vigila código que no es nuevo.** Sólo miraba los archivos que
   aparecían por primera vez, así que uno antiguo que empeorase no lo miraba nadie — y no es una
   hipótesis: al re-medir los tres archivos que arrastraban deuda, dos estaban igual que hace un día

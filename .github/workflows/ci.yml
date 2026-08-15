@@ -62,6 +62,12 @@ jobs:
       - name: Recovery gate
         shell: pwsh
         run: ./eng/run-recovery.ps1 -Mode Verify -Passes 2
+      # What the autonomous walk pressed with a real mouse, against what the views declare. The
+      # pending list may only shrink, so an area that regresses to keyboard-only work fails here
+      # rather than at the next redesign.
+      - name: Walk coverage gate
+        shell: pwsh
+        run: ./eng/check-walk-coverage.ps1
       - name: Upload audit gate evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -70,6 +76,7 @@ jobs:
           path: |
             artifacts/accessibility
             artifacts/recovery
+            artifacts/walk
           if-no-files-found: warn
       - name: Upload the ARM64 matrix
         if: always()

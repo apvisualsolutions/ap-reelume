@@ -131,6 +131,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   name for anybody using a screen reader. A blank synopsis takes no room. No new connection is
   opened: the text was already on your disk.
 
+- **A gate counts how many of the application's buttons are really pressed with a mouse.** Until now
+  the automatic walk drove the application from the keyboard and **two** of its 129 command controls
+  ever received a click; the rest could be visible, enabled and incapable of doing anything with
+  nothing to say so — which is exactly what happened to a pair of buttons that survived a whole
+  audit. There is now an inventory of all 129, a list of what is not pressed yet **with the reason
+  written beside it**, and a ratchet: that list may only shrink. The first batch covers the library
+  and the card — filter, sort, apply, open an entry, go back, mark watched, favourite, watch later,
+  rate and play — and a control only counts once it has been really pressed, once what changed has
+  been checked, and once a click beside it has done nothing. What counts is recorded while running,
+  not by reading the test code. Turning it on found **three** defects in the harness itself: it could
+  not tell apart two identical Back buttons with only one of them on screen; the same button was
+  pressed under one name and reported missing under another; and the checking click that was meant to
+  do nothing **turned the favourite button back off** in the row above, with nothing to say so.
+
 - **The coverage gate now watches code that is not new.** It only looked at files appearing for the
   first time, so an old one that got worse was watched by nobody — and that is not a hypothesis: on
   re-measuring the three files carrying debt, two were exactly where they were a day earlier and the

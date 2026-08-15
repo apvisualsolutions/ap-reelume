@@ -333,6 +333,34 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    —incluido el interruptor de `LIB-016`—, (5) bandeja de revisión y duplicados, (6) copia y
    restauración, (7) actualización y recuperación. Cada tanda cierra su área y saca sus entradas de
    la lista.
+
+   **La tanda 1 está hecha (2026-08-15).** De **2** controles pulsados con ratón a **15**, sobre
+   **128 identidades** —129 declaraciones, y el único colapso es el botón Atrás, declarado dos veces
+   en las dos ramas excluyentes de la biblioteca—. La puerta es `eng/check-walk-coverage.ps1`, la
+   lista con motivos es `eng/walk-pending.txt` y el trinquete está en **113**. Detalle en
+   [audit-walk-first-batch.md](evidence/stable/audit-walk-first-batch.md).
+   - **El ancla entregada no alcanzaba el botón Atrás.** Las dos ramas de detalle viven en el árbol
+     visual a la vez, así que casar por la clave encontraba **dos** controles donde un clic sólo
+     llega a uno. Sólo lo que está en pantalla es candidato, y los diez botones de valoración
+     —que comparten nombre accesible **por diseño**— se desempatan por el `HelpText`.
+   - **Y la puerta cazó un segundo defecto en su primera ejecución**: el botón de refresco del editor
+     se pulsaba por su `x:Name` y las vistas lo declaran por su clave, así que **el mismo control
+     tenía dos nombres** y quedaba pulsado bajo uno y pendiente bajo el otro.
+   - **El tercero es el peor y sólo apareció al buscarlo**: el clic «al lado» se ponía a un control
+     de altura por encima, y en una fila que envuelve eso es **la fila anterior**. El clic de control
+     de «Quitar la nota» **apagaba el interruptor de favorito**, y el paseo callaba porque su aserción
+     sólo preguntaba por la nota. Un clic de control que pulsa otra cosa **es una segunda pulsación
+     sin registrar**. Ahora el punto se elige **por geometría** —fuera de todo control de mando en
+     pantalla— y no con `InputHitTest`, que ya se midió que no predice a dónde va un clic.
+   - **Inalcanzables, medidos y nombrados**: los dos `DetailsTrailerLinkAction` —el de la ficha de
+     película y el de la de serie—, porque pulsarlos entrega la dirección al shell de Windows y abre
+     un navegador de verdad en la máquina que corre la puerta. Es lo que `LIB-015` decidió, así que
+     es el límite del paseo, no un defecto.
+   - **Pendientes de esta misma área por sembrado, no por alcance**: `MovieResumeAction` (progreso
+     guardado), `MovieTrailerAction` (un archivo de tráiler descubierto por grupo de versiones) y
+     `EpisodePlayAction` (la ficha de serie).
+   - **Al contar los 129 se puede contar mal**: la primera medición dio **142** porque
+     `<ComboBoxItem>` casa con `<ComboBox` sin un límite de palabra.
 5. **`DES-001` — la instalación también se ve, y hoy no está diseñada.** Los cinco activos de
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` son marcadores de posición del 3 de agosto
    —de 576 B a 7 KiB— y son **lo primero que alguien ve del producto**, antes que ninguna vista. Y

@@ -35,7 +35,13 @@ dotnet test ApSolutions.LocalMedia.sln -c Debug --no-build -m:1 --settings eng/t
 pwsh ./eng/verify-docs.ps1
 pwsh ./eng/verify.ps1 -Configuration Release -Runtime win-x64
 pwsh ./eng/run-accessibility.ps1 -Mode Verify -Passes 2
+pwsh ./eng/check-walk-coverage.ps1
 ```
+
+`check-walk-coverage.ps1` compara los controles de mando que declaran las vistas
+contra los que el paseo autónomo **pulsó de verdad con el ratón**, y lo que aún no
+se pulsa vive en [`eng/walk-pending.txt`](../../eng/walk-pending.txt) con su
+motivo. Esa lista **sólo puede encoger**.
 
 `verify.ps1` construye **los dos paquetes** —x64 y ARM64— y recorre el ciclo de
 vida del primero antes de ejecutar las pruebas, porque las suites de empaquetado

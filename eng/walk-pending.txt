@@ -1,0 +1,123 @@
+## The command controls the autonomous walk has not pressed yet.
+##
+## One identity per line — the view that declares the control, then the anchor the walk aims at —
+## followed by the reason it is still here. The list may only shrink: eng/check-walk-coverage.ps1
+## refuses a line the walk now presses, refuses a control missing from both halves, and refuses a
+## list longer than its ratchet. The batches are the ones decided in docs/NEXT-SESSION.es.md.
+##
+## A control leaves this file when the walk presses it with the mouse, asserts on the effect, and
+## clicks beside it to no effect — all three, which is what PressAsync does and records.
+
+AppearanceSettingsView#LanguageEnglish                     # batch 4
+AppearanceSettingsView#LanguageSpanish                     # batch 4
+AppearanceSettingsView#ThemeDark                           # batch 4
+AppearanceSettingsView#ThemeLight                          # batch 4
+AppearanceSettingsView#ThemeSystem                         # batch 4
+AudioOutputView#AudioOutputDeviceLabel                     # batch 2
+AudioOutputView#AudioOutputLayoutLabel                     # batch 2
+BackupView#BackupCancelLabel                               # batch 6
+BackupView#BackupCreateCopyLabel                           # batch 6
+BackupView#BackupExportLabel                               # batch 6
+DatabaseRecoveryView#RecoveryExit                          # batch 7
+DatabaseRecoveryView#RecoveryOpenBackupFolder              # batch 7
+DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
+DetectedMarkerReviewView#DetectedMarkerReviewCorrect       # batch 2
+DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
+DuplicateReviewView#{Binding ShortPath}                    # batch 5
+EpisodeRowView#EpisodePlayAction                           # batch 1: the series card, which needs the show, season and episode rows seeded
+LibraryEntryView#HomeLibraryAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
+LifecycleSettingsView#LifecycleCloseToTrayLabel            # batch 4
+LifecycleSettingsView#LifecycleStartupConsentDecline       # batch 4
+LifecycleSettingsView#LifecycleStartupConsentGrant         # batch 4
+LifecycleSettingsView#LifecycleStartupLabel                # batch 4
+LifecycleSettingsView#LifecycleTrayLabel                   # batch 4
+LooseFileBanner#LooseFileAddFolderAction                   # batch 2
+LooseFileBanner#LooseFileCancelAction                      # batch 2
+LooseFileBanner#LooseFileConfirmAction                     # batch 2
+MarkerEditorView#MarkerEditorDelete                        # batch 2
+MarkerEditorView#MarkerEditorKindLabel                     # batch 2
+MarkerEditorView#MarkerEditorSave                          # batch 2
+MetadataEditorView#MetadataLockBackdrop                    # batch 3
+MetadataEditorView#MetadataLockGenres                      # batch 3
+MetadataEditorView#MetadataLockOriginalTitle               # batch 3
+MetadataEditorView#MetadataLockOverview                    # batch 3
+MetadataEditorView#MetadataLockPoster                      # batch 3
+MetadataEditorView#MetadataLockReleaseYear                 # batch 3
+MetadataEditorView#MetadataRestoreAction                   # batch 3
+MetadataEditorView#MetadataSaveAction                      # batch 3
+MovieDetailsView#DetailsTrailerLinkAction                  # unreachable: the press hands the address to the Windows shell, which opens a real browser on the machine running the gate
+MovieDetailsView#MovieResumeAction                         # batch 1: shown only with stored progress worth returning to
+MovieDetailsView#MovieTrailerAction                        # batch 1: shown only when a trailer file sits beside the film, which needs a version group the walk does not seed yet
+NextEpisodeOverlay#NextEpisodeCancel                       # batch 2
+NextEpisodeOverlay#NextEpisodePlayNow                      # batch 2
+PlayerVersionsView#PlayerVersionsSwitchAction              # batch 2
+PlayerView#PlayerPauseAction                               # batch 2
+PlayerView#PlayerPlayAction                                # batch 2
+PlayerView#PlayerRecoveryOpenExternally                    # batch 2
+PlayerView#PlayerRecoveryRetry                             # batch 2
+PlayerView#PlayerStopAction                                # batch 2
+PrivacySettingsView#PrivacyAutoRefreshLabel                # batch 4
+PrivacySettingsView#PrivacyDiagnosticsLabel                # batch 4
+PrivacySettingsView#PrivacyExportLabel                     # batch 4
+PrivacySettingsView#PrivacyPreviewLabel                    # batch 4
+RecommendationSettingsView#RecommendationSettingsEnableLabel # batch 4
+RecommendationSettingsView#RecommendationSettingsThresholdApply # batch 4
+RecommendationSettingsView#RecommendationSettingsThresholdLabel # batch 4
+RecommendationsRailView#RecommendationsToggleAction        # unscheduled: the shell, home and onboarding are in none of the seven batches
+RenamePreviewView#RenameExecuteAction                      # batch 3
+RenamePreviewView#RenameExplicitConsent                    # batch 3
+RenamePreviewView#RenameUndoAction                         # batch 3
+RestoreWizardView#RestoreChooseArchiveLabel                # batch 6
+RestoreWizardView#RestoreConfirmLabel                      # batch 6
+ResumeHeroView#HomeResumeAction                            # unscheduled: the shell, home and onboarding are in none of the seven batches
+ResumePromptView#ResumePromptRestart                       # batch 2
+ResumePromptView#ResumePromptResume                        # batch 2
+ReviewInboxView#ReassignmentConfirmAction                  # batch 5
+ReviewInboxView#ReassignmentKeepAction                     # batch 5
+ReviewInboxView#ReviewAcceptAction                         # batch 5
+ReviewInboxView#ReviewLoadMoreAction                       # batch 5
+ReviewInboxView#ReviewManualSearchAction                   # batch 5
+ReviewInboxView#ReviewRejectAction                         # batch 5
+RootOnboardingView#RootAddAction                           # unscheduled: the shell, home and onboarding are in none of the seven batches
+RootOnboardingView#RootKindLocal                           # unscheduled: the shell, home and onboarding are in none of the seven batches
+RootOnboardingView#RootKindUnc                             # unscheduled: the shell, home and onboarding are in none of the seven batches
+RootOnboardingView#RootKindUsb                             # unscheduled: the shell, home and onboarding are in none of the seven batches
+RootOnboardingView#RootRemoveAction                        # unscheduled: the shell, home and onboarding are in none of the seven batches
+RootOnboardingView#RootRemoveCancelAction                  # unscheduled: the shell, home and onboarding are in none of the seven batches
+RootOnboardingView#RootRemoveConfirmAction                 # unscheduled: the shell, home and onboarding are in none of the seven batches
+RootOnboardingView#RootScanConsentAction                   # unscheduled: the shell, home and onboarding are in none of the seven batches
+ScanSettingsView#ScanSettingsWatchLocal                    # batch 4
+SegmentDetectionSettingsView#SegmentDetectionSettingsEnable # batch 4
+ShellView#NavigationBackups                                # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#NavigationHome                                   # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#NavigationLibrary                                # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#NavigationReview                                 # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#NavigationSettings                               # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#PlayerCloseAction                                # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#PlayerFullscreenAction                           # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#PlayerMiniModeAction                             # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#TitleEditMetadataAction                          # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#TitlePreviewRenameAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShellView#TitleReviewDuplicatesAction                      # unscheduled: the shell, home and onboarding are in none of the seven batches
+ShortcutSettingsView#ShortcutSettingsRestore               # batch 4
+ShowDetailsView#DetailsTrailerLinkAction                   # unreachable: same as the film card — the press leaves the application by design (LIB-015)
+SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2
+SubtitleStyleView#SubtitleStyleBackgroundOpacityLabel      # batch 2
+SubtitleStyleView#SubtitleStyleFamilyLabel                 # batch 2
+SubtitleStyleView#SubtitleStyleOutlineLabel                # batch 2
+SubtitleStyleView#SubtitleStyleSizeLabel                   # batch 2
+TrackSelectorView#TrackSelectorAudioLabel                  # batch 2
+TrackSelectorView#TrackSelectorRememberForSeries           # batch 2
+TrackSelectorView#TrackSelectorSubtitleLabel               # batch 2
+TransportControlsView#TransportSkipBackward                # batch 2
+TransportControlsView#TransportSkipForward                 # batch 2
+TransportControlsView#TransportToggleMute                  # batch 2
+TransportControlsView#TransportVolumeLabel                 # batch 2
+UpdateView#UpdateAutomaticCheckLabel                       # batch 7
+UpdateView#UpdateCancelLabel                               # batch 7
+UpdateView#UpdateCheckLabel                                # batch 7
+UpdateView#UpdateDownloadLabel                             # batch 7
+UpdateView#UpdateInstallLabel                              # batch 7
+VersionSwitchDialog#VersionSwitchCancel                    # batch 2
+VersionSwitchDialog#VersionSwitchConfirm                   # batch 2
+VersionSwitchDialog#VersionSwitchRestart                   # batch 2

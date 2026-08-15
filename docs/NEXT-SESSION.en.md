@@ -327,6 +327,35 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    favourite, watched, rating — (2) the player's transport, (3) editor and rename, (4) settings —
    including `LIB-016`'s switch — (5) review inbox and duplicates, (6) backup and restore, (7) update
    and recovery. Each batch closes its area and takes its entries off the list.
+
+   **Batch 1 is done (2026-08-15).** From **2** controls pressed with a mouse to **15**, out of
+   **128 identities** — 129 declarations, and the one collapse is the Back button, declared twice
+   across the library's two mutually exclusive branches. The gate is `eng/check-walk-coverage.ps1`,
+   the list with reasons is `eng/walk-pending.txt`, and the ratchet stands at **113**. Detail in
+   [audit-walk-first-batch.md](evidence/stable/audit-walk-first-batch.md).
+   - **The shipped anchor could not reach the Back button.** Both detail branches live in the visual
+     tree at once, so matching on the key found **two** controls where a click can only reach one.
+     Only what is on screen is a candidate, and the ten rating buttons — which share one accessible
+     name **by design** — are told apart by their `HelpText`.
+   - **And the gate caught a second defect on its first run**: the editor's refresh button was
+     pressed by its `x:Name` while the views declare it by its key, so **the same control had two
+     names** and was pressed under one and pending under the other.
+   - **The third is the worst and only appeared because it was looked for**: the beside click sat one
+     control-height above its target, and in a wrapping row that is **the row before it**. The
+     control click for *Clear rating* **turned the favourite toggle back off**, and the walk stayed
+     quiet because its assertion only asked about the rating. A control click that presses something
+     else **is a second, unrecorded press**. The point is now chosen **by geometry** — outside every
+     command control on screen — and not with `InputHitTest`, already measured not to predict where a
+     click goes.
+   - **Unreachable, measured and named**: both `DetailsTrailerLinkAction` buttons — the film card's
+     and the series card's — because pressing them hands the address to the Windows shell and opens
+     a real browser on the machine running the gate. That is what `LIB-015` decided, so it is the
+     walk's limit rather than a defect.
+   - **Still pending in this area for seeding, not for reach**: `MovieResumeAction` (stored
+     progress), `MovieTrailerAction` (a trailer file discovered through a version group) and
+     `EpisodePlayAction` (the series card).
+   - **Counting the 129 can be got wrong**: the first measurement read **142**, because
+     `<ComboBoxItem>` matches `<ComboBox` without a word boundary.
 5. **`DES-001` — the installation is seen too, and today it is undesigned.** The five assets in
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` are placeholders from 3 August — 576 B to
    7 KiB — and they are **the first thing anyone sees of the product**, before any view. And there is
