@@ -299,6 +299,18 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    interruptor apagado y **2** encendido, en el mismo proceso hijo.
    [audit-lib016-automatic-refresh.md](evidence/stable/audit-lib016-automatic-refresh.md).
 
+5. **El paseo autónomo de toda la aplicación, decidido el 2026-08-15, y va por delante de lo que
+   sigue**, porque es la red del rediseño y no un extra. Medido antes de prometer nada: hay **129
+   controles de mando** en las 48 vistas —95 `Button`, 18 `CheckBox`, 8 `ComboBox`, 5 `Slider`, 2
+   `ToggleButton`, 1 `RadioButton`— más 17 `ListBox`, y con **ratón de verdad se pulsa uno**:
+   `RefreshProviderMetadata`. `MouseDown`/`MouseUp` no aparecen en ningún otro archivo del
+   repositorio. **Sólo 60 de los 129 tienen `x:Name`**, que es el ancla de `Click(host, name)`; en
+   cambio **239 elementos llevan `AutomationProperties.Name`**, así que la localización va por
+   **clave de recurso** resuelta contra el diccionario que usa la aplicación: no añade superficie y
+   sobrevive al rediseño, que cambia la forma pero no quita el nombre. La forma es la de la casa: una
+   puerta que cuenta los clicables pulsados contra una **lista de pendientes que sólo puede
+   encoger**, y tandas por área. **Queda por medir, no por suponer**, si el reproductor es alcanzable
+   en headless con LibVLC nativo; si no lo es, se dice en la evidencia en vez de fingir cobertura.
 5. **`DES-001` — la instalación también se ve, y hoy no está diseñada.** Los cinco activos de
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` son marcadores de posición del 3 de agosto
    —de 576 B a 7 KiB— y son **lo primero que alguien ve del producto**, antes que ninguna vista. Y

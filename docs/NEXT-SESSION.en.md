@@ -294,6 +294,19 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    child process.
    [audit-lib016-automatic-refresh.md](evidence/stable/audit-lib016-automatic-refresh.md).
 
+5. **The autonomous walk over the whole application, decided on 2026-08-15, and it goes ahead of
+   what follows**, because it is the redesign's safety net rather than an extra. Measured before
+   promising anything: there are **129 command controls** across the 48 views — 95 `Button`, 18
+   `CheckBox`, 8 `ComboBox`, 5 `Slider`, 2 `ToggleButton`, 1 `RadioButton` — plus 17 `ListBox`, and
+   **exactly one is pressed with a real mouse**: `RefreshProviderMetadata`. `MouseDown`/`MouseUp`
+   appear in no other file in the repository. **Only 60 of the 129 carry `x:Name`**, which is what
+   `Click(host, name)` anchors on; **239 elements do carry `AutomationProperties.Name`**, so lookup
+   goes by **resource key** resolved against the dictionary the application itself uses: it adds no
+   surface and survives the redesign, which changes the shape but does not remove the name. The shape
+   is the house's: a gate counting clickables actually pressed against a **shrink-only list of
+   outstanding ones**, area by area. **Left to measure rather than assume**: whether the player is
+   reachable headless with native LibVLC; if it is not, the evidence says so instead of pretending
+   coverage.
 5. **`DES-001` — the installation is seen too, and today it is undesigned.** The five assets in
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` are placeholders from 3 August — 576 B to
    7 KiB — and they are **the first thing anyone sees of the product**, before any view. And there is
