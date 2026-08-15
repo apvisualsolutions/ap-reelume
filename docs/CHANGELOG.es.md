@@ -133,6 +133,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   la pantalla, y anunciado con su nombre para quien use un lector de pantalla. Un resumen en blanco
   no ocupa sitio. No se abre ninguna conexión nueva: el texto ya estaba en tu disco.
 
+- **Renombrar archivos no proponía ningún nombre, y ahora se sabe por qué.** La vista previa de
+  renombrado se abre, enseña su casilla de confirmación y sus dos botones, y **no ofrece nunca una
+  sola operación**: la aplicación pedía renombrar cada archivo al nombre que ya tenía, así que la
+  comprobación de seguridad lo descartaba, correctamente, como «sin cambios». Falta la pieza que
+  decide cómo debe llamarse un archivo a partir de su ficha, y eso es una decisión de producto, no un
+  cable suelto: queda anotada en vez de inventada. Nada de tu disco se tocó ni se toca.
+
 - **Los mandos del reproductor ya se pueden usar con el ratón.** Tres cosas distintas los tenían
   inservibles, y las tres se veían igual: un botón en pantalla que no hacía nada. El aviso de estado
   del vídeo —el que dice si va por hardware o si el rango es estándar— **ocupaba toda la superficie

@@ -381,6 +381,20 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
      donde ya está** (0-200 arrancando en 100); y la caché de muestras **ignoraba la duración pedida**,
      así que un salto de 30 s se salía de un archivo de 12 y dejaba Detener deshabilitado por una
      razón ajena.
+
+   **La tanda 3 está a medias a propósito (2026-08-15): el editor sí, el renombrado no.** 22 → **30**
+   pulsados, trinquete **98**. El editor quedó entero —seis candados, Guardar y Restaurar—, y
+   **Guardar afirma sobre la base**, que es el primer control del paseo cuyo efecto no está en la
+   pantalla. Detalle en [audit-walk-third-batch.md](evidence/stable/audit-walk-third-batch.md).
+   - **El renombrado no puede renombrar.** La aplicación ensamblada pide renombrar cada archivo **al
+     nombre que ya tiene** —`new RenameRequest(file.Path, Path.GetFileName(file.Path))`— y
+     `RenamePolicy` contesta correctamente `NoChange` sin operación. El plan sale **siempre vacío**,
+     Renombrar y Deshacer no pueden hacer nada, y la casilla de consentimiento guarda una decisión que
+     no se ofrece.
+   - **Y no hay nada que componga un nombre**: ése es el único `RenameRequest` de producción del
+     repositorio. **No falta un cable, falta una decisión** —cómo se llama un archivo renombrado—, y
+     es del propietario. El paseo la registra en vez de inventarse un convenio, y los tres controles
+     siguen pendientes nombrando esto.
 5. **`DES-001`, la mitad del agente: hecha el 2026-08-15.** La descripción del manifiesto ya no es
    una cadena con una barra: es `ms-resource:AppDescription`, y `eng/build-package-resources.ps1`
    construye un recurso por idioma **declarado en el propio manifiesto**, con el texto leído del

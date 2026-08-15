@@ -374,6 +374,19 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
      outside the window said nothing; **the centre of a range control is usually where it already is**
      (0–200 starting at 100); and the sample cache **ignored the requested duration**, so a 30 s skip
      ran off a 12 s file and left Stop disabled for an unrelated reason.
+
+   **Batch 3 is deliberately half done (2026-08-15): the editor yes, the rename no.** 22 → **30**
+   pressed, ratchet **98**. The editor is complete — six locks, Save and Restore — and **Save asserts
+   on the row**, the first control in the walk whose effect is not on the screen. Detail in
+   [audit-walk-third-batch.md](evidence/stable/audit-walk-third-batch.md).
+   - **The rename cannot rename.** The assembled application asks to rename each file **to the name it
+     already has** — `new RenameRequest(file.Path, Path.GetFileName(file.Path))` — and `RenamePolicy`
+     correctly answers `NoChange` with no operation. The plan is always empty, Rename and Undo can
+     never do anything, and the consent box guards a decision never offered.
+   - **And nothing composes a name**: that is the only production `RenameRequest` in the repository.
+     **What is missing is not wiring but a decision** — what a renamed file is called — and it is the
+     owner's. The walk records it rather than inventing a convention, and the three controls stay
+     pending naming this.
 5. **`DES-001`, the agent's half: done on 2026-08-15.** The manifest's description is no longer a
    string with a slash in it: it is `ms-resource:AppDescription`, and
    `eng/build-package-resources.ps1` builds one resource per language **the manifest itself

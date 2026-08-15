@@ -131,6 +131,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   name for anybody using a screen reader. A blank synopsis takes no room. No new connection is
   opened: the text was already on your disk.
 
+- **Renaming files proposed no name at all, and now it is known why.** The rename preview opens,
+  shows its confirmation box and its two buttons, and **never offers a single operation**: the
+  application was asking to rename each file to the name it already had, so the safety check
+  correctly discarded it as "no change". What is missing is the piece that decides what a file should
+  be called from its entry, and that is a product decision rather than a loose wire: it is written
+  down rather than invented. Nothing on your disk was touched, and none is.
+
 - **The player's controls can be used with a mouse now.** Three separate things had them unusable,
   and all three looked the same: a button on screen that did nothing. The video status notice — the
   one saying whether it is running on hardware or at standard range — **covered the whole player

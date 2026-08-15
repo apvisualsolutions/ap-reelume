@@ -11,6 +11,7 @@ using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
@@ -316,6 +317,48 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => editor.LockTitle,
             "clicking the title lock never locked the title");
         Assert.True(editor.LockTitle);
+
+        // The other six locks, each one pressed and each one read back. They are the fields a person
+        // protects from the next refresh, so a lock that looks set and is not would hand somebody
+        // else's data back over their own work.
+        foreach (var (anchor, read) in new (string Anchor, Func<bool> Read)[]
+        {
+            ("MetadataLockOriginalTitle", () => editor.LockOriginalTitle),
+            ("MetadataLockOverview", () => editor.LockOverview),
+            ("MetadataLockReleaseYear", () => editor.LockReleaseYear),
+            ("MetadataLockGenres", () => editor.LockGenres),
+            ("MetadataLockPoster", () => editor.LockPosterPath),
+            ("MetadataLockBackdrop", () => editor.LockBackdropPath),
+        })
+        {
+            Assert.False(read(), $"{anchor} was already set before it was pressed.");
+            await PressAsync(host, anchor, read, $"clicking {anchor} never set it");
+            Assert.True(read());
+        }
+
+        // Save is the one whose effect is not on screen: it writes a row. Asserting on the editor
+        // would prove only that the editor kept what was typed into it.
+        var metadata = new CatalogMetadataRepository(factory);
+        editor.Title = "La llegada (edición personal)";
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "MetadataSaveAction",
+            async () => (await metadata.GetAsync(new TitleId(fileId), TestContext.Current.CancellationToken))
+                ?.Metadata.Title,
+            "clicking Save never wrote the edited title to the catalogue");
+        Assert.Equal(
+            "La llegada (edición personal)",
+            (await metadata.GetAsync(new TitleId(fileId), TestContext.Current.CancellationToken))?.Metadata.Title);
+
+        // And Restore puts the provider's answer back over it, which is the whole point of having
+        // edited by hand being reversible.
+        await PressAsync(
+            host,
+            "MetadataRestoreAction",
+            () => editor.Title,
+            "clicking Restore never brought the provider's title back over the edited one");
+        Assert.Equal("La llegada", editor.Title);
     }
 
     /// <summary>
@@ -596,6 +639,60 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// What the rename preview offers a person today, which is nothing, and why the walk cannot press
+    /// its three controls.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the measurement kept rather than the scene that could not be written. The assembled
+    /// application asks to rename each file <b>to the name it already has</b> —
+    /// <c>new RenameRequest(file.Path, Path.GetFileName(file.Path))</c> in the composition root — and
+    /// <see cref="RenamePolicy"/> answers that correctly with <c>NoChange</c> and no operation. So the
+    /// plan is always empty, Rename and Undo can never do anything, and the consent box guards a
+    /// decision that is never offered.
+    /// </para>
+    /// <para>
+    /// Nothing in the repository composes a name from a title: the only <c>RenameRequest</c> outside
+    /// tests is that one. What is missing is not wiring but a decision — what a renamed file is
+    /// called — and that belongs to whoever owns the product, so the walk records the gap instead of
+    /// inventing a convention. The three controls stay in eng/walk-pending.txt naming this.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_rename_preview_can_only_ever_offer_the_name_the_file_already_has()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var original = Path.Combine(media, "arrival.2016.1080p.web.mp4");
+
+        // Nothing is decoded here, so the file only has to exist, be catalogued and be identified.
+        await File.WriteAllBytesAsync(original, [0x41, 0x50], TestContext.Current.CancellationToken);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, original, TimeSpan.FromMinutes(116));
+        await SeedIdentifiedTitleAsync(factory, fileId);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
+        await host.ViewModel.OpenRenamePreviewAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+
+        var rename = host.ViewModel.Rename;
+        Assert.NotNull(rename);
+
+        // The surface opens on a title somebody identified, and offers not one operation.
+        Assert.Empty(rename!.Operations);
+        Assert.Contains(rename.Conflicts, conflict => conflict.Kind == RenameConflictKind.NoChange);
+        Assert.False(
+            ((AsyncRelayCommand)rename.ExecuteCommand).CanExecute(null),
+            "Rename offered nothing and still declared itself executable.");
+        Assert.True(File.Exists(original), "Nothing was renamed, which is the point.");
+    }
+
+    /// <summary>
     /// Finds one command control by its <b>anchor</b>: the resource key behind its accessible name,
     /// its <c>x:Name</c>, or — for the two controls named by their data — the name the walk itself
     /// seeded.
@@ -807,27 +904,44 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// at all.
     /// </para>
     /// </remarks>
-    private static async Task PressAsync<T>(
+    private static Task PressAsync<T>(
         ShellHost host,
         string anchor,
         Func<T> probe,
         string complaint,
         string? helpText = null,
+        string? recordAs = null) =>
+        PressAsync(host, anchor, () => Task.FromResult(probe()), complaint, helpText, recordAs);
+
+    /// <summary>
+    /// The same, for a control whose effect is not on the surface but in the catalogue.
+    /// </summary>
+    /// <remarks>
+    /// Save is the reason this exists. What it changes is a row, and asserting on the editor instead
+    /// would prove the editor kept what was typed into it — which it would do whether or not anything
+    /// was written down.
+    /// </remarks>
+    private static async Task PressAsync<T>(
+        ShellHost host,
+        string anchor,
+        Func<Task<T>> probe,
+        string complaint,
+        string? helpText = null,
         string? recordAs = null)
     {
         var control = Resolve(host, anchor, helpText);
-        var before = probe();
+        var before = await probe();
 
         ClickBeside(host, control);
         await SettleAsync();
         Assert.True(
-            EqualityComparer<T>.Default.Equals(probe(), before),
+            EqualityComparer<T>.Default.Equals(await probe(), before),
             $"Clicking beside {anchor} changed the very thing the press is meant to change, so "
                 + "pressing it would have proved nothing.");
 
         Click(host, control);
         await WaitForAsync(
-            () => Task.FromResult(!EqualityComparer<T>.Default.Equals(probe(), before)),
+            async () => !EqualityComparer<T>.Default.Equals(await probe(), before),
             complaint);
         WalkLedger.Record(control, recordAs ?? anchor);
     }

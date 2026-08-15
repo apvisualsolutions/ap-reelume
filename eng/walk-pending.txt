@@ -37,14 +37,6 @@ LooseFileBanner#LooseFileConfirmAction                     # batch 2
 MarkerEditorView#MarkerEditorDelete                        # batch 2
 MarkerEditorView#MarkerEditorKindLabel                     # batch 2
 MarkerEditorView#MarkerEditorSave                          # batch 2
-MetadataEditorView#MetadataLockBackdrop                    # batch 3
-MetadataEditorView#MetadataLockGenres                      # batch 3
-MetadataEditorView#MetadataLockOriginalTitle               # batch 3
-MetadataEditorView#MetadataLockOverview                    # batch 3
-MetadataEditorView#MetadataLockPoster                      # batch 3
-MetadataEditorView#MetadataLockReleaseYear                 # batch 3
-MetadataEditorView#MetadataRestoreAction                   # batch 3
-MetadataEditorView#MetadataSaveAction                      # batch 3
 MovieDetailsView#DetailsTrailerLinkAction                  # unreachable: the press hands the address to the Windows shell, which opens a real browser on the machine running the gate
 MovieDetailsView#MovieResumeAction                         # batch 1: shown only with stored progress worth returning to
 MovieDetailsView#MovieTrailerAction                        # batch 1: shown only when a trailer file sits beside the film, which needs a version group the walk does not seed yet
@@ -61,9 +53,9 @@ RecommendationSettingsView#RecommendationSettingsEnableLabel # batch 4
 RecommendationSettingsView#RecommendationSettingsThresholdApply # batch 4
 RecommendationSettingsView#RecommendationSettingsThresholdLabel # batch 4
 RecommendationsRailView#RecommendationsToggleAction        # unscheduled: the shell, home and onboarding are in none of the seven batches
-RenamePreviewView#RenameExecuteAction                      # batch 3
-RenamePreviewView#RenameExplicitConsent                    # batch 3
-RenamePreviewView#RenameUndoAction                         # batch 3
+RenamePreviewView#RenameExecuteAction                      # blocked: nothing composes a desired name, so the plan is always empty (NoChange) - see audit-walk-third-batch.md
+RenamePreviewView#RenameExplicitConsent                    # blocked: nothing composes a desired name, so the plan is always empty (NoChange) - see audit-walk-third-batch.md
+RenamePreviewView#RenameUndoAction                         # blocked: nothing composes a desired name, so the plan is always empty (NoChange) - see audit-walk-third-batch.md
 RestoreWizardView#RestoreChooseArchiveLabel                # batch 6
 RestoreWizardView#RestoreConfirmLabel                      # batch 6
 ResumeHeroView#HomeResumeAction                            # unscheduled: the shell, home and onboarding are in none of the seven batches
