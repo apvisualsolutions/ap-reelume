@@ -297,8 +297,26 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    rancio** —una ficha sin fecha nunca se refrescó, así que es la más rancia que hay—, con los nulos
    **primero** en el orden y el tope de 20 por pasada conteniendo la primera pasada de una biblioteca
    entera.
-5. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe
-   desde la aplicación construida y no desde el código — por eso va detrás del bloque.
+5. **`DES-001` — la instalación también se ve, y hoy no está diseñada.** Los cinco activos de
+   `src/ApSolutions.LocalMedia.Windows.Package/Assets/` son marcadores de posición del 3 de agosto
+   —de 576 B a 7 KiB— y son **lo primero que alguien ve del producto**, antes que ninguna vista. Y
+   hay un defecto medido: el manifiesto declara `es-ES` y `en-US` pero su `Description` es **una sola
+   cadena con una barra dentro** («Biblioteca y reproductor de vídeo local / Local video library and
+   player»), que Windows enseña tal cual en los dos idiomas. La localización de verdad va con
+   `ms-resource:` y un recurso por idioma, como **ya se hace en winget**, que sí tiene sus dos
+   `locale.es-ES.yaml` y `locale.en-US.yaml`. Ojo: tocar el paquete obliga a reempaquetar o las
+   pruebas de empaquetado fallan.
+6. **El rediseño visual**, que el propietario está preparando con Claude Design. Lo que este
+   repositorio le debe es el inventario de **todo lo que se ve**, y ya está escrito y medido en
+   [docs/design/SURFACES.es.md](design/SURFACES.es.md) y [SURFACES.en.md](design/SURFACES.en.md): 48
+   vistas en 15 áreas, las 468 cadenas por idioma, los 23 mensajes distintos de la vista de
+   actualización —15 estados y 8 motivos de rechazo, que no son errores del usuario y piden otro
+   tratamiento— y los cinco activos de instalación. **`LIB-016` añade superficie visible nueva** (el
+   interruptor de refresco automático y su texto), así que el inventario no se cierra hasta que esa
+   entrada esté hecha.
+7. **Documentación**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` y el manual de usuario, que se escribe
+   desde la aplicación construida y no desde el código — por eso va el último, y sus capturas
+   dependen del rediseño.
 
 ## Lo terminado el 2026-08-15 (octava sesión)
 

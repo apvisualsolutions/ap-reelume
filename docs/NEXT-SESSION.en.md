@@ -291,8 +291,25 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    it was missing. **Decided on 2026-08-15: a null `refreshed_utc` counts as stale** — an entry with
    no date was never refreshed, so it is as stale as it gets — with nulls **first** in the order and
    the cap of 20 per pass containing the first pass over a whole library.
-5. **Documentation**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, written from the
-   built application rather than from the code — which is why it comes after the block.
+5. **`DES-001` — the installation is seen too, and today it is undesigned.** The five assets in
+   `src/ApSolutions.LocalMedia.Windows.Package/Assets/` are placeholders from 3 August — 576 B to
+   7 KiB — and they are **the first thing anyone sees of the product**, before any view. And there is
+   a measured defect: the manifest declares `es-ES` and `en-US` but its `Description` is **a single
+   string with a slash inside it** ("Biblioteca y reproductor de vídeo local / Local video library
+   and player"), which Windows shows exactly like that in both languages. Real localisation uses
+   `ms-resource:` and one resource per language, as **winget already does** with its two
+   `locale.es-ES.yaml` and `locale.en-US.yaml`. Note: touching the package means repackaging, or the
+   packaging tests fail.
+6. **The visual redesign**, which the owner is preparing with Claude Design. What this repository
+   owes it is the inventory of **everything that is seen**, and it is written and measured in
+   [docs/design/SURFACES.en.md](design/SURFACES.en.md) and [SURFACES.es.md](design/SURFACES.es.md):
+   48 views across 15 areas, the 468 strings per language, the update view's 23 distinct messages —
+   15 states and 8 refusal reasons, which are not user errors and ask for different treatment — and
+   the five installation assets. **`LIB-016` adds new visible surface** (the automatic-refresh switch
+   and its text), so the inventory does not close until that entry is done.
+7. **Documentation**: `DOC-101`, `DOC-201`, `T44.1`-`T44.6` and the user manual, written from the
+   built application rather than from the code — which is why it comes last, and why its screenshots
+   depend on the redesign.
 
 ## Finished on 2026-08-15 (eighth session)
 
