@@ -68,6 +68,26 @@ Al final se comprueba lo que ve la persona **y** lo que queda escrito: la ficha 
 y la fila de `catalog_metadata` también, con su fecha de refresco. / The entry shows it and the row
 holds it.
 
+## El ancla del paseo completo, medida el 2026-08-15 / The anchor for the full walk
+
+El propietario decidió que **toda la aplicación** se pruebe de forma autónoma, y eso obligaba a
+contestar antes una pregunta: cómo se localiza lo que hay que pulsar. Medido del árbol: **129
+controles de mando** en las 48 vistas, y **sólo 60 llevan `x:Name`**, que es lo que
+`Click(host, name)` usaba. Anclar en él habría significado añadir un nombre a 69 controles en
+beneficio de una prueba. / Only 60 of 129 command controls carry an `x:Name`.
+
+La alternativa estaba ya puesta: **239 elementos llevan `AutomationProperties.Name`**, hay 80 pruebas
+que lo exigen para todo control interactivo, y un rediseño cambia la forma sin quitar el nombre. Así
+que el paseo localiza por la **clave de recurso**, resuelta contra el mismo diccionario que usa la
+aplicación —no por el texto, que se reescribe, ni por el idioma cargado—. / The walk anchors on the
+resource key behind the accessible name.
+
+**Probado sobre un control que no tiene `x:Name`**: el candado del título en el editor. El clic al
+lado no lo cambia; el clic lo pone. Es la medición que decide que el paseo puede cubrir la aplicación
+entera **sin añadir superficie**. Quedan **dos** clicables sin `x:Name` y sin clave por
+`DynamicResource`, anotados para la primera tanda. / Two clickables have neither, noted for the first
+batch.
+
 ## Lo que queda verde / What is green
 
 | Suite | Resultado |

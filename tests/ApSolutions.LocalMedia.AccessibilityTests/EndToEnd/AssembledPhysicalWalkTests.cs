@@ -288,6 +288,51 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             TestContext.Current.CancellationToken);
         Assert.Equal("La llegada", stored?.Metadata.Title);
         Assert.NotNull(stored?.RefreshedUtc);
+
+        // The lock beside the title has no x:Name — like 69 of the 129 command controls — so it is
+        // found by the resource key behind its accessible name. This is the measurement that decides
+        // whether the walk can cover the whole application without adding a name to every control.
+        Assert.False(editor.LockTitle);
+        ClickBeside(host, "MetadataLockTitle");
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(editor.LockTitle);
+
+        Click(host, "MetadataLockTitle");
+        Assert.True(editor.LockTitle);
+    }
+
+    /// <summary>
+    /// Finds a control by the <b>resource key</b> behind its accessible name, resolved against the
+    /// dictionary the application itself uses.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Measured on 2026-08-15: of the 129 command controls across the 48 views, only 60 carry an
+    /// <c>x:Name</c>, so anchoring on that would mean adding one to 69 controls for the benefit of a
+    /// test. 239 elements already carry an accessible name, 80 tests require every interactive one to
+    /// have it, and a redesign changes the shape without removing it — so the key is the anchor that
+    /// costs no surface and survives what is coming.
+    /// </para>
+    /// <para>
+    /// The text is resolved rather than written down, so the walk does not break when a string is
+    /// reworded and does not depend on which language is loaded.
+    /// </para>
+    /// </remarks>
+    private static Control FindByKey(ShellHost host, string resourceKey)
+    {
+        Assert.True(
+            Avalonia.Application.Current!.TryFindResource(resourceKey, out var resolved) && resolved is string,
+            $"No resource named {resourceKey}, so no control can carry it as an accessible name.");
+        var expected = (string)resolved!;
+        var matches = host.Shell.GetVisualDescendants()
+            .OfType<Control>()
+            .Where(candidate => Avalonia.Automation.AutomationProperties.GetName(candidate) == expected)
+            .ToArray();
+
+        Assert.True(
+            matches.Length == 1,
+            $"{resourceKey} matched {matches.Length} controls; a click needs exactly one.");
+        return matches[0];
     }
 
     /// <summary>
@@ -298,7 +343,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     {
         var control = host.Shell.GetVisualDescendants()
             .OfType<Control>()
-            .FirstOrDefault(candidate => candidate.Name == controlName);
+            .FirstOrDefault(candidate => candidate.Name == controlName)
+            ?? (Avalonia.Application.Current!.TryFindResource(controlName, out _) ? FindByKey(host, controlName) : null);
         Assert.True(control is not null, $"The assembled shell has no control named {controlName}.");
 
         // Scrolling to it first is what a person does, and it is not optional: the editor sits far
@@ -350,7 +396,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     {
         var control = host.Shell.GetVisualDescendants()
             .OfType<Control>()
-            .First(candidate => candidate.Name == controlName);
+            .FirstOrDefault(candidate => candidate.Name == controlName)
+            ?? FindByKey(host, controlName);
         control.BringIntoView();
         host.Window.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
