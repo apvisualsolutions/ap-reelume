@@ -131,6 +131,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   name for anybody using a screen reader. A blank synopsis takes no room. No new connection is
   opened: the text was already on your disk.
 
+- **Windows now describes the application in your language before you open it.** The package
+  declared Spanish and English all along, but its description was **one sentence with a slash in the
+  middle** — "Biblioteca y reproductor de vídeo local / Local video library and player" — which
+  Windows showed the same way to everybody: declaring a language translates nothing by itself. The
+  package now carries one text per language and Windows picks yours. The text is not written by hand
+  anywhere: it comes from the first paragraph of the matching README, which is where the winget entry
+  already took its own, so both installation routes say exactly the same thing. The name is
+  deliberately not translated: "AP Reelume" is the product's name in both languages.
+
 - **A gate counts how many of the application's buttons are really pressed with a mouse.** Until now
   the automatic walk drove the application from the keyboard and **two** of its 129 command controls
   ever received a click; the rest could be visible, enabled and incapable of doing anything with

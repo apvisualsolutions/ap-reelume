@@ -361,6 +361,35 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
      `EpisodePlayAction` (la ficha de serie).
    - **Al contar los 129 se puede contar mal**: la primera medición dio **142** porque
      `<ComboBoxItem>` casa con `<ComboBox` sin un límite de palabra.
+5. **`DES-001`, la mitad del agente: hecha el 2026-08-15.** La descripción del manifiesto ya no es
+   una cadena con una barra: es `ms-resource:AppDescription`, y `eng/build-package-resources.ps1`
+   construye un recurso por idioma **declarado en el propio manifiesto**, con el texto leído del
+   primer párrafo de cada README —de donde winget ya sacaba el suyo—, así que las dos vías de
+   instalación dicen lo mismo. Detalle en
+   [audit-des001-package-description.md](evidence/stable/audit-des001-package-description.md).
+   - **Dos mediciones decidían si era posible**: `makepri.exe` está junto a `makeappx.exe`, y su
+     salida es **determinista** —mismo hash desde dos directorios distintos—, que es lo que la
+     comparación de reproducibilidad exige.
+   - **Y una trampa que ningún error nombra**: el DOM de XML escribe `xml:space` como `d2p1:space`
+     con su propio espacio de nombres, y `makepri` contesta «PRI224: root node not found», que no
+     nombra ni el atributo ni el archivo. Los `.resw` se escriben como texto.
+   - **Tocar el manifiesto caducó dos mediciones manuales** —`windows-lifecycle.json` degrada a
+     «bloqueado» y la suite lo acepta; `updater-handover.json` pone `UpdateHandoverTests` en rojo—, y
+     **se rehizo con permiso del propietario**. De paso, el ciclo **quedó versionado**:
+     `eng/run-sandbox-handover.ps1`, `eng/sandbox-handover.ps1` y
+     `eng/measure-handover-with-handler.ps1`. Antes el documento describía los pasos y el guion vivía
+     fuera del repositorio.
+   - **Tres defectos del arnés del sandbox, ninguno con un mensaje que lo nombrara**: el `&` de
+     PowerShell rompe el `.wsb` porque es **texto XML** («el archivo de configuración no es válido»);
+     cerrar el sandbox matando `WindowsSandboxServer` —del anfitrión— tumba la ejecución siguiente; y
+     la ventana la tiene `WindowsSandboxRemoteSession`, no un `WindowsSandboxClient`, que en esta
+     compilación no existe.
+   - **Y un hallazgo del producto, reproducido dos veces**: sin nada registrado para `.msix`,
+     `Process.Start` devuelve **nulo** y la aplicación dice «Windows no lo aceptó» —cierto: la base
+     quedó en 372 736 bytes antes y después—, **pero Windows deja el diálogo «Elegir una aplicación»
+     en pantalla**. Es la imagen espejo de lo que la mitad `withHandler` descarta. Medido y nombrado;
+     **no tocado**.
+   - **Sigue abierto**: los cinco activos de marca, que son del propietario.
 5. **`DES-001` — la instalación también se ve, y hoy no está diseñada.** Los cinco activos de
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` son marcadores de posición del 3 de agosto
    —de 576 B a 7 KiB— y son **lo primero que alguien ve del producto**, antes que ninguna vista. Y

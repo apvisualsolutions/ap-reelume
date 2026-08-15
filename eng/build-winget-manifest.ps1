@@ -75,30 +75,12 @@ finally {
     $archive.Dispose()
 }
 
-# What the product says about itself, in both languages, taken from the READMEs a documentation suite
-# already keeps paired. The first paragraph under the title is the description.
-function Get-Summary {
-    param([string]$Path)
-
-    $lines = Get-Content -LiteralPath $Path
-    $collected = [Collections.Generic.List[string]]::new()
-    $started = $false
-    foreach ($line in $lines) {
-        if ($line -match '^#\s') { $started = $true; continue }
-        if (-not $started) { continue }
-        if ([string]::IsNullOrWhiteSpace($line)) {
-            if ($collected.Count -gt 0) { break }
-            continue
-        }
-
-        $collected.Add($line.Trim())
-    }
-
-    (($collected -join ' ') -replace '\*\*', '').Trim()
-}
-
-$english = Get-Summary (Join-Path $repoRoot 'README.en.md')
-$spanish = Get-Summary (Join-Path $repoRoot 'README.es.md')
+# What the product says about itself, in both languages. The reader lives in one place because the
+# MSIX now shows the same two sentences Windows reads from its own resources: a description written
+# out twice is one that stops agreeing with itself.
+$readSummary = Join-Path $PSScriptRoot 'read-product-summary.ps1'
+$english = & $readSummary -Path (Join-Path $repoRoot 'README.en.md')
+$spanish = & $readSummary -Path (Join-Path $repoRoot 'README.es.md')
 foreach ($summary in @($english, $spanish)) {
     if (-not $summary) { throw 'A README has no description under its title.' }
     if ($summary.Length -gt 256) { throw "A description is $($summary.Length) characters; winget allows 256." }

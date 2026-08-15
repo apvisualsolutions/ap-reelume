@@ -21,6 +21,38 @@ Running this found **two defects no substitute could see**: MSIX redirected the 
 into the package container, and uninstalling deleted the user's library. Both are closed in the
 manifest; without this cycle they would still be in the published release.
 
+## El guion, que ahora está versionado / The script, now versioned
+
+Hasta el 2026-08-15 esto era **sólo prosa**: los pasos estaban descritos aquí y el guion que los
+ejecutaba vivía fuera del repositorio, así que rehacer la medición después de tocar el manifiesto
+—que es justo cuando caduca— dependía de un archivo que nada versionaba. Ya no:
+
+Until 2026-08-15 this was **prose only**: the steps were described here and the script that performed
+them lived outside the repository, so re-running the measurement after a manifest change — which is
+exactly when it expires — depended on a file nothing versioned. No longer:
+
+```powershell
+pwsh ./eng/package-x64.ps1
+pwsh ./eng/run-sandbox-handover.ps1
+```
+
+- [`run-sandbox-handover.ps1`](run-sandbox-handover.ps1) hace todo lo del anfitrión: crea el
+  certificado desechable **en el almacén del usuario**, firma una **copia** del paquete, prepara la
+  carpeta compartida, escribe el `.wsb`, lanza el sandbox, espera su informe, **cierra el sandbox** y
+  **retira el certificado**. El artefacto que se publica sigue sin firmar. / Everything the host does,
+  including removing the certificate again.
+- [`sandbox-handover.ps1`](sandbox-handover.ps1) es lo que corre **dentro**. Es ASCII puro, cada fase
+  va envuelta y el informe se escribe en un `finally`. / Runs inside; pure ASCII, report in a
+  `finally`.
+- [`measure-handover-with-handler.ps1`](measure-handover-with-handler.ps1) mide la otra mitad en esta
+  máquina: abre la ventana del instalador, la observa y la cierra. **No instala nada y no puede**,
+  porque el paquete lleva un certificado que esta máquina no confía. / Opens the installer window,
+  observes it, closes it; installs nothing and cannot.
+
+Las cuatro fases del ciclo de vida —instalar, actualizar, reparar, desinstalar— **siguen siendo
+manuales**: piden un paquete de la versión siguiente y no las cubre este guion. / The four lifecycle
+phases are still manual.
+
 ## Requisitos / Requirements
 
 - Windows 11 Pro o Enterprise con Windows Sandbox habilitado (Características de Windows).

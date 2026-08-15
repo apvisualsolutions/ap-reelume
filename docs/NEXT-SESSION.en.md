@@ -356,6 +356,35 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
      `EpisodePlayAction` (the series card).
    - **Counting the 129 can be got wrong**: the first measurement read **142**, because
      `<ComboBoxItem>` matches `<ComboBox` without a word boundary.
+5. **`DES-001`, the agent's half: done on 2026-08-15.** The manifest's description is no longer a
+   string with a slash in it: it is `ms-resource:AppDescription`, and
+   `eng/build-package-resources.ps1` builds one resource per language **the manifest itself
+   declares**, with the text read from the first paragraph of each README — where the winget entry
+   already took its own — so both installation routes say the same thing. Detail in
+   [audit-des001-package-description.md](evidence/stable/audit-des001-package-description.md).
+   - **Two measurements decided whether it was possible**: `makepri.exe` sits beside `makeappx.exe`,
+     and its output is **deterministic** — the same hash from two different directories — which is
+     what the reproducibility comparison requires.
+   - **And a trap no error message names**: the XML DOM writes `xml:space` as `d2p1:space` with a
+     namespace of its own, and `makepri` answers "PRI224: root node not found", naming neither the
+     attribute nor the file. The `.resw` files are written as text.
+   - **Touching the manifest expired two manual measurements** — `windows-lifecycle.json` degrades to
+     "blocked" and the suite accepts that; `updater-handover.json` turns `UpdateHandoverTests` red —
+     and **it was redone with the owner's permission**. The cycle is **versioned** now:
+     `eng/run-sandbox-handover.ps1`, `eng/sandbox-handover.ps1` and
+     `eng/measure-handover-with-handler.ps1`. Before, the document described the steps and the script
+     lived outside the repository.
+   - **Three defects in the sandbox harness, none of them named by any message**: PowerShell's `&`
+     breaks the `.wsb` because it is **XML text** ("the configuration file is not valid"); closing the
+     sandbox by killing `WindowsSandboxServer` — a host service — takes the next run down with it; and
+     the window belongs to `WindowsSandboxRemoteSession`, not to a `WindowsSandboxClient`, which does
+     not exist on this build.
+   - **And a product finding, reproduced twice**: with nothing registered for `.msix`,
+     `Process.Start` returns **null** and the application says Windows refused it — true: the database
+     read 372,736 bytes before and after — **but Windows leaves the "choose an app" dialog on
+     screen**. It is the mirror image of what the `withHandler` half rules out. Measured and named;
+     **not touched**.
+   - **Still open**: the five brand assets, which are the owner's.
 5. **`DES-001` — the installation is seen too, and today it is undesigned.** The five assets in
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` are placeholders from 3 August — 576 B to
    7 KiB — and they are **the first thing anyone sees of the product**, before any view. And there is

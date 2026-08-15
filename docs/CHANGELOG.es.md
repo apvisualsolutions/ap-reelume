@@ -133,6 +133,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   la pantalla, y anunciado con su nombre para quien use un lector de pantalla. Un resumen en blanco
   no ocupa sitio. No se abre ninguna conexión nueva: el texto ya estaba en tu disco.
 
+- **Windows ya describe la aplicación en tu idioma antes de que la abras.** El paquete declaraba
+  español e inglés desde el principio, pero su descripción era **una sola frase con una barra en
+  medio** —«Biblioteca y reproductor de vídeo local / Local video library and player»—, que Windows
+  enseñaba igual a todo el mundo: declarar un idioma no traduce nada por sí solo. Ahora el paquete
+  lleva un texto por idioma y Windows elige el tuyo. El texto no está escrito a mano en ninguna
+  parte: sale del primer párrafo del README correspondiente, que es de donde ya salía el de winget,
+  así que las dos vías de instalación dicen exactamente lo mismo. El nombre no se traduce, a
+  propósito: «AP Reelume» es el nombre del producto en los dos idiomas.
+
 - **Una puerta cuenta cuántos botones de la aplicación se pulsan de verdad con el ratón.** Hasta
   ahora el recorrido automático conducía la aplicación con el teclado y **dos** de sus 129 controles
   de mando llegaban a recibir un clic; el resto podía estar visible, activo e incapaz de hacer nada
