@@ -283,12 +283,17 @@ Three code commits, each with its cycle, its bilingual evidence and its full ver
    reproduce on this machine** — 64 000 operations, zero overflows, at 8 KiB and at 64 KiB — so the
    decision is tested in the domain and no deterministic integration test is pretended.
    [audit-bug012-watcher-survives-overflow.md](evidence/stable/audit-bug012-watcher-survives-overflow.md).
-4. **`LIB-016`** — the automatic refresh, off by default, stale at 90 days, 20 titles per pass. **The
-   declared network purpose's text changes with the code**, not after it. No longer blocked:
-   `catalog_metadata` stores `provider`, `provider_key` and `refreshed_utc`, the two per-title facts
-   it was missing. **Decided on 2026-08-15: a null `refreshed_utc` counts as stale** — an entry with
-   no date was never refreshed, so it is as stale as it gets — with nulls **first** in the order and
-   the cap of 20 per pass containing the first pass over a whole library.
+4. ~~**`LIB-016`**~~ **Done on 2026-08-15.** Off by default, stale at 90 days — under the 180-day
+   ceiling, with a test on the inequality — 20 per pass, stalest first, identified only, and yielding
+   to a scan or an open video, checked **before each entry**. The switch lives in Settings → Privacy
+   and **does not exist without a consented connection**. The declared network purpose changed with
+   the code. **The measurement added what was not foreseen**: no production path writes a null
+   `refreshed_utc` alongside a `provider_key` today (`identifiedWithNoDate=0`), so nulls-first is the
+   guard for a row nobody writes rather than a case in the field. Acceptance by execution: the
+   network canary counts **0** connections with the switch off and **2** with it on, in the same
+   child process.
+   [audit-lib016-automatic-refresh.md](evidence/stable/audit-lib016-automatic-refresh.md).
+
 5. **`DES-001` — the installation is seen too, and today it is undesigned.** The five assets in
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` are placeholders from 3 August — 576 B to
    7 KiB — and they are **the first thing anyone sees of the product**, before any view. And there is

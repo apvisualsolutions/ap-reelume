@@ -10,7 +10,7 @@ appears**, measured from the tree on 2026-08-15, so that nothing visible goes un
 
 - **All 48 views use localised strings.** Not one has untranslated text: the measurement found no
   view without a `DynamicResource`.
-- **468 string keys in Spanish and 468 in English**, in
+- **470 string keys in Spanish and 470 in English**, in
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` and `Strings.en.axaml`.
   `BilingualHeadingTests` compares the structure of the public documents, and a new visible string
   goes into both files or it does not go in.
@@ -39,6 +39,8 @@ appears**, measured from the tree on 2026-08-15, so that nothing visible goes un
 | Recovery (1) | `DatabaseRecoveryView` |
 | Credits (1) | `CreditsView` |
 | Update (1) | `UpdateView` |
+
+**A conditional surface (LIB-016).** `PrivacySettingsView` carries a switch and its description — "Refresh the oldest entries on their own" — that **only exists when there is a consented connection**: with no token the provider serves only what it already cached, so offering the switch would offer something that cannot happen. A redesign has to be able to draw that view both ways, with the switch and without it.
 
 They all live in `src/ApSolutions.LocalMedia.Presentation/<area>/`.
 

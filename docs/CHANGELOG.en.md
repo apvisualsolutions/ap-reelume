@@ -33,6 +33,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   against a held-out corpus of synthetic series: every approved threshold passed on the first
   measurement, with zero spurious detections on the segment-free episodes.
 
+- **Refresh the oldest entries on their own, if you turn it on.** When the application opens, entries
+  whose details are more than 90 days old can be asked about again: at most 20 at a time, oldest
+  first, and only for titles that are already identified. It ships off, the switch lives in Settings
+  → Privacy, and it **is not even offered if you have not consented to the connection**, because
+  without one there would be nothing to ask. It never happens while a scan is running or a video is
+  open, and that is checked before each entry rather than only at the start. With the switch off no
+  connection is opened at all: measured with the network canary, which in the same run counts zero
+  with it off and two with it on.
 - **A permanent guard against the house defect.** The audit found components registered that the
   application never invokes, and every case was hunted by hand; an architecture test now requires
   every registered service to be resolved at least once outside its own registration. Its first run

@@ -33,6 +33,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   aprobado se cumplió en la primera medición, con cero detecciones espurias en los episodios sin
   segmento.
 
+- **Actualizar solo las fichas más antiguas, si tú lo enciendes.** Al abrir la aplicación se pueden
+  volver a pedir al proveedor las fichas cuyos datos tienen más de 90 días: como mucho 20 por vez,
+  las más antiguas primero y sólo las de títulos ya identificados. Viene apagado, el interruptor está
+  en Ajustes → Privacidad y **no se ofrece siquiera si no has consentido la conexión**, porque sin
+  ella no habría nada que pedir. Nunca ocurre mientras se escanea ni con un vídeo abierto, y se
+  comprueba antes de cada ficha, no sólo al empezar. Con el interruptor apagado no se abre ninguna
+  conexión: medido con el vigilante de red, que en la misma ejecución cuenta cero apagado y dos
+  encendido.
 - **Una guardia permanente contra el defecto de la casa.** La auditoría encontró componentes
   registrados que la aplicación nunca invoca, y cada caso se cazó a mano; ahora una prueba de
   arquitectura exige que cada servicio registrado tenga al menos una resolución fuera de su propio

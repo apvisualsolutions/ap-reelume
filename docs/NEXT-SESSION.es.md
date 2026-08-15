@@ -288,13 +288,17 @@ Tres commits de código, cada uno con su ciclo, su evidencia bilingüe y su veri
    operaciones, cero desbordamientos, con 8 KiB y con 64 KiB—, así que la decisión se prueba en el
    dominio y no se finge una prueba de integración determinista.
    [audit-bug012-watcher-survives-overflow.md](evidence/stable/audit-bug012-watcher-survives-overflow.md).
-4. **`LIB-016`** — el refresco automático, apagado por defecto, rancio a los 90 días y 20 fichas por
-   pasada. **El texto del propósito de red declarado cambia con el código**, no después. Ya no está
-   bloqueado: `catalog_metadata` guarda `provider`, `provider_key` y `refreshed_utc`, que son los dos
-   datos por título que le faltaban. **Decidido el 2026-08-15: un `refreshed_utc` nulo cuenta como
-   rancio** —una ficha sin fecha nunca se refrescó, así que es la más rancia que hay—, con los nulos
-   **primero** en el orden y el tope de 20 por pasada conteniendo la primera pasada de una biblioteca
-   entera.
+4. ~~**`LIB-016`**~~ **Hecho el 2026-08-15.** Apagado por defecto, rancio a los 90 días —por debajo
+   del techo de 180, con prueba de la desigualdad—, 20 por pasada, las más rancias primero, sólo
+   identificadas, y cediendo ante un escaneo o un vídeo abierto, comprobado **antes de cada ficha**.
+   El interruptor vive en Ajustes → Privacidad y **no existe sin conexión consentida**. El texto del
+   propósito de red cambió con el código. **La medición añadió lo que no estaba previsto**: un
+   `refreshed_utc` nulo con `provider_key` no lo escribe **ninguna** ruta de producción hoy
+   (`identifiedWithNoDate=0`), así que los nulos primero son la guarda de una fila que nadie escribe,
+   no un caso del campo. Aceptación por ejecución: el canario de red cuenta **0** conexiones con el
+   interruptor apagado y **2** encendido, en el mismo proceso hijo.
+   [audit-lib016-automatic-refresh.md](evidence/stable/audit-lib016-automatic-refresh.md).
+
 5. **`DES-001` — la instalación también se ve, y hoy no está diseñada.** Los cinco activos de
    `src/ApSolutions.LocalMedia.Windows.Package/Assets/` son marcadores de posición del 3 de agosto
    —de 576 B a 7 KiB— y son **lo primero que alguien ve del producto**, antes que ninguna vista. Y

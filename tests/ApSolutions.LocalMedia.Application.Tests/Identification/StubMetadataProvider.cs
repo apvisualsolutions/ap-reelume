@@ -84,6 +84,16 @@ internal sealed class MemoryCatalogMetadataRepository : ICatalogMetadataReposito
         return Task.FromResult(stored);
     }
 
+    /// <summary>
+    /// Deliberately empty. Which entries are stale, in what order, and how many of them, is decided
+    /// by a SQL statement, and a double that reimplemented it would be testing the double.
+    /// </summary>
+    public Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+        DateTimeOffset staleBefore,
+        int limit,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<CatalogMetadata>>([]);
+
     public Task<MetadataWriteResult> TrySaveAsync(
         CatalogMetadata catalog,
         int expectedRevision,

@@ -49,6 +49,47 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         return await reader.ReadAsync(cancellationToken).ConfigureAwait(false) ? Read(reader) : null;
     }
 
+    /// <summary>
+    /// The stalest identified entries first. Dates are stored as round-trip UTC strings of fixed
+    /// shape, so comparing them as text orders them as moments — which is why the column is written
+    /// through <see cref="DateTimeOffset.ToUniversalTime"/> in every path that writes it.
+    /// </summary>
+    /// <remarks>
+    /// <c>refreshed_utc IS NOT NULL</c> leads the ordering so that an entry with no date comes
+    /// first: it was never refreshed, which makes it the stalest there is. The order is the policy
+    /// here — with a cap on the pass, whatever sorts last is what does not get asked about.
+    /// </remarks>
+    public async Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+        DateTimeOffset staleBefore,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(limit);
+        await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
+        await using var command = connection.CreateCommand();
+        command.CommandText = $"""
+            SELECT {Columns}
+            FROM catalog_metadata
+            WHERE provider IS NOT NULL
+              AND provider_key IS NOT NULL
+              AND (refreshed_utc IS NULL OR refreshed_utc < $staleBefore)
+            ORDER BY refreshed_utc IS NOT NULL, refreshed_utc
+            LIMIT $limit;
+            """;
+        _ = command.Parameters.AddWithValue(
+            "$staleBefore",
+            staleBefore.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture));
+        _ = command.Parameters.AddWithValue("$limit", limit);
+        var stale = new List<CatalogMetadata>();
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            stale.Add(Read(reader));
+        }
+
+        return stale;
+    }
+
     public async Task<MetadataWriteResult> TrySaveAsync(
         CatalogMetadata catalog,
         int expectedRevision,

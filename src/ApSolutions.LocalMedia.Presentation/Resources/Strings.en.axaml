@@ -413,6 +413,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PrivacyTitle">Privacy and diagnostics</x:String>
   <x:String x:Key="PrivacyDescription">AP Reelume works offline. There is no telemetry, nothing is sent automatically, and diagnostics stay off until you turn them on here.</x:String>
   <x:String x:Key="PrivacyDiagnosticsLabel">Allow a diagnostic report to be produced</x:String>
+  <x:String x:Key="PrivacyAutoRefreshLabel">Refresh the oldest entries on their own</x:String>
+  <x:String x:Key="PrivacyAutoRefreshDescription">When the application opens, and only if you turn this on, entries whose details are more than 90 days old are asked about again: at most 20 at a time, oldest first, and only for titles that are already identified. Never while a scan is running or a video is open.</x:String>
   <x:String x:Key="PrivacyStatusAccessibleName">Diagnostics status</x:String>
   <x:String x:Key="PrivacyStatusOff">Diagnostics are off. No report is produced and none is stored.</x:String>
   <x:String x:Key="PrivacyStatusOn">Diagnostics are on. You can see exactly what the report would contain before saving it.</x:String>

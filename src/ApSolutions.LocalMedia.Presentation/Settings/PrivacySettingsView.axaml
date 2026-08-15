@@ -34,6 +34,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsChecked="{Binding DiagnosticsEnabled}"
         automation:AutomationProperties.Name="{DynamicResource PrivacyDiagnosticsLabel}" />
 
+    <!--
+    LIB-016. The switch only exists where a connection is possible at all: with no consented
+    connection the automatic refresh has nothing it could do, and offering it would be offering
+    something that cannot happen.
+    -->
+    <StackPanel
+        x:Name="PrivacyAutoRefreshSurface"
+        IsVisible="{Binding CanRefreshAutomatically}"
+        Spacing="4">
+      <CheckBox
+          x:Name="AutoRefreshCheckBox"
+          Content="{DynamicResource PrivacyAutoRefreshLabel}"
+          IsChecked="{Binding AutomaticRefreshEnabled}"
+          automation:AutomationProperties.Name="{DynamicResource PrivacyAutoRefreshLabel}" />
+      <TextBlock
+          x:Name="AutoRefreshDescription"
+          MaxWidth="640"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource PrivacyAutoRefreshDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+
     <Border
         x:Name="PrivacyStatusSurface"
         Padding="16"

@@ -303,6 +303,12 @@ public sealed class MetadataEditorTests
         public Task<CatalogMetadata?> GetAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
             Task.FromResult<CatalogMetadata?>(_value.TitleId == titleId ? _value : null);
 
+        public Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+            DateTimeOffset staleBefore,
+            int limit,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<CatalogMetadata>>([]);
+
         public Task<MetadataWriteResult> TrySaveAsync(CatalogMetadata catalog, int expectedRevision, CancellationToken cancellationToken = default)
         {
             if (ForceConflict || _value.Revision != expectedRevision)

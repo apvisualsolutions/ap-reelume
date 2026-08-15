@@ -5,7 +5,12 @@ using System.Diagnostics.Tracing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
+using ApSolutions.LocalMedia.Application.Continuity;
+using ApSolutions.LocalMedia.Application.Discovery;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Privacy;
+using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Privacy;
 using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
@@ -135,6 +140,21 @@ public sealed class NetworkPrivacyTests
     }
 
     /// <summary>
+    /// LIB-016's acceptance, measured rather than read: with the automatic refresh off, a pass opens
+    /// nothing at all. The same child then turns it on and the canary counts one request per stale
+    /// entry, so the zero above is a zero and not a blind spot.
+    /// </summary>
+    [Fact]
+    public async Task The_automatic_refresh_switched_off_opens_no_connection()
+    {
+        var observed = await MeasureInChildAsync("refresh");
+
+        Assert.Equal(0, observed.PayloadLength);
+        Assert.Equal(2, observed.CanaryRequests);
+        Assert.True(observed.Requests >= 2, $"The listener saw no request although two were made: {observed.Sample}");
+    }
+
+    /// <summary>
     /// Proves the harness is not simply blind. A measurement of zero means nothing until the same
     /// measurement has been shown to reach one.
     /// </summary>
@@ -171,6 +191,31 @@ public sealed class NetworkPrivacyTests
                 new DiagnosticsConsent(IsGranted: true, GrantedUtc: DateTimeOffset.UnixEpoch),
                 MinimalInputs());
             payloadLength = DiagnosticsSerialization.Serialize(report!).Length;
+        }
+        else if (string.Equals(phase, "refresh", StringComparison.Ordinal))
+        {
+            // LIB-016, both halves in one child: the pass with the switch off, whose count is
+            // reported as the payload length, and then the same pass with it on, so the zero above
+            // is a measured zero rather than a blind one.
+            var settings = new SwitchableAutoRefresh(enabled: false);
+            var repository = new TwoStaleEntries();
+            var pass = new RefreshStaleMetadata(
+                repository,
+                new RefreshMetadata(
+                    repository,
+                    new CanaryMetadataProvider(canary.Address),
+                    new MetadataMergePolicy(),
+                    new MetadataLanguage("es-ES", "en-US"),
+                    TimeProvider.System),
+                settings,
+                new IdlePlayback(),
+                new IdleScans(),
+                TimeProvider.System);
+
+            _ = await pass.ExecuteAsync(TestContext.Current.CancellationToken);
+            payloadLength = canary.RequestCount;
+            settings.SetAutomaticRefreshEnabled(true);
+            _ = await pass.ExecuteAsync(TestContext.Current.CancellationToken);
         }
         else
         {
@@ -297,6 +342,104 @@ public sealed class NetworkPrivacyTests
             int.Parse(values[2], System.Globalization.CultureInfo.InvariantCulture),
             int.Parse(values[3], System.Globalization.CultureInfo.InvariantCulture),
             values.Length > 4 ? values[4] : string.Empty);
+    }
+
+    /// <summary>Two identified entries, both older than the stale window, and nothing else.</summary>
+    private sealed class TwoStaleEntries : ICatalogMetadataRepository
+    {
+        private readonly Dictionary<TitleId, CatalogMetadata> _rows = new[] { "movie/1", "movie/2" }
+            .Select(key => new CatalogMetadata(
+                new TitleId(Guid.NewGuid()),
+                new EditableMetadata(
+                    "Stored",
+                    OriginalTitle: null,
+                    Overview: null,
+                    ReleaseYear: null,
+                    Genres: [],
+                    PosterPath: null,
+                    BackdropPath: null,
+                    TrailerKey: null,
+                    LockedFields: new HashSet<MetadataField>()),
+                Revision: 1,
+                "tmdb",
+                key,
+                DateTimeOffset.UtcNow.AddDays(-200)))
+            .ToDictionary(entry => entry.TitleId);
+
+        public Task<CatalogMetadata?> GetAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
+            Task.FromResult(_rows.TryGetValue(titleId, out var found) ? found : null);
+
+        public Task<MetadataWriteResult> TrySaveAsync(
+            CatalogMetadata catalog,
+            int expectedRevision,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new MetadataWriteResult(
+                MetadataWriteOutcome.Applied,
+                catalog is null ? null : catalog with { Revision = expectedRevision + 1 }));
+
+        public Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+            DateTimeOffset staleBefore,
+            int limit,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<CatalogMetadata>>([.. _rows.Values.Take(limit)]);
+    }
+
+    /// <summary>
+    /// A provider that reaches the canary when it is asked about a title. What it answers does not
+    /// matter here; that it was asked at all is the whole measurement.
+    /// </summary>
+    private sealed class CanaryMetadataProvider(Uri address) : IMetadataProvider
+    {
+        private static readonly HttpClient Client = new();
+
+        public string Name => "tmdb";
+
+        public MetadataReference? TryCreateReference(string key) =>
+            new(Name, key, MetadataContentKind.Movie);
+
+        public Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
+            MetadataSearchQuery query,
+            MetadataLanguage language,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<MetadataSearchResult>>([]);
+
+        public async Task<MetadataDetails?> GetDetailsAsync(
+            MetadataReference reference,
+            MetadataLanguage language,
+            CancellationToken cancellationToken = default)
+        {
+            using var response = await Client.GetAsync(address, cancellationToken);
+            return response.IsSuccessStatusCode
+                ? new MetadataDetails(
+                    reference,
+                    language.Primary,
+                    "Refreshed",
+                    OriginalTitle: null,
+                    Overview: null,
+                    ReleaseYear: null,
+                    Genres: [],
+                    PosterPath: null,
+                    BackdropPath: null,
+                    TrailerKey: null)
+                : null;
+        }
+    }
+
+    private sealed class SwitchableAutoRefresh(bool enabled) : IAutoRefreshSettings
+    {
+        public bool AutomaticRefreshEnabled { get; private set; } = enabled;
+
+        public void SetAutomaticRefreshEnabled(bool value) => AutomaticRefreshEnabled = value;
+    }
+
+    private sealed class IdlePlayback : IPlaybackActivity
+    {
+        public bool IsPlaybackActive => false;
+    }
+
+    private sealed class IdleScans : IScanActivity
+    {
+        public bool IsScanActive => false;
     }
 
     /// <summary>Removes comments so a sentence about HTTP is not mistaken for an HTTP client.</summary>

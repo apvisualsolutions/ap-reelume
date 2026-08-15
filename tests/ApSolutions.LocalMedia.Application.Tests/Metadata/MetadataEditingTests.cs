@@ -169,6 +169,13 @@ public sealed class MetadataEditingTests
         public Task<CatalogMetadata?> GetAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
             Task.FromResult<CatalogMetadata?>(Value.TitleId == titleId ? Value : null);
 
+        // Staleness is decided by a SQL statement; a double that reimplemented it would test itself.
+        public Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+            DateTimeOffset staleBefore,
+            int limit,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<CatalogMetadata>>([]);
+
         public Task<MetadataWriteResult> TrySaveAsync(
             CatalogMetadata catalog,
             int expectedRevision,

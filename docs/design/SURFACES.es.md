@@ -10,7 +10,7 @@ del árbol el 2026-08-15, para que nada visible se quede sin diseñar.
 
 - **Las 48 vistas usan cadenas localizadas.** Ninguna tiene texto sin traducir: la medición no
   encontró ni una sola vista sin `DynamicResource`.
-- **468 claves de cadena en español y 468 en inglés**, en
+- **470 claves de cadena en español y 470 en inglés**, en
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` y `Strings.en.axaml`.
   `BilingualHeadingTests` compara la estructura de los documentos públicos, y una cadena visible
   nueva va en los dos archivos o no va.
@@ -39,6 +39,8 @@ del árbol el 2026-08-15, para que nada visible se quede sin diseñar.
 | Recuperación (1) | `DatabaseRecoveryView` |
 | Créditos (1) | `CreditsView` |
 | Actualización (1) | `UpdateView` |
+
+**Superficie condicional (LIB-016).** `PrivacySettingsView` lleva un interruptor y su texto —«Actualizar solo las fichas más antiguas»— que **sólo existe cuando hay conexión consentida**: sin token, el proveedor únicamente sirve lo que ya guardó, así que ofrecer el interruptor sería ofrecer algo que no puede ocurrir. Un rediseño tiene que poder pintar esa vista en sus dos formas, con el interruptor y sin él.
 
 Todas viven en `src/ApSolutions.LocalMedia.Presentation/<área>/`.
 

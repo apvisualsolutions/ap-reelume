@@ -1,17 +1,17 @@
 {
   "release": "MVP",
   "version": "0.1.0",
-  "commit": "06518e0d1880d3143b7da3300e0dc4e4eb5ca351",
+  "commit": "945befb6a0e463d6d189fca5dd57dac432b0f9a0",
   "runtime": "win-x64",
   "signed": false,
   "artifacts": [
     {
       "name": "APSolutions.LocalMedia_0.1.0_x64.msix",
-      "sha256": "a1606b70db3a5b8f5149073fb427dff5503e85d3ff59c1bcebe7f24e923d817c"
+      "sha256": "82bcff21d12d9486a4079bdd98a7127854199dfde2f5559c671bfbb7b2629401"
     },
     {
       "name": "ApReelume-0.1.0-win-x64.zip",
-      "sha256": "0b73534fbef3a0f0df6a743ceae7b6fd599d808c4b7f8cc27d010305ef1b47b1"
+      "sha256": "e1073953004279b2b0ed030dd45e2d290d57859676eb9975673d49e9effcb63f"
     }
   ],
   "summary": {

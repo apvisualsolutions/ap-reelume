@@ -55,6 +55,12 @@ internal static class SilentIdentification
         public Task<CatalogMetadata?> GetAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
             Task.FromResult<CatalogMetadata?>(null);
 
+        public Task<IReadOnlyList<CatalogMetadata>> ListStaleAsync(
+            DateTimeOffset staleBefore,
+            int limit,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<CatalogMetadata>>([]);
+
         public Task<MetadataWriteResult> TrySaveAsync(
             CatalogMetadata catalog,
             int expectedRevision,

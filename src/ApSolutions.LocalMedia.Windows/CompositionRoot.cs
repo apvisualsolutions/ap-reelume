@@ -188,6 +188,12 @@ public static partial class CompositionRoot
         PostSafely(() => services.GetRequiredService<UpdateViewModel>()
             .CheckAutomaticallyAsync(CancellationToken.None));
 
+        // LIB-016. One pass over the oldest entries, if somebody turned it on. It is posted like the
+        // update check — after the window exists — and it reads the switch itself, so with it off,
+        // which is the default, this opens no connection and does not even read the catalogue.
+        PostSafely(() => services.GetRequiredService<RefreshStaleMetadata>()
+            .ExecuteAsync(CancellationToken.None));
+
         if (host.PendingActivationPath is { Length: > 0 } activation)
         {
             var open = services.GetRequiredService<OpenLooseFile>();
