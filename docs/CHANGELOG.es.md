@@ -336,6 +336,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La verificación automática ya pulsa botones con el ratón.** El recorrido que conduce la
+  aplicación construida sólo usaba el teclado, y por ese hueco pasaron unos botones que estaban a la
+  vista y no hacían nada. Ahora abre la ficha de una película identificada, pulsa «Actualizar desde
+  el proveedor» con el ratón y comprueba que la ficha cambia — y, antes, que pulsar al lado no cambia
+  nada, para que el resultado no pueda deberse a otra cosa.
 - **Los dos botones del proveedor en el editor ya hacen algo.** «Actualizar desde el proveedor» y
   «Restaurar campos del proveedor» estaban visibles y activos, y no podían funcionar: esperaban unos
   datos que sólo una prueba les daba. Ahora el refresco averigua por sí mismo a qué ficha del

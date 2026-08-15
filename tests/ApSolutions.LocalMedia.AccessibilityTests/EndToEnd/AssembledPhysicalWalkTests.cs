@@ -3,11 +3,14 @@
 
 using System.Diagnostics;
 using System.Globalization;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
+using ApSolutions.LocalMedia.Infrastructure.Metadata;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
@@ -15,6 +18,7 @@ using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Shell;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -213,6 +217,207 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
     }
 
+    /// <summary>
+    /// LIB-006 as lived, and with the mouse: a title somebody identified, its card opened, its
+    /// editor opened, and "Refresh from provider" <em>clicked</em> — after which the entry shows
+    /// what the provider says.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The click is the point. This walk already drove the assembled application with
+    /// <c>Window.KeyPress</c>, but nothing in the repository used
+    /// <c>Avalonia.Headless</c>'s mouse input, and that gap is how a pair of buttons that were
+    /// visible, enabled and incapable of doing anything survived a whole audit.
+    /// </para>
+    /// <para>
+    /// The provider answers out of its own cache, which is the shipped path exactly: with no token
+    /// configured, <c>TmdbMetadataProvider</c> serves what it has stored and opens no connection. So
+    /// the real provider, the real parser and the real repository all take part — the harness only
+    /// puts the payload where a previous lookup would have left it.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task Clicking_refresh_on_an_identified_title_brings_the_provider_into_the_entry()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Arrival.2016.mp4");
+
+        // No decoding happens here, so the file only has to exist and be catalogued.
+        await File.WriteAllBytesAsync(mediaPath, [0x41, 0x50], TestContext.Current.CancellationToken);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromMinutes(116));
+        await SeedIdentifiedTitleAsync(factory, fileId);
+
+        // Tall enough for the editor to be on screen without scrolling. A person with a smaller
+        // window scrolls to it; the click is what this walk is here to prove, not the scrolling.
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
+        await host.ViewModel.OpenMetadataEditorAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        var editor = host.ViewModel.MetadataEditor;
+        Assert.NotNull(editor);
+        Assert.NotEqual("La llegada", editor!.Title);
+
+        // The control that makes the click mean something: pressing beside the button changes
+        // nothing, so what changes afterwards can only have come from pressing the button itself.
+        ClickBeside(host, "RefreshProviderMetadata");
+        await Task.Delay(300, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotEqual("La llegada", editor.Title);
+
+        Click(host, "RefreshProviderMetadata");
+        await WaitForAsync(
+            () => Task.FromResult(editor.Title == "La llegada"),
+            "clicking Refresh from provider never brought the provider's answer into the editor");
+
+        Assert.Equal("Una lingüista traduce a los visitantes.", editor.Overview);
+        Assert.False(editor.IsUnidentified);
+        Assert.False(editor.HasNoProviderAnswer);
+
+        // And it is stored, not merely on screen: the entry a person reopens tomorrow says the same.
+        var stored = await new CatalogMetadataRepository(factory).GetAsync(
+            new TitleId(fileId),
+            TestContext.Current.CancellationToken);
+        Assert.Equal("La llegada", stored?.Metadata.Title);
+        Assert.NotNull(stored?.RefreshedUtc);
+    }
+
+    /// <summary>
+    /// Presses a named control with the mouse, at its centre in window coordinates, the way a person
+    /// with a pointing device does.
+    /// </summary>
+    private static void Click(ShellHost host, string controlName)
+    {
+        var control = host.Shell.GetVisualDescendants()
+            .OfType<Control>()
+            .FirstOrDefault(candidate => candidate.Name == controlName);
+        Assert.True(control is not null, $"The assembled shell has no control named {controlName}.");
+
+        // Scrolling to it first is what a person does, and it is not optional: the editor sits far
+        // enough down the shell that the button's centre lands outside the window until it is
+        // brought into view, and a click there hits nothing at all. Two scroll viewers are nested
+        // here, so the scroll and the layout settle over a few passes rather than one.
+        var scrollers = control!.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
+        Point? centre = null;
+        for (var settle = 0; settle < 24; settle++)
+        {
+            control.BringIntoView();
+            host.Window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            centre = control.TranslatePoint(
+                new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
+                host.Window);
+            if (centre is { } candidate && IsUnder(host, candidate, control))
+            {
+                break;
+            }
+
+            // BringIntoView stops at the nearest edge, which leaves a control at the very bottom of a
+            // nested viewer still clipped. The wheel keeps going, so this does too.
+            foreach (var scroller in scrollers.Where(s => s.Offset.Y < s.Extent.Height - s.Viewport.Height))
+            {
+                scroller.Offset = scroller.Offset.WithY(Math.Min(
+                    scroller.Offset.Y + 120,
+                    Math.Max(0, scroller.Extent.Height - scroller.Viewport.Height)));
+            }
+        }
+
+        Assert.True(
+            control!.IsEffectivelyVisible && control.IsEffectivelyEnabled,
+            $"{controlName} is on screen but cannot be pressed: "
+            + $"visible={control.IsEffectivelyVisible}, enabled={control.IsEffectivelyEnabled}.");
+        Assert.True(centre.HasValue, $"{controlName} has no position in the window.");
+
+        host.Window.MouseMove(centre.Value, RawInputModifiers.None);
+        host.Window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>
+    /// Presses well clear of a control, on the empty strip above the row it sits in. It is the
+    /// control for the click: whatever the button does, this must not do it.
+    /// </summary>
+    private static void ClickBeside(ShellHost host, string controlName)
+    {
+        var control = host.Shell.GetVisualDescendants()
+            .OfType<Control>()
+            .First(candidate => candidate.Name == controlName);
+        control.BringIntoView();
+        host.Window.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        var centre = control.TranslatePoint(
+            new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
+            host.Window);
+        Assert.True(centre.HasValue, $"{controlName} has no position in the window.");
+        var beside = centre!.Value.WithY(centre.Value.Y - control.Bounds.Height);
+        host.Window.MouseMove(beside, RawInputModifiers.None);
+        host.Window.MouseDown(beside, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseUp(beside, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>Whether a click at this point would land on that control, or inside it.</summary>
+    private static bool IsUnder(ShellHost host, Point point, Control control) =>
+        host.Window.InputHitTest(point) is Visual hit
+        && (ReferenceEquals(hit, control) || hit.GetVisualAncestors().Contains(control));
+
+    /// <summary>
+    /// A title somebody already identified, plus the provider answer a previous lookup cached.
+    /// Written through the real repository and the real cache so the refresh reads them the way the
+    /// application does.
+    /// </summary>
+    private static async Task SeedIdentifiedTitleAsync(SqliteConnectionFactory factory, Guid fileId)
+    {
+        const string ProviderKey = "movie:329865";
+        _ = await new CatalogMetadataRepository(factory).TrySaveAsync(
+            new CatalogMetadata(
+                new TitleId(fileId),
+                new EditableMetadata(
+                    "Arrival 2016",
+                    OriginalTitle: null,
+                    Overview: null,
+                    ReleaseYear: null,
+                    Genres: [],
+                    PosterPath: null,
+                    BackdropPath: null,
+                    TrailerKey: null,
+                    LockedFields: new HashSet<MetadataField>()),
+                Revision: 0,
+                Provider: "tmdb",
+                ProviderKey: ProviderKey),
+            expectedRevision: 0,
+            TestContext.Current.CancellationToken);
+
+        var now = DateTimeOffset.UtcNow;
+        await new SqliteMetadataCache(factory).StoreAsync(
+            new MetadataCacheEntry(
+                new MetadataCacheKey("tmdb", ProviderKey, "es-ES", new TmdbOptions(accessToken: null).ProviderVersion),
+                """
+                {
+                  "title": "La llegada",
+                  "original_title": "Arrival",
+                  "overview": "Una lingüista traduce a los visitantes.",
+                  "release_date": "2016-11-11",
+                  "genres": [{ "name": "Ciencia ficción" }],
+                  "poster_path": "/poster.jpg",
+                  "backdrop_path": "/backdrop.jpg"
+                }
+                """,
+                ETag: null,
+                now,
+                now.AddDays(1)),
+            TestContext.Current.CancellationToken);
+    }
+
     /// <summary>Drives the dispatcher while real time passes, because the engine works on its own threads.</summary>
     private static async Task WaitForAsync(Func<Task<bool>> condition, string complaint)
     {
@@ -320,7 +525,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         return (long)(await command.ExecuteScalarAsync(TestContext.Current.CancellationToken) ?? 0L);
     }
 
-    private ShellHost ShowShell()
+    private ShellHost ShowShell(int height = 1000)
     {
         Assert.NotNull(Avalonia.Application.Current);
         ApSolutions.LocalMedia.Presentation.App.ApplyLanguage(
@@ -329,11 +534,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Directory.CreateDirectory(_dataRoot);
         var application = ApplicationHost.Create(new AppDataPaths(_dataRoot));
 
+        // The window shows what the application put in it — the container — rather than the shell
+        // lifted out of it. Lifting it out left the whole tree attached to a container that was never
+        // shown, and a Button only evaluates its Command once it is on the logical tree: every
+        // command-bound button in the shell reported itself disabled, so no click could reach one.
+        // Buttons wired with Click= were unaffected, which is why nothing noticed until this walk
+        // tried to press one.
+        var created = application.CreateShell();
+        var window = new Window { Width = 1600, Height = height, Content = created };
+        window.Show();
+
         // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
         // for it. The wait names what stood in its place if it never comes.
-        var shell = Assert.IsType<ShellView>(AssembledStartup.FinalContent(application.CreateShell()));
-        var window = new Window { Width = 1600, Height = 1000, Content = shell };
-        window.Show();
+        var shell = Assert.IsType<ShellView>(AssembledStartup.FinalContent(created));
         Dispatcher.UIThread.RunJobs();
         window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();

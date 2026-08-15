@@ -329,6 +329,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The automated verification now presses buttons with the mouse.** The walk that drives the built
+  application only ever used the keyboard, and that gap is how a pair of buttons that were on screen
+  and did nothing got through. It now opens an identified film's entry, clicks "Refresh from
+  provider" with the mouse and checks the entry changes — and, first, that clicking beside it changes
+  nothing, so the result cannot be down to something else.
 - **The editor's two provider buttons now do something.** "Refresh from provider" and "Restore
   provider fields" were visible and enabled and could not work: they waited on details only a test
   ever gave them. The refresh now works out for itself which provider entry the title is, from what
