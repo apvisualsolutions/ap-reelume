@@ -133,6 +133,64 @@ public sealed class WatchCoordinatorTests
         Assert.Equal(ScanTrigger.Recovery, Assert.Single(scanner.Commands).Trigger);
     }
 
+    /// <summary>
+    /// BUG-012. An overflowed watcher says it lost events; that is a rescan, not a funeral. The
+    /// second batch is the half the defect ate: the watching went on.
+    /// </summary>
+    [Fact]
+    public async Task A_batch_that_lost_events_is_one_recovery_scan_and_the_watching_goes_on()
+    {
+        var root = CreateRoot(RootKind.Local);
+        var scanner = new RecordingScanCoordinator();
+        var coordinator = new RootWatchCoordinator(
+            new FakeRootWatcher([
+                new FileChangeBatch(
+                    root.Id,
+                    [new FileChange(FileChangeKind.Created, @"C:\Media\during-the-storm.mkv")],
+                    DateTimeOffset.UnixEpoch,
+                    EventsLost: true),
+                new FileChangeBatch(
+                    root.Id,
+                    [new FileChange(FileChangeKind.Created, @"C:\Media\after-the-storm.mkv")],
+                    DateTimeOffset.UnixEpoch),
+            ]),
+            new FakeFallbackScanScheduler([]),
+            scanner);
+
+        await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [ScanTrigger.Recovery, ScanTrigger.Watcher],
+            scanner.Commands.Select(command => command.Trigger).ToArray());
+    }
+
+    /// <summary>
+    /// BUG-012, the other half: a watcher that really died used to stay dead until the application
+    /// was started again, so a continuous root quietly stopped being followed. The fallback pass is
+    /// the heartbeat that brings it back.
+    /// </summary>
+    [Fact]
+    public async Task A_watcher_that_died_is_started_again_by_the_next_fallback_pass()
+    {
+        var root = CreateRoot(RootKind.Unc);
+        var scanner = new RecordingScanCoordinator();
+        using var watcher = new DyingRootWatcher();
+        using var cancellation =
+            CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        var coordinator = new RootWatchCoordinator(
+            watcher,
+            new FakeFallbackScanScheduler([ScanTrigger.Recovery]),
+            scanner);
+
+        var watching = coordinator.StartAsync(root, cancellation.Token);
+        await watcher.WaitForStartsAsync(2, TimeSpan.FromSeconds(10));
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => watching);
+        Assert.Equal(2, watcher.Starts);
+        Assert.Equal(2, scanner.Commands.Count(command => command.Trigger == ScanTrigger.Recovery));
+    }
+
     [Fact]
     public async Task A_manual_root_is_not_watched_behind_its_owners_back()
     {
@@ -150,6 +208,45 @@ public sealed class WatchCoordinatorTests
         // Manual gets no watcher and no scan they did not ask for.
         Assert.Equal(0, watcher.Starts);
         Assert.Empty(scanner.Commands);
+    }
+
+    /// <summary>A watcher whose first life ends the way an unreliable root ends it.</summary>
+    private sealed class DyingRootWatcher : IRootWatcher, IDisposable
+    {
+        private readonly SemaphoreSlim _started = new(0);
+        private int _starts;
+
+        public int Starts => Volatile.Read(ref _starts);
+
+        public async IAsyncEnumerable<FileChangeBatch> StartAsync(
+            LibraryRoot root,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            _ = root;
+            var start = Interlocked.Increment(ref _starts);
+            _started.Release();
+            await Task.Yield();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (start == 1)
+            {
+                throw new IOException("The root stopped answering.");
+            }
+
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ConfigureAwait(false);
+            yield break;
+        }
+
+        public async Task WaitForStartsAsync(int starts, TimeSpan timeout)
+        {
+            for (var start = 0; start < starts; start++)
+            {
+                Assert.True(
+                    await _started.WaitAsync(timeout),
+                    $"The watcher was started {Starts} times, not {starts}.");
+            }
+        }
+
+        public void Dispose() => _started.Dispose();
     }
 
     private sealed class CountingRootWatcher : IRootWatcher

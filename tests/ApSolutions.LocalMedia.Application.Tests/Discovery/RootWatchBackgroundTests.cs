@@ -66,6 +66,32 @@ public sealed class RootWatchBackgroundTests
         Assert.Equal(1, watcher.Starts);
     }
 
+    /// <summary>
+    /// Measured on 2026-08-15, and it is why reviving a dead watcher is not this class's job: a
+    /// continuous root stays in the watching set for as long as the application runs, because the
+    /// fallback schedule it also owns never ends. <c>EnsureWatching</c> after a manual scan cannot
+    /// bring the live watcher back.
+    /// </summary>
+    [Fact]
+    public async Task A_continuous_root_is_watched_once_for_the_life_of_the_application()
+    {
+        var root = CreateRoot(ScanPolicy.Continuous);
+        using var watcher = new DyingWatcher();
+        var scans = new SignallingScanCoordinator(expectedScans: 1);
+        using var background = new RootWatchBackground(
+            new FixedRootRepository([root]),
+            new RootWatchCoordinator(watcher, new EndlessScheduler(), scans));
+
+        background.Start();
+        await watcher.WaitForStartAsync(WaitBudget);
+        await scans.WaitAsync(WaitBudget);
+        background.EnsureWatching(root.Id);
+
+        await Task.Delay(250, TestContext.Current.CancellationToken);
+        Assert.Equal(ScanTrigger.Recovery, Assert.Single(scans.Commands).Trigger);
+        Assert.Equal(1, watcher.Starts);
+    }
+
     private static RootWatchBackground CreateBackground(
         IReadOnlyList<LibraryRoot> roots,
         IScanCoordinator scans,
@@ -135,6 +161,54 @@ public sealed class RootWatchBackgroundTests
         {
             _started.Dispose();
             _cancelled.Dispose();
+        }
+    }
+
+    /// <summary>A watcher whose first life ends the way an unreliable root ends it.</summary>
+    private sealed class DyingWatcher : IRootWatcher, IDisposable
+    {
+        private readonly SemaphoreSlim _started = new(0);
+        private int _starts;
+
+        public int Starts => Volatile.Read(ref _starts);
+
+        public async IAsyncEnumerable<FileChangeBatch> StartAsync(
+            LibraryRoot root,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            _ = root;
+            var start = Interlocked.Increment(ref _starts);
+            _started.Release();
+            await Task.Yield();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (start == 1)
+            {
+                throw new IOException("The root stopped answering.");
+            }
+
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ConfigureAwait(false);
+            yield break;
+        }
+
+        public async Task WaitForStartAsync(TimeSpan timeout) =>
+            Assert.True(await _started.WaitAsync(timeout), "The watcher was never started.");
+
+        public void Dispose() => _started.Dispose();
+    }
+
+    /// <summary>
+    /// The fallback scheduler of a continuous root between recovery passes: alive, and quiet for the
+    /// next fifteen minutes. What the assembled application looks like right after startup.
+    /// </summary>
+    private sealed class EndlessScheduler : IFallbackScanScheduler
+    {
+        public async IAsyncEnumerable<ScanTrigger> ScheduleAsync(
+            LibraryRoot root,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            _ = root;
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ConfigureAwait(false);
+            yield break;
         }
     }
 

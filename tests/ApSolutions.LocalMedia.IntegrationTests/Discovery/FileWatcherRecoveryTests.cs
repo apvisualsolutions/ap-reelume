@@ -31,6 +31,13 @@ public sealed class FileWatcherRecoveryTests
         Assert.Equal(
             TimeSpan.FromMilliseconds(750),
             watcher.GetField("DefaultDebounce")?.GetValue(null));
+
+        // BUG-012: the buffer the operating system fills defaults to 8 KiB, and a folder receiving
+        // a season at once overflows it. This is the ceiling the platform allows.
+        Assert.Equal(64 * 1024, watcher.GetField("InternalBufferBytes")?.GetValue(null));
+        Assert.NotNull(Assembly.Load("ApSolutions.LocalMedia.Domain").GetType(
+            "ApSolutions.LocalMedia.Domain.Discovery.WatchErrorPolicy",
+            throwOnError: false));
         Assert.NotNull(infrastructure.GetType(
             "ApSolutions.LocalMedia.Infrastructure.FileSystem.FallbackScanScheduler",
             throwOnError: false));
@@ -111,6 +118,26 @@ public sealed class FileWatcherRecoveryTests
         }
 
         Assert.NotNull(deletion);
+
+        // BUG-012: a storm this size overflowed the system buffer on a hosted runner, and an
+        // overflow used to end the watcher — the batches simply stopped, and the folder was no
+        // longer followed. What is asserted is the half the defect ate: a file created after the
+        // storm still arrives.
+        pendingBatch = batches.MoveNextAsync().AsTask();
+        var afterTheStorm = Path.Combine(directory.Path, "after-the-storm.mkv");
+        await File.WriteAllBytesAsync(afterTheStorm, [0x41], timeout.Token);
+        FileChange? survivor = null;
+        while (survivor is null && await pendingBatch)
+        {
+            survivor = batches.Current.Changes.FirstOrDefault(change =>
+                string.Equals(change.Path, afterTheStorm, StringComparison.OrdinalIgnoreCase));
+            if (survivor is null)
+            {
+                pendingBatch = batches.MoveNextAsync().AsTask();
+            }
+        }
+
+        Assert.NotNull(survivor);
     }
 
     [Fact]

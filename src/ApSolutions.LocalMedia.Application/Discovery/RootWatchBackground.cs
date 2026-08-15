@@ -77,8 +77,10 @@ public sealed class RootWatchBackground : IDisposable
             }
             finally
             {
-                // A watcher that ended — policy said nothing to do, or its streams ran dry — may be
-                // started again by a later scan of the same root.
+                // A root counts as watched until everything the coordinator runs for it has ended
+                // — which for a continuous root means until the application leaves, because the
+                // fallback schedule never runs dry. A live watcher that dies inside that is the
+                // coordinator's own business to start again; a later scan cannot do it from here.
                 _ = _watching.TryRemove(root.Id, out _);
             }
         });
