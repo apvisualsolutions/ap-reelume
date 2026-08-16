@@ -49,15 +49,27 @@ public static class WalkLedger
             : Path.Combine(RepositoryLayout.Root, "artifacts", "walk");
 
     /// <summary>
+    /// The view a control is declared in, read <b>before</b> it is pressed.
+    /// </summary>
+    /// <remarks>
+    /// Before, because a control may not survive its own press. The review inbox's Confirm button
+    /// lives inside the offer it decides, so confirming removes the item and with it the button's
+    /// place in the tree: asked afterwards, it sat under no view at all. What it was is what it was
+    /// when it was pressed.
+    /// </remarks>
+    public static UserControl? ViewOf(Control control)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        return control.GetSelfAndVisualAncestors().OfType<UserControl>().FirstOrDefault();
+    }
+
+    /// <summary>
     /// Notes one control as pressed, and flushes. Flushing on every press rather than at the end is
     /// deliberate: a suite that fails halfway must still leave behind what it did prove.
     /// </summary>
-    public static void Record(Control control, string anchor)
+    public static void Record(UserControl? view, string anchor)
     {
-        ArgumentNullException.ThrowIfNull(control);
         ArgumentException.ThrowIfNullOrWhiteSpace(anchor);
-
-        var view = control.GetSelfAndVisualAncestors().OfType<UserControl>().FirstOrDefault();
         Assert.True(
             view is not null,
             $"The control pressed for {anchor} sits under no view, so there is nothing to record it "

@@ -411,6 +411,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   frase de manual: la comprobación automática destapó que la propia verificación podía decidir una
   ficha distinta de la pulsada, y ahora se comprueba **cuál** queda aceptada o rechazada, leyéndolo del
   catálogo y no de la pantalla. También se pulsa «Cargar más», que trae el resto de la lista.
+- **El botón que confirma un archivo movido se salía de la pantalla, así que no había manera de
+  pulsarlo.** Cuando la aplicación encuentra un archivo que puede ser uno que ya tenías, te enseña la
+  ruta de cada candidato y un botón «Es el mismo, reasignar» al lado. La ruta se colocaba a lo ancho
+  sin plegarse nunca, y con una ruta de una biblioteca de verdad —las tuyas lo son— empujaba el botón
+  fuera de la ventana, sin nada que desplazar para alcanzarlo: **la reasignación no se podía confirmar
+  en absoluto**. Ahora la ruta se pliega en el espacio que hay y el botón se queda a la vista.
+- **Y cuando hay varios candidatos, ya se distingue cuál confirma cada botón.** La aplicación sólo te
+  pregunta cuando **dos** fichas de tu catálogo podrían ser ese archivo, así que el botón aparece
+  repetido; los dos se llamaban igual, y elegir mal no es un detalle: decide cuál de tus fichas
+  conserva su progreso y tus decisiones bajo la ruta nueva. Cada botón dice ahora a qué ruta
+  pertenece, también para quien use un lector de pantalla. Las dos decisiones —«es el mismo» y «es un
+  archivo nuevo»— quedan comprobadas con el ratón, leyendo del catálogo cuál ficha quedó decidida.
 - **Ya se comprueba a dónde lleva «Ver el tráiler», en la ficha de película y en la de serie.** El
   botón abre el navegador que uses, y por eso ninguna comprobación automática podía pulsarlo: habría
   abierto ventanas en la máquina que estaba comprobando. Ahora una copia que guarda sus datos aparte

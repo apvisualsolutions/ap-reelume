@@ -402,6 +402,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   boilerplate: the automated check turned out to be able to decide a different card than the one it
   clicked, so the check now asks **which** card ends up accepted or rejected, reading it from the
   catalogue rather than from the screen. "Load more" is pressed too, and brings in the rest of the list.
+- **The button that confirms a moved file sat off the side of the screen, so there was no way to press
+  it.** When the application finds a file that may be one you already had, it shows you each
+  candidate's path with a "Same file, reassign" button beside it. The path laid itself out across the
+  row without ever wrapping, and with a real library path — yours are — it pushed the button out of
+  the window, with nothing to scroll sideways to reach it: **the reassignment could not be confirmed
+  at all**. The path now wraps into the space there is, and the button stays in view.
+- **And when there are several candidates, which one each button confirms is now clear.** The
+  application only asks you when **two** entries in your catalogue could be that file, so the button
+  appears more than once; both were called the same, and choosing wrong is no detail: it decides which
+  of your entries keeps its progress and your decisions under the new path. Each button now says which
+  path it belongs to, for screen reader users as well. Both decisions — "same file" and "it is a new
+  file" — are covered by mouse, reading from the catalogue which entry ended up decided.
 - **Where "Watch the trailer" leads is now checked, on the film card and on the series card.** The
   button opens whatever browser you use, which is why no automated check could press it: it would
   have opened windows on the machine doing the checking. A copy that keeps its data somewhere of its

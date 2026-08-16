@@ -49,13 +49,30 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 <ItemsControl ItemsSource="{Binding Candidates}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="review:ReassignmentCandidateViewModel">
-                      <StackPanel Margin="0,2" Orientation="Horizontal" Spacing="12">
+                      <!--
+                      A grid rather than a horizontal StackPanel, which offers its children infinite
+                      width: the path never wrapped there, so it took as much room as it wanted and
+                      pushed the button off the side. Measured on 2026-08-16 at x=2234 in a 1600 px
+                      window — a real library path is long enough to make the only control that
+                      confirms a reassignment unreachable, with nothing to scroll sideways.
+                      -->
+                      <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <TextBlock VerticalAlignment="Center" Text="{Binding Path}" TextWrapping="Wrap" />
+                        <!--
+                        One offer lists every candidate it could be, so this button repeats once per
+                        row and the action alone does not say which. The help text is the candidate's
+                        path, the way EpisodeRowView names its Play by the episode: without it two
+                        identical buttons decide two different entities, and neither a screen reader
+                        nor the walk can tell them apart.
+                        -->
                         <Button
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            automation:AutomationProperties.HelpText="{Binding Path}"
                             automation:AutomationProperties.Name="{DynamicResource ReassignmentConfirmAction}"
                             Command="{Binding ConfirmCommand}"
                             Content="{DynamicResource ReassignmentConfirmAction}" />
-                      </StackPanel>
+                      </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>

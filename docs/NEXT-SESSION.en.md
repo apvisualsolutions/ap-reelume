@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **69** today, with **59 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **67** today, with **61 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -43,24 +43,24 @@ one**, and this checks it.
    its event was **listened to by nobody** in `src/`; it now reaches `SearchForMatch`, the manual
    counterpart of `IdentifyScannedFiles`. **73 → 69.**
 
-   **What remains, with the recipe already worked out** (69 → 66):
-
-   - **`ReassignmentConfirmAction` and `ReassignmentKeepAction`.** The offer is seeded through the
-     application's own container — `host.Application.Services` →
-     `PendingReassignments.Offer(new PendingReassignment(command, [candidate]))` — with
-     `ReconcileFileCommand(rootId, newPath, identity)`. The **identity must be the same one** stored
-     on the old row through `IMediaFileRepository.SaveIdentityAsync`: `ConfirmAsync` looks it up by
-     stable id or by fingerprint and **throws** if it does not find it. Then `inbox.LoadAsync`, so
-     `Reassignments` fills: `ReloadReassignments` only runs on load. Both probes read the database:
-     confirm → the old row now points at the new path (`FindByPathAsync`); keep as new → the row at
-     the new path takes the identity, so `FindByStableIdentityAsync` finds it. Both buttons sit
-     inside an `ItemsControl` rather than a `ListBox`, so the beside click meets no selectable rows.
+   **Both reassignments, done on 2026-08-16**, with **two more product defects** and one harness
+   defect — [the evidence](evidence/stable/audit-walk-reassignment.md). The earlier recipe was short
+   on one point that decided everything else: `FileReconciliationPolicy` answers `Exact` for a stable
+   identity and for a unique fingerprint, so **the only offer the application produces is a
+   fingerprint collision**, and a collision means **two candidates, and therefore two buttons**. Hence:
+   (1) both "Same file, reassign" buttons carried the same accessible name while deciding different
+   entities — they now carry the candidate's path as help text, like `EpisodeRowView`; (2) the row was
+   a horizontal `StackPanel`, which offers **infinite width**, so the path never wrapped and pushed the
+   button to **x=2234 in a 1600 px window**: off the screen, with nothing to scroll, making
+   confirmation **impossible** for any real library path. It is a `Grid` with `*,Auto` now. And from
+   the harness: `WalkLedger` read the control's view **after** the effect, and confirming removes the
+   offer the button lives in, so identity is taken before the press. **69 → 67.**
    - **`DuplicateReviewView#{Binding ShortPath}`.** It needs two copies of one title in a version
      group — the proven route is the walk's first scene, where the watcher groups two identical files
      — then `library.OpenDetailsAsync` plus `OpenDuplicatesAsync`, which lands on Review with the view
      under the inbox. The radio is anchored by its own data and recorded with
      `recordAs: "{Binding ShortPath}"`, like the library's `{Binding Title}`. The probe is the
-     **stored preference**, not the screen's `IsEffective`.
+     **stored preference**, not the screen's `IsEffective`. **67 → 66.**
    - **And when it closes, a debt already measured.** `ReviewInboxViewModel.cs` sits at **92.13 % of
      lines and 59.26 % of branches** and is watched by nobody: it is an old file, so the coverage gate
      does not look at it. The two remaining reassignment controls exercise exactly
