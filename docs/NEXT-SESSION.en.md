@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **52** today, with **76 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **44** today, with **84 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -90,8 +90,16 @@ one**, and this checks it.
    the watched list, because that list is for files that **decide** rather than declare; and an
    optional hook the container leaves at null **is not caught by `ServiceConsumptionTests`**, since it
    is not a registration without a consumer. What watches it from today is the walk.
-4. **Batch 9 — root onboarding (8).** It puts the rule to work on the **folder pickers**: the three
-   root kinds, add, the scan consent, and remove with its confirm and its cancel. **52 → 44.**
+4. ~~**Batch 9 — root onboarding (8).**~~ **Done on 2026-08-16, 52 → 44** —
+   [the evidence](evidence/stable/audit-walk-root-onboarding.md) — and with **a premise of this queue
+   disproved**: there is no folder picker here. The folder is **typed into a box**, so the batch had no
+   precondition at all and could have been done earlier; the real pickers (`OpenFilePickerAsync`,
+   `SaveFilePickerAsync`) are on backup and restore, which is batch 6, where the precondition **does**
+   still hold. The defect: **Remove at x=2146 in a 1600 px window**, another horizontal `StackPanel`
+   with a path beside it. **The fourth time in one day, and now a rule of the house: whatever sits
+   beside a value of free width goes in a grid.** And from the harness: **a probe is compared by
+   value** — returning the list of folders made the beside click "change" it every time, because each
+   read is a new array; the empty case passed because an empty array is one shared instance.
 5. **Batch 6 — backup and restore (5).** The rule on the **file pickers**. Create copy, export,
    cancel; choose archive and confirm the restore. **44 → 39.**
 6. **The sandbox lifecycle, expired since `DES-001`.** The four native phases — install, upgrade,

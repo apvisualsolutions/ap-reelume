@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **52**, con **76 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **44**, con **84 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -90,9 +90,17 @@ correcta**, y con esto se comprueba.
    lista de vigilados, porque esa lista es para archivos que **deciden**, no para los que declaran; y
    un gancho opcional que el contenedor deja a nulo **no lo caza `ServiceConsumptionTests`**, porque
    no es un registro sin consumidor. Quien lo vigila desde hoy es el paseo.
-4. **Tanda 9 — el onboarding de raíces (8).** Estrena la regla en los **selectores de carpeta**: las
-   tres clases de raíz, añadir, el consentimiento de escaneo, y quitar con su confirmación y su
-   cancelación. **52 → 44.**
+4. ~~**Tanda 9 — el onboarding de raíces (8).**~~ **Hecha el 2026-08-16, 52 → 44** —
+   [la evidencia](evidence/stable/audit-walk-root-onboarding.md)—, y con **una premisa de esta cola
+   desmentida**: no hay ningún selector de carpeta aquí. La carpeta **se escribe en una caja de
+   texto**, así que la tanda no tenía condición previa ninguna y podría haberse hecho antes; los
+   selectores de verdad (`OpenFilePickerAsync`, `SaveFilePickerAsync`) están en copias y restauración,
+   o sea en la tanda 6, donde la condición **sí** sigue en pie. El defecto: **«Retirar» a x=2146 en una
+   ventana de 1600**, otra vez un `StackPanel` horizontal con una ruta al lado. **Cuarta vez en el día,
+   y ya es regla de la casa: lo que va junto a un dato de anchura libre se coloca en una rejilla.** Y
+   del arnés: **una sonda se compara por valor** — devolver la lista de carpetas hacía que el clic de
+   control «cambiara» siempre, porque cada lectura es un array nuevo; el caso vacío pasaba porque un
+   array vacío es la misma instancia compartida.
 5. **Tanda 6 — copias y restauración (5).** La regla en los **selectores de archivo**. Crear copia,
    exportar, cancelar; elegir archivo y confirmar la restauración. **44 → 39.**
 6. **El ciclo de vida en el sandbox, caducado desde `DES-001`.** Las cuatro fases nativas —instalar,

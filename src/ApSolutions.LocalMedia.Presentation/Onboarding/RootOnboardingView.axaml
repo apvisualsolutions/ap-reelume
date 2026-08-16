@@ -77,17 +77,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <ItemsControl ItemsSource="{Binding Roots}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="onboarding:LibraryRootRowViewModel">
-              <StackPanel Margin="0,2" Orientation="Horizontal" Spacing="12">
+              <!--
+              A grid, because a folder path is as long as somebody's folders are. A horizontal
+              StackPanel offers its children infinite width, so the path took all it wanted and put
+              Remove at x=2146 in a 1600 px window — measured on 2026-08-16, and the fourth control
+              in one day hidden by the same container.
+              -->
+              <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
                 <TextBlock
                     VerticalAlignment="Center"
                     Foreground="{DynamicResource TextPrimaryBrush}"
-                    Text="{Binding Path}" />
+                    Text="{Binding Path}"
+                    TextWrapping="Wrap" />
                 <Button
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
                     automation:AutomationProperties.Name="{DynamicResource RootRemoveAction}"
                     Command="{Binding $parent[ItemsControl].((onboarding:RootOnboardingViewModel)DataContext).RequestRemoveCommand}"
                     CommandParameter="{Binding}"
                     Content="{DynamicResource RootRemoveAction}" />
-              </StackPanel>
+              </Grid>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>

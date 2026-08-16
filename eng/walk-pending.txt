@@ -36,14 +36,6 @@ RestoreWizardView#RestoreChooseArchiveLabel                # batch 6
 RestoreWizardView#RestoreConfirmLabel                      # batch 6
 ResumePromptView#ResumePromptRestart                       # batch 2
 ResumePromptView#ResumePromptResume                        # batch 2
-RootOnboardingView#RootAddAction                           # unscheduled: the shell, home and onboarding are in none of the seven batches
-RootOnboardingView#RootKindLocal                           # unscheduled: the shell, home and onboarding are in none of the seven batches
-RootOnboardingView#RootKindUnc                             # unscheduled: the shell, home and onboarding are in none of the seven batches
-RootOnboardingView#RootKindUsb                             # unscheduled: the shell, home and onboarding are in none of the seven batches
-RootOnboardingView#RootRemoveAction                        # unscheduled: the shell, home and onboarding are in none of the seven batches
-RootOnboardingView#RootRemoveCancelAction                  # unscheduled: the shell, home and onboarding are in none of the seven batches
-RootOnboardingView#RootRemoveConfirmAction                 # unscheduled: the shell, home and onboarding are in none of the seven batches
-RootOnboardingView#RootScanConsentAction                   # unscheduled: the shell, home and onboarding are in none of the seven batches
 SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2
 SubtitleStyleView#SubtitleStyleBackgroundOpacityLabel      # batch 2
 SubtitleStyleView#SubtitleStyleFamilyLabel                 # batch 2

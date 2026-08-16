@@ -423,6 +423,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   conserva su progreso y tus decisiones bajo la ruta nueva. Cada botón dice ahora a qué ruta
   pertenece, también para quien use un lector de pantalla. Las dos decisiones —«es el mismo» y «es un
   archivo nuevo»— quedan comprobadas con el ratón, leyendo del catálogo cuál ficha quedó decidida.
+- **El botón «Retirar» de una carpeta de la biblioteca se salía de la pantalla.** La ruta de la
+  carpeta se escribía a lo ancho sin plegarse, así que con las rutas de verdad —las tuyas— el botón
+  quedaba fuera de la ventana y **no había forma de quitar una carpeta**. Ahora la ruta se pliega y el
+  botón se queda a la vista. De paso, esa pantalla —la primera que ves al instalar— queda comprobada
+  entera con el ratón: las tres clases de carpeta, añadirla, el permiso para el primer escaneo, y
+  retirarla **cancelando y confirmando**, comprobando que la carpeta sigue en tu disco.
 - **El botón «Continuar» de la pantalla de inicio no hacía nada.** Es la acción principal de toda la
   aplicación: la pantalla te ofrecía seguir con lo último que dejaste a medias, el botón se activaba
   solo porque había algo a lo que volver, y al pulsarlo **no pasaba nada**. Ahora abre la sesión con

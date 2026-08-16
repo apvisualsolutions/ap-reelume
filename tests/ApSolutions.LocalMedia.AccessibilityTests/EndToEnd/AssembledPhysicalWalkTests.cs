@@ -1084,6 +1084,130 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The ninth batch: adding a folder to the library and taking it back out, with the mouse. The
+    /// three kinds of root, the add, the consent the first scan needs, and the removal with both
+    /// answers to its confirmation.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the surface a first run opens on, so it is the first thing anybody ever presses, and
+    /// until now nothing had pressed it. It was scheduled behind the isolation rule on the assumption
+    /// that it opens a folder picker; it does not. The folder is typed into a box, and the picker
+    /// lives on the backup surfaces instead — which is worth writing down, because the rest of that
+    /// plan was built on it.
+    /// </para>
+    /// <para>
+    /// Removal is pressed twice on purpose: once cancelled and once confirmed. A confirmation that
+    /// only ever gets said yes to is a confirmation nobody has shown can be refused, and refusing is
+    /// the whole reason it is there — the folder holds somebody's library.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_root_onboarding_is_operated_with_the_mouse()
+    {
+        var factory = await MigrateCatalogueAsync();
+        var folder = Path.Combine(_dataRoot, "library");
+        Directory.CreateDirectory(folder);
+
+        using var host = ShowShell(height: 1600);
+        Navigate(host, AppRoute.Library);
+        var onboarding = host.ViewModel.Onboarding;
+        Assert.NotNull(onboarding);
+
+        // The three kinds, each pressed from a different one: the kind it starts on goes last,
+        // because pressing the choice already in force has no effect to observe.
+        var startsOn = onboarding!.SelectedKind;
+        foreach (var kind in new[] { RootKind.Local, RootKind.Usb, RootKind.Unc }
+            .Where(other => other != startsOn)
+            .Append(startsOn))
+        {
+            await PressAsync(
+                host,
+                $"RootKind{kind}",
+                () => onboarding.SelectedKind,
+                $"clicking the {kind} kind never chose it");
+            Assert.Equal(kind, onboarding.SelectedKind);
+        }
+
+        // A local folder is what the walk has, so the kind is left on Local before adding.
+        Assert.Equal(RootKind.Local, onboarding.SelectedKind);
+        onboarding.Path = folder;
+        Dispatcher.UIThread.RunJobs();
+
+        // The probe is the catalogue: a surface that accepted the folder and stored nothing would
+        // look identical on screen.
+        await PressAsync(
+            host,
+            "RootAddAction",
+            () => RootPathsAsync(factory),
+            "clicking Add never put the folder in the catalogue");
+        Assert.Equal(folder, await RootPathsAsync(factory));
+        Assert.Null(onboarding.FailureKey);
+
+        // Nothing is scanned until somebody says so, which is why the consent is a separate press.
+        Assert.True(onboarding.InitialScanConsentRequired);
+        await PressAsync(
+            host,
+            "RootScanConsentAction",
+            () => onboarding.CanStartInitialScan,
+            "clicking the scan consent never granted it");
+
+        // The row for the folder that is now in the catalogue, which is what removal acts on.
+        await onboarding.RefreshRootsAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(onboarding.HasRoots, "The folder that was added never reached the list.");
+
+        await PressAsync(
+            host,
+            "RootRemoveAction",
+            () => onboarding.IsConfirmingRemoval,
+            "clicking Remove never asked for the confirmation it owes");
+
+        // Refused, and the folder is still there: this is the half that proves the confirmation is
+        // one rather than a formality.
+        await PressAsync(
+            host,
+            "RootRemoveCancelAction",
+            () => onboarding.IsConfirmingRemoval,
+            "clicking Cancel never called off the removal");
+        Assert.Equal(folder, await RootPathsAsync(factory));
+
+        await PressAsync(
+            host,
+            "RootRemoveAction",
+            () => onboarding.IsConfirmingRemoval,
+            "clicking Remove a second time never asked for the confirmation again");
+
+        await PressAsync(
+            host,
+            "RootRemoveConfirmAction",
+            () => RootPathsAsync(factory),
+            "clicking Remove for good never took the folder out of the catalogue");
+        Assert.Equal(string.Empty, await RootPathsAsync(factory));
+
+        // The folder itself is untouched: removing it from the library is not deleting anybody's
+        // videos, and that distinction is the whole promise of this surface.
+        Assert.True(Directory.Exists(folder));
+    }
+
+    /// <summary>
+    /// The folders the catalogue holds, which is where adding and removing one lands.
+    /// </summary>
+    /// <remarks>
+    /// One string rather than the list it reads, because a probe is compared with
+    /// <see cref="EqualityComparer{T}"/>: an array answers "changed" on every read, since each read
+    /// is a new array. Measured here as the beside click appearing to remove a folder — with the
+    /// empty case passing, because an empty array is the same shared instance every time.
+    /// </remarks>
+    private static async Task<string> RootPathsAsync(SqliteConnectionFactory factory)
+    {
+        var roots = await new LibraryRootRepository(factory).ListAsync(TestContext.Current.CancellationToken);
+        return string.Join(";", roots.Select(root => root.Path).Order(StringComparer.Ordinal));
+    }
+
+    /// <summary>
     /// The catalogue row a film has once somebody identified it, written through SQL because the
     /// catalogue writes it during identification, which needs the network the harness does not have.
     /// </summary>
@@ -2380,15 +2504,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Dispatcher.UIThread.RunJobs();
     }
 
-    private async Task<SqliteConnectionFactory> SeedRootAsync(string mediaRoot, ScanPolicy policy)
+    /// <summary>The catalogue as a first run finds it: migrated, and holding nothing.</summary>
+    private async Task<SqliteConnectionFactory> MigrateCatalogueAsync()
     {
         Directory.CreateDirectory(_dataRoot);
         var factory = new SqliteConnectionFactory(new AppDataPaths(_dataRoot).DatabasePath);
-        using (var runner = new MigrationRunner(factory))
-        {
-            await runner.MigrateAsync(TestContext.Current.CancellationToken);
-        }
+        using var runner = new MigrationRunner(factory);
+        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        return factory;
+    }
 
+    private async Task<SqliteConnectionFactory> SeedRootAsync(string mediaRoot, ScanPolicy policy)
+    {
+        var factory = await MigrateCatalogueAsync();
         await new LibraryRootRepository(factory).AddAsync(
             new LibraryRoot(
                 new LibraryRootId(Guid.NewGuid()),

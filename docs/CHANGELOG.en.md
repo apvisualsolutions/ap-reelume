@@ -414,6 +414,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   of your entries keeps its progress and your decisions under the new path. Each button now says which
   path it belongs to, for screen reader users as well. Both decisions — "same file" and "it is a new
   file" — are covered by mouse, reading from the catalogue which entry ended up decided.
+- **The Remove button for a library folder fell off the screen.** The folder path laid itself out
+  across the row without wrapping, so with real paths — yours — the button ended up outside the window
+  and there was **no way to remove a folder**. The path wraps now and the button stays in view. That
+  surface — the first one you see after installing — is also covered by mouse end to end: the three
+  kinds of folder, adding one, the permission for the first scan, and removing one **both cancelled
+  and confirmed**, checking that the folder is still on your disk.
 - **The Continue button on the home surface did nothing.** It is the primary action of the whole
   application: home offered to carry on with whatever you last left part way through, the button
   enabled itself because there was something to return to, and pressing it **did nothing at all**. It
