@@ -19,6 +19,13 @@ namespace ApSolutions.LocalMedia.Domain.Metadata;
 /// composes an address.
 /// </para>
 /// <para>
+/// There is deliberately no check for an empty host. The launcher this rule came from carried one,
+/// and the coverage gate is what showed it had never been reached: once <c>https</c> is required,
+/// an absolute address with no host cannot be built at all — seven spellings of one were measured
+/// and every single one fails to parse. A guard that cannot run is not a defence, it is a claim of
+/// one. If a second scheme is ever allowed through here, that check has to come back with it.
+/// </para>
+/// <para>
 /// It lives here, in the layer with no I/O, because there is more than one place an address can
 /// leave from: the shell opens one for the person whose profile this is, and a run keeping its data
 /// somewhere of its own writes the same address down instead. Two exits enforcing a rule each would
@@ -41,7 +48,6 @@ public static class ExternalLinkPolicy
         address = Uri.TryCreate(link, UriKind.Absolute, out var candidate)
             && string.Equals(candidate.Scheme, Uri.UriSchemeHttps, StringComparison.Ordinal)
             && candidate.UserInfo.Length == 0
-            && candidate.Host.Length > 0
                 ? candidate
                 : null;
         return address is not null;
