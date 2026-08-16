@@ -119,11 +119,15 @@ correcta**, y con esto se comprueba.
    con el programa abierto y la biblioteca cargada: `SwapAsync` llama a `ClearAllPools()` antes de
    mover nada y el catálogo abre y cierra su conexión por operación.
 
-   **Hallazgo anotado, no corregido:** `StagedRestoreService` tiene un segundo constructor
-   (`availableBytes`, `beforeSwap`) que **nadie usa** —ni la composición ni las pruebas—, así que el
-   gancho es un punto de extensión imaginario en el **único momento destructivo** del programa y su
-   `?.Invoke()` es una rama inalcanzable. Cuarta forma del defecto de la casa. Retirarlo cambia una
-   firma pública de infraestructura, así que va con su propia medición, no de rebote.
+   **Un hallazgo que era falso, corregido el 2026-08-17.** Esta entrada afirmaba que el segundo
+   constructor de `StagedRestoreService` (`availableBytes`, `beforeSwap`) no lo usaba nadie. **Sí lo
+   usa `DisasterRecoveryTests`**, y para lo que el gancho existe: `onBeforeSwap: cancellation.Cancel`
+   prueba una cancelación justo antes del intercambio, y `onBeforeSwap: () => throw new IOException(…)`
+   un intercambio interrumpido — los dos caminos que deciden si un fallo a mitad pierde la biblioteca
+   de alguien. La llamada es `new(Paths, _ => availableBytes, onBeforeSwap)`, con el tipo inferido, y
+   un `grep` de `new StagedRestoreService(` no la encuentra. **Se pregunta al compilador quién
+   construye un tipo, no al buscador**: retirar el miembro y compilar cuesta un minuto y no puede
+   equivocarse.
 
 5b. **Tanda 6b — «Cancelar» (1).** **40 → 39.** Lo que queda de la 6, y puede esperar detrás de la 7:
 
@@ -203,10 +207,25 @@ correcta**, y con esto se comprueba.
    tiene**: la fuente es del arnés, así que puede servir despacio a propósito. Medirlo antes de
    escribir la escena.
 
-   **Sugerencia de orden, no re-deliberada:** las cuatro salidas primero, en un commit propio y con
-   `IsolatedRunTests` cubriendo las dos mitades de cada una; después los siete controles. Partirla en
-   7a (actualizador) y 7b (recuperación) es razonable si el montaje propio de la recuperación sale
-   caro.
+   **DECIDIDO el 2026-08-17, no se re-delibera:**
+
+   - **La tanda se parte, y la recuperación va PRIMERO.** **7b — recuperación (2 controles), 40 → 38**:
+     necesita dos salidas (abrir carpeta, salir), su montaje cuesta un cambio de tipo, y **no depende
+     de ninguna decisión abierta**. Después **7a — el actualizador (5), 38 → 33**.
+   - **Cómo se sirve la fuente de actualización a una ejecución aislada.** `IUpdateSource` **se
+     sustituye** por uno que lee un manifiesto de la carpeta de traspaso, y `VerifiedUpdateDownloader`
+     **se conserva** con un transporte local, para que el hash, el tamaño y el `.partial` sigan siendo
+     los de verdad. **Lo que NO se hace: hacer que `UpdateSigningKey.PublicKey` dependa de la raíz.**
+     Eso movería una decisión de seguridad para poder probar, que es exactamente el razonamiento que
+     este repositorio tiene prohibido. La verificación minisign se prueba donde ya se prueba: en sus
+     pruebas unitarias, con sus propios vectores.
+   - **El orden dentro de cada mitad**: las salidas primero, en un commit propio y con
+     `IsolatedRunTests` cubriendo **las dos mitades de cada una** —aislada y dueña del perfil— en el
+     mismo archivo, porque al fusionar Cobertura se guarda el mejor informe por línea y no la unión.
+     Después los controles.
+   - **«Cancelar» del actualizador va con la 7a**, no aparte: a diferencia del de copias, su fuente es
+     del arnés y puede servir despacio a propósito. Si medida la siembra sale cara, se aparta a una
+     7c y se dice en la evidencia, sin silencio.
 8. **Tanda 2 (resto) — el reproductor y sus superpuestos (29).** La más larga y la única que necesita
    vídeo real: pistas, salida de audio, estilo de subtítulos, marcadores, reanudar, siguiente
    episodio, cambio de versión, archivo suelto y recuperación del reproductor. **Advertencia medida:

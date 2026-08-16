@@ -117,11 +117,14 @@ one**, and this checks it.
    the program open and the library loaded: `SwapAsync` calls `ClearAllPools()` before moving
    anything, and the catalogue opens and closes its connection per operation.
 
-   **Noted, not fixed:** `StagedRestoreService` has a second constructor (`availableBytes`,
-   `beforeSwap`) that **nobody uses** — neither the composition nor the tests — so the hook is an
-   imaginary extension point at the **one destructive moment** of the program, and its `?.Invoke()` is
-   an unreachable branch. Fourth shape of the house defect. Removing it changes a public
-   infrastructure signature, so it gets its own measurement rather than riding along.
+   **A finding that was wrong, corrected on 2026-08-17.** This entry claimed the second constructor of
+   `StagedRestoreService` (`availableBytes`, `beforeSwap`) was used by nobody. **`DisasterRecoveryTests`
+   does use it**, and for exactly what the hook is for: `onBeforeSwap: cancellation.Cancel` tests a
+   cancellation right before the swap, and `onBeforeSwap: () => throw new IOException(…)` an
+   interrupted one — the two paths that decide whether a half-way failure loses somebody's library.
+   The call is `new(Paths, _ => availableBytes, onBeforeSwap)`, target-typed, which a grep for
+   `new StagedRestoreService(` never finds. **Ask the compiler who constructs a type, not the search**:
+   removing the member and building takes a minute and cannot be wrong.
 
 5b. **Batch 6b — Cancel (1).** **40 → 39.** What is left of batch 6, and it may wait behind batch 7:
 
@@ -201,9 +204,23 @@ one**, and this checks it.
    have**: the source belongs to the harness, so it can serve slowly on purpose. Measure it before
    writing the scene.
 
-   **Suggested order, not re-deliberated:** the four exits first, in a commit of their own with
-   `IsolatedRunTests` covering both halves of each; then the seven controls. Splitting into 7a (the
-   updater) and 7b (recovery) is reasonable if recovery's own mount turns out expensive.
+   **DECIDED on 2026-08-17, not up for re-deliberation:**
+
+   - **The batch splits, and recovery goes FIRST.** **7b — recovery (2 controls), 40 → 38**: it needs
+     two exits (open folder, exit), its mount costs one type change, and it **depends on no open
+     decision**. Then **7a — the updater (5), 38 → 33**.
+   - **How the update source is served to an isolated run.** `IUpdateSource` is **replaced** by one
+     reading a manifest from the handover folder, and `VerifiedUpdateDownloader` is **kept** with a
+     local transport, so the hash, the size and the `.partial` stay real. **What is NOT done: making
+     `UpdateSigningKey.PublicKey` depend on the root.** That would move a security decision in order
+     to test, which is precisely the reasoning this repository forbids. Minisign verification is
+     tested where it already is: in its own unit tests, with its own vectors.
+   - **Order within each half**: the exits first, in a commit of their own, with `IsolatedRunTests`
+     covering **both halves of each** — isolated and profile-owning — in the same file, because merged
+     Cobertura keeps the better report per line rather than the union. Then the controls.
+   - **The updater's Cancel goes with 7a**, not separately: unlike backup's, its source belongs to the
+     harness and can serve slowly on purpose. If the seeding measures expensive, it moves to a 7c and
+     the evidence says so, rather than going quiet.
 8. **Batch 2 (the rest) — the player and its overlays (29).** The longest, and the only one needing
    real video: tracks, audio output, subtitle style, markers, resume, next episode, version switch,
    loose file, and player recovery. **Measured warning: the five remaining overlays set no

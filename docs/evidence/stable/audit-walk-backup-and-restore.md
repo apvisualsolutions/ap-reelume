@@ -94,15 +94,33 @@ cierra su conexión por operación. Hasta hoy eso no lo había comprobado nadie 
 ensamblada. / The swap happens with the application running and the library loaded, and it works —
 nobody had checked that from the assembled application before.
 
-**Hallazgo anotado, no corregido aquí:** `StagedRestoreService` tiene un segundo constructor con
-`availableBytes` y un gancho `beforeSwap`, y **nadie usa ninguno de los dos** —ni la composición, ni
-las pruebas—. El gancho es un punto de extensión imaginario en el único momento destructivo del
-programa, y su `?.Invoke()` es una rama que no puede tomarse. Es el defecto de la casa en su cuarta
-forma. Retirarlo cambia una firma pública de infraestructura y merece su propia medición, así que
-queda en la cola. / Noted, not fixed here: nothing passes either argument of the three-argument
-constructor, so the hook is an imaginary extension point at the one destructive moment, and its
-null-conditional call is an unreachable branch. Removing it changes a public signature and gets its
-own measurement.
+**Un hallazgo que resultó falso, y la razón de que lo fuera merece quedarse.** Esta evidencia afirmó
+primero que el segundo constructor de `StagedRestoreService` —con `availableBytes` y un gancho
+`beforeSwap`— no lo usaba nadie, y que el gancho era un punto de extensión imaginario en el único
+momento destructivo del programa. **Es falso.** Lo destapó el compilador al retirarlo el 2026-08-17: /
+This evidence first claimed the three-argument constructor was used by nobody. It is false, and the
+compiler said so:
+
+```
+error CS1729: 'StagedRestoreService' no contiene un constructor que tome 3 argumentos
+```
+
+`DisasterRecoveryTests` lo usa, y lo usa **para lo que existe**: `onBeforeSwap: cancellation.Cancel`
+prueba una cancelación justo antes del intercambio, y
+`onBeforeSwap: () => throw new IOException(...)` prueba un intercambio interrumpido. Son los dos
+caminos que deciden si un fallo a mitad pierde la biblioteca de alguien. / It is used to test a
+cancellation and an interrupted swap — the two paths that decide whether a half-way failure loses
+somebody's library.
+
+**Por qué la búsqueda mintió:** la llamada es `new(Paths, _ => availableBytes, onBeforeSwap)`, con el
+tipo inferido del método que la devuelve. Un `grep` de `new StagedRestoreService(` no la encuentra, y
+el silencio se leyó como ausencia. / The call uses a target-typed `new`, which a grep for
+`new StagedRestoreService(` does not find, and the silence read as absence.
+
+**Regla, y es la que se lleva de aquí:** para saber quién construye un tipo se pregunta al
+compilador, no al buscador — retirar el miembro y compilar cuesta un minuto y no puede equivocarse. /
+Ask the compiler who constructs a type, not the search: removing the member and building takes a
+minute and cannot be wrong.
 
 ## Lo que queda de la tanda / What is left of the batch
 
