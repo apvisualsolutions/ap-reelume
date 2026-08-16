@@ -81,6 +81,46 @@ try {
     & $signTool sign /fd SHA256 /sha1 $certificate.Thumbprint $signedMsix | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'signtool refused to sign the staged copy.' }
 
+    <#
+        The upgrade half needs a second package: same identity, higher version. It is built by
+        resealing this one with its version raised rather than by building the application twice,
+        and that is the honest way round - what Windows reads when it decides whether an install is
+        an upgrade is the manifest's version and nothing else, so a rebuilt payload would vary
+        something the measurement is not about.
+
+        The block map, the content types and the code integrity catalogue are removed before
+        resealing: MakeAppx generates all three, and a stale one describes the package this was made
+        from rather than the package being made.
+    #>
+    $parsed = [version]$version
+    $nextVersion = "$($parsed.Major).$($parsed.Minor + 1).0.0"
+
+    Write-Output "Resealing a package of the next version ($nextVersion) for the upgrade phase ..."
+    $makeAppx = & (Join-Path $PSScriptRoot 'find-sdk-tool.ps1') -Name 'makeappx.exe'
+    $nextLayout = Join-Path $stageRoot 'next-layout'
+    & $makeAppx unpack /p $msix.FullName /d $nextLayout /o | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'MakeAppx could not unpack the package to raise its version.' }
+
+    foreach ($generated in @('AppxBlockMap.xml', '[Content_Types].xml', 'AppxMetadata/CodeIntegrity.cat', 'AppxSignature.p7x')) {
+        $path = Join-Path $nextLayout $generated
+        if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force }
+    }
+
+    $nextManifestPath = Join-Path $nextLayout 'AppxManifest.xml'
+    [xml]$nextManifest = Get-Content -LiteralPath $nextManifestPath -Raw
+    $nextManifest.Package.Identity.Version = $nextVersion
+    $nextManifest.Save($nextManifestPath)
+
+    $nextMsix = Join-Path $stageRoot ([IO.Path]::GetFileNameWithoutExtension($msix.Name) + '-next.msix')
+    & $makeAppx pack /d $nextLayout /p $nextMsix /o | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'MakeAppx failed to seal the next-version package.' }
+    & $signTool sign /fd SHA256 /sha1 $certificate.Thumbprint $nextMsix | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'signtool refused to sign the next-version package.' }
+
+    # The layout is a full copy of the payload; leaving it beside the packages would double what the
+    # sandbox has to map and would offer the cycle a folder it is not meant to install from.
+    Remove-Item -LiteralPath $nextLayout -Recurse -Force
+
     # --------------------------------------------------- the machine with a handler
     Write-Output 'Measuring the half this machine answers: what an App Installer does with it ...'
     $withHandler = & (Join-Path $PSScriptRoot 'measure-handover-with-handler.ps1') -PackagePath $signedMsix
@@ -194,6 +234,63 @@ powershell -ExecutionPolicy Bypass -NoProfile -File C:\share\sandbox-handover.ps
     Write-Output ''
     Write-Output "Report: $outputPath"
     Write-Output "Archive it at docs/evidence/stable/updater-handover.json once you have read it."
+
+    <#
+        The lifecycle half of the same run, written as its own report because it answers a different
+        question and expires on a different thing: verify-package.ps1 adopts it only while its
+        version and manifest digest still describe the package being verified.
+
+        One run produces both. The alternative - a second cycle for the lifecycle phases - would
+        install the package twice to measure one install, and the second run's Windows would not be
+        the clean one the first met.
+    #>
+    if ($null -ne $withoutHandler) {
+        $lifecycleIds = @(
+            'developer-mode',
+            'trust-test-certificate',
+            'windows-install',
+            'file-association',
+            'windows-launch',
+            'windows-upgrade',
+            'windows-downgrade-refused',
+            'windows-repair',
+            'windows-uninstall')
+
+        $lifecyclePhases = @()
+        foreach ($id in $lifecycleIds) {
+            $row = $withoutHandler.phases | Where-Object { $_.id -eq $id } | Select-Object -First 1
+            if ($null -eq $row) {
+                throw "The sandbox report has no $id phase, so the lifecycle report would be missing one."
+            }
+
+            $lifecyclePhases += $row
+        }
+
+        $lifecycle = [ordered]@{
+            version = $version
+            manifestSha256 = $manifestSha
+            machine = [ordered]@{
+                cleanVirtualMachine = $true
+                elevated            = $true
+                sandbox             = $true
+                os                  = [string]$withoutHandler.os
+                build               = [string]$withoutHandler.build
+            }
+            note = 'Run inside Windows Sandbox: a clean, disposable Windows created at launch and destroyed when the window closed. The package was signed by a throwaway certificate carrying the manifest published publisher, trusted inside the sandbox and nowhere else; the published artifact remains unsigned. The report expires when Package.appxmanifest changes, because the manifest is what governs installation, associations, and write virtualisation.'
+            phases = $lifecyclePhases
+        }
+
+        $lifecyclePath = Join-Path $stageRoot 'windows-lifecycle.json'
+        Set-Content -LiteralPath $lifecyclePath -Value ($lifecycle | ConvertTo-Json -Depth 8) -Encoding utf8NoBOM
+        Write-Output "Lifecycle: $lifecyclePath"
+        Write-Output "Archive it at docs/evidence/mvp/windows-lifecycle.json once you have read it."
+
+        $failed = @($lifecyclePhases | Where-Object { $_.outcome -ne 'Passed' })
+        if ($failed.Count -gt 0) {
+            Write-Warning ("Lifecycle phases that did not pass: {0}. Read them before archiving anything." -f
+                (($failed | ForEach-Object { "$($_.id) = $($_.outcome)" }) -join '; '))
+        }
+    }
 }
 finally {
     if ($certificate) {
