@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **40** today, with **88 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **38** today, with **90 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -221,6 +221,30 @@ one**, and this checks it.
    - **The updater's Cancel goes with 7a**, not separately: unlike backup's, its source belongs to the
      harness and can serve slowly on purpose. If the seeding measures expensive, it moves to a 7c and
      the evidence says so, rather than going quiet.
+
+   ~~**7b — the database recovery (2).**~~ **Done on 2026-08-17, 40 → 38**, in two commits and with
+   **no product defect at all** — the third such batch in eleven:
+   [the two exits](evidence/stable/audit-recovery-exits.md) and
+   [the screen pressed](evidence/stable/audit-walk-database-recovery.md).
+
+   - **The two exits are one port with two methods and one caller**, chosen in the composition by
+     `SystemHandoffDirectory` the way the other three are. What is written down is one line per
+     handover with a verb in front — `open-folder <path>`, `exit` — and the verb is what lets a probe
+     tell the two apart without parsing.
+   - **A finding that decided the design, and the compiler decided it:**
+     `IClassicDesktopStyleApplicationLifetime` is **not implementable by user code** — Avalonia
+     carries a member whose name is the warning itself — so no double can stand in for one and the
+     "there is a lifetime" half cannot be exercised anywhere. The lookup stays in `CompositionRoot`,
+     where **two literal copies** of it already lived and now there is one; what reaches the exit is
+     the call, and both new classes land at **100/100**.
+   - **The mount cost exactly what was predicted: one type change.** `ShellHost.Shell` from
+     `ShellView` to `Control`, with the view model optional **behind the property it always had**; the
+     five uses of `Shell` only walk the visual tree and the sixty-seven of `ViewModel` are untouched.
+     A shared `Mount` came out of it too, because the two ways of mounting differ only in which
+     settled content they assert.
+   - **What stays out, and is said:** the window's close and the tray's exit **still shut down
+     directly**. That is another path, with the placement saving around it, and an isolated run
+     arriving that way would still shut down — unmeasured.
 8. **Batch 2 (the rest) — the player and its overlays (29).** The longest, and the only one needing
    real video: tracks, audio output, subtitle style, markers, resume, next episode, version switch,
    loose file, and player recovery. **Measured warning: the five remaining overlays set no
@@ -228,10 +252,10 @@ one**, and this checks it.
    **each is corrected in its own batch with its own measurement**, not in bulk. **32 → 3**, and the
    last three with them: **0.**
 9. **Code coverage, to the same destination.** The gate watches new files and a short list today —
-   **seven since 2026-08-16**, with `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs` and
-   `HandoffArchivePicker.cs` added at 100/100 because they are the **three exits** the isolation rule
-   went through and what decides what leaves the application — so **an old file that gets
-   worse is still watched by nobody**. **Decided**: every old file a batch touches and leaves at the
+   **nine since 2026-08-17**, with `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
+   `HandoffArchivePicker.cs`, `WindowsSystemHandoff.cs` and `RecordingSystemHandoff.cs` at 100/100
+   because they are the **five exits** the isolation rule went through and what decides what leaves
+   the application — so **an old file that gets worse is still watched by nobody**. **Decided**: every old file a batch touches and leaves at the
    floor joins that list when the batch closes, and once the walk reaches 0, `check-coverage.ps1`
    measures **all of `src/`** against the usual floor (96 % of lines and of branches) with an
    exception list under the house rule: **it can only shrink**.
@@ -261,7 +285,7 @@ it belongs to the owner.
 **describes an artifact**: its provenance is the package's own, so regenerating it against an
 `artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
 the manifest is part of cutting a release, not part of a working session. **Decided**: they go into
-the matrix **when the manifest is regenerated against a freshly built package** — there are seven now,
+the matrix **when the manifest is regenerated against a freshly built package** — there are nine now,
 so that step stops being optional at the next release — and until then they live in
 `docs/evidence/stable/`, linked from here:
 
@@ -272,6 +296,8 @@ so that step stops being optional at the next release — and until then they li
 5. [the inbox's coverage](evidence/stable/audit-review-inbox-coverage.md)
 6. [the shell and home](evidence/stable/audit-walk-shell-and-home.md)
 7. [root onboarding](evidence/stable/audit-walk-root-onboarding.md)
+8. [the recovery screen's two exits](evidence/stable/audit-recovery-exits.md)
+9. [the recovery screen pressed](evidence/stable/audit-walk-database-recovery.md)
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would

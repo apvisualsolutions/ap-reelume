@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **40**, con **88 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **38**, con **90 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -226,6 +226,30 @@ correcta**, y con esto se comprueba.
    - **«Cancelar» del actualizador va con la 7a**, no aparte: a diferencia del de copias, su fuente es
      del arnés y puede servir despacio a propósito. Si medida la siembra sale cara, se aparta a una
      7c y se dice en la evidencia, sin silencio.
+
+   ~~**7b — la recuperación de la base (2).**~~ **Hecha el 2026-08-17, 40 → 38**, en dos commits y
+   **sin un solo defecto de producto** —el tercero así en once tandas—:
+   [las dos salidas](evidence/stable/audit-recovery-exits.md) y
+   [la pantalla pulsada](evidence/stable/audit-walk-database-recovery.md).
+
+   - **Las dos salidas son un puerto con dos métodos y un solo llamante**, elegido en la composición
+     por `SystemHandoffDirectory` igual que las tres anteriores. Lo anotado es una línea por entrega
+     con un verbo delante —`open-folder <ruta>`, `exit`—, y el verbo es lo que deja a una sonda
+     distinguir las dos sin analizar nada.
+   - **Un hallazgo que decidió el diseño, y lo decidió el compilador:**
+     `IClassicDesktopStyleApplicationLifetime` **no es implementable por código de usuario** —Avalonia
+     lleva un miembro cuyo nombre es el propio aviso—, así que ningún doble puede sustituirlo y la
+     mitad «hay ciclo de vida» no se puede ejercitar en ningún sitio. La búsqueda se queda en
+     `CompositionRoot`, donde ya vivían **dos copias literales** de la misma expresión y ahora hay
+     una; lo que llega a la salida es la llamada, y las dos clases nuevas quedan al **100/100**.
+   - **El montaje costó exactamente lo previsto: un cambio de tipo.** `ShellHost.Shell` de `ShellView`
+     a `Control`, con el modelo de vista opcional **detrás de la misma propiedad**; los cinco usos de
+     `Shell` sólo recorren el árbol visual y los sesenta y siete de `ViewModel` no se tocan. Salió
+     además un `Mount` común, porque las dos formas de montar sólo se diferencian en qué contenido
+     afirman.
+   - **Lo que sigue fuera y está dicho:** cerrar la ventana y salir por la bandeja **siguen apagando
+     directamente**. Es otro camino del producto, con el guardado de la posición alrededor, y una
+     ejecución aislada que llegue por ahí sí apagaría — sin medir.
 8. **Tanda 2 (resto) — el reproductor y sus superpuestos (29).** La más larga y la única que necesita
    vídeo real: pistas, salida de audio, estilo de subtítulos, marcadores, reanudar, siguiente
    episodio, cambio de versión, archivo suelto y recuperación del reproductor. **Advertencia medida:
@@ -233,10 +257,10 @@ correcta**, y con esto se comprueba.
    que el de estado corregido el 2026-08-15; **cada uno se corrige en su tanda con su medición**, no
    en bloque. **32 → 3**, y los tres últimos con ellos: **0.**
 9. **La cobertura de código, al mismo destino.** Hoy la puerta vigila los archivos nuevos y una lista
-   corta —**siete desde el 2026-08-16**, con `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs` y
-   `HandoffArchivePicker.cs` añadidos al 100/100 porque son las **tres salidas** que la regla de
-   aislamiento atravesó y los que deciden qué sale de la aplicación—, así que **un archivo
-   antiguo que empeora sigue sin vigilarse**. **Decidido**: cada archivo antiguo que una tanda toque y
+   corta —**nueve desde el 2026-08-17**, con `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
+   `HandoffArchivePicker.cs`, `WindowsSystemHandoff.cs` y `RecordingSystemHandoff.cs` al 100/100
+   porque son las **cinco salidas** que la regla de aislamiento atravesó y las que deciden qué sale de
+   la aplicación—, así que **un archivo antiguo que empeora sigue sin vigilarse**. **Decidido**: cada archivo antiguo que una tanda toque y
    deje en el suelo entra en esa lista al cerrarla, y cuando el paseo llegue a 0,
    `check-coverage.ps1` pasa a medir **todo `src/`** con el suelo de siempre (96 % de líneas y de
    ramas) y una lista de excepciones con la regla de la casa: **sólo puede encoger**.
@@ -266,7 +290,7 @@ propietario.
 un artefacto**: su procedencia es la del paquete, así que regenerarlo con el `artifacts/package/` de
 otra compilación escribiría una procedencia que no es la de nadie. Regenerar el manifiesto es parte de
 cortar una versión, no de una sesión de trabajo. **Decidido**: entran en la matriz **cuando se
-regenere el manifiesto con un paquete recién construido** —ya son siete, así que ese paso deja de ser
+regenere el manifiesto con un paquete recién construido** —ya son nueve, así que ese paso deja de ser
 opcional en la próxima versión— y hasta entonces viven en `docs/evidence/stable/`, enlazadas aquí:
 
 1. [el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md)
@@ -276,6 +300,8 @@ opcional en la próxima versión— y hasta entonces viven en `docs/evidence/sta
 5. [la cobertura de la bandeja](evidence/stable/audit-review-inbox-coverage.md)
 6. [el shell y el inicio](evidence/stable/audit-walk-shell-and-home.md)
 7. [el onboarding de raíces](evidence/stable/audit-walk-root-onboarding.md)
+8. [las dos salidas de la recuperación](evidence/stable/audit-recovery-exits.md)
+9. [la pantalla de recuperación pulsada](evidence/stable/audit-walk-database-recovery.md)
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

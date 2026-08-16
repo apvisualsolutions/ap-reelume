@@ -101,8 +101,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   itself: a check that pressed the first would open an Explorer window on the machine doing the
   measuring, and one that pressed the second would **end the program doing the measuring**. A test
   run — the one that is not yours — now writes down what it would have handed to Windows instead of
-  handing it over, exactly as it already did for the trailer link and the backup dialogs. Your
-  installation is unchanged: Explorer still opens, and leaving still leaves.
+  handing it over, exactly as it already did for the trailer link and the backup dialogs, and both
+  buttons are pressed with the mouse while what folder they would have shown is checked. It is the
+  one screen in the application no route leads to — it appears only if your library will not open —
+  so until today nobody had walked it at all. Your installation is unchanged: Explorer still opens,
+  and leaving still leaves.
 
 - **Checking that the program installs, upgrades, repairs and uninstalls properly is now done by the
   repository, not by somebody remembering.** Those four things are Windows' to do, not ours, so they

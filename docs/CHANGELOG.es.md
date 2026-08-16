@@ -103,8 +103,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Explorador en la máquina que está midiendo, y una que pulsara la segunda **terminaría el programa
   que está midiendo**. Ahora una ejecución de prueba —la que no es la tuya— anota lo que le habría
   entregado a Windows en vez de entregárselo, igual que ya hacía con el enlace al tráiler y con los
-  diálogos de copia. Tu instalación no cambia en nada: sigue abriéndose el Explorador, y salir sigue
-  saliendo.
+  diálogos de copia, y los dos botones se pulsan con el ratón comprobando qué carpeta habrían
+  enseñado. Es la única pantalla de la aplicación a la que no lleva ninguna ruta —aparece sólo si tu
+  biblioteca no abre—, así que hasta hoy nadie la había recorrido entera. Tu instalación no cambia en
+  nada: sigue abriéndose el Explorador, y salir sigue saliendo.
 
 - **La comprobación de que el programa se instala, se actualiza, se repara y se desinstala bien la
   hace ahora el repositorio, no una persona acordándose.** Esas cuatro cosas las hace Windows, no
