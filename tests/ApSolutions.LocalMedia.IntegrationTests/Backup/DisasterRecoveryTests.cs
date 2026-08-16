@@ -802,6 +802,10 @@ internal sealed class RestoreFixture : IDisposable
         public string StartupRegistrySubKey { get; } =
             @"Software\APSolutions\LocalMedia\Tests\Run";
 
+        // And nothing this suite drives may reach the operating system either, so the handover it
+        // would otherwise make lands under its own root.
+        public string? SystemHandoffDirectory { get; } = Path.Combine(dataRoot, "handoff");
+
         public string RestoreStagingDirectory => Path.Combine(BackupsDirectory, ".restore");
     }
 

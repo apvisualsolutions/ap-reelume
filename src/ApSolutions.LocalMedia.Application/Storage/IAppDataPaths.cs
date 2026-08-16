@@ -41,4 +41,19 @@ public interface IAppDataPaths
     /// </para>
     /// </summary>
     string StartupRegistrySubKey { get; }
+
+    /// <summary>
+    /// Where a run that does not own this machine's profile writes what it would otherwise have
+    /// handed to the operating system, and <see langword="null"/> for the run that does — which
+    /// hands it over for real.
+    /// <para>
+    /// The same rule as <see cref="StartupRegistrySubKey"/>, applied to the exits that leave the
+    /// application altogether: an address goes to the browser, a chosen path comes back from a modal
+    /// dialog. A harness cannot answer a dialog and must not open a browser on the machine measuring
+    /// it, so an isolated run writes the address down and reads the path from what its own root
+    /// declares. <see langword="null"/> rather than a folder nobody uses, because the distinction is
+    /// not <em>where</em> the handover goes but <em>whether</em> it happens at all.
+    /// </para>
+    /// </summary>
+    string? SystemHandoffDirectory { get; }
 }

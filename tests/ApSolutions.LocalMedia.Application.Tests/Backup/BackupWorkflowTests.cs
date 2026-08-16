@@ -308,6 +308,10 @@ public sealed class BackupWorkflowTests : IDisposable
         // Never the key Windows reads at sign-in: a suite leaves nothing behind there.
         public string StartupRegistrySubKey { get; } =
             @"Software\APSolutions\LocalMedia\Tests\Run";
+
+        // And nothing this suite drives may reach the operating system either, so the handover it
+        // would otherwise make lands under its own root.
+        public string? SystemHandoffDirectory { get; } = Path.Combine(dataRoot, "handoff");
     }
 
     private sealed class FakeSnapshotWriter(string source, Action? onSnapshot) : IBackupSnapshotWriter

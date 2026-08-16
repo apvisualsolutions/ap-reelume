@@ -30,7 +30,11 @@ public sealed class AppDataPaths : IAppDataPaths
         PersonalArtworkDirectory = Path.Combine(DataRoot, "personal-artwork");
         RemoteCacheDirectory = Path.Combine(DataRoot, "cache", "artwork");
         DiagnosticsDirectory = Path.Combine(DataRoot, "diagnostics");
-        StartupRegistrySubKey = ResolveStartupSubKey(DataRoot);
+        var ownsProfile = OwnsProfile(DataRoot);
+        StartupRegistrySubKey = ownsProfile
+            ? WindowsStartupService.WindowsRunKey
+            : ResolveIsolatedStartupSubKey(DataRoot);
+        SystemHandoffDirectory = ownsProfile ? null : Path.Combine(DataRoot, "handoff");
     }
 
     public string DataRoot { get; }
@@ -49,30 +53,35 @@ public sealed class AppDataPaths : IAppDataPaths
 
     public string StartupRegistrySubKey { get; }
 
+    public string? SystemHandoffDirectory { get; }
+
     /// <summary>
-    /// The key Windows reads at sign-in for the run that owns this machine's profile, and a key of
-    /// its own for a run that does not.
+    /// Whether this root belongs to the person who signs in on this machine, which is what decides
+    /// every handover the application makes to Windows itself.
     /// </summary>
     /// <remarks>
     /// The rule is the same one <see cref="ResolveDefaultRoot"/> follows, and it is deliberately
     /// about the resolved root rather than about the variable: somebody who moves their data with
-    /// <see cref="DataRootVariableName"/> is still the person who signs in here, and their startup
-    /// entry has to be the one Windows reads. A run handed a root that is neither — a test harness,
-    /// a walk, a lifecycle check — is a run that must leave nothing behind, so it writes under a key
-    /// named after that root and nowhere near sign-in.
+    /// <see cref="DataRootVariableName"/> is still the person who signs in here, so their startup
+    /// entry has to be the one Windows reads and their browser has to open. A run handed a root that
+    /// is neither — a test harness, a walk, a lifecycle check — is a run that must leave nothing
+    /// behind.
     /// </remarks>
-    private static string ResolveStartupSubKey(string dataRoot)
-    {
+    private static bool OwnsProfile(string dataRoot) =>
         // Trimmed and upper-cased before either comparing or naming, because the same folder spelt
         // with a trailing separator or in another case is the same folder — and a run that found a
         // different key on its second launch would leave a second entry behind.
-        var root = Path.TrimEndingDirectorySeparator(dataRoot).ToUpperInvariant();
-        var owned = Path.TrimEndingDirectorySeparator(Path.GetFullPath(ResolveDefaultRoot())).ToUpperInvariant();
-        if (string.Equals(root, owned, StringComparison.Ordinal))
-        {
-            return WindowsStartupService.WindowsRunKey;
-        }
+        string.Equals(
+            Path.TrimEndingDirectorySeparator(dataRoot).ToUpperInvariant(),
+            Path.TrimEndingDirectorySeparator(Path.GetFullPath(ResolveDefaultRoot())).ToUpperInvariant(),
+            StringComparison.Ordinal);
 
+    /// <summary>
+    /// A startup key named after the root, for a run that must stay away from sign-in.
+    /// </summary>
+    private static string ResolveIsolatedStartupSubKey(string dataRoot)
+    {
+        var root = Path.TrimEndingDirectorySeparator(dataRoot).ToUpperInvariant();
         var token = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(root)).AsSpan(0, 8));
         return $@"Software\APSolutions\LocalMedia\Isolated\{token}\Run";
     }

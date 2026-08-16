@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Domain.Metadata;
 
 namespace ApSolutions.LocalMedia.Windows.Metadata;
 
@@ -13,18 +14,12 @@ namespace ApSolutions.LocalMedia.Windows.Metadata;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The refusals here repeat what <c>TrailerLinkPolicy</c> already guarantees, on purpose and for
-/// the same reason the playback launcher re-checks a file extension every caller has already
-/// filtered: this is the one place that talks to the shell, so this is where the promise has to
-/// hold — not in the good behaviour of everyone who might one day call it.
-/// </para>
-/// <para>
-/// Two checks, and the second is the one a reader does not expect. Requiring <c>https</c> rules out
-/// <c>file:</c>, <c>javascript:</c> and every custom scheme some installed application has claimed.
-/// Rejecting user information rules out <c>https://www.youtube.com@example.invalid/</c>, which is a
-/// valid https address whose host is <c>example.invalid</c> and whose left-hand side is there to be
-/// read by a person rather than by the browser. Neither can be produced by the policy today; both
-/// are what this layer exists to refuse if something else ever composes an address.
+/// The refusal repeats what <c>TrailerLinkPolicy</c> already guarantees, on purpose and for the same
+/// reason the playback launcher re-checks a file extension every caller has already filtered: this
+/// is the one place that talks to the shell, so this is where the promise has to hold — not in the
+/// good behaviour of everyone who might one day call it. What it asks is
+/// <see cref="ExternalLinkPolicy"/>, which is the rule itself and is shared with the isolated exit
+/// so the two can never come to disagree about what may leave.
 /// </para>
 /// </remarks>
 public sealed class ShellExternalLinkLauncher : IExternalLinkLauncher
@@ -53,10 +48,7 @@ public sealed class ShellExternalLinkLauncher : IExternalLinkLauncher
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(link);
         cancellationToken.ThrowIfCancellationRequested();
-        if (!Uri.TryCreate(link, UriKind.Absolute, out var address)
-            || !string.Equals(address.Scheme, Uri.UriSchemeHttps, StringComparison.Ordinal)
-            || address.UserInfo.Length > 0
-            || string.IsNullOrEmpty(address.Host))
+        if (!ExternalLinkPolicy.TryAccept(link, out var address))
         {
             return Task.FromResult(false);
         }

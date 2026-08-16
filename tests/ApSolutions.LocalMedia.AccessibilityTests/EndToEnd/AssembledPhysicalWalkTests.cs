@@ -24,6 +24,7 @@ using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
+using ApSolutions.LocalMedia.Windows.Metadata;
 using ApSolutions.LocalMedia.Windows.Shell;
 using Avalonia;
 using Avalonia.Automation;
@@ -221,7 +222,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var duration = TimeSpan.FromSeconds(3);
         var firstId = await SeedMediaFileAsync(factory, media, first, duration);
         var secondId = await SeedMediaFileAsync(factory, media, second, duration);
-        await SeedSeriesAsync(factory, firstId, secondId);
+        _ = await SeedSeriesAsync(factory, firstId, secondId);
 
         using var host = ShowShell();
         await host.ViewModel.OpenPlayerAsync(
@@ -975,6 +976,111 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The provider's trailer offer (LIB-015), pressed with the mouse on both cards — and the
+    /// address each press would have opened, read back.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This scene is what the isolation rule was for. The press hands an address to the shell, which
+    /// opens a real browser on whatever machine the suite runs on, so the control had been declared
+    /// uncoverable on both cards. A run whose data root is not this machine's profile now writes the
+    /// address down under that root instead, so the press can happen and — the part that matters —
+    /// what it would have opened can be asserted. Nothing in this repository checked that before:
+    /// every assertion stopped at the view model, because the layer past it went to a browser.
+    /// </para>
+    /// <para>
+    /// Two cards, two different stored keys, and the addresses read back in order: one key on the
+    /// film and another on the series is what tells the two presses apart. The same resource key is
+    /// declared in both cards, and each is the control it is — pressing one proves nothing about the
+    /// other.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_provider_trailer_link_is_pressed_on_both_cards_and_says_where_it_would_have_gone()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var film = Path.Combine(media, "Arrival.2016.mp4");
+        var firstEpisode = Path.Combine(media, "Show.S01E01.mp4");
+        var secondEpisode = Path.Combine(media, "Show.S01E02.mp4");
+
+        // Nothing decodes on a card, so the files only have to exist and be catalogued.
+        foreach (var path in new[] { film, firstEpisode, secondEpisode })
+        {
+            await File.WriteAllBytesAsync(path, [0x41, 0x50], TestContext.Current.CancellationToken);
+        }
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var filmId = await SeedMediaFileAsync(factory, media, film, TimeSpan.FromMinutes(116));
+        var showId = await SeedSeriesAsync(
+            factory,
+            await SeedMediaFileAsync(factory, media, firstEpisode, TimeSpan.FromMinutes(42)),
+            await SeedMediaFileAsync(factory, media, secondEpisode, TimeSpan.FromMinutes(42)));
+        await SeedTrailerKeyAsync(factory, new TitleId(filmId), "FilmTrailer");
+        await SeedTrailerKeyAsync(factory, new TitleId(showId), "ShowTrailer");
+
+        // Where an isolated run says it puts what it would have handed to Windows. The walk reads the
+        // application's own answer rather than composing a path of its own, because the rule is the
+        // application's to state.
+        var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
+        Assert.NotNull(handoff);
+        var record = Path.Combine(handoff!, RecordingExternalLinkLauncher.FileName);
+        string Recorded() => File.Exists(record) ? File.ReadAllText(record) : string.Empty;
+
+        using var host = ShowShell(height: 1600);
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+
+        await library.OpenDetailsAsync(
+            library.Items.Single(item => item.Item.Id.Value == filmId),
+            TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(
+            library.MovieDetails.HasTrailerLink,
+            "The film card offered no provider trailer, so there was nothing to press.");
+
+        await PressAsync(
+            host,
+            "DetailsTrailerLinkAction",
+            Recorded,
+            "clicking the film card's trailer link never said where it would have gone");
+        Assert.Equal(
+            ["https://www.youtube.com/watch?v=FilmTrailer"],
+            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+
+        await library.OpenDetailsAsync(
+            library.Items.Single(item => item.Item.Kind == CatalogTitleKind.Show),
+            TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(LibrarySurface.ShowDetails, library.Surface);
+        Assert.True(
+            library.ShowDetails.HasTrailerLink,
+            "The series card offered no provider trailer, so there was nothing to press.");
+
+        await PressAsync(
+            host,
+            "DetailsTrailerLinkAction",
+            Recorded,
+            "clicking the series card's trailer link never said where it would have gone");
+
+        // Each card opened its own title's trailer, in the order they were pressed. The second line
+        // is what proves the series card is a control of its own rather than the film card's.
+        Assert.Equal(
+            [
+                "https://www.youtube.com/watch?v=FilmTrailer",
+                "https://www.youtube.com/watch?v=ShowTrailer",
+            ],
+            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
     /// The second batch: the player's transport, pressed with the mouse on a session the real engine
     /// is decoding. Pause and resume, both skips, mute, the volume slider, and stop.
     /// </summary>
@@ -1605,7 +1711,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// catalogue writes these rows during identification, which needs the network the harness does
     /// not have.
     /// </summary>
-    private static async Task SeedSeriesAsync(SqliteConnectionFactory factory, Guid firstFile, Guid secondFile)
+    private static async Task<Guid> SeedSeriesAsync(
+        SqliteConnectionFactory factory,
+        Guid firstFile,
+        Guid secondFile)
     {
         var showId = Guid.NewGuid();
         var firstEpisode = Guid.NewGuid();
@@ -1629,6 +1738,33 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         command.Parameters.AddWithValue("$f1", firstFile.ToString("D"));
         command.Parameters.AddWithValue("$f2", secondFile.ToString("D"));
         await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        return showId;
+    }
+
+    /// <summary>
+    /// The provider's trailer key, stored on a title the way an identification stores it.
+    /// </summary>
+    private static async Task SeedTrailerKeyAsync(
+        SqliteConnectionFactory factory,
+        TitleId titleId,
+        string trailerKey)
+    {
+        _ = await new CatalogMetadataRepository(factory).TrySaveAsync(
+            new CatalogMetadata(
+                titleId,
+                new EditableMetadata(
+                    "Arrival",
+                    OriginalTitle: null,
+                    Overview: null,
+                    ReleaseYear: 2016,
+                    Genres: [],
+                    PosterPath: null,
+                    BackdropPath: null,
+                    TrailerKey: trailerKey,
+                    LockedFields: new HashSet<MetadataField>()),
+                Revision: 0),
+            expectedRevision: 0,
+            TestContext.Current.CancellationToken);
     }
 
     private static async Task<long> CountAsync(SqliteConnectionFactory factory, string table)
