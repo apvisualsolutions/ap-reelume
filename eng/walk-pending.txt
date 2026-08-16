@@ -21,11 +21,6 @@ DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
 DuplicateReviewView#{Binding ShortPath}                    # batch 5
 EpisodeRowView#EpisodePlayAction                           # batch 1: the series card, which needs the show, season and episode rows seeded
 LibraryEntryView#HomeLibraryAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
-LifecycleSettingsView#LifecycleCloseToTrayLabel            # batch 4
-LifecycleSettingsView#LifecycleStartupConsentDecline       # batch 4
-LifecycleSettingsView#LifecycleStartupConsentGrant         # batch 4
-LifecycleSettingsView#LifecycleStartupLabel                # batch 4
-LifecycleSettingsView#LifecycleTrayLabel                   # batch 4
 LooseFileBanner#LooseFileAddFolderAction                   # batch 2
 LooseFileBanner#LooseFileCancelAction                      # batch 2
 LooseFileBanner#LooseFileConfirmAction                     # batch 2
@@ -40,13 +35,6 @@ NextEpisodeOverlay#NextEpisodePlayNow                      # batch 2
 PlayerVersionsView#PlayerVersionsSwitchAction              # batch 2
 PlayerView#PlayerRecoveryOpenExternally                    # batch 2
 PlayerView#PlayerRecoveryRetry                             # batch 2
-PrivacySettingsView#PrivacyAutoRefreshLabel                # batch 4
-PrivacySettingsView#PrivacyDiagnosticsLabel                # batch 4
-PrivacySettingsView#PrivacyExportLabel                     # batch 4
-PrivacySettingsView#PrivacyPreviewLabel                    # batch 4
-RecommendationSettingsView#RecommendationSettingsEnableLabel # batch 4
-RecommendationSettingsView#RecommendationSettingsThresholdApply # batch 4
-RecommendationSettingsView#RecommendationSettingsThresholdLabel # batch 4
 RecommendationsRailView#RecommendationsToggleAction        # unscheduled: the shell, home and onboarding are in none of the seven batches
 RestoreWizardView#RestoreChooseArchiveLabel                # batch 6
 RestoreWizardView#RestoreConfirmLabel                      # batch 6
@@ -78,7 +66,6 @@ ShellView#PlayerMiniModeAction                             # unscheduled: the sh
 ShellView#TitleEditMetadataAction                          # unscheduled: the shell, home and onboarding are in none of the seven batches
 ShellView#TitlePreviewRenameAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
 ShellView#TitleReviewDuplicatesAction                      # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShortcutSettingsView#ShortcutSettingsRestore               # batch 4
 ShowDetailsView#DetailsTrailerLinkAction                   # unreachable: same as the film card — the press leaves the application by design (LIB-015)
 SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2
 SubtitleStyleView#SubtitleStyleBackgroundOpacityLabel      # batch 2
