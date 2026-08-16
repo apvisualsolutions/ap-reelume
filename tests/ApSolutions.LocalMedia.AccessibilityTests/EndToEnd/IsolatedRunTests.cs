@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Windows;
@@ -167,5 +168,71 @@ public sealed class IsolatedRunTests : IDisposable
         Assert.Empty(Directory.Exists(owned)
             ? Directory.EnumerateFiles(owned, "*.zip", SearchOption.AllDirectories)
             : []);
+    }
+
+    /// <summary>
+    /// The same rule at what the recovery screen hands to Windows: an isolated run writes down the
+    /// folder it would have shown and the shutdown it would have asked for, and the run that owns
+    /// the profile is still the one that opens Explorer and ends.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Both halves are here rather than in two tests for the reason the archive dialogs are: merged
+    /// Cobertura reports keep the better reading per line and not the union, so a two-way choice
+    /// split across suites reads as half covered for good.
+    /// </para>
+    /// <para>
+    /// Only the isolated half is driven. Driving the owning one would open an Explorer window on
+    /// whoever ran the suite and then end the process running it, which is precisely what the rule
+    /// exists to prevent — so what is asserted there is which exit was built, before anything is
+    /// asked of it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task An_isolated_run_writes_down_what_the_recovery_screen_hands_to_windows()
+    {
+        var isolated = Path.Combine(_dataRoot, "handoff-isolated");
+        var folder = Path.Combine(isolated, "backups");
+        await using (var host = ApplicationHost.Create(new AppDataPaths(isolated)))
+        {
+            var handoff = host.Services.GetRequiredService<ISystemHandoff>();
+            Assert.IsNotType<WindowsSystemHandoff>(handoff);
+
+            Assert.True(handoff.TryOpenFolder(folder));
+            handoff.RequestExit();
+        }
+
+        var record = Path.Combine(
+            new AppDataPaths(isolated).SystemHandoffDirectory!,
+            RecordingSystemHandoff.FileName);
+        Assert.Equal(
+            [
+                $"{RecordingSystemHandoff.OpenFolderVerb} {folder}",
+                RecordingSystemHandoff.ExitVerb,
+            ],
+            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// And the person whose profile this is keeps what the screen is for: Explorer opens on the copy
+    /// they can restore from, and leaving ends the application.
+    /// </summary>
+    [Fact]
+    public async Task The_run_that_owns_the_profile_still_hands_the_recovery_screen_to_windows()
+    {
+        var owned = Path.Combine(_dataRoot, "handoff-owned");
+        var previous = Environment.GetEnvironmentVariable(AppDataPaths.DataRootVariableName);
+        Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, owned);
+        try
+        {
+            await using var host = ApplicationHost.Create(new AppDataPaths());
+
+            _ = Assert.IsType<WindowsSystemHandoff>(
+                host.Services.GetRequiredService<ISystemHandoff>());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, previous);
+        }
     }
 }

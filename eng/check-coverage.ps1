@@ -238,6 +238,21 @@ try {
             Lines    = 100.00
             Branches = 100.00
         }
+
+        # The fourth and fifth exits, on 2026-08-17: what the recovery screen hands to Windows when
+        # the database will not open — the folder a copy would be in, and the request to end. They
+        # join the other three because they decide what leaves the application, and because the
+        # screen they serve is the one nobody can reach from inside the shell.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Shell/WindowsSystemHandoff.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Shell/RecordingSystemHandoff.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
     )
 
     $watchRows = @()
