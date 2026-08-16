@@ -23,6 +23,7 @@ using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.Presentation.Recovery;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Theme;
@@ -2132,6 +2133,87 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 7b: the screen that appears when the library will not open, pressed with the mouse, and
+    /// what each press would have handed to Windows read back.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// No route leads here, and that is not an oversight: <c>CreateShell</c> builds this screen only
+    /// when the startup's answer is a refusal, so the scene has to seed a database that cannot be
+    /// used and let the application decide. Which is also why the shell's own mount cannot be used —
+    /// it asserts the settled content is the shell, and here it is deliberately not.
+    /// </para>
+    /// <para>
+    /// Both controls were uncoverable for the same reason and it is the reason the isolation rule
+    /// exists: one opened a real Explorer window on whichever machine was measuring, and the other
+    /// called shutdown on the process doing the measuring. The second is the harder shape — under a
+    /// headless harness there is no desktop lifetime, so it did nothing at all, which is exactly what
+    /// a broken control also does.
+    /// </para>
+    /// <para>
+    /// The probe is the handover record as text. Text and not a list, because a probe is compared by
+    /// value and a fresh array every read would report "it changed" for the click that must change
+    /// nothing.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_recovery_screen_is_pressed_when_the_library_will_not_open()
+    {
+        // A database that is not a database. What the migration says about it is the application's
+        // to decide; the scene only makes the file unusable, which is what a person meets.
+        Directory.CreateDirectory(_dataRoot);
+        var paths = new AppDataPaths(_dataRoot);
+        await File.WriteAllTextAsync(
+            paths.DatabasePath,
+            "this file is not a database",
+            TestContext.Current.CancellationToken);
+
+        // And a copy for the screen to offer, so the folder the first press shows is a folder a copy
+        // is really in rather than the place one would have been.
+        await File.WriteAllTextAsync(
+            $"{paths.DatabasePath}.pre-migration-20260817T000000Z.bak",
+            "a copy of a library",
+            TestContext.Current.CancellationToken);
+
+        // Where this run says it puts what it would have handed to Windows. Asserting it is not null
+        // is what proves this scene tests the isolated exit rather than passing quietly against one
+        // that would have opened a window on whoever ran it.
+        var handoff = paths.SystemHandoffDirectory;
+        Assert.NotNull(handoff);
+        var record = Path.Combine(handoff!, RecordingSystemHandoff.FileName);
+        string HandedOver() => File.Exists(record) ? File.ReadAllText(record) : string.Empty;
+
+        using var host = ShowRecovery(height: 1000);
+
+        await PressAsync(
+            host,
+            "RecoveryOpenBackupFolder",
+            HandedOver,
+            "clicking Open the backup folder never said which folder it would have shown");
+
+        // The folder is the one the copies are in, which is the application's answer and not a path
+        // this scene composed.
+        Assert.Equal(
+            [$"{RecordingSystemHandoff.OpenFolderVerb} {paths.DataRoot}"],
+            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+
+        await PressAsync(
+            host,
+            "RecoveryExit",
+            HandedOver,
+            "clicking Exit never asked for anything, which is what it did before this rule existed");
+
+        // Both handovers, in the order they were pressed. The second line is the whole of what
+        // leaving does — an application that ended here would have taken the suite with it.
+        Assert.Equal(
+            [
+                $"{RecordingSystemHandoff.OpenFolderVerb} {paths.DataRoot}",
+                RecordingSystemHandoff.ExitVerb,
+            ],
+            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
     /// Waits for a backup operation to finish and says what it finished as.
     /// </summary>
     /// <remarks>
@@ -2765,6 +2847,48 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
     private ShellHost ShowShell(int height = 1000)
     {
+        var (application, window, settled) = Mount(height);
+
+        // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
+        // for it. The wait names what stood in its place if it never comes.
+        var shell = Assert.IsType<ShellView>(settled);
+        return new ShellHost(
+            application,
+            window,
+            shell,
+            Assert.IsType<ShellViewModel>(shell.DataContext),
+            _teardownFailures.Add);
+    }
+
+    /// <summary>
+    /// The screen the shell cannot lead to: the one the startup puts up instead of the shell when
+    /// the database refuses to open.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It is mounted the same way and by the same call — <c>CreateShell</c> decides between the two
+    /// itself, and which one it decided is read rather than asked for. The seeding is the scene's,
+    /// because what makes this screen appear is a database on disk that cannot be used.
+    /// </para>
+    /// <para>
+    /// The host is the same record with no shell view model in it, which is what it costs: five uses
+    /// of <c>host.Shell</c> only ever walk the visual tree, so the type widens to <c>Control</c>, and
+    /// the sixty-seven uses of <c>host.ViewModel</c> keep the property they always had.
+    /// </para>
+    /// </remarks>
+    private ShellHost ShowRecovery(int height = 1000)
+    {
+        var (application, window, settled) = Mount(height);
+
+        var recovery = Assert.IsType<DatabaseRecoveryView>(settled);
+        return new ShellHost(application, window, recovery, null, _teardownFailures.Add);
+    }
+
+    /// <summary>
+    /// Builds the application, shows what it hands the window, and waits for the startup to settle.
+    /// </summary>
+    private (ApplicationHost Application, Window Window, Control Settled) Mount(int height)
+    {
         Assert.NotNull(Avalonia.Application.Current);
         ApSolutions.LocalMedia.Presentation.App.ApplyLanguage(
             Avalonia.Application.Current,
@@ -2782,27 +2906,27 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var window = new Window { Width = 1600, Height = height, Content = created };
         window.Show();
 
-        // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
-        // for it. The wait names what stood in its place if it never comes.
-        var shell = Assert.IsType<ShellView>(AssembledStartup.FinalContent(created));
+        var settled = AssembledStartup.FinalContent(created);
         Dispatcher.UIThread.RunJobs();
         window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
-        return new ShellHost(
-            application,
-            window,
-            shell,
-            Assert.IsType<ShellViewModel>(shell.DataContext),
-            _teardownFailures.Add);
+        return (application, window, settled);
     }
 
     private sealed record ShellHost(
         ApplicationHost Application,
         Window Window,
-        ShellView Shell,
-        ShellViewModel ViewModel,
+        Control Shell,
+        ShellViewModel? ShellModel,
         Action<Exception> ReportTeardownFailure) : IDisposable
     {
+        /// <summary>
+        /// The shell's view model, for the scenes that have a shell at all.
+        /// </summary>
+        public ShellViewModel ViewModel => ShellModel ?? throw new InvalidOperationException(
+            "This scene mounted the recovery screen, which stands in the shell's place and has no "
+                + "shell view model to ask.");
+
         public void Dispose()
         {
             // The close walks the assembled path: the window lifecycle's handler flushes and stops

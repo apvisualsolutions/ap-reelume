@@ -11,8 +11,6 @@
 AudioOutputView#AudioOutputDeviceLabel                     # batch 2
 AudioOutputView#AudioOutputLayoutLabel                     # batch 2
 BackupView#BackupCancelLabel                               # batch 6b: only exists while a copy runs
-DatabaseRecoveryView#RecoveryExit                          # batch 7
-DatabaseRecoveryView#RecoveryOpenBackupFolder              # batch 7
 DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewCorrect       # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
@@ -40,11 +38,11 @@ SubtitleStyleView#SubtitleStyleSizeLabel                   # batch 2
 TrackSelectorView#TrackSelectorAudioLabel                  # batch 2
 TrackSelectorView#TrackSelectorRememberForSeries           # batch 2
 TrackSelectorView#TrackSelectorSubtitleLabel               # batch 2
-UpdateView#UpdateAutomaticCheckLabel                       # batch 7
-UpdateView#UpdateCancelLabel                               # batch 7
-UpdateView#UpdateCheckLabel                                # batch 7
-UpdateView#UpdateDownloadLabel                             # batch 7
-UpdateView#UpdateInstallLabel                              # batch 7
+UpdateView#UpdateAutomaticCheckLabel                       # batch 7a
+UpdateView#UpdateCancelLabel                               # batch 7a
+UpdateView#UpdateCheckLabel                                # batch 7a
+UpdateView#UpdateDownloadLabel                             # batch 7a
+UpdateView#UpdateInstallLabel                              # batch 7a
 VersionSwitchDialog#VersionSwitchCancel                    # batch 2
 VersionSwitchDialog#VersionSwitchConfirm                   # batch 2
 VersionSwitchDialog#VersionSwitchRestart                   # batch 2

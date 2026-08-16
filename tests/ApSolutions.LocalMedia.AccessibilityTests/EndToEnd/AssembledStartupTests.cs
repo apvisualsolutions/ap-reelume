@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using ApSolutions.LocalMedia.Presentation;
+using ApSolutions.LocalMedia.Presentation.Recovery;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Shell;
@@ -73,6 +74,27 @@ public sealed class AssembledStartupTests : IDisposable
         var settled = AssembledStartup.FinalContent(scope.Application.CreateShell());
 
         Assert.IsType<ShellView>(settled);
+    }
+
+    /// <summary>
+    /// And when the database refuses, the recovery screen takes that place instead — which is the
+    /// only way this application ever reaches that screen.
+    /// </summary>
+    /// <remarks>
+    /// The file is made unusable rather than the refusal being simulated: what turns an unopenable
+    /// database into a screen is the startup's own decision, and a test that handed the decision in
+    /// would be asserting on its own argument.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_recovery_screen_takes_the_startup_view_s_place_when_the_database_will_not_open()
+    {
+        Directory.CreateDirectory(_dataRoot);
+        File.WriteAllText(Path.Combine(_dataRoot, "library.db"), "this file is not a database");
+        using var scope = CreateApplication();
+
+        var settled = AssembledStartup.FinalContent(scope.Application.CreateShell());
+
+        _ = Assert.IsType<DatabaseRecoveryView>(settled);
     }
 
     /// <summary>
