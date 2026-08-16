@@ -384,6 +384,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La verificación automática ya pulsa los ajustes con el ratón.** La página de ajustes es más alta
+  que la ventana, y el recorrido que conduce la aplicación construida sólo sabía bajar por ella: una
+  vez pulsado algo, todo lo que quedaba más arriba dejaba de alcanzarse. Ahora vuelve al principio de
+  la página y sólo se desplaza cuando hace falta, así que cada pulsación vale por sí sola sin
+  depender de cuál se hizo antes. Con eso quedan comprobados con el ratón el tema claro, el oscuro,
+  el del sistema, los dos idiomas, la vigilancia de carpetas locales y la detección de segmentos: se
+  pulsan y se comprueba que la preferencia cambia de verdad — y, antes, que pulsar al lado no cambia
+  nada.
 - **El renombrado ya renombra.** Proponía el nombre que el archivo ya tenía, así que la
   previsualización salía siempre vacía y los botones de Renombrar y Deshacer no podían hacer nada por
   mucho que se pulsaran. Ahora propone el nombre que la ficha merece, con el convenio que leen Plex,

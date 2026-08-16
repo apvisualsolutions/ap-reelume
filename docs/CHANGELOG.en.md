@@ -376,6 +376,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The automated verification now presses the settings with the mouse.** The settings page is taller
+  than the window, and the walk that drives the built application only knew how to go down it: once
+  something had been pressed, everything above it became unreachable. It now returns to the top of
+  the page and scrolls only when it has to, so each press stands on its own regardless of which one
+  came before. That covers, by mouse, the light theme, the dark one, the system one, both languages,
+  local-folder watching and segment detection: each is pressed and the preference is checked to have
+  actually changed — and, first, that clicking beside it changes nothing.
 - **The rename now renames.** It proposed the name the file already had, so the preview was always
   empty and the Rename and Undo buttons could do nothing however often they were pressed. It now
   proposes the name the entry deserves, in the convention Plex, Jellyfin and Kodi all read:

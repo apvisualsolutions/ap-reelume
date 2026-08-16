@@ -14,20 +14,17 @@ here; what remains is carrying them out, measuring before correcting.
    and year travel **together from one source** — crossing them wrote `Arrival 2016 (2016).mp4`.
    Detail in
    [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
-2. **Walk batch 4 — settings. BLOCKED BY THE HARNESS, measured on 2026-08-16.** Not the product:
-   the walk **cannot go back up**. Settings is the first scrolling page — extent 3680 in a 2000-tall
-   window — every press leaves the scroll where it stopped, and a control left above the viewport is
-   out of reach. And where the layout says the control is, the click does not arrive: a handler on
-   `Button.ClickEvent` measured that with the offset at 0 no button received the press, and with it
-   at 106 one did. Seven fixes were tried and none resolved it; what did remain is that the harness
-   **now names where the press went**. Start from the cause — why `TranslatePoint` and hit testing
-   disagree by a hundred pixels inside a scrolled `ScrollViewer` on Avalonia headless 12.1.1 — and
-   only then write the batch. Detail in
+2. **Walk batch 4 — settings. First half done on 2026-08-16; thirteen controls remain.** The three
+   themes, the two languages, local-root watching and segment detection are pressed: ratchet
+   **95 → 88**, 40 of 128. What remains is **lifecycle (5), privacy (4), recommendations (3) and
+   shortcuts (1)**, which would take the ratchet to **75**. Mind the two rules that were expensive to
+   measure: the harness **returns to the top and scrolls only when the control does not fit**
+   (`Reveal`), and **the theme buttons are pressed last** — applying a theme puts whatever sits above
+   it out of a click's reach, measured as eight presses in a row that never arrived. Detail in
    [audit-walk-cannot-go-back-up.md](evidence/stable/audit-walk-cannot-go-back-up.md).
-   It is **20** controls, not 14: appearance, lifecycle, privacy — including `LIB-016`'s
-   switch — scanning, recommendations, segment detection and shortcuts. It would drop the ratchet from
-   **95** to **75**, the largest remaining step, and it **touches no visual surface**, so it does not
-   collide with the redesign.
+   The four privacy controls have preconditions: `PrivacyAutoRefreshLabel` is only offered with a
+   consented connection, and `LifecycleStartupConsentGrant`/`Decline` only with consent pending. It
+   **touches no visual surface**, so it does not clash with the redesign.
 3. **The sandbox lifecycle, still expired.** The four native phases — install, upgrade, repair,
    uninstall — have been "blocked" since the manifest changed with `DES-001`. **Decided**: extend
    `eng/sandbox-handover.ps1`, which already works and already installs, with the four phases and a

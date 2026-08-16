@@ -8,11 +8,6 @@
 ## A control leaves this file when the walk presses it with the mouse, asserts on the effect, and
 ## clicks beside it to no effect — all three, which is what PressAsync does and records.
 
-AppearanceSettingsView#LanguageEnglish                     # batch 4
-AppearanceSettingsView#LanguageSpanish                     # batch 4
-AppearanceSettingsView#ThemeDark                           # batch 4
-AppearanceSettingsView#ThemeLight                          # batch 4
-AppearanceSettingsView#ThemeSystem                         # batch 4
 AudioOutputView#AudioOutputDeviceLabel                     # batch 2
 AudioOutputView#AudioOutputLayoutLabel                     # batch 2
 BackupView#BackupCancelLabel                               # batch 6
@@ -72,8 +67,6 @@ RootOnboardingView#RootRemoveAction                        # unscheduled: the sh
 RootOnboardingView#RootRemoveCancelAction                  # unscheduled: the shell, home and onboarding are in none of the seven batches
 RootOnboardingView#RootRemoveConfirmAction                 # unscheduled: the shell, home and onboarding are in none of the seven batches
 RootOnboardingView#RootScanConsentAction                   # unscheduled: the shell, home and onboarding are in none of the seven batches
-ScanSettingsView#ScanSettingsWatchLocal                    # batch 4
-SegmentDetectionSettingsView#SegmentDetectionSettingsEnable # batch 4
 ShellView#NavigationBackups                                # unscheduled: the shell, home and onboarding are in none of the seven batches
 ShellView#NavigationHome                                   # unscheduled: the shell, home and onboarding are in none of the seven batches
 ShellView#NavigationLibrary                                # unscheduled: the shell, home and onboarding are in none of the seven batches

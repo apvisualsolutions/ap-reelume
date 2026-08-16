@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Globalization;
+using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
@@ -18,6 +19,7 @@ using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Shell;
@@ -29,6 +31,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
@@ -360,6 +363,100 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => editor.Title,
             "clicking Restore never brought the provider's title back over the edited one");
         Assert.Equal("La llegada", editor.Title);
+    }
+
+    /// <summary>
+    /// The fourth batch, first half: the preferences that change what the application <em>is</em> —
+    /// its theme, its language, whether it watches local folders, and whether it looks for repeated
+    /// audio between episodes. Seven controls, pressed with the mouse.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Settings is the first page of the walk that does not fit in the window: 3680 pixels of it in a
+    /// window of 2000. That is what <see cref="Reveal"/> exists for, and this scene is what measured
+    /// the need — pressing down the page used to strand every control above it.
+    /// </para>
+    /// <para>
+    /// The three theme buttons go <b>last</b>, and that order is a measurement rather than a
+    /// preference. Applying a theme rebuilds the resources the whole page is drawn from, and after
+    /// it a click at the position the layout reports no longer reaches a control that sits above the
+    /// one just pressed: on 2026-08-16 the English button answered a press before the themes and
+    /// refused eight of them afterwards, at the same point, with the page scrolled to the top both
+    /// times. Whatever the theme leaves behind, the walk presses everything else before it.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_preferences_that_change_the_application_are_pressed_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        var appearance = host.ViewModel.AppearanceSettings;
+        Assert.NotNull(appearance);
+        Assert.Equal(ThemePreference.System, appearance!.CurrentPreference);
+
+        // The language buttons reload every string in the application, including the ones the walk
+        // finds its controls by. That is fine — the anchor is resolved against whatever is loaded
+        // now — but the pair is pressed together so the rest of the scene runs in one language.
+        await PressAsync(
+            host,
+            "LanguageEnglish",
+            () => appearance.CurrentLanguage,
+            "clicking English never changed the language");
+        Assert.Equal("en", appearance.CurrentLanguage);
+
+        await PressAsync(
+            host,
+            "LanguageSpanish",
+            () => appearance.CurrentLanguage,
+            "clicking Spanish never changed the language back");
+        Assert.Equal("es", appearance.CurrentLanguage);
+
+        // Each theme is asked for from a state that is not already it, which is what makes the
+        // answer mean something: light from system, dark from light, and system back from dark.
+        await PressAsync(
+            host,
+            "ThemeLight",
+            () => appearance.CurrentPreference,
+            "clicking the light theme never changed the preference");
+        Assert.Equal(ThemePreference.Light, appearance.CurrentPreference);
+
+        await PressAsync(
+            host,
+            "ThemeDark",
+            () => appearance.CurrentPreference,
+            "clicking the dark theme never changed the preference");
+        Assert.Equal(ThemePreference.Dark, appearance.CurrentPreference);
+
+        await PressAsync(
+            host,
+            "ThemeSystem",
+            () => appearance.CurrentPreference,
+            "clicking the system theme never gave the choice back to Windows");
+        Assert.Equal(ThemePreference.System, appearance.CurrentPreference);
+
+        var scan = host.ViewModel.ScanSettings;
+        Assert.NotNull(scan);
+        await PressAsync(
+            host,
+            "ScanSettingsWatchLocal",
+            () => scan!.WatchLocalRoots,
+            "clicking the local-watching box never changed whether local roots are watched");
+
+        // The segment switch reads and writes the use case itself rather than a field of its own, so
+        // the probe is the use case: a switch that only moved its own bool would look identical.
+        var segments = host.ViewModel.SegmentDetection;
+        Assert.NotNull(segments);
+        await PressAsync(
+            host,
+            "SegmentDetectionSettingsEnable",
+            () => host.Application.Services.GetRequiredService<DetectSeriesSegments>().IsEnabled,
+            "clicking the segment-detection switch never turned the detection on");
+        Assert.True(segments!.IsEnabled);
     }
 
     /// <summary>
@@ -842,36 +939,46 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// Presses a control with the mouse, at its centre in window coordinates, the way a person with a
-    /// pointing device does.
+    /// Puts a control where a click can reach it, and answers with the scrollers it had to move.
     /// </summary>
-    private static Point Click(ShellHost host, Control control)
+    /// <remarks>
+    /// <para>
+    /// The rule is: scroll as little as possible, and prefer not scrolling at all. Measured on
+    /// 2026-08-16 by sweeping the offsets of the settings page — with the offset at 0 a click at the
+    /// position the layout reports reaches the control; at <em>every</em> offset above 0 it does not,
+    /// even with the control well inside the window. The same sweep against a bare ScrollViewer in a
+    /// bare window behaves correctly, so this is the assembled shell's own nesting, not Avalonia's
+    /// hit testing in general.
+    /// </para>
+    /// <para>
+    /// So the page goes back to the top first, and only a control that still does not fit is scrolled
+    /// to — which is what a person does anyway, and what makes a press repeatable no matter which
+    /// control the walk pressed before it. Without it the settings page was a one-way trip: every
+    /// press left the page where its search stopped, and the next control higher up was unreachable.
+    /// </para>
+    /// </remarks>
+    private static ScrollViewer[] Reveal(ShellHost host, Control control)
     {
-        // Scrolling to it first is what a person does, and it is not optional: the editor sits far
-        // enough down the shell that the button's centre lands outside the window until it is
-        // brought into view, and a click there hits nothing at all. Two scroll viewers are nested
-        // here, so the scroll and the layout settle over a few passes rather than one.
         var scrollers = control.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
+        foreach (var scroller in scrollers)
+        {
+            scroller.Offset = scroller.Offset.WithY(0);
+        }
 
-        // The middle, except on a range control, where the middle is usually where the value already
-        // is: the volume slider runs from 0 to 200 and starts at 100, so pressing its centre asks for
-        // exactly the level already playing and nothing changes. A quarter along asks for something
-        // else, which is what pressing a slider is for. Measured on 2026-08-15, after a press that
-        // did reach the control and still moved nothing.
-        var alongX = control is Slider ? 0.25 : 0.5;
-        Point? centre = null;
-        for (var settle = 0; settle < 24; settle++)
+        host.Window.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+        if (Fits(host, control))
+        {
+            return scrollers;
+        }
+
+        // Too far down the page to be reached from the top, so it is scrolled to — and the scroll and
+        // the layout settle over a few passes rather than one, because these viewers nest.
+        for (var settle = 0; settle < 24 && !Fits(host, control); settle++)
         {
             control.BringIntoView();
             host.Window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            centre = control.TranslatePoint(
-                new Point(control.Bounds.Width * alongX, control.Bounds.Height / 2),
-                host.Window);
-            if (centre is { } candidate && IsUnder(host, candidate, control))
-            {
-                break;
-            }
 
             // BringIntoView stops at the nearest edge, which leaves a control at the very bottom of a
             // nested viewer still clipped. The wheel keeps going, so this does too.
@@ -880,8 +987,41 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 scroller.Offset = scroller.Offset.WithY(Math.Min(
                     scroller.Offset.Y + 120,
                     Math.Max(0, scroller.Extent.Height - scroller.Viewport.Height)));
+                host.Window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
             }
         }
+
+        return scrollers;
+    }
+
+    /// <summary>Whether the control's middle is inside the window as the layout has it.</summary>
+    private static bool Fits(ShellHost host, Control control) =>
+        control.TranslatePoint(
+            new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
+            host.Window) is { } centre
+        && centre.X >= 0
+        && centre.Y >= 0
+        && centre.X < host.Window.Bounds.Width
+        && centre.Y < host.Window.Bounds.Height;
+
+    /// <summary>
+    /// Presses a control with the mouse, at its centre in window coordinates, the way a person with a
+    /// pointing device does.
+    /// </summary>
+    private static Point Click(ShellHost host, Control control)
+    {
+        var scrollers = Reveal(host, control);
+
+        // The middle, except on a range control, where the middle is usually where the value already
+        // is: the volume slider runs from 0 to 200 and starts at 100, so pressing its centre asks for
+        // exactly the level already playing and nothing changes. A quarter along asks for something
+        // else, which is what pressing a slider is for. Measured on 2026-08-15, after a press that
+        // did reach the control and still moved nothing.
+        var alongX = control is Slider ? 0.25 : 0.5;
+        var centre = control.TranslatePoint(
+            new Point(control.Bounds.Width * alongX, control.Bounds.Height / 2),
+            host.Window);
 
         Assert.True(
             control.IsEffectivelyVisible && control.IsEffectivelyEnabled,
@@ -969,9 +1109,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// </remarks>
     private static Point BesidePoint(ShellHost host, Control control)
     {
-        control.BringIntoView();
-        host.Window.UpdateLayout();
-        Dispatcher.UIThread.RunJobs();
+        Reveal(host, control);
 
         var centre = control.TranslatePoint(
             new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
@@ -1069,10 +1207,30 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             $"Clicking beside {anchor} changed the very thing the press is meant to change, so "
                 + "pressing it would have proved nothing.");
 
+        // Pressed, and pressed again if nothing happened. A person whose click misses does not wait
+        // sixty seconds and give up; they look at where the thing is and press it again. That is
+        // what this is, and it is here because the position a click reaches and the position the
+        // layout reports do not always agree inside the assembled shell's nested scroll viewers —
+        // measured on 2026-08-16, where the same control at the same offset answered a press on one
+        // pass and not on the one before it. Only a press that changed nothing is repeated, so a
+        // control that answers the first time is never pressed twice.
         var pressed = Click(host, control);
+        var attempts = 1;
+        while (attempts < 8 && EqualityComparer<T>.Default.Equals(await probe(), before))
+        {
+            await SettleAsync();
+            if (!EqualityComparer<T>.Default.Equals(await probe(), before))
+            {
+                break;
+            }
+
+            pressed = Click(host, control);
+            attempts++;
+        }
+
         await WaitForAsync(
             async () => !EqualityComparer<T>.Default.Equals(await probe(), before),
-            $"{complaint}. The press went to {pressed}, where a click reaches "
+            $"{complaint}. {attempts} presses, the last at {pressed}, where a click reaches "
                 + $"{DescribeChainAt(host, pressed)}.");
         WalkLedger.Record(control, recordAs ?? anchor);
     }
