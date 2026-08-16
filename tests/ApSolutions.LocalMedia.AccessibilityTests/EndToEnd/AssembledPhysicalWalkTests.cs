@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Globalization;
+using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
@@ -362,6 +363,106 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// LIB-012 as lived: the three controls of the rename surface, pressed with the mouse, with the
+    /// effect read off <b>the file system</b> rather than off the screen.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the scene the feature was blocked for. The surface opened and its buttons were
+    /// visible and enabled, but the application asked to rename each file to the name it already
+    /// had, so the plan was always empty and no press could ever move anything. Asserting on the
+    /// view model would not have caught it either — what proves a rename is a file that is no longer
+    /// where it was, and a file that is.
+    /// </para>
+    /// <para>
+    /// The proposed name comes from the entry, not from the file: the catalogue says "La llegada"
+    /// and 2016 while the file on disk says <c>Arrival.2016.1080p.mp4</c>, so a destination in the
+    /// convention can only have been composed from what the entry knows.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_rename_surface_moves_the_file_and_puts_it_back()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Arrival.2016.1080p.mp4");
+        var renamedPath = Path.Combine(media, "La llegada (2016).mp4");
+
+        // Nothing decodes on this surface, so the file only has to exist and be catalogued.
+        await File.WriteAllBytesAsync(mediaPath, [0x41, 0x50], TestContext.Current.CancellationToken);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromMinutes(116));
+        _ = await new CatalogMetadataRepository(factory).TrySaveAsync(
+            new CatalogMetadata(
+                new TitleId(fileId),
+                new EditableMetadata(
+                    "La llegada",
+                    OriginalTitle: "Arrival",
+                    Overview: null,
+                    ReleaseYear: 2016,
+                    Genres: [],
+                    PosterPath: null,
+                    BackdropPath: null,
+                    TrailerKey: null,
+                    LockedFields: new HashSet<MetadataField>()),
+                Revision: 0),
+            expectedRevision: 0,
+            TestContext.Current.CancellationToken);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
+        await host.ViewModel.OpenRenamePreviewAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        var rename = host.ViewModel.Rename;
+        Assert.NotNull(rename);
+        var operation = Assert.Single(rename!.Operations);
+        Assert.Equal(renamedPath, operation.DestinationPath);
+        Assert.True(File.Exists(mediaPath), "Asking for a preview must not move anything.");
+
+        // Consent first, because the two buttons below stay disabled without it. Its own effect is
+        // on the screen, so the probe is the box: what it unlocks is asserted right after.
+        await PressAsync(
+            host,
+            "RenameExplicitConsent",
+            () => rename.IsConfirmed,
+            "clicking the consent box never recorded the consent the rename requires");
+        Assert.True(rename.ExecuteCommand.CanExecute(null));
+
+        // And the press that matters, proved by the disk: the old name is gone and the new one is
+        // there. The catalogue row is untouched on purpose — the file moved, the entry did not.
+        await PressAsync(
+            host,
+            "RenameExecuteAction",
+            () => File.Exists(renamedPath),
+            "clicking Rename never moved the file to the name the entry deserves");
+        Assert.False(File.Exists(mediaPath), "The file was copied rather than renamed.");
+        Assert.Equal(RenameExecutionOutcome.Succeeded, rename.LastOutcome);
+
+        // Undo is offered once, and consent is asked for again because executing cleared it: a
+        // second irreversible move deserves a second decision.
+        Assert.False(rename.IsConfirmed);
+        await PressAsync(
+            host,
+            "RenameExplicitConsent",
+            () => rename.IsConfirmed,
+            "clicking the consent box a second time never recorded the consent Undo requires");
+
+        await PressAsync(
+            host,
+            "RenameUndoAction",
+            () => File.Exists(mediaPath),
+            "clicking Undo never put the file back under the name it had");
+        Assert.False(File.Exists(renamedPath), "Undo left the renamed copy behind.");
+    }
+
+    /// <summary>
     /// The first batch of the whole-application walk: the browse surface, driven by the mouse alone.
     /// The two drop-downs open, the apply button re-runs the query the search box was given, a card
     /// opens from its own entry in the list, and the back button returns to exactly what was there.
@@ -639,27 +740,26 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// What the rename preview offers a person today, which is nothing, and why the walk cannot press
-    /// its three controls.
+    /// Where the proposed name comes from, on the entry this used to be blocked by: one somebody
+    /// identified whose stored title is still the file name, year and all, and which holds no year
+    /// of its own.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This is the measurement kept rather than the scene that could not be written. The assembled
-    /// application asks to rename each file <b>to the name it already has</b> —
-    /// <c>new RenameRequest(file.Path, Path.GetFileName(file.Path))</c> in the composition root — and
-    /// <see cref="RenamePolicy"/> answers that correctly with <c>NoChange</c> and no operation. So the
-    /// plan is always empty, Rename and Undo can never do anything, and the consent box guards a
-    /// decision that is never offered.
+    /// This is the scene that measured the block, kept and turned around. It used to assert that the
+    /// plan was empty — the application asked to rename each file to the name it already had, which
+    /// <see cref="RenamePolicy"/> answers correctly with <c>NoChange</c>. What it asserts now is the
+    /// rule that replaced it: the title and the year travel together from one source, so an entry
+    /// carrying "2016" inside its title is not handed the parser's 2016 as well. Pairing them wrote
+    /// <c>Arrival 2016 (2016).mp4</c>, which is what this run caught.
     /// </para>
     /// <para>
-    /// Nothing in the repository composes a name from a title: the only <c>RenameRequest</c> outside
-    /// tests is that one. What is missing is not wiring but a decision — what a renamed file is
-    /// called — and that belongs to whoever owns the product, so the walk records the gap instead of
-    /// inventing a convention. The three controls stay in eng/walk-pending.txt naming this.
+    /// The season and the episode are the one exception, because no entry in the catalogue holds
+    /// them: identification writes metadata, and the numbers live only in the file name.
     /// </para>
     /// </remarks>
     [AvaloniaFact(Timeout = 120_000)]
-    public async Task The_rename_preview_can_only_ever_offer_the_name_the_file_already_has()
+    public async Task The_proposed_name_takes_its_title_and_its_year_from_the_same_source()
     {
         var media = Path.Combine(_dataRoot, "media");
         Directory.CreateDirectory(media);
@@ -683,13 +783,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var rename = host.ViewModel.Rename;
         Assert.NotNull(rename);
 
-        // The surface opens on a title somebody identified, and offers not one operation.
-        Assert.Empty(rename!.Operations);
-        Assert.Contains(rename.Conflicts, conflict => conflict.Kind == RenameConflictKind.NoChange);
-        Assert.False(
-            ((AsyncRelayCommand)rename.ExecuteCommand).CanExecute(null),
-            "Rename offered nothing and still declared itself executable.");
-        Assert.True(File.Exists(original), "Nothing was renamed, which is the point.");
+        // The stored title is "Arrival 2016" and the entry holds no year, so the name is that title
+        // and nothing else: no second 2016, and no conflict standing in for a decision.
+        var operation = Assert.Single(rename!.Operations);
+        Assert.Equal("Arrival 2016.mp4", Path.GetFileName(operation.DestinationPath));
+        Assert.Empty(rename.Conflicts);
+        Assert.True(
+            ((AsyncRelayCommand)rename.ExecuteCommand).CanExecute(null) == rename.IsConfirmed,
+            "Rename declared itself executable without the consent that gates it.");
+        Assert.True(File.Exists(original), "Asking for a preview must not move anything.");
     }
 
     /// <summary>

@@ -671,6 +671,15 @@ public static partial class CompositionRoot
     /// A rename preview for one title. Producing the preview reads the file and touches nothing: the
     /// plan describes what would happen, and only an explicit confirmation executes it.
     /// </summary>
+    /// <remarks>
+    /// LIB-012: what this asked for used to be the name the file already had, which
+    /// <see cref="RenamePolicy"/> correctly discards, so the plan was always empty and neither
+    /// button could ever run. The name now comes from the entry — what a provider identified when
+    /// somebody identified it, and what the parser reads off the file name when nobody has, since a
+    /// catalogue with no metadata row still knows a season and an episode when the name carries one.
+    /// An entry with nothing better to propose produces no request at all rather than a request that
+    /// asks for the current name back.
+    /// </remarks>
     private static async Task<RenamePreviewViewModel?> OpenRenameAsync(
         IServiceProvider provider,
         TitleId titleId,
@@ -694,9 +703,34 @@ public static partial class CompositionRoot
             return null;
         }
 
+        var stored = await provider.GetRequiredService<ICatalogMetadataRepository>()
+            .GetAsync(titleId, cancellationToken)
+            .ConfigureAwait(true);
+
+        // A parser that warned is a parser saying it does not know what this is, and its clean title
+        // has already dropped whatever confused it — `Tomorrow.9999.mkv` reads as "Tomorrow", so
+        // renaming to what it read would throw away part of the only name anybody has. Its reading
+        // is used when it is sure, and the entry's own metadata is used whenever there is any.
+        var read = provider.GetRequiredService<IMediaNameParser>()
+            .Parse(FileNameContext.ForFile(file.Path, root.Path));
+        var parsed = read.ParseWarnings.Count == 0 ? read : null;
+
+        // Title and year travel together from one source or the other, never one from each: an entry
+        // whose title is still the file name carries its year inside the title, and pairing it with
+        // the year the parser found writes it twice — measured as "Arrival 2016 (2016).mp4". The
+        // season and the episode are the exception because no entry holds them; only the name does.
+        var identified = string.IsNullOrWhiteSpace(stored?.Metadata.Title) ? null : stored;
+        var proposal = TitleFileNamePolicy.Compose(new TitleNaming(
+            identified?.Metadata.Title ?? parsed?.CleanTitle,
+            identified is null ? parsed?.Year : identified.Metadata.ReleaseYear,
+            parsed?.Season,
+            parsed?.Episode,
+            EpisodeTitle: null,
+            Path.GetExtension(file.Path)));
+
         var plan = provider.GetRequiredService<PreviewRename>().Execute(new PreviewRenameCommand(
             root.Path,
-            [new RenameRequest(file.Path, Path.GetFileName(file.Path))]));
+            proposal is null ? [] : [new RenameRequest(file.Path, proposal)]));
         return new RenamePreviewViewModel(
             plan,
             provider.GetRequiredService<ExecuteRename>(),

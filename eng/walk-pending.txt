@@ -53,9 +53,6 @@ RecommendationSettingsView#RecommendationSettingsEnableLabel # batch 4
 RecommendationSettingsView#RecommendationSettingsThresholdApply # batch 4
 RecommendationSettingsView#RecommendationSettingsThresholdLabel # batch 4
 RecommendationsRailView#RecommendationsToggleAction        # unscheduled: the shell, home and onboarding are in none of the seven batches
-RenamePreviewView#RenameExecuteAction                      # blocked: nothing composes a desired name, so the plan is always empty (NoChange) - see audit-walk-third-batch.md
-RenamePreviewView#RenameExplicitConsent                    # blocked: nothing composes a desired name, so the plan is always empty (NoChange) - see audit-walk-third-batch.md
-RenamePreviewView#RenameUndoAction                         # blocked: nothing composes a desired name, so the plan is always empty (NoChange) - see audit-walk-third-batch.md
 RestoreWizardView#RestoreChooseArchiveLabel                # batch 6
 RestoreWizardView#RestoreConfirmLabel                      # batch 6
 ResumeHeroView#HomeResumeAction                            # unscheduled: the shell, home and onboarding are in none of the seven batches

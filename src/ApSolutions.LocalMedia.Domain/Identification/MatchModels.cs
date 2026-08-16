@@ -16,7 +16,26 @@ public enum ParsedMediaKind
 
 public sealed record FileNameContext(
     string FileName,
-    IReadOnlyList<string> ParentFolders);
+    IReadOnlyList<string> ParentFolders)
+{
+    /// <summary>
+    /// One file as the parser reads it: its name, and the folders between the root and it, outermost
+    /// first — the order a series layout is written in, show then season then file.
+    /// </summary>
+    public static FileNameContext ForFile(string filePath, string rootPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
+        var directory = Path.GetDirectoryName(filePath);
+        var relative = directory is null ? "." : Path.GetRelativePath(rootPath, directory);
+        var folders = relative is "." or ""
+            ? Array.Empty<string>()
+            : relative.Split(
+                [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+                StringSplitOptions.RemoveEmptyEntries);
+        return new FileNameContext(Path.GetFileName(filePath), folders);
+    }
+}
 
 public sealed record ParsedMediaName(
     ParsedMediaKind Kind,

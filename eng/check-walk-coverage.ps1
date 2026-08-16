@@ -37,8 +37,9 @@ $outputRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot $Output))
 $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 
 # Lowered by each batch of the walk and never raised. 126 before the first batch, 113 after the
-# library and the film card, 106 after the player's transport, 98 after the metadata editor.
-$maximumPending = 98
+# library and the film card, 106 after the player's transport, 98 after the metadata editor, 95
+# once the rename could rename and its three controls stopped being blocked.
+$maximumPending = 95
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)
