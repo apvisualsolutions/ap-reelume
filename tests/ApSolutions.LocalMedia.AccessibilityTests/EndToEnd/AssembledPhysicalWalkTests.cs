@@ -142,6 +142,44 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await library.OpenDetailsAsync(library.Items[0], TestContext.Current.CancellationToken);
         await host.ViewModel.OpenDuplicatesAsync(TestContext.Current.CancellationToken);
         Assert.True(host.ViewModel.HasDuplicates, "The two copies never became a group a card can open.");
+
+        // And the group is decided with the mouse. Opening it already moved to Review, where the
+        // comparison sits under the inbox; the layout still has to settle before a click can land.
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // The copy that is not already the one that would play, so that pressing it has something to
+        // change. Both files are the same sample, so which one the policy picks unaided is its own
+        // business — the walk asks the screen rather than assuming.
+        var duplicates = host.ViewModel.Duplicates;
+        Assert.NotNull(duplicates);
+        var chosen = duplicates!.Items.Single(item => !item.IsEffective);
+        Assert.Null(await PreferredVersionAsync(factory));
+
+        // The probe is the stored preference, not the radio's own IsEffective: without a preference
+        // the policy already answers with one of the two, so reading the screen would have called
+        // "the better copy" and "the copy somebody chose" the same thing.
+        await PressAsync(
+            host,
+            chosen.ShortPath,
+            () => PreferredVersionAsync(factory),
+            "clicking a version radio never stored the preference for the group",
+            recordAs: "{Binding ShortPath}");
+        Assert.Equal(chosen.Version.MediaFileId.Value, await PreferredVersionAsync(factory));
+    }
+
+    /// <summary>
+    /// Which copy of a group somebody chose, read from the catalogue. Null until one is chosen: the
+    /// policy answers with a version either way, so only this tells a choice from a default.
+    /// </summary>
+    private static async Task<Guid?> PreferredVersionAsync(SqliteConnectionFactory factory)
+    {
+        await using var connection = await factory.OpenAsync(TestContext.Current.CancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT preferred_media_file_id FROM media_version_groups;";
+        var stored = await command.ExecuteScalarAsync(TestContext.Current.CancellationToken);
+        return stored is string text ? Guid.Parse(text) : null;
     }
 
     /// <summary>
