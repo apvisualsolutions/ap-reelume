@@ -40,8 +40,6 @@ RestoreWizardView#RestoreConfirmLabel                      # batch 6
 ResumeHeroView#HomeResumeAction                            # unscheduled: the shell, home and onboarding are in none of the seven batches
 ResumePromptView#ResumePromptRestart                       # batch 2
 ResumePromptView#ResumePromptResume                        # batch 2
-ReviewInboxView#ReassignmentConfirmAction                  # batch 5: needs a held moved-file offer in the queue
-ReviewInboxView#ReassignmentKeepAction                     # batch 5: needs a held moved-file offer in the queue
 RootOnboardingView#RootAddAction                           # unscheduled: the shell, home and onboarding are in none of the seven batches
 RootOnboardingView#RootKindLocal                           # unscheduled: the shell, home and onboarding are in none of the seven batches
 RootOnboardingView#RootKindUnc                             # unscheduled: the shell, home and onboarding are in none of the seven batches

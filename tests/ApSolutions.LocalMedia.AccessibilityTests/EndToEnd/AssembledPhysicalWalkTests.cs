@@ -1305,6 +1305,196 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The rest of the fifth batch: a held moved file, decided with the mouse. One offer is confirmed
+    /// against a chosen candidate, and the next is kept as a file of its own.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The state is the one the reconciler really produces, and only one thing produces it:
+    /// <c>FileReconciliationPolicy</c> answers <c>Exact</c> for a stable file id and for a lone
+    /// fingerprint, so the <b>only</b> offer a person is ever asked to decide is a fingerprint
+    /// collision — two catalogued rows carrying the discovered file's fingerprint, and the person
+    /// says which of them the file is. Seeding one candidate would have been easier and would have
+    /// staged a screen the application cannot reach.
+    /// </para>
+    /// <para>
+    /// Which is also why this scene found a defect. Two candidates mean two Confirm buttons, and both
+    /// carried the same accessible name and nothing else: <c>ReassignmentConfirmAction</c> matched two
+    /// controls on screen, so the walk could not aim, and neither could anybody driving this surface
+    /// by name. Every other repeated command in the application already distinguishes itself —
+    /// <c>EpisodeRowView</c> by its episode, the duplicate rows by their path — and this one now
+    /// carries the candidate's path as its help text, which is what the click aims at here.
+    /// </para>
+    /// <para>
+    /// Both probes read the catalogue. Confirming asks <b>which</b> row ended up at the discovered
+    /// path rather than whether one did: the walk presses the second candidate on purpose, and the
+    /// first is asserted to be untouched, because a press that landed on the other button would leave
+    /// a reassignment that looks just as finished and is the wrong one.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task A_held_moved_file_is_reassigned_to_the_chosen_candidate_and_the_next_is_kept_as_new()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var rootId = await RootIdAsync(factory, media);
+
+        // Nothing decodes on this surface, so the files only have to exist and be catalogued.
+        var reassigned = await SeedHeldOfferAsync(factory, media, rootId, "Arrival", "sha256:v1:ARRIVAL");
+        var kept = await SeedHeldOfferAsync(factory, media, rootId, "Sicario", "sha256:v1:SICARIO");
+
+        using var host = ShowShell(height: 2000);
+        var inbox = host.ViewModel.ReviewInbox;
+        Assert.NotNull(inbox);
+        Navigate(host, AppRoute.Review);
+
+        // The queue reconciliation writes into, taken from the application's own container: the offer
+        // has to be the one the surface reads, not a copy of it.
+        var queue = host.Application.Services.GetRequiredService<PendingReassignments>();
+        var files = new MediaFileRepository(factory);
+
+        // One offer at a time. Two would put two Keep buttons on screen, and a click that has to
+        // choose between identical controls is the defect this scene already found once.
+        queue.Offer(reassigned.Pending);
+        await ShowOfferAsync(host, inbox!);
+
+        // The second candidate, so that "a reassignment happened" cannot stand in for "the one the
+        // person asked for happened".
+        var chosen = reassigned.Pending.Candidates[1];
+        await PressAsync(
+            host,
+            "ReassignmentConfirmAction",
+            () => RowAtAsync(files, rootId, reassigned.DiscoveredPath),
+            "clicking Confirm never moved the catalogued entity to the discovered path",
+            helpText: chosen.Path);
+        Assert.Equal(chosen.MediaFileId.Value, await RowAtAsync(files, rootId, reassigned.DiscoveredPath));
+
+        // And the candidate that was not pressed is still where it was, with its own row intact.
+        var untouched = reassigned.Pending.Candidates[0];
+        Assert.Equal(
+            untouched.MediaFileId.Value,
+            await RowAtAsync(files, rootId, untouched.Path));
+
+        // The offer leaves the surface with the decision, which is the other half of deciding it.
+        await WaitForAsync(
+            () => Task.FromResult(!inbox!.HasReassignments),
+            "the confirmed offer was written to the catalogue and stayed on the surface anyway");
+
+        queue.Offer(kept.Pending);
+        await ShowOfferAsync(host, inbox!);
+
+        // Keeping it as new stores the discovered identity on the discovered row, and that is the
+        // whole point: no later scan can offer this file again.
+        await PressAsync(
+            host,
+            "ReassignmentKeepAction",
+            () => FingerprintOfAsync(files, kept.DiscoveredId),
+            "clicking It is a new file never stored the identity that stops the offer returning");
+        Assert.Equal("sha256:v1:SICARIO", await FingerprintOfAsync(files, kept.DiscoveredId));
+
+        // The rows the offer named are all still their own entities: keeping a file as new decides
+        // one row and moves nothing.
+        Assert.Equal(kept.DiscoveredId.Value, await RowAtAsync(files, rootId, kept.DiscoveredPath));
+        foreach (var candidate in kept.Pending.Candidates)
+        {
+            Assert.Equal(candidate.MediaFileId.Value, await RowAtAsync(files, rootId, candidate.Path));
+        }
+        await WaitForAsync(
+            () => Task.FromResult(!inbox!.HasReassignments),
+            "the offer that was kept as new stayed on the surface anyway");
+    }
+
+    /// <summary>
+    /// What reconciliation holds for a person: two catalogued rows sharing one fingerprint, and the
+    /// stranger row a scan wrote for the path the file turned up at.
+    /// </summary>
+    private static async Task<HeldOffer> SeedHeldOfferAsync(
+        SqliteConnectionFactory factory,
+        string media,
+        LibraryRootId rootId,
+        string name,
+        string fingerprint)
+    {
+        var files = new MediaFileRepository(factory);
+        var identity = new FileIdentity(null, null, fingerprint);
+        var candidates = new List<ReassignmentCandidate>();
+        foreach (var copy in new[] { "first", "second" })
+        {
+            var seeded = await SeedFileAsync(factory, media, $"{name}.{copy}.mp4");
+            await files.SaveIdentityAsync(
+                new MediaFileId(seeded.Id),
+                identity,
+                TestContext.Current.CancellationToken);
+            candidates.Add(new ReassignmentCandidate(new MediaFileId(seeded.Id), seeded.Path));
+        }
+
+        // The discovered file carries no stored identity, which is exactly why the offer survives a
+        // restart: every later scan re-derives it until somebody decides.
+        var discovered = await SeedFileAsync(factory, media, Path.Combine("archive", $"{name}.mp4"));
+        return new HeldOffer(
+            new PendingReassignment(
+                new ReconcileFileCommand(rootId, discovered.Path, identity),
+                candidates),
+            discovered.Path,
+            new MediaFileId(discovered.Id));
+    }
+
+    private static async Task<(string Path, Guid Id)> SeedFileAsync(
+        SqliteConnectionFactory factory,
+        string media,
+        string relativePath)
+    {
+        var path = Path.Combine(media, relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        await File.WriteAllBytesAsync(path, [0x41, 0x50], TestContext.Current.CancellationToken);
+        return (path, await SeedMediaFileAsync(factory, media, path, TimeSpan.FromMinutes(116)));
+    }
+
+    /// <summary>Puts the offer the queue is now holding on screen, and waits for it to arrive.</summary>
+    private static async Task ShowOfferAsync(ShellHost host, ReviewInboxViewModel inbox)
+    {
+        // ReloadReassignments only runs on a load, so the surface is asked to load rather than
+        // expected to have noticed.
+        await inbox.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        await WaitForAsync(
+            () => Task.FromResult(inbox.HasReassignments),
+            "the queue was holding an offer and the review surface never showed it");
+    }
+
+    /// <summary>Which row sits at a path, read from the catalogue: the question a reassignment answers.</summary>
+    private static async Task<Guid?> RowAtAsync(
+        MediaFileRepository files,
+        LibraryRootId rootId,
+        string path)
+    {
+        var row = await files.FindByPathAsync(rootId, path, TestContext.Current.CancellationToken);
+        return row?.Id.Value;
+    }
+
+    /// <summary>The identity a row carries, which is what keeping a file as new writes down.</summary>
+    private static async Task<string?> FingerprintOfAsync(MediaFileRepository files, MediaFileId id)
+    {
+        var identity = await files.GetIdentityAsync(id, TestContext.Current.CancellationToken);
+        return identity?.Fingerprint;
+    }
+
+    private static async Task<LibraryRootId> RootIdAsync(SqliteConnectionFactory factory, string media)
+    {
+        var roots = await new LibraryRootRepository(factory).ListAsync(TestContext.Current.CancellationToken);
+        return roots.Single(candidate => candidate.Path == media).Id;
+    }
+
+    /// <summary>One held offer, with the discovered row the surface decides about.</summary>
+    private sealed record HeldOffer(
+        PendingReassignment Pending,
+        string DiscoveredPath,
+        MediaFileId DiscoveredId);
+
+    /// <summary>
     /// The second batch: the player's transport, pressed with the mouse on a session the real engine
     /// is decoding. Pause and resume, both skips, mute, the volume slider, and stop.
     /// </summary>
@@ -1689,12 +1879,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             .ToArray();
 
         var step = new Vector(Math.Max(control.Bounds.Width, 8), Math.Max(control.Bounds.Height, 8));
+        var refused = new List<string>();
         foreach (var offset in new[]
         {
             new Vector(0, -step.Y), new Vector(0, step.Y),
             new Vector(-step.X, 0), new Vector(step.X, 0),
             new Vector(0, -step.Y * 2), new Vector(0, step.Y * 2),
             new Vector(-step.X, -step.Y), new Vector(step.X, step.Y),
+            new Vector(-step.X / 2, -step.Y), new Vector(-step.X / 2, step.Y),
         })
         {
             var candidate = centre!.Value + offset;
@@ -1703,18 +1895,25 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 || candidate.X >= host.Window.Bounds.Width
                 || candidate.Y >= host.Window.Bounds.Height)
             {
+                refused.Add($"{candidate} is outside the window");
                 continue;
             }
 
-            if (!occupied.Any(rect => rect.Contains(candidate)))
+            if (occupied.FirstOrDefault(rect => rect.Contains(candidate)) is { Width: > 0 } taken)
             {
-                return candidate;
+                refused.Add($"{candidate} is inside {taken}");
+                continue;
             }
+
+            return candidate;
         }
 
+        // What was tried and what took it, because "surrounded" on its own leaves the next person to
+        // re-measure a layout the harness had already measured.
         Assert.Fail(
-            $"{Describe(control)} is surrounded by other command controls, so there is nowhere to "
-                + "put the click that proves the press did the work.");
+            $"{Describe(control)} at {centre} sized {control.Bounds.Size} is surrounded by other "
+                + "command controls, so there is nowhere to put the click that proves the press did "
+                + $"the work. Tried: {string.Join("; ", refused)}.");
         return default;
     }
 
@@ -1761,6 +1960,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         string? recordAs = null)
     {
         var control = Resolve(host, anchor, helpText);
+
+        // Which view this control belongs to is settled now, while it is still on the tree: a control
+        // that removes its own row by working — the inbox's Confirm is one — has no view left to be
+        // recorded against by the time the effect arrives.
+        var view = WalkLedger.ViewOf(control);
         var before = await probe();
 
         ClickBeside(host, control);
@@ -1795,7 +1999,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             async () => !EqualityComparer<T>.Default.Equals(await probe(), before),
             $"{complaint}. {attempts} presses, the last at {pressed}, where a click reaches "
                 + $"{DescribeChainAt(host, pressed)}.");
-        WalkLedger.Record(control, recordAs ?? anchor);
+        WalkLedger.Record(view, recordAs ?? anchor);
     }
 
     /// <summary>Names a control in a complaint, by whatever it does carry.</summary>
