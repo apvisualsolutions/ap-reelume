@@ -18,7 +18,6 @@ DatabaseRecoveryView#RecoveryOpenBackupFolder              # batch 7
 DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewCorrect       # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
-DuplicateReviewView#{Binding ShortPath}                    # batch 5
 EpisodeRowView#EpisodePlayAction                           # batch 1: the series card, which needs the show, season and episode rows seeded
 LibraryEntryView#HomeLibraryAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
 LooseFileBanner#LooseFileAddFolderAction                   # batch 2

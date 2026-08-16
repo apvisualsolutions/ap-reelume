@@ -423,6 +423,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
   conserva su progreso y tus decisiones bajo la ruta nueva. Cada botón dice ahora a qué ruta
   pertenece, también para quien use un lector de pantalla. Las dos decisiones —«es el mismo» y «es un
   archivo nuevo»— quedan comprobadas con el ratón, leyendo del catálogo cuál ficha quedó decidida.
+- **Ya se comprueba con el ratón que elegir qué copia se reproduce guarda tu elección.** Cuando tienes
+  dos copias del mismo título, la comparación te deja marcar cuál quieres; la verificación pulsa la
+  que **no** es la que se reproduciría de todos modos y lo lee de tu catálogo, no de la pantalla, para
+  que «la copia mejor» y «la copia que elegiste» no se confundan.
 - **Ya se comprueba a dónde lleva «Ver el tráiler», en la ficha de película y en la de serie.** El
   botón abre el navegador que uses, y por eso ninguna comprobación automática podía pulsarlo: habría
   abierto ventanas en la máquina que estaba comprobando. Ahora una copia que guarda sus datos aparte

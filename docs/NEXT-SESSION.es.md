@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **67**, con **61 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **66**, con **62 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -56,12 +56,12 @@ correcta**, y con esto se comprueba.
    `Grid` con `*,Auto`. Y del arnés: `WalkLedger` leía la vista del control **después** del efecto, y
    confirmar retira la oferta en la que el botón vive, así que la identidad se toma antes de pulsar.
    **69 → 67.**
-   - **`DuplicateReviewView#{Binding ShortPath}`.** Necesita dos copias del mismo título en un grupo
-     de versiones —el camino ya probado es el de la primera escena del paseo, con el vigilante
-     agrupando dos archivos iguales— y luego `library.OpenDetailsAsync` + `OpenDuplicatesAsync`, que
-     lleva a Revisión con la vista debajo de la bandeja. El radio se ancla por su dato y se registra
-     con `recordAs: "{Binding ShortPath}"`, como el `{Binding Title}` de la biblioteca. La sonda es
-     la **preferencia almacenada**, no el `IsEffective` de la pantalla. **67 → 66.**
+   **El radio de duplicados, hecho el 2026-08-16** y **sin un solo defecto**: el primero en cuatro
+   sesiones — [la evidencia](evidence/stable/audit-walk-duplicate-version.md). Continúa la primera
+   escena del paseo en vez de montar nada nuevo, se pulsa la copia que **no** es ya la efectiva, y la
+   sonda es `preferred_media_file_id` del grupo —nulo antes, el archivo pulsado después—, porque sin
+   preferencia guardada la política ya contesta con una de las dos y leer `IsEffective` habría llamado
+   igual a «la copia mejor» y a «la que alguien eligió». **67 → 66, y la tanda 5 cerrada.**
    - **Y al cerrarla, una deuda ya medida.** `ReviewInboxViewModel.cs` está hoy en **92,13 % de
      líneas y 59,26 % de ramas**, y no lo vigila nadie: es un archivo antiguo, así que la puerta de
      cobertura no lo mira. Las dos reasignaciones que faltan ejercen precisamente

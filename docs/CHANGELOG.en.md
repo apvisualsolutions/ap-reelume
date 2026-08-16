@@ -414,6 +414,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   of your entries keeps its progress and your decisions under the new path. Each button now says which
   path it belongs to, for screen reader users as well. Both decisions — "same file" and "it is a new
   file" — are covered by mouse, reading from the catalogue which entry ended up decided.
+- **Choosing which copy plays is now checked with the mouse to store your choice.** When you have two
+  copies of one title, the comparison lets you mark the one you want; the verification presses the one
+  that is **not** the copy that would play anyway, and reads the result from your catalogue rather than
+  from the screen, so "the better copy" and "the copy you chose" cannot be confused.
 - **Where "Watch the trailer" leads is now checked, on the film card and on the series card.** The
   button opens whatever browser you use, which is why no automated check could press it: it would
   have opened windows on the machine doing the checking. A copy that keeps its data somewhere of its

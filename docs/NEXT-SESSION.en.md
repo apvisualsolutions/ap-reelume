@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **67** today, with **61 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **66** today, with **62 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -55,12 +55,13 @@ one**, and this checks it.
    confirmation **impossible** for any real library path. It is a `Grid` with `*,Auto` now. And from
    the harness: `WalkLedger` read the control's view **after** the effect, and confirming removes the
    offer the button lives in, so identity is taken before the press. **69 → 67.**
-   - **`DuplicateReviewView#{Binding ShortPath}`.** It needs two copies of one title in a version
-     group — the proven route is the walk's first scene, where the watcher groups two identical files
-     — then `library.OpenDetailsAsync` plus `OpenDuplicatesAsync`, which lands on Review with the view
-     under the inbox. The radio is anchored by its own data and recorded with
-     `recordAs: "{Binding ShortPath}"`, like the library's `{Binding Title}`. The probe is the
-     **stored preference**, not the screen's `IsEffective`. **67 → 66.**
+   **The duplicate radio, done on 2026-08-16** and with **no defect at all**: the first such in four
+   sessions — [the evidence](evidence/stable/audit-walk-duplicate-version.md). It continues the walk's
+   first scene rather than staging anything new, presses the copy that is **not** already effective,
+   and probes the group's `preferred_media_file_id` — null before, the pressed file after — because
+   without a stored preference the policy already answers with one of the two, so reading `IsEffective`
+   would have called "the better copy" and "the one somebody chose" the same thing.
+   **67 → 66, and batch 5 closed.**
    - **And when it closes, a debt already measured.** `ReviewInboxViewModel.cs` sits at **92.13 % of
      lines and 59.26 % of branches** and is watched by nobody: it is an old file, so the coverage gate
      does not look at it. The two remaining reassignment controls exercise exactly
