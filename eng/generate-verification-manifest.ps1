@@ -74,6 +74,12 @@ $blockers = @{
     # resolves through the stored reference, and the assembled walk clicks the button and sees the
     # entry change. The condition was the click, and the click is green.
 
+    'LIB-012' = [ordered]@{
+        reason           = 'El renombrado no puede proponer ningún nombre: la aplicación ensamblada pide renombrar cada archivo al nombre que ya tiene —`new RenameRequest(file.Path, Path.GetFileName(file.Path))`, el único de producción del repositorio— y `RenamePolicy` lo descarta correctamente como `NoChange`. El plan sale siempre vacío, así que Renombrar y Deshacer no pueden ejecutarse nunca y la casilla de consentimiento guarda una decisión que no se ofrece. Las pruebas que lo daban por verificado midieron la política y la seguridad —que no se mueven carpetas, que un conflicto impide ejecutar— y ninguna midió que un plan llegara a contener una operación. / The rename can propose no name at all: the assembled application asks to rename each file to the name it already has, and the policy correctly discards that as NoChange, so the plan is always empty and neither button can ever run. What was verified was the safety, never that a plan contained an operation.'
+        owner            = 'Product'
+        unblockCondition = 'Un componente de dominio que componga el nombre a partir de la ficha, con el convenio ya decidido —el que comparten Plex, Jellyfin y Kodi, que este proyecto ya sigue en `TrailerDiscoveryPolicy`—: `Título (Año).ext` para películas y `Serie (Año) - SxxEyy - Título.ext` para episodios; su llamante en `OpenRenameAsync`; y el paseo pulsando consentimiento, Renombrar y Deshacer con el efecto leído del sistema de archivos. / A domain component composing the name from the entry in the already-decided convention, its caller, and the walk pressing consent, Rename and Undo with the effect read off the file system.'
+    }
+
     # The 2026-08-08 audit found a family of one defect: a component built, registered, and tested,
     # that nothing in the assembled application ever invokes. Each row below names its instance.
     'PRD-002' = [ordered]@{

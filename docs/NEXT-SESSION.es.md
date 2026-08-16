@@ -1,5 +1,41 @@
 # Dónde retomar
 
+## La cola decidida el 2026-08-16 (no se re-delibera)
+
+Cuatro cosas, en este orden. Las tres decisiones que faltaban están **tomadas** y escritas aquí; lo
+que queda es ejecutarlas midiendo antes de corregir.
+
+1. **`LIB-012` — desbloquear el renombrado.** Está en `BLOCKED` desde el 2026-08-16 porque **no puede
+   renombrar nada**: la aplicación pide el nombre que el archivo ya tiene. **Decidido**: un
+   `TitleFileNamePolicy` puro en `Domain/Discovery`, con el convenio que comparten Plex, Jellyfin y
+   Kodi —el mismo que este proyecto ya sigue en `TrailerDiscoveryPolicy`, así que no se inventa nada—:
+   `Título (Año).ext` para películas y `Serie (Año) - SxxEyy - Título.ext` para episodios. Sin año, el
+   título solo; el saneado y los conflictos siguen siendo de `RenamePolicy`, que ya los hace y no se
+   toca. Su llamante va en `OpenRenameAsync`, que hoy es quien se alimenta de su propia salida.
+   **Primera medición, antes de escribir**: cuántas de las fichas de una biblioteca real producen un
+   nombre distinto del actual — si la respuesta fuera «casi ninguna», el convenio está mal elegido.
+   Cierra con la tanda del paseo que pulsa consentimiento, Renombrar y Deshacer leyendo el efecto del
+   sistema de archivos, y con el estado de la matriz de vuelta a `VERIFIED` por el procedimiento.
+2. **Tanda 4 del paseo — los ajustes.** 14 controles: apariencia, ciclo de vida, privacidad
+   —incluido el interruptor de `LIB-016`—, escaneo, recomendaciones, detección de segmentos y atajos.
+   Bajaría el trinquete de **98** a **84**, el mayor salto que queda, y **no toca superficie visual**,
+   así que no choca con el rediseño.
+3. **El ciclo de vida en el sandbox, que sigue caducado.** Las cuatro fases nativas —instalar,
+   actualizar, reparar, desinstalar— están en «bloqueadas» desde que el manifiesto cambió con
+   `DES-001`. **Decidido**: extender `eng/sandbox-handover.ps1`, que ya funciona y ya instala, con las
+   cuatro fases y un paquete de la versión siguiente; el arnés del anfitrión no cambia.
+4. **Tandas 5-7 del paseo**, y después el rediseño y la documentación.
+
+**Decidido también, y no es trabajo de código:** el diálogo «Elegir una aplicación» que Windows deja
+en pantalla cuando el traspaso se rechaza **no se tapa ni se silencia**. La aplicación dice la verdad
+—no se instaló nada— y lo que falta es que ese mensaje diga **dónde está el paquete verificado** para
+que la persona lo abra ella misma. Es una cadena, va en los dos idiomas, y entra con la tanda 7.
+
+**Y una advertencia medida que vale para las tandas 2, 5 y 6:** los **cinco** superpuestos restantes
+del reproductor no fijan alineación, igual que el de estado que se corrigió el 2026-08-15, así que se
+estiran sobre todo el escenario cuando son visibles. Se corrige cada uno **en su tanda y con su
+medición**, no en bloque.
+
 Estado del proyecto al cerrar la **quinta** sesión del **2026-08-10**, la que saldó la última deuda
 de cobertura e instrumentó el camino del fallo del rojo intermitente. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
 canónico del alcance sigue siendo [FEATURES.md](FEATURES.md); el trabajo pendiente de la auditoría

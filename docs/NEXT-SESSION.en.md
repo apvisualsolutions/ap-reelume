@@ -1,5 +1,40 @@
 # Where to pick up
 
+## The queue decided on 2026-08-16 (not re-deliberated)
+
+Four things, in this order. The three decisions that were outstanding are **taken** and written down
+here; what remains is carrying them out, measuring before correcting.
+
+1. **`LIB-012` — unblock the rename.** It has been `BLOCKED` since 2026-08-16 because it **cannot
+   rename anything**: the application asks for the name the file already has. **Decided**: a pure
+   `TitleFileNamePolicy` in `Domain/Discovery`, in the convention Plex, Jellyfin and Kodi share — the
+   same one this project already follows in `TrailerDiscoveryPolicy`, so nothing is invented:
+   `Title (Year).ext` for films and `Show (Year) - SxxEyy - Title.ext` for episodes. With no year, the
+   title alone; sanitising and conflicts stay with `RenamePolicy`, which already does them and is not
+   touched. Its caller goes in `OpenRenameAsync`, which today feeds on its own output. **First
+   measurement, before writing**: how many entries of a real library produce a name different from the
+   current one — if the answer were "almost none", the convention is the wrong one. It closes with the
+   walk batch pressing consent, Rename and Undo with the effect read off the file system, and with the
+   matrix state returned to `VERIFIED` by the procedure.
+2. **Walk batch 4 — settings.** 14 controls: appearance, lifecycle, privacy — including `LIB-016`'s
+   switch — scanning, recommendations, segment detection and shortcuts. It would drop the ratchet from
+   **98** to **84**, the largest remaining step, and it **touches no visual surface**, so it does not
+   collide with the redesign.
+3. **The sandbox lifecycle, still expired.** The four native phases — install, upgrade, repair,
+   uninstall — have been "blocked" since the manifest changed with `DES-001`. **Decided**: extend
+   `eng/sandbox-handover.ps1`, which already works and already installs, with the four phases and a
+   next-version package; the host harness does not change.
+4. **Walk batches 5-7**, and then the redesign and the documentation.
+
+**Also decided, and it is not code work:** the "choose an app" dialog Windows leaves on screen when
+the handover is refused **is not hidden and not silenced**. The application tells the truth — nothing
+was installed — and what is missing is for that message to say **where the verified package is** so a
+person can open it themselves. It is a string, it goes in both languages, and it lands with batch 7.
+
+**And a measured warning that applies to batches 2, 5 and 6:** the **five** remaining player overlays
+set no alignment, exactly like the status one corrected on 2026-08-15, so they stretch over the whole
+stage when visible. Each is corrected **in its own batch with its own measurement**, not in bulk.
+
 The state of the project at the close of the **fifth** session of **2026-08-10**, the one that paid
 the last coverage debt and instrumented the intermittent red's failure path. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
 scope record is still [FEATURES.md](FEATURES.md); the audit's outstanding work lives in
