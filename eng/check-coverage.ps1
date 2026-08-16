@@ -214,6 +214,19 @@ try {
             Lines    = 100.00
             Branches = 100.00
         }
+
+        # The surface batch 5 walked end to end. It arrived at 92.13/59.26 — an old file, so watched
+        # by nobody — and the rule is that a batch pays for the file it touches before the file joins
+        # this list, because a low floor enshrines the debt instead of watching it. Two things it
+        # cost: a pair of unreachable branches, where `as AsyncRelayCommand` could not fail but could
+        # stop matching, and one branch whose two sides were exercised by two different suites and
+        # therefore read as half-covered forever, because merged Cobertura keeps the better report
+        # for a line rather than the union of them.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Presentation/Review/ReviewInboxViewModel.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
     )
 
     $watchRows = @()

@@ -95,6 +95,13 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
     private readonly ManualReassignmentViewModel? _reassignment;
     private readonly ReconcileScannedFiles? _reconciliation;
     private readonly SearchForMatch? _manualSearch;
+
+    // Held as what they are rather than looked up out of the ICommand properties with `as`. Those
+    // properties are only ever these two objects, so the cast could not fail — but it could stop
+    // matching, silently, and a command that quietly stops announcing CanExecuteChanged is exactly
+    // the defect ARQ-004 left in this class: a button that asks once and never again.
+    private readonly AsyncRelayCommand _searchManually;
+    private readonly AsyncRelayCommand _clearSelection;
     private IReadOnlyList<CandidateCardViewModel> _items = [];
     private IReadOnlyList<PendingReassignmentViewModel> _reassignments = [];
     private CandidateCardViewModel? _selectedItem;
@@ -127,10 +134,10 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         // that used to back them could not: its CanExecuteChanged had an empty add and remove, so a
         // button asked once, at construction, and never again. Typing into the search box left Search
         // disabled for good (ARQ-004 replaced twenty-four such classes; this pair was missed).
-        SearchManuallyCommand = new AsyncRelayCommand(
+        _searchManually = new AsyncRelayCommand(
             () => SearchManuallyAsync(CancellationToken.None),
             CanSearchManually);
-        ClearSelectionCommand = new AsyncRelayCommand(
+        _clearSelection = new AsyncRelayCommand(
             () =>
             {
                 SelectedItem = null;
@@ -176,7 +183,7 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         {
             if (SetField(ref _manualSearchText, value))
             {
-                (SearchManuallyCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+                _searchManually.RaiseCanExecuteChanged();
             }
         }
     }
@@ -211,9 +218,9 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
 
     public ICommand RejectSelectedCommand { get; }
 
-    public ICommand SearchManuallyCommand { get; }
+    public ICommand SearchManuallyCommand => _searchManually;
 
-    public ICommand ClearSelectionCommand { get; }
+    public ICommand ClearSelectionCommand => _clearSelection;
 
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
@@ -380,8 +387,8 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
 
     private void RaiseSelectionDependentCommands()
     {
-        (SearchManuallyCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
-        (ClearSelectionCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        _searchManually.RaiseCanExecuteChanged();
+        _clearSelection.RaiseCanExecuteChanged();
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

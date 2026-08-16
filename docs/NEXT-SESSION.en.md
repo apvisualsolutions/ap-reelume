@@ -62,13 +62,16 @@ one**, and this checks it.
    without a stored preference the policy already answers with one of the two, so reading `IsEffective`
    would have called "the better copy" and "the one somebody chose" the same thing.
    **67 → 66, and batch 5 closed.**
-   - **And when it closes, a debt already measured.** `ReviewInboxViewModel.cs` sits at **92.13 % of
-     lines and 59.26 % of branches** and is watched by nobody: it is an old file, so the coverage gate
-     does not look at it. The two remaining reassignment controls exercise exactly
-     `ConfirmReassignmentAsync` and `KeepAsNewAsync`, where most of the uncovered branches are.
-     **Decided**: when the batch closes it is measured again and **joins the watched list** in
-     `eng/check-coverage.ps1` at whatever floor it reaches; if it falls short of 96/96, the missing
-     branches are covered first, because a low floor enshrines the debt instead of watching it.
+   **And the debt, paid on 2026-08-16** — [the evidence](evidence/stable/audit-review-inbox-coverage.md).
+   `ReviewInboxViewModel.cs` goes from **92.13/59.26 watched by nobody** to **100/100 held at every
+   run**, taking the list in `eng/check-coverage.ps1` to six files. Two things the measurement taught,
+   and they apply to everything ahead: **pressing both buttons moved no branch at all** — a walk proves
+   a control works, never the paths taken when something goes wrong — and **a branch is covered whole
+   within one suite or it is not covered**, because merging Cobertura keeps the better report for a
+   line rather than the union: the walk took the "there is more" side, the UI tests took the "there is
+   not" side, and the branch read as half-covered forever. As a bonus, three **unreachable** branches
+   behind an `as AsyncRelayCommand` that could not fail but could stop matching, which is the way back
+   to `ARQ-004`.
 3. **Batch 8 — the shell and home (14).** The five navigation controls, the three player controls in
    the shell, the three card actions (edit, rename, duplicates), and the three home ones
    (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). The largest remaining
@@ -94,7 +97,7 @@ one**, and this checks it.
    **each is corrected in its own batch with its own measurement**, not in bulk. **32 → 3**, and the
    last three with them: **0.**
 9. **Code coverage, to the same destination.** The gate watches new files and a short list today —
-   **five since 2026-08-16**, with `AppDataPaths.cs` and `ShellExternalLinkLauncher.cs` added at
+   **six since 2026-08-16**, with `AppDataPaths.cs` and `ShellExternalLinkLauncher.cs` added at
    100/100 because they are what decides what leaves the application — so **an old file that gets
    worse is still watched by nobody**. **Decided**: every old file a batch touches and leaves at the
    floor joins that list when the batch closes, and once the walk reaches 0, `check-coverage.ps1`

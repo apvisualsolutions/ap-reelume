@@ -62,13 +62,16 @@ correcta**, y con esto se comprueba.
    sonda es `preferred_media_file_id` del grupo —nulo antes, el archivo pulsado después—, porque sin
    preferencia guardada la política ya contesta con una de las dos y leer `IsEffective` habría llamado
    igual a «la copia mejor» y a «la que alguien eligió». **67 → 66, y la tanda 5 cerrada.**
-   - **Y al cerrarla, una deuda ya medida.** `ReviewInboxViewModel.cs` está hoy en **92,13 % de
-     líneas y 59,26 % de ramas**, y no lo vigila nadie: es un archivo antiguo, así que la puerta de
-     cobertura no lo mira. Las dos reasignaciones que faltan ejercen precisamente
-     `ConfirmReassignmentAsync` y `KeepAsNewAsync`, que es donde están la mayoría de las ramas sin
-     cubrir. **Decidido**: al cerrar la tanda se vuelve a medir y **entra en la lista de vigilados**
-     de `eng/check-coverage.ps1` con el suelo que dé; si no llega a 96/96, se completan las ramas que
-     falten antes de añadirlo, porque un suelo bajo consagra la deuda en vez de vigilarla.
+   **Y la deuda, pagada el 2026-08-16** — [la evidencia](evidence/stable/audit-review-inbox-coverage.md).
+   `ReviewInboxViewModel.cs` va de **92,13/59,26 vigilado por nadie** a **100/100 vigilado en cada
+   ejecución**, y con él la lista de `eng/check-coverage.ps1` llega a seis archivos. Dos cosas que la
+   medición enseñó y que valen para todo lo que viene: **pulsar los dos botones no movió una sola
+   rama** —un paseo prueba que un control trabaja, nunca los caminos de cuando algo va mal—, y **una
+   rama se cubre entera dentro de una sola suite o no se cubre**, porque al fusionar informes Cobertura
+   se guarda el mejor de los dos para cada línea y no la unión: el lado «hay más página» lo tomaba el
+   paseo, el lado «no hay más» las pruebas de interfaz, y la rama se leía a la mitad para siempre. De
+   regalo, tres ramas **inalcanzables** por un `as AsyncRelayCommand` que no podía fallar pero sí dejar
+   de coincidir, que es el camino de vuelta a `ARQ-004`.
 3. **Tanda 8 — el shell y el inicio (14).** Las cinco de navegación, las tres del reproductor en el
    shell, las tres de la ficha (editar, renombrar, duplicados), y las tres de inicio
    (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). Es el mayor salto que
@@ -95,7 +98,7 @@ correcta**, y con esto se comprueba.
    que el de estado corregido el 2026-08-15; **cada uno se corrige en su tanda con su medición**, no
    en bloque. **32 → 3**, y los tres últimos con ellos: **0.**
 9. **La cobertura de código, al mismo destino.** Hoy la puerta vigila los archivos nuevos y una lista
-   corta —**cinco desde el 2026-08-16**, con `AppDataPaths.cs` y `ShellExternalLinkLauncher.cs`
+   corta —**seis desde el 2026-08-16**, con `AppDataPaths.cs` y `ShellExternalLinkLauncher.cs`
    añadidos al 100/100 porque son los que deciden qué sale de la aplicación—, así que **un archivo
    antiguo que empeora sigue sin vigilarse**. **Decidido**: cada archivo antiguo que una tanda toque y
    deje en el suelo entra en esa lista al cerrarla, y cuando el paseo llegue a 0,

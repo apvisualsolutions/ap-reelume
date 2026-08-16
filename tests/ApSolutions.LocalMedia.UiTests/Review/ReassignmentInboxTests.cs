@@ -106,6 +106,74 @@ public sealed class ReassignmentInboxTests
         Assert.False(viewModel.HasReassignments);
     }
 
+    /// <summary>
+    /// And a decision asked of that same inbox is refused rather than thrown: without the
+    /// reconciliation collaborators there is nothing to decide with.
+    /// </summary>
+    /// <remarks>
+    /// The section is invisible in that configuration, so this is not reachable by clicking — but it
+    /// is reachable by holding an offer, which is what any caller with a <c>PendingReassignment</c>
+    /// does. Answering with an exception would turn a surface that is merely absent into a crash.
+    /// </remarks>
+    [Fact]
+    public async Task Without_its_collaborators_a_held_decision_is_refused_rather_than_thrown()
+    {
+        var repository = new InMemoryMediaFiles();
+        var stranger = Media(@"R:\media\archive\film.mkv", 4);
+        await repository.UpsertAsync(stranger, TestContext.Current.CancellationToken);
+        var viewModel = new ReviewInboxViewModel(
+            new GetReviewInbox(new EmptyCandidates()),
+            new ResolveMatch(new EmptyCandidates(), new NullPublisher(), SilentIdentification.Create()),
+            new RejectMatch(new EmptyCandidates(), new NullPublisher()));
+        var pending = Offer(stranger.Path, CandidateRow(@"R:\media\old\film.mkv"));
+
+        await viewModel.ConfirmReassignmentAsync(
+            pending,
+            pending.Candidates[0],
+            TestContext.Current.CancellationToken);
+        await viewModel.KeepAsNewAsync(pending, TestContext.Current.CancellationToken);
+
+        // Nothing was decided, and nothing was written: the discovered row keeps no identity, so a
+        // later scan with the collaborators in place still offers it.
+        Assert.Null(await repository.GetIdentityAsync(stranger.Id, TestContext.Current.CancellationToken));
+        Assert.False(viewModel.HasReassignments);
+    }
+
+    /// <summary>
+    /// What an offer refuses to be built without, and what a decision refuses to be asked without.
+    /// </summary>
+    /// <remarks>
+    /// The offer rows come from a queue, and the two callbacks are how a press reaches the catalogue
+    /// at all. A row built without one of them is a button that does nothing when it is pressed —
+    /// which is this repository's characteristic defect, and the reason the guard is here rather
+    /// than left to the first person who wires a new caller.
+    /// </remarks>
+    [Fact]
+    public async Task An_offer_and_its_decisions_refuse_what_they_cannot_act_on()
+    {
+        var pending = Offer(@"R:\media\archive\film.mkv", CandidateRow(@"R:\media\old\film.mkv"));
+        var candidate = pending.Candidates[0];
+        var viewModel = CreateViewModel(new InMemoryMediaFiles(), new PendingReassignments());
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ReassignmentCandidateViewModel(null!, _ => Task.CompletedTask));
+        Assert.Throws<ArgumentNullException>(() =>
+            new ReassignmentCandidateViewModel(candidate, null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            new PendingReassignmentViewModel(null!, _ => Task.CompletedTask, () => Task.CompletedTask));
+        Assert.Throws<ArgumentNullException>(() =>
+            new PendingReassignmentViewModel(pending, null!, () => Task.CompletedTask));
+        Assert.Throws<ArgumentNullException>(() =>
+            new PendingReassignmentViewModel(pending, _ => Task.CompletedTask, null!));
+
+        _ = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            viewModel.ConfirmReassignmentAsync(null!, candidate, TestContext.Current.CancellationToken));
+        _ = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            viewModel.ConfirmReassignmentAsync(pending, null!, TestContext.Current.CancellationToken));
+        _ = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            viewModel.KeepAsNewAsync(null!, TestContext.Current.CancellationToken));
+    }
+
     private static ReviewInboxViewModel CreateViewModel(
         InMemoryMediaFiles repository,
         PendingReassignments queue)

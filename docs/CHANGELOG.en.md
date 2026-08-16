@@ -414,6 +414,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   of your entries keeps its progress and your decisions under the new path. Each button now says which
   path it belongs to, for screen reader users as well. Both decisions — "same file" and "it is a new
   file" — are covered by mouse, reading from the catalogue which entry ended up decided.
+- **The review surface is watched whole now, including when things go wrong.** It is where you correct
+  what the automatic reading got wrong, so it is now checked line by line and path by path: what
+  happens if somebody decided before you, if the card is no longer there, if you have chosen nothing.
+  With it went a check that **could not fail but could stop being worth anything** — the same kind that
+  had already left the Search button off for good — so that fault has no way back.
 - **Choosing which copy plays is now checked with the mouse to store your choice.** When you have two
   copies of one title, the comparison lets you mark the one you want; the verification presses the one
   that is **not** the copy that would play anyway, and reads the result from your catalogue rather than

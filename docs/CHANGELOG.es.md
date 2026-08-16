@@ -423,6 +423,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   conserva su progreso y tus decisiones bajo la ruta nueva. Cada botón dice ahora a qué ruta
   pertenece, también para quien use un lector de pantalla. Las dos decisiones —«es el mismo» y «es un
   archivo nuevo»— quedan comprobadas con el ratón, leyendo del catálogo cuál ficha quedó decidida.
+- **La pantalla de revisión queda vigilada entera, también cuando algo va mal.** Es donde corriges lo
+  que la lectura automática no acertó, así que ahora se comprueba línea por línea y camino por camino:
+  qué pasa si otro decidió antes que tú, si la ficha ya no existe, si no has elegido ninguna. Con ello
+  se retiró una comprobación que **no podía fallar pero sí dejar de valer** —la que ya había apagado
+  el botón «Buscar» para siempre—, para que esa avería no tenga camino de vuelta.
 - **Ya se comprueba con el ratón que elegir qué copia se reproduce guarda tu elección.** Cuando tienes
   dos copias del mismo título, la comparación te deja marcar cuál quieres; la verificación pulsa la
   que **no** es la que se reproduciría de todos modos y lo lee de tu catálogo, no de la pantalla, para
