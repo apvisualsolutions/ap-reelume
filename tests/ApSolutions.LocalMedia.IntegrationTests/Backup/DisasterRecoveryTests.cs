@@ -798,6 +798,10 @@ internal sealed class RestoreFixture : IDisposable
 
         public string DiagnosticsDirectory { get; } = Path.Combine(dataRoot, "diagnostics");
 
+        // Never the key Windows reads at sign-in: a suite leaves nothing behind there.
+        public string StartupRegistrySubKey { get; } =
+            @"Software\APSolutions\LocalMedia\Tests\Run";
+
         public string RestoreStagingDirectory => Path.Combine(BackupsDirectory, ".restore");
     }
 

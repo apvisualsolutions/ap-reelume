@@ -14,17 +14,13 @@ que queda es ejecutarlas midiendo antes de corregir.
    y el año viajan **juntos desde una fuente** — cruzarlos escribía `Arrival 2016 (2016).mp4`.
    Detalle en
    [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
-2. **Tanda 4 del paseo — los ajustes. Primera mitad hecha el 2026-08-16; quedan trece controles.**
-   Pulsados los tres temas, los dos idiomas, la vigilancia de raíces locales y la detección de
-   segmentos: trinquete **95 → 88**, 40 de 128. Faltan **ciclo de vida (5), privacidad (4),
-   recomendaciones (3) y atajos (1)**, que bajarían el trinquete a **75**. Ojo con las dos reglas que
-   costó medir: el arnés **vuelve arriba y sólo desplaza si el control no cabe** (`Reveal`), y **los
-   botones de tema se pulsan los últimos** —aplicar un tema deja fuera de alcance del clic lo que
-   está por encima, medido con ocho pulsaciones seguidas que no llegaron—. Detalle en
-   [audit-walk-cannot-go-back-up.md](evidence/stable/audit-walk-cannot-go-back-up.md).
-   Los cuatro controles de privacidad tienen condición previa: `PrivacyAutoRefreshLabel` sólo se
-   ofrece con conexión consentida, y `LifecycleStartupConsentGrant`/`Decline` sólo con el
-   consentimiento pendiente. **No toca superficie visual**, así que no choca con el rediseño.
+2. ~~**Tanda 4 del paseo — los ajustes.**~~ **Hecha entera el 2026-08-16.** Los veinte controles
+   pulsados con ratón: trinquete **95 → 75**, 53 de 128. Hizo falta un cambio de producción —
+   `IAppDataPaths.StartupRegistrySubKey`, para que una ejecución que guarda sus datos aparte guarde
+   **también su entrada de arranque aparte** y el paseo pueda conceder el arranque con Windows sin
+   registrar nada en la máquina de quien lo ejecute— y dos reglas del arnés: **`Reveal`** (volver
+   arriba, desplazar sólo si no cabe) y **los temas se pulsan los últimos**. Detalle en
+   [audit-walk-fourth-batch.md](evidence/stable/audit-walk-fourth-batch.md).
 3. **El ciclo de vida en el sandbox, que sigue caducado.** Las cuatro fases nativas —instalar,
    actualizar, reparar, desinstalar— están en «bloqueadas» desde que el manifiesto cambió con
    `DES-001`. **Decidido**: extender `eng/sandbox-handover.ps1`, que ya funciona y ya instala, con las

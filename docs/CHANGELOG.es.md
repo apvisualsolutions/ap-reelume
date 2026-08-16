@@ -384,14 +384,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
-- **La verificación automática ya pulsa los ajustes con el ratón.** La página de ajustes es más alta
-  que la ventana, y el recorrido que conduce la aplicación construida sólo sabía bajar por ella: una
-  vez pulsado algo, todo lo que quedaba más arriba dejaba de alcanzarse. Ahora vuelve al principio de
-  la página y sólo se desplaza cuando hace falta, así que cada pulsación vale por sí sola sin
-  depender de cuál se hizo antes. Con eso quedan comprobados con el ratón el tema claro, el oscuro,
-  el del sistema, los dos idiomas, la vigilancia de carpetas locales y la detección de segmentos: se
-  pulsan y se comprueba que la preferencia cambia de verdad — y, antes, que pulsar al lado no cambia
-  nada.
+- **La verificación automática ya pulsa los ajustes enteros con el ratón.** La página de ajustes es
+  más alta que la ventana, y el recorrido que conduce la aplicación construida sólo sabía bajar por
+  ella: una vez pulsado algo, todo lo que quedaba más arriba dejaba de alcanzarse. Ahora vuelve al
+  principio de la página y sólo se desplaza cuando hace falta, así que cada pulsación vale por sí
+  sola. Quedan comprobados con el ratón los veinte controles de ajustes: los tres temas, los dos
+  idiomas, la vigilancia de carpetas locales, la detección de segmentos, la bandeja y el cierre a
+  ella, el arranque con Windows —pedido, denegado, vuelto a pedir y concedido—, el consentimiento de
+  diagnóstico, el refresco automático, la previsualización, la exportación del informe, el
+  interruptor de recomendaciones, su umbral y su recálculo, y la restauración de los atajos. De cada
+  uno se comprueba el efecto de verdad, no la casilla: la exportación se lee del archivo escrito en
+  el disco y el arranque, de la entrada del registro.
+- **Una copia de la aplicación que guarda sus datos aparte guarda también aparte su arranque con
+  Windows.** Antes, cualquier copia escribía su entrada de inicio de sesión en el mismo sitio, así que
+  una comprobación automática no podía siquiera probar ese botón sin dejar registrada en tu equipo la
+  copia que estaba probando. Tu instalación normal no cambia: sigue escribiendo donde Windows lo lee.
 - **El renombrado ya renombra.** Proponía el nombre que el archivo ya tenía, así que la
   previsualización salía siempre vacía y los botones de Renombrar y Deshacer no podían hacer nada por
   mucho que se pulsaran. Ahora propone el nombre que la ficha merece, con el convenio que leen Plex,

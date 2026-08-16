@@ -71,7 +71,9 @@ public static partial class CompositionRoot
             .AddSingleton<IRecommendationSettings, StoredRecommendationSettings>()
             .AddTransient<RecommendationSettingsViewModel>()
             .AddSingleton<ILifecycleSettings, StoredLifecycleSettings>()
-            .AddSingleton<IStartupService>(_ => new WindowsStartupService(GetExecutablePath()))
+            .AddSingleton<IStartupService>(provider => new WindowsStartupService(
+                GetExecutablePath(),
+                provider.GetRequiredService<IAppDataPaths>().StartupRegistrySubKey))
             .AddSingleton<ITrayService>(_ => new WindowsTrayService(
                 ReadResource("ProductDisplayName"),
                 ReadResource("LifecycleTrayOpenAction"),

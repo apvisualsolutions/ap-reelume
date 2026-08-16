@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Lifecycle;
+using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Startup;
 using Microsoft.Win32;
 using Xunit;
@@ -119,6 +120,35 @@ public sealed class WindowsStartupTests : IDisposable
     {
         Assert.Throws<ArgumentException>(() => new WindowsStartupService(" ", TestSubKey));
         Assert.Throws<ArgumentException>(() => new WindowsStartupService(_executable, " "));
+    }
+
+    /// <summary>
+    /// Which key a run writes to is decided by whose data it is keeping, not by who is asking.
+    /// </summary>
+    /// <remarks>
+    /// The run that owns this machine's profile gets the key Windows reads at sign-in, because that
+    /// is the whole point of the feature. Any other run — a harness, a walk, a lifecycle check —
+    /// gets a key named after its own root, so it can press "start with Windows" and register
+    /// nothing on the machine of whoever ran it. Until this existed, the walk could not press that
+    /// control at all, and the one control nobody can cover is the one nobody finds broken.
+    /// </remarks>
+    [Fact]
+    public void Only_the_run_that_owns_the_profile_writes_where_windows_reads()
+    {
+        var owned = new AppDataPaths();
+        var isolated = new AppDataPaths(Path.Combine(Path.GetTempPath(), "reelume-isolated-run"));
+        var alsoIsolated = new AppDataPaths(Path.Combine(Path.GetTempPath(), "reelume-other-run"));
+
+        Assert.Equal(WindowsStartupService.WindowsRunKey, owned.StartupRegistrySubKey);
+        Assert.NotEqual(WindowsStartupService.WindowsRunKey, isolated.StartupRegistrySubKey);
+        Assert.NotEqual(isolated.StartupRegistrySubKey, alsoIsolated.StartupRegistrySubKey);
+
+        // Same root, same key, however it is spelt: a run that is restarted has to find its own
+        // entry rather than leave a second one behind.
+        Assert.Equal(
+            isolated.StartupRegistrySubKey,
+            new AppDataPaths(Path.Combine(Path.GetTempPath(), "REELUME-ISOLATED-RUN") + Path.DirectorySeparatorChar)
+                .StartupRegistrySubKey);
     }
 
     private WindowsStartupService CreateService() => new(_executable, TestSubKey);

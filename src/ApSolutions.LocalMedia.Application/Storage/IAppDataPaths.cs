@@ -28,4 +28,17 @@ public interface IAppDataPaths
 
     /// <summary>Where an exported diagnostic report is written, and nowhere a backup ever looks.</summary>
     string DiagnosticsDirectory { get; }
+
+    /// <summary>
+    /// The registry key under the current user that holds the sign-in startup entry.
+    /// <para>
+    /// It belongs to this contract for the same reason the folders do: it is a place the application
+    /// writes on this machine, and a run that keeps its data somewhere of its own must keep this
+    /// somewhere of its own too. A harness that pressed "start with Windows" against the real key
+    /// would register whatever binary it just built to start at sign-in, on the machine of whoever
+    /// ran it — which is why the suites were never allowed near that key, and why the control could
+    /// not be covered until it moved here.
+    /// </para>
+    /// </summary>
+    string StartupRegistrySubKey { get; }
 }

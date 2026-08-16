@@ -5,7 +5,9 @@ using System.Diagnostics;
 using System.Globalization;
 using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Discovery;
+using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
@@ -32,6 +34,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
@@ -63,6 +66,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
     public void Dispose()
     {
+        // The startup entry a scene may have consented to. It is under this run's own key rather than
+        // the one Windows reads at sign-in, and it still does not outlive the run that wrote it.
+        Registry.CurrentUser.DeleteSubKeyTree(
+            new AppDataPaths(_dataRoot).StartupRegistrySubKey,
+            throwOnMissingSubKey: false);
+
         // The watcher lets go of its directory handle asynchronously on the close path; the delete
         // retries rather than racing it.
         for (var attempt = 0; attempt < 5 && Directory.Exists(_dataRoot); attempt++)
@@ -457,6 +466,222 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => host.Application.Services.GetRequiredService<DetectSeriesSegments>().IsEnabled,
             "clicking the segment-detection switch never turned the detection on");
         Assert.True(segments!.IsEnabled);
+    }
+
+    /// <summary>
+    /// The fourth batch, second half so far: the lifecycle preferences — the tray, closing to it, and
+    /// starting with Windows, whose consent is asked for, declined, asked for again and granted.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Granting writes a real value into a real registry key, which is why this scene could not exist
+    /// before: the assembled application used to name the key Windows reads at sign-in, so pressing
+    /// the button would have registered whatever binary the suite had just built to start on the
+    /// machine of whoever ran it. A run keeping its data somewhere of its own now keeps this
+    /// somewhere of its own too, and the key is deleted when the scene ends.
+    /// </para>
+    /// <para>
+    /// Consent is declined before it is granted, because a decline that is never exercised is a
+    /// button nobody has proved says no. Asking twice is what a person does after changing their
+    /// mind, and it is the only way to reach both.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_lifecycle_consents_are_given_and_taken_back_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        var lifecycle = host.ViewModel.LifecycleSettings;
+        Assert.NotNull(lifecycle);
+        Assert.False(lifecycle!.TrayEnabled);
+        Assert.False(lifecycle.CanMinimizeToTray);
+
+        // The tray first: closing to it is offered only while it exists, so pressing the second box
+        // before the first would press a disabled control.
+        await PressAsync(
+            host,
+            "LifecycleTrayLabel",
+            () => lifecycle.TrayEnabled,
+            "clicking the tray box never turned the tray on");
+        Assert.True(lifecycle.CanMinimizeToTray);
+
+        await PressAsync(
+            host,
+            "LifecycleCloseToTrayLabel",
+            () => lifecycle.MinimizeToTrayOnClose,
+            "clicking the close-to-tray box never changed what the close button does");
+
+        // Asking to start with Windows grants nothing: it raises the question, and the answer is two
+        // more presses away.
+        var startup = host.Application.Services.GetRequiredService<IStartupService>();
+        Assert.Equal(StartupEntryState.Absent, startup.Inspect());
+        await PressAsync(
+            host,
+            "LifecycleStartupLabel",
+            () => lifecycle.IsStartupConsentPending,
+            "clicking the startup box never asked for the consent it needs");
+        Assert.False(lifecycle.StartWithWindows);
+
+        await PressAsync(
+            host,
+            "LifecycleStartupConsentDecline",
+            () => lifecycle.IsStartupConsentPending,
+            "clicking Decline never withdrew the pending question");
+        Assert.False(lifecycle.StartWithWindows);
+        Assert.Equal(StartupEntryState.Absent, startup.Inspect());
+
+        await PressAsync(
+            host,
+            "LifecycleStartupLabel",
+            () => lifecycle.IsStartupConsentPending,
+            "asking a second time never raised the question again");
+
+        // And Grant, whose effect is neither on the screen nor in the catalogue but in the registry:
+        // asserting on the checkbox would prove the checkbox remembers being checked.
+        await PressAsync(
+            host,
+            "LifecycleStartupConsentGrant",
+            () => startup.Inspect(),
+            "clicking Grant never wrote the startup entry it consents to");
+        Assert.Equal(StartupEntryState.Present, startup.Inspect());
+        Assert.True(lifecycle.StartWithWindows);
+        Assert.False(lifecycle.IsStartupConsentPending);
+    }
+
+    /// <summary>
+    /// The fourth batch: the privacy surface. Diagnostics consented to, the automatic refresh turned
+    /// on, the report previewed, and the report written — the last one read off the disk.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The automatic-refresh switch is only offered while a consented connection exists, because
+    /// without one it would promise something that cannot happen. So the scene puts a token in the
+    /// environment before the application is built and takes it out afterwards. Nothing connects:
+    /// the one pass over stale entries is posted when the window is configured, which this scene
+    /// never does, and turning the switch on only writes a preference.
+    /// </para>
+    /// <para>
+    /// Export asserts on the file. The screen would say the same thing whether or not anything was
+    /// written, and this is the one surface where a person has to be able to tell those apart.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_privacy_surface_consents_previews_and_writes_the_report()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        var restore = Environment.GetEnvironmentVariable(TmdbOptions.EnvironmentVariableName);
+        Environment.SetEnvironmentVariable(TmdbOptions.EnvironmentVariableName, "walk-token");
+        try
+        {
+            using var host = ShowShell(height: 2000);
+            Navigate(host, AppRoute.Settings);
+
+            var privacy = host.ViewModel.PrivacySettings;
+            Assert.NotNull(privacy);
+            Assert.False(privacy!.DiagnosticsEnabled);
+            Assert.True(privacy.CanRefreshAutomatically, "The refresh switch was not even offered.");
+
+            await PressAsync(
+                host,
+                "PrivacyDiagnosticsLabel",
+                () => privacy.DiagnosticsEnabled,
+                "clicking the diagnostics box never recorded the consent");
+
+            await PressAsync(
+                host,
+                "PrivacyAutoRefreshLabel",
+                () => privacy.AutomaticRefreshEnabled,
+                "clicking the automatic-refresh box never turned the refresh on");
+
+            await PressAsync(
+                host,
+                "PrivacyPreviewLabel",
+                () => privacy.HasPreview,
+                "clicking Preview never produced the text an export would write");
+            Assert.NotNull(privacy.PreviewJson);
+
+            // The disk, not the screen: the folder holds one report that was not there before.
+            var diagnostics = new AppDataPaths(_dataRoot).DiagnosticsDirectory;
+            await PressAsync(
+                host,
+                "PrivacyExportLabel",
+                () => Directory.Exists(diagnostics) ? Directory.GetFiles(diagnostics).Length : 0,
+                "clicking Export never wrote a report to the diagnostics folder");
+            Assert.NotNull(privacy.ExportedFileName);
+            Assert.Contains(
+                Directory.GetFiles(diagnostics),
+                file => Path.GetFileName(file) == privacy.ExportedFileName);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(TmdbOptions.EnvironmentVariableName, restore);
+        }
+    }
+
+    /// <summary>
+    /// The last of the fourth batch: the recommendation threshold and the shortcut map. Four
+    /// controls, and the two that are not a checkbox — a slider and a button whose work happens in
+    /// the catalogue — are the reason this batch is worth pressing at all.
+    /// </summary>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_recommendation_threshold_and_the_shortcut_defaults_are_pressed_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        var recommendations = host.ViewModel.RecommendationSettings;
+        Assert.NotNull(recommendations);
+        await PressAsync(
+            host,
+            "RecommendationSettingsEnableLabel",
+            () => recommendations!.IsEnabled,
+            "clicking the recommendations box never turned them on");
+
+        Assert.True(recommendations!.HasWatchedThreshold, "The threshold was not offered at all.");
+        await PressAsync(
+            host,
+            "RecommendationSettingsThresholdLabel",
+            () => recommendations.WatchedThresholdPercent,
+            "clicking the threshold slider never moved the threshold");
+
+        // Apply reaches the catalogue, so the probe is the fact that a pass ran rather than the
+        // number it returned: with nothing watched, the honest answer is zero, and zero is what a
+        // slider that did nothing would also read.
+        await PressAsync(
+            host,
+            "RecommendationSettingsThresholdApply",
+            () => recommendations.HasThresholdResult,
+            "clicking Apply never recalculated anything");
+        Assert.Equal(0, recommendations.RecalculatedCount);
+
+        // The shortcut map is restored from something other than its defaults, or restoring it would
+        // be indistinguishable from doing nothing.
+        var shortcuts = host.ViewModel.Shortcuts;
+        Assert.NotNull(shortcuts);
+        Assert.True(
+            shortcuts!.TryRebind(PlaybackInputCommand.PlayPause, new KeyGesture(Key.F9)),
+            "The rebind this scene needs was refused.");
+        Assert.Equal(PlaybackInputCommand.PlayPause, shortcuts.Resolve(new KeyGesture(Key.F9)));
+
+        await PressAsync(
+            host,
+            "ShortcutSettingsRestore",
+            () => shortcuts.Resolve(new KeyGesture(Key.F9)),
+            "clicking Restore defaults never gave the rebound key back");
+        Assert.Null(shortcuts.Resolve(new KeyGesture(Key.F9)));
+        Assert.Equal(PlaybackInputCommand.PlayPause, shortcuts.Resolve(new KeyGesture(Key.Space)));
     }
 
     /// <summary>
