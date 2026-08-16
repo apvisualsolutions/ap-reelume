@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **44** today, with **84 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **40** today, with **88 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -100,28 +100,40 @@ one**, and this checks it.
    beside a value of free width goes in a grid.** And from the harness: **a probe is compared by
    value** — returning the list of folders made the beside click "change" it every time, because each
    read is a new array; the empty case passed because an empty array is one shared instance.
-5. **Batch 6 — backup and restore (5).** The rule on the **file pickers**, which is where it was
-   actually needed. Create copy, export, cancel; choose archive and confirm the restore. **44 → 39.**
-   Investigated on 2026-08-16 so it need not be rediscovered:
+5. ~~**Batch 6a — backup and restore (4).**~~ **Done on 2026-08-16, 44 → 40** —
+   [the evidence](evidence/stable/audit-walk-backup-and-restore.md) — and **without a single product
+   defect**, the second such batch in five sessions. The isolation rule reached the file pickers with
+   no new interface, decided in the composition by `SystemHandoffDirectory` the way the link launcher
+   was; `HandoffArchivePicker` answers inside the handover folder and answers `null` when it holds
+   nothing, which is what a cancelled dialog answers. The scene **composes no path at all**: it
+   exports where the application says and restores whatever the application finds there.
 
-   - **The wiring is already in place**: both view models take a `Func<CancellationToken,
-     Task<string?>>` and are handed one at `CompositionRoot.Backup.cs:84` and `:90`. **No new
-     interface is needed** — pick the delegate by `SystemHandoffDirectory`, the way the link launcher
-     was picked. Isolated, export **writes the ZIP into the handoff folder** and restore **reads
-     whichever one is there**; the person whose profile it is still gets the Windows dialog. Without
-     that, both `ChooseArchive…Async` return `null` under a harness (there is no `MainWindow`), which
-     means "cancelled" and changes nothing to probe.
-   - **The one hard precondition is Cancel**: it carries `IsEnabled="{Binding IsRunning}"` **and**
-     `CanExecute => IsRunning`, so it exists only while a copy is running, and against the harness's
-     catalogue a copy finishes in milliseconds. A library that **takes long enough** has to be seeded
-     — many rows, and personal artwork, which is what the copy walks — and measured before the scene
-     is written. Not improvised at the end.
-   - **Decided on 2026-08-16: the batch splits in two**, so one seeding obstacle does not hold back
-     four controls that do not have it. **6a (four controls, 44 → 40)**: create copy — probe, the
-     folder appearing in `BackupsDirectory` — export — the ZIP in the handoff folder — choose archive
-     — the plan left on screen — and confirm the restore — the restored database. **6b (one control,
-     40 → 39)**: Cancel, with its slow library measured separately. 6a comes in with the isolation
-     rule; 6b may wait behind batch 7 if the seeding turns out to be expensive.
+   **What cost a run: a disk probe passing does not mean the screen has finished.** The copy's folder
+   is published **before** the continuation that sets the status runs, so `BackupStatusRunning` was
+   still on screen while the probe was already satisfied. The outcome is waited for, and only then
+   stated. Same race the privacy scene met from the other side; two appearances make it a rule.
+
+   **And it confirmed, for the first time from the assembled application**, that the swap works with
+   the program open and the library loaded: `SwapAsync` calls `ClearAllPools()` before moving
+   anything, and the catalogue opens and closes its connection per operation.
+
+   **Noted, not fixed:** `StagedRestoreService` has a second constructor (`availableBytes`,
+   `beforeSwap`) that **nobody uses** — neither the composition nor the tests — so the hook is an
+   imaginary extension point at the **one destructive moment** of the program, and its `?.Invoke()` is
+   an unreachable branch. Fourth shape of the house defect. Removing it changes a public
+   infrastructure signature, so it gets its own measurement rather than riding along.
+
+5b. **Batch 6b — Cancel (1).** **40 → 39.** What is left of batch 6, and it may wait behind batch 7:
+
+   - **The precondition is hard and it is the only one**: `IsEnabled="{Binding IsRunning}"` **and**
+     `CanExecute => IsRunning`, so the button exists only while a copy is running. Against a harness
+     library a copy finishes in **milliseconds** — measured on 2026-08-16 in the 6a scene, which
+     creates a whole one without the progress bar ever being seen. A library that **takes long
+     enough** has to be seeded — many rows, and personal artwork, which is what the copy walks — and
+     measured **before** the scene is written. Not improvised at the end.
+   - **Everything else is already in place from 6a**: the scene navigates to backups, the isolation
+     rule answers both dialogs, and the probe for a cancellation is `BackupStatusCancelled` with **no
+     new folder** published — because a cancelled copy must leave nothing to restore.
 6. **The sandbox lifecycle, expired since `DES-001`.** The four native phases — install, upgrade,
    repair, uninstall — are still blocked because the manifest changed. **Decided**: extend
    `eng/sandbox-handover.ps1`, which already installs, with the four phases and a package of the next

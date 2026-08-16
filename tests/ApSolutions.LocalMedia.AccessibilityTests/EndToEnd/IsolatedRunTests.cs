@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
 using ApSolutions.LocalMedia.Windows.Shell;
@@ -109,5 +110,62 @@ public sealed class IsolatedRunTests : IDisposable
         {
             Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, previous);
         }
+    }
+
+    /// <summary>
+    /// The same rule at the file dialogs: an isolated run answers its own, and the run that owns the
+    /// profile is still the one Windows asks.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Both halves are here rather than in two tests because merged Cobertura reports keep the better
+    /// reading per line and not the union, so a two-way choice split across suites reads as half
+    /// covered for good.
+    /// </para>
+    /// <para>
+    /// What is observed is the folder the isolated picker creates in order to answer, which is enough
+    /// to tell the two exits apart without the export itself having to succeed. The owning run cannot
+    /// be observed any further than this and must not be: proving that its dialog opens would mean
+    /// opening one on whoever ran the suite.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task An_isolated_run_answers_its_own_archive_dialog_and_the_owning_run_does_not()
+    {
+        var isolated = Path.Combine(_dataRoot, "picker-isolated");
+        await using (var host = ApplicationHost.Create(new AppDataPaths(isolated)))
+        {
+            await host.Services.GetRequiredService<BackupViewModel>()
+                .ExportAsync(TestContext.Current.CancellationToken);
+        }
+
+        var handoff = new AppDataPaths(isolated).SystemHandoffDirectory;
+        Assert.NotNull(handoff);
+        Assert.True(
+            Directory.Exists(handoff),
+            "An isolated run was asked where to export and never answered with a folder of its own, "
+                + "so the export went wherever a dialog nobody could see would have said.");
+
+        var owned = Path.Combine(_dataRoot, "picker-owned");
+        var previous = Environment.GetEnvironmentVariable(AppDataPaths.DataRootVariableName);
+        Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, owned);
+        try
+        {
+            Assert.Null(new AppDataPaths().SystemHandoffDirectory);
+            await using var host = ApplicationHost.Create(new AppDataPaths());
+            await host.Services.GetRequiredService<BackupViewModel>()
+                .ExportAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, previous);
+        }
+
+        // Nothing was composed on the owning run's behalf: with no window there is no dialog, and no
+        // dialog means cancelled, which is exactly what somebody closing one would have meant. The
+        // root may not exist at all, which is the same answer stated more strongly.
+        Assert.Empty(Directory.Exists(owned)
+            ? Directory.EnumerateFiles(owned, "*.zip", SearchOption.AllDirectories)
+            : []);
     }
 }

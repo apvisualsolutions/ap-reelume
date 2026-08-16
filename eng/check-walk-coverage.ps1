@@ -42,10 +42,11 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # batch, 73 once an isolated run stopped opening a browser and the two provider-trailer links became
 # pressable, 69 with the review inbox's four decisions, 67 once a held moved file could be decided at
 # all, 66 with the version a duplicate group plays, 52 once the shell, its title actions and home
-# were pressed, 44 with the folder a library is made of added and taken back out. The destination is
-# 0: this application ships free and nobody is going to test it by hand, so a control the walk never
-# presses is a control nobody ever presses before somebody installs it.
-$maximumPending = 44
+# were pressed, 44 with the folder a library is made of added and taken back out, 40 once a run with a
+# data root of its own answered its own file dialogs and the library could be copied out and brought
+# back. The destination is 0: this application ships free and nobody is going to test it by hand, so
+# a control the walk never presses is a control nobody ever presses before somebody installs it.
+$maximumPending = 40
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)

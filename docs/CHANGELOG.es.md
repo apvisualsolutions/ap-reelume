@@ -96,6 +96,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Copiar la biblioteca y devolverla se prueban ahora pulsando sus botones, no llamando a su
+  código.** Los dos botones que preguntan dónde guardar o de dónde leer se lo preguntan a un diálogo
+  de Windows, y un diálogo no lo puede contestar ninguna comprobación automática: así que crear una
+  copia, exportarla, elegir un archivo y confirmar la restauración eran cuatro cosas que nadie había
+  llegado a probar como las usas tú. Ahora una ejecución de prueba —la que no es la tuya— responde
+  esas dos preguntas dentro de su propia carpeta, y la comprobación exporta la biblioteca, la vuelve
+  a leer y la restaura entera, mirando el disco en cada paso en vez de creerse lo que dice la
+  pantalla. Tu instalación no cambia en nada: sigue abriéndose el diálogo de Windows de siempre. De
+  camino quedó comprobado, por primera vez desde la aplicación completa, que la restauración
+  funciona con el programa abierto y la biblioteca cargada.
+
 - **La herramienta que firma las publicaciones no compilaba, y nadie podía enterarse hasta publicar.**
   Le faltaba el encabezado de licencia que este proyecto exige en cada archivo, y esa regla es un
   error de compilación — pero su proyecto **no estaba en la solución**, así que ninguna de las

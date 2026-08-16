@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **44**, con **84 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **40**, con **88 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -101,28 +101,41 @@ correcta**, y con esto se comprueba.
    del arnés: **una sonda se compara por valor** — devolver la lista de carpetas hacía que el clic de
    control «cambiara» siempre, porque cada lectura es un array nuevo; el caso vacío pasaba porque un
    array vacío es la misma instancia compartida.
-5. **Tanda 6 — copias y restauración (5).** La regla en los **selectores de archivo**, que es donde
-   de verdad hacía falta. Crear copia, exportar, cancelar; elegir archivo y confirmar la restauración.
-   **44 → 39.** Investigado el 2026-08-16, para no redescubrirlo:
+5. ~~**Tanda 6a — copias y restauración (4).**~~ **Hecha el 2026-08-16, 44 → 40** —
+   [la evidencia](evidence/stable/audit-walk-backup-and-restore.md)—, y **sin un solo defecto de
+   producto**: el segundo en cinco sesiones. La regla de aislamiento llegó a los selectores de archivo
+   sin interfaz nueva, decidida en la composición por `SystemHandoffDirectory` igual que el lanzador
+   de enlaces; `HandoffArchivePicker` responde dentro de la carpeta de traspaso y responde `null`
+   cuando no hay nada, que es lo que contesta un diálogo cancelado. La escena **no compone ninguna
+   ruta**: exporta donde la aplicación dice y restaura lo que la aplicación encuentra allí.
 
-   - **El cableado ya está preparado**: los dos modelos reciben un `Func<CancellationToken,
-     Task<string?>>` y se les pasa en `CompositionRoot.Backup.cs:84` y `:90`. **No hace falta interfaz
-     nueva**: se elige el delegado por `SystemHandoffDirectory`, igual que se eligió el lanzador de
-     enlaces. Aislado, exportar **escribe el ZIP en la carpeta de traspaso** y restaurar **lee el que
-     haya allí**; quien es dueño del perfil sigue viendo el diálogo de Windows. Sin eso, los dos
-     `ChooseArchive…Async` devuelven `null` en un arnés (no hay `MainWindow`), que significa
-     «cancelado» y no cambia nada que sondear.
-   - **La condición previa dura es «Cancelar»**, y es la única: lleva `IsEnabled="{Binding
-     IsRunning}"` **y** `CanExecute => IsRunning`, así que sólo existe mientras una copia está en
-     marcha. Con la base del arnés la copia acaba en milisegundos. Hay que **sembrar una biblioteca
-     que tarde** —muchas filas, y artwork personal, que es lo que la copia recorre— y medir cuánto
-     dura antes de escribir la escena. No se improvisa al final.
-   - **Decidido el 2026-08-16: la tanda se parte en dos**, para que un obstáculo de siembra no
-     retenga a cuatro controles que no lo tienen. **6a (4 controles, 44 → 40)**: crear copia —sonda,
-     la carpeta que aparece en `BackupsDirectory`—, exportar —el ZIP en la carpeta de traspaso—,
-     elegir archivo —el plan que queda en pantalla— y confirmar la restauración —la base restaurada—.
-     **6b (1 control, 40 → 39)**: «Cancelar», con su biblioteca lenta medida aparte. 6a entra con la
-     regla de aislamiento; 6b puede esperar detrás de la 7 si la siembra resulta cara.
+   **Lo que costó una ejecución: una sonda de disco que pasa no significa que la pantalla haya
+   terminado.** La carpeta de la copia se publica **antes** de que corra la continuación que fija el
+   estado, así que `BackupStatusRunning` seguía en pantalla cuando la sonda ya estaba satisfecha. Se
+   espera al reposo y **luego** se dice qué salió. Es la misma carrera que la escena de privacidad
+   encontró desde el otro lado, y con dos apariciones ya es regla.
+
+   **Y quedó comprobado por primera vez desde la aplicación ensamblada** que el intercambio funciona
+   con el programa abierto y la biblioteca cargada: `SwapAsync` llama a `ClearAllPools()` antes de
+   mover nada y el catálogo abre y cierra su conexión por operación.
+
+   **Hallazgo anotado, no corregido:** `StagedRestoreService` tiene un segundo constructor
+   (`availableBytes`, `beforeSwap`) que **nadie usa** —ni la composición ni las pruebas—, así que el
+   gancho es un punto de extensión imaginario en el **único momento destructivo** del programa y su
+   `?.Invoke()` es una rama inalcanzable. Cuarta forma del defecto de la casa. Retirarlo cambia una
+   firma pública de infraestructura, así que va con su propia medición, no de rebote.
+
+5b. **Tanda 6b — «Cancelar» (1).** **40 → 39.** Lo que queda de la 6, y puede esperar detrás de la 7:
+
+   - **La condición previa es dura y es la única**: lleva `IsEnabled="{Binding IsRunning}"` **y**
+     `CanExecute => IsRunning`, así que el botón sólo existe mientras una copia está en marcha. Con
+     la biblioteca de un arnés la copia acaba en **milisegundos** —medido el 2026-08-16 en la escena
+     de la 6a, que la crea entera sin que se vea la barra—. Hay que **sembrar una biblioteca que
+     tarde** —muchas filas, y artwork personal, que es lo que la copia recorre— y medir cuánto dura
+     **antes** de escribir la escena. No se improvisa al final.
+   - **Lo demás ya está puesto por la 6a**: la escena navega a copias, la regla de aislamiento
+     responde los dos diálogos, y la sonda de una cancelación es `BackupStatusCancelled` con **ninguna
+     carpeta nueva** publicada — porque una copia cancelada no debe dejar nada que restaurar.
 6. **El ciclo de vida en el sandbox, caducado desde `DES-001`.** Las cuatro fases nativas —instalar,
    actualizar, reparar, desinstalar— siguen «bloqueadas» porque el manifiesto cambió. **Decidido**:
    extender `eng/sandbox-handover.ps1`, que ya instala, con las cuatro fases y un paquete de la

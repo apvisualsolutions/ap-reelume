@@ -16,6 +16,7 @@ using ApSolutions.LocalMedia.Infrastructure.Settings;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using ApSolutions.LocalMedia.Windows.Backup;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ApSolutions.LocalMedia.Windows;
@@ -81,11 +82,33 @@ public static partial class CompositionRoot
                     .ExecuteAsync(archive, remaps, cancellationToken),
                 (archive, remaps, progress, cancellationToken) => provider.GetRequiredService<RestoreBackup>()
                     .ExecuteAsync(archive, remaps, progress, cancellationToken),
-                ChooseArchiveSourceAsync))
+
+                // Which picker asks is decided by the data root, once, here — the same choice the
+                // trailer link makes between a real browser and a written-down address. The person
+                // whose profile this is gets the dialog Windows owns; a run that keeps its data
+                // somewhere of its own restores from the handover folder under that root, because
+                // a modal dialog is the one thing no harness can answer.
+                HandoffOrDialog(provider, picker => picker.ChooseSourceAsync, ChooseArchiveSourceAsync)))
             .AddTransient(provider => new BackupViewModel(
                 (progress, cancellationToken) => provider.GetRequiredService<CreateBackup>()
                     .ExecuteAsync(progress, cancellationToken),
                 (destination, progress, cancellationToken) => provider.GetRequiredService<ExportLibrary>()
                     .ExecuteAsync(destination, progress, cancellationToken),
-                ChooseArchiveDestinationAsync));
+                HandoffOrDialog(provider, picker => picker.ChooseDestinationAsync, ChooseArchiveDestinationAsync)));
+
+    /// <summary>
+    /// The isolated picker's answer, or the Windows dialog, decided by the resolved data root.
+    /// </summary>
+    /// <remarks>
+    /// Both halves of the pair read the root the same way and read it once, so an export and the
+    /// restore that follows it can never disagree about which exit this run has — and an assertion on
+    /// what landed in the handover folder is an assertion about the real thing.
+    /// </remarks>
+    private static Func<CancellationToken, Task<string?>> HandoffOrDialog(
+        IServiceProvider provider,
+        Func<HandoffArchivePicker, Func<CancellationToken, Task<string?>>> isolated,
+        Func<CancellationToken, Task<string?>> dialog) =>
+        provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory is { } handoff
+            ? isolated(new HandoffArchivePicker(handoff))
+            : dialog;
 }

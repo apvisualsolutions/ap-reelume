@@ -10,9 +10,7 @@
 
 AudioOutputView#AudioOutputDeviceLabel                     # batch 2
 AudioOutputView#AudioOutputLayoutLabel                     # batch 2
-BackupView#BackupCancelLabel                               # batch 6
-BackupView#BackupCreateCopyLabel                           # batch 6
-BackupView#BackupExportLabel                               # batch 6
+BackupView#BackupCancelLabel                               # batch 6b: only exists while a copy runs
 DatabaseRecoveryView#RecoveryExit                          # batch 7
 DatabaseRecoveryView#RecoveryOpenBackupFolder              # batch 7
 DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
@@ -32,8 +30,6 @@ NextEpisodeOverlay#NextEpisodePlayNow                      # batch 2
 PlayerVersionsView#PlayerVersionsSwitchAction              # batch 2
 PlayerView#PlayerRecoveryOpenExternally                    # batch 2
 PlayerView#PlayerRecoveryRetry                             # batch 2
-RestoreWizardView#RestoreChooseArchiveLabel                # batch 6
-RestoreWizardView#RestoreConfirmLabel                      # batch 6
 ResumePromptView#ResumePromptRestart                       # batch 2
 ResumePromptView#ResumePromptResume                        # batch 2
 SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2

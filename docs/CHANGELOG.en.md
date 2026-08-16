@@ -95,6 +95,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Copying your library out and bringing it back are now tested by pressing their buttons, not by
+  calling their code.** The two buttons that ask where to save or what to read ask a Windows dialog,
+  and no automated check can answer a dialog: so creating a copy, exporting it, choosing an archive
+  and confirming the restore were four things nobody had ever exercised the way you use them. A test
+  run — one that is not yours — now answers those two questions inside a folder of its own, and the
+  check exports the library, reads it back and restores the whole thing, looking at the disk at every
+  step instead of believing what the screen says. Your installation is unchanged: the usual Windows
+  dialog still opens. Along the way it confirmed, for the first time from the complete application,
+  that a restore works with the program open and the library loaded.
+
 - **The tool that signs releases did not compile, and nothing could say so until a publication.** It
   was missing the licence header this project requires in every file, and that rule is a build error
   — but its project **was not in the solution**, so none of the checks that run on every change ever
