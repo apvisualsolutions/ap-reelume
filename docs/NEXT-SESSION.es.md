@@ -41,12 +41,34 @@ correcta**, y con esto se comprueba.
    —cargar más, aceptar, rechazar y buscar a mano— con **dos defectos del producto corregidos**: el
    botón «Buscar» no se habilitaba nunca (una clase de comando privada con `CanExecuteChanged` vacío,
    superviviente de `ARQ-004`) y su evento **no lo escuchaba nadie** en `src/`; ahora llega a
-   `SearchForMatch`, la contraparte manual de `IdentifyScannedFiles`. **Queda**: las dos de
-   reasignación —hace falta sembrar una oferta de archivo movido en `PendingReassignments` con la
-   identidad guardada en la fila vieja, y `ReconcileScanResults.ConfirmAsync` exige que la identidad
-   del comando case por huella o por identidad estable— y el radio de duplicados
-   (`DuplicateReviewView#{Binding ShortPath}`), que necesita un grupo de versiones y se abre desde la
-   ficha con `OpenDuplicatesAsync`. **73 → 69, y 69 → 66 al cerrarla.**
+   `SearchForMatch`, la contraparte manual de `IdentifyScannedFiles`. **73 → 69.**
+
+   **Lo que queda, con la receta ya investigada** (69 → 66):
+
+   - **`ReassignmentConfirmAction` y `ReassignmentKeepAction`.** La oferta se siembra desde el
+     contenedor de la propia aplicación —`host.Application.Services` →
+     `PendingReassignments.Offer(new PendingReassignment(command, [candidate]))`— con
+     `ReconcileFileCommand(rootId, rutaNueva, identity)`. La **identidad tiene que ser la misma** que
+     se guardó en la fila vieja con `IMediaFileRepository.SaveIdentityAsync`: `ConfirmAsync` la busca
+     por identidad estable o por huella y **lanza** si no la encuentra. Después, `inbox.LoadAsync`
+     para que `Reassignments` se rellene: `ReloadReassignments` sólo corre al cargar. Sondas, las dos
+     en la base: confirmar → la fila vieja pasa a apuntar a la ruta nueva (`FindByPathAsync`);
+     mantener como nuevo → la fila de la ruta nueva adquiere la identidad, así que
+     `FindByStableIdentityAsync` la encuentra. Los dos botones viven dentro de un `ItemsControl`, no
+     de un `ListBox`, así que el clic al lado no tropieza con filas seleccionables.
+   - **`DuplicateReviewView#{Binding ShortPath}`.** Necesita dos copias del mismo título en un grupo
+     de versiones —el camino ya probado es el de la primera escena del paseo, con el vigilante
+     agrupando dos archivos iguales— y luego `library.OpenDetailsAsync` + `OpenDuplicatesAsync`, que
+     lleva a Revisión con la vista debajo de la bandeja. El radio se ancla por su dato y se registra
+     con `recordAs: "{Binding ShortPath}"`, como el `{Binding Title}` de la biblioteca. La sonda es
+     la **preferencia almacenada**, no el `IsEffective` de la pantalla.
+   - **Y al cerrarla, una deuda ya medida.** `ReviewInboxViewModel.cs` está hoy en **92,13 % de
+     líneas y 59,26 % de ramas**, y no lo vigila nadie: es un archivo antiguo, así que la puerta de
+     cobertura no lo mira. Las dos reasignaciones que faltan ejercen precisamente
+     `ConfirmReassignmentAsync` y `KeepAsNewAsync`, que es donde están la mayoría de las ramas sin
+     cubrir. **Decidido**: al cerrar la tanda se vuelve a medir y **entra en la lista de vigilados**
+     de `eng/check-coverage.ps1` con el suelo que dé; si no llega a 96/96, se completan las ramas que
+     falten antes de añadirlo, porque un suelo bajo consagra la deuda en vez de vigilarla.
 3. **Tanda 8 — el shell y el inicio (14).** Las cinco de navegación, las tres del reproductor en el
    shell, las tres de la ficha (editar, renombrar, duplicados), y las tres de inicio
    (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). Es el mayor salto que
@@ -73,14 +95,29 @@ correcta**, y con esto se comprueba.
    que el de estado corregido el 2026-08-15; **cada uno se corrige en su tanda con su medición**, no
    en bloque. **32 → 3**, y los tres últimos con ellos: **0.**
 9. **La cobertura de código, al mismo destino.** Hoy la puerta vigila los archivos nuevos y una lista
-   corta, así que **un archivo antiguo que empeora no lo vigila nadie**. **Decidido**: cuando el paseo
-   llegue a 0, `check-coverage.ps1` pasa a medir **todo `src/`** con el suelo de siempre (96 % de
-   líneas y de ramas) y una lista de excepciones con la regla de la casa: **sólo puede encoger**.
+   corta —**cinco desde el 2026-08-16**, con `AppDataPaths.cs` y `ShellExternalLinkLauncher.cs`
+   añadidos al 100/100 porque son los que deciden qué sale de la aplicación—, así que **un archivo
+   antiguo que empeora sigue sin vigilarse**. **Decidido**: cada archivo antiguo que una tanda toque y
+   deje en el suelo entra en esa lista al cerrarla, y cuando el paseo llegue a 0,
+   `check-coverage.ps1` pasa a medir **todo `src/`** con el suelo de siempre (96 % de líneas y de
+   ramas) y una lista de excepciones con la regla de la casa: **sólo puede encoger**.
 10. **Rediseño y documentación**, con el paseo entero como red.
 
 **Lo que ningún arnés headless puede probar, y por tanto no se disfraza de cubierto:** la imagen en
 una pantalla física y TMDB contestando por red. Eso es el paseo físico de diez minutos, y es del
 propietario.
+
+**Una decisión aplazada, y por qué.** Las dos evidencias nuevas del 2026-08-16 —el enlace al tráiler
+y la bandeja de revisión— **no se han añadido a `FEATURES.md`**, aunque pertenecen a `LIB-015` y
+`LIB-007`. `EvidenceLinkTests` exige que la matriz y `docs/evidence/mvp/verification-manifest.json`
+citen exactamente lo mismo, y el manifiesto **describe un artefacto**: su procedencia es la del
+paquete, así que regenerarlo con el `artifacts/package/` de otra compilación escribiría una
+procedencia que no es la de nadie. Regenerar el manifiesto es parte de cortar una versión, no de una
+sesión de trabajo. **Decidido**: los dos enlaces entran en la matriz **cuando se regenere el
+manifiesto con un paquete recién construido**, y hasta entonces la evidencia vive en
+`docs/evidence/stable/` enlazada desde aquí:
+[el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md) y
+[la bandeja de revisión](evidence/stable/audit-walk-review-inbox.md).
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

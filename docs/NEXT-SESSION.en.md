@@ -41,12 +41,33 @@ one**, and this checks it.
    accept, reject and manual search — with **two product defects fixed**: the Search button never
    enabled (a private command class with an empty `CanExecuteChanged`, a survivor of `ARQ-004`) and
    its event was **listened to by nobody** in `src/`; it now reaches `SearchForMatch`, the manual
-   counterpart of `IdentifyScannedFiles`. **Remaining**: the two reassignment controls — a held
-   moved-file offer has to be seeded into `PendingReassignments` with the identity stored on the old
-   row, and `ReconcileScanResults.ConfirmAsync` requires the command's identity to match by
-   fingerprint or stable id — and the duplicates radio (`DuplicateReviewView#{Binding ShortPath}`),
-   which needs a version group and is opened from the card with `OpenDuplicatesAsync`.
-   **73 → 69, and 69 → 66 when it closes.**
+   counterpart of `IdentifyScannedFiles`. **73 → 69.**
+
+   **What remains, with the recipe already worked out** (69 → 66):
+
+   - **`ReassignmentConfirmAction` and `ReassignmentKeepAction`.** The offer is seeded through the
+     application's own container — `host.Application.Services` →
+     `PendingReassignments.Offer(new PendingReassignment(command, [candidate]))` — with
+     `ReconcileFileCommand(rootId, newPath, identity)`. The **identity must be the same one** stored
+     on the old row through `IMediaFileRepository.SaveIdentityAsync`: `ConfirmAsync` looks it up by
+     stable id or by fingerprint and **throws** if it does not find it. Then `inbox.LoadAsync`, so
+     `Reassignments` fills: `ReloadReassignments` only runs on load. Both probes read the database:
+     confirm → the old row now points at the new path (`FindByPathAsync`); keep as new → the row at
+     the new path takes the identity, so `FindByStableIdentityAsync` finds it. Both buttons sit
+     inside an `ItemsControl` rather than a `ListBox`, so the beside click meets no selectable rows.
+   - **`DuplicateReviewView#{Binding ShortPath}`.** It needs two copies of one title in a version
+     group — the proven route is the walk's first scene, where the watcher groups two identical files
+     — then `library.OpenDetailsAsync` plus `OpenDuplicatesAsync`, which lands on Review with the view
+     under the inbox. The radio is anchored by its own data and recorded with
+     `recordAs: "{Binding ShortPath}"`, like the library's `{Binding Title}`. The probe is the
+     **stored preference**, not the screen's `IsEffective`.
+   - **And when it closes, a debt already measured.** `ReviewInboxViewModel.cs` sits at **92.13 % of
+     lines and 59.26 % of branches** and is watched by nobody: it is an old file, so the coverage gate
+     does not look at it. The two remaining reassignment controls exercise exactly
+     `ConfirmReassignmentAsync` and `KeepAsNewAsync`, where most of the uncovered branches are.
+     **Decided**: when the batch closes it is measured again and **joins the watched list** in
+     `eng/check-coverage.ps1` at whatever floor it reaches; if it falls short of 96/96, the missing
+     branches are covered first, because a low floor enshrines the debt instead of watching it.
 3. **Batch 8 — the shell and home (14).** The five navigation controls, the three player controls in
    the shell, the three card actions (edit, rename, duplicates), and the three home ones
    (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). The largest remaining
@@ -71,15 +92,30 @@ one**, and this checks it.
    alignment** and stretch over the whole stage, exactly like the status one corrected on 2026-08-15;
    **each is corrected in its own batch with its own measurement**, not in bulk. **32 → 3**, and the
    last three with them: **0.**
-9. **Code coverage, to the same destination.** The gate watches new files and a short list today, so
-   **an old file that gets worse is watched by nobody**. **Decided**: once the walk reaches 0,
-   `check-coverage.ps1` measures **all of `src/`** against the usual floor (96 % of lines and of
-   branches) with an exception list under the house rule: **it can only shrink**.
+9. **Code coverage, to the same destination.** The gate watches new files and a short list today —
+   **five since 2026-08-16**, with `AppDataPaths.cs` and `ShellExternalLinkLauncher.cs` added at
+   100/100 because they are what decides what leaves the application — so **an old file that gets
+   worse is still watched by nobody**. **Decided**: every old file a batch touches and leaves at the
+   floor joins that list when the batch closes, and once the walk reaches 0, `check-coverage.ps1`
+   measures **all of `src/`** against the usual floor (96 % of lines and of branches) with an
+   exception list under the house rule: **it can only shrink**.
 10. **Redesign and documentation**, with the whole walk as the net.
 
 **What no headless harness can prove, and is therefore not dressed up as covered:** the picture on a
 physical screen and TMDB answering over the network. That is the ten-minute physical walkthrough, and
 it belongs to the owner.
+
+**One decision deferred, and why.** The two new pieces of evidence from 2026-08-16 — the trailer link
+and the review inbox — have **not been added to `FEATURES.md`**, though they belong to `LIB-015` and
+`LIB-007`. `EvidenceLinkTests` requires the matrix and
+`docs/evidence/mvp/verification-manifest.json` to cite exactly the same things, and the manifest
+**describes an artifact**: its provenance is the package's own, so regenerating it against an
+`artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
+the manifest is part of cutting a release, not part of a working session. **Decided**: both links go
+into the matrix **when the manifest is regenerated against a freshly built package**, and until then
+the evidence lives in `docs/evidence/stable/`, linked from here:
+[the trailer link](evidence/stable/audit-walk-trailer-links.md) and
+[the review inbox](evidence/stable/audit-walk-review-inbox.md).
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would

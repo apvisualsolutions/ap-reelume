@@ -199,6 +199,21 @@ try {
             Lines    = 100.00
             Branches = 100.00
         }
+
+        # The two files the isolation rule went through on 2026-08-16. Neither was new, so neither
+        # would have been measured by the gate above, and both decide where something leaves the
+        # application: which registry key a startup entry is written to, and whether an address
+        # reaches a browser at all. They arrive at the top and are held there.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/AppDataPaths.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Metadata/ShellExternalLinkLauncher.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
     )
 
     $watchRows = @()
