@@ -399,6 +399,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Windows.** Antes, cualquier copia escribía su entrada de inicio de sesión en el mismo sitio, así que
   una comprobación automática no podía siquiera probar ese botón sin dejar registrada en tu equipo la
   copia que estaba probando. Tu instalación normal no cambia: sigue escribiendo donde Windows lo lee.
+- **Ya se comprueba a dónde lleva «Ver el tráiler», en la ficha de película y en la de serie.** El
+  botón abre el navegador que uses, y por eso ninguna comprobación automática podía pulsarlo: habría
+  abierto ventanas en la máquina que estaba comprobando. Ahora una copia que guarda sus datos aparte
+  **anota la dirección** en vez de abrirla, así que la verificación pulsa el botón de las dos fichas y
+  lee la dirección exacta que se habría abierto — la del tráiler de esa ficha y de ninguna otra. Tu
+  instalación normal sigue abriendo el navegador igual que antes, y lo que se puede abrir no ha
+  cambiado: sólo `https` y sólo hacia el sitio que la dirección dice.
 - **El renombrado ya renombra.** Proponía el nombre que el archivo ya tenía, así que la
   previsualización salía siempre vacía y los botones de Renombrar y Deshacer no podían hacer nada por
   mucho que se pulsaran. Ahora propone el nombre que la ficha merece, con el convenio que leen Plex,

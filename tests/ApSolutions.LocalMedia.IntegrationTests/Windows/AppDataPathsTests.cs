@@ -92,6 +92,44 @@ public sealed class AppDataPathsTests
         }
     }
 
+    /// <summary>
+    /// Whether the application hands anything to Windows itself is decided by the root it was given,
+    /// exactly as the startup key is.
+    /// </summary>
+    /// <remarks>
+    /// The person who moved their data with the variable is still the person who signs in on this
+    /// machine, so their browser still opens and their file dialogs still appear. A run handed a root
+    /// that is neither — a harness, the walk, a lifecycle check — gets a folder under that root to
+    /// put the handover in, and a folder is what makes the handover assertable: nothing in this
+    /// repository could check the address the trailer button opens while that address went to a real
+    /// browser.
+    /// </remarks>
+    [Fact]
+    public void Only_a_run_that_does_not_own_the_profile_has_somewhere_to_put_a_handover()
+    {
+        var isolated = new AppDataPaths(Path.Combine(Path.GetTempPath(), "reelume-isolated-run"));
+
+        Assert.Null(new AppDataPaths().SystemHandoffDirectory);
+        Assert.NotNull(isolated.SystemHandoffDirectory);
+        Assert.StartsWith(
+            isolated.DataRoot + Path.DirectorySeparatorChar,
+            isolated.SystemHandoffDirectory,
+            StringComparison.OrdinalIgnoreCase);
+
+        var requested = Path.Combine(Path.GetTempPath(), "APSolutions.LocalMedia.Tests", "owned-root");
+        var previous = Environment.GetEnvironmentVariable(AppDataPaths.DataRootVariableName);
+        Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, requested);
+        try
+        {
+            Assert.Null(new AppDataPaths().SystemHandoffDirectory);
+            Assert.Null(new AppDataPaths(requested).SystemHandoffDirectory);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, previous);
+        }
+    }
+
     [Fact]
     public void A_blank_name_in_the_environment_falls_back_to_the_profile_folder()
     {

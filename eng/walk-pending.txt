@@ -27,7 +27,6 @@ LooseFileBanner#LooseFileConfirmAction                     # batch 2
 MarkerEditorView#MarkerEditorDelete                        # batch 2
 MarkerEditorView#MarkerEditorKindLabel                     # batch 2
 MarkerEditorView#MarkerEditorSave                          # batch 2
-MovieDetailsView#DetailsTrailerLinkAction                  # unreachable: the press hands the address to the Windows shell, which opens a real browser on the machine running the gate
 MovieDetailsView#MovieResumeAction                         # batch 1: shown only with stored progress worth returning to
 MovieDetailsView#MovieTrailerAction                        # batch 1: shown only when a trailer file sits beside the film, which needs a version group the walk does not seed yet
 NextEpisodeOverlay#NextEpisodeCancel                       # batch 2
@@ -66,7 +65,6 @@ ShellView#PlayerMiniModeAction                             # unscheduled: the sh
 ShellView#TitleEditMetadataAction                          # unscheduled: the shell, home and onboarding are in none of the seven batches
 ShellView#TitlePreviewRenameAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
 ShellView#TitleReviewDuplicatesAction                      # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShowDetailsView#DetailsTrailerLinkAction                   # unreachable: same as the film card — the press leaves the application by design (LIB-015)
 SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2
 SubtitleStyleView#SubtitleStyleBackgroundOpacityLabel      # batch 2
 SubtitleStyleView#SubtitleStyleFamilyLabel                 # batch 2

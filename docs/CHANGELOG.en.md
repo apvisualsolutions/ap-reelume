@@ -390,6 +390,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   start-with-Windows entry there too.** Every copy used to write its sign-in entry to the same place,
   so an automated check could not even test that button without registering the copy it was testing
   on your machine. Your normal installation is unchanged: it still writes where Windows reads.
+- **Where "Watch the trailer" leads is now checked, on the film card and on the series card.** The
+  button opens whatever browser you use, which is why no automated check could press it: it would
+  have opened windows on the machine doing the checking. A copy that keeps its data somewhere of its
+  own now **writes the address down** instead of opening it, so the verification presses the button
+  on both cards and reads the exact address that would have opened — that entry's trailer and no
+  other. Your normal installation still opens the browser as before, and what may be opened is
+  unchanged: `https` only, and only to the site the address names.
 - **The rename now renames.** It proposed the name the file already had, so the preview was always
   empty and the Rename and Undo buttons could do nothing however often they were pressed. It now
   proposes the name the entry deserves, in the convention Plex, Jellyfin and Kodi all read:

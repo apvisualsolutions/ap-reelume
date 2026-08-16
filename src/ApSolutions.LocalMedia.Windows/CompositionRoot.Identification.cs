@@ -6,6 +6,7 @@ using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
@@ -90,7 +91,15 @@ public static partial class CompositionRoot
             // YouTube key, and the browser is the use YouTube's terms allow — so what is registered
             // is something that hands an address to the shell, not something that connects. The
             // declared network purposes are unchanged for that exact reason.
-            .AddSingleton<IExternalLinkLauncher, ShellExternalLinkLauncher>()
+            //
+            // Which exit is built is decided by the data root, once, here: the person whose profile
+            // this is gets their browser, and a run that keeps its data somewhere of its own writes
+            // the address down under that root instead of opening anything on the machine it is
+            // running on. Both refuse the same addresses, because both ask the same policy.
+            .AddSingleton<IExternalLinkLauncher>(provider =>
+                provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory is { } handoff
+                    ? new RecordingExternalLinkLauncher(handoff)
+                    : new ShellExternalLinkLauncher())
             .AddTransient<UpdateMetadata>()
 
             // The refresh resolves the provider entry from the row itself, so it needs the provider
