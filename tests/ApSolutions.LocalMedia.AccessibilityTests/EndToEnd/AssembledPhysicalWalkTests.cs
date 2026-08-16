@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
@@ -140,8 +141,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await library!.LoadAsync(TestContext.Current.CancellationToken);
         Assert.NotEmpty(library.Items);
         await library.OpenDetailsAsync(library.Items[0], TestContext.Current.CancellationToken);
-        await host.ViewModel.OpenDuplicatesAsync(TestContext.Current.CancellationToken);
-        Assert.True(host.ViewModel.HasDuplicates, "The two copies never became a group a card can open.");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // Opened by its button rather than by its command: this is the only scene that has a real
+        // version group to open, so it is the only one that can press it.
+        await PressAsync(
+            host,
+            "TitleReviewDuplicatesAction",
+            () => host.ViewModel.HasDuplicates,
+            "clicking Review duplicates never opened the group the two copies formed");
+        Assert.Equal(AppRoute.Review, host.ViewModel.CurrentRoute);
 
         // And the group is decided with the mouse. Opening it already moved to Review, where the
         // comparison sits under the inbox; the layout still has to settle before a click can land.
@@ -916,6 +927,183 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The eighth batch, first half: the shell's own controls. Every destination in the navigation
+    /// rail, pressed in turn, and the two corrections a title card leads to.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The rail is what every other scene has been reaching around: they navigate through the command
+    /// the way the surface would, which proves the route changes and says nothing about whether the
+    /// button a person actually presses is wired to it. This presses all five, and the probe is the
+    /// route the navigation service holds.
+    /// </para>
+    /// <para>
+    /// Home is pressed last of the five and left as the current route on purpose, so the two card
+    /// actions that follow start from a shell that is <b>not</b> already on the surface they open.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_navigation_rail_and_the_card_actions_are_pressed_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Arrival.2016.mp4");
+
+        // Nothing decodes on these surfaces, so the file only has to exist and be catalogued.
+        await File.WriteAllBytesAsync(mediaPath, [0x41, 0x50], TestContext.Current.CancellationToken);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        _ = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromMinutes(116));
+
+        using var host = ShowShell(height: 1600);
+
+        // Every destination the rail offers, taken from the shell rather than from a list written
+        // here: a destination added later is pressed by this scene the day it is added.
+        //
+        // The route the shell opens on goes last. Pressing the destination you are already on is a
+        // press with nothing to observe — the shell stays where it is, correctly — and the walk
+        // proves a control by its effect, so it has to arrive at each destination from elsewhere.
+        var opensOn = host.ViewModel.CurrentRoute;
+        foreach (var route in host.ViewModel.Routes.Where(other => other != opensOn).Append(opensOn))
+        {
+            await PressAsync(
+                host,
+                $"Navigation{route}",
+                () => host.ViewModel.CurrentRoute,
+                $"clicking {route} in the navigation rail never took the shell there");
+            Assert.Equal(route, host.ViewModel.CurrentRoute);
+        }
+
+        // Back to the library, and a card open: the three title actions are offered for whichever
+        // title the library has open, so opening one is the precondition rather than the test.
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        await library.OpenDetailsAsync(library.Items[0], TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        await PressAsync(
+            host,
+            "TitleEditMetadataAction",
+            () => host.ViewModel.HasMetadataEditor,
+            "clicking Edit details never opened the editor for the open title");
+
+        await PressAsync(
+            host,
+            "TitlePreviewRenameAction",
+            () => host.ViewModel.HasRename,
+            "clicking Rename never offered the preview for the open title");
+
+        // Asking for the preview renames nothing, which is the promise the button makes.
+        Assert.True(File.Exists(mediaPath));
+    }
+
+    /// <summary>
+    /// The eighth batch, second half: the home surface, which is the first thing anybody sees. The
+    /// recommendations rail switched on, the entry into the library, and Continue.
+    /// </summary>
+    /// <remarks>
+    /// Continue is the primary action of the whole application — the one control a person reaches for
+    /// without looking — and it is the reason this scene exists rather than a unit test: what it has
+    /// to do is open the session, and only the assembled application can be asked whether it did.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_home_surface_is_operated_with_the_mouse()
+    {
+        // Real video, because Continue has to open a session on the real engine to prove anything.
+        var sample = await RequireSampleAsync("walk-home.mp4", durationSeconds: 90);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Continue.2024.mp4");
+        File.Copy(sample, mediaPath);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromSeconds(90));
+
+        // A film somebody is part way through: the entry, and the progress that makes Home offer it.
+        await SeedMovieRowAsync(factory, fileId, "Continue");
+        await new WatchStateRepository(factory).SaveAsync(
+            new WatchState
+            {
+                Content = ContentKey.ForTitle(new TitleId(fileId)),
+                Position = TimeSpan.FromSeconds(30),
+                ObservedDuration = TimeSpan.FromSeconds(90),
+                SourceMediaFileId = new MediaFileId(fileId),
+                Status = WatchStatus.InProgress,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UtcNow.AddMinutes(-5),
+                UpdatedUtc = DateTimeOffset.UtcNow,
+            },
+            TestContext.Current.CancellationToken);
+
+        using var host = ShowShell(height: 1600);
+        Navigate(host, AppRoute.Home);
+        var home = host.ViewModel.Home;
+        Assert.NotNull(home);
+        await home!.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // The rail's switch, read from the setting it stores rather than from the rail: switched off,
+        // the rail empties instead of hiding a result, and both look the same on screen.
+        var recommendations = home.Recommendations;
+        Assert.NotNull(recommendations);
+        var settings = host.Application.Services.GetRequiredService<IRecommendationSettings>();
+        var wasEnabled = settings.IsEnabled;
+        await PressAsync(
+            host,
+            "RecommendationsToggleAction",
+            () => settings.IsEnabled,
+            "clicking the recommendations switch never stored the choice");
+        Assert.Equal(!wasEnabled, settings.IsEnabled);
+
+        // Continue, which is what Home is for: the session opens on the file the progress came from,
+        // at the position it was left at. Home offers it only for something that can be played right
+        // now, so a press that opened nothing would be the offer breaking its own promise.
+        Assert.True(home.HasResume, "Home never offered Continue for the film with progress on it.");
+        await PressAsync(
+            host,
+            "HomeResumeAction",
+            () => host.ViewModel.Player is not null,
+            "clicking Continue never opened the session it offers");
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "Continue opened a session that never reached the playing state");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // And the way into the library, which is the other thing Home is for.
+        Navigate(host, AppRoute.Home);
+        await PressAsync(
+            host,
+            "HomeLibraryAction",
+            () => host.ViewModel.CurrentRoute,
+            "clicking the library entry never took the shell to the library");
+        Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
+    }
+
+    /// <summary>
+    /// The catalogue row a film has once somebody identified it, written through SQL because the
+    /// catalogue writes it during identification, which needs the network the harness does not have.
+    /// </summary>
+    private static async Task SeedMovieRowAsync(SqliteConnectionFactory factory, Guid titleId, string title)
+    {
+        await using var connection = await factory.OpenAsync(TestContext.Current.CancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText = """
+            INSERT INTO titles (id, kind, primary_title, sort_title, release_year, added_utc,
+                                last_played_utc, has_progress, is_personal, is_available)
+            VALUES ($id, 0, $title, $sort, 2024, $added, NULL, 1, 0, 1);
+            """;
+        command.Parameters.AddWithValue("$id", titleId.ToString("D"));
+        command.Parameters.AddWithValue("$title", title);
+        command.Parameters.AddWithValue("$sort", title.ToLowerInvariant());
+        command.Parameters.AddWithValue("$added", DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture));
+        await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>
     /// The first batch, second half: the film card operated by the mouse alone — the watch state
     /// marked, cleared and handed back to the automatic rules, the three personal marks made and
     /// unmade, and the film opened on the real engine by pressing Play.
@@ -1623,7 +1811,32 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => player.IsStopped,
             "clicking Stop never stopped the session");
 
-        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+        // The shell's own three, which decide where the picture is rather than what it is doing.
+        // Exactly one mode is in force at a time, so each press is read from the shell's mode: a
+        // button that only changed its own label would leave this where it was.
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
+        await PressAsync(
+            host,
+            "PlayerMiniModeAction",
+            () => host.ViewModel.PlaybackMode,
+            "clicking Mini player never moved the session into the mini mode");
+        Assert.Equal(PlaybackMode.Mini, host.ViewModel.PlaybackMode);
+
+        await PressAsync(
+            host,
+            "PlayerFullscreenAction",
+            () => host.ViewModel.PlaybackMode,
+            "clicking Fullscreen never moved the session out of mini and into fullscreen");
+        Assert.Equal(PlaybackMode.Fullscreen, host.ViewModel.PlaybackMode);
+
+        // And closing, which is the one that ends the session rather than moving it: the shell holds
+        // no player afterwards, and the mode goes back to where a next session starts.
+        await PressAsync(
+            host,
+            "PlayerCloseAction",
+            () => host.ViewModel.Player is null,
+            "clicking Close never let go of the session the shell was holding");
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
     }
 
     /// <summary>
@@ -1721,10 +1934,25 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             .Where(candidate => helpText is null || AutomationProperties.GetHelpText(candidate) == helpText)
             .ToArray();
 
+        // A name shared between a command and the region it leads to is not an ambiguity a person
+        // has: the rail's Home button and the Home surface are both called "Inicio", and a screen
+        // reader tells them apart by role. So when more than one thing answers to a name, the
+        // command controls are what a click can mean — and only if that leaves exactly one, because
+        // two buttons with one name is a real defect and this scene must not hide it.
+        if (matches.Length > 1)
+        {
+            var commands = matches.Where(IsCommandControl).ToArray();
+            if (commands.Length == 1)
+            {
+                return commands[0];
+            }
+        }
+
         Assert.True(
             matches.Length == 1,
             $"{anchor}{(helpText is null ? string.Empty : $" [{helpText}]")} matched {matches.Length} "
-                + "controls on screen; a click needs exactly one.");
+                + $"controls on screen ({string.Join(", ", matches.Select(match => match.GetType().Name))}); "
+                + "a click needs exactly one.");
         return matches[0];
     }
 
@@ -1784,6 +2012,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         return scrollers;
     }
+
+    /// <summary>
+    /// Whether this is a thing a person presses, using the same list of element types the coverage
+    /// gate counts in eng/check-walk-coverage.ps1. A surface or a region may carry a name too.
+    /// </summary>
+    private static bool IsCommandControl(Control control) =>
+        control is Button or CheckBox or ComboBox or Slider or Avalonia.Controls.Primitives.ToggleButton;
 
     /// <summary>Whether the control's middle is inside the window as the layout has it.</summary>
     private static bool Fits(ShellHost host, Control control) =>

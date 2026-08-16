@@ -19,7 +19,6 @@ DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewCorrect       # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
 EpisodeRowView#EpisodePlayAction                           # batch 1: the series card, which needs the show, season and episode rows seeded
-LibraryEntryView#HomeLibraryAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
 LooseFileBanner#LooseFileAddFolderAction                   # batch 2
 LooseFileBanner#LooseFileCancelAction                      # batch 2
 LooseFileBanner#LooseFileConfirmAction                     # batch 2
@@ -33,10 +32,8 @@ NextEpisodeOverlay#NextEpisodePlayNow                      # batch 2
 PlayerVersionsView#PlayerVersionsSwitchAction              # batch 2
 PlayerView#PlayerRecoveryOpenExternally                    # batch 2
 PlayerView#PlayerRecoveryRetry                             # batch 2
-RecommendationsRailView#RecommendationsToggleAction        # unscheduled: the shell, home and onboarding are in none of the seven batches
 RestoreWizardView#RestoreChooseArchiveLabel                # batch 6
 RestoreWizardView#RestoreConfirmLabel                      # batch 6
-ResumeHeroView#HomeResumeAction                            # unscheduled: the shell, home and onboarding are in none of the seven batches
 ResumePromptView#ResumePromptRestart                       # batch 2
 ResumePromptView#ResumePromptResume                        # batch 2
 RootOnboardingView#RootAddAction                           # unscheduled: the shell, home and onboarding are in none of the seven batches
@@ -47,17 +44,6 @@ RootOnboardingView#RootRemoveAction                        # unscheduled: the sh
 RootOnboardingView#RootRemoveCancelAction                  # unscheduled: the shell, home and onboarding are in none of the seven batches
 RootOnboardingView#RootRemoveConfirmAction                 # unscheduled: the shell, home and onboarding are in none of the seven batches
 RootOnboardingView#RootScanConsentAction                   # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#NavigationBackups                                # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#NavigationHome                                   # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#NavigationLibrary                                # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#NavigationReview                                 # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#NavigationSettings                               # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#PlayerCloseAction                                # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#PlayerFullscreenAction                           # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#PlayerMiniModeAction                             # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#TitleEditMetadataAction                          # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#TitlePreviewRenameAction                         # unscheduled: the shell, home and onboarding are in none of the seven batches
-ShellView#TitleReviewDuplicatesAction                      # unscheduled: the shell, home and onboarding are in none of the seven batches
 SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2
 SubtitleStyleView#SubtitleStyleBackgroundOpacityLabel      # batch 2
 SubtitleStyleView#SubtitleStyleFamilyLabel                 # batch 2

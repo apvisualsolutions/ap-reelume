@@ -306,7 +306,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ContentControl>
       <ScrollViewer Grid.Column="1" Margin="16">
         <StackPanel Spacing="16">
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <!--
+          A WrapPanel, like the backup actions, and not a horizontal StackPanel: this column is 320 px
+          wide by definition and the three buttons are about 800 px of them. A horizontal StackPanel
+          offers its children infinite width and draws them where they fall, so Mini player sat at
+          x=1737 in a 1600 px window and Fullscreen was further out still — measured on 2026-08-16.
+          Neither was reachable at any window size, because the column never grows.
+          -->
+          <WrapPanel ItemSpacing="8" LineSpacing="8">
             <Button
                 automation:AutomationProperties.Name="{DynamicResource PlayerCloseAction}"
                 Command="{Binding ClosePlayerCommand}"
@@ -319,7 +326,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource PlayerFullscreenAction}"
                 Command="{Binding ToggleFullscreenCommand}"
                 Content="{DynamicResource PlayerFullscreenAction}" />
-          </StackPanel>
+          </WrapPanel>
           <ContentControl IsVisible="{Binding HasTracks}">
             <player:TrackSelectorView DataContext="{Binding Player.Tracks}" />
           </ContentControl>
