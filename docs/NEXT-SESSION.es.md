@@ -70,11 +70,15 @@ correcta**, y con esto se comprueba.
 una pantalla física y TMDB contestando por red. Eso es el paseo físico de diez minutos, y es del
 propietario.
 
-Estado del proyecto al cerrar la **quinta** sesión del **2026-08-10**, la que saldó la última deuda
-de cobertura e instrumentó el camino del fallo del rojo intermitente. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
-canónico del alcance sigue siendo [FEATURES.md](FEATURES.md); el trabajo pendiente de la auditoría
-vive en [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). Esto es
-sólo el punto de retomada.
+Estado al cerrar el **2026-08-16**, la sesión que desbloqueó `LIB-012`, cerró la tanda 4 entera y
+decidió la ruta hasta cero. **Cinco commits**: `5f85fbd` (el renombrado renombra), `3eab024` (el paseo
+dice dónde fue el clic), `5f96ac3` (vuelve arriba antes de pulsar), `679d9f1` (arranque aislado y los
+veinte ajustes) y `2596bf6` (esta cola). La versión inglesa está en
+[NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro canónico del alcance sigue siendo
+[FEATURES.md](FEATURES.md) —**43 verificados, 1 fuera de alcance, 2 bloqueados** (`PLY-004`,
+`PRD-002`)—; el trabajo pendiente de la auditoría vive en
+[2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). Esto es sólo el
+punto de retomada.
 
 ## Verificación de arranque
 

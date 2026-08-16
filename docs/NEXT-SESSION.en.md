@@ -69,9 +69,13 @@ one**, and this checks it.
 physical screen and TMDB answering over the network. That is the ten-minute physical walkthrough, and
 it belongs to the owner.
 
-The state of the project at the close of the **fifth** session of **2026-08-10**, the one that paid
-the last coverage debt and instrumented the intermittent red's failure path. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical
-scope record is still [FEATURES.md](FEATURES.md); the audit's outstanding work lives in
+The state at the close of **2026-08-16**, the session that unblocked `LIB-012`, finished batch four
+in full, and decided the route to zero. **Five commits**: `5f85fbd` (the rename renames), `3eab024`
+(the walk says where a press went), `5f96ac3` (it returns to the top before pressing), `679d9f1`
+(isolated startup entry and all twenty settings) and `2596bf6` (this queue). The Spanish version is in
+[NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical scope record is still
+[FEATURES.md](FEATURES.md) — **43 verified, 1 out of scope, 2 blocked** (`PLY-004`, `PRD-002`); the
+audit's outstanding work lives in
 [2026-08-08-audit-remediation.md](superpowers/plans/2026-08-08-audit-remediation.md). This is only the
 place to resume from.
 
