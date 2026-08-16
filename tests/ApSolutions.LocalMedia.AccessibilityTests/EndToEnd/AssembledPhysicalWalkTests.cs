@@ -845,7 +845,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// Presses a control with the mouse, at its centre in window coordinates, the way a person with a
     /// pointing device does.
     /// </summary>
-    private static void Click(ShellHost host, Control control)
+    private static Point Click(ShellHost host, Control control)
     {
         // Scrolling to it first is what a person does, and it is not optional: the editor sits far
         // enough down the shell that the button's centre lands outside the window until it is
@@ -899,12 +899,40 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 && centre.Value.Y < host.Window.Bounds.Height,
             $"{Describe(control)} sits at {centre.Value} and the window is "
                 + $"{host.Window.Bounds.Width}x{host.Window.Bounds.Height}, so the press would land "
-                + "outside it.");
+                + "outside it. Scrollers between it and the window: "
+                + (scrollers.Length == 0
+                    ? "none, so nothing here could have moved it."
+                    : string.Join(
+                        ", ",
+                        scrollers.Select(s =>
+                            $"offset {s.Offset.Y:F0}, viewport {s.Viewport.Height:F0}, "
+                            + $"extent {s.Extent.Height:F0}"))));
 
         host.Window.MouseMove(centre.Value, RawInputModifiers.None);
         host.Window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
         host.Window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
+        return centre.Value;
+    }
+
+    /// <summary>What a click at this point reaches, innermost first, a few levels up.</summary>
+    /// <remarks>
+    /// This is the second half of a complaint that used to be only its first half. A press that
+    /// misses arrives as sixty seconds of waiting and "the effect never came", which says nothing
+    /// about where the press went; naming the chain is what turns that into a lead. It is a
+    /// diagnosis and not an assertion on purpose: <c>InputHitTest</c> was measured on 2026-08-15 not
+    /// to predict where a click goes, so it may not decide whether one is allowed.
+    /// </remarks>
+    private static string DescribeChainAt(ShellHost host, Point point)
+    {
+        if (host.Window.InputHitTest(point) is not Visual hit)
+        {
+            return "nothing at all";
+        }
+
+        return string.Join(
+            " inside ",
+            new[] { hit }.Concat(hit.GetVisualAncestors()).OfType<Control>().Take(5).Select(Describe));
     }
 
     /// <summary>
@@ -1041,10 +1069,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             $"Clicking beside {anchor} changed the very thing the press is meant to change, so "
                 + "pressing it would have proved nothing.");
 
-        Click(host, control);
+        var pressed = Click(host, control);
         await WaitForAsync(
             async () => !EqualityComparer<T>.Default.Equals(await probe(), before),
-            complaint);
+            $"{complaint}. The press went to {pressed}, where a click reaches "
+                + $"{DescribeChainAt(host, pressed)}.");
         WalkLedger.Record(control, recordAs ?? anchor);
     }
 
