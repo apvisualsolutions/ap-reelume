@@ -161,6 +161,220 @@ public sealed class ReviewInboxTests
         Assert.Empty(viewModel.Items);
     }
 
+    /// <summary>
+    /// With nothing chosen there is nothing to decide, and every action says so by doing nothing.
+    /// </summary>
+    /// <remarks>
+    /// The commands are bound to buttons that are on screen whether or not a card is selected, so
+    /// "no selection" is a state a person reaches by pressing Escape, not an impossible one. What
+    /// makes it worth a test is that the alternative is a null reference on the surface a person
+    /// opens precisely because the automatic reading was not good enough.
+    /// </remarks>
+    [Fact]
+    public async Task With_nothing_selected_no_decision_reaches_the_catalogue()
+    {
+        var repository = new UiReviewRepository([
+            Candidate("undecided", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
+        ]);
+        var viewModel = CreateViewModel(repository);
+        Assert.True(viewModel.IsEmpty);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.False(viewModel.IsEmpty);
+        Assert.Null(viewModel.SelectedItem);
+
+        await viewModel.AcceptSelectedAsync(TestContext.Current.CancellationToken);
+        await viewModel.RejectSelectedAsync(TestContext.Current.CancellationToken);
+        await viewModel.SearchManuallyAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(ReviewState.Pending, Assert.Single(repository.Candidates).ReviewState);
+        Assert.False(viewModel.HasConflict);
+
+        // The page is one page long, so asking for more asks the repository nothing at all.
+        Assert.False(viewModel.HasMore);
+        await viewModel.LoadMoreAsync(TestContext.Current.CancellationToken);
+        Assert.Single(viewModel.Items);
+
+        // Typed words with no card chosen are still not a search: the file to search about is the
+        // half that is missing, and clearing a selection that is already clear changes nothing.
+        viewModel.ManualSearch = "La llegada 2016";
+        viewModel.SelectedItem = null;
+        await viewModel.SearchManuallyAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("undecided", Assert.Single(viewModel.Items).StableKey);
+    }
+
+    /// <summary>
+    /// Somebody else decided this candidate first: the decision is refused, and the card is replaced
+    /// by what the catalogue now holds rather than disappearing as though it had been applied.
+    /// </summary>
+    /// <remarks>
+    /// This is the branch that separates "your decision was written" from "your decision was
+    /// refused and here is why". Both leave the button pressed and the surface changed, and only the
+    /// stored row tells them apart — which is exactly why the conflict has to keep the card.
+    /// </remarks>
+    [Fact]
+    public async Task A_candidate_decided_elsewhere_is_refused_and_the_card_shows_what_is_stored()
+    {
+        var repository = new UiReviewRepository([
+            Candidate("contested", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
+        ]);
+        var viewModel = CreateViewModel(repository);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        viewModel.SelectedItem = Assert.Single(viewModel.Items);
+
+        // The row moves on under the surface, the way another window or a scan moves it.
+        repository.Candidates[0] = repository.Candidates[0] with
+        {
+            ReviewState = ReviewState.Suggested,
+            Revision = repository.Candidates[0].Revision + 1,
+        };
+
+        await viewModel.AcceptSelectedAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(viewModel.HasConflict);
+        Assert.Equal(ReviewState.Suggested, Assert.Single(repository.Candidates).ReviewState);
+
+        // The card stays, carrying the stored state, and stays selected: a person who has just been
+        // told no is looking at the same card they were looking at.
+        var shown = Assert.Single(viewModel.Items);
+        Assert.Equal(ReviewState.Suggested, shown.ReviewState);
+        Assert.Same(shown, viewModel.SelectedItem);
+    }
+
+    /// <summary>
+    /// The inbox arrives one page at a time, and asking for more when the last page is in hand asks
+    /// the catalogue nothing.
+    /// </summary>
+    /// <remarks>
+    /// Both halves live in one test on purpose. Merged Cobertura reports keep the better of two
+    /// runs for a line rather than the union of them, so a branch whose sides are exercised by two
+    /// different suites reads as half-covered forever — measured here on 2026-08-16, with the walk
+    /// paging through twenty-six candidates and this suite stopping at one.
+    /// </remarks>
+    [Fact]
+    public async Task The_inbox_pages_and_stops_when_there_is_no_more()
+    {
+        var repository = new UiReviewRepository(
+            Enumerable.Range(1, 26).Select(index =>
+                Candidate($"page:{index:D2}", 0.40 + (index / 1000.0), ReviewState.Pending, "Identification.Signal.Title")));
+        var viewModel = CreateViewModel(repository);
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(25, viewModel.Items.Count);
+        Assert.True(viewModel.HasMore);
+
+        await viewModel.LoadMoreAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(26, viewModel.Items.Count);
+        Assert.False(viewModel.HasMore);
+
+        // And again, with nothing left: the list is untouched rather than asked for a page that is
+        // not there.
+        await viewModel.LoadMoreAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(26, viewModel.Items.Count);
+    }
+
+    /// <summary>
+    /// A candidate the catalogue no longer holds is refused with nothing to put in its place, and the
+    /// card is left exactly as it was.
+    /// </summary>
+    /// <remarks>
+    /// The refused branch has two shapes and they are not the same: a conflict answers with the row
+    /// that won, and a vanished candidate answers with nothing. Replacing a card with a null would be
+    /// the crash; leaving the list alone is what a person can act on.
+    /// </remarks>
+    [Fact]
+    public async Task A_candidate_that_is_no_longer_there_is_refused_and_the_list_is_left_alone()
+    {
+        var repository = new UiReviewRepository([
+            Candidate("vanished", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
+        ])
+        { AnswerNotFound = true };
+        var viewModel = CreateViewModel(repository);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        var card = Assert.Single(viewModel.Items);
+        viewModel.SelectedItem = card;
+
+        await viewModel.RejectSelectedAsync(TestContext.Current.CancellationToken);
+
+        Assert.False(viewModel.HasConflict);
+        Assert.Same(card, Assert.Single(viewModel.Items));
+        Assert.Same(card, viewModel.SelectedItem);
+    }
+
+    /// <summary>
+    /// A refusal replaces the card it was about and leaves every other card where it was.
+    /// </summary>
+    [Fact]
+    public async Task A_refusal_touches_only_the_card_it_was_about()
+    {
+        var repository = new UiReviewRepository([
+            Candidate("contested", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
+            Candidate("bystander", 0.60, ReviewState.Pending, "Identification.Signal.Title"),
+        ]);
+        var viewModel = CreateViewModel(repository);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        var contested = viewModel.Items.Single(item => item.StableKey == "contested");
+        var bystander = viewModel.Items.Single(item => item.StableKey == "bystander");
+        viewModel.SelectedItem = contested;
+
+        var index = repository.Candidates.FindIndex(candidate => candidate.StableKey == "contested");
+        repository.Candidates[index] = repository.Candidates[index] with
+        {
+            Revision = repository.Candidates[index].Revision + 1,
+        };
+
+        await viewModel.AcceptSelectedAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(viewModel.HasConflict);
+        Assert.NotSame(contested, viewModel.Items.Single(item => item.StableKey == "contested"));
+        Assert.Same(bystander, viewModel.Items.Single(item => item.StableKey == "bystander"));
+    }
+
+    /// <summary>
+    /// What the surface refuses to be built without. Each of these is a collaborator the inbox cannot
+    /// answer a press without, so an inbox constructed without one is a surface that fails when
+    /// somebody uses it rather than when somebody wires it.
+    /// </summary>
+    [Fact]
+    public void The_inbox_refuses_to_exist_without_what_it_needs()
+    {
+        var repository = new UiReviewRepository([]);
+        var publisher = new NullPublisher();
+        var inbox = new GetReviewInbox(repository);
+        var resolve = new ResolveMatch(repository, publisher, SilentIdentification.Create());
+        var reject = new RejectMatch(repository, publisher);
+
+        Assert.Throws<ArgumentNullException>(() => new ReviewInboxViewModel(null!, resolve, reject));
+        Assert.Throws<ArgumentNullException>(() => new ReviewInboxViewModel(inbox, null!, reject));
+        Assert.Throws<ArgumentNullException>(() => new ReviewInboxViewModel(inbox, resolve, null!));
+    }
+
+    /// <summary>
+    /// Setting a property to what it already holds is not a change, and the surface does not announce
+    /// one: a list that says it changed is a list the screen rebuilds.
+    /// </summary>
+    [Fact]
+    public async Task Repeating_a_value_announces_nothing()
+    {
+        var repository = new UiReviewRepository([
+            Candidate("steady", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
+        ]);
+        var viewModel = CreateViewModel(repository);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        var announced = new List<string?>();
+        viewModel.PropertyChanged += (_, args) => announced.Add(args.PropertyName);
+
+        viewModel.ManualSearch = "La llegada";
+        viewModel.ManualSearch = "La llegada";
+        var card = Assert.Single(viewModel.Items);
+        viewModel.SelectedItem = card;
+        viewModel.SelectedItem = card;
+
+        Assert.Equal(1, announced.Count(name => name == nameof(ReviewInboxViewModel.ManualSearch)));
+        Assert.Equal(1, announced.Count(name => name == nameof(ReviewInboxViewModel.SelectedItem)));
+    }
+
     private static ReviewInboxViewModel CreateViewModel(
         UiReviewRepository repository,
         SearchForMatch? manualSearch = null)
@@ -246,6 +460,9 @@ public sealed class ReviewInboxTests
     {
         public List<MatchCandidate> Candidates { get; } = [.. candidates];
 
+        /// <summary>The row is gone: another window decided it, or a rescan replaced it.</summary>
+        public bool AnswerNotFound { get; init; }
+
         public Task ReplaceForMediaFileAsync(MediaFileId mediaFileId, IReadOnlyList<MatchCandidate> replacements, CancellationToken cancellationToken = default)
         {
             _ = Candidates.RemoveAll(candidate => candidate.MediaFileId == mediaFileId && !candidate.IsDecisionLocked);
@@ -267,6 +484,11 @@ public sealed class ReviewInboxTests
 
         public Task<MatchDecisionWriteResult> TrySetReviewStateAsync(MediaFileId mediaFileId, CandidateId candidateId, int expectedRevision, ReviewState reviewState, bool lockDecision, CancellationToken cancellationToken = default)
         {
+            if (AnswerNotFound)
+            {
+                return Task.FromResult(new MatchDecisionWriteResult(MatchDecisionWriteOutcome.NotFound, null));
+            }
+
             var index = Candidates.FindIndex(candidate => candidate.MediaFileId == mediaFileId && candidate.Id == candidateId);
             var current = Candidates[index];
             if (current.Revision != expectedRevision || current.IsDecisionLocked)

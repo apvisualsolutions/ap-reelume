@@ -656,7 +656,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 "PrivacyExportLabel",
                 () => Directory.Exists(diagnostics) ? Directory.GetFiles(diagnostics).Length : 0,
                 "clicking Export never wrote a report to the diagnostics folder");
-            Assert.NotNull(privacy.ExportedFileName);
+
+            // The surface names the file only after the export returns, so the disk changes first
+            // and the name arrives second. Asserting it outright was a race the walk kept winning
+            // until it ran beside the rest of the solution: measured on 2026-08-16 as
+            // "Assert.NotNull() Failure: Value is null", with the report already in the folder.
+            await WaitForAsync(
+                () => Task.FromResult(privacy.ExportedFileName is not null),
+                "the report reached the diagnostics folder and the surface never said which file it wrote");
             Assert.Contains(
                 Directory.GetFiles(diagnostics),
                 file => Path.GetFileName(file) == privacy.ExportedFileName);
