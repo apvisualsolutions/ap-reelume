@@ -5,17 +5,15 @@
 Four things, in this order. The three decisions that were outstanding are **taken** and written down
 here; what remains is carrying them out, measuring before correcting.
 
-1. **`LIB-012` — unblock the rename.** It has been `BLOCKED` since 2026-08-16 because it **cannot
-   rename anything**: the application asks for the name the file already has. **Decided**: a pure
-   `TitleFileNamePolicy` in `Domain/Discovery`, in the convention Plex, Jellyfin and Kodi share — the
-   same one this project already follows in `TrailerDiscoveryPolicy`, so nothing is invented:
-   `Title (Year).ext` for films and `Show (Year) - SxxEyy - Title.ext` for episodes. With no year, the
-   title alone; sanitising and conflicts stay with `RenamePolicy`, which already does them and is not
-   touched. Its caller goes in `OpenRenameAsync`, which today feeds on its own output. **First
-   measurement, before writing**: how many entries of a real library produce a name different from the
-   current one — if the answer were "almost none", the convention is the wrong one. It closes with the
-   walk batch pressing consent, Rename and Undo with the effect read off the file system, and with the
-   matrix state returned to `VERIFIED` by the procedure.
+1. ~~**`LIB-012` — unblock the rename.**~~ **Done on 2026-08-16.** `TitleFileNamePolicy` in
+   `Domain/Discovery` in the Plex/Jellyfin/Kodi convention; its caller in `OpenRenameAsync`; and the
+   walk scene pressing consent, Rename and Undo with the effect read off **the file system**.
+   Ratchet 98 → **95**; matrix **43 verified, 1 out of scope, 2 blocked**. The first measurement gave
+   **8 of 12** names different from the current one, so the convention was the right one; and
+   measuring turned up two rules nobody had decided: a parser that warned proposes nothing, and title
+   and year travel **together from one source** — crossing them wrote `Arrival 2016 (2016).mp4`.
+   Detail in
+   [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
 2. **Walk batch 4 — settings.** 14 controls: appearance, lifecycle, privacy — including `LIB-016`'s
    switch — scanning, recommendations, segment detection and shortcuts. It would drop the ratchet from
    **98** to **84**, the largest remaining step, and it **touches no visual surface**, so it does not

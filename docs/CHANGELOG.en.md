@@ -376,6 +376,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The rename now renames.** It proposed the name the file already had, so the preview was always
+  empty and the Rename and Undo buttons could do nothing however often they were pressed. It now
+  proposes the name the entry deserves, in the convention Plex, Jellyfin and Kodi all read:
+  `Title (Year).ext` for a film and `Show (Year) - SxxEyy - Title.ext` for an episode. Across the
+  twelve name shapes the catalogue recognises, eight get a name different from the current one and
+  the one already following the convention is left alone. When nobody has identified the entry and
+  the name cannot be read with confidence, nothing is proposed: a rename does not guess. What decides
+  which characters are safe, and what to do about two files that want the same name, is unchanged.
 - **A watched folder no longer stops being watched exactly when a lot of files arrive.** When Windows
   reported that it had dropped changes — which is what happens when a whole season is copied in at
   once — live watching of that folder ended in silence and did not come back until the application

@@ -99,7 +99,7 @@ public sealed class IdentifyScannedFiles
             try
             {
                 var result = await _identify.ExecuteAsync(
-                        new IdentifyMediaFileCommand(file.Id, CreateContext(root.Path, item.Path)),
+                        new IdentifyMediaFileCommand(file.Id, FileNameContext.ForFile(item.Path, root.Path)),
                         cancellationToken)
                     .ConfigureAwait(false);
                 await ApplyConfidentMatchAsync(file.Id, result, cancellationToken).ConfigureAwait(false);
@@ -144,19 +144,4 @@ public sealed class IdentifyScannedFiles
             cancellationToken).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// The folders between the root and the file, outermost first, which is the order the parser
-    /// reads a series layout in: show, then season, then the file.
-    /// </summary>
-    private static FileNameContext CreateContext(string rootPath, string filePath)
-    {
-        var directory = Path.GetDirectoryName(filePath);
-        var relative = directory is null ? "." : Path.GetRelativePath(rootPath, directory);
-        var folders = relative is "." or ""
-            ? Array.Empty<string>()
-            : relative.Split(
-                [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
-                StringSplitOptions.RemoveEmptyEntries);
-        return new FileNameContext(Path.GetFileName(filePath), folders);
-    }
 }

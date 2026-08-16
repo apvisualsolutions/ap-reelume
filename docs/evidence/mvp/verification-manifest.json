@@ -1,24 +1,24 @@
 {
   "release": "MVP",
   "version": "0.1.0",
-  "commit": "dbc9201d686f2c53bcef7ce3ae54360850144e0d",
+  "commit": "f4c2790d01fef10a65f3d58246b41d79e04f699f",
   "runtime": "win-x64",
   "signed": false,
   "artifacts": [
     {
       "name": "APSolutions.LocalMedia_0.1.0_x64.msix",
-      "sha256": "17c6e62fd88675d7a4bc5d80c73682173918614bd75800bd0a3e2105962d8e76"
+      "sha256": "a422faeda0c9b450b627b9b9ad1ab3c55e960ed48522599976e48f162d34466d"
     },
     {
       "name": "ApReelume-0.1.0-win-x64.zip",
-      "sha256": "ee023cc1dcf86196d8ee4714a1285741f991fe4c8b84646cfa6d19866ba131be"
+      "sha256": "0a42f1cea0df5bd97d177687b0058e34912ef1424cbe9571f161d0f3f9a8366c"
     }
   ],
   "summary": {
     "total": 46,
-    "verified": 42,
+    "verified": 43,
     "outOfScope": 1,
-    "blocked": 3
+    "blocked": 2
   },
   "features": [
     {
@@ -351,7 +351,7 @@
     },
     {
       "id": "LIB-012",
-      "status": "BLOCKED",
+      "status": "VERIFIED",
       "tasks": [
         "T17",
         "T39B"
@@ -364,13 +364,9 @@
       ],
       "evidence": [
         "docs/evidence/mvp/T17-safe-rename.md",
-        "docs/evidence/mvp/T39B-assembly.md"
-      ],
-      "blocker": {
-        "reason": "El renombrado no puede proponer ningún nombre: la aplicación ensamblada pide renombrar cada archivo al nombre que ya tiene —`new RenameRequest(file.Path, Path.GetFileName(file.Path))`, el único de producción del repositorio— y `RenamePolicy` lo descarta correctamente como `NoChange`. El plan sale siempre vacío, así que Renombrar y Deshacer no pueden ejecutarse nunca y la casilla de consentimiento guarda una decisión que no se ofrece. Las pruebas que lo daban por verificado midieron la política y la seguridad —que no se mueven carpetas, que un conflicto impide ejecutar— y ninguna midió que un plan llegara a contener una operación. / The rename can propose no name at all: the assembled application asks to rename each file to the name it already has, and the policy correctly discards that as NoChange, so the plan is always empty and neither button can ever run. What was verified was the safety, never that a plan contained an operation.",
-        "owner": "Product",
-        "unblockCondition": "Un componente de dominio que componga el nombre a partir de la ficha, con el convenio ya decidido —el que comparten Plex, Jellyfin y Kodi, que este proyecto ya sigue en `TrailerDiscoveryPolicy`—: `Título (Año).ext` para películas y `Serie (Año) - SxxEyy - Título.ext` para episodios; su llamante en `OpenRenameAsync`; y el paseo pulsando consentimiento, Renombrar y Deshacer con el efecto leído del sistema de archivos. / A domain component composing the name from the entry in the already-decided convention, its caller, and the walk pressing consent, Rename and Undo with the effect read off the file system."
-      }
+        "docs/evidence/mvp/T39B-assembly.md",
+        "docs/evidence/stable/audit-lib012-rename-that-renames.md"
+      ]
     },
     {
       "id": "PLY-001",

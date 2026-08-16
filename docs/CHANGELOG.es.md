@@ -384,6 +384,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El renombrado ya renombra.** Proponía el nombre que el archivo ya tenía, así que la
+  previsualización salía siempre vacía y los botones de Renombrar y Deshacer no podían hacer nada por
+  mucho que se pulsaran. Ahora propone el nombre que la ficha merece, con el convenio que leen Plex,
+  Jellyfin y Kodi: `Título (Año).ext` para una película y `Serie (Año) - SxxEyy - Título.ext` para un
+  episodio. Sobre las doce formas de nombre que el catálogo reconoce, ocho reciben un nombre distinto
+  del actual y la que ya seguía el convenio se deja en paz. Cuando nadie ha identificado la ficha y el
+  nombre no se deja leer con seguridad, no se propone nada: un renombrado no adivina. Lo que decide
+  qué caracteres son seguros y qué hacer con dos archivos que quieren llamarse igual no ha cambiado.
 - **Una carpeta vigilada ya no deja de vigilarse justo cuando le llegan muchos archivos.** Cuando
   Windows avisaba de que había perdido cambios —lo que pasa al copiar una temporada entera de golpe—,
   la vigilancia en vivo de esa carpeta terminaba en silencio y no volvía hasta el siguiente arranque

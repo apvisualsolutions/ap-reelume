@@ -71,7 +71,7 @@ public sealed class GroupScannedVersions
                 continue;
             }
 
-            var parsed = _parser.Parse(CreateContext(root.Path, item.Path));
+            var parsed = _parser.Parse(FileNameContext.ForFile(item.Path, root.Path));
             if (parsed.Kind is not (ParsedMediaKind.Movie or ParsedMediaKind.Episode)
                 || string.IsNullOrWhiteSpace(parsed.CleanTitle))
             {
@@ -159,15 +159,4 @@ public sealed class GroupScannedVersions
         file.TechnicalMetadata.VideoCodecs.Count > 0 ? file.TechnicalMetadata.VideoCodecs[0] : string.Empty,
         file.SizeBytes);
 
-    private static FileNameContext CreateContext(string rootPath, string filePath)
-    {
-        var directory = Path.GetDirectoryName(filePath);
-        var relative = directory is null ? "." : Path.GetRelativePath(rootPath, directory);
-        var folders = relative is "." or ""
-            ? Array.Empty<string>()
-            : relative.Split(
-                [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
-                StringSplitOptions.RemoveEmptyEntries);
-        return new FileNameContext(Path.GetFileName(filePath), folders);
-    }
 }

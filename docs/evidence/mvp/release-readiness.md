@@ -3,7 +3,7 @@
 - Versión / Version: `0.1.0` (`0.1.0.0` en el paquete / in the package)
 - Runtime: `win-x64`
 - Firma / Signing: **ninguna / none**
-- Puerta MVP / MVP gate: **aprobada el 2026-08-05 con `PLY-004` bloqueado; `LIB-012` se bloqueó el 2026-08-16 / approved on 2026-08-05 with `PLY-004` blocked; `LIB-012` blocked on 2026-08-16**
+- Puerta MVP / MVP gate: **aprobada el 2026-08-05 con `PLY-004` bloqueado; `LIB-012` se bloqueó y se desbloqueó el 2026-08-16 / approved on 2026-08-05 with `PLY-004` blocked; `LIB-012` blocked and unblocked on 2026-08-16**
 - Manifiesto de verificación / Verification manifest: [verification-manifest.json](verification-manifest.json)
 
 Este documento contiene primero el informe en español y después su traducción inglesa. Ambas partes deben actualizarse juntas.
@@ -29,9 +29,9 @@ multicanal, no por falta de trabajo.
 | | |
 |---|---:|
 | Compromisos MVP | **46** |
-| `VERIFIED` | **42** |
+| `VERIFIED` | **43** |
 | `OUT_OF_SCOPE` por decisión | **1** |
-| `BLOCKED` con condición de desbloqueo | **3** |
+| `BLOCKED` con condición de desbloqueo | **2** |
 | Sin estado o sin evidencia | **0** |
 
 Ningún compromiso queda informalmente pendiente. `FeatureCoverageTests` falla si alguno no está
@@ -96,32 +96,6 @@ canales, pero ese aparato ya no está disponible.
 
 **Riesgo si se publica igualmente.** Bajo para quien reproduzca en estéreo, que es lo que este equipo
 ofrece. Desconocido para quien tenga una salida multicanal.
-
-#### `LIB-012` — Renombrado con previsualización
-
-**Bloqueado el 2026-08-16, y no por una regresión: por una medición que nadie había hecho.** El paseo
-autónomo llegó a esta vista con el ratón y encontró que **no ofrece ni una sola operación**. La
-aplicación ensamblada pide renombrar cada archivo **al nombre que ya tiene**
-—`new RenameRequest(file.Path, Path.GetFileName(file.Path))`, el único `RenameRequest` de producción
-del repositorio— y `RenamePolicy` lo descarta correctamente como `NoChange`. El plan sale siempre
-vacío, Renombrar y Deshacer no pueden ejecutarse nunca, y la casilla de consentimiento guarda una
-decisión que no se ofrece.
-
-**Por qué estaba verificado.** Su criterio se escribió alrededor de la **seguridad** —que un conflicto
-impida ejecutar, que no se muevan carpetas, que se ofrezca deshacer— y las tres cosas se cumplen. La
-evidencia archivada llega a decir que la previsualización «se pide desde la ficha y **no mueve nada**».
-Ninguna prueba comprobó que un plan llegara a contener una operación, así que la parte segura estaba
-medida y la parte útil no existía. **Una función cuyo titular es «renombrar» y que no puede renombrar
-no está verificada, por muy bien que cumpla sus criterios de seguridad.**
-
-**Qué lo desbloquea.** Un componente de dominio que componga el nombre a partir de la ficha, con el
-convenio **ya decidido**: el que comparten Plex, Jellyfin y Kodi, que este proyecto ya sigue en
-`TrailerDiscoveryPolicy` —`Título (Año).ext` para películas, `Serie (Año) - SxxEyy - Título.ext` para
-episodios—; su llamante en `OpenRenameAsync`; y el paseo pulsando consentimiento, Renombrar y Deshacer
-con el efecto leído del sistema de archivos, no de la pantalla.
-
-**Riesgo si se publica igualmente.** Ninguno para los datos: la función no toca un solo archivo hoy, y
-ése es justamente el problema. El riesgo es de expectativa — se anuncia una capacidad que no existe.
 
 ### Riesgos que esta versión deja abiertos para `STABLE`
 
@@ -239,9 +213,9 @@ for want of work.
 | | |
 |---|---:|
 | MVP commitments | **46** |
-| `VERIFIED` | **42** |
+| `VERIFIED` | **43** |
 | `OUT_OF_SCOPE` by decision | **1** |
-| `BLOCKED` with an unblock condition | **3** |
+| `BLOCKED` with an unblock condition | **2** |
 | Without status or without evidence | **0** |
 
 No commitment is informally pending. `FeatureCoverageTests` fails when one is neither `VERIFIED` nor
@@ -305,32 +279,6 @@ longer available.
 
 **Risk if published anyway.** Low for anyone playing in stereo, which is what this machine offers.
 Unknown for anyone with a multichannel output.
-
-#### `LIB-012` — Rename with preview
-
-**Blocked on 2026-08-16, and not by a regression: by a measurement nobody had made.** The autonomous
-walk reached this view with a mouse and found it offers **not one operation**. The assembled
-application asks to rename each file **to the name it already has** —
-`new RenameRequest(file.Path, Path.GetFileName(file.Path))`, the only production `RenameRequest` in
-the repository — and `RenamePolicy` correctly discards that as `NoChange`. The plan is always empty,
-Rename and Undo can never run, and the consent box guards a decision that is never offered.
-
-**Why it was verified.** Its criterion was written around **safety** — a conflict prevents execution,
-folders are not moved, undo is offered — and all three hold. The archived evidence even says the
-preview "is asked for from the card and **moves nothing**". No test checked that a plan ever contained
-an operation, so the safe half was measured and the useful half did not exist. **A feature whose
-headline is "rename" and which cannot rename is not verified, however well it meets its safety
-criteria.**
-
-**What unblocks it.** A domain component composing the name from the entry, in the **already decided**
-convention: the one Plex, Jellyfin and Kodi share, which this project already follows in
-`TrailerDiscoveryPolicy` — `Title (Year).ext` for films, `Show (Year) - SxxEyy - Title.ext` for
-episodes — its caller in `OpenRenameAsync`, and the walk pressing consent, Rename and Undo with the
-effect read off the file system rather than off the screen.
-
-**Risk if published anyway.** None to anybody's data: the feature touches no file at all today, and
-that is exactly the problem. The risk is one of expectation — a capability is announced that does not
-exist.
 
 ### Risks this release leaves open for `STABLE`
 

@@ -5,17 +5,15 @@
 Cuatro cosas, en este orden. Las tres decisiones que faltaban están **tomadas** y escritas aquí; lo
 que queda es ejecutarlas midiendo antes de corregir.
 
-1. **`LIB-012` — desbloquear el renombrado.** Está en `BLOCKED` desde el 2026-08-16 porque **no puede
-   renombrar nada**: la aplicación pide el nombre que el archivo ya tiene. **Decidido**: un
-   `TitleFileNamePolicy` puro en `Domain/Discovery`, con el convenio que comparten Plex, Jellyfin y
-   Kodi —el mismo que este proyecto ya sigue en `TrailerDiscoveryPolicy`, así que no se inventa nada—:
-   `Título (Año).ext` para películas y `Serie (Año) - SxxEyy - Título.ext` para episodios. Sin año, el
-   título solo; el saneado y los conflictos siguen siendo de `RenamePolicy`, que ya los hace y no se
-   toca. Su llamante va en `OpenRenameAsync`, que hoy es quien se alimenta de su propia salida.
-   **Primera medición, antes de escribir**: cuántas de las fichas de una biblioteca real producen un
-   nombre distinto del actual — si la respuesta fuera «casi ninguna», el convenio está mal elegido.
-   Cierra con la tanda del paseo que pulsa consentimiento, Renombrar y Deshacer leyendo el efecto del
-   sistema de archivos, y con el estado de la matriz de vuelta a `VERIFIED` por el procedimiento.
+1. ~~**`LIB-012` — desbloquear el renombrado.**~~ **Hecho el 2026-08-16.** `TitleFileNamePolicy` en
+   `Domain/Discovery` con el convenio de Plex, Jellyfin y Kodi; su llamante en `OpenRenameAsync`; y
+   la escena del paseo que pulsa consentimiento, Renombrar y Deshacer leyendo el efecto **del sistema
+   de archivos**. Trinquete 98 → **95**; matriz **43 verificados, 1 fuera de alcance, 2 bloqueados**.
+   La primera medición dio **8 de 12** nombres distintos, así que el convenio estaba bien elegido; y
+   medir destapó dos reglas que no estaban decididas: un analizador que avisa no propone, y el título
+   y el año viajan **juntos desde una fuente** — cruzarlos escribía `Arrival 2016 (2016).mp4`.
+   Detalle en
+   [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
 2. **Tanda 4 del paseo — los ajustes.** 14 controles: apariencia, ciclo de vida, privacidad
    —incluido el interruptor de `LIB-016`—, escaneo, recomendaciones, detección de segmentos y atajos.
    Bajaría el trinquete de **98** a **84**, el mayor salto que queda, y **no toca superficie visual**,

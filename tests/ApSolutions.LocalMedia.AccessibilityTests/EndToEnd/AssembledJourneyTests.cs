@@ -224,6 +224,35 @@ public sealed class AssembledJourneyTests : IDisposable
     }
 
     /// <summary>
+    /// LIB-012: the preview has to contain something to preview. The suite above proved the surface
+    /// opens; it never asked what was on it, and what was on it was nothing — the application asked
+    /// to rename each file to the name it already had, which the policy discards as
+    /// <see cref="RenameConflictKind.NoChange"/>. A feature whose title is "rename" and whose plan is
+    /// always empty is not verified, so this asserts the operation, its destination, and that asking
+    /// still moves nothing.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task The_rename_preview_proposes_the_name_the_entry_deserves()
+    {
+        var mediaPath = SeedOneFile("Northern.Chronicles.2016.1080p.mkv");
+        using var host = ShowShell();
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+
+        await host.ViewModel.OpenRenamePreviewAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(host.ViewModel.HasRename);
+        var operation = Assert.Single(host.ViewModel.Rename!.Operations);
+        Assert.Equal("Northern Chronicles (2016).mkv", Path.GetFileName(operation.DestinationPath));
+        Assert.Empty(host.ViewModel.Rename.Conflicts);
+        Assert.True(File.Exists(mediaPath), "Asking for a preview must not move anything.");
+    }
+
+    /// <summary>
     /// Playback starts from the card, through the application's own wiring. The seeded file is one
     /// byte, so the engine reports a failure rather than a picture — and that is the point: the
     /// session, its surfaces, and its diagnosis all reached the screen, which is what was missing.
@@ -374,12 +403,12 @@ public sealed class AssembledJourneyTests : IDisposable
     /// Puts one real file in one real root, through the repositories the application itself uses, so
     /// the library the shell loads is the library the application would have found.
     /// </summary>
-    private string SeedOneFile()
+    private string SeedOneFile(string fileName = "pelicula.mkv")
     {
         Directory.CreateDirectory(_dataRoot);
         var mediaRoot = Path.Combine(_dataRoot, "media");
         Directory.CreateDirectory(mediaRoot);
-        var mediaPath = Path.Combine(mediaRoot, "pelicula.mkv");
+        var mediaPath = Path.Combine(mediaRoot, fileName);
         File.WriteAllBytes(mediaPath, [0]);
 
         var paths = new AppDataPaths(_dataRoot);
