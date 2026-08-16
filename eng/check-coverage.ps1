@@ -227,6 +227,17 @@ try {
             Lines    = 100.00
             Branches = 100.00
         }
+
+        # The third exit the isolation rule went through, on 2026-08-16: which folder an export leaves
+        # in and which archive a restore reads back. It arrives new, so the gate above already
+        # measured it once — and only once, because a file stops being new the moment it merges. It
+        # decides what leaves the application, so it belongs beside the other two rather than being
+        # forgotten at the bar it arrived at.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Backup/HandoffArchivePicker.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
     )
 
     $watchRows = @()
