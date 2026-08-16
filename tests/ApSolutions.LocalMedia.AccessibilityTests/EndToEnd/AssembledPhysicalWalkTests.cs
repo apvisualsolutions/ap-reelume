@@ -2387,12 +2387,26 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // control that answers the first time is never pressed twice.
         var pressed = Click(host, control);
         var attempts = 1;
+        var waits = 0;
         while (attempts < 8 && EqualityComparer<T>.Default.Equals(await probe(), before))
         {
             await SettleAsync();
             if (!EqualityComparer<T>.Default.Equals(await probe(), before))
             {
                 break;
+            }
+
+            // A control that is disabled right now is usually a control whose own work is still in
+            // flight, and that is the application behaving correctly: the transport bar disables a
+            // skip while the previous one is seeking, on purpose. Pressing again would land on a
+            // disabled control and the harness would report the correct behaviour as a failure —
+            // which is what CI measured on 2026-08-16, on a runner slow enough for the seek to
+            // outlast the retry that local runs never saw. A person looking at a greyed button
+            // waits for it, and so does this; when the wait runs out the press happens anyway, so a
+            // control that is disabled for a different reason still says so.
+            if (!control.IsEffectivelyEnabled && waits++ < 16)
+            {
+                continue;
             }
 
             pressed = Click(host, control);
