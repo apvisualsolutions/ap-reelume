@@ -14,9 +14,19 @@ que queda es ejecutarlas midiendo antes de corregir.
    y el año viajan **juntos desde una fuente** — cruzarlos escribía `Arrival 2016 (2016).mp4`.
    Detalle en
    [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
-2. **Tanda 4 del paseo — los ajustes.** 14 controles: apariencia, ciclo de vida, privacidad
+2. **Tanda 4 del paseo — los ajustes. BLOQUEADA POR EL ARNÉS, medido el 2026-08-16.** No es el
+   producto: el paseo **no sabe volver hacia arriba**. Los ajustes son la primera página desplazable
+   —extent 3680 en una ventana de 2000—, cada pulsación deja el desplazamiento donde lo dejó, y un
+   control que queda por encima del área visible ya no se alcanza. Y donde la disposición dice que
+   está el control, el clic **no llega**: un manejador sobre `Button.ClickEvent` midió que con el
+   desplazamiento en 0 ningún botón recibía la pulsación, y con 106 sí. Siete arreglos probados, y
+   ninguno lo resolvió; lo que sí quedó es que el arnés **ahora dice dónde fue el clic**. Empezar por
+   la causa —por qué `TranslatePoint` y el impacto discrepan cien píxeles dentro de un `ScrollViewer`
+   desplazado en Avalonia headless 12.1.1— y sólo después escribir la tanda. Detalle en
+   [audit-walk-cannot-go-back-up.md](evidence/stable/audit-walk-cannot-go-back-up.md).
+   Son **20** controles, no 14: apariencia, ciclo de vida, privacidad
    —incluido el interruptor de `LIB-016`—, escaneo, recomendaciones, detección de segmentos y atajos.
-   Bajaría el trinquete de **98** a **84**, el mayor salto que queda, y **no toca superficie visual**,
+   Bajaría el trinquete de **95** a **75**, el mayor salto que queda, y **no toca superficie visual**,
    así que no choca con el rediseño.
 3. **El ciclo de vida en el sandbox, que sigue caducado.** Las cuatro fases nativas —instalar,
    actualizar, reparar, desinstalar— están en «bloqueadas» desde que el manifiesto cambió con

@@ -14,9 +14,19 @@ here; what remains is carrying them out, measuring before correcting.
    and year travel **together from one source** — crossing them wrote `Arrival 2016 (2016).mp4`.
    Detail in
    [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
-2. **Walk batch 4 — settings.** 14 controls: appearance, lifecycle, privacy — including `LIB-016`'s
+2. **Walk batch 4 — settings. BLOCKED BY THE HARNESS, measured on 2026-08-16.** Not the product:
+   the walk **cannot go back up**. Settings is the first scrolling page — extent 3680 in a 2000-tall
+   window — every press leaves the scroll where it stopped, and a control left above the viewport is
+   out of reach. And where the layout says the control is, the click does not arrive: a handler on
+   `Button.ClickEvent` measured that with the offset at 0 no button received the press, and with it
+   at 106 one did. Seven fixes were tried and none resolved it; what did remain is that the harness
+   **now names where the press went**. Start from the cause — why `TranslatePoint` and hit testing
+   disagree by a hundred pixels inside a scrolled `ScrollViewer` on Avalonia headless 12.1.1 — and
+   only then write the batch. Detail in
+   [audit-walk-cannot-go-back-up.md](evidence/stable/audit-walk-cannot-go-back-up.md).
+   It is **20** controls, not 14: appearance, lifecycle, privacy — including `LIB-016`'s
    switch — scanning, recommendations, segment detection and shortcuts. It would drop the ratchet from
-   **98** to **84**, the largest remaining step, and it **touches no visual surface**, so it does not
+   **95** to **75**, the largest remaining step, and it **touches no visual surface**, so it does not
    collide with the redesign.
 3. **The sandbox lifecycle, still expired.** The four native phases — install, upgrade, repair,
    uninstall — have been "blocked" since the manifest changed with `DES-001`. **Decided**: extend
