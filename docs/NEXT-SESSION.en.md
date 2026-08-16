@@ -134,11 +134,29 @@ one**, and this checks it.
    - **Everything else is already in place from 6a**: the scene navigates to backups, the isolation
      rule answers both dialogs, and the probe for a cancellation is `BackupStatusCancelled` with **no
      new folder** published — because a cancelled copy must leave nothing to restore.
-6. **The sandbox lifecycle, expired since `DES-001`.** The four native phases — install, upgrade,
-   repair, uninstall — are still blocked because the manifest changed. **Decided**: extend
-   `eng/sandbox-handover.ps1`, which already installs, with the four phases and a package of the next
-   version; the host harness does not change. It sits here, between the short batches and the long
-   one, because an expired measurement is debt that grows on its own.
+6. ~~**The sandbox lifecycle, expired since `DES-001`.**~~ **Done on 2026-08-16** —
+   [the evidence](evidence/stable/audit-sandbox-lifecycle-reproduced.md) — and **the premise was half
+   wrong**: the archived report already carried all nine phases, so what had expired was **only the
+   manifest digest** (`402ae30c…` archived against `5e341b5f…` current). What was actually missing was
+   the **versioned script** being able to produce them: `sandbox-handover.ps1` installed and launched,
+   and `README-sandbox.md` itself declared the four lifecycle phases manual — which is exactly what
+   made the measurement depend on somebody remembering.
+
+   The script now does `file-association`, `windows-upgrade`, `windows-downgrade-refused`,
+   `windows-repair` and `windows-uninstall`, and `windows-launch` also checks the database did **not**
+   end up in the package's virtualised folder. The host gets the next-version package by **resealing**
+   the current one with its version raised (`0.1.0.0` → `0.2.0.0`) rather than building the
+   application twice: the manifest version is the whole of what Windows reads to decide whether an
+   install is an upgrade. **One run writes both reports**, because a second cycle would install the
+   package twice to measure one install.
+
+   Result: `lifecycle.json` with **twelve phases green**, the five native ones included, and
+   `PackagingTests` at 152. The database survived the upgrade at **372,736 bytes on both sides**, and
+   uninstalling did not take the library with it.
+
+   **And a false alarm worth an hour:** the refusal field read as `versi�n` and looked like corrupted
+   evidence; the bytes were `\xc3\xb3`, which is `ó` in correct UTF-8. The corruption was in the
+   console that printed it. An "obvious" fix would have changed a script with nothing wrong with it.
 7. **Batch 7 — the updater (5) and database recovery (2).** The update source is served from the
    isolated root, never from the network. The decided, still-pending string belongs here: when the
    handover is refused, the message must say **where the verified package is** so the person can open

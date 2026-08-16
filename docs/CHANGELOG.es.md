@@ -96,6 +96,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La comprobación de que el programa se instala, se actualiza, se repara y se desinstala bien la
+  hace ahora el repositorio, no una persona acordándose.** Esas cuatro cosas las hace Windows, no
+  nosotros, así que sólo se pueden medir instalando de verdad en un Windows limpio; hasta hoy eso
+  eran pasos escritos que alguien tenía que seguir a mano, y la medición caducaba cada vez que
+  cambiaba el archivo que Windows lee para instalar. Ahora un solo comando prepara el paquete, crea
+  uno de la versión siguiente para probar la actualización, lo lleva todo a una máquina virtual
+  desechable, ejecuta el ciclo entero y trae el resultado. Lo medido esta vez: la asociación de
+  «Abrir con» queda registrada para los ocho tipos de vídeo, la biblioteca sobrevive intacta a la
+  actualización, Windows rechaza volver a una versión anterior, la reparación funciona y desinstalar
+  **no se lleva tu biblioteca**.
+
 - **Copiar la biblioteca y devolverla se prueban ahora pulsando sus botones, no llamando a su
   código.** Los dos botones que preguntan dónde guardar o de dónde leer se lo preguntan a un diálogo
   de Windows, y un diálogo no lo puede contestar ninguna comprobación automática: así que crear una

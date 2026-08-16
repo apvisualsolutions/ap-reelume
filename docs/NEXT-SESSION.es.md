@@ -136,11 +136,30 @@ correcta**, y con esto se comprueba.
    - **Lo demás ya está puesto por la 6a**: la escena navega a copias, la regla de aislamiento
      responde los dos diálogos, y la sonda de una cancelación es `BackupStatusCancelled` con **ninguna
      carpeta nueva** publicada — porque una copia cancelada no debe dejar nada que restaurar.
-6. **El ciclo de vida en el sandbox, caducado desde `DES-001`.** Las cuatro fases nativas —instalar,
-   actualizar, reparar, desinstalar— siguen «bloqueadas» porque el manifiesto cambió. **Decidido**:
-   extender `eng/sandbox-handover.ps1`, que ya instala, con las cuatro fases y un paquete de la
-   versión siguiente; el arnés del anfitrión no cambia. Va aquí, entre tandas cortas y largas, porque
-   una medición vencida es deuda que crece sola.
+6. ~~**El ciclo de vida en el sandbox, caducado desde `DES-001`.**~~ **Hecho el 2026-08-16** —
+   [la evidencia](evidence/stable/audit-sandbox-lifecycle-reproduced.md)—, y **la premisa era medio
+   falsa**: el informe archivado ya traía las nueve fases, así que lo caducado era **sólo la huella
+   del manifiesto** (`402ae30c…` archivada contra `5e341b5f…` actual). Lo que de verdad faltaba era
+   que el **guion versionado** supiera producirlas: `sandbox-handover.ps1` instalaba y lanzaba, y el
+   propio `README-sandbox.md` declaraba manuales las cuatro del ciclo — que es exactamente lo que
+   hacía depender la medición de que alguien se acordara.
+
+   Ahora el guion hace `file-association`, `windows-upgrade`, `windows-downgrade-refused`,
+   `windows-repair` y `windows-uninstall`, y `windows-launch` comprueba además que la base **no**
+   acabó en la carpeta virtualizada del paquete. El anfitrión obtiene el paquete de la versión
+   siguiente **resellando** el actual con la versión subida (`0.1.0.0` → `0.2.0.0`) en vez de
+   construir la aplicación dos veces: lo que Windows lee para decidir si una instalación es una
+   actualización es la versión del manifiesto y nada más. **Una sola ejecución escribe los dos
+   informes**, porque un segundo ciclo instalaría el paquete dos veces para medir una instalación.
+
+   Resultado: `lifecycle.json` con **doce fases en verde**, cinco nativas incluidas, y
+   `PackagingTests` en 152. La base sobrevivió a la actualización con **372 736 bytes a los dos
+   lados**, y desinstalar no se llevó la biblioteca.
+
+   **Y una alarma falsa que costó un rato:** el campo de la negativa se leyó como `versi�n` y pareció
+   evidencia estropeada; los bytes eran `\xc3\xb3`, o sea `ó` en UTF-8 correcto. La corrupción estaba
+   en la consola que lo imprimió. Una corrección «obvia» habría tocado un guion que no tenía nada
+   que corregir.
 7. **Tanda 7 — el actualizador (5) y la recuperación de la base (2).** La fuente de actualización se
    sirve desde la raíz aislada, nunca de la red. Entra aquí la cadena decidida y pendiente: cuando el
    traspaso se rechaza, el mensaje debe decir **dónde está el paquete verificado** para que la persona

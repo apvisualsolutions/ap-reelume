@@ -95,6 +95,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Checking that the program installs, upgrades, repairs and uninstalls properly is now done by the
+  repository, not by somebody remembering.** Those four things are Windows' to do, not ours, so they
+  can only be measured by really installing on a clean Windows; until today that was a written
+  procedure somebody had to follow by hand, and the measurement expired every time the file Windows
+  reads to install it changed. One command now prepares the package, builds one of the next version
+  to test the upgrade, carries it all into a disposable virtual machine, runs the whole cycle and
+  brings the result back. Measured this time: the "Open with" association is registered for all
+  eight video types, the library survives the upgrade untouched, Windows refuses to go back to an
+  older version, repair works, and uninstalling **does not take your library with it**.
+
 - **Copying your library out and bringing it back are now tested by pressing their buttons, not by
   calling their code.** The two buttons that ask where to save or what to read ask a Windows dialog,
   and no automated check can answer a dialog: so creating a copy, exporting it, choosing an archive

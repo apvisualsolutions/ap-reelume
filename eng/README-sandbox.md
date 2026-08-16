@@ -49,9 +49,15 @@ pwsh ./eng/run-sandbox-handover.ps1
   porque el paquete lleva un certificado que esta máquina no confía. / Opens the installer window,
   observes it, closes it; installs nothing and cannot.
 
-Las cuatro fases del ciclo de vida —instalar, actualizar, reparar, desinstalar— **siguen siendo
-manuales**: piden un paquete de la versión siguiente y no las cubre este guion. / The four lifecycle
-phases are still manual.
+**Desde el 2026-08-16 el ciclo de vida entero lo hace el mismo guion.** Las fases que Windows posee
+—instalar, asociar, actualizar, rechazar la anterior, reparar y desinstalar— ya no son manuales: el
+anfitrión **resella** el paquete actual con la versión subida para tener el de la siguiente, en vez
+de construir la aplicación dos veces, porque lo que Windows lee para decidir si una instalación es
+una actualización es la versión del manifiesto y nada más. Una sola ejecución escribe los **dos**
+informes; un segundo ciclo instalaría el paquete dos veces para medir una instalación, y su Windows
+ya no sería el limpio que vio el primero. / Since 2026-08-16 the whole lifecycle is done by the same
+script: the host reseals the current package with its version raised, and one run writes both
+reports.
 
 ## Requisitos / Requirements
 
@@ -72,7 +78,12 @@ phases are still manual.
    guion tiene que ser **ASCII puro**: el sandbox trae Windows PowerShell 5.1, que lee un archivo sin
    BOM como ANSI y convierte cualquier otro byte en un error de sintaxis. El comando de inicio debe
    esperar a que la carpeta esté montada antes de leer nada.
-4. **Recoger el informe**, añadirle la versión y el SHA-256 de `Package.appxmanifest`, y archivarlo.
+4. **Recoger los informes.** El guion les pone ya la versión y el SHA-256 de `Package.appxmanifest`
+   y los deja en `artifacts/sandbox/`. **Léalos antes de archivar**: si alguna fase no pasó, el guion
+   lo avisa por nombre, y una evidencia que se copia sin mirar es una evidencia que no se midió.
+   Archivar es copiar `windows-lifecycle.json` a `docs/evidence/mvp/` y, si cambió,
+   `updater-handover.json` a `docs/evidence/stable/`. / The script stamps both reports and leaves
+   them in `artifacts/sandbox/`; read them before copying them into place.
 
 ## La entrega del actualizador / The updater's handover
 
