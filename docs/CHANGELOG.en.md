@@ -390,6 +390,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   start-with-Windows entry there too.** Every copy used to write its sign-in entry to the same place,
   so an automated check could not even test that button without registering the copy it was testing
   on your machine. Your normal installation is unchanged: it still writes where Windows reads.
+- **The review inbox's Search button can be pressed now, and it actually searches.** It had two
+  faults stacked on each other: typing into the box **did not enable it** — it stayed off however much
+  you typed — and had it been on, pressing it would have done nothing, because what it asked for was
+  listened to by nobody. Now you type the title and year with a card selected from the list, and the
+  application searches **for that file**: if what it finds leaves no doubt it is applied without
+  asking, and if it does, it waits in the inbox for you to decide. The button is available when both
+  halves are there — something typed and a card chosen — because without a card there is no file to
+  search about.
+- **Accept and Reject are now checked with the mouse to decide the card you chose.** That is not
+  boilerplate: the automated check turned out to be able to decide a different card than the one it
+  clicked, so the check now asks **which** card ends up accepted or rejected, reading it from the
+  catalogue rather than from the screen. "Load more" is pressed too, and brings in the rest of the list.
 - **Where "Watch the trailer" leads is now checked, on the film card and on the series card.** The
   button opens whatever browser you use, which is why no automated check could press it: it would
   have opened windows on the machine doing the checking. A copy that keeps its data somewhere of its

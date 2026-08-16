@@ -94,10 +94,11 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
     private readonly PendingReassignments? _reassignmentQueue;
     private readonly ManualReassignmentViewModel? _reassignment;
     private readonly ReconcileScannedFiles? _reconciliation;
+    private readonly SearchForMatch? _manualSearch;
     private IReadOnlyList<CandidateCardViewModel> _items = [];
     private IReadOnlyList<PendingReassignmentViewModel> _reassignments = [];
     private CandidateCardViewModel? _selectedItem;
-    private string? _manualSearch;
+    private string? _manualSearchText;
     private int? _nextOffset;
     private bool _hasConflict;
 
@@ -107,7 +108,8 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         RejectMatch rejectMatch,
         PendingReassignments? reassignmentQueue = null,
         ManualReassignmentViewModel? reassignment = null,
-        ReconcileScannedFiles? reconciliation = null)
+        ReconcileScannedFiles? reconciliation = null,
+        SearchForMatch? manualSearch = null)
     {
         _getReviewInbox = getReviewInbox ?? throw new ArgumentNullException(nameof(getReviewInbox));
         _resolveMatch = resolveMatch ?? throw new ArgumentNullException(nameof(resolveMatch));
@@ -115,18 +117,29 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         _reassignmentQueue = reassignmentQueue;
         _reassignment = reassignment;
         _reconciliation = reconciliation;
+        _manualSearch = manualSearch;
         LoadMoreCommand = new AsyncRelayCommand(() => LoadMoreAsync(CancellationToken.None));
         AcceptSelectedCommand = new AsyncRelayCommand(() => AcceptSelectedAsync(CancellationToken.None));
         RejectSelectedCommand = new AsyncRelayCommand(() => RejectSelectedAsync(CancellationToken.None));
-        SearchManuallyCommand = new RelayCommand(
-            _ => RequestManualSearch(),
-            _ => !string.IsNullOrWhiteSpace(ManualSearch));
-        ClearSelectionCommand = new RelayCommand(_ => SelectedItem = null, _ => SelectedItem is not null);
+
+        // Both of these answer a question that changes while the surface is on screen — is anything
+        // typed, is anything selected — so both have to be able to say the answer changed. The class
+        // that used to back them could not: its CanExecuteChanged had an empty add and remove, so a
+        // button asked once, at construction, and never again. Typing into the search box left Search
+        // disabled for good (ARQ-004 replaced twenty-four such classes; this pair was missed).
+        SearchManuallyCommand = new AsyncRelayCommand(
+            () => SearchManuallyAsync(CancellationToken.None),
+            CanSearchManually);
+        ClearSelectionCommand = new AsyncRelayCommand(
+            () =>
+            {
+                SelectedItem = null;
+                return Task.CompletedTask;
+            },
+            () => SelectedItem is not null);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    public event EventHandler<string>? ManualSearchRequested;
 
     public IReadOnlyList<CandidateCardViewModel> Items
     {
@@ -143,13 +156,29 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
     public CandidateCardViewModel? SelectedItem
     {
         get => _selectedItem;
-        set => SetField(ref _selectedItem, value);
+        set
+        {
+            if (SetField(ref _selectedItem, value))
+            {
+                RaiseSelectionDependentCommands();
+            }
+        }
     }
 
+    /// <summary>
+    /// The words a person types when none of the offers is right. What is searched for is the file
+    /// the selected candidate belongs to, so both are required before the search can run.
+    /// </summary>
     public string? ManualSearch
     {
-        get => _manualSearch;
-        set => SetField(ref _manualSearch, value);
+        get => _manualSearchText;
+        set
+        {
+            if (SetField(ref _manualSearchText, value))
+            {
+                (SearchManuallyCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+            }
+        }
     }
 
     public bool HasConflict
@@ -308,12 +337,51 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         }
     }
 
-    private void RequestManualSearch()
+    /// <summary>
+    /// Searches for what a person typed, for the file the selected candidate belongs to, and puts
+    /// the answers where the wrong ones were.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The typed words go through the same reading a file name goes through: the parser separates
+    /// title from year, the provider is asked, the scorer ranks what comes back, and the candidates
+    /// replace the ones this file had. That is the whole of what "search manually" can mean here, and
+    /// it needs no path of its own — an identification is an identification however the words arrived.
+    /// </para>
+    /// <para>
+    /// Until this existed the button raised an event, and <b>nothing in the application listened to
+    /// it</b>: the press was answered by a search that never happened. It is this repository's
+    /// characteristic defect wearing an event instead of a registration.
+    /// </para>
+    /// </remarks>
+    public async Task SearchManuallyAsync(CancellationToken cancellationToken = default)
     {
-        if (!string.IsNullOrWhiteSpace(ManualSearch))
+        if (!CanSearchManually())
         {
-            ManualSearchRequested?.Invoke(this, ManualSearch.Trim());
+            return;
         }
+
+        _ = await _manualSearch!.ExecuteAsync(
+            SelectedItem!.Candidate.MediaFileId,
+            ManualSearch!,
+            cancellationToken).ConfigureAwait(true);
+        await LoadAsync(cancellationToken).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// A search needs both halves: words to search for, and the file they are about. Without a
+    /// selected candidate there is no file, and a button that looked available would be a button that
+    /// answers nothing.
+    /// </summary>
+    private bool CanSearchManually() =>
+        _manualSearch is not null
+        && SelectedItem is not null
+        && !string.IsNullOrWhiteSpace(ManualSearch);
+
+    private void RaiseSelectionDependentCommands()
+    {
+        (SearchManuallyCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (ClearSelectionCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
@@ -330,17 +398,4 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed class RelayCommand(Action<object?> execute, Predicate<object?> canExecute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
-
-        public bool CanExecute(object? parameter) => canExecute(parameter);
-
-        public void Execute(object? parameter) => execute(parameter);
-    }
 }

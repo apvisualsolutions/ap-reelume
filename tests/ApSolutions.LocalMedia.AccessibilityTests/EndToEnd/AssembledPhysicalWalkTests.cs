@@ -11,6 +11,7 @@ using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.Domain.Identification;
 using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
@@ -20,6 +21,7 @@ using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.TestSupport;
@@ -1081,6 +1083,228 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The fifth batch: the review inbox, decided with the mouse — one more page, an accepted match,
+    /// a rejected one, and the manual search.
+    /// </summary>
+    /// <remarks>
+    /// Every probe here reads the <b>catalogue</b> rather than the list on screen. A decision that
+    /// only removed a card would look identical to one that was stored, and this is the surface where
+    /// what was decided has to outlive the screen it was decided on.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_review_inbox_is_decided_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Arrival.2016.mp4");
+
+        // Nothing decodes on this surface, so the file only has to exist and be catalogued.
+        await File.WriteAllBytesAsync(mediaPath, [0x41, 0x50], TestContext.Current.CancellationToken);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromMinutes(116));
+
+        // One more than a page, so "load more" has something left to load.
+        var candidates = new MatchCandidateRepository(factory);
+        await candidates.ReplaceForMediaFileAsync(
+            new MediaFileId(fileId),
+            [.. Enumerable.Range(1, 26).Select(index => new MatchCandidate(
+                CandidateId.FromStableKey($"movie:90000{index}"),
+                new MediaFileId(fileId),
+                $"movie:90000{index}",
+                CandidateContentKind.Movie,
+                0.40 + (index / 1000.0),
+                CandidateScorer.ScoringModelVersion,
+                ReviewState.Pending,
+                [new MatchSignal("Identification.Signal.Title", 0.40, 0.5)],
+                ["Identification.Signal.Title"]))],
+            TestContext.Current.CancellationToken);
+
+        // What a previous lookup would have cached for the words a person types into the search box,
+        // and for the entry those words find. Nothing connects: with no token the provider serves
+        // what it has stored, which is the shipped offline path exactly.
+        var now = DateTimeOffset.UtcNow;
+        var cache = new SqliteMetadataCache(factory);
+        var version = new TmdbOptions(accessToken: null).ProviderVersion;
+        await cache.StoreAsync(
+            new MetadataCacheEntry(
+                new MetadataCacheKey("tmdb", "search:movie:la-llegada:2016", "es-ES", version),
+                """
+                { "results": [ { "id": 329865, "title": "La llegada", "original_title": "Arrival",
+                                 "release_date": "2016-11-11" } ] }
+                """,
+                ETag: null,
+                now,
+                now.AddDays(1)),
+            TestContext.Current.CancellationToken);
+        await cache.StoreAsync(
+            new MetadataCacheEntry(
+                new MetadataCacheKey("tmdb", "movie:329865", "es-ES", version),
+                """
+                {
+                  "title": "La llegada",
+                  "original_title": "Arrival",
+                  "overview": "Una lingüista traduce a los visitantes.",
+                  "release_date": "2016-11-11",
+                  "genres": [{ "name": "Ciencia ficción" }]
+                }
+                """,
+                ETag: null,
+                now,
+                now.AddDays(1)),
+            TestContext.Current.CancellationToken);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Review);
+        var inbox = host.ViewModel.ReviewInbox;
+        Assert.NotNull(inbox);
+        await WaitForAsync(
+            () => Task.FromResult(inbox!.Items.Count == 25),
+            "the review inbox never loaded its first page");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        await PressAsync(
+            host,
+            "ReviewLoadMoreAction",
+            () => inbox!.Items.Count,
+            "clicking Load more never brought the rest of the inbox in");
+        Assert.Equal(26, inbox!.Items.Count);
+
+        // The decision is read from the catalogue, and the card is chosen with the mouse: the list
+        // has no other way of knowing which candidate a person means.
+        var accepted = SelectCard(host, inbox);
+        await PressAsync(
+            host,
+            "ReviewAcceptAction",
+            () => CountDecidedAsync(factory, fileId, ReviewState.Accepted),
+            "clicking Accept never stored the decision on the candidate");
+        Assert.Equal(1, await CountDecidedAsync(factory, fileId, ReviewState.Accepted));
+
+        // The one that was clicked, and not merely one of them: the control click used to land on a
+        // card and move the selection, and "a candidate was accepted" was true either way.
+        Assert.Equal(accepted, await DecidedKeyAsync(factory, fileId, ReviewState.Accepted));
+
+        // And it leaves the inbox, which is the other half of the decision: the list is what is still
+        // waiting for somebody. It arrives on the command's continuation, after the row is written.
+        await WaitForAsync(
+            () => Task.FromResult(inbox.Items.All(item => item.StableKey != accepted)),
+            "the accepted candidate was written to the catalogue and stayed in the inbox anyway");
+
+        var rejected = SelectCard(host, inbox);
+        await PressAsync(
+            host,
+            "ReviewRejectAction",
+            () => CountDecidedAsync(factory, fileId, ReviewState.Rejected),
+            "clicking Reject never stored the refusal on the candidate");
+        Assert.Equal(1, await CountDecidedAsync(factory, fileId, ReviewState.Rejected));
+        Assert.Equal(rejected, await DecidedKeyAsync(factory, fileId, ReviewState.Rejected));
+        await WaitForAsync(
+            () => Task.FromResult(inbox.Items.All(item => item.StableKey != rejected)),
+            "the rejected candidate was written to the catalogue and stayed in the inbox anyway");
+
+        // And the search a person types when none of the offers is right. The answer comes out of the
+        // provider's own cache, so the real provider, parser and scorer all take part — and because
+        // what the words find leaves no doubt, the identification is finished rather than queued: the
+        // probe is the catalogue row, which is what a person came here to change.
+        SelectCard(host, inbox);
+        inbox.ManualSearch = "La llegada 2016";
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "ReviewManualSearchAction",
+            () => StoredTitleAsync(factory, fileId),
+            "clicking Search never asked the provider for what was typed");
+        Assert.Equal("La llegada", await StoredTitleAsync(factory, fileId));
+
+        // The wrong offers are gone with it: what the file now has is the answer to the search.
+        await WaitForAsync(
+            () => Task.FromResult(inbox.Items.Count == 0),
+            "the candidates the search replaced stayed in the inbox");
+    }
+
+    /// <summary>
+    /// Picks a candidate card with the mouse, and answers with the key it picked.
+    /// </summary>
+    /// <remarks>
+    /// Whichever card is <b>on screen</b>, not whichever is first in the model. The list virtualises
+    /// against the window rather than against its own height — measured with 26 candidates in a
+    /// 2000 px window, where the first eight cards had been recycled away and only the ninth onwards
+    /// existed to be clicked. A person clicks a card they can see, and so does this.
+    /// <para>
+    /// The card is not a command control and is not recorded as one: what it does is give the buttons
+    /// below it something to act on.
+    /// </para>
+    /// </remarks>
+    private static string SelectCard(ShellHost host, ReviewInboxViewModel inbox)
+    {
+        // Back to the top first, and only then look at what is on screen. Pressing a card is itself a
+        // Reveal, and revealing recycles the containers a virtualised list had materialised further
+        // down: a card resolved before the page moved is a card with no position by the time the
+        // click lands — measured as "Border has no position in the window".
+        foreach (var scroller in host.Shell.GetVisualDescendants().OfType<ScrollViewer>())
+        {
+            scroller.Offset = scroller.Offset.WithY(0);
+        }
+
+        host.Window.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+
+        var onScreen = host.Shell.GetVisualDescendants()
+            .OfType<Control>()
+            .Where(control => control.IsEffectivelyVisible)
+            .Select(AutomationProperties.GetName)
+            .OfType<string>()
+            .ToHashSet(StringComparer.Ordinal);
+        var key = inbox.Items.Select(item => item.StableKey).FirstOrDefault(onScreen.Contains);
+        Assert.True(
+            key is not null,
+            $"None of the {inbox.Items.Count} candidates in the inbox has a card on screen to click.");
+
+        _ = Click(host, Resolve(host, key!));
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(key, inbox.SelectedItem?.StableKey);
+        return key!;
+    }
+
+    /// <summary>
+    /// How many of a file's candidates carry one decision, read from the catalogue rather than from
+    /// the list on screen: a decision that only removed a card would look the same as one that was
+    /// stored.
+    /// </summary>
+    private static async Task<int> CountDecidedAsync(
+        SqliteConnectionFactory factory,
+        Guid fileId,
+        ReviewState state)
+    {
+        var stored = await new MatchCandidateRepository(factory).GetForMediaFileAsync(
+            new MediaFileId(fileId),
+            TestContext.Current.CancellationToken);
+        return stored.Count(candidate => candidate.ReviewState == state);
+    }
+
+    /// <summary>The title the catalogue holds for a file, which is where an identification lands.</summary>
+    private static async Task<string?> StoredTitleAsync(SqliteConnectionFactory factory, Guid fileId)
+    {
+        var stored = await new CatalogMetadataRepository(factory).GetAsync(
+            new TitleId(fileId),
+            TestContext.Current.CancellationToken);
+        return stored?.Metadata.Title;
+    }
+
+    /// <summary>Which candidate carries the decision — the question that catches a press on the wrong one.</summary>
+    private static async Task<string?> DecidedKeyAsync(
+        SqliteConnectionFactory factory,
+        Guid fileId,
+        ReviewState state)
+    {
+        var stored = await new MatchCandidateRepository(factory).GetForMediaFileAsync(
+            new MediaFileId(fileId),
+            TestContext.Current.CancellationToken);
+        return stored.SingleOrDefault(candidate => candidate.ReviewState == state)?.StableKey;
+    }
+
+    /// <summary>
     /// The second batch: the player's transport, pressed with the mouse on a session the real engine
     /// is decoding. Pause and resume, both skips, mute, the volume slider, and stop.
     /// </summary>
@@ -1437,6 +1661,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// wins. Geometry, and not <c>InputHitTest</c>, because that was already measured not to predict
     /// where a click goes. If no such point exists the walk says so instead of clicking blind.
     /// </para>
+    /// <para>
+    /// A selectable row counts as occupied too, and that one cost a measurement on 2026-08-16. The
+    /// review inbox puts its Accept button directly under a list of candidate cards, so the control
+    /// click landed on the last card and <em>selected</em> it — and Accept then decided that
+    /// candidate rather than the one the walk had clicked. The scene still went green on "one
+    /// candidate is now accepted"; it was only asking <b>which</b> that caught it. A card is not a
+    /// <c>Button</c>, so listing the command types alone was not enough.
+    /// </para>
     /// </remarks>
     private static Point BesidePoint(ShellHost host, Control control)
     {
@@ -1449,7 +1681,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         var occupied = host.Shell.GetVisualDescendants()
             .OfType<Control>()
-            .Where(candidate => candidate is Button or ComboBox or Slider && candidate.IsEffectivelyVisible)
+            .Where(candidate => candidate is Button or ComboBox or Slider or ListBoxItem && candidate.IsEffectivelyVisible)
             .Select(candidate => candidate.TranslatePoint(default, host.Window) is { } origin
                 ? new Rect(origin, candidate.Bounds.Size)
                 : (Rect?)null)

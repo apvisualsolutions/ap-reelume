@@ -399,6 +399,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Windows.** Antes, cualquier copia escribía su entrada de inicio de sesión en el mismo sitio, así que
   una comprobación automática no podía siquiera probar ese botón sin dejar registrada en tu equipo la
   copia que estaba probando. Tu instalación normal no cambia: sigue escribiendo donde Windows lo lee.
+- **El botón «Buscar» de la bandeja de revisión ya se puede pulsar, y ahora busca de verdad.** Tenía
+  dos averías, una encima de otra: escribir en la caja **no lo habilitaba** —seguía apagado por mucho
+  que escribieras—, y aunque lo hubiera estado, pulsarlo no habría hecho nada, porque lo que pedía no
+  lo escuchaba nadie. Ahora buscas escribiendo el título y el año, con una ficha de la lista
+  seleccionada, y la aplicación busca **para ese archivo**: si lo que encuentra no deja lugar a dudas,
+  lo aplica sin preguntarte; si lo deja, te lo pone en la bandeja para que decidas tú. El botón está
+  disponible cuando hay las dos cosas —algo escrito y una ficha elegida—, porque sin ficha no hay
+  archivo sobre el que buscar.
+- **Ya se comprueba con el ratón que Aceptar y Rechazar deciden la ficha que has elegido.** No es una
+  frase de manual: la comprobación automática destapó que la propia verificación podía decidir una
+  ficha distinta de la pulsada, y ahora se comprueba **cuál** queda aceptada o rechazada, leyéndolo del
+  catálogo y no de la pantalla. También se pulsa «Cargar más», que trae el resto de la lista.
 - **Ya se comprueba a dónde lleva «Ver el tráiler», en la ficha de película y en la de serie.** El
   botón abre el navegador que uses, y por eso ninguna comprobación automática podía pulsarlo: habría
   abierto ventanas en la máquina que estaba comprobando. Ahora una copia que guarda sus datos aparte
