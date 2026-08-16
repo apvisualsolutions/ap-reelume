@@ -157,11 +157,46 @@ one**, and this checks it.
    **And a false alarm worth an hour:** the refusal field read as `versi�n` and looked like corrupted
    evidence; the bytes were `\xc3\xb3`, which is `ó` in correct UTF-8. The corruption was in the
    console that printed it. An "obvious" fix would have changed a script with nothing wrong with it.
-7. **Batch 7 — the updater (5) and database recovery (2).** The update source is served from the
-   isolated root, never from the network. The decided, still-pending string belongs here: when the
-   handover is refused, the message must say **where the verified package is** so the person can open
-   it themselves — in both languages, and Windows' own dialog is **neither covered nor silenced**.
-   **39 → 32.**
+7. **Batch 7 — the updater (5) and database recovery (2). 40 → 33.** The decided, still-pending string
+   belongs here: when the handover is refused, the message must say **where the verified package is**
+   so the person can open it themselves — in both languages, and Windows' own dialog is **neither
+   covered nor silenced**. **Investigated on 2026-08-16 so it need not be rediscovered:**
+
+   **It is dearer than 6a, and the reason is measurable: the isolation rule has to cover four more
+   exits.** Three are covered — the registry, the browser, the file pickers. This batch needs:
+
+   - **The source and the download.** `IUpdateSource` is `GitHubReleaseUpdateProvider` against
+     `https://api.github.com/`, and `IUpdateDownloader` fetches with `HttpClient` into
+     `DataRoot/updates` (`CompositionRoot.Updates.cs:40` and `:45`). A harness cannot and must not go
+     to the network. Isolated, both read from the handover folder.
+   - **The launcher.** `IUpdateLauncher` is `WindowsUpdateLauncher(OpenWithWindows)`, and
+     `OpenWithWindows` is `Process.Start` with `UseShellExecute` (`CompositionRoot.cs:1224`).
+     Isolated, it writes down the package it would have handed over, as the link launcher does with
+     the address.
+   - **Opening the backup folder.** `HandleRecoveryAction` makes another `Process.Start` on a folder
+     (`CompositionRoot.cs:1298`).
+   - **Exit.** `RecoveryExit` calls `desktop.Shutdown()` **only if** the `ApplicationLifetime` is
+     `IClassicDesktopStyleApplicationLifetime`, and under the headless harness **it is not**: today
+     the button does nothing that could be probed. It needs a shutdown point the root decides, like
+     the other three.
+
+   **And recovery has a hard precondition of its own:** its view is **not in the shell**.
+   `CreateShell` builds it only when `PrepareDatabaseAsync` returns a refusal
+   (`CompositionRoot.cs:303`), so the scene has to **seed a database that fails** integrity or
+   migration, and **cannot use `ShowShell()`**, which asserts `IsType<ShellView>`. It needs a mount of
+   its own.
+
+   **The updater's five, with their probes:** the automatic-check switch — the stored setting, and
+   the only one with no precondition; check — the offer on screen; download — the package in
+   `DataRoot/updates`; install — what the isolated launcher wrote down; and **Cancel, which is the
+   same obstacle as 6b**: `IsEnabled="{Binding IsBusy}"` and `CanExecute => IsBusy`. Against a local
+   source the download finishes in milliseconds, **but here there is an advantage backup does not
+   have**: the source belongs to the harness, so it can serve slowly on purpose. Measure it before
+   writing the scene.
+
+   **Suggested order, not re-deliberated:** the four exits first, in a commit of their own with
+   `IsolatedRunTests` covering both halves of each; then the seven controls. Splitting into 7a (the
+   updater) and 7b (recovery) is reasonable if recovery's own mount turns out expensive.
 8. **Batch 2 (the rest) — the player and its overlays (29).** The longest, and the only one needing
    real video: tracks, audio output, subtitle style, markers, resume, next episode, version switch,
    loose file, and player recovery. **Measured warning: the five remaining overlays set no

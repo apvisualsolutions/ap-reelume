@@ -160,11 +160,46 @@ correcta**, y con esto se comprueba.
    evidencia estropeada; los bytes eran `\xc3\xb3`, o sea `ó` en UTF-8 correcto. La corrupción estaba
    en la consola que lo imprimió. Una corrección «obvia» habría tocado un guion que no tenía nada
    que corregir.
-7. **Tanda 7 — el actualizador (5) y la recuperación de la base (2).** La fuente de actualización se
-   sirve desde la raíz aislada, nunca de la red. Entra aquí la cadena decidida y pendiente: cuando el
-   traspaso se rechaza, el mensaje debe decir **dónde está el paquete verificado** para que la persona
-   lo abra ella misma — en los dos idiomas, y el diálogo de Windows **no se tapa ni se silencia**.
-   **39 → 32.**
+7. **Tanda 7 — el actualizador (5) y la recuperación de la base (2). 40 → 33.** Entra aquí la cadena
+   decidida y pendiente: cuando el traspaso se rechaza, el mensaje debe decir **dónde está el paquete
+   verificado** para que la persona lo abra ella misma — en los dos idiomas, y el diálogo de Windows
+   **no se tapa ni se silencia**. **Investigado el 2026-08-16, para no redescubrirlo:**
+
+   **Es más cara que la 6a, y el motivo es medible: la regla de aislamiento tiene que cubrir cuatro
+   salidas más.** Van tres cubiertas —registro, navegador, selectores de archivo—; esta tanda
+   necesita:
+
+   - **La fuente y la descarga.** `IUpdateSource` es `GitHubReleaseUpdateProvider` contra
+     `https://api.github.com/`, y `IUpdateDownloader` baja con `HttpClient` a `DataRoot/updates`
+     (`CompositionRoot.Updates.cs:40` y `:45`). Un arnés no puede ni debe salir a la red. Aislado, las
+     dos leen de la carpeta de traspaso.
+   - **El lanzador.** `IUpdateLauncher` es `WindowsUpdateLauncher(OpenWithWindows)`, y
+     `OpenWithWindows` es `Process.Start` con `UseShellExecute` (`CompositionRoot.cs:1224`). Aislado,
+     anota el paquete que habría entregado — igual que el lanzador de enlaces anota la dirección.
+   - **Abrir la carpeta de copias.** `HandleRecoveryAction` hace otro `Process.Start` sobre una
+     carpeta (`CompositionRoot.cs:1298`).
+   - **Salir.** `RecoveryExit` llama a `desktop.Shutdown()` **sólo si** el `ApplicationLifetime` es
+     `IClassicDesktopStyleApplicationLifetime`, y bajo el arnés headless **no lo es**: hoy el botón no
+     hace nada que sondear. Necesita un punto de apagado que la raíz decida, como los otros tres.
+
+   **Y la recuperación tiene una condición previa propia y dura:** su vista **no está en el shell**.
+   `CreateShell` la construye sólo cuando `PrepareDatabaseAsync` devuelve una negativa
+   (`CompositionRoot.cs:303`), así que la escena tiene que **sembrar una base que falle** la
+   integridad o la migración, y **no puede usar `ShowShell()`**, que afirma `IsType<ShellView>`.
+   Necesita montaje propio.
+
+   **Los cinco del actualizador, con sus sondas:** el interruptor de comprobación automática —el
+   ajuste guardado, y es el único sin condición previa—; buscar —la oferta en pantalla—; descargar
+   —el paquete en `DataRoot/updates`—; instalar —lo anotado por el lanzador aislado—; y **«Cancelar»,
+   que es el mismo obstáculo que la 6b**: `IsEnabled="{Binding IsBusy}"` y `CanExecute => IsBusy`.
+   Con una fuente local la descarga acaba en milisegundos, **pero aquí hay una ventaja que copias no
+   tiene**: la fuente es del arnés, así que puede servir despacio a propósito. Medirlo antes de
+   escribir la escena.
+
+   **Sugerencia de orden, no re-deliberada:** las cuatro salidas primero, en un commit propio y con
+   `IsolatedRunTests` cubriendo las dos mitades de cada una; después los siete controles. Partirla en
+   7a (actualizador) y 7b (recuperación) es razonable si el montaje propio de la recuperación sale
+   caro.
 8. **Tanda 2 (resto) — el reproductor y sus superpuestos (29).** La más larga y la única que necesita
    vídeo real: pistas, salida de audio, estilo de subtítulos, marcadores, reanudar, siguiente
    episodio, cambio de versión, archivo suelto y recuperación del reproductor. **Advertencia medida:
