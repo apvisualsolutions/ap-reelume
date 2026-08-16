@@ -423,6 +423,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   conserva su progreso y tus decisiones bajo la ruta nueva. Cada botón dice ahora a qué ruta
   pertenece, también para quien use un lector de pantalla. Las dos decisiones —«es el mismo» y «es un
   archivo nuevo»— quedan comprobadas con el ratón, leyendo del catálogo cuál ficha quedó decidida.
+- **El botón «Continuar» de la pantalla de inicio no hacía nada.** Es la acción principal de toda la
+  aplicación: la pantalla te ofrecía seguir con lo último que dejaste a medias, el botón se activaba
+  solo porque había algo a lo que volver, y al pulsarlo **no pasaba nada**. Ahora abre la sesión con
+  la misma copia de la que salió tu marca de tiempo y en el punto donde la dejaste.
+- **Y dos de los tres botones del reproductor estaban fuera de la pantalla.** «Mini reproductor» y
+  «Pantalla completa» se dibujaban más allá del borde de la ventana, y no era cuestión de agrandarla:
+  la columna donde viven mide lo que mide, así que **no cabían a ningún tamaño**. Ahora los tres se
+  colocan en las líneas que hagan falta y se ven siempre.
 - **La pantalla de revisión queda vigilada entera, también cuando algo va mal.** Es donde corriges lo
   que la lectura automática no acertó, así que ahora se comprueba línea por línea y camino por camino:
   qué pasa si otro decidió antes que tú, si la ficha ya no existe, si no has elegido ninguna. Con ello

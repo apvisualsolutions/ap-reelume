@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **66**, con **62 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **52**, con **76 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -72,10 +72,24 @@ correcta**, y con esto se comprueba.
    paseo, el lado «no hay más» las pruebas de interfaz, y la rama se leía a la mitad para siempre. De
    regalo, tres ramas **inalcanzables** por un `as AsyncRelayCommand` que no podía fallar pero sí dejar
    de coincidir, que es el camino de vuelta a `ARQ-004`.
-3. **Tanda 8 — el shell y el inicio (14).** Las cinco de navegación, las tres del reproductor en el
-   shell, las tres de la ficha (editar, renombrar, duplicados), y las tres de inicio
-   (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). Es el mayor salto que
-   queda y no tiene condición previa ninguna. **66 → 52.**
+3. ~~**Tanda 8 — el shell y el inicio (14).**~~ **Hecha el 2026-08-16, 66 → 52** — el mayor salto de
+   una sola tanda desde que existe el trinquete, y [la evidencia](evidence/stable/audit-walk-shell-and-home.md)
+   cuenta **dos defectos más**, uno de ellos el peor de la jornada. (1) **«Continuar» estaba cableado
+   a nada**: `onResume: null` en el contenedor, con el botón habilitándose solo porque había progreso
+   al que volver; la acción principal de la aplicación, en la primera pantalla, sin hacer nada. Ahora
+   abre la sesión con la versión de la que salió la posición —`watch_state` la guarda para eso— y el
+   shell se lee al pulsar, no al construir. (2) **«Mini reproductor» y «Pantalla completa» estaban
+   fuera de la pantalla**, a x=1737 y más allá, y no por el tamaño de la ventana: su columna mide
+   **320 px por definición** y los tres botones suman unos 800, así que no cabían a ninguna anchura.
+   Ahora es un `WrapPanel`, como el de copias — tercera vez en el día que un `StackPanel` horizontal
+   esconde un control. Del arnés: `Resolve` prefiere el **control de mando** cuando un nombre lo
+   comparten una acción y la región a la que lleva (el botón «Inicio» y la pantalla «Inicio»), y sólo
+   si eso deja exactamente uno, para no tapar el defecto de dos botones con un nombre.
+
+   **Anotado, no re-deliberado:** `CompositionRoot.Library.cs` quedó en 97,14/100 y **no entra** en la
+   lista de vigilados, porque esa lista es para archivos que **deciden**, no para los que declaran; y
+   un gancho opcional que el contenedor deja a nulo **no lo caza `ServiceConsumptionTests`**, porque
+   no es un registro sin consumidor. Quien lo vigila desde hoy es el paseo.
 4. **Tanda 9 — el onboarding de raíces (8).** Estrena la regla en los **selectores de carpeta**: las
    tres clases de raíz, añadir, el consentimiento de escaneo, y quitar con su confirmación y su
    cancelación. **52 → 44.**

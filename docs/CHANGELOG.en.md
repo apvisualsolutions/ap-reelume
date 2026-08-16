@@ -414,6 +414,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   of your entries keeps its progress and your decisions under the new path. Each button now says which
   path it belongs to, for screen reader users as well. Both decisions — "same file" and "it is a new
   file" — are covered by mouse, reading from the catalogue which entry ended up decided.
+- **The Continue button on the home surface did nothing.** It is the primary action of the whole
+  application: home offered to carry on with whatever you last left part way through, the button
+  enabled itself because there was something to return to, and pressing it **did nothing at all**. It
+  now opens the session on the same copy your position came from, at the point you left it.
+- **And two of the three player buttons sat off the screen.** "Mini player" and "Fullscreen" were
+  drawn past the edge of the window, and no amount of resizing helped: the column they live in is a
+  fixed width, so they **never fitted at any size**. All three now lay out across as many lines as
+  they need and stay in view.
 - **The review surface is watched whole now, including when things go wrong.** It is where you correct
   what the automatic reading got wrong, so it is now checked line by line and path by path: what
   happens if somebody decided before you, if the card is no longer there, if you have chosen nothing.

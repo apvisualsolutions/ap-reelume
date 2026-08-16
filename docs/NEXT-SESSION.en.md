@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **66** today, with **62 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **52** today, with **76 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -72,10 +72,24 @@ one**, and this checks it.
    not" side, and the branch read as half-covered forever. As a bonus, three **unreachable** branches
    behind an `as AsyncRelayCommand` that could not fail but could stop matching, which is the way back
    to `ARQ-004`.
-3. **Batch 8 — the shell and home (14).** The five navigation controls, the three player controls in
-   the shell, the three card actions (edit, rename, duplicates), and the three home ones
-   (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). The largest remaining
-   step, and with no precondition at all. **66 → 52.**
+3. ~~**Batch 8 — the shell and home (14).**~~ **Done on 2026-08-16, 66 → 52** — the largest
+   single-batch step since the ratchet existed, and [the evidence](evidence/stable/audit-walk-shell-and-home.md)
+   carries **two more defects**, one of them the worst of the day. (1) **Continue was wired to
+   nothing**: `onResume: null` in the container, with the button enabling itself because there was
+   progress to return to — the primary action of the application, on the first surface anybody sees,
+   doing nothing. It now opens the session on the version the position came from (`watch_state` keeps
+   it for exactly that), and the shell is read at press time rather than captured. (2) **Mini player
+   and Fullscreen sat off the screen**, at x=1737 and beyond, and not because of the window size:
+   their column is **320 px by definition** and the three buttons are about 800, so they fitted at no
+   width at all. It is a `WrapPanel` now, like the backup actions — the third time in one day that a
+   horizontal `StackPanel` hid a control. From the harness: `Resolve` prefers the **command control**
+   when a name is shared by an action and the region it leads to (the Home button and the Home
+   surface), and only when that leaves exactly one, so it cannot mask two buttons with one name.
+
+   **Noted, not re-deliberated:** `CompositionRoot.Library.cs` measured 97.14/100 and **stays off**
+   the watched list, because that list is for files that **decide** rather than declare; and an
+   optional hook the container leaves at null **is not caught by `ServiceConsumptionTests`**, since it
+   is not a registration without a consumer. What watches it from today is the walk.
 4. **Batch 9 — root onboarding (8).** It puts the rule to work on the **folder pickers**: the three
    root kinds, add, the scan consent, and remove with its confirm and its cancel. **52 → 44.**
 5. **Batch 6 — backup and restore (5).** The rule on the **file pickers**. Create copy, export,
