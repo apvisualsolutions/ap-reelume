@@ -117,9 +117,12 @@ correcta**, y con esto se comprueba.
      marcha. Con la base del arnés la copia acaba en milisegundos. Hay que **sembrar una biblioteca
      que tarde** —muchas filas, y artwork personal, que es lo que la copia recorre— y medir cuánto
      dura antes de escribir la escena. No se improvisa al final.
-   - Los otros cuatro no tienen condición: crear copia se sonda con la carpeta que aparece en
-     `BackupsDirectory`, exportar con el ZIP en la carpeta de traspaso, elegir archivo con el plan que
-     queda en pantalla, y confirmar con la base restaurada.
+   - **Decidido el 2026-08-16: la tanda se parte en dos**, para que un obstáculo de siembra no
+     retenga a cuatro controles que no lo tienen. **6a (4 controles, 44 → 40)**: crear copia —sonda,
+     la carpeta que aparece en `BackupsDirectory`—, exportar —el ZIP en la carpeta de traspaso—,
+     elegir archivo —el plan que queda en pantalla— y confirmar la restauración —la base restaurada—.
+     **6b (1 control, 40 → 39)**: «Cancelar», con su biblioteca lenta medida aparte. 6a entra con la
+     regla de aislamiento; 6b puede esperar detrás de la 7 si la siembra resulta cara.
 6. **El ciclo de vida en el sandbox, caducado desde `DES-001`.** Las cuatro fases nativas —instalar,
    actualizar, reparar, desinstalar— siguen «bloqueadas» porque el manifiesto cambió. **Decidido**:
    extender `eng/sandbox-handover.ps1`, que ya instala, con las cuatro fases y un paquete de la
@@ -145,21 +148,40 @@ correcta**, y con esto se comprueba.
    ramas) y una lista de excepciones con la regla de la casa: **sólo puede encoger**.
 10. **Rediseño y documentación**, con el paseo entero como red.
 
+**Una tarea decidida y medida el 2026-08-16, sin sitio propio en la cola todavía: lo que queda de
+`ARQ-004`.** Sobreviven **nueve** clases de comando privadas con `CanExecuteChanged { add { } remove
+{ } }` —en `LibraryViewModel`, `RootOnboardingViewModel`, `ShortcutSettingsViewModel`,
+`DatabaseRecoveryViewModel`, `AppearanceSettingsViewModel` (dos), `LifecycleSettingsViewModel`,
+`ShellViewModel` y `WindowsTrayService`—. **Ocho son inertes** porque su `CanExecute` es constante.
+La novena, la de `LibraryViewModel`, **sí lleva predicado** (`BackCommand` con
+`Surface != LibrarySurface.Browse`), que es exactamente la forma que dejó el botón «Buscar» apagado
+para siempre; hoy **no muerde**, y eso está medido: el paseo pulsa `LibraryBackAction` y funciona,
+porque la vista se hace visible y el botón vuelve a preguntar. **Decidido**: no se tocan por ahora
+—no hay defecto observable y sustituirlas es una migración mecánica sobre nueve archivos, que en esta
+casa exige tres redes—, pero se hacen **en una tanda propia, después de la 2**, cuando el paseo cubra
+los 128 controles y pueda servir de red. Si antes de eso alguien añade un `CanExecute` condicional a
+cualquiera de las ocho, esa clase se sustituye **en ese mismo cambio**.
+
 **Lo que ningún arnés headless puede probar, y por tanto no se disfraza de cubierto:** la imagen en
 una pantalla física y TMDB contestando por red. Eso es el paseo físico de diez minutos, y es del
 propietario.
 
-**Una decisión aplazada, y por qué.** Las dos evidencias nuevas del 2026-08-16 —el enlace al tráiler
-y la bandeja de revisión— **no se han añadido a `FEATURES.md`**, aunque pertenecen a `LIB-015` y
-`LIB-007`. `EvidenceLinkTests` exige que la matriz y `docs/evidence/mvp/verification-manifest.json`
-citen exactamente lo mismo, y el manifiesto **describe un artefacto**: su procedencia es la del
-paquete, así que regenerarlo con el `artifacts/package/` de otra compilación escribiría una
-procedencia que no es la de nadie. Regenerar el manifiesto es parte de cortar una versión, no de una
-sesión de trabajo. **Decidido**: los dos enlaces entran en la matriz **cuando se regenere el
-manifiesto con un paquete recién construido**, y hasta entonces la evidencia vive en
-`docs/evidence/stable/` enlazada desde aquí:
-[el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md) y
-[la bandeja de revisión](evidence/stable/audit-walk-review-inbox.md).
+**Una decisión aplazada, y por qué.** Las evidencias del 2026-08-16 **no se han añadido a
+`FEATURES.md`**. `EvidenceLinkTests` exige que la matriz y
+`docs/evidence/mvp/verification-manifest.json` citen exactamente lo mismo, y el manifiesto **describe
+un artefacto**: su procedencia es la del paquete, así que regenerarlo con el `artifacts/package/` de
+otra compilación escribiría una procedencia que no es la de nadie. Regenerar el manifiesto es parte de
+cortar una versión, no de una sesión de trabajo. **Decidido**: entran en la matriz **cuando se
+regenere el manifiesto con un paquete recién construido** —ya son siete, así que ese paso deja de ser
+opcional en la próxima versión— y hasta entonces viven en `docs/evidence/stable/`, enlazadas aquí:
+
+1. [el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md)
+2. [la bandeja de revisión](evidence/stable/audit-walk-review-inbox.md)
+3. [las reasignaciones](evidence/stable/audit-walk-reassignment.md)
+4. [la copia que se reproduce](evidence/stable/audit-walk-duplicate-version.md)
+5. [la cobertura de la bandeja](evidence/stable/audit-review-inbox-coverage.md)
+6. [el shell y el inicio](evidence/stable/audit-walk-shell-and-home.md)
+7. [el onboarding de raíces](evidence/stable/audit-walk-root-onboarding.md)
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

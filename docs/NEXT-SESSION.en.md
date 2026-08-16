@@ -116,9 +116,12 @@ one**, and this checks it.
      catalogue a copy finishes in milliseconds. A library that **takes long enough** has to be seeded
      — many rows, and personal artwork, which is what the copy walks — and measured before the scene
      is written. Not improvised at the end.
-   - The other four have no precondition: create copy probes the folder appearing in
-     `BackupsDirectory`, export the ZIP in the handoff folder, choose archive the plan left on screen,
-     and confirm the restored database.
+   - **Decided on 2026-08-16: the batch splits in two**, so one seeding obstacle does not hold back
+     four controls that do not have it. **6a (four controls, 44 → 40)**: create copy — probe, the
+     folder appearing in `BackupsDirectory` — export — the ZIP in the handoff folder — choose archive
+     — the plan left on screen — and confirm the restore — the restored database. **6b (one control,
+     40 → 39)**: Cancel, with its slow library measured separately. 6a comes in with the isolation
+     rule; 6b may wait behind batch 7 if the seeding turns out to be expensive.
 6. **The sandbox lifecycle, expired since `DES-001`.** The four native phases — install, upgrade,
    repair, uninstall — are still blocked because the manifest changed. **Decided**: extend
    `eng/sandbox-handover.ps1`, which already installs, with the four phases and a package of the next
@@ -144,21 +147,41 @@ one**, and this checks it.
    exception list under the house rule: **it can only shrink**.
 10. **Redesign and documentation**, with the whole walk as the net.
 
+**One task decided and measured on 2026-08-16, without a place of its own in the queue yet: what is
+left of `ARQ-004`.** **Nine** private command classes still carry `CanExecuteChanged { add { } remove
+{ } }` — in `LibraryViewModel`, `RootOnboardingViewModel`, `ShortcutSettingsViewModel`,
+`DatabaseRecoveryViewModel`, `AppearanceSettingsViewModel` (two), `LifecycleSettingsViewModel`,
+`ShellViewModel` and `WindowsTrayService`. **Eight are inert**, because their `CanExecute` is
+constant. The ninth, in `LibraryViewModel`, **does carry a predicate** (`BackCommand` with
+`Surface != LibrarySurface.Browse`), which is exactly the shape that left the Search button off for
+good; today it **does not bite**, and that is measured: the walk presses `LibraryBackAction` and it
+works, because the view becomes visible and the button asks again. **Decided**: leave them for now —
+there is no observable defect, and replacing them is a mechanical migration across nine files, which
+in this house needs three nets — and do them **in a batch of their own, after batch 2**, once the walk
+covers all 128 controls and can serve as the net. If anybody adds a conditional `CanExecute` to any of
+the eight before then, that class is replaced **in the same change**.
+
 **What no headless harness can prove, and is therefore not dressed up as covered:** the picture on a
 physical screen and TMDB answering over the network. That is the ten-minute physical walkthrough, and
 it belongs to the owner.
 
-**One decision deferred, and why.** The two new pieces of evidence from 2026-08-16 — the trailer link
-and the review inbox — have **not been added to `FEATURES.md`**, though they belong to `LIB-015` and
-`LIB-007`. `EvidenceLinkTests` requires the matrix and
+**One decision deferred, and why.** The evidence from 2026-08-16 has **not been added to
+`FEATURES.md`**. `EvidenceLinkTests` requires the matrix and
 `docs/evidence/mvp/verification-manifest.json` to cite exactly the same things, and the manifest
 **describes an artifact**: its provenance is the package's own, so regenerating it against an
 `artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
-the manifest is part of cutting a release, not part of a working session. **Decided**: both links go
-into the matrix **when the manifest is regenerated against a freshly built package**, and until then
-the evidence lives in `docs/evidence/stable/`, linked from here:
-[the trailer link](evidence/stable/audit-walk-trailer-links.md) and
-[the review inbox](evidence/stable/audit-walk-review-inbox.md).
+the manifest is part of cutting a release, not part of a working session. **Decided**: they go into
+the matrix **when the manifest is regenerated against a freshly built package** — there are seven now,
+so that step stops being optional at the next release — and until then they live in
+`docs/evidence/stable/`, linked from here:
+
+1. [the trailer link](evidence/stable/audit-walk-trailer-links.md)
+2. [the review inbox](evidence/stable/audit-walk-review-inbox.md)
+3. [the reassignments](evidence/stable/audit-walk-reassignment.md)
+4. [the copy that plays](evidence/stable/audit-walk-duplicate-version.md)
+5. [the inbox's coverage](evidence/stable/audit-review-inbox-coverage.md)
+6. [the shell and home](evidence/stable/audit-walk-shell-and-home.md)
+7. [root onboarding](evidence/stable/audit-walk-root-onboarding.md)
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would
