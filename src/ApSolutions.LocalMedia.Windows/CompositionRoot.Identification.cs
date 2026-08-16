@@ -75,6 +75,11 @@ public static partial class CompositionRoot
             .AddTransient<GetReviewInbox>()
             .AddTransient<ResolveMatch>()
             .AddTransient<RejectMatch>()
+
+            // What the inbox's Search button reaches. Until it existed the button raised an event
+            // nothing listened to, so pressing it answered nothing at all — and the inbox is where a
+            // person goes precisely because the automatic reading was not good enough.
+            .AddTransient<SearchForMatch>()
             .AddTransient<ReviewInboxViewModel>();
 
     /// <summary>

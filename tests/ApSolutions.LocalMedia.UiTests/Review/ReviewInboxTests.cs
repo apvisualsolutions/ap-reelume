@@ -130,28 +130,47 @@ public sealed class ReviewInboxTests
         var repository = new UiReviewRepository([
             Candidate("wrong", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
         ]);
-        var viewModel = CreateViewModel(repository);
+        var source = new UiCandidateSource();
+        var viewModel = CreateViewModel(
+            repository,
+            new SearchForMatch(
+                new IdentifyMediaFile(new MediaNameParser(), new CandidateScorer(), source, repository),
+                SilentIdentification.Create()));
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
-        viewModel.SelectedItem = Assert.Single(viewModel.Items);
-        var searches = new List<string>();
-        viewModel.ManualSearchRequested += (_, query) => searches.Add(query);
-        viewModel.ManualSearch = "La llegada 2016";
 
-        viewModel.SearchManuallyCommand.Execute(null);
+        // Nothing to search for and nothing to search about: the button says so rather than looking
+        // available. Both halves are required, and both are answered while the surface is on screen —
+        // which is why the command has to be able to say its answer changed at all.
+        Assert.False(viewModel.SearchManuallyCommand.CanExecute(null));
+        viewModel.SelectedItem = Assert.Single(viewModel.Items);
+        Assert.False(viewModel.SearchManuallyCommand.CanExecute(null));
+        viewModel.ManualSearch = "La llegada 2016";
+        Assert.True(viewModel.SearchManuallyCommand.CanExecute(null));
+
+        await viewModel.SearchManuallyAsync(TestContext.Current.CancellationToken);
+
+        // The words were read the way a file name is read, and what came back replaced what was there.
+        Assert.Equal("La llegada", source.LastTitle);
+        Assert.Equal(2016, source.LastYear);
+        Assert.Equal("movie:329865", Assert.Single(viewModel.Items).StableKey);
+
+        viewModel.SelectedItem = Assert.Single(viewModel.Items);
         await viewModel.RejectSelectedAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(["La llegada 2016"], searches);
         Assert.Equal(ReviewState.Rejected, Assert.Single(repository.Candidates).ReviewState);
         Assert.Empty(viewModel.Items);
     }
 
-    private static ReviewInboxViewModel CreateViewModel(UiReviewRepository repository)
+    private static ReviewInboxViewModel CreateViewModel(
+        UiReviewRepository repository,
+        SearchForMatch? manualSearch = null)
     {
         var publisher = new NullPublisher();
         return new ReviewInboxViewModel(
             new GetReviewInbox(repository),
             new ResolveMatch(repository, publisher, SilentIdentification.Create()),
-            new RejectMatch(repository, publisher));
+            new RejectMatch(repository, publisher),
+            manualSearch: manualSearch);
     }
 
     private static MatchCandidate Candidate(string stableKey, double score, ReviewState state, string explanation)
@@ -185,11 +204,54 @@ public sealed class ReviewInboxTests
         Assert.Fail("The keyboard action did not complete.");
     }
 
+    /// <summary>
+    /// What a search answers, and what it was asked. The candidate source is where a manual search
+    /// ends up, so this is where "the words a person typed reached the provider" is observable.
+    /// </summary>
+    private sealed class UiCandidateSource : IIdentificationCandidateSource
+    {
+        public string? LastTitle { get; private set; }
+
+        public int? LastYear { get; private set; }
+
+        public Task<IReadOnlyList<CandidateFacts>> GetLocalAsync(
+            ParsedMediaName parsed,
+            CancellationToken cancellationToken = default)
+        {
+            LastTitle = parsed.CleanTitle;
+            LastYear = parsed.Year;
+            return Task.FromResult<IReadOnlyList<CandidateFacts>>(
+            [
+                // Close, and not close enough to decide on its own: what a manual search is for is the
+                // answer somebody still has to look at.
+                new CandidateFacts(
+                    CandidateId.FromStableKey("movie:329865"),
+                    "movie:329865",
+                    CandidateContentKind.Movie,
+                    TitleSimilarity: 0.80,
+                    SeasonMatch: null,
+                    EpisodeMatch: null,
+                    YearMatch: 1.0,
+                    DurationMatch: null),
+            ]);
+        }
+
+        public Task<IReadOnlyList<CandidateFacts>> GetRemoteAsync(
+            ParsedMediaName parsed,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<CandidateFacts>>([]);
+    }
+
     private sealed class UiReviewRepository(IEnumerable<MatchCandidate> candidates) : IMatchCandidateRepository
     {
         public List<MatchCandidate> Candidates { get; } = [.. candidates];
 
-        public Task ReplaceForMediaFileAsync(MediaFileId mediaFileId, IReadOnlyList<MatchCandidate> candidates, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task ReplaceForMediaFileAsync(MediaFileId mediaFileId, IReadOnlyList<MatchCandidate> replacements, CancellationToken cancellationToken = default)
+        {
+            _ = Candidates.RemoveAll(candidate => candidate.MediaFileId == mediaFileId && !candidate.IsDecisionLocked);
+            Candidates.AddRange(replacements);
+            return Task.CompletedTask;
+        }
 
         public Task<IReadOnlyList<MatchCandidate>> GetForMediaFileAsync(MediaFileId mediaFileId, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<MatchCandidate>>(Candidates.Where(candidate => candidate.MediaFileId == mediaFileId).ToArray());
