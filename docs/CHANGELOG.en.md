@@ -95,6 +95,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The screen that appears when your library will not open can now be checked without destroying
+  the check.** That screen offers two things: showing you the folder where the backup copy would be,
+  and leaving. Neither had ever been pressed by anything but a person, for a reason that explains
+  itself: a check that pressed the first would open an Explorer window on the machine doing the
+  measuring, and one that pressed the second would **end the program doing the measuring**. A test
+  run — the one that is not yours — now writes down what it would have handed to Windows instead of
+  handing it over, exactly as it already did for the trailer link and the backup dialogs. Your
+  installation is unchanged: Explorer still opens, and leaving still leaves.
+
 - **Checking that the program installs, upgrades, repairs and uninstalls properly is now done by the
   repository, not by somebody remembering.** Those four things are Windows' to do, not ours, so they
   can only be measured by really installing on a clean Windows; until today that was a written

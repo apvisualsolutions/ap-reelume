@@ -15,6 +15,7 @@ using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.Windows.Accessibility;
+using ApSolutions.LocalMedia.Windows.Shell;
 using ApSolutions.LocalMedia.Windows.Startup;
 using ApSolutions.LocalMedia.Windows.Tray;
 using ApSolutions.LocalMedia.Windows.Updates;
@@ -78,6 +79,16 @@ public static partial class CompositionRoot
                 ReadResource("ProductDisplayName"),
                 ReadResource("LifecycleTrayOpenAction"),
                 ReadResource("LifecycleTrayExitAction")))
+
+            // What the recovery screen hands to Windows itself, decided by the data root, once,
+            // here — the same choice the trailer link and the archive dialogs make. The person whose
+            // profile this is gets Explorer and a real shutdown; a run keeping its data somewhere of
+            // its own writes down what it would have handed over, because a harness that shut the
+            // application down would end the suite pressing the button.
+            .AddSingleton<ISystemHandoff>(provider =>
+                provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory is { } handoff
+                    ? new RecordingSystemHandoff(handoff)
+                    : new WindowsSystemHandoff(System.Diagnostics.Process.Start, ShutdownDesktop))
             .AddTransient<LifecycleSettingsViewModel>()
             .AddSingleton<IBackdropService, MicaBackdropService>()
             .AddSingleton<IReducedMotionService, WindowsReducedMotionService>()

@@ -135,11 +135,7 @@ public static partial class CompositionRoot
                 services.GetRequiredService<SegmentDetectionScheduler>().Stop();
                 services.GetRequiredService<RootWatchBackground>().Stop();
                 host.EndPlaybackSession();
-                if (Avalonia.Application.Current?.ApplicationLifetime
-                    is IClassicDesktopStyleApplicationLifetime desktop)
-                {
-                    desktop.Shutdown();
-                }
+                ShutdownDesktop();
             });
 
         tray.OpenRequested += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
@@ -302,13 +298,13 @@ public static partial class CompositionRoot
                 var refusal = await PrepareDatabaseAsync(migrationRunner, integrityChecker).ConfigureAwait(true);
                 host.Content = refusal is null
                     ? services.GetRequiredService<ShellView>()
-                    : CreateRecoveryView(paths.DatabasePath, migrationRunner.LastBackupPath, refusal);
+                    : CreateRecoveryView(services, paths.DatabasePath, migrationRunner.LastBackupPath, refusal);
             },
             // Nothing else can report a failure here: the window is already on screen with a startup
             // view in it, and leaving that view up for good would be the one outcome that says
             // nothing at all.
             exception => host.Content =
-                CreateRecoveryView(paths.DatabasePath, migrationRunner.LastBackupPath, exception.Message));
+                CreateRecoveryView(services, paths.DatabasePath, migrationRunner.LastBackupPath, exception.Message));
 
         return host;
     }
@@ -1229,6 +1225,25 @@ public static partial class CompositionRoot
         }) is not null;
 
     /// <summary>
+    /// Ends the application, when there is a desktop lifetime to end.
+    /// </summary>
+    /// <remarks>
+    /// It lives here rather than inside <see cref="WindowsSystemHandoff"/> because it cannot be
+    /// exercised anywhere else: <see cref="IClassicDesktopStyleApplicationLifetime"/> carries a
+    /// member declaring itself not implementable by user code, so nothing can stand in for one, and
+    /// shutting a real one down inside a suite would end the suite. This file is where the rest of
+    /// the application's dealings with Avalonia's lifetime already are.
+    /// </remarks>
+    private static void ShutdownDesktop()
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime
+            is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.Shutdown();
+        }
+    }
+
+    /// <summary>
     /// The language metadata is asked for, with English behind it. A provider that has nothing in the
     /// interface language should answer in one somebody can still read.
     /// </summary>
@@ -1280,39 +1295,56 @@ public static partial class CompositionRoot
     /// judged the best chance of being the one the person wants back.
     /// </summary>
     private static DatabaseRecoveryView CreateRecoveryView(
+        IServiceProvider services,
         string databasePath,
         string? migrationBackupPath,
         string failureDetail)
     {
         var backupPath = DatabaseStartup.FindLatestBackup(databasePath, migrationBackupPath);
+        var handoff = services.GetRequiredService<ISystemHandoff>();
         return new DatabaseRecoveryView
         {
             DataContext = new DatabaseRecoveryViewModel(
                 databasePath,
                 backupPath,
                 failureDetail,
-                action => HandleRecoveryAction(action, backupPath)),
+                action => HandleRecoveryAction(action, backupPath, handoff)),
         };
     }
 
-    private static void HandleRecoveryAction(DatabaseRecoveryAction action, string backupPath)
+    /// <summary>
+    /// The two things the recovery screen can do, both of them handed to the system rather than
+    /// carried out here.
+    /// </summary>
+    /// <remarks>
+    /// Which handover is built is decided by the data root, once, in the composition: a run keeping
+    /// its data somewhere of its own writes down the folder it would have shown and the shutdown it
+    /// would have asked for. Before that, neither button could be pressed by anything but a person —
+    /// one opened an Explorer window on whoever was measuring, and the other ended the process doing
+    /// the measuring.
+    /// <para>
+    /// Whether there is a folder to show at all is decided here rather than in either handover, so
+    /// the two cannot come to disagree about it: with no copy to offer,
+    /// <see cref="DatabaseStartup.FindLatestBackup"/> answers a path that deliberately does not
+    /// exist, and the folder holding it is still where a copy would be.
+    /// </para>
+    /// </remarks>
+    private static void HandleRecoveryAction(
+        DatabaseRecoveryAction action,
+        string backupPath,
+        ISystemHandoff handoff)
     {
         if (action == DatabaseRecoveryAction.OpenBackupFolder)
         {
             var folder = Path.GetDirectoryName(backupPath);
             if (!string.IsNullOrWhiteSpace(folder) && Directory.Exists(folder))
             {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = folder,
-                    UseShellExecute = true,
-                });
+                _ = handoff.TryOpenFolder(folder);
             }
         }
-        else if (action == DatabaseRecoveryAction.Exit
-            && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        else if (action == DatabaseRecoveryAction.Exit)
         {
-            desktop.Shutdown();
+            handoff.RequestExit();
         }
     }
 
