@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **75** today, with **53 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **69** today, with **59 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -29,12 +29,24 @@ one**, and this checks it.
 
 ### The order
 
-1. **The isolation rule, and with it both `DetailsTrailerLinkAction`.** First because it unblocks
-   three batches. First measurement: the address written must be the one built from the stored key
-   and no other — `LIB-015` already requires `https` and its own host, so the test is that the walk
-   reads exactly that. **75 → 73.**
-2. **Batch 5 — the review inbox (6) and duplicates (1).** No awkward preconditions: accept, reject,
-   manual search, load more, and the two reassignment controls. **73 → 66.**
+1. ~~**The isolation rule, and with it both `DetailsTrailerLinkAction`.**~~ **Done on 2026-08-16.**
+   `IAppDataPaths.SystemHandoffDirectory`: a root that is not the profile's gets a folder to write
+   what it would have handed to Windows, and the owning run gets `null`, because the distinction is
+   not where the handover goes but **whether** it happens. The link's refusals moved into
+   `ExternalLinkPolicy` in the domain, and both exits ask it. The walk reads both addresses —
+   `FilmTrailer` on the film, `ShowTrailer` on the series — in the order they were pressed. As a
+   bonus, the coverage gate found an **unreachable guard** (empty host, with `https` already required)
+   and it was removed with its measurement. **75 → 73.**
+2. **Batch 5 — the review inbox (6) and duplicates (1).** **Four done on 2026-08-16** — load more,
+   accept, reject and manual search — with **two product defects fixed**: the Search button never
+   enabled (a private command class with an empty `CanExecuteChanged`, a survivor of `ARQ-004`) and
+   its event was **listened to by nobody** in `src/`; it now reaches `SearchForMatch`, the manual
+   counterpart of `IdentifyScannedFiles`. **Remaining**: the two reassignment controls — a held
+   moved-file offer has to be seeded into `PendingReassignments` with the identity stored on the old
+   row, and `ReconcileScanResults.ConfirmAsync` requires the command's identity to match by
+   fingerprint or stable id — and the duplicates radio (`DuplicateReviewView#{Binding ShortPath}`),
+   which needs a version group and is opened from the card with `OpenDuplicatesAsync`.
+   **73 → 69, and 69 → 66 when it closes.**
 3. **Batch 8 — the shell and home (14).** The five navigation controls, the three player controls in
    the shell, the three card actions (edit, rename, duplicates), and the three home ones
    (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). The largest remaining
@@ -69,10 +81,13 @@ one**, and this checks it.
 physical screen and TMDB answering over the network. That is the ten-minute physical walkthrough, and
 it belongs to the owner.
 
-The state at the close of **2026-08-16**, the session that unblocked `LIB-012`, finished batch four
-in full, and decided the route to zero. **Five commits**: `5f85fbd` (the rename renames), `3eab024`
-(the walk says where a press went), `5f96ac3` (it returns to the top before pressing), `679d9f1`
-(isolated startup entry and all twenty settings) and `2596bf6` (this queue). The Spanish version is in
+The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
+four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would
+have gone), `d91b497` (the gate found a guard that had never run) and `a799f17` (the inbox Search
+button could not be pressed, and did nothing if it were). Before it, the day's first session left
+five: `5f85fbd` (the rename renames), `3eab024` (the walk says where a press went), `5f96ac3` (it
+returns to the top before pressing), `679d9f1` (isolated startup entry and all twenty settings) and
+`2596bf6` (this queue). The Spanish version is in
 [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical scope record is still
 [FEATURES.md](FEATURES.md) — **43 verified, 1 out of scope, 2 blocked** (`PLY-004`, `PRD-002`); the
 audit's outstanding work lives in

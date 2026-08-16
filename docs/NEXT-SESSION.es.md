@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **75**, con **53 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **69**, con **59 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -29,12 +29,24 @@ correcta**, y con esto se comprueba.
 
 ### El orden
 
-1. **La regla de aislamiento, y con ella los dos `DetailsTrailerLinkAction`.** Es lo primero porque
-   desbloquea tres tandas. Primera medición: la dirección escrita tiene que ser la de la clave
-   guardada y de nadie más — `LIB-015` ya exige `https` y host propio, así que la prueba es que el
-   paseo lea exactamente esa. **75 → 73.**
-2. **Tanda 5 — la bandeja de revisión (6) y los duplicados (1).** Sin condiciones previas raras:
-   aceptar, rechazar, buscar a mano, cargar más, y las dos de reasignación. **73 → 66.**
+1. ~~**La regla de aislamiento, y con ella los dos `DetailsTrailerLinkAction`.**~~ **Hecha el
+   2026-08-16.** `IAppDataPaths.SystemHandoffDirectory`: una raíz que no es la del perfil recibe una
+   carpeta donde anotar lo que habría entregado a Windows, y quien es dueño recibe `null` porque la
+   distinción no es dónde ocurre la entrega sino **si** ocurre. Las negativas del enlace salieron a
+   `ExternalLinkPolicy`, en el dominio, y las usan las dos salidas. El paseo lee las dos direcciones
+   —`FilmTrailer` en la película, `ShowTrailer` en la serie— en el orden en que se pulsaron. De regalo,
+   la puerta de cobertura destapó una **guarda inalcanzable** (anfitrión vacío con `https` ya exigido)
+   y se retiró con su medición. **75 → 73.**
+2. **Tanda 5 — la bandeja de revisión (6) y los duplicados (1).** **Cuatro hechas el 2026-08-16**
+   —cargar más, aceptar, rechazar y buscar a mano— con **dos defectos del producto corregidos**: el
+   botón «Buscar» no se habilitaba nunca (una clase de comando privada con `CanExecuteChanged` vacío,
+   superviviente de `ARQ-004`) y su evento **no lo escuchaba nadie** en `src/`; ahora llega a
+   `SearchForMatch`, la contraparte manual de `IdentifyScannedFiles`. **Queda**: las dos de
+   reasignación —hace falta sembrar una oferta de archivo movido en `PendingReassignments` con la
+   identidad guardada en la fila vieja, y `ReconcileScanResults.ConfirmAsync` exige que la identidad
+   del comando case por huella o por identidad estable— y el radio de duplicados
+   (`DuplicateReviewView#{Binding ShortPath}`), que necesita un grupo de versiones y se abre desde la
+   ficha con `OpenDuplicatesAsync`. **73 → 69, y 69 → 66 al cerrarla.**
 3. **Tanda 8 — el shell y el inicio (14).** Las cinco de navegación, las tres del reproductor en el
    shell, las tres de la ficha (editar, renombrar, duplicados), y las tres de inicio
    (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). Es el mayor salto que
@@ -70,10 +82,13 @@ correcta**, y con esto se comprueba.
 una pantalla física y TMDB contestando por red. Eso es el paseo físico de diez minutos, y es del
 propietario.
 
-Estado al cerrar el **2026-08-16**, la sesión que desbloqueó `LIB-012`, cerró la tanda 4 entera y
-decidió la ruta hasta cero. **Cinco commits**: `5f85fbd` (el renombrado renombra), `3eab024` (el paseo
-dice dónde fue el clic), `5f96ac3` (vuelve arriba antes de pulsar), `679d9f1` (arranque aislado y los
-veinte ajustes) y `2596bf6` (esta cola). La versión inglesa está en
+Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
+séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el
+navegador), `d91b497` (la puerta encontró una guarda que nunca corrió) y `a799f17` (el botón Buscar
+de la bandeja no se podía pulsar, y no hacía nada si se pudiera). Antes, la primera sesión del día
+dejó cinco: `5f85fbd` (el renombrado renombra), `3eab024` (el paseo dice dónde fue el clic),
+`5f96ac3` (vuelve arriba antes de pulsar), `679d9f1` (arranque aislado y los veinte ajustes) y
+`2596bf6` (esta cola). La versión inglesa está en
 [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro canónico del alcance sigue siendo
 [FEATURES.md](FEATURES.md) —**43 verificados, 1 fuera de alcance, 2 bloqueados** (`PLY-004`,
 `PRD-002`)—; el trabajo pendiente de la auditoría vive en
