@@ -1,40 +1,73 @@
-# Where to pick up
+# Where to resume
 
-## The queue decided on 2026-08-16 (not re-deliberated)
+## The queue decided on 2026-08-16 (not up for re-deliberation)
 
-Four things, in this order. The three decisions that were outstanding are **taken** and written down
-here; what remains is carrying them out, measuring before correcting.
+**The destination is zero.** This application ships free and **nobody is going to test it by hand**:
+whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
+to **0 pending** — **75** today, with **53 of 128** controls pressed by mouse — and the code coverage
+gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
+measuring before correcting.
 
-1. ~~**`LIB-012` — unblock the rename.**~~ **Done on 2026-08-16.** `TitleFileNamePolicy` in
-   `Domain/Discovery` in the Plex/Jellyfin/Kodi convention; its caller in `OpenRenameAsync`; and the
-   walk scene pressing consent, Rename and Undo with the effect read off **the file system**.
-   Ratchet 98 → **95**; matrix **43 verified, 1 out of scope, 2 blocked**. The first measurement gave
-   **8 of 12** names different from the current one, so the convention was the right one; and
-   measuring turned up two rules nobody had decided: a parser that warned proposes nothing, and title
-   and year travel **together from one source** — crossing them wrote `Arrival 2016 (2016).mp4`.
-   Detail in
-   [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
-2. ~~**Walk batch 4 — settings.**~~ **Done in full on 2026-08-16.** All twenty controls pressed with
-   the mouse: ratchet **95 → 75**, 53 of 128. It needed one production change —
-   `IAppDataPaths.StartupRegistrySubKey`, so a run keeping its data somewhere of its own keeps **its
-   startup entry somewhere of its own too** and the walk can grant start-with-Windows without
-   registering anything on the machine of whoever ran it — and two harness rules: **`Reveal`**
-   (return to the top, scroll only when it does not fit) and **themes are pressed last**. Detail in
-   [audit-walk-fourth-batch.md](evidence/stable/audit-walk-fourth-batch.md).
-3. **The sandbox lifecycle, still expired.** The four native phases — install, upgrade, repair,
-   uninstall — have been "blocked" since the manifest changed with `DES-001`. **Decided**: extend
-   `eng/sandbox-handover.ps1`, which already works and already installs, with the four phases and a
-   next-version package; the host harness does not change.
-4. **Walk batches 5-7**, and then the redesign and the documentation.
+### The decision that unblocks the rest: an isolated run touches nothing outside its own root
 
-**Also decided, and it is not code work:** the "choose an app" dialog Windows leaves on screen when
-the handover is refused **is not hidden and not silenced**. The application tells the truth — nothing
-was installed — and what is missing is for that message to say **where the verified package is** so a
-person can open it themselves. It is a string, it goes in both languages, and it lands with batch 7.
+Three controls were declared uncoverable for the same reason, and the third time stops being a
+coincidence and becomes a rule of the project:
 
-**And a measured warning that applies to batches 2, 5 and 6:** the **five** remaining player overlays
-set no alignment, exactly like the status one corrected on 2026-08-15, so they stretch over the whole
-stage when visible. Each is corrected **in its own batch with its own measurement**, not in bulk.
+- **Granting start-with-Windows** wrote to the key Windows reads at sign-in. **Resolved on
+  2026-08-16** with `IAppDataPaths.StartupRegistrySubKey`.
+- **The provider trailer link** (`DetailsTrailerLinkAction`, on the film card and the series card)
+  hands the address to the Windows shell, which opens a real browser.
+- **The file and folder pickers** (backup, restore, adding a root) open a modal system dialog no
+  harness can answer.
+
+**The rule, and it applies to all three:** a run whose data root is **not** the profile's — a harness,
+the walk, a lifecycle check — **writes and opens nothing outside that root**. Instead of opening the
+browser it writes the address it would have opened; instead of opening the dialog it resolves the path
+its root declares. The run that owns the profile behaves exactly as it does today. And this is not
+only about being able to press: **nothing checks today that the address that would open is the right
+one**, and this checks it.
+
+### The order
+
+1. **The isolation rule, and with it both `DetailsTrailerLinkAction`.** First because it unblocks
+   three batches. First measurement: the address written must be the one built from the stored key
+   and no other — `LIB-015` already requires `https` and its own host, so the test is that the walk
+   reads exactly that. **75 → 73.**
+2. **Batch 5 — the review inbox (6) and duplicates (1).** No awkward preconditions: accept, reject,
+   manual search, load more, and the two reassignment controls. **73 → 66.**
+3. **Batch 8 — the shell and home (14).** The five navigation controls, the three player controls in
+   the shell, the three card actions (edit, rename, duplicates), and the three home ones
+   (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). The largest remaining
+   step, and with no precondition at all. **66 → 52.**
+4. **Batch 9 — root onboarding (8).** It puts the rule to work on the **folder pickers**: the three
+   root kinds, add, the scan consent, and remove with its confirm and its cancel. **52 → 44.**
+5. **Batch 6 — backup and restore (5).** The rule on the **file pickers**. Create copy, export,
+   cancel; choose archive and confirm the restore. **44 → 39.**
+6. **The sandbox lifecycle, expired since `DES-001`.** The four native phases — install, upgrade,
+   repair, uninstall — are still blocked because the manifest changed. **Decided**: extend
+   `eng/sandbox-handover.ps1`, which already installs, with the four phases and a package of the next
+   version; the host harness does not change. It sits here, between the short batches and the long
+   one, because an expired measurement is debt that grows on its own.
+7. **Batch 7 — the updater (5) and database recovery (2).** The update source is served from the
+   isolated root, never from the network. The decided, still-pending string belongs here: when the
+   handover is refused, the message must say **where the verified package is** so the person can open
+   it themselves — in both languages, and Windows' own dialog is **neither covered nor silenced**.
+   **39 → 32.**
+8. **Batch 2 (the rest) — the player and its overlays (29).** The longest, and the only one needing
+   real video: tracks, audio output, subtitle style, markers, resume, next episode, version switch,
+   loose file, and player recovery. **Measured warning: the five remaining overlays set no
+   alignment** and stretch over the whole stage, exactly like the status one corrected on 2026-08-15;
+   **each is corrected in its own batch with its own measurement**, not in bulk. **32 → 3**, and the
+   last three with them: **0.**
+9. **Code coverage, to the same destination.** The gate watches new files and a short list today, so
+   **an old file that gets worse is watched by nobody**. **Decided**: once the walk reaches 0,
+   `check-coverage.ps1` measures **all of `src/`** against the usual floor (96 % of lines and of
+   branches) with an exception list under the house rule: **it can only shrink**.
+10. **Redesign and documentation**, with the whole walk as the net.
+
+**What no headless harness can prove, and is therefore not dressed up as covered:** the picture on a
+physical screen and TMDB answering over the network. That is the ten-minute physical walkthrough, and
+it belongs to the owner.
 
 The state of the project at the close of the **fifth** session of **2026-08-10**, the one that paid
 the last coverage debt and instrumented the intermittent red's failure path. The Spanish version is in [NEXT-SESSION.es.md](NEXT-SESSION.es.md). The canonical

@@ -2,40 +2,73 @@
 
 ## La cola decidida el 2026-08-16 (no se re-delibera)
 
-Cuatro cosas, en este orden. Las tres decisiones que faltaban están **tomadas** y escritas aquí; lo
-que queda es ejecutarlas midiendo antes de corregir.
+**El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
+la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
+pendientes** —hoy **75**, con **53 de 128** controles pulsados con ratón— y la puerta de cobertura de
+código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
+midiendo antes de corregir.
 
-1. ~~**`LIB-012` — desbloquear el renombrado.**~~ **Hecho el 2026-08-16.** `TitleFileNamePolicy` en
-   `Domain/Discovery` con el convenio de Plex, Jellyfin y Kodi; su llamante en `OpenRenameAsync`; y
-   la escena del paseo que pulsa consentimiento, Renombrar y Deshacer leyendo el efecto **del sistema
-   de archivos**. Trinquete 98 → **95**; matriz **43 verificados, 1 fuera de alcance, 2 bloqueados**.
-   La primera medición dio **8 de 12** nombres distintos, así que el convenio estaba bien elegido; y
-   medir destapó dos reglas que no estaban decididas: un analizador que avisa no propone, y el título
-   y el año viajan **juntos desde una fuente** — cruzarlos escribía `Arrival 2016 (2016).mp4`.
-   Detalle en
-   [audit-lib012-rename-that-renames.md](evidence/stable/audit-lib012-rename-that-renames.md).
-2. ~~**Tanda 4 del paseo — los ajustes.**~~ **Hecha entera el 2026-08-16.** Los veinte controles
-   pulsados con ratón: trinquete **95 → 75**, 53 de 128. Hizo falta un cambio de producción —
-   `IAppDataPaths.StartupRegistrySubKey`, para que una ejecución que guarda sus datos aparte guarde
-   **también su entrada de arranque aparte** y el paseo pueda conceder el arranque con Windows sin
-   registrar nada en la máquina de quien lo ejecute— y dos reglas del arnés: **`Reveal`** (volver
-   arriba, desplazar sólo si no cabe) y **los temas se pulsan los últimos**. Detalle en
-   [audit-walk-fourth-batch.md](evidence/stable/audit-walk-fourth-batch.md).
-3. **El ciclo de vida en el sandbox, que sigue caducado.** Las cuatro fases nativas —instalar,
-   actualizar, reparar, desinstalar— están en «bloqueadas» desde que el manifiesto cambió con
-   `DES-001`. **Decidido**: extender `eng/sandbox-handover.ps1`, que ya funciona y ya instala, con las
-   cuatro fases y un paquete de la versión siguiente; el arnés del anfitrión no cambia.
-4. **Tandas 5-7 del paseo**, y después el rediseño y la documentación.
+### La decisión que lo desbloquea todo: una ejecución aislada no toca nada fuera de su raíz
 
-**Decidido también, y no es trabajo de código:** el diálogo «Elegir una aplicación» que Windows deja
-en pantalla cuando el traspaso se rechaza **no se tapa ni se silencia**. La aplicación dice la verdad
-—no se instaló nada— y lo que falta es que ese mensaje diga **dónde está el paquete verificado** para
-que la persona lo abra ella misma. Es una cadena, va en los dos idiomas, y entra con la tanda 7.
+Tres controles se declararon incubribles por la misma razón, y la tercera vez deja de ser casualidad
+para ser una regla del proyecto:
 
-**Y una advertencia medida que vale para las tandas 2, 5 y 6:** los **cinco** superpuestos restantes
-del reproductor no fijan alineación, igual que el de estado que se corrigió el 2026-08-15, así que se
-estiran sobre todo el escenario cuando son visibles. Se corrige cada uno **en su tanda y con su
-medición**, no en bloque.
+- **Conceder el arranque con Windows** escribía en la clave que Windows lee al iniciar sesión.
+  **Resuelto el 2026-08-16** con `IAppDataPaths.StartupRegistrySubKey`.
+- **El enlace al tráiler del proveedor** (`DetailsTrailerLinkAction`, en la ficha de película y en la
+  de serie) entrega la dirección al shell de Windows, que abre un navegador de verdad.
+- **Los selectores de archivo y carpeta** (copias, restauración, añadir una raíz) abren un diálogo
+  modal del sistema que ningún arnés puede contestar.
+
+**Regla, y se aplica a los tres:** una ejecución cuya raíz de datos **no** es la del perfil —un
+arnés, el paseo, una comprobación de ciclo de vida— **no escribe ni abre nada fuera de esa raíz**. En
+vez de abrir el navegador, escribe la dirección que habría abierto; en vez de abrir el diálogo,
+resuelve la ruta que su raíz declara. Quien es dueño del perfil se comporta exactamente igual que
+hoy. No es sólo para poder pulsar: **hoy nadie comprueba que la dirección que se abriría sea la
+correcta**, y con esto se comprueba.
+
+### El orden
+
+1. **La regla de aislamiento, y con ella los dos `DetailsTrailerLinkAction`.** Es lo primero porque
+   desbloquea tres tandas. Primera medición: la dirección escrita tiene que ser la de la clave
+   guardada y de nadie más — `LIB-015` ya exige `https` y host propio, así que la prueba es que el
+   paseo lea exactamente esa. **75 → 73.**
+2. **Tanda 5 — la bandeja de revisión (6) y los duplicados (1).** Sin condiciones previas raras:
+   aceptar, rechazar, buscar a mano, cargar más, y las dos de reasignación. **73 → 66.**
+3. **Tanda 8 — el shell y el inicio (14).** Las cinco de navegación, las tres del reproductor en el
+   shell, las tres de la ficha (editar, renombrar, duplicados), y las tres de inicio
+   (`HomeLibraryAction`, `HomeResumeAction`, `RecommendationsToggleAction`). Es el mayor salto que
+   queda y no tiene condición previa ninguna. **66 → 52.**
+4. **Tanda 9 — el onboarding de raíces (8).** Estrena la regla en los **selectores de carpeta**: las
+   tres clases de raíz, añadir, el consentimiento de escaneo, y quitar con su confirmación y su
+   cancelación. **52 → 44.**
+5. **Tanda 6 — copias y restauración (5).** La regla en los **selectores de archivo**. Crear copia,
+   exportar, cancelar; elegir archivo y confirmar la restauración. **44 → 39.**
+6. **El ciclo de vida en el sandbox, caducado desde `DES-001`.** Las cuatro fases nativas —instalar,
+   actualizar, reparar, desinstalar— siguen «bloqueadas» porque el manifiesto cambió. **Decidido**:
+   extender `eng/sandbox-handover.ps1`, que ya instala, con las cuatro fases y un paquete de la
+   versión siguiente; el arnés del anfitrión no cambia. Va aquí, entre tandas cortas y largas, porque
+   una medición vencida es deuda que crece sola.
+7. **Tanda 7 — el actualizador (5) y la recuperación de la base (2).** La fuente de actualización se
+   sirve desde la raíz aislada, nunca de la red. Entra aquí la cadena decidida y pendiente: cuando el
+   traspaso se rechaza, el mensaje debe decir **dónde está el paquete verificado** para que la persona
+   lo abra ella misma — en los dos idiomas, y el diálogo de Windows **no se tapa ni se silencia**.
+   **39 → 32.**
+8. **Tanda 2 (resto) — el reproductor y sus superpuestos (29).** La más larga y la única que necesita
+   vídeo real: pistas, salida de audio, estilo de subtítulos, marcadores, reanudar, siguiente
+   episodio, cambio de versión, archivo suelto y recuperación del reproductor. **Advertencia medida:
+   los cinco superpuestos restantes no fijan alineación** y se estiran sobre todo el escenario, igual
+   que el de estado corregido el 2026-08-15; **cada uno se corrige en su tanda con su medición**, no
+   en bloque. **32 → 3**, y los tres últimos con ellos: **0.**
+9. **La cobertura de código, al mismo destino.** Hoy la puerta vigila los archivos nuevos y una lista
+   corta, así que **un archivo antiguo que empeora no lo vigila nadie**. **Decidido**: cuando el paseo
+   llegue a 0, `check-coverage.ps1` pasa a medir **todo `src/`** con el suelo de siempre (96 % de
+   líneas y de ramas) y una lista de excepciones con la regla de la casa: **sólo puede encoger**.
+10. **Rediseño y documentación**, con el paseo entero como red.
+
+**Lo que ningún arnés headless puede probar, y por tanto no se disfraza de cubierto:** la imagen en
+una pantalla física y TMDB contestando por red. Eso es el paseo físico de diez minutos, y es del
+propietario.
 
 Estado del proyecto al cerrar la **quinta** sesión del **2026-08-10**, la que saldó la última deuda
 de cobertura e instrumentó el camino del fallo del rojo intermitente. La versión inglesa está en [NEXT-SESSION.en.md](NEXT-SESSION.en.md). El registro
