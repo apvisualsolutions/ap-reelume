@@ -101,8 +101,25 @@ correcta**, y con esto se comprueba.
    del arnés: **una sonda se compara por valor** — devolver la lista de carpetas hacía que el clic de
    control «cambiara» siempre, porque cada lectura es un array nuevo; el caso vacío pasaba porque un
    array vacío es la misma instancia compartida.
-5. **Tanda 6 — copias y restauración (5).** La regla en los **selectores de archivo**. Crear copia,
-   exportar, cancelar; elegir archivo y confirmar la restauración. **44 → 39.**
+5. **Tanda 6 — copias y restauración (5).** La regla en los **selectores de archivo**, que es donde
+   de verdad hacía falta. Crear copia, exportar, cancelar; elegir archivo y confirmar la restauración.
+   **44 → 39.** Investigado el 2026-08-16, para no redescubrirlo:
+
+   - **El cableado ya está preparado**: los dos modelos reciben un `Func<CancellationToken,
+     Task<string?>>` y se les pasa en `CompositionRoot.Backup.cs:84` y `:90`. **No hace falta interfaz
+     nueva**: se elige el delegado por `SystemHandoffDirectory`, igual que se eligió el lanzador de
+     enlaces. Aislado, exportar **escribe el ZIP en la carpeta de traspaso** y restaurar **lee el que
+     haya allí**; quien es dueño del perfil sigue viendo el diálogo de Windows. Sin eso, los dos
+     `ChooseArchive…Async` devuelven `null` en un arnés (no hay `MainWindow`), que significa
+     «cancelado» y no cambia nada que sondear.
+   - **La condición previa dura es «Cancelar»**, y es la única: lleva `IsEnabled="{Binding
+     IsRunning}"` **y** `CanExecute => IsRunning`, así que sólo existe mientras una copia está en
+     marcha. Con la base del arnés la copia acaba en milisegundos. Hay que **sembrar una biblioteca
+     que tarde** —muchas filas, y artwork personal, que es lo que la copia recorre— y medir cuánto
+     dura antes de escribir la escena. No se improvisa al final.
+   - Los otros cuatro no tienen condición: crear copia se sonda con la carpeta que aparece en
+     `BackupsDirectory`, exportar con el ZIP en la carpeta de traspaso, elegir archivo con el plan que
+     queda en pantalla, y confirmar con la base restaurada.
 6. **El ciclo de vida en el sandbox, caducado desde `DES-001`.** Las cuatro fases nativas —instalar,
    actualizar, reparar, desinstalar— siguen «bloqueadas» porque el manifiesto cambió. **Decidido**:
    extender `eng/sandbox-handover.ps1`, que ya instala, con las cuatro fases y un paquete de la

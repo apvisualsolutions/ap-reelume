@@ -100,8 +100,25 @@ one**, and this checks it.
    beside a value of free width goes in a grid.** And from the harness: **a probe is compared by
    value** — returning the list of folders made the beside click "change" it every time, because each
    read is a new array; the empty case passed because an empty array is one shared instance.
-5. **Batch 6 — backup and restore (5).** The rule on the **file pickers**. Create copy, export,
-   cancel; choose archive and confirm the restore. **44 → 39.**
+5. **Batch 6 — backup and restore (5).** The rule on the **file pickers**, which is where it was
+   actually needed. Create copy, export, cancel; choose archive and confirm the restore. **44 → 39.**
+   Investigated on 2026-08-16 so it need not be rediscovered:
+
+   - **The wiring is already in place**: both view models take a `Func<CancellationToken,
+     Task<string?>>` and are handed one at `CompositionRoot.Backup.cs:84` and `:90`. **No new
+     interface is needed** — pick the delegate by `SystemHandoffDirectory`, the way the link launcher
+     was picked. Isolated, export **writes the ZIP into the handoff folder** and restore **reads
+     whichever one is there**; the person whose profile it is still gets the Windows dialog. Without
+     that, both `ChooseArchive…Async` return `null` under a harness (there is no `MainWindow`), which
+     means "cancelled" and changes nothing to probe.
+   - **The one hard precondition is Cancel**: it carries `IsEnabled="{Binding IsRunning}"` **and**
+     `CanExecute => IsRunning`, so it exists only while a copy is running, and against the harness's
+     catalogue a copy finishes in milliseconds. A library that **takes long enough** has to be seeded
+     — many rows, and personal artwork, which is what the copy walks — and measured before the scene
+     is written. Not improvised at the end.
+   - The other four have no precondition: create copy probes the folder appearing in
+     `BackupsDirectory`, export the ZIP in the handoff folder, choose archive the plan left on screen,
+     and confirm the restored database.
 6. **The sandbox lifecycle, expired since `DES-001`.** The four native phases — install, upgrade,
    repair, uninstall — are still blocked because the manifest changed. **Decided**: extend
    `eng/sandbox-handover.ps1`, which already installs, with the four phases and a package of the next
