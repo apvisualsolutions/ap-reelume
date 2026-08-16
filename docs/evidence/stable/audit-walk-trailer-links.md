@@ -43,9 +43,8 @@ usa, porque la distinción no es **dónde** ocurre la entrega, sino **si** ocurr
 resolved root, and it is `null` rather than an unused folder because the distinction is whether the
 handover happens at all.
 
-**Una sola política, dos salidas.** Las tres negativas —sólo `https`, sin información de usuario y con
-anfitrión propio— salen de `ShellExternalLinkLauncher` a `ExternalLinkPolicy`, en el dominio, y las
-usan las dos salidas. No es orden por el orden: la salida aislada existe **para** poder afirmar sobre
+**Una sola política, dos salidas.** Las negativas —sólo `https` y sin información de usuario— salen de
+`ShellExternalLinkLauncher` a `ExternalLinkPolicy`, en el dominio, y las usan las dos salidas. No es orden por el orden: la salida aislada existe **para** poder afirmar sobre
 lo que la otra habría abierto, y eso vale exactamente mientras las dos dejen pasar lo mismo. / One
 policy, two exits: the isolated exit exists in order to assert on what the other would have opened,
 which is worth something only while both let the same things through.
@@ -75,6 +74,20 @@ vista, porque la capa siguiente iba a un navegador real. Ahora se lee **al final
 ensamblado**: ficha → comando → política del enlace → salida. / Until today the assertion stopped at
 the view model, because the layer past it went to a real browser.
 
+## Lo que la puerta de cobertura encontró al mirar / What the coverage gate found
+
+Al pasar las negativas a un archivo nuevo, la puerta las midió por primera vez y dio **7 de 8 ramas**.
+La que faltaba era la comprobación de anfitrión vacío, que el lanzador llevaba desde el principio y a
+la que **nunca había llegado nada**: exigido ya `https`, una dirección absoluta sin anfitrión no se
+construye. Se midió con siete formas —`https://`, `https:`, `https:///`, `https:////`,
+`https://:8080/`, `https://@/` y `https:///watch?v=…`— y **ninguna** llega a ser un `https` con
+anfitrión vacío. Una guarda que no puede ejecutarse no es una defensa: es la apariencia de una. Se
+retiró, y la medición se queda en su sitio como la razón por la que no está — con la condición
+escrita: si algún día se admite un segundo esquema, la comprobación vuelve con él. / The gate measured
+the refusals for the first time and found a guard nothing had ever reached; seven spellings of a
+host-less https address were measured and none parses, so the guard was removed and the measurement
+left in its place.
+
 ## El argumento de seguridad / The security argument
 
 Esto mueve **dónde** se escribe una decisión, no **quién** puede tomarla: quien puede fijar la raíz de
@@ -86,7 +99,15 @@ declared network surface is unchanged.
 
 ## Las puertas / The gates
 
-`dotnet format --verify-no-changes --severity warn`, compilación con `-warnaserror` (0 avisos),
-dominio (458), aplicación (223), arquitectura (26), interfaz (439), integración (445), empaquetado
-(152), accesibilidad (93) y `eng/check-walk-coverage.ps1`: **129 controles declarados en 128
-identidades; 55 pulsados, 73 pendientes**. / All green.
+`dotnet format --verify-no-changes --severity warn`, compilación con `-warnaserror` (0 avisos) y la
+solución entera con cobertura: dominio (465), aplicación (223), arquitectura (26), integración (445),
+interfaz (439), accesibilidad (93), medios (116), rendimiento (18), empaquetado (152) y documentación
+(87) — **2 064 pruebas, ningún rojo**. `eng/check-walk-coverage.ps1`: **129 controles declarados en
+128 identidades; 55 pulsados, 73 pendientes**. `eng/check-coverage.ps1`: los dos archivos nuevos al
+**100 % de líneas y de ramas**, y los tres vigilados en su suelo. / All green.
+
+Y una nota de método, porque costó una ejecución: la puerta de cobertura leyó primero los informes de
+una verificación **anterior** y dijo «sin líneas instrumentables» de los dos archivos nuevos — un
+verde que no medía nada. Los informes hay que dirigirlos a la carpeta que la puerta lee, y esperar a
+que **todas** las suites terminen: a mitad de ejecución faltaban dos y el veredicto fue rojo por
+ausencia. / The gate first read a previous run's reports and passed on files it had not measured.
