@@ -186,6 +186,13 @@ one**, and this checks it.
    migration, and **cannot use `ShowShell()`**, which asserts `IsType<ShellView>`. It needs a mount of
    its own.
 
+   **That mount is cheap, and it is measured:** `AssembledStartup.FinalContent` **already** returns
+   `DatabaseRecoveryView` when the database refuses, and the harness has **only five** uses of
+   `host.Shell`, **all** of them `GetVisualDescendants()`. It is enough for `ShellHost.Shell` to go
+   from `ShellView` to `Control`; the **67** uses of `host.ViewModel` need no change if the record
+   holds the model as optional and keeps exposing the same property. No second host class and no
+   second `PressAsync` are needed.
+
    **The updater's five, with their probes:** the automatic-check switch — the stored setting, and
    the only one with no precondition; check — the offer on screen; download — the package in
    `DataRoot/updates`; install — what the isolated launcher wrote down; and **Cancel, which is the

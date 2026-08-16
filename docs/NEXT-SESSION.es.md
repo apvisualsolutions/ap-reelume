@@ -188,6 +188,13 @@ correcta**, y con esto se comprueba.
    integridad o la migración, y **no puede usar `ShowShell()`**, que afirma `IsType<ShellView>`.
    Necesita montaje propio.
 
+   **Pero el montaje propio sale barato, y está medido:** `AssembledStartup.FinalContent` **ya**
+   devuelve `DatabaseRecoveryView` cuando la base se niega, y en el arnés hay **sólo cinco usos** de
+   `host.Shell`, **todos** `GetVisualDescendants()`. Basta con que `ShellHost.Shell` pase de
+   `ShellView` a `Control`; los **67** usos de `host.ViewModel` no se tocan si el record guarda el
+   modelo como opcional y expone la propiedad de siempre. No hace falta una segunda clase de anfitrión
+   ni una segunda versión de `PressAsync`.
+
    **Los cinco del actualizador, con sus sondas:** el interruptor de comprobación automática —el
    ajuste guardado, y es el único sin condición previa—; buscar —la oferta en pantalla—; descargar
    —el paquete en `DataRoot/updates`—; instalar —lo anotado por el lanzador aislado—; y **«Cancelar»,
