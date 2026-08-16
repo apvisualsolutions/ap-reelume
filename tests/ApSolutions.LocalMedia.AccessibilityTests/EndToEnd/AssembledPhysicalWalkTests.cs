@@ -17,6 +17,7 @@ using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
+using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
@@ -2016,6 +2017,135 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             ((AsyncRelayCommand)rename.ExecuteCommand).CanExecute(null) == rename.IsConfirmed,
             "Rename declared itself executable without the consent that gates it.");
         Assert.True(File.Exists(original), "Asking for a preview must not move anything.");
+    }
+
+    /// <summary>
+    /// The sixth batch: the library copied out and brought back, with the mouse — a stored copy, an
+    /// exported archive, the dry run that says what it would do, and the restore itself.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// These four are the reason the isolation rule reached the file pickers. Both buttons that ask
+    /// for a path hand the question to a modal Windows dialog, and a dialog is the one thing no
+    /// harness can answer: without the rule, both <c>ChooseArchive…Async</c> answer
+    /// <see langword="null"/> for want of a main window, <see langword="null"/> means cancelled, and
+    /// nothing happens that could be probed. A run with a data root of its own now exports into its
+    /// handover folder and restores from what is in it.
+    /// </para>
+    /// <para>
+    /// Which is also what chains the scene: nothing here composes a path. The export goes wherever
+    /// the application says it goes, and the restore takes whatever the application finds there, so
+    /// what comes back is what went out.
+    /// </para>
+    /// <para>
+    /// Every probe reads the disk rather than the screen. A backup screen that says it made a copy
+    /// and a backup screen that made one look identical from the view model, and this is the surface
+    /// where the difference is the whole feature.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 180_000)]
+    public async Task The_library_is_copied_out_and_brought_back_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var film = Path.Combine(media, "Arrival.2016.mp4");
+
+        // Nothing decodes here: a copy walks the catalogue and the file only has to exist for the
+        // library it describes to be a real one.
+        await File.WriteAllBytesAsync(film, [0x41, 0x50], TestContext.Current.CancellationToken);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        await SeedMediaFileAsync(factory, media, film, TimeSpan.FromMinutes(116));
+
+        // Where this run says it puts what it would have handed to Windows. The walk reads the
+        // application's own answer instead of composing one, because the rule is the application's
+        // to state — and asserting it is not null is what proves this scene is testing the isolated
+        // exit rather than quietly passing against a dialog nobody could have answered.
+        var paths = new AppDataPaths(_dataRoot);
+        var handoff = paths.SystemHandoffDirectory;
+        Assert.NotNull(handoff);
+
+        // Counts rather than collections: a probe is compared by value, and a fresh array every
+        // read would report "it changed" for the click that is meant to change nothing.
+        //
+        // Dot-prefixed folders are skipped because that is what the store itself calls temporary —
+        // both its own staging and the restore's — so a copy means a copy somebody could restore.
+        int StoredCopies() => Directory.Exists(paths.BackupsDirectory)
+            ? Directory.GetDirectories(paths.BackupsDirectory)
+                .Count(directory => !Path.GetFileName(directory).StartsWith('.'))
+            : 0;
+        int ExportedArchives() => Directory.Exists(handoff!)
+            ? Directory.GetFiles(handoff!, "*.zip").Length
+            : 0;
+        int PreservedDatabases() => Directory.GetFiles(_dataRoot, "library.db.pre-restore-*.bak").Length;
+
+        using var host = ShowShell(height: 1400);
+        Navigate(host, AppRoute.Backups);
+        var backups = host.ViewModel.Backups;
+        var restore = host.ViewModel.Restore;
+        Assert.NotNull(backups);
+        Assert.NotNull(restore);
+
+        await PressAsync(
+            host,
+            "BackupCreateCopyLabel",
+            StoredCopies,
+            "clicking Create a backup now never left a copy in the backups folder");
+
+        // The folder appears before the screen says so — the copy is published and only then does the
+        // command's continuation run — so the outcome is waited for rather than read straight after
+        // the effect. Measured here on the first run of this scene, and it is the same race the
+        // privacy report scene met from the other side.
+        await SettledAsync(backups!, "BackupStatusDone", "creating a copy");
+
+        await PressAsync(
+            host,
+            "BackupExportLabel",
+            ExportedArchives,
+            "clicking Export to a ZIP file never wrote an archive where this run hands things over");
+        await SettledAsync(backups, "BackupStatusDone", "exporting an archive");
+        Assert.Equal(1, ExportedArchives());
+
+        // The dry run says what the archive would do, and says it on screen: this is the one control
+        // of the four whose effect is the plan itself rather than something on disk.
+        await PressAsync(
+            host,
+            "RestoreChooseArchiveLabel",
+            () => restore!.StatusKey,
+            "clicking Choose an archive never produced a plan to look at");
+        Assert.True(
+            restore!.CanRestore,
+            "The archive this application had just exported came back refused by its own dry run: "
+                + $"{restore.StatusKey}, {string.Join("; ", restore.Findings.Select(f => f.MessageKey))}.");
+        Assert.Equal(1, restore.MediaFileCount);
+
+        // And the swap, read from the disk: the database that was replaced is kept beside the new
+        // one, which is the only thing that tells a restore from a screen that says restored.
+        await PressAsync(
+            host,
+            "RestoreConfirmLabel",
+            PreservedDatabases,
+            "clicking Restore now never put the archive's library in place of the live one");
+        await WaitForAsync(
+            () => Task.FromResult(restore.StatusKey == "RestoreStatusRestored"),
+            $"The restore left the library in place but the wizard settled on {restore.StatusKey}.");
+        Assert.NotNull(restore.PreservedDatabaseName);
+    }
+
+    /// <summary>
+    /// Waits for a backup operation to finish and says what it finished as.
+    /// </summary>
+    /// <remarks>
+    /// The disk changes before the screen does: a copy is published, and the status key is set on the
+    /// continuation that runs afterwards. A probe reading the folder is therefore satisfied while the
+    /// screen still says running, so the outcome has to be waited for — reading it straight after the
+    /// press would be asserting on a race.
+    /// </remarks>
+    private static async Task SettledAsync(BackupViewModel backups, string expected, string what)
+    {
+        await WaitForAsync(
+            () => Task.FromResult(!backups.IsRunning),
+            $"The screen was still {what} a minute after the disk said it was done.");
+        Assert.Equal(expected, backups.StatusKey);
     }
 
     /// <summary>
