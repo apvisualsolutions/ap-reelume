@@ -470,6 +470,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A trailer kept beside a film only appeared if that film was duplicated.** The card looked for the
+  trailer file starting from the version group, and a title with no copies has no group: the file sat
+  right there and the button never appeared. It is now found from the film itself, copies or not.
+
 - **Opening a video from Explorer played it without showing it.** The file started playing and the
   application stayed on the home screen: no picture, no controls, no way to stop it, and the notice
   saying "this is not in your library" — with its offer to add the folder — never appeared at all. An

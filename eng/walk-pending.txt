@@ -1,13 +1,9 @@
 ## The command controls the autonomous walk has not pressed yet.
 ##
-## One identity per line — the view that declares the control, then the anchor the walk aims at —
-## followed by the reason it is still here. The list may only shrink: eng/check-walk-coverage.ps1
-## refuses a line the walk now presses, refuses a control missing from both halves, and refuses a
-## list longer than its ratchet. The batches are the ones decided in docs/NEXT-SESSION.es.md.
+## It is empty, and that is the point: every command control this application declares is pressed
+## with a mouse by eng/run-accessibility.ps1's walk, asserted on its effect, and clicked beside to no
+## effect. The ratchet in eng/check-walk-coverage.ps1 is 0 and does not go up.
 ##
-## A control leaves this file when the walk presses it with the mouse, asserts on the effect, and
-## clicks beside it to no effect — all three, which is what PressAsync does and records.
-
-EpisodeRowView#EpisodePlayAction                           # batch 1: the series card, which needs the show, season and episode rows seeded
-MovieDetailsView#MovieResumeAction                         # batch 1: shown only with stored progress worth returning to
-MovieDetailsView#MovieTrailerAction                        # batch 1: shown only when a trailer file sits beside the film, which needs a version group the walk does not seed yet
+## A control added from here on arrives with its scene in the same change. This list does not reopen:
+## a line here would mean shipping something nobody has ever pressed, and this application ships free
+## and is tested by nobody by hand.

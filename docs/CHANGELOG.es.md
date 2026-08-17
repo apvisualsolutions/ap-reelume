@@ -482,6 +482,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El tráiler que guardas junto a una película sólo aparecía si esa película estaba duplicada.** La
+  ficha buscaba el archivo del tráiler partiendo del grupo de versiones, y un título sin copias no
+  tiene grupo: el archivo estaba ahí al lado y el botón no salía nunca. Ahora se busca a partir de la
+  película, tenga copias o no.
+
 - **Abrir un vídeo desde el Explorador lo reproducía sin enseñarlo.** El archivo empezaba a sonar y la
   aplicación se quedaba en la pantalla de inicio: sin imagen, sin controles y sin forma de pararlo, y
   el aviso de «esto no está en tu biblioteca» —con su oferta de añadir la carpeta— no llegaba a

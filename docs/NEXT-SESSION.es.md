@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **3**, con **125 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —y **desde el 2026-08-18 lo está**: **128 de 128** controles pulsados con ratón, ng/walk-pending.txt vacío y el trinquete en 0, que no vuelve a subir. Queda la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -19,7 +19,7 @@ rehacerlo entero.
 | # | Paso | Quién | Deja el trinquete en |
 |---|---|---|---|
 | ~~1~~ | ~~La sesión suelta no se ve~~ **hecha el 2026-08-17, 6 → 3** | agente | 3 |
-| 2 | Los tres últimos de la tanda 1 | agente | **0** |
+| ~~2~~ | ~~Los tres últimos de la tanda 1~~ **hecha el 2026-08-18, 3 → 0** | agente | **0** |
 | 3 | La prueba de los subtítulos | agente | 0 |
 | 4 | Cobertura a todo `src/`, suelo 96/96 | agente | 0 |
 | 5 | `ARQ-004`, las nueve clases inertes | agente | 0 |

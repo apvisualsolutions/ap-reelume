@@ -385,9 +385,18 @@ public static partial class CompositionRoot
     /// policy that decides is pure and touches no disk; a folder that cannot be read is not a
     /// failure worth reporting — it is simply a film with no trailer offered.
     /// </summary>
-    private static string? FindTrailer(MediaVersionGroup? versions)
+    /// <remarks>
+    /// It takes the film's own path, and that is the correction of a measured defect. It used to take
+    /// the version <b>group</b> and read the path off its first available member — but
+    /// <c>GroupMediaVersions</c> refuses fewer than two versions, so a film with no duplicate has no
+    /// group at all, and the trailer was offered only to films that happened to be duplicated.
+    /// Measured on 2026-08-18 with a film and its `-trailer` sibling on disk: the card found nothing.
+    /// The group still decides <em>which</em> copy is the film when there is one, because the trailer
+    /// belongs beside the copy that would play.
+    /// </remarks>
+    private static string? FindTrailer(string? path)
     {
-        if (versions?.Versions.FirstOrDefault(version => version.IsAvailable)?.Path is not { } path)
+        if (string.IsNullOrWhiteSpace(path))
         {
             return null;
         }
@@ -555,13 +564,20 @@ public static partial class CompositionRoot
                     ?? await versionGroups
                         .FindByMemberAsync(new MediaFileId(item.Item.Id.Value), CancellationToken.None)
                         .ConfigureAwait(true);
+                // The copy that would play: the group's first available member when the film has one,
+                // and otherwise the film's own row — which is the ordinary case, because a film with
+                // no duplicate is never grouped.
+                var filmPath = versions?.Versions.FirstOrDefault(version => version.IsAvailable)?.Path
+                    ?? (await provider.GetRequiredService<IMediaFileRepository>()
+                        .FindByIdAsync(new MediaFileId(item.Item.Id.Value), CancellationToken.None)
+                        .ConfigureAwait(true))?.Path;
                 movieDetails.Apply(
                     item.Item,
                     state,
                     versions,
                     personal,
                     overview: overview,
-                    trailerPath: FindTrailer(versions),
+                    trailerPath: FindTrailer(filmPath),
                     trailerKey: trailerKey);
             }
         };

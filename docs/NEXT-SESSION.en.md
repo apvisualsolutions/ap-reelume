@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **3** today, with **125 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — and **since 2026-08-18 it is there**: **128 of 128** controls pressed by mouse, ng/walk-pending.txt empty and the ratchet at 0, which does not go up again. What remains is the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -19,7 +19,7 @@ again from scratch.
 | # | Step | Who | Leaves the ratchet at |
 |---|---|---|---|
 | ~~1~~ | ~~The loose session cannot be seen~~ **done on 2026-08-17, 6 → 3** | agent | 3 |
-| 2 | The last three of batch 1 | agent | **0** |
+| ~~2~~ | ~~The last three of batch 1~~ **done on 2026-08-18, 3 → 0** | agent | **0** |
 | 3 | The subtitle measurement | agent | 0 |
 | 4 | Coverage over all of `src/`, floor 96/96 | agent | 0 |
 | 5 | `ARQ-004`, the nine inert classes | agent | 0 |

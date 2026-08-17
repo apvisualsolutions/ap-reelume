@@ -2523,6 +2523,200 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "the confirmed folder never became a second root");
     }
 
+    /// <summary>
+    /// Batch 1: the film card's two remaining actions — returning to where you were, and the trailer
+    /// that sits beside the film on disk.
+    /// </summary>
+    [AvaloniaFact(Timeout = 180_000)]
+    public async Task The_film_card_resumes_restarts_and_plays_the_trailer_beside_it_with_the_mouse()
+    {
+        var feature = await RequireSampleAsync("walk-card.mp4", durationSeconds: 90);
+        var short_ = await RequireSampleAsync("walk-card-trailer.mp4", durationSeconds: 8);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var film = Path.Combine(media, "Arrival.2016.mp4");
+
+        // The sibling convention TrailerDiscoveryPolicy looks for: the film's own name plus the
+        // suffix. No catalogue row and no version group — the card finds it by name on disk.
+        var trailer = Path.Combine(media, "Arrival.2016-trailer.mp4");
+        File.Copy(feature, film);
+        File.Copy(short_, trailer);
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, film, TimeSpan.FromSeconds(90));
+
+        // The provider's trailer link too, so the row is the longest it can be when it is measured.
+        // That link is pressed elsewhere; here it is width.
+        await SeedTrailerKeyAsync(factory, new TitleId(fileId), "dQw4w9WgXcQ");
+
+        using var host = ShowShell(height: 1200);
+        IServiceProvider services = host.Application.Services;
+
+        // Forty seconds into ninety: above the thirty-second resume floor and well before the end,
+        // which is what makes the card offer to return at all.
+        await services.GetRequiredService<IWatchStateRepository>().SaveAsync(
+            new WatchState
+            {
+                Content = ContentKey.ForTitle(new TitleId(fileId)),
+                Position = TimeSpan.FromSeconds(40),
+                ObservedDuration = TimeSpan.FromSeconds(90),
+                SourceMediaFileId = new MediaFileId(fileId),
+                Status = WatchStatus.InProgress,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UnixEpoch,
+                UpdatedUtc = DateTimeOffset.UnixEpoch,
+            },
+            TestContext.Current.CancellationToken);
+
+        async Task<long> PlayheadSecondsAsync()
+        {
+            var snapshot = await services.GetRequiredService<IMediaPlayerEngine>()
+                .GetSnapshotAsync(TestContext.Current.CancellationToken);
+            return (long)snapshot.Position.TotalSeconds;
+        }
+
+        async Task OpenCardAsync()
+        {
+            Navigate(host, AppRoute.Library);
+            var library = host.ViewModel.Library;
+            Assert.NotNull(library);
+            await library!.LoadAsync(TestContext.Current.CancellationToken);
+            await library.OpenDetailsAsync(
+                Assert.Single(library.Items),
+                TestContext.Current.CancellationToken);
+            Dispatcher.UIThread.RunJobs();
+            host.Window.InvalidateMeasure();
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        await OpenCardAsync();
+        var card = host.ViewModel.Library!.MovieDetails;
+        Assert.True(card.CanResume, "The card offered no way back, so there is nothing to press.");
+        Assert.True(card.HasTrailer, "The card never found the trailer sitting beside the film.");
+
+        // This row is the first to show Resume and the trailer at once, so it is also the longest it
+        // has ever been — and it is a horizontal StackPanel with a free-width label between buttons,
+        // which is the shape that has put a control outside the window six times. Measured here
+        // rather than discovered as a red sixty seconds later.
+        foreach (var anchor in new[]
+        {
+            "MovieResumeAction",
+            "MoviePlayAction",
+            "MovieTrailerAction",
+            "DetailsTrailerLinkAction",
+        })
+        {
+            var control = Resolve(host, anchor);
+            var corner = control.TranslatePoint(new Point(control.Bounds.Width, 0), host.Window);
+            Assert.True(
+                corner is { } point && point.X <= host.Window.Bounds.Width,
+                $"{anchor} ends at x={corner?.X:F0} in a {host.Window.Bounds.Width:F0} px window, so "
+                    + "the film card's action row draws outside it.");
+        }
+
+        // ---- Resume: back to the second that was stored, not to the beginning.
+        await PressAsync(
+            host,
+            "MovieResumeAction",
+            () => host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
+            "returning to where you were never opened the film");
+        await WaitForAsync(
+            async () => await PlayheadSecondsAsync() >= 35,
+            "the film opened, but not at the point the card offered to return to");
+
+        // ---- And the finding that came out of the version switch: with progress stored, starting
+        // from the beginning has to actually start at the beginning. Until the requested position
+        // began to win, the host recomputed it from storage and this would have resumed instead.
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+        await OpenCardAsync();
+        Assert.True(card.CanResume, "The stored progress was lost, so 'from the start' proves nothing.");
+
+        await PressAsync(
+            host,
+            "MoviePlayAction",
+            () => host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
+            "playing from the start never opened the film");
+        await SettleAsync();
+        await SettleAsync();
+        Assert.True(
+            await PlayheadSecondsAsync() < 10,
+            $"'Play from the start' opened at {await PlayheadSecondsAsync()} s with progress stored, "
+                + "so it resumed instead of starting again.");
+
+        // ---- The trailer: a file beside the film, opened as the loose session it is.
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+        await OpenCardAsync();
+
+        await PressAsync(
+            host,
+            "MovieTrailerAction",
+            () => host.ViewModel.Player?.LooseFile?.IsLooseSession == true ? "loose" : "none",
+            "the trailer beside the film never opened");
+        await WaitForAsync(
+            () => Task.FromResult(
+                host.ViewModel.Player?.Player.MediaPath.EndsWith("-trailer.mp4", StringComparison.Ordinal)
+                    == true),
+            "something opened, but it was not the trailer");
+
+        // A trailer is not a catalogue row, which is the whole of LIB-014.
+        Assert.Equal(1, await CountAsync(factory, "media_files"));
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>
+    /// Batch 1, the last one: the row a season lists, which is how a person starts an episode.
+    /// </summary>
+    /// <remarks>
+    /// The row is told apart by its help text and not by its name, because every episode's button
+    /// answers to the same accessible name by design — the season and episode label is what a screen
+    /// reader reads out after it, and it is what a person uses to tell two rows apart as well.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task An_episode_is_started_from_its_row_with_the_mouse()
+    {
+        var sample = await RequireSampleAsync("walk-episode.mp4", durationSeconds: 12);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var first = Path.Combine(media, "Chained.S01E01.mp4");
+        var second = Path.Combine(media, "Chained.S01E02.mp4");
+        File.Copy(sample, first);
+        File.Copy(sample, second);
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var firstFile = await SeedMediaFileAsync(factory, media, first, TimeSpan.FromSeconds(12));
+        var secondFile = await SeedMediaFileAsync(factory, media, second, TimeSpan.FromSeconds(12));
+        _ = await SeedSeriesAsync(factory, firstFile, secondFile);
+
+        using var host = ShowShell(height: 1200);
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+
+        var show = library.Items.FirstOrDefault(item => item.Item.Kind == CatalogTitleKind.Show);
+        Assert.True(show is not null, "The seeded series never reached the library.");
+        await library.OpenDetailsAsync(show!, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // The second episode, not the first: a season lists them in order, and pressing the one at
+        // the top would be indistinguishable from a card that plays whatever it feels like.
+        await PressAsync(
+            host,
+            "EpisodePlayAction",
+            () => host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
+            "the episode row never started the episode it names",
+            helpText: "S01E02");
+
+        await WaitForAsync(
+            () => Task.FromResult(
+                host.ViewModel.Player?.Player.MediaPath.EndsWith("S01E02.mp4", StringComparison.Ordinal)
+                    == true),
+            "a session opened, but not the episode whose row was pressed");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
     /// <summary>One version of a title, described the way the catalogue describes one.</summary>
     private static MediaVersion Version(Guid fileId, string path, int durationSeconds) =>
         new(
