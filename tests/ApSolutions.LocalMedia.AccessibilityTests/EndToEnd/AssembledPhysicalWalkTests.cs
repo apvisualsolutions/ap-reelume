@@ -15,6 +15,7 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
 using ApSolutions.LocalMedia.Domain.Metadata;
+using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
@@ -2136,6 +2137,137 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 2a: the tracks a session offers, and where its sound goes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Four of the five are drop-downs, and a drop-down's effect is that it <b>opens</b>: what is
+    /// chosen inside one lands in a popup root of its own, which is a separate top level and not this
+    /// window's business. Same rule as the library's filter and sort. The lists are asserted on
+    /// separately, because a press that opens an empty list would prove nothing about the list.
+    /// </para>
+    /// <para>
+    /// The media is a sample with two audio tracks and a subtitle track, played as an episode of a
+    /// seeded series — which the fifth control requires: "remember for this series" is only a
+    /// question worth asking when there is a series to remember it for.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_tracks_and_the_audio_output_are_chosen_with_the_mouse()
+    {
+        var sample = await RequireMultiTrackSampleAsync("walk-tracks.mkv", durationSeconds: 12);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var first = Path.Combine(media, "Show.S01E01.mkv");
+        var second = Path.Combine(media, "Show.S01E02.mkv");
+        File.Copy(sample, first);
+        File.Copy(sample, second);
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var firstFile = await SeedMediaFileAsync(factory, media, first, TimeSpan.FromSeconds(12));
+        var secondFile = await SeedMediaFileAsync(factory, media, second, TimeSpan.FromSeconds(12));
+        var showId = await SeedSeriesAsync(factory, firstFile, secondFile);
+
+        using var host = ShowShell(height: 1200);
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(firstFile), TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the session never reached the playing state on the real engine");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        var tracks = host.ViewModel.Player!.Tracks;
+        Assert.NotNull(tracks);
+
+        // What the engine announced for this media, which is what the two lists are made of. The
+        // subtitle list carries one more than the file does: the entry that turns them off.
+        Assert.Equal(2, tracks!.AudioTracks.Count);
+        Assert.Equal(2, tracks.SubtitleTracks.Count);
+
+        await PressAsync(
+            host,
+            "TrackSelectorAudioLabel",
+            () => Resolve(host, "TrackSelectorAudioLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the audio track never opened the list of audio tracks");
+        CloseDropDown(host);
+
+        await PressAsync(
+            host,
+            "TrackSelectorSubtitleLabel",
+            () => Resolve(host, "TrackSelectorSubtitleLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the subtitle track never opened the list of subtitle tracks");
+        CloseDropDown(host);
+
+        // The one that is not a drop-down, and the one this batch found a defect in: it decides
+        // whether the choice is stored for this file or for the whole show.
+        await PressAsync(
+            host,
+            "TrackSelectorRememberForSeries",
+            () => tracks.RememberForSeries,
+            "clicking Remember for this series never asked for the choice to apply to the series");
+        Assert.True(tracks.RememberForSeries);
+
+        // And what the box means, not only that it ticks. With it on the next choice is stored under
+        // the show rather than under this episode's file, and the key it is stored under is the same
+        // one the session reads back — which is the defect this batch found: the reading side asked
+        // for the series and the writing side had none, so the application could resolve a
+        // preference nothing in it could ever write.
+        await tracks.ApplyAsync(MediaTrackKind.Audio, TestContext.Current.CancellationToken);
+        var preferences = host.Application.Services.GetRequiredService<IPlaybackPreferenceRepository>();
+        Assert.NotNull(await preferences.GetAsync(
+            PreferenceScope.Series,
+            showId.ToString("D"),
+            TestContext.Current.CancellationToken));
+        Assert.Null(await preferences.GetAsync(
+            PreferenceScope.File,
+            firstFile.ToString("D"),
+            TestContext.Current.CancellationToken));
+
+        var audio = host.ViewModel.Player!.AudioOutput;
+        Assert.NotNull(audio);
+
+        await PressAsync(
+            host,
+            "AudioOutputDeviceLabel",
+            () => Resolve(host, "AudioOutputDeviceLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the output device never opened the list of outputs");
+        CloseDropDown(host);
+
+        await PressAsync(
+            host,
+            "AudioOutputLayoutLabel",
+            () => Resolve(host, "AudioOutputLayoutLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the channel layout never opened the list of layouts");
+        CloseDropDown(host);
+
+        // The layouts are the application's own list rather than the machine's, so this one is the
+        // same everywhere and can be asserted on.
+        Assert.NotEmpty(AudioOutputViewModel.Layouts);
+
+        // Closed the way every scene with a session closes one, and the way a person does before
+        // leaving. It is not tidying up: a shutdown that still holds a session takes the coordinator
+        // through an engine the container has already let go of, which is a finding of its own and is
+        // written down as one rather than hidden here.
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>
+    /// Closes whichever drop-down is open, the way a person dismisses one.
+    /// </summary>
+    /// <remarks>
+    /// A popup is a top level of its own, so a click beside a control while one is open is a click
+    /// into somebody else's window. Every press that opens one closes it before the next.
+    /// </remarks>
+    private static void CloseDropDown(ShellHost host)
+    {
+        host.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>
     /// Batch 6b: the copy that is stopped while it is still copying.
     /// </summary>
     /// <remarks>
@@ -3435,15 +3567,70 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-        var arguments =
+        await EncodeAsync(
+            encoder!,
             $"-hide_banner -loglevel error -nostdin -y " +
-            $"-f lavfi -i testsrc2=size=320x240:rate=15:duration={durationSeconds} " +
-            $"-f lavfi -i sine=frequency=440:duration={durationSeconds} " +
-            $"-c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -b:a 64k -shortest " +
-            $"\"{destination}\"";
+                $"-f lavfi -i testsrc2=size=320x240:rate=15:duration={durationSeconds} " +
+                $"-f lavfi -i sine=frequency=440:duration={durationSeconds} " +
+                $"-c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -b:a 64k -shortest " +
+                $"\"{destination}\"");
+        return destination;
+    }
+
+    /// <summary>
+    /// One sample with more than one of what a person can choose between: two audio tracks in two
+    /// languages, and a subtitle track.
+    /// </summary>
+    /// <remarks>
+    /// The track surface exists to choose among tracks, so a sample with one of each would put an
+    /// empty list on screen and a press on it would prove nothing about the list. The languages are
+    /// declared as metadata because that is what the surface shows: a track describes itself by its
+    /// language and its channels, never by its position.
+    /// </remarks>
+    private static async Task<string> RequireMultiTrackSampleAsync(string name, int durationSeconds)
+    {
+        var encoder = FindEncoder();
+        Assert.SkipWhen(
+            encoder is null,
+            "ffmpeg was not found. Set FFMPEG_PATH or install ffmpeg to generate the walk's media.");
+        var stem = string.Create(
+            CultureInfo.InvariantCulture,
+            $"{Path.GetFileNameWithoutExtension(name)}-{durationSeconds}s");
+        var directory = Path.Combine(RepositoryLayout.Root, "artifacts", "test-media", "walk");
+        var destination = Path.Combine(directory, $"{stem}{Path.GetExtension(name)}");
+        if (File.Exists(destination) && new FileInfo(destination).Length > 0)
+        {
+            return destination;
+        }
+
+        Directory.CreateDirectory(directory);
+        var subtitles = Path.Combine(directory, $"{stem}.srt");
+        await File.WriteAllTextAsync(
+            subtitles,
+            $"1{Environment.NewLine}00:00:00,000 --> 00:00:0{Math.Min(durationSeconds, 9)},000"
+                + $"{Environment.NewLine}A line, so the track carries something.{Environment.NewLine}",
+            TestContext.Current.CancellationToken);
+
+        await EncodeAsync(
+            encoder!,
+            $"-hide_banner -loglevel error -nostdin -y " +
+                $"-f lavfi -i testsrc2=size=320x240:rate=15:duration={durationSeconds} " +
+                $"-f lavfi -i sine=frequency=440:duration={durationSeconds} " +
+                $"-f lavfi -i sine=frequency=880:duration={durationSeconds} " +
+                $"-i \"{subtitles}\" " +
+                $"-map 0:v -map 1:a -map 2:a -map 3:s " +
+                $"-c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -b:a 64k -c:s srt " +
+                $"-metadata:s:a:0 language=eng -metadata:s:a:1 language=spa " +
+                $"-metadata:s:s:0 language=eng -shortest " +
+                $"\"{destination}\"");
+        return destination;
+    }
+
+    private static async Task EncodeAsync(string encoder, string arguments)
+    {
         using var process = new Process
         {
-            StartInfo = new ProcessStartInfo(encoder!, arguments)
+            StartInfo = new ProcessStartInfo(encoder, arguments)
             {
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
@@ -3455,7 +3642,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var error = await process.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
         await process.WaitForExitAsync(TestContext.Current.CancellationToken);
         Assert.True(process.ExitCode == 0, $"The encoder failed with exit code {process.ExitCode}: {error}");
-        return destination;
     }
 
     private static string? FindEncoder()

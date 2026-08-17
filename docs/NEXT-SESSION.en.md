@@ -4,19 +4,28 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **32** today, with **96 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **27** today, with **101 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
 ### The queue from 2026-08-17, with its count
 
-**32 pending, and they are exactly these two groups.** Everything below is decided; what remains is
+**27 pending, and they are exactly these two groups.** Everything below is decided; what remains is
 carrying it out, measuring before correcting.
 
 | Step | What | How many | Leaves |
 |---|---|---|---|
-| **2a–2e** | The player and its overlays | 29 | 3 |
+| **2b–2e** | The player and its overlays | 24 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
+
+**And one open finding that is not a control**, measured in 2a and written down in
+[its evidence](evidence/stable/audit-walk-tracks-and-audio-output.md): **shutting down with a session
+still active** takes the coordinator through an engine the container has already released
+(`ObjectDisposedException` on `LibVlcMediaPlayerEngine`). The engine is registered **three times** and
+the last one — `IVideoFrameSource` — is resolved when a video starts drawing, so it enters the
+disposal list after the coordinator and leaves it before. The real close policy **does** stop
+playback, so this is reached by other routes; it is reviewed **with the direct shutdown**, which was
+already parked until the redesign touches the lifecycle.
 
 Then: coverage over all of `src/`, what is left of `ARQ-004`, and the redesign.
 
@@ -41,7 +50,7 @@ composition, and no product defect: the control worked, and what was missing was
 
 | | Surface | Controls |
 |---|---|---|
-| **2a** | Tracks and audio output | 5 |
+| ~~**2a**~~ | ~~Tracks and audio output~~ | **done on 2026-08-17, 32 → 27** |
 | **2b** | Subtitle style | 4 |
 | **2c** | Markers: editor, review and skip | 7 |
 | **2d** | Resume, next episode and versions | 8 |
@@ -50,6 +59,13 @@ composition, and no product defect: the control worked, and what was missing was
 It is the only batch that needs **real video**. And the warning stands measured: **the five remaining
 overlays set no alignment** and stretch over the whole stage, exactly like the status one corrected on
 2026-08-15; **each is corrected in its own scene with its own measurement**, never in bulk.
+
+**What 2a left behind, and what saves time in the four that remain:** a drop-down is tested by
+**opening** it — what is chosen inside lands in another window root — and closed with Escape before
+the next; `RequireMultiTrackSampleAsync` produces and caches a sample with **two audio tracks and one
+subtitle track**; and the defect it found is the house's own seen from the other side: a scope the
+application **reads** and that nothing in it could **write** —
+[the evidence](evidence/stable/audit-walk-tracks-and-audio-output.md).
 
 **The three from batch 1** are the ones needing seeding the walk does not do yet: the episode row (a
 show, a season and episodes), the film card's Resume (stored progress worth returning to) and its

@@ -96,6 +96,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Elegir pista de audio, subtítulos y salida de sonido se comprueba ahora con el ratón.** Los cinco
+  mandos del lateral del reproductor —las dos listas de pistas, la casilla de la serie, el dispositivo
+  de salida y la disposición de canales— se pulsan sobre una sesión reproduciendo vídeo de verdad, con
+  una muestra que trae **dos pistas de audio y una de subtítulos** para que las listas tengan algo que
+  ofrecer.
+
 - **Cancelar una copia de seguridad a medias se comprueba ahora pulsando el botón mientras copia.**
   «Cancelar» sólo existe mientras la copia corre, y con una biblioteca de prueba la copia entera acaba
   en **51 ms**: no había ventana en la que pulsarlo. Ahora la comprobación siembra la biblioteca de
@@ -464,6 +470,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   el arte anterior.
 
 ### Corregido
+
+- **«Recordar para esta serie» ya se puede marcar.** La casilla que hace que tu elección de idioma o
+  de subtítulos valga para **toda la serie** y no sólo para ese episodio estaba **deshabilitada
+  siempre**: la aplicación nunca le decía a qué serie pertenece lo que estás viendo. Era peor que un
+  botón muerto, porque al abrir un episodio **sí** buscaba una preferencia guardada para la serie —
+  una que nada podía guardar—. Ahora se marca, y lo que elijas después queda guardado para el programa
+  entero, así que el siguiente episodio empieza como dejaste el anterior.
 
 - **La verificación automática ya pulsa los ajustes enteros con el ratón.** La página de ajustes es
   más alta que la ventana, y el recorrido que conduce la aplicación construida sólo sabía bajar por

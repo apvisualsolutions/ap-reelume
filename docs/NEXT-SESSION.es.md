@@ -4,19 +4,28 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **32**, con **96 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **27**, con **101 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
 ### La cola desde el 2026-08-17, con su recuento
 
-**32 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
+**27 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
 queda es ejecutarlo midiendo antes de corregir.
 
 | Paso | Qué | Cuántos | Deja |
 |---|---|---|---|
-| **2a–2e** | El reproductor y sus superpuestos | 29 | 3 |
+| **2b–2e** | El reproductor y sus superpuestos | 24 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
+
+**Y un hallazgo abierto que no es un control**, medido en la 2a y escrito en
+[su evidencia](evidence/stable/audit-walk-tracks-and-audio-output.md): **apagar con una sesión todavía
+activa** lleva al coordinador a parar un motor que el contenedor ya soltó
+(`ObjectDisposedException` sobre `LibVlcMediaPlayerEngine`). El motor está registrado **tres veces** y
+la última —`IVideoFrameSource`— se resuelve cuando un vídeo empieza a dibujarse, así que entra en la
+lista de desechado después del coordinador y sale antes. La política de cierre real **sí** para la
+reproducción, así que esto se alcanza por otras vías; se revisa **con el apagado directo**, que ya
+estaba aparcado hasta que el rediseño toque el ciclo de vida.
 
 Después: la cobertura a todo `src/`, lo que queda de `ARQ-004`, y el rediseño.
 
@@ -41,7 +50,7 @@ sin defecto de producto: el control funcionaba y lo que faltaba era una ventana.
 
 | | Superficie | Controles |
 |---|---|---|
-| **2a** | Pistas y salida de audio | 5 |
+| ~~**2a**~~ | ~~Pistas y salida de audio~~ | **hecha el 2026-08-17, 32 → 27** |
 | **2b** | Estilo de subtítulos | 4 |
 | **2c** | Marcadores: editor, revisión y salto | 7 |
 | **2d** | Reanudar, siguiente episodio y versiones | 8 |
@@ -50,6 +59,13 @@ sin defecto de producto: el control funcionaba y lo que faltaba era una ventana.
 Es la única tanda que necesita **vídeo real**. Y la advertencia sigue medida: **los cinco superpuestos
 que quedan no fijan alineación** y se estiran sobre todo el escenario, igual que el de estado
 corregido el 2026-08-15; **cada uno se corrige en su escena con su medición**, nunca en bloque.
+
+**Lo que dejó la 2a, y ahorra tiempo en las cuatro que quedan:** un desplegable se prueba **abriéndolo**
+—lo que se elige dentro cae en otra raíz de ventana— y se cierra con Escape antes del siguiente;
+`RequireMultiTrackSampleAsync` produce y cachea una muestra con **dos pistas de audio y una de
+subtítulos**; y el defecto que salió es de la familia de la casa vista del revés: un ámbito que la
+aplicación **lee** y que nada dentro de ella podía **escribir** —
+[la evidencia](evidence/stable/audit-walk-tracks-and-audio-output.md).
 
 **Los tres de la tanda 1** son los que necesitan siembra que el paseo aún no hace: la fila de episodio
 (exige serie, temporada y episodios), «Continuar» de la ficha de película (exige progreso guardado que

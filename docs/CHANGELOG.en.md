@@ -95,6 +95,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Choosing the audio track, the subtitles and the sound output is now verified with the mouse.**
+  The five controls in the player's side column — the two track lists, the series box, the output
+  device and the channel layout — are pressed against a session with real video decoding, using a
+  sample that carries **two audio tracks and one subtitle track** so the lists have something to
+  offer.
+
 - **Cancelling a backup halfway is now verified by pressing the button while one copies.** Cancel only
   exists while the copy runs, and with a test-sized library the whole copy is over in **51 ms**: there
   was no window to press it in. The check now seeds a real person's library — 3,000 titles with a
@@ -452,6 +458,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   survives.
 
 ### Fixed
+
+- **"Remember for this series" can be ticked now.** The box that makes your audio or subtitle choice
+  apply to the **whole series** rather than to that one episode was **always disabled**: the
+  application never told it which series you were watching. It was worse than a dead button, because
+  on opening an episode it **did** look for a preference stored for the series — one nothing could
+  store. It ticks now, and what you pick afterwards is stored for the whole show, so the next episode
+  starts the way you left the last one.
 
 - **The automated verification now presses the whole of settings with the mouse.** The settings page
   is taller than the window, and the walk that drives the built application only knew how to go down

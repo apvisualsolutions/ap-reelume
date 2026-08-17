@@ -900,6 +900,15 @@ public static partial class CompositionRoot
         });
         await player.OpenAsync(mediaFileId, file.Path, startPosition, cancellationToken).ConfigureAwait(true);
 
+        // Which scopes this session's choices are read from and written to. They are computed once
+        // because the two sides have to agree: the reading side already asked for the series when the
+        // file is an episode, while the surface that writes was built with no series at all — so the
+        // application could resolve a series preference that nothing in it could ever store, and the
+        // box offering to store one was disabled for every episode ever played. Walking it with the
+        // mouse is what said so: "cannot be pressed: visible=True, enabled=False".
+        var fileScopeKey = mediaFileId.Value.ToString("D");
+        var seriesScopeKey = episodeEntry is not null ? seriesId.Value.ToString("D") : null;
+
         // The stored choices are applied the moment the media is open (PLY-A01): the use case
         // resolves file over series over global and falls back by language when a named track is
         // absent. Registered, tested end to end, and invoked by nobody — the audit's house defect.
@@ -910,8 +919,8 @@ public static partial class CompositionRoot
                 .ApplyAsync(
                     engine,
                     new PlaybackPreferenceContext(
-                        mediaFileId.Value.ToString("D"),
-                        episodeEntry is not null ? seriesId.Value.ToString("D") : null,
+                        fileScopeKey,
+                        seriesScopeKey,
                         ExternalSubtitlePaths: []),
                     cancellationToken)
                 .ConfigureAwait(true);
@@ -967,8 +976,8 @@ public static partial class CompositionRoot
         player.ApplyTracks(snapshot.Tracks);
         var tracks = new TrackSelectorViewModel(
             provider.GetRequiredService<SelectTrack>(),
-            mediaFileId.Value.ToString("D"),
-            seriesScopeKey: null,
+            fileScopeKey,
+            seriesScopeKey,
             ReadResource("TrackSelectorSubtitlesDisabled"));
         tracks.Load(snapshot.Tracks, applied?.Audio, applied?.Subtitle);
 
