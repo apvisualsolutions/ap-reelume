@@ -40,6 +40,64 @@ narrowed to the declaration of `OpenPlayerAsync`; and **`RepositoryPrivacyTests`
 as an unknown directory at the root, which is the check working. The local trailer is **no longer
 blocked**, but it still needs seeding of its own, so it moves to step 2.
 
+#### 2. The last three — how they get seeded and in what order, decided
+
+**For the first time in the whole queue, no pending control is blocked by a defect.** They are **two
+scenes, not three**, because two of the three live on the same card:
+
+**(a) The film card: Resume and the local trailer.** Seeding: the film in its folder, a `WatchState`
+with a position **above the resume floor — 30 s — and below the end**, and a sibling file
+**`<the-film's-name>-trailer.mp4`**, which is what `TrailerDiscoveryPolicy` looks for
+(`Suffix = "-trailer"`, or inside a `Trailers` folder). **No version group is needed**: `HasTrailer`
+comes from discovery by name, not from the catalogue — the old queue note said otherwise and was
+wrong.
+
+- **Resume** — probe: the session opens **at the stored point**, read from the engine and waited for
+  until the demuxer has applied the start position.
+- **The trailer** — probe: the session plays **the trailer file**, and that can now be asserted for
+  real because a loose session reaches the screen: `Player.LooseFile.IsLooseSession` and the media
+  path.
+- **And the first open finding is measured here:** with stored progress, **"Play from the start" has
+  to leave the playhead at 0**. Now that the requested position wins it should be fixed; what is
+  missing is the number.
+
+**(b) The series card: the episode row.** Seeding: a show with a season and episodes — the harness
+already has `SeedSeriesAsync` — reaching the card from the library and pressing the row. Probe: the
+session opens **that** episode, by its path.
+
+**A measurable prediction, and it gets measured BEFORE pressing:** the action row of
+`MovieDetailsView` is a `StackPanel Orientation="Horizontal"` with **a free-width `TextBlock` between
+buttons** — the resume position text — and five controls. That is **exactly the shape that has put a
+control outside the window six times**, and this scene is the first to make Resume and the trailer
+visible at once, so the row will be the longest it has ever been. If it overflows, it becomes a
+`WrapPanel` like the other six. Measure the bounds against the window before attempting the click,
+not after the red.
+
+#### The two open findings, and what happens to each
+
+1. **"Play from the start"** — measured in scene (a), as above.
+2. **Progress is stored per file, not per version group.**
+   `ContentKey.ForTitle(new TitleId(mediaFileId.Value))` ties progress to the file, so after switching
+   version there are **two `WatchState` rows** and returning to the previous one would not resume where
+   it was left. **Decided: measure first and correct only if the measurement shows a real loss** — the
+   version scene already exists and asserting both keys after switching back is enough. Moving the key
+   to the group is a model change with a migration, and the position travels in the request today, so
+   the symptom may not exist.
+
+#### What is decided about the design package, for step 6
+
+- **The ten `SURFACES.es.md` / `.en.md` changes go at the start of step 6**, before any token is
+  touched: the inventory has to be right before anything is redesigned against it. **`MiniPlayerWindow`
+  belongs there too** — measured absent on 2026-08-17 by comparing the tree with the inventory, and
+  the package confirms it by giving it five new controls.
+- **The updater's rejection count resolves to EIGHT**: `README.md` says 8 and `github.md` says 7, and
+  the one that adds up to 23 messages is 8 (15 states + 8 rejections).
+- **The 25 consequence strings are approved against the package's own rule** — "if the phrase helps
+  decide or act, it is translated; if it explains why something is designed that way, it is an AXAML
+  comment" — reviewed one by one as they are written. **They do not block step 6**; whatever fails
+  that rule stays a comment.
+- **The 35 installation assets stay blocked** on the brand's vector original, and are not improvised.
+
 What follows is kept because it describes the shape of the correction, which is the reference for the
 loose path:
 

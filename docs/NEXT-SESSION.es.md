@@ -41,6 +41,65 @@ leer la composición como texto** —cuarta vez— y se acotó a la declaración
 comprobación funcionando. El tráiler local **ya no está bloqueado**, pero sigue pendiente porque
 necesita siembra propia, así que pasa al paso 2.
 
+#### 2. Los tres últimos — decidido cómo se siembran y en qué orden
+
+**Por primera vez en toda la cola, ningún pendiente está bloqueado por un defecto.** Son **dos
+escenas, no tres**, porque dos de los tres viven en la misma ficha:
+
+**(a) La ficha de película: «Continuar» y el tráiler local.** Siembra: la película en su carpeta, un
+`WatchState` con posición **por encima del suelo de reanudación —30 s— y por debajo del final**, y un
+archivo hermano **`<nombre-de-la-película>-trailer.mp4`**, que es lo que `TrailerDiscoveryPolicy`
+busca (`Suffix = "-trailer"`, o dentro de una carpeta `Trailers`). **No hace falta grupo de
+versiones**: `HasTrailer` sale del descubrimiento por nombre, no del catálogo — la nota antigua de la
+cola decía lo contrario y estaba equivocada.
+
+- **«Continuar»** — sonda: la sesión abre **en el punto guardado**, leído del motor y esperando a que
+  el demultiplexor aplique la posición de inicio.
+- **El tráiler** — sonda: la sesión pasa a reproducir **el archivo del tráiler**, y ahora eso se puede
+  afirmar de verdad porque una sesión suelta ya llega a la pantalla: `Player.LooseFile.IsLooseSession`
+  y la ruta del medio.
+- **Y aquí se mide el primer hallazgo abierto:** con progreso guardado, **«Reproducir desde el
+  principio» tiene que dejar el cabezal en 0**. Ahora que la posición pedida manda debería estar
+  arreglado; lo que falta es el número.
+
+**(b) La ficha de serie: la fila de episodio.** Siembra: serie con temporada y episodios —el arnés ya
+tiene `SeedSeriesAsync`—, llegar a la ficha desde la biblioteca y pulsar la fila. Sonda: la sesión
+abre **ese** episodio, por su ruta.
+
+**Predicción medible, y se mide ANTES de pulsar:** la fila de acciones de `MovieDetailsView` es un
+`StackPanel Orientation="Horizontal"` con **un `TextBlock` de anchura libre entre botones** —el texto
+de la posición de reanudación— y cinco controles. Es **exactamente la forma que ha sacado un control
+fuera de la ventana seis veces**, y esta escena es la primera que hace visibles a la vez «Continuar» y
+el tráiler, así que la fila será la más larga que ha tenido nunca. Si se sale, pasa a `WrapPanel` como
+las otras seis. Se mide con los `bounds` frente a la ventana antes de intentar el clic, no después del
+rojo.
+
+#### Los dos hallazgos abiertos, y qué se hace con cada uno
+
+1. **«Reproducir desde el principio»** — se mide en la escena (a), como está dicho arriba.
+2. **El progreso se guarda por archivo, no por grupo de versiones.**
+   `ContentKey.ForTitle(new TitleId(mediaFileId.Value))` ata el progreso al archivo, así que tras
+   cambiar de versión hay **dos `WatchState`** y volver a la anterior no reanudaría donde se dejó.
+   **Decidido: se mide primero y sólo se corrige si la medición demuestra pérdida real** — la escena
+   de versiones ya existe y basta con afirmar las dos claves tras volver. Cambiar la clave al grupo es
+   un cambio de modelo con migración, y hoy la posición viaja en el encargo, así que el síntoma puede
+   no existir.
+
+#### Lo que queda decidido del paquete de diseño, para el paso 6
+
+- **Los diez cambios de `SURFACES.es.md` / `.en.md` entran al principio del paso 6**, antes de tocar
+  tokens: el inventario tiene que ser correcto antes de rediseñar contra él. Ahí entra también
+  **`MiniPlayerWindow`, que no está en el documento** — medido el 2026-08-17 comparando el árbol con
+  el inventario, y el paquete lo confirma al darle cinco controles nuevos.
+- **La discrepancia de motivos de rechazo del actualizador se resuelve en OCHO**: `README.md` dice 8 y
+  `github.md` dice 7, y el que cuadra con los 23 mensajes es el 8 (15 estados + 8 rechazos).
+- **Las 25 cadenas de consecuencia se aprueban contra la regla que el propio paquete da** —«si la
+  frase ayuda a decidir o a actuar, se traduce; si explica por qué está diseñada así, es un comentario
+  del AXAML»— revisándolas una a una al escribirlas. **No bloquean el paso 6**; lo que no pase esa
+  regla se queda como comentario.
+- **Los 35 activos de instalación siguen bloqueados** en el original vectorial de la marca, y no se
+  improvisan.
+
 Lo que sigue debajo se conserva porque describe la forma de la corrección, que es la referencia para
 la vía suelta:
 
