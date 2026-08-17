@@ -38,6 +38,9 @@ public sealed class RecordingSystemHandoff : ISystemHandoff
     /// <summary>What a line says when the application was asked to end.</summary>
     public const string ExitVerb = "exit";
 
+    /// <summary>What a line says when a file was handed to whatever the system plays it with.</summary>
+    public const string PlayExternallyVerb = "play-externally";
+
     private readonly Lock _gate = new();
 
     public RecordingSystemHandoff(string handoffDirectory)
@@ -62,6 +65,20 @@ public sealed class RecordingSystemHandoff : ISystemHandoff
     }
 
     public void RequestExit() => _ = Record(ExitVerb);
+
+    /// <summary>
+    /// Writes down a file that would have been opened with whatever the system plays it with.
+    /// </summary>
+    /// <remarks>
+    /// It is not on <see cref="ISystemHandoff"/> because the Windows side of that exit already
+    /// exists and is a launcher of its own; what has to be shared is the <b>file</b>, so that one
+    /// probe reads every handover in the order they were asked for and one lock owns the writing.
+    /// </remarks>
+    public bool RecordPlayedExternally(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        return Record($"{PlayExternallyVerb} {path}");
+    }
 
     private bool Record(string line)
     {

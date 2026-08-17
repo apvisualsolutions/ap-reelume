@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Continuity;
+using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Storage;
 using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
@@ -149,6 +150,27 @@ public sealed class ApplicationHost : IAsyncDisposable
         // The session's loop and handlers go before the services they were feeding: a tick landing
         // on a disposed tracker would be an exception raised by the teardown itself.
         EndPlaybackSession();
+
+        // And the session itself goes with them, which is not the same thing. Ending the hooks
+        // detaches the handlers and stops the save loop; the media is still open, so the container's
+        // own teardown reaches the coordinator, which stops a player the engine's disposal has
+        // already taken away. Measured on 2026-08-17, twice, from a scene that ended while a video
+        // was playing: "ObjectDisposedException: LibVlcMediaPlayerEngine" out of
+        // PlaybackSessionCoordinator.DisposeAsync — the engine is registered three times, and the
+        // last of them is resolved when a video starts drawing, so it enters the disposal list after
+        // the coordinator and leaves it before.
+        try
+        {
+            await _services.GetRequiredService<IPlaybackSessionCoordinator>()
+                .StopAsync(CancellationToken.None)
+                .ConfigureAwait(false);
+        }
+        catch (ObjectDisposedException)
+        {
+            // Something already took the engine away, which is the very thing this call exists to
+            // get ahead of. There is nothing left to stop and nothing worth saying about it.
+        }
+
         await _services.DisposeAsync().ConfigureAwait(false);
     }
 

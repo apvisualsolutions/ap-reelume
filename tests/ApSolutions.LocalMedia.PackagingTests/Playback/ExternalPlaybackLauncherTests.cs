@@ -3,6 +3,7 @@
 
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Windows.Playback;
+using ApSolutions.LocalMedia.Windows.Shell;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests.Playback;
@@ -94,5 +95,68 @@ public sealed class ExternalPlaybackLauncherTests
 
         _ = await Assert.ThrowsAnyAsync<OperationCanceledException>(
             () => launcher.TryLaunchAsync(@"C:\does-not-matter.mkv", cancellation.Token));
+    }
+
+    /// <summary>
+    /// The stand-in an isolated run is built with instead, held to the same contract — every refusal
+    /// above, plus the half the tests above deliberately cannot drive.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It is asserted here, beside the real one, because that is the claim: what the recorder writes
+    /// down only says something about the real launcher while the two refuse the same things. A
+    /// recorder that accepted a `.ps1` would make every probe reading its record meaningless.
+    /// </para>
+    /// <para>
+    /// And it is one test rather than five on purpose. Merged Cobertura reports keep the better of
+    /// the two readings per line rather than their union, so a branch split across suites reads as
+    /// half-covered for ever; this file owns every branch of that class.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task The_recorder_refuses_everything_the_shell_launcher_refuses()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), $"apsolutions-handoff-{Guid.NewGuid():N}");
+        _ = Directory.CreateDirectory(folder);
+        try
+        {
+            var handoff = new RecordingSystemHandoff(folder);
+            var launcher = new RecordingExternalPlaybackLauncher(handoff);
+
+            // A recorder with nowhere to write is not a quieter recorder, it is a launcher that
+            // silently hands nothing over while a probe reads an empty record and calls it a refusal.
+            _ = Assert.Throws<ArgumentNullException>(() => new RecordingExternalPlaybackLauncher(null!));
+
+            _ = await Assert.ThrowsAsync<ArgumentException>(
+                () => launcher.TryLaunchAsync("   ", TestContext.Current.CancellationToken));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(
+                () => launcher.TryLaunchAsync(null!, TestContext.Current.CancellationToken));
+
+            using var cancellation = new CancellationTokenSource();
+            await cancellation.CancelAsync();
+            _ = await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => launcher.TryLaunchAsync(@"C:\does-not-matter.mkv", cancellation.Token));
+
+            var script = Path.Combine(folder, "install.ps1");
+            await File.WriteAllTextAsync(script, "whoami", TestContext.Current.CancellationToken);
+            Assert.False(await launcher.TryLaunchAsync(script, TestContext.Current.CancellationToken));
+
+            Assert.False(await launcher.TryLaunchAsync(
+                Path.Combine(folder, "Gone.2014.mkv"),
+                TestContext.Current.CancellationToken));
+
+            // The half the real launcher cannot be asked for without opening a player on whoever is
+            // running this: an approved container that is really there does get handed over.
+            var film = Path.Combine(folder, "Arrival.2016.mkv");
+            await File.WriteAllTextAsync(film, "a film", TestContext.Current.CancellationToken);
+            Assert.True(await launcher.TryLaunchAsync(film, TestContext.Current.CancellationToken));
+            Assert.Equal(
+                [$"{RecordingSystemHandoff.PlayExternallyVerb} {film}"],
+                await File.ReadAllLinesAsync(handoff.RecordPath, TestContext.Current.CancellationToken));
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
     }
 }

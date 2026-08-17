@@ -2341,6 +2341,110 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
     }
 
+    /// <summary>
+    /// Batch 2e: the two ways out of a session the engine could not open.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The two are offered for <b>different failures</b>, and that is measured rather than assumed.
+    /// <c>PlaybackDiagnosticsPolicy.RecoveryActionsFor</c> gives corrupted media
+    /// <c>ChooseAnotherVersion</c> and <c>OpenExternally</c> — no retry, because reopening bytes that
+    /// are still the same bytes would fail the same way — and gives a missing file <c>Retry</c>,
+    /// which is the disk somebody plugged back in. Measured on 2026-08-17 with two bytes behind an
+    /// approved extension: <c>corrupted=True canRetry=False canOpenExternally=True</c>. So the scene
+    /// opens twice, and each press meets the failure that offers it.
+    /// </para>
+    /// <para>
+    /// Handing a file over is the <b>ninth exit</b> the isolation rule covers: the real launcher
+    /// starts a process with <c>UseShellExecute</c>, which would open the system's player on the
+    /// machine running this. The composition picked the recorder because this run keeps its data
+    /// somewhere of its own, and the probe is the line it wrote — verb first, so it can be told from
+    /// the other handovers without parsing anything.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse()
+    {
+        var sample = await RequireSampleAsync("walk-recovery.mp4", durationSeconds: 8);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var broken = Path.Combine(media, "Arrival.2016.mp4");
+        var absent = Path.Combine(media, "Dune.2021.mp4");
+
+        // Two bytes behind an approved extension: a container the library catalogues and the decoder
+        // cannot open, which is what puts the recovery actions on screen at all.
+        await File.WriteAllBytesAsync(broken, [0x00, 0x00], TestContext.Current.CancellationToken);
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var brokenFile = await SeedMediaFileAsync(factory, media, broken, TimeSpan.FromSeconds(8));
+
+        // Catalogued and then taken away, which is the ordinary way a person meets Retry: the row is
+        // there and the disk holding it is not.
+        await File.WriteAllBytesAsync(absent, [0x00, 0x00], TestContext.Current.CancellationToken);
+        var absentFile = await SeedMediaFileAsync(factory, media, absent, TimeSpan.FromSeconds(8));
+        File.Delete(absent);
+
+        // Asserting this is not null is what proves the scene presses the isolated exit rather than
+        // passing quietly against one that would have opened the system's player on whoever ran it.
+        var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
+        Assert.NotNull(handoff);
+        var record = Path.Combine(handoff!, RecordingSystemHandoff.FileName);
+
+        using var host = ShowShell(height: 1400);
+
+        // ---- Open with an external application: the file that cannot be decoded.
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(brokenFile), StartPosition: null),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.HasFailed == true),
+            "the two-byte file opened, so there was no failure to recover from");
+        Assert.True(
+            host.ViewModel.Player!.Player.MediaWasCorrupted,
+            "the two-byte file failed as something other than corrupted media, so the actions on "
+                + "screen are not the ones this scene was written for.");
+
+        await PressAsync(
+            host,
+            "PlayerRecoveryOpenExternally",
+            () => ReadRecord(record),
+            "handing the file to the system's own player wrote nothing down");
+
+        await SettleAsync();
+        Assert.Contains(
+            $"{RecordingSystemHandoff.PlayExternallyVerb} {broken}",
+            RecordedLines(record));
+
+        // ---- Retry: the file that was not there, put back between the two presses.
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(absentFile), StartPosition: null),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.FileWasNotFound == true),
+            "a file that is not on disk opened anyway, so there was nothing to retry");
+
+        // What makes the retry mean something: the second attempt has something to find. Without
+        // this the press would be honest and the session would fail again, which proves the press
+        // reached the button and nothing about what the button is for.
+        File.Copy(sample, absent, overwrite: true);
+        await PressAsync(
+            host,
+            "PlayerRecoveryRetry",
+            () => host.ViewModel.Player?.Player.IsPlaying == true ? "playing" : "not playing",
+            "retrying never opened the file that had come back");
+
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the retried session never reached the playing state on the real engine");
+
+        // And the scene ends here, with a video still playing, on purpose: closing the player first
+        // is what every other scene does and what hid this. Measured on 2026-08-17, twice, the
+        // moment a scene stopped short of the close — "ObjectDisposedException:
+        // LibVlcMediaPlayerEngine" from the coordinator's own disposal, because ending the session's
+        // hooks is not the same as stopping the session. Somebody who closes the window mid-film
+        // takes this path, so the teardown has to survive it.
+    }
+
     /// <summary>One version of a title, described the way the catalogue describes one.</summary>
     private static MediaVersion Version(Guid fileId, string path, int durationSeconds) =>
         new(
