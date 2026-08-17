@@ -304,9 +304,10 @@ correcta**, y con esto se comprueba.
    que el de estado corregido el 2026-08-15; **cada uno se corrige en su tanda con su medición**, no
    en bloque. **32 → 3**, y los tres últimos con ellos: **0.**
 9. **La cobertura de código, al mismo destino.** Hoy la puerta vigila los archivos nuevos y una lista
-   corta —**once desde el 2026-08-17**, con `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
+   corta —**trece desde el 2026-08-17**, con `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
    `HandoffArchivePicker.cs`, `WindowsSystemHandoff.cs`, `RecordingSystemHandoff.cs`,
-   `HandoffUpdateSource.cs` y `HandoffUpdateManifest.cs` al 100/100 porque son las **salidas** que la
+   `HandoffUpdateSource.cs`, `HandoffUpdateManifest.cs`, `HandoffUpdateDownloader.cs` y
+   `HandoffUpdateTransport.cs` al 100/100 porque son las **salidas** que la
    regla de aislamiento atravesó y las que deciden qué sale de la aplicación y qué alcanza—, así que
    **un archivo antiguo que empeora sigue sin vigilarse**. **Decidido**: cada archivo antiguo que una tanda toque y
    deje en el suelo entra en esa lista al cerrarla, y cuando el paseo llegue a 0,

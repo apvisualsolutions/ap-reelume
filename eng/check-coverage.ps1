@@ -268,6 +268,20 @@ try {
             Lines    = 100.00
             Branches = 100.00
         }
+
+        # And what stands in for the network while the download itself stays the product's own. The
+        # transport is the one that has to be held here: it decides which address is answered and
+        # with which file, and a hole in that is a way to read this machine through a manifest.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Updates/HandoffUpdateDownloader.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Updates/HandoffUpdateTransport.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
     )
 
     $watchRows = @()
