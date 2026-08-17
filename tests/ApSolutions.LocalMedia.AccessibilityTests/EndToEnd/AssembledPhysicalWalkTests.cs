@@ -2251,6 +2251,104 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 7c: the fetch that is still arriving, stopped with the mouse.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Cancel is the one control on this screen that does not exist on an idle one:
+    /// <c>IsEnabled="{Binding IsBusy}"</c> and a command that can only execute while busy, so it can
+    /// be pressed only during one of the three steps. With the package on the disk beside it the whole
+    /// download finishes in milliseconds, so this scene declares how slowly the transport is to answer
+    /// and presses inside that window.
+    /// </para>
+    /// <para>
+    /// The wait is the harness's, on the same line everything else on this surface is drawn on: what
+    /// an isolated run replaces is where the bytes come from, and a source is entitled to be slow.
+    /// Nothing was added to the product to make this pressable — the cancellation travels the real
+    /// path, from the token the view model created into the transport's wait, out as
+    /// <see cref="OperationCanceledException"/> and into the status the screen reads.
+    /// </para>
+    /// <para>
+    /// Its own scene rather than a step in the one before it: a transport that answers slowly would
+    /// change what Download and Install measure, and those are already green.
+    /// </para>
+    /// <para>
+    /// Here the status is the probe, and it is the one place on this surface where that is safe —
+    /// there is no moment between pressing Cancel and the fetch stopping for a probe to be satisfied
+    /// by, which is the race that cost three measurements elsewhere. What a status cannot say is that
+    /// nothing arrived, so the staging folder is asked afterwards.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_fetch_still_arriving_is_cancelled_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        var updates = host.ViewModel.Updates;
+        Assert.NotNull(updates);
+
+        // How long the transport holds the answer, and therefore the window both presses below have
+        // to happen inside. Measured rather than chosen: the two presses spend 950 ms of it here, and
+        // the window also has to hold the harness's own retry budget — PressAsync presses up to eight
+        // times, a settle apart, which is another 2400 ms of real time. 950 + 2400 is what 3000 would
+        // not have held, and a run that has already cancelled abandons the rest of the wait, so a
+        // window with room in it costs nothing.
+        const int ServeDelayMilliseconds = 5000;
+        await SeedUpdateManifestAsync(ServeDelayMilliseconds);
+
+        await PressAsync(
+            host,
+            "UpdateCheckLabel",
+            () => updates!.StatusKey,
+            "clicking Check for updates never asked anything");
+
+        Assert.Equal("UpdateStatusOffered", updates!.StatusKey);
+
+        // Started, and deliberately not finished. A status that turns the instant a button is pressed
+        // is exactly the wrong probe for a press that has to land — and exactly the right one for a
+        // press whose whole point is that something is now in flight.
+        var window = Stopwatch.StartNew();
+        await PressAsync(
+            host,
+            "UpdateDownloadLabel",
+            () => updates.StatusKey,
+            "clicking Download never started the fetch this scene is here to stop");
+
+        Assert.Equal("UpdateStatusDownloading", updates.StatusKey);
+        Assert.True(updates.IsBusy, "The fetch was not running, so there was nothing to cancel.");
+
+        await PressAsync(
+            host,
+            "UpdateCancelLabel",
+            () => updates.StatusKey,
+            "clicking Cancel never stopped the fetch that was still arriving");
+
+        // The window, spent. It is an upper bound — it starts before the press that starts the fetch,
+        // so it counts the click beside Download as well — and it is asserted rather than only
+        // written down, because a scene that presses after the fetch has finished measures the
+        // control's absence and would say so far less clearly.
+        Assert.True(
+            window.ElapsedMilliseconds < ServeDelayMilliseconds,
+            $"Both presses took {window.ElapsedMilliseconds} ms of a {ServeDelayMilliseconds} ms "
+                + "window, so the fetch had already finished and Cancel was pressed on a screen with "
+                + "nothing running. Declare a longer wait in the manifest.");
+
+        Assert.Equal("UpdateStatusCancelled", updates.StatusKey);
+
+        // And nothing arrived. The status says the fetch stopped; only the folder says that stopping
+        // it left no package behind.
+        var staging = Path.Combine(_dataRoot, "updates");
+        Assert.Empty(Directory.Exists(staging)
+            ? Directory.GetFiles(staging, "*.msix", SearchOption.AllDirectories)
+            : []);
+    }
+
+    /// <summary>
     /// Reads a handover record while the application may still be writing to it.
     /// </summary>
     /// <remarks>
@@ -2309,13 +2407,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// Writes the release a run with a data root of its own is offered, in the folder that run says
     /// it uses for handovers.
     /// </summary>
+    /// <param name="serveDelayMilliseconds">
+    /// How slowly the transport is to answer, for a scene that has to press something while the fetch
+    /// is still in flight. Zero leaves the field out altogether, which is the shape every other scene
+    /// uses and the one a manifest written by anything else would have.
+    /// </param>
     /// <remarks>
     /// The address is data rather than source, and that is the rule rather than a convenience: a test
     /// walks <c>src/</c> for anything shaped like a host and fails on one the network purpose
     /// registry does not declare. Nothing is contacted either way — no manifest here names a place
     /// this application would connect to.
     /// </remarks>
-    private async Task SeedUpdateManifestAsync()
+    private async Task SeedUpdateManifestAsync(int serveDelayMilliseconds = 0)
     {
         var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
         Assert.NotNull(handoff);
@@ -2333,6 +2436,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var sha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes))
             .ToLowerInvariant();
 
+        var serveDelay = serveDelayMilliseconds > 0
+            ? string.Create(
+                CultureInfo.InvariantCulture,
+                $",{Environment.NewLine}  \"serveDelayMilliseconds\": {serveDelayMilliseconds}")
+            : string.Empty;
+
         await File.WriteAllTextAsync(
             Path.Combine(handoff!, HandoffUpdateManifest.FileName),
             string.Create(
@@ -2346,7 +2455,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                   "sizeInBytes": {{bytes.Length}},
                   "summaryEs": "Lo que cambia en esta versión.",
                   "summaryEn": "What changed in this version.",
-                  "packageFile": "{{PackageFile}}"
+                  "packageFile": "{{PackageFile}}"{{serveDelay}}
                 }
                 """),
             TestContext.Current.CancellationToken);

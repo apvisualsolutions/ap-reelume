@@ -95,6 +95,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Cancelling a download halfway is now verified by pressing the button while one runs.** Cancel
+  only exists while something is in flight, and in an automated check the package sits in the folder
+  next door: the whole download finished in milliseconds, before there was anything to cancel. A test
+  run can now ask its own folder to answer slowly, and the button is pressed with the download still
+  arriving. What is exercised is the real path — the same cancellation your click produces, the same
+  interruption, the same "Cancelled. Nothing was installed." on screen — and the staging folder is
+  checked to hold no package afterwards. **Nothing changes in your installation**: the wait lives in
+  the file a test run writes for itself, not in the application.
+
 - **Downloading the update and confirming it are now verified end to end.** And what is verified is
   the real thing: the download that runs is **the same one** your installation uses, so the hash and
   the size the release promises are checked against what arrives, and the file lives under a

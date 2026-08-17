@@ -4,33 +4,30 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **34** today, with **94 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **33** today, with **95 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
 ### The queue from 2026-08-17, with its count
 
-**34 pending, and they are exactly these four groups.** Everything below is decided; what remains is
+**33 pending, and they are exactly these three groups.** Everything below is decided; what remains is
 carrying it out, measuring before correcting.
 
 | Step | What | How many | Leaves |
 |---|---|---|---|
-| **7c** | The updater's Cancel | 1 | 33 |
 | **6b** | Backup's Cancel | 1 | 32 |
 | **2a–2e** | The player and its overlays | 29 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
 
 Then: coverage over all of `src/`, what is left of `ARQ-004`, and the redesign.
 
-**7c — the updater's Cancel. DECIDED how it is served slowly:** the manifest gains an **optional**
-`serveDelayMilliseconds` and `HandoffUpdateTransport` does `await Task.Delay(delay, ct)` before
-answering. That is not a shortcut: the cancellation travels on **the model's real token**, so what is
-exercised is the real path — `OperationCanceledException` → `UpdateStatusCancelled`. A scene of **its
-own**, not inside the existing one, because the delay would change the timings of download and
-install. Start at **3000 ms and measure it**; the optional field is read with `TryGetProperty` and
-both of its branches have to be covered. The probe is `StatusKey` — here the state **is** the effect,
-there is no transient between pressing and cancelling — plus the assertion that **no `.msix`** is in
-the staging folder.
+~~**7c — the updater's Cancel.**~~ **Done on 2026-08-17, 34 → 33** —
+[the evidence](evidence/stable/audit-walk-update-cancel.md) — exactly as decided: an **optional**
+`serveDelayMilliseconds` in the manifest, `await Task.Delay(delay, ct)` in the transport, a scene of
+its own, and the status as the probe. **The window was measured and 3000 ms would not do:** both
+presses spend **950 ms**, but the window also has to hold `PressAsync`'s retry budget — eight presses
+a settle apart, **2400 ms** — so it is **5000 ms**, which costs nothing because cancelling abandons
+the rest of the wait.
 
 **6b — backup's Cancel. DECIDED the order of the measurement:** the catalogue first, because it is
 cheap to seed in bulk over SQL — 1,000, 10,000 and 50,000 rows, timing `CreateBackup` — and if at
@@ -324,11 +321,13 @@ one**, and this checks it.
      one, the download refuses it and **leaves nothing**. The transport does **not** implement
      `Range` (the downloader already treats a non-partial answer as "start from zero") and composes
      **no paths** from the request.
-7c. **The updater's Cancel (1). 34 → 33.** All that is left of 7a, apart and with its measured
-   reason: it carries `IsEnabled="{Binding IsBusy}"` **and** `CanExecute => IsBusy`, and with the
-   package on disk beside it the whole download finishes in **milliseconds**. The advantage over 6b
-   stands — the source belongs to the harness and **can serve slowly on purpose** — so the manifest
-   has to be able to declare a wait, and it has to be **measured before** the scene is written.
+7c. ~~**The updater's Cancel (1). 34 → 33.**~~ **Done on 2026-08-17** —
+   [the evidence](evidence/stable/audit-walk-update-cancel.md). The archived red says why it had
+   waited two batches: the press of Download came back with `UpdateStatusReady` where the scene
+   expected `UpdateStatusDownloading`, because with the package on the disk beside it the whole
+   download finishes in milliseconds. The manifest now declares an **optional** wait, the transport
+   holds it on the caller's own token, and **the product was not touched**: what the cancellation
+   travels — token, interruption, status — is its own.
 
    ~~**7b — the database recovery (2).**~~ **Done on 2026-08-17, 40 → 38**, in two commits and with
    **no product defect at all** — the third such batch in eleven:

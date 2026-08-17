@@ -96,6 +96,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Cancelar una descarga a medias se comprueba ahora pulsando el botón mientras corre.** «Cancelar»
+  sólo existe mientras algo está en marcha, y en una comprobación automática el paquete está en la
+  carpeta de al lado: la descarga entera terminaba en milisegundos, antes de que hubiera nada que
+  cancelar. Ahora la ejecución de prueba puede pedirle a su propia carpeta que conteste despacio, y
+  el botón se pulsa con la descarga en vuelo. Lo que se ejercita es el camino de verdad —el mismo
+  aviso de cancelación que produce tu clic, la misma interrupción, el mismo «Se ha cancelado. No se
+  ha instalado nada.» en pantalla— y se comprueba además que en la carpeta de preparación no queda
+  ningún paquete. **En tu instalación no cambia nada**: la espera vive en el archivo que una
+  ejecución de prueba escribe para sí misma, no en la aplicación.
+
 - **Descargar la actualización y confirmarla se comprueban ahora de principio a fin.** Y lo que se
   comprueba es lo de verdad: la descarga que corre es **la misma** que usa tu instalación, así que el
   hash y el tamaño que la versión promete se verifican contra lo que llega, y el archivo vive con un

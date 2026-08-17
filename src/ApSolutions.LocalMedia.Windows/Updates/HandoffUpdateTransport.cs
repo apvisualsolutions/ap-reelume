@@ -29,6 +29,13 @@ namespace ApSolutions.LocalMedia.Windows.Updates;
 /// inside the handover folder. Nothing here composes a path from the request: a transport that served
 /// whatever an address asked for would be a way to read this machine through a manifest.
 /// </para>
+/// <para>
+/// It answers as slowly as the manifest asks it to, which is nearly always at once. A fetch from a
+/// folder finishes in milliseconds, so a run that has to press something while one is in flight —
+/// the update screen's Cancel exists only while something runs — declares the wait in the data it
+/// wrote for itself. The product is untouched by it: the wait takes the caller's own token, so what
+/// is stopped is stopped where a slow network would have been stopped.
+/// </para>
 /// </remarks>
 public sealed class HandoffUpdateTransport : HttpMessageHandler
 {
@@ -40,7 +47,7 @@ public sealed class HandoffUpdateTransport : HttpMessageHandler
         _handoffDirectory = handoffDirectory;
     }
 
-    protected override Task<HttpResponseMessage> SendAsync(
+    protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
@@ -52,17 +59,25 @@ public sealed class HandoffUpdateTransport : HttpMessageHandler
         {
             // Not what this run was offered. A 404 rather than a throw, because that is what a
             // server answers and the downloader already knows what to do with one.
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+            return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
 
         var package = Path.Combine(_handoffDirectory, Path.GetFileName(manifest.PackageFile));
         if (!File.Exists(package))
         {
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+            return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
+
+        // Held for as long as the manifest asks, which is for no time at all unless a run has asked
+        // otherwise. Only the answer this run was offered is held: a refusal made slowly would
+        // measure nothing. There is no branch here because a manifest that declares no wait declares
+        // zero, and waiting for zero is the same path as not waiting; what makes this worth having is
+        // the token, which is the caller's own, so a fetch stopped here is stopped exactly where a
+        // fetch over a slow network would be.
+        await Task.Delay(manifest.ServeDelayMilliseconds, cancellationToken).ConfigureAwait(false);
 
         var content = new StreamContent(File.OpenRead(package));
         content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
+        return new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
     }
 }

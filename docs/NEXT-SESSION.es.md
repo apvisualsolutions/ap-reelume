@@ -4,33 +4,30 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **34**, con **94 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **33**, con **95 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
 ### La cola desde el 2026-08-17, con su recuento
 
-**34 pendientes, y son exactamente estos cuatro grupos.** Todo lo de abajo está decidido; lo que
+**33 pendientes, y son exactamente estos tres grupos.** Todo lo de abajo está decidido; lo que
 queda es ejecutarlo midiendo antes de corregir.
 
 | Paso | Qué | Cuántos | Deja |
 |---|---|---|---|
-| **7c** | «Cancelar» del actualizador | 1 | 33 |
 | **6b** | «Cancelar» de copias | 1 | 32 |
 | **2a–2e** | El reproductor y sus superpuestos | 29 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
 
 Después: la cobertura a todo `src/`, lo que queda de `ARQ-004`, y el rediseño.
 
-**7c — «Cancelar» del actualizador. DECIDIDO cómo se sirve despacio:** el manifiesto gana un campo
-**opcional** `serveDelayMilliseconds` y `HandoffUpdateTransport` hace `await Task.Delay(delay, ct)`
-antes de responder. Eso no es un atajo: la cancelación viaja por **el token real del modelo**, así que
-lo que se ejercita es el camino de verdad —`OperationCanceledException` → `UpdateStatusCancelled`—.
-Escena **propia**, no dentro de la existente, porque el retardo cambiaría los tiempos de descargar e
-instalar. Empezar por **3000 ms y medirlo**; el campo opcional se lee con `TryGetProperty` y sus dos
-ramas hay que cubrirlas. La sonda es `StatusKey` —aquí el estado **es** el efecto, no hay transitorio
-entre pulsar y cancelar— más la aserción de que **no hay ningún `.msix`** en la carpeta de
-preparación.
+~~**7c — «Cancelar» del actualizador.**~~ **Hecha el 2026-08-17, 34 → 33** —
+[la evidencia](evidence/stable/audit-walk-update-cancel.md)—, tal como estaba decidida: campo
+**opcional** `serveDelayMilliseconds` en el manifiesto, `await Task.Delay(delay, ct)` en el
+transporte, escena propia y sonda de estado. **La ventana se midió y 3000 ms no valía:** las dos
+pulsaciones gastan **950 ms**, pero la ventana también tiene que aguantar el presupuesto de
+reintentos de `PressAsync` —ocho pulsaciones a un asentamiento de distancia, **2400 ms**—, así que
+quedó en **5000 ms**, que no cuesta nada porque cancelar abandona el resto de la espera.
 
 **6b — «Cancelar» de copias. DECIDIDO el orden de la medición:** primero **el catálogo**, que es
 barato de sembrar en bloque por SQL —1.000, 10.000 y 50.000 filas, cronometrando `CreateBackup`—; si
@@ -329,11 +326,13 @@ correcta**, y con esto se comprueba.
      demuestra: con un paquete distinto del prometido, la descarga lo rechaza y **no deja nada**. El
      transporte **no** implementa `Range` (el descargador ya trata lo que no es `PartialContent` como
      «empezar de cero») y **no compone rutas** a partir de la petición.
-7c. **«Cancelar» del actualizador (1). 34 → 33.** Lo único que queda de la 7a, y va aparte con su
-   razón medida: lleva `IsEnabled="{Binding IsBusy}"` **y** `CanExecute => IsBusy`, y con el paquete
-   en el disco al lado la descarga entera acaba en **milisegundos**. La ventaja sobre la 6b sigue en
-   pie —la fuente es del arnés y **puede servir despacio a propósito**—, así que el manifiesto tiene
-   que poder declarar una espera y hay que **medirla antes** de escribir la escena.
+7c. ~~**«Cancelar» del actualizador (1). 34 → 33.**~~ **Hecha el 2026-08-17** —
+   [la evidencia](evidence/stable/audit-walk-update-cancel.md)—. El rojo archivado dice por qué
+   llevaba dos tandas esperando: la pulsación de Descargar volvía con `UpdateStatusReady` donde la
+   escena esperaba `UpdateStatusDownloading`, porque con el paquete en el disco al lado la descarga
+   entera acaba en milisegundos. El manifiesto declara ahora una espera **opcional**, el transporte
+   la sostiene con el token del que llama, y **no se tocó el producto**: lo que la cancelación
+   recorre —token, interrupción, estado— es suyo.
 
    ~~**7b — la recuperación de la base (2).**~~ **Hecha el 2026-08-17, 40 → 38**, en dos commits y
    **sin un solo defecto de producto** —el tercero así en once tandas—:
