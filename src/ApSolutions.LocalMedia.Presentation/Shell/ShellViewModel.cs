@@ -399,6 +399,26 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         Player = await open(request, cancellationToken).ConfigureAwait(true);
     }
 
+    /// <summary>
+    /// Opens one file from outside the library and shows the session it makes.
+    /// </summary>
+    /// <remarks>
+    /// The surfaces are assigned exactly as <see cref="OpenPlayerAsync"/> assigns them, and that is
+    /// the whole point of it existing: until 2026-08-17 a file activated from Explorer reached the
+    /// engine and never reached <see cref="Player"/>, so it played with nothing on screen — the banner
+    /// that offers to add its folder lives on those surfaces and could not be seen, let alone pressed.
+    /// </remarks>
+    public async Task OpenLoosePlayerAsync(string path, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        if (_surfaces.OpenLoosePlayer is not { } open)
+        {
+            return;
+        }
+
+        Player = await open(path, cancellationToken).ConfigureAwait(true);
+    }
+
     /// <summary>Closes the session and stops the media with it.</summary>
     public async Task ClosePlayerAsync(CancellationToken cancellationToken = default)
     {

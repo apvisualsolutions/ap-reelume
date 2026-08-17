@@ -201,18 +201,25 @@ public static partial class CompositionRoot
 
         if (host.PendingActivationPath is { Length: > 0 } activation)
         {
-            var open = services.GetRequiredService<OpenLooseFile>();
             var banner = services.GetRequiredService<LooseFileViewModel>();
             PostSafely(async () =>
             {
                 try
                 {
-                    banner.Apply(await open.ExecuteAsync(activation, CancellationToken.None)
-                        .ConfigureAwait(true));
+                    // Through the shell, so the session gets a screen. Applying the banner and
+                    // nothing else is what this used to do, and it played a video nobody could see:
+                    // the banner hangs off the player's surfaces, so without them it is a view model
+                    // filled correctly and shown to no one.
+                    if (services.GetRequiredService<ShellHost>().Shell is { } shell)
+                    {
+                        await shell.OpenLoosePlayerAsync(activation, CancellationToken.None)
+                            .ConfigureAwait(true);
+                    }
                 }
                 catch (PlaybackFailureException)
                 {
-                    // The player already speaks these failures; a loose activation adds nothing to say.
+                    // Refused before anything opened — an unapproved container, or a file that is not
+                    // where the activation said. There is no session to describe.
                     banner.Clear();
                 }
             });
@@ -463,12 +470,18 @@ public static partial class CompositionRoot
             },
 
             // A trailer is a file the person already has, so it opens the way a file dropped on the
-            // application opens: as a loose session. That use case refuses an extension outside the
+            // application opens: as a loose session. That path refuses an extension outside the
             // approved list and writes no catalogue row, which is exactly what a trailer must not
-            // become (LIB-014). Nothing is downloaded and nothing is streamed.
-            onPlayTrailer: path => provider
-                .GetRequiredService<OpenLooseFile>()
-                .ExecuteAsync(path, CancellationToken.None),
+            // become (LIB-014). Nothing is downloaded and nothing is streamed. It goes through the
+            // shell for the reason the activation does: a session with no surfaces is a video nobody
+            // can see or stop.
+            onPlayTrailer: async path =>
+            {
+                if (provider.GetRequiredService<ShellHost>().Shell is { } shell)
+                {
+                    await shell.OpenLoosePlayerAsync(path, CancellationToken.None).ConfigureAwait(true);
+                }
+            },
 
             // The provider's trailer goes the other way (LIB-015): out of the application and into
             // whatever browser the person uses. The address arrives already composed by
@@ -587,6 +600,8 @@ public static partial class CompositionRoot
             OpenRename = (titleId, cancellationToken) => OpenRenameAsync(provider, titleId, cancellationToken),
             OpenDuplicates = (titleId, cancellationToken) => OpenDuplicatesAsync(provider, titleId, cancellationToken),
             OpenPlayer = (request, cancellationToken) => OpenPlayerAsync(host, provider, request, cancellationToken),
+            OpenLoosePlayer = (path, cancellationToken) =>
+                OpenLoosePlayerAsync(provider, path, cancellationToken),
             // Closing the player writes the position before it stops the media: a session that ends
             // without persisting is a resume offer that never appears.
             ClosePlayer = async cancellationToken =>
@@ -764,6 +779,63 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<MediaVersionSelectionPolicy>(),
                 provider.GetRequiredService<SetPreferredVersion>(),
                 new MediaVersionPreferences(PreferHdr: true));
+    }
+
+    /// <summary>
+    /// Opens one file from outside the library and builds the little that session puts on screen.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Deliberately not <see cref="OpenPlayerAsync"/> with a flag. That one begins by reading the
+    /// media file from the catalogue — a loose file is in no catalogue — and its path attaches the
+    /// progress tracker, reads the resume decision, composes the markers and looks up the version
+    /// group. Every one of those writes or reads something a loose session promised not to touch: "a
+    /// loose session leaves the database exactly as it found it". What a loose session gets is the
+    /// player, its transport, the picture's own diagnosis, and the banner that says where this came
+    /// from.
+    /// </para>
+    /// <para>
+    /// The use case is asked first and its refusals are what they always were, so an unapproved
+    /// container or a file that is not there fails before the engine is touched. What changed on
+    /// 2026-08-17 is which of the two opens: the player does, and therefore a failure lands on the
+    /// surface that can say so — a file that cannot be decoded now reaches the recovery actions
+    /// instead of clearing the banner and leaving an empty screen.
+    /// </para>
+    /// </remarks>
+    private static async Task<PlayerSurfaces?> OpenLoosePlayerAsync(
+        IServiceProvider provider,
+        string path,
+        CancellationToken cancellationToken)
+    {
+        var session = await OpenLooseFile.ExecuteAsync(path, cancellationToken)
+            .ConfigureAwait(true);
+
+        var player = new PlayerViewModel(
+            provider.GetRequiredService<IPlaybackSessionCoordinator>(),
+            provider.GetRequiredService<IVideoFrameSource>(),
+            provider.GetRequiredService<IExternalPlaybackLauncher>())
+        {
+            Transport = provider.GetRequiredService<TransportControlsViewModel>(),
+        };
+
+        var videoStatus = new VideoStatusViewModel();
+        var capabilities = provider.GetRequiredService<LibVlcMediaPlayerEngine>().Capabilities;
+        videoStatus.Apply(
+            capabilities,
+            capabilities is { HardwareAccelerationRequested: true, HardwareAccelerationActive: false });
+
+        var banner = provider.GetRequiredService<LooseFileViewModel>();
+        banner.Apply(session);
+
+        await player.OpenAsync(session.MediaFileId, session.Path, cancellationToken: cancellationToken)
+            .ConfigureAwait(true);
+
+        return new PlayerSurfaces
+        {
+            Player = player,
+            VideoStatus = videoStatus,
+            LooseFile = banner,
+        };
     }
 
     /// <summary>

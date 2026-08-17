@@ -85,7 +85,6 @@ public static partial class CompositionRoot
             .AddTransient<ReviewDetectedSegments>()
             .AddSingleton(provider => new SegmentDetectionScheduler(
                 () => provider.GetRequiredService<DetectSeriesSegments>()))
-            .AddTransient<OpenLooseFile>()
             .AddSingleton(provider => new LooseFileViewModel(folder =>
                 provider.GetRequiredService<AddLibraryRoot>()
                     .ExecuteAsync(

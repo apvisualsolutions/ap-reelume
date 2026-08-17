@@ -32,7 +32,7 @@ public sealed class ResumeWiringTests
     [Fact]
     public void The_resume_decision_exists_before_the_media_opens()
     {
-        var source = CompositionRootSource();
+        var source = CatalogedOpenSource();
 
         var decision = source.IndexOf(".DecideAsync(", StringComparison.Ordinal);
         var open = source.IndexOf("player.OpenAsync(", StringComparison.Ordinal);
@@ -77,6 +77,30 @@ public sealed class ResumeWiringTests
     private static string CompositionRootSource()
     {
         return CompositionSourceText.Read();
+    }
+
+    /// <summary>
+    /// The composition from the catalogued open onwards, which is the only session these tests are
+    /// about.
+    /// </summary>
+    /// <remarks>
+    /// Reading the whole file broke on 2026-08-17, and it broke by being right about the wrong
+    /// method: a loose session was given its own opening, that opening also calls
+    /// <c>player.OpenAsync</c>, and it sits earlier in the file — so "the decision comes before the
+    /// open" started comparing a resume decision against a session that deliberately has none. Fourth
+    /// time a test that reads the composition as text has been broken by code moving. The window is
+    /// the fix: these assertions are about <c>OpenPlayerAsync</c>, so they read <c>OpenPlayerAsync</c>.
+    /// </remarks>
+    private static string CatalogedOpenSource()
+    {
+        // The declaration and not a call: "OpenPlayerAsync(" on its own also matches the four places
+        // that invoke it, and one of those sits before the method in the file.
+        const string Declaration = "private static async Task<PlayerSurfaces?> OpenPlayerAsync(";
+        var source = CompositionSourceText.Read();
+        var start = source.IndexOf(Declaration, StringComparison.Ordinal);
+
+        Assert.True(start >= 0, $"The composition root no longer declares '{Declaration}'.");
+        return source[start..];
     }
 
     private sealed class RequestRecordingCoordinator : IPlaybackSessionCoordinator

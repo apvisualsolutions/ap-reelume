@@ -79,6 +79,20 @@ public sealed record ShellSurfaces
     /// <summary>Opens one media file and returns everything that session puts on screen.</summary>
     public Func<PlayDetailsRequest, CancellationToken, Task<PlayerSurfaces?>>? OpenPlayer { get; init; }
 
+    /// <summary>
+    /// Opens one file that is not in the library, by path, and returns what that session puts on
+    /// screen — which is deliberately less: the player, its transport, and the banner that says where
+    /// this came from.
+    /// </summary>
+    /// <remarks>
+    /// It is a second entry rather than a flag on <see cref="OpenPlayer"/> because the two differ in
+    /// what they may touch, not in how they are called: a catalogued session resumes, tracks progress,
+    /// carries markers and knows its other versions, and a loose one must do none of those — "a loose
+    /// session leaves the database as it found it". Sharing one entry would put that promise behind an
+    /// `if`, which is where promises go to be forgotten.
+    /// </remarks>
+    public Func<string, CancellationToken, Task<PlayerSurfaces?>>? OpenLoosePlayer { get; init; }
+
     /// <summary>Stops the session the shell is showing. Closing the surface must also stop the media.</summary>
     public Func<CancellationToken, Task>? ClosePlayer { get; init; }
 
