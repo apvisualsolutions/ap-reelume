@@ -39,8 +39,6 @@ TrackSelectorView#TrackSelectorAudioLabel                  # batch 2
 TrackSelectorView#TrackSelectorRememberForSeries           # batch 2
 TrackSelectorView#TrackSelectorSubtitleLabel               # batch 2
 UpdateView#UpdateCancelLabel                               # batch 7a
-UpdateView#UpdateDownloadLabel                             # batch 7a
-UpdateView#UpdateInstallLabel                              # batch 7a
 VersionSwitchDialog#VersionSwitchCancel                    # batch 2
 VersionSwitchDialog#VersionSwitchConfirm                   # batch 2
 VersionSwitchDialog#VersionSwitchRestart                   # batch 2
