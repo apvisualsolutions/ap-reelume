@@ -46,7 +46,12 @@ public static partial class CompositionRoot
             .AddSingleton<IUpdateDownloader>(provider => new VerifiedUpdateDownloader(
                 CreateUpdateClient(baseAddress: null),
                 Path.Combine(provider.GetRequiredService<IAppDataPaths>().DataRoot, "updates")))
-            .AddSingleton<IUpdateLauncher>(_ => new WindowsUpdateLauncher(OpenWithWindows))
+            // The fourth exit the isolation rule goes through: a run keeping its data somewhere of
+            // its own writes down which package it would have handed over instead of starting an
+            // installer on the machine measuring it. Which handover is built was decided once,
+            // elsewhere, by the resolved data root.
+            .AddSingleton<IUpdateLauncher>(provider => new WindowsUpdateLauncher(
+                provider.GetRequiredService<ISystemHandoff>().TryOpenPackage))
             .AddSingleton<CheckForUpdates>()
             .AddSingleton<ConfirmUpdate>()
             // One instance, not one per resolution: the window starts the automatic check on the

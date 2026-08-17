@@ -1217,13 +1217,6 @@ public static partial class CompositionRoot
     /// process and the installer appears, so a refusal cannot be reported while an install is
     /// starting. Both halves are archived in docs/evidence/stable/updater-handover.json.
     /// </remarks>
-    private static bool OpenWithWindows(string path) =>
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = path,
-            UseShellExecute = true,
-        }) is not null;
-
     /// <summary>
     /// Ends the application, when there is a desktop lifetime to end.
     /// </summary>

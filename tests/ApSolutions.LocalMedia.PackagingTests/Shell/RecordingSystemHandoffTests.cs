@@ -55,20 +55,39 @@ public sealed class RecordingSystemHandoffTests : IDisposable
             await File.ReadAllLinesAsync(handoff.RecordPath, TestContext.Current.CancellationToken));
     }
 
+    [Fact]
+    public async Task An_offered_package_is_written_down_under_a_verb_of_its_own()
+    {
+        var handoff = new RecordingSystemHandoff(_root);
+        var package = Path.Combine(_root, "apreelume-0.2.0.msix");
+
+        Assert.True(handoff.TryOpenPackage(package));
+
+        Assert.Equal(
+            [$"{RecordingSystemHandoff.OpenPackageVerb} {package}"],
+            await File.ReadAllLinesAsync(handoff.RecordPath, TestContext.Current.CancellationToken));
+    }
+
     /// <summary>
-    /// Each handover is added, in order, and the two are told apart by their verb — which is what a
-    /// probe reads instead of parsing anything.
+    /// Each handover is added, in order, and each is told apart by its verb — which is what a probe
+    /// reads instead of parsing anything.
     /// </summary>
     [Fact]
     public async Task Every_handover_is_added_in_the_order_it_was_asked_for()
     {
         var handoff = new RecordingSystemHandoff(_root);
+        var package = Path.Combine(_root, "apreelume-0.2.0.msix");
 
         Assert.True(handoff.TryOpenFolder(_root));
+        Assert.True(handoff.TryOpenPackage(package));
         handoff.RequestExit();
 
         Assert.Equal(
-            [$"{RecordingSystemHandoff.OpenFolderVerb} {_root}", RecordingSystemHandoff.ExitVerb],
+            [
+                $"{RecordingSystemHandoff.OpenFolderVerb} {_root}",
+                $"{RecordingSystemHandoff.OpenPackageVerb} {package}",
+                RecordingSystemHandoff.ExitVerb,
+            ],
             await File.ReadAllLinesAsync(handoff.RecordPath, TestContext.Current.CancellationToken));
     }
 
@@ -86,12 +105,14 @@ public sealed class RecordingSystemHandoffTests : IDisposable
     }
 
     [Fact]
-    public void A_folder_that_names_nothing_is_rejected_before_anything_is_written()
+    public void Something_that_names_nothing_is_rejected_before_anything_is_written()
     {
         var handoff = new RecordingSystemHandoff(_root);
 
         _ = Assert.Throws<ArgumentException>(() => handoff.TryOpenFolder("   "));
         _ = Assert.Throws<ArgumentNullException>(() => handoff.TryOpenFolder(null!));
+        _ = Assert.Throws<ArgumentException>(() => handoff.TryOpenPackage("   "));
+        _ = Assert.Throws<ArgumentNullException>(() => handoff.TryOpenPackage(null!));
         Assert.False(File.Exists(handoff.RecordPath));
     }
 
@@ -108,6 +129,7 @@ public sealed class RecordingSystemHandoffTests : IDisposable
         var handoff = new RecordingSystemHandoff(blocked);
 
         Assert.False(handoff.TryOpenFolder(_root));
+        Assert.False(handoff.TryOpenPackage(Path.Combine(_root, "apreelume-0.2.0.msix")));
 
         // And leaving is refused just as quietly: a screen that could not write its record must not
         // become a screen that crashes on the way out.
