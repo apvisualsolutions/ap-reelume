@@ -95,6 +95,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The permission to look for updates on its own is checked by pressing it.** It is the switch that
+  decides whether the application opens a connection you did not ask for, so what it decides has to
+  survive closing the window: the check now presses it with the mouse and goes and reads **the file**
+  it is stored in, rather than believing the box. Pressing it contacts nothing.
+
 - **The screen that appears when your library will not open can now be checked without destroying
   the check.** That screen offers two things: showing you the folder where the backup copy would be,
   and leaving. Neither had ever been pressed by anything but a person, for a reason that explains

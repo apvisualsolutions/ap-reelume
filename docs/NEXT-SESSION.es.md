@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **38**, con **90 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **37**, con **91 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -227,6 +227,30 @@ correcta**, y con esto se comprueba.
      del arnés y puede servir despacio a propósito. Si medida la siembra sale cara, se aparta a una
      7c y se dice en la evidencia, sin silencio.
 
+   **7a — el actualizador. Empezada el 2026-08-17: 38 → 37**, con
+   [el interruptor de comprobación automática](evidence/stable/audit-walk-update-automatic-check.md),
+   el único de los cinco sin condición previa. **Quedan cuatro** —buscar, descargar, instalar y
+   «Cancelar»—, y su investigación está cerrada; **no se re-delibera**:
+
+   - **La dirección la trae el manifiesto, no el código.**
+     `NetworkPrivacyTests.No_source_file_names_a_host_that_is_neither_declared_nor_handed_off` recorre
+     `src/` buscando `https?://…` y falla con cualquier anfitrión que el registro no declare. Declarar
+     uno de arnés **mentiría sobre lo que la aplicación conecta** y ensancharía `IsDeclaredHost`, que
+     es en lo que confía el canario de red. Así que el manifiesto de la carpeta de traspaso trae la
+     dirección **y** el anfitrión, y `VerifiedUpdateDownloader` recibe su allowlist por parámetro, que
+     **ya admite** («tests hand in their loopback server explicitly»).
+   - **`UpdatePolicy` exige `release.Sha256Signed`**, que es un veredicto que pone la fuente tras
+     verificar minisign con la clave embebida. La fuente del arnés **lo afirma**, como un doble en una
+     unitaria, y la evidencia lo dice con todas las letras: en una ejecución aislada la firma no se
+     verifica porque no hay nada firmado. Lo real es lo que se conserva a propósito —hash, tamaño y
+     `.partial`— sobre transporte local. **Sigue prohibido** hacer que `UpdateSigningKey.PublicKey`
+     dependa de la raíz.
+   - **El lanzador** anota el paquete que habría entregado, con la forma que ya tienen las cinco
+     salidas.
+   - **Orden sugerido:** las tres salidas en un commit con `IsolatedRunTests` cubriendo las dos
+     mitades de cada una, y después los cuatro controles. «Cancelar» con la fuente sirviendo despacio
+     a propósito.
+
    ~~**7b — la recuperación de la base (2).**~~ **Hecha el 2026-08-17, 40 → 38**, en dos commits y
    **sin un solo defecto de producto** —el tercero así en once tandas—:
    [las dos salidas](evidence/stable/audit-recovery-exits.md) y
@@ -290,7 +314,7 @@ propietario.
 un artefacto**: su procedencia es la del paquete, así que regenerarlo con el `artifacts/package/` de
 otra compilación escribiría una procedencia que no es la de nadie. Regenerar el manifiesto es parte de
 cortar una versión, no de una sesión de trabajo. **Decidido**: entran en la matriz **cuando se
-regenere el manifiesto con un paquete recién construido** —ya son nueve, así que ese paso deja de ser
+regenere el manifiesto con un paquete recién construido** —ya son diez, así que ese paso deja de ser
 opcional en la próxima versión— y hasta entonces viven en `docs/evidence/stable/`, enlazadas aquí:
 
 1. [el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md)
@@ -302,6 +326,7 @@ opcional en la próxima versión— y hasta entonces viven en `docs/evidence/sta
 7. [el onboarding de raíces](evidence/stable/audit-walk-root-onboarding.md)
 8. [las dos salidas de la recuperación](evidence/stable/audit-recovery-exits.md)
 9. [la pantalla de recuperación pulsada](evidence/stable/audit-walk-database-recovery.md)
+10. [el permiso para buscar actualizaciones](evidence/stable/audit-walk-update-automatic-check.md)
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

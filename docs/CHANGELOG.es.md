@@ -96,6 +96,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El permiso para buscar actualizaciones por su cuenta se comprueba pulsándolo.** Es el interruptor
+  que decide si la aplicación abre una conexión que no le has pedido, así que lo que decide tiene que
+  sobrevivir a cerrar la ventana: ahora la comprobación lo pulsa con el ratón y va a mirar **el
+  archivo** donde queda guardado, en vez de creerse la casilla. Pulsarlo no contacta con nada.
+
 - **La pantalla que aparece cuando tu biblioteca no abre ya se puede comprobar sin destruir la
   comprobación.** Esa pantalla ofrece dos cosas: enseñarte la carpeta donde estaría la copia de
   seguridad, y salir. Ninguna de las dos la había pulsado nunca nada que no fuera una persona, y por

@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **38** today, with **90 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **37** today, with **91 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -222,6 +222,28 @@ one**, and this checks it.
      harness and can serve slowly on purpose. If the seeding measures expensive, it moves to a 7c and
      the evidence says so, rather than going quiet.
 
+   **7a — the updater. Started on 2026-08-17: 38 → 37**, with
+   [the automatic-check switch](evidence/stable/audit-walk-update-automatic-check.md), the only one of
+   the five with no precondition. **Four are left** — check, download, install and Cancel — and their
+   investigation is closed; **not up for re-deliberation**:
+
+   - **The address comes from the manifest, not from the code.**
+     `NetworkPrivacyTests.No_source_file_names_a_host_that_is_neither_declared_nor_handed_off` walks
+     `src/` for `https?://…` and fails on any host the registry does not declare. Declaring a harness
+     host would **lie about what the application connects to** and would widen `IsDeclaredHost`, which
+     is what the network canary trusts. So the handover manifest carries the address **and** the host,
+     and `VerifiedUpdateDownloader` takes its allowlist as a parameter, which it **already does**
+     ("tests hand in their loopback server explicitly").
+   - **`UpdatePolicy` requires `release.Sha256Signed`**, a verdict the source sets after verifying
+     minisign against the embedded key. The harness source **asserts it**, like a double in a unit
+     test, and the evidence says so outright: in an isolated run the signature is not verified because
+     nothing is signed. What stays real is what is kept on purpose — hash, size and `.partial` — over
+     a local transport. Making `UpdateSigningKey.PublicKey` depend on the root **stays forbidden**.
+   - **The launcher** writes down which package it would have handed over, in the shape the five
+     exits already have.
+   - **Suggested order:** the three exits in one commit with `IsolatedRunTests` covering both halves
+     of each, then the four controls. Cancel with the source serving slowly on purpose.
+
    ~~**7b — the database recovery (2).**~~ **Done on 2026-08-17, 40 → 38**, in two commits and with
    **no product defect at all** — the third such batch in eleven:
    [the two exits](evidence/stable/audit-recovery-exits.md) and
@@ -285,7 +307,7 @@ it belongs to the owner.
 **describes an artifact**: its provenance is the package's own, so regenerating it against an
 `artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
 the manifest is part of cutting a release, not part of a working session. **Decided**: they go into
-the matrix **when the manifest is regenerated against a freshly built package** — there are nine now,
+the matrix **when the manifest is regenerated against a freshly built package** — there are ten now,
 so that step stops being optional at the next release — and until then they live in
 `docs/evidence/stable/`, linked from here:
 
@@ -298,6 +320,7 @@ so that step stops being optional at the next release — and until then they li
 7. [root onboarding](evidence/stable/audit-walk-root-onboarding.md)
 8. [the recovery screen's two exits](evidence/stable/audit-recovery-exits.md)
 9. [the recovery screen pressed](evidence/stable/audit-walk-database-recovery.md)
+10. [the permission to look for updates](evidence/stable/audit-walk-update-automatic-check.md)
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would
