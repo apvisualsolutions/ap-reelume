@@ -10,7 +10,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:VersionSwitchViewModel"
     automation:AutomationProperties.Name="{DynamicResource VersionSwitchAccessibleName}">
-  <StackPanel x:Name="VersionSwitchSurface" IsVisible="{Binding IsVisible}" Spacing="12">
+  <!--
+    A question, and it has to be sized to itself. Without these two alignments the panel stretches to
+    whatever contains it, and in the shell that is the whole player stage: measured on 2026-08-17 at
+    1280x1400 over a 1280x1400 stage, with the three answers at its top-left corner. Third of the
+    three overlays the walk found undimensioned, after the resume prompt and the next-episode offer.
+  -->
+  <Border
+      x:Name="VersionSwitchSurface"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center"
+      IsVisible="{Binding IsVisible}"
+      Padding="16"
+      Background="{DynamicResource ShellSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8">
+  <StackPanel Spacing="12">
     <TextBlock
         x:Name="VersionSwitchHeadline"
         Foreground="{DynamicResource TextPrimaryBrush}"
@@ -48,7 +64,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{Binding SuggestedPositionText}" />
     </StackPanel>
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
+    <!--
+      A WrapPanel and not a horizontal StackPanel, for the reason measured five times before this
+      one: a horizontal StackPanel offers its children infinite width, so three answers of unknown
+      length draw where they fall rather than where they fit.
+    -->
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
       <Button
           x:Name="ConfirmSwitchButton"
           Command="{Binding ConfirmCommand}"
@@ -64,6 +85,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding CancelCommand}"
           Content="{DynamicResource VersionSwitchCancel}"
           automation:AutomationProperties.Name="{DynamicResource VersionSwitchCancel}" />
-    </StackPanel>
+    </WrapPanel>
   </StackPanel>
+  </Border>
 </UserControl>

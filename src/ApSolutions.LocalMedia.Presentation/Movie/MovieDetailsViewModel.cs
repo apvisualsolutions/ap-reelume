@@ -17,9 +17,18 @@ namespace ApSolutions.LocalMedia.Presentation.Movie;
 
 /// <summary>
 /// What the details ask the host to open: which version, and from where. A start position of zero is
-/// a deliberate restart rather than an absence of progress.
+/// a deliberate restart rather than an absence of progress, which is why the absence has a value of
+/// its own: <see langword="null"/> asks the host to decide with the resume policy.
 /// </summary>
-public sealed record PlayDetailsRequest(MediaFileId? MediaFileId, TimeSpan StartPosition);
+/// <remarks>
+/// The distinction is not decoration. Until 2026-08-17 the host read the file and ignored the
+/// position, so every caller that had already worked out where to open was overruled by a policy
+/// reading storage under the <b>new</b> file's content key — and a confirmed version switch, whose
+/// whole point is the second the person agreed to carry across, opened the other version at zero and
+/// then wrote that zero over the position it had just transferred. Measured on the walk: the
+/// playhead read 0, 0, 0, 0, 1, 1, 1, 2 while the switch had stored 00:02:01.
+/// </remarks>
+public sealed record PlayDetailsRequest(MediaFileId? MediaFileId, TimeSpan? StartPosition);
 
 /// <summary>
 /// The complete film details: what it is, whether it can be played right now, how far through it the
