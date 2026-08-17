@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **36**, con **92 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **34**, con **94 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -260,11 +260,19 @@ correcta**, y con esto se comprueba.
      porque calcularlos allí haría que la verificación comprobara el archivo contra sí mismo. Las tres
      respuestas se mantienen aparte: sin manifiesto **no hay release**, ilegible es **inalcanzable**, y
      otra arquitectura es **un rechazo con su motivo**.
-   - **Queda la descarga**, que es el transporte local para `VerifiedUpdateDownloader`, y con ella los
-     tres controles restantes —descargar, instalar y «Cancelar»— **36 → 33**. El transporte responde
-     con el archivo entero y **no** implementa `Range`: el descargador ya trata una respuesta sin
-     `PartialContent` como «empezar de cero», y la reanudación está probada donde vive, contra su
-     servidor de bucle. «Cancelar» con la fuente sirviendo despacio a propósito.
+   - ~~**La descarga.**~~ **Hecha el 2026-08-17, 36 → 34** —
+     [la evidencia](evidence/stable/audit-walk-update-download.md)—, y con ella **descargar e
+     instalar**. Se sustituye **el transporte y la allowlist, nada más**:
+     `VerifiedUpdateDownloader` hace el trabajo en los dos lados, así que el hash, el tamaño y el
+     `.partial` son los de una instalación de verdad — y se comprueba lo contrario, que es lo que lo
+     demuestra: con un paquete distinto del prometido, la descarga lo rechaza y **no deja nada**. El
+     transporte **no** implementa `Range` (el descargador ya trata lo que no es `PartialContent` como
+     «empezar de cero») y **no compone rutas** a partir de la petición.
+7c. **«Cancelar» del actualizador (1). 34 → 33.** Lo único que queda de la 7a, y va aparte con su
+   razón medida: lleva `IsEnabled="{Binding IsBusy}"` **y** `CanExecute => IsBusy`, y con el paquete
+   en el disco al lado la descarga entera acaba en **milisegundos**. La ventaja sobre la 6b sigue en
+   pie —la fuente es del arnés y **puede servir despacio a propósito**—, así que el manifiesto tiene
+   que poder declarar una espera y hay que **medirla antes** de escribir la escena.
 
    ~~**7b — la recuperación de la base (2).**~~ **Hecha el 2026-08-17, 40 → 38**, en dos commits y
    **sin un solo defecto de producto** —el tercero así en once tandas—:
@@ -330,7 +338,7 @@ propietario.
 un artefacto**: su procedencia es la del paquete, así que regenerarlo con el `artifacts/package/` de
 otra compilación escribiría una procedencia que no es la de nadie. Regenerar el manifiesto es parte de
 cortar una versión, no de una sesión de trabajo. **Decidido**: entran en la matriz **cuando se
-regenere el manifiesto con un paquete recién construido** —ya son doce, así que ese paso deja de ser
+regenere el manifiesto con un paquete recién construido** —ya son trece, así que ese paso deja de ser
 opcional en la próxima versión— y hasta entonces viven en `docs/evidence/stable/`, enlazadas aquí:
 
 1. [el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md)
@@ -345,6 +353,7 @@ opcional en la próxima versión— y hasta entonces viven en `docs/evidence/sta
 10. [el permiso para buscar actualizaciones](evidence/stable/audit-walk-update-automatic-check.md)
 11. [la entrega del paquete a Windows](evidence/stable/audit-updater-handover-exit.md)
 12. [buscar actualizaciones sin red](evidence/stable/audit-walk-update-check.md)
+13. [la descarga y la confirmación](evidence/stable/audit-walk-update-download.md)
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

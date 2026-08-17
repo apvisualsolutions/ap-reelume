@@ -95,6 +95,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Downloading the update and confirming it are now verified end to end.** And what is verified is
+  the real thing: the download that runs is **the same one** your installation uses, so the hash and
+  the size the release promises are checked against what arrives, and the file lives under a
+  provisional name until they match. All that changes in a test run is where the bytes come from —
+  its own folder instead of the network. The opposite is checked too: given a package that is not the
+  promised one, the download refuses it and leaves nothing behind, which is what shows no check was
+  loosened in order to test.
+
 - **Checking for updates is now verified without asking anybody anything.** The button asked GitHub
   what had been published, so any automated check would have made that query from whichever machine
   was doing the measuring. A test run now reads the version it has itself described in its own

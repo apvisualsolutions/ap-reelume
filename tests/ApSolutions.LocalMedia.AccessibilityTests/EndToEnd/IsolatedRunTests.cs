@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
 using ApSolutions.LocalMedia.Windows.Shell;
+using ApSolutions.LocalMedia.Windows.Updates;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -260,6 +261,10 @@ public sealed class IsolatedRunTests : IDisposable
             // With nothing described there is nothing to install, which is an answer and not a
             // failure — and it is reached without a single connection.
             Assert.Null(await source.GetLatestAsync("win-x64", TestContext.Current.CancellationToken));
+
+            // The download too: what an isolated run replaces is the transport, never the check on
+            // what arrived, so it is the same class doing the work on both sides.
+            Assert.IsType<HandoffUpdateDownloader>(host.Services.GetRequiredService<IUpdateDownloader>());
         }
 
         var owned = Path.Combine(_dataRoot, "source-owned");
@@ -273,6 +278,8 @@ public sealed class IsolatedRunTests : IDisposable
             // proving the other half by watching GitHub answer is not something a suite may do.
             _ = Assert.IsType<GitHubReleaseUpdateProvider>(
                 host.Services.GetRequiredService<IUpdateSource>());
+            _ = Assert.IsType<VerifiedUpdateDownloader>(
+                host.Services.GetRequiredService<IUpdateDownloader>());
         }
         finally
         {

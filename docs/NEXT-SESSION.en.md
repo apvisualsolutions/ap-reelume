@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **36** today, with **92 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **34** today, with **94 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -254,11 +254,19 @@ one**, and this checks it.
      because computing them there would make the verification check the file against itself. The
      three answers stay apart: no manifest means **no release**, an unreadable one is
      **unreachable**, and another architecture is **a refusal with its reason**.
-   - **The download is what is left** — a local transport for `VerifiedUpdateDownloader` — and with it
-     the three remaining controls: download, install and Cancel, **36 → 33**. The transport answers
-     with the whole file and does **not** implement `Range`: the downloader already treats an answer
-     that is not `PartialContent` as "start from zero", and resuming is tested where it lives, against
-     its loopback server. Cancel with the source serving slowly on purpose.
+   - ~~**The download.**~~ **Done on 2026-08-17, 36 → 34** —
+     [the evidence](evidence/stable/audit-walk-update-download.md) — and with it **download and
+     install**. Only **the transport and the allowlist** are replaced: `VerifiedUpdateDownloader`
+     does the work on both sides, so the hash, the size and the `.partial` are a real installation's
+     — and the opposite is checked, which is what proves it: given a package that is not the promised
+     one, the download refuses it and **leaves nothing**. The transport does **not** implement
+     `Range` (the downloader already treats a non-partial answer as "start from zero") and composes
+     **no paths** from the request.
+7c. **The updater's Cancel (1). 34 → 33.** All that is left of 7a, apart and with its measured
+   reason: it carries `IsEnabled="{Binding IsBusy}"` **and** `CanExecute => IsBusy`, and with the
+   package on disk beside it the whole download finishes in **milliseconds**. The advantage over 6b
+   stands — the source belongs to the harness and **can serve slowly on purpose** — so the manifest
+   has to be able to declare a wait, and it has to be **measured before** the scene is written.
 
    ~~**7b — the database recovery (2).**~~ **Done on 2026-08-17, 40 → 38**, in two commits and with
    **no product defect at all** — the third such batch in eleven:
@@ -324,7 +332,7 @@ it belongs to the owner.
 **describes an artifact**: its provenance is the package's own, so regenerating it against an
 `artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
 the manifest is part of cutting a release, not part of a working session. **Decided**: they go into
-the matrix **when the manifest is regenerated against a freshly built package** — there are twelve now,
+the matrix **when the manifest is regenerated against a freshly built package** — there are thirteen now,
 so that step stops being optional at the next release — and until then they live in
 `docs/evidence/stable/`, linked from here:
 
@@ -340,6 +348,7 @@ so that step stops being optional at the next release — and until then they li
 10. [the permission to look for updates](evidence/stable/audit-walk-update-automatic-check.md)
 11. [handing the package to Windows](evidence/stable/audit-updater-handover-exit.md)
 12. [checking for updates without the network](evidence/stable/audit-walk-update-check.md)
+13. [the download and the confirmation](evidence/stable/audit-walk-update-download.md)
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would

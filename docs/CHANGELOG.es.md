@@ -96,6 +96,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Descargar la actualización y confirmarla se comprueban ahora de principio a fin.** Y lo que se
+  comprueba es lo de verdad: la descarga que corre es **la misma** que usa tu instalación, así que el
+  hash y el tamaño que la versión promete se verifican contra lo que llega, y el archivo vive con un
+  nombre provisional hasta que coinciden. Lo único que cambia en una ejecución de prueba es de dónde
+  vienen los bytes: de su propia carpeta en vez de la red. Se comprueba además lo contrario —con un
+  paquete que no es el prometido, la descarga lo rechaza y no deja nada—, que es lo que demuestra que
+  no se aflojó ninguna comprobación para poder probar.
+
 - **Buscar actualizaciones se comprueba ahora sin preguntarle nada a nadie.** El botón preguntaba a
   GitHub qué se ha publicado, así que cualquier comprobación automática habría hecho esa consulta
   desde la máquina que estuviera midiendo. Ahora una ejecución de prueba lee la versión que ella misma

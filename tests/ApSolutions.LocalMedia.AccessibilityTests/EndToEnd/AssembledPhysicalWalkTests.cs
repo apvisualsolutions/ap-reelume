@@ -28,6 +28,7 @@ using ApSolutions.LocalMedia.Presentation.Recovery;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Theme;
+using ApSolutions.LocalMedia.Presentation.Updates;
 using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
@@ -1388,7 +1389,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
         Assert.NotNull(handoff);
         var record = Path.Combine(handoff!, RecordingExternalLinkLauncher.FileName);
-        string Recorded() => File.Exists(record) ? File.ReadAllText(record) : string.Empty;
+        string Recorded() => ReadRecord(record);
 
         using var host = ShowShell(height: 1600);
         Navigate(host, AppRoute.Library);
@@ -1414,7 +1415,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking the film card's trailer link never said where it would have gone");
         Assert.Equal(
             ["https://www.youtube.com/watch?v=FilmTrailer"],
-            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+            RecordedLines(record));
 
         await library.OpenDetailsAsync(
             library.Items.Single(item => item.Item.Kind == CatalogTitleKind.Show),
@@ -1440,7 +1441,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 "https://www.youtube.com/watch?v=FilmTrailer",
                 "https://www.youtube.com/watch?v=ShowTrailer",
             ],
-            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+            RecordedLines(record));
     }
 
     /// <summary>
@@ -2203,6 +2204,105 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         Assert.Equal("UpdateStatusOffered", updates.StatusKey);
         Assert.Equal("999.0.0", updates.OfferedVersion);
+
+        // The download is the product's own: what changes for this run is where the bytes come from,
+        // so the hash and the size the manifest declared are checked against what actually arrived,
+        // and the file is staged under .partial until they match.
+        //
+        // The probe counts staged packages rather than reading the status, and that is the third
+        // time this shape has cost a measurement: a status turns to "downloading" the instant the
+        // button is pressed, so a probe watching it is satisfied by the press having *started*
+        // something. The staging folder only holds a package once the hash and the size agree.
+        var staging = Path.Combine(_dataRoot, "updates");
+        int StagedPackages() => Directory.Exists(staging)
+            ? Directory.GetFiles(staging, "*.msix", SearchOption.AllDirectories).Length
+            : 0;
+
+        await PressAsync(
+            host,
+            "UpdateDownloadLabel",
+            StagedPackages,
+            "clicking Download never fetched the package this run was offered");
+
+        // And the screen is asked what it settled on only once it has settled. The disk changes
+        // before the screen does, so reading the status straight after the effect is asserting on a
+        // race — measured here, and before this on backups and on the privacy report.
+        await SettledUpdateAsync(updates, "UpdateStatusReady", "downloading");
+        var staged = Directory.GetFiles(staging, "*.msix", SearchOption.AllDirectories);
+        Assert.Single(staged);
+        Assert.Empty(Directory.GetFiles(staging, "*.partial", SearchOption.AllDirectories));
+
+        // And the confirmation, which is the only thing in this application that constructs a
+        // consent. What it hands over is read back from the record rather than from the screen: a
+        // screen can say "handed to Windows" with nothing having left.
+        var handoffRecord = Path.Combine(
+            new AppDataPaths(_dataRoot).SystemHandoffDirectory!,
+            RecordingSystemHandoff.FileName);
+        await PressAsync(
+            host,
+            "UpdateInstallLabel",
+            () => ReadRecord(handoffRecord),
+            "clicking Install never handed the package anywhere");
+
+        await SettledUpdateAsync(updates, "UpdateStatusHandedToWindows", "installing");
+        Assert.Equal(
+            $"{RecordingSystemHandoff.OpenPackageVerb} {staged[0]}",
+            RecordedLines(handoffRecord)[^1]);
+    }
+
+    /// <summary>
+    /// Reads a handover record while the application may still be writing to it.
+    /// </summary>
+    /// <remarks>
+    /// Sharing the write is not caution, it is the fix for a measured failure: the record is appended
+    /// to from whichever thread the effect lands on, and a probe opening it the ordinary way lost the
+    /// race on the second pass of the accessibility gate with "the process cannot access the file".
+    /// A probe that reads a file the application writes has to share the write, or it is measuring
+    /// the race rather than the effect.
+    /// </remarks>
+    private static string ReadRecord(string path)
+    {
+        if (!File.Exists(path))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            using var stream = new FileStream(
+                path,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite | FileShare.Delete);
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
+        }
+        catch (IOException)
+        {
+            // Still being written this instant. "Nothing yet" is the honest answer, and PressAsync
+            // asks again.
+            return string.Empty;
+        }
+    }
+
+    /// <summary>The same record, as the lines it holds.</summary>
+    private static string[] RecordedLines(string path) =>
+        ReadRecord(path).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+    /// <summary>
+    /// Waits for the updater to stop working and says what it stopped as.
+    /// </summary>
+    /// <remarks>
+    /// The same shape as the backup surface's, and for the same reason: the effect lands before the
+    /// screen does, so the outcome is waited for rather than read straight after the press. Third
+    /// appearance of this race in this repository.
+    /// </remarks>
+    private static async Task SettledUpdateAsync(UpdateViewModel updates, string expected, string what)
+    {
+        await WaitForAsync(
+            () => Task.FromResult(!updates.IsBusy),
+            $"The updater was still {what} a minute after the effect had landed.");
+        Assert.Equal(expected, updates.StatusKey);
     }
 
     /// <summary>
@@ -2220,20 +2320,35 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
         Assert.NotNull(handoff);
         Directory.CreateDirectory(handoff!);
+
+        // A package with bytes in it, and a manifest describing exactly those bytes. The hash and
+        // the size are computed here rather than declared, because the download checks what arrives
+        // against what was promised: a manifest that promised something else would be measuring the
+        // verification instead of the button.
+        const string PackageFile = "apreelume-999.0.0.msix";
+        var package = Path.Combine(handoff!, PackageFile);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(
+            "a package this run would install, if this run installed anything");
+        await File.WriteAllBytesAsync(package, bytes, TestContext.Current.CancellationToken);
+        var sha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes))
+            .ToLowerInvariant();
+
         await File.WriteAllTextAsync(
             Path.Combine(handoff!, HandoffUpdateManifest.FileName),
-            """
-            {
-              "version": "999.0.0",
-              "runtime": "win-x64",
-              "url": "https://updates.handoff.invalid/apreelume-999.0.0.msix",
-              "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-              "sizeInBytes": 2048,
-              "summaryEs": "Lo que cambia en esta versión.",
-              "summaryEn": "What changed in this version.",
-              "packageFile": "apreelume-999.0.0.msix"
-            }
-            """,
+            string.Create(
+                CultureInfo.InvariantCulture,
+                $$"""
+                {
+                  "version": "999.0.0",
+                  "runtime": "{{System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier}}",
+                  "url": "https://updates.handoff.invalid/{{PackageFile}}",
+                  "sha256": "{{sha256}}",
+                  "sizeInBytes": {{bytes.Length}},
+                  "summaryEs": "Lo que cambia en esta versión.",
+                  "summaryEn": "What changed in this version.",
+                  "packageFile": "{{PackageFile}}"
+                }
+                """),
             TestContext.Current.CancellationToken);
     }
 
@@ -2286,26 +2401,25 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var handoff = paths.SystemHandoffDirectory;
         Assert.NotNull(handoff);
         var record = Path.Combine(handoff!, RecordingSystemHandoff.FileName);
-        string HandedOver() => File.Exists(record) ? File.ReadAllText(record) : string.Empty;
 
         using var host = ShowRecovery(height: 1000);
 
         await PressAsync(
             host,
             "RecoveryOpenBackupFolder",
-            HandedOver,
+            () => ReadRecord(record),
             "clicking Open the backup folder never said which folder it would have shown");
 
         // The folder is the one the copies are in, which is the application's answer and not a path
         // this scene composed.
         Assert.Equal(
             [$"{RecordingSystemHandoff.OpenFolderVerb} {paths.DataRoot}"],
-            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+            RecordedLines(record));
 
         await PressAsync(
             host,
             "RecoveryExit",
-            HandedOver,
+            () => ReadRecord(record),
             "clicking Exit never asked for anything, which is what it did before this rule existed");
 
         // Both handovers, in the order they were pressed. The second line is the whole of what
@@ -2315,7 +2429,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 $"{RecordingSystemHandoff.OpenFolderVerb} {paths.DataRoot}",
                 RecordingSystemHandoff.ExitVerb,
             ],
-            await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+            RecordedLines(record));
     }
 
     /// <summary>

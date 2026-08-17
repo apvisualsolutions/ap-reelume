@@ -50,9 +50,18 @@ public static partial class CompositionRoot
                         UpdateRepositoryOwner,
                         UpdateRepositoryName,
                         UpdateSigningKey.PublicKey))
-            .AddSingleton<IUpdateDownloader>(provider => new VerifiedUpdateDownloader(
-                CreateUpdateClient(baseAddress: null),
-                Path.Combine(provider.GetRequiredService<IAppDataPaths>().DataRoot, "updates")))
+            // The same choice again, and what changes for an isolated run is the transport and the
+            // allowlist — never the download itself. VerifiedUpdateDownloader does the work on both
+            // sides, so the hash, the declared size and the staging under .partial are the ones a
+            // person's installation uses rather than a harness's imitation of them.
+            .AddSingleton<IUpdateDownloader>(provider =>
+            {
+                var paths = provider.GetRequiredService<IAppDataPaths>();
+                var staging = Path.Combine(paths.DataRoot, "updates");
+                return paths.SystemHandoffDirectory is { } handoff
+                    ? new HandoffUpdateDownloader(handoff, staging)
+                    : new VerifiedUpdateDownloader(CreateUpdateClient(baseAddress: null), staging);
+            })
             // The fourth exit the isolation rule goes through: a run keeping its data somewhere of
             // its own writes down which package it would have handed over instead of starting an
             // installer on the machine measuring it. Which handover is built was decided once,
