@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+  *{box-sizing:border-box}
+  body { margin: 0; background: #050608; }
+  a { color: #9CC9EC; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  @keyframes apr-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes apr-shim{0%{background-position:-520px 0}100%{background-position:520px 0}}
+  @keyframes apr-tip{from{opacity:0;transform:translate(-6px,0)}to{opacity:1;transform:translate(0,0)}}
+  @keyframes apr-pulse{0%,100%{opacity:.5}50%{opacity:1}}
+  @keyframes apr-knob{0%,100%{left:2px}50%{left:20px}}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}}
+</style>
+</helmet>
+
+<div style="width:1600px;margin:0 auto;background:#08090C;color:#EDF1F6;font-family:'Segoe UI Variable Text','Segoe UI Variable','Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;padding:52px 44px 72px">
+
+  <div style="max-width:820px;margin:0 0 40px">
+    <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#8B97A8;margin-bottom:13px">AP Reelume · catálogo de elementos</div>
+    <h1 style="margin:0 0 12px;font-size:42px;font-weight:300;letter-spacing:-.032em;line-height:1.05">Todo, en todos sus estados</h1>
+    <p style="margin:0;font-size:14.5px;color:#C3CEDB">Ordenado por elemento y no por pantalla. Cada uno con las formas que tiene —cinco en la acción, cinco en la fila elegible, cuatro o dos donde no existen más—, el reproductor completo, y las cuatro animaciones que el proyecto define, corriendo con sus duraciones. Lo que no se anima en la aplicación tampoco se anima aquí, y lo dice. La columna «sobre» es el estado pintado, no un especímen interactivo: cámbialo en el prototipo si quieres sentirlo.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:38px">
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px">
+        <h2 style="margin:0;font-size:22px;font-weight:300;letter-spacing:-.022em">Acción · los cinco estados</h2>
+        <span style="font-size:12px;color:#8B97A8">reposo · sobre · pulsado · foco · deshabilitado</span>
+      </div>
+      <div style="display:grid;grid-template-columns:118px repeat(5,1fr);gap:0;border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden">
+        <div style="background:#0B0E13;padding:11px 13px"></div>
+        <div style="background:#0B0E13;padding:11px 13px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:#8B97A8">Reposo</div>
+        <div style="background:#0B0E13;padding:11px 13px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:#8B97A8">Sobre</div>
+        <div style="background:#0B0E13;padding:11px 13px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:#8B97A8">Pulsado</div>
+        <div style="background:#141922;padding:11px 13px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:#9CC9EC">Foco</div>
+        <div style="background:#0B0E13;padding:11px 13px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:#8B97A8">Deshab.</div>
+
+        <div style="background:#0B0E13;padding:15px 13px;font-size:12px;display:flex;align-items:center">Primaria</div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 17px;border-radius:19px;background:#F3F6FA;color:#0A0C10;font-size:13.5px;font-weight:600;display:flex;align-items:center;white-space:nowrap">Reanudar</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 17px;border-radius:19px;background:#FFFFFF;color:#0A0C10;font-size:13.5px;font-weight:600;display:flex;align-items:center;white-space:nowrap">Reanudar</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 17px;border-radius:19px;background:#D6DCE4;color:#0A0C10;font-size:13.5px;font-weight:600;display:flex;align-items:center;white-space:nowrap">Reanudar</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 17px;border-radius:19px;background:#F3F6FA;color:#0A0C10;font-size:13.5px;font-weight:600;display:flex;align-items:center;white-space:nowrap;box-shadow:0 0 0 1px #08090C,0 0 0 3px #7CC4FF">Reanudar</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 17px;border-radius:19px;background:#3A3F46;color:#7A8494;font-size:13.5px;font-weight:600;display:flex;align-items:center;white-space:nowrap;border:1px dashed rgba(255,255,255,.24)">Reanudar</div></div>
+
+        <div style="background:#0B0E13;padding:15px 13px;font-size:12px;display:flex;align-items:center">Secundaria</div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 16px;border-radius:19px;border:1px solid rgba(255,255,255,.32);font-size:13.5px;display:flex;align-items:center;white-space:nowrap">Detalles</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 16px;border-radius:19px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.09);font-size:13.5px;display:flex;align-items:center;white-space:nowrap">Detalles</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 16px;border-radius:19px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.16);font-size:13.5px;display:flex;align-items:center;white-space:nowrap">Detalles</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 16px;border-radius:19px;border:1px solid rgba(255,255,255,.32);font-size:13.5px;display:flex;align-items:center;white-space:nowrap;box-shadow:0 0 0 1px #08090C,0 0 0 3px #7CC4FF">Detalles</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="height:38px;padding:0 16px;border-radius:19px;border:1px dashed rgba(255,255,255,.24);color:#7A8494;font-size:13.5px;display:flex;align-items:center;white-space:nowrap">Detalles</div></div>
+
+        <div style="background:#0B0E13;padding:15px 13px;font-size:12px;display:flex;align-items:center">De icono</div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:13px">↺</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:13px">↺</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:13px">↺</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 0 0 1px #08090C,0 0 0 3px #7CC4FF">↺</div></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><div style="width:36px;height:36px;border-radius:8px;border:1px dashed rgba(255,255,255,.24);color:#7A8494;display:flex;align-items:center;justify-content:center;font-size:13px">↺</div></div>
+
+        <div style="background:#0B0E13;padding:15px 13px;font-size:12px;display:flex;align-items:center">Enlace</div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><span style="font-size:12.5px;color:#9CC9EC;font-weight:600">Volver</span></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><span style="font-size:12.5px;color:#C6E2F7;font-weight:600;text-decoration:underline">Volver</span></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><span style="font-size:12.5px;color:#7FB6E0;font-weight:600;text-decoration:underline">Volver</span></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><span style="font-size:12.5px;color:#9CC9EC;font-weight:600;box-shadow:0 0 0 1px #08090C,0 0 0 3px #7CC4FF;border-radius:4px;padding:2px 4px">Volver</span></div>
+        <div style="padding:15px 13px;display:flex;align-items:center"><span style="font-size:12.5px;color:#7A8494;font-weight:600;text-decoration:line-through">Volver</span></div>
+      </div>
+      <div style="font-size:11.5px;color:#8B97A8;margin-top:11px;line-height:1.5;max-width:100ch"><strong>Deshabilitado lleva borde punteado</strong> en las cuatro variantes: es la señal que no es color, y separa lo deshabilitado de lo ausente sin comparar dos grises. <strong>Aparece en:</strong> todas las pantallas; la primaria una sola vez por pantalla.</div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px">
+        <h2 style="margin:0;font-size:22px;font-weight:300;letter-spacing:-.022em">Selección · cada control en sus formas</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Píldora de opción</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="height:32px;padding:0 14px;border-radius:999px;background:rgba(23,105,170,.22);border:1px solid #1769AA;font-size:12.5px;display:flex;align-items:center;gap:6px;width:fit-content">● Elegida</div>
+            <div style="height:32px;padding:0 14px;border-radius:999px;background:#171B22;border:1px solid transparent;color:#8B97A8;font-size:12.5px;display:flex;align-items:center;gap:6px;width:fit-content">○ Sin elegir</div>
+            <div style="height:32px;padding:0 14px;border-radius:999px;background:#1E242E;border:1px solid rgba(255,255,255,.2);font-size:12.5px;display:flex;align-items:center;gap:6px;width:fit-content">○ Sobre</div>
+            <div style="height:32px;padding:0 14px;border-radius:999px;background:#171B22;border:1px solid transparent;color:#8B97A8;font-size:12.5px;display:flex;align-items:center;gap:6px;width:fit-content;box-shadow:0 0 0 1px #12151B,0 0 0 3px #7CC4FF">○ Con foco</div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Marca <span style="font-family:Consolas,monospace">●</span> además del color. <strong>En:</strong> 4 temas, idioma, tipo de raíz, pestañas de tipo, tipo de marcador.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Desplegable</div>
+          <div style="height:32px;padding:0 13px;border-radius:999px;background:#171B22;border:1px solid #3A424F;font-size:12.5px;display:flex;align-items:center;gap:7px;width:fit-content"><span style="opacity:.72;font-size:11.5px">Orden</span><span style="font-weight:600">Título</span><span style="opacity:.55;font-size:8px">▼</span></div>
+          <div style="height:32px;padding:0 13px;border-radius:999px;background:rgba(23,105,170,.22);border:1px solid #1769AA;font-size:12.5px;display:flex;align-items:center;gap:7px;width:fit-content"><span style="opacity:.72;font-size:11.5px">Orden</span><span style="font-weight:600">Título</span><span style="opacity:.55;font-size:8px">▲</span></div>
+          <div style="padding:5px;border-radius:10px;background:rgba(13,16,21,.98);border:1px solid #3A424F;display:flex;flex-direction:column;gap:2px;animation:apr-in 160ms ease-out">
+            <div style="min-height:28px;padding:4px 8px;border-radius:6px;background:rgba(23,105,170,.22);border:1px solid #1769AA;font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px"><span style="width:11px;text-align:center;font-size:8px">●</span>Elegido</div>
+            <div style="min-height:28px;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.07);font-size:12px;color:#EDF1F6;display:flex;align-items:center;gap:7px"><span style="width:11px"></span>Sobre</div>
+            <div style="min-height:28px;padding:4px 8px;border-radius:6px;font-size:12px;color:#C3CEDB;display:flex;align-items:center;gap:7px"><span style="width:11px"></span>Reposo</div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Cerrado <span style="font-family:Consolas,monospace">▼</span>, abierto <span style="font-family:Consolas,monospace">▲</span>. <strong>En:</strong> 5 desplegables + el de velocidad, que abre hacia arriba.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Interruptor</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:42px;height:24px;border-radius:999px;background:#1769AA;border:1px solid #1769AA;position:relative;flex:none"><div style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:999px;background:#fff"></div></div><span style="font-size:11.5px;color:#8B97A8">Activado</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:42px;height:24px;border-radius:999px;background:#171B22;border:1px solid #3A424F;position:relative;flex:none"><div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:999px;background:#8B97A8"></div></div><span style="font-size:11.5px;color:#8B97A8">Desactivado</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:42px;height:24px;border-radius:999px;background:#171B22;border:1px solid #3A424F;position:relative;flex:none;box-shadow:0 0 0 1px #12151B,0 0 0 3px #7CC4FF"><div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:999px;background:#8B97A8"></div></div><span style="font-size:11.5px;color:#9CC9EC">Con foco</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:42px;height:24px;border-radius:999px;background:#0E1116;border:1px dashed #5B6472;position:relative;flex:none"><div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:999px;background:#5B6472"></div></div><span style="font-size:11.5px;color:#7A8494">Deshabilitado</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><div style="width:42px;height:24px;border-radius:999px;background:#1769AA;border:1px solid #1769AA;position:relative;flex:none"><div style="position:absolute;top:2px;width:18px;height:18px;border-radius:999px;background:#fff;animation:apr-knob 1.9s ease-in-out infinite"></div></div><span style="font-size:11.5px;color:#9CC9EC">Transición 160 ms</span></div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Con su estado escrito al lado, no sólo la posición. <strong>En:</strong> los bloques de ajustes, consentimiento, comprobación automática, segmentos.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Fila elegible</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="padding:9px 11px;border-radius:8px;background:rgba(23,105,170,.28);border:1px solid #62AEE8;font-size:12.5px"><div style="font-weight:600">2160p HDR10 · actual</div><div style="font-size:10.5px;color:#8B97A8;font-family:Consolas,monospace;margin-top:2px">HEVC · 7.1 · 24,4 GB</div></div>
+            <div style="padding:9px 11px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);font-size:12.5px"><div style="font-weight:600">1080p SDR</div><div style="font-size:10.5px;color:#8B97A8;font-family:Consolas,monospace;margin-top:2px">H.264 · 5.1 · 8,1 GB</div></div>
+            <div style="padding:9px 11px;border-radius:8px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.28);font-size:12.5px"><div style="font-weight:600">Sobre</div></div>
+            <div style="padding:9px 11px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);font-size:12.5px;box-shadow:0 0 0 1px #12151B,0 0 0 3px #7CC4FF"><div style="font-weight:600">Con foco</div></div>
+            <div style="padding:9px 11px;border-radius:8px;border:1px dashed #5B6472;font-size:12.5px;color:#7A8494"><div style="font-weight:600">Deshabilitada · en raíz desconectada</div></div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Cinco formas. <strong>En:</strong> diálogo de versión, marcadores, detectados, pistas, duplicados.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px">
+        <h2 style="margin:0;font-size:22px;font-weight:300;letter-spacing:-.022em">Reproductor</h2>
+        <span style="font-size:12px;color:#8B97A8">superficie propia #0B0D10 · columna fija de 320 px · tres formas de sesión</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;margin-bottom:14px">
+        <div style="background:#0B0D10;border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.1)">
+            <div style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:12px">✕</div>
+            <div style="min-width:0"><div style="font-size:13px;font-weight:600">El Faro de Piedra</div><div style="font-size:11px;color:#8B97A8">2019 · Drama</div></div>
+            <span style="padding:3px 8px;border-radius:4px;background:rgba(98,174,232,.18);color:#9CCEF5;font-size:10.5px;font-weight:700;white-space:nowrap">Sesión única</span>
+            <div style="flex:1"></div>
+            <div style="display:flex;gap:6px">
+              <div style="height:28px;padding:0 11px;border-radius:4px;border:1px solid rgba(255,255,255,.24);font-size:12px;display:flex;align-items:center">Audio</div>
+              <div style="height:28px;padding:0 11px;border-radius:4px;border:1px solid #62AEE8;background:rgba(98,174,232,.2);font-size:12px;display:flex;align-items:center">Marcadores</div>
+            </div>
+          </div>
+          <div style="position:relative;height:180px;background:linear-gradient(135deg,#16283B,#0B0D10)">
+            <div style="position:absolute;top:12px;left:12px;max-width:260px;padding:9px 11px;border-radius:8px;background:rgba(13,16,21,.92);border:1px solid rgba(255,255,255,.2);display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:11px;color:#C3CEDB">HDR10 directo a una pantalla compatible.</div>
+              <div style="font-size:11px;color:#F2C879;font-weight:600;display:flex;gap:7px"><span>!</span><span>Se decodifica por software.</span></div>
+            </div>
+            <div style="position:absolute;bottom:12px;right:12px;height:38px;padding:0 18px;border-radius:19px;border:1px solid rgba(255,255,255,.34);background:rgba(13,16,21,.94);font-size:13px;font-weight:600;display:flex;align-items:center;white-space:nowrap">Saltar intro · 1:24</div>
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;align-items:center;gap:11px">
+              <span style="font-size:11.5px;font-variant-numeric:tabular-nums;color:#C3CEDB">49:01</span>
+              <div style="flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.18);position:relative"><div style="width:42%;height:100%;border-radius:2px;background:#62AEE8"></div><div style="position:absolute;left:42%;top:-4px;width:12px;height:12px;border-radius:6px;background:#fff;transform:translateX(-6px)"></div></div>
+              <span style="font-size:11.5px;font-variant-numeric:tabular-nums;color:#C3CEDB">1:58:00</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+              <div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:12px">↺</div>
+              <div style="width:52px;height:52px;border-radius:26px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:15px">❚❚</div>
+              <div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:12px">↻</div>
+              <div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:13px">🔊</div>
+              <div style="width:110px;height:4px;border-radius:2px;background:rgba(255,255,255,.18)"><div style="width:64%;height:100%;border-radius:2px;background:#62AEE8"></div></div>
+              <span style="font-size:11.5px;color:#C3CEDB">100 %</span>
+              <div style="height:30px;padding:0 12px;border-radius:15px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.05);font-size:12.5px;display:flex;align-items:center;gap:7px"><span style="opacity:.72;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Velocidad</span><span style="font-weight:600">1×</span><span style="opacity:.55;font-size:8px">▲</span></div>
+            </div>
+            <div style="font-size:11px;color:#8B97A8">Espacio reproduce · ← → salta · ↑ ↓ volumen · F pantalla completa · N mini · Esc cierra</div>
+          </div>
+        </div>
+
+        <div style="background:#111820;border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.1)"><span style="flex:1;font-size:12.5px;font-weight:600">Marcadores</span><div style="width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:11px">✕</div></div>
+          <div style="padding:13px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:11.5px;color:#8B97A8;line-height:1.45">Nada se aplica hasta que lo aceptes.</div>
+            <div style="padding:7px 10px;border-radius:7px;background:rgba(98,174,232,.2);border:1px solid #62AEE8;font-size:12px;display:flex;align-items:center;gap:8px"><span style="flex:1">Intro · 0:42 → 2:06</span><span style="padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(72,187,120,.18);color:#8FDBA6">94 %</span></div>
+            <div style="padding:7px 10px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);font-size:12px;display:flex;align-items:center;gap:8px"><span style="flex:1">Créditos · 1:47:00</span><span style="padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(242,200,121,.18);color:#F2C879">81 %</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <div style="height:30px;padding:0 12px;border-radius:15px;background:#F3F6FA;color:#0A0C10;font-size:12px;font-weight:600;display:flex;align-items:center">Aceptar</div>
+              <div style="height:30px;padding:0 12px;border-radius:15px;border:1px solid rgba(255,255,255,.28);font-size:12px;display:flex;align-items:center">Corregir</div>
+              <div style="height:30px;padding:0 12px;border-radius:15px;border:1px solid rgba(255,255,255,.28);font-size:12px;display:flex;align-items:center">Descartar</div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,.1);margin:2px 0"></div>
+            <div style="display:flex;gap:7px;align-items:flex-end;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:10px;opacity:.72;text-transform:uppercase;letter-spacing:.06em">Inicio · 0:42</span><div style="height:30px;width:88px;border-radius:7px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.06);font-family:Consolas,monospace;font-size:12px;display:flex;align-items:center;padding:0 9px">42</div></div>
+              <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:10px;opacity:.72;text-transform:uppercase;letter-spacing:.06em">Fin · 2:06</span><div style="height:30px;width:88px;border-radius:7px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.06);font-family:Consolas,monospace;font-size:12px;display:flex;align-items:center;padding:0 9px">126</div></div>
+            </div>
+            <div style="display:flex;gap:9px;padding:9px 11px;border-radius:8px;background:rgba(242,200,121,.16);border:1px solid #F2C879;font-size:11.5px;line-height:1.45"><span style="color:#F2C879">!</span><span>Dos marcadores solapados hacen ambiguo el botón de saltar.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Mini · 480×270</div>
+          <div style="width:100%;aspect-ratio:16/9;background:#0B0D10;border:1px solid rgba(255,255,255,.14);border-radius:8px;position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:26px;background:rgba(13,16,21,.9);display:flex;align-items:center;justify-content:flex-end;gap:5px;padding:0 7px"><div style="width:22px;height:19px;border-radius:999px;background:rgba(237,241,246,.14);font-size:10px;display:flex;align-items:center;justify-content:center">⤢</div><div style="width:22px;height:19px;border-radius:999px;background:rgba(237,241,246,.14);font-size:10px;display:flex;align-items:center;justify-content:center">✕</div></div>
+            <div style="margin-bottom:11px;display:flex;gap:7px;align-items:center;padding:6px;background:rgba(13,16,21,.9);border-radius:8px">
+              <div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);font-size:12px;display:flex;align-items:center;justify-content:center">↺</div>
+              <div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.14);font-size:12px;display:flex;align-items:center;justify-content:center">❚❚</div>
+              <div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);font-size:12px;display:flex;align-items:center;justify-content:center">↻</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Los cinco controles, con el <strong>mismo vocabulario que el reproductor grande</strong>: los cinco a 36×36 y radio 8, como el <span style="font-family:Consolas,monospace">pbtn</span> del transporte. La pausa <em>no</em> hereda el círculo de 52 px del reproductor grande: ahí es la acción primaria de la pantalla, y en el mini es uno de cinco iguales. Un mini que inventa sus propios botones obliga a aprender dos veces lo mismo. El cromo aparece al pasar el ratón <em>y al recibir foco</em>.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#F2C879">Mini · 320×180 mínimo</div>
+          <div style="width:100%;aspect-ratio:16/9;background:#0B0D10;border:1px solid rgba(255,255,255,.14);border-radius:8px;position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:24px;background:rgba(13,16,21,.9);display:flex;align-items:center;justify-content:flex-end;gap:5px;padding:0 6px"><div style="width:20px;height:17px;border-radius:999px;background:rgba(237,241,246,.14);font-size:9px;display:flex;align-items:center;justify-content:center">⤢</div><div style="width:20px;height:17px;border-radius:999px;background:rgba(237,241,246,.14);font-size:9px;display:flex;align-items:center;justify-content:center">✕</div></div>
+            <div style="margin-bottom:10px;padding:6px;background:rgba(13,16,21,.9);border-radius:8px"><div style="width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.14);font-size:12px;display:flex;align-items:center;justify-content:center">❚❚</div></div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><strong>Los saltos se pliegan fuera</strong>, no se aprietan. Caben tres de los cinco.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Superposiciones</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="padding:9px 11px;border-radius:8px;background:rgba(13,16,21,.97);border:1px solid rgba(255,255,255,.2);font-size:11.5px"><div style="font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9CC9EC;margin-bottom:3px">A continuación</div>Empieza en (segundos): <span style="font-weight:600">12</span></div>
+            <div style="padding:9px 11px;border-radius:8px;background:rgba(13,16,21,.97);border:1px solid rgba(255,255,255,.2);font-size:11.5px"><div style="font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9CC9EC;margin-bottom:3px">Reanudar</div>¿Continuar donde lo dejaste?</div>
+            <div style="padding:9px 11px;border-radius:8px;background:rgba(245,163,172,.16);border:1px solid #F5A3AC;font-size:11.5px;display:flex;gap:8px"><span style="color:#F5A3AC">✕</span><span>El archivo no está disponible en su ruta.</span></div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Las seis van con alineación y <span style="font-family:Consolas,monospace">max-width</span> <em>y max-height</em> explícitos.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px">
+        <h2 style="margin:0;font-size:22px;font-weight:300;letter-spacing:-.022em">Animaciones</h2>
+        <span style="font-size:12px;color:#8B97A8">las cuatro del proyecto, corriendo · 160 ms del token, 0 ms con movimiento reducido</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Esqueleto de carga</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="width:148px;aspect-ratio:2/3;border-radius:8px;background:linear-gradient(100deg,#171B22 30%,#232935 50%,#171B22 70%);background-size:520px 100%;animation:apr-shim 1.35s linear infinite"></div>
+            <div style="height:11px;width:110px;border-radius:3px;background:#171B22"></div>
+            <div style="height:9px;width:68px;border-radius:3px;background:#171B22"></div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><span style="font-family:Consolas,monospace">apr-shim</span> 1,35 s en bucle, a tamaño real: 148 px, el valor por defecto del tamaño de portada. <strong>En:</strong> cuadrícula de Biblioteca e Inicio mientras se abre el catálogo.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Entrada de sección</div>
+          <div style="padding:13px;border-radius:8px;background:#171B22;border:1px solid rgba(255,255,255,.1);animation:apr-in 900ms ease-out infinite alternate">
+            <div style="font-size:12.5px;font-weight:600">Biblioteca</div>
+            <div style="font-size:11px;color:#8B97A8;margin-top:3px">12 elementos</div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><span style="font-family:Consolas,monospace">apr-in</span> — opacidad + 6 px hacia arriba, en 160 ms. <strong>En:</strong> cada cambio de pantalla del shell. Aquí en bucle para verla.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Tooltip del riel</div>
+          <div style="display:flex;align-items:center;gap:10px;height:56px">
+            <div style="width:40px;height:40px;border-radius:8px;background:rgba(98,174,232,.2);border:1px solid #62AEE8;display:flex;align-items:center;justify-content:center;font-size:14px;flex:none">▦</div>
+            <div style="padding:6px 11px;border-radius:8px;background:rgba(13,16,21,.97);border:1px solid rgba(255,255,255,.2);font-size:12px;animation:apr-tip 1.6s ease-out infinite alternate">Biblioteca</div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><span style="font-family:Consolas,monospace">apr-tip</span> — entra 6 px desde la izquierda. <strong>En:</strong> los 6 destinos del riel de navegación, al pasar el ratón y al recibir foco.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Progreso y pulso</div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div><div style="font-size:10.5px;color:#8B97A8;margin-bottom:5px">Copia en curso · <span style="color:#EDF1F6">no se anima</span></div><div style="height:3px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden"><div style="width:62%;height:100%;background:#1769AA"></div></div></div>
+            <div><div style="font-size:10.5px;color:#8B97A8;margin-bottom:5px">Escaneando</div><div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="width:8px;height:8px;border-radius:4px;background:#62AEE8;animation:apr-pulse 1.5s ease-in-out infinite;flex:none"></span>1 240 archivos enumerados</div></div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Sólo el punto se anima, con <span style="font-family:Consolas,monospace">apr-pulse</span>. <strong>La barra no</strong>: su relleno es el progreso real, y animarla sola diría algo falso sobre lo que está pasando. <strong>En:</strong> copia, descarga de actualización, escaneo.</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:14px 16px;border-radius:10px;background:rgba(242,200,121,.12);border:1px solid rgba(242,200,121,.45);font-size:12px;line-height:1.55;color:#EDF1F6"><strong>Movimiento reducido apaga las cuatro, y la transición de la manija.</strong> No las acorta: las lleva a 0 ms, que es lo que hace el token <span style="font-family:Consolas,monospace">MotionDurationReducedMilliseconds</span>. Esta página respeta la preferencia del sistema, así que si la tienes activada verás los especímenes quietos — y eso también es un estado que había que catalogar.</div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px">
+        <h2 style="margin:0;font-size:22px;font-weight:300;letter-spacing:-.022em">Estado, entrada y distintivos</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:13px;border-radius:10px;background:#171B22;border:1px solid rgba(255,255,255,.07);font-size:12px;display:flex;gap:9px"><span style="color:#8B97A8">○</span><span><strong>Neutro</strong> · proceso</span></div>
+          <div style="padding:13px;border-radius:10px;background:rgba(72,187,120,.16);border:1px solid #8FDBA6;font-size:12px;display:flex;gap:9px"><span style="color:#8FDBA6">✓</span><span><strong>Positivo</strong> · al día, vacío deseable</span></div>
+          <div style="padding:13px;border-radius:10px;background:rgba(242,200,121,.16);border:1px solid #F2C879;font-size:12px;display:flex;gap:9px"><span style="color:#F2C879">!</span><span><strong>Advertencia</strong> · los 8 rechazos</span></div>
+          <div style="padding:13px;border-radius:10px;background:rgba(245,163,172,.16);border:1px solid #F5A3AC;font-size:12px;display:flex;gap:9px"><span style="color:#F5A3AC">✕</span><span><strong>Error</strong> · los 7 fallos</span></div>
+          <div style="padding:13px;border-radius:10px;border:1px dashed #3A424F;font-size:12px;color:#8B97A8"><strong style="color:#EDF1F6">Ausente</strong> · el control no está</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:9px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Campos</div>
+          <div style="height:36px;padding:0 11px;border-radius:8px;border:1px solid #3A424F;background:#171B22;font-family:Consolas,monospace;font-size:12.5px;display:flex;align-items:center">D:\Cine</div>
+          <div style="height:36px;padding:0 11px;border-radius:8px;border:1px solid #3A424F;background:#171B22;font-size:12.5px;display:flex;align-items:center;box-shadow:0 0 0 1px #12151B,0 0 0 3px #7CC4FF">Con foco</div>
+          <div style="height:36px;padding:0 11px;border-radius:8px;border:1px solid #3A424F;background:#171B22;font-size:12.5px;color:#7A8494;display:flex;align-items:center">Vacío con marcador</div>
+          <div style="height:36px;padding:0 11px;border-radius:8px;border:1px solid #F5A3AC;background:#171B22;font-size:12.5px;display:flex;align-items:center">Con error</div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Rutas siempre monoespaciadas. <strong>En:</strong> búsqueda, primeros pasos, reasignación, editor, marcadores.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:9px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Distintivos</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(72,187,120,.18);color:#8FDBA6">Disponible</span>
+            <span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(242,200,121,.18);color:#F2C879">No disponible</span>
+            <span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(255,255,255,.1)">Película</span>
+            <span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(255,255,255,.1)">Serie</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:13px;padding-top:2px"><span>○ Sin empezar</span></div>
+          <div style="display:flex;gap:12px;font-size:13px"><span>◐ En curso</span></div>
+          <div style="display:flex;gap:12px;font-size:13px"><span>● Visto</span></div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45">Los tres símbolos son literales del árbol y se quedan; el nombre accesible viene de su clave.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:9px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9CC9EC">Foco · el mismo en 4 temas</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="padding:8px;border-radius:8px;background:#08090C"><div style="height:32px;padding:0 13px;border-radius:7px;background:#171B22;border:1px solid #6B7484;font-size:12.5px;display:inline-flex;align-items:center;box-shadow:0 0 0 1px #08090C,0 0 0 3px #7CC4FF">Oscuro</div></div>
+            <div style="padding:8px;border-radius:8px;background:#FBFCFE"><div style="height:32px;padding:0 13px;border-radius:7px;background:#EDF1F6;border:1px solid #7E8B9C;color:#101828;font-size:12.5px;display:inline-flex;align-items:center;box-shadow:0 0 0 1px #FBFCFE,0 0 0 3px #005A9C">Claro</div></div>
+            <div style="padding:8px;border-radius:8px;background:#FFFFFF"><div style="height:32px;padding:0 13px;border-radius:7px;background:#FFF;border:1px solid #000;color:#000;font-size:12.5px;display:inline-flex;align-items:center;box-shadow:0 0 0 1px #FFF,0 0 0 3px #000">AC claro</div></div>
+            <div style="padding:8px;border-radius:8px;background:#000"><div style="height:32px;padding:0 13px;border-radius:7px;background:#000;border:1px solid #FFF;color:#FFF;font-size:12.5px;display:inline-flex;align-items:center;box-shadow:0 0 0 1px #000,0 0 0 3px #FFFF00">AC oscuro</div></div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><strong>Anillo doble.</strong> En AC claro el borde y el foco son el mismo negro: lo único que los separa es la geometría.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px">
+        <h2 style="margin:0;font-size:22px;font-weight:300;letter-spacing:-.022em">Contenedores y tipografía</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Fila de lista</div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:11px;align-items:center;padding:11px 13px;border-radius:10px;background:#171B22;border:1px solid rgba(255,255,255,.07)">
+            <div style="min-width:0"><div style="font-family:Consolas,monospace;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">E:\Respaldo\Series</div><div style="font-size:10.5px;color:#8B97A8;margin-top:2px">Unidad USB</div></div>
+            <div style="height:27px;padding:0 10px;border-radius:14px;border:1px solid rgba(255,255,255,.28);font-size:11.5px;display:inline-flex;align-items:center;flex:none">Quitar</div>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:11px;align-items:center;padding:11px 13px;border-radius:10px;background:#171B22;border:1px solid #F2C879">
+            <div style="min-width:0"><div style="font-family:Consolas,monospace;font-size:12px">Sin resolver</div></div>
+            <span style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(242,200,121,.18);color:#F2C879;flex:none">Aviso</span>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><strong>Rejilla <span style="font-family:Consolas,monospace">1fr auto</span>, nunca fila horizontal:</strong> ésa dibujó «Quitar» en x=2146 dentro de 1600. <strong>En:</strong> raíces, versiones, duplicados, marcadores, pistas, anfitriones, reasignación.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Tarjeta y hairline</div>
+          <div style="padding:13px;border-radius:10px;background:#171B22;border:1px solid rgba(255,255,255,.07);box-shadow:0 1px 2px rgba(0,0,0,.5),0 12px 32px rgba(0,0,0,.42)">
+            <div style="font-size:12.5px;font-weight:600">Tarjeta con elevación</div>
+            <div style="height:1px;background:rgba(255,255,255,.07);margin:9px 0"></div>
+            <div style="font-size:11px;color:#8B97A8">Separada por hairline, no por borde</div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><strong>Dos tokens, no uno:</strong> el hairline separa superficies (1,80:1, y basta), el borde de control delimita lo pulsable (3,88:1, y hace falta). <strong>En:</strong> todas las tarjetas de ajustes, fichas, paneles.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:11px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Panel superpuesto</div>
+          <div style="position:relative;height:92px;border-radius:8px;background:#0B0D10;border:1px solid rgba(255,255,255,.12);overflow:hidden;display:flex;align-items:center;justify-content:center">
+            <div style="max-width:76%;max-height:76%;overflow:auto;padding:10px 12px;border-radius:8px;background:rgba(13,16,21,.97);border:1px solid rgba(255,255,255,.2);font-size:11px;line-height:1.45">Alineación, <span style="font-family:Consolas,monospace">max-width</span> <em>y</em> <span style="font-family:Consolas,monospace">max-height</span> explícitos</div>
+          </div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45"><strong>Las dos dimensiones acotadas:</strong> acotar sólo el ancho dejó un diálogo saliéndose por arriba y por abajo del escenario. Sin alineación explícita, un panel medido a 1280×1400. <strong>En:</strong> las 6 superposiciones del reproductor.</div>
+        </div>
+        <div style="background:#12151B;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:17px;display:flex;flex-direction:column;gap:9px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B97A8">Tipografía</div>
+          <div style="font-size:32px;font-weight:300;letter-spacing:-.03em;line-height:1.08">Display 32/300</div>
+          <div style="font-size:20px;font-weight:600;letter-spacing:-.015em">Subtítulo 20/600</div>
+          <div style="font-size:14px">Cuerpo 14/400 · Segoe UI Variable Text</div>
+          <div style="font-size:12px;color:#8B97A8">Secundario 12 · #8B97A8 · 6,17:1</div>
+          <div style="font-family:Consolas,'Cascadia Mono',monospace;font-size:13px">Monoespaciado 13 · rutas y códigos</div>
+          <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#8B97A8">Antetítulo 10,5 · .18em</div>
+          <div style="font-size:11px;color:#8B97A8;line-height:1.45;margin-top:2px">Todas de serie en Windows 11. <strong>En:</strong> cada pantalla; el display en peso 300 sólo en títulos de pantalla y héroes.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:17px 19px;border-radius:10px;background:rgba(23,105,170,.14);border:1px solid #1769AA">
+      <div style="font-size:13px;font-weight:600;margin-bottom:5px">Cómo usar esto</div>
+      <div style="font-size:12.5px;color:#C3CEDB;line-height:1.55;max-width:96ch">Dime el nombre de la ficha y qué quieres cambiar: la lista de «en:» es la lista de pantallas que se mueven contigo. Lo que va en negrita lleva una razón medida detrás —el punteado del deshabilitado, el pliegue del mini a 320 px, el <span style="font-family:Consolas,monospace">max-height</span> de los paneles, el anillo doble— y cambiarlo es posible sabiendo qué defecto reabre.</div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1680,&quot;height&quot;:2400}}"></script>
+</body>
+</html>

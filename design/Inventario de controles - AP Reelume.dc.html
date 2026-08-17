@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; background: #6b6b6b; }
+  a { color: #1769AA; }
+  a:hover { color: #0f4d7d; }
+</style>
+</helmet>
+<x-import component-from-global-scope="doc-page" from="./doc-page.js" size="a4" hint-size="100%,100%">
+  <div slot="header" style="display:flex;justify-content:space-between;align-items:baseline;font:400 9pt 'Segoe UI',system-ui,sans-serif;color:#64748B;border-bottom:1px solid #CBD5E1;padding-bottom:6pt;">
+    <span style="font-weight:600;color:#111827;">AP Reelume — inventario de controles y cadenas</span>
+    <span>sustituye a la §5 de la propuesta · 17-08-2026</span>
+  </div>
+  <div slot="footer" style="display:flex;justify-content:space-between;font:400 8.5pt 'Segoe UI',system-ui,sans-serif;color:#64748B;border-top:1px solid #CBD5E1;padding-top:6pt;">
+    <span>GPL-3.0-or-later · AP Solutions</span>
+    <span>Cada línea nueva necesita su prueba en el mismo cambio</span>
+  </div>
+
+  <div style="font:400 10.5pt/1.55 'Segoe UI',system-ui,sans-serif;color:#111827;text-wrap:pretty;">
+
+    <h1 style="font:600 25pt/1.15 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 6pt;letter-spacing:-0.01em;">Lo que mueve el trinquete</h1>
+    <p style="margin:0 0 14pt;font-size:11.5pt;color:#334155;max-width:34em;">La §5 de la propuesta declaraba 9 controles añadidos. Eso era cierto entonces y ha dejado de serlo: desde ese recuento el prototipo ganó el panel de marcadores, copia y restauración, el primer arranque, el menú de velocidad, cinco desplegables reconvertidos y las acciones por motivo de fallo. Este documento sustituye a esa lista.</p>
+
+    <p style="margin:0 0 16pt;padding:9pt 11pt;background:#FEF3C7;border-left:3px solid #B45309;font-size:9.5pt;"><strong>Los recuentos «por elemento» no son cifras fijas.</strong> Una lista de N raíces tiene N botones de quitar. Para el paseo automático eso es <em>una</em> clave con N instancias, no N claves — pero para la prueba de nombre accesible hay que cubrir el caso de cero, uno y varios. Donde pongo «+N» es eso.</p>
+
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">AÑADIDOS</h2>
+
+    <h3 style="font:600 11pt 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 5pt;">Reproductor — 41 fijos + 2 por elemento</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin:0 0 12pt;">
+      <thead><tr style="background:#F1F5F9;"><th style="text-align:left;padding:5pt 6pt;border:1px solid #CBD5E1;width:30%;">Superficie</th><th style="text-align:left;padding:5pt 6pt;border:1px solid #CBD5E1;width:12%;">Nº</th><th style="text-align:left;padding:5pt 6pt;border:1px solid #CBD5E1;">Controles</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">MiniPlayerWindow</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">5</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Pausa, −10 s, +10 s, volver a la ventana, cerrar. La ventana no tenía ninguno</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Menú de velocidad</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">11 <span style="color:#047857;">(−9)</span></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">1 botón + 9 <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">menuitemradio</span> + «Volver a 1×» condicional. <strong>Sustituye</strong> las 9 píldoras de velocidad: neto <strong>+2</strong></td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Pestaña del panel Marcadores</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">1</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Cuarta pestaña junto a Audio, Subtítulos y Vídeo</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">DetectedMarkerReviewView</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">5 + N</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">2 selectores de tiempo, aceptar, corregir, descartar, + N filas de detección seleccionables</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">MarkerEditorView</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">9 + N</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Desplegable de tipo (1 + 3 ítems), 2 selectores, guardar, eliminar, + N filas de marcador</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">ResumePromptView</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">2</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Continuar en <em>mm:ss</em>, empezar de cero</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">SkipMarkerButton</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">1</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Píldora con el destino en la etiqueta</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">VersionSwitchDialog</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">4</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">2 filas de versión + «quedarme con esta» + «cambiar y conservar posición»</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">NextEpisodeOverlay</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">2</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Reproducir ahora, cancelar. Ya existían en el AXAML; nuevos <strong>en el prototipo</strong>, no en el inventario</td></tr>
+        <tr style="background:#FEF9E7;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;font-family:'Cascadia Mono',Consolas,monospace;">PlayerRecoveryChooseAnotherVersion</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">1</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Cambia de tipo:</strong> en el AXAML es un <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">TextBlock</span> que sólo informa; aquí es un botón que abre el diálogo de versiones. Misma clave, control nuevo para el paseo</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font:600 11pt 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 5pt;">Biblioteca — 12 fijos</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin:0 0 12pt;">
+      <tbody>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;width:30%;font-family:'Cascadia Mono',Consolas,monospace;">LibrarySearchClear</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;width:12%;">1</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Salida del estado «sin resultados» sin borrar a mano</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Desplegable de estado</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">6 <span style="color:#047857;">(−1)</span></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">1 botón + 5 ítems. Sustituye un <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">ComboBox</span>: en AXAML es una <em>plantilla</em>, no un control nuevo</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Desplegable de orden</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">5 <span style="color:#047857;">(−1)</span></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">1 botón + 4 ítems, mismo caso</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font:600 11pt 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 5pt;">Ajustes — 24 fijos + 1 por elemento</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin:0 0 12pt;">
+      <tbody>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;width:30%;">Apariencia · temas</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;width:12%;">4 <span style="color:#047857;">(−3)</span></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">De 3 botones a 4 píldoras con estado visible: neto <strong>+1</strong>. Claves nuevas <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">ThemeHighContrastLight</span> y <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">ThemeHighContrastDark</span></td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Actualización (sección nueva)</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">7</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Entrada de navegación, interruptor de comprobación automática, comprobar, descargar, instalar, cancelar, reintentar, y el expansor del detalle del rechazo</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Detección de segmentos (sección nueva)</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">2</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Entrada de navegación + el interruptor que ya declara <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">SegmentDetectionSettingsEnable</span></td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Privacidad</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">2</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Interruptor de consentimiento de consultas y el de previsualización del informe. Los dos <strong>condicionales</strong>: el segundo no existe con diagnósticos apagados</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Copia</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">3</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Hacer copia, exportar, cancelar (condicional). Coinciden con <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">BackupView.axaml</span></td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Restauración</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">2 + N</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Elegir archivo, restaurar, + un campo de ruta por cada raíz ausente</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Desplegable «Catalogar como»</td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">4 <span style="color:#047857;">(−1)</span></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">1 botón + 3 ítems, sustituye un <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">ComboBox</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font:600 11pt 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 5pt;">Primeros pasos — 8 fijos + 1 por elemento</h3>
+    <p style="margin:0 0 12pt;font-size:9.5pt;">Campo de carpeta, 3 botones de tipo <em>con estado visible</em> —el AXAML tiene los tres botones pero ninguna forma de saber cuál está elegido—, añadir, confirmar el borrado, conservar, dar consentimiento de escaneo, + un botón de quitar por raíz.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10pt;margin:0 0 16pt;">
+      <div style="border:1px solid #CBD5E1;border-top:3px solid #1769AA;padding:9pt 11pt;">
+        <div style="font:600 19pt/1 'Segoe UI Semibold','Segoe UI',sans-serif;">85</div>
+        <div style="font-size:8.5pt;color:#475569;margin-top:3pt;">controles fijos añadidos (41 + 12 + 24 + 8), más 4 familias «por elemento»</div>
+      </div>
+      <div style="border:1px solid #CBD5E1;border-top:3px solid #047857;padding:9pt 11pt;">
+        <div style="font:600 19pt/1 'Segoe UI Semibold','Segoe UI',sans-serif;">−15</div>
+        <div style="font-size:8.5pt;color:#475569;margin-top:3pt;">sustituidos: 9 píldoras de velocidad, <strong>3</strong> <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">ComboBox</span> (estado, orden, catalogar como) y <strong>3</strong> botones de tema</div>
+      </div>
+      <div style="border:1px solid #CBD5E1;border-top:3px solid #B45309;padding:9pt 11pt;">
+        <div style="font:600 19pt/1 'Segoe UI Semibold','Segoe UI',sans-serif;">128 → 202</div>
+        <div style="font-size:8.5pt;color:#475569;margin-top:3pt;">neto <strong>+74</strong> = 85 fijos + 4 familias (una instancia cada una) − 15 sustituidos</div>
+      </div>
+    </div>
+
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">RENOMBRADOS — 0 controles</h2>
+    <p style="margin:0 0 8pt;">Sigue siendo cero, y sigue siendo deliberado: en este árbol <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">Content</span> y <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">AutomationProperties.Name</span> apuntan a la misma clave, así que reescribir una etiqueta <em>es</em> renombrar el control. No he reescrito ninguna etiqueta existente. Donde me tenté —«O verlo en el navegador» para el enlace del tráiler— lo revertí a la cadena completa.</p>
+    <p style="margin:0 0 12pt;">Un renombrado que no es de control y hay que declarar: la clave del diccionario <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">AppThemeVariants.HighContrast</span> → <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">HighContrastDark</span>, más <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">HighContrastLight</span> junto a ella. Toca <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">AppThemeVariants</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">ThemePreference</span> y <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">FluentThemeService</span>.</p>
+
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">ELIMINADOS — 2 controles</h2>
+    <p style="margin:0 0 12pt;">Los dos son duplicados que quitar es una corrección, no una pérdida: en Copias y restauración había un segundo botón <strong>«Restaurar» habilitado siempre</strong> que se saltaba tanto la elección del archivo como la reasignación de raíces, y un segundo «Exportar». Dos controles con la misma etiqueta visible resuelven a la misma clave, así que el paseo automático no podía distinguirlos. Y en el reproductor salen dos fichas —aceleración y HDR— que el nuevo distintivo de estado de vídeo ya dice, con las cadenas del repositorio.</p>
+
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">CADENAS NUEVAS</h2>
+    <p style="margin:0 0 8pt;">Van en los dos archivos en el mismo cambio, o no van. Tres familias:</p>
+    <ul style="margin:0 0 8pt;padding-left:16pt;font-size:10pt;line-height:1.55;">
+      <li><strong>22 de estados vacíos</strong> (11 listas × título y descripción), como declaró la propuesta: <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">LibraryEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">LibrarySearchNoResults*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">ReviewInboxEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">DuplicatesEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">PlayerVersionsEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">MarkersEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">DetectedMarkersEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">TracksEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">ShortcutsEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">BackupHistoryEmpty*</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">RestoreRootsEmpty*</span>.</li>
+      <li><strong>2 de los temas nuevos</strong>: <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">ThemeHighContrastLight</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">ThemeHighContrastDark</span>.</li>
+      <li><strong>Las explicaciones que escribí en el prototipo.</strong> Aquí soy explícito para que nadie las dé por existentes: cada consecuencia que añadí —lo que pierde un borrado de raíz, por qué una raíz USB marca sus títulos como no disponibles, por qué los cuatro <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:9pt;">null</span> del informe se listan en vez de omitirse, por qué la base sustituida se renombra y no se borra— <strong>no tiene clave todavía</strong>. Son unas 40 cadenas por idioma. Hay que decidir cuáles pasan al producto antes de escribirlas: las que sólo explican el prototipo no van.</li>
+    </ul>
+    <p style="margin:0 0 12pt;padding:8pt 10pt;background:#F8FAFC;border:1px solid #CBD5E1;font-size:9.5pt;">Lección de esta sesión, y me costó cuatro correcciones: <strong>leer la clave antes de escribir el texto.</strong> Inventé el nombre del archivo de tráiler y contradecía a <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">TrailerDiscoveryPolicy</span>; inventé el cuerpo de «archivo dañado» y contradecía a <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">PlayerFailureCorruptedMedia</span>. Las 470 claves existentes son la fuente, no el borrador.</p>
+
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">Lo que NO cuenta como control</h2>
+    <p style="margin:0 0 12pt;">El prototipo tiene aparatos de demostración que no son producto y que <strong>no deben entrar en el inventario</strong>: las fichas para recorrer estados (15 de actualización, 7 de rechazo, 4 de copia, 4 de restauración = 30), el panel «Demostración» entero, y la barra de título dibujada a mano. Si alguien las contara, el inventario pasaría de 202 a 232 sin que exista ni un control. En la aplicación esos estados los conduce el actualizador, la copia o el sistema.</p>
+
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:0 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">Lo que sigue pendiente, y de quién depende</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin:0 0 10pt;">
+      <thead><tr style="background:#F1F5F9;"><th style="text-align:left;padding:5pt 7pt;border:1px solid #CBD5E1;width:34%;">Pendiente</th><th style="text-align:left;padding:5pt 7pt;border:1px solid #CBD5E1;">Estado</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:5pt 7pt;border:1px solid #CBD5E1;">Los 35 PNG de instalación</td><td style="padding:5pt 7pt;border:1px solid #CBD5E1;background:#FEF3C7;"><strong>Bloqueado en ti.</strong> Necesito el original vectorial de «AP Reelume», o el encargo de diseñar la marca. La matriz de tamaños está en la §6 de la propuesta</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:5pt 7pt;border:1px solid #CBD5E1;">Las 7 superficies que no son <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8pt;">.axaml</span></td><td style="padding:5pt 7pt;border:1px solid #CBD5E1;">Puedo especificar sus <strong>textos y activos</strong> —el tooltip y las dos entradas del menú de bandeja, los títulos y filtros de los tres diálogos, el nombre en «Abrir con»— pero no su forma: la dibuja Windows</td></tr>
+        <tr><td style="padding:5pt 7pt;border:1px solid #CBD5E1;"><span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8pt;">SURFACES.es.md</span> y <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8pt;">.en.md</span></td><td style="padding:5pt 7pt;border:1px solid #CBD5E1;">Los diez cambios que necesita están abajo, listos para volcar. Yo no escribo en el repositorio: el texto es tuyo para aplicarlo en un cambio con las pruebas</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:5pt 7pt;border:1px solid #CBD5E1;"><span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8pt;">LooseFileBanner</span></td><td style="padding:5pt 7pt;border:1px solid #CBD5E1;">No verificable: el defecto medido el 17-08 impide que llegue a pantalla. Y quedan 6 controles sin pulsar en <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8pt;">eng/walk-pending.txt</span></td></tr>
+      </tbody>
+    </table>
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:20pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">Las siete superficies que no son <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:13pt;">.axaml</span></h2>
+    <p style="margin:0 0 10pt;">Su forma la dibuja Windows y no se puede rediseñar. Lo que sí es nuestro es el <strong>texto y el activo</strong>, y eso es lo que se ve. Esto lo cierra.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin:0 0 14pt;">
+      <thead><tr style="background:#F1F5F9;"><th style="text-align:left;padding:5pt 6pt;border:1px solid #CBD5E1;width:22%;">Superficie</th><th style="text-align:left;padding:5pt 6pt;border:1px solid #CBD5E1;">Lo que decidimos nosotros</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Bandeja</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Tooltip: <strong>«AP Reelume»</strong> a secas — el nombre del editor sobra en 16 px y Windows ya lo repite. Menú de dos entradas: «Abrir AP Reelume» y «Salir», en ese orden, con la primera por defecto al doble clic. El icono es el sexto activo: 16/20/24/32/48 px reales, no escalas, y en <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">altform-unplated</span> con alfa real — un icono de bandeja con fondo pintado se ve como un cuadrado en cuanto el usuario cambia el color de la barra</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Elegir carpeta de medios</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Título: «Elige una carpeta que contenga tus vídeos». Carpeta inicial: la biblioteca de vídeos del usuario, no la última usada — en el primer arranque no hay última</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Guardar la copia</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Nombre propuesto con fecha: <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">ap-reelume-2026-08-17.zip</span>. Filtro de un solo tipo; ofrecer «todos los archivos» en un diálogo de guardado sólo invita a romper la extensión</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Abrir la copia</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Filtro «Copia de AP Reelume (*.zip)». Carpeta inicial: la de copias, que es donde estará el 95 % de las veces</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>La tercera forma: sin diálogo</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Cuando la ejecución no es dueña del perfil, la carpeta de entrega se decide sola y <strong>el usuario no ve nada</strong>. Eso necesita una confirmación posterior que diga dónde acabó el archivo: un aviso silencioso sobre una escritura en disco es la clase de cosa que rompe la confianza</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Explorador</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Ocho extensiones en «Abrir con», en el menú contextual y como icono de cada vídeo del disco. El nombre visible es <strong>«AP Reelume»</strong>; el icono de asociación es el <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">targetsize-32</span>. <strong>Y una decisión que no es de forma:</strong> el producto <em>no</em> debe pedir ser el predeterminado de vídeo. Una biblioteca local que se apropia de la extensión <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">.mp4</span> del sistema contradice su propia promesa de no tocar nada</td></tr>
+        <tr><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Arranque de MSIX</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Fondo <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">#111827</span>, el mismo de <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:7.5pt;">StartupView</span>, para que las dos esperas seguidas parezcan una. Sin texto: MSIX no lo localiza y una palabra en el idioma equivocado es peor que ninguna</td></tr>
+        <tr style="background:#FAFCFE;"><td style="padding:4pt 6pt;border:1px solid #CBD5E1;"><strong>Barra de título y ventana</strong></td><td style="padding:4pt 6pt;border:1px solid #CBD5E1;">Cromo del sistema, sin dibujar: es lo que garantiza minimizar, ajustar y cerrar con los gestos que el usuario ya tiene. Título «AP Reelume» sin sufijos de estado. Tamaño recordado con el mínimo que el diseño soporta, y <strong>pantalla completa como modo</strong> del escenario, no como ventana aparte</td></tr>
+      </tbody>
+    </table>
+
+    <h2 style="font:600 15pt/1.25 'Segoe UI Semibold','Segoe UI',sans-serif;margin:20pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid #111827;">Los diez cambios que necesita <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:13pt;">SURFACES</span></h2>
+    <ol style="margin:0 0 14pt;padding-left:18pt;font-size:9.5pt;line-height:1.55;">
+      <li><strong>Corregir dos cifras medidas.</strong> Los tokens son <strong>58 declaraciones / 40 nombres</strong> + 3 de <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">Brand.axaml</span>, no 61. Y los selectores de foco son <strong>ocho</strong>, no nueve.</li>
+      <li><strong>Borrar el defecto ya arreglado</strong> de la descripción del manifiesto: hoy es <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">ms-resource:AppDescription</span> con un recurso por idioma. El documento aún lo cuenta como vivo.</li>
+      <li><strong>Corregir la versión de Avalonia</strong>: el árbol pina <strong>12.1.1</strong>.</li>
+      <li><strong>Añadir una sección de superficies que no son vistas</strong>, con las ocho de la tabla anterior.</li>
+      <li><strong>Añadir una tabla de estados condicionales</strong> en vez de una nota: doce filas, no una, y marcar dónde conviven <em>ausente</em> y <em>deshabilitado</em> (privacidad y actualización).</li>
+      <li><strong>Añadir vacío, carga y error por lista</strong>: quince listas, cuatro con cadena y once sin. Incluida la que nadie ve venir: buscar y no encontrar nada.</li>
+      <li><strong>Nombrar los siete motivos de fallo de <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">PlayerView</span> y los seis avisos de <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">VideoStatusOverlay</span></strong>, con la misma dignidad que los 23 de actualización — son 13 mensajes que hoy no se nombran.</li>
+      <li><strong>Corregir «<span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">BackupView</span> tiene historial»</strong>: no lo tiene. Las dos listas (<span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">Findings</span>, <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">Roots</span>) están en <span style="font-family:'Cascadia Mono',Consolas,monospace;font-size:8.5pt;">RestoreWizardView</span>. Ése error lo introduje yo en la auditoría.</li>
+      <li><strong>Decir la verdad sobre los temas</strong>: tres diccionarios, dos aplicables, cinco colores de alto contraste claro que nadie lee, y el reproductor forzado a oscuro en todos.</li>
+      <li><strong>Añadir el icono de bandeja</strong> junto a los cinco del paquete, y la matriz de escalas de los seis. Y volver a fechar la medición.</li>
+    </ol>
+
+    <p style="margin:0;padding:9pt 11pt;background:#ECFDF5;border-left:3px solid #047857;font-size:9.5pt;"><strong>Las 48 vistas están diseñadas, y las ocho superficies del sistema están especificadas.</strong> Lo que queda sin cerrar son dos cosas y ninguna es de diseño de pantallas: <strong>los 35 activos de marca</strong>, que dependen de que me des el original vectorial, y <strong>las cadenas del prototipo</strong>, que hay que decidir cuáles pasan al producto antes de escribirlas en los dos archivos. Todo lo demás de este documento se aplica leyendo.</p>
+  </div>
+</x-import>
+
+</x-dc>
+</body>
+</html>
