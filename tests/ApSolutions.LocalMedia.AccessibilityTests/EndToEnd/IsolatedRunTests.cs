@@ -5,6 +5,7 @@ using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Updates;
 using ApSolutions.LocalMedia.Domain.Updates;
+using ApSolutions.LocalMedia.Infrastructure.Updates;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
@@ -228,6 +229,55 @@ public sealed class IsolatedRunTests : IDisposable
                 $"{RecordingSystemHandoff.OpenPackageVerb} {Path.Combine(isolated, "apreelume-0.2.0.msix")}",
             ],
             await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// The same rule at the update source: an isolated run is offered whatever its own handover
+    /// folder describes, and the run that owns the profile still asks GitHub.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Both halves are here for the reason the others are, and this one had a second reason measured
+    /// on the day it was written: <c>CompositionDescriptorTests</c> asserted the provider's published
+    /// address while composing against a root of its own, and the moment the source began to depend
+    /// on the root that assertion **went blind rather than false**. A test about what the application
+    /// connects to has to compose as the run that connects, and this is the pair that says so.
+    /// </para>
+    /// <para>
+    /// Only the isolated half is asked anything. Asking the other one would query GitHub from
+    /// whichever machine ran the suite, which is the whole thing the rule exists to prevent.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task An_isolated_run_is_offered_its_own_manifest_and_the_owning_run_asks_github()
+    {
+        var isolated = Path.Combine(_dataRoot, "source-isolated");
+        await using (var host = ApplicationHost.Create(new AppDataPaths(isolated)))
+        {
+            var source = host.Services.GetRequiredService<IUpdateSource>();
+            Assert.IsNotType<GitHubReleaseUpdateProvider>(source);
+
+            // With nothing described there is nothing to install, which is an answer and not a
+            // failure — and it is reached without a single connection.
+            Assert.Null(await source.GetLatestAsync("win-x64", TestContext.Current.CancellationToken));
+        }
+
+        var owned = Path.Combine(_dataRoot, "source-owned");
+        var previous = Environment.GetEnvironmentVariable(AppDataPaths.DataRootVariableName);
+        Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, owned);
+        try
+        {
+            await using var host = ApplicationHost.Create(new AppDataPaths());
+
+            // Nothing is asked of it on purpose: what this asserts is which source was built, and
+            // proving the other half by watching GitHub answer is not something a suite may do.
+            _ = Assert.IsType<GitHubReleaseUpdateProvider>(
+                host.Services.GetRequiredService<IUpdateSource>());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, previous);
+        }
     }
 
     /// <summary>

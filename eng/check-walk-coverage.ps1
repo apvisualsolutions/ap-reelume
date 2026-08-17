@@ -46,10 +46,11 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # data root of its own answered its own file dialogs and the library could be copied out and brought
 # back, 38 once the screen that stands in the shell's place could be mounted and neither of its two
 # buttons destroyed what was pressing it, 37 with the switch that decides whether this application
-# may look for updates on its own. The destination is 0: this application ships free and nobody is
-# going to test it by hand, so a control the walk never presses is a control nobody ever presses
-# before somebody installs it.
-$maximumPending = 37
+# may look for updates on its own, 36 once that look stopped meaning a connection and started meaning
+# a manifest a run keeps under its own root. The destination is 0: this application ships free and
+# nobody is going to test it by hand, so a control the walk never presses is a control nobody ever
+# presses before somebody installs it.
+$maximumPending = 36
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)

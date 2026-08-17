@@ -106,7 +106,7 @@ public sealed class CompositionDescriptorTests
     [Fact]
     public void The_update_source_the_application_builds_looks_where_the_changelogs_publish()
     {
-        using var provider = Compose().BuildServiceProvider();
+        using var provider = ComposeAsTheRunThatConnects().BuildServiceProvider();
         var source = Assert.IsType<GitHubReleaseUpdateProvider>(
             provider.GetRequiredService<IUpdateSource>());
 
@@ -141,4 +141,25 @@ public sealed class CompositionDescriptorTests
             new AppDataPaths(dataRoot),
             new CompositionRoot.ShellHost());
     }
+
+    /// <summary>
+    /// The composition as the person whose profile this is gets it, which is the only one that has
+    /// an update provider to ask about.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Every other test here composes against a root of its own, and since the isolation rule
+    /// reached the updater that root is exactly what decides <em>not</em> to build the provider this
+    /// one is about — so the assertion above went blind rather than false, which is the worse of the
+    /// two. The rule is now: a test about what the application connects to has to compose as the run
+    /// that connects.
+    /// </para>
+    /// <para>
+    /// Nothing is written anywhere. The default paths are composed, not created, and the only thing
+    /// resolved is a source that holds an address — asking it anything is what would open a
+    /// connection, and nothing here asks.
+    /// </para>
+    /// </remarks>
+    private static IServiceCollection ComposeAsTheRunThatConnects() =>
+        new ServiceCollection().AddLocalMedia(new AppDataPaths(), new CompositionRoot.ShellHost());
 }

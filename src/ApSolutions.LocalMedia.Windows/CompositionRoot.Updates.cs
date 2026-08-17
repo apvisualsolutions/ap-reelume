@@ -38,11 +38,18 @@ public static partial class CompositionRoot
         services
             .AddSingleton<IUpdateSettings, StoredUpdateSettings>()
             .AddSingleton(_ => new InstalledRelease(GetAppVersion(), GetRuntimeIdentifier()))
-            .AddSingleton<IUpdateSource>(_ => new GitHubReleaseUpdateProvider(
-                CreateUpdateClient(new Uri("https://api.github.com/")),
-                UpdateRepositoryOwner,
-                UpdateRepositoryName,
-                UpdateSigningKey.PublicKey))
+            // Which source answers is decided by the resolved data root, once, here — the same
+            // choice every other handover makes. A harness must not ask GitHub about releases from
+            // whichever machine is running the suite, so a run keeping its data somewhere of its own
+            // is offered whatever its own handover folder describes, and nothing is contacted.
+            .AddSingleton<IUpdateSource>(provider =>
+                provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory is { } handoff
+                    ? new HandoffUpdateSource(handoff)
+                    : new GitHubReleaseUpdateProvider(
+                        CreateUpdateClient(new Uri("https://api.github.com/")),
+                        UpdateRepositoryOwner,
+                        UpdateRepositoryName,
+                        UpdateSigningKey.PublicKey))
             .AddSingleton<IUpdateDownloader>(provider => new VerifiedUpdateDownloader(
                 CreateUpdateClient(baseAddress: null),
                 Path.Combine(provider.GetRequiredService<IAppDataPaths>().DataRoot, "updates")))
