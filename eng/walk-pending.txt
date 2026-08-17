@@ -9,8 +9,5 @@
 ## clicks beside it to no effect — all three, which is what PressAsync does and records.
 
 EpisodeRowView#EpisodePlayAction                           # batch 1: the series card, which needs the show, season and episode rows seeded
-LooseFileBanner#LooseFileAddFolderAction                   # batch 2e: measured 2026-08-17 — a file activated from Explorer plays (engine=Playing) while no player surfaces are built (stages=0), so the banner never reaches the screen at all
-LooseFileBanner#LooseFileCancelAction                      # batch 2e: blocked by the defect on the line above
-LooseFileBanner#LooseFileConfirmAction                     # batch 2e: blocked by the defect on the line above
 MovieDetailsView#MovieResumeAction                         # batch 1: shown only with stored progress worth returning to
-MovieDetailsView#MovieTrailerAction                        # batch 1: a local trailer opens through OpenLooseFile, so the same defect blocks it
+MovieDetailsView#MovieTrailerAction                        # batch 1: shown only when a trailer file sits beside the film, which needs a version group the walk does not seed yet

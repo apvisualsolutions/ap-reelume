@@ -482,6 +482,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Abrir un vídeo desde el Explorador lo reproducía sin enseñarlo.** El archivo empezaba a sonar y la
+  aplicación se quedaba en la pantalla de inicio: sin imagen, sin controles y sin forma de pararlo, y
+  el aviso de «esto no está en tu biblioteca» —con su oferta de añadir la carpeta— no llegaba a
+  aparecer nunca. Ahora una activación abre el reproductor como cualquier otra reproducción, y un
+  archivo que no se puede decodificar te ofrece reintentar o abrirlo con otra aplicación en vez de
+  dejarte una pantalla vacía. Lo mismo valía para el tráiler local.
+
 - **Cerrar la aplicación con un vídeo abierto reventaba el apagado.** Terminar los enganches de una
   sesión no es pararla: el medio seguía abierto, así que el desmontaje intentaba parar un reproductor
   que ya se había desechado y saltaba una excepción. Ahora la sesión se para antes que los servicios

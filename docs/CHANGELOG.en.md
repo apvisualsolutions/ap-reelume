@@ -470,6 +470,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Opening a video from Explorer played it without showing it.** The file started playing and the
+  application stayed on the home screen: no picture, no controls, no way to stop it, and the notice
+  saying "this is not in your library" — with its offer to add the folder — never appeared at all. An
+  activation now opens the player like any other playback, and a file that cannot be decoded offers
+  you a retry or an external application instead of leaving you an empty screen. The same was true of
+  a local trailer.
+
 - **Closing the application with a video open broke the shutdown.** Ending a session's hooks is not
   stopping it: the media stayed open, so the teardown tried to stop a player that had already been
   disposed and threw. The session is now stopped before the services that were feeding it. Nothing

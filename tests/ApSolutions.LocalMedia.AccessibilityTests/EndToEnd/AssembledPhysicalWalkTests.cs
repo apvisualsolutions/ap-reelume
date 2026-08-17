@@ -2445,6 +2445,84 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // takes this path, so the teardown has to survive it.
     }
 
+    /// <summary>
+    /// Batch 2e: the banner shown while something from outside the library is playing.
+    /// </summary>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task A_file_from_outside_the_library_offers_its_folder_with_the_mouse()
+    {
+        var sample = await RequireSampleAsync("walk-loose.mp4", durationSeconds: 12);
+        var media = Path.Combine(_dataRoot, "media");
+        var outside = Path.Combine(_dataRoot, "outside");
+        Directory.CreateDirectory(media);
+        Directory.CreateDirectory(outside);
+        var loose = Path.Combine(outside, "Arrival.2016.mp4");
+        File.Copy(sample, loose);
+
+        // A library that exists and does not contain this file, which is the whole situation the
+        // banner is about.
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 1400, activationPath: loose);
+        host.Application.ConfigureWindow(host.Window);
+
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.LooseFile?.IsLooseSession == true),
+            "the activation never put a loose session on the screen");
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the loose session never reached the playing state on the real engine");
+
+        var banner = host.ViewModel.Player!.LooseFile!;
+        Assert.Equal("Arrival.2016.mp4", banner.DisplayName);
+        Assert.Equal(outside, banner.FolderPath);
+
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // The banner is a card, not a sheet over the picture. Measured before the correction at
+        // 1280x1400 over a 1280x1400 stage — and it carries a background, so it also swallowed every
+        // click meant for the video behind it. Asserted rather than eyeballed, because this is the
+        // third overlay to do it and the previous two were found the same way.
+        var stage = host.Shell.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "PlayerStage");
+        var surface = host.Shell.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "LooseFileSurface");
+        Assert.True(
+            surface.Bounds.Width < stage.Bounds.Width && surface.Bounds.Height < stage.Bounds.Height,
+            $"The loose-file banner is {surface.Bounds.Size} over a {stage.Bounds.Size} stage, so it "
+                + "is drawn as a sheet over the whole player rather than as the card it is.");
+
+        // ---- Ask, refuse, ask again, agree. Cancel goes in the middle because confirming adds the
+        // root and there is nothing left to refuse afterwards.
+        await PressAsync(
+            host,
+            "LooseFileAddFolderAction",
+            () => banner.IsAddFolderConfirmationPending,
+            "adding the containing folder never asked first, and adding a root is not a shrug");
+
+        await PressAsync(
+            host,
+            "LooseFileCancelAction",
+            () => banner.IsAddFolderConfirmationPending,
+            "refusing the confirmation never withdrew it");
+
+        await PressAsync(
+            host,
+            "LooseFileAddFolderAction",
+            () => banner.IsAddFolderConfirmationPending,
+            "the refused confirmation left the banner unable to ask again");
+
+        await PressAsync(
+            host,
+            "LooseFileConfirmAction",
+            async () => await CountAsync(factory, "library_roots"),
+            "confirming never added the folder the loose file lives in");
+
+        await WaitForAsync(
+            async () => await CountAsync(factory, "library_roots") == 2,
+            "the confirmed folder never became a second root");
+    }
+
     /// <summary>One version of a title, described the way the catalogue describes one.</summary>
     private static MediaVersion Version(Guid fileId, string path, int durationSeconds) =>
         new(
@@ -4291,9 +4369,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         return (long)(await command.ExecuteScalarAsync(TestContext.Current.CancellationToken) ?? 0L);
     }
 
-    private ShellHost ShowShell(int height = 1000)
+    /// <param name="activationPath">
+    /// The file Explorer handed over, for the surface that only exists because of one. It is set
+    /// before the shell is created because that is when the startup reads it — and the window has to
+    /// be configured afterwards, because <c>ConfigureWindow</c> is where the activation is read and
+    /// nowhere else.
+    /// </param>
+    private ShellHost ShowShell(int height = 1000, string? activationPath = null)
     {
-        var (application, window, settled) = Mount(height);
+        var (application, window, settled) = Mount(height, activationPath);
 
         // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
         // for it. The wait names what stood in its place if it never comes.
@@ -4333,7 +4417,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// <summary>
     /// Builds the application, shows what it hands the window, and waits for the startup to settle.
     /// </summary>
-    private (ApplicationHost Application, Window Window, Control Settled) Mount(int height)
+    private (ApplicationHost Application, Window Window, Control Settled) Mount(
+        int height,
+        string? activationPath = null)
     {
         Assert.NotNull(Avalonia.Application.Current);
         ApSolutions.LocalMedia.Presentation.App.ApplyLanguage(
@@ -4341,6 +4427,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             CultureInfo.GetCultureInfo("es-ES"));
         Directory.CreateDirectory(_dataRoot);
         var application = ApplicationHost.Create(new AppDataPaths(_dataRoot));
+        application.PendingActivationPath = activationPath;
 
         // The window shows what the application put in it — the container — rather than the shell
         // lifted out of it. Lifting it out left the whole tree attached to a container that was never

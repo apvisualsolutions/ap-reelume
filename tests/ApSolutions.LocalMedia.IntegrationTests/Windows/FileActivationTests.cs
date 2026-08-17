@@ -47,10 +47,8 @@ public sealed class FileActivationTests : IAsyncLifetime
     {
         var before = await CensusAsync();
         var path = CreateFile("loose.mkv");
-        var coordinator = new CountingCoordinator();
 
-        var session = await new OpenLooseFile(coordinator)
-            .ExecuteAsync(path, TestContext.Current.CancellationToken);
+        var session = await OpenLooseFile.ExecuteAsync(path, TestContext.Current.CancellationToken);
 
         var after = await CensusAsync();
         Assert.Equal(before, after);
@@ -70,13 +68,11 @@ public sealed class FileActivationTests : IAsyncLifetime
     {
         var before = await CensusAsync();
         var path = CreateFile("loose.mp4");
-        var coordinator = new CountingCoordinator();
-        var open = new OpenLooseFile(coordinator);
 
-        await open.ExecuteAsync(path, TestContext.Current.CancellationToken);
-        await open.ExecuteAsync(path, TestContext.Current.CancellationToken);
+        await OpenLooseFile.ExecuteAsync(path, TestContext.Current.CancellationToken);
+        await OpenLooseFile.ExecuteAsync(path, TestContext.Current.CancellationToken);
         await Assert.ThrowsAsync<PlaybackFailureException>(() =>
-            open.ExecuteAsync(Path.Combine(_directory.FullName, "missing.mkv"), TestContext.Current.CancellationToken));
+            OpenLooseFile.ExecuteAsync(Path.Combine(_directory.FullName, "missing.mkv"), TestContext.Current.CancellationToken));
 
         Assert.Equal(before, await CensusAsync());
     }
@@ -96,8 +92,7 @@ public sealed class FileActivationTests : IAsyncLifetime
         await File.WriteAllBytesAsync(path, [0, 1, 2, 3], TestContext.Current.CancellationToken);
         Assert.True(path.Length > 240, $"The path was only {path.Length} characters long.");
 
-        var session = await new OpenLooseFile(new CountingCoordinator())
-            .ExecuteAsync(path, TestContext.Current.CancellationToken);
+        var session = await OpenLooseFile.ExecuteAsync(path, TestContext.Current.CancellationToken);
 
         Assert.Equal("película 日本語 con espacios.mkv", session.DisplayName);
         Assert.Equal(before, await CensusAsync());
@@ -158,28 +153,4 @@ public sealed class FileActivationTests : IAsyncLifetime
         return census;
     }
 
-    private sealed class CountingCoordinator : IPlaybackSessionCoordinator
-    {
-        public PlaybackSession? ActiveSession { get; private set; }
-
-        public Task<PlaybackSession> StartAsync(
-            PlaybackRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            ArgumentNullException.ThrowIfNull(request);
-            cancellationToken.ThrowIfCancellationRequested();
-            ActiveSession = new PlaybackSession(Guid.NewGuid(), request.MediaFileId, request.Path);
-            return Task.FromResult(ActiveSession);
-        }
-
-        public Task PauseAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
-
-        public Task ResumeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
-
-        public Task StopAsync(CancellationToken cancellationToken = default)
-        {
-            ActiveSession = null;
-            return Task.CompletedTask;
-        }
-    }
 }

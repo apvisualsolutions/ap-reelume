@@ -12,8 +12,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
     IsVisible="{Binding IsLooseSession}"
     automation:AutomationProperties.Name="{DynamicResource LooseFileAccessibleName}"
     automation:AutomationProperties.LiveSetting="Polite">
+  <!--
+    A notice, and it has to be sized to itself. Without the alignments it stretches to whatever
+    contains it, and in the shell that is the whole player stage: measured on 2026-08-17 at 1280x1400
+    over a 1280x1400 stage. It carries a background, so unlike the resume prompt it also swallowed
+    every click meant for the picture behind it. Both dimensions are bounded and not just declared:
+    a MaxWidth alone leaves the height stretching, which is the half of this defect that keeps coming
+    back. It sits at the top because it describes where the session came from, not what it is doing.
+  -->
   <Border
       x:Name="LooseFileSurface"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Top"
+      Margin="16"
+      MaxWidth="720"
+      MaxHeight="320"
       Padding="16"
       Background="{DynamicResource CardSurfaceBrush}"
       BorderBrush="{DynamicResource ShellBorderBrush}"

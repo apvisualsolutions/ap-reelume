@@ -30,7 +30,13 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Privacy;
 public sealed class RepositoryPrivacyTests
 {
     /// <summary>Where versioned text lives. Build output and the library itself are not in it.</summary>
-    private static readonly string[] VersionedDirectories = ["src", "tests", "docs", "eng", ".github", "benchmarks"];
+    // "design" joined on 2026-08-17 with the interface redesign handoff. A directory that appears at
+    // the root and is not on this list is read as one of the owner's own folders, so the check
+    // reported every versioned file that says "design" — which is the check working: an unknown
+    // directory beside the repository is exactly what it exists to notice. Adding a versioned one
+    // here is the statement that it belongs to the repository.
+    private static readonly string[] VersionedDirectories =
+        ["src", "tests", "docs", "eng", ".github", "benchmarks", "design"];
 
     private static readonly string[] Skipped = ["bin", "obj", "artifacts", ".git", "node_modules"];
 

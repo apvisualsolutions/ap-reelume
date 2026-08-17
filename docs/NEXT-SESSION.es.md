@@ -4,7 +4,7 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **6**, con **122 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **3**, con **125 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -18,8 +18,8 @@ rehacerlo entero.
 
 | # | Paso | Quién | Deja el trinquete en |
 |---|---|---|---|
-| 1 | La sesión suelta no se ve | agente | 2 |
-| 2 | Los dos últimos de la tanda 1 | agente | **0** |
+| ~~1~~ | ~~La sesión suelta no se ve~~ **hecha el 2026-08-17, 6 → 3** | agente | 3 |
+| 2 | Los tres últimos de la tanda 1 | agente | **0** |
 | 3 | La prueba de los subtítulos | agente | 0 |
 | 4 | Cobertura a todo `src/`, suelo 96/96 | agente | 0 |
 | 5 | `ARQ-004`, las nueve clases inertes | agente | 0 |
@@ -29,7 +29,20 @@ rehacerlo entero.
 | 9 | Firmar y publicar | **propietario** | — |
 | 10 | `REL-004` y la restauración trimestral de la clave | **propietario** | — |
 
-#### 1. La sesión suelta no se ve — decidido cómo se corrige
+#### ~~1. La sesión suelta no se ve~~ — hecha el 2026-08-17
+
+**Hecha exactamente como estaba decidida** —
+[la evidencia](evidence/stable/audit-walk-loose-session.md). `OpenLooseFile` valida y describe,
+`ShellSurfaces.OpenLoosePlayer` es la vía única, y los dos llamantes pasan por ella. Tres cosas que no
+estaban previstas y quedaron resueltas en el mismo cambio: **`OpenLooseFile` pasó a estático y salió
+del contenedor** porque `CA1822` lo dijo al quedarse sin estado; **`ResumeWiringTests` se rompió por
+leer la composición como texto** —cuarta vez— y se acotó a la declaración de `OpenPlayerAsync`; y
+**`RepositoryPrivacyTests` señaló `design/`** como carpeta desconocida en la raíz, que es la
+comprobación funcionando. El tráiler local **ya no está bloqueado**, pero sigue pendiente porque
+necesita siembra propia, así que pasa al paso 2.
+
+Lo que sigue debajo se conserva porque describe la forma de la corrección, que es la referencia para
+la vía suelta:
 
 **Un archivo activado desde el Explorador se reproduce y no se ve.** Medido el 2026-08-17:
 

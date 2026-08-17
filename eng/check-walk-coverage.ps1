@@ -58,10 +58,12 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # could be switched to at all — its row put the button at x=1674 in a 1600 px window, 8 once that
 # switch could be refused and started over, which needed two versions long enough for either of them
 # to hold progress worth resuming, 6 once a session that will not open could be handed to the system
-# and retried, which made the ninth exit of the isolation rule. The destination is 0: this
-# application ships free and nobody is going to test it by hand, so a control the walk never presses
-# is a control nobody ever presses before somebody installs it.
-$maximumPending = 6
+# and retried, which made the ninth exit of the isolation rule, 3 once a file activated from Explorer
+# reached the screen at all — it played with no surfaces built, so the banner offering to add its
+# folder could not be seen, let alone pressed. The destination is 0: this application ships free and
+# nobody is going to test it by hand, so a control the walk never presses is a control nobody ever
+# presses before somebody installs it.
+$maximumPending = 3
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)

@@ -4,7 +4,7 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **6** today, with **122 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **3** today, with **125 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
@@ -18,8 +18,8 @@ again from scratch.
 
 | # | Step | Who | Leaves the ratchet at |
 |---|---|---|---|
-| 1 | The loose session cannot be seen | agent | 2 |
-| 2 | The last two of batch 1 | agent | **0** |
+| ~~1~~ | ~~The loose session cannot be seen~~ **done on 2026-08-17, 6 → 3** | agent | 3 |
+| 2 | The last three of batch 1 | agent | **0** |
 | 3 | The subtitle measurement | agent | 0 |
 | 4 | Coverage over all of `src/`, floor 96/96 | agent | 0 |
 | 5 | `ARQ-004`, the nine inert classes | agent | 0 |
@@ -29,7 +29,19 @@ again from scratch.
 | 9 | Sign and publish | **owner** | — |
 | 10 | `REL-004` and the quarterly key restore | **owner** | — |
 
-#### 1. The loose session cannot be seen — how it gets corrected, decided
+#### ~~1. The loose session cannot be seen~~ — done on 2026-08-17
+
+**Done exactly as decided** — [the evidence](evidence/stable/audit-walk-loose-session.md).
+`OpenLooseFile` validates and describes, `ShellSurfaces.OpenLoosePlayer` is the one path, and both
+callers go through it. Three things were not foreseen and were settled in the same change:
+**`OpenLooseFile` became static and left the container** because `CA1822` said so once it held no
+state; **`ResumeWiringTests` broke by reading the composition as text** — fourth time — and was
+narrowed to the declaration of `OpenPlayerAsync`; and **`RepositoryPrivacyTests` flagged `design/`**
+as an unknown directory at the root, which is the check working. The local trailer is **no longer
+blocked**, but it still needs seeding of its own, so it moves to step 2.
+
+What follows is kept because it describes the shape of the correction, which is the reference for the
+loose path:
 
 **A file activated from Explorer plays and cannot be seen.** Measured on 2026-08-17:
 
