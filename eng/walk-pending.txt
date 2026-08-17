@@ -10,7 +10,6 @@
 
 AudioOutputView#AudioOutputDeviceLabel                     # batch 2
 AudioOutputView#AudioOutputLayoutLabel                     # batch 2
-BackupView#BackupCancelLabel                               # batch 6b: only exists while a copy runs
 DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewCorrect       # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
