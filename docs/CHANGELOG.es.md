@@ -96,6 +96,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Hacer una marca, saltarla y decidir lo que la detección propone se comprueba ahora con el ratón.**
+  Los siete mandos de las tres superficies de marcas se pulsan sobre un episodio reproduciéndose de
+  verdad, y lo que se comprueba en cada uno es **la fila de la base de datos**, no la lista en
+  pantalla: una superficie que quitara algo de su propia lista sin guardar nada se vería igual.
+
 - **Elegir pista de audio, subtítulos y salida de sonido se comprueba ahora con el ratón.** Los cinco
   mandos del lateral del reproductor —las dos listas de pistas, la casilla de la serie, el dispositivo
   de salida y la disposición de canales— se pulsan sobre una sesión reproduciendo vídeo de verdad, con
@@ -470,6 +475,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   el arte anterior.
 
 ### Corregido
+
+- **«Borrar» del editor de marcas se dibujaba fuera de la pantalla.** En la columna del reproductor
+  cabía «Guardar» y el botón de al lado quedaba **once píxeles fuera de la ventana**, sin nada que
+  desplazar: no había forma de borrar una marca con el ratón. Le pasaba lo mismo a los tres botones de
+  las detecciones propuestas. Los cuatro grupos se reordenan ahora en varias líneas cuando no caben.
 
 - **El estilo de subtítulos que eliges ya no se pierde al cerrar.** El tamaño, la tipografía, la
   opacidad del fondo y el grosor del contorno se guardaban **en ninguna parte**: cambiabas los cuatro

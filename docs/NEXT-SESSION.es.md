@@ -4,18 +4,18 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **23**, con **105 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **16**, con **112 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
 ### La cola desde el 2026-08-17, con su recuento
 
-**23 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
+**16 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
 queda es ejecutarlo midiendo antes de corregir.
 
 | Paso | Qué | Cuántos | Deja |
 |---|---|---|---|
-| **2c–2e** | El reproductor y sus superpuestos | 20 | 3 |
+| **2d–2e** | El reproductor y sus superpuestos | 13 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
 
 **Y dos hallazgos abiertos que hay que llevar al corte de versión**, los dos medidos y escritos en su
@@ -58,7 +58,7 @@ sin defecto de producto: el control funcionaba y lo que faltaba era una ventana.
 |---|---|---|
 | ~~**2a**~~ | ~~Pistas y salida de audio~~ | **hecha el 2026-08-17, 32 → 27** |
 | ~~**2b**~~ | ~~Estilo de subtítulos~~ | **hecha el 2026-08-17, 27 → 23** |
-| **2c** | Marcadores: editor, revisión y salto | 7 |
+| ~~**2c**~~ | ~~Marcadores: editor, revisión y salto~~ | **hecha el 2026-08-17, 23 → 16** |
 | **2d** | Reanudar, siguiente episodio y versiones | 8 |
 | **2e** | Archivo suelto y recuperación del reproductor | 5 |
 

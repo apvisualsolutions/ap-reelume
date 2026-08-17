@@ -27,7 +27,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         SelectedItem="{Binding Selected, Mode=TwoWay}"
         automation:AutomationProperties.Name="{DynamicResource DetectedMarkerReviewListName}" />
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
+    <!--
+    WrapPanels for the reason the marker editor's are: a horizontal StackPanel offers its children
+    infinite width, and this surface shares the player's 320 px column, where three buttons and two
+    spinners never fit on one line. Measured as a press landing at x=1611 in a 1600 px window.
+    -->
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
       <NumericUpDown
           x:Name="DetectedStartSelector"
           Minimum="0"
@@ -38,7 +43,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Minimum="0"
           Value="{Binding EndSeconds, Mode=TwoWay}"
           automation:AutomationProperties.Name="{DynamicResource DetectedMarkerReviewEndLabel}" />
-    </StackPanel>
+    </WrapPanel>
 
     <TextBlock
         x:Name="DetectedRangeErrorText"
@@ -47,7 +52,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource DetectedMarkerReviewRangeError}"
         TextWrapping="Wrap" />
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
       <Button
           x:Name="AcceptDetectionButton"
           Command="{Binding AcceptCommand}"
@@ -63,6 +68,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding DeleteCommand}"
           Content="{DynamicResource DetectedMarkerReviewDelete}"
           automation:AutomationProperties.Name="{DynamicResource DetectedMarkerReviewDelete}" />
-    </StackPanel>
+    </WrapPanel>
   </StackPanel>
 </UserControl>

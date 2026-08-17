@@ -8,16 +8,10 @@
 ## A control leaves this file when the walk presses it with the mouse, asserts on the effect, and
 ## clicks beside it to no effect — all three, which is what PressAsync does and records.
 
-DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
-DetectedMarkerReviewView#DetectedMarkerReviewCorrect       # batch 2
-DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
 EpisodeRowView#EpisodePlayAction                           # batch 1: the series card, which needs the show, season and episode rows seeded
 LooseFileBanner#LooseFileAddFolderAction                   # batch 2
 LooseFileBanner#LooseFileCancelAction                      # batch 2
 LooseFileBanner#LooseFileConfirmAction                     # batch 2
-MarkerEditorView#MarkerEditorDelete                        # batch 2
-MarkerEditorView#MarkerEditorKindLabel                     # batch 2
-MarkerEditorView#MarkerEditorSave                          # batch 2
 MovieDetailsView#MovieResumeAction                         # batch 1: shown only with stored progress worth returning to
 MovieDetailsView#MovieTrailerAction                        # batch 1: shown only when a trailer file sits beside the film, which needs a version group the walk does not seed yet
 NextEpisodeOverlay#NextEpisodeCancel                       # batch 2
@@ -27,7 +21,6 @@ PlayerView#PlayerRecoveryOpenExternally                    # batch 2
 PlayerView#PlayerRecoveryRetry                             # batch 2
 ResumePromptView#ResumePromptRestart                       # batch 2
 ResumePromptView#ResumePromptResume                        # batch 2
-SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2
 VersionSwitchDialog#VersionSwitchCancel                    # batch 2
 VersionSwitchDialog#VersionSwitchConfirm                   # batch 2
 VersionSwitchDialog#VersionSwitchRestart                   # batch 2

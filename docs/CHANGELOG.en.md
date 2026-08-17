@@ -95,6 +95,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Making a marker, skipping it, and deciding what detection proposes are now verified with the
+  mouse.** The seven controls of the three marker surfaces are pressed against an episode that is
+  really playing, and what is checked for each is **the row in the database**, not the list on
+  screen: a surface that removed something from its own list and stored nothing would look identical.
+
 - **Choosing the audio track, the subtitles and the sound output is now verified with the mouse.**
   The five controls in the player's side column — the two track lists, the series box, the output
   device and the channel layout — are pressed against a session with real video decoding, using a
@@ -458,6 +463,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   survives.
 
 ### Fixed
+
+- **The marker editor's Delete was drawn off the screen.** In the player's column Save fitted and the
+  button beside it sat **eleven pixels outside the window**, with nothing to scroll: there was no way
+  to delete a marker with the mouse. The three buttons for proposed detections had the same problem.
+  All four groups now wrap onto more lines when they do not fit.
 
 - **The subtitle style you choose is no longer lost on closing.** The size, the typeface, the
   background opacity and the outline thickness were saved **nowhere**: you changed all four controls,

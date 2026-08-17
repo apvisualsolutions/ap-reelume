@@ -2137,6 +2137,226 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 2c: the ranges of an episode — made by hand, offered as a skip, and decided when a
+    /// detector proposed them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Seven controls over three surfaces that only exist during a session, so this scene plays real
+    /// video from beginning to end of its own work. The detections are seeded <b>before</b> the
+    /// player opens, because the review surface loads them while the session is being built: seeding
+    /// them afterwards would fill a database nobody was going to read again.
+    /// </para>
+    /// <para>
+    /// The skip offer is recomputed on the engine's position events and nowhere else, so the marker
+    /// is saved while the session <b>plays</b> — that is the only thing that makes the offer appear,
+    /// and it is how a person meets it. The session is paused only afterwards, because the probe for
+    /// the skip is the playhead, and a playing session moves the playhead by itself: the click beside
+    /// the control would "change" the very thing the press is meant to change.
+    /// </para>
+    /// <para>
+    /// Every probe is the row in the database rather than the list on screen. A surface that removed
+    /// a row from its own collection and stored nothing looks identical from the collection.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_markers_of_an_episode_are_made_skipped_and_decided_with_the_mouse()
+    {
+        var sample = await RequireSampleAsync("walk-markers.mp4", durationSeconds: 90);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var first = Path.Combine(media, "Marked.S01E01.mp4");
+        var second = Path.Combine(media, "Marked.S01E02.mp4");
+        File.Copy(sample, first);
+        File.Copy(sample, second);
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var firstFile = await SeedMediaFileAsync(factory, media, first, TimeSpan.FromSeconds(90));
+        var secondFile = await SeedMediaFileAsync(factory, media, second, TimeSpan.FromSeconds(90));
+        var showId = await SeedSeriesAsync(factory, firstFile, secondFile);
+
+        using var host = ShowShell(height: 2000);
+        var services = host.Application.Services;
+        var detected = services.GetRequiredService<IDetectedMarkerRepository>();
+        var manual = services.GetRequiredService<IIntroMarkerRepository>();
+        var series = new SeriesId(showId);
+
+        // Three proposals, one per decision, far enough from each other and from the manual range
+        // that no press can be explained by an overlap.
+        var proposals = new[]
+        {
+            SeedDetection(series, firstFile, MarkerKind.Recap, 50, 56),
+            SeedDetection(series, firstFile, MarkerKind.Credits, 62, 70),
+            SeedDetection(series, firstFile, MarkerKind.Intro, 76, 84),
+        };
+        foreach (var proposal in proposals)
+        {
+            await detected.SaveAsync(proposal, TestContext.Current.CancellationToken);
+        }
+
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(firstFile), TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the session never reached the playing state on the real engine");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        var surfaces = host.ViewModel.Player!;
+        var editor = surfaces.Markers;
+        var review = surfaces.DetectedReview;
+        var skip = surfaces.Skip;
+        Assert.NotNull(editor);
+        Assert.NotNull(review);
+        Assert.NotNull(skip);
+        Assert.Equal(3, review!.Detections.Count);
+
+        // What the series holds by hand, as a sentence: a probe is compared by value, and a fresh
+        // list every read would report "it changed" for the click that must change nothing.
+        async Task<string> ManualRangesAsync() => string.Join(
+            ";",
+            (await manual.GetForSeriesAsync(series, TestContext.Current.CancellationToken))
+                .Select(marker => string.Create(
+                    CultureInfo.InvariantCulture,
+                    $"{marker.Kind}:{marker.Start.TotalSeconds}-{marker.End.TotalSeconds}")));
+
+        Assert.Equal(string.Empty, await ManualRangesAsync());
+
+        await PressAsync(
+            host,
+            "MarkerEditorKindLabel",
+            () => Resolve(host, "MarkerEditorKindLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the marker kind never opened the list of kinds");
+        CloseDropDown(host);
+
+        // The range is typed the way the two spinners take it — they are not command controls and
+        // the walk does not count them — and the press that matters is Save.
+        editor!.SelectedKind = MarkerKind.Intro;
+        editor.StartSeconds = 0;
+        editor.EndSeconds = 40;
+        Dispatcher.UIThread.RunJobs();
+
+        await PressAsync(
+            host,
+            "MarkerEditorSave",
+            ManualRangesAsync,
+            "clicking Save never wrote the range into the series");
+
+        Assert.Equal("Intro:0-40", await ManualRangesAsync());
+
+        // And it reaches the session that is running: the offer is recomputed from the engine's own
+        // position events, so this is the application noticing the playhead is now inside a range.
+        await WaitForAsync(
+            () => Task.FromResult(skip!.IsVisible),
+            "the range saved mid-session never surfaced the skip offer on the playhead");
+
+        // Paused before the skip is pressed, through the same keyboard chain the transport scene
+        // walks. A playing session moves the playhead on its own, and the playhead is the probe.
+        var playerView = host.Shell.GetVisualDescendants().OfType<PlayerView>().First();
+        Assert.True(playerView.Focus(), "The player surface refused the focus.");
+        host.Window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPaused == true),
+            "the space bar never paused the playing session");
+
+        // The engine is asked where the playhead is, not the transport bar. The bar's position is fed
+        // by the engine's position events, and a paused session raises none — so a seek that really
+        // happened would be invisible in the surface's own copy. Measured here: the press landed on
+        // the button (the impact chain named it) and the bar never moved. Whole seconds, because a
+        // probe is compared by value and the ticks of a paused engine are nobody's business.
+        var engine = services.GetRequiredService<IMediaPlayerEngine>();
+        async Task<long> PlayheadSecondsAsync() =>
+            (long)(await engine.GetSnapshotAsync(TestContext.Current.CancellationToken))
+                .Position.TotalSeconds;
+
+        await PressAsync(
+            host,
+            "SkipMarkerAccessibleName",
+            PlayheadSecondsAsync,
+            "clicking Skip never moved the playhead out of the range it was inside");
+
+        Assert.True(
+            await PlayheadSecondsAsync() >= 39,
+            $"Skip left the playhead at {await PlayheadSecondsAsync()} s, still inside the range it "
+                + "offered to skip.");
+
+        // Deleting needs a row selected, and the list that selects it is not a command control.
+        editor.SelectedMarker = Assert.Single(editor.Markers);
+        Dispatcher.UIThread.RunJobs();
+
+        await PressAsync(
+            host,
+            "MarkerEditorDelete",
+            ManualRangesAsync,
+            "clicking Delete never took the range out of the series");
+
+        Assert.Equal(string.Empty, await ManualRangesAsync());
+
+        // And the three decisions on what a detector proposed. Each is read back from its row: a
+        // surface that changed its own copy and stored nothing looks identical on screen.
+        review.Selected = review.Detections.Single(row => row.Id == proposals[0].Id);
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "DetectedMarkerReviewAccept",
+            async () => (await detected.GetAsync(proposals[0].Id, TestContext.Current.CancellationToken))
+                ?.UserCorrected == true,
+            "clicking Accept never confirmed the proposal against the next detection run");
+
+        review.Selected = review.Detections.Single(row => row.Id == proposals[1].Id);
+        review.StartSeconds = 60;
+        review.EndSeconds = 68;
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "DetectedMarkerReviewCorrect",
+            async () => (await detected.GetAsync(proposals[1].Id, TestContext.Current.CancellationToken))
+                ?.End.TotalSeconds ?? 0,
+            "clicking Correct never moved the proposal to the range that was typed");
+
+        review.Selected = review.Detections.Single(row => row.Id == proposals[2].Id);
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "DetectedMarkerReviewDelete",
+            async () => (await detected.GetForFileAsync(
+                new MediaFileId(firstFile),
+                TestContext.Current.CancellationToken)).Count,
+            "clicking Delete never removed the proposal from the episode");
+
+        // The accepted one survived, the corrected one carries the typed range, and the deleted one
+        // is gone: three decisions, three rows, read from the database.
+        var remaining = await detected.GetForFileAsync(
+            new MediaFileId(firstFile),
+            TestContext.Current.CancellationToken);
+        Assert.Equal(2, remaining.Count);
+        Assert.True(remaining.Single(row => row.Id == proposals[0].Id).UserCorrected);
+        Assert.Equal(TimeSpan.FromSeconds(68), remaining.Single(row => row.Id == proposals[1].Id).End);
+
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>One proposal as a detector would have left it: never corrected, and confident.</summary>
+    private static DetectedMarker SeedDetection(
+        SeriesId series,
+        Guid fileId,
+        MarkerKind kind,
+        int startSeconds,
+        int endSeconds) =>
+        new(
+            Guid.NewGuid(),
+            series,
+            new MediaFileId(fileId),
+            kind,
+            TimeSpan.FromSeconds(startSeconds),
+            TimeSpan.FromSeconds(endSeconds),
+            Confidence: 0.9,
+            DetectorVersion: 1,
+            UserCorrected: false);
+
+    /// <summary>
     /// Batch 2b: how subtitles look, chosen in settings and kept.
     /// </summary>
     /// <remarks>
