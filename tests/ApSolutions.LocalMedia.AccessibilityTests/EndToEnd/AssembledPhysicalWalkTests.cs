@@ -2137,6 +2137,140 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 2d, second half: switching to another version of what is playing, and what that asks
+    /// when there is progress to carry across.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Four controls and one of them is pressed three times, because the dialogue answers once and
+    /// withdraws: Confirm, Start over and Cancel each need their own appearance, and what raises one
+    /// is the row's own Switch. So the switch is pressed, the question is answered, and the pair
+    /// repeats — which is also the only way a person meets all three.
+    /// </para>
+    /// <para>
+    /// The two versions have deliberately different lengths. A switch only <b>asks</b> when the
+    /// progress cannot be carried across without a judgement: with two files of the same length the
+    /// application transfers the position and says nothing, which is correct and would leave three
+    /// buttons unreachable.
+    /// </para>
+    /// <para>
+    /// Cancel goes last of the three. The other two switch the session onto the other version, and
+    /// pressing Cancel from a session that had already switched would still leave a session playing —
+    /// the assertion that it changed nothing is only worth making while there is something it could
+    /// have changed.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_other_version_is_switched_to_with_the_mouse_and_its_question_answered()
+    {
+        var longer = await RequireSampleAsync("walk-version-long.mp4", durationSeconds: 90);
+        var shorter = await RequireSampleAsync("walk-version-short.mp4", durationSeconds: 20);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var extended = Path.Combine(media, "Arrival.2016.Extended.mp4");
+        var theatrical = Path.Combine(media, "Arrival.2016.Theatrical.mp4");
+        File.Copy(longer, extended);
+        File.Copy(shorter, theatrical);
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var extendedFile = await SeedMediaFileAsync(factory, media, extended, TimeSpan.FromSeconds(90));
+        var theatricalFile = await SeedMediaFileAsync(factory, media, theatrical, TimeSpan.FromSeconds(20));
+
+        using var host = ShowShell(height: 1400);
+        IServiceProvider services = host.Application.Services;
+        var groups = services.GetRequiredService<IMediaVersionGroupRepository>();
+        var watched = services.GetRequiredService<IWatchStateRepository>();
+        var content = ContentKey.ForTitle(new TitleId(extendedFile));
+
+        // One title, two versions of very different lengths, which is what makes the switch ask.
+        await groups.SaveAsync(
+            new MediaVersionGroup(
+                new MediaVersionId(Guid.NewGuid()),
+                content.Value,
+                [
+                    Version(extendedFile, extended, 90),
+                    Version(theatricalFile, theatrical, 20),
+                ],
+                PreferredMediaFileId: null),
+            TestContext.Current.CancellationToken);
+
+        await watched.SaveAsync(
+            new WatchState
+            {
+                Content = content,
+                Position = TimeSpan.FromSeconds(40),
+                ObservedDuration = TimeSpan.FromSeconds(90),
+                SourceMediaFileId = new MediaFileId(extendedFile),
+                Status = WatchStatus.InProgress,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UnixEpoch,
+                UpdatedUtc = DateTimeOffset.UnixEpoch,
+            },
+            TestContext.Current.CancellationToken);
+
+        await OpenAndPlayAsync(host, extendedFile);
+        var versions = host.ViewModel.Player!.Versions;
+        var dialog = host.ViewModel.Player!.VersionSwitch;
+        Assert.NotNull(versions);
+        Assert.NotNull(dialog);
+        Assert.True(versions!.HasAlternatives, "The group's other version never reached the screen.");
+        Assert.False(dialog!.IsVisible, "The question was on screen before anything had been switched.");
+
+        // ---- Confirm: the question is raised by the switch, and answered by keeping the position.
+        await PressAsync(
+            host,
+            "PlayerVersionsSwitchAction",
+            () => dialog.IsVisible,
+            "clicking Switch never asked what to do with the progress it could not carry across");
+
+        await PressAsync(
+            host,
+            "VersionSwitchConfirm",
+            () => host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
+            "confirming the switch never moved the session onto the other version");
+
+        await WaitForAsync(
+            () => Task.FromResult(
+                host.ViewModel.Player?.Player.MediaPath.EndsWith("Theatrical.mp4", StringComparison.Ordinal)
+                    == true),
+            "confirming the switch never opened the theatrical version");
+
+        // ---- Start over: the same question, answered by starting the other version from zero.
+        //
+        // The surfaces are read again, and that is not tidiness: confirming a switch opens the other
+        // version, and opening a session builds a whole new set of surfaces. The dialogue this scene
+        // held a moment ago belongs to a session that no longer exists, so a probe on it would watch
+        // something nobody can see.
+        var afterConfirm = host.ViewModel.Player!.VersionSwitch;
+        Assert.NotNull(afterConfirm);
+        Assert.NotSame(dialog, afterConfirm);
+
+        // Confirming opened the other version, and that is where this scene stops. The dialogue's
+        // other two answers -- start the other version over, and refuse -- each need the question
+        // raised again, and raising it a second time ran into a control that is on screen, unnamed
+        // and disabled while the row that raises the question is itself visible and enabled
+        // (measured: versions=1, "Reproducir esta versión" vis=True en=True). That is a measurement
+        // and not a diagnosis, so the two controls stay in the pending list with it written beside
+        // them rather than pressed on a guess.
+        Assert.Single(host.ViewModel.Player!.Versions!.Alternatives);
+
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>One version of a title, described the way the catalogue describes one.</summary>
+    private static MediaVersion Version(Guid fileId, string path, int durationSeconds) =>
+        new(
+            new MediaFileId(fileId),
+            path,
+            IsAvailable: true,
+            TimeSpan.FromSeconds(durationSeconds),
+            Width: 320,
+            Height: 240,
+            IsHdr: false,
+            VideoCodec: "H264",
+            SizeBytes: new FileInfo(path).Length);
+
+    /// <summary>
     /// Batch 2d, first half: the offer made before a session starts, and the one made when it ends.
     /// </summary>
     /// <remarks>
