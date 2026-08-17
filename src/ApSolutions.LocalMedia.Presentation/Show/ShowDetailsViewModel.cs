@@ -146,7 +146,9 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     private Task PlayAsync(EpisodeRowViewModel episode) => _onPlay is null || !episode.IsPlayable
         ? Task.CompletedTask
-        : _onPlay(new PlayDetailsRequest(episode.MediaFileId, TimeSpan.Zero));
+        // No position of its own: an episode left half-watched is resumed, and that is the resume
+        // policy's decision to make rather than this row's.
+        : _onPlay(new PlayDetailsRequest(episode.MediaFileId, StartPosition: null));
 
     private Task OpenTrailerLinkAsync() =>
         _onOpenTrailerLink is null || _trailerLink is not { Length: > 0 } link

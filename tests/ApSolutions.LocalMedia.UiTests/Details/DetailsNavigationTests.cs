@@ -280,7 +280,10 @@ public sealed class DetailsNavigationTests
 
         var request = Assert.Single(requests);
         Assert.Equal(playable.MediaFileId, request.MediaFileId);
-        Assert.Equal(TimeSpan.Zero, request.StartPosition);
+
+        // No position, rather than zero: an episode left half-watched is resumed, and zero now means
+        // "start it again" to whoever opens it. The film card is the one that names a second.
+        Assert.Null(request.StartPosition);
         Assert.Equal(playable.Id, rows[0].Id);
     }
 

@@ -27,7 +27,11 @@ public sealed class VersionSwitchDialogTests
     public void Nothing_is_asked_when_the_decision_needs_no_confirmation()
     {
         var view = Build(out var viewModel);
-        var surface = view.GetVisualDescendants().OfType<StackPanel>().Single(p => p.Name == "VersionSwitchSurface");
+        // By name and not by type: it became a Border when the dialogue stopped stretching over the
+        // whole player stage, and what this test is about is whether it is shown, not its shape.
+        var surface = view.GetVisualDescendants()
+            .OfType<Control>()
+            .Single(control => control.Name == "VersionSwitchSurface");
 
         viewModel.Apply(ProgressTransferDecision.Exact(TimeSpan.FromMinutes(20)));
         Dispatcher.UIThread.RunJobs();

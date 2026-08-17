@@ -4,32 +4,42 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **10**, con **118 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **8**, con **120 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
 ### La cola desde el 2026-08-17, con su recuento
 
-**10 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
+**8 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
 queda es ejecutarlo midiendo antes de corregir.
 
 | Paso | Qué | Cuántos | Deja |
 |---|---|---|---|
-| **2d (resto) y 2e** | Las dos respuestas que faltan y el archivo suelto | 7 | 3 |
+| **2e** | El archivo suelto y la recuperación del reproductor | 5 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
 
 #### Las cinco decisiones del 2026-08-17, tomadas y no reabiertas
 
-**1. Las dos respuestas que faltan del diálogo de versiones (2 controles).** El rojo medido fue «un
-`Button` en pantalla, sin nombre y deshabilitado» mientras la fila que levanta la pregunta estaba
-visible y habilitada. **La lectura que hay que comprobar primero**, porque explica las tres cosas a la
-vez —sin nombre, deshabilitado, y sólo tras confirmar—: confirmar reconstruye la sesión, la lista de
-versiones se vuelve a plantillar, y el control que `Resolve` devolvió **queda desprendido del árbol**;
-uno desprendido pierde el nombre que le daba un `DynamicResource` y contesta `IsEffectivelyEnabled`
-falso. **Se confirma en una línea** —`control.GetVisualRoot() is null` en el punto del fallo— y si es
-eso, la corrección es de la escena y no del producto: esperar a que la sesión nueva **se asiente**
-(superficies distintas **y** dos `SettleAsync`) antes de llamar a `PressAsync`, que resuelve una sola
-vez. Si no es eso, la siguiente medición es el `CanExecute` de la fila nueva.
+~~**1. Las dos respuestas que faltan del diálogo de versiones (2 controles).**~~ **Hecha el
+2026-08-17, 10 → 8** — [la evidencia](evidence/stable/audit-walk-version-switch-answers.md). El
+control desprendido se confirmó tal cual —`before detached=False en=True`, `after detached=True
+en=False name=<null>`, con una fila viva ocupando su sitio—, **pero era el síntoma**: `PressAsync`
+reintenta cuando la sonda no cambia, y para el segundo intento la sesión ya se había reconstruido. La
+causa medida en la misma ejecución fue `asking=False`: **la pregunta no se levantaba**, porque el
+suelo de reanudación son 30 s y la escena cambiaba a una versión de 20 — no existe posición que
+cumpla las dos cosas. Duraciones a **60 s y 180 s** y el orden pasa a confirmar → refusar → empezar de
+nuevo, que lo fija la misma aritmética. Y con las duraciones arregladas salió **un defecto de producto
+del que nadie miraba**: confirmar un cambio calculaba el segundo trasladado, lo guardaba (`00:02:01`)
+y luego **abría la otra versión desde cero** escribiendo ese cero encima (`playhead: 0, 0, 0, 1, 1,
+2`). `PlayDetailsRequest.StartPosition` estaba **producida en cinco sitios, documentada, vigilada por
+una prueba del lado del productor y leída en ninguno** — el defecto de la casa visto desde el
+consumidor. Pasa a `TimeSpan?`, donde `null` es «decide tú con la política de reanudación».
+
+**Hallazgo abierto que salió de ahí, sin medir y por tanto sin corregir:** «Reproducir desde el
+principio» de la ficha de película pasaba `TimeSpan.Zero` a un anfitrión que lo ignoraba, así que con
+progreso guardado **probablemente no empezaba por el principio**. Ahora que la posición pedida manda,
+debería estar arreglado de paso; lo que falta es **medirlo**, y el sitio natural es la escena de la
+tanda 1 que ya tiene que sembrar progreso para «Continuar».
 
 **2. La novena salida de la regla de aislamiento (2 controles de la 2e).** «Abrir con una aplicación
 externa» arranca un **proceso real** (`ShellExternalPlaybackLauncher`, `UseShellExecute`): abriría el
@@ -42,10 +52,11 @@ después **sustituye el archivo por una muestra buena** y pulsa «Reintentar», 
 sesión pasa a reproducir. La clase nueva entra en la lista de vigilados de `check-coverage.ps1` al
 100/100 al cerrarse la tanda.
 
-**3. Los tres superpuestos que siguen sin dimensionarse** —`SkipMarkerButton`, `VersionSwitchDialog` y
-`LooseFileBanner`— se corrigen **cada uno en su escena y con su medición**, como los dos del
-2026-08-17: `Border` con alineación, fondo y borde, y las filas de botones a `WrapPanel`. La medición
-se toma antes: los `bounds` del control frente a los del escenario.
+**3. Los superpuestos que siguen sin dimensionarse** —ya sólo `SkipMarkerButton` y `LooseFileBanner`,
+porque `VersionSwitchDialog` se corrigió el 2026-08-17 con su medición (`surfaces=1 [0, 0, 1280, 1400]`
+sobre `stage=0, 0, 1280, 1400`)— se corrigen **cada uno en su escena y con su medición**: `Border` con
+alineación, fondo y borde, y las filas de botones a `WrapPanel`. La medición se toma antes: los
+`bounds` del control frente a los del escenario.
 
 **4. `A11Y-002` en el corte de versión: pasa a `BLOCKED`.** El estilo de subtítulos llega a la base de
 datos y **no a la imagen** —LibVLC toma su dibujado de las opciones con las que se construye la
@@ -92,12 +103,12 @@ sin defecto de producto: el control funcionaba y lo que faltaba era una ventana.
 | ~~**2a**~~ | ~~Pistas y salida de audio~~ | **hecha el 2026-08-17, 32 → 27** |
 | ~~**2b**~~ | ~~Estilo de subtítulos~~ | **hecha el 2026-08-17, 27 → 23** |
 | ~~**2c**~~ | ~~Marcadores: editor, revisión y salto~~ | **hecha el 2026-08-17, 23 → 16** |
-| **2d** | ~~Reanudar, siguiente episodio y cambiar de versión~~ **hechos, 16 → 10**; quedan **dos respuestas** del diálogo | 2 |
+| ~~**2d**~~ | ~~Reanudar, siguiente episodio y cambiar de versión, con las tres respuestas~~ | **hecha el 2026-08-17, 16 → 8** |
 | **2e** | Archivo suelto y recuperación del reproductor | 5 |
 
-Es la única tanda que necesita **vídeo real**. Y la advertencia sigue medida: **los cinco superpuestos
-que quedan no fijan alineación** y se estiran sobre todo el escenario, igual que el de estado
-corregido el 2026-08-15; **cada uno se corrige en su escena con su medición**, nunca en bloque.
+Es la única tanda que necesita **vídeo real**. Y la advertencia sigue medida: **los superpuestos que
+quedan no fijan alineación** y se estiran sobre todo el escenario, igual que el de estado corregido el
+2026-08-15; **cada uno se corrige en su escena con su medición**, nunca en bloque. Quedan dos.
 
 **Lo que dejó la 2a, y ahorra tiempo en las cuatro que quedan:** un desplegable se prueba **abriéndolo**
 —lo que se elige dentro cae en otra raíz de ventana— y se cierra con Escape antes del siguiente;

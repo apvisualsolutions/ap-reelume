@@ -482,6 +482,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Cambiar de versión perdía el punto que acababas de aceptar.** La aplicación preguntaba qué hacer
+  con tu progreso, calculaba el segundo equivalente en la otra versión y lo guardaba — y después abría
+  esa versión **desde el principio** y escribía ese cero encima de lo que acababa de guardar: medido,
+  el cabezal en 0, 0, 0, 1, 1, 2 sobre un progreso trasladado de 2:01. Ahora quien abre el reproductor
+  sabiendo dónde quiere abrirlo manda, y «Empezar de nuevo» empieza de verdad por el principio.
+
+- **La pregunta del cambio de versión se dibujaba sobre toda la pantalla.** Como la oferta de
+  continuar y la del siguiente episodio antes que ella, se estiraba al escenario entero del reproductor
+  —1280×1400 medidos— con sus tres respuestas en la esquina. Ahora tiene su tamaño, su fondo y su
+  borde, y sus respuestas se reordenan si no caben.
+
 - **El botón para cambiar de versión se dibujaba fuera de la ventana.** En la fila de cada versión
   alternativa, la etiqueta de calidad empujaba el botón tan a la derecha como largo fuera su texto:
   medido a 74 píxeles fuera de una ventana de 1600, sin nada que desplazar. Era una versión a la que

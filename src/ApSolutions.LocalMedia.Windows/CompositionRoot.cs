@@ -864,7 +864,11 @@ public static partial class CompositionRoot
                 file.TechnicalMetadata.Duration,
                 cancellationToken)
             .ConfigureAwait(true);
-        var startPosition = resume.Choice == ResumeChoice.Resume ? resume.Position : TimeSpan.Zero;
+        // A caller that named a position had already decided it, and deciding it again here is how a
+        // confirmed version switch lost the very second it had just asked about: the policy reads
+        // storage under the new file's content key, which a freshly opened version has none of.
+        var startPosition = request.StartPosition
+            ?? (resume.Choice == ResumeChoice.Resume ? resume.Position : TimeSpan.Zero);
 
         // The tracker is attached before the media opens and fed from the engine's own position
         // event. Without this the session plays and nothing about it is ever written, so the resume

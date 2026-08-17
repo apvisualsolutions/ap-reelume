@@ -470,6 +470,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Switching version lost the point you had just agreed to.** The application asked what to do with
+  your progress, worked out the equivalent second in the other version and stored it — and then opened
+  that version **from the beginning** and wrote that zero over what it had just stored: measured, the
+  playhead at 0, 0, 0, 1, 1, 2 against a carried-across position of 2:01. Whoever opens the player
+  knowing where to open it now decides, and Start over really does start at the beginning.
+
+- **The version switch's question was drawn over the whole screen.** Like the resume offer and the
+  next-episode offer before it, it stretched to the player's entire stage — 1280x1400 measured — with
+  its three answers in the corner. It now has its own size, background and border, and its answers
+  wrap when they do not fit.
+
 - **The button that switches version was drawn outside the window.** In each alternative version's
   row, the quality label pushed the button as far right as its text was long: measured 74 pixels
   outside a 1600 px window, with nothing to scroll. It was a version nobody could switch to with a

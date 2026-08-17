@@ -283,7 +283,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         using var host = ShowShell();
         await host.ViewModel.OpenPlayerAsync(
-            new PlayDetailsRequest(new MediaFileId(firstId), TimeSpan.Zero),
+            new PlayDetailsRequest(new MediaFileId(firstId), StartPosition: null),
             TestContext.Current.CancellationToken);
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
@@ -1881,7 +1881,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         using var host = ShowShell(height: 1200);
         await host.ViewModel.OpenPlayerAsync(
-            new PlayDetailsRequest(new MediaFileId(fileId), TimeSpan.Zero),
+            new PlayDetailsRequest(new MediaFileId(fileId), StartPosition: null),
             TestContext.Current.CancellationToken);
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
@@ -2154,17 +2154,37 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// buttons unreachable.
     /// </para>
     /// <para>
-    /// Cancel goes last of the three. The other two switch the session onto the other version, and
-    /// pressing Cancel from a session that had already switched would still leave a session playing —
-    /// the assertion that it changed nothing is only worth making while there is something it could
-    /// have changed.
+    /// <b>Both</b> lengths have to be able to hold progress worth resuming, and that is what the
+    /// lengths here are for. Measured on 2026-08-17, with a sixty-second cut and a twenty-second one:
+    /// confirming the first switch landed the session at 8.9 s of the twenty, the next switch flushed
+    /// that position and <c>ProgressPolicy.MinimumResumePosition</c> is thirty seconds, so the policy
+    /// answered <c>Restart</c> and <b>the question was never raised again</b>. No position between 30 s
+    /// and a twenty-second end exists, so the second and third answers were unreachable by arithmetic
+    /// rather than by anything the harness was doing. Sixty and a hundred and eighty carry across as
+    /// 40 s → 120 s, and every leg of the walk stays above the floor and below the end.
+    /// </para>
+    /// <para>
+    /// That is also the whole of the "on screen, unnamed and disabled Button" the previous session
+    /// recorded, and it was a symptom: with the question never arriving, the probe never changed, so
+    /// <see cref="PressAsync{T}(ShellHost, string, Func{T}, string, string?, string?)"/> pressed again —
+    /// and by then the row it had resolved had been replaced by the rebuilt session and was detached
+    /// from the tree, where a <c>DynamicResource</c> name resolves to nothing and
+    /// <c>IsEffectivelyEnabled</c> is false. Measured: <c>before detached=False en=True</c>,
+    /// <c>after detached=True en=False name=&lt;null&gt;</c>, with a live replacement row beside it.
+    /// </para>
+    /// <para>
+    /// So the order is Confirm, then Cancel, then Start over — decided by the same arithmetic and not
+    /// by taste. Starting over lands the session at zero, which is below the resume floor, so nothing
+    /// after it could raise the question a further time. Cancel keeps its point either way: it is
+    /// pressed while a session is playing and another version is there to switch to, so the assertion
+    /// that it changed nothing is made while there is something it could have changed.
     /// </para>
     /// </remarks>
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_other_version_is_switched_to_with_the_mouse_and_its_question_answered()
     {
-        var longer = await RequireSampleAsync("walk-version-long.mp4", durationSeconds: 90);
-        var shorter = await RequireSampleAsync("walk-version-short.mp4", durationSeconds: 20);
+        var longer = await RequireSampleAsync("walk-version-long.mp4", durationSeconds: 180);
+        var shorter = await RequireSampleAsync("walk-version-short.mp4", durationSeconds: 60);
         var media = Path.Combine(_dataRoot, "media");
         Directory.CreateDirectory(media);
         var extended = Path.Combine(media, "Arrival.2016.Extended.mp4");
@@ -2173,14 +2193,21 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         File.Copy(shorter, theatrical);
 
         var factory = await SeedRootAsync(media, ScanPolicy.Manual);
-        var extendedFile = await SeedMediaFileAsync(factory, media, extended, TimeSpan.FromSeconds(90));
-        var theatricalFile = await SeedMediaFileAsync(factory, media, theatrical, TimeSpan.FromSeconds(20));
+        var extendedFile = await SeedMediaFileAsync(factory, media, extended, TimeSpan.FromSeconds(180));
+        var theatricalFile = await SeedMediaFileAsync(factory, media, theatrical, TimeSpan.FromSeconds(60));
 
         using var host = ShowShell(height: 1400);
         IServiceProvider services = host.Application.Services;
         var groups = services.GetRequiredService<IMediaVersionGroupRepository>();
         var watched = services.GetRequiredService<IWatchStateRepository>();
-        var content = ContentKey.ForTitle(new TitleId(extendedFile));
+        var content = ContentKey.ForTitle(new TitleId(theatricalFile));
+
+        async Task<long> PlayheadSecondsAsync()
+        {
+            var snapshot = await services.GetRequiredService<IMediaPlayerEngine>()
+                .GetSnapshotAsync(TestContext.Current.CancellationToken);
+            return (long)snapshot.Position.TotalSeconds;
+        }
 
         // One title, two versions of very different lengths, which is what makes the switch ask.
         await groups.SaveAsync(
@@ -2188,19 +2215,21 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 new MediaVersionId(Guid.NewGuid()),
                 content.Value,
                 [
-                    Version(extendedFile, extended, 90),
-                    Version(theatricalFile, theatrical, 20),
+                    Version(theatricalFile, theatrical, 60),
+                    Version(extendedFile, extended, 180),
                 ],
                 PreferredMediaFileId: null),
             TestContext.Current.CancellationToken);
 
+        // Forty seconds into the theatrical cut: past the resume floor, and far enough from its end
+        // that the proportional carry across lands well past the floor on the other side too.
         await watched.SaveAsync(
             new WatchState
             {
                 Content = content,
                 Position = TimeSpan.FromSeconds(40),
-                ObservedDuration = TimeSpan.FromSeconds(90),
-                SourceMediaFileId = new MediaFileId(extendedFile),
+                ObservedDuration = TimeSpan.FromSeconds(60),
+                SourceMediaFileId = new MediaFileId(theatricalFile),
                 Status = WatchStatus.InProgress,
                 IsManualOverride = false,
                 StartedUtc = DateTimeOffset.UnixEpoch,
@@ -2208,7 +2237,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        await OpenAndPlayAsync(host, extendedFile);
+        await OpenAndPlayAsync(host, theatricalFile);
         var versions = host.ViewModel.Player!.Versions;
         var dialog = host.ViewModel.Player!.VersionSwitch;
         Assert.NotNull(versions);
@@ -2231,12 +2260,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         await WaitForAsync(
             () => Task.FromResult(
-                host.ViewModel.Player?.Player.MediaPath.EndsWith("Theatrical.mp4", StringComparison.Ordinal)
+                host.ViewModel.Player?.Player.MediaPath.EndsWith("Extended.mp4", StringComparison.Ordinal)
                     == true),
-            "confirming the switch never opened the theatrical version");
+            "confirming the switch never opened the extended version");
 
-        // ---- Start over: the same question, answered by starting the other version from zero.
-        //
         // The surfaces are read again, and that is not tidiness: confirming a switch opens the other
         // version, and opening a session builds a whole new set of surfaces. The dialogue this scene
         // held a moment ago belongs to a session that no longer exists, so a probe on it would watch
@@ -2244,15 +2271,72 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var afterConfirm = host.ViewModel.Player!.VersionSwitch;
         Assert.NotNull(afterConfirm);
         Assert.NotSame(dialog, afterConfirm);
-
-        // Confirming opened the other version, and that is where this scene stops. The dialogue's
-        // other two answers -- start the other version over, and refuse -- each need the question
-        // raised again, and raising it a second time ran into a control that is on screen, unnamed
-        // and disabled while the row that raises the question is itself visible and enabled
-        // (measured: versions=1, "Reproducir esta versión" vis=True en=True). That is a measurement
-        // and not a diagnosis, so the two controls stay in the pending list with it written beside
-        // them rather than pressed on a guess.
         Assert.Single(host.ViewModel.Player!.Versions!.Alternatives);
+
+        // The next switch flushes the playhead before it decides, so the session has to have reached
+        // the point it was opened at first: the engine answers 0 until the demuxer applies the start
+        // position, and a flushed zero is below the resume floor, which is the policy answering
+        // "start again" instead of asking. Measured on the resume scene: 0, 40, 40, 40, 41.
+        // Confirming means the position moves too, and nothing else in the suite watched that it did.
+        // Measured before the fix: the playhead read 0, 0, 0, 0, 1, 1, 1, 2 on a switch that had
+        // stored 00:02:01 — the transferred second was written and then reopened over.
+        await WaitForAsync(
+            async () => await PlayheadSecondsAsync() >= 110,
+            "confirming the switch carried the progress across and then opened the other version "
+                + "somewhere else entirely");
+
+        // ---- Cancel: the same question, refused. Its effect is the state, because refusing has no
+        // in-flight half to wait for -- and it is pressed while a session is playing and another
+        // version is there to switch to, so "nothing changed" is a claim about something.
+        await PressAsync(
+            host,
+            "PlayerVersionsSwitchAction",
+            () => afterConfirm!.IsVisible,
+            "switching back never asked again, so there was no question left to refuse");
+
+        var playingBeforeCancel = host.ViewModel.Player!.Player.MediaPath;
+        await PressAsync(
+            host,
+            "VersionSwitchCancel",
+            () => afterConfirm!.Chosen?.ToString() ?? "nothing",
+            "refusing the switch never registered as an answer");
+
+        await SettleAsync();
+        Assert.Equal(VersionSwitchChoice.Cancel, afterConfirm!.Chosen);
+        Assert.False(afterConfirm.IsVisible, "The question stayed on screen after it was refused.");
+        Assert.Same(afterConfirm, host.ViewModel.Player!.VersionSwitch);
+        Assert.Equal(playingBeforeCancel, host.ViewModel.Player!.Player.MediaPath);
+
+        // ---- Start over: the same question again, answered by opening the other version from zero.
+        // It goes last because zero is below the resume floor, so no question survives it.
+        await PressAsync(
+            host,
+            "PlayerVersionsSwitchAction",
+            () => afterConfirm.IsVisible,
+            "the refused switch left the row unable to raise the question a third time");
+
+        await PressAsync(
+            host,
+            "VersionSwitchRestart",
+            () => host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
+            "starting the other version over never moved the session onto it");
+
+        await WaitForAsync(
+            () => Task.FromResult(
+                host.ViewModel.Player?.Player.MediaPath.EndsWith("Theatrical.mp4", StringComparison.Ordinal)
+                    == true),
+            "starting over never opened the theatrical version");
+
+        // Zero is the whole of what Start over means, and it is read from the engine rather than from
+        // the position events, which say nothing until the demuxer has applied a start position.
+        await WaitForAsync(
+            async () => await PlayheadSecondsAsync() < 10,
+            "starting over opened the other version somewhere other than its beginning");
+
+        var stored = await watched.GetAsync(
+            ContentKey.ForTitle(new TitleId(extendedFile)),
+            TestContext.Current.CancellationToken);
+        Assert.Equal(TimeSpan.Zero, stored?.Position);
 
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
     }
@@ -2464,7 +2548,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     private static async Task OpenAndPlayAsync(ShellHost host, Guid fileId)
     {
         await host.ViewModel.OpenPlayerAsync(
-            new PlayDetailsRequest(new MediaFileId(fileId), TimeSpan.Zero),
+            new PlayDetailsRequest(new MediaFileId(fileId), StartPosition: null),
             TestContext.Current.CancellationToken);
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
@@ -2533,7 +2617,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         }
 
         await host.ViewModel.OpenPlayerAsync(
-            new PlayDetailsRequest(new MediaFileId(firstFile), TimeSpan.Zero),
+            new PlayDetailsRequest(new MediaFileId(firstFile), StartPosition: null),
             TestContext.Current.CancellationToken);
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
@@ -2850,7 +2934,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         using var host = ShowShell(height: 1200);
         await host.ViewModel.OpenPlayerAsync(
-            new PlayDetailsRequest(new MediaFileId(firstFile), TimeSpan.Zero),
+            new PlayDetailsRequest(new MediaFileId(firstFile), StartPosition: null),
             TestContext.Current.CancellationToken);
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),

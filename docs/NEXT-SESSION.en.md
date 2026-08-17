@@ -4,32 +4,42 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **10** today, with **118 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **8** today, with **120 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
 ### The queue from 2026-08-17, with its count
 
-**10 pending, and they are exactly these two groups.** Everything below is decided; what remains is
+**8 pending, and they are exactly these two groups.** Everything below is decided; what remains is
 carrying it out, measuring before correcting.
 
 | Step | What | How many | Leaves |
 |---|---|---|---|
-| **2d (rest) and 2e** | The two remaining answers and the loose file | 7 | 3 |
+| **2e** | The loose file and the player's recovery | 5 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
 
 #### The five decisions of 2026-08-17, taken and not reopened
 
-**1. The version dialogue's two remaining answers (2 controls).** The measured red was "a `Button` on
-screen, unnamed and disabled" while the row that raises the question was visible and enabled. **The
-reading to check first**, because it explains all three facts at once — unnamed, disabled, and only
-after a confirm: confirming rebuilds the session, the versions list is re-templated, and the control
-`Resolve` returned is **detached from the tree**; a detached one loses the name a `DynamicResource`
-gave it and answers `IsEffectivelyEnabled` false. **One line confirms it** — `control.GetVisualRoot()
-is null` at the point of failure — and if that is it, the correction belongs to the scene rather than
-the product: wait for the new session to **settle** (different surfaces **and** two `SettleAsync`)
-before calling `PressAsync`, which resolves once. If it is not that, the next measurement is the new
-row's `CanExecute`.
+~~**1. The version dialogue's two remaining answers (2 controls).**~~ **Done on 2026-08-17, 10 → 8** —
+[the evidence](evidence/stable/audit-walk-version-switch-answers.md). The detached control reproduced
+exactly — `before detached=False en=True`, `after detached=True en=False name=<null>`, with a live row
+in its place — **but it was the symptom**: `PressAsync` presses again when the probe does not change,
+and by the second attempt the session had been rebuilt. The cause, measured in the same run, was
+`asking=False`: **the question was never raised**, because the resume floor is 30 s and the scene
+switched onto a twenty-second version — no position satisfies both. The lengths become **60 s and
+180 s** and the order becomes confirm → refuse → start over, fixed by the same arithmetic. And with
+the lengths fixed, **a product defect nobody was watching** came out: confirming a switch worked out
+the transferred second, stored it (`00:02:01`) and then **opened the other version at zero**, writing
+that zero over it (`playhead: 0, 0, 0, 1, 1, 2`). `PlayDetailsRequest.StartPosition` was **produced in
+five places, documented, guarded by a test on the producer's side, and read in none** — the house
+defect seen from the consumer. It becomes `TimeSpan?`, where `null` means "decide with the resume
+policy".
+
+**An open finding that came out of it, unmeasured and therefore uncorrected:** the film card's "Play
+from the start" passed `TimeSpan.Zero` to a host that ignored it, so with stored progress it
+**probably did not start at the start**. Now that the requested position wins it should be fixed in
+passing; what is missing is **measuring it**, and the natural place is the batch 1 scene that already
+has to seed progress for Resume.
 
 **2. The ninth exit for the isolation rule (2 of 2e's controls).** "Open with an external application"
 starts a **real process** (`ShellExternalPlaybackLauncher`, `UseShellExecute`): it would open the
@@ -42,10 +52,11 @@ the record, then **replaces the file with a good sample** and presses Retry, who
 session reaching the playing state. The new class joins `check-coverage.ps1`'s watched list at 100/100
 when the batch closes.
 
-**3. The three overlays that still do not size themselves** — `SkipMarkerButton`,
-`VersionSwitchDialog` and `LooseFileBanner` — are corrected **each in its own scene with its own
-measurement**, like the two on 2026-08-17: a `Border` with alignment, background and border, and their
-button rows as `WrapPanel`s. The measurement comes first: the control's bounds against the stage's.
+**3. The overlays that still do not size themselves** — now only `SkipMarkerButton` and
+`LooseFileBanner`, because `VersionSwitchDialog` was corrected on 2026-08-17 with its measurement
+(`surfaces=1 [0, 0, 1280, 1400]` over `stage=0, 0, 1280, 1400`) — are corrected **each in its own scene
+with its own measurement**: a `Border` with alignment, background and border, and their button rows as
+`WrapPanel`s. The measurement comes first: the control's bounds against the stage's.
 
 **4. `A11Y-002` at the version cut: it goes to `BLOCKED`.** The subtitle style reaches the database and
 **not the picture** — LibVLC takes its rendering from the options its instance is built with, and here
@@ -91,12 +102,12 @@ composition, and no product defect: the control worked, and what was missing was
 | ~~**2a**~~ | ~~Tracks and audio output~~ | **done on 2026-08-17, 32 → 27** |
 | ~~**2b**~~ | ~~Subtitle style~~ | **done on 2026-08-17, 27 → 23** |
 | ~~**2c**~~ | ~~Markers: editor, review and skip~~ | **done on 2026-08-17, 23 → 16** |
-| **2d** | ~~Resume, next episode and switching version~~ **done, 16 → 10**; **two answers** of the dialogue remain | 2 |
+| ~~**2d**~~ | ~~Resume, next episode and switching version, with all three answers~~ | **done on 2026-08-17, 16 → 8** |
 | **2e** | Loose file and player recovery | 5 |
 
-It is the only batch that needs **real video**. And the warning stands measured: **the five remaining
+It is the only batch that needs **real video**. And the warning stands measured: **the remaining
 overlays set no alignment** and stretch over the whole stage, exactly like the status one corrected on
-2026-08-15; **each is corrected in its own scene with its own measurement**, never in bulk.
+2026-08-15; **each is corrected in its own scene with its own measurement**, never in bulk. Two left.
 
 **What 2a left behind, and what saves time in the four that remain:** a drop-down is tested by
 **opening** it — what is chosen inside lands in another window root — and closed with Escape before
