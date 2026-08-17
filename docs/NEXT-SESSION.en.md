@@ -4,18 +4,17 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **33** today, with **95 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **32** today, with **96 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
 ### The queue from 2026-08-17, with its count
 
-**33 pending, and they are exactly these three groups.** Everything below is decided; what remains is
+**32 pending, and they are exactly these two groups.** Everything below is decided; what remains is
 carrying it out, measuring before correcting.
 
 | Step | What | How many | Leaves |
 |---|---|---|---|
-| **6b** | Backup's Cancel | 1 | 32 |
 | **2a–2e** | The player and its overlays | 29 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
 
@@ -29,15 +28,14 @@ presses spend **950 ms**, but the window also has to hold `PressAsync`'s retry b
 a settle apart, **2400 ms** — so it is **5000 ms**, which costs nothing because cancelling abandons
 the rest of the wait.
 
-**6b — backup's Cancel. DECIDED the order of the measurement:** the catalogue first, because it is
-cheap to seed in bulk over SQL — 1,000, 10,000 and 50,000 rows, timing `CreateBackup` — and if at
-50,000 the copy still finishes inside a second, then **personal artwork**, which is what actually
-takes up room (200 files of 1 MB is 200 MB to copy). **And the decision that matters:** if neither
-reaches seconds, this control **stays pending with its measured number written beside it**, and the
-destination becomes 1 rather than 0, said out loud. What is **not** done is putting a hook in the
-composition to make the copy slow: in the updater the slow source belongs to the harness and does not
-touch the product, and here that argument does not exist — it would be changing the product in order
-to test it.
+~~**6b — backup's Cancel.**~~ **Done on 2026-08-17, 33 → 32** —
+[the evidence](evidence/stable/audit-walk-backup-cancel.md) — and **the destination is still 0**: the
+honest library that takes long enough exists. Both levers were measured in the decided order and the
+second won for a reason nobody had predicted: **the cost per file outweighs the cost per megabyte**,
+so the lever is how many images there are rather than how much they weigh. The catalogue only reaches
+a second at 50,000 rows (1,159 ms) and makes the scene expensive; **6,000 images of 50 KiB give
+3,944 ms for 293 MB**, where 6,000 of 100 KiB give 4,377 ms for twice the disk. No hook in the
+composition, and no product defect: the control worked, and what was missing was a window.
 
 **Batch 2 — DECIDED that it splits into five scenes by surface**, not one of 29 controls:
 
@@ -185,7 +183,11 @@ one**, and this checks it.
    `new StagedRestoreService(` never finds. **Ask the compiler who constructs a type, not the search**:
    removing the member and building takes a minute and cannot be wrong.
 
-5b. **Batch 6b — Cancel (1).** **40 → 39.** What is left of batch 6, and it may wait behind batch 7:
+5b. ~~**Batch 6b — Cancel (1).**~~ **Done on 2026-08-17, 33 → 32** —
+   [the evidence](evidence/stable/audit-walk-backup-cancel.md). The precondition was the one below and
+   it was met by seeding: **6,000 images of 50 KiB** give a copy of **3,944 ms**, and both presses
+   spend **1,211 ms**. What had not been predicted is which lever wins: **the cost per file outweighs
+   the cost per megabyte**.
 
    - **The precondition is hard and it is the only one**: `IsEnabled="{Binding IsRunning}"` **and**
      `CanExecute => IsRunning`, so the button exists only while a copy is running. Against a harness

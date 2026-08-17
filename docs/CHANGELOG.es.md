@@ -96,6 +96,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Cancelar una copia de seguridad a medias se comprueba ahora pulsando el botón mientras copia.**
+  «Cancelar» sólo existe mientras la copia corre, y con una biblioteca de prueba la copia entera acaba
+  en **51 ms**: no había ventana en la que pulsarlo. Ahora la comprobación siembra la biblioteca de
+  alguien real —3.000 títulos con póster y fondo, 293 MB de imágenes— y con eso la copia tarda cuatro
+  segundos, tiempo de sobra para pulsar. Se comprueba lo que de verdad importa: que al cancelar la
+  pantalla dice cancelado **y que en la carpeta de copias no queda nada**, porque una copia a medias
+  publicada sería peor que ninguna. La aplicación no cambió: lo que tarda es copiar lo que hay.
+
 - **Cancelar una descarga a medias se comprueba ahora pulsando el botón mientras corre.** «Cancelar»
   sólo existe mientras algo está en marcha, y en una comprobación automática el paquete está en la
   carpeta de al lado: la descarga entera terminaba en milisegundos, antes de que hubiera nada que

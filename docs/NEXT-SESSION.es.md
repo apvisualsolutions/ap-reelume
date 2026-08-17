@@ -4,18 +4,17 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **33**, con **95 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **32**, con **96 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
 ### La cola desde el 2026-08-17, con su recuento
 
-**33 pendientes, y son exactamente estos tres grupos.** Todo lo de abajo está decidido; lo que
+**32 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
 queda es ejecutarlo midiendo antes de corregir.
 
 | Paso | Qué | Cuántos | Deja |
 |---|---|---|---|
-| **6b** | «Cancelar» de copias | 1 | 32 |
 | **2a–2e** | El reproductor y sus superpuestos | 29 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
 
@@ -29,14 +28,14 @@ pulsaciones gastan **950 ms**, pero la ventana también tiene que aguantar el pr
 reintentos de `PressAsync` —ocho pulsaciones a un asentamiento de distancia, **2400 ms**—, así que
 quedó en **5000 ms**, que no cuesta nada porque cancelar abandona el resto de la espera.
 
-**6b — «Cancelar» de copias. DECIDIDO el orden de la medición:** primero **el catálogo**, que es
-barato de sembrar en bloque por SQL —1.000, 10.000 y 50.000 filas, cronometrando `CreateBackup`—; si
-a 50.000 la copia no pasa del segundo, entonces **artwork personal**, que es lo que de verdad hace
-bulto (200 archivos de 1 MB son 200 MB que copiar). **Y la decisión que importa:** si ninguna de las
-dos llega a segundos, este control **se queda pendiente con su número medido escrito al lado**, y el
-destino pasa a ser 1 en vez de 0, dicho en voz alta. Lo que **no** se hace es meter un gancho en la
-composición para que la copia tarde: en el actualizador la fuente lenta es del arnés y no toca al
-producto, y aquí no existe ese argumento — sería cambiar el producto para poder probarlo.
+~~**6b — «Cancelar» de copias.**~~ **Hecha el 2026-08-17, 33 → 32** —
+[la evidencia](evidence/stable/audit-walk-backup-cancel.md)—, y **el destino sigue siendo 0**: la
+biblioteca honesta que tarda lo suficiente existe. Las dos palancas se midieron en el orden decidido y
+ganó la segunda por una razón que no estaba prevista: **el coste por archivo pesa más que el coste por
+megabyte**, así que la palanca es cuántas imágenes hay y no cuánto pesan. El catálogo llega al segundo
+sólo con 50.000 filas (1.159 ms) y encarece la escena; **6.000 imágenes de 50 KiB dan 3.944 ms con
+293 MB**, donde 6.000 de 100 KiB dan 4.377 ms con el doble de disco. Ni un gancho en la composición, y
+sin defecto de producto: el control funcionaba y lo que faltaba era una ventana.
 
 **Tanda 2 — DECIDIDO que se parte en cinco escenas por superficie**, no una sola de 29 controles:
 
@@ -187,7 +186,11 @@ correcta**, y con esto se comprueba.
    construye un tipo, no al buscador**: retirar el miembro y compilar cuesta un minuto y no puede
    equivocarse.
 
-5b. **Tanda 6b — «Cancelar» (1).** **40 → 39.** Lo que queda de la 6, y puede esperar detrás de la 7:
+5b. ~~**Tanda 6b — «Cancelar» (1).**~~ **Hecha el 2026-08-17, 33 → 32** —
+   [la evidencia](evidence/stable/audit-walk-backup-cancel.md)—. La condición previa era la de abajo y
+   se cumplió sembrando: **6.000 imágenes de 50 KiB** dan una copia de **3.944 ms**, y las dos
+   pulsaciones gastan **1.211 ms**. Lo que no se había previsto es cuál de las dos palancas gana: **el
+   coste por archivo pesa más que el coste por megabyte**.
 
    - **La condición previa es dura y es la única**: lleva `IsEnabled="{Binding IsRunning}"` **y**
      `CanExecute => IsRunning`, así que el botón sólo existe mientras una copia está en marcha. Con

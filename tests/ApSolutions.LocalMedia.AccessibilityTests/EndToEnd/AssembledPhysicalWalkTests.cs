@@ -2136,6 +2136,124 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 6b: the copy that is stopped while it is still copying.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Cancel exists only while a copy runs — <c>IsEnabled="{Binding IsRunning}"</c> and a command
+    /// that can only execute then — so the scene has to give the application enough to copy for a
+    /// press to land inside it. That is seeding rather than a hook: what makes a copy take time is a
+    /// library with things in it, which is the same thing that makes it take time for a person.
+    /// </para>
+    /// <para>
+    /// Both levers were measured on this machine before this was written, timing
+    /// <c>CreateBackup</c>. A catalogue of 1,000 / 10,000 / 50,000 rows answers in 51 / 147 /
+    /// 1,159 ms; personal artwork of 2,000 / 4,000 / 8,000 files of 100 KiB, in 1,694 / 3,059 /
+    /// 5,892 ms. The cost per file outweighs the cost per megabyte, so artwork is the lever and the
+    /// count matters more than the size: 6,000 files of 50 KiB answer in 3,944 ms for 293 MB of
+    /// seeding, where 6,000 of 100 KiB buy 4,377 ms for twice the disk. 50 KiB is what a 300×450
+    /// poster weighs, and 6,000 files is 3,000 identified titles with a poster and a backdrop each.
+    /// </para>
+    /// <para>
+    /// What is <em>not</em> done is making the copy slow from the composition. In the updater the
+    /// slow part is the harness's own source and the product is untouched by it; here there is no
+    /// such thing to make slow, so a hook would be changing the product in order to test it.
+    /// </para>
+    /// <para>
+    /// The status is the probe for the same reason it is on the updater's Cancel: there is no moment
+    /// between pressing it and the copy stopping for a probe to be satisfied by. What a status cannot
+    /// say is that nothing was left behind, so the backups folder is asked afterwards — a run that
+    /// published a copy and then said "cancelled" would look identical from the screen.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_copy_still_running_is_cancelled_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var film = Path.Combine(media, "Arrival.2016.mp4");
+        await File.WriteAllBytesAsync(film, [0x41, 0x50], TestContext.Current.CancellationToken);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        await SeedMediaFileAsync(factory, media, film, TimeSpan.FromMinutes(116));
+
+        // The artwork of a library somebody has used for years, and the reason there is a window at
+        // all. 3944 ms measured for exactly this seeding; see the remarks for the ladder it came
+        // from and for why the count is the lever rather than the size.
+        var paths = new AppDataPaths(_dataRoot);
+        const int CopyMilliseconds = 3944;
+        await SeedPersonalArtworkAsync(paths, files: 6_000, kibibytes: 50);
+
+        // Dot-prefixed folders are the store's own temporaries — its staging and the restore's — so
+        // what this counts is copies somebody could restore.
+        int StoredCopies() => Directory.Exists(paths.BackupsDirectory)
+            ? Directory.GetDirectories(paths.BackupsDirectory)
+                .Count(directory => !Path.GetFileName(directory).StartsWith('.'))
+            : 0;
+
+        using var host = ShowShell(height: 1400);
+        Navigate(host, AppRoute.Backups);
+        var backups = host.ViewModel.Backups;
+        Assert.NotNull(backups);
+
+        var window = Stopwatch.StartNew();
+        await PressAsync(
+            host,
+            "BackupCreateCopyLabel",
+            () => backups!.StatusKey,
+            "clicking Create a backup now never started the copy this scene is here to stop");
+
+        Assert.Equal("BackupStatusRunning", backups!.StatusKey);
+        Assert.True(backups.IsRunning, "The copy was not running, so there was nothing to cancel.");
+
+        await PressAsync(
+            host,
+            "BackupCancelLabel",
+            () => backups.StatusKey,
+            "clicking Cancel never stopped the copy that was running");
+
+        // The window, spent. An upper bound — it starts before the press that starts the copy — and
+        // asserted rather than only written down, because a scene that presses after the copy has
+        // finished is measuring the control's absence and would say so far less clearly.
+        Assert.True(
+            window.ElapsedMilliseconds < CopyMilliseconds,
+            $"Both presses took {window.ElapsedMilliseconds} ms of a copy measured at "
+                + $"{CopyMilliseconds} ms, so it had already finished and Cancel was pressed on a "
+                + "screen with nothing running. Seed more artwork.");
+
+        Assert.Equal("BackupStatusCancelled", backups.StatusKey);
+
+        // And nothing was published. The staging folder is discarded on the way out, so a cancelled
+        // copy leaves the backups folder exactly as it found it.
+        Assert.Equal(0, StoredCopies());
+    }
+
+    /// <summary>
+    /// The personal artwork a long-used library holds, written straight to disk.
+    /// </summary>
+    /// <remarks>
+    /// Written rather than catalogued on purpose: what a copy walks is the folder, not the rows, so
+    /// this is the smallest seeding that produces the time the scene needs. The bytes differ per file
+    /// only in their first four, which is enough for the hashes the manifest records to differ while
+    /// the seeding stays one buffer.
+    /// </remarks>
+    private static async Task SeedPersonalArtworkAsync(AppDataPaths paths, int files, int kibibytes)
+    {
+        Directory.CreateDirectory(paths.PersonalArtworkDirectory);
+        var image = new byte[1024 * kibibytes];
+        Random.Shared.NextBytes(image);
+        for (var index = 0; index < files; index++)
+        {
+            BitConverter.TryWriteBytes(image, index);
+            await File.WriteAllBytesAsync(
+                Path.Combine(
+                    paths.PersonalArtworkDirectory,
+                    string.Create(CultureInfo.InvariantCulture, $"poster-{index}.jpg")),
+                image,
+                TestContext.Current.CancellationToken);
+        }
+    }
+
+    /// <summary>
     /// Batch 7a: the permission to look for updates, and the look itself.
     /// </summary>
     /// <remarks>

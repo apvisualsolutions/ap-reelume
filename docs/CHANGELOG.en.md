@@ -95,6 +95,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Cancelling a backup halfway is now verified by pressing the button while one copies.** Cancel only
+  exists while the copy runs, and with a test-sized library the whole copy is over in **51 ms**: there
+  was no window to press it in. The check now seeds a real person's library — 3,000 titles with a
+  poster and a backdrop, 293 MB of images — and with that the copy takes four seconds, room enough to
+  press. What is checked is what matters: that cancelling says cancelled **and that nothing is left in
+  the backups folder**, because a half-copy published would be worse than none. The application did
+  not change: what takes time is copying what is there.
+
 - **Cancelling a download halfway is now verified by pressing the button while one runs.** Cancel
   only exists while something is in flight, and in an automated check the package sits in the folder
   next door: the whole download finished in milliseconds, before there was anything to cancel. A test
