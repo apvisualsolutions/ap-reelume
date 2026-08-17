@@ -8,8 +8,6 @@
 ## A control leaves this file when the walk presses it with the mouse, asserts on the effect, and
 ## clicks beside it to no effect — all three, which is what PressAsync does and records.
 
-AudioOutputView#AudioOutputDeviceLabel                     # batch 2
-AudioOutputView#AudioOutputLayoutLabel                     # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewAccept        # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewCorrect       # batch 2
 DetectedMarkerReviewView#DetectedMarkerReviewDelete        # batch 2
@@ -34,9 +32,6 @@ SubtitleStyleView#SubtitleStyleBackgroundOpacityLabel      # batch 2
 SubtitleStyleView#SubtitleStyleFamilyLabel                 # batch 2
 SubtitleStyleView#SubtitleStyleOutlineLabel                # batch 2
 SubtitleStyleView#SubtitleStyleSizeLabel                   # batch 2
-TrackSelectorView#TrackSelectorAudioLabel                  # batch 2
-TrackSelectorView#TrackSelectorRememberForSeries           # batch 2
-TrackSelectorView#TrackSelectorSubtitleLabel               # batch 2
 VersionSwitchDialog#VersionSwitchCancel                    # batch 2
 VersionSwitchDialog#VersionSwitchConfirm                   # batch 2
 VersionSwitchDialog#VersionSwitchRestart                   # batch 2
