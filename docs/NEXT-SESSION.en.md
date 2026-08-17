@@ -18,6 +18,13 @@ carrying it out, measuring before correcting.
 | **2d (rest) and 2e** | The two remaining answers and the loose file | 7 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
 
+**What 2e needs before it can be written, measured on 2026-08-17:** "Open with an external
+application" starts a **real process** (`ShellExternalPlaybackLauncher`, `UseShellExecute`), so it
+would open the system's player on whichever machine is measuring. It is the **ninth exit** for the
+isolation rule and is solved the way the previous five were: the composition chooses by
+`SystemHandoffDirectory` between the real launcher and one that **records** what it would have
+opened. The loose file's three need none of that; the retry shares a surface with the exit.
+
 **And two open findings to carry to the version cut**, both measured and written down in their
 evidence: **(1)** the subtitle style reaches the database and **not the picture** — LibVLC takes its
 rendering from the options its instance is built with — so `A11Y-002` needs its state or its wording

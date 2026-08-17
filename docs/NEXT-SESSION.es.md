@@ -18,6 +18,13 @@ queda es ejecutarlo midiendo antes de corregir.
 | **2d (resto) y 2e** | Las dos respuestas que faltan y el archivo suelto | 7 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
 
+**Lo que 2e necesita antes de escribirse, medido el 2026-08-17:** «Abrir con una aplicación externa»
+arranca un **proceso real** (`ShellExternalPlaybackLauncher`, `UseShellExecute`), así que abriría el
+reproductor del sistema en la máquina que mide. Es la **novena salida** de la regla de aislamiento, y
+se resuelve como las cinco anteriores: la composición elige por `SystemHandoffDirectory` entre el
+lanzador real y uno que **anote** lo que habría abierto. Los tres del archivo suelto no necesitan nada
+de eso; el reintento comparte superficie con la salida.
+
 **Y dos hallazgos abiertos que hay que llevar al corte de versión**, los dos medidos y escritos en su
 evidencia: **(1)** el estilo de subtítulos llega a la base de datos y **no a la imagen** —LibVLC toma
 su dibujado de las opciones con las que se construye la instancia—, así que `A11Y-002` pide revisión
