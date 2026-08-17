@@ -14,13 +14,9 @@ LooseFileBanner#LooseFileCancelAction                      # batch 2
 LooseFileBanner#LooseFileConfirmAction                     # batch 2
 MovieDetailsView#MovieResumeAction                         # batch 1: shown only with stored progress worth returning to
 MovieDetailsView#MovieTrailerAction                        # batch 1: shown only when a trailer file sits beside the film, which needs a version group the walk does not seed yet
-NextEpisodeOverlay#NextEpisodeCancel                       # batch 2
-NextEpisodeOverlay#NextEpisodePlayNow                      # batch 2
 PlayerVersionsView#PlayerVersionsSwitchAction              # batch 2
 PlayerView#PlayerRecoveryOpenExternally                    # batch 2
 PlayerView#PlayerRecoveryRetry                             # batch 2
-ResumePromptView#ResumePromptRestart                       # batch 2
-ResumePromptView#ResumePromptResume                        # batch 2
 VersionSwitchDialog#VersionSwitchCancel                    # batch 2
 VersionSwitchDialog#VersionSwitchConfirm                   # batch 2
 VersionSwitchDialog#VersionSwitchRestart                   # batch 2

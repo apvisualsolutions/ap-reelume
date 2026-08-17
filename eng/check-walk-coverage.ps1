@@ -53,10 +53,12 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # that the copy can be stopped halfway, 27 once a session offered more than one of everything a
 # person can choose between, 23 once the subtitle style was stored and read back instead of dying
 # with the window, 16 once the ranges of an episode could be made, skipped and decided without a
-# button landing outside the window. The destination is 0: this application ships free and
+# button landing outside the window, 12 with the offer made before a session starts and the one made
+# when it ends, both answered and both sized to themselves. The destination is 0: this application
+# ships free and
 # nobody is going to test it by hand, so a control the walk never presses is a control nobody ever
 # presses before somebody installs it.
-$maximumPending = 16
+$maximumPending = 12
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)

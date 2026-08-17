@@ -11,7 +11,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="player:ResumePromptViewModel"
     IsVisible="{Binding IsVisible}"
     automation:AutomationProperties.Name="{DynamicResource ResumePromptAccessibleName}">
-  <StackPanel x:Name="ResumePromptSurface" Spacing="12">
+  <!--
+    An offer, and it has to be sized to itself. Without these two alignments the panel stretches to
+    whatever contains it, and in the shell that is the whole player stage: measured on 2026-08-17 at
+    1280x1400 over a 1280x1400 stage, with the two buttons at its top-left corner. It carries no
+    background, so unlike the status badge corrected on 2026-08-15 it swallowed nothing — what it
+    cost was an offer drawn as a full-stage panel instead of as the card it is.
+  -->
+  <Border
+      x:Name="ResumePromptSurface"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center"
+      Padding="16"
+      Background="{DynamicResource ShellSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8">
+  <StackPanel Spacing="12">
     <TextBlock
         x:Name="ResumePromptHeadline"
         Foreground="{DynamicResource TextPrimaryBrush}"
@@ -23,7 +39,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{Binding ResumePositionText}" />
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
       <Button
           x:Name="ResumeButton"
           Command="{Binding ResumeCommand}"
@@ -34,6 +50,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding RestartCommand}"
           Content="{DynamicResource ResumePromptRestart}"
           automation:AutomationProperties.Name="{DynamicResource ResumePromptRestart}" />
-    </StackPanel>
+    </WrapPanel>
   </StackPanel>
+  </Border>
 </UserControl>

@@ -26,7 +26,12 @@ public sealed class NextEpisodeOverlayTests
     public void Nothing_is_shown_until_a_next_episode_is_offered()
     {
         var view = Build(out var viewModel);
-        var surface = view.GetVisualDescendants().OfType<StackPanel>().Single(p => p.Name == "NextEpisodeSurface");
+        // The surface is asked for by name and not by type: it became a Border when the overlay
+        // stopped stretching over the whole player stage, and what this test is about is whether it
+        // is shown, not what shape it is.
+        var surface = view.GetVisualDescendants()
+            .OfType<Control>()
+            .Single(control => control.Name == "NextEpisodeSurface");
 
         Assert.False(viewModel.IsVisible);
         Assert.False(surface.IsVisible);

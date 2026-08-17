@@ -2137,6 +2137,210 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 2d, first half: the offer made before a session starts, and the one made when it ends.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Both surfaces answer <b>once</b> and hide, so four controls need four sessions: a prompt that
+    /// has been answered is not a prompt, and pressing its other button afterwards would be pressing
+    /// something nobody can reach. That is why this scene opens the player four times rather than
+    /// arranging the presses inside one.
+    /// </para>
+    /// <para>
+    /// Resume is pressed from somewhere else on the timeline on purpose. The session already opens at
+    /// the stored point — that is what the decision did — so pressing Resume where the playhead
+    /// already is would ask for the position it already has, which is the rule that cost a
+    /// measurement on the volume slider. The playhead is moved first, and then Resume brings it back.
+    /// </para>
+    /// <para>
+    /// The playhead is read from the engine and the session is paused first, both for the reasons the
+    /// marker scene measured: a probe fed by position events cannot see a seek while the engine is
+    /// stopped, and a playing session moves the very thing the press is meant to move.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_resume_offer_and_the_next_episode_offer_are_answered_with_the_mouse()
+    {
+        var feature = await RequireSampleAsync("walk-resume.mp4", durationSeconds: 90);
+        var episode = await RequireSampleAsync("walk-chain.mp4", durationSeconds: 3);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var film = Path.Combine(media, "Arrival.2016.mp4");
+        var first = Path.Combine(media, "Chained.S01E01.mp4");
+        var second = Path.Combine(media, "Chained.S01E02.mp4");
+        File.Copy(feature, film);
+        File.Copy(episode, first);
+        File.Copy(episode, second);
+
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var filmFile = await SeedMediaFileAsync(factory, media, film, TimeSpan.FromSeconds(90));
+        var firstFile = await SeedMediaFileAsync(factory, media, first, TimeSpan.FromSeconds(3));
+        var secondFile = await SeedMediaFileAsync(factory, media, second, TimeSpan.FromSeconds(3));
+        _ = await SeedSeriesAsync(factory, firstFile, secondFile);
+
+        using var host = ShowShell(height: 1400);
+        // Typed rather than inferred, because a local function reads a captured variable at the
+        // nullable state it had where the function was written, not where it is called.
+        IServiceProvider services = host.Application.Services;
+        var watched = services.GetRequiredService<IWatchStateRepository>();
+        var content = ContentKey.ForTitle(new TitleId(filmFile));
+
+        async Task<long> PlayheadSecondsAsync()
+        {
+            var snapshot = await services.GetRequiredService<IMediaPlayerEngine>()
+                .GetSnapshotAsync(TestContext.Current.CancellationToken);
+            return (long)snapshot.Position.TotalSeconds;
+        }
+
+        // Forty seconds into a ninety-second film, which is what a person left behind.
+        async Task SeedProgressAsync() => await watched.SaveAsync(
+            new WatchState
+            {
+                Content = content,
+                Position = TimeSpan.FromSeconds(40),
+                ObservedDuration = TimeSpan.FromSeconds(90),
+                SourceMediaFileId = new MediaFileId(filmFile),
+                Status = WatchStatus.InProgress,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UnixEpoch,
+                UpdatedUtc = DateTimeOffset.UnixEpoch,
+            },
+            TestContext.Current.CancellationToken);
+
+        // ---- First session: the offer is refused, and the film starts over.
+        await SeedProgressAsync();
+        await OpenAndPlayAsync(host, filmFile);
+        var resume = host.ViewModel.Player!.Resume;
+        Assert.NotNull(resume);
+        Assert.True(resume!.IsVisible, "The stored progress never raised the resume offer.");
+        Assert.Equal("00:00:40", resume.ResumePositionText);
+
+        // The session opens where it was left, and it is waited for rather than read: the engine
+        // answers 0 until the demuxer has applied the start position, measured here as
+        // "0, 40, 40, 40, 40, 41, 41, 41" over two seconds. Nothing else in this repository checks
+        // that end to end -- the wiring test asserts the request carries the position, against a
+        // coordinator that never opens anything -- and reading too early is what made a working
+        // Start over look like a press that did nothing.
+        await WaitForAsync(
+            async () => await PlayheadSecondsAsync() >= 39,
+            "the session with stored progress never opened at the point it was left");
+
+        await PauseWithTheSpaceBarAsync(host);
+
+        await PressAsync(
+            host,
+            "ResumePromptRestart",
+            PlayheadSecondsAsync,
+            "clicking Start over never took the playhead back to the beginning");
+
+        Assert.True(
+            await PlayheadSecondsAsync() < 5,
+            $"Start over left the playhead at {await PlayheadSecondsAsync()} s.");
+        Assert.False(resume.IsVisible, "The offer stayed on screen after it had been answered.");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // ---- Second session: the offer is taken, from somewhere else on the timeline.
+        await SeedProgressAsync();
+        await OpenAndPlayAsync(host, filmFile);
+        var secondResume = host.ViewModel.Player!.Resume;
+        Assert.NotNull(secondResume);
+        Assert.True(secondResume!.IsVisible, "The stored progress never raised the offer a second time.");
+        await WaitForAsync(
+            async () => await PlayheadSecondsAsync() >= 39,
+            "the session with stored progress never opened at the point it was left, a second time");
+        await PauseWithTheSpaceBarAsync(host);
+        await services.GetRequiredService<ControlPlayback>()
+            .SeekAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            async () => await PlayheadSecondsAsync() < 10,
+            "the playhead never moved away from the stored point, so Resume would have had nothing to do");
+
+        await PressAsync(
+            host,
+            "ResumePromptResume",
+            PlayheadSecondsAsync,
+            "clicking Resume never took the playhead back to the stored point");
+
+        Assert.True(
+            await PlayheadSecondsAsync() >= 39,
+            $"Resume left the playhead at {await PlayheadSecondsAsync()} s rather than at the stored 40.");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // ---- Third session: an episode ends and the offer is refused.
+        await OpenAndPlayAsync(host, firstFile);
+        var overlay = host.ViewModel.Player!.NextEpisode;
+        Assert.NotNull(overlay);
+        await WaitForAsync(
+            () => Task.FromResult(overlay!.IsVisible),
+            "the end of the episode never raised the next-episode offer");
+
+        await PressAsync(
+            host,
+            "NextEpisodeCancel",
+            () => overlay!.IsVisible,
+            "clicking Cancel never ended the offer that was counting down");
+
+        // And refusing means refusing: the session is still the episode that ended, not the next one.
+        await SettleAsync();
+        Assert.EndsWith(
+            "Chained.S01E01.mp4",
+            host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
+            StringComparison.Ordinal);
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // ---- Fourth session: the same end, accepted, which chains onto the next episode.
+        await OpenAndPlayAsync(host, firstFile);
+        var chained = host.ViewModel.Player!.NextEpisode;
+        Assert.NotNull(chained);
+        await WaitForAsync(
+            () => Task.FromResult(chained!.IsVisible),
+            "the end of the episode never raised the offer a second time");
+        Assert.Equal("T1 E2", chained!.EpisodeLabel);
+
+        await PressAsync(
+            host,
+            "NextEpisodePlayNow",
+            () => host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
+            "clicking Play now never chained the session onto the next episode");
+
+        await WaitForAsync(
+            () => Task.FromResult(
+                host.ViewModel.Player?.Player.MediaPath.EndsWith("Chained.S01E02.mp4", StringComparison.Ordinal)
+                    == true),
+            "accepting the offer never opened the second episode");
+
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>
+    /// Pauses through the keyboard chain the transport scene walks: view → shared map → router →
+    /// coordinator → engine.
+    /// </summary>
+    private static async Task PauseWithTheSpaceBarAsync(ShellHost host)
+    {
+        var view = host.Shell.GetVisualDescendants().OfType<PlayerView>().First();
+        Assert.True(view.Focus(), "The player surface refused the focus.");
+        host.Window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPaused == true),
+            "the space bar never paused the playing session");
+    }
+
+    /// <summary>Opens one file and waits until the real engine is decoding it.</summary>
+    private static async Task OpenAndPlayAsync(ShellHost host, Guid fileId)
+    {
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(fileId), TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the session never reached the playing state on the real engine");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>
     /// Batch 2c: the ranges of an episode — made by hand, offered as a skip, and decided when a
     /// detector proposed them.
     /// </summary>
