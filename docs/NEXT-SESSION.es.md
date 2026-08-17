@@ -296,10 +296,11 @@ correcta**, y con esto se comprueba.
    que el de estado corregido el 2026-08-15; **cada uno se corrige en su tanda con su medición**, no
    en bloque. **32 → 3**, y los tres últimos con ellos: **0.**
 9. **La cobertura de código, al mismo destino.** Hoy la puerta vigila los archivos nuevos y una lista
-   corta —**nueve desde el 2026-08-17**, con `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
-   `HandoffArchivePicker.cs`, `WindowsSystemHandoff.cs` y `RecordingSystemHandoff.cs` al 100/100
-   porque son las **cinco salidas** que la regla de aislamiento atravesó y las que deciden qué sale de
-   la aplicación—, así que **un archivo antiguo que empeora sigue sin vigilarse**. **Decidido**: cada archivo antiguo que una tanda toque y
+   corta —**once desde el 2026-08-17**, con `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
+   `HandoffArchivePicker.cs`, `WindowsSystemHandoff.cs`, `RecordingSystemHandoff.cs`,
+   `HandoffUpdateSource.cs` y `HandoffUpdateManifest.cs` al 100/100 porque son las **salidas** que la
+   regla de aislamiento atravesó y las que deciden qué sale de la aplicación y qué alcanza—, así que
+   **un archivo antiguo que empeora sigue sin vigilarse**. **Decidido**: cada archivo antiguo que una tanda toque y
    deje en el suelo entra en esa lista al cerrarla, y cuando el paseo llegue a 0,
    `check-coverage.ps1` pasa a medir **todo `src/`** con el suelo de siempre (96 % de líneas y de
    ramas) y una lista de excepciones con la regla de la casa: **sólo puede encoger**.

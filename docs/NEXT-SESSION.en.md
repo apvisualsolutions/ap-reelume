@@ -290,10 +290,11 @@ one**, and this checks it.
    **each is corrected in its own batch with its own measurement**, not in bulk. **32 → 3**, and the
    last three with them: **0.**
 9. **Code coverage, to the same destination.** The gate watches new files and a short list today —
-   **nine since 2026-08-17**, with `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
-   `HandoffArchivePicker.cs`, `WindowsSystemHandoff.cs` and `RecordingSystemHandoff.cs` at 100/100
-   because they are the **five exits** the isolation rule went through and what decides what leaves
-   the application — so **an old file that gets worse is still watched by nobody**. **Decided**: every old file a batch touches and leaves at the
+   **eleven since 2026-08-17**, with `AppDataPaths.cs`, `ShellExternalLinkLauncher.cs`,
+   `HandoffArchivePicker.cs`, `WindowsSystemHandoff.cs`, `RecordingSystemHandoff.cs`,
+   `HandoffUpdateSource.cs` and `HandoffUpdateManifest.cs` at 100/100 because they are the **exits**
+   the isolation rule went through and what decides what leaves the application and what it reaches
+   for — so **an old file that gets worse is still watched by nobody**. **Decided**: every old file a batch touches and leaves at the
    floor joins that list when the batch closes, and once the walk reaches 0, `check-coverage.ps1`
    measures **all of `src/`** against the usual floor (96 % of lines and of branches) with an
    exception list under the house rule: **it can only shrink**.
