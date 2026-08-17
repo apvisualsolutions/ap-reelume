@@ -8,6 +8,68 @@ to **0 pending** — **34** today, with **94 of 128** controls pressed by mouse 
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
+### The queue from 2026-08-17, with its count
+
+**34 pending, and they are exactly these four groups.** Everything below is decided; what remains is
+carrying it out, measuring before correcting.
+
+| Step | What | How many | Leaves |
+|---|---|---|---|
+| **7c** | The updater's Cancel | 1 | 33 |
+| **6b** | Backup's Cancel | 1 | 32 |
+| **2a–2e** | The player and its overlays | 29 | 3 |
+| **1 (rest)** | The three left over from the first batch | 3 | **0** |
+
+Then: coverage over all of `src/`, what is left of `ARQ-004`, and the redesign.
+
+**7c — the updater's Cancel. DECIDED how it is served slowly:** the manifest gains an **optional**
+`serveDelayMilliseconds` and `HandoffUpdateTransport` does `await Task.Delay(delay, ct)` before
+answering. That is not a shortcut: the cancellation travels on **the model's real token**, so what is
+exercised is the real path — `OperationCanceledException` → `UpdateStatusCancelled`. A scene of **its
+own**, not inside the existing one, because the delay would change the timings of download and
+install. Start at **3000 ms and measure it**; the optional field is read with `TryGetProperty` and
+both of its branches have to be covered. The probe is `StatusKey` — here the state **is** the effect,
+there is no transient between pressing and cancelling — plus the assertion that **no `.msix`** is in
+the staging folder.
+
+**6b — backup's Cancel. DECIDED the order of the measurement:** the catalogue first, because it is
+cheap to seed in bulk over SQL — 1,000, 10,000 and 50,000 rows, timing `CreateBackup` — and if at
+50,000 the copy still finishes inside a second, then **personal artwork**, which is what actually
+takes up room (200 files of 1 MB is 200 MB to copy). **And the decision that matters:** if neither
+reaches seconds, this control **stays pending with its measured number written beside it**, and the
+destination becomes 1 rather than 0, said out loud. What is **not** done is putting a hook in the
+composition to make the copy slow: in the updater the slow source belongs to the harness and does not
+touch the product, and here that argument does not exist — it would be changing the product in order
+to test it.
+
+**Batch 2 — DECIDED that it splits into five scenes by surface**, not one of 29 controls:
+
+| | Surface | Controls |
+|---|---|---|
+| **2a** | Tracks and audio output | 5 |
+| **2b** | Subtitle style | 4 |
+| **2c** | Markers: editor, review and skip | 7 |
+| **2d** | Resume, next episode and versions | 8 |
+| **2e** | Loose file and player recovery | 5 |
+
+It is the only batch that needs **real video**. And the warning stands measured: **the five remaining
+overlays set no alignment** and stretch over the whole stage, exactly like the status one corrected on
+2026-08-15; **each is corrected in its own scene with its own measurement**, never in bulk.
+
+**The three from batch 1** are the ones needing seeding the walk does not do yet: the episode row (a
+show, a season and episodes), the film card's Resume (stored progress worth returning to) and its
+local trailer (a trailer file beside the film, with a version group).
+
+**Cutting a release.** There are now **thirteen** evidence documents waiting to enter `FEATURES.md`,
+and regenerating the manifest is part of cutting a release rather than of a working session.
+**Decided**: when the walk reaches its floor, **0.2.0** is cut against a freshly built package, and
+all thirteen go in at once.
+
+**Shutting down from the window and from the tray stays direct.** They are not inventory controls —
+there is no AXAML behind them — so they do not touch the ratchet, and no isolated run reaches them
+today. It is revisited if the redesign touches the lifecycle, and not before: inventing work there
+would be inventing it.
+
 ### The decision that unblocks the rest: an isolated run touches nothing outside its own root
 
 Three controls were declared uncoverable for the same reason, and the third time stops being a

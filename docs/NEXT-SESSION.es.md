@@ -8,6 +8,67 @@ pendientes** —hoy **34**, con **94 de 128** controles pulsados con ratón— y
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
+### La cola desde el 2026-08-17, con su recuento
+
+**34 pendientes, y son exactamente estos cuatro grupos.** Todo lo de abajo está decidido; lo que
+queda es ejecutarlo midiendo antes de corregir.
+
+| Paso | Qué | Cuántos | Deja |
+|---|---|---|---|
+| **7c** | «Cancelar» del actualizador | 1 | 33 |
+| **6b** | «Cancelar» de copias | 1 | 32 |
+| **2a–2e** | El reproductor y sus superpuestos | 29 | 3 |
+| **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
+
+Después: la cobertura a todo `src/`, lo que queda de `ARQ-004`, y el rediseño.
+
+**7c — «Cancelar» del actualizador. DECIDIDO cómo se sirve despacio:** el manifiesto gana un campo
+**opcional** `serveDelayMilliseconds` y `HandoffUpdateTransport` hace `await Task.Delay(delay, ct)`
+antes de responder. Eso no es un atajo: la cancelación viaja por **el token real del modelo**, así que
+lo que se ejercita es el camino de verdad —`OperationCanceledException` → `UpdateStatusCancelled`—.
+Escena **propia**, no dentro de la existente, porque el retardo cambiaría los tiempos de descargar e
+instalar. Empezar por **3000 ms y medirlo**; el campo opcional se lee con `TryGetProperty` y sus dos
+ramas hay que cubrirlas. La sonda es `StatusKey` —aquí el estado **es** el efecto, no hay transitorio
+entre pulsar y cancelar— más la aserción de que **no hay ningún `.msix`** en la carpeta de
+preparación.
+
+**6b — «Cancelar» de copias. DECIDIDO el orden de la medición:** primero **el catálogo**, que es
+barato de sembrar en bloque por SQL —1.000, 10.000 y 50.000 filas, cronometrando `CreateBackup`—; si
+a 50.000 la copia no pasa del segundo, entonces **artwork personal**, que es lo que de verdad hace
+bulto (200 archivos de 1 MB son 200 MB que copiar). **Y la decisión que importa:** si ninguna de las
+dos llega a segundos, este control **se queda pendiente con su número medido escrito al lado**, y el
+destino pasa a ser 1 en vez de 0, dicho en voz alta. Lo que **no** se hace es meter un gancho en la
+composición para que la copia tarde: en el actualizador la fuente lenta es del arnés y no toca al
+producto, y aquí no existe ese argumento — sería cambiar el producto para poder probarlo.
+
+**Tanda 2 — DECIDIDO que se parte en cinco escenas por superficie**, no una sola de 29 controles:
+
+| | Superficie | Controles |
+|---|---|---|
+| **2a** | Pistas y salida de audio | 5 |
+| **2b** | Estilo de subtítulos | 4 |
+| **2c** | Marcadores: editor, revisión y salto | 7 |
+| **2d** | Reanudar, siguiente episodio y versiones | 8 |
+| **2e** | Archivo suelto y recuperación del reproductor | 5 |
+
+Es la única tanda que necesita **vídeo real**. Y la advertencia sigue medida: **los cinco superpuestos
+que quedan no fijan alineación** y se estiran sobre todo el escenario, igual que el de estado
+corregido el 2026-08-15; **cada uno se corrige en su escena con su medición**, nunca en bloque.
+
+**Los tres de la tanda 1** son los que necesitan siembra que el paseo aún no hace: la fila de episodio
+(exige serie, temporada y episodios), «Continuar» de la ficha de película (exige progreso guardado que
+merezca volver) y su tráiler local (exige un archivo de tráiler junto a la película, con grupo de
+versiones).
+
+**El corte de versión.** Ya son **trece** evidencias esperando a entrar en `FEATURES.md`, y regenerar
+el manifiesto es parte de cortar una versión, no de una sesión de trabajo. **Decidido**: cuando el
+paseo llegue a su mínimo se corta **0.2.0** con un paquete recién construido, y ahí entran las trece
+de golpe.
+
+**El apagado desde la ventana y desde la bandeja se queda directo.** No son controles del inventario
+—no hay AXAML detrás—, así que no tocan el trinquete, y una ejecución aislada no llega a ellos hoy. Se
+revisa si el rediseño toca el ciclo de vida, y no antes: inventar ahí trabajo sería inventarlo.
+
 ### La decisión que lo desbloquea todo: una ejecución aislada no toca nada fuera de su raíz
 
 Tres controles se declararon incubribles por la misma razón, y la tercera vez deja de ser casualidad
