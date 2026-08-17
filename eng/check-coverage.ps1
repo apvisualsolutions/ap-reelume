@@ -253,6 +253,21 @@ try {
             Lines    = 100.00
             Branches = 100.00
         }
+
+        # The source an isolated run is offered its releases by, and the manifest it reads them from.
+        # They join the list for the reason the other exits did — they decide what the application
+        # reaches for — and for one of their own: the manifest is where a release's hash and size
+        # come from, so a hole here would be a hole in what the download then proves.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Updates/HandoffUpdateSource.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Updates/HandoffUpdateManifest.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
     )
 
     $watchRows = @()
