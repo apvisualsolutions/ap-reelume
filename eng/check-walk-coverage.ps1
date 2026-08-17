@@ -60,10 +60,15 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # to hold progress worth resuming, 6 once a session that will not open could be handed to the system
 # and retried, which made the ninth exit of the isolation rule, 3 once a file activated from Explorer
 # reached the screen at all — it played with no surfaces built, so the banner offering to add its
-# folder could not be seen, let alone pressed. The destination is 0: this application ships free and
-# nobody is going to test it by hand, so a control the walk never presses is a control nobody ever
-# presses before somebody installs it.
-$maximumPending = 3
+# folder could not be seen, let alone pressed — and **0** on 2026-08-18, with the film card's two
+# actions and the row a season lists. The last three needed no defect fixed and no rule invented,
+# only seeding: stored progress worth returning to, a `-trailer` file beside the film, and a show
+# with a season and episodes.
+#
+# It is 0 and it does not go up. A control added from here on arrives with its scene in the same
+# change: this application ships free and nobody is going to test it by hand, so a control the walk
+# never presses is a control nobody ever presses before somebody installs it.
+$maximumPending = 0
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)
