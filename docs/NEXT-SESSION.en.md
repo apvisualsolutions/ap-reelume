@@ -4,18 +4,18 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **16** today, with **112 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **12** today, with **116 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
 ### The queue from 2026-08-17, with its count
 
-**16 pending, and they are exactly these two groups.** Everything below is decided; what remains is
+**12 pending, and they are exactly these two groups.** Everything below is decided; what remains is
 carrying it out, measuring before correcting.
 
 | Step | What | How many | Leaves |
 |---|---|---|---|
-| **2d–2e** | The player and its overlays | 13 | 3 |
+| **2d (rest) and 2e** | Versions, loose file and recovery | 9 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
 
 **And two open findings to carry to the version cut**, both measured and written down in their
@@ -59,7 +59,7 @@ composition, and no product defect: the control worked, and what was missing was
 | ~~**2a**~~ | ~~Tracks and audio output~~ | **done on 2026-08-17, 32 → 27** |
 | ~~**2b**~~ | ~~Subtitle style~~ | **done on 2026-08-17, 27 → 23** |
 | ~~**2c**~~ | ~~Markers: editor, review and skip~~ | **done on 2026-08-17, 23 → 16** |
-| **2d** | Resume, next episode and versions | 8 |
+| **2d** | ~~Resume and next episode~~ **done, 16 → 12**; the **versions** remain | 4 |
 | **2e** | Loose file and player recovery | 5 |
 
 It is the only batch that needs **real video**. And the warning stands measured: **the five remaining

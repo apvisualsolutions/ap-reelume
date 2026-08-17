@@ -95,6 +95,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Carrying on where you left off is now really verified, and with the mouse.** Until today only the
+  *request* to open at the stored point was checked; now what is checked is that it **opens there**,
+  against the real video engine, and that the four buttons of the two offers — resume, start over,
+  play the next episode, and don't — do what they say. Each offer answers once and withdraws, so the
+  check opens the player four times, the way a person would.
+
 - **Making a marker, skipping it, and deciding what detection proposes are now verified with the
   mouse.** The seven controls of the three marker surfaces are pressed against an episode that is
   really playing, and what is checked for each is **the row in the database**, not the list on
@@ -463,6 +469,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   survives.
 
 ### Fixed
+
+- **The resume offer and the next-episode offer were drawn over the whole screen.** Both stretched to
+  the player's entire stage — 1280x1400 measured — with their buttons in the corner instead of being
+  drawn as the card they are. They now have their own size, background and border, and their buttons
+  wrap when they do not fit.
 
 - **The marker editor's Delete was drawn off the screen.** In the player's column Save fitted and the
   button beside it sat **eleven pixels outside the window**, with nothing to scroll: there was no way

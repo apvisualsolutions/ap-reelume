@@ -11,7 +11,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="player:NextEpisodeViewModel"
     automation:AutomationProperties.Name="{DynamicResource NextEpisodeAccessibleName}"
     automation:AutomationProperties.LiveSetting="Polite">
-  <StackPanel x:Name="NextEpisodeSurface" IsVisible="{Binding IsVisible}" Spacing="8">
+  <!--
+    Sized to itself, like the status badge corrected on 2026-08-15 and the resume offer beside it:
+    without the two alignments this stretches to the whole player stage, measured on 2026-08-17 at
+    1280x1400, with its buttons in the corner rather than in the card they belong to.
+  -->
+  <Border
+      x:Name="NextEpisodeSurface"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Bottom"
+      Margin="24"
+      Padding="16"
+      IsVisible="{Binding IsVisible}"
+      Background="{DynamicResource ShellSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="8">
+  <StackPanel Spacing="8">
     <TextBlock
         x:Name="NextEpisodeHeadline"
         Foreground="{DynamicResource TextPrimaryBrush}"
@@ -33,7 +49,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{Binding CountdownText}" />
     </StackPanel>
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
       <Button
           x:Name="PlayNextNowButton"
           Command="{Binding PlayNowCommand}"
@@ -44,6 +60,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding CancelCommand}"
           Content="{DynamicResource NextEpisodeCancel}"
           automation:AutomationProperties.Name="{DynamicResource NextEpisodeCancel}" />
-    </StackPanel>
+    </WrapPanel>
   </StackPanel>
+  </Border>
 </UserControl>

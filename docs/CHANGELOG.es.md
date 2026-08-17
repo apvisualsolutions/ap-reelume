@@ -96,6 +96,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Continuar donde lo dejaste se comprueba ahora de verdad, y con el ratón.** Hasta hoy sólo se
+  comprobaba que la aplicación *pedía* abrir en el punto guardado; ahora se comprueba que **abre ahí**,
+  con el motor de vídeo real, y que los cuatro botones de las dos ofertas —continuar, empezar de
+  nuevo, poner el siguiente episodio y no ponerlo— hacen lo que dicen. Cada oferta se contesta una vez
+  y se retira, así que la comprobación abre el reproductor cuatro veces, como haría una persona.
+
 - **Hacer una marca, saltarla y decidir lo que la detección propone se comprueba ahora con el ratón.**
   Los siete mandos de las tres superficies de marcas se pulsan sobre un episodio reproduciéndose de
   verdad, y lo que se comprueba en cada uno es **la fila de la base de datos**, no la lista en
@@ -475,6 +481,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   el arte anterior.
 
 ### Corregido
+
+- **La oferta de continuar y la del siguiente episodio se dibujaban sobre toda la pantalla.** Las dos
+  se estiraban al escenario entero del reproductor —1280×1400 medidos— con sus botones en la esquina,
+  en vez de dibujarse como la tarjeta que son. Ahora tienen su tamaño, su fondo y su borde, y sus
+  botones se reordenan si no caben.
 
 - **«Borrar» del editor de marcas se dibujaba fuera de la pantalla.** En la columna del reproductor
   cabía «Guardar» y el botón de al lado quedaba **once píxeles fuera de la ventana**, sin nada que
