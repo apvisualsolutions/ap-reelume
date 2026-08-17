@@ -282,6 +282,16 @@ try {
             Lines    = 100.00
             Branches = 100.00
         }
+
+        # The ninth exit. It stands in for a launcher that starts a real process, so what has to be
+        # held here is its two refusals: an extension outside the approved list and a file that is
+        # not there. A recorder that wrote down a handover the real one would have refused would make
+        # every probe reading that record say nothing about the real launcher.
+        [pscustomobject]@{
+            File     = 'src/ApSolutions.LocalMedia.Windows/Playback/RecordingExternalPlaybackLauncher.cs'
+            Lines    = 100.00
+            Branches = 100.00
+        }
     )
 
     $watchRows = @()

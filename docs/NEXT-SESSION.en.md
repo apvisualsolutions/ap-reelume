@@ -4,19 +4,42 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **8** today, with **120 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **6** today, with **122 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
 ### The queue from 2026-08-17, with its count
 
-**8 pending, and they are exactly these two groups.** Everything below is decided; what remains is
-carrying it out, measuring before correcting.
+**6 pending, and one measured defect blocks them.** The loose file's three and batch 1's local
+trailer are **the same problem**, so correcting it unblocks four of the six.
 
 | Step | What | How many | Leaves |
 |---|---|---|---|
-| **2e** | The loose file and the player's recovery | 5 | 3 |
-| **1 (rest)** | The three left over from the first batch | 3 | **0** |
+| **The loose session cannot be seen** | The loose-file banner (3) and the local trailer (1) | 4 | 2 |
+| **1 (rest)** | The episode row and the film card's Resume | 2 | **0** |
+
+#### The defect to correct before anything else, already measured
+
+**A file activated from Explorer plays and cannot be seen.** Measured on 2026-08-17:
+
+```
+singleton.IsLooseSession=True  name='Arrival.2016.mp4'  engine=Playing  pos=00:00:00.15
+player=False  playerVisible=False  stages=0  surfaces=0
+```
+
+The activation does its whole part — `OpenLooseFile` starts the engine and the banner receives its
+session — but **nobody builds the player surfaces**, and `HasLooseFile` is
+`Player?.LooseFile is not null`. So the video plays with no picture and no transport, and the notice
+saying "this is not in your library" never reaches the screen with its three buttons inside. The
+**local trailer** opens the same way and has the same problem.
+
+**What does not work**, and this is checked: reusing `OpenPlayerAsync` as it stands. It begins with
+`FindByIdAsync` and a loose file is not in the catalogue; and its path starts the progress tracker,
+which is exactly what `OpenLooseFile` promises not to touch — "a loose session leaves the database as
+it found it". What is needed is a path that builds **the player, the transport and the banner** and
+nothing else: no tracker, no markers, no versions, no resume offer. The harness already knows how to
+get there: `ApplicationHost.PendingActivationPath` before `CreateShell` and **`ConfigureWindow`
+after**, which is where the activation is read and nowhere else.
 
 #### The five decisions of 2026-08-17, taken and not reopened
 
@@ -41,16 +64,15 @@ from the start" passed `TimeSpan.Zero` to a host that ignored it, so with stored
 passing; what is missing is **measuring it**, and the natural place is the batch 1 scene that already
 has to seed progress for Resume.
 
-**2. The ninth exit for the isolation rule (2 of 2e's controls).** "Open with an external application"
-starts a **real process** (`ShellExternalPlaybackLauncher`, `UseShellExecute`): it would open the
-system's player on whichever machine is measuring. Solved **the way the previous five were**: the
-composition chooses by `SystemHandoffDirectory` between the real launcher and one that **records**
-what it would have opened, with a verb in front — `play-externally <path>` — so a probe tells them
-apart without parsing anything. The retry shares that surface: the scene opens a file that cannot be
-decoded — two bytes with an approved extension — presses "Open with an external application" reading
-the record, then **replaces the file with a good sample** and presses Retry, whose probe is the
-session reaching the playing state. The new class joins `check-coverage.ps1`'s watched list at 100/100
-when the batch closes.
+~~**2. The ninth exit for the isolation rule (2 of 2e's controls).**~~ **Done on 2026-08-17, 8 → 6** —
+[the evidence](evidence/stable/audit-walk-player-recovery.md). The recorder
+(`RecordingExternalPlaybackLauncher`, verb `play-externally <path>`) joins `check-coverage.ps1`'s
+watched list at 100/100, and its **two refusals** — an extension outside the list and an absent file —
+are asserted in `IsolatedRunTests` beside both halves of the choice. What did **not** hold was the two
+presses sharing one surface: `corrupted=True canRetry=False canOpenExternally=True`. The policy gives
+corrupted media another version and an external open, **no retry**, and it is right — reopening the
+same bytes fails the same way; retry is offered when the **file is missing**. The scene opens twice
+and each press meets the failure that offers it.
 
 **3. The overlays that still do not size themselves** — now only `SkipMarkerButton` and
 `LooseFileBanner`, because `VersionSwitchDialog` was corrected on 2026-08-17 with its measurement
@@ -66,15 +88,11 @@ which is where the manifest is regenerated from a freshly built package, with th
 `eng/generate-verification-manifest.ps1` and in `release-readiness.md`. The ten-minute physical walk
 also gains a check: **whether subtitles look the way they were asked to**.
 
-**5. Shutting down with an active session gets fixed, and this is how.** `ObjectDisposedException` on
-`LibVlcMediaPlayerEngine`: the engine is registered **three times** and the last one —
-`IVideoFrameSource` — is resolved when a video starts drawing, so it enters the container's disposal
-list after the coordinator and leaves it before. **The fix goes where its reason already is**:
-`ApplicationHost.DisposeAsync` ends the session's loop before disposing the services — "the session's
-loop and handlers go before the services they were feeding" — and that is where it has to **stop the
-session** as well, not only its hooks: one line, with the coordinator resolved before
-`_services.DisposeAsync()`. The proof is the 2a scene **without** closing the player at the end. It
-goes with 2e, the batch that touches that surface.
+~~**5. Shutting down with an active session gets fixed, and this is how.**~~ **Done on 2026-08-17**,
+exactly as decided: `ApplicationHost.DisposeAsync` stops the session (`StopAsync`, with
+`ObjectDisposedException` swallowed) before `_services.DisposeAsync()`. What proves it is **not** the
+2a scene but the new recovery one, which ends with a video still playing for the same reason: closing
+the player first is what every scene did and what hid this.
 
 Then: coverage over all of `src/`, what is left of `ARQ-004`, and the redesign.
 
@@ -103,7 +121,7 @@ composition, and no product defect: the control worked, and what was missing was
 | ~~**2b**~~ | ~~Subtitle style~~ | **done on 2026-08-17, 27 → 23** |
 | ~~**2c**~~ | ~~Markers: editor, review and skip~~ | **done on 2026-08-17, 23 → 16** |
 | ~~**2d**~~ | ~~Resume, next episode and switching version, with all three answers~~ | **done on 2026-08-17, 16 → 8** |
-| **2e** | Loose file and player recovery | 5 |
+| **2e** | ~~Player recovery~~ **done on 2026-08-17, 8 → 6**; the loose file waits on the defect above | 3 |
 
 It is the only batch that needs **real video**. And the warning stands measured: **the remaining
 overlays set no alignment** and stretch over the whole stage, exactly like the status one corrected on

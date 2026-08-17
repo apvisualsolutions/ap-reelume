@@ -4,19 +4,42 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **8**, con **120 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **6**, con **122 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
 ### La cola desde el 2026-08-17, con su recuento
 
-**8 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
-queda es ejecutarlo midiendo antes de corregir.
+**6 pendientes, y los bloquea un solo defecto medido.** Los tres del archivo suelto y el tráiler
+local de la tanda 1 son **el mismo problema**, así que corregirlo desbloquea cuatro de los seis.
 
 | Paso | Qué | Cuántos | Deja |
 |---|---|---|---|
-| **2e** | El archivo suelto y la recuperación del reproductor | 5 | 3 |
-| **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
+| **La sesión suelta no se ve** | Banner del archivo suelto (3) y tráiler local (1) | 4 | 2 |
+| **1 (resto)** | Fila de episodio y «Continuar» de la ficha | 2 | **0** |
+
+#### El defecto que hay que corregir antes de seguir, ya medido
+
+**Un archivo activado desde el Explorador se reproduce y no se ve.** Medido el 2026-08-17:
+
+```
+singleton.IsLooseSession=True  name='Arrival.2016.mp4'  engine=Playing  pos=00:00:00.15
+player=False  playerVisible=False  stages=0  surfaces=0
+```
+
+La activación hace su parte entera —`OpenLooseFile` arranca el motor y el banner recibe su sesión—,
+pero **nadie construye las superficies del reproductor**, y `HasLooseFile` es
+`Player?.LooseFile is not null`. Así que el vídeo suena sin imagen y sin transporte, y el aviso de
+«esto no está en tu biblioteca» no llega a la pantalla con sus tres botones dentro. Lo mismo le pasa
+al **tráiler local**, que abre por la misma vía.
+
+**Lo que no vale**, y está comprobado: reutilizar `OpenPlayerAsync` tal cual. Empieza por
+`FindByIdAsync` y un archivo suelto no está en el catálogo; y su camino arranca el seguimiento de
+progreso, que es exactamente lo que `OpenLooseFile` promete no tocar —«una sesión suelta deja la base
+de datos como la encontró»—. Hace falta una vía que construya **reproductor, transporte y banner** y
+nada más: sin seguimiento, sin marcadores, sin versiones, sin oferta de reanudar. El arnés ya sabe
+llegar: `ApplicationHost.PendingActivationPath` antes de `CreateShell` y **`ConfigureWindow`
+después**, que es donde la activación se lee y en ningún otro sitio.
 
 #### Las cinco decisiones del 2026-08-17, tomadas y no reabiertas
 
@@ -41,16 +64,15 @@ progreso guardado **probablemente no empezaba por el principio**. Ahora que la p
 debería estar arreglado de paso; lo que falta es **medirlo**, y el sitio natural es la escena de la
 tanda 1 que ya tiene que sembrar progreso para «Continuar».
 
-**2. La novena salida de la regla de aislamiento (2 controles de la 2e).** «Abrir con una aplicación
-externa» arranca un **proceso real** (`ShellExternalPlaybackLauncher`, `UseShellExecute`): abriría el
-reproductor del sistema en la máquina que mide. Se resuelve **como las cinco anteriores**: la
-composición elige por `SystemHandoffDirectory` entre el lanzador real y uno que **anote** lo que
-habría abierto, con verbo delante —`play-externally <ruta>`— para que la sonda lo distinga sin
-analizar nada. El reintento comparte superficie: la escena abre un archivo que no se puede decodificar
-—dos bytes con extensión aprobada—, pulsa «Abrir con una aplicación externa» leyendo el registro, y
-después **sustituye el archivo por una muestra buena** y pulsa «Reintentar», cuya sonda es que la
-sesión pasa a reproducir. La clase nueva entra en la lista de vigilados de `check-coverage.ps1` al
-100/100 al cerrarse la tanda.
+~~**2. La novena salida de la regla de aislamiento (2 controles de la 2e).**~~ **Hecha el 2026-08-17,
+8 → 6** — [la evidencia](evidence/stable/audit-walk-player-recovery.md). El anotador
+(`RecordingExternalPlaybackLauncher`, verbo `play-externally <ruta>`) entra en los vigilados de
+`check-coverage.ps1` al 100/100, y sus **dos negativas** —extensión fuera de la lista y archivo
+ausente— se afirman en `IsolatedRunTests` junto a las dos mitades de la elección. Lo que **no** se
+cumplió fue que las dos pulsaciones compartieran superficie: `corrupted=True canRetry=False
+canOpenExternally=True`. La política da a un medio corrupto elegir otra versión y abrir fuera, **sin
+reintentar**, y tiene razón —reabrir los mismos bytes falla igual—; reintentar se ofrece cuando
+**falta el archivo**. La escena abre dos veces y cada pulsación encuentra el fallo que la ofrece.
 
 **3. Los superpuestos que siguen sin dimensionarse** —ya sólo `SkipMarkerButton` y `LooseFileBanner`,
 porque `VersionSwitchDialog` se corrigió el 2026-08-17 con su medición (`surfaces=1 [0, 0, 1280, 1400]`
@@ -67,15 +89,11 @@ bloqueador nombrado en `eng/generate-verification-manifest.ps1` y en `release-re
 físico de diez minutos gana además una comprobación: **mirar si los subtítulos se ven como se
 pidieron**.
 
-**5. El apagado con una sesión activa se corrige, y así.** `ObjectDisposedException` sobre
-`LibVlcMediaPlayerEngine`: el motor está registrado **tres veces** y la última —`IVideoFrameSource`—
-se resuelve cuando un vídeo empieza a dibujarse, así que entra en la lista de desechado del contenedor
-después del coordinador y sale antes. **La corrección va donde ya está su razón**:
-`ApplicationHost.DisposeAsync` termina el ciclo de la sesión antes de desechar los servicios —«the
-session's loop and handlers go before the services they were feeding»— y ahí mismo tiene que **parar
-la sesión**, no sólo sus enganches: una línea, con el coordinador resuelto antes de
-`_services.DisposeAsync()`. La prueba es la escena de la 2a **sin** cerrar el reproductor al final. Va
-con la 2e, que es la tanda que toca esa superficie.
+~~**5. El apagado con una sesión activa se corrige, y así.**~~ **Hecha el 2026-08-17**, exactamente
+como estaba decidida: `ApplicationHost.DisposeAsync` para la sesión (`StopAsync`, con
+`ObjectDisposedException` tragada) antes de `_services.DisposeAsync()`. Lo que la prueba **no** es la
+escena de la 2a sino la nueva de recuperación, que termina con un vídeo sonando por la misma razón:
+cerrar el reproductor primero es lo que hacían todas las escenas y es lo que tapaba esto.
 
 Después: la cobertura a todo `src/`, lo que queda de `ARQ-004`, y el rediseño.
 
@@ -104,7 +122,7 @@ sin defecto de producto: el control funcionaba y lo que faltaba era una ventana.
 | ~~**2b**~~ | ~~Estilo de subtítulos~~ | **hecha el 2026-08-17, 27 → 23** |
 | ~~**2c**~~ | ~~Marcadores: editor, revisión y salto~~ | **hecha el 2026-08-17, 23 → 16** |
 | ~~**2d**~~ | ~~Reanudar, siguiente episodio y cambiar de versión, con las tres respuestas~~ | **hecha el 2026-08-17, 16 → 8** |
-| **2e** | Archivo suelto y recuperación del reproductor | 5 |
+| **2e** | ~~Recuperación del reproductor~~ **hecha el 2026-08-17, 8 → 6**; el archivo suelto espera al defecto de arriba | 3 |
 
 Es la única tanda que necesita **vídeo real**. Y la advertencia sigue medida: **los superpuestos que
 quedan no fijan alineación** y se estiran sobre todo el escenario, igual que el de estado corregido el

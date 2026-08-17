@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Home;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Application.Playback;
+using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Common;
 using ApSolutions.LocalMedia.Domain.Continuity;
@@ -22,6 +23,7 @@ using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Windows.MediaKeys;
 using ApSolutions.LocalMedia.Windows.Playback;
+using ApSolutions.LocalMedia.Windows.Shell;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ApSolutions.LocalMedia.Windows;
@@ -43,7 +45,15 @@ public static partial class CompositionRoot
             .AddSingleton<LibVlcMediaPlayerEngine>()
             .AddSingleton<IMediaPlayerEngine>(provider => provider.GetRequiredService<LibVlcMediaPlayerEngine>())
             .AddSingleton<IVideoFrameSource>(provider => provider.GetRequiredService<LibVlcMediaPlayerEngine>())
-            .AddSingleton<IExternalPlaybackLauncher, ShellExternalPlaybackLauncher>()
+            // The ninth exit the isolation rule covers, and the same choice by the same data root:
+            // "Open with an external application" starts a real process, so a run that does not own
+            // this profile writes down the file it would have handed over instead of opening the
+            // system's player on the machine measuring it.
+            .AddSingleton<IExternalPlaybackLauncher>(provider =>
+                provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory is not null
+                    ? new RecordingExternalPlaybackLauncher(
+                        provider.GetRequiredService<RecordingSystemHandoff>())
+                    : new ShellExternalPlaybackLauncher())
             .AddSingleton<PlaybackSessionCoordinator>()
             .AddSingleton<IPlaybackSessionCoordinator>(provider =>
                 provider.GetRequiredService<PlaybackSessionCoordinator>())

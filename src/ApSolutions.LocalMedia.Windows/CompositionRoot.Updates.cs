@@ -101,14 +101,25 @@ public static partial class CompositionRoot
                 ReadResource("LifecycleTrayOpenAction"),
                 ReadResource("LifecycleTrayExitAction")))
 
+            // The one that writes handovers down, resolved rather than built where it is needed:
+            // there are two exits behind it now — the recovery screen's and the player's external
+            // one — and two of these would be two locks over one file. It is only ever resolved on
+            // the branch that has already found a handover folder, which is why asking for it
+            // without one is a failure rather than a null.
+            .AddSingleton(provider => new RecordingSystemHandoff(
+                provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory
+                    ?? throw new InvalidOperationException(
+                        "This run owns the profile, so it hands things to Windows rather than "
+                            + "writing them down; nothing should have asked for the recorder.")))
+
             // What the recovery screen hands to Windows itself, decided by the data root, once,
             // here — the same choice the trailer link and the archive dialogs make. The person whose
             // profile this is gets Explorer and a real shutdown; a run keeping its data somewhere of
             // its own writes down what it would have handed over, because a harness that shut the
             // application down would end the suite pressing the button.
             .AddSingleton<ISystemHandoff>(provider =>
-                provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory is { } handoff
-                    ? new RecordingSystemHandoff(handoff)
+                provider.GetRequiredService<IAppDataPaths>().SystemHandoffDirectory is not null
+                    ? provider.GetRequiredService<RecordingSystemHandoff>()
                     : new WindowsSystemHandoff(System.Diagnostics.Process.Start, ShutdownDesktop))
             .AddTransient<LifecycleSettingsViewModel>()
             .AddSingleton<IBackdropService, MicaBackdropService>()

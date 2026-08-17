@@ -3,12 +3,14 @@
 
 using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Updates;
 using ApSolutions.LocalMedia.Domain.Updates;
 using ApSolutions.LocalMedia.Infrastructure.Updates;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
+using ApSolutions.LocalMedia.Windows.Playback;
 using ApSolutions.LocalMedia.Windows.Shell;
 using ApSolutions.LocalMedia.Windows.Updates;
 using Microsoft.Extensions.DependencyInjection;
@@ -218,6 +220,24 @@ public sealed class IsolatedRunTests : IDisposable
                     new UpdateRelease("0.2.0", "win-x64", null, null, 9, null, null),
                     package),
                 TestContext.Current.CancellationToken));
+
+            // The ninth exit, and it goes through the launcher the application really builds for the
+            // same reason: what has to be isolated is a process starting, not a method somebody
+            // remembered to call. Its refusals are asserted here too, because a recorder that wrote
+            // down handovers the real launcher would have refused would make the probe say nothing
+            // about the real one.
+            var media = Path.Combine(isolated, "Arrival.2016.mkv");
+            await File.WriteAllTextAsync(media, "a film", TestContext.Current.CancellationToken);
+            var external = host.Services.GetRequiredService<IExternalPlaybackLauncher>();
+            Assert.IsNotType<ShellExternalPlaybackLauncher>(external);
+            Assert.True(await external.TryLaunchAsync(media, TestContext.Current.CancellationToken));
+
+            var script = Path.Combine(isolated, "install.ps1");
+            await File.WriteAllTextAsync(script, "whoami", TestContext.Current.CancellationToken);
+            Assert.False(await external.TryLaunchAsync(script, TestContext.Current.CancellationToken));
+            Assert.False(await external.TryLaunchAsync(
+                Path.Combine(isolated, "Gone.2014.mkv"),
+                TestContext.Current.CancellationToken));
         }
 
         var record = Path.Combine(
@@ -228,6 +248,7 @@ public sealed class IsolatedRunTests : IDisposable
                 $"{RecordingSystemHandoff.OpenFolderVerb} {folder}",
                 RecordingSystemHandoff.ExitVerb,
                 $"{RecordingSystemHandoff.OpenPackageVerb} {Path.Combine(isolated, "apreelume-0.2.0.msix")}",
+                $"{RecordingSystemHandoff.PlayExternallyVerb} {Path.Combine(isolated, "Arrival.2016.mkv")}",
             ],
             await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
     }
@@ -303,6 +324,8 @@ public sealed class IsolatedRunTests : IDisposable
 
             _ = Assert.IsType<WindowsSystemHandoff>(
                 host.Services.GetRequiredService<ISystemHandoff>());
+            _ = Assert.IsType<ShellExternalPlaybackLauncher>(
+                host.Services.GetRequiredService<IExternalPlaybackLauncher>());
         }
         finally
         {

@@ -470,6 +470,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Closing the application with a video open broke the shutdown.** Ending a session's hooks is not
+  stopping it: the media stayed open, so the teardown tried to stop a player that had already been
+  disposed and threw. The session is now stopped before the services that were feeding it. Nothing
+  saw this because every check closed the player first, which is exactly what somebody closing the
+  window mid-film does not do.
+
 - **Switching version lost the point you had just agreed to.** The application asked what to do with
   your progress, worked out the equivalent second in the other version and stored it — and then opened
   that version **from the beginning** and wrote that zero over what it had just stored: measured, the

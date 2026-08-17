@@ -482,6 +482,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Cerrar la aplicación con un vídeo abierto reventaba el apagado.** Terminar los enganches de una
+  sesión no es pararla: el medio seguía abierto, así que el desmontaje intentaba parar un reproductor
+  que ya se había desechado y saltaba una excepción. Ahora la sesión se para antes que los servicios
+  que la alimentaban. Nadie lo veía porque toda comprobación cerraba el reproductor primero, que es
+  justo lo que quien cierra la ventana a media película no hace.
+
 - **Cambiar de versión perdía el punto que acababas de aceptar.** La aplicación preguntaba qué hacer
   con tu progreso, calculaba el segundo equivalente en la otra versión y lo guardaba — y después abría
   esa versión **desde el principio** y escribía ese cero encima de lo que acababa de guardar: medido,
