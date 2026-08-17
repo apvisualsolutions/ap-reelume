@@ -482,6 +482,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El botón para cambiar de versión se dibujaba fuera de la ventana.** En la fila de cada versión
+  alternativa, la etiqueta de calidad empujaba el botón tan a la derecha como largo fuera su texto:
+  medido a 74 píxeles fuera de una ventana de 1600, sin nada que desplazar. Era una versión a la que
+  no se podía cambiar con el ratón. La fila se reparte ahora entre una etiqueta que se pliega y un
+  botón que conserva su sitio.
+
 - **La oferta de continuar y la del siguiente episodio se dibujaban sobre toda la pantalla.** Las dos
   se estiraban al escenario entero del reproductor —1280×1400 medidos— con sus botones en la esquina,
   en vez de dibujarse como la tarjeta que son. Ahora tienen su tamaño, su fondo y su borde, y sus

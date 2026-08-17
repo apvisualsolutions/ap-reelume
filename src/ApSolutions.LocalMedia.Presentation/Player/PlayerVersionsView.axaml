@@ -19,13 +19,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ItemsControl ItemsSource="{Binding Alternatives}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="player:PlayerVersionRowViewModel">
-          <StackPanel Margin="0,2" Orientation="Horizontal" Spacing="12">
-            <TextBlock VerticalAlignment="Center" Text="{Binding QualityLabel}" />
+          <!--
+            A Grid and not a horizontal StackPanel, which is the sixth time this shape has been
+            measured here: a StackPanel offers its children infinite width, so a label of free width
+            beside a button pushes the button as far right as the text is long. Measured on
+            2026-08-17 at x=1674 in a 1600 px window, with nothing to scroll sideways — the row of a
+            version nobody could switch to. The label takes the star column and wraps; the button
+            keeps its own width and its place.
+          -->
+          <Grid Margin="0,2" ColumnDefinitions="*,Auto">
+            <TextBlock
+                Grid.Column="0"
+                Margin="0,0,12,0"
+                VerticalAlignment="Center"
+                Text="{Binding QualityLabel}"
+                TextWrapping="Wrap" />
             <Button
+                Grid.Column="1"
                 automation:AutomationProperties.Name="{DynamicResource PlayerVersionsSwitchAction}"
                 Command="{Binding SwitchCommand}"
                 Content="{DynamicResource PlayerVersionsSwitchAction}" />
-          </StackPanel>
+          </Grid>
         </DataTemplate>
       </ItemsControl.ItemTemplate>
     </ItemsControl>

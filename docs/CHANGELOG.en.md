@@ -470,6 +470,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The button that switches version was drawn outside the window.** In each alternative version's
+  row, the quality label pushed the button as far right as its text was long: measured 74 pixels
+  outside a 1600 px window, with nothing to scroll. It was a version nobody could switch to with a
+  mouse. The row is now split between a label that wraps and a button that keeps its place.
+
 - **The resume offer and the next-episode offer were drawn over the whole screen.** Both stretched to
   the player's entire stage — 1280x1400 measured — with their buttons in the corner instead of being
   drawn as the card they are. They now have their own size, background and border, and their buttons
