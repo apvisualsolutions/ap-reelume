@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
@@ -142,6 +143,59 @@ public sealed class HandoffUpdateDownloadTests : IDisposable
         Assert.Equal(HttpStatusCode.NotFound, withoutPackage.StatusCode);
     }
 
+    /// <summary>
+    /// A manifest may ask for the answer to be held back, and one that says nothing asks for nothing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is what makes the update screen's Cancel pressable at all: it exists only while a fetch
+    /// is running, and a fetch from the folder next door is over before anything could be pressed —
+    /// measured as "UpdateStatusReady where UpdateStatusDownloading was expected", before the wait
+    /// existed.
+    /// </para>
+    /// <para>
+    /// Both halves are asserted here rather than only the declared one, because the field is read
+    /// with a fallback and the fallback is the shape every other manifest has: a merged coverage
+    /// report keeps the better of two runs for a line rather than the union of them, so a branch
+    /// split across two suites reads as half covered forever.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task A_declared_wait_holds_the_answer_back_and_no_declaration_holds_nothing()
+    {
+        Seed(serveDelayMilliseconds: 500);
+        using var client = new HttpClient(new HandoffUpdateTransport(Handoff));
+
+        var held = Stopwatch.StartNew();
+        using var answer = await client.GetAsync(Address, TestContext.Current.CancellationToken);
+        held.Stop();
+
+        Assert.Equal(HttpStatusCode.OK, answer.StatusCode);
+        Assert.Equal(
+            Payload,
+            await answer.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
+
+        // 400 rather than 500: a timer is allowed to fire a tick early, and the assertion is that the
+        // answer was held rather than that it was held to the millisecond.
+        Assert.True(
+            held.ElapsedMilliseconds >= 400,
+            $"The manifest asked for 500 ms and the answer arrived in {held.ElapsedMilliseconds} ms, "
+                + "so nothing was held back and a fetch could not be caught in flight.");
+
+        // And the same package, described by a manifest that asks for no wait at all. Only the
+        // manifest is rewritten: the answer above still holds the package open, and rewriting a file
+        // the transport is serving measures the harness rather than the transport.
+        WriteManifest();
+        var atOnce = Stopwatch.StartNew();
+        using var immediate = await client.GetAsync(Address, TestContext.Current.CancellationToken);
+        atOnce.Stop();
+
+        Assert.Equal(HttpStatusCode.OK, immediate.StatusCode);
+        Assert.True(
+            atOnce.ElapsedMilliseconds < 400,
+            $"A manifest declaring no wait held the answer for {atOnce.ElapsedMilliseconds} ms.");
+    }
+
     [Fact]
     public async Task A_cancelled_request_is_never_answered()
     {
@@ -173,15 +227,23 @@ public sealed class HandoffUpdateDownloadTests : IDisposable
         Sha256Signed = true,
     };
 
-    private void Seed()
+    private void Seed(int serveDelayMilliseconds = 0)
     {
-        WriteManifest();
+        WriteManifest(serveDelayMilliseconds);
         File.WriteAllBytes(Path.Combine(Handoff, PackageFile), Payload);
     }
 
-    private void WriteManifest()
+    private void WriteManifest(int serveDelayMilliseconds = 0)
     {
         Directory.CreateDirectory(Handoff);
+
+        // Left out unless a test asks for it, because absent is the shape a manifest ordinarily has.
+        var serveDelay = serveDelayMilliseconds > 0
+            ? string.Create(
+                CultureInfo.InvariantCulture,
+                $",{Environment.NewLine}  \"serveDelayMilliseconds\": {serveDelayMilliseconds}")
+            : string.Empty;
+
         File.WriteAllText(
             Path.Combine(Handoff, HandoffUpdateManifest.FileName),
             string.Create(
@@ -195,7 +257,7 @@ public sealed class HandoffUpdateDownloadTests : IDisposable
                   "sizeInBytes": {{Payload.Length}},
                   "summaryEs": "Lo que cambia.",
                   "summaryEn": "What changed.",
-                  "packageFile": "{{PackageFile}}"
+                  "packageFile": "{{PackageFile}}"{{serveDelay}}
                 }
                 """));
     }

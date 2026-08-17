@@ -38,6 +38,20 @@ public sealed record HandoffUpdateManifest(
     public const string FileName = "update-manifest.json";
 
     /// <summary>
+    /// How long the transport holds the answer back, in milliseconds. Optional, and nearly always
+    /// absent.
+    /// </summary>
+    /// <remarks>
+    /// It exists for a run that has to press something while a fetch is still in flight — the update
+    /// screen's Cancel only exists while one is. With the package on the disk beside it a download
+    /// finishes in milliseconds, so the wait is declared here, in the data a run writes for itself,
+    /// rather than anywhere in the product: what is being made slow is where the bytes come from, and
+    /// a source is entitled to be slow. Everything the cancellation then travels — the caller's token,
+    /// the exception, the status the screen lands on — is the application's own.
+    /// </remarks>
+    public int ServeDelayMilliseconds { get; init; }
+
+    /// <summary>
     /// Reads the manifest, or answers <see langword="null"/> when the folder holds none.
     /// </summary>
     /// <remarks>
@@ -66,7 +80,14 @@ public sealed record HandoffUpdateManifest(
                 root.GetProperty("sizeInBytes").GetInt64(),
                 Text(root, "summaryEs"),
                 Text(root, "summaryEn"),
-                Text(root, "packageFile"));
+                Text(root, "packageFile"))
+            {
+                // Asked for or not asked for, and both are answers: a manifest that says nothing about
+                // waiting is asking to be answered at once, which is what every manifest but one says.
+                ServeDelayMilliseconds = root.TryGetProperty("serveDelayMilliseconds", out var wait)
+                    ? wait.GetInt32()
+                    : 0,
+            };
         }
         catch (Exception exception)
             when (exception is JsonException or KeyNotFoundException or FormatException
