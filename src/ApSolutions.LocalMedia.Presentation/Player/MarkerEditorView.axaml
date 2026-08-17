@@ -24,7 +24,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
         SelectedItem="{Binding SelectedMarker, Mode=TwoWay}"
         automation:AutomationProperties.Name="{DynamicResource MarkerEditorListName}" />
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
+    <!--
+    A WrapPanel and not a horizontal StackPanel, for the reason measured five times in this
+    repository: a horizontal StackPanel offers its children infinite width and draws them where they
+    fall, so the last one lands wherever the sum says — off the screen, with nothing to scroll. This
+    surface lives in the player's 320 px column, where a kind selector and two spinners never fit on
+    one line.
+    -->
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
       <ComboBox
           x:Name="MarkerKindSelector"
           MinWidth="160"
@@ -41,7 +48,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Minimum="0"
           Value="{Binding EndSeconds, Mode=TwoWay}"
           automation:AutomationProperties.Name="{DynamicResource MarkerEditorEndLabel}" />
-    </StackPanel>
+    </WrapPanel>
 
     <TextBlock
         x:Name="MarkerRangeErrorText"
@@ -57,7 +64,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource MarkerEditorOverlapError}"
         TextWrapping="Wrap" />
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
+    <WrapPanel ItemSpacing="8" LineSpacing="8">
       <Button
           x:Name="SaveMarkerButton"
           Command="{Binding SaveCommand}"
@@ -68,6 +75,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding DeleteCommand}"
           Content="{DynamicResource MarkerEditorDelete}"
           automation:AutomationProperties.Name="{DynamicResource MarkerEditorDelete}" />
-    </StackPanel>
+    </WrapPanel>
   </StackPanel>
 </UserControl>
