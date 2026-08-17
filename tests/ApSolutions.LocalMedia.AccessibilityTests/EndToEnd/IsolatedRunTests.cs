@@ -3,6 +3,8 @@
 
 using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Updates;
+using ApSolutions.LocalMedia.Domain.Updates;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
@@ -200,6 +202,20 @@ public sealed class IsolatedRunTests : IDisposable
 
             Assert.True(handoff.TryOpenFolder(folder));
             handoff.RequestExit();
+
+            // The updater's handover is the same exit and is asked through the launcher the
+            // application really builds, because what has to be isolated is the installer starting —
+            // not a method somebody remembered to call directly.
+            var package = Path.Combine(isolated, "apreelume-0.2.0.msix");
+            await File.WriteAllTextAsync(
+                package,
+                "a package",
+                TestContext.Current.CancellationToken);
+            Assert.True(await host.Services.GetRequiredService<IUpdateLauncher>().LaunchAsync(
+                new StagedUpdate(
+                    new UpdateRelease("0.2.0", "win-x64", null, null, 9, null, null),
+                    package),
+                TestContext.Current.CancellationToken));
         }
 
         var record = Path.Combine(
@@ -209,6 +225,7 @@ public sealed class IsolatedRunTests : IDisposable
             [
                 $"{RecordingSystemHandoff.OpenFolderVerb} {folder}",
                 RecordingSystemHandoff.ExitVerb,
+                $"{RecordingSystemHandoff.OpenPackageVerb} {Path.Combine(isolated, "apreelume-0.2.0.msix")}",
             ],
             await File.ReadAllLinesAsync(record, TestContext.Current.CancellationToken));
     }

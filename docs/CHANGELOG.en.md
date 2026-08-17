@@ -95,6 +95,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Handing the update to Windows is now checked too, without starting an installer.** Installing
+  here means giving Windows the package and stepping aside, so any automated check started a real
+  installer on the machine doing the measuring. A test run now writes down which package it would
+  have handed over, as it already did for the backup folder. On the way, something that lived in a
+  comment moved to where it is decided: on a Windows with nothing registered for `.msix` the call
+  does not fail — it simply starts nothing — and that is a **refusal**, not a success; for a folder,
+  starting nothing means it landed in a window you already had open.
+
 - **The permission to look for updates on its own is checked by pressing it.** It is the switch that
   decides whether the application opens a connection you did not ask for, so what it decides has to
   survive closing the window: the check now presses it with the mouse and goes and reads **the file**

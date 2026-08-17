@@ -239,10 +239,17 @@ one**, and this checks it.
      test, and the evidence says so outright: in an isolated run the signature is not verified because
      nothing is signed. What stays real is what is kept on purpose — hash, size and `.partial` — over
      a local transport. Making `UpdateSigningKey.PublicKey` depend on the root **stays forbidden**.
-   - **The launcher** writes down which package it would have handed over, in the shape the five
-     exits already have.
-   - **Suggested order:** the three exits in one commit with `IsolatedRunTests` covering both halves
-     of each, then the four controls. Cancel with the source serving slowly on purpose.
+   - ~~**The launcher.**~~ **Done on 2026-08-17** —
+     [the evidence](evidence/stable/audit-updater-handover-exit.md) — and with **no new class and no
+     new interface**: `WindowsUpdateLauncher` already took the handover as a delegate, so
+     `ISystemHandoff` gained `TryOpenPackage` and the composition hands it over. `OpenWithWindows` was
+     left with no callers, and **the compiler said so**. The isolation rule now covers **six** exits.
+     An asymmetry that lived in a comment moved to where it is decided: a null process is **success**
+     for a folder — it lands in a window already open — and a **refusal** for a package, which is the
+     refusal that really happens on a Windows with nothing registered for `.msix`.
+   - **The source and the download are what is left**, in a commit of their own with
+     `IsolatedRunTests` covering both halves of each, then the four controls. Cancel with the source
+     serving slowly on purpose.
 
    ~~**7b — the database recovery (2).**~~ **Done on 2026-08-17, 40 → 38**, in two commits and with
    **no product defect at all** — the third such batch in eleven:
@@ -307,7 +314,7 @@ it belongs to the owner.
 **describes an artifact**: its provenance is the package's own, so regenerating it against an
 `artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
 the manifest is part of cutting a release, not part of a working session. **Decided**: they go into
-the matrix **when the manifest is regenerated against a freshly built package** — there are ten now,
+the matrix **when the manifest is regenerated against a freshly built package** — there are eleven now,
 so that step stops being optional at the next release — and until then they live in
 `docs/evidence/stable/`, linked from here:
 
@@ -321,6 +328,7 @@ so that step stops being optional at the next release — and until then they li
 8. [the recovery screen's two exits](evidence/stable/audit-recovery-exits.md)
 9. [the recovery screen pressed](evidence/stable/audit-walk-database-recovery.md)
 10. [the permission to look for updates](evidence/stable/audit-walk-update-automatic-check.md)
+11. [handing the package to Windows](evidence/stable/audit-updater-handover-exit.md)
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would

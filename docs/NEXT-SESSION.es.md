@@ -245,9 +245,15 @@ correcta**, y con esto se comprueba.
      verifica porque no hay nada firmado. Lo real es lo que se conserva a propósito —hash, tamaño y
      `.partial`— sobre transporte local. **Sigue prohibido** hacer que `UpdateSigningKey.PublicKey`
      dependa de la raíz.
-   - **El lanzador** anota el paquete que habría entregado, con la forma que ya tienen las cinco
-     salidas.
-   - **Orden sugerido:** las tres salidas en un commit con `IsolatedRunTests` cubriendo las dos
+   - ~~**El lanzador.**~~ **Hecho el 2026-08-17** —
+     [la evidencia](evidence/stable/audit-updater-handover-exit.md)—, y **sin clase ni interfaz
+     nueva**: `WindowsUpdateLauncher` ya recibía la entrega como delegado, así que `ISystemHandoff`
+     ganó `TryOpenPackage` y la composición se lo pasa. `OpenWithWindows` quedó sin llamantes y **lo
+     dijo el compilador**. Con ello la regla de aislamiento cubre **seis** salidas. Y una asimetría
+     que estaba en un comentario pasó a estar donde se decide: un proceso nulo es **éxito** para una
+     carpeta —cae en una ventana ya abierta— y **rechazo** para un paquete, que es la negativa que de
+     verdad ocurre en un Windows sin nada registrado para `.msix`.
+   - **Queda la fuente y la descarga**, en un commit propio con `IsolatedRunTests` cubriendo las dos
      mitades de cada una, y después los cuatro controles. «Cancelar» con la fuente sirviendo despacio
      a propósito.
 
@@ -314,7 +320,7 @@ propietario.
 un artefacto**: su procedencia es la del paquete, así que regenerarlo con el `artifacts/package/` de
 otra compilación escribiría una procedencia que no es la de nadie. Regenerar el manifiesto es parte de
 cortar una versión, no de una sesión de trabajo. **Decidido**: entran en la matriz **cuando se
-regenere el manifiesto con un paquete recién construido** —ya son diez, así que ese paso deja de ser
+regenere el manifiesto con un paquete recién construido** —ya son once, así que ese paso deja de ser
 opcional en la próxima versión— y hasta entonces viven en `docs/evidence/stable/`, enlazadas aquí:
 
 1. [el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md)
@@ -327,6 +333,7 @@ opcional en la próxima versión— y hasta entonces viven en `docs/evidence/sta
 8. [las dos salidas de la recuperación](evidence/stable/audit-recovery-exits.md)
 9. [la pantalla de recuperación pulsada](evidence/stable/audit-walk-database-recovery.md)
 10. [el permiso para buscar actualizaciones](evidence/stable/audit-walk-update-automatic-check.md)
+11. [la entrega del paquete a Windows](evidence/stable/audit-updater-handover-exit.md)
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

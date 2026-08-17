@@ -32,6 +32,9 @@ public sealed class RecordingSystemHandoff : ISystemHandoff
     /// <summary>What a line says when a folder was offered to whoever is at the machine.</summary>
     public const string OpenFolderVerb = "open-folder";
 
+    /// <summary>What a line says when a verified package was handed over to be installed.</summary>
+    public const string OpenPackageVerb = "open-package";
+
     /// <summary>What a line says when the application was asked to end.</summary>
     public const string ExitVerb = "exit";
 
@@ -50,6 +53,12 @@ public sealed class RecordingSystemHandoff : ISystemHandoff
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(folder);
         return Record($"{OpenFolderVerb} {folder}");
+    }
+
+    public bool TryOpenPackage(string package)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(package);
+        return Record($"{OpenPackageVerb} {package}");
     }
 
     public void RequestExit() => _ = Record(ExitVerb);

@@ -47,24 +47,45 @@ public sealed class WindowsSystemHandoff : ISystemHandoff
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(folder);
 
-        try
-        {
-            // A null process is not a failure: the folder can land in an Explorer window that was
-            // already open, and there is no child of this process to report.
-            using var process = _start(new ProcessStartInfo
-            {
-                FileName = folder,
-                UseShellExecute = true,
-            });
-            return true;
-        }
-        catch (Win32Exception)
-        {
-            // Nothing is registered to show a folder, or the folder is gone. The screen keeps
-            // offering everything else it can do.
-            return false;
-        }
+        // A null process is not a failure: the folder can land in an Explorer window that was
+        // already open, and there is no child of this process to report.
+        return Hand(folder, requireProcess: false);
+    }
+
+    /// <summary>
+    /// Opens the package, and here a process that never started <em>is</em> the failure.
+    /// </summary>
+    /// <remarks>
+    /// The asymmetry with the folder is measured rather than stylistic, and it is the refusal that
+    /// actually happens: on a clean Windows with nothing registered for <c>.msix</c> the shell call
+    /// returns nothing and throws nothing, so a launcher that treated null as success would report an
+    /// installation starting while nothing at all had. Where an App Installer exists it answers with
+    /// a process. Both halves are archived in docs/evidence/stable/updater-handover.json.
+    /// </remarks>
+    public bool TryOpenPackage(string package)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(package);
+        return Hand(package, requireProcess: true);
     }
 
     public void RequestExit() => _shutdown();
+
+    private bool Hand(string path, bool requireProcess)
+    {
+        try
+        {
+            using var process = _start(new ProcessStartInfo
+            {
+                FileName = path,
+                UseShellExecute = true,
+            });
+            return !requireProcess || process is not null;
+        }
+        catch (Win32Exception)
+        {
+            // Nothing is registered to take it, or it is gone. The screen keeps offering everything
+            // else it can do.
+            return false;
+        }
+    }
 }

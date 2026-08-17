@@ -85,6 +85,71 @@ public sealed class WindowsSystemHandoffTests
     }
 
     /// <summary>
+    /// A package reaches the shell the same way, whole and alone: the file is the entire
+    /// instruction, so nothing in its path can be read as an argument.
+    /// </summary>
+    [Fact]
+    public void A_package_reaches_the_shell_whole_and_alone()
+    {
+        var seen = new List<ProcessStartInfo>();
+        var handoff = new WindowsSystemHandoff(
+            startInfo =>
+            {
+                seen.Add(startInfo);
+                return new Process();
+            },
+            NoShutdown);
+
+        Assert.True(handoff.TryOpenPackage(@"C:\staging\apreelume-0.2.0.msix"));
+
+        var startInfo = Assert.Single(seen);
+        Assert.Equal(@"C:\staging\apreelume-0.2.0.msix", startInfo.FileName);
+        Assert.True(startInfo.UseShellExecute);
+        Assert.Empty(startInfo.ArgumentList);
+        Assert.Empty(startInfo.Arguments);
+    }
+
+    /// <summary>
+    /// And here a shell that starts nothing is a refusal, which is the opposite of what it means for
+    /// a folder — and it is the refusal that actually happens.
+    /// </summary>
+    /// <remarks>
+    /// Measured on a clean Windows with nothing registered for <c>.msix</c>: the call returns null
+    /// and throws nothing. Treating that as success would report an installation starting while
+    /// nothing at all had.
+    /// </remarks>
+    [Fact]
+    public void A_shell_that_starts_nothing_refuses_the_package_even_though_it_accepts_a_folder()
+    {
+        var handoff = new WindowsSystemHandoff(_ => null, NoShutdown);
+
+        Assert.False(handoff.TryOpenPackage(@"C:\staging\apreelume-0.2.0.msix"));
+        Assert.True(handoff.TryOpenFolder(@"C:\staging"));
+    }
+
+    [Fact]
+    public void A_shell_that_will_not_take_the_package_is_refused_rather_than_thrown() =>
+        Assert.False(new WindowsSystemHandoff(_ => throw new Win32Exception(2), NoShutdown)
+            .TryOpenPackage(@"C:\staging\gone.msix"));
+
+    [Fact]
+    public void A_package_that_names_nothing_is_rejected_before_any_shell_call()
+    {
+        var seen = new List<ProcessStartInfo>();
+        var handoff = new WindowsSystemHandoff(
+            startInfo =>
+            {
+                seen.Add(startInfo);
+                return null;
+            },
+            NoShutdown);
+
+        _ = Assert.Throws<ArgumentException>(() => handoff.TryOpenPackage("   "));
+        _ = Assert.Throws<ArgumentNullException>(() => handoff.TryOpenPackage(null!));
+        Assert.Empty(seen);
+    }
+
+    /// <summary>
     /// Leaving asks for the shutdown, once, and reaches the shell for nothing on the way.
     /// </summary>
     [Fact]

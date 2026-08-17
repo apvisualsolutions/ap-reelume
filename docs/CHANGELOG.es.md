@@ -96,6 +96,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Entregar la actualización a Windows también se comprueba ahora sin arrancar un instalador.**
+  Instalar aquí significa darle el paquete a Windows y apartarse, así que cualquier comprobación
+  automática arrancaba un instalador de verdad en la máquina que estaba midiendo. Una ejecución de
+  prueba anota qué paquete habría entregado, como ya hacía con la carpeta de copias. De paso quedó
+  donde se decide una cosa que estaba en un comentario: en un Windows sin nada registrado para
+  `.msix`, la llamada no falla —simplemente no arranca nada—, y eso es un **rechazo**, no un éxito;
+  para una carpeta, en cambio, que no arranque nada significa que se abrió en una ventana que ya
+  tenías.
+
 - **El permiso para buscar actualizaciones por su cuenta se comprueba pulsándolo.** Es el interruptor
   que decide si la aplicación abre una conexión que no le has pedido, así que lo que decide tiene que
   sobrevivir a cerrar la ventana: ahora la comprobación lo pulsa con el ratón y va a mirar **el
