@@ -9,6 +9,7 @@ using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Application.Playback;
+using ApSolutions.LocalMedia.Application.Updates;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
@@ -2130,6 +2131,56 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => Task.FromResult(restore.StatusKey == "RestoreStatusRestored"),
             $"The restore left the library in place but the wizard settled on {restore.StatusKey}.");
         Assert.NotNull(restore.PreservedDatabaseName);
+    }
+
+    /// <summary>
+    /// Batch 7a, the half with no precondition: the switch that decides whether this application may
+    /// look for updates nobody asked it to look for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It is the only one of the updater's five controls that needs nothing staged, and it is the one
+    /// whose effect is furthest from the screen: a check is a connection, so the answer to "may it
+    /// look on its own?" has to survive the window closing. The probe therefore reads the stored
+    /// setting rather than the box, and the file it lives in is read afterwards — a switch that only
+    /// moved its own bool would look identical from the view model.
+    /// </para>
+    /// <para>
+    /// Nothing is contacted by pressing it. The automatic pass runs from <c>ConfigureWindow</c>, which
+    /// this scene does not call, so what is measured here is the preference and only the preference.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_switch_that_lets_the_application_look_for_updates_is_pressed_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        var updates = host.ViewModel.Updates;
+        Assert.NotNull(updates);
+        var settings = host.Application.Services.GetRequiredService<IUpdateSettings>();
+        Assert.False(
+            settings.AutomaticCheckEnabled,
+            "An installation nobody has asked starts with automatic checks off, and this one did not.");
+
+        await PressAsync(
+            host,
+            "UpdateAutomaticCheckLabel",
+            () => settings.AutomaticCheckEnabled,
+            "clicking the automatic-check box never changed whether the application may look on its own");
+
+        Assert.True(updates!.AutomaticCheckEnabled);
+
+        // And it reached the file, which is what makes it an answer rather than a state of this
+        // window: the next launch reads this and nothing else.
+        var stored = await File.ReadAllTextAsync(
+            new AppDataPaths(_dataRoot).SettingsPath,
+            TestContext.Current.CancellationToken);
+        Assert.Contains("updates.automaticCheckEnabled", stored, StringComparison.Ordinal);
     }
 
     /// <summary>

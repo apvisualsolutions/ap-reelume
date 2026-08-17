@@ -38,7 +38,6 @@ SubtitleStyleView#SubtitleStyleSizeLabel                   # batch 2
 TrackSelectorView#TrackSelectorAudioLabel                  # batch 2
 TrackSelectorView#TrackSelectorRememberForSeries           # batch 2
 TrackSelectorView#TrackSelectorSubtitleLabel               # batch 2
-UpdateView#UpdateAutomaticCheckLabel                       # batch 7a
 UpdateView#UpdateCancelLabel                               # batch 7a
 UpdateView#UpdateCheckLabel                                # batch 7a
 UpdateView#UpdateDownloadLabel                             # batch 7a
