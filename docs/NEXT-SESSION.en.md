@@ -8,17 +8,28 @@ to **0 pending** — **6** today, with **122 of 128** controls pressed by mouse 
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
-### The queue from 2026-08-17, with its count
+### The whole plan to 0.2.0, fixed on 2026-08-17
 
-**6 pending, and one measured defect blocks them.** The loose file's three and batch 1's local
-trailer are **the same problem**, so correcting it unblocks four of the six.
+**Ten steps, and the order is a decision rather than a list.** The autonomous walk **is the redesign's
+net**, so it reaches zero **before** the interface changes; the coverage gate goes to watching the
+whole tree for the same reason. What belongs to the owner goes in one block at the end, with a single
+exception: the physical walk goes **before** the cut, because a finding there means doing the cut
+again from scratch.
 
-| Step | What | How many | Leaves |
+| # | Step | Who | Leaves the ratchet at |
 |---|---|---|---|
-| **The loose session cannot be seen** | The loose-file banner (3) and the local trailer (1) | 4 | 2 |
-| **1 (rest)** | The episode row and the film card's Resume | 2 | **0** |
+| 1 | The loose session cannot be seen | agent | 2 |
+| 2 | The last two of batch 1 | agent | **0** |
+| 3 | The subtitle measurement | agent | 0 |
+| 4 | Coverage over all of `src/`, floor 96/96 | agent | 0 |
+| 5 | `ARQ-004`, the nine inert classes | agent | 0 |
+| 6 | **The redesign**, from Claude Design's material | agent | 0, under the rule below |
+| 7 | The ten-minute physical walk | **owner** | — |
+| 8 | Cut 0.2.0, up to the moment of signing | agent | — |
+| 9 | Sign and publish | **owner** | — |
+| 10 | `REL-004` and the quarterly key restore | **owner** | — |
 
-#### The defect to correct before anything else, already measured
+#### 1. The loose session cannot be seen — how it gets corrected, decided
 
 **A file activated from Explorer plays and cannot be seen.** Measured on 2026-08-17:
 
@@ -33,13 +44,64 @@ session — but **nobody builds the player surfaces**, and `HasLooseFile` is
 saying "this is not in your library" never reaches the screen with its three buttons inside. The
 **local trailer** opens the same way and has the same problem.
 
-**What does not work**, and this is checked: reusing `OpenPlayerAsync` as it stands. It begins with
-`FindByIdAsync` and a loose file is not in the catalogue; and its path starts the progress tracker,
-which is exactly what `OpenLooseFile` promises not to touch — "a loose session leaves the database as
-it found it". What is needed is a path that builds **the player, the transport and the banner** and
-nothing else: no tracker, no markers, no versions, no resume offer. The harness already knows how to
-get there: `ApplicationHost.PendingActivationPath` before `CreateShell` and **`ConfigureWindow`
-after**, which is where the activation is read and nowhere else.
+**The root cause, and why the correction is what it is: two paths open media and only one builds a
+screen.** `OpenLooseFile` starts the coordinator itself; `PlayerViewModel.OpenAsync` starts it and has
+a surface. While there are two, this comes back.
+
+**Decided: `OpenLooseFile` validates and describes, and opening is always the player's.** It stops
+calling the coordinator and keeps its two refusals — an extension outside the approved list and an
+absent file — which are the ones needed **before** anything is touched. One path is added and both
+callers use it:
+
+- `ShellSurfaces.OpenLoosePlayer` — `Func<string, CancellationToken, Task<PlayerSurfaces?>>`, with its
+  `ShellViewModel.OpenLoosePlayerAsync`, beside `OpenPlayer` and for the same reason.
+- In the composition: ask `OpenLooseFile` for the session, build `PlayerSurfaces` with **`Player`,
+  `LooseFile` and `VideoStatus`** — only `Player` is required on that record — plus the container's
+  transport, and call `player.OpenAsync(session.MediaFileId, session.Path)`.
+- **No tracker, no markers, no versions and no resume offer**, which is what keeps the promise: "a
+  loose session leaves the database as it found it".
+- Both callers go through it: the activation (`ConfigureWindow`) and the local trailer
+  (`onPlayTrailer` in `CompositionRoot`).
+
+**What is gained in passing, and it is a real improvement:** today a loose file that cannot be decoded
+has its `catch` clear the banner and nothing is left on screen; opening through the player, the
+failure reaches `Report` and **the recovery screen appears** — the one batch 2e has just left proven.
+
+**What does not work, and this is checked:** reusing `OpenPlayerAsync` as it stands — it begins with
+`FindByIdAsync` and a loose file is not in the catalogue, and its path starts the progress tracker;
+and letting `OpenLooseFile` keep starting and opening again from the player, which is a double open
+for no reason.
+
+**Before touching it, re-read `FileActivationTests`**: it asserts the promise that cannot be lost — a
+census of more than twenty tables identical before and after an activation — and does **not** assert
+that `OpenLooseFile` starts the engine, so moving the start does not break it. `OpenLooseFileTests`
+does speak about the coordinator and is updated with the change.
+
+**How the harness gets there:** `ApplicationHost.PendingActivationPath` before `CreateShell` and
+**`ConfigureWindow` after**, which is where the activation is read and nowhere else.
+
+#### 3. The subtitle measurement — what gets measured, decided
+
+`A11Y-002` is blocked **by measurement rather than by observation**. The direct way is tried first:
+decode one frame with the style applied and one without it and compare the bitmaps; if the engine will
+not hand over a frame, plan B measures **the cause**, which is already diagnosed — the LibVLC instance
+is cached per option set and none of the cached ones carries subtitle options. Either way the outcome
+is the same blocker with a number behind it. It goes in `MediaTests`.
+
+#### 6. The redesign — the ratchet rule, decided before starting
+
+The walk counts **129 declarations in 128 identities** today by reading the `.axaml`, and the script
+only knows how to shrink. A redesign moves that inventory, so:
+
+- **A new control arrives with its scene in the same change**, never with a line in
+  `eng/walk-pending.txt`. The pending list closed and does not reopen.
+- **A renamed control** has its anchor changed in the scene that presses it; the anchor is the resource
+  key behind `AutomationProperties.Name`, and a redesign changes the shape without removing it.
+- **A control that disappears** leaves the inventory by itself, and the ratchet drops with it.
+- The **two overlays still undimensioned** — `SkipMarkerButton` and `LooseFileBanner` — are corrected
+  here if the redesign touches them, and otherwise each in its own scene with its own measurement.
+- The **five brand assets** belong in this step, where the visual direction lives. If they arrive here
+  they reach 0.2.0 at no cost; the package builds today without them.
 
 #### The five decisions of 2026-08-17, taken and not reopened
 

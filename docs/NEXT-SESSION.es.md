@@ -8,17 +8,28 @@ pendientes** —hoy **6**, con **122 de 128** controles pulsados con ratón— y
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
-### La cola desde el 2026-08-17, con su recuento
+### El plan completo hasta 0.2.0, fijado el 2026-08-17
 
-**6 pendientes, y los bloquea un solo defecto medido.** Los tres del archivo suelto y el tráiler
-local de la tanda 1 son **el mismo problema**, así que corregirlo desbloquea cuatro de los seis.
+**Diez pasos, y el orden es una decisión, no una lista.** El paseo autónomo **es la red del
+rediseño**, así que llega a cero **antes** de que la interfaz cambie; la puerta de cobertura pasa a
+vigilar el árbol entero por la misma razón. Lo que le toca al propietario va en un bloque al final,
+con una sola excepción: su paseo físico va **antes** del corte, porque un hallazgo suyo obliga a
+rehacerlo entero.
 
-| Paso | Qué | Cuántos | Deja |
+| # | Paso | Quién | Deja el trinquete en |
 |---|---|---|---|
-| **La sesión suelta no se ve** | Banner del archivo suelto (3) y tráiler local (1) | 4 | 2 |
-| **1 (resto)** | Fila de episodio y «Continuar» de la ficha | 2 | **0** |
+| 1 | La sesión suelta no se ve | agente | 2 |
+| 2 | Los dos últimos de la tanda 1 | agente | **0** |
+| 3 | La prueba de los subtítulos | agente | 0 |
+| 4 | Cobertura a todo `src/`, suelo 96/96 | agente | 0 |
+| 5 | `ARQ-004`, las nueve clases inertes | agente | 0 |
+| 6 | **El rediseño**, con el material de Claude Design | agente | 0, con la regla de abajo |
+| 7 | El paseo físico de diez minutos | **propietario** | — |
+| 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
+| 9 | Firmar y publicar | **propietario** | — |
+| 10 | `REL-004` y la restauración trimestral de la clave | **propietario** | — |
 
-#### El defecto que hay que corregir antes de seguir, ya medido
+#### 1. La sesión suelta no se ve — decidido cómo se corrige
 
 **Un archivo activado desde el Explorador se reproduce y no se ve.** Medido el 2026-08-17:
 
@@ -33,13 +44,65 @@ pero **nadie construye las superficies del reproductor**, y `HasLooseFile` es
 «esto no está en tu biblioteca» no llega a la pantalla con sus tres botones dentro. Lo mismo le pasa
 al **tráiler local**, que abre por la misma vía.
 
-**Lo que no vale**, y está comprobado: reutilizar `OpenPlayerAsync` tal cual. Empieza por
-`FindByIdAsync` y un archivo suelto no está en el catálogo; y su camino arranca el seguimiento de
-progreso, que es exactamente lo que `OpenLooseFile` promete no tocar —«una sesión suelta deja la base
-de datos como la encontró»—. Hace falta una vía que construya **reproductor, transporte y banner** y
-nada más: sin seguimiento, sin marcadores, sin versiones, sin oferta de reanudar. El arnés ya sabe
-llegar: `ApplicationHost.PendingActivationPath` antes de `CreateShell` y **`ConfigureWindow`
-después**, que es donde la activación se lee y en ningún otro sitio.
+**La causa de raíz, y por eso la corrección es la que es: hay dos caminos que abren medios y sólo uno
+construye pantalla.** `OpenLooseFile` arranca el coordinador por su cuenta; `PlayerViewModel.OpenAsync`
+arranca y además tiene superficie. Mientras haya dos, esto vuelve.
+
+**Decidido: `OpenLooseFile` valida y describe, y abrir es siempre del reproductor.** Deja de llamar
+al coordinador; conserva sus dos negativas —extensión fuera de la lista aprobada y archivo ausente—,
+que son las que hacen falta **antes** de tocar nada. Se añade una vía única que los dos llamantes
+usan:
+
+- `ShellSurfaces.OpenLoosePlayer` — `Func<string, CancellationToken, Task<PlayerSurfaces?>>`, con su
+  `ShellViewModel.OpenLoosePlayerAsync`, al lado de `OpenPlayer` y por la misma razón que aquélla.
+- En la composición: pide la sesión a `OpenLooseFile`, construye `PlayerSurfaces` con **`Player`,
+  `LooseFile` y `VideoStatus`** —de ese `record` sólo `Player` es obligatorio— más el transporte del
+  contenedor, y llama a `player.OpenAsync(session.MediaFileId, session.Path)`.
+- **Sin seguimiento de progreso, sin marcadores, sin versiones y sin oferta de reanudar**, que es lo
+  que mantiene la promesa: «una sesión suelta deja la base de datos como la encontró».
+- Los dos llamantes pasan por ahí: la activación (`ConfigureWindow`) y el tráiler local
+  (`onPlayTrailer` en `CompositionRoot`).
+
+**Lo que se gana de paso, y es una mejora real:** hoy un archivo suelto que no se puede decodificar
+hace que el `catch` limpie el banner y no quede nada en pantalla; abriendo por el reproductor, el
+fallo llega a `Report` y **aparece la pantalla de recuperación** que la tanda 2e acaba de dejar
+probada.
+
+**Lo que no vale, y está comprobado:** reutilizar `OpenPlayerAsync` tal cual —empieza por
+`FindByIdAsync` y un archivo suelto no está en el catálogo, y su camino arranca el seguimiento de
+progreso—; y dejar que `OpenLooseFile` siga arrancando y abrir otra vez desde el reproductor, que es
+un doble arranque sin razón.
+
+**Antes de tocarlo, releer `FileActivationTests`**: afirma la promesa que no se puede perder —el censo
+de más de veinte tablas idéntico antes y después de una activación— y **no** afirma que
+`OpenLooseFile` arranque el motor, así que mover el arranque no la rompe. `OpenLooseFileTests` sí
+habla del coordinador y se actualiza con el cambio.
+
+**Cómo llega el arnés:** `ApplicationHost.PendingActivationPath` antes de `CreateShell` y
+**`ConfigureWindow` después**, que es donde la activación se lee y en ningún otro sitio.
+
+#### 3. La prueba de los subtítulos — decidido qué se mide
+
+`A11Y-002` se bloquea **por medición y no por observación**. Primero se intenta lo directo:
+decodificar un fotograma con estilo aplicado y otro sin él y comparar los mapas de bits; si el motor
+no deja llegar al fotograma, el plan B mide **la causa**, que ya está diagnosticada — la instancia de
+LibVLC se cachea por juego de opciones y ninguna de las cacheadas lleva opciones de subtítulos. En los
+dos casos el resultado es el mismo bloqueador, con un número detrás. Va en `MediaTests`.
+
+#### 6. El rediseño — la regla del trinquete, decidida antes de empezar
+
+El paseo cuenta hoy **129 declaraciones en 128 identidades** leyendo los `.axaml`, y el guion sólo
+sabe encoger. Un rediseño mueve ese inventario, así que:
+
+- **Un control nuevo entra con su escena en el mismo cambio**, nunca con una línea en
+  `eng/walk-pending.txt`. La lista de pendientes se cerró y no se reabre.
+- **Un control renombrado** cambia su ancla en la escena que lo pulsa; el ancla es la clave de
+  recurso tras `AutomationProperties.Name`, y un rediseño cambia la forma sin quitarla.
+- **Un control que desaparece** sale del inventario solo, y el trinquete baja con él.
+- Los **dos superpuestos que quedan sin dimensionar** —`SkipMarkerButton` y `LooseFileBanner`— se
+  corrigen aquí si el rediseño los toca, y si no, cada uno en su escena con su medición.
+- Los **cinco activos de marca** encajan en este paso, que es donde vive la dirección visual. Si
+  vienen aquí, entran en 0.2.0 sin coste; el paquete se construye hoy sin ellos.
 
 #### Las cinco decisiones del 2026-08-17, tomadas y no reabiertas
 
