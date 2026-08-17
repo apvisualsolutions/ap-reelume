@@ -18,27 +18,53 @@ queda es ejecutarlo midiendo antes de corregir.
 | **2d (resto) y 2e** | Las dos respuestas que faltan y el archivo suelto | 7 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
 
-**Lo que 2e necesita antes de escribirse, medido el 2026-08-17:** «Abrir con una aplicación externa»
-arranca un **proceso real** (`ShellExternalPlaybackLauncher`, `UseShellExecute`), así que abriría el
-reproductor del sistema en la máquina que mide. Es la **novena salida** de la regla de aislamiento, y
-se resuelve como las cinco anteriores: la composición elige por `SystemHandoffDirectory` entre el
-lanzador real y uno que **anote** lo que habría abierto. Los tres del archivo suelto no necesitan nada
-de eso; el reintento comparte superficie con la salida.
+#### Las cinco decisiones del 2026-08-17, tomadas y no reabiertas
 
-**Y dos hallazgos abiertos que hay que llevar al corte de versión**, los dos medidos y escritos en su
-evidencia: **(1)** el estilo de subtítulos llega a la base de datos y **no a la imagen** —LibVLC toma
-su dibujado de las opciones con las que se construye la instancia—, así que `A11Y-002` pide revisión
-de estado o de redacción; **(2)** el paseo físico de diez minutos tiene ahora una comprobación más:
-mirar si los subtítulos se ven como se pidieron.
+**1. Las dos respuestas que faltan del diálogo de versiones (2 controles).** El rojo medido fue «un
+`Button` en pantalla, sin nombre y deshabilitado» mientras la fila que levanta la pregunta estaba
+visible y habilitada. **La lectura que hay que comprobar primero**, porque explica las tres cosas a la
+vez —sin nombre, deshabilitado, y sólo tras confirmar—: confirmar reconstruye la sesión, la lista de
+versiones se vuelve a plantillar, y el control que `Resolve` devolvió **queda desprendido del árbol**;
+uno desprendido pierde el nombre que le daba un `DynamicResource` y contesta `IsEffectivelyEnabled`
+falso. **Se confirma en una línea** —`control.GetVisualRoot() is null` en el punto del fallo— y si es
+eso, la corrección es de la escena y no del producto: esperar a que la sesión nueva **se asiente**
+(superficies distintas **y** dos `SettleAsync`) antes de llamar a `PressAsync`, que resuelve una sola
+vez. Si no es eso, la siguiente medición es el `CanExecute` de la fila nueva.
 
-**Y un hallazgo abierto que no es un control**, medido en la 2a y escrito en
-[su evidencia](evidence/stable/audit-walk-tracks-and-audio-output.md): **apagar con una sesión todavía
-activa** lleva al coordinador a parar un motor que el contenedor ya soltó
-(`ObjectDisposedException` sobre `LibVlcMediaPlayerEngine`). El motor está registrado **tres veces** y
-la última —`IVideoFrameSource`— se resuelve cuando un vídeo empieza a dibujarse, así que entra en la
-lista de desechado después del coordinador y sale antes. La política de cierre real **sí** para la
-reproducción, así que esto se alcanza por otras vías; se revisa **con el apagado directo**, que ya
-estaba aparcado hasta que el rediseño toque el ciclo de vida.
+**2. La novena salida de la regla de aislamiento (2 controles de la 2e).** «Abrir con una aplicación
+externa» arranca un **proceso real** (`ShellExternalPlaybackLauncher`, `UseShellExecute`): abriría el
+reproductor del sistema en la máquina que mide. Se resuelve **como las cinco anteriores**: la
+composición elige por `SystemHandoffDirectory` entre el lanzador real y uno que **anote** lo que
+habría abierto, con verbo delante —`play-externally <ruta>`— para que la sonda lo distinga sin
+analizar nada. El reintento comparte superficie: la escena abre un archivo que no se puede decodificar
+—dos bytes con extensión aprobada—, pulsa «Abrir con una aplicación externa» leyendo el registro, y
+después **sustituye el archivo por una muestra buena** y pulsa «Reintentar», cuya sonda es que la
+sesión pasa a reproducir. La clase nueva entra en la lista de vigilados de `check-coverage.ps1` al
+100/100 al cerrarse la tanda.
+
+**3. Los tres superpuestos que siguen sin dimensionarse** —`SkipMarkerButton`, `VersionSwitchDialog` y
+`LooseFileBanner`— se corrigen **cada uno en su escena y con su medición**, como los dos del
+2026-08-17: `Border` con alineación, fondo y borde, y las filas de botones a `WrapPanel`. La medición
+se toma antes: los `bounds` del control frente a los del escenario.
+
+**4. `A11Y-002` en el corte de versión: pasa a `BLOCKED`.** El estilo de subtítulos llega a la base de
+datos y **no a la imagen** —LibVLC toma su dibujado de las opciones con las que se construye la
+instancia, y aquí hay una instancia cacheada por juego de opciones sin ninguna de subtítulos—, así que
+«subtítulos personalizables» no está entregado por mucho que sus seis controles existan y persistan. Se
+cambia **en el corte**, que es donde el manifiesto se regenera con un paquete recién construido, con el
+bloqueador nombrado en `eng/generate-verification-manifest.ps1` y en `release-readiness.md`. El paseo
+físico de diez minutos gana además una comprobación: **mirar si los subtítulos se ven como se
+pidieron**.
+
+**5. El apagado con una sesión activa se corrige, y así.** `ObjectDisposedException` sobre
+`LibVlcMediaPlayerEngine`: el motor está registrado **tres veces** y la última —`IVideoFrameSource`—
+se resuelve cuando un vídeo empieza a dibujarse, así que entra en la lista de desechado del contenedor
+después del coordinador y sale antes. **La corrección va donde ya está su razón**:
+`ApplicationHost.DisposeAsync` termina el ciclo de la sesión antes de desechar los servicios —«the
+session's loop and handlers go before the services they were feeding»— y ahí mismo tiene que **parar
+la sesión**, no sólo sus enganches: una línea, con el coordinador resuelto antes de
+`_services.DisposeAsync()`. La prueba es la escena de la 2a **sin** cerrar el reproductor al final. Va
+con la 2e, que es la tanda que toca esa superficie.
 
 Después: la cobertura a todo `src/`, lo que queda de `ARQ-004`, y el rediseño.
 

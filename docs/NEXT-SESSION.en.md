@@ -18,27 +18,52 @@ carrying it out, measuring before correcting.
 | **2d (rest) and 2e** | The two remaining answers and the loose file | 7 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
 
-**What 2e needs before it can be written, measured on 2026-08-17:** "Open with an external
-application" starts a **real process** (`ShellExternalPlaybackLauncher`, `UseShellExecute`), so it
-would open the system's player on whichever machine is measuring. It is the **ninth exit** for the
-isolation rule and is solved the way the previous five were: the composition chooses by
-`SystemHandoffDirectory` between the real launcher and one that **records** what it would have
-opened. The loose file's three need none of that; the retry shares a surface with the exit.
+#### The five decisions of 2026-08-17, taken and not reopened
 
-**And two open findings to carry to the version cut**, both measured and written down in their
-evidence: **(1)** the subtitle style reaches the database and **not the picture** — LibVLC takes its
-rendering from the options its instance is built with — so `A11Y-002` needs its state or its wording
-revisited; **(2)** the ten-minute physical walk gains one check: whether subtitles look the way they
-were asked to.
+**1. The version dialogue's two remaining answers (2 controls).** The measured red was "a `Button` on
+screen, unnamed and disabled" while the row that raises the question was visible and enabled. **The
+reading to check first**, because it explains all three facts at once — unnamed, disabled, and only
+after a confirm: confirming rebuilds the session, the versions list is re-templated, and the control
+`Resolve` returned is **detached from the tree**; a detached one loses the name a `DynamicResource`
+gave it and answers `IsEffectivelyEnabled` false. **One line confirms it** — `control.GetVisualRoot()
+is null` at the point of failure — and if that is it, the correction belongs to the scene rather than
+the product: wait for the new session to **settle** (different surfaces **and** two `SettleAsync`)
+before calling `PressAsync`, which resolves once. If it is not that, the next measurement is the new
+row's `CanExecute`.
 
-**And one open finding that is not a control**, measured in 2a and written down in
-[its evidence](evidence/stable/audit-walk-tracks-and-audio-output.md): **shutting down with a session
-still active** takes the coordinator through an engine the container has already released
-(`ObjectDisposedException` on `LibVlcMediaPlayerEngine`). The engine is registered **three times** and
-the last one — `IVideoFrameSource` — is resolved when a video starts drawing, so it enters the
-disposal list after the coordinator and leaves it before. The real close policy **does** stop
-playback, so this is reached by other routes; it is reviewed **with the direct shutdown**, which was
-already parked until the redesign touches the lifecycle.
+**2. The ninth exit for the isolation rule (2 of 2e's controls).** "Open with an external application"
+starts a **real process** (`ShellExternalPlaybackLauncher`, `UseShellExecute`): it would open the
+system's player on whichever machine is measuring. Solved **the way the previous five were**: the
+composition chooses by `SystemHandoffDirectory` between the real launcher and one that **records**
+what it would have opened, with a verb in front — `play-externally <path>` — so a probe tells them
+apart without parsing anything. The retry shares that surface: the scene opens a file that cannot be
+decoded — two bytes with an approved extension — presses "Open with an external application" reading
+the record, then **replaces the file with a good sample** and presses Retry, whose probe is the
+session reaching the playing state. The new class joins `check-coverage.ps1`'s watched list at 100/100
+when the batch closes.
+
+**3. The three overlays that still do not size themselves** — `SkipMarkerButton`,
+`VersionSwitchDialog` and `LooseFileBanner` — are corrected **each in its own scene with its own
+measurement**, like the two on 2026-08-17: a `Border` with alignment, background and border, and their
+button rows as `WrapPanel`s. The measurement comes first: the control's bounds against the stage's.
+
+**4. `A11Y-002` at the version cut: it goes to `BLOCKED`.** The subtitle style reaches the database and
+**not the picture** — LibVLC takes its rendering from the options its instance is built with, and here
+there is one cached instance per option set with no subtitle options in it — so "customizable
+subtitles" is not delivered however much its six controls exist and persist. It changes **at the cut**,
+which is where the manifest is regenerated from a freshly built package, with the blocker named in
+`eng/generate-verification-manifest.ps1` and in `release-readiness.md`. The ten-minute physical walk
+also gains a check: **whether subtitles look the way they were asked to**.
+
+**5. Shutting down with an active session gets fixed, and this is how.** `ObjectDisposedException` on
+`LibVlcMediaPlayerEngine`: the engine is registered **three times** and the last one —
+`IVideoFrameSource` — is resolved when a video starts drawing, so it enters the container's disposal
+list after the coordinator and leaves it before. **The fix goes where its reason already is**:
+`ApplicationHost.DisposeAsync` ends the session's loop before disposing the services — "the session's
+loop and handlers go before the services they were feeding" — and that is where it has to **stop the
+session** as well, not only its hooks: one line, with the coordinator resolved before
+`_services.DisposeAsync()`. The proof is the 2a scene **without** closing the player at the end. It
+goes with 2e, the batch that touches that surface.
 
 Then: coverage over all of `src/`, what is left of `ARQ-004`, and the redesign.
 
