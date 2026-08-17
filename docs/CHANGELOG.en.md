@@ -95,6 +95,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Checking for updates is now verified without asking anybody anything.** The button asked GitHub
+  what had been published, so any automated check would have made that query from whichever machine
+  was doing the measuring. A test run now reads the version it has itself described in its own
+  folder, and no connection is opened. What decides whether a version is worth offering — newer, your
+  architecture, a hash, and notes in both languages — is unchanged. Your installation still asks
+  GitHub.
+
 - **Handing the update to Windows is now checked too, without starting an installer.** Installing
   here means giving Windows the package and stepping aside, so any automated check started a real
   installer on the machine doing the measuring. A test run now writes down which package it would

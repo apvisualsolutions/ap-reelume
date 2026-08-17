@@ -32,6 +32,7 @@ using ApSolutions.LocalMedia.TestSupport;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
 using ApSolutions.LocalMedia.Windows.Shell;
+using ApSolutions.LocalMedia.Windows.Updates;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
@@ -2134,24 +2135,31 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// Batch 7a, the half with no precondition: the switch that decides whether this application may
-    /// look for updates nobody asked it to look for.
+    /// Batch 7a: the permission to look for updates, and the look itself.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// It is the only one of the updater's five controls that needs nothing staged, and it is the one
-    /// whose effect is furthest from the screen: a check is a connection, so the answer to "may it
-    /// look on its own?" has to survive the window closing. The probe therefore reads the stored
-    /// setting rather than the box, and the file it lives in is read afterwards — a switch that only
-    /// moved its own bool would look identical from the view model.
+    /// The switch is the only one of the updater's five controls that needs nothing staged, and it is
+    /// the one whose effect is furthest from the screen: a check is a connection, so the answer to
+    /// "may it look on its own?" has to survive the window closing. The probe therefore reads the
+    /// stored setting rather than the box, and the file it lives in is read afterwards — a switch
+    /// that only moved its own bool would look identical from the view model.
     /// </para>
     /// <para>
-    /// Nothing is contacted by pressing it. The automatic pass runs from <c>ConfigureWindow</c>, which
-    /// this scene does not call, so what is measured here is the preference and only the preference.
+    /// Nothing is contacted by either press. The automatic pass runs from <c>ConfigureWindow</c>,
+    /// which this scene does not call, and the source a run with a data root of its own is built with
+    /// reads its own handover folder — which is what makes Check pressable at all. Asking GitHub what
+    /// it has published, from whichever machine happens to run the suite, is not something a test may
+    /// do.
+    /// </para>
+    /// <para>
+    /// The manifest is written after the shell is up, on purpose: the source reads it per question
+    /// rather than at construction, so a run that has nothing to install and one that has something
+    /// are the same application at two moments rather than two applications.
     /// </para>
     /// </remarks>
     [AvaloniaFact(Timeout = 120_000)]
-    public async Task The_switch_that_lets_the_application_look_for_updates_is_pressed_with_the_mouse()
+    public async Task The_updater_is_allowed_to_look_and_then_asked_to_with_the_mouse()
     {
         var media = Path.Combine(_dataRoot, "media");
         Directory.CreateDirectory(media);
@@ -2181,6 +2189,52 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             new AppDataPaths(_dataRoot).SettingsPath,
             TestContext.Current.CancellationToken);
         Assert.Contains("updates.automaticCheckEnabled", stored, StringComparison.Ordinal);
+
+        // Now there is something to find. The version is far past anything this build could carry,
+        // because what is being measured is the press and not the comparison — UpdatePolicy has its
+        // own tests for which versions are newer than which.
+        await SeedUpdateManifestAsync();
+
+        await PressAsync(
+            host,
+            "UpdateCheckLabel",
+            () => updates.StatusKey,
+            "clicking Check for updates never asked anything");
+
+        Assert.Equal("UpdateStatusOffered", updates.StatusKey);
+        Assert.Equal("999.0.0", updates.OfferedVersion);
+    }
+
+    /// <summary>
+    /// Writes the release a run with a data root of its own is offered, in the folder that run says
+    /// it uses for handovers.
+    /// </summary>
+    /// <remarks>
+    /// The address is data rather than source, and that is the rule rather than a convenience: a test
+    /// walks <c>src/</c> for anything shaped like a host and fails on one the network purpose
+    /// registry does not declare. Nothing is contacted either way — no manifest here names a place
+    /// this application would connect to.
+    /// </remarks>
+    private async Task SeedUpdateManifestAsync()
+    {
+        var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
+        Assert.NotNull(handoff);
+        Directory.CreateDirectory(handoff!);
+        await File.WriteAllTextAsync(
+            Path.Combine(handoff!, HandoffUpdateManifest.FileName),
+            """
+            {
+              "version": "999.0.0",
+              "runtime": "win-x64",
+              "url": "https://updates.handoff.invalid/apreelume-999.0.0.msix",
+              "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+              "sizeInBytes": 2048,
+              "summaryEs": "Lo que cambia en esta versión.",
+              "summaryEn": "What changed in this version.",
+              "packageFile": "apreelume-999.0.0.msix"
+            }
+            """,
+            TestContext.Current.CancellationToken);
     }
 
     /// <summary>

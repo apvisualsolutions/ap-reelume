@@ -96,6 +96,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Buscar actualizaciones se comprueba ahora sin preguntarle nada a nadie.** El botón preguntaba a
+  GitHub qué se ha publicado, así que cualquier comprobación automática habría hecho esa consulta
+  desde la máquina que estuviera midiendo. Ahora una ejecución de prueba lee la versión que ella misma
+  ha dejado descrita en su carpeta, y no se abre ninguna conexión. Lo que decide si una versión merece
+  ofrecerse —que sea más nueva, que sea de tu arquitectura, que traiga hash y notas en los dos
+  idiomas— sigue siendo exactamente lo mismo. Tu instalación sigue preguntando a GitHub.
+
 - **Entregar la actualización a Windows también se comprueba ahora sin arrancar un instalador.**
   Instalar aquí significa darle el paquete a Windows y apartarse, así que cualquier comprobación
   automática arrancaba un instalador de verdad en la máquina que estaba midiendo. Una ejecución de
