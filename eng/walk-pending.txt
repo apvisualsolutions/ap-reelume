@@ -28,10 +28,6 @@ PlayerView#PlayerRecoveryRetry                             # batch 2
 ResumePromptView#ResumePromptRestart                       # batch 2
 ResumePromptView#ResumePromptResume                        # batch 2
 SkipMarkerButton#SkipMarkerAccessibleName                  # batch 2
-SubtitleStyleView#SubtitleStyleBackgroundOpacityLabel      # batch 2
-SubtitleStyleView#SubtitleStyleFamilyLabel                 # batch 2
-SubtitleStyleView#SubtitleStyleOutlineLabel                # batch 2
-SubtitleStyleView#SubtitleStyleSizeLabel                   # batch 2
 VersionSwitchDialog#VersionSwitchCancel                    # batch 2
 VersionSwitchDialog#VersionSwitchConfirm                   # batch 2
 VersionSwitchDialog#VersionSwitchRestart                   # batch 2

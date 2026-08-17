@@ -4,19 +4,25 @@
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —hoy **27**, con **101 de 128** controles pulsados con ratón— y la puerta de cobertura de
+pendientes** —hoy **23**, con **105 de 128** controles pulsados con ratón— y la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
 ### La cola desde el 2026-08-17, con su recuento
 
-**27 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
+**23 pendientes, y son exactamente estos dos grupos.** Todo lo de abajo está decidido; lo que
 queda es ejecutarlo midiendo antes de corregir.
 
 | Paso | Qué | Cuántos | Deja |
 |---|---|---|---|
-| **2b–2e** | El reproductor y sus superpuestos | 24 | 3 |
+| **2c–2e** | El reproductor y sus superpuestos | 20 | 3 |
 | **1 (resto)** | Los tres que quedaron de la primera tanda | 3 | **0** |
+
+**Y dos hallazgos abiertos que hay que llevar al corte de versión**, los dos medidos y escritos en su
+evidencia: **(1)** el estilo de subtítulos llega a la base de datos y **no a la imagen** —LibVLC toma
+su dibujado de las opciones con las que se construye la instancia—, así que `A11Y-002` pide revisión
+de estado o de redacción; **(2)** el paseo físico de diez minutos tiene ahora una comprobación más:
+mirar si los subtítulos se ven como se pidieron.
 
 **Y un hallazgo abierto que no es un control**, medido en la 2a y escrito en
 [su evidencia](evidence/stable/audit-walk-tracks-and-audio-output.md): **apagar con una sesión todavía
@@ -51,7 +57,7 @@ sin defecto de producto: el control funcionaba y lo que faltaba era una ventana.
 | | Superficie | Controles |
 |---|---|---|
 | ~~**2a**~~ | ~~Pistas y salida de audio~~ | **hecha el 2026-08-17, 32 → 27** |
-| **2b** | Estilo de subtítulos | 4 |
+| ~~**2b**~~ | ~~Estilo de subtítulos~~ | **hecha el 2026-08-17, 27 → 23** |
 | **2c** | Marcadores: editor, revisión y salto | 7 |
 | **2d** | Reanudar, siguiente episodio y versiones | 8 |
 | **2e** | Archivo suelto y recuperación del reproductor | 5 |

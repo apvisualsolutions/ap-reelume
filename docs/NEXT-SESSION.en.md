@@ -4,19 +4,25 @@
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — **27** today, with **101 of 128** controls pressed by mouse — and the code coverage
+to **0 pending** — **23** today, with **105 of 128** controls pressed by mouse — and the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 
 ### The queue from 2026-08-17, with its count
 
-**27 pending, and they are exactly these two groups.** Everything below is decided; what remains is
+**23 pending, and they are exactly these two groups.** Everything below is decided; what remains is
 carrying it out, measuring before correcting.
 
 | Step | What | How many | Leaves |
 |---|---|---|---|
-| **2b–2e** | The player and its overlays | 24 | 3 |
+| **2c–2e** | The player and its overlays | 20 | 3 |
 | **1 (rest)** | The three left over from the first batch | 3 | **0** |
+
+**And two open findings to carry to the version cut**, both measured and written down in their
+evidence: **(1)** the subtitle style reaches the database and **not the picture** — LibVLC takes its
+rendering from the options its instance is built with — so `A11Y-002` needs its state or its wording
+revisited; **(2)** the ten-minute physical walk gains one check: whether subtitles look the way they
+were asked to.
 
 **And one open finding that is not a control**, measured in 2a and written down in
 [its evidence](evidence/stable/audit-walk-tracks-and-audio-output.md): **shutting down with a session
@@ -51,7 +57,7 @@ composition, and no product defect: the control worked, and what was missing was
 | | Surface | Controls |
 |---|---|---|
 | ~~**2a**~~ | ~~Tracks and audio output~~ | **done on 2026-08-17, 32 → 27** |
-| **2b** | Subtitle style | 4 |
+| ~~**2b**~~ | ~~Subtitle style~~ | **done on 2026-08-17, 27 → 23** |
 | **2c** | Markers: editor, review and skip | 7 |
 | **2d** | Resume, next episode and versions | 8 |
 | **2e** | Loose file and player recovery | 5 |

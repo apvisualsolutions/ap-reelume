@@ -471,6 +471,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El estilo de subtítulos que eliges ya no se pierde al cerrar.** El tamaño, la tipografía, la
+  opacidad del fondo y el grosor del contorno se guardaban **en ninguna parte**: cambiabas los cuatro
+  mandos, cerrabas la ventana y volvías a empezar de cero. Ahora cada cambio se guarda al hacerlo y
+  vuelve al abrir. **Lo que todavía falta, y se dice en voz alta:** ese estilo llega a la base de
+  datos pero **aún no a la imagen** — el motor de vídeo recibe su dibujado de subtítulos al arrancar,
+  y conectarlo es trabajo aparte que sólo se puede confirmar mirando una pantalla.
+
 - **«Recordar para esta serie» ya se puede marcar.** La casilla que hace que tu elección de idioma o
   de subtítulos valga para **toda la serie** y no sólo para ese episodio estaba **deshabilitada
   siempre**: la aplicación nunca le decía a qué serie pertenece lo que estás viendo. Era peor que un

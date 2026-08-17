@@ -459,6 +459,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The subtitle style you choose is no longer lost on closing.** The size, the typeface, the
+  background opacity and the outline thickness were saved **nowhere**: you changed all four controls,
+  closed the window, and started from scratch. Every change is now stored as you make it and comes
+  back when you open the application. **What is still missing, said out loud:** that style reaches the
+  database but **not yet the picture** — the video engine takes its subtitle rendering at startup, and
+  connecting it is separate work that only a screen can confirm.
+
 - **"Remember for this series" can be ticked now.** The box that makes your audio or subtitle choice
   apply to the **whole series** rather than to that one episode was **always disabled**: the
   application never told it which series you were watching. It was worse than a dead button, because
