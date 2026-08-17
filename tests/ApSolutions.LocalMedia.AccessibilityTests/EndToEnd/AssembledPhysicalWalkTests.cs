@@ -2137,6 +2137,128 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Batch 2b: how subtitles look, chosen in settings and kept.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This surface lives in settings rather than over the picture, so it needs no video at all. Three
+    /// sliders and a drop-down, and each is asked for a value it is not already at — a range control
+    /// pressed at its centre usually asks for what it already has.
+    /// </para>
+    /// <para>
+    /// The probe is <b>the stored preference</b>, not the view model. That is the rule this surface
+    /// was breaking: nothing in the application saved this style, loaded it, or read it, so the whole
+    /// effect of four controls was a field of one object that died with the window. Asserting on that
+    /// field would have proved the field keeps what was put in it.
+    /// </para>
+    /// <para>
+    /// What is still missing is written down rather than implied: the style reaches the database and
+    /// not the picture. LibVLC takes its subtitle rendering from instance options, so applying a
+    /// chosen style means building the engine with it — a separate piece of work, and one only a
+    /// physical screen can confirm.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_subtitle_style_is_chosen_with_the_mouse_and_kept()
+    {
+        _ = await SeedRootAsync(Path.Combine(_dataRoot, "media"), ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        var style = host.ViewModel.SubtitleStyle;
+        Assert.NotNull(style);
+
+        var preferences = host.Application.Services.GetRequiredService<IPlaybackPreferenceRepository>();
+
+        // A style somebody chose on a previous run, waiting in the database. Storing it and then
+        // starting the window is the whole round trip: the half that reads was as absent as the half
+        // that writes, so a choice stored by this scene's presses would have come back to nobody.
+        var chosen = SubtitleStyle.Create(
+            fontSizePercent: 130,
+            fontFamily: "Verdana",
+            foregroundHex: SubtitleStyle.EngineDefault.ForegroundHex,
+            backgroundHex: SubtitleStyle.EngineDefault.BackgroundHex,
+            backgroundOpacity: 0.4,
+            outlineThickness: 1.5);
+        await preferences.SaveAsync(
+            new PlaybackPreference
+            {
+                Scope = PreferenceScope.Global,
+                ScopeKey = PlaybackPreference.GlobalKey,
+                SubtitleStyle = chosen,
+            },
+            TestContext.Current.CancellationToken);
+
+        // The startup a person gets, which is where the load lives. It also starts the watchers and
+        // the two passes that read their own switches — both off by default, so nothing is contacted.
+        host.Application.ConfigureWindow(host.Window);
+        await WaitForAsync(
+            () => Task.FromResult(style!.FontSizePercent == chosen.FontSizePercent),
+            "the style stored before this window opened never reached the screen it belongs to");
+        Assert.Equal(chosen.FontFamily, style!.FontFamily);
+        Assert.Equal(chosen.OutlineThickness, style.OutlineThickness);
+
+        // What the application stored, as a sentence: a probe is compared by value, and a record read
+        // fresh every time would report "it changed" for the click that must change nothing.
+        async Task<string> StoredAsync()
+        {
+            var stored = await preferences.GetAsync(
+                PreferenceScope.Global,
+                PlaybackPreference.GlobalKey,
+                TestContext.Current.CancellationToken);
+            return stored?.SubtitleStyle is { } saved
+                ? string.Create(
+                    CultureInfo.InvariantCulture,
+                    $"{saved.FontSizePercent}|{saved.FontFamily}|{saved.BackgroundOpacity}|{saved.OutlineThickness}")
+                : "nothing stored";
+        }
+
+        await PressAsync(
+            host,
+            "SubtitleStyleSizeLabel",
+            StoredAsync,
+            "dragging the subtitle size never left a size stored anywhere");
+
+        await PressAsync(
+            host,
+            "SubtitleStyleBackgroundOpacityLabel",
+            StoredAsync,
+            "dragging the background opacity never left one stored anywhere");
+
+        await PressAsync(
+            host,
+            "SubtitleStyleOutlineLabel",
+            StoredAsync,
+            "dragging the outline thickness never left one stored anywhere");
+
+        // The family is a drop-down, so its effect is that it opens: what is chosen inside lands in a
+        // popup root of its own.
+        await PressAsync(
+            host,
+            "SubtitleStyleFamilyLabel",
+            () => Resolve(host, "SubtitleStyleFamilyLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the subtitle family never opened the list of families");
+        CloseDropDown(host);
+
+        // And the three that were dragged are the three that were stored, each away from what the
+        // window opened holding. Read from the database rather than from the screen, because the
+        // screen is the half that was already known to work.
+        var stored = await preferences.GetAsync(
+            PreferenceScope.Global,
+            PlaybackPreference.GlobalKey,
+            TestContext.Current.CancellationToken);
+        Assert.NotNull(stored?.SubtitleStyle);
+        Assert.NotEqual(chosen.FontSizePercent, stored!.SubtitleStyle!.FontSizePercent);
+        Assert.NotEqual(chosen.BackgroundOpacity, stored.SubtitleStyle.BackgroundOpacity);
+        Assert.NotEqual(chosen.OutlineThickness, stored.SubtitleStyle.OutlineThickness);
+
+        // And nothing else of that preference was disturbed: the style is one field of a row that
+        // also carries the track choices, so saving it has to leave the rest as it was.
+        Assert.Equal(chosen.ForegroundHex, stored.SubtitleStyle.ForegroundHex);
+    }
+
+    /// <summary>
     /// Batch 2a: the tracks a session offers, and where its sound goes.
     /// </summary>
     /// <remarks>

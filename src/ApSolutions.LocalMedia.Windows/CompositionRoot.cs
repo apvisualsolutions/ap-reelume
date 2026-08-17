@@ -190,6 +190,15 @@ public static partial class CompositionRoot
         PostSafely(() => services.GetRequiredService<RefreshStaleMetadata>()
             .ExecuteAsync(CancellationToken.None));
 
+        // The subtitle style somebody chose comes back. It is loaded onto the surface the shell was
+        // handed rather than onto a freshly resolved one, because this view model is transient: a
+        // fresh instance would be filled correctly and shown to nobody. Without this the choice was
+        // stored and never read, which is the same defect from the other end.
+        if (services.GetRequiredService<ShellHost>().Shell?.SubtitleStyle is { } subtitleStyle)
+        {
+            PostSafely(() => subtitleStyle.LoadAsync(CancellationToken.None));
+        }
+
         if (host.PendingActivationPath is { Length: > 0 } activation)
         {
             var open = services.GetRequiredService<OpenLooseFile>();

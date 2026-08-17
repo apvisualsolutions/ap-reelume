@@ -17,6 +17,7 @@ public sealed class SubtitleStyleViewModel : INotifyPropertyChanged
     private readonly PreferenceScope _scope;
     private readonly string _scopeKey;
     private SubtitleStyle _style = SubtitleStyle.EngineDefault;
+    private bool _isLoading;
 
     public SubtitleStyleViewModel(
         IPlaybackPreferenceRepository repository,
@@ -82,7 +83,15 @@ public sealed class SubtitleStyleViewModel : INotifyPropertyChanged
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         var stored = await _repository.GetAsync(_scope, _scopeKey, cancellationToken).ConfigureAwait(true);
-        Update(stored?.SubtitleStyle ?? SubtitleStyle.EngineDefault);
+        _isLoading = true;
+        try
+        {
+            Update(stored?.SubtitleStyle ?? SubtitleStyle.EngineDefault);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
     }
 
     /// <summary>Persists the current style without disturbing the other fields of the scope.</summary>
@@ -125,6 +134,17 @@ public sealed class SubtitleStyleViewModel : INotifyPropertyChanged
         }
 
         _style = style;
+
+        // A choice that dies with the window is not a choice. Every setter here goes through this,
+        // so this is the one place it can be stored from — and it stores rather than waiting to be
+        // asked, because nothing in the application was ever going to ask: walking the surface with
+        // the mouse found four controls whose whole effect was a field of this object. Loading is
+        // excluded because showing what is already stored is not a change worth storing back.
+        if (!_isLoading)
+        {
+            _ = SaveAsync();
+        }
+
         foreach (var name in new[]
         {
             nameof(Style),
