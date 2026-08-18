@@ -21,7 +21,7 @@ again from scratch.
 | ~~1~~ | ~~The loose session cannot be seen~~ **done on 2026-08-17, 6 → 3** | agent | 3 |
 | ~~2~~ | ~~The last three of batch 1~~ **done on 2026-08-18, 3 → 0** | agent | **0** |
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
-| 4 | Coverage over all of `src/`, floor 96/96 | agent | 0 |
+| ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops** | agent | 0 |
 | 5 | `ARQ-004`, the nine inert classes | agent | 0 |
 | 6 | **The redesign**, from Claude Design's material | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |

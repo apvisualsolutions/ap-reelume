@@ -25,7 +25,13 @@ param(
 
     [double]$MinimumLinePercent = 96.0,
 
-    [double]$MinimumBranchPercent = 96.0
+    [double]$MinimumBranchPercent = 96.0,
+
+    # Writes eng/coverage-debt.txt from this run instead of checking against it. The list has to be
+    # produced by the same arithmetic that verifies it, or the two drift: generating it separately
+    # disagreed on three files the first time it was tried, because a path can appear twice in the
+    # merged report and the check takes the first match rather than merging them.
+    [switch]$WriteDebt
 )
 
 $ErrorActionPreference = 'Stop'
@@ -327,6 +333,86 @@ try {
 
     Write-Output "Coverage gate: watched files, held at every run whatever their age:"
     $watchRows | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
+
+    # ------------------------------------------------------------- the debt, and its ratchet
+    <#
+        Everything else in src/, held at the floor it meets today. The watched list above is the
+        opposite promise -- files that reached the bar and are kept there -- and this one is the
+        debt: 219 files on 2026-08-18, each pinned so it cannot get worse while the number comes
+        down. It works the way eng/walk-pending.txt worked, and that list went from 126 to 0.
+
+        A file leaves eng/coverage-debt.txt by reaching 96/96, never by being edited out: a floor
+        below what was measured fails, exactly like a floor above it, so the file always says what
+        is true today.
+    #>
+    $debtRatchet = 219
+    $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
+
+    if ($WriteDebt) {
+        $emitted = @()
+        foreach ($key in ($coverageByFile.Keys | Sort-Object)) {
+            $relative = $key -replace '^.*?/(src/)', '$1'
+            if (-not $relative.StartsWith('src/')) { continue }
+            # The first key wins, exactly as Measure-File picks it, so what is written is what will
+            # be read back.
+            if ($emitted.File -contains $relative) { continue }
+            $m = Measure-File -Coverage $coverageByFile -Path $relative
+            if (-not $m) { continue }
+            $lineFloor = [math]::Floor($m.LinePct)
+            $branchFloor = [math]::Floor($m.BranchPct)
+            if ($lineFloor -ge 96 -and $branchFloor -ge 96) { continue }
+            $emitted += [pscustomobject]@{ File = $relative; Lines = $lineFloor; Branches = $branchFloor }
+        }
+
+        $width = ($emitted.File | Measure-Object -Property Length -Maximum).Maximum + 2
+        $lines = foreach ($e in $emitted) {
+            '{0}{1,3} {2,3}' -f $e.File.PadRight($width), $e.Lines, $e.Branches
+        }
+
+        $head = Get-Content -LiteralPath $debtFile | Where-Object { $_.TrimStart().StartsWith('#') -or -not $_.Trim() }
+        Set-Content -LiteralPath $debtFile -Value (@($head) + @($lines)) -Encoding utf8
+        Write-Output "Coverage gate: wrote $($emitted.Count) file(s) to eng/coverage-debt.txt."
+        exit 0
+    }
+    $debt = @(Get-Content -LiteralPath $debtFile |
+        Where-Object { $_.Trim() -and -not $_.TrimStart().StartsWith('#') } |
+        ForEach-Object {
+            $parts = $_ -split '\s+'
+            [pscustomobject]@{ File = $parts[0]; Lines = [int]$parts[1]; Branches = [int]$parts[2] }
+        })
+
+    $debtFailures = @()
+    if ($debt.Count -gt $debtRatchet) {
+        $debtFailures += ("eng/coverage-debt.txt holds $($debt.Count) files and the ratchet is " +
+            "$debtRatchet. The list only shrinks; lower the ratchet with it, never the other way.")
+    }
+
+    $improved = 0
+    foreach ($entry in $debt) {
+        $measured = Measure-File -Coverage $coverageByFile -Path $entry.File
+        if (-not $measured) { continue }
+
+        $linePct = [math]::Floor($measured.LinePct)
+        $branchPct = [math]::Floor($measured.BranchPct)
+        if ($linePct -lt $entry.Lines -or $branchPct -lt $entry.Branches) {
+            $debtFailures += ("$($entry.File) fell to $linePct/$branchPct, below the " +
+                "$($entry.Lines)/$($entry.Branches) it held. Coverage does not go backwards.")
+        }
+        elseif ($linePct -ge 96 -and $branchPct -ge 96) {
+            $improved++
+            $debtFailures += ("$($entry.File) now reaches $linePct/$branchPct and is at the bar. " +
+                "Take it out of eng/coverage-debt.txt and lower the ratchet by one.")
+        }
+        elseif ($linePct -gt $entry.Lines -or $branchPct -gt $entry.Branches) {
+            $improved++
+            $debtFailures += ("$($entry.File) now reaches $linePct/$branchPct; raise its floor in " +
+                "eng/coverage-debt.txt so the debt cannot come back.")
+        }
+    }
+
+    Write-Output ("Coverage gate: {0} file(s) still short of 96/96, ratchet {1}{2}." -f
+        $debt.Count, $debtRatchet, $(if ($improved) { ", $improved improved" } else { '' }))
+    if ($debtFailures) { throw ($debtFailures -join [Environment]::NewLine) }
 
     $rows = @()
     $failures = @()
