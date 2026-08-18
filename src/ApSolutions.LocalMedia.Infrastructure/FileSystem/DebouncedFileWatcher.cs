@@ -13,6 +13,7 @@ public sealed class DebouncedFileWatcher : IRootWatcher
 {
     private readonly IClock _clock;
     private readonly TimeSpan _debounce;
+    private readonly int _internalBufferBytes;
 
     public static readonly TimeSpan DefaultDebounce = TimeSpan.FromMilliseconds(750);
 
@@ -24,13 +25,31 @@ public sealed class DebouncedFileWatcher : IRootWatcher
     /// </summary>
     public const int InternalBufferBytes = 64 * 1024;
 
-    public DebouncedFileWatcher(IClock clock, TimeSpan? debounce = null)
+    /// <summary>
+    /// The smallest buffer the platform honours; anything under it is silently raised to this.
+    /// Only a test asks for it, and it asks so that the overflow it exists to prove is certain
+    /// rather than likely: at the product's ceiling a storm overflows on some runs and not on
+    /// others, so the handler BUG-012 added ran or did not run with nothing saying which, and this
+    /// file's coverage swung by four lines between two runs of the same binary.
+    /// </summary>
+    public const int MinimumInternalBufferBytes = 4 * 1024;
+
+    public DebouncedFileWatcher(
+        IClock clock,
+        TimeSpan? debounce = null,
+        int? internalBufferBytes = null)
     {
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         _debounce = debounce ?? DefaultDebounce;
         if (_debounce <= TimeSpan.Zero)
         {
             throw new ArgumentOutOfRangeException(nameof(debounce));
+        }
+
+        _internalBufferBytes = internalBufferBytes ?? InternalBufferBytes;
+        if (_internalBufferBytes is < MinimumInternalBufferBytes or > InternalBufferBytes)
+        {
+            throw new ArgumentOutOfRangeException(nameof(internalBufferBytes));
         }
     }
 
@@ -44,7 +63,7 @@ public sealed class DebouncedFileWatcher : IRootWatcher
             SingleReader = true,
             SingleWriter = false,
         });
-        using var watcher = CreateWatcher(root.Path, changes.Writer);
+        using var watcher = CreateWatcher(root.Path, changes.Writer, _internalBufferBytes);
         watcher.EnableRaisingEvents = true;
 
         while (await changes.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
@@ -85,12 +104,15 @@ public sealed class DebouncedFileWatcher : IRootWatcher
         }
     }
 
-    private static FileSystemWatcher CreateWatcher(string path, ChannelWriter<WatchSignal> writer)
+    private static FileSystemWatcher CreateWatcher(
+        string path,
+        ChannelWriter<WatchSignal> writer,
+        int internalBufferBytes)
     {
         var watcher = new FileSystemWatcher(path)
         {
             IncludeSubdirectories = true,
-            InternalBufferSize = InternalBufferBytes,
+            InternalBufferSize = internalBufferBytes,
             NotifyFilter = NotifyFilters.FileName |
                            NotifyFilters.DirectoryName |
                            NotifyFilters.LastWrite |

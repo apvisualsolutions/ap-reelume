@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Events;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Common;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
@@ -177,6 +178,236 @@ public sealed class FileWatcherRecoveryTests
     }
 
     [Fact]
+    public void Watcher_refuses_a_clock_a_debounce_or_a_buffer_it_cannot_honour()
+    {
+        Assert.Throws<ArgumentNullException>(() => new DebouncedFileWatcher(null!));
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => new DebouncedFileWatcher(new SystemClock(), TimeSpan.Zero));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new DebouncedFileWatcher(
+            new SystemClock(),
+            internalBufferBytes: DebouncedFileWatcher.MinimumInternalBufferBytes - 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new DebouncedFileWatcher(
+            new SystemClock(),
+            internalBufferBytes: DebouncedFileWatcher.InternalBufferBytes + 1));
+    }
+
+    [Fact]
+    public async Task Overflowing_the_system_buffer_is_reported_as_lost_events_and_the_watching_goes_on()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var stormRoot = Path.Combine(directory.Path, "overflow");
+        Directory.CreateDirectory(stormRoot);
+        var root = Root(stormRoot, RootKind.Local);
+
+        // BUG-012 handler only runs when Windows drops change records, and at the product ceiling
+        // of 64 KiB a storm overflows on some runs and not on others: this file coverage swung
+        // between 88.54/73.81 and 93.75/71.43 across two runs of the same binary. So the buffer is
+        // a constructor parameter — the pattern the debounce already had — and this test asks for
+        // the smallest one the platform honours. Each record costs twelve bytes plus the name in
+        // UTF-16, so names this long fit about twenty of them in 4 KiB, and the storm below is
+        // thousands.
+        var watcher = new DebouncedFileWatcher(
+            new SystemClock(),
+            TimeSpan.FromMilliseconds(150),
+            DebouncedFileWatcher.MinimumInternalBufferBytes);
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(60));
+        await using var batches = watcher.StartAsync(root, timeout.Token).GetAsyncEnumerator(timeout.Token);
+        var pendingBatch = batches.MoveNextAsync().AsTask();
+        await Task.Delay(100, timeout.Token);
+
+        var longName = new string('o', 96);
+        Parallel.For(
+            0,
+            4_000,
+            new ParallelOptions { MaxDegreeOfParallelism = 64, CancellationToken = timeout.Token },
+            index =>
+            {
+                // Concurrent, synchronous and empty on purpose: what overflows the buffer is
+                // writing records faster than the thread of the watcher drains them. A sequential
+                // loop hands it a third of a millisecond between files, which is all the time it
+                // needs to keep up — that is precisely how the earlier storm failed to overflow.
+                File.Create(Path.Combine(stormRoot, $"{longName}{index}.mkv")).Dispose();
+            });
+
+        var eventsLost = false;
+        try
+        {
+            while (!eventsLost && await pendingBatch)
+            {
+                eventsLost = batches.Current.EventsLost;
+                if (!eventsLost)
+                {
+                    pendingBatch = batches.MoveNextAsync().AsTask();
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Falls through to the assertion, which says what went wrong far better than a
+            // cancellation would.
+        }
+
+        // The assertion is the whole point. A test that provokes a condition it cannot guarantee
+        // has to state that the condition happened, or it goes blind instead of red: the storm
+        // that did not overflow passed just the same, without ever running what it protects.
+        Assert.True(eventsLost, "The storm never overflowed the buffer, so nothing was proven.");
+
+        // And an overflow is not the end of the watching: a file created afterwards still arrives.
+        pendingBatch = batches.MoveNextAsync().AsTask();
+        var afterTheStorm = Path.Combine(stormRoot, "after-the-storm.mkv");
+        await File.WriteAllBytesAsync(afterTheStorm, [0x41], timeout.Token);
+        FileChange? survivor = null;
+        while (survivor is null && await pendingBatch)
+        {
+            survivor = batches.Current.Changes.FirstOrDefault(change =>
+                string.Equals(change.Path, afterTheStorm, StringComparison.OrdinalIgnoreCase));
+            if (survivor is null)
+            {
+                pendingBatch = batches.MoveNextAsync().AsTask();
+            }
+        }
+
+        Assert.NotNull(survivor);
+    }
+
+    [Fact]
+    public async Task A_change_arriving_exactly_as_the_debounce_ends_joins_the_batch()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var folder = Path.Combine(directory.Path, "racing-debounce");
+        Directory.CreateDirectory(folder);
+        var first = Path.Combine(folder, "first.mkv");
+        var second = Path.Combine(folder, "second.mkv");
+
+        // The last thing in this file whose coverage was left to chance. When a change arrives
+        // while the debounce is still waiting, the watcher cancels the debounce and then awaits it
+        // to let the cancellation through — and if the debounce had just elapsed, that await
+        // returns normally instead. Against a real clock that is a race of microseconds, won on
+        // some runs and not on others. This clock ends its wait when the watcher cancels it, so the
+        // second half of that pair is exercised every time rather than now and then.
+        var watcher = new DebouncedFileWatcher(
+            new ClockWhoseWaitEndsWhenItIsCancelled(),
+            TimeSpan.FromMilliseconds(300));
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(30));
+        await using var batches = watcher
+            .StartAsync(Root(folder, RootKind.Local), timeout.Token)
+            .GetAsyncEnumerator(timeout.Token);
+        var pendingBatch = batches.MoveNextAsync().AsTask();
+        await Task.Delay(200, timeout.Token);
+
+        await File.WriteAllBytesAsync(first, [0x41], timeout.Token);
+        await Task.Delay(50, timeout.Token);
+        await File.WriteAllBytesAsync(second, [0x50], timeout.Token);
+
+        // What the watcher promises either way: a debounce that ends early takes the change that
+        // ended it with it, instead of leaving it for a batch that may never come.
+        FileChange? late = null;
+        while (late is null && await pendingBatch)
+        {
+            late = batches.Current.Changes.FirstOrDefault(change =>
+                string.Equals(change.Path, second, StringComparison.OrdinalIgnoreCase));
+            if (late is null)
+            {
+                pendingBatch = batches.MoveNextAsync().AsTask();
+            }
+        }
+
+        Assert.NotNull(late);
+    }
+
+    [Fact]
+    public async Task A_root_that_disappears_ends_the_watching_with_the_reason_rather_than_in_silence()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var vanishing = Path.Combine(directory.Path, "vanishing");
+        Directory.CreateDirectory(vanishing);
+        var watcher = new DebouncedFileWatcher(new SystemClock(), TimeSpan.FromMilliseconds(150));
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(30));
+        await using var batches = watcher
+            .StartAsync(Root(vanishing, RootKind.Local), timeout.Token)
+            .GetAsyncEnumerator(timeout.Token);
+        var pending = batches.MoveNextAsync().AsTask();
+        await Task.Delay(200, timeout.Token);
+
+        Directory.Delete(vanishing, recursive: true);
+
+        // The other half of the same decision, and the half that must never be mistaken for an
+        // overflow: a root that stopped answering is the end of this watcher, so the reader is
+        // told why instead of waiting forever for batches that will not come.
+        var error = await Assert.ThrowsAnyAsync<Exception>(async () => await pending);
+        Assert.False(
+            error is OperationCanceledException,
+            "The watching was cancelled rather than ended by the vanished root.");
+        Assert.False(WatchErrorPolicy.MeansEventsWereLost(error));
+    }
+
+    [Fact]
+    public async Task Changes_to_one_path_coalesce_to_the_change_that_survives()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var folder = Path.Combine(directory.Path, "coalescing");
+        Directory.CreateDirectory(folder);
+        var alreadyThere = Path.Combine(folder, "already-there.mkv");
+        await File.WriteAllBytesAsync(alreadyThere, [0x41], TestContext.Current.CancellationToken);
+        var renamedExisting = Path.Combine(folder, "renamed-existing.mkv");
+        var created = Path.Combine(folder, "created.mkv");
+        var renamed = Path.Combine(folder, "renamed.mkv");
+        var recreated = Path.Combine(folder, "recreated.mkv");
+
+        // Three seconds of debounce so every step below lands in one batch, and the batch closes
+        // three seconds after the last of them. Coalescing is what the batch is for, and it can
+        // only be measured when the changes meet: read one change per batch and the pairs this
+        // asserts never form. Which pairs formed used to be left to whatever the operating system
+        // happened to deliver during a storm, and it delivered differently on each run.
+        var watcher = new DebouncedFileWatcher(new SystemClock(), TimeSpan.FromSeconds(3));
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(60));
+        await using var batches = watcher
+            .StartAsync(Root(folder, RootKind.Local), timeout.Token)
+            .GetAsyncEnumerator(timeout.Token);
+        var pendingBatch = batches.MoveNextAsync().AsTask();
+        await Task.Delay(200, timeout.Token);
+
+        await File.WriteAllBytesAsync(created, [0x41], timeout.Token);
+        await Task.Delay(80, timeout.Token);
+        await File.AppendAllTextAsync(created, "x", timeout.Token);
+        await Task.Delay(80, timeout.Token);
+        File.Move(created, renamed);
+        await Task.Delay(80, timeout.Token);
+        File.Delete(renamed);
+        await Task.Delay(80, timeout.Token);
+        await File.WriteAllBytesAsync(recreated, [0x41], timeout.Token);
+        await Task.Delay(80, timeout.Token);
+        File.Delete(recreated);
+        await Task.Delay(80, timeout.Token);
+        await File.WriteAllBytesAsync(recreated, [0x41], timeout.Token);
+        await Task.Delay(80, timeout.Token);
+        File.Move(alreadyThere, renamedExisting);
+
+        Assert.True(await pendingBatch);
+        var batch = batches.Current.Changes;
+
+        // Created then changed then renamed then deleted, all on the same file: what survives is
+        // one deletion, at the name the file had when it went.
+        Assert.Equal(FileChangeKind.Deleted, Single(batch, renamed).Kind);
+
+        // The rename took the old path with it, so nothing is left claiming a file that is gone.
+        Assert.DoesNotContain(
+            batch,
+            change => string.Equals(change.Path, created, StringComparison.OrdinalIgnoreCase));
+
+        // Deleted and created again is a file that changed, not one that appeared.
+        Assert.Equal(FileChangeKind.Changed, Single(batch, recreated).Kind);
+
+        // And a rename whose old path was never pending — the file was there before the watching
+        // began — is carried through as the rename it is.
+        Assert.Equal(FileChangeKind.Renamed, Single(batch, renamedExisting).Kind);
+    }
+
+    [Fact]
     public async Task Unreliable_UNC_watcher_recovers_a_lost_event_and_skips_unchanged_probes()
     {
         using var directory = new DatabaseTestDirectory();
@@ -272,6 +503,11 @@ public sealed class FileWatcherRecoveryTests
         Assert.Equal(1, await CountMediaAsync(factory));
     }
 
+    private static FileChange Single(IReadOnlyList<FileChange> changes, string path) =>
+        Assert.Single(
+            changes,
+            change => string.Equals(change.Path, path, StringComparison.OrdinalIgnoreCase));
+
     private static LibraryRoot Root(string path, RootKind kind) => new(
         new LibraryRootId(Guid.NewGuid()),
         path,
@@ -305,6 +541,23 @@ public sealed class FileWatcherRecoveryTests
             stream,
             TestContext.Current.CancellationToken);
         return $"{Path.GetFileName(path)}|{Convert.ToHexString(hash)}";
+    }
+
+    /// <summary>
+    /// A clock whose wait ends — successfully — the moment it is cancelled, instead of throwing.
+    /// It models the one ordering a real clock only reaches by coincidence: the debounce elapsing
+    /// in the same instant the watcher gives up on it.
+    /// </summary>
+    private sealed class ClockWhoseWaitEndsWhenItIsCancelled : IClock
+    {
+        public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+
+        public async Task DelayAsync(TimeSpan delay, CancellationToken cancellationToken = default)
+        {
+            var cancelled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            using var registration = cancellationToken.Register(() => cancelled.TrySetResult());
+            await Task.WhenAny(cancelled.Task, Task.Delay(delay, CancellationToken.None));
+        }
     }
 
     private sealed class ThrowingRootWatcher : IRootWatcher
