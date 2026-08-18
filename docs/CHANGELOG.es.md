@@ -512,6 +512,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Cambiar de versión dos veces seguidas ya no se salta la pregunta ni deja en cero por dónde ibas.**
+  La fila de la otra versión seguía pulsable mientras su propio cambio estaba en marcha, así que un
+  doble clic —o un segundo clic mientras la pregunta ya estaba en pantalla— lanzaba un segundo cambio.
+  Y todo cambio guarda antes la posición del reproductor: si la sesión acababa de abrirse y el motor
+  aún respondía cero, ese cero quedaba por debajo del punto desde el que se ofrece reanudar, así que
+  el segundo cambio decidía que no había nada que llevarse, abría la otra versión **sin preguntar** y
+  dejaba la posición guardada en cero. Ahora la fila se apaga mientras su cambio está en marcha,
+  igual que el salto de la barra de transporte se apaga mientras busca.
+
 - **El tráiler que guardas junto a una película sólo aparecía si esa película estaba duplicada.** La
   ficha buscaba el archivo del tráiler partiendo del grupo de versiones, y un título sin copias no
   tiene grupo: el archivo estaba ahí al lado y el botón no salía nunca. Ahora se busca a partir de la

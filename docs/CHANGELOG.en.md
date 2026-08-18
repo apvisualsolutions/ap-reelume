@@ -500,6 +500,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Switching version twice in a row no longer skips the question or leaves your place at zero.** The
+  other version's row stayed pressable while its own switch was in flight, so a double click — or a
+  second click while the question was already on screen — started a second switch. And every switch
+  saves the player's position first: if the session had only just opened and the engine still answered
+  zero, that zero fell below the point resuming is offered from, so the second switch decided there
+  was nothing to carry across, opened the other version **without asking**, and left the stored
+  position at zero. The row now greys out while its switch is in flight, the way the transport bar's
+  skip greys out while it seeks.
+
 - **A trailer kept beside a film only appeared if that film was duplicated.** The card looked for the
   trailer file starting from the version group, and a title with no copies has no group: the file sat
   right there and the button never appeared. It is now found from the film itself, copies or not.

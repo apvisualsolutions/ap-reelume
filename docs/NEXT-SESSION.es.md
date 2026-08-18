@@ -190,6 +190,24 @@ respiro que su hilo necesita. En paralelo desborda en el primer segundo. El prim
 - **Los 35 activos de instalación siguen bloqueados** en el original vectorial de la marca, y no se
   improvisan.
 
+#### Y un rojo que CI trajo en medio, con un defecto de producto dentro (2026-08-18)
+
+El run de `ba1502e` falló **1 de 117** en el paseo:
+`ConfirmSwitchButton is on screen but cannot be pressed: visible=False, enabled=True` — la pregunta
+del cambio de versión se iba de la pantalla entre resolver el botón y pulsarlo. Local da 117/117 en
+dos pasadas, a 2 minutos por pasada frente a los 5 m 38 s del runner, así que la ventana la abre la
+lentitud de allí.
+
+**No era del paseo.** La fila de la otra versión seguía pulsable mientras su propio cambio estaba en
+marcha, el arnés vuelve a pulsar a los 300 ms lo que parece no haber hecho nada, y **todo cambio vacía
+la posición del reproductor antes de decidir**: una sesión recién abierta responde cero, cero está por
+debajo del suelo de reanudación, y entonces la política deja de preguntar, **abre la otra versión sin
+preguntar y deja la posición guardada en cero**. Es decir: un doble clic bastaba, sin runner lento.
+
+Corregido donde vino la segunda petición —la fila se apaga mientras su cambio está en marcha, el
+patrón que la barra de transporte ya tenía— y **el eslabón que era una deducción se midió**, no se
+supuso: [la evidencia](evidence/stable/audit-version-switch-reentry.md). El caso de uso no se toca.
+
 Lo que sigue debajo se conserva porque describe la forma de la corrección, que es la referencia para
 la vía suelta:
 

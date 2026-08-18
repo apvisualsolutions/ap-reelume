@@ -190,6 +190,25 @@ which is exactly what it is there for.
   that rule stays a comment.
 - **The 35 installation assets stay blocked** on the brand's vector original, and are not improvised.
 
+#### And a red CI brought in the middle, with a product defect inside it (2026-08-18)
+
+The run for `ba1502e` failed **1 of 117** in the walk:
+`ConfirmSwitchButton is on screen but cannot be pressed: visible=False, enabled=True` — the version
+switch's question left the screen between the button being resolved and being pressed. Locally it is
+117/117 over two passes, at two minutes a pass against the runner's 5 m 38 s, so the window is opened
+by the slowness there.
+
+**It was not the walk's.** The other version's row stayed pressable while its own switch was in
+flight, the harness presses again after 300 ms of apparent silence, and **every switch flushes the
+playhead before it decides**: a session that has just opened answers zero, zero is below the resume
+floor, and the policy then stops asking, **opens the other version unasked and leaves the stored
+position at zero**. So a double click was enough, no slow runner required.
+
+Fixed where the second request came from — the row greys out while its switch is in flight, the
+pattern the transport bar already had — and **the one link that was a deduction was measured** rather
+than assumed: [the evidence](evidence/stable/audit-version-switch-reentry.md). The use case is left
+alone.
+
 What follows is kept because it describes the shape of the correction, which is the reference for the
 loose path:
 
