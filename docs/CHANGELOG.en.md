@@ -104,6 +104,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   border's colour and the text the background's — because in those palettes a lighter shade would say
   nothing.
 
+- **Checkboxes are no longer painted by Windows.** All eighteen in the application took their
+  colours from the graphics library's theme, with three consequences anyone could see. A **checked,
+  switched-off** box was unreadable in the light theme: a white mark over the grey beneath it, with
+  less difference than it takes to make out a shape. The **outline of a switched-off box** did not
+  reach the minimum either. And a **checked** box was always the same Windows blue, which is not this
+  application's colour in any theme, nor the high contrast one in the two that are. The box, the mark
+  and the label now come from the same colours as everything else, in all four themes, and in high
+  contrast hovering or pressing **inverts** the box exactly as the button does. **In high contrast a
+  checkbox used to be painted exactly as in the ordinary theme**, so turning high contrast on in
+  Windows changed every control but this one.
+
 - **A switched-off control looks different from a working one, in high contrast too.** In the light
   and dark themes the colour said it: a duller fill and greyer text. In the two high contrast themes
   **nothing said it** — those palettes have two colours and no third one to spend, so a switched-off

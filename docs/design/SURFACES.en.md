@@ -144,7 +144,7 @@ by sight.
 | Measure | Value |
 | --- | --- |
 | Dictionaries in `Theme/DesignTokens.axaml` | **4**: `Light`, `Dark`, `HighContrastLight` and `HighContrastDark` |
-| Token declarations in the dictionaries | **140**, across **35 names**: 23 brushes and 12 aliases |
+| Token declarations in the dictionaries | **268**, across **67 names**: 24 brushes and 43 aliases (12 for the button, 31 for the checkbox) |
 | Scalars, outside the dictionaries | **13** |
 | Plus, in `Resources/Brand.axaml` | 3 (strings, no colours) |
 | Focus selectors | **10**: `Button`, `ToggleButton`, `ToggleSwitch`, `RadioButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
@@ -166,6 +166,11 @@ Four things the redesign has to know:
   third colour to spend — the disabled fill, the resting fill and the surface are one, the border is
   one for all four states, and the disabled text is the primary text — so the difference is the
   **dotted outline**, drawn as an adorner over the ten types.
+- **Every control type gets in through its own resources, and no two are alike.** A button consumes
+  **12** of the base theme's resources; a checkbox, **73**; a combo box, 59; a `RadioButton`, 38; a
+  `ToggleButton`, 37; a `Slider`, 32. A `TextBox` has **2** of its own and a `ListBoxItem` **1**:
+  those paint from the generic ones (`TextControl*`, 32). Assuming the next type works like the last
+  is how this goes wrong.
 
 ## The installation, which is also seen
 

@@ -104,6 +104,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
   temas, y en alto contraste pasar el ratón o pulsar **invierte** el botón —el relleno toma el color
   del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada.
 
+- **Las casillas de verificación ya no las pinta Windows.** Las dieciocho de la aplicación tomaban
+  sus colores del tema de la biblioteca gráfica, y eso tenía tres consecuencias que se veían. Una
+  casilla **marcada y apagada** era ilegible en el tema claro: la marca blanca sobre el gris de
+  debajo, con menos diferencia de la que hace falta para ver una forma. El **borde de una casilla
+  apagada** tampoco llegaba al mínimo. Y una casilla **marcada** salía siempre del mismo azul de
+  Windows, que no es el color de esta aplicación en ningún tema, ni el de alto contraste en los dos
+  que lo son. Ahora la caja, la marca y la etiqueta salen de los mismos colores que el resto, en los
+  cuatro temas, y en alto contraste pasar el ratón o pulsar **invierte** la caja igual que hace el
+  botón. **En alto contraste una casilla se pintaba exactamente igual que en el tema normal**, así
+  que encender el alto contraste en Windows cambiaba todos los controles menos éste.
+
 - **Un control apagado se distingue de uno normal, también en alto contraste.** En los temas claro y
   oscuro se sabía por el color: un relleno más apagado y un texto más gris. En los dos temas de alto
   contraste **no se sabía de ninguna manera** — esas paletas son de dos colores y no les queda un

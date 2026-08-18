@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a and 2b done on 2026-08-18**; the eight types and the views remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b and 2c done**; seven types and the views remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -262,9 +262,14 @@ marker** rather than as a style.
    our own. Recorded as a decision, not as debt. If the owner's physical walk says it does not read, it
    reopens **with that measurement**.
 3. **`primary-action` gets a primary-action style** rather than being deleted: it is "Continue" on the
-   home surface, and the redesign wants hierarchy. It needs a new token, **`AccentTextBrush`** — white
-   in light, dark and high contrast light; **black** in high contrast dark, where the accent is cyan —
+   home surface, and the redesign wants hierarchy. It needs a new token, **`AccentTextBrush`** — ~~white
+   in light, dark and high contrast light; **black** in high contrast dark, where the accent is cyan~~ —
    and `ContrastTokenTests` measures it against `AccentBrush` at the text bar of 4.5:1.
+   **The token arrived on 2026-08-19 with the checkbox, which needed it sooner, and the struck-out
+   half was false**: the **dark** theme's `AccentBrush` is `#62AEE8`, a pale blue, and white on it
+   reads **2.40:1**. It is `#FFFFFF` in light and high contrast light, `#111827` in dark and
+   `#000000` in high contrast dark — the colour follows the **accent's luminance**, never the theme's
+   name. The gate measures it now, proved failing.
 4. **`ToggleSwitch` keeps its focus selector and gets NO states.** Zero uses across the 48 views:
    giving states to a type nobody mounts is declaring without spending. The focus selector stays
    because it is already written and costs nothing.
@@ -311,6 +316,48 @@ there was no high contrast dark, which has been false for a day.
 (5), `ToggleButton` (2), `RadioButton` (1) — each through **its own theme resources**, as the button
 was; the consumed-scalars gate with a list that only shrinks; `primary-action` with the
 `AccentTextBrush` token; and then the typography and the views, one per commit.
+
+#### ~~Phase 2c: the checkbox~~ — done on 2026-08-19, and it was not a second button
+
+**Done** — [the evidence](evidence/stable/audit-redesign-phase2c-checkbox-states.md). Eighteen across
+the views, and **31 aliases per theme** (124 in all) against the button's 12.
+
+**What to know before touching the next type, because it changes the plan:** a probe enumerating the
+base theme's keys at runtime gives **1,054**, and per type: `CheckBox` **73**, `ComboBox` 59,
+`RadioButton` 38, `ToggleButton` 37, `Slider` 32, `Button` 18 — and `TextBox` **2** and `ListBoxItem`
+**1**, which paint from the generic ones (`TextControl*`, 32). **No type works like the last one.**
+
+The three defects, with their numbers: a **checked, switched-off** box was unreadable in the light
+theme (white mark over the grey `#33000000` leaves, **1.68:1**); the **disabled box's outline** read
+**2.83:1** against a minimum of 3; and a **checked** box was `#0078D7` in all four themes. And
+**Light painted identically to HighContrastLight**, as did Dark to HighContrastDark: nothing of this
+project's reached a checkbox.
+
+**Two lessons that cost a measurement each:**
+
+1. **A brush is read whole, and the alpha lives in the colour.** The base theme's checkbox brushes
+   carry alpha **in the colour itself** (`#99000000`, `#66FFFFFF`, `#33000000`), not in `Opacity`.
+   The first version of the test measured luminance without compositing it and reported **1.00:1**,
+   white on white — a false number. **And the danger was not that failure but its opposite**: where
+   the alpha ran the other way it would have **passed** a 2.83:1 border as if it were 21:1.
+2. **A bar is chosen by what it measures, not by what you want to pass.** The mark was held to 4.5
+   (text) and a mark is a graphic, whose bar is 3.0. It was lowered **after** measuring, which
+   deserves suspicion, so it is written down that **it rescued nothing** — 1.68:1 fails both — and
+   that the new mapping clears 3.0 by 4.26 at its narrowest.
+
+**And one test changed its question**: it asked for the box's outline against the surface, and in
+high contrast hovering **inverts** — the box goes solid and the outline vanishes into it, 1.00:1 —
+which is the clearest of the four states. It now asks whether the box can be seen by its outline
+**or** by its fill.
+
+**One intermittent, unresolved and recorded**: `AssembledPhysicalWalkTests.A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse`
+failed once in the whole suite and did not recur in the walk alone (33/33) or in the two passes
+after. If it reappears on CI, that is the thread.
+
+**What is next, in order:** `ListBoxItem` (17), `TextBox` (15), `ComboBox` (8), `Slider` (5),
+`NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — and the first two **have no resources of
+their own**, so their way in has to be measured first; the consumed-scalars gate with a list that
+only shrinks; `primary-action`, which now has its token; and then the typography and the views.
 
 #### What step 8 has to remember about the redesign (2026-08-18)
 

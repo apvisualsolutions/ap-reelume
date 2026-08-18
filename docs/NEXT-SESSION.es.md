@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a y 2b hechas el 2026-08-18**; quedan los ocho tipos y las vistas | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b y 2c hechas**; quedan siete tipos y las vistas | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -261,9 +261,14 @@ como **marcador de las pruebas**, no como estilo.
    propia. Se documenta como decisión, no como deuda. Si el paseo físico del propietario dice que no se
    distingue, se reabre **con esa medición**.
 3. **`primary-action` recibe estilo de acción primaria**, no se borra: es «Continuar» en la portada, y
-   el rediseño quiere jerarquía. Necesita un token nuevo, **`AccentTextBrush`** —blanco en claro,
-   oscuro y alto contraste claro; **negro** en alto contraste oscuro, porque el acento allí es cian—, y
+   el rediseño quiere jerarquía. Necesita un token nuevo, **`AccentTextBrush`** —~~blanco en claro,
+   oscuro y alto contraste claro; **negro** en alto contraste oscuro, porque el acento allí es cian~~—, y
    `ContrastTokenTests` lo mide contra `AccentBrush` con el listón de texto, 4,5:1.
+   **El token llegó el 2026-08-19 con la casilla, que lo necesitaba antes, y la mitad tachada era
+   falsa**: el `AccentBrush` del tema **oscuro** es `#62AEE8`, un azul pálido, y blanco encima mide
+   **2,40:1**. Queda `#FFFFFF` en claro y alto contraste claro, `#111827` en oscuro y `#000000` en
+   alto contraste oscuro — el color sigue la **luminancia del acento**, no el nombre del tema. Lo mide
+   ya la puerta, probada fallando.
 4. **`ToggleSwitch` conserva su selector de foco y NO recibe estados.** Cero usos en las 48 vistas: dar
    estados a un tipo que nadie monta es declarar sin gastar. El foco se queda porque ya está escrito y
    cuesta cero.
@@ -311,6 +316,48 @@ lleva un día siendo falso.
 `ToggleButton` (2), `RadioButton` (1)—, cada uno por **sus propios recursos de tema** como el botón;
 la puerta de escalares consumidos con lista que sólo encoge; `primary-action` con el token
 `AccentTextBrush`; y después la tipografía y las vistas, una por commit.
+
+#### ~~La fase 2c: la casilla~~ — hecha el 2026-08-19, y no era un segundo botón
+
+**Hecha** — [la evidencia](evidence/stable/audit-redesign-phase2c-checkbox-states.md). Dieciocho en
+las vistas, y **31 alias por tema** (124 en total) frente a los 12 del botón.
+
+**Lo que hay que saber antes de tocar el siguiente tipo, porque cambia el plan:** una sonda que
+enumera las claves del tema base en ejecución da **1 054**, y por tipo: `CheckBox` **73**, `ComboBox`
+59, `RadioButton` 38, `ToggleButton` 37, `Slider` 32, `Button` 18 — y `TextBox` **2** y `ListBoxItem`
+**1**, que pintan desde los genéricos (`TextControl*`, 32). **Ningún tipo se hace como el anterior.**
+
+Los tres defectos, con su número: una casilla **marcada y apagada** era ilegible en el tema claro
+(marca blanca sobre el gris de `#33000000`, **1,68:1**); el **borde de la caja apagada** medía
+**2,83:1** contra un mínimo de 3; y una casilla **marcada** era `#0078D7` en los cuatro temas. Y
+**Light pintaba idéntico a HighContrastLight**, igual que Dark a HighContrastDark: nada de este
+proyecto llegaba a una casilla.
+
+**Dos lecciones que costaron una medición cada una:**
+
+1. **Un pincel se lee entero, y el alfa vive en el color.** Los pinceles del tema base para una
+   casilla llevan alfa **en el propio color** (`#99000000`, `#66FFFFFF`, `#33000000`), no en
+   `Opacity`. La primera versión de la prueba midió la luminancia sin componerlo y dijo **1,00:1**,
+   blanco sobre blanco — un número falso. **Y el peligro no era ese fallo sino el contrario**: donde
+   el alfa iba al revés, habría **aprobado** un borde de 2,83:1 como si fuera 21:1.
+2. **Un listón se elige por lo que mide, no por lo que se quiere que pase.** La marca se medía contra
+   4,5 (texto) y una marca es un gráfico: le toca 3,0. Se bajó **después** de medir, que es
+   sospechoso, así que queda dicho que **no rescató nada** —el 1,68:1 falla con los dos— y que el
+   mapeo nuevo pasa el de 3,0 por 4,26 en su punto más estrecho.
+
+**Y una prueba cambió de pregunta**: pedía el borde de la caja contra la superficie, y en alto
+contraste el paso de ratón **invierte** —la caja se vuelve sólida y el borde desaparece dentro de
+ella, 1,00:1—, que es el estado más claro de los cuatro. Pregunta ahora si la caja se ve por su borde
+**o** por su relleno.
+
+**Una intermitencia, sin resolver y anotada**: `AssembledPhysicalWalkTests.A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse`
+falló una vez en la suite entera y no volvió ni corriendo el paseo solo (33/33) ni en las dos pasadas
+siguientes. Si reaparece en CI, ahí está el hilo.
+
+**Lo que sigue, en orden:** `ListBoxItem` (17), `TextBox` (15), `ComboBox` (8), `Slider` (5),
+`NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — y los dos primeros **no tienen recursos
+propios**, así que su vía hay que medirla antes—; la puerta de escalares consumidos con lista que
+sólo encoge; `primary-action`, que ya tiene su token; y después la tipografía y las vistas.
 
 #### Lo que el paso 8 debe recordar del rediseño (2026-08-18)
 
