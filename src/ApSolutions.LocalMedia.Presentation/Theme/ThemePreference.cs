@@ -13,9 +13,16 @@ public enum ThemePreference
     Dark,
 }
 
+/// <summary>
+/// The two variants Windows' own high contrast setting maps onto. They are a state, not a fourth
+/// choice: the three pills in Appearance stay as they are, and which of these is applied is read
+/// from the system rather than picked.
+/// </summary>
 public static class AppThemeVariants
 {
-    public static ThemeVariant HighContrast { get; } = new("HighContrast", ThemeVariant.Light);
+    public static ThemeVariant HighContrastLight { get; } = new("HighContrastLight", ThemeVariant.Light);
+
+    public static ThemeVariant HighContrastDark { get; } = new("HighContrastDark", ThemeVariant.Dark);
 }
 
 public interface IThemeService

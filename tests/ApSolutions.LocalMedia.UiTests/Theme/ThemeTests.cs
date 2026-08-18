@@ -105,8 +105,11 @@ public sealed class ThemeTests
             Capture(viewType, viewModelType, harness.Service, 1.0, System.IO.Path.Combine(artifacts, $"appearance-{mode.ToLowerInvariant()}.png"));
         }
 
-        Avalonia.Application.Current!.RequestedThemeVariant = new ThemeVariant("HighContrast", ThemeVariant.Light);
-        Capture(viewType, viewModelType, harness.Service, 1.0, System.IO.Path.Combine(artifacts, "appearance-high-contrast.png"));
+        foreach (var (name, variant) in HighContrastVariants())
+        {
+            Avalonia.Application.Current!.RequestedThemeVariant = variant;
+            Capture(viewType, viewModelType, harness.Service, 1.0, System.IO.Path.Combine(artifacts, $"appearance-{name}.png"));
+        }
 
         Apply(harness, "Light");
         foreach (var scale in new[] { 1.0, 1.5, 2.0 })
@@ -171,6 +174,57 @@ public sealed class ThemeTests
         window.Close();
     }
 
+    /// <summary>
+    /// High contrast is not a fourth preference: nothing in the shell can select it, so a test that
+    /// wants to see it has to ask the system's answer for it. That is what the service reports and
+    /// what these two variants are.
+    /// </summary>
+    [AvaloniaFact]
+    public void System_high_contrast_overrides_the_preference_and_takes_its_side_from_the_system()
+    {
+        using var directory = new TestDirectory();
+        var (light, dark) = HighContrastVariantPair();
+
+        var lightHarness = CreateHarness(
+            directory.SettingsPath,
+            reducedMotion: false,
+            highContrast: true,
+            highContrastIsLight: true);
+        Assert.Equal(light, Avalonia.Application.Current!.RequestedThemeVariant);
+
+        // Choosing a theme does not undo a need: the pill is stored, the variant stays put.
+        Apply(lightHarness, "Dark");
+        Assert.Equal(light, Avalonia.Application.Current.RequestedThemeVariant);
+
+        _ = CreateHarness(
+            directory.SettingsPath,
+            reducedMotion: false,
+            highContrast: true,
+            highContrastIsLight: false);
+        Assert.Equal(dark, Avalonia.Application.Current.RequestedThemeVariant);
+
+        // And with the system out of high contrast, the stored preference is what applies again.
+        _ = CreateHarness(directory.SettingsPath, reducedMotion: false);
+        Assert.Equal(ThemeVariant.Dark, Avalonia.Application.Current.RequestedThemeVariant);
+    }
+
+    private static (ThemeVariant Light, ThemeVariant Dark) HighContrastVariantPair()
+    {
+        var variants = RequireType(
+            Assembly.Load(PresentationAssemblyName),
+            "ApSolutions.LocalMedia.Presentation.Theme.AppThemeVariants");
+        return (
+            Assert.IsType<ThemeVariant>(variants.GetProperty("HighContrastLight")?.GetValue(null)),
+            Assert.IsType<ThemeVariant>(variants.GetProperty("HighContrastDark")?.GetValue(null)));
+    }
+
+    private static IEnumerable<(string Name, ThemeVariant Variant)> HighContrastVariants()
+    {
+        var (light, dark) = HighContrastVariantPair();
+        yield return ("high-contrast-light", light);
+        yield return ("high-contrast-dark", dark);
+    }
+
     private static void Capture(Type viewType, Type viewModelType, object themeService, double scale, string path)
     {
         var view = Assert.IsAssignableFrom<Control>(Activator.CreateInstance(viewType));
@@ -197,7 +251,14 @@ public sealed class ThemeTests
         window.Close();
     }
 
-    private static ThemeHarness CreateHarness(string settingsPath, bool reducedMotion)
+    private static ThemeHarness CreateHarness(string settingsPath, bool reducedMotion) =>
+        CreateHarness(settingsPath, reducedMotion, highContrast: false, highContrastIsLight: true);
+
+    private static ThemeHarness CreateHarness(
+        string settingsPath,
+        bool reducedMotion,
+        bool highContrast,
+        bool highContrastIsLight)
     {
         var presentation = Assembly.Load(PresentationAssemblyName);
         var infrastructure = Assembly.Load(InfrastructureAssemblyName);
@@ -210,6 +271,9 @@ public sealed class ThemeTests
         var reducedMotionContract = RequireType(
             presentation,
             "ApSolutions.LocalMedia.Presentation.Theme.IReducedMotionService");
+        var highContrastContract = RequireType(
+            presentation,
+            "ApSolutions.LocalMedia.Presentation.Theme.IHighContrastService");
         var serviceType = RequireType(
             presentation,
             "ApSolutions.LocalMedia.Presentation.Theme.FluentThemeService");
@@ -225,21 +289,23 @@ public sealed class ThemeTests
         Assert.NotNull(store);
         Assert.True(settingsContract.IsInstanceOfType(store));
 
-        var backdrop = CreateProxy(backdropContract, reducedMotion: false);
-        var motion = CreateProxy(reducedMotionContract, reducedMotion);
+        var backdrop = CreateProxy(backdropContract, isEnabled: false, isLight: true);
+        var motion = CreateProxy(reducedMotionContract, reducedMotion, isLight: true);
+        var contrast = CreateProxy(highContrastContract, highContrast, highContrastIsLight);
         var constructor = serviceType.GetConstructor(
-            [typeof(Avalonia.Application), settingsContract, backdropContract, reducedMotionContract]);
+            [typeof(Avalonia.Application), settingsContract, backdropContract, reducedMotionContract, highContrastContract]);
         Assert.NotNull(constructor);
         Assert.NotNull(Avalonia.Application.Current);
-        var service = constructor.Invoke([Avalonia.Application.Current, store, backdrop, motion]);
+        var service = constructor.Invoke([Avalonia.Application.Current, store, backdrop, motion, contrast]);
         return new ThemeHarness(service, preferenceType);
     }
 
-    private static object CreateProxy(Type contract, bool reducedMotion)
+    private static object CreateProxy(Type contract, bool isEnabled, bool isLight)
     {
         var proxy = DispatchProxy.Create(contract, typeof(RuntimeInterfaceProxy));
         Assert.NotNull(proxy);
-        ((RuntimeInterfaceProxy)proxy).ReducedMotion = reducedMotion;
+        ((RuntimeInterfaceProxy)proxy).IsEnabled = isEnabled;
+        ((RuntimeInterfaceProxy)proxy).IsLight = isLight;
         return proxy;
     }
 
@@ -276,22 +342,23 @@ public sealed class ThemeTests
 #pragma warning disable CA1852 // DispatchProxy creates a runtime-derived proxy type.
     private class RuntimeInterfaceProxy : DispatchProxy
     {
-        public bool ReducedMotion { get; set; }
+        public bool IsEnabled { get; set; }
+
+        public bool IsLight { get; set; }
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
             Assert.NotNull(targetMethod);
-            if (targetMethod.Name == "get_IsEnabled")
-            {
-                return ReducedMotion;
-            }
 
-            if (targetMethod.ReturnType == typeof(bool))
+            // Reduced motion and high contrast both answer IsEnabled, so the proxy answers by name
+            // rather than by one shared flag: a single flag would have made a high contrast proxy
+            // report whatever the motion one was asked for.
+            return targetMethod.Name switch
             {
-                return false;
-            }
-
-            return null;
+                "get_IsEnabled" => IsEnabled,
+                "get_IsLight" => IsLight,
+                _ => targetMethod.ReturnType == typeof(bool) ? false : null,
+            };
         }
     }
 #pragma warning restore CA1852

@@ -16,17 +16,20 @@ public sealed class FluentThemeService : IThemeService
     private readonly ISettingsStore _settingsStore;
     private readonly IBackdropService _backdropService;
     private readonly IReducedMotionService _reducedMotionService;
+    private readonly IHighContrastService _highContrastService;
 
     public FluentThemeService(
         Avalonia.Application application,
         ISettingsStore settingsStore,
         IBackdropService backdropService,
-        IReducedMotionService reducedMotionService)
+        IReducedMotionService reducedMotionService,
+        IHighContrastService highContrastService)
     {
         _application = application ?? throw new ArgumentNullException(nameof(application));
         _settingsStore = settingsStore ?? throw new ArgumentNullException(nameof(settingsStore));
         _backdropService = backdropService ?? throw new ArgumentNullException(nameof(backdropService));
         _reducedMotionService = reducedMotionService ?? throw new ArgumentNullException(nameof(reducedMotionService));
+        _highContrastService = highContrastService ?? throw new ArgumentNullException(nameof(highContrastService));
 
         var storedPreference = _settingsStore.Read<ThemePreference>(PreferenceKey);
         CurrentPreference = Enum.IsDefined(storedPreference)
@@ -61,14 +64,37 @@ public sealed class FluentThemeService : IThemeService
         return _backdropService.TryApply(window);
     }
 
+    /// <summary>
+    /// The three pills decide the theme, except when the system asks for high contrast: that is a
+    /// need rather than a taste, so it overrides the choice instead of appearing beside it. Which
+    /// side of it applies is read from the system too, so the preference needs no fourth value and
+    /// no stored setting has to migrate.
+    /// </summary>
+    /// <remarks>
+    /// Read when the theme is applied — at startup and on every change of preference. Turning high
+    /// contrast on in Windows while the application is already open therefore reaches it on the next
+    /// launch; following it live needs a settings-change message, which is not this.
+    /// </remarks>
     private void ApplyToApplication(ThemePreference preference)
     {
+        if (!Enum.IsDefined(preference))
+        {
+            throw new ArgumentOutOfRangeException(nameof(preference));
+        }
+
+        if (_highContrastService.IsEnabled)
+        {
+            _application.RequestedThemeVariant = _highContrastService.IsLight
+                ? AppThemeVariants.HighContrastLight
+                : AppThemeVariants.HighContrastDark;
+            return;
+        }
+
         _application.RequestedThemeVariant = preference switch
         {
-            ThemePreference.System => ThemeVariant.Default,
             ThemePreference.Light => ThemeVariant.Light,
             ThemePreference.Dark => ThemeVariant.Dark,
-            _ => throw new ArgumentOutOfRangeException(nameof(preference)),
+            _ => ThemeVariant.Default,
         };
     }
 }
