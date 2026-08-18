@@ -141,7 +141,7 @@ src/ApSolutions.LocalMedia.Presentation/Language/LanguageService.cs             
 src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                       83 100
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  50
-src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           89  80
+src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           94  81
 src/ApSolutions.LocalMedia.Presentation/Library/ManualReassignmentViewModel.cs                94  60
 src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  77
 src/ApSolutions.LocalMedia.Presentation/Library/UnavailableBadge.axaml                       100  50
