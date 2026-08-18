@@ -209,6 +209,55 @@ pattern the transport bar already had — and **the one link that was a deductio
 than assumed: [the evidence](evidence/stable/audit-version-switch-reentry.md). The use case is left
 alone.
 
+#### Step 6's phase 1, measured against the tree and decided (2026-08-18)
+
+**Thirteen new brushes, not twelve.** The README says twelve and its table lists thirteen; measured
+against `DesignTokens.axaml` — nine brushes per dictionary — and against `Resources/Brand.axaml` —
+three strings, no colours — **all thirteen are new**. The five scalars do add up:
+`FocusInnerStrokeThickness`, `SpaceXSmall`, `SpaceXLarge`, `CornerRadiusSmall`, `CornerRadiusMedium`.
+
+**And the finding that changes the scope: nothing applies high contrast today.**
+`AppThemeVariants.HighContrast` is referenced only by the AXAML itself, and `FluentThemeService` maps
+`System/Light/Dark` and nothing else. The dictionary exists and **no path selects it**: the house
+defect wearing a theme's face. So the fourth dictionary does not arrive alone — it arrives with
+whatever feeds it.
+
+**Decided, and not re-deliberated:**
+
+- **`IHighContrastService`** in `Presentation/Theme` shaped exactly like `IReducedMotionService`, with
+  **`WindowsHighContrastService`** in `Windows/Accessibility` over
+  `SystemParametersInfo(SPI_GETHIGHCONTRAST)`. `FluentThemeService` consumes it and, when the system
+  is in high contrast, the variant becomes `HighContrastLight` or `HighContrastDark`.
+- **Light or dark is decided by the luminance of `COLOR_WINDOW`** (`GetSysColor`), never by the name
+  of the Windows theme: names are localised and users define their own, the colour does not lie. Above
+  0.5 is light.
+- **`ThemePreference` does not change** (three pills, already decided), so **there is no settings
+  migration**. The service is registered **with its consumer in the same change**, or
+  `ServiceConsumptionTests` catches it — which is exactly what should happen.
+- **`AccentBrush`**: `#0000FF` in `HighContrastLight`, `#00FFFF` in `HighContrastDark`. Yellow is left
+  to focus.
+- **In both high-contrast themes, warning, error and success share surface and border** (the theme's).
+  The glyph and the heading tell them apart, never the colour — and that takes the warning out of
+  yellow without a rule of its own.
+- **Typography is NOT in this phase.** It belongs to phase 2, with the control states, which is where
+  it is first used. This phase is colour, scalars, dictionaries and focus.
+- **Focus selectors go from 8 to 10** (`ToggleSwitch`, `RadioButton`) and the ring becomes double. The
+  disabled dotted border needs a `Rectangle` with `StrokeDashArray`: `Border` has no dashed stroke.
+- **`ContrastTokenTests` extends to the new tokens and the four dictionaries**, proved failing in both
+  directions. No view is touched until those tests pass.
+
+#### `LibVlcFactory.cs`: a floor given back, and why
+
+Run `32161925025` measured **93/85** where the floor said **94/90**, with the file unchanged. It is
+the defect the watcher had just had, in the same shape: the file releases instances on a **deferred
+timer**, so whether a drain runs before the suite ends depends on the runner's clock rather than on
+anything a test asserts. It wobbles **inside CI**, so no number holds and whichever one is written
+fails the next run.
+
+The floor was given back by copying the artefact whole — the only way a floor moves — and it is said
+out loud here rather than buried in a copied file. **The next piece is pinning that condition and
+asserting it, and taking 94/90 back.**
+
 What follows is kept because it describes the shape of the correction, which is the reference for the
 loose path:
 

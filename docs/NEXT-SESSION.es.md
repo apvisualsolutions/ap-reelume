@@ -208,6 +208,56 @@ Corregido donde vino la segunda petición —la fila se apaga mientras su cambio
 patrón que la barra de transporte ya tenía— y **el eslabón que era una deducción se midió**, no se
 supuso: [la evidencia](evidence/stable/audit-version-switch-reentry.md). El caso de uso no se toca.
 
+#### La fase 1 del paso 6, medida contra el árbol y decidida (2026-08-18)
+
+**Trece brochas nuevas, no doce.** El README dice «doce» y su tabla lista trece; medido contra
+`DesignTokens.axaml` —nueve brochas por diccionario— y contra `Resources/Brand.axaml` —tres cadenas,
+ningún color—, **las trece son nuevas**. Los cinco escalares sí cuadran: `FocusInnerStrokeThickness`,
+`SpaceXSmall`, `SpaceXLarge`, `CornerRadiusSmall`, `CornerRadiusMedium`.
+
+**Y el hallazgo que cambia el alcance: hoy nadie aplica el alto contraste.**
+`AppThemeVariants.HighContrast` sólo lo referencia el propio AXAML, y `FluentThemeService` mapea
+`System/Light/Dark` y nada más. El diccionario existe y **ningún camino lo selecciona**: el defecto de
+la casa con cara de tema. Así que el cuarto diccionario no se añade solo — se añade con quien lo
+alimenta.
+
+**Decidido, y no se re-delibera:**
+
+- **`IHighContrastService`** en `Presentation/Theme` con la forma exacta de `IReducedMotionService`, e
+  implementación **`WindowsHighContrastService`** en `Windows/Accessibility` sobre
+  `SystemParametersInfo(SPI_GETHIGHCONTRAST)`. `FluentThemeService` lo consume y, cuando el sistema
+  está en alto contraste, el variant pasa a `HighContrastLight` o `HighContrastDark`.
+- **Claro u oscuro se decide por luminancia de `COLOR_WINDOW`** (`GetSysColor`), no por el nombre del
+  tema de Windows: los nombres son localizables y el usuario puede definir los suyos, el color no
+  miente. Por encima de 0,5 → claro.
+- **`ThemePreference` no cambia** (tres píldoras, ya decidido) y por tanto **no hay migración de
+  ajustes**. El servicio se registra **con su consumidor en el mismo cambio**, o `ServiceConsumptionTests`
+  lo caza — que es exactamente lo que debe pasar.
+- **`AccentBrush`**: `#0000FF` en `HighContrastLight`, `#00FFFF` en `HighContrastDark`. El amarillo
+  queda para el foco.
+- **En los dos temas de alto contraste, aviso, error y acierto comparten superficie y borde** (los del
+  tema). Los distingue el glifo y el encabezado, nunca el color — y con eso el aviso sale del amarillo
+  sin una regla aparte.
+- **La tipografía NO entra en esta fase.** Es la fase 2, con los estados de control, que es donde se
+  usa por primera vez. Esta fase es color, escalares, diccionarios y foco.
+- **Los selectores de foco suben de 8 a 10** (`ToggleSwitch`, `RadioButton`) y el anillo pasa a doble.
+  El punteado del deshabilitado necesita un `Rectangle` con `StrokeDashArray`: `Border` no tiene trazo
+  discontinuo.
+- **`ContrastTokenTests` se extiende a los tokens nuevos y a los cuatro diccionarios**, y se prueba
+  fallando en las dos direcciones. Ninguna vista se toca hasta que esas pruebas pasen.
+
+#### `LibVlcFactory.cs`: un suelo cedido, y por qué
+
+El run `32161925025` midió **93/85** donde el suelo decía **94/90**, sin que el archivo cambiara. Es
+el mismo defecto que el vigilante acababa de tener, en la misma forma: el archivo libera instancias
+con un **temporizador diferido**, así que si un drenaje corre antes de que la suite acabe depende del
+reloj del runner y no de algo que una prueba afirme. Baila **dentro de CI**, así que ningún número
+aguanta y cualquiera que se escriba hace fallar el run siguiente.
+
+Se cedió el suelo copiando el artefacto entero —que es la única forma en que un suelo se mueve— y se
+dice aquí en voz alta en lugar de enterrarlo en un archivo copiado. **La siguiente pieza es fijar esa
+condición y afirmarla, y recuperar 94/90.**
+
 Lo que sigue debajo se conserva porque describe la forma de la corrección, que es la referencia para
 la vía suelta:
 
