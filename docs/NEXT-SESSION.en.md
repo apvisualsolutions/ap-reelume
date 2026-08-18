@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phases 1 and 2a done on 2026-08-18**; the dotted border, the eight types and the views remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -243,6 +243,52 @@ border, and in high contrast hovering and pressing **invert**.
 And two things the measuring turned up: **`primary-action`** (in `ResumeHeroView`) is a class **no
 style defines and no test looks for**, and **`navigation-destination`** is used, but as a **test
 marker** rather than as a style.
+
+#### The seven decisions step 6 had left, taken on 2026-08-18 (not reopened)
+
+1. **The dotted disabled border is drawn as an ADORNER, not by copying templates.** An attached
+   property in `Presentation/Theme` adds a `Rectangle` with `StrokeDashArray` to the adorner layer when
+   a control is disabled. **Why not a `ControlTheme` per type:** the focus ring already proved the
+   adorner layer reaches all ten types with **one** implementation — including the `ToggleSwitch`,
+   which hangs it on the `Grid` in its template, and the `NumericUpDown`, which hangs it on its
+   `TextBox`. Copying nine Fluent templates is nine surfaces that drift with every Avalonia update, for
+   one dashed line. A new file, so **96/96 from its first commit**: the test forces `IsEnabled=false`
+   and asserts the `StrokeDashArray` in the layer.
+2. **The 2 px pressed border in high contrast will NOT be done, and this is a deliberate departure from
+   the package.** Pressing in high contrast already inverts fill **and** text — 21:1 measured — so the
+   thickness adds a third cue to a state that has two, and would need another adorner or a template of
+   our own. Recorded as a decision, not as debt. If the owner's physical walk says it does not read, it
+   reopens **with that measurement**.
+3. **`primary-action` gets a primary-action style** rather than being deleted: it is "Continue" on the
+   home surface, and the redesign wants hierarchy. It needs a new token, **`AccentTextBrush`** — white
+   in light, dark and high contrast light; **black** in high contrast dark, where the accent is cyan —
+   and `ContrastTokenTests` measures it against `AccentBrush` at the text bar of 4.5:1.
+4. **`ToggleSwitch` keeps its focus selector and gets NO states.** Zero uses across the 48 views:
+   giving states to a type nobody mounts is declaring without spending. The focus selector stays
+   because it is already written and costs nothing.
+5. **The order of the remaining eight types is the measured order of use**: `CheckBox` (18),
+   `ListBoxItem` (17), `TextBox` (15), `ComboBox` (8), `Slider` (5), `NumericUpDown` (5),
+   `ToggleButton` (2), `RadioButton` (1). Each through its **own theme resources**, as the button was.
+6. **The scalars become a ratchet rather than a promise.** A new test walks the `.axaml` of `src/` and
+   requires that **every declared scalar be consumed by at least one view**, with a named exception
+   list — today `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge`, `SpaceXLarge`,
+   `CornerRadiusSmall`, `CornerRadiusMedium` — **which can only shrink**, exactly like the orphan list
+   in `ServiceConsumptionTests` and like `eng/coverage-debt.txt`.
+7. **Typography: the tree's twelve literal sizes map onto six tokens, and this is the mapping.**
+   34 and 32 → `FontSizeDisplay` 32; 30, 28 and 26 → `FontSizeTitle` 28; 24, 22, 20 and 18 →
+   `FontSizeSubtitle` 20; 16 and 14 → `FontSizeBody` 14; 12 → `FontSizeCaption` 12; and `FontSizeMono`
+   13 for paths, hashes and codecs. Declared **in the first view that spends them**, not before.
+
+#### What step 8 has to remember about the redesign (2026-08-18)
+
+**`UX-003` and `A11Y-001` are `VERIFIED` citing high contrast, and until today that was only half
+true**: their evidence measured that the surfaces **render** when a test forces the variant by hand,
+and the application never reached that state on its own — nothing applied high contrast. It does now.
+When the manifest is **regenerated** in step 8, those two rows must gain
+[phase 1's evidence](evidence/stable/audit-redesign-phase1-tokens.md). It was tried now and the gate
+refused, rightly: `EvidenceLinkTests` requires matrix and manifest to cite the same documents, and the
+manifest is generated from a package and its hashes, so doing it before the cut would mean generating
+it twice.
 
 #### ~~Step 6's phase 1~~ — done on 2026-08-18, and phase 2 inherits three things
 

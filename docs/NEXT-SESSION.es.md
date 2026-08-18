@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fases 1 y 2a hechas el 2026-08-18**; queda el punteado, los ocho tipos y las vistas | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -241,6 +241,54 @@ donde empieza—: sus cuatro estados de color salen ya de los tokens en los cuat
 Y dos cosas del árbol que salieron midiendo: **`primary-action`** (en `ResumeHeroView`) es una clase
 que **ningún estilo define y ninguna prueba busca**, y **`navigation-destination`** sí tiene uso, pero
 como **marcador de las pruebas**, no como estilo.
+
+#### Las siete decisiones que quedaban del paso 6, tomadas el 2026-08-18 (no se re-deliberan)
+
+1. **El borde punteado del deshabilitado se dibuja como ADORNO, no copiando plantillas.** Una
+   propiedad adjunta en `Presentation/Theme` que añade un `Rectangle` con `StrokeDashArray` a la capa
+   de adornos cuando el control se deshabilita. **Por qué y no un `ControlTheme` propio por tipo:** el
+   anillo de foco ya demostró que la capa de adornos alcanza a los diez tipos con **una**
+   implementación —incluidos el `ToggleSwitch`, que lo cuelga del `Grid` de su plantilla, y el
+   `NumericUpDown`, que lo cuelga de su `TextBox`—; copiar nueve plantillas de Fluent son nueve
+   superficies que se desincronizan con cada actualización de Avalonia, para una raya. Archivo nuevo,
+   así que **96/96 desde el primer commit**: la prueba fuerza `IsEnabled=false` y afirma el
+   `StrokeDashArray` en la capa.
+2. **El borde de 2 px al pulsar en alto contraste NO se hace, y esto es una desviación consciente del
+   paquete.** El pulsado en alto contraste ya invierte relleno **y** texto —medido, 21:1—, así que el
+   grosor añade una tercera señal a un estado que ya tiene dos, y exigiría otro adorno o una plantilla
+   propia. Se documenta como decisión, no como deuda. Si el paseo físico del propietario dice que no se
+   distingue, se reabre **con esa medición**.
+3. **`primary-action` recibe estilo de acción primaria**, no se borra: es «Continuar» en la portada, y
+   el rediseño quiere jerarquía. Necesita un token nuevo, **`AccentTextBrush`** —blanco en claro,
+   oscuro y alto contraste claro; **negro** en alto contraste oscuro, porque el acento allí es cian—, y
+   `ContrastTokenTests` lo mide contra `AccentBrush` con el listón de texto, 4,5:1.
+4. **`ToggleSwitch` conserva su selector de foco y NO recibe estados.** Cero usos en las 48 vistas: dar
+   estados a un tipo que nadie monta es declarar sin gastar. El foco se queda porque ya está escrito y
+   cuesta cero.
+5. **El orden de los ocho tipos que faltan es el del uso medido**: `CheckBox` (18), `ListBoxItem` (17),
+   `TextBox` (15), `ComboBox` (8), `Slider` (5), `NumericUpDown` (5), `ToggleButton` (2),
+   `RadioButton` (1). Cada uno por sus **propios recursos de tema**, como el botón.
+6. **Los escalares se convierten en trinquete, no en promesa.** Una prueba nueva recorre los `.axaml`
+   de `src/` y exige que **cada escalar declarado lo consuma al menos una vista**, con una lista de
+   excepciones nombradas —hoy `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge`, `SpaceXLarge`,
+   `CornerRadiusSmall`, `CornerRadiusMedium`— **que sólo puede encoger**, igual que la lista de
+   huérfanos de `ServiceConsumptionTests` y que `eng/coverage-debt.txt`. Así la deuda es visible y no
+   puede crecer en silencio.
+7. **La tipografía: los doce tamaños literales del árbol se mapean a seis tokens, y el mapeo es este.**
+   34 y 32 → `FontSizeDisplay` 32; 30, 28 y 26 → `FontSizeTitle` 28; 24, 22, 20 y 18 →
+   `FontSizeSubtitle` 20; 16 y 14 → `FontSizeBody` 14; 12 → `FontSizeCaption` 12; y `FontSizeMono` 13
+   para rutas, hashes y códecs. Se declaran **en la primera vista que los gaste**, no antes.
+
+#### Lo que el paso 8 debe recordar del rediseño (2026-08-18)
+
+**`UX-003` y `A11Y-001` están `VERIFIED` citando el alto contraste, y hasta hoy eso era cierto sólo a
+medias**: sus evidencias midieron que las superficies **renderizan** cuando una prueba fuerza el
+variant a mano, y la aplicación no llegaba nunca a ese estado por sí sola —nadie aplicaba el alto
+contraste—. Ya lo hace. Al **regenerar el manifiesto** en el paso 8 hay que añadir a esas dos filas
+[la evidencia de la fase 1](evidence/stable/audit-redesign-phase1-tokens.md). Se intentó ahora y la
+puerta lo rechazó con razón: `EvidenceLinkTests` exige que matriz y manifiesto citen lo mismo, y el
+manifiesto se genera desde un paquete con sus hashes, así que hacerlo antes del corte sería generarlo
+dos veces.
 
 #### ~~La fase 1 del paso 6~~ — hecha el 2026-08-18, y la fase 2 hereda tres cosas
 
