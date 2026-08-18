@@ -63,6 +63,19 @@ public sealed class LibVlcFactory : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// The options one native instance is built with, for the run that asked for them.
+    /// </summary>
+    /// <remarks>
+    /// Exposed for the same reason as <see cref="NativeInstanceCount"/>: what is true of the native
+    /// instance can only be asserted from outside if it can be read from outside. What matters here
+    /// is what is <b>absent</b> — LibVLC takes its subtitle drawing from options given to the
+    /// instance, and an instance is created once per option set and kept for the life of the
+    /// process, so an option that is not in this list can never reach a drawing.
+    /// </remarks>
+    public static IReadOnlyList<string> InstanceOptions(bool headless) =>
+        headless ? HeadlessOptions : BaseOptions;
+
     /// <summary>Media handed to <see cref="DeferRelease"/> and not yet disposed.</summary>
     public static int PendingDeferredReleaseCount
     {

@@ -20,7 +20,7 @@ rehacerlo entero.
 |---|---|---|---|
 | ~~1~~ | ~~La sesión suelta no se ve~~ **hecha el 2026-08-17, 6 → 3** | agente | 3 |
 | ~~2~~ | ~~Los tres últimos de la tanda 1~~ **hecha el 2026-08-18, 3 → 0** | agente | **0** |
-| 3 | La prueba de los subtítulos | agente | 0 |
+| ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | 4 | Cobertura a todo `src/`, suelo 96/96 | agente | 0 |
 | 5 | `ARQ-004`, las nueve clases inertes | agente | 0 |
 | 6 | **El rediseño**, con el material de Claude Design | agente | 0, con la regla de abajo |
