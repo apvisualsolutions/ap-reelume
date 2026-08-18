@@ -2804,10 +2804,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // ---- First session: the offer is refused, and the film starts over.
         await SeedProgressAsync();
         await OpenAndPlayAsync(host, filmFile);
+
+        // The offer is raised after the session opens, so it is waited for rather than read — the
+        // same lesson the playhead comment below spells out, which this line did not apply. On an
+        // idle machine it is already visible when the open returns; under the load of the other 116
+        // scenes it is not, and CI measured exactly that on 2026-08-18: pass 1 failed here, pass 2
+        // passed all 117.
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Resume?.IsVisible == true),
+            "The stored progress never raised the resume offer.");
         var resume = host.ViewModel.Player!.Resume;
         Assert.NotNull(resume);
-        Assert.True(resume!.IsVisible, "The stored progress never raised the resume offer.");
-        Assert.Equal("00:00:40", resume.ResumePositionText);
+        Assert.Equal("00:00:40", resume!.ResumePositionText);
 
         // The session opens where it was left, and it is waited for rather than read: the engine
         // answers 0 until the demuxer has applied the start position, measured here as
@@ -2836,9 +2844,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // ---- Second session: the offer is taken, from somewhere else on the timeline.
         await SeedProgressAsync();
         await OpenAndPlayAsync(host, filmFile);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Resume?.IsVisible == true),
+            "The stored progress never raised the offer a second time.");
         var secondResume = host.ViewModel.Player!.Resume;
         Assert.NotNull(secondResume);
-        Assert.True(secondResume!.IsVisible, "The stored progress never raised the offer a second time.");
         await WaitForAsync(
             async () => await PlayheadSecondsAsync() >= 39,
             "the session with stored progress never opened at the point it was left, a second time");
