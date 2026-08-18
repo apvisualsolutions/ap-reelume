@@ -89,7 +89,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PlaybackPreferenceRe
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/RecommendationReadModel.cs       100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/WatchStateRepository.cs          100  94
 src/ApSolutions.LocalMedia.Infrastructure/Data/SqliteConnectionFactory.cs                     92  64
-src/ApSolutions.LocalMedia.Infrastructure/FileSystem/DebouncedFileWatcher.cs                  89  69
+src/ApSolutions.LocalMedia.Infrastructure/FileSystem/DebouncedFileWatcher.cs                  93  71
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/FallbackScanScheduler.cs                 94  83
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/LightweightFingerprintProvider.cs       100  57
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/MediaFileEnumerator.cs                   73  88
