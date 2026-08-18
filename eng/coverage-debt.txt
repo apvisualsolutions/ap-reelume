@@ -89,7 +89,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PlaybackPreferenceRe
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/RecommendationReadModel.cs       100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/WatchStateRepository.cs          100  94
 src/ApSolutions.LocalMedia.Infrastructure/Data/SqliteConnectionFactory.cs                     92  64
-src/ApSolutions.LocalMedia.Infrastructure/FileSystem/DebouncedFileWatcher.cs                  93  71
+src/ApSolutions.LocalMedia.Infrastructure/FileSystem/DebouncedFileWatcher.cs                 100  95
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/FallbackScanScheduler.cs                 94  83
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/LightweightFingerprintProvider.cs       100  57
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/MediaFileEnumerator.cs                   73  88
@@ -107,7 +107,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs           
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs               87  73
 src/ApSolutions.LocalMedia.Infrastructure/Playback/HardwareAccelerationFallback.cs            77 100
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                86  79
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcFactory.cs                           94  90
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcFactory.cs                           93  85
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 91  80
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  61
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs           100  83
