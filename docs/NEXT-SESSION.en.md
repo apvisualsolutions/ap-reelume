@@ -22,7 +22,7 @@ again from scratch.
 | ~~2~~ | ~~The last three of batch 1~~ **done on 2026-08-18, 3 → 0** | agent | **0** |
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops** | agent | 0 |
-| 5 | `ARQ-004`, the nine inert classes | agent | 0 |
+| ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
 | 6 | **The redesign**, from Claude Design's material | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
@@ -97,17 +97,29 @@ answers the same and there is nothing to notify.
 | `RootOnboardingViewModel`, `ShortcutSettingsViewModel`, `LifecycleSettingsViewModel`, `WindowsTrayService` | `true` | no |
 | `DatabaseRecoveryViewModel`, `AppearanceSettingsViewModel` (x2), `ShellViewModel` | parameter only | no |
 
-**What gets done, in two parts:**
+**Done on 2026-08-18 —
+[the evidence](evidence/stable/audit-arq004-command-notification.md) — and the note was true for a
+false reason.** It said Back does not bite today "because the view becomes visible and the button
+asks again". Measured: **no AXAML bound `BackCommand`**. Both Back buttons called `BackToLibrary()`
+through the code-behind, so the predicate was never evaluated — a public command with a predicate
+that no view consumed, the house defect wearing a command's face. And the predicted red could not
+exist for a second reason: each button lives **inside the grid of its own surface**, so while it is
+visible the predicate is true by construction.
 
-1. **`LibraryViewModel.BackCommand`.** Its private `RelayCommand` gains `RaiseCanExecuteChanged`,
-   raised where `Surface` is assigned. It does not bite today **by accident** — the view becomes
-   visible and the button asks again — and the redesign changes exactly when a view becomes visible,
-   so it is a timer. **Measure first**: the walk has to see a Back that is disabled when it should be
-   live, or the red does not exist and the hypothesis was wrong.
-2. **The note becomes a gate.** An architecture test holding the **closed list** of those eight files
-   — the shape of `ServiceConsumptionTests`' orphan list — so that a ninth empty `CanExecuteChanged`
-   fails and forces either `AsyncRelayCommand` or a justification on the list. That is what turns
-   "somebody has to remember" into something that does not depend on remembering.
+What was done, and in which order:
+
+1. **Bind the command** (`Command="{Binding BackCommand}"` on both buttons, `OnBackClick` gone) **and
+   measure**. The red appeared at once, in the library's walk scene: `Volver a la biblioteca is on
+   screen but cannot be pressed: visible=True, enabled=False`. Both detail branches sit in the visual
+   tree at once, so the button asks on attach while `Surface` is still `Browse`, and the empty event
+   throws the subscription away.
+2. **The notification**, with a real event on the private `RelayCommand` and the raise in the one
+   place `Surface` is assigned. Green under the same probe, plus a new unit test where **the count is
+   the assertion**: the predicate alone passes whoever was or was not told.
+3. **The gate**, `CommandNotificationTests`, holding the closed list of the **seven** that remain and
+   **each one's exact predicate**: it watches the event-predicate pair rather than the event alone.
+   It was tested by failing in both directions — an undeclared eighth, and a predicate that changed
+   shape — and it carries its own anti-blindness floor.
 
 #### What is decided about the design package, for step 6
 
@@ -620,7 +632,9 @@ left of `ARQ-004`.** **Nine** private command classes still carry `CanExecuteCha
 constant. The ninth, in `LibraryViewModel`, **does carry a predicate** (`BackCommand` with
 `Surface != LibrarySurface.Browse`), which is exactly the shape that left the Search button off for
 good; today it **does not bite**, and that is measured: the walk presses `LibraryBackAction` and it
-works, because the view becomes visible and the button asks again. **Decided**: leave them for now —
+works, because the view becomes visible and the button asks again. **That last reason was false, and
+it was measured on 2026-08-18: the walk worked because no AXAML bound `BackCommand`.** See step 5.
+**Decided then**: leave them for now —
 there is no observable defect, and replacing them is a mechanical migration across nine files, which
 in this house needs three nets — and do them **in a batch of their own, after batch 2**, once the walk
 covers all 128 controls and can serve as the net. If anybody adds a conditional `CanExecute` to any of
@@ -636,7 +650,7 @@ it belongs to the owner.
 **describes an artifact**: its provenance is the package's own, so regenerating it against an
 `artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
 the manifest is part of cutting a release, not part of a working session. **Decided**: they go into
-the matrix **when the manifest is regenerated against a freshly built package** — there are thirteen now,
+the matrix **when the manifest is regenerated against a freshly built package** — there are fourteen now,
 so that step stops being optional at the next release — and until then they live in
 `docs/evidence/stable/`, linked from here:
 
@@ -653,6 +667,7 @@ so that step stops being optional at the next release — and until then they li
 11. [handing the package to Windows](evidence/stable/audit-updater-handover-exit.md)
 12. [checking for updates without the network](evidence/stable/audit-walk-update-check.md)
 13. [the download and the confirmation](evidence/stable/audit-walk-update-download.md)
+14. [the command nobody listened to](evidence/stable/audit-arq004-command-notification.md)
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would

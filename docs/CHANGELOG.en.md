@@ -95,6 +95,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The library's Back button now uses the library's command, and that command announces when what
+  it can do changes.** The button called the screen's code directly, so the rule that decides when
+  Back makes sense — only away from the list — was never consulted. Wiring it up showed at once why
+  that rule needs to announce itself: the film card and the series card both exist at the same time
+  even though only one is seen, so the button asks on start-up, is told no, and without an
+  announcement it stays **visible on screen and dead to the touch** forever. Nothing you can see
+  changes today; what changes is that the redesign can no longer break it quietly. And so it cannot
+  come back, a check carries the closed list of the seven commands that stay silent on purpose, each
+  with the reason it may: if an eighth appears, or if one of the seven has its rule changed, it fails
+  in the same change that introduces it.
+
 - **Carrying on where you left off is now really verified, and with the mouse.** Until today only the
   *request* to open at the stored point was checked; now what is checked is that it **opens there**,
   against the real video engine, and that the four buttons of the two offers — resume, start over,

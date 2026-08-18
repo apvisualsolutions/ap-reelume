@@ -22,7 +22,7 @@ rehacerlo entero.
 | ~~2~~ | ~~Los tres últimos de la tanda 1~~ **hecha el 2026-08-18, 3 → 0** | agente | **0** |
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja** | agente | 0 |
-| 5 | `ARQ-004`, las nueve clases inertes | agente | 0 |
+| ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
 | 6 | **El rediseño**, con el material de Claude Design | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
@@ -98,17 +98,29 @@ nada que notificar.
 | `RootOnboardingViewModel`, `ShortcutSettingsViewModel`, `LifecycleSettingsViewModel`, `WindowsTrayService` | `true` | no |
 | `DatabaseRecoveryViewModel`, `AppearanceSettingsViewModel` (×2), `ShellViewModel` | sólo el parámetro | no |
 
-**Lo que se hace, en dos partes:**
+**Hecho el 2026-08-18 —
+[la evidencia](evidence/stable/audit-arq004-command-notification.md)— y la nota era cierta por una
+causa falsa.** Decía que hoy no muerde «porque la vista se hace visible y el botón vuelve a
+preguntar». Medido: **ningún AXAML enlazaba `BackCommand`**. Los dos botones «Volver» llamaban a
+`BackToLibrary()` por el code-behind, así que el predicado no se evaluaba nunca — un comando público
+con predicado que ninguna vista consumía, el defecto de la casa con cara de comando. Y el rojo
+predicho no podía existir por una segunda razón: cada botón vive **dentro del `Grid` de su propia
+superficie**, así que mientras es visible el predicado es verdadero por construcción.
 
-1. **`LibraryViewModel.BackCommand`.** Su `RelayCommand` privado gana `RaiseCanExecuteChanged` y se
-   dispara donde `Surface` se asigna. Hoy no muerde **por accidente** —la vista se hace visible y el
-   botón vuelve a preguntar—, y el rediseño cambia justamente cuándo se hace visible una vista, así
-   que es una bomba con temporizador. **Mídelo antes**: el paseo tiene que ver un «Volver»
-   deshabilitado cuando debería estar activo, o el rojo no existe y la hipótesis estaba mal.
-2. **La nota pasa a puerta.** Una prueba de arquitectura con la **lista cerrada** de los ocho archivos
-   —la forma de la lista de huérfanos de `ServiceConsumptionTests`—: si aparece un noveno
-   `CanExecuteChanged` vacío, falla y obliga a usar `AsyncRelayCommand` o a justificarlo en la lista.
-   Eso es lo que convierte «hay que acordarse» en algo que no depende de acordarse.
+Lo que se hizo, y en qué orden:
+
+1. **Enlazar el comando** (`Command="{Binding BackCommand}"` en los dos botones, fuera `OnBackClick`)
+   **y medir**. El rojo apareció en el acto, en la escena del paseo de la biblioteca:
+   `Volver a la biblioteca is on screen but cannot be pressed: visible=True, enabled=False`. Las dos
+   ramas de detalle viven en el árbol visual a la vez, así que el botón pregunta al adjuntarse con
+   `Surface` todavía en `Browse` y el evento vacío tira la suscripción a la basura.
+2. **La notificación**, con el evento real en el `RelayCommand` privado y el disparo en el único sitio
+   donde `Surface` se asigna. Verde con la misma sonda, y una prueba de unidad nueva donde **la cuenta
+   es la aserción**: el predicado solo pasa avisen a quien avisen.
+3. **La puerta**, `CommandNotificationTests`, con la lista cerrada de los **siete** que quedan y **el
+   predicado exacto** de cada uno: vigila la pareja evento-predicado, no el evento a solas. Se probó
+   fallando en las dos direcciones —un octavo sin declarar y un predicado que cambia de forma— y lleva
+   su propio suelo anticeguera.
 
 #### Lo que queda decidido del paquete de diseño, para el paso 6
 
@@ -630,7 +642,9 @@ correcta**, y con esto se comprueba.
 La novena, la de `LibraryViewModel`, **sí lleva predicado** (`BackCommand` con
 `Surface != LibrarySurface.Browse`), que es exactamente la forma que dejó el botón «Buscar» apagado
 para siempre; hoy **no muerde**, y eso está medido: el paseo pulsa `LibraryBackAction` y funciona,
-porque la vista se hace visible y el botón vuelve a preguntar. **Decidido**: no se tocan por ahora
+porque la vista se hace visible y el botón vuelve a preguntar. **Esa última causa era falsa, y se
+midió el 2026-08-18: el paseo funcionaba porque ningún AXAML enlazaba `BackCommand`.** Ver el paso 5.
+**Decidido entonces**: no se tocan por ahora
 —no hay defecto observable y sustituirlas es una migración mecánica sobre nueve archivos, que en esta
 casa exige tres redes—, pero se hacen **en una tanda propia, después de la 2**, cuando el paseo cubra
 los 128 controles y pueda servir de red. Si antes de eso alguien añade un `CanExecute` condicional a
@@ -646,7 +660,7 @@ propietario.
 un artefacto**: su procedencia es la del paquete, así que regenerarlo con el `artifacts/package/` de
 otra compilación escribiría una procedencia que no es la de nadie. Regenerar el manifiesto es parte de
 cortar una versión, no de una sesión de trabajo. **Decidido**: entran en la matriz **cuando se
-regenere el manifiesto con un paquete recién construido** —ya son trece, así que ese paso deja de ser
+regenere el manifiesto con un paquete recién construido** —ya son catorce, así que ese paso deja de ser
 opcional en la próxima versión— y hasta entonces viven en `docs/evidence/stable/`, enlazadas aquí:
 
 1. [el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md)
@@ -662,6 +676,7 @@ opcional en la próxima versión— y hasta entonces viven en `docs/evidence/sta
 11. [la entrega del paquete a Windows](evidence/stable/audit-updater-handover-exit.md)
 12. [buscar actualizaciones sin red](evidence/stable/audit-walk-update-check.md)
 13. [la descarga y la confirmación](evidence/stable/audit-walk-update-download.md)
+14. [el comando que nadie escuchaba](evidence/stable/audit-arq004-command-notification.md)
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

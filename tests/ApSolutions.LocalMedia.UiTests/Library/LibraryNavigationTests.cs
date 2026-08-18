@@ -92,6 +92,40 @@ public sealed class LibraryNavigationTests
         Assert.Equal(LibrarySurface.ShowDetails, viewModel.Surface);
     }
 
+    /// <summary>
+    /// ARQ-004. The Back button is bound to this command, and both detail branches sit in the visual
+    /// tree from the start, so the command is asked once — while the surface is still Browse — and
+    /// the answer is no. Unless it announces the change, the button keeps that first no forever, and
+    /// the walk measured exactly that: <c>Volver a la biblioteca is on screen but cannot be pressed:
+    /// visible=True, enabled=False</c>. The count is the assertion: the predicate alone passes
+    /// whether or not anyone was told.
+    /// </summary>
+    [Fact]
+    public async Task Back_announces_the_moment_it_becomes_available()
+    {
+        var queryService = new RecordingQueryService(
+            new CatalogPage([Item(1, CatalogTitleKind.Movie, "Arrival")], null));
+        var viewModel = new LibraryViewModel(queryService);
+        var announcements = 0;
+        viewModel.BackCommand.CanExecuteChanged += (_, _) => announcements++;
+
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.False(viewModel.BackCommand.CanExecute(null));
+        Assert.Equal(0, announcements);
+
+        viewModel.OpenDetails(viewModel.Items[0]);
+
+        Assert.True(viewModel.BackCommand.CanExecute(null));
+        Assert.Equal(1, announcements);
+
+        viewModel.BackCommand.Execute(null);
+
+        Assert.Equal(LibrarySurface.Browse, viewModel.Surface);
+        Assert.False(viewModel.BackCommand.CanExecute(null));
+        Assert.Equal(2, announcements);
+    }
+
     [AvaloniaFact]
     public async Task Library_renders_virtualized_bilingual_snapshots()
     {

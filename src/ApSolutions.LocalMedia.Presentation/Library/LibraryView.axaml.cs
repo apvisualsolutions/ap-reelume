@@ -22,14 +22,4 @@ public sealed partial class LibraryView : UserControl
             GuardedEvent.Run(() => viewModel.OpenDetailsAsync(item));
         }
     }
-
-    private void OnBackClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        _ = sender;
-        _ = e;
-        if (DataContext is LibraryViewModel viewModel)
-        {
-            viewModel.BackToLibrary();
-        }
-    }
 }

@@ -96,6 +96,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El botón «Volver» de la biblioteca usa ya el comando de la biblioteca, y ese comando avisa cuando
+  cambia lo que puede hacerse.** El botón llamaba directo al código de la pantalla, así que la regla
+  que decide cuándo «Volver» tiene sentido —sólo fuera de la lista— no se consultaba nunca. Al
+  conectarlo se vio en el acto por qué esa regla necesita avisar: la ficha de película y la de serie
+  existen a la vez aunque sólo se vea una, así que el botón pregunta al arrancar, le dicen que no, y
+  sin aviso se queda **visible en la pantalla y apagado al tacto** para siempre. Hoy no cambia nada de
+  lo que ves; lo que cambia es que el rediseño ya no puede romperlo en silencio. Y para que no vuelva,
+  una comprobación lleva la lista cerrada de los siete comandos que callan a propósito, cada uno con
+  la razón por la que puede callar: si aparece un octavo, o si a uno de los siete le cambia la regla,
+  falla en el mismo cambio que lo introduce.
+
 - **Continuar donde lo dejaste se comprueba ahora de verdad, y con el ratón.** Hasta hoy sólo se
   comprobaba que la aplicación *pedía* abrir en el punto guardado; ahora se comprueba que **abre ahí**,
   con el motor de vídeo real, y que los cuatro botones de las dos ofertas —continuar, empezar de
