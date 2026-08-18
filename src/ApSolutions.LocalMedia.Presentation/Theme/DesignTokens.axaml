@@ -49,6 +49,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#DCEAF6" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#111827" />
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FCF0D0" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#8A6100" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FDECEA" />
@@ -67,6 +68,37 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUnchecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUnchecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundChecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
@@ -86,6 +118,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="AccentBrush" Color="#62AEE8" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#203B55" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#111827" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#3A2E0B" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#E8B84B" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#3B1A17" />
@@ -104,6 +137,37 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUnchecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUnchecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundChecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <!--
           Warning, danger and positive share the theme's own surface and border here, in both high
@@ -129,6 +193,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="AccentBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#000000" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FFFFFF" />
@@ -147,6 +212,37 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUnchecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUnchecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundChecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
@@ -171,6 +267,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="AccentBrush" Color="#00FFFF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#000000" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#000000" />
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#000000" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#000000" />
@@ -189,6 +286,37 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillUncheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUncheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUnchecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUnchecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundUncheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="CheckBoxForegroundChecked" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>

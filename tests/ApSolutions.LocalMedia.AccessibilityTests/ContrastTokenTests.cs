@@ -48,6 +48,7 @@ public sealed class ContrastTokenTests
         "FocusInnerStrokeBrush",
         "AccentBrush",
         "AccentSubtleBrush",
+        "AccentTextBrush",
         "WarningSurfaceBrush",
         "WarningBorderBrush",
         "DangerSurfaceBrush",
@@ -116,6 +117,13 @@ public sealed class ContrastTokenTests
 
             // The accent has to be visible as itself, and it has to be distinguishable from focus.
             AssertContrastAtLeast(brushes, "AccentBrush", "ShellSurfaceBrush", NonTextMinimum, $"{theme} accent");
+
+            // And whatever sits on the accent has to be readable on it. This one is measured because
+            // guessing it went wrong once already: the decision written down said white in light,
+            // dark and high contrast light and black in high contrast dark — but the dark theme's
+            // accent is a pale blue, and white on it reads 2.40:1. The colour follows the accent's
+            // luminance, not the theme's name.
+            AssertContrastAtLeast(brushes, "AccentTextBrush", "AccentBrush", TextMinimum, $"{theme} text on the accent");
             Assert.False(
                 string.Equals(brushes["AccentBrush"], brushes["FocusStrokeBrush"], StringComparison.OrdinalIgnoreCase),
                 $"{theme} paints the accent and the focus ring in the same colour, so the mark and the "
