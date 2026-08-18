@@ -96,6 +96,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El cierre de un vídeo tiene ya prueba de su caso lento.** Al cerrar un vídeo, la aplicación
+  espera a que se liberen sus datos antes de soltar el reproductor —hacerlo al revés es lo que hace
+  caer al descodificador—, y esa espera tiene un tope para que un cierre nunca se quede colgado: si
+  se agota, la liberación termina igual por su cuenta un instante después. Eso funciona, pero **sólo
+  se ejercía cuando la máquina de verificación iba lo bastante cargada**: de cinco mediciones de la
+  misma versión, el tope se agotó en una y en cuatro no. Ahora una prueba pide un tope más corto que
+  la espera, así que rendirse es el único desenlace que el reloj permite, y lo comprueba. Con ella se
+  cubrieron las otras tres decisiones del cierre —cerrar dos veces, cerrar con un reproductor
+  todavía prestado y un tope que no puede esperar nada— y se retiró un dato que la fábrica de vídeo
+  publicaba y que no leía nadie. El archivo pasa de medir distinto en la máquina de integración a
+  medir lo mismo tres veces seguidas.
+
 - **La prueba que vigila las avalanchas de cambios ya no aprueba cuando no hay avalancha.** Cuando
   llegan más cambios de los que Windows alcanza a anotar, la aplicación se entera de que ha perdido
   avisos y vuelve a recorrer la carpeta entera en vez de dejar de seguirla en silencio; eso funciona

@@ -95,6 +95,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Closing a video now has a test for its slow case.** When a video closes, the application waits
+  for its data to be released before letting go of the player — doing it the other way round is what
+  brings the decoder down — and that wait has a ceiling so a close can never hang: if the ceiling
+  runs out, the release still finishes on its own a moment later. That works, but **it was only ever
+  exercised when the verification machine happened to be busy enough**: across five measurements of
+  the same version, the ceiling ran out on one and did not on four. A test now asks for a ceiling
+  shorter than the wait, so giving up is the only outcome the clock allows, and it checks that it
+  happened. Three more closing decisions came with it — closing twice, closing while a player is
+  still borrowed, and a ceiling that cannot wait at all — and a piece of data the video factory
+  published and nothing read was removed. The file goes from measuring differently on the
+  integration machine to measuring the same three times running.
+
 - **The test that watches for avalanches of changes no longer passes when there is no avalanche.**
   When more changes arrive than Windows can record, the application learns that it has lost notices
   and walks the whole folder again instead of quietly ceasing to follow it; that has worked since it

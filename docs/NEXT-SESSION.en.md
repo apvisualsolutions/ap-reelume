@@ -246,17 +246,24 @@ whatever feeds it.
 - **`ContrastTokenTests` extends to the new tokens and the four dictionaries**, proved failing in both
   directions. No view is touched until those tests pass.
 
-#### `LibVlcFactory.cs`: a floor given back, and why
+#### ~~`LibVlcFactory.cs`: a floor given back, and why~~ — done on 2026-08-18
 
-Run `32161925025` measured **93/85** where the floor said **94/90**, with the file unchanged. It is
-the defect the watcher had just had, in the same shape: the file releases instances on a **deferred
-timer**, so whether a drain runs before the suite ends depends on the runner's clock rather than on
-anything a test asserts. It wobbles **inside CI**, so no number holds and whichever one is written
-fails the next run.
+Run `32161925025` measured **93/85** where the floor said **94/90**, with the file unchanged, and the
+floor was given back by copying the artefact whole. The cause was measured by comparing **five CI
+runs line by line**: a single line and a single branch separate the bad measurement from the other
+four, and both are the flush **exhausting its five-second ceiling**. It was not the deferred timer,
+which is what this note said: it is that the release queue is **one for the whole process**, so a
+busy runner leaves it full for more than five seconds and an idle one does not. Nobody asked for that
+branch; chance exercised it.
 
-The floor was given back by copying the artefact whole — the only way a floor moves — and it is said
-out loud here rather than buried in a copied file. **The next piece is pinning that condition and
-asserting it, and taking 94/90 back.**
+The product does not change, because the ceiling does exactly what it should. What was missing was
+the test: it asks for a ceiling **below the quiescence window** and asserts the giving up, so that
+outcome stops depending on the clock. From **93.68/90 to 96.70/100 across three identical runs**, and
+three more teardown decisions and a property nothing read along the way.
+[The evidence](evidence/stable/audit-libvlc-flush-determinism.md).
+
+**The floor rises with the artefact of the run that verifies that commit**, whole and never edited by
+hand.
 
 What follows is kept because it describes the shape of the correction, which is the reference for the
 loose path:

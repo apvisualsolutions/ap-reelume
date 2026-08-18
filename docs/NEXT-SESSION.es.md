@@ -246,17 +246,23 @@ alimenta.
 - **`ContrastTokenTests` se extiende a los tokens nuevos y a los cuatro diccionarios**, y se prueba
   fallando en las dos direcciones. Ninguna vista se toca hasta que esas pruebas pasen.
 
-#### `LibVlcFactory.cs`: un suelo cedido, y por qué
+#### ~~`LibVlcFactory.cs`: un suelo cedido, y por qué~~ — hecho el 2026-08-18
 
-El run `32161925025` midió **93/85** donde el suelo decía **94/90**, sin que el archivo cambiara. Es
-el mismo defecto que el vigilante acababa de tener, en la misma forma: el archivo libera instancias
-con un **temporizador diferido**, así que si un drenaje corre antes de que la suite acabe depende del
-reloj del runner y no de algo que una prueba afirme. Baila **dentro de CI**, así que ningún número
-aguanta y cualquiera que se escriba hace fallar el run siguiente.
+El run `32161925025` midió **93/85** donde el suelo decía **94/90**, sin que el archivo cambiara, y
+el suelo se cedió copiando el artefacto entero. La causa se midió comparando **cinco ejecuciones de
+CI línea a línea**: una sola línea y una sola rama separan la medición mala de las otras cuatro, y
+las dos son el vaciado **agotando su techo de cinco segundos**. No era el temporizador diferido, que
+es lo que decía esta nota: era que la cola de liberación es **una para todo el proceso**, así que un
+runner cargado la deja llena más de cinco segundos y uno holgado no. Nadie pedía esa rama; la ejercía
+el azar.
 
-Se cedió el suelo copiando el artefacto entero —que es la única forma en que un suelo se mueve— y se
-dice aquí en voz alta en lugar de enterrarlo en un archivo copiado. **La siguiente pieza es fijar esa
-condición y afirmarla, y recuperar 94/90.**
+El producto no cambia, porque el techo hace exactamente lo que debe. Lo que faltaba era la prueba: se
+pide un techo **por debajo de la ventana de quiescencia** y se afirma el abandono, con lo que
+rendirse deja de depender del reloj. De **93,68/90 a 96,70/100 en tres tiradas idénticas**, y por el
+camino tres decisiones más del desmontaje y una propiedad que nadie leía.
+[La evidencia](evidence/stable/audit-libvlc-flush-determinism.md).
+
+**El suelo sube con el artefacto del run que verifique ese commit**, entero y sin editar a mano.
 
 Lo que sigue debajo se conserva porque describe la forma de la corrección, que es la referencia para
 la vía suelta:

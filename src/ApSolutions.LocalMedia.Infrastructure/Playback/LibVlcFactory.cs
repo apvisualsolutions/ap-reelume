@@ -42,14 +42,7 @@ public sealed class LibVlcFactory : IAsyncDisposable
     private readonly LibVLC _libVlc;
     private bool _isDisposed;
 
-    private LibVlcFactory(LibVLC libVlc, bool isHeadless)
-    {
-        _libVlc = libVlc;
-        IsHeadless = isHeadless;
-    }
-
-    /// <summary>True when frames must be decoded into memory instead of a host surface.</summary>
-    public bool IsHeadless { get; }
+    private LibVlcFactory(LibVLC libVlc) => _libVlc = libVlc;
 
     /// <summary>Number of native LibVLC instances created by this process; the contract is exactly one per option set.</summary>
     public static int NativeInstanceCount
@@ -101,10 +94,10 @@ public sealed class LibVlcFactory : IAsyncDisposable
     }
 
     /// <summary>Creates a factory that decodes without a window or sound card, for automated runs.</summary>
-    public static LibVlcFactory CreateHeadless() => Create(HeadlessOptions, isHeadless: true);
+    public static LibVlcFactory CreateHeadless() => Create(HeadlessOptions);
 
     /// <summary>Creates the factory used by the shell, rendering into a host-provided surface.</summary>
-    public static LibVlcFactory CreateDefault() => Create(BaseOptions, isHeadless: false);
+    public static LibVlcFactory CreateDefault() => Create(BaseOptions);
 
     public MediaPlayer CreateMediaPlayer()
     {
@@ -247,7 +240,7 @@ public sealed class LibVlcFactory : IAsyncDisposable
         }
     }
 
-    private static LibVlcFactory Create(string[] options, bool isHeadless)
+    private static LibVlcFactory Create(string[] options)
     {
         var key = string.Join(' ', options);
         lock (InstanceSync)
@@ -259,7 +252,7 @@ public sealed class LibVlcFactory : IAsyncDisposable
                 SharedInstances[key] = instance;
             }
 
-            return new LibVlcFactory(instance, isHeadless);
+            return new LibVlcFactory(instance);
         }
     }
 
