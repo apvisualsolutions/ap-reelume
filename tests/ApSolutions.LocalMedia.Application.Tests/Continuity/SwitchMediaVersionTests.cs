@@ -87,6 +87,43 @@ public sealed class SwitchMediaVersionTests
     }
 
     /// <summary>
+    /// The second unconfirmed switch — the one a double click sends while the question is still on
+    /// screen — opens the other version without asking, and writes the stored position away with it.
+    /// </summary>
+    /// <remarks>
+    /// This is measured rather than deduced, because it is the second half of what CI caught on
+    /// 2026-08-18: the walk reported "ConfirmSwitchButton is on screen but cannot be pressed:
+    /// visible=False, enabled=True" — a question that vanished between being found and being
+    /// answered. Every switch flushes the playhead before it decides, and a session whose demuxer
+    /// has not applied its start position yet observes zero; zero is below the resume floor, so the
+    /// policy stops asking. The use case is right to do that — nothing is worth carrying across from
+    /// zero — which is why the fix belongs where the second request came from: the row is no longer
+    /// pressable while its own switch is in flight.
+    /// </remarks>
+    [Fact]
+    public async Task A_second_unconfirmed_switch_over_a_playhead_at_zero_opens_without_asking()
+    {
+        var harness = await Harness.WithProgressAsync(TimeSpan.FromMinutes(50), Feature);
+        var target = Version(Other, TimeSpan.FromMinutes(130));
+
+        var first = await harness.SwitchAsync(target);
+        Assert.Equal(ProgressTransferKind.Confirm, first.Decision.Kind);
+        Assert.False(first.Opened);
+
+        // What the engine answers while the demuxer is still applying the start position. Measured on
+        // the walk's resume scene, which read 0, 40, 40, 40, 41 over five passes.
+        harness.Tracker.Observe(TimeSpan.Zero, Feature);
+        var second = await harness.SwitchAsync(target);
+
+        Assert.Equal(ProgressTransferKind.Restart, second.Decision.Kind);
+        Assert.True(second.Opened);
+        Assert.Equal(TimeSpan.Zero, Assert.Single(harness.Coordinator.Requests).StartPosition);
+        var stored = await harness.Repository.GetAsync(Content, TestContext.Current.CancellationToken);
+        Assert.Equal(TimeSpan.Zero, stored!.Position);
+        Assert.Equal(Other, stored.SourceMediaFileId);
+    }
+
+    /// <summary>
     /// "Start again" is the dialog's second answer: the person switches without carrying the
     /// progress across, so the new version opens at zero and zero is what gets recorded.
     /// </summary>

@@ -15,19 +15,50 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 public sealed class PlayerVersionRowViewModel
 {
     private readonly MediaVersion _version;
+    private readonly AsyncRelayCommand _switch;
+    private bool _isSwitching;
 
     public PlayerVersionRowViewModel(MediaVersion version, Func<MediaVersion, Task> onSwitch)
     {
         _version = version ?? throw new ArgumentNullException(nameof(version));
         ArgumentNullException.ThrowIfNull(onSwitch);
-        SwitchCommand = new AsyncRelayCommand(() => onSwitch(_version), () => _version.IsAvailable);
+        _switch = new AsyncRelayCommand(
+            () => SwitchAsync(onSwitch),
+            () => _version.IsAvailable && !_isSwitching);
     }
 
     public MediaVersion Version => _version;
 
     public bool IsAvailable => _version.IsAvailable;
 
-    public ICommand SwitchCommand { get; }
+    public ICommand SwitchCommand => _switch;
+
+    /// <summary>
+    /// The switch, with the row unpressable while its own work is in flight. The transport bar
+    /// already does this — a skip is disabled while the previous one seeks — and this row needed it
+    /// for a sharper reason: every switch flushes the playhead before it decides what to do with the
+    /// progress, and a session whose demuxer has not applied its start position yet answers zero.
+    /// Zero is below the resume floor, so a second switch decides there is nothing to carry across,
+    /// opens the other version without asking and writes the stored position away. Measured on CI on
+    /// 2026-08-18, where the harness pressed again after 300 ms of apparent silence and the question
+    /// it was about to answer vanished from the screen underneath it.
+    /// </summary>
+    private async Task SwitchAsync(Func<MediaVersion, Task> onSwitch)
+    {
+        _isSwitching = true;
+        _switch.RaiseCanExecuteChanged();
+        try
+        {
+            await onSwitch(_version).ConfigureAwait(true);
+        }
+        finally
+        {
+            // Pressable again even when the switch failed, or one refusal would leave a dead row and
+            // the failure would read as a button that does nothing.
+            _isSwitching = false;
+            _switch.RaiseCanExecuteChanged();
+        }
+    }
 
     public string QualityLabel => string.Join(
         " · ",

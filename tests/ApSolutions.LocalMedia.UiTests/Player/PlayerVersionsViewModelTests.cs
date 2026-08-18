@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Player;
 using Xunit;
 
@@ -97,6 +98,82 @@ public sealed class PlayerVersionsViewModelTests
             new PlayerVersionRowViewModel(null!, _ => Task.CompletedTask));
         Assert.Throws<ArgumentNullException>(() =>
             new PlayerVersionRowViewModel(Version(), null!));
+    }
+
+    /// <summary>
+    /// A switch already under way is not asked for again, which is what CI measured on 2026-08-18.
+    /// </summary>
+    /// <remarks>
+    /// The walk failed on a hosted runner with "ConfirmSwitchButton is on screen but cannot be
+    /// pressed: visible=False, enabled=True" — the dialogue vanished between the harness resolving
+    /// the button and pressing it. The cause is here: the row's command stayed pressable while its
+    /// own work was in flight, so a second press — a double click, or a harness repeating a press
+    /// that seemed to do nothing — started a second switch. And a second switch flushes the playhead
+    /// before it decides: a session whose demuxer has not applied its start position yet answers
+    /// zero, zero is below the resume floor, so the policy stops asking, opens the other version
+    /// unasked and writes the stored position away. The transport bar already does this, on purpose,
+    /// and for the same reason.
+    /// </remarks>
+    [Fact]
+    public async Task A_switch_already_under_way_cannot_be_asked_for_again()
+    {
+        var inFlight = new TaskCompletionSource();
+        var asked = 0;
+        var row = new PlayerVersionRowViewModel(
+            Version(),
+            _ =>
+            {
+                asked++;
+                return inFlight.Task;
+            });
+        var announcements = 0;
+        row.SwitchCommand.CanExecuteChanged += (_, _) => announcements++;
+
+        Assert.True(row.SwitchCommand.CanExecute(null));
+        row.SwitchCommand.Execute(null);
+
+        Assert.Equal(1, asked);
+        Assert.False(row.SwitchCommand.CanExecute(null));
+
+        // And the button says so, or nothing on screen would grey out.
+        Assert.Equal(1, announcements);
+
+        // A press that arrives anyway is refused too: nothing about ICommand promises the caller
+        // asked first, and a key binding or code calling this directly reaches the same place.
+        row.SwitchCommand.Execute(null);
+        Assert.Equal(1, asked);
+
+        inFlight.SetResult();
+        for (var attempt = 0; attempt < 100 && !row.SwitchCommand.CanExecute(null); attempt++)
+        {
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+
+        // Once the switch is done the row is pressable again, and says that too.
+        Assert.True(row.SwitchCommand.CanExecute(null));
+        Assert.Equal(2, announcements);
+    }
+
+    /// <summary>
+    /// The row is pressable again even when the switch it asked for fails. Without the finally that
+    /// is a row that can never be pressed again, and the failure would be reported as a dead button.
+    /// </summary>
+    [Fact]
+    public async Task A_switch_that_fails_leaves_the_row_pressable()
+    {
+        var row = new PlayerVersionRowViewModel(
+            Version(),
+            _ => Task.FromException(new InvalidOperationException("the version would not open")));
+
+        row.SwitchCommand.Execute(null);
+        for (var attempt = 0; attempt < 100 && !row.SwitchCommand.CanExecute(null); attempt++)
+        {
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+
+        Assert.True(row.SwitchCommand.CanExecute(null));
+        Assert.IsType<InvalidOperationException>(
+            Assert.IsType<AsyncRelayCommand>(row.SwitchCommand).LastFailure);
     }
 
     [Fact]
