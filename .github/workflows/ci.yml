@@ -21,8 +21,18 @@ jobs:
     # pull requests to execute on a personal machine the moment the variable reappears, so the
     # workflow no longer consults it. Hosted minutes are free on public repositories.
     runs-on: windows-2025
-    # The verification now seals the package and builds the payload twice more to compare them.
-    timeout-minutes: 60
+    # The verification seals the package and builds the payload twice more to compare them, and the
+    # walk now presses all 128 command controls with real video behind them. Measured on 2026-08-18
+    # with one commit that ran on two runners: 36 minutes on one and over 60 on the other, with no
+    # gap anywhere in the log — the steps chained, the work was simply slower. A ceiling that cuts
+    # healthy runs at random does not catch hangs, it teaches people to ignore reds, so it moves to
+    # 90: a hang still dies, thirty minutes later, and a healthy job has room on a bad runner.
+    #
+    # The old rule of thumb went with it. "Cancelled at 60 minutes is a hang" is no longer true;
+    # cancelled at 90 is. And the number to watch is the healthy job: it was 36-64 minutes here, so
+    # a healthy run approaching 90 means the work has grown again and this deserves another look
+    # rather than another raise.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
