@@ -89,7 +89,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PlaybackPreferenceRe
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/RecommendationReadModel.cs       100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/WatchStateRepository.cs          100  94
 src/ApSolutions.LocalMedia.Infrastructure/Data/SqliteConnectionFactory.cs                     92  64
-src/ApSolutions.LocalMedia.Infrastructure/FileSystem/DebouncedFileWatcher.cs                  88  73
+src/ApSolutions.LocalMedia.Infrastructure/FileSystem/DebouncedFileWatcher.cs                  89  69
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/FallbackScanScheduler.cs                 94  83
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/LightweightFingerprintProvider.cs       100  57
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/MediaFileEnumerator.cs                   73  88
@@ -106,10 +106,10 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbOptions.cs               
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs                        100  50
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs               87  73
 src/ApSolutions.LocalMedia.Infrastructure/Playback/HardwareAccelerationFallback.cs            77 100
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                97  83
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                86  79
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcFactory.cs                           94  90
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 91  82
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  66
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 91  80
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  61
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs           100  83
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/NetworkPurposeRegistry.cs                  100  87
 src/ApSolutions.LocalMedia.Infrastructure/Settings/JsonSettingsStore.cs                       96  75
@@ -157,7 +157,7 @@ src/ApSolutions.LocalMedia.Presentation/Navigation/RouteStateConverter.cs       
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingViewModel.cs                100  84
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        98  79
+src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        94  73
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileViewModel.cs                          97  82
@@ -222,12 +222,12 @@ src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml                
 src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           86  55
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs                0   0
-src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         90  64
+src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         89  64
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  75
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90
 src/ApSolutions.LocalMedia.Windows/Playback/ShellExternalPlaybackLauncher.cs                  40  50
-src/ApSolutions.LocalMedia.Windows/Playback/WindowsAudioDeviceCatalog.cs                      79  61
+src/ApSolutions.LocalMedia.Windows/Playback/WindowsAudioDeviceCatalog.cs                      32  11
 src/ApSolutions.LocalMedia.Windows/Playback/WindowsDisplayCapabilityProvider.cs               76  60
 src/ApSolutions.LocalMedia.Windows/Program.cs                                                  0 100
 src/ApSolutions.LocalMedia.Windows/Startup/WindowsStartupService.cs                          100  91
