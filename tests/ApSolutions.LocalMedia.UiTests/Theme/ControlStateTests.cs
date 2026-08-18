@@ -1,0 +1,200 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+using Avalonia.Controls;
+using Avalonia.Controls.Documents;
+using Avalonia.Controls.Presenters;
+using Avalonia.Headless.XUnit;
+using Avalonia.Media;
+using Avalonia.Styling;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
+using Xunit;
+
+namespace ApSolutions.LocalMedia.UiTests.Theme;
+
+/// <summary>
+/// A button's five states, in all four themes, read off what actually paints them.
+/// </summary>
+/// <remarks>
+/// Before these styles the base theme painted all five: a 20 % black fill, a transparent border
+/// where the design asks for one pixel of the control boundary, a disabled state identical to rest,
+/// and a pointer-over whose fill went solid black under black text. None of it came from a token, so
+/// no contrast check ever saw it. Measured on the <c>ContentPresenter</c>, because that is what
+/// paints — a <c>Background</c> setter on the button itself does not win.
+/// </remarks>
+// The theme variant is one setting on one application, and these three classes all change it. They
+// are serialised so that a class reading a theme cannot be reading one another class just replaced —
+// a race that would only ever show up on some runs, which is the kind this repository keeps finding
+// on CI's second pass.
+[Collection("ThemeVariant")]
+public sealed class ControlStateTests
+{
+    public static TheoryData<string> Themes() =>
+        ["Light", "Dark", "HighContrastLight", "HighContrastDark"];
+
+    [AvaloniaTheory]
+    [MemberData(nameof(Themes))]
+    public void Every_state_of_a_button_comes_from_a_token(string themeName)
+    {
+        var theme = Resolve(themeName);
+        Avalonia.Application.Current!.RequestedThemeVariant = theme;
+        var button = new Button { Content = "Ok", Width = 120, Height = 36 };
+        var window = new Window { Width = 320, Height = 200, Content = button };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            var rest = Read(button, state: null);
+            Assert.Equal(Token(theme, "ControlFillBrush"), rest.Background);
+            Assert.Equal(Token(theme, "ShellBorderBrush"), rest.Border);
+            Assert.Equal(1, rest.Thickness);
+
+            var hover = Read(button, ":pointerover");
+            Assert.Equal(Token(theme, "ControlFillHoverBrush"), hover.Background);
+
+            var pressed = Read(button, ":pressed");
+            Assert.Equal(Token(theme, "ControlFillPressedBrush"), pressed.Background);
+
+            var disabled = Read(button, ":disabled");
+            Assert.Equal(Token(theme, "ControlFillDisabledBrush"), disabled.Background);
+
+            // A disabled control has to look different from a resting one. In light and dark the
+            // fill says it. In the two high contrast themes the fill *cannot*: the disabled fill is
+            // the surface, by design, because those palettes have no third colour to spend — and
+            // there the design's answer is a dotted border, which needs a template of our own and is
+            // not here yet. So the difference is asserted where it exists and the gap is named where
+            // it does not, rather than the assertion being quietly loosened for all four.
+            if (theme == ThemeVariant.Light || theme == ThemeVariant.Dark)
+            {
+                Assert.NotEqual(rest.Background, disabled.Background);
+            }
+            else
+            {
+                Assert.Equal(Token(theme, "ShellSurfaceBrush"), disabled.Background);
+            }
+        }
+        finally
+        {
+            window.Close();
+            Avalonia.Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+        }
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(Themes))]
+    public void Hovering_and_pressing_keep_the_label_readable(string themeName)
+    {
+        var theme = Resolve(themeName);
+        Avalonia.Application.Current!.RequestedThemeVariant = theme;
+        var button = new Button { Content = "Ok", Width = 120, Height = 36 };
+        var window = new Window { Width = 320, Height = 200, Content = button };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            foreach (var state in new[] { ":pointerover", ":pressed" })
+            {
+                var painted = Read(button, state);
+                var ratio = Contrast(painted.Foreground, painted.Background);
+                Assert.True(
+                    ratio >= 4.5,
+                    $"{themeName} {state}: the label reads {ratio:F2}:1 against the fill under it. The "
+                        + "base theme's pointer-over used to put black text on a black fill, which is "
+                        + "what the token for active text exists to prevent.");
+            }
+        }
+        finally
+        {
+            window.Close();
+            Avalonia.Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+        }
+    }
+
+    [AvaloniaFact]
+    public void High_contrast_inverts_a_pressed_button_instead_of_tinting_it()
+    {
+        foreach (var themeName in new[] { "HighContrastLight", "HighContrastDark" })
+        {
+            var theme = Resolve(themeName);
+            Avalonia.Application.Current!.RequestedThemeVariant = theme;
+            var button = new Button { Content = "Ok", Width = 120, Height = 36 };
+            var window = new Window { Width = 320, Height = 200, Content = button };
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                var rest = Read(button, state: null);
+                var pressed = Read(button, ":pressed");
+
+                // Inversion, not a tint: the fill becomes what the border was and the text becomes
+                // what the surface was. A tint would be invisible in a palette of two colours.
+                Assert.Equal(Token(theme, "ShellBorderBrush"), pressed.Background);
+                Assert.Equal(Token(theme, "ShellSurfaceBrush"), pressed.Foreground);
+                Assert.Equal(rest.Background, pressed.Foreground);
+
+                // The design also asks for a 2 px border while pressed, and the base template keeps
+                // one thickness for every state — so that arrives with the same template as the
+                // dotted border. Asserted at what it is today so the day it changes is a red here.
+                Assert.Equal(1, pressed.Thickness);
+            }
+            finally
+            {
+                window.Close();
+                Avalonia.Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+            }
+        }
+    }
+
+    private static ThemeVariant Resolve(string name) => name switch
+    {
+        "Light" => ThemeVariant.Light,
+        "Dark" => ThemeVariant.Dark,
+        "HighContrastLight" => Presentation.Theme.AppThemeVariants.HighContrastLight,
+        "HighContrastDark" => Presentation.Theme.AppThemeVariants.HighContrastDark,
+        _ => throw new ArgumentOutOfRangeException(nameof(name)),
+    };
+
+    private static Color Token(ThemeVariant theme, string key)
+    {
+        Assert.True(
+            Avalonia.Application.Current!.TryGetResource(key, theme, out var value),
+            $"{key} is missing from {theme}, so the state below it would fall back to the base theme.");
+        return Assert.IsAssignableFrom<ISolidColorBrush>(value).Color;
+    }
+
+    private static (Color Background, Color Border, Color Foreground, double Thickness) Read(
+        Button button,
+        string? state)
+    {
+        foreach (var candidate in new[] { ":pointerover", ":pressed", ":disabled" })
+        {
+            ((IPseudoClasses)button.Classes).Set(candidate, candidate == state);
+        }
+
+        Dispatcher.UIThread.RunJobs();
+        var presenter = button.GetVisualDescendants().OfType<ContentPresenter>().FirstOrDefault();
+        Assert.True(presenter is not null, "The button has no content presenter, so nothing paints it.");
+        return (
+            ColorOf(presenter.Background),
+            ColorOf(presenter.BorderBrush),
+            ColorOf(TextElement.GetForeground(presenter)),
+            presenter.BorderThickness.Top);
+    }
+
+    private static Color ColorOf(IBrush? brush) =>
+        Assert.IsAssignableFrom<ISolidColorBrush>(brush).Color;
+
+    private static double Contrast(Color first, Color second)
+    {
+        var lighter = Math.Max(Luminance(first), Luminance(second));
+        var darker = Math.Min(Luminance(first), Luminance(second));
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    private static double Luminance(Color color) =>
+        Presentation.Theme.HighContrastPolicy.RelativeLuminance(color.R, color.G, color.B);
+}

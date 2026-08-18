@@ -23,7 +23,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <x:String x:Key="SelectedStateGlyph">●</x:String>
 
       <!--
-        Four dictionaries, and every one of them carries the same twenty-two keys. A brush missing
+        Four dictionaries, and every one of them carries the same twenty-three brushes. A brush missing
         from one theme falls back to whatever the base theme draws, which no contrast check covers,
         so ContrastTokenTests reads these dictionaries — the ones the application actually paints —
         rather than a parallel list of colours kept beside them. It used to read such a list: the
@@ -48,12 +48,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#DCEAF6" />
+          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#111827" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FCF0D0" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#8A6100" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FDECEA" />
           <SolidColorBrush x:Key="DangerBorderBrush" Color="#B3261E" />
           <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#E4F2E9" />
           <SolidColorBrush x:Key="PositiveBorderBrush" Color="#14653B" />
+          <StaticResource x:Key="ButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
@@ -72,12 +85,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#111827" />
           <SolidColorBrush x:Key="AccentBrush" Color="#62AEE8" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#203B55" />
+          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#F8FAFC" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#3A2E0B" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#E8B84B" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#3B1A17" />
           <SolidColorBrush x:Key="DangerBorderBrush" Color="#F2B8B5" />
           <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#12301F" />
           <SolidColorBrush x:Key="PositiveBorderBrush" Color="#7BD3A0" />
+          <StaticResource x:Key="ButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
         </ResourceDictionary>
         <!--
           Warning, danger and positive share the theme's own surface and border here, in both high
@@ -102,12 +128,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#000000" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="DangerBorderBrush" Color="#000000" />
           <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PositiveBorderBrush" Color="#000000" />
+          <StaticResource x:Key="ButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
@@ -131,12 +170,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#000000" />
           <SolidColorBrush x:Key="AccentBrush" Color="#00FFFF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#000000" />
+          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#000000" />
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="DangerBorderBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="PositiveBorderBrush" Color="#FFFFFF" />
+          <StaticResource x:Key="ButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
@@ -167,6 +219,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </FocusAdornerTemplate>
     </Setter>
   </Style>
+  <!--
+    The five states of a button, and they are set on the ContentPresenter rather than on the Button:
+    measured, the presenter is what paints, and a Background setter on the Button itself loses to the
+    base theme. What the base theme painted, before these: a 20 % black fill, a *transparent* border,
+    and a pointer-over state whose fill went to solid black under black text — a contrast of 1:1 that
+    no check covered, because none of it came from a token.
+
+    In high contrast, hovering and pressing *invert*: the fill becomes the border's colour and the
+    text becomes the surface's. That is why the text has a token of its own rather than staying at
+    TextPrimaryBrush — in light and dark it is the same colour, and in the two high contrast themes it
+    is the opposite one. Same for the pressed border: 1 px normally, 2 px where the border is the only
+    shape a control has.
+  -->
   <!--
     Every control type that can take keyboard focus is styled from the same token, so the focus ring
     the contrast matrix measured is the ring the person actually sees. A type left out here would fall

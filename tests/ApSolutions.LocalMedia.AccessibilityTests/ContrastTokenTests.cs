@@ -43,6 +43,7 @@ public sealed class ContrastTokenTests
         "TextPrimaryBrush",
         "TextSecondaryBrush",
         "TextDisabledBrush",
+        "ControlTextActiveBrush",
         "FocusStrokeBrush",
         "FocusInnerStrokeBrush",
         "AccentBrush",
