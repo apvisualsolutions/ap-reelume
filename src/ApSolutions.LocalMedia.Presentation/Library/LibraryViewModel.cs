@@ -22,6 +22,7 @@ public enum LibrarySurface
 public sealed class LibraryViewModel : INotifyPropertyChanged
 {
     private readonly ICatalogQueryService _queryService;
+    private readonly RelayCommand _back;
     private IReadOnlyList<CatalogItemViewModel> _items = [];
     private string? _search;
     private CatalogFilter _filters;
@@ -46,7 +47,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         OpenDetailsCommand = new RelayCommand(
             parameter => OpenDetails((CatalogItemViewModel)parameter!),
             parameter => parameter is CatalogItemViewModel);
-        BackCommand = new RelayCommand(_ => BackToLibrary(), _ => Surface != LibrarySurface.Browse);
+        _back = new RelayCommand(_ => BackToLibrary(), _ => Surface != LibrarySurface.Browse);
+        BackCommand = _back;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -85,6 +87,11 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsBrowsing));
                 OnPropertyChanged(nameof(IsMovieDetails));
                 OnPropertyChanged(nameof(IsShowDetails));
+
+                // Both detail branches sit in the visual tree from the start, so the Back button
+                // is asked once — while the surface is still Browse — and the answer is no. Without
+                // this it renders enabled=False forever, which is what the walk measured.
+                _back.RaiseCanExecuteChanged();
             }
         }
     }
@@ -216,14 +223,12 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 
     private sealed class RelayCommand(Action<object?> execute, Predicate<object?> canExecute) : ICommand
     {
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
+        public event EventHandler? CanExecuteChanged;
 
         public bool CanExecute(object? parameter) => canExecute(parameter);
 
         public void Execute(object? parameter) => execute(parameter);
+
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -108,7 +108,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Grid IsVisible="{Binding IsMovieDetails}" RowDefinitions="Auto,*" RowSpacing="12">
       <Button
           HorizontalAlignment="Left"
-          Click="OnBackClick"
+          Command="{Binding BackCommand}"
           Content="{DynamicResource LibraryBackAction}"
           automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
       <movie:MovieDetailsView Grid.Row="1" DataContext="{Binding MovieDetails}" />
@@ -117,7 +117,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Grid IsVisible="{Binding IsShowDetails}" RowDefinitions="Auto,*" RowSpacing="12">
       <Button
           HorizontalAlignment="Left"
-          Click="OnBackClick"
+          Command="{Binding BackCommand}"
           Content="{DynamicResource LibraryBackAction}"
           automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
       <show:ShowDetailsView Grid.Row="1" DataContext="{Binding ShowDetails}" />
