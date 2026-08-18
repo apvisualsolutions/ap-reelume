@@ -21,7 +21,7 @@ rehacerlo entero.
 | ~~1~~ | ~~La sesión suelta no se ve~~ **hecha el 2026-08-17, 6 → 3** | agente | 3 |
 | ~~2~~ | ~~Los tres últimos de la tanda 1~~ **hecha el 2026-08-18, 3 → 0** | agente | **0** |
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
-| ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja** | agente | 0 |
+| ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
 | 6 | **El rediseño**, con el material de Claude Design | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
@@ -660,7 +660,7 @@ propietario.
 un artefacto**: su procedencia es la del paquete, así que regenerarlo con el `artifacts/package/` de
 otra compilación escribiría una procedencia que no es la de nadie. Regenerar el manifiesto es parte de
 cortar una versión, no de una sesión de trabajo. **Decidido**: entran en la matriz **cuando se
-regenere el manifiesto con un paquete recién construido** —ya son catorce, así que ese paso deja de ser
+regenere el manifiesto con un paquete recién construido** —ya son quince, así que ese paso deja de ser
 opcional en la próxima versión— y hasta entonces viven en `docs/evidence/stable/`, enlazadas aquí:
 
 1. [el enlace al tráiler](evidence/stable/audit-walk-trailer-links.md)
@@ -677,6 +677,7 @@ opcional en la próxima versión— y hasta entonces viven en `docs/evidence/sta
 12. [buscar actualizaciones sin red](evidence/stable/audit-walk-update-check.md)
 13. [la descarga y la confirmación](evidence/stable/audit-walk-update-download.md)
 14. [el comando que nadie escuchaba](evidence/stable/audit-arq004-command-notification.md)
+15. [el suelo lo pone quien mide](evidence/stable/audit-coverage-debt-belongs-to-ci.md)
 
 Estado al cerrar la **segunda sesión del 2026-08-16**, que ejecutó el paso 1 entero y cuatro
 séptimos del 2. **Tres commits**: `1d80815` (una ejecución aislada dice a dónde habría ido el

@@ -21,7 +21,7 @@ again from scratch.
 | ~~1~~ | ~~The loose session cannot be seen~~ **done on 2026-08-17, 6 → 3** | agent | 3 |
 | ~~2~~ | ~~The last three of batch 1~~ **done on 2026-08-18, 3 → 0** | agent | **0** |
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
-| ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops** | agent | 0 |
+| ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
 | 6 | **The redesign**, from Claude Design's material | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
@@ -650,7 +650,7 @@ it belongs to the owner.
 **describes an artifact**: its provenance is the package's own, so regenerating it against an
 `artifacts/package/` from another build would write a provenance belonging to nobody. Regenerating
 the manifest is part of cutting a release, not part of a working session. **Decided**: they go into
-the matrix **when the manifest is regenerated against a freshly built package** — there are fourteen now,
+the matrix **when the manifest is regenerated against a freshly built package** — there are fifteen now,
 so that step stops being optional at the next release — and until then they live in
 `docs/evidence/stable/`, linked from here:
 
@@ -668,6 +668,7 @@ so that step stops being optional at the next release — and until then they li
 12. [checking for updates without the network](evidence/stable/audit-walk-update-check.md)
 13. [the download and the confirmation](evidence/stable/audit-walk-update-download.md)
 14. [the command nobody listened to](evidence/stable/audit-arq004-command-notification.md)
+15. [the floor belongs to whoever measures](evidence/stable/audit-coverage-debt-belongs-to-ci.md)
 
 The state at the close of the **second session of 2026-08-16**, which carried out step 1 in full and
 four sevenths of step 2. **Three commits**: `1d80815` (an isolated run says where the browser would

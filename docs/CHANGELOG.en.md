@@ -95,6 +95,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Coverage watching is now measured where it is verified.** Each file's bar had been measured on
+  the developer's machine and checked on the integration one, which has no sound card: seven files
+  covering audio, video and timers read differently in each place, and one of them — the audio device
+  catalogue — went from 79/61 to 32/11, because there is nothing there to enumerate. Coverage was not
+  getting worse; it was being measured in the wrong place. The list now comes from integration
+  itself, which publishes it on every build, and here it is only reported. What does not change: it
+  still cannot get worse, and a file still leaves the list only by improving.
+
 - **The library's Back button now uses the library's command, and that command announces when what
   it can do changes.** The button called the screen's code directly, so the rule that decides when
   Back makes sense — only away from the list — was never consulted. Wiring it up showed at once why

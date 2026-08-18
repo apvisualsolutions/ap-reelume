@@ -96,6 +96,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La vigilancia de cobertura pasa a medirse donde se verifica.** El listón de cada archivo se había
+  medido en la máquina de quien programa y se comprobaba en la de integración, que no tiene tarjeta
+  de sonido: siete archivos de audio, vídeo y temporizadores daban números distintos en cada sitio, y
+  uno de ellos —el catálogo de dispositivos de audio— pasaba de 79/61 a 32/11, porque allí no hay
+  nada que enumerar. No era que la cobertura empeorase; era que se medía en el sitio equivocado.
+  Ahora la lista sale de la propia integración, que la publica en cada compilación, y aquí sólo se
+  informa. Lo que no cambia: sigue sin poder empeorar, y de la lista sólo se sale mejorando.
+
 - **El botón «Volver» de la biblioteca usa ya el comando de la biblioteca, y ese comando avisa cuando
   cambia lo que puede hacerse.** El botón llamaba directo al código de la pantalla, así que la regla
   que decide cuándo «Volver» tiene sentido —sólo fuera de la lista— no se consultaba nunca. Al

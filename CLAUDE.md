@@ -43,6 +43,12 @@ pwsh -NoProfile -File eng/verify-docs.ps1
 
 `eng/verify.ps1` las corre todas más el empaquetado y la puerta de cobertura.
 
+**Los suelos de cobertura los mide CI, no esta máquina.** `eng/coverage-debt.txt` se copia del
+artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
+siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
+tiene: `WindowsAudioDeviceCatalog.cs` vale 79/61 aquí y 32/11 allí. Fuera de CI el trinquete informa
+y no bloquea. Nunca se edita a mano, y nunca se genera con una ejecución local.
+
 **Quien verifica de verdad es CI, y por eso el orden cambió el 2026-08-18.** CI corre ese mismo
 `verify.ps1` **y además** `run-accessibility.ps1 -Passes 2`, `run-recovery.ps1 -Passes 2` y
 `check-walk-coverage.ps1`: es un superconjunto estricto de lo que puede correrse aquí, y las carreras

@@ -86,6 +86,24 @@ jobs:
       - name: Walk coverage gate
         shell: pwsh
         run: ./eng/check-walk-coverage.ps1
+      # The debt floors belong to the environment that measures them, and that is this one: the
+      # runner has no audio device and its clocks are not a developer's, so seven files read
+      # differently here — WindowsAudioDeviceCatalog.cs holds 79/61 on the machine that wrote the
+      # list and reads 32/11 here. Every build writes the list it would hold itself and publishes
+      # it, pass or fail, so moving a floor is copying this run's measurement rather than guessing
+      # at one. It runs after the gates so a failing verify still leaves the numbers behind.
+      - name: Emit the coverage debt this run measured
+        if: always()
+        continue-on-error: true
+        shell: pwsh
+        run: ./eng/check-coverage.ps1 -ResultsDirectory artifacts/test-results/verify-win-x64 -WriteDebt
+      - name: Upload the coverage debt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-debt
+          path: eng/coverage-debt.txt
+          if-no-files-found: warn
       - name: Upload audit gate evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
