@@ -85,6 +85,31 @@ rojo.
    un cambio de modelo con migración, y hoy la posición viaja en el encargo, así que el síntoma puede
    no existir.
 
+#### 5. `ARQ-004` — decidido, y la nota vieja estaba incompleta
+
+Medido el 2026-08-18: hay **ocho** archivos con `CanExecuteChanged` vacío, no nueve clases, y **sólo
+uno tiene riesgo real**. Un `CanExecuteChanged` vacío sólo importa cuando `CanExecute` mira **estado
+que cambia**; si mira el parámetro, cada consulta con el mismo parámetro da siempre lo mismo y no hay
+nada que notificar.
+
+| Archivo | `CanExecute` | Riesgo |
+|---|---|---|
+| `LibraryViewModel` | `Surface != LibrarySurface.Browse` | **sí, estado que cambia** |
+| `RootOnboardingViewModel`, `ShortcutSettingsViewModel`, `LifecycleSettingsViewModel`, `WindowsTrayService` | `true` | no |
+| `DatabaseRecoveryViewModel`, `AppearanceSettingsViewModel` (×2), `ShellViewModel` | sólo el parámetro | no |
+
+**Lo que se hace, en dos partes:**
+
+1. **`LibraryViewModel.BackCommand`.** Su `RelayCommand` privado gana `RaiseCanExecuteChanged` y se
+   dispara donde `Surface` se asigna. Hoy no muerde **por accidente** —la vista se hace visible y el
+   botón vuelve a preguntar—, y el rediseño cambia justamente cuándo se hace visible una vista, así
+   que es una bomba con temporizador. **Mídelo antes**: el paseo tiene que ver un «Volver»
+   deshabilitado cuando debería estar activo, o el rojo no existe y la hipótesis estaba mal.
+2. **La nota pasa a puerta.** Una prueba de arquitectura con la **lista cerrada** de los ocho archivos
+   —la forma de la lista de huérfanos de `ServiceConsumptionTests`—: si aparece un noveno
+   `CanExecuteChanged` vacío, falla y obliga a usar `AsyncRelayCommand` o a justificarlo en la lista.
+   Eso es lo que convierte «hay que acordarse» en algo que no depende de acordarse.
+
 #### Lo que queda decidido del paquete de diseño, para el paso 6
 
 - **Los diez cambios de `SURFACES.es.md` / `.en.md` entran al principio del paso 6**, antes de tocar

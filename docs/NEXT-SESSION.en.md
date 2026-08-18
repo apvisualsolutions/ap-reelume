@@ -84,6 +84,31 @@ not after the red.
    to the group is a model change with a migration, and the position travels in the request today, so
    the symptom may not exist.
 
+#### 5. `ARQ-004` — decided, and the old note was incomplete
+
+Measured on 2026-08-18: there are **eight** files with an empty `CanExecuteChanged`, not nine classes,
+and **only one carries real risk**. An empty `CanExecuteChanged` only matters when `CanExecute` looks
+at **state that changes**; if it looks at the parameter, every query with the same parameter always
+answers the same and there is nothing to notify.
+
+| File | `CanExecute` | Risk |
+|---|---|---|
+| `LibraryViewModel` | `Surface != LibrarySurface.Browse` | **yes, changing state** |
+| `RootOnboardingViewModel`, `ShortcutSettingsViewModel`, `LifecycleSettingsViewModel`, `WindowsTrayService` | `true` | no |
+| `DatabaseRecoveryViewModel`, `AppearanceSettingsViewModel` (x2), `ShellViewModel` | parameter only | no |
+
+**What gets done, in two parts:**
+
+1. **`LibraryViewModel.BackCommand`.** Its private `RelayCommand` gains `RaiseCanExecuteChanged`,
+   raised where `Surface` is assigned. It does not bite today **by accident** — the view becomes
+   visible and the button asks again — and the redesign changes exactly when a view becomes visible,
+   so it is a timer. **Measure first**: the walk has to see a Back that is disabled when it should be
+   live, or the red does not exist and the hypothesis was wrong.
+2. **The note becomes a gate.** An architecture test holding the **closed list** of those eight files
+   — the shape of `ServiceConsumptionTests`' orphan list — so that a ninth empty `CanExecuteChanged`
+   fails and forces either `AsyncRelayCommand` or a justification on the list. That is what turns
+   "somebody has to remember" into something that does not depend on remembering.
+
 #### What is decided about the design package, for step 6
 
 - **The ten `SURFACES.es.md` / `.en.md` changes go at the start of step 6**, before any token is
