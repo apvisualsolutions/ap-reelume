@@ -1,9 +1,17 @@
 name: CI
 
 on:
+  # Working branches only, and main deliberately absent. Main is kept by fast-forward from the branch
+  # with `git push origin codex/...:main`, so every commit it receives has already run here under the
+  # same SHA — and a check belongs to a commit rather than to a ref, so main shows the result it
+  # already earned. Until 2026-08-18 both were listed and every change verified itself twice over an
+  # identical tree, which on a 36-to-64-minute job is half the work for no second opinion.
+  #
+  # What this gives up: a commit that reached main without passing through a branch would go
+  # unverified. That does not happen today, and it announces itself — the commit would carry no check
+  # at all. Anything arriving from outside still comes through pull_request below.
   push:
     branches:
-      - main
       - codex/**
   pull_request:
 
