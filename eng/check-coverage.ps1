@@ -36,6 +36,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
+
+# The debt floors belong to the environment that measures them, and that environment is CI. A
+# hosted runner has no audio device and its clocks are not this machine's, so seven files read
+# differently there — WindowsAudioDeviceCatalog.cs holds 79/61 here and reads 32/11 there, because
+# half of it never runs without a device to enumerate. The floors are written from a CI run, and
+# since this machine measures *more* on those files, checking them here would fail asking to raise
+# a floor that CI cannot meet. So off CI the debt is reported and does not block; the watched list
+# and the new-file gate below hold everywhere, because neither varies with the hardware.
+$isContinuousIntegration = $env:GITHUB_ACTIONS -eq 'true'
 $resultsRoot = if ([IO.Path]::IsPathRooted($ResultsDirectory)) { $ResultsDirectory } else { Join-Path $repoRoot $ResultsDirectory }
 
 Push-Location $repoRoot
@@ -344,6 +353,12 @@ try {
         A file leaves eng/coverage-debt.txt by reaching 96/96, never by being edited out: a floor
         below what was measured fails, exactly like a floor above it, so the file always says what
         is true today.
+
+        "Measured" means measured by CI. The list is copied from the coverage-debt artefact of a CI
+        run, never written from a local one: seven files depend on hardware a hosted runner does not
+        have, so a floor measured here is a floor for a machine that never verifies anything. That
+        is why -WriteDebt is run by the workflow on every build, pass or fail — moving a floor is
+        then copying a measurement rather than guessing at one.
     #>
     $debtRatchet = 219
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
@@ -412,7 +427,14 @@ try {
 
     Write-Output ("Coverage gate: {0} file(s) still short of 96/96, ratchet {1}{2}." -f
         $debt.Count, $debtRatchet, $(if ($improved) { ", $improved improved" } else { '' }))
-    if ($debtFailures) { throw ($debtFailures -join [Environment]::NewLine) }
+    if ($debtFailures) {
+        $debtVerdict = $debtFailures -join [Environment]::NewLine
+        if ($isContinuousIntegration) { throw $debtVerdict }
+
+        Write-Output $debtVerdict
+        Write-Warning ('The debt floors are held by CI, which measures them; this run only reports ' +
+            'them. Take the coverage-debt artefact from the CI run to move a floor.')
+    }
 
     $rows = @()
     $failures = @()
