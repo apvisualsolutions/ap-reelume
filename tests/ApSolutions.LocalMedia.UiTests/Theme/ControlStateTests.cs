@@ -62,10 +62,10 @@ public sealed class ControlStateTests
 
             // A disabled control has to look different from a resting one. In light and dark the
             // fill says it. In the two high contrast themes the fill *cannot*: the disabled fill is
-            // the surface, by design, because those palettes have no third colour to spend — and
-            // there the design's answer is a dotted border, which needs a template of our own and is
-            // not here yet. So the difference is asserted where it exists and the gap is named where
-            // it does not, rather than the assertion being quietly loosened for all four.
+            // the surface, by design, because those palettes have no third colour to spend. There the
+            // difference is geometry — the dotted outline, which DisabledOutlineTests measures — so
+            // this asserts the fill where the fill is the cue, and asserts what the fill actually is
+            // where it is not, rather than the assertion being quietly loosened for all four.
             if (theme == ThemeVariant.Light || theme == ThemeVariant.Dark)
             {
                 Assert.NotEqual(rest.Background, disabled.Background);
@@ -136,9 +136,11 @@ public sealed class ControlStateTests
                 Assert.Equal(Token(theme, "ShellSurfaceBrush"), pressed.Foreground);
                 Assert.Equal(rest.Background, pressed.Foreground);
 
-                // The design also asks for a 2 px border while pressed, and the base template keeps
-                // one thickness for every state — so that arrives with the same template as the
-                // dotted border. Asserted at what it is today so the day it changes is a red here.
+                // The design also asks for a 2 px border while pressed. Decided against, and on
+                // purpose: pressing in high contrast already inverts both the fill and the text, at
+                // 21:1, so thickness would be a third signal on a state that has two — and the base
+                // template keeps one thickness for every state, so it would cost an adorner or a
+                // template of our own. Asserted at what it is today so the day it changes is a red.
                 Assert.Equal(1, pressed.Thickness);
             }
             finally

@@ -277,6 +277,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
+  <!--
+    Disabled is drawn, not tinted. In light and dark the fill says it; in the two high contrast themes
+    it cannot — measured, the disabled fill, the resting fill and the surface are one colour, the
+    border is the theme's single border in all four states, and the disabled text is the primary text.
+    A dotted outline is geometry, and geometry still reads in a palette of two colours. It is an
+    adorner for the same reason the focus ring is one: ten types from one implementation.
+  -->
+  <Style Selector="Button:disabled, ToggleButton:disabled, ToggleSwitch:disabled, RadioButton:disabled, TextBox:disabled, ComboBox:disabled, CheckBox:disabled, Slider:disabled, NumericUpDown:disabled, ListBoxItem:disabled">
+    <Setter Property="theme:DisabledOutline.IsShown" Value="True" />
+  </Style>
   <Style Selector="Button.theme-option">
     <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
