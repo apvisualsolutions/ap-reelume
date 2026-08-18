@@ -123,10 +123,24 @@ What was done, and in which order:
 
 #### What is decided about the design package, for step 6
 
-- **The ten `SURFACES.es.md` / `.en.md` changes go at the start of step 6**, before any token is
-  touched: the inventory has to be right before anything is redesigned against it. **`MiniPlayerWindow`
-  belongs there too** — measured absent on 2026-08-17 by comparing the tree with the inventory, and
-  the package confirms it by giving it five new controls.
+- ~~**The ten `SURFACES.es.md` / `.en.md` changes**~~ **done on 2026-08-18**, each measured against the
+  tree before it was written — and of the ten, **three were not true**:
+  - **`MiniPlayerWindow` was already there** (Player (16)); the note saying it was absent had been
+    overtaken.
+  - **"`BackupView` has history" does not appear** in `SURFACES`: it was an error in the package's own
+    audit, which admits it in writing.
+  - **"the seven failure reasons in `PlayerView`" are six.** `PlaybackFailureCode` has seven values,
+    but the seventh — `UnsupportedCapability` — travels in `VideoOutputDecision` and surfaces through
+    `VideoStatusOverlay`: the video **does play**, tone mapped. Painting it as a failure would say
+    there is no picture when there is one.
+  - Two more did not apply to the document (it names neither the tokens nor the Avalonia version), but
+    their figures were verified and feed the new themes section: **58 declarations / 40 names** plus 3
+    in `Brand.axaml`, and **8** focus selectors.
+  - What was genuinely missing, measured: **23 lists with data and only 4 with an empty string**, and
+    the library's empty state is painted by `ShellView`, so **searching with no results shows
+    nothing**; high contrast is **one** dictionary and it sits over `Light`, so anyone on the Windows
+    dark high-contrast theme gets the light one; and the tray icon is the **sixth** asset, in another
+    project.
 - **The updater's rejection count resolves to EIGHT**: `README.md` says 8 and `github.md` says 7, and
   the one that adds up to 23 messages is 8 (15 states + 8 rejections).
 - **The 25 consequence strings are approved against the package's own rule** — "if the phrase helps

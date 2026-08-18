@@ -1,15 +1,16 @@
 # Everything that is seen
 
-An inventory of AP Reelume's visible surfaces, so that a redesign can cover **all** of them rather
-than the ones that come to mind. The Spanish version is in [SURFACES.es.md](SURFACES.es.md).
+An inventory of AP Reelume's visible surfaces, so a redesign can cover **all** of them and not only
+the ones anybody remembers. The Spanish version is in [SURFACES.es.md](SURFACES.es.md).
 
-This document decides no aesthetics. It says **what exists, where it lives, and in which states it
-appears**, measured from the tree on 2026-08-15, so that nothing visible goes undesigned.
+This document decides no aesthetics. It states **what exists, where it lives and in which states it
+appears**, measured from the tree on 2026-08-15 and measured again on **2026-08-18**, so nothing
+visible is left undesigned.
 
-## The rule already met, and not to be redone
+## The rule that already holds, and needs no redoing
 
-- **All 48 views use localised strings.** Not one has untranslated text: the measurement found no
-  view without a `DynamicResource`.
+- **All 48 views use localised strings.** Not one carries untranslated text: the measurement found no
+  view without `DynamicResource`.
 - **470 string keys in Spanish and 470 in English**, in
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` and `Strings.en.axaml`.
   `BilingualHeadingTests` compares the structure of the public documents, and a new visible string
@@ -18,7 +19,7 @@ appears**, measured from the tree on 2026-08-15, so that nothing visible goes un
   `→` (a rename's source and destination) and `!` (the transport's warning). If the redesign replaces
   them with icons, the accessible name still comes from `AutomationProperties`, which is already set.
 - **Every interactive control has an accessible name**, and 80 accessibility tests require it. A
-  redesign may change the shape, not remove the name.
+  redesign may change the shape, not take the name away.
 
 ## The 48 views, by area
 
@@ -27,73 +28,166 @@ appears**, measured from the tree on 2026-08-15, so that nothing visible goes un
 | Shell (2) | `ShellView`, `StartupView` |
 | Home (5) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecommendationsRailView`, `LibraryEntryView` |
 | Library (2) | `LibraryView`, `UnavailableBadge` |
-| Film entry (1) | `MovieDetailsView` |
-| Series entry (2) | `ShowDetailsView`, `EpisodeRowView` |
+| Film card (1) | `MovieDetailsView` |
+| Series card (2) | `ShowDetailsView`, `EpisodeRowView` |
 | Player (16) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow` |
 | Settings (7) | `AppearanceSettingsView`, `PrivacySettingsView`, `ScanSettingsView`, `LifecycleSettingsView`, `RecommendationSettingsView`, `SegmentDetectionSettingsView`, `DiagnosticsPreviewView` |
 | Review (3) | `ReviewInboxView`, `CandidateCardView`, `DuplicateReviewView` |
 | Metadata (2) | `MetadataEditorView`, `RenamePreviewView` |
 | Catalogue (2) | `PersonalActionsView`, `WatchStatusControl` |
 | Backup (2) | `BackupView`, `RestoreWizardView` |
-| Onboarding (1) | `RootOnboardingView` |
+| First steps (1) | `RootOnboardingView` |
 | Recovery (1) | `DatabaseRecoveryView` |
 | Credits (1) | `CreditsView` |
 | Update (1) | `UpdateView` |
 
-**A conditional surface (LIB-016).** `PrivacySettingsView` carries a switch and its description — "Refresh the oldest entries on their own" — that **only exists when there is a consented connection**: with no token the provider serves only what it already cached, so offering the switch would offer something that cannot happen. A redesign has to be able to draw that view both ways, with the switch and without it.
+All of them live in `src/ApSolutions.LocalMedia.Presentation/<area>/`.
 
-They all live in `src/ApSolutions.LocalMedia.Presentation/<area>/`.
+## The surfaces that are not views
+
+Eight things the user sees that have **no `.axaml`**: Windows draws their shape and it cannot be
+redesigned. What is ours is **the text and the asset**, and that is exactly what is seen.
+
+| Surface | What we decide |
+| --- | --- |
+| Tray icon and menu | The tooltip, the two menu entries, and which one a double click takes. The icon is the sixth asset (see below) |
+| "Choose a media folder" dialog | The title and the initial folder |
+| "Save the backup" dialog | The proposed name, with a date, and the type filter |
+| "Open the backup" dialog | The filter and the initial folder |
+| The handover with no dialog | When the run does not own the profile the folder is decided for it and the user sees nothing, so a confirmation afterwards has to say where the file ended up |
+| Windows Explorer | The eight extensions under "Open with", the visible name, and the association icon |
+| MSIX start-up | The splash screen and its background colour |
+| Title bar and window chrome | The title, the remembered size and its minimum; the chrome is the system's on purpose, because that is what guarantees minimise, snap and close with the gestures the user already has |
 
 ## The update, which is more than it looks
 
-`UpdateView` is **one view with twenty-three distinct messages**, which is why it is named
-separately: a redesign covering only "checking" and "ready" leaves most of it out.
+`UpdateView` is **one view with twenty-three distinct messages**, and that is why it gets its own
+section: a redesign covering only "checking" and "ready" leaves most of it out.
 
-- **Process states (15)**: idle, checking, up to date, offered, unreachable, unusable release,
-  downloading, ready, interrupted, verification failed, cancelled, not confirmed, tampered, handed to
-  Windows, and launch refused.
-- **Refusal reasons (8)**, which are what explain why an update is **not** applied: insecure
-  download, unusable hash, unsigned checksums, wrong runtime, undeclared size, incomplete summary and
-  undeclared host.
-- **Controls**: check, download, install, cancel, the automatic-check box and the confirmation notice.
-- There is a **progress bar**, and the status area announces itself to screen readers
-  (`LiveSetting="Polite"`): whatever the redesign puts there has to stay a live region.
+- **Process states (15)**: idle, checking, up to date, version available, offline, unusable version,
+  downloading, ready, interrupted, verification failed, cancelled, unconfirmed, tampered with,
+  handed to Windows, and launch refused.
+- **Refusal reasons (8)**, the ones that explain why an update is **not** applied: insecure download,
+  unusable hash, unsigned sums, wrong runtime, undeclared size, incomplete summary, and undeclared
+  host.
+- **Controls**: check, download, install, cancel, the automatic-check box, and the confirmation
+  notice.
+- There is a **progress bar** and the status area announces itself to screen readers
+  (`LiveSetting="Polite"`): whatever the redesign puts there has to stay a live region, and stay in
+  **one** container — splitting it in two splits the announcement.
 
 A refusal **is not a user error**: it is the updater declining to install something it could not
-verify. It deserves different visual treatment from a failure.
+verify. It deserves visual treatment distinct from a failure's.
+
+## The player, which has no single state either
+
+Measured on 2026-08-18, and the distinction matters because these are **two grammars, not one**:
+
+- **`PlayerView` shows six failure reasons**, each with its own string and its own `TextBlock`: file
+  not found, could not open, engine unavailable, unsupported codec, corrupted file, and no playable
+  track. These are failures: **there is no picture**.
+- `PlaybackFailureCode` has **seven** values, and the seventh — `UnsupportedCapability` — is **not
+  one of those six**: it travels in `VideoOutputDecision` and surfaces through `VideoStatusOverlay`.
+  The video **does play**, tone mapped; what is reported is that the format itself is out of scope. A
+  redesign painting it as a failure would say there is no picture when there is one.
+- **`VideoStatusOverlay` has six notices**: hardware acceleration, software fallback, HDR10
+  passthrough, tone mapping, standard range, and unsupported format. These are not errors: they are
+  the state of the picture.
+
+## The lists and their empty state
+
+Measured on 2026-08-18: **23 lists with data** in the tree — taking a list to be a `ListBox`,
+`ItemsControl` or `ItemsRepeater` with `ItemsSource` — and **only four have a string written for
+when they are empty**:
+
+| List with an empty string | View that paints it |
+| --- | --- |
+| Library | `ShellView` (`EmptyLibraryTitle`, `EmptyLibraryDescription`) |
+| In progress | `InProgressRailView` (`HomeInProgressEmpty`) |
+| Recommendations | `RecommendationsRailView` (`RecommendationsEmpty`) |
+| A series' episodes | `ShowDetailsView` (`ShowDetailsEmpty`) |
+
+The **other nineteen say nothing when empty**, and none of them says anything while loading or when
+it fails. A redesign has to decide those three states per list, not only the full one.
+
+**And there is one nobody sees coming**: the library's empty state is painted by `ShellView`, not by
+`LibraryView`, so **searching and finding nothing shows no text at all** — not even the empty-library
+one, which would say something false anyway: the library is not empty, it is the search that finds
+nothing.
+
+## Absent is not the same as disabled
+
+Twelve surfaces change shape with state, and the redesign has to be able to paint all of them. The
+distinction is the one `PrivacySettingsView` already models: **absent** means the control does not
+exist and leaves no gap; **disabled** means it exists and cannot be used.
+
+| Surface | What changes | Grammar |
+| --- | --- | --- |
+| `PrivacySettingsView` | The automatic-refresh switch **does not exist** without consented connectivity (LIB-016): offering it would offer something that cannot happen | absent |
+| `PrivacySettingsView` | The diagnostics preview, depending on whether there is anything to show | absent |
+| `PrivacySettingsView` | Exporting diagnostics always exists, possible or not | disabled |
+| `UpdateView` | Its four controls, by the state of the process | disabled |
+| `UpdateView` | The confirmation notice, which exists only with a downloaded version | absent |
+| `ShellView` | The eight Settings blocks | absent |
+| `PlayerView` | The five optional panels in the side column | absent |
+| `RootOnboardingView` | Its four forms: no roots, roots, confirming a removal, and asking consent | absent |
+| `LooseFileBanner` | Only with a loose session | absent |
+| `MetadataEditorView` | Its three messages | absent |
+| `RecommendationsRailView` | Empty is not the same as switched off by setting | absent |
+| `RestoreWizardView` | Only the missing root gains an editable field | absent |
+
+**The two grammars share a screen** in privacy and in update, which is why they have to be told apart
+by sight.
+
+## The themes, measured
+
+| Measure | Value |
+| --- | --- |
+| Dictionaries in `Theme/DesignTokens.axaml` | **3**: `Light`, `Dark` and `AppThemeVariants.HighContrast` |
+| Token declarations | **58**, across **40** distinct names |
+| Plus, in `Resources/Brand.axaml` | 3 |
+| Focus selectors | **8**: `Button`, `ToggleButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
+
+Three things the redesign has to know:
+
+- **There is only one high contrast.** `AppThemeVariants.HighContrast` is declared over
+  `ThemeVariant.Light`, so **there is no high-contrast dark dictionary**: someone on the Windows
+  high-contrast dark theme gets the light one.
+- **The player ignores the chosen theme.** `PlayerThemeVariant` always returns `ThemeVariant.Dark`,
+  on purpose, because a darkened room does not want a white interface. It is the one surface that
+  does not obey the preference.
+- **`ToggleSwitch` and `RadioButton` have no focus selector of their own** and fall through to the
+  base theme's, which no check covers.
 
 ## The installation, which is also seen
 
-What Windows shows on install and in the Start menu comes from
+What Windows shows while installing and in the Start menu comes from
 `src/ApSolutions.LocalMedia.Windows.Package/`:
 
 | Asset | Use | State |
 | --- | --- | --- |
-| `Assets/Square44x44Logo.png` | Taskbar, app list | 576 B — placeholder |
-| `Assets/Square150x150Logo.png` | Start menu tile | 1.7 KiB — placeholder |
-| `Assets/Wide310x150Logo.png` | Wide tile | 3.0 KiB — placeholder |
-| `Assets/StoreLogo.png` | Store listing | 628 B — placeholder |
-| `Assets/SplashScreen.png` | Splash screen | 7.0 KiB — placeholder |
+| `Assets/Square44x44Logo.png` | Taskbar, app list | 576 B — provisional |
+| `Assets/Square150x150Logo.png` | Start menu tile | 1.7 KiB — provisional |
+| `Assets/Wide310x150Logo.png` | Wide tile | 3.0 KiB — provisional |
+| `Assets/StoreLogo.png` | Store listing | 628 B — provisional |
+| `Assets/SplashScreen.png` | Splash screen | 7.0 KiB — provisional |
+| `Presentation/Assets/tray-icon.png` | Tray icon | **The sixth, and it lives in another project** |
 
-All five date from 3 August and their size gives them away as placeholders rather than branding. **It
+The first five are from 3 August and their size gives them away as placeholders, not branding. **It
 is the first thing anyone sees of the product**, before any view.
 
-**And there is a measured defect in the text.** The manifest declares both languages —
-`<Resource Language="es-ES"/>` and `<Resource Language="en-US"/>` — but its description is **a single
-string with a slash inside it**:
+**And five files are not five assets.** MSIX scales each one, so what has to be produced is **35**:
+the 44 px square in five scales plus five target sizes and its unplated variant; the other four in
+five scales each; and the tray one in five **real** sizes, 16/20/24/32/48, which are scales of
+nothing. A tray icon with a painted background reads as a square the moment somebody changes the bar
+colour, so that one needs real alpha.
 
-```xml
-Description="Biblioteca y reproductor de vídeo local / Local video library and player"
-```
-
-Windows shows it exactly like that in both languages, slash included. Real localisation uses
-`ms-resource:` and one resource per language, as winget already does: it **does** have its two
-`locale.es-ES.yaml` and `locale.en-US.yaml` files with their own well-written descriptions. The tile
-and splash background colour (`#111827`) is decided here too.
+The tile and splash background colour (`#111827`) is decided here too.
 
 ## What this document does not cover
 
 - **The user manual** (`DOC-101`, `DOC-201`, `T44.1`-`T44.6`) is written from the built application,
   so its screenshots depend on the redesign and come afterwards.
-- **Themes and colour tokens** live in `src/ApSolutions.LocalMedia.Presentation/Theme/` and in
-  `Resources/Brand.axaml`; this inventory names the surfaces, not the palette.
+- **The palette.** The colour values live in `Theme/DesignTokens.axaml` and in
+  `Resources/Brand.axaml`; this inventory counts how many there are and which themes exist, it does
+  not decide their values.

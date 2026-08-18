@@ -124,10 +124,23 @@ Lo que se hizo, y en qué orden:
 
 #### Lo que queda decidido del paquete de diseño, para el paso 6
 
-- **Los diez cambios de `SURFACES.es.md` / `.en.md` entran al principio del paso 6**, antes de tocar
-  tokens: el inventario tiene que ser correcto antes de rediseñar contra él. Ahí entra también
-  **`MiniPlayerWindow`, que no está en el documento** — medido el 2026-08-17 comparando el árbol con
-  el inventario, y el paquete lo confirma al darle cinco controles nuevos.
+- ~~**Los diez cambios de `SURFACES.es.md` / `.en.md`**~~ **hechos el 2026-08-18**, midiendo cada uno
+  contra el árbol antes de escribirlo — y de diez, **tres no eran ciertos**:
+  - **`MiniPlayerWindow` ya estaba** en el inventario (Reproductor (16)); la nota que decía que
+    faltaba estaba superada.
+  - **«`BackupView` tiene historial» no aparece** en `SURFACES`: era un error de la auditoría del
+    propio paquete, que lo admite por escrito.
+  - **«los siete motivos de fallo de `PlayerView`» son seis.** `PlaybackFailureCode` tiene siete
+    valores, pero el séptimo —`UnsupportedCapability`— viaja en `VideoOutputDecision` y sale por
+    `VideoStatusOverlay`: el vídeo **se reproduce** con conversión de tono. Pintarlo como fallo diría
+    que no hay imagen cuando sí la hay.
+  - Dos más no aplicaban al documento (los tokens y la versión de Avalonia no se nombran en él), pero
+    sus cifras sí se verificaron y entran en la sección de temas nueva: **58 declaraciones / 40
+    nombres** +3 de `Brand.axaml`, y **8** selectores de foco.
+  - Lo medido que sí faltaba: **23 listas con datos y sólo 4 con cadena de vacío**, y el vacío de la
+    biblioteca lo pinta `ShellView`, así que **buscar sin resultados no muestra nada**; el alto
+    contraste es **uno solo** y sobre `Light`, así que quien use el oscuro de Windows recibe el claro;
+    y el icono de bandeja es el **sexto** activo, en otro proyecto.
 - **La discrepancia de motivos de rechazo del actualizador se resuelve en OCHO**: `README.md` dice 8 y
   `github.md` dice 7, y el que cuadra con los 23 mensajes es el 8 (15 estados + 8 rechazos).
 - **Las 25 cadenas de consecuencia se aprueban contra la regla que el propio paquete da** —«si la
