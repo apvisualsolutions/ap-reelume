@@ -124,11 +124,13 @@ public static partial class CompositionRoot
             .AddTransient<LifecycleSettingsViewModel>()
             .AddSingleton<IBackdropService, MicaBackdropService>()
             .AddSingleton<IReducedMotionService, WindowsReducedMotionService>()
+            .AddSingleton<IHighContrastService, WindowsHighContrastService>()
             .AddSingleton<IThemeService>(provider => new FluentThemeService(
                 Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized."),
                 provider.GetRequiredService<ISettingsStore>(),
                 provider.GetRequiredService<IBackdropService>(),
-                provider.GetRequiredService<IReducedMotionService>()))
+                provider.GetRequiredService<IReducedMotionService>(),
+                provider.GetRequiredService<IHighContrastService>()))
             // One answer to "which language?" (BUG-011): the window, the updater's summary, and the
             // metadata language all read what this service applied, never the machine's culture.
             .AddSingleton<ILanguageService>(provider => new StoredLanguageService(

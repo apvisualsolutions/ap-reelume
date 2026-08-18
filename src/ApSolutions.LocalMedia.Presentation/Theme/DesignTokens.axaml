@@ -8,76 +8,135 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme">
   <Styles.Resources>
     <ResourceDictionary>
-      <Color x:Key="CalmBlueColor">#1769AA</Color>
-
-      <Color x:Key="LightSurfaceColor">#F8FAFC</Color>
-      <Color x:Key="LightTextPrimaryColor">#111827</Color>
-      <Color x:Key="LightControlFillColor">#E2E8F0</Color>
-      <Color x:Key="LightControlBorderColor">#475569</Color>
-      <Color x:Key="LightFocusColor">#005A9C</Color>
-
-      <Color x:Key="DarkSurfaceColor">#111827</Color>
-      <Color x:Key="DarkTextPrimaryColor">#F8FAFC</Color>
-      <Color x:Key="DarkControlFillColor">#1F2937</Color>
-      <Color x:Key="DarkControlBorderColor">#94A3B8</Color>
-      <Color x:Key="DarkFocusColor">#7CC4FF</Color>
-
-      <Color x:Key="HighContrastLightSurfaceColor">#FFFFFF</Color>
-      <Color x:Key="HighContrastLightTextColor">#000000</Color>
-      <Color x:Key="HighContrastLightControlFillColor">#FFFFFF</Color>
-      <Color x:Key="HighContrastLightControlBorderColor">#000000</Color>
-      <Color x:Key="HighContrastLightFocusColor">#000000</Color>
-
-      <Color x:Key="HighContrastDarkSurfaceColor">#000000</Color>
-      <Color x:Key="HighContrastDarkTextColor">#FFFFFF</Color>
-      <Color x:Key="HighContrastDarkControlFillColor">#000000</Color>
-      <Color x:Key="HighContrastDarkControlBorderColor">#FFFFFF</Color>
-      <Color x:Key="HighContrastDarkFocusColor">#FFFF00</Color>
-
-      <Color x:Key="PlayerSurfaceColor">#0B0D10</Color>
-      <Color x:Key="PlayerTextColor">#FFFFFF</Color>
       <Thickness x:Key="FocusStrokeThickness">2</Thickness>
+      <Thickness x:Key="FocusInnerStrokeThickness">1</Thickness>
       <x:Double x:Key="ControlHeight">36</x:Double>
+      <x:Double x:Key="SpaceXSmall">4</x:Double>
       <x:Double x:Key="SpaceSmall">8</x:Double>
       <x:Double x:Key="SpaceMedium">16</x:Double>
       <x:Double x:Key="SpaceLarge">24</x:Double>
+      <x:Double x:Key="SpaceXLarge">32</x:Double>
+      <CornerRadius x:Key="CornerRadiusSmall">4</CornerRadius>
+      <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
       <x:Double x:Key="MotionDurationStandardMilliseconds">160</x:Double>
       <x:Double x:Key="MotionDurationReducedMilliseconds">0</x:Double>
       <x:String x:Key="SelectedStateGlyph">●</x:String>
 
+      <!--
+        Four dictionaries, and every one of them carries the same twenty-two keys. A brush missing
+        from one theme falls back to whatever the base theme draws, which no contrast check covers,
+        so ContrastTokenTests reads these dictionaries — the ones the application actually paints —
+        rather than a parallel list of colours kept beside them. It used to read such a list: the
+        colours said the control border was #475569 while the dictionary painted #64748B, and they
+        described a HighContrastLight theme that no dictionary provided.
+      -->
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#F8FAFC" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#E2E8F0" />
+          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#D6DFEA" />
+          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#C4D0DF" />
+          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#EEF3F7" />
           <SolidColorBrush x:Key="ShellBorderBrush" Color="#64748B" />
+          <SolidColorBrush x:Key="ShellHairlineBrush" Color="#170F172A" />
           <SolidColorBrush x:Key="TextPrimaryBrush" Color="#111827" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#475569" />
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#64748B" />
           <SolidColorBrush x:Key="FocusStrokeBrush" Color="#005A9C" />
+          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#DCEAF6" />
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FCF0D0" />
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#8A6100" />
+          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FDECEA" />
+          <SolidColorBrush x:Key="DangerBorderBrush" Color="#B3261E" />
+          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#E4F2E9" />
+          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#14653B" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#1F2937" />
+          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#2A3648" />
+          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#354357" />
+          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#172033" />
           <SolidColorBrush x:Key="ShellBorderBrush" Color="#94A3B8" />
+          <SolidColorBrush x:Key="ShellHairlineBrush" Color="#12FFFFFF" />
           <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#7A8AA0" />
           <SolidColorBrush x:Key="FocusStrokeBrush" Color="#7CC4FF" />
+          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#111827" />
           <SolidColorBrush x:Key="AccentBrush" Color="#62AEE8" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#203B55" />
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#3A2E0B" />
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#E8B84B" />
+          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#3B1A17" />
+          <SolidColorBrush x:Key="DangerBorderBrush" Color="#F2B8B5" />
+          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#12301F" />
+          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#7BD3A0" />
         </ResourceDictionary>
-        <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrast}">
+        <!--
+          Warning, danger and positive share the theme's own surface and border here, in both high
+          contrast dictionaries. What tells them apart is the glyph and the heading, never the hue:
+          a palette that says "amber means careful" says nothing to someone who cannot separate
+          amber from red, and in these themes it also has no colour left to say it with.
+        -->
+        <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastLight}">
+          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ControlFillBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#000000" />
+          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#000000" />
+          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ShellBorderBrush" Color="#000000" />
+          <SolidColorBrush x:Key="ShellHairlineBrush" Color="#000000" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#000000" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#000000" />
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#000000" />
+          <SolidColorBrush x:Key="FocusStrokeBrush" Color="#000000" />
+          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="AccentBrush" Color="#0000FF" />
+          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#000000" />
+          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="DangerBorderBrush" Color="#000000" />
+          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#000000" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#000000" />
+          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#000000" />
           <SolidColorBrush x:Key="ShellBorderBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="ShellHairlineBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#FFFFFF" />
+          <!--
+            Focus keeps the yellow and the accent gives it up: they used to be the same #FFFF00, so
+            the one theme where focus matters most was the one where focus and brand were the same
+            colour. #00FFFF reads 16,75:1 on black.
+          -->
           <SolidColorBrush x:Key="FocusStrokeBrush" Color="#FFFF00" />
-          <SolidColorBrush x:Key="AccentBrush" Color="#FFFF00" />
+          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#000000" />
+          <SolidColorBrush x:Key="AccentBrush" Color="#00FFFF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#000000" />
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="DangerBorderBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#FFFFFF" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
@@ -85,6 +144,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
   <Style Selector="Button">
     <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
+  </Style>
+  <!--
+    The ring is drawn twice, in two colours, one inside the other. Borrowing the control's own border
+    for it had two measured holes: a Slider has no border to paint on, and in high contrast light the
+    border and the focus colour are both black, so focus changed one pixel of thickness and nothing
+    else. Two concentric rings are a *geometry* cue, and geometry still reads in a theme whose whole
+    palette is one colour. It is also what Windows 11 draws for its own focus rectangle.
+  -->
+  <Style Selector="Button, ToggleButton, ToggleSwitch, RadioButton, TextBox, ComboBox, CheckBox, Slider, NumericUpDown, ListBoxItem">
+    <Setter Property="FocusAdorner">
+      <FocusAdornerTemplate>
+        <Border
+            BorderBrush="{DynamicResource FocusStrokeBrush}"
+            BorderThickness="{DynamicResource FocusStrokeThickness}"
+            CornerRadius="{DynamicResource CornerRadiusSmall}">
+          <Border
+              BorderBrush="{DynamicResource FocusInnerStrokeBrush}"
+              BorderThickness="{DynamicResource FocusInnerStrokeThickness}"
+              CornerRadius="{DynamicResource CornerRadiusSmall}" />
+        </Border>
+      </FocusAdornerTemplate>
+    </Setter>
   </Style>
   <!--
     Every control type that can take keyboard focus is styled from the same token, so the focus ring
@@ -120,6 +201,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
   <Style Selector="ListBoxItem:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="ToggleSwitch:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
+  </Style>
+  <Style Selector="RadioButton:focus">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>

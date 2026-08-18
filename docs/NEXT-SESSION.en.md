@@ -209,7 +209,40 @@ pattern the transport bar already had — and **the one link that was a deductio
 than assumed: [the evidence](evidence/stable/audit-version-switch-reentry.md). The use case is left
 alone.
 
-#### Step 6's phase 1, measured against the tree and decided (2026-08-18)
+#### ~~Step 6's phase 1~~ — done on 2026-08-18, and phase 2 inherits three things
+
+**Done in full and as decided**, plus what the measuring added:
+[the evidence](evidence/stable/audit-redesign-phase1-tokens.md). Four dictionaries of **22 brushes
+each** (they were three of nine), five new scalars, the high contrast accent out of the yellow, and
+focus from 8 to 10 types with a **double ring** — drawn as an adorner of two concentric borders,
+which is what solves the borderless `Slider` and the black-on-black of high contrast light. No view
+was touched.
+
+**What was not planned and came out of measuring:**
+
+- **`ContrastTokenTests` measured a list of `<Color>` resources nothing painted**, which had already
+  drifted from the dictionary (`#475569` measured against `#64748B` painted) and described a
+  `HighContrastLight` with no dictionary. It now reads the four dictionaries and the 23 loose colours
+  are gone.
+- **`Focus(NavigationMethod.Tab)` is not pressing tab.** The `NumericUpDown` showed no ring until the
+  probe became `window.KeyPress(Key.Tab, …)`: it hands the keyboard to its `TextBox` without saying
+  the keyboard brought it. Three attempts from the harness before that.
+- **A `ToggleSwitch` hangs the ring on the `Grid` in its template**, not on itself.
+
+**Phase 2 inherits, and this is not reopened:**
+
+1. **Nothing spends the space scalars.** Measured: not one view reads `SpaceSmall`, `SpaceMedium` or
+   `SpaceLarge`, which were already there; nor the four new ones. The control states spend them, or
+   they go. A token declared and never spent is the house defect.
+2. **The dotted border of the disabled state** (a `Rectangle` with `StrokeDashArray`; `Border` has no
+   dashed stroke) goes with the five states, which is where it is used.
+3. **The typography**, already decided for that phase.
+
+And one known limit, written down so it is not discovered twice: **high contrast is read when the
+theme is applied**, so turning it on in Windows while the application is open arrives on the next
+launch. Following it live needs `WM_SETTINGCHANGE`.
+
+#### What phase 1 decided, to be read with the above (2026-08-18)
 
 **Thirteen new brushes, not twelve.** The README says twelve and its table lists thirteen; measured
 against `DesignTokens.axaml` — nine brushes per dictionary — and against `Resources/Brand.axaml` —

@@ -95,6 +95,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The application goes into high contrast when Windows is.** Until now the high contrast theme
+  existed in the code and **no path selected it**: anyone with it turned on in Windows saw the same
+  application as everybody else. It is now read from the system at startup and overrides the three
+  appearance options, because it is a need rather than a taste — so the three options stay three and
+  there is nothing to reconfigure. Whether that system theme is a light one or a dark one is decided
+  by the colour Windows draws windows with, not by the theme's name, which is translated and which
+  anyone can change. Turning it on while the application is open arrives on the next launch.
+
+- **The focus rectangle is now a double one, and it shows on all ten kinds of control.** It used to
+  be drawn by thickening the control's own border, which left two measured holes: a slider has no
+  border to paint it on, and in high contrast light the border and the focus colour are the same
+  black, so focusing changed one pixel of thickness and nothing anyone could see. It is now two
+  concentric rectangles, one in the focus colour and one in the background's: what marks the focused
+  control is its **shape**, which still reads in a theme where everything is black and white. In high
+  contrast the yellow is now reserved for focus and the brand colour moves to blue or cyan, where
+  both used to be the same yellow.
+
 - **Closing a video now has a test for its slow case.** When a video closes, the application waits
   for its data to be released before letting go of the player — doing it the other way round is what
   brings the decoder down — and that wait has a ceiling so a close can never hang: if the ceiling

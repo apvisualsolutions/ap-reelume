@@ -96,6 +96,24 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La aplicación se pone en alto contraste cuando Windows lo está.** Hasta ahora el tema de alto
+  contraste existía en el código y **ningún camino lo seleccionaba**: quien lo tuviera encendido en
+  Windows veía la aplicación igual que todos los demás. Ahora se lee del sistema al arrancar y manda
+  sobre las tres opciones de apariencia, porque es una necesidad y no un gusto —así que las tres
+  opciones siguen siendo tres y no hay nada que reconfigurar—. Si el tema del sistema es claro u
+  oscuro se decide por el color con el que Windows dibuja las ventanas y no por el nombre del tema,
+  que está traducido y que cualquiera puede cambiar. Encenderlo con la aplicación abierta llega en el
+  arranque siguiente.
+
+- **El recuadro del foco es ahora doble, y se ve en los diez tipos de control.** Antes se dibujaba
+  engordando el borde del propio control, y eso dejaba dos huecos medidos: una barra deslizante no
+  tiene borde donde pintarlo, y en alto contraste claro el borde y el foco son el mismo negro, así
+  que enfocar cambiaba un píxel de grosor y nada que se pudiera ver. Ahora son dos recuadros
+  concéntricos, uno del color del foco y otro del color del fondo: lo que distingue al control
+  enfocado es la **forma**, que sigue viéndose en un tema donde todo es blanco y negro. En alto
+  contraste el amarillo queda reservado al foco y la marca pasa al azul o al cian, que antes eran el
+  mismo amarillo.
+
 - **El cierre de un vídeo tiene ya prueba de su caso lento.** Al cerrar un vídeo, la aplicación
   espera a que se liberen sus datos antes de soltar el reproductor —hacerlo al revés es lo que hace
   caer al descodificador—, y esa espera tiene un tope para que un cierre nunca se quede colgado: si

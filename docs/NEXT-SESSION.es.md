@@ -208,7 +208,39 @@ Corregido donde vino la segunda petición —la fila se apaga mientras su cambio
 patrón que la barra de transporte ya tenía— y **el eslabón que era una deducción se midió**, no se
 supuso: [la evidencia](evidence/stable/audit-version-switch-reentry.md). El caso de uso no se toca.
 
-#### La fase 1 del paso 6, medida contra el árbol y decidida (2026-08-18)
+#### ~~La fase 1 del paso 6~~ — hecha el 2026-08-18, y la fase 2 hereda tres cosas
+
+**Hecha entera y como estaba decidida**, más lo que la medición añadió:
+[la evidencia](evidence/stable/audit-redesign-phase1-tokens.md). Cuatro diccionarios de **22 brochas
+cada uno** (eran tres de nueve), cinco escalares nuevos, el acento de alto contraste fuera del
+amarillo, y el foco de 8 a 10 tipos con **anillo doble** — dibujado como adorno de dos bordes
+concéntricos, que es lo que resuelve el `Slider` sin borde y el negro sobre negro del alto contraste
+claro. Ninguna vista se tocó.
+
+**Lo que no estaba previsto y salió al medir:**
+
+- **`ContrastTokenTests` medía una lista de `<Color>` que no pintaba nadie**, y ya había divergido del
+  diccionario (`#475569` medido contra `#64748B` pintado) y describía un `HighContrastLight` sin
+  diccionario. Ahora lee los cuatro diccionarios y los 23 `Color` sueltos se han ido.
+- **`Focus(NavigationMethod.Tab)` no es pulsar el tabulador.** El `NumericUpDown` no mostraba anillo
+  hasta que la sonda pasó a `window.KeyPress(Key.Tab, …)`: pasa el teclado a su `TextBox` sin decir
+  que el teclado lo trajo. Tres intentos desde el arnés antes de eso.
+- **Un `ToggleSwitch` cuelga el anillo del `Grid` de su plantilla**, no de sí mismo.
+
+**La fase 2 hereda, y esto no se re-delibera:**
+
+1. **Los escalares de espacio no los gasta nadie.** Medido: ni una vista lee `SpaceSmall`,
+   `SpaceMedium` ni `SpaceLarge`, que ya estaban antes; los cuatro nuevos tampoco. Los estados de
+   control los gastan, o se borran. Un token declarado y nunca gastado es el defecto de la casa.
+2. **El borde punteado del deshabilitado** (`Rectangle` con `StrokeDashArray`; `Border` no tiene trazo
+   discontinuo) va con los cinco estados, que es donde se usa.
+3. **La tipografía**, que ya estaba decidida para esta fase.
+
+Y un límite conocido, escrito para que no se descubra dos veces: **el alto contraste se lee al aplicar
+el tema**, así que encenderlo en Windows con la aplicación abierta llega en el arranque siguiente.
+Seguirlo en vivo necesita `WM_SETTINGCHANGE`.
+
+#### Lo que la fase 1 decidió, para leerlo con lo de arriba (2026-08-18)
 
 **Trece brochas nuevas, no doce.** El README dice «doce» y su tabla lista trece; medido contra
 `DesignTokens.axaml` —nueve brochas por diccionario— y contra `Resources/Brand.axaml` —tres cadenas,
