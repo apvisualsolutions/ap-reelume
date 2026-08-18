@@ -41,7 +41,30 @@ dotnet test <suite afectada> -c Release -m:1 --settings eng/test.runsettings
 pwsh -NoProfile -File eng/verify-docs.ps1
 ```
 
-`eng/verify.ps1` las corre todas más el empaquetado y la puerta de cobertura. Es lo que ejecuta CI.
+`eng/verify.ps1` las corre todas más el empaquetado y la puerta de cobertura.
+
+**Quien verifica de verdad es CI, y por eso el orden cambió el 2026-08-18.** CI corre ese mismo
+`verify.ps1` **y además** `run-accessibility.ps1 -Passes 2`, `run-recovery.ps1 -Passes 2` y
+`check-walk-coverage.ps1`: es un superconjunto estricto de lo que puede correrse aquí, y las carreras
+que sólo aparecen en la segunda pasada nunca las vio una ejecución local. Correr `verify.ps1` entero
+antes de cada push era hacer dos veces el mismo trabajo —media hora de la máquina de quien programa,
+por commit— para obtener una garantía **más débil** que la que llega después.
+
+El orden es ahora:
+
+1. Durante el trabajo, **las suites afectadas** en local. Segundos, y es donde se atrapa lo evidente.
+2. `git add -A` → **commit** → push **sólo a la rama**.
+3. **CI verifica**, una vez: desde el 2026-08-18 `main` no dispara el flujo, porque recibe el mismo
+   SHA por fast-forward y un check pertenece al commit, no a la referencia.
+4. **Con CI en verde**, el fast-forward a `main` — que es instantáneo y no vuelve a verificar.
+
+Así `main` no recibe nunca un commit sin verificar, y lo garantiza el paso 3 en lugar de una
+verificación local más floja. Lo que se cede está medido: un fallo se conoce unos cuarenta minutos
+más tarde, en la rama, donde no molesta. **Lo que exige es mirar CI del commit anterior antes de
+avanzar `main`**, o un rojo queda debajo del trabajo siguiente.
+
+`eng/verify.ps1` sigue siendo la herramienta cuando hace falta la respuesta completa aquí y ahora —
+un cambio del empaquetado, o una duda que CI tardaría en contestar—. Deja de ser un peaje por commit.
 
 Medir antes de corregir. «Funciona» no es evidencia; un número lo es. La evidencia vive en
 `docs/evidence/`, y la de auditorías se acumula en `docs/evidence/stable/`.

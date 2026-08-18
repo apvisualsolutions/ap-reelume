@@ -59,6 +59,11 @@ No es negociable, y es la razón de que la matriz de funcionalidades signifique 
    / **Changelog in both languages**, describing the effect on the person using the program.
 6. **Un commit.** Mensaje en inglés, en imperativo, diciendo qué cambia para el usuario.
    / **One commit**, in English, imperative, saying what changes for the user.
+7. **Push a la rama, y `main` sólo con CI en verde.** Quien verifica de verdad es CI: corre
+   `eng/verify.ps1` **y además** las dos pasadas de accesibilidad y de recuperación y la puerta del
+   paseo, así que cubre estrictamente más que cualquier ejecución local. El fast-forward a `main`
+   espera a ese verde, y por eso `main` no vuelve a verificar lo que ya se verificó.
+   / **Push to the branch; `main` only once CI is green** — CI runs strictly more than any local run.
 
 Las pruebas se llaman como frases porque se leen como el informe de lo que el programa promete.
 `Content_kept_longer_than_the_TMDB_retention_limit_is_neither_served_nor_kept` dice más que
