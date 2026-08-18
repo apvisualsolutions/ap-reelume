@@ -160,17 +160,27 @@ recibe el claro. Se añade `HighContrastLight`, se renombra el existente a `High
 píldora, que sea **un estado y no una opción**: decir que el sistema está en alto contraste y que se
 está respetando. Eso informa sin duplicar el ajuste.
 
-**2. `DebouncedFileWatcher` se arregla por el constructor, no abriendo visibilidad.** Su cobertura
-baila (89/69 y 93/71 en CI; 69,44 % y 66,66 % de ramas en dos tiradas locales del mismo binario)
-porque el manejador `watcher.Error` sólo corre si Windows desborda el búfer, y la prueba de `BUG-012`
-provoca una tormenta **sin afirmar que el desbordamiento ocurriera**: cuando no ocurre, pasa igual sin
-ejercer lo que existe para proteger. **Decidido**: `InternalBufferBytes` pasa a **parámetro opcional
-del constructor** con el valor de producto por defecto —exactamente el patrón que ya tiene
-`debounce`—, la prueba usa el mínimo que Windows admite, garantiza el desbordamiento y **lo afirma**.
-Nada se vuelve `internal`, `WatchSignal` sigue privado y el producto no cambia.
+**2. ~~`DebouncedFileWatcher` se arregla por el constructor~~ — hecho el 2026-08-18, y tal como estaba
+decidido.** El búfer es ya un parámetro opcional del constructor con el valor de producto por defecto;
+la prueba pide el mínimo que la plataforma respeta, desborda de verdad y **lo afirma**. Nada se volvió
+`internal` y `WatchSignal` sigue privado.
 
-**Va primero, antes de tocar un token**, y por una razón práctica: mientras ese archivo sea una moneda
-al aire, uno de cada tres runs puede dejar `main` atascado en mitad del rediseño.
+**La causa registrada era una de tres.** Al medir las dos tiradas enteras aparecieron otras dos
+condiciones que ocurrían o no por azar: la otra mitad del mismo manejador —el error que **sí** termina
+la vigilancia, que se ejecutaba por casualidad cuando un directorio de prueba desaparecía debajo de un
+vigilante vivo— y el switch de coalescencia, cuyas parejas dependían de lo que el sistema entregara
+durante la tormenta (13 de 16 ramas en una tirada, 11 de 16 en la otra). Cada una tiene ya su prueba,
+y una cuarta cubre el debounce que expira **en el mismo instante** en que llega el cambio que lo
+cancela, con un reloj cuya espera termina con éxito al cancelarse.
+[La evidencia](evidence/stable/audit-watcher-overflow-determinism.md): de **88,54/73,81 y
+93,75/71,43** en dos tiradas del mismo binario a **100/95,83 en tres seguidas**. Las dos ramas que
+faltan no son alcanzables.
+
+**Y lo que se midió sin esperarlo: una tormenta secuencial no desborda 4 KiB.** Dos mil archivos con
+nombres de cien caracteres, uno tras otro, no desbordaron ni una vez: el cuello de botella no es el
+vigilante vaciando el búfer, es crear el archivo, y esas tres décimas de milisegundo son todo el
+respiro que su hilo necesita. En paralelo desborda en el primer segundo. El primer intento salió rojo
+**por la aserción nueva y no por un tiempo agotado**, que es exactamente para lo que está.
 - **La discrepancia de motivos de rechazo del actualizador se resuelve en OCHO**: `README.md` dice 8 y
   `github.md` dice 7, y el que cuadra con los 23 mensajes es el 8 (15 estados + 8 rechazos).
 - **Las 25 cadenas de consecuencia se aprueban contra la regla que el propio paquete da** —«si la

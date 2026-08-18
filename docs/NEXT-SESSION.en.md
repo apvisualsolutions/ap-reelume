@@ -161,18 +161,27 @@ enum**. If the redesign wants to show a fourth pill, it should be **a state and 
 saying the system is in high contrast and that it is being honoured. That informs without duplicating
 the setting.
 
-**2. `DebouncedFileWatcher` is fixed through its constructor, not by opening visibility.** Its
-coverage varies (89/69 and 93/71 on CI; 69.44% and 66.66% of branches on two local runs of the same
-binary) because the `watcher.Error` handler only runs when Windows overflows the buffer, and the
-`BUG-012` test provokes a storm **without asserting that the overflow happened**: when it does not,
-the test passes without exercising what it exists to protect. **Decided**: `InternalBufferBytes`
-becomes an **optional constructor parameter** defaulting to the product value — exactly the pattern
-`debounce` already has — the test uses the smallest Windows allows, guarantees the overflow and
-**asserts it**. Nothing becomes `internal`, `WatchSignal` stays private, and the product does not
-change.
+**2. ~~`DebouncedFileWatcher` is fixed through its constructor~~ — done on 2026-08-18, exactly as
+decided.** The buffer is now an optional constructor parameter defaulting to the product value; the
+test asks for the smallest the platform honours, overflows for real and **asserts it**. Nothing
+became `internal` and `WatchSignal` stays private.
 
-**It goes first, before a single token**, for a practical reason: while that file is a coin toss, one
-run in three can leave `main` stuck in the middle of the redesign.
+**The recorded cause was one of three.** Measuring the two full runs turned up two more conditions
+left to chance: the other half of the same handler — the error that **does** end the watching, which
+ran by accident when a test directory vanished under a live watcher — and the coalescing switch,
+whose pairs depended on what the system happened to deliver during the storm (13 of 16 branches on
+one run, 11 of 16 on the other). Each now has its own test, and a fourth covers the debounce elapsing
+**in the very instant** the change that cancels it arrives, with a clock whose wait ends successfully
+when cancelled. [The evidence](evidence/stable/audit-watcher-overflow-determinism.md): from
+**88.54/73.81 and 93.75/71.43** across two runs of the same binary to **100/95.83 three times in a
+row**. The two missing branches are unreachable.
+
+**And what was measured without expecting it: a sequential storm does not overflow 4 KiB.** Two
+thousand files with hundred-character names, one after another, never overflowed once: the bottleneck
+is not the watcher draining the buffer, it is creating the file, and those three tenths of a
+millisecond are all the breathing room its thread needs. In parallel it overflows within the first
+second. The first attempt came out red **through the new assertion rather than through a timeout**,
+which is exactly what it is there for.
 - **The updater's rejection count resolves to EIGHT**: `README.md` says 8 and `github.md` says 7, and
   the one that adds up to 23 messages is 8 (15 states + 8 rejections).
 - **The 25 consequence strings are approved against the package's own rule** — "if the phrase helps

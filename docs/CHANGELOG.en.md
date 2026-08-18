@@ -95,6 +95,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The test that watches for avalanches of changes no longer passes when there is no avalanche.**
+  When more changes arrive than Windows can record, the application learns that it has lost notices
+  and walks the whole folder again instead of quietly ceasing to follow it; that has worked since it
+  was fixed. What did not work was its test: it provoked the avalanche and **never checked that one
+  happened**, so on the runs where none did it passed without exercising any of what it protects.
+  The buffer size can now be asked for when the watcher is built — the application still asks for the
+  maximum — the test asks for the minimum, overflows for real and asserts it. Measuring that turned
+  up two more conditions left to chance — the error that does end the watching, and which changes are
+  merged into one notice — and each now has its own test. The file goes from measuring differently on
+  every run to measuring the same thing three times over.
+
 - **Coverage watching is now measured where it is verified.** Each file's bar had been measured on
   the developer's machine and checked on the integration one, which has no sound card: seven files
   covering audio, video and timers read differently in each place, and one of them — the audio device

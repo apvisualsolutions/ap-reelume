@@ -96,6 +96,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La prueba que vigila las avalanchas de cambios ya no aprueba cuando no hay avalancha.** Cuando
+  llegan más cambios de los que Windows alcanza a anotar, la aplicación se entera de que ha perdido
+  avisos y vuelve a recorrer la carpeta entera en vez de dejar de seguirla en silencio; eso funciona
+  desde que se corrigió. Lo que no funcionaba era su prueba: provocaba la avalancha y **no comprobaba
+  que hubiera ocurrido**, así que las veces en que no ocurría aprobaba sin ejercer nada de lo que
+  protege. Ahora el tamaño del búfer se puede pedir al construir el vigilante —la aplicación sigue
+  pidiendo el máximo—, la prueba pide el mínimo, desborda de verdad y lo afirma. Midiéndolo salieron
+  otras dos condiciones que ocurrían o no por azar —el error que sí termina la vigilancia, y qué
+  cambios se juntan en un mismo aviso—, y cada una tiene ya su prueba. El archivo pasa de medir
+  distinto en cada ejecución a medir lo mismo tres veces seguidas.
+
 - **La vigilancia de cobertura pasa a medirse donde se verifica.** El listón de cada archivo se había
   medido en la máquina de quien programa y se comprobaba en la de integración, que no tiene tarjeta
   de sonido: siete archivos de audio, vídeo y temporizadores daban números distintos en cada sitio, y
