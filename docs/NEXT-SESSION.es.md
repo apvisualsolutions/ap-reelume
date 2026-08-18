@@ -208,6 +208,40 @@ Corregido donde vino la segunda petición —la fila se apaga mientras su cambio
 patrón que la barra de transporte ya tenía— y **el eslabón que era una deducción se midió**, no se
 supuso: [la evidencia](evidence/stable/audit-version-switch-reentry.md). El caso de uso no se toca.
 
+#### La fase 2 del paso 6: el botón hecho, y lo que la plantilla propia debe (2026-08-18)
+
+**El botón está hecho** —95 de las vistas, contra 18 casillas y 15 cuadros de texto, así que es por
+donde empieza—: sus cuatro estados de color salen ya de los tokens en los cuatro temas, con borde de
+1 px, y en alto contraste el paso de ratón y la pulsación **invierten**.
+[La evidencia](evidence/stable/audit-redesign-phase2-button-states.md).
+
+**Lo que se midió y decide cómo se hace el resto:**
+
+- **Un estilo de aplicación NO alcanza los elementos de plantilla de un `ControlTheme`.** Ni
+  `Button /template/ ContentPresenter` ni con `#PART_ContentPresenter`. Lo que sí alcanza es **el
+  recurso que esa plantilla consume**: `ButtonBackground`, `ButtonForeground`, `ButtonBorderBrush` y
+  sus tres estados cada uno. Se redirigen con `<StaticResource x:Key="…" ResourceKey="…" />`, que
+  Avalonia acepta como entrada de diccionario, así que **no se duplica ni un valor**. Los demás tipos
+  se hacen igual, con sus propios recursos.
+- **`ControlTextActiveBrush` es un token nuevo** (van catorce), y hace falta: sin él la inversión de
+  alto contraste no se puede expresar sin una regla por tema.
+- **Un pincel se lee entero.** `ButtonBackgroundPointerOver` dice `Black` y lleva `Opacity 0,1`;
+  leyendo sólo `.Color` se concluyó «texto negro sobre fondo negro», que es falso.
+
+**Lo que la plantilla propia debe, y no se re-delibera:**
+
+1. **El borde punteado del deshabilitado** (`Rectangle` con `StrokeDashArray`). Sin él, **en alto
+   contraste deshabilitado es hoy indistinguible de reposo** —el relleno deshabilitado *es* la
+   superficie, por diseño—, y eso está medido y afirmado tal cual en la prueba, no aflojado.
+2. **El borde de 2 px al pulsar en alto contraste**: la plantilla base tiene un solo grosor para todos
+   los estados. Afirmado a 1 px, que es lo cierto hoy, y **el token del grosor llega con la plantilla
+   que lo gaste**, no antes: se escribió, se quedó sin consumidor al cambiar de vía, y se retiró.
+3. Después: los otros ocho tipos de control, empezando por `CheckBox` (18) y `TextBox` (15).
+
+Y dos cosas del árbol que salieron midiendo: **`primary-action`** (en `ResumeHeroView`) es una clase
+que **ningún estilo define y ninguna prueba busca**, y **`navigation-destination`** sí tiene uso, pero
+como **marcador de las pruebas**, no como estilo.
+
 #### ~~La fase 1 del paso 6~~ — hecha el 2026-08-18, y la fase 2 hereda tres cosas
 
 **Hecha entera y como estaba decidida**, más lo que la medición añadió:

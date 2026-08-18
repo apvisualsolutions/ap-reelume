@@ -95,6 +95,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Buttons have a shape and react, and their colours come from the theme.** Until now a button's
+  border was transparent in all four of its states — it had no shape of its own — its resting,
+  hovered and pressed colours came from the graphics library's base theme, and **disabled was painted
+  exactly like resting**: the only thing between them was the text's grey. All four states now come
+  from the same tokens as the rest of the application, with a one-pixel border visible in all four
+  themes, and in high contrast hovering or pressing **inverts** the button — the fill takes the
+  border's colour and the text the background's — because in those palettes a lighter shade would say
+  nothing. What the design asks for the disabled state in high contrast, a dotted border, is still to
+  come: it needs a template of its own.
+
 - **The application goes into high contrast when Windows is.** Until now the high contrast theme
   existed in the code and **no path selected it**: anyone with it turned on in Windows saw the same
   application as everybody else. It is now read from the system at startup and overrides the three

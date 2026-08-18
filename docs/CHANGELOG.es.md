@@ -96,6 +96,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los botones tienen forma y reaccionan, y los colores salen del tema.** Hasta ahora el borde de un
+  botón era transparente en sus cuatro estados —no tenía forma propia—, el color de reposo, de paso de
+  ratón y de pulsado venía del tema base de la biblioteca gráfica, y **deshabilitado se pintaba igual
+  que en reposo**: lo único que los separaba era el gris del texto. Ahora los cuatro estados salen de
+  los mismos tokens que el resto de la aplicación, con un borde de un píxel que se ve en los cuatro
+  temas, y en alto contraste pasar el ratón o pulsar **invierte** el botón —el relleno toma el color
+  del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada. Queda
+  pendiente lo que el diseño pide para el deshabilitado en alto contraste, un borde punteado, que
+  necesita una plantilla propia.
+
 - **La aplicación se pone en alto contraste cuando Windows lo está.** Hasta ahora el tema de alto
   contraste existía en el código y **ningún camino lo seleccionaba**: quien lo tuviera encendido en
   Windows veía la aplicación igual que todos los demás. Ahora se lee del sistema al arrancar y manda

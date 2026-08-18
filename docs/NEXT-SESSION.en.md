@@ -209,6 +209,41 @@ pattern the transport bar already had — and **the one link that was a deductio
 than assumed: [the evidence](evidence/stable/audit-version-switch-reentry.md). The use case is left
 alone.
 
+#### Step 6's phase 2: the button done, and what the template owes (2026-08-18)
+
+**The button is done** — 95 of them across the views, against 18 checkboxes and 15 text boxes, so it
+is where this starts: its four colour states now come from the tokens in all four themes, with a 1 px
+border, and in high contrast hovering and pressing **invert**.
+[The evidence](evidence/stable/audit-redesign-phase2-button-states.md).
+
+**What was measured, and what it decides about the rest:**
+
+- **An application style does NOT reach the template elements of a `ControlTheme`.** Neither
+  `Button /template/ ContentPresenter` nor the same with `#PART_ContentPresenter`. What does reach
+  them is **the resource that template consumes**: `ButtonBackground`, `ButtonForeground`,
+  `ButtonBorderBrush` and three states of each. They are pointed at our tokens with
+  `<StaticResource x:Key="…" ResourceKey="…" />`, which Avalonia accepts as a dictionary entry, so
+  **not one value is duplicated**. The other types go the same way, with their own resources.
+- **`ControlTextActiveBrush` is a new token** (fourteen now), and it is needed: without it the high
+  contrast inversion cannot be expressed without a per-theme rule.
+- **A brush is read whole.** `ButtonBackgroundPointerOver` says `Black` and carries `Opacity 0.1`;
+  reading only `.Color` produced "black text on a black fill", which is false.
+
+**What the template owes, and this is not reopened:**
+
+1. **The dotted disabled border** (a `Rectangle` with `StrokeDashArray`). Without it, **in high
+   contrast disabled is today indistinguishable from rest** — the disabled fill *is* the surface, by
+   design — and that is measured and asserted as such, not loosened away.
+2. **The 2 px pressed border in high contrast**: the base template keeps one thickness for every
+   state. Asserted at 1 px, which is what is true today, and **the thickness token arrives with the
+   template that spends it**: it was written, lost its consumer when the approach changed, and was
+   taken back out.
+3. Then the other eight control types, starting with `CheckBox` (18) and `TextBox` (15).
+
+And two things the measuring turned up: **`primary-action`** (in `ResumeHeroView`) is a class **no
+style defines and no test looks for**, and **`navigation-destination`** is used, but as a **test
+marker** rather than as a style.
+
 #### ~~Step 6's phase 1~~ — done on 2026-08-18, and phase 2 inherits three things
 
 **Done in full and as decided**, plus what the measuring added:

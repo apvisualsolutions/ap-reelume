@@ -17,6 +17,11 @@ using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Theme;
 
+// The theme variant is one setting on one application, and these three classes all change it. They
+// are serialised so that a class reading a theme cannot be reading one another class just replaced —
+// a race that would only ever show up on some runs, which is the kind this repository keeps finding
+// on CI's second pass.
+[Collection("ThemeVariant")]
 public sealed class ThemeTests
 {
     private const string PresentationAssemblyName = "ApSolutions.LocalMedia.Presentation";
