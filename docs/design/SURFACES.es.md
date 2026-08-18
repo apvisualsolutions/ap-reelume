@@ -142,21 +142,29 @@ que distinguirlas a la vista.
 
 | Medida | Valor |
 | --- | --- |
-| Diccionarios en `Theme/DesignTokens.axaml` | **3**: `Light`, `Dark` y `AppThemeVariants.HighContrast` |
-| Declaraciones de token | **58**, en **40 nombres** distintos |
-| Además, en `Resources/Brand.axaml` | 3 |
-| Selectores de foco | **8**: `Button`, `ToggleButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
+| Diccionarios en `Theme/DesignTokens.axaml` | **4**: `Light`, `Dark`, `HighContrastLight` y `HighContrastDark` |
+| Declaraciones de token en los diccionarios | **140**, en **35 nombres**: 23 brochas y 12 alias |
+| Escalares, fuera de los diccionarios | **13** |
+| Además, en `Resources/Brand.axaml` | 3 (cadenas, ningún color) |
+| Selectores de foco | **10**: `Button`, `ToggleButton`, `ToggleSwitch`, `RadioButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
+| Tipos con punteado de deshabilitado | **los mismos 10**, por adorno |
 
-Tres cosas que el rediseño tiene que saber:
+Cuatro cosas que el rediseño tiene que saber:
 
-- **El alto contraste es uno solo.** `AppThemeVariants.HighContrast` se declara sobre
-  `ThemeVariant.Light`, así que **no hay diccionario de alto contraste oscuro**: quien use el tema de
-  alto contraste oscuro de Windows recibe el claro.
+- **El alto contraste son dos, y el sistema los elige.** Había un solo diccionario declarado sobre
+  `ThemeVariant.Light` y **ningún camino lo seleccionaba**. Hoy `IHighContrastService` pregunta a
+  Windows y `FluentThemeService` pasa a `HighContrastLight` o `HighContrastDark` según la luminancia
+  de `COLOR_WINDOW`, nunca según el nombre del tema, que es localizable.
+- **El alto contraste no se elige en la aplicación**: `ThemePreference` tiene tres valores y sigue
+  teniéndolos. Es una necesidad declarada al sistema, no una preferencia de esta aplicación, y
+  ofrecer una copia crearía dos fuentes de verdad para la misma necesidad.
 - **El reproductor ignora el tema elegido.** `PlayerThemeVariant` devuelve `ThemeVariant.Dark`
   siempre, a propósito, porque una sala a oscuras no quiere una interfaz blanca. Es la única
   superficie que no obedece la preferencia.
-- **`ToggleSwitch` y `RadioButton` no tienen selector de foco propio** y caen al del tema base, que
-  ninguna comprobación cubre.
+- **En alto contraste, deshabilitado se dice con geometría y no con color.** Las dos paletas no
+  tienen un tercer color que gastar —relleno deshabilitado, relleno de reposo y superficie son el
+  mismo, el borde es uno para los cuatro estados y el texto deshabilitado es el primario—, así que
+  la diferencia es el **borde punteado**, dibujado como adorno sobre los diez tipos.
 
 ## La instalación, que también se ve
 

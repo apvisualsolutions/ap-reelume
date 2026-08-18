@@ -102,9 +102,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
   que en reposo**: lo único que los separaba era el gris del texto. Ahora los cuatro estados salen de
   los mismos tokens que el resto de la aplicación, con un borde de un píxel que se ve en los cuatro
   temas, y en alto contraste pasar el ratón o pulsar **invierte** el botón —el relleno toma el color
-  del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada. Queda
-  pendiente lo que el diseño pide para el deshabilitado en alto contraste, un borde punteado, que
-  necesita una plantilla propia.
+  del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada.
+
+- **Un control apagado se distingue de uno normal, también en alto contraste.** En los temas claro y
+  oscuro se sabía por el color: un relleno más apagado y un texto más gris. En los dos temas de alto
+  contraste **no se sabía de ninguna manera** — esas paletas son de dos colores y no les queda un
+  tercero que gastar, así que el relleno, el borde y el texto de un control apagado eran exactamente
+  los de uno normal. Ahora lo dice el **borde punteado** que el diseño pide, dibujado por encima del
+  control y en los diez tipos que pueden apagarse: botones, casillas, campos de texto, listas
+  desplegables, filas de una lista, barras deslizantes y los demás. Se dibuja uno por control y no
+  uno por pieza: una lista desplegable o un selector numérico llevan un campo de texto dentro, y dos
+  rectángulos punteados a unos píxeles uno de otro no son una señal, son ruido.
 
 - **La aplicación se pone en alto contraste cuando Windows lo está.** Hasta ahora el tema de alto
   contraste existía en el código y **ningún camino lo seleccionaba**: quien lo tuviera encendido en

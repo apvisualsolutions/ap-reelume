@@ -143,21 +143,29 @@ by sight.
 
 | Measure | Value |
 | --- | --- |
-| Dictionaries in `Theme/DesignTokens.axaml` | **3**: `Light`, `Dark` and `AppThemeVariants.HighContrast` |
-| Token declarations | **58**, across **40** distinct names |
-| Plus, in `Resources/Brand.axaml` | 3 |
-| Focus selectors | **8**: `Button`, `ToggleButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
+| Dictionaries in `Theme/DesignTokens.axaml` | **4**: `Light`, `Dark`, `HighContrastLight` and `HighContrastDark` |
+| Token declarations in the dictionaries | **140**, across **35 names**: 23 brushes and 12 aliases |
+| Scalars, outside the dictionaries | **13** |
+| Plus, in `Resources/Brand.axaml` | 3 (strings, no colours) |
+| Focus selectors | **10**: `Button`, `ToggleButton`, `ToggleSwitch`, `RadioButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
+| Types with a disabled outline | **the same 10**, by adorner |
 
-Three things the redesign has to know:
+Four things the redesign has to know:
 
-- **There is only one high contrast.** `AppThemeVariants.HighContrast` is declared over
-  `ThemeVariant.Light`, so **there is no high-contrast dark dictionary**: someone on the Windows
-  high-contrast dark theme gets the light one.
+- **High contrast is two themes, and the system picks.** There used to be one dictionary, declared
+  over `ThemeVariant.Light`, and **no path selected it**. Today `IHighContrastService` asks Windows
+  and `FluentThemeService` switches to `HighContrastLight` or `HighContrastDark` by the luminance of
+  `COLOR_WINDOW`, never by the theme's name, which is localised.
+- **High contrast is not chosen in the application**: `ThemePreference` has three values and keeps
+  them. It is a need declared to the system rather than a taste in this application, and offering a
+  copy would create two sources of truth for one need.
 - **The player ignores the chosen theme.** `PlayerThemeVariant` always returns `ThemeVariant.Dark`,
   on purpose, because a darkened room does not want a white interface. It is the one surface that
   does not obey the preference.
-- **`ToggleSwitch` and `RadioButton` have no focus selector of their own** and fall through to the
-  base theme's, which no check covers.
+- **In high contrast, disabled is said with geometry and not with colour.** Neither palette has a
+  third colour to spend — the disabled fill, the resting fill and the surface are one, the border is
+  one for all four states, and the disabled text is the primary text — so the difference is the
+  **dotted outline**, drawn as an adorner over the ten types.
 
 ## The installation, which is also seen
 

@@ -102,8 +102,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   from the same tokens as the rest of the application, with a one-pixel border visible in all four
   themes, and in high contrast hovering or pressing **inverts** the button — the fill takes the
   border's colour and the text the background's — because in those palettes a lighter shade would say
-  nothing. What the design asks for the disabled state in high contrast, a dotted border, is still to
-  come: it needs a template of its own.
+  nothing.
+
+- **A switched-off control looks different from a working one, in high contrast too.** In the light
+  and dark themes the colour said it: a duller fill and greyer text. In the two high contrast themes
+  **nothing said it** — those palettes have two colours and no third one to spend, so a switched-off
+  control's fill, border and text were exactly a working one's. It is now the **dotted outline** the
+  design asks for, drawn over the control and on all ten kinds that can be switched off: buttons,
+  checkboxes, text fields, drop-down lists, list rows, sliders and the rest. One outline per control
+  rather than one per piece: a drop-down list or a number picker holds a text field inside it, and two
+  dashed rectangles a few pixels apart are not a signal, they are noise.
 
 - **The application goes into high contrast when Windows is.** Until now the high contrast theme
   existed in the code and **no path selected it**: anyone with it turned on in Windows saw the same

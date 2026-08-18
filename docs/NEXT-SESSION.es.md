@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fases 1 y 2a hechas el 2026-08-18**; queda el punteado, los ocho tipos y las vistas | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a y 2b hechas el 2026-08-18**; quedan los ocho tipos y las vistas | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -244,7 +244,9 @@ como **marcador de las pruebas**, no como estilo.
 
 #### Las siete decisiones que quedaban del paso 6, tomadas el 2026-08-18 (no se re-deliberan)
 
-1. **El borde punteado del deshabilitado se dibuja como ADORNO, no copiando plantillas.** Una
+1. ~~**El borde punteado del deshabilitado se dibuja como ADORNO, no copiando plantillas.**~~
+   **Hecha el 2026-08-18 como estaba decidida** — [la evidencia](evidence/stable/audit-redesign-phase2b-disabled-outline.md).
+   Lo que sigue queda por lo que explica el porqué: Una
    propiedad adjunta en `Presentation/Theme` que añade un `Rectangle` con `StrokeDashArray` a la capa
    de adornos cuando el control se deshabilita. **Por qué y no un `ControlTheme` propio por tipo:** el
    anillo de foco ya demostró que la capa de adornos alcanza a los diez tipos con **una**
@@ -278,6 +280,37 @@ como **marcador de las pruebas**, no como estilo.
    34 y 32 → `FontSizeDisplay` 32; 30, 28 y 26 → `FontSizeTitle` 28; 24, 22, 20 y 18 →
    `FontSizeSubtitle` 20; 16 y 14 → `FontSizeBody` 14; 12 → `FontSizeCaption` 12; y `FontSizeMono` 13
    para rutas, hashes y códecs. Se declaran **en la primera vista que los gaste**, no antes.
+
+#### ~~La fase 2b: el punteado del deshabilitado~~ — hecha el 2026-08-18
+
+**Hecha exactamente como estaba decidida** —
+[la evidencia](evidence/stable/audit-redesign-phase2b-disabled-outline.md)—. Propiedad adjunta
+`DisabledOutline.IsShown` en `Presentation/Theme`, un `Rectangle` con `StrokeDashArray` en la capa de
+adornos, y **el cuándo lo dice un selector** `:disabled` sobre los mismos diez tipos que el foco. El
+archivo nuevo mide **100 % de líneas y 100 % de ramas** —comprobado en local antes de empujar, que es
+lo que ahorra los 35 minutos de CI por intento— y las 2 170 activaciones no salen de sus pruebas sino
+de las vistas reales de la suite de interfaz.
+
+**Lo que la medición añadió, y es la lección de esta tanda: deshabilitar se hereda, y un estilo de
+aplicación alcanza también los elementos de plantilla.** Ocho tipos recibían un adorno y **dos
+recibían dos**: `ComboBox` y `NumericUpDown` llevan un `TextBox` dentro cuyo `IsEnabled` propio sigue
+en `true`, así que se dibujaban dos rectángulos punteados a unos píxeles uno de otro. La condición
+correcta **no es el `IsEnabled` local sino `TemplatedParent is null`**, y las dos respuestas difieren
+justo donde importa: un control dentro de un panel deshabilitado entero conserva su `IsEnabled` en
+`true`, y como un panel no es de los diez tipos, mirar el flag local dejaría ese caso **sin ninguna
+raya**. Hoy ese caso no existe —medido: los once `IsEnabled` enlazados del árbol están en nueve
+`Button` y dos `CheckBox`, ningún contenedor—, pero la regla se escribió para cuando exista.
+
+**Y de paso se corrigió `SURFACES`**, cuya sección de temas seguía describiendo el árbol de antes de
+la fase 1: decía 3 diccionarios (son **4**), 58 declaraciones en 40 nombres (son **140** en **35**,
+más 13 escalares fuera), 8 selectores de foco (son **10**) y que no había alto contraste oscuro, que
+lleva un día siendo falso.
+
+**Lo que sigue de la fase 2, en orden y sin deliberar:** los ocho tipos por uso medido —`CheckBox`
+(18), `ListBoxItem` (17), `TextBox` (15), `ComboBox` (8), `Slider` (5), `NumericUpDown` (5),
+`ToggleButton` (2), `RadioButton` (1)—, cada uno por **sus propios recursos de tema** como el botón;
+la puerta de escalares consumidos con lista que sólo encoge; `primary-action` con el token
+`AccentTextBrush`; y después la tipografía y las vistas, una por commit.
 
 #### Lo que el paso 8 debe recordar del rediseño (2026-08-18)
 

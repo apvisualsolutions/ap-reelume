@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phases 1 and 2a done on 2026-08-18**; the dotted border, the eight types and the views remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a and 2b done on 2026-08-18**; the eight types and the views remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -246,7 +246,9 @@ marker** rather than as a style.
 
 #### The seven decisions step 6 had left, taken on 2026-08-18 (not reopened)
 
-1. **The dotted disabled border is drawn as an ADORNER, not by copying templates.** An attached
+1. ~~**The dotted disabled border is drawn as an ADORNER, not by copying templates.**~~
+   **Done on 2026-08-18 exactly as decided** — [the evidence](evidence/stable/audit-redesign-phase2b-disabled-outline.md).
+   What follows is kept for the reasoning: An attached
    property in `Presentation/Theme` adds a `Rectangle` with `StrokeDashArray` to the adorner layer when
    a control is disabled. **Why not a `ControlTheme` per type:** the focus ring already proved the
    adorner layer reaches all ten types with **one** implementation — including the `ToggleSwitch`,
@@ -278,6 +280,37 @@ marker** rather than as a style.
    34 and 32 → `FontSizeDisplay` 32; 30, 28 and 26 → `FontSizeTitle` 28; 24, 22, 20 and 18 →
    `FontSizeSubtitle` 20; 16 and 14 → `FontSizeBody` 14; 12 → `FontSizeCaption` 12; and `FontSizeMono`
    13 for paths, hashes and codecs. Declared **in the first view that spends them**, not before.
+
+#### ~~Phase 2b: the dotted disabled outline~~ — done on 2026-08-18
+
+**Done exactly as decided** —
+[the evidence](evidence/stable/audit-redesign-phase2b-disabled-outline.md). An attached property,
+`DisabledOutline.IsShown` in `Presentation/Theme`, a `Rectangle` with `StrokeDashArray` in the adorner
+layer, and **a `:disabled` selector says when**, over the same ten types the focus ring covers. The
+new file measures **100 % of lines and 100 % of branches** — checked locally before pushing, which is
+what saves CI's thirty-five minutes per attempt — and its 2,170 hits come not from its own tests but
+from the UI suite's real views.
+
+**What measuring added, and it is this batch's lesson: disabling is inherited, and an application
+style reaches template elements too.** Eight types took one adorner and **two took two**: a `ComboBox`
+and a `NumericUpDown` hold a `TextBox` whose own `IsEnabled` is still `true`, so two dashed rectangles
+were drawn a few pixels apart. The right test is **not the local `IsEnabled` but
+`TemplatedParent is null`**, and the two answers differ exactly where it matters: a control inside a
+wholly disabled panel keeps its own `IsEnabled` at `true`, and since a panel is not one of the ten
+types, keying off the local flag would leave that case with **no outline at all**. That case does not
+exist today — measured: the tree's eleven bound `IsEnabled` are on nine `Button` and two `CheckBox`,
+no container — but the rule is written for when it does.
+
+**And `SURFACES` was corrected along the way**, its themes section still describing the tree from
+before phase 1: it said 3 dictionaries (there are **4**), 58 declarations across 40 names (there are
+**140** across **35**, plus 13 scalars outside them), 8 focus selectors (there are **10**), and that
+there was no high contrast dark, which has been false for a day.
+
+**What is left of phase 2, in order and not up for deliberation:** the eight types by measured use —
+`CheckBox` (18), `ListBoxItem` (17), `TextBox` (15), `ComboBox` (8), `Slider` (5), `NumericUpDown`
+(5), `ToggleButton` (2), `RadioButton` (1) — each through **its own theme resources**, as the button
+was; the consumed-scalars gate with a list that only shrinks; `primary-action` with the
+`AccentTextBrush` token; and then the typography and the views, one per commit.
 
 #### What step 8 has to remember about the redesign (2026-08-18)
 
