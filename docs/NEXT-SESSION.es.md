@@ -141,6 +141,36 @@ Lo que se hizo, y en qué orden:
     biblioteca lo pinta `ShellView`, así que **buscar sin resultados no muestra nada**; el alto
     contraste es **uno solo** y sobre `Light`, así que quien use el oscuro de Windows recibe el claro;
     y el icono de bandeja es el **sexto** activo, en otro proyecto.
+
+#### Las dos decisiones que quedaban del paso 6, tomadas el 2026-08-18
+
+**1. El alto contraste NO se elige en la aplicación: siguen siendo tres píldoras.** El paquete
+sustituye los tres botones de tema por cuatro píldoras, y la cuarta sólo podría ser alto contraste
+—`ThemePreference` tiene exactamente `System`, `Light` y `Dark`—. **Se rechaza**, y no por trabajo:
+el alto contraste de Windows es un ajuste de **accesibilidad del sistema**, y ofrecer una copia en la
+aplicación crea dos fuentes de verdad para la misma necesidad. Alguien con el sistema en alto
+contraste y la aplicación en «Claro» tendría una aplicación contradiciendo una necesidad declarada,
+que es peor que no ofrecer nada. Además, dejar el enum como está significa que **no hay migración de
+ajustes** ni valores huérfanos en los guardados.
+
+Lo que sí falta de verdad **es el cuarto diccionario**, y ése se hace: hoy `AppThemeVariants.HighContrast`
+está declarado sobre `ThemeVariant.Light`, así que quien use el alto contraste **oscuro** de Windows
+recibe el claro. Se añade `HighContrastLight`, se renombra el existente a `HighContrastDark`, y toca
+`AppThemeVariants` y `FluentThemeService` — **no el enum**. Si el rediseño quiere enseñar una cuarta
+píldora, que sea **un estado y no una opción**: decir que el sistema está en alto contraste y que se
+está respetando. Eso informa sin duplicar el ajuste.
+
+**2. `DebouncedFileWatcher` se arregla por el constructor, no abriendo visibilidad.** Su cobertura
+baila (89/69 y 93/71 en CI; 69,44 % y 66,66 % de ramas en dos tiradas locales del mismo binario)
+porque el manejador `watcher.Error` sólo corre si Windows desborda el búfer, y la prueba de `BUG-012`
+provoca una tormenta **sin afirmar que el desbordamiento ocurriera**: cuando no ocurre, pasa igual sin
+ejercer lo que existe para proteger. **Decidido**: `InternalBufferBytes` pasa a **parámetro opcional
+del constructor** con el valor de producto por defecto —exactamente el patrón que ya tiene
+`debounce`—, la prueba usa el mínimo que Windows admite, garantiza el desbordamiento y **lo afirma**.
+Nada se vuelve `internal`, `WatchSignal` sigue privado y el producto no cambia.
+
+**Va primero, antes de tocar un token**, y por una razón práctica: mientras ese archivo sea una moneda
+al aire, uno de cada tres runs puede dejar `main` atascado en mitad del rediseño.
 - **La discrepancia de motivos de rechazo del actualizador se resuelve en OCHO**: `README.md` dice 8 y
   `github.md` dice 7, y el que cuadra con los 23 mensajes es el 8 (15 estados + 8 rechazos).
 - **Las 25 cadenas de consecuencia se aprueban contra la regla que el propio paquete da** —«si la

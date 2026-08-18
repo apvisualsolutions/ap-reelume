@@ -141,6 +141,38 @@ What was done, and in which order:
     nothing**; high contrast is **one** dictionary and it sits over `Light`, so anyone on the Windows
     dark high-contrast theme gets the light one; and the tray icon is the **sixth** asset, in another
     project.
+
+#### The two decisions step 6 still owed, taken on 2026-08-18
+
+**1. High contrast is NOT chosen inside the application: it stays three pills.** The package replaces
+the three theme buttons with four pills, and the fourth could only be high contrast —
+`ThemePreference` holds exactly `System`, `Light` and `Dark`. **Rejected**, and not for the work:
+Windows' high contrast is a **system accessibility** setting, and offering a copy inside the
+application creates two sources of truth for one need. Someone with the system in high contrast and
+the application on "Light" would have an application contradicting a declared need, which is worse
+than offering nothing. Leaving the enum alone also means **no settings migration** and no orphaned
+stored values.
+
+What is genuinely missing **is the fourth dictionary**, and that does get done: today
+`AppThemeVariants.HighContrast` is declared over `ThemeVariant.Light`, so anyone on the Windows
+**dark** high-contrast theme gets the light one. `HighContrastLight` is added, the existing one is
+renamed `HighContrastDark`, and it touches `AppThemeVariants` and `FluentThemeService` — **not the
+enum**. If the redesign wants to show a fourth pill, it should be **a state and not an option**:
+saying the system is in high contrast and that it is being honoured. That informs without duplicating
+the setting.
+
+**2. `DebouncedFileWatcher` is fixed through its constructor, not by opening visibility.** Its
+coverage varies (89/69 and 93/71 on CI; 69.44% and 66.66% of branches on two local runs of the same
+binary) because the `watcher.Error` handler only runs when Windows overflows the buffer, and the
+`BUG-012` test provokes a storm **without asserting that the overflow happened**: when it does not,
+the test passes without exercising what it exists to protect. **Decided**: `InternalBufferBytes`
+becomes an **optional constructor parameter** defaulting to the product value — exactly the pattern
+`debounce` already has — the test uses the smallest Windows allows, guarantees the overflow and
+**asserts it**. Nothing becomes `internal`, `WatchSignal` stays private, and the product does not
+change.
+
+**It goes first, before a single token**, for a practical reason: while that file is a coin toss, one
+run in three can leave `main` stuck in the middle of the redesign.
 - **The updater's rejection count resolves to EIGHT**: `README.md` says 8 and `github.md` says 7, and
   the one that adds up to 23 messages is 8 (15 states + 8 rejections).
 - **The 25 consequence strings are approved against the package's own rule** — "if the phrase helps
