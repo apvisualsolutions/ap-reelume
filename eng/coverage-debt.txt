@@ -107,7 +107,6 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs           
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs               87  73
 src/ApSolutions.LocalMedia.Infrastructure/Playback/HardwareAccelerationFallback.cs            77 100
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                86  79
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcFactory.cs                           93  85
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 91  80
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  61
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs           100  83
@@ -219,7 +218,7 @@ src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml.cs            
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsView.axaml                           100  50
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsViewModel.cs                          98  77
 src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml                             100  50
-src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           86  55
+src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           88  65
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs                0   0
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         89  64
