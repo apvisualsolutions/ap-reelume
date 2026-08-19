@@ -115,3 +115,9 @@ El paseo / the walk    134 controles en 133 identidades; 133 pulsadas, 0 pendien
 `CornerRadiusMedium` sale de `NotSpentYet` en este mismo cambio, que es lo que `ScalarTokenTests`
 exige: esa lista falla también cuando algo empieza a gastarse. Pasa de seis a cinco. /
 `CornerRadiusMedium` leaves `NotSpentYet` in this same change; the list goes from six to five.
+
+Y la deuda de cobertura **encoge**: `MiniPlayerWindow.axaml.cs` pasa de 83/50 a **100/100** y
+`PlayerWindowCoordinator.cs` llega a **100/100**, así que los dos abandonan `eng/coverage-debt.txt`;
+`PlayerViewModel.cs` sube de 99/92 a 99/93 y `MiniPlayerChromeView.axaml` entra a 100/50. El trinquete
+baja de 218 a **217**. / The coverage debt **shrinks**: two files reach the bar and leave the list, one
+raises its floor, one new file joins, and the ratchet goes from 218 to 217.
