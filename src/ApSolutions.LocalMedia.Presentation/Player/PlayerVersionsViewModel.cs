@@ -15,16 +15,36 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 public sealed class PlayerVersionRowViewModel
 {
     private readonly MediaVersion _version;
+    private readonly VersionSwitchViewModel _question;
     private readonly AsyncRelayCommand _switch;
     private bool _isSwitching;
 
-    public PlayerVersionRowViewModel(MediaVersion version, Func<MediaVersion, Task> onSwitch)
+    /// <summary>
+    /// The row, the question its switch can raise, and the switch itself. The question is mandatory
+    /// because a row that does not know about it is pressable underneath it, and an optional one
+    /// left at null would compile into exactly that.
+    /// </summary>
+    public PlayerVersionRowViewModel(
+        MediaVersion version,
+        VersionSwitchViewModel question,
+        Func<MediaVersion, Task> onSwitch)
     {
         _version = version ?? throw new ArgumentNullException(nameof(version));
+        _question = question ?? throw new ArgumentNullException(nameof(question));
         ArgumentNullException.ThrowIfNull(onSwitch);
         _switch = new AsyncRelayCommand(
             () => SwitchAsync(onSwitch),
-            () => _version.IsAvailable && !_isSwitching);
+            () => _version.IsAvailable && !_isSwitching && !_question.IsVisible);
+
+        // The dialogue and the rows are built together and replaced together, so this needs no
+        // unsubscribing: the question never outlives the row that listens to it.
+        _question.PropertyChanged += (_, changed) =>
+        {
+            if (changed.PropertyName == nameof(VersionSwitchViewModel.IsVisible))
+            {
+                _switch.RaiseCanExecuteChanged();
+            }
+        };
     }
 
     public MediaVersion Version => _version;

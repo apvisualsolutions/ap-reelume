@@ -581,8 +581,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   saves the player's position first: if the session had only just opened and the engine still answered
   zero, that zero fell below the point resuming is offered from, so the second switch decided there
   was nothing to carry across, opened the other version **without asking**, and left the stored
-  position at zero. The row now greys out while its switch is in flight, the way the transport bar's
-  skip greys out while it seeks.
+  position at zero. The row now greys out while its switch is in flight — the way the transport bar's
+  skip greys out while it seeks — **and while its question is still on screen**, which is the longer
+  of the two gaps: a switch that asks finishes at once and waits for your answer, so the row came
+  back to life directly underneath the question. Answering it hands the row back.
 
 - **A trailer kept beside a film only appeared if that film was duplicated.** The card looked for the
   trailer file starting from the version group, and a title with no copies has no group: the file sat

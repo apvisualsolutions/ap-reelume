@@ -348,7 +348,15 @@ playhead, answers zero and takes the question with it. It deserves its own measu
 With these, **nothing in step 6 is left to deliberate**: what follows is execution, measuring before
 each correction.
 
-1. **The version-switch defect is fixed, and it goes FIRST**, before any new type, because it is a
+1. ~~**The version-switch defect is fixed, and it goes FIRST**~~ — **done on 2026-08-19**, exactly as
+   decided: [the evidence](evidence/stable/audit-version-switch-question-guard.md). It was done as
+   written — required parameter, `&& !_question.IsVisible`, and the subscription — and the only
+   thing not foreseen is **why the subscription is not optional**: refusing the question does **not**
+   rebuild the surfaces, so it has to be **that very row** that becomes pressable again, and the walk
+   scene, which presses the row three times, is what checks it. The file holds 100/100. The decision
+   as it was taken:
+
+   **The version-switch defect is fixed, and it goes FIRST**, before any new type, because it is a
    live product defect: the row that opens the question stays pressable while the question is on
    screen, and a second press flushes the playhead, answers zero and **takes the question and the
    progress with it**. The fix: `PlayerVersionRowViewModel` takes the `VersionSwitchViewModel` as a

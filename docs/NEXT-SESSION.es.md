@@ -349,7 +349,16 @@ contesta cero y se lleva la pregunta. Merece su propia medición.
 Con esto **no queda nada por deliberar en el paso 6**: lo que sigue es ejecutar, midiendo antes de
 cada corrección.
 
-1. **El defecto del cambio de versión se corrige, y va PRIMERO**, antes que ningún tipo nuevo, porque
+1. ~~**El defecto del cambio de versión se corrige, y va PRIMERO**~~ — **hecho el 2026-08-19**,
+   exactamente como estaba decidido:
+   [la evidencia](evidence/stable/audit-version-switch-question-guard.md). Se hizo tal cual —
+   parámetro obligatorio, `&& !_question.IsVisible` y la suscripción— y lo único que no estaba
+   previsto es **por qué la suscripción no es opcional**: refusar la pregunta **no reconstruye las
+   superficies**, así que tiene que rehabilitarse **esa misma fila**, y la escena del paseo, que
+   pulsa la fila tres veces, es la que lo comprueba. El archivo queda en 100/100. El texto de la
+   decisión, tal como se tomó:
+
+   **El defecto del cambio de versión se corrige, y va PRIMERO**, antes que ningún tipo nuevo, porque
    es un defecto de producto vivo: la fila que abre la pregunta sigue pulsable mientras la pregunta
    está en pantalla, y una segunda pulsación vacía el cabezal, contesta cero y **se lleva la pregunta
    y el progreso**. La corrección: `PlayerVersionRowViewModel` recibe el `VersionSwitchViewModel`
