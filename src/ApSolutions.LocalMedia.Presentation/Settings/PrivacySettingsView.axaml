@@ -17,7 +17,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </UserControl.Resources>
   <StackPanel x:Name="PrivacySurface" Spacing="12">
     <TextBlock
-        FontSize="20"
+        FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource PrivacyTitle}"

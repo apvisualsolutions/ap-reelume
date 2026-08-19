@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
     <StackPanel Orientation="Horizontal" Spacing="12">
       <TextBlock
-          FontSize="30"
+          FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Text="{Binding Title}"
           TextTrimming="CharacterEllipsis"
@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           CornerRadius="4"
           IsVisible="{Binding !IsAvailable}"
           automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
-        <TextBlock FontSize="12" Text="{DynamicResource MediaUnavailable}" />
+        <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
       </Border>
     </StackPanel>
 
@@ -68,17 +68,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <StackPanel Margin="0,0,0,16" Spacing="6">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock
-                    FontSize="18"
+                    FontSize="{DynamicResource FontSizeSubtitle}"
                     FontWeight="SemiBold"
                     IsVisible="{Binding IsRegular}"
                     Text="{DynamicResource SeasonHeading}" />
                 <TextBlock
-                    FontSize="18"
+                    FontSize="{DynamicResource FontSizeSubtitle}"
                     FontWeight="SemiBold"
                     IsVisible="{Binding IsRegular}"
                     Text="{Binding SeasonNumberText}" />
                 <TextBlock
-                    FontSize="18"
+                    FontSize="{DynamicResource FontSizeSubtitle}"
                     FontWeight="SemiBold"
                     IsVisible="{Binding IsSpecials}"
                     Text="{DynamicResource SeasonSpecialsHeading}" />

@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource HomeInProgressAccessibleName}">
   <Grid RowDefinitions="Auto,*">
     <TextBlock
-        FontSize="18"
+        FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         Text="{DynamicResource HomeInProgressHeading}" />
     <TextBlock
@@ -44,7 +44,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Text="{Binding Title}"
                   TextTrimming="CharacterEllipsis" />
               <TextBlock
-                  FontSize="12"
+                  FontSize="{DynamicResource FontSizeCaption}"
                   IsVisible="{Binding HasSubtitle}"
                   Text="{Binding Subtitle}"
                   TextTrimming="CharacterEllipsis" />
@@ -53,8 +53,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Value="{Binding CompletedFraction}"
                   automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
               <StackPanel Orientation="Horizontal" Spacing="4">
-                <TextBlock FontSize="12" Text="{Binding CompletedText}" />
-                <TextBlock FontSize="12" Text="{DynamicResource HomePercentSuffix}" />
+                <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{Binding CompletedText}" />
+                <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource HomePercentSuffix}" />
               </StackPanel>
               <Border
                   Padding="8,4"
@@ -62,7 +62,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   CornerRadius="4"
                   IsVisible="{Binding !IsAvailable}"
                   automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
-                <TextBlock FontSize="12" Text="{DynamicResource MediaUnavailable}" />
+                <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
               </Border>
             </StackPanel>
           </Border>

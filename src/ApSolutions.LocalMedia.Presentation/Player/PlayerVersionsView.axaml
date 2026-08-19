@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource PlayerVersionsAccessibleName}">
   <StackPanel Spacing="8" IsVisible="{Binding HasAlternatives}">
     <TextBlock
-        FontSize="16"
+        FontSize="{DynamicResource FontSizeBody}"
         FontWeight="SemiBold"
         Text="{DynamicResource PlayerVersionsTitle}"
         automation:AutomationProperties.HeadingLevel="2" />

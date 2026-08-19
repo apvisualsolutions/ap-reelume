@@ -127,6 +127,59 @@ public sealed class ScalarTokenTests
         }
     }
 
+    /// <summary>No view writes a font size of its own instead of asking the scale.</summary>
+    /// <remarks>
+    /// Thirteen distinct literal sizes were in the tree across 52 uses and 30 files — 12, 14, 16, 17,
+    /// 18, 20, 22, 24, 26, 28, 30, 32, 34 — which is not a scale, it is thirty files each deciding on
+    /// their own. They map onto five tokens. This is the same shape of check
+    /// <c>ReducedMotionTests</c> makes about durations, and for the same reason: a literal is
+    /// invisible to anything that wants to change the whole application at once.
+    /// <para>
+    /// It counts what remains rather than what changed, so it stays true as views are added.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_view_writes_a_font_size_of_its_own_instead_of_asking_the_scale()
+    {
+        var literals = new List<string>();
+        var references = 0;
+        var root = Path.Combine(RepositoryLayout.Root, "src");
+        foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
+        {
+            foreach (var line in File.ReadLines(file))
+            {
+                var trimmed = line.Trim();
+                if (!trimmed.StartsWith("FontSize=\"", StringComparison.Ordinal)
+                    && !trimmed.Contains(" FontSize=\"", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (trimmed.Contains("FontSize=\"{", StringComparison.Ordinal))
+                {
+                    references++;
+                }
+                else
+                {
+                    literals.Add($"{Path.GetFileName(file)}: {trimmed}");
+                }
+            }
+        }
+
+        // Anti-blindness floor: a reader that found nothing would pass by measuring nothing. Fifty-two
+        // uses were mapped, and a view added later only makes this bigger.
+        Assert.True(
+            references >= 52,
+            $"only {references} font sizes come from the scale, which is fewer than the 52 that were "
+                + "mapped onto it, so either this check stopped reading or sizes went back to being "
+                + "written by hand.");
+
+        Assert.True(
+            literals.Count == 0,
+            "a view writes its own font size instead of asking the scale:\n  "
+                + string.Join("\n  ", literals));
+    }
+
     /// <summary>Every keyed entry of the token file that is not a brush or a redirect.</summary>
     private static HashSet<string> DeclaredScalars()
     {

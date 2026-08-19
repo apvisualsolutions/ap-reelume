@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fase 2 entera, puerta de escalares y `primary-action` hechas**; quedan **la tipografía y las vistas** | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fase 2, puerta de escalares, `primary-action` y la tipografía hechas**; quedan **las vistas** | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -281,7 +281,7 @@ como **marcador de las pruebas**, no como estilo.
    `CornerRadiusSmall`, `CornerRadiusMedium`— **que sólo puede encoger**, igual que la lista de
    huérfanos de `ServiceConsumptionTests` y que `eng/coverage-debt.txt`. Así la deuda es visible y no
    puede crecer en silencio.
-7. **La tipografía: los tamaños literales del árbol se mapean a seis tokens, y el mapeo es este.**
+7. ~~**La tipografía**~~ — **hecha el 2026-08-19**: [la evidencia](evidence/stable/audit-type-scale.md). **Cinco tokens, no seis**: `FontSizeMono` no se declara porque nada lo gasta y la puerta de escalares lo rechazaría — llega con la primera ruta o hash que lo pida. El `17` fue a `FontSizeBody` **por lo que el texto es** (un párrafo que se ajusta), no por distancia. La línea base de `HomeLayoutTests` movió **un solo campo** y hacia la consistencia. **La tipografía: los tamaños literales del árbol se mapean a seis tokens, y el mapeo es este.**
    **Medido el 2026-08-19: son TRECE, no doce — 52 usos en 30 archivos — y el que falta en el mapeo
    de abajo es el `17` de `ShellView.axaml:140`**, que hay que colocar al ejecutar (por proximidad va
    con el 18, a `FontSizeSubtitle`, pero se mide antes de decidirlo).

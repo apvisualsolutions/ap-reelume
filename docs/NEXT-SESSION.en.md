@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phase 2, the scalar gate and `primary-action` all done**; **the type scale and the views** remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phase 2, the scalar gate, `primary-action` and the type scale all done**; **the views** remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -281,7 +281,7 @@ marker** rather than as a style.
    list — today `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge`, `SpaceXLarge`,
    `CornerRadiusSmall`, `CornerRadiusMedium` — **which can only shrink**, exactly like the orphan list
    in `ServiceConsumptionTests` and like `eng/coverage-debt.txt`.
-7. **Typography: the tree's literal sizes map onto six tokens, and this is the mapping.**
+7. ~~**Typography**~~ — **done on 2026-08-19**: [the evidence](evidence/stable/audit-type-scale.md). **Five tokens, not six**: `FontSizeMono` is not declared because nothing spends it and the scalars gate would refuse it — it arrives with the first path or hash that asks. The 17 went to `FontSizeBody` **by what the text is** (a wrapping paragraph), not by distance. `HomeLayoutTests`' baseline moved **one field**, toward consistency. **Typography: the tree's literal sizes map onto six tokens, and this is the mapping.**
    **Measured on 2026-08-19: there are THIRTEEN, not twelve — 52 uses across 30 files — and
    the one missing from the map below is the `17` in `ShellView.axaml:140`**, to be placed
    when this runs (by proximity it goes with the 18, onto `FontSizeSubtitle`, but that gets

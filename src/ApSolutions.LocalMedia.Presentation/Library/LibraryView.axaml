@@ -20,7 +20,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Grid>
     <Grid IsVisible="{Binding IsBrowsing}" RowDefinitions="Auto,Auto,Auto,*">
       <TextBlock
-          FontSize="32"
+          FontSize="{DynamicResource FontSizeDisplay}"
           FontWeight="SemiBold"
           Text="{DynamicResource LibraryTitle}"
           automation:AutomationProperties.HeadingLevel="1" />

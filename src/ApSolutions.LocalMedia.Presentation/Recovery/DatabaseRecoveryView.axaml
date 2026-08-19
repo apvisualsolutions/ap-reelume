@@ -13,7 +13,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border Padding="48" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="720" Spacing="16">
       <TextBlock
-          FontSize="30"
+          FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource RecoveryTitle}" />

@@ -95,6 +95,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Font sizes are a scale now, not thirty separate decisions.** Every screen chose the size of
+  its own text: **thirteen distinct sizes** spread across thirty files, with headings that resembled
+  each other without ever matching. There are now **five sizes** for the whole application, and
+  changing them changes the whole application at once instead of file by file. The only thing that
+  moves on the home screen is one pixel of a card's edge, and in the right direction: it used to
+  depend on the system scale and is now the same at 100 %, 150 % and 200 %.
+
 - **The "keep watching" button finally stands apart from the others.** It carried the mark for
   "primary action" and **no style defined it**, so the button that is the point of the home screen
   was painted like any secondary button beside it. At rest it now carries the application's colour,

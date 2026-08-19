@@ -19,6 +19,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <CornerRadius x:Key="CornerRadiusSmall">4</CornerRadius>
       <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
       <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>
+      <!--
+        Five sizes for the whole application, mapped from the thirteen literals the views carried:
+        34 and 32 to Display, 30/28/26 to Title, 24/22/20/18 to Subtitle, 17/16/14 to Body, 12 to
+        Caption. FontSizeMono is not declared, because nothing spends it yet and the scalars gate
+        refuses a token nobody reads — it arrives with the first path or hash that needs it.
+      -->
+      <x:Double x:Key="FontSizeDisplay">32</x:Double>
+      <x:Double x:Key="FontSizeTitle">28</x:Double>
+      <x:Double x:Key="FontSizeSubtitle">20</x:Double>
+      <x:Double x:Key="FontSizeBody">14</x:Double>
+      <x:Double x:Key="FontSizeCaption">12</x:Double>
 
       <!--
         Four dictionaries, and every one of them carries the same twenty-three brushes. A brush missing

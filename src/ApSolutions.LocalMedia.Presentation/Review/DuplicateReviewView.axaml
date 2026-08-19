@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="review:DuplicateReviewViewModel"
     automation:AutomationProperties.Name="{DynamicResource DuplicateReviewAccessibleName}">
   <Grid RowDefinitions="Auto,*" RowSpacing="12">
-    <TextBlock FontSize="28" FontWeight="SemiBold" Text="{DynamicResource DuplicateReviewTitle}" />
+    <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource DuplicateReviewTitle}" />
     <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="review:MediaVersionItemViewModel">

@@ -17,7 +17,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </UserControl.Resources>
   <Grid Margin="24" RowDefinitions="Auto,*,Auto,Auto,Auto" RowSpacing="12">
     <StackPanel>
-      <TextBlock FontSize="28" FontWeight="SemiBold" Text="{DynamicResource RenamePreviewTitle}" />
+      <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource RenamePreviewTitle}" />
       <TextBlock Text="{DynamicResource RenamePreviewDescription}" TextWrapping="Wrap" />
     </StackPanel>
     <ListBox Grid.Row="1" ItemsSource="{Binding Operations}" automation:AutomationProperties.Name="{DynamicResource RenameOperationListName}">

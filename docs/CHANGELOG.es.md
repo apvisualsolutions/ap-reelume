@@ -96,6 +96,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los tamaños de letra son ya una escala y no treinta decisiones sueltas.** Cada pantalla elegía
+  el tamaño de su texto por su cuenta: **trece tamaños distintos** repartidos por treinta archivos,
+  con títulos que se parecían entre sí sin llegar a coincidir. Ahora hay **cinco tamaños** para toda
+  la aplicación, y cambiarlos cambia la aplicación entera de una vez en lugar de archivo por archivo.
+  Lo único que se mueve en la pantalla de inicio es un píxel del borde de una tarjeta, y en la
+  dirección buena: antes dependía de la escala del sistema y ahora es el mismo al 100 %, al 150 % y
+  al 200 %.
+
 - **El botón de «continuar viendo» por fin se distingue de los demás.** Llevaba puesta la marca de
   «acción principal» y **ningún estilo la definía**, así que el botón que es el sentido de la pantalla
   de inicio se pintaba igual que cualquier botón secundario a su lado. Ahora en reposo lleva el color
