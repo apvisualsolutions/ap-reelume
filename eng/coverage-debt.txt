@@ -218,7 +218,7 @@ src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml.cs            
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsView.axaml                           100  50
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsViewModel.cs                          98  77
 src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml                             100  50
-src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           88  65
+src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           90  69
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs                0   0
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         89  64
