@@ -317,6 +317,32 @@ there was no high contrast dark, which has been false for a day.
 was; the consumed-scalars gate with a list that only shrinks; `primary-action` with the
 `AccentTextBrush` token; and then the typography and the views, one per commit.
 
+#### The CI red `4b2c326` brought, and it was the harness (2026-08-19)
+
+`RestartSwitchButton is on screen but cannot be pressed: visible=False, enabled=True` in the version
+switch scene — [the evidence](evidence/stable/audit-walk-press-retry.md). **The commit did not cause
+it**: it touches tokens and theme tests, and the scene passes six of six locally.
+
+**The cause, read in `PressAsync`'s retry loop:** it repeats a press that showed no effect, and before
+repeating it looks **only at whether the control is disabled**. Answering the version-switch question
+**closes it** — which is right, and the scene asserts it — so the button leaves the tree the moment it
+is pressed while its command stays enabled; on a loaded runner the effect takes longer, the loop goes
+round again and presses a button that is no longer there.
+
+**So the house rule gains an exception, which is the part to remember:** `visible=False` accuses the
+product **unless pressing that control is precisely what takes it off the screen**. All three buttons
+of that question are of that kind, as is any confirmation that closes what it confirms.
+
+The decision moved out to `WalkPressPolicy`, with a test of its own — because the case **only appears
+on a slow runner**, and a rule exercised by luck is a rule nobody checks — and proved failing against
+the old rule. A control that is not on screen is **never pressed again**: the effect's own timeout
+speaks, which is the true failure.
+
+**Noted and untouched, because it is a different thing:** the row that opens the question **stays
+pressable while the question is on screen** — `SwitchToVersionAsync` returns as soon as it calls
+`Apply`, so the row's `finally` re-enables it with the dialogue open, and a second press flushes the
+playhead, answers zero and takes the question with it. It deserves its own measurement.
+
 #### ~~Phase 2d: the list row~~ — done on 2026-08-19
 
 **Done** — [the evidence](evidence/stable/audit-redesign-phase2d-list-row.md). 17 direct uses and

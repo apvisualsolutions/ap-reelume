@@ -317,6 +317,33 @@ lleva un día siendo falso.
 la puerta de escalares consumidos con lista que sólo encoge; `primary-action` con el token
 `AccentTextBrush`; y después la tipografía y las vistas, una por commit.
 
+#### El rojo de CI que trajo `4b2c326`, y era del arnés (2026-08-19)
+
+`RestartSwitchButton is on screen but cannot be pressed: visible=False, enabled=True` en la escena del
+cambio de versión — [la evidencia](evidence/stable/audit-walk-press-retry.md). **No lo causó el
+commit**: toca tokens y pruebas de tema, y la escena pasa seis de seis en local.
+
+**La causa, leída en el bucle de `PressAsync`:** repite una pulsación sin efecto y antes de repetirla
+mira **sólo si el control está deshabilitado**. Contestar la pregunta del cambio de versión **la
+cierra** —que es lo correcto, y la escena lo afirma—, así que el botón sale del árbol al pulsarlo
+mientras su comando sigue habilitado; en un runner cargado el efecto tarda, el bucle da otra vuelta y
+pulsa un botón que ya no está.
+
+**Y con eso la regla de la casa gana una excepción, que es lo que hay que recordar:** `visible=False`
+acusa al producto **salvo que pulsar ese control sea justamente lo que lo quita de la pantalla**. Los
+tres botones de esa pregunta son de esa clase, y también cualquier confirmación que cierre lo que
+confirma.
+
+La decisión salió a `WalkPressPolicy`, con su prueba propia —porque el caso **sólo aparece en un
+runner lento**, y una regla que se ejercita por suerte no la comprueba nadie— y probada fallando con
+la regla vieja. Un control que no está en pantalla ya **no se vuelve a pulsar**: habla el tiempo de
+espera del efecto, que es el fallo verdadero.
+
+**Anotado y sin tocar, porque es otra cosa:** la fila que abre la pregunta **sigue pulsable mientras
+la pregunta está en pantalla** — `SwitchToVersionAsync` retorna en cuanto llama a `Apply`, así que el
+`finally` de la fila la rehabilita con el diálogo abierto, y una segunda pulsación vacía el cabezal,
+contesta cero y se lleva la pregunta. Merece su propia medición.
+
 #### ~~La fase 2d: la fila de lista~~ — hecha el 2026-08-19
 
 **Hecha** — [la evidencia](evidence/stable/audit-redesign-phase2d-list-row.md). 17 usos directos y
