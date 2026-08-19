@@ -971,6 +971,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="Button:disabled, ToggleButton:disabled, ToggleSwitch:disabled, RadioButton:disabled, TextBox:disabled, ComboBox:disabled, CheckBox:disabled, Slider:disabled, NumericUpDown:disabled, ListBoxItem:disabled">
     <Setter Property="theme:DisabledOutline.IsShown" Value="True" />
   </Style>
+  <!--
+    The one button that is the point of its screen. It was a class on ResumeHeroView's button that no
+    style declared and no test looked for, so "resume what you were watching" was painted exactly
+    like every secondary button beside it.
+
+    The hierarchy is carried entirely by the resting state, which is when a person looks and decides.
+    Hover and press invert like every other control, deliberately: one grammar of states across the
+    application beats a fourth way of saying "pressed", and an accent that stayed put through hover
+    would be the only control in the two high contrast themes that stopped answering the mouse.
+
+    The setters go on the presenter because that is what paints a button — measured in phase 2a, a
+    Background setter on the Button itself loses to the base theme.
+  -->
+  <Style Selector="Button.primary-action">
+    <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+  </Style>
+
   <Style Selector="Button.theme-option">
     <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
