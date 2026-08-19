@@ -103,6 +103,50 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <!--
+            The drop-down, in three families of its own: the closed frame, the panel that opens, and
+            the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
+            because IsEditable appears nowhere in the tree.
+          -->
+          <StaticResource x:Key="ComboBoxBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundUnfocused" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundBorderBrushUnfocused" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocusedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocusedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForegroundFocusedPressed" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="CardSurfaceBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelected" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedDisabled" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
           <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
@@ -191,6 +235,50 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <!--
+            The drop-down, in three families of its own: the closed frame, the panel that opens, and
+            the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
+            because IsEditable appears nowhere in the tree.
+          -->
+          <StaticResource x:Key="ComboBoxBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundUnfocused" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundBorderBrushUnfocused" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocusedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocusedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForegroundFocusedPressed" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="CardSurfaceBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelected" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedDisabled" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
           <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
@@ -285,6 +373,50 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <!--
+            The drop-down, in three families of its own: the closed frame, the panel that opens, and
+            the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
+            because IsEditable appears nowhere in the tree.
+          -->
+          <StaticResource x:Key="ComboBoxBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundUnfocused" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundBorderBrushUnfocused" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocusedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocusedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForegroundFocusedPressed" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="CardSurfaceBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelected" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedDisabled" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
           <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
@@ -378,6 +510,50 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <!--
+            The drop-down, in three families of its own: the closed frame, the panel that opens, and
+            the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
+            because IsEditable appears nowhere in the tree.
+          -->
+          <StaticResource x:Key="ComboBoxBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundUnfocused" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxBackgroundBorderBrushUnfocused" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxForegroundFocusedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocusedPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownGlyphForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxPlaceHolderForegroundFocusedPressed" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="CardSurfaceBrush" />
+          <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ComboBoxItemBackgroundSelectedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ComboBoxItemForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelected" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ComboBoxItemBorderBrushSelectedDisabled" ResourceKey="ShellBorderBrush" />
           <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
           <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
@@ -455,6 +631,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
   <Style Selector="ListBoxItem:selected">
     <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+  <!--
+    A drop-down row is the same idea as a list row and is read the same way: the fill is a tint, and
+    the border is the part that has to clear the bar, because in the two high contrast themes the
+    subtle accent *is* the surface. Measured before writing any of it: a ComboBoxItem's content
+    presenter takes BorderThickness by template binding, so the thickness is given here — every row
+    carries it in every state and only the colour changes, or selecting one would shove its text
+    sideways.
+
+    The colour is *not* given here, and that was measured the hard way. A style setting BorderBrush
+    on the item reaches the item (measured: bd=#ff1769aa on it) and the presenter ignores it
+    (bd=Transparent), because the control theme sets the presenter's brush per state from
+    ComboBoxItemBorderBrush*. The template binding was verified in the resting state, which is the
+    one state where nothing competes for it. What reaches a template is the resource it consumes,
+    so the selected border is a redirect above and not a setter here.
+  -->
+  <Style Selector="ComboBoxItem">
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderBrush" Value="Transparent" />
   </Style>
   <!--
     Every control type that can take keyboard focus is styled from the same token, so the focus ring

@@ -104,6 +104,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   border's colour and the text the background's — because in those palettes a lighter shade would say
   nothing.
 
+- **Drop-down lists can be seen, open and closed.** The chosen row inside a drop-down stood apart
+  from the others by **less than it takes to tell two shades apart**, exactly as a list row did and
+  for the same reason: Windows' translucent blue. The panel that opens had no visible edge either —
+  black at fourteen per cent — and an open drop-down floats over the window, so its edge is the only
+  thing saying where it ends. And in the two high contrast themes, hovering a row painted it **the
+  same colour as its own text**: black on black. The chosen row now carries a border in the
+  application's colour as well as a fill, the panel has the same edge as everything else, and the
+  text of the rows that invert comes from the colour that exists for it. All eight drop-downs.
+
 - **Text fields can be read.** The grey hint that says what an empty field is for was painted with
   two layers of transparency on top of its colour, and came out at **less than half** the contrast it
   takes to read text. A switched-off field could not be read either, and had no shape: neither its

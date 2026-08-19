@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b, 2c, 2d and 2e done**; four types and the views remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b, 2c, 2d, 2e and 2f done**; three types and the views remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -364,7 +364,7 @@ each correction.
    adds `&& !question.IsVisible`, and it subscribes to the dialogue's `PropertyChanged` to ask again
    when `IsVisible` changes. **Rejected**: making the dialogue modal, a structural change to the
    surface for a defect in a predicate.
-2. **Phase 2f (`ComboBox`) follows the list row's pattern** for the drop-down's rows: a subtle accent
+2. ~~**Phase 2f (`ComboBox`)**~~ — **done**, and the first measurement answered **yes**, with a trap inside it: the presenter takes the **thickness** by template binding and **not the colour**, because the control theme sets its brush per state. The colour goes through a resource redirect. **Phase 2f (`ComboBox`) follows the list row's pattern** for the drop-down's rows: a subtle accent
    fill **plus** a second cue, at the same thickness in every state. The **first measurement of the
    phase** is whether a `ComboBoxItem`'s content presenter takes the border by template binding as
    the `ListBoxItem` does; if it does not, the cue is another adorner. The closed frame and the arrow
@@ -395,7 +395,7 @@ each correction.
    view per commit — and **the five controls `MiniPlayerWindow` gains arrive with their walk scene in
    the same commit**. The ratchet does not cross a phase boundary carrying debt.
 
-#### Phase 2f: the `ComboBox`, already measured — 2026-08-19
+#### ~~Phase 2f: the `ComboBox`~~ — done on 2026-08-19
 
 **Measured with not a line written**, so the next session executes instead of discovering. Eight
 uses, and it inherits nothing from the text field: `IsEditable` appears nowhere in the tree, so a

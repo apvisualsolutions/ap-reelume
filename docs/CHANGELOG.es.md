@@ -104,6 +104,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
   temas, y en alto contraste pasar el ratón o pulsar **invierte** el botón —el relleno toma el color
   del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada.
 
+- **Las listas desplegables se ven, abiertas y cerradas.** La fila elegida dentro de un desplegable
+  se separaba de las demás **menos de lo que hace falta para distinguir dos tonos**, igual que le
+  pasaba a la fila de una lista, y por la misma causa: el azul translúcido de Windows. El panel que
+  se abre tampoco tenía un borde que se viera —era negro al catorce por ciento—, y un desplegable
+  abierto flota sobre la ventana, así que su borde es lo único que dice dónde termina. Y en los dos
+  temas de alto contraste, pasar el ratón por una fila la pintaba **del mismo color que su texto**:
+  negro sobre negro. Ahora la fila elegida lleva borde del color de la aplicación además del fondo,
+  el panel tiene el borde de todo lo demás, y el texto de las filas que invierten sale del color que
+  existe para eso. Los ocho desplegables de la aplicación.
+
 - **Los campos de texto se leen.** El aviso gris que dice para qué sirve un campo vacío estaba
   pintado con dos capas de transparencia encima del color, y quedaba **por debajo de la mitad** del
   contraste que hace falta para leer un texto. Un campo apagado tampoco se leía ni se distinguía del

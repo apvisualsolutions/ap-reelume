@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b, 2c, 2d y 2e hechas**; quedan cuatro tipos y las vistas | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b, 2c, 2d, 2e y 2f hechas**; quedan tres tipos y las vistas | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -366,7 +366,7 @@ cada corrección.
    casa—, su predicado añade `&& !question.IsVisible`, y se suscribe al `PropertyChanged` del
    diálogo para volver a preguntar cuando `IsVisible` cambie. **Descartado** hacer el diálogo modal:
    es un cambio estructural de la superficie para un defecto de un predicado.
-2. **La fase 2f (`ComboBox`) sigue el patrón de la fila de lista** en las filas del desplegable:
+2. ~~**La fase 2f (`ComboBox`)**~~ — **hecha**, y la primera medición contestó que **sí**, con una trampa dentro: el presenter toma el **grosor** por `TemplateBinding` y **no el color**, porque el `ControlTheme` fija su pincel por estado. El color va por redirección de recurso. **La fase 2f (`ComboBox`) sigue el patrón de la fila de lista** en las filas del desplegable:
    relleno del acento tenue **más** una segunda señal, con el mismo grosor en todos los estados. La
    **primera medición de la fase** es si el `ContentPresenter` de un `ComboBoxItem` toma el borde por
    `TemplateBinding` como el `ListBoxItem`; si no lo toma, la señal es otro adorno. El marco cerrado y
@@ -397,7 +397,7 @@ cada corrección.
    luego una vista por commit— y **los cinco controles que gana `MiniPlayerWindow` llegan con su
    escena de paseo en el mismo commit**. El trinquete no cruza de fase con deuda.
 
-#### La fase 2f: el `ComboBox`, ya medido — 2026-08-19
+#### ~~La fase 2f: el `ComboBox`~~ — hecha el 2026-08-19
 
 **Medido y sin escribir una línea**, para que la sesión siguiente ejecute en vez de descubrir. Ocho
 usos, y **no hereda nada del campo de texto**: `IsEditable` no aparece en el árbol, así que un
