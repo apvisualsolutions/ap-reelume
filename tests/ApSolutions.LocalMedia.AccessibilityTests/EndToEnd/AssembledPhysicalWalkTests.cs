@@ -4336,17 +4336,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 break;
             }
 
-            // A control that is disabled right now is usually a control whose own work is still in
-            // flight, and that is the application behaving correctly: the transport bar disables a
-            // skip while the previous one is seeking, on purpose. Pressing again would land on a
-            // disabled control and the harness would report the correct behaviour as a failure —
-            // which is what CI measured on 2026-08-16, on a runner slow enough for the seek to
-            // outlast the retry that local runs never saw. A person looking at a greyed button
-            // waits for it, and so does this; when the wait runs out the press happens anyway, so a
-            // control that is disabled for a different reason still says so.
-            if (!control.IsEffectivelyEnabled && waits++ < 16)
+            // Whether to wait, press again, or stop pressing lives in WalkPressPolicy, where the two
+            // reasons not to repeat a press can be measured without a slow runner: a control whose
+            // own work is in flight is correctly disabled, and a control that removes itself by
+            // working — the version-switch answers close the question they answer — is simply gone.
+            var step = WalkPressPolicy.Next(
+                control.IsEffectivelyVisible,
+                control.IsEffectivelyEnabled,
+                waits);
+            if (step == PressStep.Wait)
             {
+                waits++;
                 continue;
+            }
+
+            if (step == PressStep.StopPressing)
+            {
+                break;
             }
 
             pressed = Click(host, control);
