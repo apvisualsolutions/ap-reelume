@@ -17,7 +17,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <WrapPanel ItemSpacing="12" LineSpacing="8">
       <TextBlock
           VerticalAlignment="Center"
-          FontSize="18"
+          FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
           Text="{DynamicResource RecommendationsHeading}"
           automation:AutomationProperties.HeadingLevel="2" />
@@ -63,13 +63,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Text="{Binding Title}"
                   TextTrimming="CharacterEllipsis" />
               <TextBlock
-                  FontSize="12"
+                  FontSize="{DynamicResource FontSizeCaption}"
                   IsVisible="{Binding HasReasons}"
                   Text="{DynamicResource RecommendationsWhyLabel}" />
               <ItemsControl ItemsSource="{Binding ReasonKeys}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
-                    <TextBlock FontSize="12" Text="{Binding Converter={StaticResource ReasonTextConverter}}" />
+                    <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{Binding Converter={StaticResource ReasonTextConverter}}" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>

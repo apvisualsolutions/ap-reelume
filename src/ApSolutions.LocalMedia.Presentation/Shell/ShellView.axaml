@@ -33,7 +33,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         BorderThickness="0,0,1,0">
       <Grid RowDefinitions="Auto,*,Auto">
         <TextBlock
-            FontSize="24"
+            FontSize="{DynamicResource FontSizeSubtitle}"
             FontWeight="SemiBold"
             Text="{DynamicResource ProductDisplayName}"
             automation:AutomationProperties.HeadingLevel="1" />
@@ -117,7 +117,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 FontWeight="SemiBold"
                 Text="{DynamicResource ProductDisplayName}" />
             <TextBlock
-                FontSize="12"
+                FontSize="{DynamicResource FontSizeCaption}"
                 Text="{DynamicResource PublisherSignature}" />
           </StackPanel>
         </Border>
@@ -130,14 +130,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding IsPrimaryContentVisible}"
         RowDefinitions="Auto,Auto,*">
       <TextBlock
-          FontSize="34"
+          FontSize="{DynamicResource FontSizeDisplay}"
           FontWeight="SemiBold"
           Text="{DynamicResource WelcomeTitle}" />
       <TextBlock
           Grid.Row="1"
           MaxWidth="680"
           Margin="0,14,0,0"
-          FontSize="17"
+          FontSize="{DynamicResource FontSizeBody}"
           Text="{DynamicResource WelcomeDescription}"
           TextWrapping="Wrap" />
       <Border
@@ -150,7 +150,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <StackPanel VerticalAlignment="Center" Spacing="10">
           <TextBlock
               HorizontalAlignment="Center"
-              FontSize="22"
+              FontSize="{DynamicResource FontSizeSubtitle}"
               FontWeight="SemiBold"
               Text="{DynamicResource EmptyLibraryTitle}" />
           <TextBlock

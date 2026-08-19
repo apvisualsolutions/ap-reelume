@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource MetadataEditorAccessibleName}">
   <ScrollViewer>
     <Grid Margin="24" ColumnDefinitions="2*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="12">
-      <TextBlock Grid.ColumnSpan="2" FontSize="28" FontWeight="SemiBold" Text="{DynamicResource MetadataEditorTitle}" />
+      <TextBlock Grid.ColumnSpan="2" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource MetadataEditorTitle}" />
 
       <TextBox Grid.Row="1" Text="{Binding Title}" automation:AutomationProperties.Name="{DynamicResource MetadataTitleLabel}" />
       <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding LockTitle}" Content="{DynamicResource MetadataLockTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataLockTitle}" />

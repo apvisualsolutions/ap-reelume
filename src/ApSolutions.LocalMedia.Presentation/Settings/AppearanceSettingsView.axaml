@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="16">
       <TextBlock
-          FontSize="28"
+          FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource AppearanceTitle}"
@@ -56,7 +56,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </Button>
       </StackPanel>
       <TextBlock
-          FontSize="20"
+          FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource LanguageTitle}"

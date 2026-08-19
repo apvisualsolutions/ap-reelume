@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsAccessibleName}">
   <StackPanel x:Name="SegmentDetectionSurface" Spacing="12">
     <TextBlock
-        FontSize="24"
+        FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         Text="{DynamicResource SegmentDetectionSettingsTitle}"
         automation:AutomationProperties.HeadingLevel="1" />

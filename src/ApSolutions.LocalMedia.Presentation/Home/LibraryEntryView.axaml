@@ -19,7 +19,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
       <StackPanel Spacing="2">
         <TextBlock
-            FontSize="18"
+            FontSize="{DynamicResource FontSizeSubtitle}"
             FontWeight="SemiBold"
             Text="{DynamicResource HomeLibraryHeading}" />
         <StackPanel Orientation="Horizontal" Spacing="6">

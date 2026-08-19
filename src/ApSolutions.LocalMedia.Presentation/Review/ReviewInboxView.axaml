@@ -16,7 +16,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </UserControl.KeyBindings>
   <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
     <TextBlock
-        FontSize="32"
+        FontSize="{DynamicResource FontSizeDisplay}"
         FontWeight="SemiBold"
         Text="{DynamicResource ReviewInboxTitle}"
         automation:AutomationProperties.HeadingLevel="1" />
@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding HasReassignments}"
         automation:AutomationProperties.Name="{DynamicResource ReassignmentSectionAccessibleName}">
       <TextBlock
-          FontSize="20"
+          FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
           Text="{DynamicResource ReassignmentSectionTitle}"
           automation:AutomationProperties.HeadingLevel="2" />

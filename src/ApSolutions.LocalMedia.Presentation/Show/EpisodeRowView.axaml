@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           CornerRadius="4"
           IsVisible="{Binding !IsAvailable}"
           automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
-        <TextBlock FontSize="12" Text="{DynamicResource MediaUnavailable}" />
+        <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
       </Border>
       <TextBlock IsVisible="{Binding !IsPlayable}" Text="{DynamicResource EpisodeNoFile}" />
     </StackPanel>

@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsAccessibleName}">
   <StackPanel Spacing="8">
     <TextBlock
-        FontSize="20"
+        FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         Text="{DynamicResource RecommendationSettingsTitle}"
         automation:AutomationProperties.HeadingLevel="1" />
@@ -36,7 +36,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         TextWrapping="Wrap" />
     <StackPanel Spacing="8" IsVisible="{Binding HasWatchedThreshold}">
       <TextBlock
-          FontSize="16"
+          FontSize="{DynamicResource FontSizeBody}"
           FontWeight="SemiBold"
           Text="{DynamicResource RecommendationSettingsThresholdLabel}"
           automation:AutomationProperties.HeadingLevel="2" />

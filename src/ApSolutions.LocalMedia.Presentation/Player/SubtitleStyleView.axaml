@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource SubtitleStyleAccessibleName}">
   <StackPanel x:Name="SubtitleStyleSurface" Spacing="12">
     <TextBlock
-        FontSize="20"
+        FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource SubtitleStyleAccessibleName}"

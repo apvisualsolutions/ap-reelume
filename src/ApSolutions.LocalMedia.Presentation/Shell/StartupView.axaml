@@ -15,7 +15,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         VerticalAlignment="Center"
         Spacing="12">
       <TextBlock
-          FontSize="30"
+          FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource ProductDisplayName}" />

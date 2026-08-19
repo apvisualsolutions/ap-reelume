@@ -20,15 +20,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
       <StackPanel Spacing="4">
         <TextBlock
-            FontSize="14"
+            FontSize="{DynamicResource FontSizeBody}"
             Text="{DynamicResource HomeResumeHeading}" />
         <TextBlock
-            FontSize="24"
+            FontSize="{DynamicResource FontSizeSubtitle}"
             FontWeight="SemiBold"
             Text="{Binding ResumeTitle}"
             TextTrimming="CharacterEllipsis" />
         <TextBlock
-            FontSize="14"
+            FontSize="{DynamicResource FontSizeBody}"
             IsVisible="{Binding HasResumeSubtitle}"
             Text="{Binding ResumeSubtitle}"
             TextTrimming="CharacterEllipsis" />

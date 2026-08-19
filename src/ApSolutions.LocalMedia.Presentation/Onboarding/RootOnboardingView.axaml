@@ -18,7 +18,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="720" Spacing="16">
       <TextBlock
-          FontSize="28"
+          FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource RootOnboardingTitle}"
@@ -69,7 +69,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Border>
       <StackPanel Spacing="8" IsVisible="{Binding HasRoots}">
         <TextBlock
-            FontSize="20"
+            FontSize="{DynamicResource FontSizeSubtitle}"
             FontWeight="SemiBold"
             Foreground="{DynamicResource TextPrimaryBrush}"
             Text="{DynamicResource RootListTitle}"

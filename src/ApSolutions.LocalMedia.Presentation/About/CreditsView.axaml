@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <StackPanel Spacing="8">
     <TextBlock
         Text="{DynamicResource AboutCreditsHeading}"
-        FontSize="20"
+        FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         automation:AutomationProperties.HeadingLevel="2" />
 
