@@ -47,7 +47,6 @@ public sealed class ScalarTokenTests
         "SpaceMedium",
         "SpaceLarge",
         "SpaceXLarge",
-        "CornerRadiusMedium",
     ];
 
     /// <summary>

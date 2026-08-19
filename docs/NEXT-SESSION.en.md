@@ -1,14 +1,29 @@
 # Where to resume
 
-## State on opening (2026-08-19, end of the afternoon session)
+## State on opening (2026-08-19, end of the evening session)
 
-**`main` and the branch are both at `e182bd5`, CI green, nothing in flight.** That run verified the
-full superset: the whole of `verify.ps1` **plus** the accessibility, recovery and walk gates. Work can
-start straight away.
+**The branch carries the mini player and its five controls.** Ahead of it sit `243d62f`
+(documentation only) and `e182bd5`, which is where `main` is. **First thing: `gh run list`**, and move
+`main` forward to each green in order.
 
-**Step 6 is done except the views**: the whole of phase 2 (all ten control types), the scalars gate,
-`primary-action` and the type scale. **Next is `MiniPlayerWindow`**, and it is **fully decided**
-below — nine decisions, none outstanding.
+**Step 6 is done except the views, and `MiniPlayerWindow` no longer counts**: what is left is
+`UpdateView`, `PlayerView`, then one view per commit in `SURFACES.en.md`'s order.
+
+**What this batch cost, and what the remaining views inherit:**
+
+1. **A secondary window is not like a view.** `PlayerWindowCoordinator.Apply` assigned
+   `window.Content`, which **replaces the whole AXAML tree**: the mini window threw away everything it
+   declared for itself the moment a session arrived. `Host()` and `MiniPlayerSurface` had been there
+   from the start and **only one test ever called them** — the house defect, form eleven.
+2. **`WalkLedger.Record` requires a `UserControl` ancestor.** A control declared straight inside a
+   `Window` has no walk identity at all, so the five live in `MiniPlayerChromeView` rather than in the
+   window.
+3. **The walk could not leave the shell's window**, and `MiniPlayerWindow` was the only secondary
+   window in the tree, so nobody had needed it to. The harness gained `Reachable`, `SecondaryWindows`
+   and `RootOf`, and every click function now aims at the control's own window.
+4. **Long labels do not overflow; they leave nowhere for the beside click.** With five long-text
+   buttons the chrome wrapped into three rows inside 480×270 and `BesidePoint` ran out of free points.
+   Short labels fixed it, and the symptom was never "outside the window".
 
 **Three things that cost one CI round each and should not repeat:**
 
@@ -399,9 +414,10 @@ each correction.
    style that spends a scalar is real consumption — **plus a named list of the ones the base theme
    consumes**, which today is one: `TextControlPlaceholderOpacity`. Measured on 2026-08-19:
    `FocusStrokeThickness` (11), `CornerRadiusSmall` (2), `FocusInnerStrokeThickness` (1) and
-   `ControlHeight` (1) are spent. **The exception list, which may only shrink, is six**:
-   `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge`, `SpaceXLarge` and `CornerRadiusMedium`.
-   It empties itself as the views spend them.
+   `ControlHeight` (1) are spent. **The exception list, which may only shrink, is five
+   since 2026-08-19**: `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge` and `SpaceXLarge`.
+   `CornerRadiusMedium` left it when `player-chrome` spent it. It empties itself as the views spend
+   the rest.
 5. **`MotionDurationStandardMilliseconds` and `MotionDurationReducedMilliseconds` are DELETED.** No
    AXAML reads them and `FluentThemeService` holds its own `TimeSpan.FromMilliseconds(160)`: they are
    **a parallel copy of a number**, which is exactly the defect that bit with the `<Color>` list
@@ -419,10 +435,25 @@ each correction.
    view per commit — and **the five controls `MiniPlayerWindow` gains arrive with their walk scene in
    the same commit**. The ratchet does not cross a phase boundary carrying debt.
 
-#### `MiniPlayerWindow`: the five controls, FULLY DECIDED — 2026-08-19
+#### ~~`MiniPlayerWindow`: the five controls~~ — done on 2026-08-19
 
-**Nothing left to deliberate.** Measured without writing code, as the `ComboBox` was, with the nine
-decisions below taken. Today the window is ten lines: a `Panel Background="Black"` and **zero
+**Done**, with [its evidence](evidence/stable/audit-mini-player-chrome.md). All nine decisions held
+except two details the measurement forced, written down here:
+
+- **The five do not live in `MiniPlayerWindow.axaml`** but in `MiniPlayerChromeView`, a new
+  `UserControl`, because `WalkLedger.Record` requires a `UserControl` ancestor and asserts without
+  one. The data context is still `ShellViewModel` and **there is no new view model**, which is what
+  decision 1 was protecting.
+- **`TogglePlaybackCommand` does not belong in `CommandNotificationTests`**: that gate lists the files
+  that **silence** `CanExecuteChanged`, and an `AsyncRelayCommand` does not. The guarantee decision 2
+  was after lives in `UpdateState`'s list of commands that get `RaiseCanExecuteChanged`, where it
+  became the sixth.
+
+The original decision text is kept below because it explains **why** each binding is the one it is.
+What follows, for the views that remain: `UpdateView`, `PlayerView`, then one per commit.
+
+**What it was, before it was done.** Measured without writing code, as the `ComboBox` was, with the
+nine decisions below taken. The window was ten lines: a `Panel Background="Black"` and **zero
 controls**.
 
 **The five, with the keys the package already fixed** and each one's exact binding:

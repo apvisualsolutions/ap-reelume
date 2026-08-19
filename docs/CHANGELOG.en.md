@@ -10,6 +10,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The mini player gains its five controls.** Pause/resume, two ten-second skips, back to the main
+  window, and close — always visible, and each named for a screen reader. The window used to drop
+  everything it declared for itself the moment a session arrived, because the coordinator assigned
+  its whole content; now the chrome and the picture share the window.
+
 - **An independent updater.** It checks for a newer version only when you ask or have allowed it,
   tells you what changed in Spanish and English, downloads into a folder of its own while verifying
   the published hash and size, and hands the package to Windows only after a confirmation that names

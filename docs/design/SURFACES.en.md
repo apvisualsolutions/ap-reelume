@@ -9,7 +9,7 @@ visible is left undesigned.
 
 ## The rule that already holds, and needs no redoing
 
-- **All 48 views use localised strings.** Not one carries untranslated text: the measurement found no
+- **All 49 views use localised strings.** Not one carries untranslated text: the measurement found no
   view without `DynamicResource`.
 - **470 string keys in Spanish and 470 in English**, in
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` and `Strings.en.axaml`.
@@ -21,7 +21,7 @@ visible is left undesigned.
 - **Every interactive control has an accessible name**, and 80 accessibility tests require it. A
   redesign may change the shape, not take the name away.
 
-## The 48 views, by area
+## The 49 views, by area
 
 | Area | Views |
 | --- | --- |
@@ -30,7 +30,7 @@ visible is left undesigned.
 | Library (2) | `LibraryView`, `UnavailableBadge` |
 | Film card (1) | `MovieDetailsView` |
 | Series card (2) | `ShowDetailsView`, `EpisodeRowView` |
-| Player (16) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow` |
+| Player (17) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow`, `MiniPlayerChromeView` |
 | Settings (7) | `AppearanceSettingsView`, `PrivacySettingsView`, `ScanSettingsView`, `LifecycleSettingsView`, `RecommendationSettingsView`, `SegmentDetectionSettingsView`, `DiagnosticsPreviewView` |
 | Review (3) | `ReviewInboxView`, `CandidateCardView`, `DuplicateReviewView` |
 | Metadata (2) | `MetadataEditorView`, `RenamePreviewView` |

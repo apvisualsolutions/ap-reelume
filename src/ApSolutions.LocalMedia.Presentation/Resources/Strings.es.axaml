@@ -205,6 +205,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AudioOutputLayoutDegraded">El dispositivo elegido no admite esa disposición; se usa la mayor que acepta.</x:String>
   <x:String x:Key="AudioOutputDeviceFallback">El dispositivo guardado no está conectado; se usa el predeterminado y se recuerda tu elección.</x:String>
   <x:String x:Key="MiniPlayerTitle">Mini reproductor</x:String>
+  <x:String x:Key="MiniPlayerPlayPause">Pausa</x:String>
+  <x:String x:Key="MiniPlayerSkipBack">Atrás</x:String>
+  <x:String x:Key="MiniPlayerSkipForward">Adelante</x:String>
+  <x:String x:Key="MiniPlayerRestore">Ampliar</x:String>
+  <x:String x:Key="MiniPlayerClose">Cerrar</x:String>
+  <x:String x:Key="MiniPlayerChromeAccessibleName">Controles del mini reproductor</x:String>
   <x:String x:Key="ShortcutSettingsAccessibleName">Atajos de teclado</x:String>
   <x:String x:Key="ShortcutSettingsDescription">Cada acción esencial tiene un atajo. Puedes cambiarlos; un atajo ya usado se rechaza indicando qué acción lo ocupa.</x:String>
   <x:String x:Key="ShortcutSettingsListName">Lista de atajos</x:String>

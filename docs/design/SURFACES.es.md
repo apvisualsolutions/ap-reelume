@@ -9,7 +9,7 @@ diseñar.
 
 ## La regla que ya se cumple, y no hay que rehacer
 
-- **Las 48 vistas usan cadenas localizadas.** Ninguna tiene texto sin traducir: la medición no
+- **Las 49 vistas usan cadenas localizadas.** Ninguna tiene texto sin traducir: la medición no
   encontró ni una sola vista sin `DynamicResource`.
 - **470 claves de cadena en español y 470 en inglés**, en
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` y `Strings.en.axaml`.
@@ -21,7 +21,7 @@ diseñar.
 - **Cada control interactivo tiene nombre accesible**, y hay 80 pruebas de accesibilidad que lo
   exigen. Un rediseño puede cambiar la forma, no quitarle el nombre.
 
-## Las 48 vistas, por área
+## Las 49 vistas, por área
 
 | Área | Vistas |
 | --- | --- |
@@ -30,7 +30,7 @@ diseñar.
 | Biblioteca (2) | `LibraryView`, `UnavailableBadge` |
 | Ficha de película (1) | `MovieDetailsView` |
 | Ficha de serie (2) | `ShowDetailsView`, `EpisodeRowView` |
-| Reproductor (16) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow` |
+| Reproductor (17) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow`, `MiniPlayerChromeView` |
 | Ajustes (7) | `AppearanceSettingsView`, `PrivacySettingsView`, `ScanSettingsView`, `LifecycleSettingsView`, `RecommendationSettingsView`, `SegmentDetectionSettingsView`, `DiagnosticsPreviewView` |
 | Revisión (3) | `ReviewInboxView`, `CandidateCardView`, `DuplicateReviewView` |
 | Metadatos (2) | `MetadataEditorView`, `RenamePreviewView` |

@@ -10,6 +10,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El mini reproductor gana sus cinco controles.** Pausa/reanudar, dos saltos de diez segundos,
+  volver a la ventana grande y cerrar, siempre visibles y con nombre para un lector de pantalla. La
+  ventana dejaba caer todo lo que declaraba para sí misma en cuanto llegaba una sesión —el
+  coordinador le asignaba el contenido entero— y ahora el cromo y el vídeo comparten la ventana.
+
 - **Actualizador independiente.** Comprueba si hay una versión nueva sólo cuando lo pides o lo has
   permitido, te dice qué cambia en español y en inglés, descarga a una carpeta aparte comprobando el
   hash y el tamaño publicados, y entrega el paquete a Windows únicamente tras una confirmación que

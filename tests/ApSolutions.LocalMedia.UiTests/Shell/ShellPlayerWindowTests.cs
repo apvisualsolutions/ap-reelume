@@ -11,6 +11,7 @@ using ApSolutions.LocalMedia.Presentation.Shell;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Shell;
@@ -42,9 +43,14 @@ public sealed class ShellPlayerWindowTests
         await viewModel.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
 
-        var mini = Assert.IsType<MiniPlayerWindow>(stage.Parent);
+        // The stage is inside the mini window rather than being all of it: the window keeps a tree of
+        // its own, which is where its five controls live. What is asserted is the window it ended up
+        // under, because the parent it hangs from is now the panel that holds it.
+        var mini = Assert.IsType<MiniPlayerWindow>(
+            stage.GetVisualAncestors().OfType<Window>().FirstOrDefault());
         Assert.True(mini.Topmost);
-        Assert.Same(stage, mini.Content);
+        Assert.Contains(stage, mini.GetVisualDescendants());
+        Assert.NotEmpty(mini.GetVisualDescendants().OfType<MiniPlayerChromeView>());
 
         await viewModel.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
@@ -64,7 +70,7 @@ public sealed class ShellPlayerWindowTests
         var stage = Stage(view);
         await viewModel.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        Assert.IsType<MiniPlayerWindow>(stage.Parent);
+        Assert.IsType<MiniPlayerWindow>(stage.GetVisualAncestors().OfType<Window>().FirstOrDefault());
 
         await viewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();

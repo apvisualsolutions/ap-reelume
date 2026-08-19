@@ -1970,6 +1970,133 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The mini player's own five controls, pressed with the mouse inside the window they live in.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the first scene in this repository that presses anything outside the shell's window,
+    /// and it is why the harness learned to aim: until 2026-08-19 <c>Resolve</c> searched the shell
+    /// alone and every click was translated into the shell's window, so a control in the mini player
+    /// would have been invisible to the walk — which reads as "the application does not declare it"
+    /// rather than "the harness cannot see it".
+    /// </para>
+    /// <para>
+    /// The order is not arbitrary. The two skips go before the pause, because a paused session is not
+    /// the state either skip was measured in; Restore is what takes the session back to the shell, so
+    /// it comes after everything that needs the mini window on screen; and Close ends the session, so
+    /// the walk returns to the mini mode once more to press it.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_mini_players_five_controls_are_pressed_with_the_mouse()
+    {
+        var sample = await RequireSampleAsync("walk-mini.mp4", durationSeconds: 90);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Mini.2024.mp4");
+        File.Copy(sample, mediaPath);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromSeconds(90));
+
+        using var host = ShowShell(height: 1200);
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(fileId), StartPosition: null),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the session never reached the playing state on the real engine");
+
+        var player = host.ViewModel.Player!.Player;
+        var transport = player.Transport;
+        Assert.NotNull(transport);
+
+        await EnterMiniModeAsync(host);
+
+        // The five are measured against the window before a single click, because a control that
+        // falls outside it is the shape that has cost this repository six measurements - and here the
+        // window is 480 wide and holds five buttons carrying translated words.
+        foreach (var anchor in new[]
+        {
+            "MiniPlayerPlayPause",
+            "MiniPlayerSkipBack",
+            "MiniPlayerSkipForward",
+            "MiniPlayerRestore",
+            "MiniPlayerClose",
+        })
+        {
+            var control = Resolve(host, anchor);
+            var window = RootOf(host, control);
+            var corner = control.TranslatePoint(
+                new Point(control.Bounds.Width, control.Bounds.Height),
+                window);
+            Assert.True(
+                corner is { } point
+                    && point.X <= window.Bounds.Width
+                    && point.Y <= window.Bounds.Height,
+                $"{anchor} ends at {corner} in a {window.Bounds.Width:F0}x{window.Bounds.Height:F0} "
+                    + "mini player, so a press would land outside the window it lives in.");
+        }
+
+        await PressAsync(
+            host,
+            "MiniPlayerSkipForward",
+            () => transport!.Position,
+            "clicking the mini player's forward skip never moved the playhead");
+
+        await PressAsync(
+            host,
+            "MiniPlayerSkipBack",
+            () => transport!.Position,
+            "clicking the mini player's backward skip never moved the playhead");
+
+        // One control for two answers: what it does is read from the state, so pressing it on a
+        // playing session pauses it. That the same button resumes is PlayerViewModelTests' question,
+        // and asking it here would need a second press this ledger would not record.
+        await PressAsync(
+            host,
+            "MiniPlayerPlayPause",
+            () => player.IsPaused,
+            "clicking the mini player's pause never paused the session the engine was decoding");
+        Assert.True(player.IsPaused);
+
+        await PressAsync(
+            host,
+            "MiniPlayerRestore",
+            () => host.ViewModel.PlaybackMode,
+            "clicking the mini player's restore never took the session back to the shell");
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
+
+        // And back, for the one that ends the session rather than moving it.
+        await EnterMiniModeAsync(host);
+        await PressAsync(
+            host,
+            "MiniPlayerClose",
+            () => host.ViewModel.Player is null,
+            "clicking the mini player's close never let go of the session the shell was holding");
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
+    }
+
+    /// <summary>
+    /// Puts the session in the mini window and waits until the window is laid out.
+    /// </summary>
+    /// <remarks>
+    /// The mode is changed through the shell's own view model rather than by pressing Mini player,
+    /// which the shell batch already presses and records. What this scene is measuring starts once
+    /// the second window is on screen, and a press with no layout behind it would only measure the
+    /// harness waiting.
+    /// </remarks>
+    private static async Task EnterMiniModeAsync(ShellHost host)
+    {
+        await host.ViewModel.TogglePlaybackModeAsync(
+            PlaybackMode.Mini,
+            TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        await WaitForAsync(
+            () => Task.FromResult(SecondaryWindows(host).Any(window => window.Bounds.Width > 0)),
+            "the mini mode never put a laid-out window on screen for its controls to live in");
+    }
+
+    /// <summary>
     /// Where the proposed name comes from, on the entry this used to be blocked by: one somebody
     /// identified whose stored title is still the file name, year and all, and which holds no year
     /// of its own.
@@ -3992,8 +4119,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var expected = Avalonia.Application.Current!.TryFindResource(anchor, out var resolved) && resolved is string text
             ? text
             : anchor;
-        var matches = host.Shell.GetVisualDescendants()
-            .OfType<Control>()
+        var matches = Reachable(host)
             .Where(candidate =>
                 candidate.Name == anchor || AutomationProperties.GetName(candidate) == expected)
             .Where(candidate => candidate.IsEffectivelyVisible)
@@ -4023,6 +4149,43 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Everything a click can reach: the shell, and any window the shell has opened.
+    /// </summary>
+    /// <remarks>
+    /// Until 2026-08-19 this was the shell alone, and it was enough because the application had one
+    /// window. The mini player is the second, and a control inside it is a control the walk could
+    /// look straight past — which reads as "the application does not declare it" rather than as
+    /// "the harness cannot see it".
+    /// </remarks>
+    private static IEnumerable<Control> Reachable(ShellHost host) =>
+        host.Shell.GetVisualDescendants()
+            .OfType<Control>()
+            .Concat(SecondaryWindows(host).SelectMany(window => window.GetVisualDescendants().OfType<Control>()));
+
+    /// <summary>
+    /// The windows the shell has opened beside its own, found through the surface they hold.
+    /// </summary>
+    /// <remarks>
+    /// Through the stage rather than through the application's window list: the stage is named, the
+    /// shell keeps its name scope wherever the stage travels, and asking it is the same question a
+    /// person answers by looking — "where is the picture right now".
+    /// </remarks>
+    private static IEnumerable<Window> SecondaryWindows(ShellHost host)
+    {
+        var stage = (host.Shell as UserControl)?.FindControl<Panel>("PlayerStage");
+        return stage is null
+            ? []
+            : stage.GetVisualAncestors()
+                .OfType<Window>()
+                .Where(window => !ReferenceEquals(window, host.Window))
+                .Take(1);
+    }
+
+    /// <summary>The window a click on this control has to be aimed at.</summary>
+    private static Window RootOf(ShellHost host, Control control) =>
+        control.GetVisualAncestors().OfType<Window>().FirstOrDefault() ?? host.Window;
+
+    /// <summary>
     /// Puts a control where a click can reach it, and answers with the scrollers it had to move.
     /// </summary>
     /// <remarks>
@@ -4043,13 +4206,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// </remarks>
     private static ScrollViewer[] Reveal(ShellHost host, Control control)
     {
+        var window = RootOf(host, control);
         var scrollers = control.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
         foreach (var scroller in scrollers)
         {
             scroller.Offset = scroller.Offset.WithY(0);
         }
 
-        host.Window.UpdateLayout();
+        window.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
         if (Fits(host, control))
         {
@@ -4061,7 +4225,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         for (var settle = 0; settle < 24 && !Fits(host, control); settle++)
         {
             control.BringIntoView();
-            host.Window.UpdateLayout();
+            window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             // BringIntoView stops at the nearest edge, which leaves a control at the very bottom of a
@@ -4071,7 +4235,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 scroller.Offset = scroller.Offset.WithY(Math.Min(
                     scroller.Offset.Y + 120,
                     Math.Max(0, scroller.Extent.Height - scroller.Viewport.Height)));
-                host.Window.UpdateLayout();
+                window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
             }
         }
@@ -4088,13 +4252,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
     /// <summary>Whether the control's middle is inside the window as the layout has it.</summary>
     private static bool Fits(ShellHost host, Control control) =>
-        control.TranslatePoint(
+        RootOf(host, control) is { } window
+        && control.TranslatePoint(
             new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
-            host.Window) is { } centre
+            window) is { } centre
         && centre.X >= 0
         && centre.Y >= 0
-        && centre.X < host.Window.Bounds.Width
-        && centre.Y < host.Window.Bounds.Height;
+        && centre.X < window.Bounds.Width
+        && centre.Y < window.Bounds.Height;
 
     /// <summary>
     /// Presses a control with the mouse, at its centre in window coordinates, the way a person with a
@@ -4102,6 +4267,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// </summary>
     private static Point Click(ShellHost host, Control control)
     {
+        var window = RootOf(host, control);
         var scrollers = Reveal(host, control);
 
         // The middle, except on a range control, where the middle is usually where the value already
@@ -4112,7 +4278,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var alongX = control is Slider ? 0.25 : 0.5;
         var centre = control.TranslatePoint(
             new Point(control.Bounds.Width * alongX, control.Bounds.Height / 2),
-            host.Window);
+            window);
 
         Assert.True(
             control.IsEffectivelyVisible && control.IsEffectivelyEnabled,
@@ -4126,10 +4292,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.True(
             centre.Value.X >= 0
                 && centre.Value.Y >= 0
-                && centre.Value.X < host.Window.Bounds.Width
-                && centre.Value.Y < host.Window.Bounds.Height,
+                && centre.Value.X < window.Bounds.Width
+                && centre.Value.Y < window.Bounds.Height,
             $"{Describe(control)} sits at {centre.Value} and the window is "
-                + $"{host.Window.Bounds.Width}x{host.Window.Bounds.Height}, so the press would land "
+                + $"{window.Bounds.Width}x{window.Bounds.Height}, so the press would land "
                 + "outside it. Scrollers between it and the window: "
                 + (scrollers.Length == 0
                     ? "none, so nothing here could have moved it."
@@ -4139,9 +4305,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                             $"offset {s.Offset.Y:F0}, viewport {s.Viewport.Height:F0}, "
                             + $"extent {s.Extent.Height:F0}"))));
 
-        host.Window.MouseMove(centre.Value, RawInputModifiers.None);
-        host.Window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
-        host.Window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
+        window.MouseMove(centre.Value, RawInputModifiers.None);
+        window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
+        window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
         return centre.Value;
     }
@@ -4154,9 +4320,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// diagnosis and not an assertion on purpose: <c>InputHitTest</c> was measured on 2026-08-15 not
     /// to predict where a click goes, so it may not decide whether one is allowed.
     /// </remarks>
-    private static string DescribeChainAt(ShellHost host, Point point)
+    private static string DescribeChainAt(ShellHost host, Control control, Point point)
     {
-        if (host.Window.InputHitTest(point) is not Visual hit)
+        if (RootOf(host, control).InputHitTest(point) is not Visual hit)
         {
             return "nothing at all";
         }
@@ -4172,10 +4338,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// </summary>
     private static void ClickBeside(ShellHost host, Control control)
     {
+        var window = RootOf(host, control);
         var beside = BesidePoint(host, control);
-        host.Window.MouseMove(beside, RawInputModifiers.None);
-        host.Window.MouseDown(beside, MouseButton.Left, RawInputModifiers.None);
-        host.Window.MouseUp(beside, MouseButton.Left, RawInputModifiers.None);
+        window.MouseMove(beside, RawInputModifiers.None);
+        window.MouseDown(beside, MouseButton.Left, RawInputModifiers.None);
+        window.MouseUp(beside, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
     }
 
@@ -4208,17 +4375,20 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// </remarks>
     private static Point BesidePoint(ShellHost host, Control control)
     {
+        var window = RootOf(host, control);
         Reveal(host, control);
 
         var centre = control.TranslatePoint(
             new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
-            host.Window);
+            window);
         Assert.True(centre.HasValue, $"{Describe(control)} has no position in the window.");
 
-        var occupied = host.Shell.GetVisualDescendants()
+        // The controls that could take the click are the ones in the same window, which is not the
+        // same set as the shell's once a second window is on screen.
+        var occupied = window.GetVisualDescendants()
             .OfType<Control>()
             .Where(candidate => candidate is Button or ComboBox or Slider or ListBoxItem && candidate.IsEffectivelyVisible)
-            .Select(candidate => candidate.TranslatePoint(default, host.Window) is { } origin
+            .Select(candidate => candidate.TranslatePoint(default, window) is { } origin
                 ? new Rect(origin, candidate.Bounds.Size)
                 : (Rect?)null)
             .OfType<Rect>()
@@ -4238,8 +4408,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             var candidate = centre!.Value + offset;
             if (candidate.X < 0
                 || candidate.Y < 0
-                || candidate.X >= host.Window.Bounds.Width
-                || candidate.Y >= host.Window.Bounds.Height)
+                || candidate.X >= window.Bounds.Width
+                || candidate.Y >= window.Bounds.Height)
             {
                 refused.Add($"{candidate} is outside the window");
                 continue;
@@ -4364,7 +4534,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await WaitForAsync(
             async () => !EqualityComparer<T>.Default.Equals(await probe(), before),
             $"{complaint}. {attempts} presses, the last at {pressed}, where a click reaches "
-                + $"{DescribeChainAt(host, pressed)}.");
+                + $"{DescribeChainAt(host, control, pressed)}.");
         WalkLedger.Record(view, recordAs ?? anchor);
     }
 

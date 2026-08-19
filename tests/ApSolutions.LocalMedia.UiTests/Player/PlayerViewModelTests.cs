@@ -94,6 +94,41 @@ public sealed class PlayerViewModelTests
         Assert.False(viewModel.StopCommand.CanExecute(null));
     }
 
+    /// <summary>
+    /// The mini player's one button for two answers: what it does is read from the state.
+    /// </summary>
+    /// <remarks>
+    /// A window with 480 logical pixels and five controls has no room for a Pause and a Resume of
+    /// which exactly one is ever enabled. Asking the state rather than holding a flag of its own is
+    /// what keeps this in step with the session: a flag would be a second copy of a number this class
+    /// already has, which is the defect that has bitten this repository more than once.
+    /// </remarks>
+    [Fact]
+    public async Task One_control_pauses_or_resumes_according_to_the_state()
+    {
+        var coordinator = new RecordingCoordinator();
+        var viewModel = new PlayerViewModel(coordinator);
+
+        // Idle: neither answer applies, so the one control has nothing to ask.
+        Assert.False(viewModel.TogglePlaybackCommand.CanExecute(null));
+
+        await viewModel.OpenAsync(new MediaFileId(Guid.NewGuid()), SamplePath, cancellationToken: TestContext.Current.CancellationToken);
+        Assert.True(viewModel.TogglePlaybackCommand.CanExecute(null));
+        viewModel.TogglePlaybackCommand.Execute(null);
+        await RecordingCoordinator.WaitForAsync(() => coordinator.PauseCount == 1);
+        Assert.Equal(0, coordinator.ResumeCount);
+
+        viewModel.ApplySessionState(PlaybackState.Paused, failure: null);
+        Assert.True(viewModel.TogglePlaybackCommand.CanExecute(null));
+        viewModel.TogglePlaybackCommand.Execute(null);
+        await RecordingCoordinator.WaitForAsync(() => coordinator.ResumeCount == 1);
+        Assert.Equal(1, coordinator.PauseCount);
+
+        // Stopped: the session is over and the control goes quiet rather than resuming nothing.
+        viewModel.ApplySessionState(PlaybackState.Stopped, failure: null);
+        Assert.False(viewModel.TogglePlaybackCommand.CanExecute(null));
+    }
+
     [Fact]
     public void A_reported_session_failure_replaces_the_previous_reason()
     {

@@ -63,6 +63,11 @@ public sealed partial class ShellView : UserControl
         if (mode == PlaybackMode.Mini)
         {
             var window = _miniWindow ??= new MiniPlayerWindow();
+
+            // The mini window's chrome is bound to the shell's own view model - the session, the
+            // mode and the close all already live there, so a view model of its own would be a
+            // second answer to questions that have one.
+            window.DataContext = _viewModel;
             var screen = window.Screens.Primary?.Bounds ?? new PixelRect(0, 0, 1920, 1080);
             _windowCoordinator.Apply(window, stage, PlaybackMode.Mini, screen, window.RenderScaling);
             window.Show();
@@ -73,7 +78,7 @@ public sealed partial class ShellView : UserControl
         // lingering empty behind the main window.
         if (_miniWindow is { } mini)
         {
-            mini.Content = null;
+            mini.Release();
             mini.Close();
             _miniWindow = null;
         }
