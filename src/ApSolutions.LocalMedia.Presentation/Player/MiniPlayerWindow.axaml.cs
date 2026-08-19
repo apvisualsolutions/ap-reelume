@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 /// <c>Window.Content</c>, and the five controls this window needs would have been discarded the
 /// moment a session arrived — declared, never shown, and never pressed.
 /// </remarks>
-public sealed partial class MiniPlayerWindow : Window, IPlayerSurfaceHost
+public sealed partial class MiniPlayerWindow : Window
 {
     public MiniPlayerWindow()
     {

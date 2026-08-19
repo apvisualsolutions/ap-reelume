@@ -80,23 +80,21 @@ public sealed class WindowLifecycleTests
     }
 
     [AvaloniaFact]
-    public void Moving_between_modes_carries_the_same_surface_instance()
+    public void Each_mode_leaves_the_window_in_the_shape_that_mode_asks_for()
     {
         var coordinator = new PlayerWindowCoordinator();
-        var surface = new PlayerView { DataContext = new PlayerViewModel(new InertCoordinator()) };
         var window = new Window { Width = 800, Height = 600 };
         window.Show();
 
         foreach (var mode in new[] { PlaybackMode.Embedded, PlaybackMode.Fullscreen, PlaybackMode.Mini })
         {
-            coordinator.Apply(window, surface, mode, Screen2560X1440, 1.5);
+            coordinator.Apply(window, mode, Screen2560X1440, 1.5);
             Dispatcher.UIThread.RunJobs();
-            Assert.Same(surface, window.Content);
             Assert.Equal(mode, coordinator.Current);
         }
 
         Assert.True(window.Topmost);
-        coordinator.Apply(window, surface, PlaybackMode.Embedded, Screen2560X1440, 1.5);
+        coordinator.Apply(window, PlaybackMode.Embedded, Screen2560X1440, 1.5);
         Assert.False(window.Topmost);
         Assert.Equal(WindowDecorations.Full, window.WindowDecorations);
         window.Close();
@@ -106,15 +104,14 @@ public sealed class WindowLifecycleTests
     public void Fullscreen_removes_the_decorations_and_returning_restores_them()
     {
         var coordinator = new PlayerWindowCoordinator();
-        var surface = new PlayerView { DataContext = new PlayerViewModel(new InertCoordinator()) };
         var window = new Window { Width = 800, Height = 600 };
         window.Show();
 
-        coordinator.Apply(window, surface, PlaybackMode.Fullscreen, Screen2560X1440, 1.5);
+        coordinator.Apply(window, PlaybackMode.Fullscreen, Screen2560X1440, 1.5);
         Assert.Equal(WindowDecorations.None, window.WindowDecorations);
         Assert.False(window.Topmost);
 
-        coordinator.Apply(window, surface, PlaybackMode.Embedded, Screen2560X1440, 1.5);
+        coordinator.Apply(window, PlaybackMode.Embedded, Screen2560X1440, 1.5);
         Assert.Equal(WindowDecorations.Full, window.WindowDecorations);
         window.Close();
     }
@@ -135,22 +132,31 @@ public sealed class WindowLifecycleTests
         Assert.True(onScreen.IsVisibleOn(Screen2560X1440, 1.5));
     }
 
+    /// <summary>
+    /// A hundred mode changes leave one window and one surface, on the path the shell actually takes.
+    /// </summary>
+    /// <remarks>
+    /// The window is a real <see cref="MiniPlayerWindow"/> and the surface is placed the way the shell
+    /// places it, because that is where a second video frame would be built if one were going to be.
+    /// A generic window and an assignment would have proved it about a path nothing runs.
+    /// </remarks>
     [AvaloniaFact]
     public void A_hundred_mode_changes_leave_one_window_and_one_surface()
     {
         var coordinator = new PlayerWindowCoordinator();
         var surface = new PlayerView { DataContext = new PlayerViewModel(new InertCoordinator()) };
-        var window = new Window { Width = 800, Height = 600 };
+        var window = new MiniPlayerWindow();
         window.Show();
         var modes = new[] { PlaybackMode.Fullscreen, PlaybackMode.Mini, PlaybackMode.Embedded };
 
         for (var iteration = 0; iteration < 100; iteration++)
         {
-            coordinator.Apply(window, surface, modes[iteration % modes.Length], Screen2560X1440, 1.5);
+            window.Host(surface);
+            coordinator.Apply(window, modes[iteration % modes.Length], Screen2560X1440, 1.5);
         }
 
         Dispatcher.UIThread.RunJobs();
-        Assert.Same(surface, window.Content);
+        Assert.Contains(surface, window.GetVisualDescendants().OfType<PlayerView>());
         Assert.Single(surface.GetVisualDescendants().OfType<VideoFrameView>());
         window.Close();
     }
