@@ -104,6 +104,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
   temas, y en alto contraste pasar el ratón o pulsar **invierte** el botón —el relleno toma el color
   del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada.
 
+- **Las barras, los interruptores y las opciones también dejan de pintarlas Windows.** Los cinco
+  controles de barra —el tamaño y el borde de los subtítulos, la posición del vídeo y el peso de las
+  recomendaciones—, los dos botones que se quedan pulsados y el selector de versión duplicada salían
+  **todos** del mismo azul del sistema, idéntico en el tema claro y en el de alto contraste oscuro.
+  Además, una **barra apagada dejaba de decir dónde estaba su valor** —las dos mitades quedaban del
+  mismo gris, y la barra del vídeo está apagada siempre que no hay nada reproduciéndose—, un **botón
+  que se queda pulsado no tenía borde** en ninguno de sus diez estados, así que no tenía forma
+  propia, y **apagado se pintaba igual que en reposo**. El punto de la opción elegida era blanco en
+  los cuatro temas. Ahora los tres salen de los colores de la aplicación, la barra apagada sigue
+  diciendo su valor y el interruptor tiene borde.
+
 - **Las listas desplegables se ven, abiertas y cerradas.** La fila elegida dentro de un desplegable
   se separaba de las demás **menos de lo que hace falta para distinguir dos tonos**, igual que le
   pasaba a la fila de una lista, y por la misma causa: el azul translúcido de Windows. El panel que

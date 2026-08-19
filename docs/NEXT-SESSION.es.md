@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b, 2c, 2d, 2e y 2f hechas**; quedan tres tipos y las vistas | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **la fase 2 entera hecha, 2a a 2g**; quedan la puerta de escalares, `primary-action`, la tipografía y las vistas | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -371,7 +371,7 @@ cada corrección.
    **primera medición de la fase** es si el `ContentPresenter` de un `ComboBoxItem` toma el borde por
    `TemplateBinding` como el `ListBoxItem`; si no lo toma, la señal es otro adorno. El marco cerrado y
    la flecha ya cumplen y sólo pasan a tokens.
-3. **`Slider` (5), `ToggleButton` (2) y `RadioButton` (1) van juntos en una sola fase 2g.** Ocho usos
+3. ~~**`Slider` (5), `ToggleButton` (2) y `RadioButton` (1) juntos en la fase 2g**~~ — **hecha el 2026-08-19**: [la evidencia](evidence/stable/audit-redesign-phase2g.md). Lo que decidió el diseño fue **una tabla**: el acento medido contra los trece tokens en los cuatro temas. Los de línea y texto —borde, filete, primario, secundario— **comparten luminancia con el acento por construcción** y ninguno puede ir junto a él; los de superficie y relleno sirven todos. **`Slider` (5), `ToggleButton` (2) y `RadioButton` (1) van juntos en una sola fase 2g.** Ocho usos
    entre los tres y el patrón ya está establecido; separarlos son dos vueltas de CI por nada.
 4. **La puerta de escalares cuenta el consumo en CUALQUIER `.axaml` de `src/`**, incluido el propio
    archivo de tokens —un estilo que gasta un escalar es consumo real—, **más una lista nombrada de

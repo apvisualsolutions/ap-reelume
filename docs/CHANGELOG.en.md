@@ -104,6 +104,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   border's colour and the text the background's — because in those palettes a lighter shade would say
   nothing.
 
+- **Sliders, toggles and options stop being painted by Windows too.** The five sliders — subtitle
+  size and outline, video position, recommendation weight — the two buttons that stay pressed in, and
+  the duplicate version picker **all** came out of the same system blue, byte-identical in the light
+  theme and in the high contrast dark one. On top of that, a **disabled slider stopped saying where
+  its value was** — both halves of the track went to one grey, and the video's slider is disabled
+  whenever nothing is playing — a **button that stays pressed in had no border** in any of its ten
+  states, so it had no shape of its own, and **disabled was painted exactly like resting**. The dot
+  of a chosen option was white in all four themes. All three now come from the application's colours,
+  a disabled slider still says its value, and a toggle has an outline.
+
 - **Drop-down lists can be seen, open and closed.** The chosen row inside a drop-down stood apart
   from the others by **less than it takes to tell two shades apart**, exactly as a list row did and
   for the same reason: Windows' translucent blue. The panel that opens had no visible edge either —

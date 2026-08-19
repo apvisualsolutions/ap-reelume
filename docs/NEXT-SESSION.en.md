@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b, 2c, 2d, 2e and 2f done**; three types and the views remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **the whole of phase 2 done, 2a to 2g**; the scalar gate, `primary-action`, the type scale and the views remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -369,7 +369,7 @@ each correction.
    phase** is whether a `ComboBoxItem`'s content presenter takes the border by template binding as
    the `ListBoxItem` does; if it does not, the cue is another adorner. The closed frame and the arrow
    already pass and only move to tokens.
-3. **`Slider` (5), `ToggleButton` (2) and `RadioButton` (1) go together as one phase 2g.** Eight uses
+3. ~~**`Slider` (5), `ToggleButton` (2) and `RadioButton` (1) together in phase 2g**~~ — **done on 2026-08-19**: [the evidence](evidence/stable/audit-redesign-phase2g.md). What decided the design was **a table**: the accent measured against all thirteen tokens in all four themes. The line and text tokens — border, hairline, primary, secondary — **share the accent's luminance by construction** and none of them can sit beside it; the surface and fill tokens all work. **`Slider` (5), `ToggleButton` (2) and `RadioButton` (1) go together as one phase 2g.** Eight uses
    between them and the pattern is established; splitting them is two CI rounds for nothing.
 4. **The scalars gate counts consumption in ANY `.axaml` under `src/`**, the token file included — a
    style that spends a scalar is real consumption — **plus a named list of the ones the base theme
