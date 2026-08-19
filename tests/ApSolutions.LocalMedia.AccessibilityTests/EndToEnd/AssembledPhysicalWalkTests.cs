@@ -2398,7 +2398,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             TestContext.Current.CancellationToken);
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.HasFailed == true),
-            "the two-byte file opened, so there was no failure to recover from");
+            () => WhyItHasNotFailedYet(
+                host.ViewModel.Player,
+                "the two-byte file opened, so there was no failure to recover from"));
         Assert.True(
             host.ViewModel.Player!.Player.MediaWasCorrupted,
             "the two-byte file failed as something other than corrupted media, so the actions on "
@@ -4439,7 +4441,20 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>Drives the dispatcher while real time passes, because the engine works on its own threads.</summary>
-    private static async Task WaitForAsync(Func<Task<bool>> condition, string complaint)
+    private static Task WaitForAsync(Func<Task<bool>> condition, string complaint) =>
+        WaitForAsync(condition, () => complaint);
+
+    /// <summary>
+    /// The same wait, with the complaint written when it is needed instead of before.
+    /// </summary>
+    /// <remarks>
+    /// A condition of the shape <c>Player?.Player.HasFailed == true</c> reads false in two very
+    /// different situations — the session opened and did not fail, and there is no session at all —
+    /// and a complaint fixed in advance can only describe one of them. It described the first while
+    /// the second is what a null hands back, so a red said "the file opened" about a run where
+    /// nothing ever opened. Deferring the text lets the probe look at what it found.
+    /// </remarks>
+    private static async Task WaitForAsync(Func<Task<bool>> condition, Func<string> complaint)
     {
         var deadline = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(60);
         while (DateTimeOffset.UtcNow < deadline)
@@ -4453,8 +4468,26 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             await Task.Delay(100, TestContext.Current.CancellationToken);
         }
 
-        Assert.Fail(complaint);
+        Assert.Fail(complaint());
     }
+
+    /// <summary>
+    /// Why a session that was expected to fail has not, told apart from never having existed.
+    /// </summary>
+    /// <remarks>
+    /// Written for the one scene that has gone intermittently red twice — 2026-08-19, in the full
+    /// suite both times, passing alone both times — where the sixty-second deadline rules slowness
+    /// out and the old wording ruled nothing in.
+    /// </remarks>
+    private static string WhyItHasNotFailedYet(PlayerSurfaces? surfaces, string opened) =>
+        surfaces is null
+            ? "no player session reached the screen at all, so there was never anything that could "
+                + "fail. That is not the same as the file opening, and it is what a null Player "
+                + "hands back to a condition written with ?. — the two readings this message used "
+                + "to run together."
+            : $"{opened} — idle={surfaces.Player.IsIdle} opening={surfaces.Player.IsOpening} "
+                + $"playing={surfaces.Player.IsPlaying} stopped={surfaces.Player.IsStopped} "
+                + $"failed={surfaces.Player.HasFailed} path={surfaces.Player.MediaPath}";
 
     private static void Navigate(ShellHost host, AppRoute route)
     {
