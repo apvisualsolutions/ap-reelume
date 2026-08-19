@@ -210,6 +210,63 @@ public sealed class WindowLifecycleTests
         mini.Close();
     }
 
+    /// <summary>
+    /// A mode that has been on screen before comes back to where it was, not to the default.
+    /// </summary>
+    /// <remarks>
+    /// This is what <c>Remember</c> and <c>Recall</c> are for, and until 2026-08-19 the two were only
+    /// tested against each other: nothing asked whether <c>Apply</c> actually used what had been
+    /// remembered. A coordinator that stored a position and then ignored it would have passed every
+    /// test in this file while moving somebody's mini player back to the corner on every switch.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_mode_that_was_on_screen_before_returns_to_where_it_was_left()
+    {
+        var coordinator = new PlayerWindowCoordinator();
+        var window = new Window { Width = 800, Height = 600 };
+        window.Show();
+        var moved = new PlayerWindowGeometry(300, 200, 640, 360);
+
+        coordinator.Remember(PlaybackMode.Mini, moved, Screen2560X1440, 1.5);
+        coordinator.Apply(window, PlaybackMode.Mini, Screen2560X1440, 1.5);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(moved.Width, window.Width);
+        Assert.Equal(moved.Height, window.Height);
+        Assert.NotEqual(
+            PlayerWindowCoordinator.DefaultMiniGeometry.Width,
+            window.Width);
+        window.Close();
+    }
+
+    /// <summary>
+    /// Embedded uses the geometry it is handed, and falls back only when handed none.
+    /// </summary>
+    /// <remarks>
+    /// The fallback is the size the shell opens at. Both halves are asserted because a parameter that
+    /// is accepted and ignored looks exactly like one that works, from the side that passes it.
+    /// </remarks>
+    [AvaloniaFact]
+    public void Embedded_uses_the_geometry_it_is_given_and_falls_back_only_without_one()
+    {
+        var shell = new PlayerWindowGeometry(10, 20, 1400, 900);
+
+        var given = PlayerWindowCoordinator.GeometryFor(
+            PlaybackMode.Embedded,
+            Screen2560X1440,
+            1.5,
+            shell);
+        var withoutOne = PlayerWindowCoordinator.GeometryFor(
+            PlaybackMode.Embedded,
+            Screen2560X1440,
+            1.5);
+
+        Assert.Equal(shell, given);
+        Assert.NotEqual(shell, withoutOne);
+        Assert.Equal(1180, withoutOne.Width);
+        Assert.Equal(760, withoutOne.Height);
+    }
+
     [AvaloniaFact]
     public void A_zero_or_negative_scaling_is_refused_rather_than_producing_an_infinite_window()
     {
