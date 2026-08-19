@@ -3576,6 +3576,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// say is that nothing was left behind, so the backups folder is asked afterwards — a run that
     /// published a copy and then said "cancelled" would look identical from the screen.
     /// </para>
+    /// <para>
+    /// The seeding numbers above are still what buys the window, but the scene no longer <em>asserts</em>
+    /// on a clock. It used to compare the two presses against the measured copy duration, which is a
+    /// number from one machine: a hosted runner failed it on 2026-08-19 with 4736 ms of presses
+    /// against a copy calibrated at 3944 ms, and nothing was wrong. The question the clock was
+    /// standing in for — did the copy end by itself before Cancel was pressed — is answered directly
+    /// by watching every status the surface passes through, because a copy that finished says
+    /// <c>BackupStatusDone</c>.
+    /// </para>
     /// </remarks>
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_copy_still_running_is_cancelled_with_the_mouse()
@@ -3588,10 +3597,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await SeedMediaFileAsync(factory, media, film, TimeSpan.FromMinutes(116));
 
         // The artwork of a library somebody has used for years, and the reason there is a window at
-        // all. 3944 ms measured for exactly this seeding; see the remarks for the ladder it came
-        // from and for why the count is the lever rather than the size.
+        // all. See the remarks for the ladder it came from and for why the count is the lever rather
+        // than the size.
         var paths = new AppDataPaths(_dataRoot);
-        const int CopyMilliseconds = 3944;
         await SeedPersonalArtworkAsync(paths, files: 6_000, kibibytes: 50);
 
         // Dot-prefixed folders are the store's own temporaries — its staging and the restore's — so
@@ -3606,14 +3614,31 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var backups = host.ViewModel.Backups;
         Assert.NotNull(backups);
 
+        // Every status this surface passes through, from before the copy starts. This is the scene's
+        // net and it replaced a stopwatch on 2026-08-19: the stopwatch compared the two presses
+        // against a duration measured on one machine, so on a slower runner it failed a run where
+        // nothing was wrong — 4736 ms of presses against a copy calibrated at 3944 ms. What it was
+        // really asking is whether the copy finished on its own before Cancel was pressed, and that
+        // is not an inference from a clock: BackupStatusDone is the surface saying so out loud. A
+        // press that changed the status only because the copy had ended would leave Done in here,
+        // and no machine is fast or slow enough to change that.
+        var statuses = new List<string>();
+        backups!.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(BackupViewModel.StatusKey))
+            {
+                statuses.Add(backups.StatusKey);
+            }
+        };
+
         var window = Stopwatch.StartNew();
         await PressAsync(
             host,
             "BackupCreateCopyLabel",
-            () => backups!.StatusKey,
+            () => backups.StatusKey,
             "clicking Create a backup now never started the copy this scene is here to stop");
 
-        Assert.Equal("BackupStatusRunning", backups!.StatusKey);
+        Assert.Equal("BackupStatusRunning", backups.StatusKey);
         Assert.True(backups.IsRunning, "The copy was not running, so there was nothing to cancel.");
 
         await PressAsync(
@@ -3622,14 +3647,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => backups.StatusKey,
             "clicking Cancel never stopped the copy that was running");
 
-        // The window, spent. An upper bound — it starts before the press that starts the copy — and
-        // asserted rather than only written down, because a scene that presses after the copy has
-        // finished is measuring the control's absence and would say so far less clearly.
+        // The copy never finished on its own, so Cancel is what stopped it. The whole route is in
+        // both complaints, and the elapsed time with it: when this does fail, the first thing worth
+        // knowing is where the surface went and how long it had to get there.
+        var route = $"{string.Join(" → ", statuses)} in {window.ElapsedMilliseconds} ms";
         Assert.True(
-            window.ElapsedMilliseconds < CopyMilliseconds,
-            $"Both presses took {window.ElapsedMilliseconds} ms of a copy measured at "
-                + $"{CopyMilliseconds} ms, so it had already finished and Cancel was pressed on a "
+            !statuses.Contains("BackupStatusDone", StringComparer.Ordinal),
+            $"The surface went {route}, so the copy finished on its own and Cancel was pressed on a "
                 + "screen with nothing running. Seed more artwork.");
+        Assert.True(
+            statuses.Contains("BackupStatusCancelled", StringComparer.Ordinal),
+            $"The surface went {route}, and never reached the cancelled state, so pressing Cancel "
+                + "did not stop the copy.");
 
         Assert.Equal("BackupStatusCancelled", backups.StatusKey);
 

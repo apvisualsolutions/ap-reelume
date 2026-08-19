@@ -638,6 +638,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La escena que probaba cancelar una copia acusaba a la máquina lenta.** Comparaba el tiempo de sus
+  dos pulsaciones contra una duración medida en una sola máquina, así que un runner más lento la ponía
+  roja sin que nada estuviera mal. Lo que el reloj intentaba deducir —si la copia había terminado
+  sola— lo dice la propia pantalla, y ahora la escena lo observa en vez de inferirlo.
+
 - **Cambiar de versión dos veces seguidas ya no se salta la pregunta ni deja en cero por dónde ibas.**
   La fila de la otra versión seguía pulsable mientras su propio cambio estaba en marcha, así que un
   doble clic —o un segundo clic mientras la pregunta ya estaba en pantalla— lanzaba un segundo cambio.

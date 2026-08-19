@@ -621,6 +621,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The scene that tested cancelling a copy blamed the slower machine.** It compared the time its two
+  presses took against a duration measured on one machine, so a slower runner turned it red with
+  nothing wrong. What the clock was trying to infer — whether the copy had finished on its own — is
+  something the surface says out loud, and the scene now watches for it instead of inferring it.
+
 - **Switching version twice in a row no longer skips the question or leaves your place at zero.** The
   other version's row stayed pressable while its own switch was in flight, so a double click — or a
   second click while the question was already on screen — started a second switch. And every switch
