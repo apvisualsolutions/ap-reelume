@@ -427,9 +427,28 @@ there it is the primary action, here it is one of five equals.
    mechanism. What it forces: **it enters `CommandNotificationTests`**, the gate on the seven, which
    carries a closed list with each one's exact predicate. It becomes eight, or the new one is
    declared there.
-2. **`PlayerSurfaces` does not expose the transport.** Its twelve properties do not include
-   `TransportControlsViewModel`, so **before deciding how the mini reaches it, measure where
-   `TransportControlsView` takes it from**. Without that the two skip buttons have nothing to bind to.
+2. ~~**`PlayerSurfaces` does not expose the transport.**~~ **Corrected the same day: the path was
+   already there and I got it wrong.** `PlayerSurfaces` does not expose it, true, but
+   **`PlayerViewModel` does** — `public TransportControlsViewModel? Transport { get; init; }`, fed in
+   `CompositionRoot` — and `PlayerSurfaces.Player` **is** a `PlayerViewModel`. I read one type and
+   concluded about the one next to it.
+
+   **And that changes the whole job: no new type is needed.** The window's `DataContext` can be the
+   `ShellViewModel` itself, which already exposes `Player`, `ToggleMiniPlayerCommand` and
+   `ClosePlayerCommand`. The five bindings become:
+
+   ```
+   Pause      {Binding Player.Player.TogglePlaybackCommand}   <- the only one missing
+   -10 s      {Binding Player.Player.Transport.SkipBackwardCommand}
+   +10 s      {Binding Player.Player.Transport.SkipForwardCommand}
+   Restore    {Binding ToggleMiniPlayerCommand}
+   Close      {Binding ClosePlayerCommand}
+   ```
+
+   **With no `MiniPlayerViewModel` there is no new file under `src/`**, so the **96/96 requirement
+   falls away** and the commit is: one command, five strings in two languages, five name tests and
+   the scene. The only host change is giving the window its `DataContext` where it is created, in
+   `ShellView.axaml.cs`.
 
 **Decided: the chrome is ALWAYS VISIBLE in the first commit, not revealed on hover.** The package
 asks for "on hover and on focus", and that is a visual refinement rather than a capability. The
@@ -447,9 +466,10 @@ border.
   default size (480), so all five are there at 480 — but this is **exactly the shape that has pushed
   a control out of the window six times**, so the scene measures the bounds against the window
   **before** attempting the click, not after the red.
-- **`MiniPlayerViewModel` would be a new file under `src/`**, so it starts at **96/96 of lines and
-  branches**. Measure it locally before pushing, with `--collect "XPlat Code Coverage"` into a
-  separate folder.
+- ~~**`MiniPlayerViewModel` would be a new file**~~ — **not needed any more** (see above). What does
+  touch coverage is the **new command** on `PlayerViewModel`: an already-watched file, so its floor
+  may **rise** when it is covered, and the ratchet fails in that direction too. Copy the run's
+  `coverage-debt` artifact whole, never by hand.
 
 **And what the commit must carry whole, because the ratchet does not cross a phase with debt:** the
 five controls, their five strings **in both languages**, their five accessible-name tests, and **the

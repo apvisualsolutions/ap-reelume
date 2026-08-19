@@ -427,10 +427,27 @@ grande: allí es la acción primaria y aquí es uno de cinco iguales.
    `RaiseCanExecuteChanged` sobre sus comandos al cambiar de estado—, así que el nuevo hereda el
    mecanismo. Lo que obliga: **entra en `CommandNotificationTests`**, la puerta de los siete, que
    lleva lista cerrada con el predicado exacto de cada uno. Pasa a ocho o el nuevo se declara ahí.
-2. **`PlayerSurfaces` no expone el transporte.** Sus doce propiedades no incluyen
-   `TransportControlsViewModel`, así que **antes de decidir cómo lo alcanza el mini hay que medir de
-   dónde lo toma `TransportControlsView`**. Sin eso, los dos botones de salto no tienen a qué
-   enlazarse.
+2. ~~**`PlayerSurfaces` no expone el transporte.**~~ **Corregido el mismo día: la vía ya estaba y
+   me equivoqué al escribirlo.** `PlayerSurfaces` no lo expone, cierto, pero **`PlayerViewModel` sí**
+   —`public TransportControlsViewModel? Transport { get; init; }`, alimentado en `CompositionRoot`—,
+   y `PlayerSurfaces.Player` **es** un `PlayerViewModel`. Miré un tipo y concluí sobre el de al lado.
+
+   **Y eso cambia el trabajo entero: no hace falta un tipo nuevo.** El `DataContext` de la ventana
+   puede ser el propio `ShellViewModel`, que ya expone `Player`, `ToggleMiniPlayerCommand` y
+   `ClosePlayerCommand`. Los cinco enlaces quedan:
+
+   ```
+   Pausa      {Binding Player.Player.TogglePlaybackCommand}   <- el único que falta
+   −10 s      {Binding Player.Player.Transport.SkipBackwardCommand}
+   +10 s      {Binding Player.Player.Transport.SkipForwardCommand}
+   Volver     {Binding ToggleMiniPlayerCommand}
+   Cerrar     {Binding ClosePlayerCommand}
+   ```
+
+   **Sin `MiniPlayerViewModel` no hay archivo nuevo de `src/`**, así que **decae el requisito de
+   96/96** y el commit se queda en: un comando, cinco cadenas × dos idiomas, cinco pruebas de nombre
+   y la escena. Lo único que hay que añadir en el anfitrión es darle el `DataContext` a la ventana
+   donde se crea, en `ShellView.axaml.cs`.
 
 **Decidido: el cromo va SIEMPRE VISIBLE en el primer commit, y no aparece al pasar el ratón.** El
 paquete lo pide «al pasar el ratón y al recibir foco», y esa es una decisión de refinamiento visual,
@@ -448,9 +465,10 @@ borde de 2 px al pulsar.
   usa el tamaño por defecto (480), así que a 480 están los cinco — pero es **exactamente la forma que
   ha sacado un control fuera de la ventana seis veces**, así que la escena mide los `bounds` frente a
   la ventana **antes** de intentar el clic, no después del rojo.
-- **`MiniPlayerViewModel` sería un tipo nuevo de `src/`**, así que arranca en **96/96 de líneas y
-  ramas**. Se mide en local antes de empujar, con `--collect "XPlat Code Coverage"` a una carpeta
-  aparte.
+- ~~**`MiniPlayerViewModel` sería un tipo nuevo**~~ — **ya no hace falta** (ver arriba). Lo que sí
+  toca cobertura es el **comando nuevo** de `PlayerViewModel`: es un archivo ya vigilado, así que su
+  suelo puede **subir** al cubrirlo, y el trinquete falla también en esa dirección. Se copia entero
+  el artefacto `coverage-debt` del run, nunca a mano.
 
 **Y lo que el commit tiene que llevar entero, porque el trinquete no cruza de fase con deuda:** los
 cinco controles, sus cinco cadenas **en los dos idiomas**, sus cinco pruebas de nombre accesible, y
