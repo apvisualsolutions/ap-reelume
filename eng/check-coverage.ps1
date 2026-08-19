@@ -347,8 +347,9 @@ try {
     <#
         Everything else in src/, held at the floor it meets today. The watched list above is the
         opposite promise -- files that reached the bar and are kept there -- and this one is the
-        debt: 219 files on 2026-08-18, each pinned so it cannot get worse while the number comes
-        down. It works the way eng/walk-pending.txt worked, and that list went from 126 to 0.
+        debt: 219 files on 2026-08-18, 217 on 2026-08-19, each pinned so it cannot get worse while
+        the number comes down. It works the way eng/walk-pending.txt worked, and that list went from
+        126 to 0.
 
         A file leaves eng/coverage-debt.txt by reaching 96/96, never by being edited out: a floor
         below what was measured fails, exactly like a floor above it, so the file always says what
@@ -360,7 +361,7 @@ try {
         is why -WriteDebt is run by the workflow on every build, pass or fail — moving a floor is
         then copying a measurement rather than guessing at one.
     #>
-    $debtRatchet = 218
+    $debtRatchet = 217
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     if ($WriteDebt) {

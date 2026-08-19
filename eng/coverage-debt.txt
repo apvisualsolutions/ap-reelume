@@ -162,14 +162,13 @@ src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml            
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileViewModel.cs                          97  82
 src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorViewModel.cs                       95  79
+src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerChromeView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerWindow.axaml                        100  50
-src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerWindow.axaml.cs                      83  50
 src/ApSolutions.LocalMedia.Presentation/Player/NextEpisodeOverlay.axaml                      100  50
 src/ApSolutions.LocalMedia.Presentation/Player/NextEpisodeViewModel.cs                        95  70
 src/ApSolutions.LocalMedia.Presentation/Player/PlayerVersionsView.axaml                      100  50
 src/ApSolutions.LocalMedia.Presentation/Player/PlayerView.axaml                              100  50
-src/ApSolutions.LocalMedia.Presentation/Player/PlayerViewModel.cs                             99  92
-src/ApSolutions.LocalMedia.Presentation/Player/PlayerWindowCoordinator.cs                    100  92
+src/ApSolutions.LocalMedia.Presentation/Player/PlayerViewModel.cs                             99  93
 src/ApSolutions.LocalMedia.Presentation/Player/ResumePromptView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/ShortcutMap.cs                                 97  85
 src/ApSolutions.LocalMedia.Presentation/Player/ShortcutSettingsView.axaml                    100  50
