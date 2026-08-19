@@ -2,12 +2,9 @@
 
 ## Estado al abrir (2026-08-19, cierre de la sesión de noche)
 
-**La rama lleva el mini reproductor con sus cinco controles.** Antes van `243d62f` (sólo
-documentación) y `e182bd5`, que es donde está `main`. **Lo primero: `gh run list`** y avanzar `main`
-a cada verde por orden.
-
-**El paso 6 está hecho salvo las vistas, y `MiniPlayerWindow` ya no cuenta**: quedan `UpdateView`,
-`PlayerView` y luego una vista por commit en el orden de `SURFACES.es.md`.
+**`main` y la rama están en `6bfb4d6`, con CI verde y nada en vuelo.** Seis commits, y el mini
+reproductor está hecho. **Lo siguiente son `UpdateView` y `PlayerView`**, y `UpdateView` está medida
+entera más abajo: sólo cuesta maqueta, porque sus cinco controles ya están en el paseo.
 
 **Lo que costó esta tanda, y que el resto de las vistas hereda:**
 
@@ -15,25 +12,37 @@ a cada verde por orden.
    `window.Content`, lo que **sustituye el árbol entero del AXAML**: la ventana mini tiraba todo lo que
    declaraba para sí misma en cuanto llegaba una sesión. `Host()` y `MiniPlayerSurface` llevaban ahí
    desde el principio y **sólo los llamaba una prueba** — el defecto de la casa, forma once.
-2. **`WalkLedger.Record` exige un `UserControl` ancestro.** Un control declarado directamente dentro de
-   un `Window` no tiene identidad de paseo posible, así que los cinco viven en
-   `MiniPlayerChromeView` y no en la ventana.
+2. **`WalkLedger.Record` exige un `UserControl` ancestro**, y el inventario de la puerta usa el nombre
+   del `.axaml`. Un control declarado dentro de un `Window` no puede casar las dos mitades **jamás**,
+   así que los cinco viven en `MiniPlayerChromeView` y no en la ventana.
 3. **El paseo no sabía salir de la ventana del shell**, y `MiniPlayerWindow` era la única ventana
    secundaria del árbol, así que nadie lo había necesitado. El arnés ganó `Reachable`,
-   `SecondaryWindows` y `RootOf`, y cada función de clic apunta ya a la ventana del control.
-4. **Las etiquetas largas no se salen: dejan sin sitio al clic de control.** Con cinco botones de
-   texto largo el cromo se plegaba en tres filas dentro de 480×270 y `BesidePoint` se quedó sin punto
-   libre. Las etiquetas cortas lo resolvieron; el síntoma no fue «fuera de la ventana».
+   `SecondaryWindows` y `RootOf`, y cada función de clic apunta ya a la ventana **del control**.
+4. **Las etiquetas largas no se salen: dejan sin sitio al clic de control.** Cinco botones de texto
+   largo plegaron el cromo en tres filas dentro de 480×270 y `BesidePoint` se quedó sin punto libre.
+   El síntoma esperado —«fuera de la ventana»— no fue el que llegó.
 
-**Tres cosas que costaron una vuelta de CI cada una y no deben repetirse:**
+**Los tres rojos de CI, y los tres fueron puertas haciendo su trabajo:**
 
-1. **Las suites afectadas por un cambio de vistas son CUATRO**, no dos: `UiTests`,
-   `AccessibilityTests`, **`IntegrationTests`** y `DocumentationTests`. Veintitrés archivos de prueba
-   leen `.axaml` **como texto**, y `TmdbLogoTests` compara dos tamaños entre sí.
-2. **El trinquete de cobertura falla también cuando algo MEJORA** sin declararlo. Se corrige copiando
-   entero el artefacto `coverage-debt` del run, nunca a mano.
-3. **`verify.ps1` aborta en el primer fallo**, así que un rojo de suite **esconde** los posteriores:
-   un run rojo no dice que sólo haya un problema.
+- **El trinquete de cobertura encontró una rama que nadie recorría** antes de que nadie la leyera. El
+  primer intento enrutó el mini reproductor por una interfaz y **dejó viva la rama vieja de `Apply`**.
+  La corrección fue **borrarla**, no cubrirla: una prueba escrita para alcanzar código muerto pone el
+  número en verde y deja el defecto dentro.
+- **Y al borrarla, el archivo BAJÓ de 100/92 a 100/91**, porque quitar ramas cubiertas sube el peso de
+  las que nunca lo estuvieron. Había dos así desde siempre —que `Apply` usara lo que `Remember` guardó,
+  y el parámetro `embedded` de `GeometryFor`—, ambas garantías reales sin prueba. Cubiertas, el archivo
+  mide 100/100 y **sale** de la deuda. **Un suelo que baja es una bajada**: buscar una explicación de
+  proceso es la forma cómoda de no mirar el código.
+- **Una red calibrada en una máquina acusa a otra.**
+  `The_copy_still_running_is_cancelled_with_the_mouse` comparaba el tiempo de sus dos pulsaciones
+  contra una duración medida aquí, y en el runner falló un run donde no pasaba nada. Lo que el reloj
+  infería —si la copia había terminado sola— **lo dice la pantalla**: ahora la escena guarda todos los
+  estados por los que pasa y afirma que `BackupStatusDone` no está entre ellos.
+
+**Y las tres de la sesión anterior siguen valiendo:** las suites afectadas por un cambio de vistas son
+**cuatro** (`UiTests`, `AccessibilityTests`, `IntegrationTests`, `DocumentationTests`); el trinquete de
+cobertura **falla también cuando algo mejora** sin declararlo; y `verify.ps1` **aborta en el primer
+fallo**, así que un rojo esconde los posteriores.
 
 ## La cola decidida el 2026-08-16 (no se re-delibera)
 

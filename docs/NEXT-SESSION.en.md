@@ -2,12 +2,9 @@
 
 ## State on opening (2026-08-19, end of the evening session)
 
-**The branch carries the mini player and its five controls.** Ahead of it sit `243d62f`
-(documentation only) and `e182bd5`, which is where `main` is. **First thing: `gh run list`**, and move
-`main` forward to each green in order.
-
-**Step 6 is done except the views, and `MiniPlayerWindow` no longer counts**: what is left is
-`UpdateView`, `PlayerView`, then one view per commit in `SURFACES.en.md`'s order.
+**`main` and the branch are both at `6bfb4d6`, CI green, nothing in flight.** Six commits, and the
+mini player is done. **Next are `UpdateView` and `PlayerView`**, and `UpdateView` is measured in full
+below: it costs layout only, because its five controls are already in the walk.
 
 **What this batch cost, and what the remaining views inherit:**
 
@@ -15,25 +12,37 @@
    `window.Content`, which **replaces the whole AXAML tree**: the mini window threw away everything it
    declared for itself the moment a session arrived. `Host()` and `MiniPlayerSurface` had been there
    from the start and **only one test ever called them** — the house defect, form eleven.
-2. **`WalkLedger.Record` requires a `UserControl` ancestor.** A control declared straight inside a
-   `Window` has no walk identity at all, so the five live in `MiniPlayerChromeView` rather than in the
-   window.
+2. **`WalkLedger.Record` requires a `UserControl` ancestor**, and the gate's inventory keys on the
+   `.axaml` file name. A control declared inside a `Window` can never match the two halves, so the
+   five live in `MiniPlayerChromeView` rather than in the window.
 3. **The walk could not leave the shell's window**, and `MiniPlayerWindow` was the only secondary
    window in the tree, so nobody had needed it to. The harness gained `Reachable`, `SecondaryWindows`
-   and `RootOf`, and every click function now aims at the control's own window.
-4. **Long labels do not overflow; they leave nowhere for the beside click.** With five long-text
-   buttons the chrome wrapped into three rows inside 480×270 and `BesidePoint` ran out of free points.
-   Short labels fixed it, and the symptom was never "outside the window".
+   and `RootOf`, and every click function now aims at the control's **own** window.
+4. **Long labels do not overflow; they leave nowhere for the beside click.** Five long-text buttons
+   wrapped the chrome into three rows inside 480×270 and `BesidePoint` ran out of free points. The
+   expected symptom — "outside the window" — is not the one that arrived.
 
-**Three things that cost one CI round each and should not repeat:**
+**Three CI reds, and all three were gates doing their job:**
 
-1. **A change to views affects FOUR suites**, not two: `UiTests`, `AccessibilityTests`,
-   **`IntegrationTests`** and `DocumentationTests`. Twenty-three test files read `.axaml` **as text**,
-   and `TmdbLogoTests` compares two sizes against each other.
-2. **The coverage ratchet also fails when something IMPROVES** without saying so. It is fixed by
-   copying the run's `coverage-debt` artifact whole, never by hand.
-3. **`verify.ps1` aborts on the first failure**, so a suite red **hides** the ones after it: a red run
-   does not mean there is only one problem.
+- **The coverage ratchet found a branch nothing walked** before anybody read it. The first attempt
+  routed the mini player through an interface and **left the old `Apply` branch alive**. The fix was
+  **deleting** it, not covering it: a test written to reach dead code turns the number green and
+  leaves the defect in.
+- **And deleting it dropped the file from 100/92 to 100/91**, because removing covered branches raises
+  the weight of the ones never covered. Two had been there all along — that `Apply` used what
+  `Remember` stored, and `GeometryFor`'s `embedded` parameter — both real guarantees with no test.
+  Covered, the file measures 100/100 and **leaves** the debt list. **A floor that drops is a drop**:
+  reaching for a process explanation is the comfortable way not to look at the code.
+- **A net calibrated on one machine accuses another.**
+  `The_copy_still_running_is_cancelled_with_the_mouse` compared its two presses against a duration
+  measured here, and on the runner it failed a run where nothing was wrong. What the clock inferred —
+  whether the copy finished on its own — **the surface says out loud**: the scene now records every
+  status it passes through and asserts `BackupStatusDone` is not among them.
+
+**And the three from the previous session still hold:** a view change affects **four** suites
+(`UiTests`, `AccessibilityTests`, `IntegrationTests`, `DocumentationTests`); the coverage ratchet
+**also fails when something improves** undeclared; and `verify.ps1` **aborts on the first failure**, so
+one red hides the ones after it.
 
 ## The queue decided on 2026-08-16 (not up for re-deliberation)
 
