@@ -524,14 +524,31 @@ tiene su token; y después la tipografía y las vistas.
 
 #### Lo que el paso 8 debe recordar del rediseño (2026-08-18)
 
-**`UX-003` y `A11Y-001` están `VERIFIED` citando el alto contraste, y hasta hoy eso era cierto sólo a
-medias**: sus evidencias midieron que las superficies **renderizan** cuando una prueba fuerza el
-variant a mano, y la aplicación no llegaba nunca a ese estado por sí sola —nadie aplicaba el alto
-contraste—. Ya lo hace. Al **regenerar el manifiesto** en el paso 8 hay que añadir a esas dos filas
-[la evidencia de la fase 1](evidence/stable/audit-redesign-phase1-tokens.md). Se intentó ahora y la
-puerta lo rechazó con razón: `EvidenceLinkTests` exige que matriz y manifiesto citen lo mismo, y el
-manifiesto se genera desde un paquete con sus hashes, así que hacerlo antes del corte sería generarlo
-dos veces.
+**`UX-003` y `A11Y-001` están `VERIFIED` citando el alto contraste, y hasta el 2026-08-18 eso era
+cierto sólo a medias**: sus evidencias midieron que las superficies **renderizan** cuando una prueba
+fuerza el variant a mano, y la aplicación no llegaba nunca a ese estado por sí sola —nadie aplicaba el
+alto contraste—. Ya lo hace.
+
+**El reparto de evidencias está decidido el 2026-08-19, para que el paso 8 sea mecánico.** Al
+regenerar el manifiesto se añaden estos enlaces, y ningún otro:
+
+| Fila | Evidencias que se le añaden |
+| --- | --- |
+| `UX-003` | [fase 1: los cuatro diccionarios y el servicio que los aplica](evidence/stable/audit-redesign-phase1-tokens.md) |
+| `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md) |
+
+**`UX-003` recibe sólo la fase 1** porque esa fila habla del **tema** —que exista, que se aplique y
+que el reproductor lo ignore a propósito—, no de los estados de un control. Las cinco fases de estados
+van a `A11Y-001`, que es la fila del contraste y del foco, y cada una lleva dentro los números que
+corrigió.
+
+**[La evidencia del arnés del paseo](evidence/stable/audit-walk-press-retry.md) NO se enlaza en
+ninguna fila**, y eso también es una decisión: describe cómo mide la suite, no una capacidad del
+producto. Enlazarla haría que la matriz prometiera algo que nadie puede usar.
+
+**Y el orden importa**: se intentó añadir un enlace antes del corte y la puerta lo rechazó con razón.
+`EvidenceLinkTests` exige que matriz y manifiesto citen lo mismo, y el manifiesto se genera desde un
+paquete con sus hashes, así que tocar la matriz antes de tener ese paquete es generarlo dos veces.
 
 #### ~~La fase 1 del paso 6~~ — hecha el 2026-08-18, y la fase 2 hereda tres cosas
 

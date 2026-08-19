@@ -519,14 +519,30 @@ which now has its token; and then the typography and the views.
 
 #### What step 8 has to remember about the redesign (2026-08-18)
 
-**`UX-003` and `A11Y-001` are `VERIFIED` citing high contrast, and until today that was only half
-true**: their evidence measured that the surfaces **render** when a test forces the variant by hand,
-and the application never reached that state on its own — nothing applied high contrast. It does now.
-When the manifest is **regenerated** in step 8, those two rows must gain
-[phase 1's evidence](evidence/stable/audit-redesign-phase1-tokens.md). It was tried now and the gate
-refused, rightly: `EvidenceLinkTests` requires matrix and manifest to cite the same documents, and the
-manifest is generated from a package and its hashes, so doing it before the cut would mean generating
-it twice.
+**`UX-003` and `A11Y-001` are `VERIFIED` citing high contrast, and until 2026-08-18 that was only
+half true**: their evidence measured that the surfaces **render** when a test forces the variant by
+hand, and the application never reached that state on its own. It does now.
+
+**The split is decided as of 2026-08-19, so step 8 is mechanical.** Regenerating the manifest adds
+these links and no others:
+
+| Row | Evidence it gains |
+| --- | --- |
+| `UX-003` | [phase 1: the four dictionaries and the service that applies them](evidence/stable/audit-redesign-phase1-tokens.md) |
+| `A11Y-001` | [phase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: the button](evidence/stable/audit-redesign-phase2-button-states.md), [2b: the disabled outline](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: the checkbox](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: the list row](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: the text field](evidence/stable/audit-redesign-phase2e-text-field.md) |
+
+**`UX-003` gets phase 1 alone** because that row is about the **theme** — that it exists, that it is
+applied, and that the player ignores it on purpose — not about a control's states. The five state
+phases go to `A11Y-001`, the contrast and focus row, each carrying the numbers it corrected.
+
+**[The walk harness's evidence](evidence/stable/audit-walk-press-retry.md) is linked from NO row**,
+and that is a decision too: it describes how the suite measures, not a capability of the product.
+Linking it would have the matrix promise something nobody can use.
+
+**And the order matters**: adding a link before the cut was tried and the gate refused, rightly.
+`EvidenceLinkTests` requires matrix and manifest to cite the same documents, and the manifest is
+generated from a package and its hashes, so touching the matrix before that package exists means
+generating it twice.
 
 #### ~~Step 6's phase 1~~ — done on 2026-08-18, and phase 2 inherits three things
 
