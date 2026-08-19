@@ -28,7 +28,11 @@ internal static class ThemeContrast
     /// (1:1 against it) rather than an exception, because "the control has no border at all" is an
     /// answer a contrast assertion should be allowed to state instead of crashing on.
     /// </remarks>
-    public static Color Painted(IBrush? brush, Color background)
+    /// <param name="elementOpacity">
+    /// The opacity of the element carrying the brush, for the case where transparency is applied
+    /// twice over: a text box's placeholder is <c>#99000000</c> at <c>Opacity 0.5</c> on top.
+    /// </param>
+    public static Color Painted(IBrush? brush, Color background, double elementOpacity = 1.0)
     {
         if (brush is null)
         {
@@ -36,7 +40,7 @@ internal static class ThemeContrast
         }
 
         var solid = Assert.IsAssignableFrom<ISolidColorBrush>(brush);
-        var alpha = solid.Color.A / 255.0 * solid.Opacity;
+        var alpha = solid.Color.A / 255.0 * solid.Opacity * elementOpacity;
         return Color.FromRgb(
             (byte)Math.Round((solid.Color.R * alpha) + (background.R * (1 - alpha))),
             (byte)Math.Round((solid.Color.G * alpha) + (background.G * (1 - alpha))),

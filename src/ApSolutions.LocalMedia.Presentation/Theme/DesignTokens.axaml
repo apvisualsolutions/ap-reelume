@@ -20,6 +20,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
       <x:Double x:Key="MotionDurationStandardMilliseconds">160</x:Double>
       <x:Double x:Key="MotionDurationReducedMilliseconds">0</x:Double>
+      <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>
       <x:String x:Key="SelectedStateGlyph">●</x:String>
 
       <!--
@@ -102,6 +103,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="TextControlBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="FocusStrokeBrush" />
+          <StaticResource x:Key="TextControlBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundFocused" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
@@ -174,6 +191,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="TextControlBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="FocusStrokeBrush" />
+          <StaticResource x:Key="TextControlBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundFocused" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <!--
           Warning, danger and positive share the theme's own surface and border here, in both high
@@ -252,6 +285,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="TextControlBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="FocusStrokeBrush" />
+          <StaticResource x:Key="TextControlBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundFocused" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
@@ -329,6 +378,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
           <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="TextControlBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="TextControlBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="FocusStrokeBrush" />
+          <StaticResource x:Key="TextControlBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="TextControlForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="TextControlForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundFocused" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="TextControlPlaceholderForegroundDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
