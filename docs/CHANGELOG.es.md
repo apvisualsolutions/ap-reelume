@@ -10,6 +10,8 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La pantalla de actualización dice cuál es su acción.** «Buscar actualizaciones» se pintaba igual
+  que los otros tres botones, así que nada en pantalla decía para qué está esa pantalla.
 - **El mini reproductor gana sus cinco controles.** Pausa/reanudar, dos saltos de diez segundos,
   volver a la ventana grande y cerrar, siempre visibles y con nombre para un lector de pantalla. La
   ventana dejaba caer todo lo que declaraba para sí misma en cuanto llegaba una sesión —el

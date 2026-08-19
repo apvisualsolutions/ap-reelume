@@ -3,8 +3,8 @@
 ## State on opening (2026-08-19, end of the evening session)
 
 **`main` and the branch are both at `6bfb4d6`, CI green, nothing in flight.** Six commits, and the
-mini player is done. **Next are `UpdateView` and `PlayerView`**, and `UpdateView` is measured in full
-below: it costs layout only, because its five controls are already in the walk.
+mini player is done. **Next is `PlayerView`**: `UpdateView` was done on 2026-08-20 and cost layout
+only, because its five controls were already in the walk.
 
 **What this batch cost, and what the remaining views inherit:**
 
@@ -536,7 +536,24 @@ The five controls, their **five strings in both languages**, their **five access
 to views are four, not two: `UiTests`, `AccessibilityTests`, `IntegrationTests` and
 `DocumentationTests`.
 
-#### `UpdateView` and the scalar that CANNOT be spent where it is needed — measured 2026-08-19
+#### `UpdateView` ~~measured~~ **done on 2026-08-20**, and the scalar that CANNOT be spent where it is needed
+
+**The view is done** apart from its spacing, with [its evidence](evidence/stable/audit-update-view.md):
+`primary-action` on `UpdateCheckButton` — the only candidate — and both `CornerRadius="8"` now spending
+`CornerRadiusMedium`. **Spacing is not in it**, because that mapping covers 183 sites across the tree
+and is decided once rather than view by view: that is the scalars phase, still outstanding and decided
+below.
+
+**And a new trap that cost one writing round:** the radius test **passed before the view was touched**.
+It compared the painted value against the resolved token, and since `CornerRadiusMedium` is 8 and the
+literals were 8, the numbers agreed. **A test that compares the value cannot tell a literal from a
+token while the two agree**; the *source* is what has to be measured, by reading the `.axaml`. The
+house already knew half of this — "a test comparing numbers written in views has to resolve the
+tokens" — and this is the other half.
+
+**Next is `PlayerView`**, then one view per commit in `SURFACES.en.md`'s order.
+
+##### What was measured on 2026-08-19, and still holds entirely
 
 **Measured without writing code**, as the `ComboBox` and the mini player were, so the next session
 executes. And the headline is not about `UpdateView`: it is about **the whole view phase**.

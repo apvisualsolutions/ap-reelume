@@ -39,7 +39,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Background="{DynamicResource AccentSubtleBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
-        CornerRadius="8"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource UpdateStatusAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
       <StackPanel Spacing="8">
@@ -76,7 +76,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Background="{DynamicResource CardSurfaceBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
-        CornerRadius="8"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
         IsVisible="{Binding HasOffer}"
         automation:AutomationProperties.Name="{DynamicResource UpdateOfferAccessibleName}">
       <StackPanel Spacing="6">
@@ -108,8 +108,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </Border>
 
     <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <!--
+        The one action this screen is for. Download and install appear by state and cancel is never
+        what a screen is for, so there is no second candidate.
+      -->
       <Button
           x:Name="UpdateCheckButton"
+          Classes="primary-action"
           Command="{Binding CheckCommand}"
           Content="{DynamicResource UpdateCheckLabel}"
           IsEnabled="{Binding IsIdle}"

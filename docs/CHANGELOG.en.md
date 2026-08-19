@@ -10,6 +10,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The update screen says which action is its own.** "Check for updates" was painted exactly like
+  the other three buttons, so nothing on screen said what the screen was for.
 - **The mini player gains its five controls.** Pause/resume, two ten-second skips, back to the main
   window, and close — always visible, and each named for a screen reader. The window used to drop
   everything it declared for itself the moment a session arrived, because the coordinator assigned

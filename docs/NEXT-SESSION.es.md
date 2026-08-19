@@ -3,8 +3,8 @@
 ## Estado al abrir (2026-08-19, cierre de la sesión de noche)
 
 **`main` y la rama están en `6bfb4d6`, con CI verde y nada en vuelo.** Seis commits, y el mini
-reproductor está hecho. **Lo siguiente son `UpdateView` y `PlayerView`**, y `UpdateView` está medida
-entera más abajo: sólo cuesta maqueta, porque sus cinco controles ya están en el paseo.
+reproductor está hecho. **Lo siguiente es `PlayerView`**: `UpdateView` se hizo el 2026-08-20 y sólo
+costó maqueta, porque sus cinco controles ya estaban en el paseo.
 
 **Lo que costó esta tanda, y que el resto de las vistas hereda:**
 
@@ -535,7 +535,24 @@ en `CommandNotificationTests`. El trinquete del paseo sube a 5 y vuelve a **0** 
 un cambio de vistas son cuatro, no dos: `UiTests`, `AccessibilityTests`, `IntegrationTests` y
 `DocumentationTests`.
 
-#### `UpdateView` y el escalar que NO se puede gastar donde hace falta — medido el 2026-08-19
+#### `UpdateView` ~~medida~~ **hecha el 2026-08-20**, y el escalar que NO se puede gastar donde hace falta
+
+**La vista está hecha** salvo su espaciado, con [su evidencia](evidence/stable/audit-update-view.md):
+`primary-action` en `UpdateCheckButton` —el único candidato— y sus dos `CornerRadius="8"` gastando ya
+`CornerRadiusMedium`. **El espaciado NO va en ella** porque su mapeo vale para 183 sitios del árbol y
+se decide una vez, no vista por vista: eso es la fase de escalares, que sigue pendiente y está decidida
+abajo.
+
+**Y una trampa nueva que costó una vuelta de escritura:** la prueba del radio **pasaba antes de tocar
+la vista**. Comparaba el valor pintado contra el token resuelto, y como `CornerRadiusMedium` vale 8 y
+los literales eran 8, los números coincidían. **Una prueba que compara el valor no distingue un literal
+de un token mientras los dos coincidan**; hay que medir la **fuente**, leyendo el `.axaml`. La casa ya
+sabía la mitad —«una prueba que compara números escritos en vistas tiene que resolver los tokens»— y
+ésta es la otra mitad.
+
+**Lo siguiente es `PlayerView`**, y después una vista por commit en el orden de `SURFACES.es.md`.
+
+##### Lo que se midió el 2026-08-19, y sigue valiendo entero
 
 **Medido sin escribir código**, como el `ComboBox` y el mini reproductor, para que la sesión siguiente
 ejecute. Y el titular no es de `UpdateView`: es de **toda la fase de vistas**.
