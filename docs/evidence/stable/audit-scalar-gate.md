@@ -85,6 +85,28 @@ Mutaciones aplicadas y revertidas: / Mutations applied and reverted:
    "CornerRadiusMedium is on the unspent list and is not declared any more…"
 ```
 
+## Lo que CI pidió después, y es la puerta funcionando / What CI asked for afterwards
+
+El run de este commit **falló**, y no por una prueba: las trece suites pasaron y lo que se quejó fue
+**el trinquete de cobertura**. / The run failed, and not on a test: all thirteen suites passed and the
+coverage ratchet is what complained.
+
+```
+src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs now reaches 90/69;
+raise its floor
+```
+
+**El trinquete falla en las dos direcciones**, y ésta es la de mejorar: la prueba nueva
+—`Motion_that_is_allowed_is_short_rather_than_absent`, la mitad de la garantía que se mudó aquí— cubre
+código de `FluentThemeService` que antes no medía nadie, y lo lleva de **88/65 a 90/69**. Mudar la
+garantía al sitio donde vive el número **mejoró la cobertura del número**, que es el argumento de por
+qué el cambio era bueno, dicho por la máquina. / The ratchet fails in both directions, and this is the
+improving one: moving the guarantee to where the number lives improved that file's coverage, which is
+the argument for the change, made by the machine.
+
+El suelo se sube **copiando entero el artefacto `coverage-debt` de ese run**, nunca a mano: una sola
+línea cambió. / The floor is raised by copying the run's `coverage-debt` artifact whole.
+
 ## El verde / The green
 
 ```
