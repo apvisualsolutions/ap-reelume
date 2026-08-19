@@ -84,6 +84,25 @@ public sealed class ThemeTests
         Assert.Equal(ThemeVariant.Light, Avalonia.Application.Current!.RequestedThemeVariant);
     }
 
+    /// <summary>The other half: with motion allowed, the duration is short rather than absent.</summary>
+    /// <remarks>
+    /// This used to be asserted about <c>MotionDurationStandardMilliseconds</c> in the token file,
+    /// by two separate tests, and the application never read that token: the number it uses is
+    /// <c>FluentThemeService</c>'s own. So the guarantee was watching a parallel copy, which is the
+    /// defect the scalars gate exists to stop. The token was deleted and the guarantee moved here,
+    /// onto the property the rest of the application asks.
+    /// </remarks>
+    [AvaloniaFact]
+    public void Motion_that_is_allowed_is_short_rather_than_absent()
+    {
+        using var directory = new TestDirectory();
+        var harness = CreateHarness(directory.SettingsPath, reducedMotion: false);
+
+        Assert.Equal(true, GetProperty(harness.Service, "AnimationsEnabled"));
+        var duration = Assert.IsType<TimeSpan>(GetProperty(harness.Service, "MotionDuration"));
+        Assert.InRange(duration.TotalMilliseconds, 1, 250);
+    }
+
     [AvaloniaFact]
     public void Appearance_renders_all_theme_contrast_modes_and_scales_at_100_150_200_percent()
     {

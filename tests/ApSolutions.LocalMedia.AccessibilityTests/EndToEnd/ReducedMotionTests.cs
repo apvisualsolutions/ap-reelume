@@ -18,6 +18,15 @@ namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 /// </summary>
 public sealed class ReducedMotionTests
 {
+    /// <remarks>
+    /// There is no duration token to ask for, and that is on purpose: no view has a transition, so
+    /// <c>MotionDurationStandardMilliseconds</c> and its reduced twin were a parallel copy of a
+    /// number that lives in <c>FluentThemeService</c>, and they were deleted with the scalars gate.
+    /// What this measures is unchanged — a view must not write a duration of its own — and the first
+    /// transition that needs one declares the token then, with the service reading from it. The
+    /// guarantee those tokens carried moved to <c>ThemeTests</c>, onto the service's own
+    /// <c>MotionDuration</c>, which is the number the application actually uses.
+    /// </remarks>
     [Fact]
     public void No_view_writes_a_duration_of_its_own_instead_of_asking_the_token()
     {
@@ -66,30 +75,6 @@ public sealed class ReducedMotionTests
         }
 
         audit.Complete();
-    }
-
-    [Fact]
-    public void The_reduced_motion_token_is_zero_and_the_standard_one_stays_short()
-    {
-        var tokens = XDocument.Load(Path.Combine(
-            RepositoryLayout.Root,
-            "src",
-            "ApSolutions.LocalMedia.Presentation",
-            "Theme",
-            "DesignTokens.axaml"));
-        var key = XName.Get("Key", "http://schemas.microsoft.com/winfx/2006/xaml");
-        var values = tokens.Descendants()
-            .Where(element => element.Attribute(key) is not null)
-            .GroupBy(element => element.Attribute(key)!.Value, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => group.First().Value, StringComparer.Ordinal);
-
-        Assert.Equal(
-            0,
-            double.Parse(values["MotionDurationReducedMilliseconds"], CultureInfo.InvariantCulture));
-        Assert.InRange(
-            double.Parse(values["MotionDurationStandardMilliseconds"], CultureInfo.InvariantCulture),
-            1,
-            250);
     }
 
     [AvaloniaFact]
