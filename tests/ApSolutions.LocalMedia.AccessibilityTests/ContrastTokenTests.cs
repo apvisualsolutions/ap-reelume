@@ -168,7 +168,6 @@ public sealed class ContrastTokenTests
 
         Assert.True(thickness >= 2.0, $"Focus thickness was {thickness}.");
         Assert.True(innerThickness >= 1.0, $"Focus inner thickness was {innerThickness}.");
-        Assert.False(string.IsNullOrWhiteSpace(resources["SelectedStateGlyph"]));
 
         var document = XDocument.Load(GetTokenPath());
         Assert.Contains(
@@ -191,17 +190,6 @@ public sealed class ContrastTokenTests
         // Three theme choices plus the two language choices BUG-011 added; every option carries
         // its non-color cue.
         Assert.Equal(5, stateCueBindings.Length);
-    }
-
-    [Fact]
-    public void Reduced_motion_token_is_zero_while_standard_motion_remains_bounded()
-    {
-        var resources = LoadScalars();
-        var reduced = double.Parse(resources["MotionDurationReducedMilliseconds"], CultureInfo.InvariantCulture);
-        var standard = double.Parse(resources["MotionDurationStandardMilliseconds"], CultureInfo.InvariantCulture);
-
-        Assert.Equal(0, reduced);
-        Assert.InRange(standard, 1, 250);
     }
 
     [Fact]

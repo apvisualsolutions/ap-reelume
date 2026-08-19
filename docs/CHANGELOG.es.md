@@ -96,6 +96,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Una comprobación exige que cada medida del tema la gaste alguien.** Los números del aspecto
+  —espaciados, redondeos, grosores— se declaran en un solo sitio, y hasta ahora nada impedía declarar
+  uno y no usarlo nunca. Se habían colado tres: dos duraciones de animación que **repetían un número
+  que la aplicación ya tenía en otro sitio** —y que dos pruebas vigilaban en la copia mientras nadie
+  miraba el original— y un símbolo que se escribía a mano en los seis sitios donde aparece. Los tres
+  se han quitado, la garantía que daban las dos pruebas se ha movido al sitio donde vive el número de
+  verdad, y ahora una medida declarada tiene que gastarse o figurar en una lista que **sólo puede
+  encoger**. Nada de esto cambia lo que se ve; evita que dos copias del mismo número acaben
+  discrepando.
+
 - **Los botones tienen forma y reaccionan, y los colores salen del tema.** Hasta ahora el borde de un
   botón era transparente en sus cuatro estados —no tenía forma propia—, el color de reposo, de paso de
   ratón y de pulsado venía del tema base de la biblioteca gráfica, y **deshabilitado se pintaba igual

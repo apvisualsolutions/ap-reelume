@@ -95,6 +95,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **A check requires every measurement in the theme to be spent by something.** The numbers behind
+  the look — spacings, corner radii, thicknesses — are declared in one place, and until now nothing
+  stopped one being declared and never used. Three had got in: two animation durations that
+  **repeated a number the application already held elsewhere** — with two tests watching the copy
+  while nothing watched the original — and a symbol written by hand in all six places it appears.
+  All three are gone, the guarantee those two tests gave has moved to where the real number lives,
+  and a declared measurement must now either be spent or appear on a list that **can only shrink**.
+  None of this changes what you see; it stops two copies of one number drifting apart.
+
 - **Buttons have a shape and react, and their colours come from the theme.** Until now a button's
   border was transparent in all four of its states — it had no shape of its own — its resting,
   hovered and pressed colours came from the graphics library's base theme, and **disabled was painted
