@@ -104,6 +104,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   temas, y en alto contraste pasar el ratón o pulsar **invierte** el botón —el relleno toma el color
   del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada.
 
+- **Una lista dice en qué fila estás.** La fila seleccionada se pintaba de un azul translúcido que,
+  sobre el fondo, se separaba de las demás **menos de lo que hace falta para distinguir dos tonos**;
+  el texto encima se leía perfectamente, así que el problema nunca fue leer la fila, era saber cuál
+  era. Ahora la fila seleccionada lleva **un borde del color de la aplicación** además del fondo, y
+  en los dos temas de alto contraste —donde ese fondo es el mismo de la página— el borde es toda la
+  señal. Todas las filas llevan el mismo borde y sólo cambia de color al seleccionarse, así que
+  seleccionar una no mueve su texto. Afecta a las 23 listas con datos.
+
 - **Las casillas de verificación ya no las pinta Windows.** Las dieciocho de la aplicación tomaban
   sus colores del tema de la biblioteca gráfica, y eso tenía tres consecuencias que se veían. Una
   casilla **marcada y apagada** era ilegible en el tema claro: la marca blanca sobre el gris de

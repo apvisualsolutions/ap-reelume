@@ -99,6 +99,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
@@ -168,6 +171,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
         </ResourceDictionary>
         <!--
           Warning, danger and positive share the theme's own surface and border here, in both high
@@ -243,6 +249,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
@@ -317,6 +326,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedPointerOver" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedPressed" ResourceKey="TextPrimaryBrush" />
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
@@ -360,6 +372,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
     is the opposite one. Same for the pressed border: 1 px normally, 2 px where the border is the only
     shape a control has.
   -->
+  <!--
+    Which row you are on is a list's whole job, and it was being said with colour alone: the selected
+    row was Windows 10's blue at 40 % opacity, which over the surface reads 1,73:1 in light and
+    2,24:1 in high contrast dark. The fill now comes from the accent's subtle token, and the row
+    carries a border that only changes colour — every row has the same thickness in every state, so
+    selecting one does not shove its text sideways. In the two high contrast themes the subtle accent
+    *is* the surface, and there the border is the entire cue, which is why it and not the fill is the
+    part that has to clear the bar.
+
+    Declared before the focus selectors on purpose: between styles that both match, the last one
+    declared wins, and focus has to win over selection.
+  -->
+  <Style Selector="ListBoxItem">
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+  <Style Selector="ListBoxItem:selected">
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
   <!--
     Every control type that can take keyboard focus is styled from the same token, so the focus ring
     the contrast matrix measured is the ring the person actually sees. A type left out here would fall

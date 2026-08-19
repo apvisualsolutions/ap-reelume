@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b and 2c done**; seven types and the views remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b, 2c and 2d done**; six types and the views remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -317,6 +317,35 @@ there was no high contrast dark, which has been false for a day.
 was; the consumed-scalars gate with a list that only shrinks; `primary-action` with the
 `AccentTextBrush` token; and then the typography and the views, one per commit.
 
+#### ~~Phase 2d: the list row~~ — done on 2026-08-19
+
+**Done** — [the evidence](evidence/stable/audit-redesign-phase2d-list-row.md). 17 direct uses and
+**23 lists with data** behind them.
+
+**The defect**: the selected row stood apart from the others by **1.73:1** in light, 2.22 in dark,
+1.76 and 2.24 in the high contrast pair, against a bar of 3. The label on it read 11.58:1, so the
+defect **was never the text**: it was knowing which row you are on. And once again Light painted
+identically to HighContrastLight.
+
+**Three measured things that decided the design, and that carry to what is left:**
+
+1. **A shared brush is redirected by measuring who else takes it.** The row's are system brushes
+   (`SystemControlHighlightList*`). Painted a colour no theme uses, with **twelve** control types
+   mounted and five pseudo-classes forced: **only the list consumes them** — not `ComboBox`, not
+   `Menu`, not `TabControl`, not one of the ten focus types.
+2. **The row's content presenter DOES take its `BorderBrush` and `BorderThickness`** by template
+   binding, so an application style can give it geometry with no template of our own and no adorner.
+   **Its text, though, comes from a generic brush** (`SystemControlForegroundBaseHighBrush`), so a
+   selected row's label colour **cannot be given on its own** — which is what rules out a solid accent
+   fill and leaves the tint plus the border.
+3. **Declaration order decides.** Between styles that both match, **the last declared wins**, so the
+   row's two styles go **before** the focus selectors: after them, a focused row would have lost its
+   ring.
+
+**And a third shape of transparency**: the selected row carries alpha **in the colour and in
+`Opacity`** at once (`#FF0078D7` at 0.4). With three shapes in three batches, the contrast arithmetic
+moved to one place, `ThemeContrast`, which composites both.
+
 #### ~~Phase 2c: the checkbox~~ — done on 2026-08-19, and it was not a second button
 
 **Done** — [the evidence](evidence/stable/audit-redesign-phase2c-checkbox-states.md). Eighteen across
@@ -354,10 +383,10 @@ which is the clearest of the four states. It now asks whether the box can be see
 failed once in the whole suite and did not recur in the walk alone (33/33) or in the two passes
 after. If it reappears on CI, that is the thread.
 
-**What is next, in order:** `ListBoxItem` (17), `TextBox` (15), `ComboBox` (8), `Slider` (5),
-`NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — and the first two **have no resources of
-their own**, so their way in has to be measured first; the consumed-scalars gate with a list that
-only shrinks; `primary-action`, which now has its token; and then the typography and the views.
+**What is next, in order:** ~~`ListBoxItem` (17)~~ **done**, `TextBox` (15), `ComboBox` (8),
+`Slider` (5), `NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — the `TextBox` has **2**
+resources of its own, so its way in has to be measured first; the consumed-scalars gate with a list
+that only shrinks; `primary-action`, which now has its token; and then the typography and the views.
 
 #### What step 8 has to remember about the redesign (2026-08-18)
 

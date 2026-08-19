@@ -144,7 +144,7 @@ by sight.
 | Measure | Value |
 | --- | --- |
 | Dictionaries in `Theme/DesignTokens.axaml` | **4**: `Light`, `Dark`, `HighContrastLight` and `HighContrastDark` |
-| Token declarations in the dictionaries | **268**, across **67 names**: 24 brushes and 43 aliases (12 for the button, 31 for the checkbox) |
+| Token declarations in the dictionaries | **280**, across **70 names**: 24 brushes and 46 aliases (12 for the button, 31 for the checkbox, 3 for lists) |
 | Scalars, outside the dictionaries | **13** |
 | Plus, in `Resources/Brand.axaml` | 3 (strings, no colours) |
 | Focus selectors | **10**: `Button`, `ToggleButton`, `ToggleSwitch`, `RadioButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
@@ -169,8 +169,14 @@ Four things the redesign has to know:
 - **Every control type gets in through its own resources, and no two are alike.** A button consumes
   **12** of the base theme's resources; a checkbox, **73**; a combo box, 59; a `RadioButton`, 38; a
   `ToggleButton`, 37; a `Slider`, 32. A `TextBox` has **2** of its own and a `ListBoxItem` **1**:
-  those paint from the generic ones (`TextControl*`, 32). Assuming the next type works like the last
-  is how this goes wrong.
+  those paint from **shared** system brushes. Assuming the next type works like the last is how this
+  goes wrong.
+- **A shared brush is redirected by measuring who else takes it.** The three list ones
+  (`SystemControlHighlightList*`) were checked by painting them a colour no theme uses and mounting
+  twelve control types: **only the list consumes them**. And what decided the row's design: its
+  content presenter **does** take the row's border by template binding, but its text comes from a
+  generic brush, so a selected row's label colour **cannot be given** — hence a tinted fill and a
+  border for the cue.
 
 ## The installation, which is also seen
 

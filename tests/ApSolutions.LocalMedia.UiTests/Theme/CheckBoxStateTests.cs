@@ -54,9 +54,12 @@ public sealed class CheckBoxStateTests
         // at 4.5 first and lowered on measuring, which is worth saying plainly: nothing was rescued
         // by it — today's 1.68:1 fails either bar, and the mapping that replaces it clears 3:1 by
         // 4.26 at its narrowest. What changed is that the bar now matches what is being measured.
-        var surface = Token(theme, "ShellSurfaceBrush");
-        var fill = Over(painted.BoxFill, surface);
-        var ratio = Contrast(Over(painted.Glyph, fill), fill);
+        //
+        // Composited rather than read raw: see ThemeContrast, which is where that arithmetic lives
+        // for every theme test, because two of them measuring the same thing differently drift.
+        var surface = ThemeContrast.Token(theme, "ShellSurfaceBrush");
+        var fill = ThemeContrast.Painted(new SolidColorBrush(painted.BoxFill), surface);
+        var ratio = ThemeContrast.Ratio(ThemeContrast.Painted(new SolidColorBrush(painted.Glyph), fill), fill);
         Assert.True(
             ratio >= NonTextMinimum,
             $"{themeName}: a checked, switched-off box shows its mark at {ratio:F2}:1 against the fill "
@@ -69,7 +72,7 @@ public sealed class CheckBoxStateTests
     {
         var theme = Resolve(themeName);
         using var scene = new Scene(theme, isChecked: false);
-        var surface = Token(theme, "ShellSurfaceBrush");
+        var surface = ThemeContrast.Token(theme, "ShellSurfaceBrush");
 
         foreach (var state in new string?[] { null, ":pointerover", ":pressed", ":disabled" })
         {
@@ -81,8 +84,8 @@ public sealed class CheckBoxStateTests
             // the outline would call that inversion a failure, when it is the clearest state of the
             // four. Measured before this: the disabled outline read 2.83:1.
             var ratio = Math.Max(
-                Contrast(Over(painted.BoxStroke, surface), surface),
-                Contrast(Over(painted.BoxFill, surface), surface));
+                ThemeContrast.Ratio(ThemeContrast.Painted(new SolidColorBrush(painted.BoxStroke), surface), surface),
+                ThemeContrast.Ratio(ThemeContrast.Painted(new SolidColorBrush(painted.BoxFill), surface), surface));
             Assert.True(
                 ratio >= NonTextMinimum,
                 $"{themeName} {state ?? ":rest"}: the box reads {ratio:F2}:1 against the surface by "
@@ -101,7 +104,9 @@ public sealed class CheckBoxStateTests
 
         // Measured: #0078D7 in all four themes — Windows 10's blue, which is nobody's token here and
         // in the two high contrast palettes is not the accent either (#0000FF and #00FFFF).
-        Assert.Equal(Token(theme, "AccentBrush"), Over(painted.BoxFill, Token(theme, "ShellSurfaceBrush")));
+        Assert.Equal(
+            ThemeContrast.Token(theme, "AccentBrush"),
+            ThemeContrast.Painted(new SolidColorBrush(painted.BoxFill), ThemeContrast.Token(theme, "ShellSurfaceBrush")));
     }
 
     [AvaloniaTheory]
@@ -111,9 +116,9 @@ public sealed class CheckBoxStateTests
         var theme = Resolve(themeName);
         using var scene = new Scene(theme, isChecked: false);
 
-        var surface = Token(theme, "ShellSurfaceBrush");
-        Assert.Equal(Token(theme, "TextPrimaryBrush"), Over(scene.Read(state: null).Label, surface));
-        Assert.Equal(Token(theme, "TextDisabledBrush"), Over(scene.Read(":disabled").Label, surface));
+        var surface = ThemeContrast.Token(theme, "ShellSurfaceBrush");
+        Assert.Equal(ThemeContrast.Token(theme, "TextPrimaryBrush"), ThemeContrast.Painted(new SolidColorBrush(scene.Read(state: null).Label), surface));
+        Assert.Equal(ThemeContrast.Token(theme, "TextDisabledBrush"), ThemeContrast.Painted(new SolidColorBrush(scene.Read(":disabled").Label), surface));
     }
 
     [AvaloniaFact]
@@ -155,45 +160,6 @@ public sealed class CheckBoxStateTests
         "HighContrastDark" => Presentation.Theme.AppThemeVariants.HighContrastDark,
         _ => throw new ArgumentOutOfRangeException(nameof(name)),
     };
-
-    private static Color Token(ThemeVariant theme, string key)
-    {
-        Assert.True(
-            Avalonia.Application.Current!.TryGetResource(key, theme, out var value),
-            $"{key} is missing from {theme}, so the state below it would fall back to the base theme.");
-        return Assert.IsAssignableFrom<ISolidColorBrush>(value).Color;
-    }
-
-    private static double Contrast(Color first, Color second)
-    {
-        var lighter = Math.Max(Luminance(first), Luminance(second));
-        var darker = Math.Min(Luminance(first), Luminance(second));
-        return (lighter + 0.05) / (darker + 0.05);
-    }
-
-    /// <summary>
-    /// One colour composited over another, so a translucent brush is measured as it is seen.
-    /// </summary>
-    /// <remarks>
-    /// Every brush the base theme gives a checkbox carries alpha in the colour itself — <c>#99000000</c>,
-    /// <c>#66FFFFFF</c>, <c>#33000000</c> — and a luminance that ignores the alpha channel measures a
-    /// colour nobody sees. The first version of these tests did exactly that and reported a checked,
-    /// switched-off box in the dark theme at 1.00:1, white on white, when what is on screen is white
-    /// on the grey that 40 % white leaves over black. That number was not a worse failure, it was a
-    /// wrong one — and where the alpha ran the other way it would have passed a border that reads
-    /// 2.85:1 as if it were 21:1.
-    /// </remarks>
-    private static Color Over(Color foreground, Color background)
-    {
-        var alpha = foreground.A / 255.0;
-        return Color.FromRgb(
-            (byte)Math.Round((foreground.R * alpha) + (background.R * (1 - alpha))),
-            (byte)Math.Round((foreground.G * alpha) + (background.G * (1 - alpha))),
-            (byte)Math.Round((foreground.B * alpha) + (background.B * (1 - alpha))));
-    }
-
-    private static double Luminance(Color color) =>
-        Presentation.Theme.HighContrastPolicy.RelativeLuminance(color.R, color.G, color.B);
 
     private readonly record struct Painted(Color BoxFill, Color BoxStroke, Color Glyph, Color Label);
 

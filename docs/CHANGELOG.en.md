@@ -104,6 +104,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   border's colour and the text the background's — because in those palettes a lighter shade would say
   nothing.
 
+- **A list says which row you are on.** The selected row was painted a translucent blue that stood
+  apart from the others by **less than it takes to tell two shades apart**; the text on it read
+  perfectly, so the problem was never reading the row but knowing which one it was. The selected row
+  now carries **a border in the application's colour** as well as a fill, and in the two high contrast
+  themes — where that fill is the page's own colour — the border is the whole cue. Every row carries
+  the same border and only its colour changes on selection, so selecting one does not move its text.
+  This reaches all 23 lists with data.
+
 - **Checkboxes are no longer painted by Windows.** All eighteen in the application took their
   colours from the graphics library's theme, with three consequences anyone could see. A **checked,
   switched-off** box was unreadable in the light theme: a white mark over the grey beneath it, with

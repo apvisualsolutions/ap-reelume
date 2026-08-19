@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b y 2c hechas**; quedan siete tipos y las vistas | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b, 2c y 2d hechas**; quedan seis tipos y las vistas | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -317,6 +317,35 @@ lleva un día siendo falso.
 la puerta de escalares consumidos con lista que sólo encoge; `primary-action` con el token
 `AccentTextBrush`; y después la tipografía y las vistas, una por commit.
 
+#### ~~La fase 2d: la fila de lista~~ — hecha el 2026-08-19
+
+**Hecha** — [la evidencia](evidence/stable/audit-redesign-phase2d-list-row.md). 17 usos directos y
+**23 listas con datos** detrás.
+
+**El defecto**: la fila seleccionada se separaba de las demás **1,73:1** en claro, 2,22 en oscuro,
+1,76 y 2,24 en los de alto contraste, contra un listón de 3. El texto encima se leía a 11,58:1, así
+que el defecto **nunca fue el texto**: era saber en qué fila estás. Y otra vez Light pintaba idéntico
+a HighContrastLight.
+
+**Tres cosas medidas que decidieron el diseño, y que valen para lo que queda:**
+
+1. **Una brocha compartida se redirige midiendo quién más la toma.** Las de la fila son del sistema
+   (`SystemControlHighlightList*`). Se pintaron de un color que ningún tema usa y se montaron **doce**
+   tipos forzando cinco pseudoclases: **sólo la lista las consume** — ni `ComboBox`, ni `Menu`, ni
+   `TabControl`, ni ninguno de los diez con foco.
+2. **El `ContentPresenter` de la fila SÍ toma su `BorderBrush` y su `BorderThickness`** por
+   `TemplateBinding`, así que un estilo de aplicación puede darle geometría sin plantilla propia y sin
+   adorno. **Su texto, en cambio, sale de una brocha genérica** (`SystemControlForegroundBaseHighBrush`),
+   así que el color del texto de una fila seleccionada **no se puede dar a solas** — y eso es lo que
+   descarta el acento pleno como relleno y deja el tinte más el borde.
+3. **El orden de declaración decide.** Entre estilos que ambos casan gana **el último declarado**, así
+   que los dos estilos de la fila van **antes** que los selectores de foco: puestos después, una fila
+   enfocada habría perdido su anillo.
+
+**Y una tercera forma de transparencia**: la fila seleccionada lleva alfa **en el color y en
+`Opacity`** a la vez (`#FF0078D7` al 0,4). Con tres formas distintas en tres tandas, la aritmética de
+contraste pasó a un único sitio, `ThemeContrast`, que compone las dos.
+
 #### ~~La fase 2c: la casilla~~ — hecha el 2026-08-19, y no era un segundo botón
 
 **Hecha** — [la evidencia](evidence/stable/audit-redesign-phase2c-checkbox-states.md). Dieciocho en
@@ -354,10 +383,10 @@ ella, 1,00:1—, que es el estado más claro de los cuatro. Pregunta ahora si la
 falló una vez en la suite entera y no volvió ni corriendo el paseo solo (33/33) ni en las dos pasadas
 siguientes. Si reaparece en CI, ahí está el hilo.
 
-**Lo que sigue, en orden:** `ListBoxItem` (17), `TextBox` (15), `ComboBox` (8), `Slider` (5),
-`NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — y los dos primeros **no tienen recursos
-propios**, así que su vía hay que medirla antes—; la puerta de escalares consumidos con lista que
-sólo encoge; `primary-action`, que ya tiene su token; y después la tipografía y las vistas.
+**Lo que sigue, en orden:** ~~`ListBoxItem` (17)~~ **hecho**, `TextBox` (15), `ComboBox` (8),
+`Slider` (5), `NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — el `TextBox` tiene **2**
+recursos propios, así que su vía hay que medirla antes—; la puerta de escalares consumidos con lista
+que sólo encoge; `primary-action`, que ya tiene su token; y después la tipografía y las vistas.
 
 #### Lo que el paso 8 debe recordar del rediseño (2026-08-18)
 

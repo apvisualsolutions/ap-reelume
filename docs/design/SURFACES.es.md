@@ -143,7 +143,7 @@ que distinguirlas a la vista.
 | Medida | Valor |
 | --- | --- |
 | Diccionarios en `Theme/DesignTokens.axaml` | **4**: `Light`, `Dark`, `HighContrastLight` y `HighContrastDark` |
-| Declaraciones de token en los diccionarios | **268**, en **67 nombres**: 24 brochas y 43 alias (12 del botón, 31 de la casilla) |
+| Declaraciones de token en los diccionarios | **280**, en **70 nombres**: 24 brochas y 46 alias (12 del botón, 31 de la casilla, 3 de las listas) |
 | Escalares, fuera de los diccionarios | **13** |
 | Además, en `Resources/Brand.axaml` | 3 (cadenas, ningún color) |
 | Selectores de foco | **10**: `Button`, `ToggleButton`, `ToggleSwitch`, `RadioButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
@@ -168,8 +168,14 @@ Cuatro cosas que el rediseño tiene que saber:
 - **Cada tipo de control entra por sus propios recursos, y no hay dos iguales.** Un botón consume
   **12** recursos del tema base; una casilla, **73**; una lista desplegable, 59; un `RadioButton`,
   38; un `ToggleButton`, 37; un `Slider`, 32. Un `TextBox` tiene **2** propios y un `ListBoxItem`
-  **1**: ésos pintan desde los genéricos (`TextControl*`, 32). Suponer que el siguiente se hace como
+  **1**: ésos pintan desde brochas **compartidas** del sistema. Suponer que el siguiente se hace como
   el anterior es la forma de equivocarse aquí.
+- **Una brocha compartida se redirige midiendo quién más la toma.** Las tres de las listas
+  (`SystemControlHighlightList*`) se comprobaron pintándolas de un color que ningún tema usa y
+  montando doce tipos de control: **sólo la lista las consume**. Y lo que decidió el diseño de la
+  fila: su `ContentPresenter` **sí** toma el borde de la fila por `TemplateBinding`, pero su texto
+  sale de una brocha genérica, así que el color del texto de una fila seleccionada **no se puede dar**
+  — de ahí que el relleno sea un tinte y la señal, el borde.
 
 ## La instalación, que también se ve
 
