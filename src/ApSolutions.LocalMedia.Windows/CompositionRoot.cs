@@ -1264,6 +1264,7 @@ public static partial class CompositionRoot
                 .Where(version => version.MediaFileId != mediaFileId)
                 .Select(version => new PlayerVersionRowViewModel(
                     version,
+                    versionSwitch,
                     target => SwitchToVersionAsync(target, confirmed: false, restartFromZero: false)))]);
 
         return new PlayerSurfaces

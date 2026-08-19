@@ -41,7 +41,7 @@ public sealed class VersionSwitchWiringTests
     {
         MediaVersion? handed = null;
         var version = Version(available: true);
-        var row = new PlayerVersionRowViewModel(version, target =>
+        var row = new PlayerVersionRowViewModel(version, Question(), target =>
         {
             handed = target;
             return Task.CompletedTask;
@@ -61,6 +61,7 @@ public sealed class VersionSwitchWiringTests
     {
         var row = new PlayerVersionRowViewModel(
             Version(available: false),
+            Question(),
             _ => Task.CompletedTask);
 
         Assert.False(row.SwitchCommand.CanExecute(null));
@@ -71,7 +72,7 @@ public sealed class VersionSwitchWiringTests
     {
         Assert.False(new PlayerVersionsViewModel([]).HasAlternatives);
         Assert.True(new PlayerVersionsViewModel([
-            new PlayerVersionRowViewModel(Version(available: true), _ => Task.CompletedTask),
+            new PlayerVersionRowViewModel(Version(available: true), Question(), _ => Task.CompletedTask),
         ]).HasAlternatives);
     }
 
@@ -85,6 +86,8 @@ public sealed class VersionSwitchWiringTests
         IsHdr: true,
         "HEVC",
         4_000_000_000);
+
+    private static VersionSwitchViewModel Question() => new();
 
     private static string CompositionSource()
     {
