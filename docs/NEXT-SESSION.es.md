@@ -1,5 +1,25 @@
 # Dónde retomar
 
+## Estado al abrir (2026-08-19, cierre de la sesión de tarde)
+
+**`main` y la rama están en `e182bd5`, con CI verde y nada en vuelo.** El run verificó el superconjunto
+completo: `verify.ps1` entero **más** las puertas de accesibilidad, recuperación y paseo. Se puede
+empezar a trabajar directamente.
+
+**El paso 6 está hecho salvo las vistas**: la fase 2 entera (los diez tipos de control), la puerta de
+escalares, `primary-action` y la tipografía. **Lo siguiente es `MiniPlayerWindow`**, y está **decidido
+entero** más abajo — nueve decisiones, ninguna pendiente.
+
+**Tres cosas que costaron una vuelta de CI cada una y no deben repetirse:**
+
+1. **Las suites afectadas por un cambio de vistas son CUATRO**, no dos: `UiTests`,
+   `AccessibilityTests`, **`IntegrationTests`** y `DocumentationTests`. Veintitrés archivos de prueba
+   leen `.axaml` **como texto**, y `TmdbLogoTests` compara dos tamaños entre sí.
+2. **El trinquete de cobertura falla también cuando algo MEJORA** sin declararlo. Se corrige copiando
+   entero el artefacto `coverage-debt` del run, nunca a mano.
+3. **`verify.ps1` aborta en el primer fallo**, así que un rojo de suite **esconde** los posteriores:
+   un run rojo no dice que sólo haya un problema.
+
 ## La cola decidida el 2026-08-16 (no se re-delibera)
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
@@ -400,80 +420,80 @@ cada corrección.
    luego una vista por commit— y **los cinco controles que gana `MiniPlayerWindow` llegan con su
    escena de paseo en el mismo commit**. El trinquete no cruza de fase con deuda.
 
-#### `MiniPlayerWindow`: los cinco controles, medidos sin escribir código — 2026-08-19
+#### `MiniPlayerWindow`: los cinco controles, DECIDIDO ENTERO — 2026-08-19
 
-**Medido entero para que la sesión siguiente ejecute en vez de descubrir**, como se hizo con el
-`ComboBox`. Hoy la ventana son diez líneas: un `Panel Background="Black"` y **cero controles**.
+**No queda nada por deliberar.** Medido sin escribir código, como se hizo con el `ComboBox`, y con las
+nueve decisiones tomadas abajo. Hoy la ventana son diez líneas: un `Panel Background="Black"` y **cero
+controles**.
 
-**Los cinco, con las claves que el paquete ya fijó** (`Propuesta de diseño`, tabla de cadenas nuevas):
+**Los cinco, con las claves que el paquete ya fijó** y el enlace exacto de cada uno:
 
-| Clave | Qué | Comando | ¿Existe? |
-|---|---|---|---|
-| `MiniPlayerPlayPause` | Pausa / reanudar | — | **NO. Ver abajo** |
-| `MiniPlayerSkipBack` | −10 s | `TransportControlsViewModel.SkipBackwardCommand` | sí |
-| `MiniPlayerSkipForward` | +10 s | `TransportControlsViewModel.SkipForwardCommand` | sí |
-| `MiniPlayerRestore` | Volver a la ventana grande | `ShellViewModel.ToggleMiniPlayerCommand` | sí |
-| `MiniPlayerClose` | Cerrar | `ShellViewModel.ClosePlayerCommand` | sí |
+| Clave | Qué | Enlace |
+|---|---|---|
+| `MiniPlayerPlayPause` | Pausa / reanudar | `{Binding Player.Player.TogglePlaybackCommand}` ← **el único que hay que crear** |
+| `MiniPlayerSkipBack` | −10 s | `{Binding Player.Player.Transport.SkipBackwardCommand}` |
+| `MiniPlayerSkipForward` | +10 s | `{Binding Player.Player.Transport.SkipForwardCommand}` |
+| `MiniPlayerRestore` | Volver a la ventana grande | `{Binding ToggleMiniPlayerCommand}` |
+| `MiniPlayerClose` | Cerrar | `{Binding ClosePlayerCommand}` |
 
-Los cinco con `pl.pbtn` —36×36, radio 8—, **no** el círculo de 52 px de la pausa del reproductor
-grande: allí es la acción primaria y aquí es uno de cinco iguales.
+##### Las nueve decisiones (2026-08-19, no se re-deliberan)
 
-**Los dos hallazgos que cambian el trabajo, y por eso esta nota existe:**
+1. **El `DataContext` de la ventana es el `ShellViewModel`, y NO hay tipo nuevo.** Ya expone `Player`,
+   `ToggleMiniPlayerCommand` y `ClosePlayerCommand`, y `PlayerSurfaces.Player` **es** un
+   `PlayerViewModel`, que expone `Transport`. Se asigna donde la ventana se crea, en
+   `ShellView.axaml.cs` (`_miniWindow ??= new MiniPlayerWindow()`). **Sin archivo nuevo de `src/` no
+   hay suelo de 96/96 que ganar.**
+2. **`TogglePlaybackCommand` se añade a `PlayerViewModel`**, con predicado `CanPause || CanResume`.
+   Hereda la notificación que ya existe —ese modelo emite las dos propiedades y llama a
+   `RaiseCanExecuteChanged` al cambiar de estado—, y **entra en `CommandNotificationTests` como el
+   octavo**, con su predicado exacto: esa puerta lleva lista cerrada.
+3. **El cromo va SIEMPRE VISIBLE. Decisión firme, no aplazada.** El paquete lo pide «al pasar el ratón
+   y al recibir foco». Se descarta por dos razones y queda como **desviación consciente**, igual que
+   el borde de 2 px al pulsar: (a) **el paseo es la red del rediseño** y su resolvedor busca el
+   control **antes** de mover el ratón, así que lo hallaría invisible y `visible=False` acusaría al
+   producto de un defecto que no tiene; (b) una ventana de 480×270 dedicada sólo a reproducir no tiene
+   con qué competir por el espacio de cinco botones de 36 px. El propio paquete admite que el cromo
+   oculto es un problema de accesibilidad —por eso añade «y al recibir foco»—, y lo más accesible es
+   que esté.
+4. **Clase de estilo nueva `player-chrome`, en `DesignTokens.axaml`, y sólo para estos cinco.**
+   Medido: el transporte grande **no usa ninguna clase** —son `Button` desnudos— y en todo el árbol
+   sólo existen tres (`theme-option` 5, `navigation-destination` 5 que es marcador de pruebas, y
+   `primary-action` 1). El `pl.pbtn` del paquete es del prototipo HTML, no del código. **Que el
+   transporte grande adopte la clase es trabajo de `PlayerView`**, su propia vista, o arrastraría la
+   línea base de maqueta de otra pantalla a este commit.
+5. **`MinWidth`/`MinHeight` de 36 y `CornerRadiusMedium`, NO tamaño fijo.** El paquete dice 36×36, y
+   un tamaño fijo con `Content` traducido **corta texto en uno de los dos idiomas**: es un defecto
+   esperando. 36 de mínimo da la misma área de pulsación sin apostar a que dos idiomas midan igual.
+6. **⚠ `CornerRadiusMedium` SALE de `NotSpentYet` en ese mismo commit.** Lo exige `ScalarTokenTests`,
+   que **falla también cuando algo de esa lista empieza a gastarse**. La lista pasa de seis a cinco.
+   Sin esto, una vuelta de CI perdida.
+7. **`Content` y `AutomationProperties.Name` salen de la MISMA clave**, como hacen los tres botones
+   del transporte. Es lo que el árbol ya hace y lo que el paseo espera para identificarlos.
+8. **El orden de las vistas que quedan, después de `MiniPlayerWindow`, `UpdateView` y `PlayerView`, es
+   el del inventario de `SURFACES.es.md`.** Es el registro canónico de superficies y ya está medido,
+   así que no hay que deliberar vista por vista.
+9. **Una vista que no necesite cambios no lleva commit vacío**: se anota en una línea de la evidencia
+   de la fase diciendo **qué se midió** y por qué no cambia.
 
-1. **No hay un comando único de pausa/reanudar.** `PlayerViewModel` tiene `PauseCommand` y
-   `ResumeCommand` **separados**, con `CanPause` (`Playing`) y `CanResume` (`Paused`). El diseño pide
-   **un** control. Hay que añadir un comando que alterne, con predicado `CanPause || CanResume`. Lo
-   bueno: `PlayerViewModel` **ya notifica** —emite `CanPause` y `CanResume` y llama a
-   `RaiseCanExecuteChanged` sobre sus comandos al cambiar de estado—, así que el nuevo hereda el
-   mecanismo. Lo que obliga: **entra en `CommandNotificationTests`**, la puerta de los siete, que
-   lleva lista cerrada con el predicado exacto de cada uno. Pasa a ocho o el nuevo se declara ahí.
-2. ~~**`PlayerSurfaces` no expone el transporte.**~~ **Corregido el mismo día: la vía ya estaba y
-   me equivoqué al escribirlo.** `PlayerSurfaces` no lo expone, cierto, pero **`PlayerViewModel` sí**
-   —`public TransportControlsViewModel? Transport { get; init; }`, alimentado en `CompositionRoot`—,
-   y `PlayerSurfaces.Player` **es** un `PlayerViewModel`. Miré un tipo y concluí sobre el de al lado.
+##### Dos trampas ya identificadas
 
-   **Y eso cambia el trabajo entero: no hace falta un tipo nuevo.** El `DataContext` de la ventana
-   puede ser el propio `ShellViewModel`, que ya expone `Player`, `ToggleMiniPlayerCommand` y
-   `ClosePlayerCommand`. Los cinco enlaces quedan:
+- **Los dos saltos «se pliegan fuera a 320 px de ancho»**, que es el mínimo de la ventana. El paseo usa
+  el tamaño por defecto (480), así que a 480 están los cinco — pero es **exactamente la forma que ha
+  sacado un control fuera de la ventana seis veces**, así que la escena mide los `bounds` frente a la
+  ventana **antes** de intentar el clic, no después del rojo.
+- **`PlayerViewModel.cs` es un archivo ya vigilado por la cobertura**, así que el comando nuevo puede
+  **subir** su suelo, y el trinquete falla también en esa dirección — pasó en esta misma rama con
+  `FluentThemeService`. Se copia entero el artefacto `coverage-debt` del run, nunca a mano.
 
-   ```
-   Pausa      {Binding Player.Player.TogglePlaybackCommand}   <- el único que falta
-   −10 s      {Binding Player.Player.Transport.SkipBackwardCommand}
-   +10 s      {Binding Player.Player.Transport.SkipForwardCommand}
-   Volver     {Binding ToggleMiniPlayerCommand}
-   Cerrar     {Binding ClosePlayerCommand}
-   ```
+##### Lo que el commit lleva entero
 
-   **Sin `MiniPlayerViewModel` no hay archivo nuevo de `src/`**, así que **decae el requisito de
-   96/96** y el commit se queda en: un comando, cinco cadenas × dos idiomas, cinco pruebas de nombre
-   y la escena. Lo único que hay que añadir en el anfitrión es darle el `DataContext` a la ventana
-   donde se crea, en `ShellView.axaml.cs`.
+Los cinco controles, sus **cinco cadenas en los dos idiomas**, sus **cinco pruebas de nombre
+accesible**, **la escena de paseo que los pulsa**, `CornerRadiusMedium` fuera de la lista y el octavo
+en `CommandNotificationTests`. El trinquete del paseo sube a 5 y vuelve a **0** dentro de la fase.
 
-**Decidido: el cromo va SIEMPRE VISIBLE en el primer commit, y no aparece al pasar el ratón.** El
-paquete lo pide «al pasar el ratón y al recibir foco», y esa es una decisión de refinamiento visual,
-no de capacidad. El motivo es el trinquete: **el paseo es la red del rediseño**, y un control que sólo
-existe con el puntero encima no lo puede cubrir sin cambiar también el arnés — el resolvedor busca el
-control **antes** de mover el ratón, así que lo encontraría invisible y `visible=False` acusaría al
-producto. Cambiar la vista y el arnés en el mismo commit mezcla dos cosas que se rompen por separado.
-Una ventana de 480×270 tiene sitio de sobra para cinco botones de 36. **La aparición por hover se
-añade después, con su medición del arnés**, y queda anotada como desviación consciente igual que el
-borde de 2 px al pulsar.
-
-**Dos trampas ya identificadas para esa sesión:**
-
-- **Los dos saltos «se pliegan fuera a 320 px de ancho»**, que es el mínimo de la ventana. El paseo
-  usa el tamaño por defecto (480), así que a 480 están los cinco — pero es **exactamente la forma que
-  ha sacado un control fuera de la ventana seis veces**, así que la escena mide los `bounds` frente a
-  la ventana **antes** de intentar el clic, no después del rojo.
-- ~~**`MiniPlayerViewModel` sería un tipo nuevo**~~ — **ya no hace falta** (ver arriba). Lo que sí
-  toca cobertura es el **comando nuevo** de `PlayerViewModel`: es un archivo ya vigilado, así que su
-  suelo puede **subir** al cubrirlo, y el trinquete falla también en esa dirección. Se copia entero
-  el artefacto `coverage-debt` del run, nunca a mano.
-
-**Y lo que el commit tiene que llevar entero, porque el trinquete no cruza de fase con deuda:** los
-cinco controles, sus cinco cadenas **en los dos idiomas**, sus cinco pruebas de nombre accesible, y
-**la escena de paseo que los pulsa**, en el mismo cambio. El trinquete sube a 5 y vuelve a 0 dentro
-de la fase.
+**Y antes de empujar: `IntegrationTests` también lee las vistas como texto.** Las suites afectadas por
+un cambio de vistas son cuatro, no dos: `UiTests`, `AccessibilityTests`, `IntegrationTests` y
+`DocumentationTests`.
 
 #### ~~La fase 2f: el `ComboBox`~~ — hecha el 2026-08-19
 

@@ -1,5 +1,25 @@
 # Where to resume
 
+## State on opening (2026-08-19, end of the afternoon session)
+
+**`main` and the branch are both at `e182bd5`, CI green, nothing in flight.** That run verified the
+full superset: the whole of `verify.ps1` **plus** the accessibility, recovery and walk gates. Work can
+start straight away.
+
+**Step 6 is done except the views**: the whole of phase 2 (all ten control types), the scalars gate,
+`primary-action` and the type scale. **Next is `MiniPlayerWindow`**, and it is **fully decided**
+below — nine decisions, none outstanding.
+
+**Three things that cost one CI round each and should not repeat:**
+
+1. **A change to views affects FOUR suites**, not two: `UiTests`, `AccessibilityTests`,
+   **`IntegrationTests`** and `DocumentationTests`. Twenty-three test files read `.axaml` **as text**,
+   and `TmdbLogoTests` compares two sizes against each other.
+2. **The coverage ratchet also fails when something IMPROVES** without saying so. It is fixed by
+   copying the run's `coverage-debt` artifact whole, never by hand.
+3. **`verify.ps1` aborts on the first failure**, so a suite red **hides** the ones after it: a red run
+   does not mean there is only one problem.
+
 ## The queue decided on 2026-08-16 (not up for re-deliberation)
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
@@ -399,82 +419,82 @@ each correction.
    view per commit — and **the five controls `MiniPlayerWindow` gains arrive with their walk scene in
    the same commit**. The ratchet does not cross a phase boundary carrying debt.
 
-#### `MiniPlayerWindow`: the five controls, measured without writing code — 2026-08-19
+#### `MiniPlayerWindow`: the five controls, FULLY DECIDED — 2026-08-19
 
-**Measured whole so the next session executes rather than discovers**, the way the `ComboBox` was.
-Today the window is ten lines: a `Panel Background="Black"` and **zero controls**.
+**Nothing left to deliberate.** Measured without writing code, as the `ComboBox` was, with the nine
+decisions below taken. Today the window is ten lines: a `Panel Background="Black"` and **zero
+controls**.
 
-**The five, with the keys the package already fixed** (`Propuesta de diseño`, new strings table):
+**The five, with the keys the package already fixed** and each one's exact binding:
 
-| Key | What | Command | Exists? |
-|---|---|---|---|
-| `MiniPlayerPlayPause` | Pause / resume | — | **NO. See below** |
-| `MiniPlayerSkipBack` | −10 s | `TransportControlsViewModel.SkipBackwardCommand` | yes |
-| `MiniPlayerSkipForward` | +10 s | `TransportControlsViewModel.SkipForwardCommand` | yes |
-| `MiniPlayerRestore` | Back to the big window | `ShellViewModel.ToggleMiniPlayerCommand` | yes |
-| `MiniPlayerClose` | Close | `ShellViewModel.ClosePlayerCommand` | yes |
+| Key | What | Binding |
+|---|---|---|
+| `MiniPlayerPlayPause` | Pause / resume | `{Binding Player.Player.TogglePlaybackCommand}` ← **the only one to create** |
+| `MiniPlayerSkipBack` | −10 s | `{Binding Player.Player.Transport.SkipBackwardCommand}` |
+| `MiniPlayerSkipForward` | +10 s | `{Binding Player.Player.Transport.SkipForwardCommand}` |
+| `MiniPlayerRestore` | Back to the big window | `{Binding ToggleMiniPlayerCommand}` |
+| `MiniPlayerClose` | Close | `{Binding ClosePlayerCommand}` |
 
-All five at `pl.pbtn` — 36×36, radius 8 — and **not** the 52 px circle of the big player's pause:
-there it is the primary action, here it is one of five equals.
+##### The nine decisions (2026-08-19, not reopened)
 
-**The two findings that change the work, and why this note exists:**
+1. **The window's `DataContext` is the `ShellViewModel`, and there is NO new type.** It already
+   exposes `Player`, `ToggleMiniPlayerCommand` and `ClosePlayerCommand`, and `PlayerSurfaces.Player`
+   **is** a `PlayerViewModel`, which exposes `Transport`. It is assigned where the window is created,
+   in `ShellView.axaml.cs` (`_miniWindow ??= new MiniPlayerWindow()`). **With no new file under
+   `src/` there is no 96/96 floor to earn.**
+2. **`TogglePlaybackCommand` is added to `PlayerViewModel`**, with predicate
+   `CanPause || CanResume`. It inherits the notification that already works — that model raises both
+   properties and calls `RaiseCanExecuteChanged` when the state moves — and **enters
+   `CommandNotificationTests` as the eighth**, with its exact predicate: that gate carries a closed
+   list.
+3. **The chrome is ALWAYS VISIBLE. A firm decision, not a postponed one.** The package asks for
+   "on hover and on focus". It is declined for two reasons and recorded as a **deliberate deviation**,
+   exactly like the 2 px pressed border: (a) **the walk is the redesign's net** and its resolver looks
+   for a control **before** moving the mouse, so it would find it invisible and `visible=False` would
+   accuse the product of a defect it does not have; (b) a 480×270 window that does nothing but play
+   has nothing competing for the space of five 36 px buttons. The package itself concedes that hidden
+   chrome is an accessibility problem — that is why it adds "and on focus" — and the most accessible
+   answer is for it to be there.
+4. **A new style class `player-chrome`, in `DesignTokens.axaml`, for these five only.** Measured: the
+   big transport **uses no class at all** — bare `Button`s — and the whole tree holds only three
+   (`theme-option` 5, `navigation-destination` 5 which is a test marker, and `primary-action` 1). The
+   package's `pl.pbtn` belongs to the HTML prototype, not to the code. **The big transport adopting
+   the class is `PlayerView`'s job**, its own view, or it would drag another screen's layout baseline
+   into this commit.
+5. **`MinWidth`/`MinHeight` of 36 and `CornerRadiusMedium`, NOT a fixed size.** The package says
+   36×36, and a fixed size with translated `Content` **clips text in one of the two languages**: a
+   defect waiting to happen. A minimum of 36 gives the same hit area without betting that two
+   languages measure the same.
+6. **⚠ `CornerRadiusMedium` LEAVES `NotSpentYet` in that same commit.** `ScalarTokenTests` requires
+   it: the gate **also fails when something on that list starts being spent**. The list goes from six
+   to five. Without this, one CI round is wasted.
+7. **`Content` and `AutomationProperties.Name` come from the SAME key**, as the transport's three
+   buttons do. It is what the tree already does and what the walk expects in order to identify them.
+8. **The order of the remaining views, after `MiniPlayerWindow`, `UpdateView` and `PlayerView`, is
+   the order of the `SURFACES.es.md` inventory.** It is the canonical record of surfaces and is
+   already measured, so there is no deliberating view by view.
+9. **A view that needs no change gets no empty commit**: it is recorded in one line of the phase's
+   evidence saying **what was measured** and why nothing changes.
 
-1. **There is no single pause/resume command.** `PlayerViewModel` has `PauseCommand` and
-   `ResumeCommand` **separately**, with `CanPause` (`Playing`) and `CanResume` (`Paused`). The design
-   asks for **one** control. A toggling command is needed, with predicate `CanPause || CanResume`.
-   The good part: `PlayerViewModel` **already notifies** — it raises `CanPause` and `CanResume` and
-   calls `RaiseCanExecuteChanged` on its commands when the state moves — so the new one inherits the
-   mechanism. What it forces: **it enters `CommandNotificationTests`**, the gate on the seven, which
-   carries a closed list with each one's exact predicate. It becomes eight, or the new one is
-   declared there.
-2. ~~**`PlayerSurfaces` does not expose the transport.**~~ **Corrected the same day: the path was
-   already there and I got it wrong.** `PlayerSurfaces` does not expose it, true, but
-   **`PlayerViewModel` does** — `public TransportControlsViewModel? Transport { get; init; }`, fed in
-   `CompositionRoot` — and `PlayerSurfaces.Player` **is** a `PlayerViewModel`. I read one type and
-   concluded about the one next to it.
+##### Two traps already identified
 
-   **And that changes the whole job: no new type is needed.** The window's `DataContext` can be the
-   `ShellViewModel` itself, which already exposes `Player`, `ToggleMiniPlayerCommand` and
-   `ClosePlayerCommand`. The five bindings become:
+- **The two skips "fold out at 320 px wide"**, the window's minimum. The walk uses the default size
+  (480), so all five are there at 480 — but this is **exactly the shape that has pushed a control out
+  of a window six times**, so the scene measures bounds against the window **before** attempting the
+  click, not after the red.
+- **`PlayerViewModel.cs` is already watched by the coverage ratchet**, so the new command may **raise**
+  its floor, and the ratchet fails in that direction too — it happened on this very branch with
+  `FluentThemeService`. Copy the run's `coverage-debt` artifact whole, never by hand.
 
-   ```
-   Pause      {Binding Player.Player.TogglePlaybackCommand}   <- the only one missing
-   -10 s      {Binding Player.Player.Transport.SkipBackwardCommand}
-   +10 s      {Binding Player.Player.Transport.SkipForwardCommand}
-   Restore    {Binding ToggleMiniPlayerCommand}
-   Close      {Binding ClosePlayerCommand}
-   ```
+##### What the commit carries whole
 
-   **With no `MiniPlayerViewModel` there is no new file under `src/`**, so the **96/96 requirement
-   falls away** and the commit is: one command, five strings in two languages, five name tests and
-   the scene. The only host change is giving the window its `DataContext` where it is created, in
-   `ShellView.axaml.cs`.
+The five controls, their **five strings in both languages**, their **five accessible-name tests**,
+**the walk scene that presses them**, `CornerRadiusMedium` off the list, and the eighth entry in
+`CommandNotificationTests`. The walk ratchet rises to 5 and returns to **0** inside the phase.
 
-**Decided: the chrome is ALWAYS VISIBLE in the first commit, not revealed on hover.** The package
-asks for "on hover and on focus", and that is a visual refinement rather than a capability. The
-reason is the ratchet: **the walk is the redesign's net**, and a control that only exists while the
-pointer is over it cannot be covered without also changing the harness — the resolver looks for the
-control **before** moving the mouse, so it would find it invisible and `visible=False` would accuse
-the product. Changing the view and the harness in one commit mixes two things that break separately.
-A 480×270 window has room to spare for five 36 px buttons. **Hover reveal comes afterwards, with its
-own harness measurement**, and is recorded as a deliberate deviation exactly like the 2 px pressed
-border.
-
-**Two traps already identified for that session:**
-
-- **The two skips "fold out at 320 px wide"**, which is the window's minimum. The walk uses the
-  default size (480), so all five are there at 480 — but this is **exactly the shape that has pushed
-  a control out of the window six times**, so the scene measures the bounds against the window
-  **before** attempting the click, not after the red.
-- ~~**`MiniPlayerViewModel` would be a new file**~~ — **not needed any more** (see above). What does
-  touch coverage is the **new command** on `PlayerViewModel`: an already-watched file, so its floor
-  may **rise** when it is covered, and the ratchet fails in that direction too. Copy the run's
-  `coverage-debt` artifact whole, never by hand.
-
-**And what the commit must carry whole, because the ratchet does not cross a phase with debt:** the
-five controls, their five strings **in both languages**, their five accessible-name tests, and **the
-walk scene that presses them**, in the same change. The ratchet rises to 5 and returns to 0 inside
-the phase.
+**And before pushing: `IntegrationTests` reads the views as text too.** The suites affected by a change
+to views are four, not two: `UiTests`, `AccessibilityTests`, `IntegrationTests` and
+`DocumentationTests`.
 
 #### ~~Phase 2f: the `ComboBox`~~ — done on 2026-08-19
 
