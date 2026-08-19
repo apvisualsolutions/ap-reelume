@@ -52,9 +52,17 @@ arrives holds no chrome at all.
   shell: no hay modelo de vista nuevo, porque la sesión, el modo y el cierre ya viven ahí. /
   **`MiniPlayerChromeView`**, a `UserControl` holding the five, its data context the shell's own.
 - **La ventana pasa a `DockPanel`**: el cromo abajo y el escenario rellenando. `Host()` deja de ser
-  código muerto y pasa a ser la ruta real, con `Release()` para soltar el escenario al volver; `Apply`
-  pregunta por `IPlayerSurfaceHost` y sólo asigna `Content` a las ventanas que no saben hospedar. /
+  código muerto y pasa a ser la ruta real, con `Release()` para soltar el escenario al volver. /
   **The window becomes a `DockPanel`**; `Host()` stops being dead code and becomes the real path.
+- **`Apply` deja de mover el contenido**, y ésa fue la segunda vuelta: el primer intento le puso una
+  interfaz —`IPlayerSurfaceHost`— y **dejó viva la rama vieja que ya no recorre nadie**. El trinquete
+  de cobertura lo cazó en CI, `PlayerWindowCoordinator` cayendo de 100/92 a 98/90, con el mensaje
+  exacto: «coverage does not go backwards». La corrección no fue cubrir la rama muerta sino
+  **borrarla**: `Apply` aplica una forma —posición, tamaño, `Topmost`, decoraciones— y la colocación
+  vive donde vive la ventana. Con la rama se fue la interfaz, que sin ella no tenía consumidor. /
+  **`Apply` stops moving the content.** The first attempt added an interface and left the old branch
+  alive with nothing walking it; the coverage ratchet caught it in CI. The fix was deleting the dead
+  branch, not covering it.
 - **El arnés aprende a apuntar**: `Reachable`, `SecondaryWindows` y `RootOf`, y cada función de clic
   trabaja sobre la ventana del control en vez de sobre la del shell. / **The harness learns to aim.**
 - **`TogglePlaybackCommand`** en `PlayerViewModel`, predicado `CanPause || CanResume`, y **en la lista
@@ -91,11 +99,17 @@ the symptom is not that they overflow**: it is that there is nowhere left to put
 
 ## El verde / The green
 
+Medido en CI, que es quien verifica / Measured in CI, which is what verifies:
+
 ```
-UiTests                598/598
-AccessibilityTests     el paseo pulsa los cinco / the walk presses all five
+UiTests                600/600
+AccessibilityTests     135/135
+IntegrationTests       455/457 (2 omitidas por diseño / 2 skipped by design)
 DocumentationTests      87/87
-IntegrationTests       456/457 (1 omitida por diseño / 1 skipped by design)
+MediaTests             118/123      PackagingTests  190/193
+Domain.Tests           465/465      Application.Tests  230/230
+ArchitectureTests       30/30       PerformanceTests    17/18
+El paseo / the walk    134 controles en 133 identidades; 133 pulsadas, 0 pendientes
 ```
 
 `CornerRadiusMedium` sale de `NotSpentYet` en este mismo cambio, que es lo que `ScalarTokenTests`

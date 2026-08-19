@@ -69,7 +69,8 @@ public sealed partial class ShellView : UserControl
             // second answer to questions that have one.
             window.DataContext = _viewModel;
             var screen = window.Screens.Primary?.Bounds ?? new PixelRect(0, 0, 1920, 1080);
-            _windowCoordinator.Apply(window, stage, PlaybackMode.Mini, screen, window.RenderScaling);
+            window.Host(stage);
+            _windowCoordinator.Apply(window, PlaybackMode.Mini, screen, window.RenderScaling);
             window.Show();
             return;
         }

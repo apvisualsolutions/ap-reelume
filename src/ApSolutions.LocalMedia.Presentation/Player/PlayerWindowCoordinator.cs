@@ -28,21 +28,7 @@ public sealed record PlayerWindowGeometry(double X, double Y, double Width, doub
 }
 
 /// <summary>
-/// A window that knows how to take the player surface without losing its own tree.
-/// </summary>
-/// <remarks>
-/// Assigning <c>Window.Content</c> is the simple way to move a surface and it costs the window
-/// everything it declared for itself. The mini player needs its own five controls, so it takes the
-/// surface into a panel instead and this is how the coordinator asks.
-/// </remarks>
-public interface IPlayerSurfaceHost
-{
-    /// <summary>Takes the surface, detaching it from wherever it was.</summary>
-    void Host(Control surface);
-}
-
-/// <summary>
-/// Moves the same player surface between embedded, fullscreen, and mini without recreating it.
+/// Puts a window into the shape a playback mode asks for.
 /// </summary>
 /// <remarks>
 /// Fullscreen deliberately does not use <c>WindowState.FullScreen</c>. On a scaled display that
@@ -103,30 +89,19 @@ public sealed class PlayerWindowCoordinator
         _geometry.TryGetValue(mode, out var geometry) ? geometry : null;
 
     /// <summary>
-    /// Applies a mode to a window and moves the player content into it. The content instance is the
-    /// same object throughout, which is what keeps the session and its surface alive.
+    /// Applies a mode to a window: where it sits, how big it is, whether it stays on top, and
+    /// whether it keeps its decorations.
     /// </summary>
-    public void Apply(Window window, Control content, PlaybackMode mode, PixelRect screenBounds, double scaling)
+    /// <remarks>
+    /// It does not move the surface, and that is the whole of the change made on 2026-08-19. It used
+    /// to assign <c>Window.Content</c>, which replaces everything the window declared for itself —
+    /// the mini player's own five controls included. Moving the surface belongs to whoever owns the
+    /// window and knows where inside it the picture goes; this knows only the shape.
+    /// </remarks>
+    public void Apply(Window window, PlaybackMode mode, PixelRect screenBounds, double scaling)
     {
         ArgumentNullException.ThrowIfNull(window);
-        ArgumentNullException.ThrowIfNull(content);
         var geometry = Recall(mode) ?? GeometryFor(mode, screenBounds, scaling);
-
-        // A window that hosts the surface itself keeps its own tree; one that does not gets the
-        // surface as its whole content, which is what every window but the mini player wants.
-        if (window is IPlayerSurfaceHost surfaceHost)
-        {
-            surfaceHost.Host(content);
-        }
-        else if (!ReferenceEquals(window.Content, content))
-        {
-            if (content.Parent is ContentControl previousHost)
-            {
-                previousHost.Content = null;
-            }
-
-            window.Content = content;
-        }
 
         window.WindowDecorations = mode == PlaybackMode.Fullscreen
             ? WindowDecorations.None
