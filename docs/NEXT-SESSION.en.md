@@ -515,12 +515,17 @@ high contrast hovering **inverts** — the box goes solid and the outline vanish
 which is the clearest of the four states. It now asks whether the box can be seen by its outline
 **or** by its fill.
 
-**One intermittent, unresolved and recorded**: `AssembledPhysicalWalkTests.A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse`
-failed once in the whole suite and did not recur in the walk alone (33/33) or in the two passes
-after. If it reappears on CI, that is the thread.
+**One intermittent, and on 2026-08-19 it came back a second time**:
+`AssembledPhysicalWalkTests.A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse`.
+Both times **in the whole suite** and both times **passing alone**. Still no cause, but no longer
+mute: the assertion is the wait for the two-byte file to **fail**, on a **60-second** deadline — so
+not slowness — and its condition `Player?.Player.HasFailed == true` read false **when there is no
+session either**, while the complaint accused the file of having opened. Corrected separately: the
+text is written when it is needed and tells the two apart, proved failing in both directions. The
+next occurrence will say which one it is.
 
 **What is next, in order:** ~~`ListBoxItem` (17)~~, ~~`TextBox` (15)~~ and ~~`NumericUpDown` (5)~~
-**done**; `ComboBox` (8), `Slider` (5), `ToggleButton` (2) and `RadioButton` (1) remain — the
+**done**; ~~`ComboBox` (8)~~, ~~`Slider` (5)~~, ~~`ToggleButton` (2)~~ and ~~`RadioButton` (1)~~ **all done too, phase 2 is complete** — the
 `ComboBox` has 59 resources of its own and does **not** inherit the text field's unless editable,
 which does not exist here; the consumed-scalars gate with a list that only shrinks; `primary-action`,
 which now has its token; and then the typography and the views.

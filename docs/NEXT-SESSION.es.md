@@ -521,12 +521,17 @@ contraste el paso de ratón **invierte** —la caja se vuelve sólida y el borde
 ella, 1,00:1—, que es el estado más claro de los cuatro. Pregunta ahora si la caja se ve por su borde
 **o** por su relleno.
 
-**Una intermitencia, sin resolver y anotada**: `AssembledPhysicalWalkTests.A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse`
-falló una vez en la suite entera y no volvió ni corriendo el paseo solo (33/33) ni en las dos pasadas
-siguientes. Si reaparece en CI, ahí está el hilo.
+**Una intermitencia, y el 2026-08-19 reapareció por segunda vez**:
+`AssembledPhysicalWalkTests.A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse`.
+Las dos veces **en la suite entera** y las dos veces **pasando sola**. Sigue sin causa, pero ya no es
+muda: la aserción es la espera de que el archivo de dos bytes **falle**, con **60 s** de plazo —así
+que no es lentitud—, y su condición `Player?.Player.HasFailed == true` daba falso **también cuando no
+hay sesión**, mientras el mensaje acusaba de que el archivo se había abierto. Corregido aparte: el
+texto se escribe cuando hace falta y distingue los dos casos, probado fallando en las dos
+direcciones. El próximo suceso dirá cuál de los dos es.
 
 **Lo que sigue, en orden:** ~~`ListBoxItem` (17)~~, ~~`TextBox` (15)~~ y ~~`NumericUpDown` (5)~~
-**hechos**; quedan `ComboBox` (8), `Slider` (5), `ToggleButton` (2) y `RadioButton` (1) — el
+**hechos**; ~~`ComboBox` (8)~~, ~~`Slider` (5)~~, ~~`ToggleButton` (2)~~ y ~~`RadioButton` (1)~~ **hechos también: la fase 2 está entera** — el
 `ComboBox` tiene 59 recursos propios y **no** hereda los del campo de texto salvo editable, que aquí
 no existe—; la puerta de escalares consumidos con lista que sólo encoge; `primary-action`, que ya
 tiene su token; y después la tipografía y las vistas.
