@@ -400,6 +400,63 @@ cada corrección.
    luego una vista por commit— y **los cinco controles que gana `MiniPlayerWindow` llegan con su
    escena de paseo en el mismo commit**. El trinquete no cruza de fase con deuda.
 
+#### `MiniPlayerWindow`: los cinco controles, medidos sin escribir código — 2026-08-19
+
+**Medido entero para que la sesión siguiente ejecute en vez de descubrir**, como se hizo con el
+`ComboBox`. Hoy la ventana son diez líneas: un `Panel Background="Black"` y **cero controles**.
+
+**Los cinco, con las claves que el paquete ya fijó** (`Propuesta de diseño`, tabla de cadenas nuevas):
+
+| Clave | Qué | Comando | ¿Existe? |
+|---|---|---|---|
+| `MiniPlayerPlayPause` | Pausa / reanudar | — | **NO. Ver abajo** |
+| `MiniPlayerSkipBack` | −10 s | `TransportControlsViewModel.SkipBackwardCommand` | sí |
+| `MiniPlayerSkipForward` | +10 s | `TransportControlsViewModel.SkipForwardCommand` | sí |
+| `MiniPlayerRestore` | Volver a la ventana grande | `ShellViewModel.ToggleMiniPlayerCommand` | sí |
+| `MiniPlayerClose` | Cerrar | `ShellViewModel.ClosePlayerCommand` | sí |
+
+Los cinco con `pl.pbtn` —36×36, radio 8—, **no** el círculo de 52 px de la pausa del reproductor
+grande: allí es la acción primaria y aquí es uno de cinco iguales.
+
+**Los dos hallazgos que cambian el trabajo, y por eso esta nota existe:**
+
+1. **No hay un comando único de pausa/reanudar.** `PlayerViewModel` tiene `PauseCommand` y
+   `ResumeCommand` **separados**, con `CanPause` (`Playing`) y `CanResume` (`Paused`). El diseño pide
+   **un** control. Hay que añadir un comando que alterne, con predicado `CanPause || CanResume`. Lo
+   bueno: `PlayerViewModel` **ya notifica** —emite `CanPause` y `CanResume` y llama a
+   `RaiseCanExecuteChanged` sobre sus comandos al cambiar de estado—, así que el nuevo hereda el
+   mecanismo. Lo que obliga: **entra en `CommandNotificationTests`**, la puerta de los siete, que
+   lleva lista cerrada con el predicado exacto de cada uno. Pasa a ocho o el nuevo se declara ahí.
+2. **`PlayerSurfaces` no expone el transporte.** Sus doce propiedades no incluyen
+   `TransportControlsViewModel`, así que **antes de decidir cómo lo alcanza el mini hay que medir de
+   dónde lo toma `TransportControlsView`**. Sin eso, los dos botones de salto no tienen a qué
+   enlazarse.
+
+**Decidido: el cromo va SIEMPRE VISIBLE en el primer commit, y no aparece al pasar el ratón.** El
+paquete lo pide «al pasar el ratón y al recibir foco», y esa es una decisión de refinamiento visual,
+no de capacidad. El motivo es el trinquete: **el paseo es la red del rediseño**, y un control que sólo
+existe con el puntero encima no lo puede cubrir sin cambiar también el arnés — el resolvedor busca el
+control **antes** de mover el ratón, así que lo encontraría invisible y `visible=False` acusaría al
+producto. Cambiar la vista y el arnés en el mismo commit mezcla dos cosas que se rompen por separado.
+Una ventana de 480×270 tiene sitio de sobra para cinco botones de 36. **La aparición por hover se
+añade después, con su medición del arnés**, y queda anotada como desviación consciente igual que el
+borde de 2 px al pulsar.
+
+**Dos trampas ya identificadas para esa sesión:**
+
+- **Los dos saltos «se pliegan fuera a 320 px de ancho»**, que es el mínimo de la ventana. El paseo
+  usa el tamaño por defecto (480), así que a 480 están los cinco — pero es **exactamente la forma que
+  ha sacado un control fuera de la ventana seis veces**, así que la escena mide los `bounds` frente a
+  la ventana **antes** de intentar el clic, no después del rojo.
+- **`MiniPlayerViewModel` sería un tipo nuevo de `src/`**, así que arranca en **96/96 de líneas y
+  ramas**. Se mide en local antes de empujar, con `--collect "XPlat Code Coverage"` a una carpeta
+  aparte.
+
+**Y lo que el commit tiene que llevar entero, porque el trinquete no cruza de fase con deuda:** los
+cinco controles, sus cinco cadenas **en los dos idiomas**, sus cinco pruebas de nombre accesible, y
+**la escena de paseo que los pulsa**, en el mismo cambio. El trinquete sube a 5 y vuelve a 0 dentro
+de la fase.
+
 #### ~~La fase 2f: el `ComboBox`~~ — hecha el 2026-08-19
 
 **Medido y sin escribir una línea**, para que la sesión siguiente ejecute en vez de descubrir. Ocho

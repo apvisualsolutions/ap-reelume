@@ -399,6 +399,63 @@ each correction.
    view per commit — and **the five controls `MiniPlayerWindow` gains arrive with their walk scene in
    the same commit**. The ratchet does not cross a phase boundary carrying debt.
 
+#### `MiniPlayerWindow`: the five controls, measured without writing code — 2026-08-19
+
+**Measured whole so the next session executes rather than discovers**, the way the `ComboBox` was.
+Today the window is ten lines: a `Panel Background="Black"` and **zero controls**.
+
+**The five, with the keys the package already fixed** (`Propuesta de diseño`, new strings table):
+
+| Key | What | Command | Exists? |
+|---|---|---|---|
+| `MiniPlayerPlayPause` | Pause / resume | — | **NO. See below** |
+| `MiniPlayerSkipBack` | −10 s | `TransportControlsViewModel.SkipBackwardCommand` | yes |
+| `MiniPlayerSkipForward` | +10 s | `TransportControlsViewModel.SkipForwardCommand` | yes |
+| `MiniPlayerRestore` | Back to the big window | `ShellViewModel.ToggleMiniPlayerCommand` | yes |
+| `MiniPlayerClose` | Close | `ShellViewModel.ClosePlayerCommand` | yes |
+
+All five at `pl.pbtn` — 36×36, radius 8 — and **not** the 52 px circle of the big player's pause:
+there it is the primary action, here it is one of five equals.
+
+**The two findings that change the work, and why this note exists:**
+
+1. **There is no single pause/resume command.** `PlayerViewModel` has `PauseCommand` and
+   `ResumeCommand` **separately**, with `CanPause` (`Playing`) and `CanResume` (`Paused`). The design
+   asks for **one** control. A toggling command is needed, with predicate `CanPause || CanResume`.
+   The good part: `PlayerViewModel` **already notifies** — it raises `CanPause` and `CanResume` and
+   calls `RaiseCanExecuteChanged` on its commands when the state moves — so the new one inherits the
+   mechanism. What it forces: **it enters `CommandNotificationTests`**, the gate on the seven, which
+   carries a closed list with each one's exact predicate. It becomes eight, or the new one is
+   declared there.
+2. **`PlayerSurfaces` does not expose the transport.** Its twelve properties do not include
+   `TransportControlsViewModel`, so **before deciding how the mini reaches it, measure where
+   `TransportControlsView` takes it from**. Without that the two skip buttons have nothing to bind to.
+
+**Decided: the chrome is ALWAYS VISIBLE in the first commit, not revealed on hover.** The package
+asks for "on hover and on focus", and that is a visual refinement rather than a capability. The
+reason is the ratchet: **the walk is the redesign's net**, and a control that only exists while the
+pointer is over it cannot be covered without also changing the harness — the resolver looks for the
+control **before** moving the mouse, so it would find it invisible and `visible=False` would accuse
+the product. Changing the view and the harness in one commit mixes two things that break separately.
+A 480×270 window has room to spare for five 36 px buttons. **Hover reveal comes afterwards, with its
+own harness measurement**, and is recorded as a deliberate deviation exactly like the 2 px pressed
+border.
+
+**Two traps already identified for that session:**
+
+- **The two skips "fold out at 320 px wide"**, which is the window's minimum. The walk uses the
+  default size (480), so all five are there at 480 — but this is **exactly the shape that has pushed
+  a control out of the window six times**, so the scene measures the bounds against the window
+  **before** attempting the click, not after the red.
+- **`MiniPlayerViewModel` would be a new file under `src/`**, so it starts at **96/96 of lines and
+  branches**. Measure it locally before pushing, with `--collect "XPlat Code Coverage"` into a
+  separate folder.
+
+**And what the commit must carry whole, because the ratchet does not cross a phase with debt:** the
+five controls, their five strings **in both languages**, their five accessible-name tests, and **the
+walk scene that presses them**, in the same change. The ratchet rises to 5 and returns to 0 inside
+the phase.
+
 #### ~~Phase 2f: the `ComboBox`~~ — done on 2026-08-19
 
 **Measured with not a line written**, so the next session executes instead of discovering. Eight
