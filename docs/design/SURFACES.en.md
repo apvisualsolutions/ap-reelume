@@ -144,7 +144,7 @@ by sight.
 | Measure | Value |
 | --- | --- |
 | Dictionaries in `Theme/DesignTokens.axaml` | **4**: `Light`, `Dark`, `HighContrastLight` and `HighContrastDark` |
-| Token declarations in the dictionaries | **280**, across **70 names**: 24 brushes and 46 aliases (12 for the button, 31 for the checkbox, 3 for lists) |
+| Token declarations in the dictionaries | **344**, across **86 names**: 24 brushes and 62 aliases (12 for the button, 31 for the checkbox, 3 for lists, 16 for text fields) |
 | Scalars, outside the dictionaries | **13** |
 | Plus, in `Resources/Brand.axaml` | 3 (strings, no colours) |
 | Focus selectors | **10**: `Button`, `ToggleButton`, `ToggleSwitch`, `RadioButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
@@ -171,6 +171,10 @@ Four things the redesign has to know:
   `ToggleButton`, 37; a `Slider`, 32. A `TextBox` has **2** of its own and a `ListBoxItem` **1**:
   those paint from **shared** system brushes. Assuming the next type works like the last is how this
   goes wrong.
+- **One family of resources can be worth several types, and that is measured too.** `TextControl*`
+  is taken by the `TextBox` (25 places) and the `NumericUpDown` (35, because it is a box with two
+  arrows), and by **none** of the button, checkbox or slider. The `ComboBox` only touches it through
+  the box it grows **when editable**, and the tree has none.
 - **A shared brush is redirected by measuring who else takes it.** The three list ones
   (`SystemControlHighlightList*`) were checked by painting them a colour no theme uses and mounting
   twelve control types: **only the list consumes them**. And what decided the row's design: its

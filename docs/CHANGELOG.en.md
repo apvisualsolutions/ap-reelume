@@ -104,6 +104,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   border's colour and the text the background's — because in those palettes a lighter shade would say
   nothing.
 
+- **Text fields can be read.** The grey hint that says what an empty field is for was painted with
+  two layers of transparency on top of its colour, and came out at **less than half** the contrast it
+  takes to read text. A switched-off field could not be read either, and had no shape: neither its
+  text nor its outline reached the minimum. And the blue rectangle marking the field with the cursor
+  was **the same blue in all four themes**, including the one whose focus colour is yellow. The
+  background, the border, the text and the hint now come from the application's colours, focus uses
+  each theme's focus colour, and in high contrast hovering **inverts** the field exactly as the button
+  does. It reaches the five numeric fields too, which are a text box with two arrows.
+
 - **A list says which row you are on.** The selected row was painted a translucent blue that stood
   apart from the others by **less than it takes to tell two shades apart**; the text on it read
   perfectly, so the problem was never reading the row but knowing which one it was. The selected row

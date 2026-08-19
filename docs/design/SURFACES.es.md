@@ -143,7 +143,7 @@ que distinguirlas a la vista.
 | Medida | Valor |
 | --- | --- |
 | Diccionarios en `Theme/DesignTokens.axaml` | **4**: `Light`, `Dark`, `HighContrastLight` y `HighContrastDark` |
-| Declaraciones de token en los diccionarios | **280**, en **70 nombres**: 24 brochas y 46 alias (12 del botón, 31 de la casilla, 3 de las listas) |
+| Declaraciones de token en los diccionarios | **344**, en **86 nombres**: 24 brochas y 62 alias (12 del botón, 31 de la casilla, 3 de las listas, 16 de los campos de texto) |
 | Escalares, fuera de los diccionarios | **13** |
 | Además, en `Resources/Brand.axaml` | 3 (cadenas, ningún color) |
 | Selectores de foco | **10**: `Button`, `ToggleButton`, `ToggleSwitch`, `RadioButton`, `TextBox`, `ComboBox`, `CheckBox`, `Slider`, `NumericUpDown`, `ListBoxItem` |
@@ -170,6 +170,10 @@ Cuatro cosas que el rediseño tiene que saber:
   38; un `ToggleButton`, 37; un `Slider`, 32. Un `TextBox` tiene **2** propios y un `ListBoxItem`
   **1**: ésos pintan desde brochas **compartidas** del sistema. Suponer que el siguiente se hace como
   el anterior es la forma de equivocarse aquí.
+- **Una familia de recursos puede valer por varios tipos, y también se mide.** `TextControl*` la
+  toman el `TextBox` (25 sitios) y el `NumericUpDown` (35, porque es una caja con dos flechas), y
+  **ninguno** del botón, la casilla o la barra deslizante. El `ComboBox` sólo la toca por la caja que
+  le crece **cuando es editable**, y el árbol no tiene ninguno.
 - **Una brocha compartida se redirige midiendo quién más la toma.** Las tres de las listas
   (`SystemControlHighlightList*`) se comprobaron pintándolas de un color que ningún tema usa y
   montando doce tipos de control: **sólo la lista las consume**. Y lo que decidió el diseño de la

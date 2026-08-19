@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b, 2c and 2d done**; six types and the views remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phases 1, 2a, 2b, 2c, 2d and 2e done**; four types and the views remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -343,6 +343,31 @@ pressable while the question is on screen** — `SwitchToVersionAsync` returns a
 `Apply`, so the row's `finally` re-enables it with the dialogue open, and a second press flushes the
 playhead, answers zero and takes the question with it. It deserves its own measurement.
 
+#### ~~Phase 2e: the text field~~ — done on 2026-08-19, and it is worth two types
+
+**Done** — [the evidence](evidence/stable/audit-redesign-phase2e-text-field.md). 16 aliases per theme.
+
+**One family of resources can be worth several types, and it is measured like a single brush.**
+`TextControl*` is taken by the `TextBox` (25 places) and the `NumericUpDown` (35, because it is a box
+with two arrows), and by **none** of the button, checkbox or slider. The `ComboBox` only touches it
+through the box it grows **when editable**, and `IsEditable` appears nowhere in the tree: a closed
+combo box **has no `PART_BorderElement` at all**, so it gets its own family.
+
+The four defects, with their numbers: the **hint in an empty field** read **2.11:1** (it carries
+transparency **twice**, in the colour and in `Opacity`); a **switched-off field** could not be read —
+2.56:1 — and had no shape — 2.51:1 against the surface, 1.66 in high contrast dark; the **focus
+border** was `#0078D7` in all four themes, including the one whose focus is yellow; and **Light
+painted identically to HighContrastLight** for the third time.
+
+**A phase-1 style that painted nothing, measured along the way:** `TextBox:focus` **does** reach the
+control — it sets the right `BorderBrush` — and the template **ignores it**, because what paints is
+its `PART_BorderElement` from `TextControlBorderBrushFocused`. The ring still showed, being an
+adorner, and the inner border said Windows blue. **It is the house defect wearing a setter's face.**
+
+**And what the test had to learn:** a `NumericUpDown` has **two frames**, and the inner text box's is
+**deliberately transparent** so it does not draw two concentric rectangles. Looking for
+`PART_BorderElement` read black on black; ask for **the frame that shows**, not for a part name.
+
 #### ~~Phase 2d: the list row~~ — done on 2026-08-19
 
 **Done** — [the evidence](evidence/stable/audit-redesign-phase2d-list-row.md). 17 direct uses and
@@ -409,10 +434,11 @@ which is the clearest of the four states. It now asks whether the box can be see
 failed once in the whole suite and did not recur in the walk alone (33/33) or in the two passes
 after. If it reappears on CI, that is the thread.
 
-**What is next, in order:** ~~`ListBoxItem` (17)~~ **done**, `TextBox` (15), `ComboBox` (8),
-`Slider` (5), `NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — the `TextBox` has **2**
-resources of its own, so its way in has to be measured first; the consumed-scalars gate with a list
-that only shrinks; `primary-action`, which now has its token; and then the typography and the views.
+**What is next, in order:** ~~`ListBoxItem` (17)~~, ~~`TextBox` (15)~~ and ~~`NumericUpDown` (5)~~
+**done**; `ComboBox` (8), `Slider` (5), `ToggleButton` (2) and `RadioButton` (1) remain — the
+`ComboBox` has 59 resources of its own and does **not** inherit the text field's unless editable,
+which does not exist here; the consumed-scalars gate with a list that only shrinks; `primary-action`,
+which now has its token; and then the typography and the views.
 
 #### What step 8 has to remember about the redesign (2026-08-18)
 

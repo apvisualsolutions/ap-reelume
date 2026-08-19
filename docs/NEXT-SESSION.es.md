@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b, 2c y 2d hechas**; quedan seis tipos y las vistas | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fases 1, 2a, 2b, 2c, 2d y 2e hechas**; quedan cuatro tipos y las vistas | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -344,6 +344,32 @@ la pregunta está en pantalla** — `SwitchToVersionAsync` retorna en cuanto lla
 `finally` de la fila la rehabilita con el diálogo abierto, y una segunda pulsación vacía el cabezal,
 contesta cero y se lleva la pregunta. Merece su propia medición.
 
+#### ~~La fase 2e: el campo de texto~~ — hecha el 2026-08-19, y vale por dos tipos
+
+**Hecha** — [la evidencia](evidence/stable/audit-redesign-phase2e-text-field.md). 16 alias por tema.
+
+**Una familia de recursos puede valer por varios tipos, y se mide igual que una brocha suelta.**
+`TextControl*` la toman el `TextBox` (25 sitios) y el `NumericUpDown` (35, porque es una caja con dos
+flechas), y **ninguno** del botón, la casilla o la barra deslizante. El `ComboBox` sólo la toca por la
+caja que le crece **cuando es editable**, y `IsEditable` no aparece ni una vez en el árbol: un
+desplegable cerrado **no tiene `PART_BorderElement` siquiera**, así que le tocará su propia familia.
+
+Los cuatro defectos, con su número: el **aviso de un campo vacío** medía **2,11:1** (lleva
+transparencia **dos veces**, en el color y en `Opacity`); un **campo apagado** no se leía —2,56:1— ni
+tenía forma —2,51:1 contra la superficie, 1,66 en alto contraste oscuro—; el **borde del foco** era
+`#0078D7` en los cuatro temas, incluido aquél cuyo foco es amarillo; y **Light pintaba idéntico a
+HighContrastLight** por tercera vez.
+
+**Un estilo de la fase 1 que no pintaba nada, medido de paso:** `TextBox:focus` **sí** llega al
+control —le pone el `BorderBrush` correcto— y la plantilla **lo ignora**, porque quien pinta es su
+`PART_BorderElement` desde `TextControlBorderBrushFocused`. El anillo se veía igual por ser adorno, y
+el borde interior decía azul de Windows. **Es el defecto de la casa con cara de setter.**
+
+**Y lo que la prueba tuvo que aprender:** un `NumericUpDown` tiene **dos marcos**, y el del `TextBox`
+interior es **transparente a propósito** para no dibujar dos rectángulos concéntricos. Buscar
+`PART_BorderElement` leía negro sobre negro; hay que preguntar por **el marco que se ve**, no por un
+nombre de parte.
+
 #### ~~La fase 2d: la fila de lista~~ — hecha el 2026-08-19
 
 **Hecha** — [la evidencia](evidence/stable/audit-redesign-phase2d-list-row.md). 17 usos directos y
@@ -410,10 +436,11 @@ ella, 1,00:1—, que es el estado más claro de los cuatro. Pregunta ahora si la
 falló una vez en la suite entera y no volvió ni corriendo el paseo solo (33/33) ni en las dos pasadas
 siguientes. Si reaparece en CI, ahí está el hilo.
 
-**Lo que sigue, en orden:** ~~`ListBoxItem` (17)~~ **hecho**, `TextBox` (15), `ComboBox` (8),
-`Slider` (5), `NumericUpDown` (5), `ToggleButton` (2), `RadioButton` (1) — el `TextBox` tiene **2**
-recursos propios, así que su vía hay que medirla antes—; la puerta de escalares consumidos con lista
-que sólo encoge; `primary-action`, que ya tiene su token; y después la tipografía y las vistas.
+**Lo que sigue, en orden:** ~~`ListBoxItem` (17)~~, ~~`TextBox` (15)~~ y ~~`NumericUpDown` (5)~~
+**hechos**; quedan `ComboBox` (8), `Slider` (5), `ToggleButton` (2) y `RadioButton` (1) — el
+`ComboBox` tiene 59 recursos propios y **no** hereda los del campo de texto salvo editable, que aquí
+no existe—; la puerta de escalares consumidos con lista que sólo encoge; `primary-action`, que ya
+tiene su token; y después la tipografía y las vistas.
 
 #### Lo que el paso 8 debe recordar del rediseño (2026-08-18)
 

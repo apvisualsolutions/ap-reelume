@@ -104,6 +104,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   temas, y en alto contraste pasar el ratón o pulsar **invierte** el botón —el relleno toma el color
   del borde y el texto el del fondo— porque en esas paletas un tono más claro no diría nada.
 
+- **Los campos de texto se leen.** El aviso gris que dice para qué sirve un campo vacío estaba
+  pintado con dos capas de transparencia encima del color, y quedaba **por debajo de la mitad** del
+  contraste que hace falta para leer un texto. Un campo apagado tampoco se leía ni se distinguía del
+  fondo: ni su texto ni su borde llegaban al mínimo. Y el recuadro azul que marcaba el campo con el
+  cursor era **el mismo azul en los cuatro temas**, incluido aquél en el que el foco es amarillo.
+  Ahora el fondo, el borde, el texto y el aviso salen de los colores de la aplicación, el foco usa el
+  color de foco de cada tema, y en alto contraste pasar el ratón **invierte** el campo igual que hace
+  el botón. Alcanza también a los cinco campos numéricos, que son una caja de texto con dos flechas.
+
 - **Una lista dice en qué fila estás.** La fila seleccionada se pintaba de un azul translúcido que,
   sobre el fondo, se separaba de las demás **menos de lo que hace falta para distinguir dos tonos**;
   el texto encima se leía perfectamente, así que el problema nunca fue leer la fila, era saber cuál
