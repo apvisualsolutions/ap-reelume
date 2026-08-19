@@ -23,7 +23,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **la fase 2 entera hecha, 2a a 2g**; quedan la puerta de escalares, `primary-action`, la tipografía y las vistas | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fase 2 entera, puerta de escalares y `primary-action` hechas**; quedan **la tipografía y las vistas** | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -281,7 +281,10 @@ como **marcador de las pruebas**, no como estilo.
    `CornerRadiusSmall`, `CornerRadiusMedium`— **que sólo puede encoger**, igual que la lista de
    huérfanos de `ServiceConsumptionTests` y que `eng/coverage-debt.txt`. Así la deuda es visible y no
    puede crecer en silencio.
-7. **La tipografía: los doce tamaños literales del árbol se mapean a seis tokens, y el mapeo es este.**
+7. **La tipografía: los tamaños literales del árbol se mapean a seis tokens, y el mapeo es este.**
+   **Medido el 2026-08-19: son TRECE, no doce — 52 usos en 30 archivos — y el que falta en el mapeo
+   de abajo es el `17` de `ShellView.axaml:140`**, que hay que colocar al ejecutar (por proximidad va
+   con el 18, a `FontSizeSubtitle`, pero se mide antes de decidirlo).
    34 y 32 → `FontSizeDisplay` 32; 30, 28 y 26 → `FontSizeTitle` 28; 24, 22, 20 y 18 →
    `FontSizeSubtitle` 20; 16 y 14 → `FontSizeBody` 14; 12 → `FontSizeCaption` 12; y `FontSizeMono` 13
    para rutas, hashes y códecs. Se declaran **en la primera vista que los gaste**, no antes.
@@ -389,7 +392,7 @@ cada corrección.
    está **literal en seis sitios** —uno en AXAML y cinco en modelos de vista— y ni `○` ni `◐` tienen
    recurso, así que la abstracción estaba a medias y nadie la usaba. El glifo es un dato del modelo
    de vista, no del tema.
-7. **`primary-action`**: en reposo, fondo `AccentBrush`, texto `AccentTextBrush` y borde
+7. ~~**`primary-action`**~~ — **hecha el 2026-08-19**: [la evidencia](evidence/stable/audit-primary-action.md). Y el mecanismo quedó medido: el estilo va sobre el `Button` y alcanza **sólo el reposo**, porque el `ControlTheme` fija el relleno del presenter por pseudoclase — el mismo mecanismo que en la 2f fue defecto, aquí es el diseño, y por eso se afirman los cinco estados. **`primary-action`**: en reposo, fondo `AccentBrush`, texto `AccentTextBrush` y borde
    `AccentBrush`; al pasar el ratón y al pulsar **invierte como todo lo demás**
    (`ControlFillHoverBrush` / `ControlFillPressedBrush` con `ControlTextActiveBrush`). Una sola
    gramática de estados en toda la aplicación, y la jerarquía la da el reposo, que es cuando se mira.

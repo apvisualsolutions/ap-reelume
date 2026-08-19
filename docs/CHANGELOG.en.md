@@ -95,6 +95,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The "keep watching" button finally stands apart from the others.** It carried the mark for
+  "primary action" and **no style defined it**, so the button that is the point of the home screen
+  was painted like any secondary button beside it. At rest it now carries the application's colour,
+  and on hover or press it answers **exactly like every other control**, which is what makes an
+  application feel like one piece.
+
 - **A check requires every measurement in the theme to be spent by something.** The numbers behind
   the look — spacings, corner radii, thicknesses — are declared in one place, and until now nothing
   stopped one being declared and never used. Three had got in: two animation durations that

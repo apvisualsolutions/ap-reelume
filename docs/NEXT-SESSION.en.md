@@ -23,7 +23,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **the whole of phase 2 done, 2a to 2g**; the scalar gate, `primary-action`, the type scale and the views remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phase 2, the scalar gate and `primary-action` all done**; **the type scale and the views** remain | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -281,7 +281,11 @@ marker** rather than as a style.
    list — today `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge`, `SpaceXLarge`,
    `CornerRadiusSmall`, `CornerRadiusMedium` — **which can only shrink**, exactly like the orphan list
    in `ServiceConsumptionTests` and like `eng/coverage-debt.txt`.
-7. **Typography: the tree's twelve literal sizes map onto six tokens, and this is the mapping.**
+7. **Typography: the tree's literal sizes map onto six tokens, and this is the mapping.**
+   **Measured on 2026-08-19: there are THIRTEEN, not twelve — 52 uses across 30 files — and
+   the one missing from the map below is the `17` in `ShellView.axaml:140`**, to be placed
+   when this runs (by proximity it goes with the 18, onto `FontSizeSubtitle`, but that gets
+   measured first).
    34 and 32 → `FontSizeDisplay` 32; 30, 28 and 26 → `FontSizeTitle` 28; 24, 22, 20 and 18 →
    `FontSizeSubtitle` 20; 16 and 14 → `FontSizeBody` 14; 12 → `FontSizeCaption` 12; and `FontSizeMono`
    13 for paths, hashes and codecs. Declared **in the first view that spends them**, not before.
@@ -387,7 +391,7 @@ each correction.
    `●` is **literal in six places** — one AXAML and five view models — and neither `○` nor `◐` has a
    resource, so the abstraction was half-built and unused. The glyph is a view model's datum, not the
    theme's.
-7. **`primary-action`**: at rest, `AccentBrush` fill, `AccentTextBrush` text and `AccentBrush` border;
+7. ~~**`primary-action`**~~ — **done on 2026-08-19**: [the evidence](evidence/stable/audit-primary-action.md). And the mechanism is measured: the style goes on the `Button` and reaches **rest only**, because the control theme sets the presenter's fill per pseudo-class — the mechanism phase 2f met as a defect is the design here, which is why all five states are asserted. **`primary-action`**: at rest, `AccentBrush` fill, `AccentTextBrush` text and `AccentBrush` border;
    hovering and pressing **invert like everything else** (`ControlFillHoverBrush` /
    `ControlFillPressedBrush` with `ControlTextActiveBrush`). One grammar of states across the whole
    application, and the hierarchy comes from the resting state, which is when it is looked at.

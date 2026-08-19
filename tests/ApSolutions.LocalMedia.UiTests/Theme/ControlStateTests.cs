@@ -82,6 +82,88 @@ public sealed class ControlStateTests
         }
     }
 
+    /// <summary>
+    /// The one button that is the point of its screen looks like it, and behaves like every other.
+    /// </summary>
+    /// <remarks>
+    /// <c>primary-action</c> was a class put on <c>ResumeHeroView</c>'s button and defined by
+    /// nobody — no style declared it and no test looked for it — so the button that resumes what you
+    /// were watching was painted exactly like every secondary button beside it. The house defect with
+    /// a class attribute's face.
+    /// <para>
+    /// The hierarchy is carried entirely by the resting state, which is when a person looks at a
+    /// screen and decides. Hovering and pressing invert exactly as every other control does, because
+    /// one grammar of states across the application is worth more than a fourth way of saying
+    /// "pressed" — and in the two high contrast themes an accent that stayed put through hover would
+    /// be the only control that stopped answering the mouse.
+    /// </para>
+    /// </remarks>
+    [AvaloniaTheory]
+    [MemberData(nameof(Themes))]
+    public void The_primary_action_leads_at_rest_and_answers_like_the_rest(string themeName)
+    {
+        var theme = Resolve(themeName);
+        Avalonia.Application.Current!.RequestedThemeVariant = theme;
+        var button = new Button { Content = "Resume", Width = 160, Height = 36 };
+        button.Classes.Add("primary-action");
+        var window = new Window { Width = 320, Height = 200, Content = button };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            var rest = Read(button, state: null);
+            Assert.Equal(Token(theme, "AccentBrush"), rest.Background);
+            Assert.Equal(Token(theme, "AccentTextBrush"), rest.Foreground);
+            Assert.Equal(Token(theme, "AccentBrush"), rest.Border);
+
+            // It has to lead, and that is a number: the ordinary button's resting fill is what it is
+            // being told apart from.
+            var ordinary = new Button { Content = "Ok", Width = 120, Height = 36 };
+            var second = new Window { Width = 320, Height = 200, Content = ordinary };
+            second.Show();
+            Dispatcher.UIThread.RunJobs();
+            try
+            {
+                var ratio = Contrast(rest.Background, Read(ordinary, state: null).Background);
+                Assert.True(
+                    ratio >= 3.0,
+                    $"{themeName}: the primary action differs from an ordinary button by {ratio:F2}:1, "
+                        + "so nothing on the screen says which one is the point of it.");
+            }
+            finally
+            {
+                second.Close();
+            }
+
+            // And the same grammar as everything else once a hand reaches it. This is not luck about
+            // which style wins: the control theme sets the presenter's fill per pseudo-class and
+            // leaves the resting one to the template binding, so a setter on the button reaches rest
+            // and only rest. Phase 2f met the same mechanism as a defect; here it is the design, and
+            // it is asserted rather than assumed — including disabled, which nothing else claims.
+            Assert.Equal(Token(theme, "ControlFillHoverBrush"), Read(button, ":pointerover").Background);
+            Assert.Equal(Token(theme, "ControlFillPressedBrush"), Read(button, ":pressed").Background);
+            Assert.Equal(Token(theme, "ControlFillDisabledBrush"), Read(button, ":disabled").Background);
+            foreach (var state in new[] { ":pointerover", ":pressed" })
+            {
+                var painted = Read(button, state);
+                Assert.Equal(Token(theme, "ControlTextActiveBrush"), painted.Foreground);
+                Assert.True(
+                    Contrast(painted.Foreground, painted.Background) >= 4.5,
+                    $"{themeName} {state}: the primary action's label stops being readable.");
+            }
+
+            // A disabled primary action stops leading, or it would still be shouting for a press it
+            // will not accept.
+            Assert.Equal(Token(theme, "TextDisabledBrush"), Read(button, ":disabled").Foreground);
+        }
+        finally
+        {
+            window.Close();
+            Avalonia.Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+        }
+    }
+
     [AvaloniaTheory]
     [MemberData(nameof(Themes))]
     public void Hovering_and_pressing_keep_the_label_readable(string themeName)

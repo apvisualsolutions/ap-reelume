@@ -96,6 +96,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El botón de «continuar viendo» por fin se distingue de los demás.** Llevaba puesta la marca de
+  «acción principal» y **ningún estilo la definía**, así que el botón que es el sentido de la pantalla
+  de inicio se pintaba igual que cualquier botón secundario a su lado. Ahora en reposo lleva el color
+  de la aplicación, y al pasar el ratón o pulsarlo responde **igual que todos los demás controles**,
+  que es lo que hace que la aplicación se sienta de una pieza.
+
 - **Una comprobación exige que cada medida del tema la gaste alguien.** Los números del aspecto
   —espaciados, redondeos, grosores— se declaran en un solo sitio, y hasta ahora nada impedía declarar
   uno y no usarlo nunca. Se habían colado tres: dos duraciones de animación que **repetían un número
