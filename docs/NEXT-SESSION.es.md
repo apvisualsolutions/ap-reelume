@@ -344,6 +344,50 @@ la pregunta está en pantalla** — `SwitchToVersionAsync` retorna en cuanto lla
 `finally` de la fila la rehabilita con el diálogo abierto, y una segunda pulsación vacía el cabezal,
 contesta cero y se lleva la pregunta. Merece su propia medición.
 
+#### Las ocho decisiones que cierran el paso 6, tomadas el 2026-08-19 (no se re-deliberan)
+
+Con esto **no queda nada por deliberar en el paso 6**: lo que sigue es ejecutar, midiendo antes de
+cada corrección.
+
+1. **El defecto del cambio de versión se corrige, y va PRIMERO**, antes que ningún tipo nuevo, porque
+   es un defecto de producto vivo: la fila que abre la pregunta sigue pulsable mientras la pregunta
+   está en pantalla, y una segunda pulsación vacía el cabezal, contesta cero y **se lleva la pregunta
+   y el progreso**. La corrección: `PlayerVersionRowViewModel` recibe el `VersionSwitchViewModel`
+   como parámetro **obligatorio** —un opcional dejado a nulo es la cuarta forma del defecto de la
+   casa—, su predicado añade `&& !question.IsVisible`, y se suscribe al `PropertyChanged` del
+   diálogo para volver a preguntar cuando `IsVisible` cambie. **Descartado** hacer el diálogo modal:
+   es un cambio estructural de la superficie para un defecto de un predicado.
+2. **La fase 2f (`ComboBox`) sigue el patrón de la fila de lista** en las filas del desplegable:
+   relleno del acento tenue **más** una segunda señal, con el mismo grosor en todos los estados. La
+   **primera medición de la fase** es si el `ContentPresenter` de un `ComboBoxItem` toma el borde por
+   `TemplateBinding` como el `ListBoxItem`; si no lo toma, la señal es otro adorno. El marco cerrado y
+   la flecha ya cumplen y sólo pasan a tokens.
+3. **`Slider` (5), `ToggleButton` (2) y `RadioButton` (1) van juntos en una sola fase 2g.** Ocho usos
+   entre los tres y el patrón ya está establecido; separarlos son dos vueltas de CI por nada.
+4. **La puerta de escalares cuenta el consumo en CUALQUIER `.axaml` de `src/`**, incluido el propio
+   archivo de tokens —un estilo que gasta un escalar es consumo real—, **más una lista nombrada de
+   los que consume el tema base**, que hoy es uno: `TextControlPlaceholderOpacity`. Medido el
+   2026-08-19: consumen `FocusStrokeThickness` (11), `CornerRadiusSmall` (2),
+   `FocusInnerStrokeThickness` (1) y `ControlHeight` (1). **La lista de excepciones, que sólo puede
+   encoger, son seis**: `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge`, `SpaceXLarge` y
+   `CornerRadiusMedium`. Se vaciará sola cuando las vistas los gasten.
+5. **`MotionDurationStandardMilliseconds` y `MotionDurationReducedMilliseconds` se BORRAN.** Ningún
+   AXAML los lee y `FluentThemeService` tiene su propia `TimeSpan.FromMilliseconds(160)`: son **una
+   copia paralela de un número**, que es exactamente el defecto que ya mordió con los `<Color>` que
+   nadie pintaba. Si una animación en AXAML los necesita, se declaran entonces y el servicio pasa a
+   leer de ahí.
+6. **`SelectedStateGlyph` se BORRA**, y con él su aserción en `ContrastTokenTests`. Medido: el `●`
+   está **literal en seis sitios** —uno en AXAML y cinco en modelos de vista— y ni `○` ni `◐` tienen
+   recurso, así que la abstracción estaba a medias y nadie la usaba. El glifo es un dato del modelo
+   de vista, no del tema.
+7. **`primary-action`**: en reposo, fondo `AccentBrush`, texto `AccentTextBrush` y borde
+   `AccentBrush`; al pasar el ratón y al pulsar **invierte como todo lo demás**
+   (`ControlFillHoverBrush` / `ControlFillPressedBrush` con `ControlTextActiveBrush`). Una sola
+   gramática de estados en toda la aplicación, y la jerarquía la da el reposo, que es cuando se mira.
+8. **Las vistas van en el orden del `PROMPT.md`** —`MiniPlayerWindow`, `UpdateView`, `PlayerView`, y
+   luego una vista por commit— y **los cinco controles que gana `MiniPlayerWindow` llegan con su
+   escena de paseo en el mismo commit**. El trinquete no cruza de fase con deuda.
+
 #### La fase 2f: el `ComboBox`, ya medido — 2026-08-19
 
 **Medido y sin escribir una línea**, para que la sesión siguiente ejecute en vez de descubrir. Ocho

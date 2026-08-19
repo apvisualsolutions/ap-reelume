@@ -343,6 +343,50 @@ pressable while the question is on screen** — `SwitchToVersionAsync` returns a
 `Apply`, so the row's `finally` re-enables it with the dialogue open, and a second press flushes the
 playhead, answers zero and takes the question with it. It deserves its own measurement.
 
+#### The eight decisions that close step 6, taken on 2026-08-19 (not reopened)
+
+With these, **nothing in step 6 is left to deliberate**: what follows is execution, measuring before
+each correction.
+
+1. **The version-switch defect is fixed, and it goes FIRST**, before any new type, because it is a
+   live product defect: the row that opens the question stays pressable while the question is on
+   screen, and a second press flushes the playhead, answers zero and **takes the question and the
+   progress with it**. The fix: `PlayerVersionRowViewModel` takes the `VersionSwitchViewModel` as a
+   **required** parameter — an optional left null is the house defect's fourth form — its predicate
+   adds `&& !question.IsVisible`, and it subscribes to the dialogue's `PropertyChanged` to ask again
+   when `IsVisible` changes. **Rejected**: making the dialogue modal, a structural change to the
+   surface for a defect in a predicate.
+2. **Phase 2f (`ComboBox`) follows the list row's pattern** for the drop-down's rows: a subtle accent
+   fill **plus** a second cue, at the same thickness in every state. The **first measurement of the
+   phase** is whether a `ComboBoxItem`'s content presenter takes the border by template binding as
+   the `ListBoxItem` does; if it does not, the cue is another adorner. The closed frame and the arrow
+   already pass and only move to tokens.
+3. **`Slider` (5), `ToggleButton` (2) and `RadioButton` (1) go together as one phase 2g.** Eight uses
+   between them and the pattern is established; splitting them is two CI rounds for nothing.
+4. **The scalars gate counts consumption in ANY `.axaml` under `src/`**, the token file included — a
+   style that spends a scalar is real consumption — **plus a named list of the ones the base theme
+   consumes**, which today is one: `TextControlPlaceholderOpacity`. Measured on 2026-08-19:
+   `FocusStrokeThickness` (11), `CornerRadiusSmall` (2), `FocusInnerStrokeThickness` (1) and
+   `ControlHeight` (1) are spent. **The exception list, which may only shrink, is six**:
+   `SpaceXSmall`, `SpaceSmall`, `SpaceMedium`, `SpaceLarge`, `SpaceXLarge` and `CornerRadiusMedium`.
+   It empties itself as the views spend them.
+5. **`MotionDurationStandardMilliseconds` and `MotionDurationReducedMilliseconds` are DELETED.** No
+   AXAML reads them and `FluentThemeService` holds its own `TimeSpan.FromMilliseconds(160)`: they are
+   **a parallel copy of a number**, which is exactly the defect that bit with the `<Color>` list
+   nobody painted. If an AXAML animation needs them, they are declared then and the service reads
+   from there.
+6. **`SelectedStateGlyph` is DELETED**, and its assertion in `ContrastTokenTests` with it. Measured:
+   `●` is **literal in six places** — one AXAML and five view models — and neither `○` nor `◐` has a
+   resource, so the abstraction was half-built and unused. The glyph is a view model's datum, not the
+   theme's.
+7. **`primary-action`**: at rest, `AccentBrush` fill, `AccentTextBrush` text and `AccentBrush` border;
+   hovering and pressing **invert like everything else** (`ControlFillHoverBrush` /
+   `ControlFillPressedBrush` with `ControlTextActiveBrush`). One grammar of states across the whole
+   application, and the hierarchy comes from the resting state, which is when it is looked at.
+8. **The views follow `PROMPT.md`'s order** — `MiniPlayerWindow`, `UpdateView`, `PlayerView`, then one
+   view per commit — and **the five controls `MiniPlayerWindow` gains arrive with their walk scene in
+   the same commit**. The ratchet does not cross a phase boundary carrying debt.
+
 #### Phase 2f: the `ComboBox`, already measured — 2026-08-19
 
 **Measured with not a line written**, so the next session executes instead of discovering. Eight
