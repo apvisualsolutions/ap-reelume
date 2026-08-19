@@ -343,6 +343,39 @@ pressable while the question is on screen** — `SwitchToVersionAsync` returns a
 `Apply`, so the row's `finally` re-enables it with the dialogue open, and a second press flushes the
 playhead, answers zero and takes the question with it. It deserves its own measurement.
 
+#### Phase 2f: the `ComboBox`, already measured — 2026-08-19
+
+**Measured with not a line written**, so the next session executes instead of discovering. Eight
+uses, and it inherits nothing from the text field: `IsEditable` appears nowhere in the tree, so a
+closed combo box has no `PART_BorderElement`.
+
+**It has three families of its own**, and the third is the one that matters:
+
+1. **The closed frame** — `ComboBoxBackground` / `PointerOver` / `Pressed` / `Disabled`,
+   `ComboBoxBorderBrush*` (4), `ComboBoxForeground*` (4), `ComboBoxDropDownGlyphForeground*` (4) and
+   `ComboBoxPlaceHolderForeground*` (2).
+2. **The drop-down** — `ComboBoxDropDownBackground`, `ComboBoxDropDownBorderBrush`.
+3. **The drop-down's rows** — `ComboBoxItem*`, **22 brushes** shaped exactly like the list row's.
+
+**What paints today, measured:**
+
+```
+Light / HighContrastLight   IDENTICAL (fourth time)
+  Border[Background]           #66FFFFFF, border #99000000 -> the border reads 5.69:1 on the fill
+  Border[HighlightBackground]  #0078D7 at 40 % -> 1.74:1 against the frame
+  Path (the arrow)             #cc000000 -> 12.47:1
+HighContrastDark
+  Border[HighlightBackground]  #0078D7 at 60 % -> 2.24:1 against the surface
+```
+
+**The defect is the list row's, at almost the same number**: the drop-down's highlight is Windows'
+translucent blue at **1.74:1** in light and **2.24:1** in high contrast dark, against a bar of 3. The
+frame's border (5.69:1) and the arrow (12.47:1) are already fine and only move to tokens.
+
+**The way in and the known traps carry over**: measure the family with markers before redirecting;
+the drop-down rows follow the list row (a faint fill **plus** a second cue, because in high contrast
+the faint one is the surface); and declaration order matters wherever a state can coincide with focus.
+
 #### ~~Phase 2e: the text field~~ — done on 2026-08-19, and it is worth two types
 
 **Done** — [the evidence](evidence/stable/audit-redesign-phase2e-text-field.md). 16 aliases per theme.

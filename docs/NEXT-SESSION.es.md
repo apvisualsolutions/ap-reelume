@@ -344,6 +344,42 @@ la pregunta está en pantalla** — `SwitchToVersionAsync` retorna en cuanto lla
 `finally` de la fila la rehabilita con el diálogo abierto, y una segunda pulsación vacía el cabezal,
 contesta cero y se lleva la pregunta. Merece su propia medición.
 
+#### La fase 2f: el `ComboBox`, ya medido — 2026-08-19
+
+**Medido y sin escribir una línea**, para que la sesión siguiente ejecute en vez de descubrir. Ocho
+usos, y **no hereda nada del campo de texto**: `IsEditable` no aparece en el árbol, así que un
+desplegable cerrado no tiene `PART_BorderElement`.
+
+**Tiene tres familias propias**, y la tercera es la que importa:
+
+1. **El marco cerrado** — `ComboBoxBackground` / `PointerOver` / `Pressed` / `Disabled`,
+   `ComboBoxBorderBrush*` (4), `ComboBoxForeground*` (4), `ComboBoxDropDownGlyphForeground*` (4) y
+   `ComboBoxPlaceHolderForeground*` (2).
+2. **El desplegable** — `ComboBoxDropDownBackground`, `ComboBoxDropDownBorderBrush`.
+3. **Las filas del desplegable** — `ComboBoxItem*`, **22 pinceles** con la misma forma que la fila de
+   lista (fondo, borde y texto × reposo/sobre/pulsado/seleccionado × normal/deshabilitado).
+
+**Lo que pinta hoy, medido:**
+
+```
+Light / HighContrastLight   IDÉNTICOS (cuarta vez)
+  Border[Background]           #66FFFFFF, borde #99000000 -> el borde mide 5,69:1 sobre el fondo
+  Border[HighlightBackground]  #0078D7 al 40 % -> 1,74:1 contra el marco
+  Path (la flecha)             #cc000000 -> 12,47:1
+HighContrastDark
+  Border[HighlightBackground]  #0078D7 al 60 % -> 2,24:1 contra la superficie
+```
+
+**El defecto es el mismo que el de la fila de lista, y con casi el mismo número**: el resaltado del
+desplegable es el azul de Windows translúcido, a **1,74:1** en claro y **2,24:1** en alto contraste
+oscuro, contra un listón de 3. Lo que ya está bien es el borde del marco (5,69:1) y la flecha
+(12,47:1), así que esos no se tocan salvo para pasarlos a tokens.
+
+**La vía y las trampas ya conocidas valen aquí**: la familia se mide con marcadores antes de
+redirigir; las filas del desplegable van como la fila de lista (relleno tenue **más** una segunda
+señal, porque en alto contraste el tenue es la superficie); y el orden de declaración importa si se
+tocan estados que puedan coincidir con el foco.
+
 #### ~~La fase 2e: el campo de texto~~ — hecha el 2026-08-19, y vale por dos tipos
 
 **Hecha** — [la evidencia](evidence/stable/audit-redesign-phase2e-text-field.md). 16 alias por tema.
