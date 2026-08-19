@@ -526,6 +526,75 @@ en `CommandNotificationTests`. El trinquete del paseo sube a 5 y vuelve a **0** 
 un cambio de vistas son cuatro, no dos: `UiTests`, `AccessibilityTests`, `IntegrationTests` y
 `DocumentationTests`.
 
+#### `UpdateView` y el escalar que NO se puede gastar donde hace falta — medido el 2026-08-19
+
+**Medido sin escribir código**, como el `ComboBox` y el mini reproductor, para que la sesión siguiente
+ejecute. Y el titular no es de `UpdateView`: es de **toda la fase de vistas**.
+
+##### El hallazgo que decide la fase entera
+
+**Los cinco `Space*` son `x:Double`, y las propiedades que los necesitan son `Thickness`.** Por eso
+siguen los cinco en `NotSpentYet` y por eso ahí se van a quedar mientras nadie lo decida: un
+`Setter Property="Margin" Value="{DynamicResource SpaceXSmall}"` **no convierte**, y lo mismo vale para
+`Padding` y `BorderThickness`. Se midió en el commit del mini reproductor, que acabó escribiendo
+`Margin="4"` literal por esto.
+
+Lo medido en todo `src/`:
+
+| Dónde | Tipo | Apariciones | Valores literales |
+|---|---|---|---|
+| `Spacing` (`StackPanel`), `ItemSpacing`/`LineSpacing` (`WrapPanel`) | `double` — **los tokens SÍ sirven** | **183** | 8 (90), 12 (45), 4 (21), 6 (12), 16 (6), 24 (4), 2 (3), 10 (2) |
+| `Padding`, `Margin` | `Thickness` — **los tokens NO sirven** | **89** | varios |
+| `CornerRadius` | `CornerRadius` — sirven | **35** | 8 (23) = `CornerRadiusMedium`, 4 (5) = `CornerRadiusSmall`, 6 (4), 10 (2), 12 (1) |
+
+**La decisión estaba entre dos opciones y LA CUENTA YA LA CIERRA** (hecha el 2026-08-19, sobre los 89):
+
+| Forma | Cuántos | ¿Lo cubre un token escalar? |
+|---|---|---|
+| Uniforme y **en la escala** (16×21, 24×5, 32×2, 8×1, 4×1) | **30** | sí |
+| Uniforme y **fuera de la escala** (12×11, 48×6, 20×2, 10×2, 28×1) | **22** | sólo remapeando |
+| **Asimétrico** (`48,0`, `0,2`, `8,4`, `0,8,0,0`, `0,0,0,24`…) | **37** | **no, de ninguna forma** |
+
+**Gana la opción 2, y no por gusto: los gemelos `Thickness` cubrirían 30 de 89, un 34 %.** Los 37
+asimétricos no los expresa un escalar ni con gemelos —`Margin="0,8,0,0"` necesita cuatro valores— y
+declarar una familia de tokens asimétricos sería inventar una escala que el paquete no pide.
+
+**Decidido, y no se re-delibera:** los `Space*` son para `Spacing` / `ItemSpacing` / `LineSpacing`
+—183 sitios, y 168 de ellos, el 92 %, caen en cuatro valores (8, 12, 4 y 6)—, y `Padding` / `Margin` se quedan
+con literales. **Se dice en el archivo de tokens**, junto a la declaración, para que la siguiente
+persona no vuelva a intentarlo: costó un `Margin="4"` literal en el commit del mini reproductor
+descubrirlo.
+
+Y **el mapeo de los literales que no están en la escala se hace como se hizo con la tipografía**: 12 y
+10 al que toque, 6 y 2 al que toque, escrito una vez en el archivo de tokens y no discutido vista por
+vista. Trece literales de tamaño de letra se mapearon a cinco tokens sin que nadie lo notara.
+
+##### `UpdateView` en concreto
+
+Su maqueta ya está en mejor estado que la media: usa `FontSizeSubtitle`, `TextPrimaryBrush`,
+`AccentSubtleBrush`, `CardSurfaceBrush` y `ShellBorderBrush`, y su `WrapPanel` ya usa
+`ItemSpacing`/`LineSpacing` — que es, de paso, **lo que el cromo del mini reproductor debería usar en
+vez de su `Margin="4"`**, y es un arreglo de una línea para cuando se toque esa vista.
+
+Lo que le queda, y no es una lista larga:
+
+1. **`CornerRadius="8"` en dos bordes** → `CornerRadiusMedium`. Directo.
+2. **`Spacing="12"`, `Spacing="8"`, `Spacing="6"`** → los tokens que salgan del mapeo de arriba.
+3. **`UpdateCheckButton` es la acción principal de la pantalla** y no lleva `primary-action`. Es el
+   único candidato de la vista: descargar e instalar aparecen **según el estado**, y cancelar nunca es
+   la acción principal.
+4. **`Padding="16"` en dos bordes** → depende de la decisión de arriba.
+5. **`MaxWidth="640"` y `MaxWidth="600"` se quedan.** Son medidas de longitud de línea legible, no
+   escala; un token para eso sería inventar una familia con dos miembros.
+
+**Sus cuatro controles ya están en el paseo** (`UpdateCheckButton`, `UpdateDownloadButton`,
+`UpdateInstallButton`, `UpdateCancelButton`, más `UpdateAutomaticCheckBox`), así que esta vista **no
+añade deuda de paseo**: es la primera del rediseño que sólo cuesta maqueta.
+
+**Quién la lee como texto, y hay que correrlos**: `UpdateSurfaceTests` (UiTests),
+`AssembledJourneyTests`, `AssembledPhysicalWalkTests` y `CompositionDescriptorTests`
+(AccessibilityTests).
+
 #### ~~La fase 2f: el `ComboBox`~~ — hecha el 2026-08-19
 
 **Medido y sin escribir una línea**, para que la sesión siguiente ejecute en vez de descubrir. Ocho

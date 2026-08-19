@@ -527,6 +527,73 @@ The five controls, their **five strings in both languages**, their **five access
 to views are four, not two: `UiTests`, `AccessibilityTests`, `IntegrationTests` and
 `DocumentationTests`.
 
+#### `UpdateView` and the scalar that CANNOT be spent where it is needed — measured 2026-08-19
+
+**Measured without writing code**, as the `ComboBox` and the mini player were, so the next session
+executes. And the headline is not about `UpdateView`: it is about **the whole view phase**.
+
+##### The finding that decides the entire phase
+
+**All five `Space*` are `x:Double`, and the properties that need them are `Thickness`.** That is why
+all five are still in `NotSpentYet`, and why they stay there until somebody decides: a
+`Setter Property="Margin" Value="{DynamicResource SpaceXSmall}"` **does not convert**, and the same
+goes for `Padding` and `BorderThickness`. It was measured in the mini player commit, which ended up
+writing a literal `Margin="4"` because of it.
+
+Measured across all of `src/`:
+
+| Where | Type | Occurrences | Literal values |
+|---|---|---|---|
+| `Spacing` (`StackPanel`), `ItemSpacing`/`LineSpacing` (`WrapPanel`) | `double` — **tokens DO work** | **183** | 8 (90), 12 (45), 4 (21), 6 (12), 16 (6), 24 (4), 2 (3), 10 (2) |
+| `Padding`, `Margin` | `Thickness` — **tokens do NOT work** | **89** | mixed |
+| `CornerRadius` | `CornerRadius` — they work | **35** | 8 (23) = `CornerRadiusMedium`, 4 (5) = `CornerRadiusSmall`, 6 (4), 10 (2), 12 (1) |
+
+**The decision was between two options and THE COUNT SETTLES IT** (made 2026-08-19, over the 89):
+
+| Shape | How many | Can a scalar token cover it? |
+|---|---|---|
+| Uniform and **on the scale** (16×21, 24×5, 32×2, 8×1, 4×1) | **30** | yes |
+| Uniform and **off the scale** (12×11, 48×6, 20×2, 10×2, 28×1) | **22** | only by remapping |
+| **Asymmetric** (`48,0`, `0,2`, `8,4`, `0,8,0,0`, `0,0,0,24`…) | **37** | **no, not in any form** |
+
+**Option 2 wins, and not by preference: `Thickness` twins would cover 30 of 89, or 34%.** The 37
+asymmetric ones cannot be expressed by a scalar even with twins — `Margin="0,8,0,0"` needs four
+values — and declaring a family of asymmetric tokens would be inventing a scale the package never
+asked for.
+
+**Decided, and not reopened:** `Space*` are for `Spacing` / `ItemSpacing` / `LineSpacing` — 183 sites,
+168 of them — 92% — landing on four values (8, 12, 4 and 6) — and `Padding` / `Margin` keep their literals. **This is
+said in the token file**, beside the declaration, so the next person does not try again: finding it
+out cost a literal `Margin="4"` in the mini player commit.
+
+And **the literals that are not on the scale get mapped the way the type scale was**: 12 and 10 to
+whichever fits, 6 and 2 to whichever fits, written once in the token file and not argued view by view.
+Thirteen font-size literals mapped to five tokens and nobody noticed.
+
+##### `UpdateView` itself
+
+Its layout is already better than average: it uses `FontSizeSubtitle`, `TextPrimaryBrush`,
+`AccentSubtleBrush`, `CardSurfaceBrush` and `ShellBorderBrush`, and its `WrapPanel` already uses
+`ItemSpacing`/`LineSpacing` — which is, incidentally, **what the mini player's chrome should use
+instead of its `Margin="4"`**, a one-line fix for whenever that view is touched.
+
+What is left, and it is not a long list:
+
+1. **`CornerRadius="8"` on two borders** → `CornerRadiusMedium`. Straight swap.
+2. **`Spacing="12"`, `Spacing="8"`, `Spacing="6"`** → whatever the mapping above produces.
+3. **`UpdateCheckButton` is the screen's primary action** and carries no `primary-action`. It is the
+   only candidate here: download and install appear **by state**, and cancel is never primary.
+4. **`Padding="16"` on two borders** → depends on the decision above.
+5. **`MaxWidth="640"` and `MaxWidth="600"` stay.** They are readable line lengths, not scale; a token
+   for that would be inventing a family with two members.
+
+**Its four controls are already in the walk** (`UpdateCheckButton`, `UpdateDownloadButton`,
+`UpdateInstallButton`, `UpdateCancelButton`, plus `UpdateAutomaticCheckBox`), so this view **adds no
+walk debt**: it is the first of the redesign that costs layout only.
+
+**Who reads it as text, and must be run**: `UpdateSurfaceTests` (UiTests), `AssembledJourneyTests`,
+`AssembledPhysicalWalkTests` and `CompositionDescriptorTests` (AccessibilityTests).
+
 #### ~~Phase 2f: the `ComboBox`~~ — done on 2026-08-19
 
 **Measured with not a line written**, so the next session executes instead of discovering. Eight
