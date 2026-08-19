@@ -88,6 +88,39 @@ un literal que vuelve / a literal returns          -> rojo nombrando el archivo 
 una referencia que desaparece / one goes missing   -> "only 51 font sizes come from the scale…"
 ```
 
+## Lo que CI cazó y las suites locales no / What CI caught and the local suites did not
+
+El run de este commit **falló**, y no en el trinquete: / The run failed, and not on the ratchet:
+
+```
+IntegrationTests.Metadata.TmdbLogoTests.The_logo_is_drawn_smaller_than_the_product_name [FAIL]
+```
+
+**Es una obligación de los términos de TMDB**: su marca se dibuja **menos prominente** que el nombre
+del producto, y la prueba lo **mide** en vez de afirmarlo, leyendo los dos números de las vistas. El
+barrido cambió el nombre del producto de `24` a `{DynamicResource FontSizeSubtitle}`, y la prueba, que
+sólo sabía leer literales, lo interpretó como **cero**. / TMDB's terms ask for their mark to be less
+prominent than the product's own name, and the test measures it rather than asserting it.
+
+**El color era el correcto por la razón equivocada**: 16 sigue siendo menor que los 20 que vale el
+token, así que la relación **nunca se rompió**; lo que se rompió fue la lectura. La prueba pasa a
+**seguir la indirección** —si el tamaño es un recurso, lo resuelve contra `DesignTokens.axaml`—, que
+es lo que la hace medir el tamaño dibujado y no la ortografía de un atributo. Con aserción
+anticeguera: un tamaño que resuelva a cero falla diciendo que **dejó de poder leerse**, no que el
+nombre encogió. / The colour was right for the wrong reason: 16 is still less than the 20 the token
+holds, so the relation never broke — the reading did.
+
+Probada fallando: el nombre del producto a `FontSizeCaption` da
+`«The TMDB logo is drawn at 16 against a product name at 12, which is not less prominent»`. /
+Proved failing. Y la suite entera de `IntegrationTests`, que no se había corrido, da **456/457** con
+una omitida. / And the whole `IntegrationTests` suite, which had not been run, gives 456/457.
+
+**Y la lección, que es de método:** se corrieron `UiTests` (594) y `AccessibilityTests` (133) porque
+parecían «las suites afectadas» por un cambio de vistas. **`IntegrationTests` también leía esas
+vistas**, y ahí vivía la única prueba que ata dos tamaños entre sí. Un barrido sobre treinta archivos
+afecta a más suites de las que su carpeta sugiere. / A sweep over thirty files reaches more suites
+than its folder suggests.
+
 ## El verde / The green
 
 ```

@@ -41,6 +41,9 @@ public sealed class TmdbLogoTests
 
     private const string ShellPath = "src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml";
 
+    private const string TokensPath =
+        "src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml";
+
     [Fact]
     public void The_versioned_logo_is_the_file_TMDB_publishes()
     {
@@ -97,6 +100,10 @@ public sealed class TmdbLogoTests
         var productName = Number(ProductNameFontSize());
 
         Assert.True(logoHeight > 0, "The logo declares no height, so nothing bounds how large it draws.");
+        Assert.True(
+            productName > 0,
+            "The product name's size read as zero, which means this check stopped being able to read "
+                + "it rather than that the name shrank.");
         Assert.True(
             logoHeight < productName,
             $"The TMDB logo is drawn at {logoHeight} against a product name at {productName}, "
@@ -157,7 +164,43 @@ public sealed class TmdbLogoTests
         // The TextBlock's own attributes, taken from the element that carries the binding.
         var start = shell.LastIndexOf("<TextBlock", index, StringComparison.Ordinal);
         Assert.True(start >= 0, "The product name is no longer drawn by a TextBlock.");
-        return Attribute(shell[start..(index + "ProductDisplayName".Length)], "FontSize");
+        return Resolve(Attribute(shell[start..(index + "ProductDisplayName".Length)], "FontSize"));
+    }
+
+    /// <summary>
+    /// A size the view takes from the type scale, resolved to the number the scale holds.
+    /// </summary>
+    /// <remarks>
+    /// Views stopped writing literal font sizes on 2026-08-19: thirteen distinct literals across
+    /// thirty files became five tokens, and the product name went from <c>24</c> to
+    /// <c>{DynamicResource FontSizeSubtitle}</c>. Reading only literals, this check parsed that as
+    /// zero and went red — which was the right colour for the wrong reason, because 16 is still less
+    /// than the 20 the token holds. Following the indirection is what keeps it measuring the drawn
+    /// size rather than the spelling of an attribute.
+    /// </remarks>
+    private static string Resolve(string value)
+    {
+        var reference = Regex.Match(
+            value,
+            @"^\{(?:Dynamic|Static)Resource\s+(?<key>[A-Za-z0-9]+)\}$",
+            RegexOptions.None,
+            Timeout);
+        if (!reference.Success)
+        {
+            return value;
+        }
+
+        var key = reference.Groups["key"].Value;
+        var declared = Regex.Match(
+            File.ReadAllText(FromRoot(TokensPath)),
+            $@"x:Key=""{key}"">(?<value>[^<]+)<",
+            RegexOptions.None,
+            Timeout);
+        Assert.True(
+            declared.Success,
+            $"The product name asks the theme for {key} and the theme does not declare it, so its "
+                + "drawn size cannot be known and this comparison would silently measure nothing.");
+        return declared.Groups["value"].Value;
     }
 
     private static double Number(string value) =>
