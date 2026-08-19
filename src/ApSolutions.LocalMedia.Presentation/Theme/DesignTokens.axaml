@@ -143,6 +143,73 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <!--
+            Phase 2g: the slider, the toggle and the radio. Eight uses between them and one grammar
+            of states, so they are aliases and not a fourth way of saying the same thing. Two
+            families are left alone on purpose, because nothing in the tree can reach them: the
+            toggle's Indeterminate* (IsThreeState appears nowhere) and the slider's tick bar (no
+            view sets TickPlacement, so no tick is drawn).
+          -->
+          <StaticResource x:Key="SliderTrackValueFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillDisabled" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="SliderTrackFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SliderTrackFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SliderTrackFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFill" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
@@ -275,6 +342,73 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <!--
+            Phase 2g: the slider, the toggle and the radio. Eight uses between them and one grammar
+            of states, so they are aliases and not a fourth way of saying the same thing. Two
+            families are left alone on purpose, because nothing in the tree can reach them: the
+            toggle's Indeterminate* (IsThreeState appears nowhere) and the slider's tick bar (no
+            view sets TickPlacement, so no tick is drawn).
+          -->
+          <StaticResource x:Key="SliderTrackValueFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillDisabled" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="SliderTrackFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SliderTrackFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SliderTrackFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFill" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
@@ -413,6 +547,73 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <!--
+            Phase 2g: the slider, the toggle and the radio. Eight uses between them and one grammar
+            of states, so they are aliases and not a fourth way of saying the same thing. Two
+            families are left alone on purpose, because nothing in the tree can reach them: the
+            toggle's Indeterminate* (IsThreeState appears nowhere) and the slider's tick bar (no
+            view sets TickPlacement, so no tick is drawn).
+          -->
+          <StaticResource x:Key="SliderTrackValueFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillDisabled" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="SliderTrackFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SliderTrackFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SliderTrackFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFill" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
@@ -550,6 +751,73 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="ControlTextActiveBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextDisabledBrush" />
+          <!--
+            Phase 2g: the slider, the toggle and the radio. Eight uses between them and one grammar
+            of states, so they are aliases and not a fourth way of saying the same thing. Two
+            families are left alone on purpose, because nothing in the tree can reach them: the
+            toggle's Indeterminate* (IsThreeState appears nowhere) and the slider's tick bar (no
+            view sets TickPlacement, so no tick is drawn).
+          -->
+          <StaticResource x:Key="SliderTrackValueFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderTrackValueFillDisabled" ResourceKey="TextSecondaryBrush" />
+          <StaticResource x:Key="SliderTrackFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="SliderTrackFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="SliderTrackFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="SliderThumbBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackground" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="ToggleButtonBackgroundCheckedDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrush" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonBorderBrushCheckedDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="ToggleButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="ToggleButtonForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="ControlFillBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPointerOver" ResourceKey="ControlFillHoverBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPressed" ResourceKey="ControlFillPressedBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillDisabled" ResourceKey="ControlFillDisabledBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="AccentBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePointerOver" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePressed" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokeDisabled" ResourceKey="ShellBorderBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFill" ResourceKey="AccentTextBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPointerOver" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillPressed" ResourceKey="ControlTextActiveBrush" />
+          <StaticResource x:Key="RadioButtonCheckGlyphFillDisabled" ResourceKey="TextDisabledBrush" />
+          <StaticResource x:Key="RadioButtonForeground" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPointerOver" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundPressed" ResourceKey="TextPrimaryBrush" />
+          <StaticResource x:Key="RadioButtonForegroundDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="AccentBrush" />
           <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="AccentBrush" />
