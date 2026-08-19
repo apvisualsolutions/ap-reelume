@@ -1001,6 +1001,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
   </Style>
 
+  <!--
+    The mini player's own five, and nothing else. A minimum and not a fixed size: the package asks for
+    36x36 and a fixed one cuts the label in whichever of the two languages runs longer, which is a
+    defect waiting rather than a layout.
+  -->
+  <Style Selector="Button.player-chrome">
+    <Setter Property="MinWidth" Value="36" />
+    <Setter Property="MinHeight" Value="36" />
+    <!-- A literal and not SpaceXSmall: that token is an x:Double and Margin takes a Thickness. -->
+    <Setter Property="Margin" Value="4" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+  </Style>
+
   <Style Selector="Button.theme-option">
     <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />

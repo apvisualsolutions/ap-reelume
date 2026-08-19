@@ -171,6 +171,39 @@ public sealed class WindowLifecycleTests
         mini.Close();
     }
 
+    /// <summary>
+    /// Hosting the same surface twice leaves it where it is instead of building it again.
+    /// </summary>
+    /// <remarks>
+    /// A mode applied twice is not rare — the shell reapplies it whenever the view model says so —
+    /// and re-parenting a video surface tears its frame down and makes a new one. What that costs is
+    /// the session, which is the one thing this whole coordinator exists to keep.
+    /// </remarks>
+    [AvaloniaFact]
+    public void Hosting_the_same_surface_again_does_not_rebuild_it()
+    {
+        var mini = new MiniPlayerWindow();
+        var surface = new PlayerView { DataContext = new PlayerViewModel(new InertCoordinator()) };
+
+        mini.Host(surface);
+        mini.Show();
+        Dispatcher.UIThread.RunJobs();
+        var frame = surface.GetVisualDescendants().OfType<VideoFrameView>().Single();
+
+        mini.Host(surface);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Same(frame, surface.GetVisualDescendants().OfType<VideoFrameView>().Single());
+        Assert.Contains(surface, mini.GetVisualDescendants().OfType<PlayerView>());
+
+        // And letting go leaves the window without it, which is what the shell asks for on the way
+        // back: a control that still has a parent cannot be given a second one.
+        mini.Release();
+        Dispatcher.UIThread.RunJobs();
+        Assert.DoesNotContain(surface, mini.GetVisualDescendants().OfType<PlayerView>());
+        mini.Close();
+    }
+
     [AvaloniaFact]
     public void A_zero_or_negative_scaling_is_refused_rather_than_producing_an_infinite_window()
     {

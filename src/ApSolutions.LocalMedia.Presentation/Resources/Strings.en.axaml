@@ -205,6 +205,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AudioOutputLayoutDegraded">The chosen device cannot take that layout; the largest it accepts is used.</x:String>
   <x:String x:Key="AudioOutputDeviceFallback">The saved device is not connected; the default is used and your choice is remembered.</x:String>
   <x:String x:Key="MiniPlayerTitle">Mini player</x:String>
+  <x:String x:Key="MiniPlayerPlayPause">Pause/play</x:String>
+  <x:String x:Key="MiniPlayerSkipBack">Back</x:String>
+  <x:String x:Key="MiniPlayerSkipForward">Forward</x:String>
+  <x:String x:Key="MiniPlayerRestore">Expand</x:String>
+  <x:String x:Key="MiniPlayerClose">Close</x:String>
+  <x:String x:Key="MiniPlayerChromeAccessibleName">Mini player controls</x:String>
   <x:String x:Key="ShortcutSettingsAccessibleName">Keyboard shortcuts</x:String>
   <x:String x:Key="ShortcutSettingsDescription">Every essential action has a shortcut. You can change them; a shortcut already in use is refused and names the action holding it.</x:String>
   <x:String x:Key="ShortcutSettingsListName">Shortcut list</x:String>

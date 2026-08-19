@@ -28,6 +28,20 @@ public sealed record PlayerWindowGeometry(double X, double Y, double Width, doub
 }
 
 /// <summary>
+/// A window that knows how to take the player surface without losing its own tree.
+/// </summary>
+/// <remarks>
+/// Assigning <c>Window.Content</c> is the simple way to move a surface and it costs the window
+/// everything it declared for itself. The mini player needs its own five controls, so it takes the
+/// surface into a panel instead and this is how the coordinator asks.
+/// </remarks>
+public interface IPlayerSurfaceHost
+{
+    /// <summary>Takes the surface, detaching it from wherever it was.</summary>
+    void Host(Control surface);
+}
+
+/// <summary>
 /// Moves the same player surface between embedded, fullscreen, and mini without recreating it.
 /// </summary>
 /// <remarks>
@@ -98,7 +112,13 @@ public sealed class PlayerWindowCoordinator
         ArgumentNullException.ThrowIfNull(content);
         var geometry = Recall(mode) ?? GeometryFor(mode, screenBounds, scaling);
 
-        if (!ReferenceEquals(window.Content, content))
+        // A window that hosts the surface itself keeps its own tree; one that does not gets the
+        // surface as its whole content, which is what every window but the mini player wants.
+        if (window is IPlayerSurfaceHost surfaceHost)
+        {
+            surfaceHost.Host(content);
+        }
+        else if (!ReferenceEquals(window.Content, content))
         {
             if (content.Parent is ContentControl previousHost)
             {

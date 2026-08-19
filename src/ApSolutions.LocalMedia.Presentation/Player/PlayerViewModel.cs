@@ -41,6 +41,7 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         StopCommand = new AsyncRelayCommand(() => _coordinator.StopAsync(CancellationToken.None), () => CanStop);
         RetryCommand = new AsyncRelayCommand(RetryAsync, () => CanRetry);
         OpenExternallyCommand = new AsyncRelayCommand(OpenExternallyAsync, () => CanOpenExternally);
+        TogglePlaybackCommand = new AsyncRelayCommand(TogglePlaybackAsync, () => CanPause || CanResume);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -54,6 +55,17 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     public ICommand RetryCommand { get; }
 
     public ICommand OpenExternallyCommand { get; }
+
+    /// <summary>
+    /// Pause and resume behind one control, for a window with no room for two.
+    /// </summary>
+    /// <remarks>
+    /// The mini player has five buttons and 480 logical pixels, so it asks the one question a person
+    /// asks - keep going, or stop for a moment - rather than showing two buttons of which exactly one
+    /// is ever enabled. What it does is decided by the state, not by a flag this class would then
+    /// have to keep in step with it.
+    /// </remarks>
+    public ICommand TogglePlaybackCommand { get; }
 
     /// <summary>Decoded frames the view draws; never an engine object.</summary>
     public IVideoFrameSource? FrameSource { get; }
@@ -202,6 +214,11 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(ExternalLaunchFailed));
     }
 
+    private Task TogglePlaybackAsync() =>
+        CanPause
+            ? _coordinator.PauseAsync(CancellationToken.None)
+            : _coordinator.ResumeAsync(CancellationToken.None);
+
     private void UpdateState(PlaybackState state)
     {
         _state = state;
@@ -239,6 +256,7 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
             StopCommand,
             RetryCommand,
             OpenExternallyCommand,
+            TogglePlaybackCommand,
         })
         {
             (command as AsyncRelayCommand)?.RaiseCanExecuteChanged();

@@ -1,0 +1,54 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.MiniPlayerChromeView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:shell="clr-namespace:ApSolutions.LocalMedia.Presentation.Shell"
+    x:DataType="shell:ShellViewModel"
+    automation:AutomationProperties.Name="{DynamicResource MiniPlayerChromeAccessibleName}">
+  <!--
+    A WrapPanel and not a row: the window's own minimum is 320 and five buttons carrying translated
+    words do not fit on one line there. Wrapping keeps every one of them inside the window at any
+    width the window allows, which is the shape that has put a control outside the window six times
+    in this repository.
+  -->
+  <WrapPanel
+      x:Name="MiniPlayerChromeSurface"
+      HorizontalAlignment="Center"
+      Background="{DynamicResource ShellSurfaceBrush}">
+    <Button
+        x:Name="MiniPlayerPlayPause"
+        Classes="player-chrome"
+        Command="{Binding Player.Player.TogglePlaybackCommand}"
+        Content="{DynamicResource MiniPlayerPlayPause}"
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerPlayPause}" />
+    <Button
+        x:Name="MiniPlayerSkipBack"
+        Classes="player-chrome"
+        Command="{Binding Player.Player.Transport.SkipBackwardCommand}"
+        Content="{DynamicResource MiniPlayerSkipBack}"
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipBack}" />
+    <Button
+        x:Name="MiniPlayerSkipForward"
+        Classes="player-chrome"
+        Command="{Binding Player.Player.Transport.SkipForwardCommand}"
+        Content="{DynamicResource MiniPlayerSkipForward}"
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipForward}" />
+    <Button
+        x:Name="MiniPlayerRestore"
+        Classes="player-chrome"
+        Command="{Binding ToggleMiniPlayerCommand}"
+        Content="{DynamicResource MiniPlayerRestore}"
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerRestore}" />
+    <Button
+        x:Name="MiniPlayerClose"
+        Classes="player-chrome"
+        Command="{Binding ClosePlayerCommand}"
+        Content="{DynamicResource MiniPlayerClose}"
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerClose}" />
+  </WrapPanel>
+</UserControl>
