@@ -2,6 +2,22 @@
 
 ## State on opening (2026-08-20, end of the afternoon session)
 
+**`main` and the branch are level, CI green, working tree clean, nothing in flight.** Phase 6 has
+started: **tranche 1 (Shell) is done** and **tranche 2 (Home) is measured** without writing code.
+
+**Both CI reds this batch were the coverage gate, and they taught different things:** a real
+improvement nobody declared (`RouteStateConverter.cs` at 100/85 — expect a second CI round per
+tranche, it is the price of CI owning the floors), and **a floor that rose without being an
+improvement** (`PlaybackProgressTracker.cs`, 83 in three runs and 85 in a fourth with one line of a
+`.txt` as the only change between them). **What tells an improvement from a dance is the tree diff
+between the two runs**, and raising a dancing floor is worse than leaving it low.
+
+**And a loose end from tranche 1, closed:** `StartupView` was written off as needing nothing without
+checking what §4 asks of it — that its background match the MSIX splash so the seam does not show.
+They match, both `#111827`, but **nothing was watching**, so it was one edit from becoming a flash on
+every launch. **It can only match one theme, and that is a decision**: a manifest colour is static,
+painted before any of our code runs.
+
 **STEP 6 IS ON PHASE 6 OF 6, AND THAT PHASE IS ALMOST ENTIRELY UNDONE.** What closed on 2026-08-20
 were **phases 1 to 5 of `design/PROMPT.md`** plus phase 6's prerequisites — and it was declared "step 6
 closed", which was **false**. Measured against the package that same day:

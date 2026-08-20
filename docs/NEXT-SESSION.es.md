@@ -2,6 +2,32 @@
 
 ## Estado al abrir (2026-08-20, cierre de la sesión de tarde)
 
+**`main` y la rama al día, CI verde, árbol limpio, nada en vuelo.** La fase 6 arrancó: **el tramo 1
+(Shell) está hecho** y el **tramo 2 (Inicio) está medido** sin escribir código, abajo.
+
+**Los dos rojos de CI de esta tanda fueron la puerta de cobertura, y enseñaron cosas distintas:**
+
+1. **Una mejora real sin declarar.** `RouteStateConverter.cs` subió a 100/85 al ganar la rama del
+   `Kind` nuevo con su prueba. El trinquete **falla también cuando algo mejora**, y esto va a repetirse
+   en casi todos los tramos: **cuenta con una segunda vuelta de CI por tramo**, que es el precio
+   conocido de que los suelos los mida CI.
+2. **Un suelo que sube y NO es una mejora.** `PlaybackProgressTracker.cs` leyó 83 en tres runs y 85 en
+   el cuarto, con **una línea de un `.txt`** como único cambio del árbol entre ellos: un `.cs` no
+   mejora por eso. **Lo que distingue una mejora de un baile es el diff del árbol entre los dos runs.**
+   Subir un suelo que baila es **peor** que dejarlo bajo, porque convierte un rojo ocasional en un rojo
+   por estar **por debajo**. Se estabilizó pidiendo la rama a propósito, y la causa salió comparando los
+   Cobertura línea a línea — la primera hipótesis, el `WaitAsync` de al lado, era falsa y ya tenía
+   prueba.
+
+**Y un cabo suelto del tramo 1, cerrado:** de `StartupView` se dijo «no necesitaba nada» sin comprobar
+lo que la §4 le pide, que es que **el fondo case con el de la pantalla de arranque de MSIX para que la
+costura no se vea**. Casan —los dos son `#111827`— pero **nadie lo vigilaba**, así que estaba a una
+edición de convertirse en un parpadeo en cada arranque. Ahora hay prueba. **Y sólo puede casar con un
+tema, que es una decisión y no un descuido**: el color del manifiesto es estático —Windows lo pinta
+antes de que corra código nuestro, sin saber qué tema eligió la persona— y `ShellSurfaceBrush` es uno
+de cuatro. Se casa con **oscuro**, que es la variante sobre la que el paquete diseña y donde vive el
+reproductor; un color que no desentonara en los cuatro sería un gris medio que no le va a ninguno.
+
 **EL PASO 6 ESTÁ EN SU FASE 6 DE 6, Y ESA FASE ESTÁ CASI ENTERA POR HACER.** Lo que se cerró el
 2026-08-20 fueron **las fases 1 a 5 de `design/PROMPT.md`** más los prerrequisitos de la 6 — y se
 declaró «paso 6 cerrado», que era **falso**. Medido contra el paquete ese mismo día:
@@ -64,6 +90,11 @@ dos carriles ya llevan varios `IsVisible` de estado.
   el **título a dos líneas** (`MaxLines`), el **año en `TextSecondaryBrush`** y, sobre todo, **las
   iniciales sobre `ControlFillBrush` cuando no hay portada** — la §4 insiste en que **nunca sea un
   hueco**. Hoy tiene **un** `IsVisible`, así que ese estado no existe.
+- **`LibraryEntryView`, decidido para no deliberarlo al escribirlo:** las iniciales son **las de las
+  dos primeras palabras del título**, en mayúsculas, y **una sola** si el título tiene una palabra. No
+  se recorta a un número fijo de caracteres —un título en otra escritura puede no tener «letras» en el
+  sentido latino— y el hueco nunca se deja vacío: si el título no da ninguna inicial, se pinta el
+  relleno liso, que es el mismo estado que «cargando».
 - **`RecommendationsRailView`** tiene cinco `IsVisible`; hay que comprobar si son **los tres estados que
   la §4 distingue** —vacío, **apagado por ajuste** y con contenido— porque los dos primeros **no son lo
   mismo** y ésa es la única razón por la que la fila lo dice.
