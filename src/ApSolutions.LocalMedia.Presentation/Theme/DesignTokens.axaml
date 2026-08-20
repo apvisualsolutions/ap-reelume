@@ -1002,15 +1002,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
-    The mini player's own five, and nothing else. A minimum and not a fixed size: the package asks for
-    36x36 and a fixed one cuts the label in whichever of the two languages runs longer, which is a
-    defect waiting rather than a layout.
+    The player's chrome, wherever it is: the mini player's five and the large transport's three. A
+    minimum and not a fixed size, because the package asks for 36x36 and a fixed one cuts the label in
+    whichever of the two languages runs longer, which is a defect waiting rather than a layout.
+
+    It carries no Margin. It used to, because the mini player's five needed separating and this was
+    the only place saying anything about them. But the large transport places its three in a panel
+    that already spaces them, so the same four a side would land on top of that spacing and push them
+    twenty apart. What is the control's is its target area and its corner; where it sits belongs to
+    whoever puts it there, and both panels now say so themselves.
   -->
   <Style Selector="Button.player-chrome">
     <Setter Property="MinWidth" Value="36" />
     <Setter Property="MinHeight" Value="36" />
-    <!-- A literal and not SpaceXSmall: that token is an x:Double and Margin takes a Thickness. -->
-    <Setter Property="Margin" Value="4" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
   </Style>
 

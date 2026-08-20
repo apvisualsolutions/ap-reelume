@@ -159,6 +159,45 @@ public sealed class MiniPlayerChromeTests
         window.Close();
     }
 
+    /// <summary>
+    /// The row separates its own five, because the class no longer does it for them.
+    /// </summary>
+    /// <remarks>
+    /// The separation used to be a <c>Margin</c> on <c>player-chrome</c>, which worked while the mini
+    /// player was the only thing wearing it. The large transport adopting the class is what took it
+    /// out: it places its three in a panel that already spaces them, and four a side on top of that
+    /// pushes them twenty apart. So the spacing moved to whoever does the placing, and this asserts
+    /// that the mini player picked up what the class put down — without it, removing that setter
+    /// would leave these five touching and nothing would say so.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_chrome_row_spaces_its_own_five()
+    {
+        var (window, view, _) = await ShowPlayingAsync();
+        var mini = MiniWindow(view);
+
+        var row = mini.GetVisualDescendants()
+            .OfType<WrapPanel>()
+            .SingleOrDefault(panel => panel.Name == "MiniPlayerChromeSurface");
+
+        Assert.True(row is not null, "The mini player's chrome row is not in the window.");
+        Assert.True(
+            row!.ItemSpacing > 0 && row.LineSpacing > 0,
+            $"The chrome row spaces its buttons by {row.ItemSpacing}x{row.LineSpacing}, so five "
+                + "controls that used to be separated by the class are now touching.");
+
+        foreach (var name in Chrome)
+        {
+            var button = mini.GetVisualDescendants()
+                .OfType<Button>()
+                .Single(candidate => candidate.Name == name);
+
+            Assert.Equal(default, button.Margin);
+        }
+
+        window.Close();
+    }
+
     private static Window MiniWindow(ShellView view)
     {
         var stage = view.FindControl<Panel>("PlayerStage")
