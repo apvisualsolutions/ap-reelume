@@ -10,8 +10,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:TransportControlsViewModel"
     automation:AutomationProperties.Name="{DynamicResource TransportAccessibleName}">
-  <StackPanel x:Name="TransportSurface" Spacing="10">
-    <StackPanel Orientation="Horizontal" Spacing="8">
+  <StackPanel x:Name="TransportSurface" Spacing="{DynamicResource Space12}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <Button
           x:Name="SkipBackwardButton"
           automation:AutomationProperties.Name="{DynamicResource TransportSkipBackward}"
@@ -40,7 +40,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{Binding SpeedLabel}" />
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource TransportVolumeLabel}" />
@@ -71,7 +71,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         BorderThickness="1"
         CornerRadius="6"
         automation:AutomationProperties.Name="{DynamicResource TransportBoostWarningTitle}">
-      <StackPanel Orientation="Horizontal" Spacing="8">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
         <TextBlock
             x:Name="BoostWarningIcon"
             VerticalAlignment="Center"

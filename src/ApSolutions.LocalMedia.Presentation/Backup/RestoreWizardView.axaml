@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="RestoreResourceKey" />
   </UserControl.Resources>
-  <StackPanel x:Name="RestoreSurface" Spacing="12">
+  <StackPanel x:Name="RestoreSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource RestoreDescription}"
         TextWrapping="Wrap" />
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="ChooseArchiveButton"
           Command="{Binding ChooseArchiveCommand}"
@@ -51,7 +51,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         CornerRadius="8"
         automation:AutomationProperties.Name="{DynamicResource RestoreStatusAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
-      <StackPanel Spacing="8">
+      <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock
             x:Name="RestoreStatusText"
             MaxWidth="600"
@@ -84,7 +84,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.Name="{DynamicResource RestoreRootsAccessibleName}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="backup:RootRemapRowViewModel">
-          <StackPanel Margin="0,0,0,12" Spacing="4">
+          <StackPanel Margin="0,0,0,12" Spacing="{DynamicResource Space4}">
             <TextBlock
                 Foreground="{DynamicResource TextPrimaryBrush}"
                 Text="{Binding OldPath}"

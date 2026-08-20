@@ -2,14 +2,23 @@
 
 ## Estado al abrir (2026-08-20, cierre de la sesión de tarde)
 
-**`PlayerView` está hecha.** Once commits en la tanda. Del paso 6 sigue sin quedar ninguna decisión
-abierta; lo que queda es ejecutar, en este orden:
+**`PlayerView` y la fase de escalares de espacio están hechas.** Doce commits en la tanda. Del paso 6
+queda **una sola cosa**: **una vista por commit en el orden de `SURFACES.es.md`**.
 
-1. **La fase de escalares de espacio** — decidida entera abajo el 2026-08-20, con su recuento. Barrido
-   de una vez, y termina cuando `NotSpentYet` queda **vacía**.
-2. **Una vista por commit** en el orden de `SURFACES.es.md`.
+**Los tokens ya no tienen deuda.** `NotSpentYet` está **vacía** y hay puerta para las dos escalas —la
+tipográfica y la de espaciado— que exige que el `.axaml` **no escriba el número**. Una vista nueva que
+escriba un espaciado o un tamaño a mano falla en `ScalarTokenTests`.
 
-**Y una advertencia que `PlayerView` acaba de comprar cara, porque vale para todas las que quedan:**
+**Dos advertencias que esta tanda compró caras, y valen para todas las vistas que quedan.**
+
+**La primera, de la fase de escalares: cuando dos mediciones discrepan, se diffan los dos comandos.**
+Un recuento propio dio 163 donde el documento decía 183, y lo primero que hice fue construir una
+explicación de por qué el documento estaba mal —que además cuadraba con un tercer número—. El
+documento tenía razón; mi patrón llevaba un `\b` que no veía `RowSpacing` ni `ColumnSpacing`. **Una
+hipótesis que encaja con los números no es una medición**, y aquí habría dejado 23 sitios sin tokenizar
+con la fase declarada terminada.
+
+**La segunda, de `PlayerView`:**
 la red del desbordamiento se escribe **aunque el cambio parezca sólo cosmético**. Ahí la única prueba
 que encontró algo fue la que **pasaba antes del cambio** —no era su rojo, era su red—: midió que la
 fila del transporte terminaba **74 píxeles fuera** de una ventana de 900, que es el mínimo que la
@@ -61,7 +70,7 @@ los posteriores.
 
 **El objetivo es cero.** Esta aplicación se publica gratis y **nadie la va a probar a mano**: lo que
 la suite no cubra no lo cubre nadie. El trinquete de `eng/check-walk-coverage.ps1` va a **0
-pendientes** —y **desde el 2026-08-18 lo está**: **128 de 128** controles pulsados con ratón, ng/walk-pending.txt vacío y el trinquete en 0, que no vuelve a subir. Queda la puerta de cobertura de
+pendientes** —y **desde el 2026-08-18 lo está**: **128 de 128** controles pulsados con ratón, `eng/walk-pending.txt` vacío y el trinquete en 0, que no vuelve a subir. Queda la puerta de cobertura de
 código, a vigilar el árbol entero. Todo lo de abajo está **decidido**; lo que queda es ejecutarlo
 midiendo antes de corregir.
 
@@ -548,10 +557,32 @@ en `CommandNotificationTests`. El trinquete del paseo sube a 5 y vuelve a **0** 
 un cambio de vistas son cuatro, no dos: `UiTests`, `AccessibilityTests`, `IntegrationTests` y
 `DocumentationTests`.
 
-#### La fase de escalares de espacio: DECIDIDA ENTERA el 2026-08-20, y no se re-delibera
+#### La fase de escalares de espacio: ~~decidida~~ **HECHA el 2026-08-20**
 
-Es la única decisión de diseño que quedaba abierta en el paso 6. Se decide **contando**, y el recuento
-de `Spacing` / `ItemSpacing` / `LineSpacing` en todos los `.axaml` de `src/` —**183 sitios**— es éste:
+**Hecha tal como estaba decidida**, con [su evidencia](evidence/stable/audit-spacing-scale.md): la
+escala gana el 12, los nombres pasan a `Space4/8/12/16/24`, y los **186** sitios de espaciado de
+`src/` piden ya el token. **`NotSpentYet` queda vacía**, que era la condición de terminación, y se
+afirma en voz alta porque un bucle sobre una lista vacía pasa sin medir nada. La puerta nueva se probó
+fallando en tres direcciones. Un solo campo de la línea base de Inicio se movió, **1 px lógico**.
+
+**Dos cosas que la decisión no tenía:**
+
+1. **No hay `Space32`.** Nadie escribe 32 en ninguna de las cinco propiedades, así que declararlo sería
+   el defecto de la casa con nombre ordenado. Misma decisión que `FontSizeMono`: llega con el primer
+   sitio que lo pida. La decisión decía «los seis escalares pasan a estar gastados» y eran **cinco**.
+2. **Las propiedades de espaciado son CINCO, no tres.** `RowSpacing` y `ColumnSpacing` de `Grid` son
+   23 sitios y el mismo `double`. Un patrón con `\b` delante de `Spacing` no las ve, y por eso el
+   primer recuento dio 163 y **acusó al documento de haber contado mal**. El documento tenía razón:
+   183 + los 3 que `PlayerView` añadió = 186. **Lo caro no fue el número sino la explicación
+   plausible y falsa que se construyó encima** —«el 183 contaba los `.axaml` de `bin/`»—, que además
+   cuadraba, porque los dos scripts diferían en el patrón y no en los archivos. **Dos mediciones que
+   discrepan se reconcilian diffando los dos comandos, no inventando una historia que encaje.**
+
+##### El recuento con el que se decidió
+
+Se decide **contando**, y el recuento de las cinco propiedades de espaciado en todos los `.axaml` de
+`src/` —**186 sitios**, de los que 183 se midieron el 2026-08-19 y 3 los añadió `PlayerView`— es éste
+(la tabla de abajo es la original, con los números de antes de esos tres):
 
 | Valor | Sitios | ¿En la escala 4/8/16/24/32? |
 |---|---|---|
@@ -702,11 +733,14 @@ ejecute. Y el titular no es de `UpdateView`: es de **toda la fase de vistas**.
 
 ##### El hallazgo que decide la fase entera
 
-**Los cinco `Space*` son `x:Double`, y las propiedades que los necesitan son `Thickness`.** Por eso
-siguen los cinco en `NotSpentYet` y por eso ahí se van a quedar mientras nadie lo decida: un
-`Setter Property="Margin" Value="{DynamicResource SpaceXSmall}"` **no convierte**, y lo mismo vale para
-`Padding` y `BorderThickness`. Se midió en el commit del mini reproductor, que acabó escribiendo
-`Margin="4"` literal por esto.
+**Los escalares de espacio son `x:Double`, y `Padding`, `Margin` y `BorderThickness` son
+`Thickness`.** Un `Setter Property="Margin" Value="{DynamicResource Space4}"` **no convierte**. Se
+midió en el commit del mini reproductor, que acabó escribiendo `Margin="4"` literal por esto.
+
+**Y ésa es la mitad que resolvió la fase, hecha el 2026-08-20**: las propiedades que **sí** son
+`double` —`Spacing`, `ItemSpacing`, `LineSpacing`, `RowSpacing` y `ColumnSpacing`— son **186 sitios**
+y ya gastan los tokens. `Padding`/`Margin`/`BorderThickness` se quedan con literales, que era la otra
+mitad de la decisión y sigue en pie.
 
 Lo medido en todo `src/`:
 
@@ -917,7 +951,7 @@ regenerar el manifiesto se añaden estos enlaces, y ningún otro:
 | --- | --- |
 | `UX-003` | [fase 1: los cuatro diccionarios y el servicio que los aplica](evidence/stable/audit-redesign-phase1-tokens.md) |
 | `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md), [el mini reproductor](evidence/stable/audit-mini-player-chrome.md), [el reproductor grande](evidence/stable/audit-player-view.md) |
-| `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md) |
+| `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md), [la escala de espaciado](evidence/stable/audit-spacing-scale.md) |
 
 **Las dos filas nuevas se decidieron el 2026-08-20.** [El mini
 reproductor](evidence/stable/audit-mini-player-chrome.md) va a `A11Y-001` porque lo que gana esa
@@ -927,6 +961,11 @@ actualización](evidence/stable/audit-update-view.md) a la fila de la propia pan
 cambia allí es **cuál es su acción principal**, que es jerarquía visual y no accesibilidad.
 `UX-002` es «Fluent moderno en Avalonia», **comprobado contra `FEATURES.md` el 2026-08-20** — leer la
 matriz no es cambiarla, y dejar un identificador a ojo habría costado una vuelta en el paso 8.
+
+**La cuarta se decidió el 2026-08-20 y también se comprobó contra la matriz.** [La escala de
+espaciado](evidence/stable/audit-spacing-scale.md) va a `UX-002`, cuya fila dice literalmente «sigue
+tokens, **densidad**, foco y comportamiento aprobados»: 186 sitios pidiendo cinco medidas es densidad,
+y es la misma fila que se llevó la escala tipográfica por la misma razón.
 
 **La tercera fila nueva se decidió el 2026-08-20.** [El reproductor
 grande](evidence/stable/audit-player-view.md) va a `A11Y-001` por la misma razón que el mini y

@@ -17,10 +17,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
       CornerRadius="6"
       automation:AutomationProperties.Name="{Binding StableKey}"
       automation:AutomationProperties.HelpText="{Binding ExplanationSummary}">
-    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
+    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="{DynamicResource Space8}">
       <TextBlock FontWeight="SemiBold" Text="{Binding StableKey}" />
       <TextBlock Grid.Column="1" Text="{Binding ScorePercent}" />
-      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
         <TextBlock IsVisible="{Binding IsPending}" Text="{DynamicResource ReviewStatusPending}" />
         <TextBlock IsVisible="{Binding IsSuggested}" Text="{DynamicResource ReviewStatusSuggested}" />
         <TextBlock Text="{DynamicResource ReviewExplanationHeading}" />

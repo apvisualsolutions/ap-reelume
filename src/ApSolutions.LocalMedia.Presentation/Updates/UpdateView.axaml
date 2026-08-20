@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="UpdateResourceKey" />
   </UserControl.Resources>
-  <StackPanel x:Name="UpdateSurface" Spacing="12">
+  <StackPanel x:Name="UpdateSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -42,7 +42,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource UpdateStatusAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
-      <StackPanel Spacing="8">
+      <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock
             x:Name="UpdateStatusText"
             MaxWidth="600"
@@ -79,7 +79,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         CornerRadius="{DynamicResource CornerRadiusMedium}"
         IsVisible="{Binding HasOffer}"
         automation:AutomationProperties.Name="{DynamicResource UpdateOfferAccessibleName}">
-      <StackPanel Spacing="6">
+      <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock
             x:Name="UpdateOfferedVersion"
             FontWeight="SemiBold"
@@ -107,7 +107,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </Border>
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <!--
         The one action this screen is for. Download and install appear by state and cancel is never
         what a screen is for, so there is no second candidate.

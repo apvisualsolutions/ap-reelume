@@ -19,15 +19,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <!--
     The spacing is the panel's and not the buttons'. It lived in the player-chrome class as a Margin
     until the large transport adopted that class and would have inherited a separation it did not
-    want. These are literals and not the Space* tokens because those are x:Double, which is what
-    ItemSpacing and LineSpacing take - the scalar phase maps every one of the 183 in the tree at once.
+    want.
   -->
   <WrapPanel
       x:Name="MiniPlayerChromeSurface"
       HorizontalAlignment="Center"
       Background="{DynamicResource ShellSurfaceBrush}"
-      ItemSpacing="8"
-      LineSpacing="8">
+      ItemSpacing="{DynamicResource Space8}"
+      LineSpacing="{DynamicResource Space8}">
     <Button
         x:Name="MiniPlayerPlayPause"
         Classes="player-chrome"

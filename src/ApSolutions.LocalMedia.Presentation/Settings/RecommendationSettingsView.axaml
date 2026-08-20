@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="settings:RecommendationSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsAccessibleName}">
-  <StackPanel Spacing="8">
+  <StackPanel Spacing="{DynamicResource Space8}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -34,7 +34,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         MaxWidth="640"
         Text="{DynamicResource RecommendationSettingsPrivacyNotice}"
         TextWrapping="Wrap" />
-    <StackPanel Spacing="8" IsVisible="{Binding HasWatchedThreshold}">
+    <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasWatchedThreshold}">
       <TextBlock
           FontSize="{DynamicResource FontSizeBody}"
           FontWeight="SemiBold"
@@ -44,7 +44,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           MaxWidth="640"
           Text="{DynamicResource RecommendationSettingsThresholdDescription}"
           TextWrapping="Wrap" />
-      <StackPanel Orientation="Horizontal" Spacing="12">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
         <Slider
             Width="240"
             Minimum="{x:Static settings:RecommendationSettingsViewModel.MinimumWatchedThresholdPercent}"
@@ -61,7 +61,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Content="{DynamicResource RecommendationSettingsThresholdApply}"
           Command="{Binding ApplyWatchedThresholdCommand}"
           automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsThresholdApply}" />
-      <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasThresholdResult}">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}" IsVisible="{Binding HasThresholdResult}">
         <TextBlock Text="{DynamicResource RecommendationSettingsThresholdRecalculated}" />
         <TextBlock Text="{Binding RecalculatedCount}" />
       </StackPanel>

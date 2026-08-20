@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="recovery:DatabaseRecoveryViewModel"
     automation:AutomationProperties.Name="{DynamicResource RecoveryAccessibleName}">
   <Border Padding="48" Background="{DynamicResource ShellSurfaceBrush}">
-    <StackPanel MaxWidth="720" Spacing="16">
+    <StackPanel MaxWidth="720" Spacing="{DynamicResource Space16}">
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
@@ -48,7 +48,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Text="{Binding FailureDetail}"
             TextWrapping="Wrap" />
       </Border>
-      <StackPanel Orientation="Horizontal" Spacing="12">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
         <Button
             automation:AutomationProperties.Name="{DynamicResource RecoveryOpenBackupFolder}"
             Command="{Binding RecoveryCommand}"

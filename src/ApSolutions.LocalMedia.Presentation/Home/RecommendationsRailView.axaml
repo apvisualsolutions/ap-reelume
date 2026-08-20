@@ -13,8 +13,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="ReasonTextConverter" />
   </UserControl.Resources>
-  <Grid RowDefinitions="Auto,*" RowSpacing="8">
-    <WrapPanel ItemSpacing="12" LineSpacing="8">
+  <Grid RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space8}">
+    <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space8}">
       <TextBlock
           VerticalAlignment="Center"
           FontSize="{DynamicResource FontSizeSubtitle}"
@@ -57,7 +57,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="home:RecommendationItemViewModel">
           <Border Width="220" Padding="12">
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="{DynamicResource Space4}">
               <TextBlock
                   FontWeight="SemiBold"
                   Text="{Binding Title}"

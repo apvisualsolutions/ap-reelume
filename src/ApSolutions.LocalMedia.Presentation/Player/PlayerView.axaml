@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
         CornerRadius="{DynamicResource CornerRadiusMedium}">
-      <StackPanel Spacing="8">
+      <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock
             FontWeight="SemiBold"
             Foreground="{DynamicResource TextPrimaryBrush}"
@@ -74,7 +74,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <StackPanel
             x:Name="RecoveryActionsSurface"
             Orientation="Horizontal"
-            Spacing="8">
+            Spacing="{DynamicResource Space8}">
           <!--
             The one action of the one screen here that is for an action. Opening the file elsewhere
             sits beside it as the secondary, and the transport gets none at all.
@@ -137,7 +137,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         window here, and the fix is the same one the other six got. The minimum target area this
         change gives the three buttons makes the row wider, so it is measured rather than assumed.
       -->
-      <WrapPanel ItemSpacing="12" LineSpacing="12">
+      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
         <Button
             Classes="player-chrome"
             IsVisible="{Binding CanResume}"

@@ -16,7 +16,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <home:ResourceKeyConverter x:Key="OnboardingResourceKey" />
   </UserControl.Resources>
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
-    <StackPanel MaxWidth="720" Spacing="16">
+    <StackPanel MaxWidth="720" Spacing="{DynamicResource Space16}">
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBox
           automation:AutomationProperties.Name="{DynamicResource RootPathLabel}"
           Text="{Binding Path}" />
-      <StackPanel Orientation="Horizontal" Spacing="12">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
         <Button
             automation:AutomationProperties.Name="{DynamicResource RootKindLocal}"
             Command="{Binding SelectKindCommand}"
@@ -67,7 +67,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Text="{Binding FailureKey, Converter={StaticResource OnboardingResourceKey}}"
             TextWrapping="Wrap" />
       </Border>
-      <StackPanel Spacing="8" IsVisible="{Binding HasRoots}">
+      <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasRoots}">
         <TextBlock
             FontSize="{DynamicResource FontSizeSubtitle}"
             FontWeight="SemiBold"
@@ -83,7 +83,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Remove at x=2146 in a 1600 px window — measured on 2026-08-16, and the fourth control
               in one day hidden by the same container.
               -->
-              <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
                 <TextBlock
                     VerticalAlignment="Center"
                     Foreground="{DynamicResource TextPrimaryBrush}"
@@ -111,7 +111,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           CornerRadius="8"
           automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}"
           automation:AutomationProperties.LiveSetting="Assertive">
-        <StackPanel Spacing="12">
+        <StackPanel Spacing="{DynamicResource Space12}">
           <TextBlock
               FontWeight="SemiBold"
               Foreground="{DynamicResource TextPrimaryBrush}"
@@ -121,7 +121,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Foreground="{DynamicResource TextPrimaryBrush}"
               Text="{DynamicResource RootRemoveConfirmDescription}"
               TextWrapping="Wrap" />
-          <StackPanel Orientation="Horizontal" Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
             <Button
                 automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAction}"
                 Command="{Binding ConfirmRemoveCommand}"
@@ -140,7 +140,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           BorderBrush="{DynamicResource ShellBorderBrush}"
           BorderThickness="1"
           CornerRadius="8">
-        <StackPanel Spacing="12">
+        <StackPanel Spacing="{DynamicResource Space12}">
           <TextBlock
               Foreground="{DynamicResource TextPrimaryBrush}"
               Text="{DynamicResource RootScanConsentDescription}"

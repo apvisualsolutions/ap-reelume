@@ -38,7 +38,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="home:InProgressItemViewModel">
           <Border Width="220" Padding="12">
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="{DynamicResource Space4}">
               <TextBlock
                   FontWeight="SemiBold"
                   Text="{Binding Title}"
@@ -52,7 +52,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Maximum="1"
                   Value="{Binding CompletedFraction}"
                   automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
-              <StackPanel Orientation="Horizontal" Spacing="4">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
                 <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{Binding CompletedText}" />
                 <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource HomePercentSuffix}" />
               </StackPanel>

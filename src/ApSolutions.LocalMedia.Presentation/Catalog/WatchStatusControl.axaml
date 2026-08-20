@@ -10,8 +10,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:catalog="clr-namespace:ApSolutions.LocalMedia.Presentation.Catalog"
     x:DataType="catalog:WatchStatusViewModel"
     automation:AutomationProperties.Name="{DynamicResource WatchStatusAccessibleName}">
-  <StackPanel x:Name="WatchStatusSurface" Spacing="8">
-    <StackPanel Orientation="Horizontal" Spacing="6">
+  <StackPanel x:Name="WatchStatusSurface" Spacing="{DynamicResource Space8}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <TextBlock
           x:Name="NotStartedGlyph"
           IsVisible="{Binding IsNotStarted}"
@@ -53,7 +53,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource WatchStatusManualOverride}"
         TextWrapping="Wrap" />
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="MarkWatchedButton"
           Command="{Binding MarkWatchedCommand}"

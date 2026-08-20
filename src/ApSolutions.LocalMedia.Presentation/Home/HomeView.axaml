@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
     x:DataType="home:HomeViewModel"
     automation:AutomationProperties.Name="{DynamicResource HomeAccessibleName}">
-  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeTitle}"
         FontWeight="SemiBold"

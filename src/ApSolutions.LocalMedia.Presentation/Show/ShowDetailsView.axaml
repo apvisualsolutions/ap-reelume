@@ -11,8 +11,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:ShowDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource ShowDetailsAccessibleName}">
-  <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
-    <StackPanel Orientation="Horizontal" Spacing="12">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
@@ -34,7 +34,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Border>
     </StackPanel>
 
-    <StackPanel Grid.Row="1" Spacing="8">
+    <StackPanel Grid.Row="1" Spacing="{DynamicResource Space8}">
       <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
       <Button
           HorizontalAlignment="Left"
@@ -65,8 +65,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <ItemsControl ItemsSource="{Binding Seasons}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="show:SeasonViewModel">
-            <StackPanel Margin="0,0,0,16" Spacing="6">
-              <StackPanel Orientation="Horizontal" Spacing="6">
+            <StackPanel Margin="0,0,0,16" Spacing="{DynamicResource Space8}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
                 <TextBlock
                     FontSize="{DynamicResource FontSizeSubtitle}"
                     FontWeight="SemiBold"

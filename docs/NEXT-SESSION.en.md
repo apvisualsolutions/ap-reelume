@@ -1,22 +1,32 @@
 # Where to resume
 
-## State on opening (2026-08-20, end of the small-hours session)
+## State on opening (2026-08-20, end of the afternoon session)
 
-**`main` and the branch are level, CI green, nothing in flight.** Nine commits in the batch: the whole
-mini player, `UpdateView`, and the corrections its reds brought.
+**`PlayerView` and the spacing scalars phase are done.** Twelve commits in the batch. Step 6 has
+**one thing** left: **one view per commit** in `SURFACES.en.md`'s order.
 
-**Step 6 has no open decisions left.** What remains is execution, in this order:
+**The tokens carry no debt any more.** `NotSpentYet` is **empty**, and both scales — type and spacing
+— have a gate that requires the `.axaml` **not to write the number**. A new view that writes a
+spacing or a size by hand fails `ScalarTokenTests`.
 
-1. **`PlayerView`** — measured in full below. Three `CornerRadius` to the token, `primary-action` on
-   `PlayerRecoveryRetry` only, and the `Margin` out of `player-chrome` so the large transport can
-   adopt it. Its five buttons are already pressed: **it adds no walk debt**.
-2. **The spacing scalars phase** — fully decided below on 2026-08-20, with its count. One sweep, and it
-   ends when `NotSpentYet` is **empty**.
-3. **One view per commit** in `SURFACES.en.md`'s order.
+**Two warnings this batch bought dearly, and they apply to every view that is left.**
 
-**Two views in a row have cost layout only** — `UpdateView` and `PlayerView` — because their controls
-were already in the walk. That is the norm from here on: the walk reached zero before the interface
-changed, which was the point of that order.
+**The first, from the scalars phase: when two measurements disagree, diff the two commands.** A count
+of my own said 163 where the note said 183, and the first thing I did was build an explanation of why
+the note was wrong — one that even agreed with a third number. The note was right; my pattern carried
+a `\b` that never saw `RowSpacing` or `ColumnSpacing`. **A hypothesis that fits the numbers is not a
+measurement**, and here it would have left 23 sites untokenised with the phase declared finished.
+
+**The second, from `PlayerView`:** the overflow net gets written **even when the change looks purely
+cosmetic**. There, the only test that found anything was the one that **passed before the change** —
+it was the net, not the red: it measured the transport row ending **74 pixels outside** a 900-wide
+window, which is the minimum the application allows. Seventh time a horizontal `StackPanel` with
+translated labels has drawn a control off the screen. **Measure against the real minimum width, not a
+comfortable one.**
+
+**Three views in a row have cost layout only** — `MiniPlayerWindow`, `UpdateView` and `PlayerView` —
+because their controls were already in the walk. That is the norm from here on: the walk reached zero
+before the interface changed, which was the point of that order.
 
 **What this batch cost, and what the remaining views inherit:**
 
@@ -58,7 +68,7 @@ it.
 
 **The destination is zero.** This application ships free and **nobody is going to test it by hand**:
 whatever the suite does not cover, nothing covers. The ratchet in `eng/check-walk-coverage.ps1` goes
-to **0 pending** — and **since 2026-08-18 it is there**: **128 of 128** controls pressed by mouse, ng/walk-pending.txt empty and the ratchet at 0, which does not go up again. What remains is the code coverage
+to **0 pending** — and **since 2026-08-18 it is there**: **128 of 128** controls pressed by mouse, `eng/walk-pending.txt` empty and the ratchet at 0, which does not go up again. What remains is the code coverage
 gate goes to watching the whole tree. Everything below is **decided**; what remains is carrying it out,
 measuring before correcting.
 

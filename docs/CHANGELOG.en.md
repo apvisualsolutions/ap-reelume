@@ -102,6 +102,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Spacing across the whole application is a scale now, not a hundred and eighty-six separate
+  decisions.** Every view chose on its own how far apart to put things: eight distinct values — 2, 4,
+  6, 8, 10, 12, 16 and 24 — spread across fifty-four screens. There are now **five measurements** for
+  the whole application, and changing them changes the whole application at once instead of file by
+  file. Seventeen sites move by 2 pixels and no more; the only thing that changes on the home screen
+  is one pixel of a card's bottom edge.
+
 - **The player's buttons are easier to hit, and the failure screen says what to do.** Play, pause and
   stop now have a minimum 36 by 36 pixel target area, the same one the mini player introduced. And
   when something fails, "Try again" is painted as that screen's leading action instead of looking

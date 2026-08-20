@@ -15,7 +15,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="PrivacyResourceKey" />
   </UserControl.Resources>
-  <StackPanel x:Name="PrivacySurface" Spacing="12">
+  <StackPanel x:Name="PrivacySurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -42,7 +42,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <StackPanel
         x:Name="PrivacyAutoRefreshSurface"
         IsVisible="{Binding CanRefreshAutomatically}"
-        Spacing="4">
+        Spacing="{DynamicResource Space4}">
       <CheckBox
           x:Name="AutoRefreshCheckBox"
           Content="{DynamicResource PrivacyAutoRefreshLabel}"
@@ -65,7 +65,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         CornerRadius="8"
         automation:AutomationProperties.Name="{DynamicResource PrivacyStatusAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
-      <StackPanel Spacing="8">
+      <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock
             x:Name="PrivacyStatusText"
             MaxWidth="600"
@@ -75,7 +75,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </Border>
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="PrivacyPreviewButton"
           Command="{Binding PreviewCommand}"
@@ -102,7 +102,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.Name="{DynamicResource PrivacyNetworkTitle}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="privacy:NetworkPurpose">
-          <StackPanel Margin="0,0,0,8" Spacing="2">
+          <StackPanel Margin="0,0,0,8" Spacing="{DynamicResource Space4}">
             <TextBlock
                 FontWeight="SemiBold"
                 Foreground="{DynamicResource TextPrimaryBrush}"

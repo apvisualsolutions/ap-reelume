@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:DetectedMarkerReviewViewModel"
     automation:AutomationProperties.Name="{DynamicResource DetectedMarkerReviewAccessibleName}">
-  <StackPanel x:Name="DetectedMarkerReviewSurface" Spacing="12">
+  <StackPanel x:Name="DetectedMarkerReviewSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontWeight="SemiBold"
         Text="{DynamicResource DetectedMarkerReviewTitle}"
@@ -32,7 +32,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     infinite width, and this surface shares the player's 320 px column, where three buttons and two
     spinners never fit on one line. Measured as a press landing at x=1611 in a 1600 px window.
     -->
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <NumericUpDown
           x:Name="DetectedStartSelector"
           Minimum="0"
@@ -52,7 +52,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource DetectedMarkerReviewRangeError}"
         TextWrapping="Wrap" />
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="AcceptDetectionButton"
           Command="{Binding AcceptCommand}"

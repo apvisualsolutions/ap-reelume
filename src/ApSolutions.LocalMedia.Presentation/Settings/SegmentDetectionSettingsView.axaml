@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="settings:SegmentDetectionSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsAccessibleName}">
-  <StackPanel x:Name="SegmentDetectionSurface" Spacing="12">
+  <StackPanel x:Name="SegmentDetectionSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"

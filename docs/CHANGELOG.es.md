@@ -103,6 +103,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El espaciado de toda la aplicación es ya una escala y no ciento ochenta y seis decisiones
+  sueltas.** Cada vista elegía por su cuenta cuánto separar sus cosas: ocho valores distintos
+  —2, 4, 6, 8, 10, 12, 16 y 24— repartidos por cincuenta y cuatro pantallas. Ahora hay **cinco
+  medidas** para toda la aplicación, y cambiarlas cambia la aplicación entera de una vez en lugar de
+  archivo por archivo. Diecisiete sitios se mueven 2 píxeles y ninguno más; lo único que cambia en la
+  pantalla de inicio es un píxel del borde inferior de una tarjeta.
+
 - **Los botones del reproductor son más fáciles de acertar, y la pantalla de fallo dice qué hacer.**
   Reproducir, pausar y detener tienen ya un área mínima de pulsación de 36 por 36 píxeles, la misma
   que estrenó el mini reproductor. Y cuando algo falla, «Volver a intentarlo» se pinta como la acción
