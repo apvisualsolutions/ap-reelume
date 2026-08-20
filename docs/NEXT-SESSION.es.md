@@ -110,6 +110,47 @@ y no lo es. La decisión seguía siendo la buena por otro motivo —Inicio ya ac
 pide **un solo acento sólido por pantalla**—, que ahora está escrito y **medido sobre la pantalla
 ensamblada**, que es la mitad que una tabla por vista no puede ver.
 
+#### El tramo 3 (Biblioteca y fichas), medido el 2026-08-20 sin escribir código
+
+**Lo que ya está y no hay que rehacer:** el contador de escaneo de `LibraryView` (`ScanProgressSurface`
+con `EnumeratedCount`), el vacío de `ShowDetailsView` (`ShowDetailsEmpty`), «sin sinopsis»
+(`HasOverview` en las dos fichas) y los tres estados de visto de `EpisodeRowView` (`○ ◐ ●`).
+
+**Lo que falta, por vista:**
+
+- **`LibraryView`** es la que más trabajo lleva. (1) La lista es un `ListBox` **vertical** con
+  `VirtualizingStackPanel`, no una cuadrícula fluida; y **la cuadrícula tiene una decisión dentro**:
+  un `WrapPanel` da el reflujo y **pierde la virtualización** que hoy tiene, que es lo que sostiene una
+  biblioteca grande. (2) La fila de filtros es un `Grid` de cuatro columnas y debe ser `WrapPanel` —
+  es la forma que ha sacado un control fuera de la ventana **siete veces**. (3) La búsqueda no tiene
+  botón de borrar: **es un control nuevo**, así que llega con su prueba de nombre accesible y su línea
+  de paseo. (4) «Buscando sin resultados» no existe.
+- **⚠ Y una trampa del paquete, medida:** de sus 22 cadenas de vacío, la primera pareja
+  —`LibraryEmptyTitle` / `LibraryEmptyDescription`— **ya existe con otro nombre**: son
+  `EmptyLibraryTitle` / `EmptyLibraryDescription`, y **las pinta `ShellView`**, no `LibraryView`.
+  Añadir las del paquete sería duplicar. Las que sí faltan son
+  `LibrarySearchNoResultsTitle` / `…Description`.
+- **`UnavailableBadge`** debe pasar de `AccentSubtleBrush` a `WarningSurfaceBrush` + borde + glifo. **Y
+  el trabajo es mayor de lo que la fila sugiere**: el mismo distintivo está **copiado a mano** en
+  `InProgressRailView`, `RecentlyAddedRailView`, `MovieDetailsView`, `ShowDetailsView` y
+  `EpisodeRowView`, así que o se cambian los seis o la aplicación dirá lo mismo de dos maneras. Lo
+  limpio es que el badge sea el único, y para eso hay que quitarle el `x:DataType` fijo a
+  `CatalogItemViewModel` — los cinco modelos exponen `IsAvailable`.
+- **⚠ `AccentSubtleBrush` es hoy la caja de aviso de TODA la aplicación: 18 vistas.** Y
+  `WarningSurfaceBrush`, `DangerSurfaceBrush` y `PositiveSurfaceBrush` están declarados en los cuatro
+  diccionarios y **ningún `.axaml` los lee** — declarados en previsión de la §4, que los gasta en los
+  tramos 3, 4 y 6. `ScalarTokenTests` no los vigila porque **no son escalares**. Si la fase 6 termina
+  sin gastarlos, son doce declaraciones muertas.
+- **`MovieDetailsView`**: la fila de acciones es un `StackPanel` horizontal con **cuatro botones y un
+  texto** y tiene que ser `WrapPanel`. Lo de «dos columnas con portada fija de 320 px» choca con que
+  no hay portadas.
+- **`ShowDetailsView`**: **no tiene selector de temporada**. Hoy apila todas las temporadas en un
+  `ItemsControl`. El selector es **un control nuevo** (con su escena), y «una sola temporada oculta el
+  selector» es un estado más.
+- **`EpisodeRowView`**: fila de **56 px** y número **monoespaciado alineado a la derecha**. Ojo:
+  **`FontSizeMono` no existe** —se decidió no declarar un escalar que nadie gasta—, así que lo
+  monoespaciado se pide por `FontFamily`, no por tamaño.
+
 **⚠ DOS TRAMPAS DEL DOCUMENTO, medidas, que valen para los ocho tramos:**
 
 1. **La §4 nombra los escalares con los nombres VIEJOS.** Cita `SpaceXSmall`, `SpaceSmall`,
