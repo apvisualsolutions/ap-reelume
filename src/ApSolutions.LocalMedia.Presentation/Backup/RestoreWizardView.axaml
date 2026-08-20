@@ -35,6 +35,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           IsEnabled="{Binding IsIdle}"
           automation:AutomationProperties.Name="{DynamicResource RestoreChooseArchiveLabel}" />
       <Button
+          Classes="primary-action"
           x:Name="ConfirmRestoreButton"
           Command="{Binding ConfirmCommand}"
           Content="{DynamicResource RestoreConfirmLabel}"

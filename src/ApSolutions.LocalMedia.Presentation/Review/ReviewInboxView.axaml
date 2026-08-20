@@ -122,6 +122,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </ListBox>
     <WrapPanel Grid.Row="4" ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
+          Classes="primary-action"
           x:Name="AcceptReviewAction"
           automation:AutomationProperties.Name="{DynamicResource ReviewAcceptAction}"
           Command="{Binding AcceptSelectedCommand}"

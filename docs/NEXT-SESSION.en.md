@@ -15,10 +15,19 @@ failing at 300: it names nine views with their control and coordinate.
 nested in the shell it gets less. It catches a view too wide **on its own**; one that is only too wide
 once nested is still the walk's to catch. **Silence from that gate is not a certificate.**
 
-**What is left per view is therefore ONE THING: `primary-action` where there is one.** And that
-**cannot be swept**, because what a screen's leading action is, is that screen's decision. Measured on
-2026-08-20: **34 views have a button and only 3 have a leading action** — `ResumeHeroView`,
-`PlayerView` and `UpdateView`. That is the work step 6 has left.
+**And `primary-action` is decided for all 48 views**, with
+[its evidence](evidence/stable/audit-leading-actions.md): **17 lead** (the previous 3 plus 14 new) and
+**16 deliberately do not**, for six distinct reasons. The table lives in `LeadingActionTests` and **a
+new view fails until somebody decides**, which is what keeps it from ageing. Proved by failing in three
+directions: losing the action, gaining a second, and being in the tree without being in the table.
+
+**The reason most worth remembering**, because it is a matter of principle rather than layout: on the
+two screens that ask permission — `LifecycleSettingsView` and `PrivacySettingsView` — **the affirmative
+is not accented**, because highlighting the yes of a consent is a dark pattern and this application
+exists for the opposite.
+
+**With that, step 6 has no known work left.** What remains is whatever the owner's physical walk
+(step 7) turns up.
 
 **The tokens carry no debt any more.** `NotSpentYet` is **empty**, and **all three scales** — type,
 spacing and corners — have a gate that requires the `.axaml` **not to write the number**. A new view

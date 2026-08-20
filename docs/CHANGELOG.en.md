@@ -108,6 +108,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Every screen now says what its action is.** Fourteen more screens paint the button that is their
+  point in the accent colour — resume the film, save the record, create the copy, add the folder,
+  accept the match — with the rest clearly beside it. **Sixteen screens highlight nothing, and that is
+  a decision too**: a frame is not for anything in particular, a row that repeats cannot highlight
+  anything, and on the two screens that ask your permission — start with Windows, export a diagnostic
+  — **the yes is not highlighted**, because nudging towards yes on a permission question is exactly
+  what this application does not do.
+
 - **Rounded corners are two measurements now, not five.** Corners were chosen screen by screen — 4, 6,
   8, 10 and 12 pixels across twenty-six views — so two identical cards could round differently with
   nobody having decided it: of the application's seven card surfaces, four used one measurement and

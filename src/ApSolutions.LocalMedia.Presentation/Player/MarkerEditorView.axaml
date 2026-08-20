@@ -66,6 +66,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
+          Classes="primary-action"
           x:Name="SaveMarkerButton"
           Command="{Binding SaveCommand}"
           Content="{DynamicResource MarkerEditorSave}"

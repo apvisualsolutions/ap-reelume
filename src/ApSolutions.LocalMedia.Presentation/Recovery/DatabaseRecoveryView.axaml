@@ -50,6 +50,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Border>
       <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
         <Button
+            Classes="primary-action"
             automation:AutomationProperties.Name="{DynamicResource RecoveryOpenBackupFolder}"
             Command="{Binding RecoveryCommand}"
             CommandParameter="{x:Static recovery:DatabaseRecoveryAction.OpenBackupFolder}"

@@ -15,10 +15,20 @@ fallando a 300: nombra nueve vistas con su control y su coordenada.
 el shell recibe menos. Caza la vista demasiado ancha **por sí misma**; la que sólo lo es al anidarse la
 sigue cazando el paseo. **Un silencio de esa puerta no es un certificado.**
 
-**Lo que queda por vista es, entonces, UNA SOLA COSA: `primary-action` donde la haya.** Y ésa **no se
-puede barrer**, porque cuál es la acción principal de una pantalla es una decisión de esa pantalla.
-Medido el 2026-08-20: **34 vistas tienen botón y sólo 3 tienen acción principal** —`ResumeHeroView`,
-`PlayerView` y `UpdateView`—. Ése es el trabajo que queda del paso 6.
+**Y `primary-action` está decidida para las 48 vistas**, con
+[su evidencia](evidence/stable/audit-leading-actions.md): **17 lideran** (las 3 anteriores más 14
+nuevas) y **16 no lo hacen a propósito**, por seis razones distintas. La tabla vive en
+`LeadingActionTests` y **una vista nueva falla hasta que alguien decida**, que es lo que impide que
+envejezca. Probada fallando en tres direcciones: perder la acción, ganar una segunda, y estar en el
+árbol sin estar en la tabla.
+
+**La razón que más vale la pena recordar**, porque es de principio y no de maqueta: en las dos
+pantallas que piden permiso —`LifecycleSettingsView` y `PrivacySettingsView`— **no se acentúa la
+afirmativa**, porque destacar el sí de un consentimiento es un patrón oscuro y esta aplicación existe
+para lo contrario.
+
+**Con eso, el paso 6 no tiene trabajo pendiente conocido.** Lo que quede será lo que encuentre el paseo
+físico del propietario (paso 7).
 
 **Los tokens ya no tienen deuda.** `NotSpentYet` está **vacía** y hay puerta para **las tres escalas**
 —tipografía, espaciado y radios— que exige que el `.axaml` **no escriba el número**. Una vista nueva
@@ -977,7 +987,7 @@ regenerar el manifiesto se añaden estos enlaces, y ningún otro:
 | --- | --- |
 | `UX-003` | [fase 1: los cuatro diccionarios y el servicio que los aplica](evidence/stable/audit-redesign-phase1-tokens.md) |
 | `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md), [el mini reproductor](evidence/stable/audit-mini-player-chrome.md), [el reproductor grande](evidence/stable/audit-player-view.md) |
-| `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md), [la escala de espaciado](evidence/stable/audit-spacing-scale.md), [la escala de radios](evidence/stable/audit-corner-radius-scale.md) |
+| `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md), [la escala de espaciado](evidence/stable/audit-spacing-scale.md), [la escala de radios](evidence/stable/audit-corner-radius-scale.md), [las acciones principales](evidence/stable/audit-leading-actions.md), [la puerta de desbordamiento](evidence/stable/audit-view-overflow-gate.md) |
 
 **Las dos filas nuevas se decidieron el 2026-08-20.** [El mini
 reproductor](evidence/stable/audit-mini-player-chrome.md) va a `A11Y-001` porque lo que gana esa

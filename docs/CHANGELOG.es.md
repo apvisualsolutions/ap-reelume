@@ -109,6 +109,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Cada pantalla dice ya cuál es su acción.** Catorce pantallas más pintan con el color de acento el
+  botón que es su sentido —continuar la película, guardar la ficha, crear la copia, añadir la carpeta,
+  aceptar la coincidencia—, y el resto de botones quedan claramente al lado. **Dieciséis pantallas no
+  destacan ninguno, y también es una decisión**: un marco no está para nada en concreto, una fila que
+  se repite no puede destacar nada, y en las dos pantallas donde se te pide permiso —arrancar con
+  Windows y exportar un diagnóstico— **no se destaca el sí**, porque empujar hacia el sí en una
+  pregunta de permiso es exactamente lo que esta aplicación no hace.
+
 - **Los bordes redondeados son ya dos medidas y no cinco.** Las esquinas se elegían pantalla por
   pantalla —4, 6, 8, 10 y 12 píxeles repartidos por veintiséis vistas—, así que dos tarjetas iguales
   podían redondearse distinto sin que nadie lo hubiera decidido: de las siete superficies de tarjeta

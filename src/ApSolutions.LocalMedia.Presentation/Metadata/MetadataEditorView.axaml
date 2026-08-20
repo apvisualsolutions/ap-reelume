@@ -41,7 +41,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock Name="UnidentifiedMessage" Grid.Row="9" Grid.ColumnSpan="2" TextWrapping="Wrap" IsVisible="{Binding IsUnidentified}" Text="{DynamicResource MetadataUnidentifiedMessage}" />
       <TextBlock Name="NoProviderAnswerMessage" Grid.Row="9" Grid.ColumnSpan="2" TextWrapping="Wrap" IsVisible="{Binding HasNoProviderAnswer}" Text="{DynamicResource MetadataNoProviderAnswerMessage}" />
       <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-        <Button Command="{Binding SaveCommand}" Content="{DynamicResource MetadataSaveAction}" automation:AutomationProperties.Name="{DynamicResource MetadataSaveAction}" />
+        <Button Classes="primary-action" Command="{Binding SaveCommand}" Content="{DynamicResource MetadataSaveAction}" automation:AutomationProperties.Name="{DynamicResource MetadataSaveAction}" />
         <Button Name="RefreshProviderMetadata" Command="{Binding RefreshProviderCommand}" Content="{DynamicResource MetadataRefreshAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRefreshAction}" />
         <Button Name="RestoreProviderMetadata" Command="{Binding RestoreProviderCommand}" Content="{DynamicResource MetadataRestoreAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRestoreAction}" />
       </StackPanel>
