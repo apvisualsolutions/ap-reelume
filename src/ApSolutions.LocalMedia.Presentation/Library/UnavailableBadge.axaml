@@ -2,16 +2,34 @@
 SPDX-FileCopyrightText: 2026 AP Solutions
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
+<!--
+A medium that is not reachable right now is a warning, not an error: an unplugged drive or a network
+share that is down is not something that went wrong, it is something that is not here, and its titles
+stay in the catalogue on purpose. The border and the glyph are why it is never colour alone.
+
+It carries no x:DataType because six view models mount it — the catalogue item, the two rails' cards,
+both detail cards and the episode row — and a compiled binding is bound to one of them. Avalonia
+refuses a compiled binding without one, so the visibility is a ReflectionBinding, the same escape
+LibraryView already uses for its filter tags. What the compiler stops checking is asserted in
+UnavailableBadgeTests, on the effect rather than on the type.
+-->
 <UserControl
     x:Class="ApSolutions.LocalMedia.Presentation.Library.UnavailableBadge"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
-    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
-    x:DataType="library:CatalogItemViewModel"
-    IsVisible="{Binding !IsAvailable}"
+    IsVisible="{ReflectionBinding !IsAvailable}"
     automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
-  <Border Padding="8,4" Background="{DynamicResource AccentSubtleBrush}" CornerRadius="{DynamicResource CornerRadiusSmall}">
-    <TextBlock Text="{DynamicResource MediaUnavailable}" />
+  <Border
+      Padding="8,4"
+      VerticalAlignment="Center"
+      Background="{DynamicResource WarningSurfaceBrush}"
+      BorderBrush="{DynamicResource WarningBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource CornerRadiusSmall}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+      <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="⚠" />
+      <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
+    </StackPanel>
   </Border>
 </UserControl>

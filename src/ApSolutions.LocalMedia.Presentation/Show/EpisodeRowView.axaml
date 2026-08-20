@@ -7,6 +7,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:EpisodeRowViewModel">
   <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
@@ -20,14 +21,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock IsVisible="{Binding IsInProgress}" Text="{DynamicResource WatchStatusInProgress}" />
       <TextBlock IsVisible="{Binding IsNotStarted}" Text="{DynamicResource WatchStatusNotStarted}" />
       <TextBlock IsVisible="{Binding IsManualOverride}" Text="{DynamicResource WatchStatusManualOverride}" />
-      <Border
-          Padding="8,2"
-          Background="{DynamicResource AccentSubtleBrush}"
-          CornerRadius="{DynamicResource CornerRadiusSmall}"
-          IsVisible="{Binding !IsAvailable}"
-          automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
-        <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
-      </Border>
+      <library:UnavailableBadge />
       <TextBlock IsVisible="{Binding !IsPlayable}" Text="{DynamicResource EpisodeNoFile}" />
     </StackPanel>
 

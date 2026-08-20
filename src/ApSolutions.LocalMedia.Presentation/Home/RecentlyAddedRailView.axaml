@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     x:DataType="home:HomeViewModel"
     automation:AutomationProperties.Name="{DynamicResource HomeRecentlyAddedAccessibleName}">
   <Grid RowDefinitions="Auto,*">
@@ -56,14 +57,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Foreground="{DynamicResource TextSecondaryBrush}"
                   IsVisible="{Binding HasYear}"
                   Text="{Binding YearText}" />
-              <Border
-                  Padding="8,4"
-                  Background="{DynamicResource AccentSubtleBrush}"
-                  CornerRadius="{DynamicResource CornerRadiusSmall}"
-                  IsVisible="{Binding !IsAvailable}"
-                  automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
-                <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
-              </Border>
+              <library:UnavailableBadge />
             </StackPanel>
           </Border>
         </DataTemplate>
