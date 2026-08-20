@@ -26,7 +26,7 @@ src/ApSolutions.LocalMedia.Application/Catalog/SetPreferredVersion.cs           
 src/ApSolutions.LocalMedia.Application/Continuity/ConfigureWatchedThreshold.cs               100  91
 src/ApSolutions.LocalMedia.Application/Continuity/DeleteManualMarker.cs                      100  83
 src/ApSolutions.LocalMedia.Application/Continuity/GetNextEpisode.cs                          100  50
-src/ApSolutions.LocalMedia.Application/Continuity/PlaybackProgressTracker.cs                  97  83
+src/ApSolutions.LocalMedia.Application/Continuity/PlaybackProgressTracker.cs                  97  85
 src/ApSolutions.LocalMedia.Application/Continuity/ResumePlayback.cs                          100  75
 src/ApSolutions.LocalMedia.Application/Continuity/SaveManualMarker.cs                        100  87
 src/ApSolutions.LocalMedia.Application/Continuity/StartNextEpisodeCountdown.cs               100  71
