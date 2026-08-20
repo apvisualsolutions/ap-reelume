@@ -2,8 +2,24 @@
 
 ## Estado al abrir (2026-08-20, cierre de la sesión de tarde)
 
-**`PlayerView`, la fase de escalares de espacio y la escala de radios están hechas.** Trece commits en
-la tanda. Del paso 6 queda **una sola cosa**: **una vista por commit en el orden de `SURFACES.es.md`**.
+**EL PASO 6 NO TIENE TRABAJO PENDIENTE CONOCIDO.** `main` está en `c8ddd34` con CI verde y **nada en
+vuelo**. Dieciséis commits en la tanda, seis en esta sesión: `PlayerView`, la escala de espaciado, la
+escala de radios, la puerta de desbordamiento, las acciones principales de las 48 vistas, y una
+corrección de lo que esa puerta prometía.
+
+**Lo que ahora bloquea el paso 8 —cortar 0.2.0— es el paseo físico de diez minutos del propietario
+(paso 7).** La sesión siguiente no tiene trabajo de rediseño que hacer; si abre sin un hallazgo de ese
+paseo, lo que toca es preguntar por él o adelantar lo que el paso 8 permita sin él.
+
+**Una observación menor que quedó anotada y sin corregir**, porque nada la motivó: ni
+`eng/check-walk-coverage.ps1` ni `eng/run-accessibility.ps1` le ponen techo a su `dotnet test`, y la
+regla de la casa dice que todo proceso hijo de un guion de `eng/` lo necesita. Apareció mirando un run
+que **no** estaba colgado, así que no hay medición que pida arreglarlo hoy.
+
+**Y un aviso sobre cómo se lee la salud de CI**, que costó un diagnóstico equivocado en esta sesión:
+para saber cuánto lleva un paso **hay que medir la hora actual**, no restarla de una hora supuesta. Un
+run que parecía llevar 21 minutos en la puerta del paseo llevaba menos de uno; el run entero duró **61
+minutos** y ese paso **4:16**, ambos sanos.
 
 **Y la red del desbordamiento ya no se escribe vista por vista: hay puerta.**
 `ViewOverflowTests` monta **las 48 vistas** sin contexto de datos —todas las ramas visibles a la vez,

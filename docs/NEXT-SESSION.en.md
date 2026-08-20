@@ -2,8 +2,23 @@
 
 ## State on opening (2026-08-20, end of the afternoon session)
 
-**`PlayerView`, the spacing scalars phase and the corner scale are done.** Thirteen commits in the
-batch. Step 6 has **one thing** left: **one view per commit** in `SURFACES.en.md`'s order.
+**STEP 6 HAS NO KNOWN WORK LEFT.** `main` is at `c8ddd34`, CI green, **nothing in flight**. Sixteen
+commits in the batch, six in this session: `PlayerView`, the spacing scale, the corner scale, the
+overflow gate, leading actions across all 48 views, and a correction to what that gate claimed.
+
+**What now blocks step 8 — cutting 0.2.0 — is the owner's ten-minute physical walk (step 7).** The
+next session has no redesign work to do; if it opens without a finding from that walk, the thing to do
+is ask about it or bring forward whatever step 8 allows without it.
+
+**One minor observation, noted and not fixed**, because nothing motivated it: neither
+`eng/check-walk-coverage.ps1` nor `eng/run-accessibility.ps1` bounds its `dotnet test`, and the house
+rule says every child process of an `eng/` script needs a ceiling. It surfaced while looking at a run
+that was **not** hung, so no measurement asks for it today.
+
+**And a warning about reading CI's health**, which cost a wrong diagnosis this session: to know how
+long a step has been running you must **measure the current time**, not subtract from an assumed one.
+A run that looked like it had spent 21 minutes in the walk gate had spent less than one; the whole run
+took **61 minutes** and that step **4:16**, both healthy.
 
 **And the overflow net is no longer written view by view: there is a gate.**
 `ViewOverflowTests` mounts **all 48 views** without a data context — every branch visible at once,
