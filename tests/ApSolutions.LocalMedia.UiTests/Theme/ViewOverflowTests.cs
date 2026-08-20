@@ -33,10 +33,20 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </para>
 /// <para>
 /// It is measured against 900, which is <c>MinWidth</c> on the main window in <c>App.axaml.cs</c>.
-/// One honest limitation, stated rather than hidden: a view mounted alone gets the whole 900, while
-/// inside the shell it gets 900 minus whatever the shell's own chrome takes. So this catches a view
-/// that is too wide on its own and cannot catch one that is only too wide once nested. That is the
-/// same class of defect the walk covers from the other side.
+/// </para>
+/// <para>
+/// <b>Two limitations, stated rather than hidden, because a gate that promises more than it measures
+/// is worse than no gate.</b> First, a view mounted alone gets the whole 900, while inside the shell
+/// it gets 900 minus whatever the shell's own chrome takes: this catches a view too wide on its own
+/// and cannot catch one only too wide once nested. Second, no data context means every
+/// <c>ItemsControl</c> is empty — 17 views in the tree hold one — so what is measured is each view's
+/// own layout with its lists empty, not a row that turns out too wide once filled. Both halves are
+/// the walk's, from the other side and with the mouse. <b>Silence here is not a certificate.</b>
+/// </para>
+/// <para>
+/// The second limitation is narrower than it sounds, and that is measured too: the rows and cards
+/// those lists hold — <c>LibraryEntryView</c>, <c>EpisodeRowView</c>, <c>CandidateCardView</c> — are
+/// views in their own right and are mounted and measured here on their own.
 /// </para>
 /// </remarks>
 public sealed class ViewOverflowTests

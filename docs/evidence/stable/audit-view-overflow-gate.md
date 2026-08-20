@@ -29,13 +29,27 @@ por defecto, así que **todas las ramas de todas las vistas están en pantalla a
 de lo que la aplicación puede llegar a ser, así que es una **cota superior**: si cabe aquí, cabe. /
 **Without a data context**, which leaves every branch on screen at once — an upper bound.
 
-## La limitación, dicha y no escondida / The limitation, stated rather than hidden
+## Las dos limitaciones, dichas y no escondidas / The two limitations, stated rather than hidden
 
-**Una vista montada sola recibe los 900 enteros; dentro del shell recibe 900 menos lo que el cromo del
-shell ocupe.** Así que esta puerta caza una vista demasiado ancha **por sí misma** y no puede cazar
-una que sólo lo sea al anidarse. Esa mitad la cubre el paseo, desde el otro lado y con el ratón. Un
-silencio aquí no es un certificado. / A view mounted alone gets the whole 900; nested it gets less.
-This gate catches a view too wide on its own and cannot catch one that is only too wide once nested.
+**Una puerta que promete más de lo que mide es peor que no tener puerta**, así que las dos van escritas
+en la propia prueba. / **A gate that promises more than it measures is worse than no gate.**
+
+1. **Una vista montada sola recibe los 900 enteros; dentro del shell recibe 900 menos lo que el cromo
+   ocupe.** Caza la vista demasiado ancha **por sí misma** y no la que sólo lo es al anidarse. / A view
+   mounted alone gets the whole 900; nested it gets less.
+2. **Sin contexto de datos, todo `ItemsControl` está vacío** —y **17 vistas del árbol tienen uno**—,
+   así que lo medido es la maqueta propia de cada vista con sus listas vacías, no una fila que resulte
+   demasiado ancha al llenarse. / **With no data context every `ItemsControl` is empty**, and 17 views
+   hold one.
+
+**La segunda es más estrecha de lo que suena, y eso también está medido:** las filas y tarjetas que
+esas listas contienen —`LibraryEntryView`, `EpisodeRowView`, `CandidateCardView`— son vistas por
+derecho propio y **aquí se montan y se miden solas**. / The rows those lists hold are views in their
+own right and are measured here on their own.
+
+**Las dos mitades que faltan son del paseo**, desde el otro lado y con el ratón. **Un silencio de esta
+puerta no es un certificado.** / Both missing halves are the walk's. **Silence here is not a
+certificate.**
 
 ## Probada fallando, y con dos suelos anticeguera / Proved by failing, with two anti-blindness floors
 
