@@ -283,6 +283,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="HomeInProgressAccessibleName">Items in progress</x:String>
   <x:String x:Key="HomeInProgressHeading">In progress</x:String>
   <x:String x:Key="HomeInProgressEmpty">You have not started anything yet. Open the library and pick something.</x:String>
+  <x:String x:Key="HomeRecentlyAddedAccessibleName">Recently added</x:String>
+  <x:String x:Key="HomeRecentlyAddedHeading">Recently added</x:String>
+  <x:String x:Key="HomeRecentlyAddedEmpty">Nothing new since the last scan.</x:String>
   <x:String x:Key="HomeLibraryEntryAccessibleName">Library access</x:String>
   <x:String x:Key="HomeLibraryHeading">Your library</x:String>
   <x:String x:Key="HomeLibraryAction">Open library</x:String>
@@ -322,6 +325,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RecommendationsToggleAction">Turn recommendations on or off</x:String>
   <x:String x:Key="RecommendationsOn">Recommendations are on</x:String>
   <x:String x:Key="RecommendationsOff">Recommendations are off</x:String>
+  <x:String x:Key="RecommendationsOffDescription">Nothing is computed while it is off: the catalogue is not read for this.</x:String>
   <x:String x:Key="RecommendationsEmpty">There is nothing to suggest right now.</x:String>
   <x:String x:Key="RecommendationsWhyLabel">Why</x:String>
   <x:String x:Key="RecommendationReasonGenreMatch">Matches genres you usually watch</x:String>

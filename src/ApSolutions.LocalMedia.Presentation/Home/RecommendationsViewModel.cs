@@ -50,6 +50,13 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
 
     public bool HasRecommendations => Items.Count > 0;
 
+    /// <summary>
+    /// On and ranked nothing. Kept apart from <see cref="IsDisabled"/> because the rail must never say
+    /// there is nothing to suggest about a catalogue it did not read: switched off, the formula
+    /// returns before asking the read model anything at all.
+    /// </summary>
+    public bool IsEmpty => IsEnabled && Items.Count == 0;
+
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         var results = await _getRecommendations
@@ -57,6 +64,7 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
             .ConfigureAwait(false);
         Items = [.. results.Select(result => new RecommendationItemViewModel(result, _titleLookup(result.ContentId)))];
         OnPropertyChanged(nameof(HasRecommendations));
+        OnPropertyChanged(nameof(IsEmpty));
     }
 
     /// <summary>Stores the choice and reloads; switched off, the rail empties instead of hiding a result.</summary>

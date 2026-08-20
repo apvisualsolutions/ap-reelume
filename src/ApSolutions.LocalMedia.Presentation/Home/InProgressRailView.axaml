@@ -48,10 +48,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   IsVisible="{Binding HasSubtitle}"
                   Text="{Binding Subtitle}"
                   TextTrimming="CharacterEllipsis" />
-              <ProgressBar
-                  Maximum="1"
-                  Value="{Binding CompletedFraction}"
-                  automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
               <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
                 <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{Binding CompletedText}" />
                 <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource HomePercentSuffix}" />
@@ -64,6 +60,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
                 <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
               </Border>
+              <!--
+              The progress bar sits at the foot of the card rather than inside it, and is 3 px rather
+              than the theme's 4: it is a rule under the card, not a control to read. MinHeight goes
+              with Height because the base ControlTheme sets a minimum of its own, and Height alone
+              measures 4. The percentage above it says the same thing in words, so the bar is never
+              the only carrier.
+              -->
+              <ProgressBar
+                  Height="3"
+                  MinHeight="3"
+                  Background="{DynamicResource ControlFillBrush}"
+                  Foreground="{DynamicResource AccentBrush}"
+                  Maximum="1"
+                  Value="{Binding CompletedFraction}"
+                  automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
             </StackPanel>
           </Border>
         </DataTemplate>

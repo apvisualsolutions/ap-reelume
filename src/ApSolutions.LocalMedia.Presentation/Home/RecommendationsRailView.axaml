@@ -36,10 +36,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource RecommendationsOff}" />
     </WrapPanel>
 
+    <!--
+    Three states, and the two quiet ones are not the same sentence. Empty means the formula ran over
+    the catalogue and ranked nothing; switched off means GetRecommendations returned before reading
+    anything, so "there is nothing to suggest" would be a claim about a catalogue nobody looked at.
+    -->
     <TextBlock
         Grid.Row="1"
-        IsVisible="{Binding !HasRecommendations}"
+        IsVisible="{Binding IsEmpty}"
         Text="{DynamicResource RecommendationsEmpty}"
+        TextWrapping="Wrap" />
+
+    <TextBlock
+        Grid.Row="1"
+        IsVisible="{Binding IsDisabled}"
+        Text="{DynamicResource RecommendationsOffDescription}"
         TextWrapping="Wrap" />
 
     <ListBox
