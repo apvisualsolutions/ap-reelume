@@ -103,6 +103,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los botones del reproductor son más fáciles de acertar, y la pantalla de fallo dice qué hacer.**
+  Reproducir, pausar y detener tienen ya un área mínima de pulsación de 36 por 36 píxeles, la misma
+  que estrenó el mini reproductor. Y cuando algo falla, «Volver a intentarlo» se pinta como la acción
+  principal de esa pantalla en lugar de igual que el botón de al lado.
+
 - **Los tamaños de letra son ya una escala y no treinta decisiones sueltas.** Cada pantalla elegía
   el tamaño de su texto por su cuenta: **trece tamaños distintos** repartidos por treinta archivos,
   con títulos que se parecían entre sí sin llegar a coincidir. Ahora hay **cinco tamaños** para toda
@@ -639,6 +644,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   el arte anterior.
 
 ### Corregido
+
+- **Los mandos del reproductor ya no se salen de la ventana.** En una ventana estrecha —900 píxeles
+  de ancho, que es lo más pequeña que la aplicación permite dejarla— la fila del transporte terminaba
+  74 píxeles pasado el borde derecho: el control de volumen, el botón de silencio y el indicador de
+  velocidad quedaban fuera de la pantalla y no había forma de pulsarlos. Ahora la fila se reparte en
+  varias líneas cuando no cabe en una, como ya hacían las demás.
 
 - **La escena que probaba cancelar una copia acusaba a la máquina lenta.** Comparaba el tiempo de sus
   dos pulsaciones contra una duración medida en una sola máquina, así que un runner más lento la ponía

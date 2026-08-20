@@ -102,6 +102,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The player's buttons are easier to hit, and the failure screen says what to do.** Play, pause and
+  stop now have a minimum 36 by 36 pixel target area, the same one the mini player introduced. And
+  when something fails, "Try again" is painted as that screen's leading action instead of looking
+  like the button beside it.
+
 - **Font sizes are a scale now, not thirty separate decisions.** Every screen chose the size of
   its own text: **thirteen distinct sizes** spread across thirty files, with headings that resembled
   each other without ever matching. There are now **five sizes** for the whole application, and
@@ -622,6 +627,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   survives.
 
 ### Fixed
+
+- **The player's controls no longer run off the side of the window.** In a narrow window — 900 pixels
+  wide, which is the smallest the application lets you make it — the transport row ended 74 pixels
+  past the right edge: the volume control, the mute button and the speed readout were off screen with
+  no way to press them. The row now wraps onto more than one line when it does not fit on one, as the
+  others already did.
 
 - **The scene that tested cancelling a copy blamed the slower machine.** It compared the time its two
   presses took against a duration measured on one machine, so a slower runner turned it red with

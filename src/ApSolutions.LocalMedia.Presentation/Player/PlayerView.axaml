@@ -16,6 +16,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         FrameSource="{Binding FrameSource}"
         automation:AutomationProperties.Name="{DynamicResource PlayerVideoSurfaceName}" />
     <Border
+        x:Name="PlayerFailureSurface"
         IsVisible="{Binding HasFailed}"
         Margin="24"
         Padding="16"
@@ -24,7 +25,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Background="{DynamicResource ShellSurfaceBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
-        CornerRadius="8">
+        CornerRadius="{DynamicResource CornerRadiusMedium}">
       <StackPanel Spacing="8">
         <TextBlock
             FontWeight="SemiBold"
@@ -74,7 +75,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
             x:Name="RecoveryActionsSurface"
             Orientation="Horizontal"
             Spacing="8">
+          <!--
+            The one action of the one screen here that is for an action. Opening the file elsewhere
+            sits beside it as the secondary, and the transport gets none at all.
+          -->
           <Button
+              Classes="primary-action"
               IsVisible="{Binding CanRetry}"
               automation:AutomationProperties.Name="{DynamicResource PlayerRecoveryRetry}"
               Command="{Binding RetryCommand}"
@@ -97,7 +103,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Background="{DynamicResource ShellSurfaceBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
-        CornerRadius="8"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
         Opacity="0.92">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
@@ -112,21 +118,40 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Background="{DynamicResource ShellSurfaceBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
-        CornerRadius="8"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
         Opacity="{Binding ControlsOpacity}"
         automation:AutomationProperties.Name="{DynamicResource PlayerTransportName}">
-      <StackPanel Orientation="Horizontal" Spacing="12">
+      <!--
+        No primary action here, and that is a decision rather than an omission: Play and Pause
+        alternate by state, so marking either would make the screen change what it is for depending
+        on what is happening, and Stop is the point of nothing.
+
+        The three wear player-chrome, which is where the mini player's chrome stops being the mini
+        player's. What they take from it is the 36x36 target area - a real accessibility gain and not
+        a layout one - and the corner. The separation is this panel's spacing, which is why the class
+        no longer carries a margin of its own.
+
+        A WrapPanel and not a horizontal StackPanel, which is what this was: measured on 2026-08-20,
+        the row ended 74px past the right edge of a 900-wide window, and 900 is the minimum the
+        application allows. It is the seventh time this exact shape has drawn a control outside the
+        window here, and the fix is the same one the other six got. The minimum target area this
+        change gives the three buttons makes the row wider, so it is measured rather than assumed.
+      -->
+      <WrapPanel ItemSpacing="12" LineSpacing="12">
         <Button
+            Classes="player-chrome"
             IsVisible="{Binding CanResume}"
             automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
             Command="{Binding ResumeCommand}"
             Content="{DynamicResource PlayerPlayAction}" />
         <Button
+            Classes="player-chrome"
             IsVisible="{Binding CanPause}"
             automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
             Command="{Binding PauseCommand}"
             Content="{DynamicResource PlayerPauseAction}" />
         <Button
+            Classes="player-chrome"
             automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
             Command="{Binding StopCommand}"
             Content="{DynamicResource PlayerStopAction}" />
@@ -165,7 +190,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             </DataTemplate>
           </ContentControl.ContentTemplate>
         </ContentControl>
-      </StackPanel>
+      </WrapPanel>
     </Border>
   </Panel>
 </UserControl>

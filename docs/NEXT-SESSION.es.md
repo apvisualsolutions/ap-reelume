@@ -1,22 +1,24 @@
 # Dónde retomar
 
-## Estado al abrir (2026-08-20, cierre de la sesión de madrugada)
+## Estado al abrir (2026-08-20, cierre de la sesión de tarde)
 
-**`main` y la rama están al día, con CI verde y nada en vuelo.** Nueve commits en la tanda: el mini
-reproductor entero, `UpdateView`, y las correcciones que trajeron sus rojos.
+**`PlayerView` está hecha.** Once commits en la tanda. Del paso 6 sigue sin quedar ninguna decisión
+abierta; lo que queda es ejecutar, en este orden:
 
-**Del paso 6 ya no queda ninguna decisión abierta.** Lo que queda es ejecutar, en este orden:
-
-1. **`PlayerView`** — medida entera abajo. Tres `CornerRadius` al token, `primary-action` sólo en
-   `PlayerRecoveryRetry`, y el `Margin` fuera de `player-chrome` para que el transporte grande pueda
-   adoptarla. Sus cinco botones ya están pulsados: **no añade deuda de paseo**.
-2. **La fase de escalares de espacio** — decidida entera abajo el 2026-08-20, con su recuento. Barrido
+1. **La fase de escalares de espacio** — decidida entera abajo el 2026-08-20, con su recuento. Barrido
    de una vez, y termina cuando `NotSpentYet` queda **vacía**.
-3. **Una vista por commit** en el orden de `SURFACES.es.md`.
+2. **Una vista por commit** en el orden de `SURFACES.es.md`.
 
-**Dos vistas seguidas han costado sólo maqueta** —`UpdateView` y `PlayerView`— porque sus controles ya
-estaban en el paseo. Es lo normal a partir de aquí: el paseo llegó a cero antes de que la interfaz
-cambiara, que era el sentido de hacerlo en ese orden.
+**Y una advertencia que `PlayerView` acaba de comprar cara, porque vale para todas las que quedan:**
+la red del desbordamiento se escribe **aunque el cambio parezca sólo cosmético**. Ahí la única prueba
+que encontró algo fue la que **pasaba antes del cambio** —no era su rojo, era su red—: midió que la
+fila del transporte terminaba **74 píxeles fuera** de una ventana de 900, que es el mínimo que la
+aplicación permite. Séptima vez que un `StackPanel` horizontal con etiquetas traducidas saca un
+control de la pantalla. **Se mide contra la anchura mínima real, no contra una cómoda.**
+
+**Tres vistas seguidas han costado sólo maqueta** —`MiniPlayerWindow`, `UpdateView` y `PlayerView`—
+porque sus controles ya estaban en el paseo. Es lo normal a partir de aquí: el paseo llegó a cero
+antes de que la interfaz cambiara, que era el sentido de hacerlo en ese orden.
 
 **Lo que costó esta tanda, y que el resto de las vistas hereda:**
 
@@ -617,7 +619,29 @@ darse por hecha a medias.
 **valor** no distingue un literal de un token mientras los dos coincidan, y coinciden justo cuando la
 tokenización sería correcta. Lo que se afirma es que el `.axaml` **no escribe el número**.
 
-#### `PlayerView`: medida el 2026-08-20, y con ella la clase del cromo se generaliza
+#### `PlayerView` ~~medida~~ **hecha el 2026-08-20**, y la fila que se salía por la derecha
+
+**Hecha tal como estaba decidida**, con [su evidencia](evidence/stable/audit-player-view.md): los tres
+`CornerRadius` al token, `primary-action` sólo en `PlayerRecoveryRetry`, el `Margin` fuera de
+`Button.player-chrome`, `MiniPlayerChromeView` con `ItemSpacing`/`LineSpacing`, y los tres del
+transporte con la clase del cromo. Las cuatro suites verdes (`UiTests` 610, `AccessibilityTests` 135,
+`IntegrationTests` 456, `DocumentationTests` 87) y el paseo intacto en **133/133, 0 pendientes**.
+
+**Y una cosa que la medición no tenía: la fila del transporte se salía de la ventana.** La red que se
+escribió para vigilar el ensanchamiento —dar 36×36 a tres botones los hace más anchos— midió que a
+**900 píxeles de ancho la fila terminaba en x=974**, con el transporte entero, el botón de silencio,
+el indicador de velocidad y el control de volumen fuera. **900 es `MinWidth` de la ventana principal
+en `App.axaml.cs`**, o sea lo más estrecha que cualquiera puede dejarla. Era un `StackPanel`
+horizontal con botones de palabras traducidas: **la séptima vez que esa forma saca un control fuera de
+la ventana aquí**, y recibió la corrección de las otras seis, un `WrapPanel`.
+
+**Lo que esto enseña para las vistas que quedan:** la red del desbordamiento **se escribe aunque el
+cambio parezca sólo cosmético**, y se mide contra la anchura mínima real y no contra una cómoda. Esa
+prueba pasó antes del cambio —no era su rojo, era su red— y fue la única que encontró algo. La cota
+superior se mide sin contexto de datos, que deja todos los `IsVisible` en su valor por defecto: es más
+ancha que cualquier estado real, así que si cabe, cabe.
+
+##### La medida original, del 2026-08-20 por la mañana
 
 **Medida sin escribir código.** 171 líneas, cinco botones, ninguno con `x:Name` —se identifican por su
 clave de nombre accesible, que es lo que el paseo usa— y **los cinco ya están pulsados**, así que esta
@@ -892,7 +916,7 @@ regenerar el manifiesto se añaden estos enlaces, y ningún otro:
 | Fila | Evidencias que se le añaden |
 | --- | --- |
 | `UX-003` | [fase 1: los cuatro diccionarios y el servicio que los aplica](evidence/stable/audit-redesign-phase1-tokens.md) |
-| `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md), [el mini reproductor](evidence/stable/audit-mini-player-chrome.md) |
+| `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md), [el mini reproductor](evidence/stable/audit-mini-player-chrome.md), [el reproductor grande](evidence/stable/audit-player-view.md) |
 | `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md) |
 
 **Las dos filas nuevas se decidieron el 2026-08-20.** [El mini
@@ -903,6 +927,12 @@ actualización](evidence/stable/audit-update-view.md) a la fila de la propia pan
 cambia allí es **cuál es su acción principal**, que es jerarquía visual y no accesibilidad.
 `UX-002` es «Fluent moderno en Avalonia», **comprobado contra `FEATURES.md` el 2026-08-20** — leer la
 matriz no es cambiarla, y dejar un identificador a ojo habría costado una vuelta en el paso 8.
+
+**La tercera fila nueva se decidió el 2026-08-20.** [El reproductor
+grande](evidence/stable/audit-player-view.md) va a `A11Y-001` por la misma razón que el mini y
+comprobado igual contra la matriz: lo que gana son **36×36 de área de pulsación en tres controles** y
+**cuatro que no se podían pulsar porque estaban fuera de la ventana** a la anchura mínima que la
+aplicación permite. Un control fuera de la pantalla es un problema de acceso, no de gusto.
 
 **`UX-003` recibe sólo la fase 1** porque esa fila habla del **tema** —que exista, que se aplique y
 que el reproductor lo ignore a propósito—, no de los estados de un control. Las cinco fases de estados
