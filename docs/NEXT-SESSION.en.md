@@ -19,6 +19,43 @@ point 6 reads "the rest of the views, one change per view, following §4 of `Pro
 **What was done is not wasted: it is §4's scaffolding.** The three scales, the leading action across
 all 48 views and the overflow gate are exactly what §4 spends.
 
+### Phase 6, area by area, in §4's order
+
+**The order is §4's own, which matches `SURFACES.en.md`.** Each row is one tranche; **the unit of a
+commit is the view**, except where §4 groups several under one change.
+
+| # | Area | What §4 asks for that carries the most work |
+|---|---|---|
+| ~~1~~ | ~~**Shell** (2)~~ **DONE 2026-08-20** | [Its evidence](evidence/stable/audit-shell-navigation-bar.md). The 248px navigation and the glyph **were already there**; what was added is the 3px bar — which **exists or does not**, rather than dimming — and `TitleActionsSurface` became a `WrapPanel`. |
+| 2 | **Home** (5) | One-column grid at `SpaceLarge`; 3px progress at the foot of each cover; 2:3 card with **initials when there is no artwork, never a hole**; three states for the recommendations rail (empty, switched off, with content) — **not the same thing**. |
+| 3 | **Library and details** (5) | **Fluid** grid with a 180px minimum; filters row to `WrapPanel`; search gains a clear button; **"searching, no results", which does not exist today**; `UnavailableBadge` goes from error to **warning**. |
+| 4 | **Player** (16) | Own surface `#0B0D10` and a fixed 320px column; failure moves to `DangerSurfaceBrush` with a glyph; `VideoStatusOverlay` **split into two grammars** (data vs warning); the three overlays with **explicit alignment and `MaxWidth 420`**; the four lists at 36px rows with no horizontal scroll ever. |
+| 5 | **Settings** (7) | `AppearanceSettingsView` from 3 theme buttons to **5**, and its horizontal `StackPanel` **must** become a `WrapPanel`: five do not fit in 620px and **the split is not fixed by hand**, because Spanish wraps 4+1 and English falls elsewhere. `PrivacySettingsView` must **tell absent from disabled**. |
+| 6 | **Review, Metadata, Catalog** (7) | An empty inbox is **the desirable state**: `PositiveSurfaceBrush` with a glyph, not a sad void. |
+| 7 | **Backup, Onboarding, Recovery, Credits** (5) | `RestoreWizardView`: only the missing root gains an editable field; **the duplicate always-enabled "Restore" is removed**. `DatabaseRecoveryView` gains no route from the shell. |
+| 8 | **`UpdateView` and `PlayerView`** | Layout is done; **the grammar of their messages is not**: 23 messages in four grammars, and 6 failure reasons with actions **conditioned by reason**. `PlayerRecoveryChooseAnotherVersion` **goes from `TextBlock` to `Button`** — the package's only type change. |
+| 9 | **The four animations** | `apr-in`, `apr-shim`, `apr-tip`, `apr-pulse`, plus the handle transition. The conduit exists; **reduced motion takes them to 0 ms rather than shortening them**. There is not one `<Animation>` in the tree today. |
+
+**Three rules that hold for all nine, none optional:**
+
+1. **A new control arrives with its accessible-name test and its walk line IN THE SAME CHANGE.**
+2. **A new string goes in both languages or not at all.** There are **47**, in `design/Cadenas nuevas`.
+3. **No existing button label is rewritten.** `Content` and `AutomationProperties.Name` point at the
+   same key, so rewriting a label **renames the control**. The package declares **0 renames**.
+
+**Two decisions phase 6 needed, taken on 2026-08-20:**
+
+1. **0.2.0 is NOT cut until §4 is finished.** The ten-step order is 6 → 7 → 8, and cutting early would
+   publish half the screens with the new grammar and half without, which is worse than either. The one
+   exception stays: **a finding from the owner's physical walk goes in whenever it arrives.**
+2. **Inside phase 6 the ratchet's unit is THE TRANCHE, not the phase.** With **69 controls** across
+   eight tranches, treating the whole phase as one unit would leave the net broken for the entire
+   redesign — and **the walk is the redesign's net**. So **each tranche closes with
+   `eng/walk-pending.txt` empty**.
+
+**And where §4 contradicts the tree, the tree wins**, with the discrepancy noted: it already happened
+with `PlayerView`'s "seven failure reasons", which are **six**.
+
 ### The order, which was already written and is not up for re-deliberation
 
 **Next is phase 6 of step 6: §4, one view per commit.** `design/PROMPT.md` point 6 says so and the

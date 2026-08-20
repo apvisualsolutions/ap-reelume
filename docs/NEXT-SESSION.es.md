@@ -52,6 +52,55 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
    apuntan a la misma clave, así que reescribir una etiqueta **es renombrar el control** y rompe el
    paseo. El paquete declara **0 renombrados** a propósito.
 
+#### El tramo 2 (Inicio), medido el 2026-08-20 sin escribir código
+
+Para que la sesión siguiente ejecute en vez de descubrir. **Lo que ya está y no hay que rehacer**:
+`LibraryEntryView` gasta `CornerRadiusMedium`, `InProgressRailView` ya tiene su `ProgressBar`, y los
+dos carriles ya llevan varios `IsVisible` de estado.
+
+**Lo que falta, por vista:**
+
+- **`LibraryEntryView`** es la que más trabajo lleva y son 49 líneas: le faltan la **proporción 2:3**,
+  el **título a dos líneas** (`MaxLines`), el **año en `TextSecondaryBrush`** y, sobre todo, **las
+  iniciales sobre `ControlFillBrush` cuando no hay portada** — la §4 insiste en que **nunca sea un
+  hueco**. Hoy tiene **un** `IsVisible`, así que ese estado no existe.
+- **`RecommendationsRailView`** tiene cinco `IsVisible`; hay que comprobar si son **los tres estados que
+  la §4 distingue** —vacío, **apagado por ajuste** y con contenido— porque los dos primeros **no son lo
+  mismo** y ésa es la única razón por la que la fila lo dice.
+- **`InProgressRailView`**: la barra de 3 px al pie de cada portada, en acento **sobre
+  `ControlFillBrush`**, que hoy no aparece en el archivo.
+- **`HomeView`** y **`ResumeHeroView`**: separación y jerarquía; el héroe **no se pinta** cuando no hay
+  nada que reanudar (ausente, no vacío).
+
+**⚠ DOS TRAMPAS DEL DOCUMENTO, medidas, que valen para los ocho tramos:**
+
+1. **La §4 nombra los escalares con los nombres VIEJOS.** Cita `SpaceXSmall`, `SpaceSmall`,
+   `SpaceMedium`, `SpaceLarge` y `SpaceXLarge`, y hoy son `Space4/8/12/16/24`. La traducción es directa
+   por su valor —`SpaceLarge` era 24 → `Space24`— salvo la última.
+2. **`SpaceXLarge` era 32 y NO EXISTE**, porque se decidió no declarar un escalar que nadie gasta. La
+   §4 lo pide **dos veces**, y las dos como **`Padding SpaceXLarge`** — que **no se puede aplicar
+   igualmente**, porque `Padding` es `Thickness` y los `Space*` son `x:Double`: el setter no convierte.
+   Así que ahí va **literal 32**, como el resto de `Padding`/`Margin`, y `Space32` **sigue sin
+   declararse**. Si algún día lo pide un `Spacing`, entonces sí.
+
+**Dos decisiones que la fase 6 necesitaba y se toman el 2026-08-20, para no deliberarlas por tramo:**
+
+1. **0.2.0 NO se corta hasta que la §4 termine.** El orden de los diez pasos es 6 → 7 → 8, y adelantar
+   el corte publicaría una versión con el rediseño a medias: la mitad de las pantallas con la gramática
+   nueva y la otra mitad sin ella es peor que ninguna de las dos. La única excepción sigue siendo la de
+   siempre: **un hallazgo del paseo físico del propietario entra cuando llegue**, porque corregirlo
+   después del corte cuesta rehacer el corte.
+2. **Dentro de la fase 6, la unidad del trinquete es EL TRAMO, no la fase.** La regla de la casa dice
+   que el trinquete del paseo sube dentro de una unidad y vuelve a **0** al cerrarla; con **69
+   controles** repartidos en ocho tramos, tratar la fase entera como unidad dejaría la red rota
+   mientras dura todo el rediseño — y **el paseo es la red del rediseño**, que es la razón de haberlo
+   llevado a cero antes de empezar. Así que **cada tramo cierra con `eng/walk-pending.txt` vacío**.
+
+**Y si la §4 contradice al árbol, manda el árbol**, con la discrepancia anotada: ya pasó con los «siete
+motivos de fallo» de `PlayerView`, que son **seis** —el séptimo viaja en `VideoOutputDecision` y sale
+por `VideoStatusOverlay`, con el vídeo reproduciéndose—. Pintarlo como fallo le diría a alguien que no
+hay imagen mientras la está viendo.
+
 **Y lo que ya está pagado, que es el andamio de todo esto:** las tres escalas con puerta —la §4 escribe
 `SpaceLarge` y `CornerRadiusMedium` por todas partes—, la acción principal decidida para las 48, la
 puerta de desbordamiento (que es exactamente la red de los `WrapPanel` que la §4 pide) y el paseo en 0.
