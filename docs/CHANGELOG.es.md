@@ -103,6 +103,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los bordes redondeados son ya dos medidas y no cinco.** Las esquinas se elegían pantalla por
+  pantalla —4, 6, 8, 10 y 12 píxeles repartidos por veintiséis vistas—, así que dos tarjetas iguales
+  podían redondearse distinto sin que nadie lo hubiera decidido: de las siete superficies de tarjeta
+  de la aplicación, cuatro llevaban una medida y tres otra. Ahora hay **dos**, y siete sitios se
+  igualan con el resto.
+
 - **El espaciado de toda la aplicación es ya una escala y no ciento ochenta y seis decisiones
   sueltas.** Cada vista elegía por su cuenta cuánto separar sus cosas: ocho valores distintos
   —2, 4, 6, 8, 10, 12, 16 y 24— repartidos por cincuenta y cuatro pantallas. Ahora hay **cinco

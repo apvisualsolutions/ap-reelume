@@ -69,7 +69,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Background="{DynamicResource AccentSubtleBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
-        CornerRadius="6"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource TransportBoostWarningTitle}">
       <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
         <TextBlock

@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       Background="{DynamicResource ShellSurfaceBrush}"
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
-      CornerRadius="8">
+      CornerRadius="{DynamicResource CornerRadiusMedium}">
   <StackPanel Spacing="{DynamicResource Space12}">
     <TextBlock
         x:Name="ResumePromptHeadline"

@@ -102,6 +102,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Rounded corners are two measurements now, not five.** Corners were chosen screen by screen — 4, 6,
+  8, 10 and 12 pixels across twenty-six views — so two identical cards could round differently with
+  nobody having decided it: of the application's seven card surfaces, four used one measurement and
+  three used another. There are now **two**, and seven sites fall into line with the rest.
+
 - **Spacing across the whole application is a scale now, not a hundred and eighty-six separate
   decisions.** Every view chose on its own how far apart to put things: eight distinct values — 2, 4,
   6, 8, 10, 12, 16 and 24 — spread across fifty-four screens. There are now **five measurements** for

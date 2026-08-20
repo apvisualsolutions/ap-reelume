@@ -16,7 +16,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       Background="{DynamicResource CardSurfaceBrush}"
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
-      CornerRadius="8">
+      CornerRadius="{DynamicResource CornerRadiusMedium}">
     <StackPanel Spacing="{DynamicResource Space8}">
       <TextBlock
           FontWeight="SemiBold"

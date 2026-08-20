@@ -2,12 +2,23 @@
 
 ## State on opening (2026-08-20, end of the afternoon session)
 
-**`PlayerView` and the spacing scalars phase are done.** Twelve commits in the batch. Step 6 has
-**one thing** left: **one view per commit** in `SURFACES.en.md`'s order.
+**`PlayerView`, the spacing scalars phase and the corner scale are done.** Thirteen commits in the
+batch. Step 6 has **one thing** left: **one view per commit** in `SURFACES.en.md`'s order.
 
-**The tokens carry no debt any more.** `NotSpentYet` is **empty**, and both scales — type and spacing
-— have a gate that requires the `.axaml` **not to write the number**. A new view that writes a
-spacing or a size by hand fails `ScalarTokenTests`.
+**The tokens carry no debt any more.** `NotSpentYet` is **empty**, and **all three scales** — type,
+spacing and corners — have a gate that requires the `.axaml` **not to write the number**. A new view
+that writes a size, a spacing or a corner by hand fails `ScalarTokenTests`. **That is what makes "one
+view per commit" genuinely cost layout only**: what is left per view is `primary-action` where there
+is one, the overflow net, and nothing else.
+
+**The corner scale was decided here and was not in the plan** (`docs/evidence/stable/audit-corner-radius-scale.md`).
+It was done in one sweep for the argument that won in spacing — it is a mapping, not a per-screen
+decision, and without a gate the remaining views can reintroduce literals — and its lesson is the
+opposite of the expected one: **a criterion that has just been proved is when it is easiest to
+misapply.** The three large radii were the three cards and a `CornerRadiusLarge` looked due; measuring
+the other side said **four of the seven card surfaces already carried 8**. Not a step the tree was
+asking for, a split nobody decided. **The question is not "does the step make sense?" but "does
+anything already in the tree contradict it?"**
 
 **Two warnings this batch bought dearly, and they apply to every view that is left.**
 
