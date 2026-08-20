@@ -1002,8 +1002,8 @@ regenerar el manifiesto se añaden estos enlaces, y ningún otro:
 | Fila | Evidencias que se le añaden |
 | --- | --- |
 | `UX-003` | [fase 1: los cuatro diccionarios y el servicio que los aplica](evidence/stable/audit-redesign-phase1-tokens.md) |
-| `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md), [el mini reproductor](evidence/stable/audit-mini-player-chrome.md), [el reproductor grande](evidence/stable/audit-player-view.md) |
-| `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md), [la escala de espaciado](evidence/stable/audit-spacing-scale.md), [la escala de radios](evidence/stable/audit-corner-radius-scale.md), [las acciones principales](evidence/stable/audit-leading-actions.md), [la puerta de desbordamiento](evidence/stable/audit-view-overflow-gate.md) |
+| `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md), [el mini reproductor](evidence/stable/audit-mini-player-chrome.md), [el reproductor grande](evidence/stable/audit-player-view.md), [la puerta de desbordamiento](evidence/stable/audit-view-overflow-gate.md) |
+| `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md), [la escala de espaciado](evidence/stable/audit-spacing-scale.md), [la escala de radios](evidence/stable/audit-corner-radius-scale.md), [las acciones principales](evidence/stable/audit-leading-actions.md) |
 
 **Las dos filas nuevas se decidieron el 2026-08-20.** [El mini
 reproductor](evidence/stable/audit-mini-player-chrome.md) va a `A11Y-001` porque lo que gana esa
@@ -1016,6 +1016,13 @@ matriz no es cambiarla, y dejar un identificador a ojo habría costado una vuelt
 
 **La quinta va a la misma fila y por la misma razón**: [la escala de
 radios](evidence/stable/audit-corner-radius-scale.md) es tokens y densidad, como las otras dos escalas.
+
+**Y la sexta cambió de fila al revisarla, que es para lo que se revisa.** [La puerta de
+desbordamiento](evidence/stable/audit-view-overflow-gate.md) se anotó primero en `UX-002` con las
+escalas, y va a **`A11Y-001`**: por el mismo argumento con el que se decidió el reproductor grande, un
+control dibujado fuera de la ventana **no se puede pulsar**, y eso es acceso y no gusto. Poner la misma
+clase de hallazgo en dos filas distintas habría costado una vuelta en el paso 8, que es exactamente lo
+que el reparto existe para evitar.
 
 **La cuarta se decidió el 2026-08-20 y también se comprobó contra la matriz.** [La escala de
 espaciado](evidence/stable/audit-spacing-scale.md) va a `UX-002`, cuya fila dice literalmente «sigue
