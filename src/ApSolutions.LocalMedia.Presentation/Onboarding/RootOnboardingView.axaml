@@ -48,6 +48,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Content="{DynamicResource RootKindUnc}" />
       </StackPanel>
       <Button
+          Classes="primary-action"
           HorizontalAlignment="Left"
           automation:AutomationProperties.Name="{DynamicResource RootAddAction}"
           Command="{Binding AddRootCommand}"

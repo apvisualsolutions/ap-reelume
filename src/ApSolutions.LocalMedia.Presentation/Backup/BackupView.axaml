@@ -29,6 +29,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
+          Classes="primary-action"
           x:Name="CreateCopyButton"
           Command="{Binding CreateCopyCommand}"
           Content="{DynamicResource BackupCreateCopyLabel}"

@@ -53,6 +53,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.Name="{DynamicResource RenameExplicitConsent}" />
     <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <Button
+          Classes="primary-action"
           Command="{Binding ExecuteCommand}"
           Content="{DynamicResource RenameExecuteAction}"
           automation:AutomationProperties.Name="{DynamicResource RenameExecuteAction}" />

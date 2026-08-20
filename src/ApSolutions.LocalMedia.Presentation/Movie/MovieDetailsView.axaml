@@ -36,6 +36,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <Button
+          Classes="primary-action"
           Command="{Binding ResumeCommand}"
           Content="{DynamicResource MovieResumeAction}"
           IsVisible="{Binding CanResume}"
