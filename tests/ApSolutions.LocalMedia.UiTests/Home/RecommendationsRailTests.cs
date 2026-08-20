@@ -272,6 +272,41 @@ public sealed class RecommendationsRailTests
         }
     }
 
+    /// <summary>
+    /// The rail has three states and switched off is not one of the other two.
+    /// </summary>
+    /// <remarks>
+    /// Empty means the formula ran and ranked nothing; switched off means it never ran, because
+    /// <c>GetRecommendations</c> returns before reading anything. Painting the empty sentence in both
+    /// says "there is nothing to suggest" about a catalogue nobody looked at, which is the one claim
+    /// the switch exists to avoid making. Asserted on what is <b>on screen</b> rather than on the
+    /// bindings, because a binding that is right and a panel that is collapsed look the same here.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Switched_off_is_not_the_same_as_empty_and_the_rail_says_which()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
+        var empty = Resource("RecommendationsEmpty");
+        var off = Resource("RecommendationsOffDescription");
+        var stocked = new StubRecommendationReadModel
+        {
+            Candidates = [Candidate(1, ["Drama"], "Alfa")],
+        };
+
+        var switchedOff = await VisibleTextsAsync(stocked, enabled: false);
+        Assert.Contains(off, switchedOff);
+        Assert.DoesNotContain(empty, switchedOff);
+
+        var ranNothing = await VisibleTextsAsync(new StubRecommendationReadModel(), enabled: true);
+        Assert.Contains(empty, ranNothing);
+        Assert.DoesNotContain(off, ranNothing);
+
+        var withContent = await VisibleTextsAsync(stocked, enabled: true);
+        Assert.DoesNotContain(empty, withContent);
+        Assert.DoesNotContain(off, withContent);
+    }
+
     [Fact]
     public void Every_reason_code_has_a_resource_key_in_both_languages()
     {
@@ -294,6 +329,41 @@ public sealed class RecommendationsRailTests
                 Assert.Contains($"RecommendationReason{reason}", keys);
             }
         }
+    }
+
+    /// <summary>The words a mounted rail actually puts on screen, collapsed branches excluded.</summary>
+    private static async Task<string[]> VisibleTextsAsync(StubRecommendationReadModel readModel, bool enabled)
+    {
+        var rail = new RecommendationsViewModel(
+            new GetRecommendations(readModel),
+            new StubRecommendationSettings(enabled),
+            id => readModel.TitleOf(id));
+        await rail.LoadAsync(TestContext.Current.CancellationToken);
+
+        var window = new Window
+        {
+            Width = 1024,
+            Height = 720,
+            Content = new RecommendationsRailView { DataContext = rail },
+        };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var texts = window.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => block.IsEffectivelyVisible)
+            .Select(block => block.Text ?? string.Empty)
+            .ToArray();
+        window.Close();
+        return texts;
+    }
+
+    /// <summary>A string from the language dictionary, which does not vary by theme variant.</summary>
+    private static string Resource(string key)
+    {
+        Assert.True(
+            Avalonia.Application.Current!.TryFindResource(key, out var value),
+            $"{key} is not declared, so nothing can paint it.");
+        return Assert.IsType<string>(value);
     }
 
     private static RecommendationCandidate Candidate(int seed, string[] genres, string title)

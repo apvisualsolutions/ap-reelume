@@ -10,7 +10,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
     x:DataType="home:HomeViewModel"
     automation:AutomationProperties.Name="{DynamicResource HomeAccessibleName}">
-  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space12}">
+  <!--
+  One column, and the rows are separated by the largest step in the scale: Home is a stack of
+  independent blocks — hero, library, rails — and at Space12 the rails read as part of whatever is
+  above them. The hero is the only accented action on the screen, so nothing else competes with it.
+  -->
+  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="{DynamicResource Space24}">
     <TextBlock
         FontSize="{DynamicResource FontSizeTitle}"
         FontWeight="SemiBold"
@@ -19,7 +24,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <home:ResumeHeroView x:Name="ResumeHero" Grid.Row="1" />
     <home:LibraryEntryView x:Name="LibraryEntry" Grid.Row="2" />
     <home:InProgressRailView Grid.Row="3" />
-    <ContentControl Grid.Row="4" IsVisible="{Binding HasRecommendationsRail}">
+    <home:RecentlyAddedRailView Grid.Row="4" />
+    <ContentControl Grid.Row="5" IsVisible="{Binding HasRecommendationsRail}">
       <home:RecommendationsRailView DataContext="{Binding Recommendations}" />
     </ContentControl>
   </Grid>

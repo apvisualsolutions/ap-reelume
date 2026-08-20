@@ -1,0 +1,73 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Home.RecentlyAddedRailView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    x:DataType="home:HomeViewModel"
+    automation:AutomationProperties.Name="{DynamicResource HomeRecentlyAddedAccessibleName}">
+  <Grid RowDefinitions="Auto,*">
+    <TextBlock
+        FontSize="{DynamicResource FontSizeSubtitle}"
+        FontWeight="SemiBold"
+        Text="{DynamicResource HomeRecentlyAddedHeading}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <TextBlock
+        Grid.Row="1"
+        Margin="0,8,0,0"
+        IsVisible="{Binding !HasRecentlyAdded}"
+        Text="{DynamicResource HomeRecentlyAddedEmpty}"
+        TextWrapping="Wrap" />
+    <ListBox
+        x:Name="RecentlyAddedRail"
+        Grid.Row="1"
+        Margin="0,8,0,0"
+        IsVisible="{Binding HasRecentlyAdded}"
+        ItemsSource="{Binding RecentlyAdded}"
+        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+        ScrollViewer.VerticalScrollBarVisibility="Disabled"
+        automation:AutomationProperties.Name="{DynamicResource HomeRecentlyAddedHeading}">
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="home:RecentlyAddedItemViewModel">
+          <Border Width="220" Padding="12">
+            <StackPanel Spacing="{DynamicResource Space4}">
+              <!--
+              Two lines and no more: a title that wraps freely makes the cards of one rail different
+              heights, and one that never wraps hides half of every long name behind an ellipsis.
+              MaxLines needs the wrapping to have something to break, so the two go together.
+              -->
+              <TextBlock
+                  FontWeight="SemiBold"
+                  MaxLines="2"
+                  Text="{Binding Title}"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="Wrap" />
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource TextSecondaryBrush}"
+                  IsVisible="{Binding HasYear}"
+                  Text="{Binding YearText}" />
+              <Border
+                  Padding="8,4"
+                  Background="{DynamicResource AccentSubtleBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusSmall}"
+                  IsVisible="{Binding !IsAvailable}"
+                  automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
+                <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />
+              </Border>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
+</UserControl>

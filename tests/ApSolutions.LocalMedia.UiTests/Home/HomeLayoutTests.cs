@@ -19,6 +19,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -209,6 +210,148 @@ public sealed class HomeLayoutTests
         Assert.Equal("20", card.CompletedText);
         Assert.Equal(ContentKey.ForEpisode(Show, Episode), card.Content);
         Assert.Equal(Show, card.TitleId);
+    }
+
+    /// <summary>
+    /// What Home reads about recently added titles reaches the screen.
+    /// </summary>
+    /// <remarks>
+    /// Every layer under this one was already built and already tested: SQLite orders by date added,
+    /// <c>GetHome</c> carries twelve of them, and <c>RecentlyAddedItemViewModel</c> formats the year.
+    /// No view painted any of it, which is the house defect in its sixth form — produced everywhere
+    /// and consumed nowhere — with the aggravation that the tests above pass, so it read as covered.
+    /// Asserted on visible text rather than on the view model, because the view model was never the
+    /// half that was missing.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Home_paints_the_recently_added_titles_it_already_reads()
+    {
+        ApplyLanguage("es-ES");
+        var viewModel = await CreateViewModelWithRecentAsync(
+            new RecentlyAddedItem(Movie, CatalogTitleKind.Movie, "Arrival", 2016, true, Noon),
+            new RecentlyAddedItem(Show, CatalogTitleKind.Show, "Crónicas", null, false, Noon));
+        using var host = Host(viewModel, 1366, 768, 1.0);
+
+        var texts = host.View.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => block.IsEffectivelyVisible)
+            .Select(block => block.Text ?? string.Empty)
+            .ToArray();
+
+        Assert.Contains("Arrival", texts);
+        Assert.Contains("2016", texts);
+        Assert.Contains("Crónicas", texts);
+    }
+
+    /// <summary>
+    /// A recently added card gives the title at most two lines and sets the year apart from it.
+    /// </summary>
+    /// <remarks>
+    /// The year is asserted to be a <b>different</b> colour from the title as well as the secondary
+    /// one: a card where both are the same brush would satisfy "the year is TextSecondaryBrush" the
+    /// day somebody made the title secondary too, and the point of the rule is the contrast between
+    /// the two, not the name of one token.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task A_recently_added_card_holds_the_title_to_two_lines_and_sets_the_year_apart()
+    {
+        ApplyLanguage("es-ES");
+        var viewModel = await CreateViewModelWithRecentAsync(
+            new RecentlyAddedItem(Movie, CatalogTitleKind.Movie, "Arrival", 2016, true, Noon));
+        using var host = Host(viewModel, 1366, 768, 1.0);
+
+        var rail = Assert.Single(host.View.GetVisualDescendants().OfType<RecentlyAddedRailView>());
+        var blocks = rail.GetVisualDescendants().OfType<TextBlock>().ToArray();
+        var title = Assert.Single(blocks, block => block.Text == "Arrival");
+        var year = Assert.Single(blocks, block => block.Text == "2016");
+
+        Assert.Equal(2, title.MaxLines);
+        Assert.Equal(TextWrapping.Wrap, title.TextWrapping);
+        Assert.Equal(
+            ThemeColour("TextSecondaryBrush"),
+            Assert.IsAssignableFrom<ISolidColorBrush>(year.Foreground).Color);
+        Assert.NotEqual(
+            Assert.IsAssignableFrom<ISolidColorBrush>(title.Foreground).Color,
+            Assert.IsAssignableFrom<ISolidColorBrush>(year.Foreground).Color);
+    }
+
+    /// <summary>
+    /// Continue is the only solid accent on Home, and when there is nothing to continue the hero is
+    /// absent rather than empty.
+    /// </summary>
+    /// <remarks>
+    /// <c>LeadingActionTests</c> decides this one view at a time, which cannot see that Home mounts
+    /// four of them at once: four views each leading with nothing wrong would still pass there and
+    /// put four accents on one screen. This asks the assembled screen. The second half is the same
+    /// distinction the rest of the tree draws — absent leaves no gap, disabled does — measured as
+    /// zero height rather than as a false <c>IsVisible</c>, because a collapsed panel and a panel
+    /// that still reserves its row read identically from the binding.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Continue_is_the_only_solid_accent_and_its_absence_leaves_no_gap()
+    {
+        ApplyLanguage("es-ES");
+        var withProgress = await CreateViewModelWithRailAsync(EpisodeProgress());
+        using (var host = Host(withProgress, 1366, 768, 1.0))
+        {
+            var accented = host.View.GetVisualDescendants()
+                .OfType<Control>()
+                .Where(control => control.Classes.Contains("primary-action"))
+                .ToArray();
+            Assert.Equal("ResumeHeroAction", Assert.Single(accented).Name);
+        }
+
+        var withoutProgress = await CreateViewModelWithRailAsync();
+        using (var host = Host(withoutProgress, 1366, 768, 1.0))
+        {
+            Assert.DoesNotContain(
+                host.View.GetVisualDescendants().OfType<Control>(),
+                control => control.Classes.Contains("primary-action"));
+
+            var hero = Assert.Single(host.View.GetVisualDescendants().OfType<ResumeHeroView>());
+            Assert.False(hero.IsVisible);
+            Assert.Equal(0, hero.Bounds.Height);
+        }
+    }
+
+    /// <summary>
+    /// The in-progress card carries its progress as a 3 px bar at its foot, in the accent over the
+    /// control fill.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Read from the elements that <b>paint</b> rather than from the control's own properties: a
+    /// <c>ProgressBar</c> takes <c>Foreground</c> and <c>Background</c> and its <c>ControlTheme</c>
+    /// decides whether either reaches the screen, which is the house defect wearing a setter.
+    /// </para>
+    /// <para>
+    /// The bar is asserted to be <b>last</b>, because the design has it under the card rather than in
+    /// the middle of it, and a rule about position that only checks existence passes either way.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_in_progress_card_ends_with_a_three_pixel_bar_in_the_accent()
+    {
+        ApplyLanguage("es-ES");
+        var viewModel = await CreateViewModelAsync(EpisodeProgress());
+        using var host = Host(viewModel, 1366, 768, 1.0);
+
+        var rail = Assert.Single(host.View.GetVisualDescendants().OfType<InProgressRailView>());
+        var bar = Assert.Single(rail.GetVisualDescendants().OfType<ProgressBar>());
+        Assert.Equal(3, bar.Bounds.Height);
+
+        var painted = bar.GetVisualDescendants()
+            .OfType<Border>()
+            .Select(border => border.Background)
+            .OfType<ISolidColorBrush>()
+            .Select(brush => brush.Color)
+            .ToArray();
+        Assert.Contains(ThemeColour("AccentBrush"), painted);
+        Assert.Contains(ThemeColour("ControlFillBrush"), painted);
+
+        var card = bar.GetVisualAncestors().OfType<StackPanel>().First();
+        var siblings = card.Children.OfType<Control>().Where(child => child.IsVisible).ToArray();
+        Assert.Same(bar, siblings[^1]);
     }
 
     [Fact]
@@ -403,6 +546,15 @@ public sealed class HomeLayoutTests
         return viewModel;
     }
 
+    private static async Task<HomeViewModel> CreateViewModelWithRecentAsync(params RecentlyAddedItem[] recent)
+    {
+        var viewModel = new HomeViewModel(
+            new GetHome(new StubHomeReadModel([]) { RecentlyAdded = recent }),
+            new NavigationService());
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        return viewModel;
+    }
+
     private static ViewHost Host(HomeViewModel viewModel, double width, double height, double scale)
     {
         var view = new HomeView { DataContext = viewModel };
@@ -437,6 +589,20 @@ public sealed class HomeLayoutTests
             .OfType<Control>()
             .Where(control => control.Focusable && control.IsVisible && !string.IsNullOrEmpty(control.Name))
             .Select(control => control.Name!);
+
+    /// <summary>
+    /// A theme brush's colour. Asked for by variant, because the four dictionaries each declare their
+    /// own and <c>TryFindResource</c> over the application answers null for all of them.
+    /// </summary>
+    private static Color ThemeColour(string key)
+    {
+        var application = Avalonia.Application.Current;
+        Assert.NotNull(application);
+        Assert.True(
+            application.TryGetResource(key, application.ActualThemeVariant, out var value),
+            $"{key} is not declared in this theme variant.");
+        return Assert.IsAssignableFrom<ISolidColorBrush>(value).Color;
+    }
 
     private static void ApplyLanguage(string cultureName)
     {

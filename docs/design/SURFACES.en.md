@@ -4,14 +4,14 @@ An inventory of AP Reelume's visible surfaces, so a redesign can cover **all** o
 the ones anybody remembers. The Spanish version is in [SURFACES.es.md](SURFACES.es.md).
 
 This document decides no aesthetics. It states **what exists, where it lives and in which states it
-appears**, measured from the tree on 2026-08-15 and measured again on **2026-08-18**, so nothing
+appears**, measured from the tree on 2026-08-15, measured again on 2026-08-18 and again on **2026-08-20**, so nothing
 visible is left undesigned.
 
 ## The rule that already holds, and needs no redoing
 
-- **All 49 views use localised strings.** Not one carries untranslated text: the measurement found no
+- **All 50 views use localised strings.** Not one carries untranslated text: the measurement found no
   view without `DynamicResource`.
-- **470 string keys in Spanish and 470 in English**, in
+- **480 string keys in Spanish and 480 in English**, in
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` and `Strings.en.axaml`.
   `BilingualHeadingTests` compares the structure of the public documents, and a new visible string
   goes into both files or it does not go in.
@@ -21,12 +21,12 @@ visible is left undesigned.
 - **Every interactive control has an accessible name**, and 80 accessibility tests require it. A
   redesign may change the shape, not take the name away.
 
-## The 49 views, by area
+## The 50 views, by area
 
 | Area | Views |
 | --- | --- |
 | Shell (2) | `ShellView`, `StartupView` |
-| Home (5) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecommendationsRailView`, `LibraryEntryView` |
+| Home (6) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecentlyAddedRailView`, `RecommendationsRailView`, `LibraryEntryView` |
 | Library (2) | `LibraryView`, `UnavailableBadge` |
 | Film card (1) | `MovieDetailsView` |
 | Series card (2) | `ShowDetailsView`, `EpisodeRowView` |
@@ -96,15 +96,16 @@ Measured on 2026-08-18, and the distinction matters because these are **two gram
 
 ## The lists and their empty state
 
-Measured on 2026-08-18: **23 lists with data** in the tree — taking a list to be a `ListBox`,
-`ItemsControl` or `ItemsRepeater` with `ItemsSource` — and **only four have a string written for
+Measured on 2026-08-20: **24 lists with data** in the tree — taking a list to be a `ListBox`,
+`ItemsControl` or `ItemsRepeater` with `ItemsSource` — and **five have a string written for
 when they are empty**:
 
 | List with an empty string | View that paints it |
 | --- | --- |
 | Library | `ShellView` (`EmptyLibraryTitle`, `EmptyLibraryDescription`) |
 | In progress | `InProgressRailView` (`HomeInProgressEmpty`) |
-| Recommendations | `RecommendationsRailView` (`RecommendationsEmpty`) |
+| Recommendations | `RecommendationsRailView` (`RecommendationsEmpty`, plus `RecommendationsOffDescription` when the setting is off, which is not the same thing) |
+| Recently added | `RecentlyAddedRailView` (`HomeRecentlyAddedEmpty`) |
 | A series' episodes | `ShowDetailsView` (`ShowDetailsEmpty`) |
 
 The **other nineteen say nothing when empty**, and none of them says anything while loading or when

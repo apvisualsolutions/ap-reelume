@@ -4,14 +4,14 @@ Inventario de las superficies visibles de AP Reelume, para que un rediseño pued
 y no sólo las que se recuerdan. La versión inglesa está en [SURFACES.en.md](SURFACES.en.md).
 
 Este documento no decide estética. Dice **qué existe, dónde vive y en qué estados aparece**, medido
-del árbol el 2026-08-15 y vuelto a medir el **2026-08-18**, para que nada visible se quede sin
+del árbol el 2026-08-15, vuelto a medir el 2026-08-18 y otra vez el **2026-08-20**, para que nada visible se quede sin
 diseñar.
 
 ## La regla que ya se cumple, y no hay que rehacer
 
-- **Las 49 vistas usan cadenas localizadas.** Ninguna tiene texto sin traducir: la medición no
+- **Las 50 vistas usan cadenas localizadas.** Ninguna tiene texto sin traducir: la medición no
   encontró ni una sola vista sin `DynamicResource`.
-- **470 claves de cadena en español y 470 en inglés**, en
+- **480 claves de cadena en español y 480 en inglés**, en
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` y `Strings.en.axaml`.
   `BilingualHeadingTests` compara la estructura de los documentos públicos, y una cadena visible
   nueva va en los dos archivos o no va.
@@ -21,12 +21,12 @@ diseñar.
 - **Cada control interactivo tiene nombre accesible**, y hay 80 pruebas de accesibilidad que lo
   exigen. Un rediseño puede cambiar la forma, no quitarle el nombre.
 
-## Las 49 vistas, por área
+## Las 50 vistas, por área
 
 | Área | Vistas |
 | --- | --- |
 | Shell (2) | `ShellView`, `StartupView` |
-| Inicio (5) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecommendationsRailView`, `LibraryEntryView` |
+| Inicio (6) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecentlyAddedRailView`, `RecommendationsRailView`, `LibraryEntryView` |
 | Biblioteca (2) | `LibraryView`, `UnavailableBadge` |
 | Ficha de película (1) | `MovieDetailsView` |
 | Ficha de serie (2) | `ShowDetailsView`, `EpisodeRowView` |
@@ -96,15 +96,16 @@ Medido el 2026-08-18, y la distinción importa porque son **dos gramáticas, no 
 
 ## Las listas y su estado vacío
 
-Medido el 2026-08-18: **23 listas con datos** en el árbol —entendiendo por lista un `ListBox`,
-`ItemsControl` o `ItemsRepeater` con `ItemsSource`—, y **sólo cuatro tienen escrita una cadena para
+Medido el 2026-08-20: **24 listas con datos** en el árbol —entendiendo por lista un `ListBox`,
+`ItemsControl` o `ItemsRepeater` con `ItemsSource`—, y **cinco tienen escrita una cadena para
 cuando están vacías**:
 
 | Lista con cadena de vacío | Vista que la pinta |
 | --- | --- |
 | Biblioteca | `ShellView` (`EmptyLibraryTitle`, `EmptyLibraryDescription`) |
 | En curso | `InProgressRailView` (`HomeInProgressEmpty`) |
-| Recomendaciones | `RecommendationsRailView` (`RecommendationsEmpty`) |
+| Recomendaciones | `RecommendationsRailView` (`RecommendationsEmpty`, y `RecommendationsOffDescription` cuando el ajuste está apagado, que no es lo mismo) |
+| Añadido recientemente | `RecentlyAddedRailView` (`HomeRecentlyAddedEmpty`) |
 | Episodios de una serie | `ShowDetailsView` (`ShowDetailsEmpty`) |
 
 Las **diecinueve restantes no dicen nada cuando están vacías**, y ninguna dice nada mientras carga ni

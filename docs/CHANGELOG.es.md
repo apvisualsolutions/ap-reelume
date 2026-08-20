@@ -107,7 +107,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
   descarta en vez de abrir la ventana fuera de toda pantalla, y una ventana cerrada maximizada
   reabre maximizada sobre sus límites de restauración.
 
+- **Inicio enseña lo que has añadido hace poco.** La aplicación ya leía de su base los últimos títulos
+  que entraron en la biblioteca —doce en cada carga, ordenados por fecha de alta—, y no los pintaba en
+  ninguna parte: se leían y se tiraban. Ahora hay un carril con ellos, con el título en dos líneas como
+  mucho, el año en un tono secundario y el aviso de que un medio no está disponible ahora mismo.
+
 ### Cambiado
+
+- **Con las recomendaciones apagadas, Inicio ya no dice que no haya nada que sugerir.** Decía «no hay
+  nada que sugerir ahora mismo», que era falso: apagado, no se calcula nada y el catálogo no se llega a
+  leer, así que la aplicación afirmaba algo sobre unas películas que nadie había mirado. Ahora el
+  carril dice lo que de verdad pasa, y el estado vacío —encendido y sin resultados— se distingue del
+  apagado.
+
+- **El progreso de las fichas en curso es una regla fina al pie, no una barra en medio.** Tres píxeles
+  de acento bajo cada ficha, con el porcentaje escrito encima como hasta ahora: la barra nunca es lo
+  único que lo dice. Y los bloques de Inicio se separan más entre sí, para que los carriles no se lean
+  como parte de lo que tienen encima.
 
 - **La barra lateral dice en qué pantalla estás de dos maneras, y ninguna es el color.** El destino
   abierto lleva ya una barra de acento a su izquierda, además del punto relleno que ya tenía: quien no

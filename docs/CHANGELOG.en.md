@@ -106,7 +106,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   discarded instead of opening the window off every screen, and a window closed maximized reopens
   maximized over its restore bounds.
 
+- **Home shows what was added recently.** The application already read the titles that most recently
+  entered the library from its own database — twelve on every load, ordered by when they were added —
+  and painted them nowhere: they were read and thrown away. There is now a rail for them, with the
+  title on at most two lines, the year in a secondary tone, and the badge for a medium that is not
+  reachable right now.
+
 ### Changed
+
+- **With recommendations off, Home no longer says there is nothing to suggest.** It said "there is
+  nothing to suggest right now", which was false: switched off, nothing is computed and the catalogue
+  is never read, so the application was making a claim about films nobody had looked at. The rail now
+  says what actually happens, and the empty state — on, with no results — is told apart from the off
+  one.
+
+- **Progress on in-progress cards is a thin rule at the foot, not a bar in the middle.** Three pixels
+  of the accent under each card, with the percentage written above it as before: the bar is never the
+  only thing that says it. And Home's blocks are further apart, so the rails do not read as part of
+  whatever sits above them.
 
 - **The sidebar says which screen you are on in two ways, neither of them colour.** The open
   destination now carries an accent bar to its left as well as the filled dot it already had, so

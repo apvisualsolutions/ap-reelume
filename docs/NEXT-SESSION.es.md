@@ -1,11 +1,17 @@
 # Dónde retomar
 
-## Estado al abrir (2026-08-20, cierre de la sesión de tarde)
+## Estado al abrir (2026-08-20, cierre de la sesión de noche)
 
-**`main` y la rama al día, CI verde, árbol limpio, nada en vuelo.** La fase 6 arrancó: **el tramo 1
-(Shell) está hecho** y el **tramo 2 (Inicio) está medido** sin escribir código, abajo.
+**La rama al día y verde en local; `main` espera el verde de CI de este commit.** La fase 6 va por
+**2 tramos de 9**: el 1 (Shell) y el 2 (Inicio) están hechos.
 
-**Los dos rojos de CI de esta tanda fueron la puerta de cobertura, y enseñaron cosas distintas:**
+**Lo que el tramo 2 enseñó, y no es de Inicio sino del método:** medir la fila contra el árbol **antes
+de escribir** encontró dos discrepancias con el documento y **un defecto de la casa** que ninguna
+suite podía ver. Está entero abajo, en «Lo que el tramo 2 dejó escrito». Lo más caro de los tres:
+**no hay portadas en toda la aplicación**, y la §4 las da por hechas en tres filas de Inicio y volverá
+a pedirlas en Biblioteca y en las fichas.
+
+**Lo que sigue vigente de los rojos de CI de la tanda anterior:**
 
 1. **Una mejora real sin declarar.** `RouteStateConverter.cs` subió a 100/85 al ganar la rama del
    `Kind` nuevo con su prueba. El trinquete **falla también cuando algo mejora**, y esto va a repetirse
@@ -19,14 +25,10 @@
    Cobertura línea a línea — la primera hipótesis, el `WaitAsync` de al lado, era falsa y ya tenía
    prueba.
 
-**Y un cabo suelto del tramo 1, cerrado:** de `StartupView` se dijo «no necesitaba nada» sin comprobar
-lo que la §4 le pide, que es que **el fondo case con el de la pantalla de arranque de MSIX para que la
-costura no se vea**. Casan —los dos son `#111827`— pero **nadie lo vigilaba**, así que estaba a una
-edición de convertirse en un parpadeo en cada arranque. Ahora hay prueba. **Y sólo puede casar con un
-tema, que es una decisión y no un descuido**: el color del manifiesto es estático —Windows lo pinta
-antes de que corra código nuestro, sin saber qué tema eligió la persona— y `ShellSurfaceBrush` es uno
-de cuatro. Se casa con **oscuro**, que es la variante sobre la que el paquete diseña y donde vive el
-reproductor; un color que no desentonara en los cuatro sería un gris medio que no le va a ninguno.
+**Lo siguiente por orden es el tramo 3: Biblioteca y fichas (5 vistas).** Su fila de la §4 está en la
+tabla de abajo, y **hay que medirla vista por vista antes de escribir nada**: en los dos tramos
+anteriores la mitad de lo que pedía ya estaba hecho, y en éste una de sus filas —la cuadrícula fluida
+con mínimo de 180 px por ficha— vuelve a rozar la portada que no existe.
 
 **EL PASO 6 ESTÁ EN SU FASE 6 DE 6, Y ESA FASE ESTÁ CASI ENTERA POR HACER.** Lo que se cerró el
 2026-08-20 fueron **las fases 1 a 5 de `design/PROMPT.md`** más los prerrequisitos de la 6 — y se
@@ -57,7 +59,7 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 | # | Área | Lo que la §4 pide de más calado |
 |---|---|---|
 | ~~1~~ | ~~**Shell** (2)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-shell-navigation-bar.md). Los 248 px y el glifo **ya estaban**; se añadió la barra de 3 px —que **existe o no existe**, no se atenúa— y `TitleActionsSurface` pasó a `WrapPanel`. `StartupView` no necesitaba nada. |
-| 2 | **Inicio** (5) | Rejilla de una columna con `SpaceLarge`; progreso de 3 px al pie de las portadas; ficha 2:3 con **iniciales cuando no hay portada, nunca un hueco**; tres estados del carril de recomendaciones (vacío, apagado por ajuste, con contenido) — **no son lo mismo**. |
+| ~~2~~ | ~~**Inicio** (5)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-home-tranche.md). Los tres estados del carril, la barra de 3 px al pie y `Space24` en la rejilla. **Dos discrepancias con la §4**: no hay portadas en toda la aplicación (0 `<Image>` en `src/`) y `LibraryEntryView` **no es la ficha que el documento describe**. Y el hallazgo: `RecentlyAdded` se leía de SQLite y no lo pintaba nadie, así que Inicio gana una vista, `RecentlyAddedRailView`. |
 | 3 | **Biblioteca y fichas** (5) | Cuadrícula **fluida** con mínimo de 180 px; fila de filtros a `WrapPanel`; búsqueda con botón de borrar; **«buscando sin resultados», que hoy no existe**; `UnavailableBadge` pasa de error a **aviso** (`WarningSurfaceBrush` + borde + glifo). |
 | 4 | **Reproductor** (16) | Superficie propia `#0B0D10` y columna fija de 320 px; el fallo pasa a `DangerSurfaceBrush` con glifo; `VideoStatusOverlay` **partido en dos gramáticas** (dato vs aviso); los tres superpuestos con **alineación explícita y `MaxWidth 420`** — es la forma que causó el panel de 1280×1400; las cuatro listas a filas de 36 px sin scroll horizontal. |
 | 5 | **Ajustes** (7) | `AppearanceSettingsView` de 3 botones de tema a **5**, y su `StackPanel` horizontal **tiene** que ser `WrapPanel`: cinco no caben en 620 px y **la división no se fija a mano**, porque en español pliega 4+1 y en inglés cae en otro sitio. `PrivacySettingsView` debe **distinguir ausente de deshabilitado**. |
@@ -78,30 +80,35 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
    apuntan a la misma clave, así que reescribir una etiqueta **es renombrar el control** y rompe el
    paseo. El paquete declara **0 renombrados** a propósito.
 
-#### El tramo 2 (Inicio), medido el 2026-08-20 sin escribir código
+#### Lo que el tramo 2 (Inicio) dejó escrito, hecho el 2026-08-20
 
-Para que la sesión siguiente ejecute en vez de descubrir. **Lo que ya está y no hay que rehacer**:
-`LibraryEntryView` gasta `CornerRadiusMedium`, `InProgressRailView` ya tiene su `ProgressBar`, y los
-dos carriles ya llevan varios `IsVisible` de estado.
+[Su evidencia](evidence/stable/audit-home-tranche.md). Tres cosas que valen para los siete tramos que
+quedan:
 
-**Lo que falta, por vista:**
+1. **NO HAY PORTADAS EN TODA LA APLICACIÓN, y la §4 las da por hechas.** Medido: **cero `<Image>` en
+   los `.axaml` de `src/`**, y el único mapa de bits del árbol es el fotograma de vídeo de LibVLC.
+   `PosterPath` se produce, se fusiona y se persiste en SQLite, y **ninguna vista lo lee**. La §4 pide
+   portadas en tres filas de Inicio y las volverá a pedir en Biblioteca y en las fichas. **No es
+   trabajo de una vista**: una ruta de TMDB es remota, así que descargarla sería una conexión nueva que
+   habría que declarar en `NetworkPurposeRegistry`, y con ella caché en disco, tamaño y caducidad.
+   Cuando un tramo la pida, se salta esa parte y se anota — como aquí.
+2. **`LibraryEntryView` NO ES LA FICHA QUE LA §4 DESCRIBE.** El documento la pinta como «ficha 2:3,
+   título a dos líneas, año en `TextSecondaryBrush`, iniciales sin portada»; en el árbol es el bloque
+   de **entrada a la biblioteca** —recuentos y un botón—. Manda el árbol. La decisión sobre las
+   iniciales que esta nota traía escrita **no se gastó** y sigue disponible el día que existan las
+   portadas: dos iniciales de las dos primeras palabras del título, una si sólo hay una palabra, y
+   relleno liso si el título no da ninguna.
+3. **El tramo destapó un defecto de la casa en su sexta forma.** `RecentlyAdded` se lee de SQLite,
+   viaja por `GetHome` y llega a `RecentlyAddedItemViewModel` con su año formateado, y **ningún
+   `.axaml` lo pintaba** — con tres suites en verde afirmando sobre él. Inicio gana una vista,
+   `RecentlyAddedRailView`, y con ella `SURFACES` pasa a **50** y el área de Inicio a **6**. **Antes de
+   dar por cerrado un tramo, pregunta qué datos de esa área produce la aplicación y no pinta nadie.**
 
-- **`LibraryEntryView`** es la que más trabajo lleva y son 49 líneas: le faltan la **proporción 2:3**,
-  el **título a dos líneas** (`MaxLines`), el **año en `TextSecondaryBrush`** y, sobre todo, **las
-  iniciales sobre `ControlFillBrush` cuando no hay portada** — la §4 insiste en que **nunca sea un
-  hueco**. Hoy tiene **un** `IsVisible`, así que ese estado no existe.
-- **`LibraryEntryView`, decidido para no deliberarlo al escribirlo:** las iniciales son **las de las
-  dos primeras palabras del título**, en mayúsculas, y **una sola** si el título tiene una palabra. No
-  se recorta a un número fijo de caracteres —un título en otra escritura puede no tener «letras» en el
-  sentido latino— y el hueco nunca se deja vacío: si el título no da ninguna inicial, se pinta el
-  relleno liso, que es el mismo estado que «cargando».
-- **`RecommendationsRailView`** tiene cinco `IsVisible`; hay que comprobar si son **los tres estados que
-  la §4 distingue** —vacío, **apagado por ajuste** y con contenido— porque los dos primeros **no son lo
-  mismo** y ésa es la única razón por la que la fila lo dice.
-- **`InProgressRailView`**: la barra de 3 px al pie de cada portada, en acento **sobre
-  `ControlFillBrush`**, que hoy no aparece en el archivo.
-- **`HomeView`** y **`ResumeHeroView`**: separación y jerarquía; el héroe **no se pinta** cuando no hay
-  nada que reanudar (ausente, no vacío).
+**Y la razón escrita en una tabla cerrada puede ser falsa aunque la decisión sea correcta.**
+`LeadingActionTests` decía que `LibraryEntryView` no lidera por ser «una fila o ficha que se repite»,
+y no lo es. La decisión seguía siendo la buena por otro motivo —Inicio ya acentúa Continuar y la §4
+pide **un solo acento sólido por pantalla**—, que ahora está escrito y **medido sobre la pantalla
+ensamblada**, que es la mitad que una tabla por vista no puede ver.
 
 **⚠ DOS TRAMPAS DEL DOCUMENTO, medidas, que valen para los ocho tramos:**
 

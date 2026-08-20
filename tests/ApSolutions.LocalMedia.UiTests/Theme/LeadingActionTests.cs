@@ -37,7 +37,11 @@ public sealed class LeadingActionTests
     /// <list type="bullet">
     /// <item>a frame rather than a screen (<c>ShellView</c>);</item>
     /// <item>a row or card that repeats — a hierarchy repeated N times is not a hierarchy
-    /// (<c>LibraryEntryView</c>, <c>EpisodeRowView</c>, <c>PlayerVersionsView</c>);</item>
+    /// (<c>EpisodeRowView</c>, <c>PlayerVersionsView</c>);</item>
+    /// <item>a block on a screen that has already accented something else: Home mounts four views and
+    /// Continue wears its one accent, so <c>LibraryEntryView</c> leads with nothing even though it is
+    /// a single block with a single button. <c>HomeLayoutTests</c> asserts the assembled screen has
+    /// exactly one, which is the half a per-view table cannot see;</item>
     /// <item>chrome whose buttons alternate by state, so a leading action would move with what is
     /// happening (<c>TransportControlsView</c>, <c>MiniPlayerChromeView</c>);</item>
     /// <item>mutually exclusive options rather than actions (<c>AppearanceSettingsView</c>,
@@ -59,6 +63,7 @@ public sealed class LeadingActionTests
         ["HomeView"] = null,
         ["ResumeHeroView"] = "ResumeHeroAction",
         ["InProgressRailView"] = null,
+        ["RecentlyAddedRailView"] = null,
         ["RecommendationsRailView"] = null,
         ["LibraryEntryView"] = null,
 
