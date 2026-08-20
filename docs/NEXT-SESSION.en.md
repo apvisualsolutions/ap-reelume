@@ -536,6 +536,43 @@ The five controls, their **five strings in both languages**, their **five access
 to views are four, not two: `UiTests`, `AccessibilityTests`, `IntegrationTests` and
 `DocumentationTests`.
 
+#### `PlayerView`: measured 2026-08-20, and the chrome class generalises with it
+
+**Measured without writing code.** 171 lines, five buttons, none with an `x:Name` — they are
+identified by their accessible-name key, which is what the walk uses — and **all five are already
+pressed**, so this view adds no walk debt either. It is the second in a row that costs layout only.
+
+**The literals, counted:**
+
+| What | How many | What happens |
+|---|---|---|
+| `CornerRadius="8"` | 3 | → `CornerRadiusMedium`, straight swap |
+| `Margin` 24/16/16, `Padding` 16/10/12, `BorderThickness` 1 | 7 | **they stay**: `Thickness`, and the token is `x:Double` |
+| `Spacing` 8/8/12 | 3 | scalars phase, not here |
+
+**`primary-action` goes on `PlayerRecoveryRetry`, and only there.** It is the "try again" of a failure
+screen, with `PlayerRecoveryOpenExternally` beside it as the secondary. **Nothing in the transport
+takes it**: `Play` and `Pause` alternate **by state**, so marking one would make the screen's primary
+action change with what is happening — exactly what a hierarchy cannot do — and `Stop` is the point of
+nothing.
+
+**And this is where the package's decision 4 gets paid**, the one saying the large transport would
+adopt the chrome class. Measured now that the class exists: `player-chrome` gives `MinWidth`/
+`MinHeight` 36, `CornerRadiusMedium` **and a `Margin="4"`**. The three transport buttons live in a
+`StackPanel` with `Spacing="12"`, so the class would add 4 a side and space them 20 apart. **The
+margin does not belong to the class; it belongs to whatever places it.** So:
+
+1. **`Margin` leaves `Button.player-chrome`**, which keeps the minimum press area and the radius — the
+   only parts that are about the control rather than about its place.
+2. **`MiniPlayerChromeView` moves to `ItemSpacing`/`LineSpacing` on its `WrapPanel`**, which is what
+   `UpdateView` already did and what was written down as a "one-line fix" when it was measured.
+3. **The three transport buttons adopt `player-chrome`** and gain the 36 minimum press area, which is
+   a real accessibility improvement rather than a layout one.
+
+**The affected suites are the usual four**, plus a look at `MiniPlayerChromeTests`, which asserts
+`MinWidth`/`MinHeight` >= 36 on the mini's five: still true once the margin leaves, but that is the
+test that says so.
+
 #### `UpdateView` ~~measured~~ **done on 2026-08-20**, and the scalar that CANNOT be spent where it is needed
 
 **The view is done** apart from its spacing, with [its evidence](evidence/stable/audit-update-view.md):

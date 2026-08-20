@@ -535,6 +535,43 @@ en `CommandNotificationTests`. El trinquete del paseo sube a 5 y vuelve a **0** 
 un cambio de vistas son cuatro, no dos: `UiTests`, `AccessibilityTests`, `IntegrationTests` y
 `DocumentationTests`.
 
+#### `PlayerView`: medida el 2026-08-20, y con ella la clase del cromo se generaliza
+
+**Medida sin escribir código.** 171 líneas, cinco botones, ninguno con `x:Name` —se identifican por su
+clave de nombre accesible, que es lo que el paseo usa— y **los cinco ya están pulsados**, así que esta
+vista tampoco añade deuda de paseo. Es la segunda seguida que sólo cuesta maqueta.
+
+**Los literales, contados:**
+
+| Qué | Cuántos | Qué se hace |
+|---|---|---|
+| `CornerRadius="8"` | 3 | → `CornerRadiusMedium`, directo |
+| `Margin` 24/16/16, `Padding` 16/10/12, `BorderThickness` 1 | 7 | **se quedan**: son `Thickness` y el token es `x:Double` |
+| `Spacing` 8/8/12 | 3 | fase de escalares, no aquí |
+
+**`primary-action` va en `PlayerRecoveryRetry`, y sólo ahí.** Es el «vuelve a intentarlo» de una
+pantalla de fallo, con `PlayerRecoveryOpenExternally` de secundaria al lado. **En el transporte no va
+ninguna**: `Play` y `Pause` se alternan **por estado**, así que marcar una haría que la pantalla
+cambiara de acción principal según lo que esté pasando — que es exactamente lo que una jerarquía no
+puede hacer— y `Stop` no es el sentido de nada.
+
+**Y aquí se paga la decisión 4 del paquete**, la que decía que el transporte grande adoptaría la clase
+del cromo. Medido ahora que la clase existe: `player-chrome` da `MinWidth`/`MinHeight` 36,
+`CornerRadiusMedium` **y un `Margin="4"`**. Los tres botones del transporte viven en un `StackPanel`
+con `Spacing="12"`, así que la clase les sumaría 4 a cada lado y los separaría 20. **El margen no es de
+la clase: es de quien la coloca.** Así que:
+
+1. **`Margin` sale de `Button.player-chrome`**, que se queda con el área mínima de pulsación y el
+   radio — lo único que es del control y no de su sitio.
+2. **`MiniPlayerChromeView` pasa a `ItemSpacing`/`LineSpacing` en su `WrapPanel`**, que es lo que
+   `UpdateView` ya hacía y lo que se anotó como «arreglo de una línea» al medirla.
+3. **Los tres del transporte adoptan `player-chrome`** y ganan los 36 de área mínima, que es una
+   mejora de accesibilidad real y no una de maqueta.
+
+**Las suites afectadas son las cuatro de siempre**, y además hay que mirar `MiniPlayerChromeTests`,
+que afirma `MinWidth`/`MinHeight` ≥ 36 sobre los cinco del mini: sigue siendo cierto tras sacar el
+margen, pero es la prueba que lo dice.
+
 #### `UpdateView` ~~medida~~ **hecha el 2026-08-20**, y el escalar que NO se puede gastar donde hace falta
 
 **La vista está hecha** salvo su espaciado, con [su evidencia](evidence/stable/audit-update-view.md):
