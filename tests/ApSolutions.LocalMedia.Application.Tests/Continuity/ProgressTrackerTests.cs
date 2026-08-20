@@ -172,6 +172,49 @@ public sealed class ProgressTrackerTests
         Assert.True(DateTimeOffset.UtcNow - started < TimeSpan.FromSeconds(10));
     }
 
+    /// <summary>
+    /// The periodic loop ends by its own condition when the session is cancelled while a write is in
+    /// flight, and not only by the delay throwing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This exists because the branch was being exercised <b>by luck</b>. Cancelling a session almost
+    /// always lands inside <c>DelayAsync</c>, which throws and leaves through the catch without ever
+    /// re-evaluating the <c>while</c>. The loop's own exit is only taken when cancellation arrives
+    /// between the flush and the top of the loop — a race — so <c>PlaybackProgressTracker.cs</c> read
+    /// 97/83 in three CI runs and 97/85 in a fourth, with **one line of a .txt** as the only change in
+    /// the tree between them. Comparing the two Cobertura reports line by line named it in one shot:
+    /// line 97, one of two branches.
+    /// </para>
+    /// <para>
+    /// A floor that moves by chance is worse than a low floor: raising it would make every run that
+    /// lost the race fail for being under it. So the branch is asked for on purpose — the repository
+    /// cancels the session <b>while it is being written to</b>, which puts the token in the one state
+    /// the loop's own condition is there to notice.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task The_loop_ends_by_its_own_condition_when_cancellation_lands_during_a_write()
+    {
+        using var session = new CancellationTokenSource();
+        var repository = new CancellingWatchStateRepository(session);
+        var clock = new ManualClock();
+        await using var tracker = new PlaybackProgressTracker(repository, clock);
+        _ = await tracker.BeginAsync(Content, Source, TestContext.Current.CancellationToken);
+        tracker.Observe(TimeSpan.FromMinutes(4), TimeSpan.FromMinutes(90));
+
+        var loop = tracker.RunAsync(session.Token);
+        await clock.WaitForDelayAsync(TestContext.Current.CancellationToken);
+
+        // Released without cancelling: the delay completes normally, the flush runs, and the
+        // repository cancels from inside it. The loop then returns to its own condition and leaves.
+        await clock.AdvanceAsync(TestContext.Current.CancellationToken);
+        await loop.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+
+        Assert.True(loop.IsCompletedSuccessfully, "The loop did not end on its own condition.");
+        Assert.True(repository.CancelledDuringWrite, "The repository never got to cancel mid-write.");
+    }
+
     [Fact]
     public async Task Concurrent_flushes_are_serialised_and_end_on_the_last_observation()
     {
@@ -370,6 +413,28 @@ public sealed class ProgressTrackerTests
             }
 
             _ = pending?.TrySetResult();
+        }
+    }
+
+    /// <summary>
+    /// Cancels the session from inside the write, which is the one moment the loop's own condition is
+    /// there to catch. Anything that cancels from outside races the delay and usually loses.
+    /// </summary>
+    private sealed class CancellingWatchStateRepository(CancellationTokenSource session) : IWatchStateRepository
+    {
+        public bool CancelledDuringWrite { get; private set; }
+
+        public Task<WatchState?> GetAsync(ContentKey content, CancellationToken cancellationToken = default) =>
+            Task.FromResult<WatchState?>(null);
+
+        public Task<IReadOnlyList<WatchState>> GetAllAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<WatchState>>([]);
+
+        public Task SaveAsync(WatchState state, CancellationToken cancellationToken = default)
+        {
+            CancelledDuringWrite = true;
+            session.Cancel();
+            return Task.CompletedTask;
         }
     }
 
