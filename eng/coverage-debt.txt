@@ -152,7 +152,7 @@ src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewViewModel.cs      
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsViewModel.cs                       100  79
 src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs                       83  75
-src/ApSolutions.LocalMedia.Presentation/Navigation/RouteStateConverter.cs                    100  83
+src/ApSolutions.LocalMedia.Presentation/Navigation/RouteStateConverter.cs                    100  85
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingViewModel.cs                100  84
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
