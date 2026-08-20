@@ -68,22 +68,32 @@ jobs:
       # -NonBlockingPerformance: the budgets run and their verdict is archived with the test
       # results, but a shared runner's noise cannot fail the build (CI-003/CI-005). They stay
       # blocking on the physical harness, which is where they mean something.
+      # Every gate below carries its own ceiling, and their only job is to name which step hung.
+      # The job's 90 minutes were already there and can only say the whole job died. The numbers are
+      # what these steps measured on 2026-08-20 with room on top: 39m26s here, 13m20s for
+      # accessibility, 2m09s for recovery, 3m00s-4m16s for the walk. A step that reaches its ceiling
+      # is a hang worth reading, not a slow runner - which is the distinction that cost six runs to
+      # learn the first time.
       - name: Verify both architectures
+        timeout-minutes: 70
         shell: pwsh
         run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -NonBlockingPerformance
       # The two audit gates used to be manual-only (CI-001/CI-002): the accessibility journey and
       # the recovery matrix could regress and CI would stay green. Verify mode fails on any
       # critical or major finding, and each gate has to pass twice in a row to be called clean.
       - name: Accessibility gate
+        timeout-minutes: 35
         shell: pwsh
         run: ./eng/run-accessibility.ps1 -Mode Verify -Passes 2
       - name: Recovery gate
+        timeout-minutes: 15
         shell: pwsh
         run: ./eng/run-recovery.ps1 -Mode Verify -Passes 2
       # What the autonomous walk pressed with a real mouse, against what the views declare. The
       # pending list may only shrink, so an area that regresses to keyboard-only work fails here
       # rather than at the next redesign.
       - name: Walk coverage gate
+        timeout-minutes: 15
         shell: pwsh
         run: ./eng/check-walk-coverage.ps1
       # The debt floors belong to the environment that measures them, and that is this one: the
