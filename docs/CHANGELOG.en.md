@@ -108,6 +108,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The sidebar says which screen you are on in two ways, neither of them colour.** The open
+  destination now carries an accent bar to its left as well as the filled dot it already had, so
+  anyone who cannot tell those tones apart still knows where they are. And the three title action
+  buttons wrap onto more than one line when they do not fit, instead of pushing the last one off the
+  window.
+
 - **Every screen now says what its action is.** Fourteen more screens paint the button that is their
   point in the accent colour — resume the film, save the record, create the copy, add the folder,
   accept the match — with the rest clearly beside it. **Sixteen screens highlight nothing, and that is

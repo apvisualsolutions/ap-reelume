@@ -14,6 +14,13 @@ public enum RouteStateKind
 
     /// <summary>The status a screen reader announces for the destination that is open.</summary>
     Status,
+
+    /// <summary>
+    /// Whether this destination is the open one, for the bar that says so without using colour on its
+    /// own. It answers a bool because the bar is <b>present or absent</b> rather than tinted: a
+    /// dimmed bar would be a second thing to interpret, and absent is not the same as disabled.
+    /// </summary>
+    IsCurrent,
 }
 
 /// <summary>
@@ -33,6 +40,7 @@ public sealed class RouteStateConverter : IValueConverter
         return Kind switch
         {
             RouteStateKind.Glyph => isCurrent ? "●" : "○",
+            RouteStateKind.IsCurrent => isCurrent,
             _ => isCurrent ? ReadStatusText() : string.Empty,
         };
     }

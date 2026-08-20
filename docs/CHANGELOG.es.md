@@ -109,6 +109,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La barra lateral dice en qué pantalla estás de dos maneras, y ninguna es el color.** El destino
+  abierto lleva ya una barra de acento a su izquierda, además del punto relleno que ya tenía: quien no
+  distinga esos tonos sigue sabiendo dónde está. Y los tres botones de acción del título se reparten en
+  varias líneas cuando no caben, en vez de empujar al último fuera de la ventana.
+
 - **Cada pantalla dice ya cuál es su acción.** Catorce pantallas más pintan con el color de acento el
   botón que es su sentido —continuar la película, guardar la ficha, crear la copia, añadir la carpeta,
   aceptar la coincidencia—, y el resto de botones quedan claramente al lado. **Dieciséis pantallas no

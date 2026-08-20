@@ -24,6 +24,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <navigation:RouteStateConverter x:Key="RouteGlyph" Kind="Glyph" />
     <navigation:RouteStateConverter x:Key="RouteStatus" Kind="Status" />
+    <navigation:RouteStateConverter x:Key="RouteIsCurrent" Kind="IsCurrent" />
   </UserControl.Resources>
   <Grid Background="{DynamicResource ShellSurfaceBrush}" ColumnDefinitions="248,*">
     <Border
@@ -51,6 +52,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Home}">
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <!--
+                The second signal, and it is a bar that exists or does not rather than one that
+                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+              -->
+              <Border
+                  Classes="navigation-current-bar"
+                  Width="3"
+                  Background="{DynamicResource AccentBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusSmall}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
               <TextBlock Text="{DynamicResource NavigationHome}" />
             </StackPanel>
@@ -63,6 +74,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Library}">
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <!--
+                The second signal, and it is a bar that exists or does not rather than one that
+                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+              -->
+              <Border
+                  Classes="navigation-current-bar"
+                  Width="3"
+                  Background="{DynamicResource AccentBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusSmall}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
               <TextBlock Text="{DynamicResource NavigationLibrary}" />
             </StackPanel>
@@ -75,6 +96,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Review}">
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <!--
+                The second signal, and it is a bar that exists or does not rather than one that
+                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+              -->
+              <Border
+                  Classes="navigation-current-bar"
+                  Width="3"
+                  Background="{DynamicResource AccentBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusSmall}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
               <TextBlock Text="{DynamicResource NavigationReview}" />
             </StackPanel>
@@ -87,6 +118,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Backups}">
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <!--
+                The second signal, and it is a bar that exists or does not rather than one that
+                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+              -->
+              <Border
+                  Classes="navigation-current-bar"
+                  Width="3"
+                  Background="{DynamicResource AccentBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusSmall}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
               <TextBlock Text="{DynamicResource NavigationBackups}" />
             </StackPanel>
@@ -99,6 +140,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Settings}">
             <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <!--
+                The second signal, and it is a bar that exists or does not rather than one that
+                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+              -->
+              <Border
+                  Classes="navigation-current-bar"
+                  Width="3"
+                  Background="{DynamicResource AccentBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusSmall}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
               <TextBlock Text="{DynamicResource NavigationSettings}" />
             </StackPanel>
@@ -224,10 +275,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <onboarding:RootOnboardingView DataContext="{Binding Onboarding}" />
         </ContentControl>
         <library:LibraryView DataContext="{Binding Library}" />
-        <StackPanel
+        <!--
+          A WrapPanel and not a horizontal StackPanel: three buttons carrying translated words is the
+          shape that has drawn a control off the side seven times in this repository, and §4 asks for
+          this one by name.
+        -->
+        <WrapPanel
             x:Name="TitleActionsSurface"
-            Orientation="Horizontal"
-            Spacing="{DynamicResource Space8}"
+            ItemSpacing="{DynamicResource Space8}"
+            LineSpacing="{DynamicResource Space8}"
             automation:AutomationProperties.Name="{DynamicResource TitleActionsAccessibleName}">
           <Button
               automation:AutomationProperties.Name="{DynamicResource TitleEditMetadataAction}"
@@ -241,7 +297,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.Name="{DynamicResource TitleReviewDuplicatesAction}"
               Command="{Binding ReviewDuplicatesCommand}"
               Content="{DynamicResource TitleReviewDuplicatesAction}" />
-        </StackPanel>
+        </WrapPanel>
         <ContentControl IsVisible="{Binding HasMetadataEditor}">
           <metadata:MetadataEditorView DataContext="{Binding MetadataEditor}" />
         </ContentControl>

@@ -30,7 +30,7 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 
 | # | Área | Lo que la §4 pide de más calado |
 |---|---|---|
-| 1 | **Shell** (2) | Navegación de 248 px sobre `NavigationSurfaceBrush`; destino activo con **barra de 3 px + glifo** (dos señales, una no es color); `TitleActionsSurface` de `StackPanel` a `WrapPanel`. `StartupView` sólo tipografía. |
+| ~~1~~ | ~~**Shell** (2)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-shell-navigation-bar.md). Los 248 px y el glifo **ya estaban**; se añadió la barra de 3 px —que **existe o no existe**, no se atenúa— y `TitleActionsSurface` pasó a `WrapPanel`. `StartupView` no necesitaba nada. |
 | 2 | **Inicio** (5) | Rejilla de una columna con `SpaceLarge`; progreso de 3 px al pie de las portadas; ficha 2:3 con **iniciales cuando no hay portada, nunca un hueco**; tres estados del carril de recomendaciones (vacío, apagado por ajuste, con contenido) — **no son lo mismo**. |
 | 3 | **Biblioteca y fichas** (5) | Cuadrícula **fluida** con mínimo de 180 px; fila de filtros a `WrapPanel`; búsqueda con botón de borrar; **«buscando sin resultados», que hoy no existe**; `UnavailableBadge` pasa de error a **aviso** (`WarningSurfaceBrush` + borde + glifo). |
 | 4 | **Reproductor** (16) | Superficie propia `#0B0D10` y columna fija de 320 px; el fallo pasa a `DangerSurfaceBrush` con glifo; `VideoStatusOverlay` **partido en dos gramáticas** (dato vs aviso); los tres superpuestos con **alineación explícita y `MaxWidth 420`** — es la forma que causó el panel de 1280×1400; las cuatro listas a filas de 36 px sin scroll horizontal. |
