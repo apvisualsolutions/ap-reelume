@@ -5,6 +5,21 @@
 **`PlayerView`, the spacing scalars phase and the corner scale are done.** Thirteen commits in the
 batch. Step 6 has **one thing** left: **one view per commit** in `SURFACES.en.md`'s order.
 
+**And the overflow net is no longer written view by view: there is a gate.**
+`ViewOverflowTests` mounts **all 48 views** without a data context — every branch visible at once,
+which is the upper bound — in a 900-wide window and asserts no control ends outside it. Proved by
+failing at 300: it names nine views with their control and coordinate.
+[Its evidence](evidence/stable/audit-view-overflow-gate.md).
+
+**Its limitation is stated and must be respected:** a view mounted alone gets the whole 900, and
+nested in the shell it gets less. It catches a view too wide **on its own**; one that is only too wide
+once nested is still the walk's to catch. **Silence from that gate is not a certificate.**
+
+**What is left per view is therefore ONE THING: `primary-action` where there is one.** And that
+**cannot be swept**, because what a screen's leading action is, is that screen's decision. Measured on
+2026-08-20: **34 views have a button and only 3 have a leading action** — `ResumeHeroView`,
+`PlayerView` and `UpdateView`. That is the work step 6 has left.
+
 **The tokens carry no debt any more.** `NotSpentYet` is **empty**, and **all three scales** — type,
 spacing and corners — have a gate that requires the `.axaml` **not to write the number**. A new view
 that writes a size, a spacing or a corner by hand fails `ScalarTokenTests`. **That is what makes "one

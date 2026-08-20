@@ -10,6 +10,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A check that stops a control from ending up off the screen.** It is the defect that has come up
+  most often in this application — seven times — always the same: a row of buttons with translated
+  text that does not fit and leaves the last one half outside, where nobody can press it. All
+  forty-eight screens are now measured at once against the smallest window the application allows,
+  with every notice and state visible simultaneously, which is wider than they ever really are.
+
 - **The update screen says which action is its own.** "Check for updates" was painted exactly like
   the other three buttons, so nothing on screen said what the screen was for.
 - **The mini player gains its five controls.** Pause/resume, two ten-second skips, back to the main

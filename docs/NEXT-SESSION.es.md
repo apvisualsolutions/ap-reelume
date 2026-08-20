@@ -5,6 +5,21 @@
 **`PlayerView`, la fase de escalares de espacio y la escala de radios están hechas.** Trece commits en
 la tanda. Del paso 6 queda **una sola cosa**: **una vista por commit en el orden de `SURFACES.es.md`**.
 
+**Y la red del desbordamiento ya no se escribe vista por vista: hay puerta.**
+`ViewOverflowTests` monta **las 48 vistas** sin contexto de datos —todas las ramas visibles a la vez,
+que es la cota superior— en una ventana de 900 y afirma que ningún control termina fuera. Probada
+fallando a 300: nombra nueve vistas con su control y su coordenada.
+[Su evidencia](evidence/stable/audit-view-overflow-gate.md).
+
+**Su limitación está dicha y hay que respetarla:** una vista sola recibe los 900 enteros, y anidada en
+el shell recibe menos. Caza la vista demasiado ancha **por sí misma**; la que sólo lo es al anidarse la
+sigue cazando el paseo. **Un silencio de esa puerta no es un certificado.**
+
+**Lo que queda por vista es, entonces, UNA SOLA COSA: `primary-action` donde la haya.** Y ésa **no se
+puede barrer**, porque cuál es la acción principal de una pantalla es una decisión de esa pantalla.
+Medido el 2026-08-20: **34 vistas tienen botón y sólo 3 tienen acción principal** —`ResumeHeroView`,
+`PlayerView` y `UpdateView`—. Ése es el trabajo que queda del paso 6.
+
 **Los tokens ya no tienen deuda.** `NotSpentYet` está **vacía** y hay puerta para **las tres escalas**
 —tipografía, espaciado y radios— que exige que el `.axaml` **no escriba el número**. Una vista nueva
 que escriba a mano un tamaño, un espaciado o una esquina falla en `ScalarTokenTests`. **Eso es lo que

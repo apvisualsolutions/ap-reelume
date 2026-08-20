@@ -10,6 +10,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Una comprobación que impide que un mando quede fuera de la pantalla.** Es el defecto que más veces
+  ha aparecido en esta aplicación —siete—, siempre igual: una fila de botones con textos traducidos
+  que no cabe y deja el último medio fuera, donde nadie puede pulsarlo. Ahora las cuarenta y ocho
+  pantallas se miden de una vez contra la ventana más pequeña que la aplicación permite, y con todos
+  sus avisos y estados visibles a la vez, que es más ancho de lo que llegan a estar nunca.
+
 - **La pantalla de actualización dice cuál es su acción.** «Buscar actualizaciones» se pintaba igual
   que los otros tres botones, así que nada en pantalla decía para qué está esa pantalla.
 - **El mini reproductor gana sus cinco controles.** Pausa/reanudar, dos saltos de diez segundos,
