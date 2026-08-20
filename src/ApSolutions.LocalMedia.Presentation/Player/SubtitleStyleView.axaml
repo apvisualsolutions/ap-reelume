@@ -97,7 +97,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         x:Name="SubtitlePreviewSurface"
         Padding="12"
         Background="{DynamicResource CardSurfaceBrush}"
-        CornerRadius="8"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource SubtitleStylePreviewLabel}">
       <TextBlock
           x:Name="SubtitlePreviewText"

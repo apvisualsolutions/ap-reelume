@@ -15,7 +15,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="review:MediaVersionItemViewModel">
-          <Border Margin="0,4" Padding="12" BorderThickness="1" CornerRadius="6">
+          <Border Margin="0,4" Padding="12" BorderThickness="1" CornerRadius="{DynamicResource CornerRadiusMedium}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}" RowDefinitions="Auto,Auto">
               <RadioButton
                   automation:AutomationProperties.Name="{Binding ShortPath}"

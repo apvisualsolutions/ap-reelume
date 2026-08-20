@@ -41,6 +41,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <x:Double x:Key="Space12">12</x:Double>
       <x:Double x:Key="Space16">16</x:Double>
       <x:Double x:Key="Space24">24</x:Double>
+      <!--
+        Two radii for the whole application, spent by all 37 CornerRadius sites in src/. Thirty of
+        them were literals: 8 eighteen times, 4 five times, and 6, 10 and 12 seven times between them.
+
+        Those seven looked like a missing step, because the 10s and the 12 are all card surfaces and a
+        large card sharing a button's radius does look wrong. The tree said otherwise: of the seven
+        surfaces painted with CardSurfaceBrush, four already carried 8. It was not a step being asked
+        for, it was a split nobody decided, so all seven became Medium and the scale stays at two.
+        The one site that moves more than 2px is the welcome card, and it moves into line with six
+        others.
+
+        These stay semantic where the spacing scale went numeric: two values with no gap between them
+        cannot develop a missing step, which is the whole reason those had to be renamed.
+      -->
       <CornerRadius x:Key="CornerRadiusSmall">4</CornerRadius>
       <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
       <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>

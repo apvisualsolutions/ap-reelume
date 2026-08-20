@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       Padding="12"
       BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
       BorderThickness="1"
-      CornerRadius="6"
+      CornerRadius="{DynamicResource CornerRadiusMedium}"
       automation:AutomationProperties.Name="{Binding StableKey}"
       automation:AutomationProperties.HelpText="{Binding ExplanationSummary}">
     <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="{DynamicResource Space8}">

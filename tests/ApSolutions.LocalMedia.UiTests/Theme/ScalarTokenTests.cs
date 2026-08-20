@@ -249,6 +249,64 @@ public sealed class ScalarTokenTests
                 + "being written by hand.");
     }
 
+    /// <summary>No view writes a corner radius of its own instead of asking the scale.</summary>
+    /// <remarks>
+    /// <para>
+    /// The third scale, and the last one that was still loose. Thirty literals across twenty-six
+    /// files: 8 eighteen times, 4 five times, and then 6 four times, 10 twice and 12 once.
+    /// </para>
+    /// <para>
+    /// Those last seven looked like a missing step — the 10s and the 12 are all card surfaces, and a
+    /// large card sharing a button's radius does look wrong — so the hypothesis was worth having. The
+    /// measurement refused it: of the seven surfaces painted with <c>CardSurfaceBrush</c>, <b>four
+    /// already carried 8</b> and three carried 10 or 12. That is not a step the tree is asking for,
+    /// it is a split nobody decided. So all seven go to <c>CornerRadiusMedium</c>, which is what four
+    /// of the cards already were, and the scale stays at two values with no gap between them. Only
+    /// one site moves by more than 2px, and it moves into line with six others.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_view_writes_a_corner_radius_of_its_own_instead_of_asking_the_scale()
+    {
+        var literals = new List<string>();
+        var references = 0;
+        var pattern = new Regex(
+            @"CornerRadius=""(?<value>[^""]+)""",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(5));
+
+        foreach (var file in Directory.EnumerateFiles(
+            Path.Combine(RepositoryLayout.Root, "src"),
+            "*.axaml",
+            SearchOption.AllDirectories))
+        {
+            foreach (Match match in pattern.Matches(File.ReadAllText(file)))
+            {
+                if (match.Groups["value"].Value.StartsWith('{'))
+                {
+                    references++;
+                }
+                else
+                {
+                    literals.Add($"{Path.GetFileName(file)}: {match.Value}");
+                }
+            }
+        }
+
+        Assert.True(
+            literals.Count == 0,
+            "a view writes its own corner radius instead of asking the scale:\n  "
+                + string.Join("\n  ", literals));
+
+        // Anti-blindness floor: 37 corners come from the scale, and a view added later only makes
+        // this bigger.
+        Assert.True(
+            references >= 37,
+            $"only {references} corner radii come from the scale, which is fewer than the 37 that "
+                + "were mapped onto it, so either this check stopped reading or radii went back to "
+                + "being written by hand.");
+    }
+
     /// <summary>Every keyed entry of the token file that is not a brush or a redirect.</summary>
     private static HashSet<string> DeclaredScalars()
     {

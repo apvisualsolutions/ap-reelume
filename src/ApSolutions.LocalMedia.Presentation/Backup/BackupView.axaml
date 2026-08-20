@@ -54,7 +54,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Background="{DynamicResource AccentSubtleBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
-        CornerRadius="8"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource BackupStatusAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
       <StackPanel Spacing="{DynamicResource Space8}">

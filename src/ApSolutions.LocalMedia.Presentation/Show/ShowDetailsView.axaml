@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Padding="8,4"
           VerticalAlignment="Center"
           Background="{DynamicResource AccentSubtleBrush}"
-          CornerRadius="4"
+          CornerRadius="{DynamicResource CornerRadiusSmall}"
           IsVisible="{Binding !IsAvailable}"
           automation:AutomationProperties.Name="{DynamicResource MediaUnavailable}">
         <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource MediaUnavailable}" />

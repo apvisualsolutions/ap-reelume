@@ -110,7 +110,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Grid.Row="2"
             Padding="12"
             Background="{DynamicResource AccentSubtleBrush}"
-            CornerRadius="8"
+            CornerRadius="{DynamicResource CornerRadiusMedium}"
             automation:AutomationProperties.Name="{DynamicResource AboutAccessibleName}">
           <StackPanel Spacing="{DynamicResource Space4}">
             <TextBlock
@@ -145,7 +145,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Margin="0,36,0,0"
           Padding="28"
           Background="{DynamicResource CardSurfaceBrush}"
-          CornerRadius="12"
+          CornerRadius="{DynamicResource CornerRadiusMedium}"
           automation:AutomationProperties.Name="{DynamicResource CurrentAreaAccessibleName}">
         <StackPanel VerticalAlignment="Center" Spacing="{DynamicResource Space12}">
           <TextBlock

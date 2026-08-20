@@ -59,7 +59,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Background="{DynamicResource AccentSubtleBrush}"
           BorderBrush="{DynamicResource ShellBorderBrush}"
           BorderThickness="1"
-          CornerRadius="8"
+          CornerRadius="{DynamicResource CornerRadiusMedium}"
           automation:AutomationProperties.Name="{DynamicResource RootAddFailureAccessibleName}"
           automation:AutomationProperties.LiveSetting="Assertive">
         <TextBlock
@@ -108,7 +108,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Background="{DynamicResource AccentSubtleBrush}"
           BorderBrush="{DynamicResource ShellBorderBrush}"
           BorderThickness="1"
-          CornerRadius="8"
+          CornerRadius="{DynamicResource CornerRadiusMedium}"
           automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}"
           automation:AutomationProperties.LiveSetting="Assertive">
         <StackPanel Spacing="{DynamicResource Space12}">
@@ -139,7 +139,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Background="{DynamicResource AccentSubtleBrush}"
           BorderBrush="{DynamicResource ShellBorderBrush}"
           BorderThickness="1"
-          CornerRadius="8">
+          CornerRadius="{DynamicResource CornerRadiusMedium}">
         <StackPanel Spacing="{DynamicResource Space12}">
           <TextBlock
               Foreground="{DynamicResource TextPrimaryBrush}"
