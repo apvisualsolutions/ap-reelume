@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="settings:AppearanceSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource AppearanceAccessibleName}">
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
-    <StackPanel MaxWidth="620" Spacing="16">
+    <StackPanel MaxWidth="620" Spacing="{DynamicResource Space16}">
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
@@ -23,13 +23,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource AppearanceDescription}"
           TextWrapping="Wrap" />
-      <StackPanel Orientation="Horizontal" Spacing="12">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
         <Button
             Classes="theme-option"
             automation:AutomationProperties.Name="{DynamicResource ThemeSystem}"
             Command="{Binding ApplyThemeCommand}"
             CommandParameter="{x:Static theme:ThemePreference.System}">
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
             <TextBlock Text="{Binding SystemStateCue}" />
             <TextBlock Text="{DynamicResource ThemeSystem}" />
           </StackPanel>
@@ -39,7 +39,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             automation:AutomationProperties.Name="{DynamicResource ThemeLight}"
             Command="{Binding ApplyThemeCommand}"
             CommandParameter="{x:Static theme:ThemePreference.Light}">
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
             <TextBlock Text="{Binding LightStateCue}" />
             <TextBlock Text="{DynamicResource ThemeLight}" />
           </StackPanel>
@@ -49,7 +49,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             automation:AutomationProperties.Name="{DynamicResource ThemeDark}"
             Command="{Binding ApplyThemeCommand}"
             CommandParameter="{x:Static theme:ThemePreference.Dark}">
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
             <TextBlock Text="{Binding DarkStateCue}" />
             <TextBlock Text="{DynamicResource ThemeDark}" />
           </StackPanel>
@@ -65,13 +65,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource LanguageDescription}"
           TextWrapping="Wrap" />
-      <StackPanel Orientation="Horizontal" Spacing="12">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
         <Button
             Classes="theme-option"
             automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
             Command="{Binding ApplyLanguageCommand}"
             CommandParameter="es">
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
             <TextBlock Text="{Binding SpanishStateCue}" />
             <TextBlock Text="{DynamicResource LanguageSpanish}" />
           </StackPanel>
@@ -81,7 +81,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             automation:AutomationProperties.Name="{DynamicResource LanguageEnglish}"
             Command="{Binding ApplyLanguageCommand}"
             CommandParameter="en">
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
             <TextBlock Text="{Binding EnglishStateCue}" />
             <TextBlock Text="{DynamicResource LanguageEnglish}" />
           </StackPanel>

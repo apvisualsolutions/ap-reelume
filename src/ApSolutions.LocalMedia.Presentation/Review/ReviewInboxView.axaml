@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.KeyBindings>
     <KeyBinding Gesture="Escape" Command="{Binding ClearSelectionCommand}" />
   </UserControl.KeyBindings>
-  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeDisplay}"
         FontWeight="SemiBold"
@@ -22,7 +22,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.HeadingLevel="1" />
     <StackPanel
         Grid.Row="1"
-        Spacing="8"
+        Spacing="{DynamicResource Space8}"
         IsVisible="{Binding HasReassignments}"
         automation:AutomationProperties.Name="{DynamicResource ReassignmentSectionAccessibleName}">
       <TextBlock
@@ -44,7 +44,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 BorderBrush="{DynamicResource ShellBorderBrush}"
                 BorderThickness="1"
                 CornerRadius="8">
-              <StackPanel Spacing="8">
+              <StackPanel Spacing="{DynamicResource Space8}">
                 <TextBlock FontWeight="SemiBold" Text="{Binding NewPath}" TextWrapping="Wrap" />
                 <ItemsControl ItemsSource="{Binding Candidates}">
                   <ItemsControl.ItemTemplate>
@@ -56,7 +56,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                       window — a real library path is long enough to make the only control that
                       confirms a reassignment unreachable, with nothing to scroll sideways.
                       -->
-                      <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                      <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
                         <TextBlock VerticalAlignment="Center" Text="{Binding Path}" TextWrapping="Wrap" />
                         <!--
                         One offer lists every candidate it could be, so this button repeats once per
@@ -87,7 +87,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ItemsControl.ItemTemplate>
       </ItemsControl>
     </StackPanel>
-    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
       <TextBox
           x:Name="ManualSearchBox"
           automation:AutomationProperties.Name="{DynamicResource ReviewManualSearchLabel}"
@@ -120,7 +120,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <WrapPanel Grid.Row="4" ItemSpacing="8" LineSpacing="8">
+    <WrapPanel Grid.Row="4" ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="AcceptReviewAction"
           automation:AutomationProperties.Name="{DynamicResource ReviewAcceptAction}"

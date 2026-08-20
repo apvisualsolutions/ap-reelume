@@ -13,7 +13,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         MaxWidth="720"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
-        Spacing="12">
+        Spacing="{DynamicResource Space12}">
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"

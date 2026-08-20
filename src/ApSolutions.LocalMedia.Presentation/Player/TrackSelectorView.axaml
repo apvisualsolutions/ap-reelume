@@ -10,8 +10,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:TrackSelectorViewModel"
     automation:AutomationProperties.Name="{DynamicResource TrackSelectorAccessibleName}">
-  <StackPanel x:Name="TrackSelectorSurface" Spacing="12">
-    <StackPanel Spacing="4">
+  <StackPanel x:Name="TrackSelectorSurface" Spacing="{DynamicResource Space12}">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource TrackSelectorAudioLabel}" />
@@ -24,7 +24,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           SelectedItem="{Binding SelectedAudio, Mode=TwoWay}" />
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource TrackSelectorSubtitleLabel}" />

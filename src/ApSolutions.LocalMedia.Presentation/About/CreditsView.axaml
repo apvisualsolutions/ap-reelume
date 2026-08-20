@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     automation:AutomationProperties.Name="{DynamicResource AboutCreditsAccessibleName}">
-  <StackPanel Spacing="8">
+  <StackPanel Spacing="{DynamicResource Space8}">
     <TextBlock
         Text="{DynamicResource AboutCreditsHeading}"
         FontSize="{DynamicResource FontSizeSubtitle}"

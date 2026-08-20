@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
@@ -36,18 +37,17 @@ public sealed class ScalarTokenTests
     private static readonly string[] SpentByTheBaseTheme = ["TextControlPlaceholderOpacity"];
 
     /// <summary>
-    /// Declared for the redesign and not spent yet. <b>This list may only shrink.</b> The views are
-    /// the phase that spends them, and the test below refuses both a name that has started being
-    /// used and a name that has stopped existing, so it cannot quietly become a place to park things.
+    /// Declared for the redesign and not spent yet. <b>This list may only shrink, and on 2026-08-20
+    /// it reached empty.</b>
     /// </summary>
-    private static readonly string[] NotSpentYet =
-    [
-        "SpaceXSmall",
-        "SpaceSmall",
-        "SpaceMedium",
-        "SpaceLarge",
-        "SpaceXLarge",
-    ];
+    /// <remarks>
+    /// It held the five space scalars from the day they were declared until the spacing phase spent
+    /// them: all 186 spacing sites in <c>src/</c> now ask the scale. Empty is asserted rather than
+    /// merely allowed, because a loop over an empty list passes by doing nothing, and a check that
+    /// has gone blind looks exactly like one that has been satisfied. Adding a name back is a
+    /// decision somebody has to make against a failing test.
+    /// </remarks>
+    private static readonly string[] NotSpentYet = [];
 
     /// <summary>
     /// What a resource dictionary holds that is not a scalar. Written as what to exclude rather than
@@ -101,6 +101,14 @@ public sealed class ScalarTokenTests
     {
         var declared = DeclaredScalars();
         var spent = SpentScalars(declared);
+
+        // The list reached empty on 2026-08-20 and this says so out loud. Without it the loop below
+        // would iterate over nothing and pass, which is what a check looks like after it has gone
+        // blind — indistinguishable from one that is satisfied.
+        Assert.True(
+            NotSpentYet.Length == 0,
+            $"{string.Join(", ", NotSpentYet)} — the unspent list was empty and is not any more. It "
+                + "only shrinks, so a token that goes back on it is a phase that did not finish.");
 
         foreach (var name in NotSpentYet)
         {
@@ -177,6 +185,68 @@ public sealed class ScalarTokenTests
             literals.Count == 0,
             "a view writes its own font size instead of asking the scale:\n  "
                 + string.Join("\n  ", literals));
+    }
+
+    /// <summary>No view writes a spacing of its own instead of asking the scale.</summary>
+    /// <remarks>
+    /// <para>
+    /// The same check the font sizes get, for the same reason, and this is the half that the update
+    /// screen taught: a test that compares the painted <em>value</em> cannot tell a literal from a
+    /// token while the two agree — and they agree exactly when the tokenisation would be correct, so
+    /// the false green is the normal case. What is asserted is that the markup does not write the
+    /// number.
+    /// </para>
+    /// <para>
+    /// All five spacing properties are read, not just <c>Spacing</c>. <c>RowSpacing</c> and
+    /// <c>ColumnSpacing</c> belong to <c>Grid</c> and are the same double saying the same thing, and
+    /// they were nearly missed: a pattern anchored with a word boundary counted 163 sites where there
+    /// were 186, and the 23 it skipped were all of them. A gate that watches four of five properties
+    /// is a gate that says the phase is finished when it is not.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_view_writes_a_spacing_of_its_own_instead_of_asking_the_scale()
+    {
+        var literals = new List<string>();
+        var references = 0;
+        var pattern = new Regex(
+            @"(Row|Column|Item|Line)?Spacing=""(?<value>[^""]+)""",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(5));
+
+        foreach (var file in Directory.EnumerateFiles(
+            Path.Combine(RepositoryLayout.Root, "src"),
+            "*.axaml",
+            SearchOption.AllDirectories))
+        {
+            foreach (Match match in pattern.Matches(File.ReadAllText(file)))
+            {
+                var value = match.Groups["value"].Value;
+                if (value.StartsWith('{'))
+                {
+                    references++;
+                }
+                else
+                {
+                    literals.Add($"{Path.GetFileName(file)}: {match.Value}");
+                }
+            }
+        }
+
+        // The literals go first because this is the assertion that names the file. The floor below
+        // catches the same mutation, but it can only say that a number is missing, not where it went.
+        Assert.True(
+            literals.Count == 0,
+            "a view writes its own spacing instead of asking the scale:\n  "
+                + string.Join("\n  ", literals));
+
+        // Anti-blindness floor: a reader that found nothing would pass by measuring nothing. 186 sites
+        // were mapped onto the scale, and a view added later only makes this bigger.
+        Assert.True(
+            references >= 186,
+            $"only {references} spacings come from the scale, which is fewer than the 186 that were "
+                + "mapped onto it, so either this check stopped reading or spacings went back to "
+                + "being written by hand.");
     }
 
     /// <summary>Every keyed entry of the token file that is not a brush or a redirect.</summary>

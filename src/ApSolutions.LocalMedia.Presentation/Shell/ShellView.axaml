@@ -41,7 +41,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <StackPanel
             Grid.Row="1"
             Margin="0,28,0,0"
-            Spacing="8"
+            Spacing="{DynamicResource Space8}"
             automation:AutomationProperties.Name="{DynamicResource MainNavigationAccessibleName}">
           <Button
               Classes="navigation-destination"
@@ -50,7 +50,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Home}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Home}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
               <TextBlock Text="{DynamicResource NavigationHome}" />
             </StackPanel>
@@ -62,7 +62,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Library}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Library}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
               <TextBlock Text="{DynamicResource NavigationLibrary}" />
             </StackPanel>
@@ -74,7 +74,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Review}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Review}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
               <TextBlock Text="{DynamicResource NavigationReview}" />
             </StackPanel>
@@ -86,7 +86,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Backups}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Backups}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
               <TextBlock Text="{DynamicResource NavigationBackups}" />
             </StackPanel>
@@ -98,7 +98,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Settings}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Settings}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
               <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
               <TextBlock Text="{DynamicResource NavigationSettings}" />
             </StackPanel>
@@ -112,7 +112,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Background="{DynamicResource AccentSubtleBrush}"
             CornerRadius="8"
             automation:AutomationProperties.Name="{DynamicResource AboutAccessibleName}">
-          <StackPanel Spacing="2">
+          <StackPanel Spacing="{DynamicResource Space4}">
             <TextBlock
                 FontWeight="SemiBold"
                 Text="{DynamicResource ProductDisplayName}" />
@@ -147,7 +147,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Background="{DynamicResource CardSurfaceBrush}"
           CornerRadius="12"
           automation:AutomationProperties.Name="{DynamicResource CurrentAreaAccessibleName}">
-        <StackPanel VerticalAlignment="Center" Spacing="10">
+        <StackPanel VerticalAlignment="Center" Spacing="{DynamicResource Space12}">
           <TextBlock
               HorizontalAlignment="Center"
               FontSize="{DynamicResource FontSizeSubtitle}"
@@ -170,7 +170,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ScrollViewer
         Grid.Column="1"
         IsVisible="{Binding IsSettingsVisible}">
-      <StackPanel Margin="0,0,0,24" Spacing="24">
+      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
         <settings:AppearanceSettingsView DataContext="{Binding AppearanceSettings}" />
         <ContentControl
             Margin="48,0"
@@ -219,7 +219,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsLibraryVisible}">
-      <StackPanel Spacing="24">
+      <StackPanel Spacing="{DynamicResource Space24}">
         <ContentControl IsVisible="{Binding HasOnboarding}">
           <onboarding:RootOnboardingView DataContext="{Binding Onboarding}" />
         </ContentControl>
@@ -227,7 +227,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <StackPanel
             x:Name="TitleActionsSurface"
             Orientation="Horizontal"
-            Spacing="8"
+            Spacing="{DynamicResource Space8}"
             automation:AutomationProperties.Name="{DynamicResource TitleActionsAccessibleName}">
           <Button
               automation:AutomationProperties.Name="{DynamicResource TitleEditMetadataAction}"
@@ -254,7 +254,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsReviewVisible}">
-      <StackPanel Spacing="24">
+      <StackPanel Spacing="{DynamicResource Space24}">
         <review:ReviewInboxView DataContext="{Binding ReviewInbox}" />
         <ContentControl IsVisible="{Binding HasDuplicates}">
           <review:DuplicateReviewView DataContext="{Binding Duplicates}" />
@@ -265,7 +265,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsBackupsVisible}">
-      <StackPanel Margin="0,0,0,24" Spacing="24">
+      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
         <backup:BackupView DataContext="{Binding Backups}" />
         <ContentControl IsVisible="{Binding HasRestore}">
           <backup:RestoreWizardView DataContext="{Binding Restore}" />
@@ -305,7 +305,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </Panel>
       </ContentControl>
       <ScrollViewer Grid.Column="1" Margin="16">
-        <StackPanel Spacing="16">
+        <StackPanel Spacing="{DynamicResource Space16}">
           <!--
           A WrapPanel, like the backup actions, and not a horizontal StackPanel: this column is 320 px
           wide by definition and the three buttons are about 800 px of them. A horizontal StackPanel
@@ -313,7 +313,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           x=1737 in a 1600 px window and Fullscreen was further out still — measured on 2026-08-16.
           Neither was reachable at any window size, because the column never grows.
           -->
-          <WrapPanel ItemSpacing="8" LineSpacing="8">
+          <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
             <Button
                 automation:AutomationProperties.Name="{DynamicResource PlayerCloseAction}"
                 Command="{Binding ClosePlayerCommand}"

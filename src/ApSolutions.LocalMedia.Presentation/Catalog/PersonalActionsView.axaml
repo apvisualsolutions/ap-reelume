@@ -11,8 +11,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     x:DataType="catalog:PersonalActionsViewModel"
     automation:AutomationProperties.Name="{DynamicResource PersonalActionsAccessibleName}">
-  <StackPanel Spacing="8">
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+  <StackPanel Spacing="{DynamicResource Space8}">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <ToggleButton
           Command="{Binding ToggleFavoriteCommand}"
           Content="{DynamicResource PersonalFavoriteAction}"
@@ -28,7 +28,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource PersonalFavoriteOff}" />
     </WrapPanel>
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <ToggleButton
           Command="{Binding ToggleWatchLaterCommand}"
           Content="{DynamicResource PersonalWatchLaterAction}"
@@ -44,14 +44,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource PersonalWatchLaterOff}" />
     </WrapPanel>
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <TextBlock
           VerticalAlignment="Center"
           Text="{DynamicResource PersonalRatingLabel}" />
       <ItemsControl ItemsSource="{Binding RatingChoices}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
-            <WrapPanel ItemSpacing="4" LineSpacing="4" />
+            <WrapPanel ItemSpacing="{DynamicResource Space4}" LineSpacing="{DynamicResource Space4}" />
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>

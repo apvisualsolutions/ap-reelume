@@ -17,8 +17,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="10">
-    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-      <StackPanel Spacing="4">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+      <StackPanel Spacing="{DynamicResource Space4}">
         <TextBlock
             FontSize="{DynamicResource FontSizeBody}"
             Text="{DynamicResource HomeResumeHeading}" />
@@ -32,7 +32,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             IsVisible="{Binding HasResumeSubtitle}"
             Text="{Binding ResumeSubtitle}"
             TextTrimming="CharacterEllipsis" />
-        <StackPanel Orientation="Horizontal" Spacing="8">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
           <ProgressBar
               Width="220"
               VerticalAlignment="Center"

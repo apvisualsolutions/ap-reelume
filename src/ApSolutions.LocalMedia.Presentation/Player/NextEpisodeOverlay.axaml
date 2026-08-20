@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="8">
-  <StackPanel Spacing="8">
+  <StackPanel Spacing="{DynamicResource Space8}">
     <TextBlock
         x:Name="NextEpisodeHeadline"
         Foreground="{DynamicResource TextPrimaryBrush}"
@@ -39,7 +39,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{Binding EpisodeLabel}" />
 
-    <StackPanel Orientation="Horizontal" Spacing="6">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource NextEpisodeRemainingLabel}" />
@@ -49,7 +49,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{Binding CountdownText}" />
     </StackPanel>
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="PlayNextNowButton"
           Command="{Binding PlayNowCommand}"

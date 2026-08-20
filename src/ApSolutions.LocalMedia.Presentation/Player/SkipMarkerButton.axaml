@@ -15,7 +15,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       IsVisible="{Binding IsVisible}"
       Command="{Binding SkipCommand}"
       automation:AutomationProperties.Name="{DynamicResource SkipMarkerAccessibleName}">
-    <StackPanel Orientation="Horizontal" Spacing="6">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <TextBlock
           x:Name="SkipIntroText"
           IsVisible="{Binding IsIntro}"

@@ -11,11 +11,36 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <Thickness x:Key="FocusStrokeThickness">2</Thickness>
       <Thickness x:Key="FocusInnerStrokeThickness">1</Thickness>
       <x:Double x:Key="ControlHeight">36</x:Double>
-      <x:Double x:Key="SpaceXSmall">4</x:Double>
-      <x:Double x:Key="SpaceSmall">8</x:Double>
-      <x:Double x:Key="SpaceMedium">16</x:Double>
-      <x:Double x:Key="SpaceLarge">24</x:Double>
-      <x:Double x:Key="SpaceXLarge">32</x:Double>
+      <!--
+        The spacing scale, spent by all 186 spacing sites in src/ - Spacing, ItemSpacing, LineSpacing,
+        RowSpacing and ColumnSpacing, which are all double and all say the same thing. Counted rather
+        than chosen: 8 appeared 92 times, 12 forty-six, 4 twenty-one, 6 twelve, 16 six, 24 four, 2
+        three times and 10 twice.
+
+        12 is a step of its own and not a rounding. The gap from 8 to 16 is 2x and real use piles up
+        inside it — 12 was the second most common value in the tree, a quarter of all its spacing — so
+        mapping those forty-six sites to 8 or to 16 would move every one of them by a third, which is
+        a visual decision taken by arithmetic rather than by design. The rest map to the nearest step
+        and nothing in the application moves more than 2px: 6 to Space8, 2 to Space4, 10 to Space12.
+
+        Numeric names and not XSmall/Small/Medium, because a semantic scale forces a new name to be
+        invented every time a step turns out to be missing, and one just did: the alternative here
+        was SpaceSmallMedium, which describes nothing. A number cannot lie about what it is.
+
+        There is no Space32, for the same reason FontSizeMono is not declared: nothing spends it, and
+        a scalar nobody reads is this repository's characteristic defect wearing a tidy name.
+        ScalarTokenTests would refuse it. It arrives with the first site that asks for 32.
+
+        Padding, Margin and BorderThickness keep their literals and are not on this scale. They are
+        Thickness and these are x:Double, so the setter does not convert; and of the 89 literals
+        those three properties carry, 37 are asymmetric - 0,8,0,0 and 48,0 and 8,4 - which no scalar
+        token expresses at all.
+      -->
+      <x:Double x:Key="Space4">4</x:Double>
+      <x:Double x:Key="Space8">8</x:Double>
+      <x:Double x:Key="Space12">12</x:Double>
+      <x:Double x:Key="Space16">16</x:Double>
+      <x:Double x:Key="Space24">24</x:Double>
       <CornerRadius x:Key="CornerRadiusSmall">4</CornerRadius>
       <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
       <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>

@@ -29,7 +29,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="8">
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           x:Name="HdrPassthroughText"
           IsVisible="{Binding IsHdrPassthrough}"

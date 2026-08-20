@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="8">
-  <StackPanel Spacing="12">
+  <StackPanel Spacing="{DynamicResource Space12}">
     <TextBlock
         x:Name="VersionSwitchHeadline"
         Foreground="{DynamicResource TextPrimaryBrush}"
@@ -54,7 +54,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource VersionSwitchIncompatibleStructure}"
         TextWrapping="Wrap" />
 
-    <StackPanel Orientation="Horizontal" Spacing="6">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource VersionSwitchSuggestedLabel}" />
@@ -69,7 +69,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       one: a horizontal StackPanel offers its children infinite width, so three answers of unknown
       length draw where they fall rather than where they fit.
     -->
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="ConfirmSwitchButton"
           Command="{Binding ConfirmCommand}"

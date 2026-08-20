@@ -32,7 +32,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="8">
-    <StackPanel Spacing="8">
+    <StackPanel Spacing="{DynamicResource Space8}">
       <TextBlock
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
@@ -48,7 +48,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource LooseFileDescription}"
           TextWrapping="Wrap" />
 
-      <WrapPanel ItemSpacing="8" LineSpacing="8">
+      <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
         <Button
             x:Name="AddContainingFolderButton"
             Command="{Binding AddFolderCommand}"
@@ -67,12 +67,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
           IsVisible="{Binding IsAddFolderConfirmationPending}"
           automation:AutomationProperties.Name="{DynamicResource LooseFileConfirmAccessibleName}"
           automation:AutomationProperties.LiveSetting="Polite">
-        <StackPanel Spacing="8">
+        <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock
               MaxWidth="600"
               Text="{DynamicResource LooseFileConfirmDescription}"
               TextWrapping="Wrap" />
-          <WrapPanel ItemSpacing="8" LineSpacing="8">
+          <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
             <Button
                 x:Name="ConfirmAddFolderButton"
                 Command="{Binding ConfirmAddFolderCommand}"

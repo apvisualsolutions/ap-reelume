@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:ShortcutSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsAccessibleName}">
-  <StackPanel x:Name="ShortcutSettingsSurface" Spacing="12">
+  <StackPanel x:Name="ShortcutSettingsSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"

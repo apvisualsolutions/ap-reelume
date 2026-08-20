@@ -9,13 +9,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:EpisodeRowViewModel">
-  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-    <StackPanel Orientation="Horizontal" Spacing="4">
+  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
       <TextBlock Text="{DynamicResource EpisodePrefix}" />
       <TextBlock FontWeight="SemiBold" Text="{Binding EpisodeNumberText}" />
     </StackPanel>
 
-    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <TextBlock IsVisible="{Binding IsWatched}" Text="{DynamicResource WatchStatusWatched}" />
       <TextBlock IsVisible="{Binding IsInProgress}" Text="{DynamicResource WatchStatusInProgress}" />
       <TextBlock IsVisible="{Binding IsNotStarted}" Text="{DynamicResource WatchStatusNotStarted}" />

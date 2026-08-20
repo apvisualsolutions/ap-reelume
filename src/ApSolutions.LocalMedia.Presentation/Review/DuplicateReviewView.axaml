@@ -10,13 +10,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
     x:DataType="review:DuplicateReviewViewModel"
     automation:AutomationProperties.Name="{DynamicResource DuplicateReviewAccessibleName}">
-  <Grid RowDefinitions="Auto,*" RowSpacing="12">
+  <Grid RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space12}">
     <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource DuplicateReviewTitle}" />
     <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="review:MediaVersionItemViewModel">
           <Border Margin="0,4" Padding="12" BorderThickness="1" CornerRadius="6">
-            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}" RowDefinitions="Auto,Auto">
               <RadioButton
                   automation:AutomationProperties.Name="{Binding ShortPath}"
                   Command="{Binding $parent[ItemsControl].((review:DuplicateReviewViewModel)DataContext).SetPreferredCommand}"
@@ -24,7 +24,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   IsChecked="{Binding IsEffective}" />
               <TextBlock Grid.Column="1" Text="{Binding ShortPath}" />
               <TextBlock Grid.Column="2" Text="{Binding Quality}" />
-              <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+              <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
                 <TextBlock IsVisible="{Binding IsAvailable}" Text="{DynamicResource MediaVersionAvailable}" />
                 <TextBlock IsVisible="{Binding IsUnavailable}" Text="{DynamicResource MediaVersionUnavailable}" />
                 <TextBlock IsVisible="{Binding IsStoredPreferred}" Text="{DynamicResource MediaVersionPreferred}" />

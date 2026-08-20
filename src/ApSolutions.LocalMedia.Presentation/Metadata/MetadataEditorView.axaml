@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="metadata:MetadataEditorViewModel"
     automation:AutomationProperties.Name="{DynamicResource MetadataEditorAccessibleName}">
   <ScrollViewer>
-    <Grid Margin="24" ColumnDefinitions="2*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="12">
+    <Grid Margin="24" ColumnDefinitions="2*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space8}" ColumnSpacing="{DynamicResource Space12}">
       <TextBlock Grid.ColumnSpan="2" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource MetadataEditorTitle}" />
 
       <TextBox Grid.Row="1" Text="{Binding Title}" automation:AutomationProperties.Name="{DynamicResource MetadataTitleLabel}" />
@@ -40,7 +40,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock Grid.Row="9" Grid.ColumnSpan="2" IsVisible="{Binding HasConflict}" Text="{DynamicResource MetadataConflictMessage}" />
       <TextBlock Name="UnidentifiedMessage" Grid.Row="9" Grid.ColumnSpan="2" TextWrapping="Wrap" IsVisible="{Binding IsUnidentified}" Text="{DynamicResource MetadataUnidentifiedMessage}" />
       <TextBlock Name="NoProviderAnswerMessage" Grid.Row="9" Grid.ColumnSpan="2" TextWrapping="Wrap" IsVisible="{Binding HasNoProviderAnswer}" Text="{DynamicResource MetadataNoProviderAnswerMessage}" />
-      <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+      <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
         <Button Command="{Binding SaveCommand}" Content="{DynamicResource MetadataSaveAction}" automation:AutomationProperties.Name="{DynamicResource MetadataSaveAction}" />
         <Button Name="RefreshProviderMetadata" Command="{Binding RefreshProviderCommand}" Content="{DynamicResource MetadataRefreshAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRefreshAction}" />
         <Button Name="RestoreProviderMetadata" Command="{Binding RestoreProviderCommand}" Content="{DynamicResource MetadataRestoreAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRestoreAction}" />

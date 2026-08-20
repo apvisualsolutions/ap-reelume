@@ -11,8 +11,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:movie="clr-namespace:ApSolutions.LocalMedia.Presentation.Movie"
     x:DataType="movie:MovieDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource MovieDetailsAccessibleName}">
-  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="12">
-    <StackPanel Orientation="Horizontal" Spacing="12">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
@@ -34,7 +34,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Border>
     </StackPanel>
 
-    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <Button
           Command="{Binding ResumeCommand}"
           Content="{DynamicResource MovieResumeAction}"
@@ -60,7 +60,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
     </StackPanel>
 
-    <StackPanel Grid.Row="2" Spacing="8">
+    <StackPanel Grid.Row="2" Spacing="{DynamicResource Space8}">
       <catalog:WatchStatusControl DataContext="{Binding WatchStatus}" />
       <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
     </StackPanel>
@@ -78,7 +78,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         TextWrapping="Wrap"
         automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
 
-    <StackPanel Grid.Row="4" IsVisible="{Binding HasVersions}" Spacing="6">
+    <StackPanel Grid.Row="4" IsVisible="{Binding HasVersions}" Spacing="{DynamicResource Space8}">
       <TextBlock
           FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
@@ -86,9 +86,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <ItemsControl ItemsSource="{Binding Versions}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="movie:MediaVersionRowViewModel">
-            <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
               <TextBlock Text="{Binding QualityLabel}" />
-              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
                 <TextBlock IsVisible="{Binding IsEffective}" Text="{DynamicResource MovieVersionEffective}" />
                 <TextBlock IsVisible="{Binding IsPreferred}" Text="{DynamicResource MovieVersionPreferred}" />
                 <TextBlock IsVisible="{Binding !IsAvailable}" Text="{DynamicResource MediaUnavailable}" />

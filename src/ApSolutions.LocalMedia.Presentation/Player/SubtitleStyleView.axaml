@@ -10,14 +10,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:SubtitleStyleViewModel"
     automation:AutomationProperties.Name="{DynamicResource SubtitleStyleAccessibleName}">
-  <StackPanel x:Name="SubtitleStyleSurface" Spacing="12">
+  <StackPanel x:Name="SubtitleStyleSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource SubtitleStyleAccessibleName}"
         automation:AutomationProperties.HeadingLevel="2" />
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SubtitleStyleSizeLabel}" />
@@ -31,7 +31,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Value="{Binding FontSizePercent, Mode=TwoWay}" />
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SubtitleStyleFamilyLabel}" />
@@ -43,7 +43,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           SelectedItem="{Binding FontFamily, Mode=TwoWay}" />
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SubtitleStyleForegroundLabel}" />
@@ -54,7 +54,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{Binding ForegroundHex, Mode=TwoWay}" />
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SubtitleStyleBackgroundLabel}" />
@@ -65,7 +65,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{Binding BackgroundHex, Mode=TwoWay}" />
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SubtitleStyleBackgroundOpacityLabel}" />
@@ -79,7 +79,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Value="{Binding BackgroundOpacity, Mode=TwoWay}" />
     </StackPanel>
 
-    <StackPanel Spacing="4">
+    <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SubtitleStyleOutlineLabel}" />

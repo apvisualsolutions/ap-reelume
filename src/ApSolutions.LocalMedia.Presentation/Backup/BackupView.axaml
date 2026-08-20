@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="BackupResourceKey" />
   </UserControl.Resources>
-  <StackPanel x:Name="BackupSurface" Spacing="12">
+  <StackPanel x:Name="BackupSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource BackupDescription}"
         TextWrapping="Wrap" />
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="CreateCopyButton"
           Command="{Binding CreateCopyCommand}"
@@ -57,7 +57,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         CornerRadius="8"
         automation:AutomationProperties.Name="{DynamicResource BackupStatusAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
-      <StackPanel Spacing="8">
+      <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock
             x:Name="BackupStatusText"
             MaxWidth="600"

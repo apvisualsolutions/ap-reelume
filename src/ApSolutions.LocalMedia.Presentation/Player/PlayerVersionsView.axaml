@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:PlayerVersionsViewModel"
     automation:AutomationProperties.Name="{DynamicResource PlayerVersionsAccessibleName}">
-  <StackPanel Spacing="8" IsVisible="{Binding HasAlternatives}">
+  <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasAlternatives}">
     <TextBlock
         FontSize="{DynamicResource FontSizeBody}"
         FontWeight="SemiBold"

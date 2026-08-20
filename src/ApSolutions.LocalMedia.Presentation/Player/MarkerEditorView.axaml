@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:MarkerEditorViewModel"
     automation:AutomationProperties.Name="{DynamicResource MarkerEditorAccessibleName}">
-  <StackPanel x:Name="MarkerEditorSurface" Spacing="12">
+  <StackPanel x:Name="MarkerEditorSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         x:Name="MarkerEditorHeadline"
         Foreground="{DynamicResource TextPrimaryBrush}"
@@ -31,7 +31,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     surface lives in the player's 320 px column, where a kind selector and two spinners never fit on
     one line.
     -->
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <ComboBox
           x:Name="MarkerKindSelector"
           MinWidth="160"
@@ -64,7 +64,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource MarkerEditorOverlapError}"
         TextWrapping="Wrap" />
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="SaveMarkerButton"
           Command="{Binding SaveCommand}"

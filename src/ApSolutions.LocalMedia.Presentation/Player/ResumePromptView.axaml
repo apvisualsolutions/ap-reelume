@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="8">
-  <StackPanel Spacing="12">
+  <StackPanel Spacing="{DynamicResource Space12}">
     <TextBlock
         x:Name="ResumePromptHeadline"
         Foreground="{DynamicResource TextPrimaryBrush}"
@@ -39,7 +39,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{Binding ResumePositionText}" />
 
-    <WrapPanel ItemSpacing="8" LineSpacing="8">
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="ResumeButton"
           Command="{Binding ResumeCommand}"

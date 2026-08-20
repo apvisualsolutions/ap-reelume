@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="settings:LifecycleSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource LifecycleSettingsAccessibleName}">
-  <StackPanel x:Name="LifecycleSettingsSurface" Spacing="12">
+  <StackPanel x:Name="LifecycleSettingsSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -61,12 +61,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding IsStartupConsentPending}"
         automation:AutomationProperties.Name="{DynamicResource LifecycleStartupConsentAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
-      <StackPanel Spacing="12">
+      <StackPanel Spacing="{DynamicResource Space12}">
         <TextBlock
             MaxWidth="600"
             Text="{DynamicResource LifecycleStartupConsentDescription}"
             TextWrapping="Wrap" />
-        <WrapPanel ItemSpacing="8" LineSpacing="8">
+        <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
           <Button
               x:Name="GrantStartupConsentButton"
               Command="{Binding GrantStartupConsentCommand}"
