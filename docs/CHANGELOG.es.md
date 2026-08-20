@@ -114,6 +114,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Un medio que no está deja de parecer un error.** El distintivo de «no disponible ahora mismo» —el
+  que llevan los títulos de un USB desenchufado o de una carpeta de red caída— pasa a la forma de aviso:
+  fondo ámbar, borde y un símbolo delante, para que no dependa de distinguir un color. Y se dice de una
+  sola manera en las seis pantallas que lo enseñaban, que hasta ahora lo dibujaban cada una por su
+  cuenta.
+
+
 - **Con las recomendaciones apagadas, Inicio ya no dice que no haya nada que sugerir.** Decía «no hay
   nada que sugerir ahora mismo», que era falso: apagado, no se calcula nada y el catálogo no se llega a
   leer, así que la aplicación afirmaba algo sobre unas películas que nadie había mirado. Ahora el

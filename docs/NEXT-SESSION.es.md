@@ -130,17 +130,16 @@ con `EnumeratedCount`), el vacío de `ShowDetailsView` (`ShowDetailsEmpty`), «s
   `EmptyLibraryTitle` / `EmptyLibraryDescription`, y **las pinta `ShellView`**, no `LibraryView`.
   Añadir las del paquete sería duplicar. Las que sí faltan son
   `LibrarySearchNoResultsTitle` / `…Description`.
-- **`UnavailableBadge`** debe pasar de `AccentSubtleBrush` a `WarningSurfaceBrush` + borde + glifo. **Y
-  el trabajo es mayor de lo que la fila sugiere**: el mismo distintivo está **copiado a mano** en
-  `InProgressRailView`, `RecentlyAddedRailView`, `MovieDetailsView`, `ShowDetailsView` y
-  `EpisodeRowView`, así que o se cambian los seis o la aplicación dirá lo mismo de dos maneras. Lo
-  limpio es que el badge sea el único, y para eso hay que quitarle el `x:DataType` fijo a
-  `CatalogItemViewModel` — los cinco modelos exponen `IsAvailable`.
-- **⚠ `AccentSubtleBrush` es hoy la caja de aviso de TODA la aplicación: 18 vistas.** Y
-  `WarningSurfaceBrush`, `DangerSurfaceBrush` y `PositiveSurfaceBrush` están declarados en los cuatro
-  diccionarios y **ningún `.axaml` los lee** — declarados en previsión de la §4, que los gasta en los
-  tramos 3, 4 y 6. `ScalarTokenTests` no los vigila porque **no son escalares**. Si la fase 6 termina
-  sin gastarlos, son doce declaraciones muertas.
+- ~~**`UnavailableBadge`**~~ **HECHO el 2026-08-20** ([su evidencia](evidence/stable/audit-unavailable-badge.md)):
+  aviso con borde y glifo `⚠`, y **las cinco copias hechas a mano** —`InProgressRailView`,
+  `RecentlyAddedRailView`, `MovieDetailsView`, `ShowDetailsView` y `EpisodeRowView`— montan ya el
+  badge, con puerta que impide que vuelvan. Perdió el `x:DataType` para servir a seis modelos, y como
+  **Avalonia rechaza un binding compilado sin él**, su visibilidad es `ReflectionBinding`.
+- **⚠ `AccentSubtleBrush` es la caja de aviso de casi toda la aplicación: 18 vistas.** Los seis
+  pinceles de gramática —`WarningSurfaceBrush`, `DangerSurfaceBrush`, `PositiveSurfaceBrush` y sus tres
+  bordes— estaban declarados en los cuatro diccionarios **sin un solo lector**, esperando a la §4, que
+  los gasta en los tramos 3, 4 y 6. **El badge gastó el primero**; los otros cinco siguen sin lectores.
+  `ScalarTokenTests` no los vigila porque **no son escalares**.
 - **`MovieDetailsView`**: la fila de acciones es un `StackPanel` horizontal con **cuatro botones y un
   texto** y tiene que ser `WrapPanel`. Lo de «dos columnas con portada fija de 320 px» choca con que
   no hay portadas.

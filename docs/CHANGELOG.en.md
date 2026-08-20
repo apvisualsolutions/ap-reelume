@@ -114,6 +114,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **A medium that is not there stops looking like an error.** The "not available right now" badge — the
+  one on titles from an unplugged drive or a network share that is down — takes the shape of a warning:
+  amber fill, a border, and a symbol in front, so it never depends on telling a colour apart. And it is
+  said one way across the six screens that showed it, each of which used to draw its own.
+
+
 - **With recommendations off, Home no longer says there is nothing to suggest.** It said "there is
   nothing to suggest right now", which was false: switched off, nothing is computed and the catalogue
   is never read, so the application was making a claim about films nobody had looked at. The rail now
