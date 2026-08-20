@@ -8,13 +8,73 @@ escala de radios, la puerta de desbordamiento, las acciones principales de las 4
 corrección de lo que esa puerta prometía.
 
 **Lo que ahora bloquea el paso 8 —cortar 0.2.0— es el paseo físico de diez minutos del propietario
-(paso 7).** La sesión siguiente no tiene trabajo de rediseño que hacer; si abre sin un hallazgo de ese
-paseo, lo que toca es preguntar por él o adelantar lo que el paso 8 permita sin él.
+(paso 7).**
 
-**Una observación menor que quedó anotada y sin corregir**, porque nada la motivó: ni
-`eng/check-walk-coverage.ps1` ni `eng/run-accessibility.ps1` le ponen techo a su `dotnet test`, y la
-regla de la casa dice que todo proceso hijo de un guion de `eng/` lo necesita. Apareció mirando un run
-que **no** estaba colgado, así que no hay medición que pida arreglarlo hoy.
+### Cómo abre la sesión siguiente, según lo que traiga
+
+**Si trae hallazgos del paseo físico:** cada uno se convierte en **su escena con su medición**, no en
+un arreglo a ojo. El orden es el de siempre —rojo archivado, corrección mínima, verde con las cuatro
+suites de vistas, evidencia bilingüe, changelog, un commit— y si el hallazgo es «esto se ve mal» sin
+número, lo primero es **encontrar el número que lo dice**. Un hallazgo de maqueta que ya tenga puerta
+(desbordamiento, escalas, acción principal) debería haber fallado allí: si no lo hizo, **la puerta
+tiene un agujero y ése es el defecto real**, no sólo la pantalla.
+
+**Si no trae ninguno, el paso 8 se abre solo:**
+
+```bash
+pwsh ./eng/prepare-release.ps1
+```
+
+**Ése es el checklist, y no hay que escribir otro.** El guion contesta si el árbol se puede publicar y
+construye todo lo que una versión lleva; **no crea el tag, no publica, no empuja y no cambia ninguna
+configuración**, así que correrlo es gratis y su informe dice qué falta. Con el artefacto recién
+construido, `-SkipBuild` lo reutiliza.
+
+**El informe ya se corrió el 2026-08-20 y dice esto**, así que la sesión siguiente no lo descubre:
+
+```
+AP Reelume - release readiness for 0.1.0
+  ok      The repository is public, so the release address will answer.
+  ok      688 file(s) identical across two clean builds.
+  ok      winget manifest ready at artifacts/package/winget
+  ok      Read arm64-matrix.json before deciding whether ARM64 ships. It is built, not certified.
+  BLOCKS  The working tree has uncommitted changes.
+  BLOCKS  SHA256SUMS.txt is not signed.
+```
+
+**Los dos bloqueadores son los esperados y ninguno es un defecto:** el árbol sucio era el trabajo de
+esa misma sesión sin confirmar, y **firmar es del propietario** (paso 9). O sea: **cuando el paseo
+físico pase, el corte no tiene ningún obstáculo técnico conocido**.
+
+**Y la versión sigue en 0.1.0.** Subirla a 0.2.0 son **dos sitios**, y el guion comprueba que
+coincidan: `Directory.Build.props` línea 24 (`<Version>`) y
+`src/ApSolutions.LocalMedia.Windows.Package/Package.appxmanifest` línea 29 (`Version="0.1.0.0"`, con
+sus cuatro componentes).
+
+**⚠ TRAMPA MEDIDA AL CORRERLO: `prepare-release.ps1` lee `main` LOCAL, no `origin/main`.** Dio
+`BLOCKS main is 9 commit(s) behind…` con `origin/main` perfectamente al día, porque la referencia
+local se había quedado atrás. Se arregla con `git fetch origin main:main` antes de correrlo. **No se
+cambió el guion**: mirar la remota sin un `fetch` previo no garantiza más, y meterle red a un guion de
+release en vísperas del corte es riesgo por comodidad.
+
+Lo que el corte tiene decidido de antemano, para no deliberarlo: **`A11Y-002` pasa a `BLOCKED`** con su
+bloqueador nombrado en `eng/generate-verification-manifest.ps1` y en `release-readiness.md`; el
+manifiesto **se regenera desde el paquete recién construido** y las evidencias se añaden a
+`FEATURES.md` según el reparto de abajo, **ni una más**; y `release-readiness.md` se cuadra con el
+manifiesto **en los dos idiomas**, porque llevaban tiempo discrepando y ninguna prueba lo vigilaba.
+
+**Los techos por paso están puestos, y no dentro de los guiones.** La regla de la casa pide techo para
+todo proceso hijo de `eng/`, y acotar el `dotnet test` desde PowerShell obliga a `Start-Process` y a
+redirigir la salida, que es cambiar cómo CI captura su registro para no ganar nada. El techo lo pone
+quien ya sabe: **`timeout-minutes` por paso en `ci.yml`** — 70 para la verificación, 35 para
+accesibilidad, 15 para recuperación y 15 para el paseo, entre 1,5× y 5× lo medido el 2026-08-20 (39m26s,
+13m20s, 2m09s y 3-4m). El techo del job (90) sólo podía decir que el job entero murió; éstos dicen
+**cuál** paso colgó.
+
+**No quedan hallazgos de producto abiertos.** Los dos que arrastraba la cola se cerraron el 2026-08-20:
+«Reproducir desde el principio» estaba medido y correcto, y el progreso por archivo es un defecto real
+**localizado en `CompositionRoot.cs:951` y `:964`** que se pospone a después de 0.2.0 por ser una
+migración de datos — está abajo con su diseño correcto y su porqué.
 
 **Y un aviso sobre cómo se lee la salud de CI**, que costó un diagnóstico equivocado en esta sesión:
 para saber cuánto lleva un paso **hay que medir la hora actual**, no restarla de una hora supuesta. Un
@@ -192,7 +252,38 @@ el tráiler, así que la fila será la más larga que ha tenido nunca. Si se sal
 las otras seis. Se mide con los `bounds` frente a la ventana antes de intentar el clic, no después del
 rojo.
 
-#### Los dos hallazgos abiertos, y qué se hace con cada uno
+#### Los dos hallazgos abiertos: CERRADOS el 2026-08-20
+
+**1. «Reproducir desde el principio» — CERRADO, y estaba medido desde antes.** La escena del paseo
+afirma, con el motor real, que tras pulsarlo el cabezal queda **por debajo de 5 segundos**, y falla
+diciendo dónde lo dejó (`Start over left the playhead at {x} s.`). Lo mide también
+`PlayerViewModelTests`, que exige `(ResumeChoice.Restart, TimeSpan.Zero)`.
+
+**2. El progreso por archivo — es un DEFECTO REAL, está localizado, y se pospone a después de 0.2.0
+con su diseño correcto escrito.** Medido el 2026-08-20:
+
+- **El dominio ya es por contenido y está bien.** `SwitchMediaVersion` guarda un `WatchState` por
+  `ContentKey` y cambia `SourceMediaFileId` para decir qué versión lo produjo. No hay dos estados por
+  título dentro del comando.
+- **Quien pasa la clave equivocada es la composición.** `CompositionRoot.cs` líneas **951 y 964**
+  construyen `ContentKey.ForTitle(new TitleId(mediaFileId.Value))`: meten el id del **archivo** donde
+  el dominio espera el del **título**. Con eso, dos versiones del mismo título tienen dos claves.
+- **La clave correcta ya se calcula en otro sitio**: `GroupScannedVersions.cs:139` usa
+  `ContentKey.ForTitle(new TitleId(ordered[0].Value))` —el primer archivo del grupo— como identidad
+  del grupo. La corrección es que la composición pregunte por el grupo cuando el archivo pertenece a
+  uno, y use su propio id cuando no.
+- **El síntoma es acotado, y el agudo ya está corregido.** Perder el segundo al confirmar un cambio de
+  versión se arregló haciendo que mande la posición pedida, con el porqué escrito en el propio
+  `CompositionRoot`. Lo que queda es más estrecho: abrir la otra versión **desde la biblioteca** —no
+  con el conmutador— ofrece el punto de esa versión y no el más avanzado del título.
+- **Por qué se pospone: cambiar la clave es una migración de datos**, y una migración en la víspera de
+  un corte de versión es riesgo puro por un síntoma que no pierde nada (los dos `WatchState` existen,
+  y `ProgressTransferPolicy` traduce entre metrajes distintos cuando el usuario pide el cambio).
+- **Y por qué NO se escribe una prueba que lo fije**: una prueba que consagra un comportamiento que
+  sabemos incorrecto es una trampa para quien venga a corregirlo. Lo que queda es esta nota, con la
+  línea exacta.
+
+#### Cómo era la nota antes de medirla (2026-08-16)
 
 1. **«Reproducir desde el principio»** — se mide en la escena (a), como está dicho arriba.
 2. **El progreso se guarda por archivo, no por grupo de versiones.**

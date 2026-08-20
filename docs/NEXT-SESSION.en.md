@@ -6,14 +6,59 @@
 commits in the batch, six in this session: `PlayerView`, the spacing scale, the corner scale, the
 overflow gate, leading actions across all 48 views, and a correction to what that gate claimed.
 
-**What now blocks step 8 — cutting 0.2.0 — is the owner's ten-minute physical walk (step 7).** The
-next session has no redesign work to do; if it opens without a finding from that walk, the thing to do
-is ask about it or bring forward whatever step 8 allows without it.
+**What now blocks step 8 — cutting 0.2.0 — is the owner's ten-minute physical walk (step 7).**
 
-**One minor observation, noted and not fixed**, because nothing motivated it: neither
-`eng/check-walk-coverage.ps1` nor `eng/run-accessibility.ps1` bounds its `dotnet test`, and the house
-rule says every child process of an `eng/` script needs a ceiling. It surfaced while looking at a run
-that was **not** hung, so no measurement asks for it today.
+### How the next session opens, depending on what arrives
+
+**If it brings findings from the physical walk:** each becomes **its own scene with its own
+measurement**, not a fix by eye. If a finding is "this looks wrong" with no number, the first job is
+**finding the number that says so**. And a layout finding that already has a gate — overflow, scales,
+leading action — should have failed there: if it did not, **the gate has a hole and that is the real
+defect**, not just the screen.
+
+**If it brings none, step 8 opens by itself:**
+
+```bash
+pwsh ./eng/prepare-release.ps1
+```
+
+**That is the checklist and there is no need to write another.** It answers whether the tree could be
+published and builds everything a release carries; it **creates no tag, publishes nothing, pushes
+nothing and changes no setting**, so running it is free and its report says what is missing.
+`-SkipBuild` reuses a freshly built artifact.
+
+**The report was already run on 2026-08-20**, so the next session does not discover it: the repository
+is public, 688 files are identical across two clean builds, the winget manifest is ready, and ARM64 is
+built but not certified. **Two blockers, both expected and neither a defect**: an uncommitted working
+tree (that session's own work) and an unsigned `SHA256SUMS.txt`, which is **the owner's** to sign
+(step 9). Once the physical walk passes, **the cut has no known technical obstacle**.
+
+**The version is still 0.1.0.** Raising it to 0.2.0 means **two places**, and the script checks they
+agree: `Directory.Build.props` line 24 and
+`src/ApSolutions.LocalMedia.Windows.Package/Package.appxmanifest` line 29 (four components there).
+
+**⚠ TRAP MEASURED WHILE RUNNING IT: `prepare-release.ps1` reads the LOCAL `main`, not `origin/main`.**
+It reported `main is 9 commit(s) behind…` with `origin/main` perfectly up to date. Run
+`git fetch origin main:main` first. **The script was not changed**: reading the remote without a fetch
+guarantees no more, and adding network to a release script on the eve of a cut is risk for
+convenience.
+
+What the cut has decided in advance: **`A11Y-002` goes to `BLOCKED`** with its blocker named in
+`eng/generate-verification-manifest.ps1` and in `release-readiness.md`; the manifest is **regenerated
+from the freshly built package** and evidence is added to `FEATURES.md` per the split below, **not one
+link more**; and `release-readiness.md` is squared against the manifest **in both languages**.
+
+**Per-step ceilings are in place, and not inside the scripts.** The house rule asks for a ceiling on
+every child process of `eng/`, and bounding `dotnet test` from PowerShell means `Start-Process` and
+redirected output — changing how CI captures its log to gain nothing. The ceiling goes where the tool
+already knows how: **`timeout-minutes` per step in `ci.yml`** — 70 for verification, 35 for
+accessibility, 15 for recovery, 15 for the walk, between 1.5x and 5x what they measured on 2026-08-20.
+The job's 90 could only say the whole job died; these say **which** step hung.
+
+**No product findings are open.** Both the queue carried were closed on 2026-08-20: "start over" was
+already measured and correct, and progress-per-file is a real defect **localised to
+`CompositionRoot.cs:951` and `:964`** that is deferred past 0.2.0 because fixing it is a data
+migration.
 
 **And a warning about reading CI's health**, which cost a wrong diagnosis this session: to know how
 long a step has been running you must **measure the current time**, not subtract from an assumed one.

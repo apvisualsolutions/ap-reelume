@@ -104,6 +104,24 @@ No son estilo: hay una puerta que falla si las rompes.
 5. **Nada personal en el árbol.** Ni rutas de una máquina concreta, ni nombres de la biblioteca de
    nadie. `RepositoryPrivacyTests` lo mide.
 
+## Y cuatro más, si vas a tocar una vista
+
+Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo el `.axaml`.
+
+6. **Ningún `.axaml` escribe un número que tenga token.** Las tres escalas —`FontSize*`, los cinco
+   `Space*` y los dos `CornerRadius*`— tienen puerta en `ScalarTokenTests`, y lo que se afirma es que
+   **el marcado no escribe el número**, no que el valor coincida: un token de 8 y un literal de 8
+   pintan igual, así que comparar el valor aprueba justo lo que debía rechazar.
+7. **Cada vista lidera con el botón que se decidió, o con ninguno.** `LeadingActionTests` lleva una
+   tabla cerrada de las 48; **una vista que no esté en la tabla falla**, y `primary-action` se afirma
+   como **la única** de su vista. Si tu vista es nueva, la decisión es tuya y hay que escribirla ahí.
+8. **Ningún control se dibuja fuera de la ventana más estrecha que la aplicación permite** (900, el
+   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 48, sin contexto de datos —lo
+   que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
+   silencio suyo no es un certificado.
+9. **Un control nuevo llega con su escena de paseo en el mismo commit.** `eng/check-walk-coverage.ps1`
+   está en **0 pendientes** y no vuelve a subir.
+
 ## El defecto característico de este proyecto
 
 **Registrado y nunca alimentado**: un servicio que se registra en el contenedor y que nada resuelve,
