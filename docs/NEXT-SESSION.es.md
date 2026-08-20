@@ -2,24 +2,87 @@
 
 ## Estado al abrir (2026-08-20, cierre de la sesión de tarde)
 
-**EL PASO 6 NO TIENE TRABAJO PENDIENTE CONOCIDO.** `main` está en `c8ddd34` con CI verde y **nada en
-vuelo**. Dieciséis commits en la tanda, seis en esta sesión: `PlayerView`, la escala de espaciado, la
-escala de radios, la puerta de desbordamiento, las acciones principales de las 48 vistas, y una
-corrección de lo que esa puerta prometía.
+**EL PASO 6 ESTÁ EN SU FASE 6 DE 6, Y ESA FASE ESTÁ CASI ENTERA POR HACER.** Lo que se cerró el
+2026-08-20 fueron **las fases 1 a 5 de `design/PROMPT.md`** más los prerrequisitos de la 6 — y se
+declaró «paso 6 cerrado», que era **falso**. Medido contra el paquete ese mismo día:
 
-**Lo que ahora bloquea el paso 8 —cortar 0.2.0— es el paseo físico de diez minutos del propietario
-(paso 7).**
+| Qué pide el paquete | Propuesto | Hoy | Falta |
+|---|---|---|---|
+| Controles | 202 | **133** | **69** |
+| Cadenas nuevas | +47 | **0** | **47** |
+| Animaciones | 4 | **0** | **4** |
 
-### Cómo abre la sesión siguiente, según lo que traiga
+**El error no fue de ejecución sino de comprobación: se dio por cerrado un paso contra la propia
+lectura de este documento en vez de contra el documento que lo define**, que es `design/PROMPT.md`. Su
+punto 6 dice «el resto de las vistas, un cambio por vista, siguiendo la §4 de `Propuesta de diseño`», y
+la §4 son 48 filas con cambios estructurales y estados condicionales que hoy no existen.
 
-**Si trae hallazgos del paseo físico:** cada uno se convierte en **su escena con su medición**, no en
-un arreglo a ojo. El orden es el de siempre —rojo archivado, corrección mínima, verde con las cuatro
-suites de vistas, evidencia bilingüe, changelog, un commit— y si el hallazgo es «esto se ve mal» sin
-número, lo primero es **encontrar el número que lo dice**. Un hallazgo de maqueta que ya tenga puerta
-(desbordamiento, escalas, acción principal) debería haber fallado allí: si no lo hizo, **la puerta
-tiene un agujero y ése es el defecto real**, no sólo la pantalla.
+**Lo hecho no es trabajo perdido: es el andamio de la §4.** Las tres escalas, la acción principal de
+las 48 vistas y la puerta de desbordamiento son exactamente lo que la §4 gasta —escribe `SpaceLarge`,
+`CornerRadiusMedium` y `WrapPanel` por todas partes—, y ahora hay puerta que impide que se degrade
+mientras se rediseña.
 
-**Si no trae ninguno, el paso 8 se abre solo:**
+### La fase 6, área por área, en el orden de la §4
+
+**El orden es el de la propia §4, que coincide con `SURFACES.es.md`.** Cada fila de abajo es un tramo
+de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varias bajo el mismo cambio
+(las cuatro listas del reproductor, los tres paneles superpuestos, los tres ajustes de mismo esqueleto).
+
+| # | Área | Lo que la §4 pide de más calado |
+|---|---|---|
+| 1 | **Shell** (2) | Navegación de 248 px sobre `NavigationSurfaceBrush`; destino activo con **barra de 3 px + glifo** (dos señales, una no es color); `TitleActionsSurface` de `StackPanel` a `WrapPanel`. `StartupView` sólo tipografía. |
+| 2 | **Inicio** (5) | Rejilla de una columna con `SpaceLarge`; progreso de 3 px al pie de las portadas; ficha 2:3 con **iniciales cuando no hay portada, nunca un hueco**; tres estados del carril de recomendaciones (vacío, apagado por ajuste, con contenido) — **no son lo mismo**. |
+| 3 | **Biblioteca y fichas** (5) | Cuadrícula **fluida** con mínimo de 180 px; fila de filtros a `WrapPanel`; búsqueda con botón de borrar; **«buscando sin resultados», que hoy no existe**; `UnavailableBadge` pasa de error a **aviso** (`WarningSurfaceBrush` + borde + glifo). |
+| 4 | **Reproductor** (16) | Superficie propia `#0B0D10` y columna fija de 320 px; el fallo pasa a `DangerSurfaceBrush` con glifo; `VideoStatusOverlay` **partido en dos gramáticas** (dato vs aviso); los tres superpuestos con **alineación explícita y `MaxWidth 420`** — es la forma que causó el panel de 1280×1400; las cuatro listas a filas de 36 px sin scroll horizontal. |
+| 5 | **Ajustes** (7) | `AppearanceSettingsView` de 3 botones de tema a **5**, y su `StackPanel` horizontal **tiene** que ser `WrapPanel`: cinco no caben en 620 px y **la división no se fija a mano**, porque en español pliega 4+1 y en inglés cae en otro sitio. `PrivacySettingsView` debe **distinguir ausente de deshabilitado**. |
+| 6 | **Revisión, Metadatos, Catálogo** (7) | La bandeja vacía es **el estado deseable**: `PositiveSurfaceBrush` con glifo, no un vacío triste. |
+| 7 | **Copias, Primeros pasos, Recuperación, Créditos** (5) | `RestoreWizardView`: sólo la raíz ausente gana campo editable y su estado pasa a «Reasignada» al escribir; **se elimina el «Restaurar» duplicado siempre habilitado**. `DatabaseRecoveryView` no gana ruta desde el shell. |
+| 8 | **`UpdateView` y `PlayerView`** | Ya tienen su maqueta; les falta **la gramática de sus mensajes**: 23 en cuatro gramáticas, y 6 motivos de fallo con acciones **condicionadas por motivo** (`CanChooseAnotherVersion` es un flag **independiente**). Y `PlayerRecoveryChooseAnotherVersion` **pasa de `TextBlock` a `Button`**: es el único cambio de tipo del paquete. |
+| 9 | **Las cuatro animaciones** | `apr-in`, `apr-shim`, `apr-tip`, `apr-pulse`, más la transición de la manija. El conducto ya existe (`IReducedMotionService` → `MotionDuration`); **movimiento reducido las lleva a 0 ms, no las acorta**. Hoy no hay ni un `<Animation>` en el árbol. |
+
+**Tres reglas que valen para las nueve filas, y ninguna es opcional:**
+
+1. **Un control nuevo llega con su prueba de nombre accesible y su línea de paseo EN EL MISMO CAMBIO.**
+   El trinquete está en 0 y la puerta rechaza lo que no case.
+2. **Una cadena nueva va en los dos idiomas o no va.** Son **47** —22 de estado vacío y 25 de
+   consecuencia— y están en `design/Cadenas nuevas`, con su texto en los dos. Las de consecuencia se
+   aprueban una a una contra la regla del propio paquete: **si ayuda a decidir o a actuar se traduce; si
+   explica por qué está diseñada así, es comentario del AXAML**.
+3. **No se reescribe la etiqueta de un botón existente.** `Content` y `AutomationProperties.Name`
+   apuntan a la misma clave, así que reescribir una etiqueta **es renombrar el control** y rompe el
+   paseo. El paquete declara **0 renombrados** a propósito.
+
+**Y lo que ya está pagado, que es el andamio de todo esto:** las tres escalas con puerta —la §4 escribe
+`SpaceLarge` y `CornerRadiusMedium` por todas partes—, la acción principal decidida para las 48, la
+puerta de desbordamiento (que es exactamente la red de los `WrapPanel` que la §4 pide) y el paseo en 0.
+
+**Los 35 activos de instalación NO entran**: bloqueados esperando el vectorial de la marca.
+
+### El orden, que ya estaba escrito y no se re-delibera
+
+**Lo siguiente es la fase 6 del paso 6: la §4, una vista por commit.** Lo dice `design/PROMPT.md`
+punto 6 y lo repite la tabla de diez pasos: el paso 7 (el paseo físico) y el 8 (cortar 0.2.0) van
+**después**, y el paseo físico va antes del corte porque un hallazgo suyo obliga a rehacerlo entero.
+Preguntar en qué orden seguir es re-deliberar algo decidido el 2026-08-17.
+
+**El orden de las vistas dentro de la §4 es el de sus propias áreas**, que es también el de
+`SURFACES.es.md`: Shell, Inicio, Biblioteca, fichas, Reproductor, Ajustes, Revisión, Metadatos,
+Catálogo, Copias, Primeros pasos, Recuperación, Créditos, Actualización. Las dos que la §4 marca como
+las de más trabajo —`UpdateView` y `PlayerView`— ya tienen su parte de maqueta hecha y les falta la
+gramática de sus mensajes.
+
+**Cada vista trae consigo tres cosas que no son opcionales**, y por eso una vista es un commit:
+sus controles nuevos **con su prueba de nombre accesible y su línea de paseo en el mismo cambio**, sus
+cadenas nuevas **en los dos idiomas**, y sus estados condicionales pintados. Un control nuevo sin
+escena hace fallar la puerta del paseo, que está en 0.
+
+**Si el propietario trae hallazgos de su paseo físico antes de que la §4 termine**, van **primero**:
+cada uno como su escena con su medición. Si el hallazgo es «esto se ve mal» sin número, lo primero es
+encontrar el número. Y un hallazgo de maqueta que ya tenga puerta —desbordamiento, escalas, acción
+principal— debería haber fallado allí: si no lo hizo, **la puerta tiene un agujero y ése es el defecto
+real**, no sólo la pantalla.
+
+### Y cuando la §4 termine y el paseo físico pase, el paso 8 se abre solo
 
 ```bash
 pwsh ./eng/prepare-release.ps1
@@ -103,8 +166,8 @@ pantallas que piden permiso —`LifecycleSettingsView` y `PrivacySettingsView`�
 afirmativa**, porque destacar el sí de un consentimiento es un patrón oscuro y esta aplicación existe
 para lo contrario.
 
-**Con eso, el paso 6 no tiene trabajo pendiente conocido.** Lo que quede será lo que encuentre el paseo
-físico del propietario (paso 7).
+**Con eso quedan hechos el andamio y las cinco primeras fases.** Lo que sigue es la fase 6: la §4,
+una vista por commit.
 
 **Los tokens ya no tienen deuda.** `NotSpentYet` está **vacía** y hay puerta para **las tres escalas**
 —tipografía, espaciado y radios— que exige que el `.axaml` **no escriba el número**. Una vista nueva

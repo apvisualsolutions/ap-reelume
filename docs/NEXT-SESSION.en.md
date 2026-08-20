@@ -2,21 +2,38 @@
 
 ## State on opening (2026-08-20, end of the afternoon session)
 
-**STEP 6 HAS NO KNOWN WORK LEFT.** `main` is at `c8ddd34`, CI green, **nothing in flight**. Sixteen
-commits in the batch, six in this session: `PlayerView`, the spacing scale, the corner scale, the
-overflow gate, leading actions across all 48 views, and a correction to what that gate claimed.
+**STEP 6 IS ON PHASE 6 OF 6, AND THAT PHASE IS ALMOST ENTIRELY UNDONE.** What closed on 2026-08-20
+were **phases 1 to 5 of `design/PROMPT.md`** plus phase 6's prerequisites — and it was declared "step 6
+closed", which was **false**. Measured against the package that same day:
 
-**What now blocks step 8 — cutting 0.2.0 — is the owner's ten-minute physical walk (step 7).**
+| What the package asks for | Proposed | Today | Missing |
+|---|---|---|---|
+| Controls | 202 | **133** | **69** |
+| New strings | +47 | **0** | **47** |
+| Animations | 4 | **0** | **4** |
 
-### How the next session opens, depending on what arrives
+**The error was not in the execution but in the checking: a step was called done against this
+document's own wording rather than against the document that defines it**, `design/PROMPT.md`, whose
+point 6 reads "the rest of the views, one change per view, following §4 of `Propuesta de diseño`".
 
-**If it brings findings from the physical walk:** each becomes **its own scene with its own
-measurement**, not a fix by eye. If a finding is "this looks wrong" with no number, the first job is
-**finding the number that says so**. And a layout finding that already has a gate — overflow, scales,
-leading action — should have failed there: if it did not, **the gate has a hole and that is the real
-defect**, not just the screen.
+**What was done is not wasted: it is §4's scaffolding.** The three scales, the leading action across
+all 48 views and the overflow gate are exactly what §4 spends.
 
-**If it brings none, step 8 opens by itself:**
+### The order, which was already written and is not up for re-deliberation
+
+**Next is phase 6 of step 6: §4, one view per commit.** `design/PROMPT.md` point 6 says so and the
+ten-step table repeats it: step 7 (the physical walk) and step 8 (cutting 0.2.0) come **after**.
+
+**The order of the views inside §4 is that of its own areas**, which is also `SURFACES.en.md`'s.
+
+**Each view carries three things that are not optional**, which is why a view is a commit: its new
+controls **with their accessible-name test and their walk line in the same change**, its new strings
+**in both languages**, and its conditional states painted.
+
+**If the owner brings findings from the physical walk before §4 finishes**, those go **first**, each as
+its own scene with its own measurement.
+
+### And when §4 is finished and the physical walk passes, step 8 opens by itself
 
 ```bash
 pwsh ./eng/prepare-release.ps1
@@ -86,8 +103,8 @@ two screens that ask permission — `LifecycleSettingsView` and `PrivacySettings
 is not accented**, because highlighting the yes of a consent is a dark pattern and this application
 exists for the opposite.
 
-**With that, step 6 has no known work left.** What remains is whatever the owner's physical walk
-(step 7) turns up.
+**With that, the scaffolding and the first five phases are done.** What follows is phase 6: §4, one
+view per commit.
 
 **The tokens carry no debt any more.** `NotSpentYet` is **empty**, and **all three scales** — type,
 spacing and corners — have a gate that requires the `.axaml` **not to write the number**. A new view
