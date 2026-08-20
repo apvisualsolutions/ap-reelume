@@ -1,48 +1,58 @@
 # Where to resume
 
-## State on opening (2026-08-19, end of the evening session)
+## State on opening (2026-08-20, end of the small-hours session)
 
-**`main` and the branch are both at `6bfb4d6`, CI green, nothing in flight.** Six commits, and the
-mini player is done. **Next is `PlayerView`**: `UpdateView` was done on 2026-08-20 and cost layout
-only, because its five controls were already in the walk.
+**`main` and the branch are level, CI green, nothing in flight.** Nine commits in the batch: the whole
+mini player, `UpdateView`, and the corrections its reds brought.
+
+**Step 6 has no open decisions left.** What remains is execution, in this order:
+
+1. **`PlayerView`** — measured in full below. Three `CornerRadius` to the token, `primary-action` on
+   `PlayerRecoveryRetry` only, and the `Margin` out of `player-chrome` so the large transport can
+   adopt it. Its five buttons are already pressed: **it adds no walk debt**.
+2. **The spacing scalars phase** — fully decided below on 2026-08-20, with its count. One sweep, and it
+   ends when `NotSpentYet` is **empty**.
+3. **One view per commit** in `SURFACES.en.md`'s order.
+
+**Two views in a row have cost layout only** — `UpdateView` and `PlayerView` — because their controls
+were already in the walk. That is the norm from here on: the walk reached zero before the interface
+changed, which was the point of that order.
 
 **What this batch cost, and what the remaining views inherit:**
 
-1. **A secondary window is not like a view.** `PlayerWindowCoordinator.Apply` assigned
-   `window.Content`, which **replaces the whole AXAML tree**: the mini window threw away everything it
-   declared for itself the moment a session arrived. `Host()` and `MiniPlayerSurface` had been there
-   from the start and **only one test ever called them** — the house defect, form eleven.
+1. **A secondary window is not like a view.** `PlayerWindowCoordinator.Apply` assigned `window.Content`,
+   which **replaces the whole AXAML tree**: the mini window threw away everything it declared for
+   itself the moment a session arrived. `Host()` and `MiniPlayerSurface` had been there from the start
+   and **only one test ever called them** — the house defect, form eleven.
 2. **`WalkLedger.Record` requires a `UserControl` ancestor**, and the gate's inventory keys on the
-   `.axaml` file name. A control declared inside a `Window` can never match the two halves, so the
-   five live in `MiniPlayerChromeView` rather than in the window.
-3. **The walk could not leave the shell's window**, and `MiniPlayerWindow` was the only secondary
-   window in the tree, so nobody had needed it to. The harness gained `Reachable`, `SecondaryWindows`
-   and `RootOf`, and every click function now aims at the control's **own** window.
-4. **Long labels do not overflow; they leave nowhere for the beside click.** Five long-text buttons
-   wrapped the chrome into three rows inside 480×270 and `BesidePoint` ran out of free points. The
-   expected symptom — "outside the window" — is not the one that arrived.
+   `.axaml` file name. A control declared inside a `Window` can never match the two halves.
+3. **The walk could not leave the shell's window**, and nobody had needed it to. The harness gained
+   `Reachable`, `SecondaryWindows` and `RootOf`, and every click function now aims at the control's
+   **own** window.
+4. **Long labels do not overflow; they leave nowhere for the beside click.**
+5. **A test that compares the VALUE cannot tell a literal from a token** while the two agree — and they
+   agree exactly when the tokenisation would be correct, so the false green is the ordinary case. What
+   gets asserted is that the `.axaml` **does not write the number**.
 
-**Three CI reds, and all three were gates doing their job:**
+**Four CI reds, and all four were gates doing their job:**
 
-- **The coverage ratchet found a branch nothing walked** before anybody read it. The first attempt
-  routed the mini player through an interface and **left the old `Apply` branch alive**. The fix was
-  **deleting** it, not covering it: a test written to reach dead code turns the number green and
-  leaves the defect in.
+- **The coverage ratchet found a branch nothing walked.** The mini player's first attempt routed
+  through an interface and **left the old `Apply` branch alive**. The fix was **deleting** it, not
+  covering it: a test written to reach dead code turns the number green and leaves the defect in.
 - **And deleting it dropped the file from 100/92 to 100/91**, because removing covered branches raises
-  the weight of the ones never covered. Two had been there all along — that `Apply` used what
-  `Remember` stored, and `GeometryFor`'s `embedded` parameter — both real guarantees with no test.
-  Covered, the file measures 100/100 and **leaves** the debt list. **A floor that drops is a drop**:
-  reaching for a process explanation is the comfortable way not to look at the code.
-- **A net calibrated on one machine accuses another.**
-  `The_copy_still_running_is_cancelled_with_the_mouse` compared its two presses against a duration
-  measured here, and on the runner it failed a run where nothing was wrong. What the clock inferred —
-  whether the copy finished on its own — **the surface says out loud**: the scene now records every
-  status it passes through and asserts `BackupStatusDone` is not among them.
+  the weight of the ones never covered. Two had been there all along, both real guarantees with no
+  test. Covered, the file measures 100/100 and **leaves** the debt list. **A floor that drops is a
+  drop**: reaching for a process explanation is the comfortable way not to look at the code.
+- **A net calibrated on one machine accuses another.** The copy-cancel scene compared its two presses
+  against a duration measured here. What the clock inferred, the surface says: it now records the
+  statuses it passes through and asserts `BackupStatusDone` is not among them.
+- **And the ratchet asked for three improvements to be declared**, which is the half of its job that
+  catches things getting better without saying so.
 
-**And the three from the previous session still hold:** a view change affects **four** suites
-(`UiTests`, `AccessibilityTests`, `IntegrationTests`, `DocumentationTests`); the coverage ratchet
-**also fails when something improves** undeclared; and `verify.ps1` **aborts on the first failure**, so
-one red hides the ones after it.
+**And the usual three still hold:** a view change affects **four** suites (`UiTests`,
+`AccessibilityTests`, `IntegrationTests`, `DocumentationTests`); the coverage ratchet **also fails when
+something improves**; and `verify.ps1` **aborts on the first failure**, so one red hides the ones after
+it.
 
 ## The queue decided on 2026-08-16 (not up for re-deliberation)
 
@@ -67,7 +77,7 @@ again from scratch.
 | ~~3~~ | ~~The subtitle measurement~~ **done on 2026-08-18** | agent | 0 |
 | ~~4~~ | ~~Coverage over all of `src/`~~ **done 2026-08-18 as a ratchet: 219, and it only drops; corrected the same day so CI measures the floor** | agent | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **done 2026-08-18: the command bound, the notification, and the gate on the seven** | agent | 0 |
-| 6 | **The redesign**, from Claude Design's material — **phase 2, the scalar gate, `primary-action` and the type scale all done**; **the views** remain | agent | 0, under the rule below |
+| 6 | **The redesign**, from Claude Design's material — **phase 2, the scalar gate, `primary-action`, the type scale, `MiniPlayerWindow` and `UpdateView` all done**; **`PlayerView`, the spacing scalars phase and the remaining views** are left, all decided | agent | 0, under the rule below |
 | 7 | The ten-minute physical walk | **owner** | — |
 | 8 | Cut 0.2.0, up to the moment of signing | agent | — |
 | 9 | Sign and publish | **owner** | — |
@@ -536,6 +546,77 @@ The five controls, their **five strings in both languages**, their **five access
 to views are four, not two: `UiTests`, `AccessibilityTests`, `IntegrationTests` and
 `DocumentationTests`.
 
+#### The spacing scalars phase: FULLY DECIDED on 2026-08-20, and not reopened
+
+It is the last design decision step 6 had open. It is settled by **counting**, and the count of
+`Spacing` / `ItemSpacing` / `LineSpacing` across every `.axaml` under `src/` — **183 sites** — is this:
+
+| Value | Sites | On the 4/8/16/24/32 scale? |
+|---|---|---|
+| 8 | 90 | yes |
+| **12** | **45** | **no** |
+| 4 | 21 | yes |
+| 6 | 12 | no |
+| 16 | 6 | yes |
+| 24 | 4 | yes |
+| 2 | 3 | no |
+| 10 | 2 | no |
+
+**121 of 183 (66%) are already on the scale. Of the 62 that are not, forty-five are the same value: 12.**
+
+##### 1. The scale gains the 12 step
+
+The gap between 8 and 16 is **2×**, and real usage piles up inside it: 12 is **a quarter of all the
+spacing in the application**. Mapping it to 16 moves 45 sites **+33%**; to 8, **−33%**. Either would be
+a large visual change decided **by rounding rather than by design**, which is the thing a token system
+exists to prevent. **The scale was incomplete and the tree proves it**; the step gets declared instead
+of forcing 45 sites onto a value nobody chose.
+
+##### 2. The names go numeric: `Space4`, `Space8`, `Space12`, `Space16`, `Space24`, `Space32`
+
+Semantic names — `XSmall`, `Small`, `Medium`, `Large`, `XLarge` — **force a new name to be invented
+every time a step is missing**, and one just was: the alternative here was `SpaceSmallMedium`, which
+describes nothing. A numeric name cannot lie and makes the mapping obvious at the point of use.
+
+**The cost is zero today and will not be again.** Measured 2026-08-20: **no `.axaml` under `src/`
+consumes any of the five** — all five are in `NotSpentYet` — so the rename touches their declaration
+and `ScalarTokenTests`'s list, and nothing else. Doing it after they are spent would cost 183
+substitutions.
+
+**`CornerRadiusSmall` and `CornerRadiusMedium` stay as they are**, and that is not an oversight: they
+are already consumed, they are only two values, and between 4 and 8 there is no gap a step could go
+missing from.
+
+##### 3. The mapping for the remaining seventeen
+
+| From | To | Sites | How far it moves |
+|---|---|---|---|
+| 6 | `Space8` | 12 | +2 px |
+| 2 | `Space4` | 3 | +2 px |
+| 10 | `Space12` | 2 | +2 px |
+
+**Measured result: no site in the application moves more than 2 px.** Against the 45 sites moving 4 px
+that any mapping of the 12 would cost. That number is what decides, which is why this is not a
+preference.
+
+##### 4. What does not enter, already decided
+
+`Padding`, `Margin` and `BorderThickness` **keep their literals**: they are `Thickness`, the tokens are
+`x:Double`, and of their 89 literals **37 are asymmetric** — `0,8,0,0`, `48,0`, `8,4` — which no scalar
+token expresses. This is said **in the token file**, beside the declaration, so the next person does
+not try again.
+
+##### 5. How it is carried out
+
+**In one sweep, not view by view**: it is a mapping, not a per-screen decision, exactly like the
+thirteen font-size literals that became five tokens without anyone noticing. And it has a termination
+condition that checks itself: **`NotSpentYet` ends up EMPTY**, because all six scalars become spent.
+`ScalarTokenTests` fails if any is left over, so the phase cannot be called done half way.
+
+**Mind the test trap** that cost a round in `UpdateView`: a test comparing the **value** cannot tell a
+literal from a token while the two agree, and they agree exactly when the tokenisation would be
+correct. What gets asserted is that the `.axaml` **does not write the number**.
+
 #### `PlayerView`: measured 2026-08-20, and the chrome class generalises with it
 
 **Measured without writing code.** 171 lines, five buttons, none with an `x:Name` — they are
@@ -578,8 +659,8 @@ test that says so.
 **The view is done** apart from its spacing, with [its evidence](evidence/stable/audit-update-view.md):
 `primary-action` on `UpdateCheckButton` — the only candidate — and both `CornerRadius="8"` now spending
 `CornerRadiusMedium`. **Spacing is not in it**, because that mapping covers 183 sites across the tree
-and is decided once rather than view by view: that is the scalars phase, still outstanding and decided
-below.
+and is decided once rather than view by view: that is the scalars phase, **fully decided on
+2026-08-20** and written below with its count.
 
 **And a new trap that cost one writing round:** the radius test **passed before the view was touched**.
 It compared the painted value against the resolved token, and since `CornerRadiusMedium` is 8 and the
@@ -804,7 +885,17 @@ these links and no others:
 | Row | Evidence it gains |
 | --- | --- |
 | `UX-003` | [phase 1: the four dictionaries and the service that applies them](evidence/stable/audit-redesign-phase1-tokens.md) |
-| `A11Y-001` | [phase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: the button](evidence/stable/audit-redesign-phase2-button-states.md), [2b: the disabled outline](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: the checkbox](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: the list row](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: the text field](evidence/stable/audit-redesign-phase2e-text-field.md) |
+| `A11Y-001` | [phase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: the button](evidence/stable/audit-redesign-phase2-button-states.md), [2b: the disabled outline](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: the checkbox](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: the list row](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: the text field](evidence/stable/audit-redesign-phase2e-text-field.md), [the mini player](evidence/stable/audit-mini-player-chrome.md) |
+| `UX-002` | [the update screen](evidence/stable/audit-update-view.md) |
+
+**Both new rows were decided on 2026-08-20.** [The mini
+player](evidence/stable/audit-mini-player-chrome.md) goes to `A11Y-001` because what that window gains
+is **five controls with accessible names and a press area**, which is exactly the focus-and-contrast
+row; and [the update screen](evidence/stable/audit-update-view.md) to that screen's own row, because
+what changes there is **which action is primary**, which is visual hierarchy rather than accessibility.
+`UX-002` is "Modern Fluent design in Avalonia", **checked against `FEATURES.md` on 2026-08-20** —
+reading the matrix is not changing it, and leaving an identifier to guesswork would have cost a round
+in step 8.
 
 **`UX-003` gets phase 1 alone** because that row is about the **theme** — that it exists, that it is
 applied, and that the player ignores it on purpose — not about a control's states. The five state

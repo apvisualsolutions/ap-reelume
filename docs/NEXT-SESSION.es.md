@@ -1,10 +1,22 @@
 # Dónde retomar
 
-## Estado al abrir (2026-08-19, cierre de la sesión de noche)
+## Estado al abrir (2026-08-20, cierre de la sesión de madrugada)
 
-**`main` y la rama están en `6bfb4d6`, con CI verde y nada en vuelo.** Seis commits, y el mini
-reproductor está hecho. **Lo siguiente es `PlayerView`**: `UpdateView` se hizo el 2026-08-20 y sólo
-costó maqueta, porque sus cinco controles ya estaban en el paseo.
+**`main` y la rama están al día, con CI verde y nada en vuelo.** Nueve commits en la tanda: el mini
+reproductor entero, `UpdateView`, y las correcciones que trajeron sus rojos.
+
+**Del paso 6 ya no queda ninguna decisión abierta.** Lo que queda es ejecutar, en este orden:
+
+1. **`PlayerView`** — medida entera abajo. Tres `CornerRadius` al token, `primary-action` sólo en
+   `PlayerRecoveryRetry`, y el `Margin` fuera de `player-chrome` para que el transporte grande pueda
+   adoptarla. Sus cinco botones ya están pulsados: **no añade deuda de paseo**.
+2. **La fase de escalares de espacio** — decidida entera abajo el 2026-08-20, con su recuento. Barrido
+   de una vez, y termina cuando `NotSpentYet` queda **vacía**.
+3. **Una vista por commit** en el orden de `SURFACES.es.md`.
+
+**Dos vistas seguidas han costado sólo maqueta** —`UpdateView` y `PlayerView`— porque sus controles ya
+estaban en el paseo. Es lo normal a partir de aquí: el paseo llegó a cero antes de que la interfaz
+cambiara, que era el sentido de hacerlo en ese orden.
 
 **Lo que costó esta tanda, y que el resto de las vistas hereda:**
 
@@ -13,36 +25,35 @@ costó maqueta, porque sus cinco controles ya estaban en el paseo.
    declaraba para sí misma en cuanto llegaba una sesión. `Host()` y `MiniPlayerSurface` llevaban ahí
    desde el principio y **sólo los llamaba una prueba** — el defecto de la casa, forma once.
 2. **`WalkLedger.Record` exige un `UserControl` ancestro**, y el inventario de la puerta usa el nombre
-   del `.axaml`. Un control declarado dentro de un `Window` no puede casar las dos mitades **jamás**,
-   así que los cinco viven en `MiniPlayerChromeView` y no en la ventana.
-3. **El paseo no sabía salir de la ventana del shell**, y `MiniPlayerWindow` era la única ventana
-   secundaria del árbol, así que nadie lo había necesitado. El arnés ganó `Reachable`,
-   `SecondaryWindows` y `RootOf`, y cada función de clic apunta ya a la ventana **del control**.
-4. **Las etiquetas largas no se salen: dejan sin sitio al clic de control.** Cinco botones de texto
-   largo plegaron el cromo en tres filas dentro de 480×270 y `BesidePoint` se quedó sin punto libre.
-   El síntoma esperado —«fuera de la ventana»— no fue el que llegó.
+   del `.axaml`. Un control declarado dentro de un `Window` no puede casar las dos mitades **jamás**.
+3. **El paseo no sabía salir de la ventana del shell**, y nadie lo había necesitado. El arnés ganó
+   `Reachable`, `SecondaryWindows` y `RootOf`, y cada función de clic apunta ya a la ventana **del
+   control**.
+4. **Las etiquetas largas no se salen: dejan sin sitio al clic de control.**
+5. **Una prueba que compara el VALOR no distingue un literal de un token** mientras los dos coincidan
+   — y coinciden justo cuando la tokenización sería correcta, así que el falso verde es el caso
+   normal. Se afirma que el `.axaml` **no escribe el número**.
 
-**Los tres rojos de CI, y los tres fueron puertas haciendo su trabajo:**
+**Los cuatro rojos de CI, y los cuatro fueron puertas haciendo su trabajo:**
 
-- **El trinquete de cobertura encontró una rama que nadie recorría** antes de que nadie la leyera. El
-  primer intento enrutó el mini reproductor por una interfaz y **dejó viva la rama vieja de `Apply`**.
-  La corrección fue **borrarla**, no cubrirla: una prueba escrita para alcanzar código muerto pone el
-  número en verde y deja el defecto dentro.
-- **Y al borrarla, el archivo BAJÓ de 100/92 a 100/91**, porque quitar ramas cubiertas sube el peso de
-  las que nunca lo estuvieron. Había dos así desde siempre —que `Apply` usara lo que `Remember` guardó,
-  y el parámetro `embedded` de `GeometryFor`—, ambas garantías reales sin prueba. Cubiertas, el archivo
-  mide 100/100 y **sale** de la deuda. **Un suelo que baja es una bajada**: buscar una explicación de
-  proceso es la forma cómoda de no mirar el código.
-- **Una red calibrada en una máquina acusa a otra.**
-  `The_copy_still_running_is_cancelled_with_the_mouse` comparaba el tiempo de sus dos pulsaciones
-  contra una duración medida aquí, y en el runner falló un run donde no pasaba nada. Lo que el reloj
-  infería —si la copia había terminado sola— **lo dice la pantalla**: ahora la escena guarda todos los
-  estados por los que pasa y afirma que `BackupStatusDone` no está entre ellos.
+- **El trinquete de cobertura encontró una rama que nadie recorría.** El primer intento del mini
+  reproductor enrutó por una interfaz y **dejó viva la rama vieja de `Apply`**. La corrección fue
+  **borrarla**, no cubrirla: una prueba escrita para alcanzar código muerto pone el número en verde y
+  deja el defecto dentro.
+- **Y al borrarla el archivo BAJÓ de 100/92 a 100/91**, porque quitar ramas cubiertas sube el peso de
+  las que nunca lo estuvieron. Había dos así desde siempre, ambas garantías reales sin prueba.
+  Cubiertas, el archivo mide 100/100 y **sale** de la deuda. **Un suelo que baja es una bajada**:
+  buscar una explicación de proceso es la forma cómoda de no mirar el código.
+- **Una red calibrada en una máquina acusa a otra.** La escena de cancelar la copia comparaba el
+  tiempo de sus dos pulsaciones contra una duración medida aquí. Lo que el reloj infería lo dice la
+  pantalla: ahora guarda los estados por los que pasa y afirma que `BackupStatusDone` no está.
+- **Y el trinquete pidió declarar tres mejoras**, que es la mitad de su trabajo que caza lo que mejora
+  sin decirlo.
 
-**Y las tres de la sesión anterior siguen valiendo:** las suites afectadas por un cambio de vistas son
-**cuatro** (`UiTests`, `AccessibilityTests`, `IntegrationTests`, `DocumentationTests`); el trinquete de
-cobertura **falla también cuando algo mejora** sin declararlo; y `verify.ps1` **aborta en el primer
-fallo**, así que un rojo esconde los posteriores.
+**Y las tres de siempre siguen valiendo:** un cambio de vistas afecta a **cuatro** suites (`UiTests`,
+`AccessibilityTests`, `IntegrationTests`, `DocumentationTests`); el trinquete de cobertura **falla
+también cuando algo mejora**; y `verify.ps1` **aborta en el primer fallo**, así que un rojo esconde
+los posteriores.
 
 ## La cola decidida el 2026-08-16 (no se re-delibera)
 
@@ -67,7 +78,7 @@ rehacerlo entero.
 | ~~3~~ | ~~La prueba de los subtítulos~~ **hecha el 2026-08-18** | agente | 0 |
 | ~~4~~ | ~~Cobertura a todo `src/`~~ **hecha el 2026-08-18 como trinquete: 219 y sólo baja; corregido el mismo día para que el suelo lo mida CI** | agente | 0 |
 | ~~5~~ | ~~`ARQ-004`~~ **hecha el 2026-08-18: el comando enlazado, la notificación y la puerta de los siete** | agente | 0 |
-| 6 | **El rediseño**, con el material de Claude Design — **fase 2, puerta de escalares, `primary-action` y la tipografía hechas**; quedan **las vistas** | agente | 0, con la regla de abajo |
+| 6 | **El rediseño**, con el material de Claude Design — **fase 2, puerta de escalares, `primary-action`, la tipografía, `MiniPlayerWindow` y `UpdateView` hechas**; quedan **`PlayerView`, la fase de escalares de espacio y el resto de vistas**, todo decidido | agente | 0, con la regla de abajo |
 | 7 | El paseo físico de diez minutos | **propietario** | — |
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
@@ -535,6 +546,77 @@ en `CommandNotificationTests`. El trinquete del paseo sube a 5 y vuelve a **0** 
 un cambio de vistas son cuatro, no dos: `UiTests`, `AccessibilityTests`, `IntegrationTests` y
 `DocumentationTests`.
 
+#### La fase de escalares de espacio: DECIDIDA ENTERA el 2026-08-20, y no se re-delibera
+
+Es la única decisión de diseño que quedaba abierta en el paso 6. Se decide **contando**, y el recuento
+de `Spacing` / `ItemSpacing` / `LineSpacing` en todos los `.axaml` de `src/` —**183 sitios**— es éste:
+
+| Valor | Sitios | ¿En la escala 4/8/16/24/32? |
+|---|---|---|
+| 8 | 90 | sí |
+| **12** | **45** | **no** |
+| 4 | 21 | sí |
+| 6 | 12 | no |
+| 16 | 6 | sí |
+| 24 | 4 | sí |
+| 2 | 3 | no |
+| 10 | 2 | no |
+
+**121 de 183 (66 %) ya están en la escala. De los 62 que no, cuarenta y cinco son el mismo valor: 12.**
+
+##### 1. La escala gana el escalón de 12
+
+El hueco entre 8 y 16 es de **2×**, y el uso real se acumula justo dentro de él: el 12 es **una cuarta
+parte de todo el espaciado de la aplicación**. Mapearlo a 16 mueve 45 sitios **+33 %**; a 8, **−33 %**.
+Cualquiera de los dos sería un cambio visual grande decidido **por redondeo y no por diseño**, que es
+exactamente lo que un sistema de tokens existe para evitar. **La escala estaba incompleta y el árbol lo
+demuestra**; el escalón se declara en vez de forzar 45 sitios a un valor que nadie eligió.
+
+##### 2. Los nombres pasan a numéricos: `Space4`, `Space8`, `Space12`, `Space16`, `Space24`, `Space32`
+
+Los nombres semánticos —`XSmall`, `Small`, `Medium`, `Large`, `XLarge`— **obligan a inventar un nombre
+cada vez que falta un paso**, y acaba de faltar uno: la alternativa era `SpaceSmallMedium`, que no
+describe nada. Un nombre numérico no puede mentir y hace el mapeo evidente en el sitio de uso.
+
+**El coste es cero hoy y no volverá a serlo.** Medido el 2026-08-20: **ningún `.axaml` de `src/`
+consume ninguno de los cinco** —están los cinco en `NotSpentYet`—, así que el renombrado toca su
+declaración y la lista de `ScalarTokenTests`, y nada más. Hacerlo después de gastarlos costaría 183
+sustituciones.
+
+**`CornerRadiusSmall` y `CornerRadiusMedium` se quedan como están**, y no es un descuido: ya están
+consumidos, sólo son dos valores y entre 4 y 8 no hay hueco donde pueda faltar un paso.
+
+##### 3. El mapeo de los diecisiete restantes
+
+| De | A | Sitios | Cuánto se mueve |
+|---|---|---|---|
+| 6 | `Space8` | 12 | +2 px |
+| 2 | `Space4` | 3 | +2 px |
+| 10 | `Space12` | 2 | +2 px |
+
+**Resultado medido: ningún sitio de la aplicación cambia más de 2 px.** Contra los 45 sitios moviendo
+4 px que costaría cualquier mapeo del 12. Ése es el número que decide, y por eso la decisión no es una
+preferencia.
+
+##### 4. Lo que NO entra, y ya estaba decidido
+
+`Padding`, `Margin` y `BorderThickness` **se quedan con literales**: son `Thickness`, los tokens son
+`x:Double`, y de sus 89 literales **37 son asimétricos** —`0,8,0,0`, `48,0`, `8,4`— que ningún token
+escalar expresa. Se dice **en el archivo de tokens**, junto a la declaración, para que la siguiente
+persona no vuelva a intentarlo.
+
+##### 5. Cómo se ejecuta
+
+**De una vez y por barrido**, no vista por vista: es un mapeo, no una decisión por pantalla, igual que
+los trece literales de tamaño de letra que se volvieron cinco tokens sin que nadie lo notara. Y tiene
+una condición de terminación que se comprueba sola: **`NotSpentYet` queda VACÍA**, porque los seis
+escalares pasan a estar gastados. `ScalarTokenTests` falla si sobra alguno, así que la fase no puede
+darse por hecha a medias.
+
+**Ojo con la trampa de la prueba** que costó una vuelta en `UpdateView`: una prueba que compara el
+**valor** no distingue un literal de un token mientras los dos coincidan, y coinciden justo cuando la
+tokenización sería correcta. Lo que se afirma es que el `.axaml` **no escribe el número**.
+
 #### `PlayerView`: medida el 2026-08-20, y con ella la clase del cromo se generaliza
 
 **Medida sin escribir código.** 171 líneas, cinco botones, ninguno con `x:Name` —se identifican por su
@@ -577,8 +659,8 @@ margen, pero es la prueba que lo dice.
 **La vista está hecha** salvo su espaciado, con [su evidencia](evidence/stable/audit-update-view.md):
 `primary-action` en `UpdateCheckButton` —el único candidato— y sus dos `CornerRadius="8"` gastando ya
 `CornerRadiusMedium`. **El espaciado NO va en ella** porque su mapeo vale para 183 sitios del árbol y
-se decide una vez, no vista por vista: eso es la fase de escalares, que sigue pendiente y está decidida
-abajo.
+se decide una vez, no vista por vista: eso es la fase de escalares, **decidida entera el 2026-08-20**
+y escrita abajo con su recuento.
 
 **Y una trampa nueva que costó una vuelta de escritura:** la prueba del radio **pasaba antes de tocar
 la vista**. Comparaba el valor pintado contra el token resuelto, y como `CornerRadiusMedium` vale 8 y
@@ -810,7 +892,17 @@ regenerar el manifiesto se añaden estos enlaces, y ningún otro:
 | Fila | Evidencias que se le añaden |
 | --- | --- |
 | `UX-003` | [fase 1: los cuatro diccionarios y el servicio que los aplica](evidence/stable/audit-redesign-phase1-tokens.md) |
-| `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md) |
+| `A11Y-001` | [fase 1](evidence/stable/audit-redesign-phase1-tokens.md), [2a: el botón](evidence/stable/audit-redesign-phase2-button-states.md), [2b: el punteado del deshabilitado](evidence/stable/audit-redesign-phase2b-disabled-outline.md), [2c: la casilla](evidence/stable/audit-redesign-phase2c-checkbox-states.md), [2d: la fila de lista](evidence/stable/audit-redesign-phase2d-list-row.md), [2e: el campo de texto](evidence/stable/audit-redesign-phase2e-text-field.md), [el mini reproductor](evidence/stable/audit-mini-player-chrome.md) |
+| `UX-002` | [la pantalla de actualización](evidence/stable/audit-update-view.md) |
+
+**Las dos filas nuevas se decidieron el 2026-08-20.** [El mini
+reproductor](evidence/stable/audit-mini-player-chrome.md) va a `A11Y-001` porque lo que gana esa
+ventana son **cinco controles con nombre accesible y área de pulsación**, que es exactamente la fila
+del foco y el contraste; y [la pantalla de
+actualización](evidence/stable/audit-update-view.md) a la fila de la propia pantalla, porque lo que
+cambia allí es **cuál es su acción principal**, que es jerarquía visual y no accesibilidad.
+`UX-002` es «Fluent moderno en Avalonia», **comprobado contra `FEATURES.md` el 2026-08-20** — leer la
+matriz no es cambiarla, y dejar un identificador a ojo habría costado una vuelta en el paso 8.
 
 **`UX-003` recibe sólo la fase 1** porque esa fila habla del **tema** —que exista, que se aplique y
 que el reproductor lo ignore a propósito—, no de los estados de un control. Las cinco fases de estados
