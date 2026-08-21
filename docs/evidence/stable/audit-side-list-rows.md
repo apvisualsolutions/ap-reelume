@@ -1,9 +1,12 @@
 # Las filas de 36 px, y lo que estaban pintando mientras nadie miraba / The 36 px rows, and what they were painting while nobody looked
 
-Octavo trabajo del tramo 4 de la §4 y **el que lo cierra**. La §4 pedía altura, truncado y tooltip; lo
-que la medición encontró primero fue **qué decían esas filas**. / §4's fourth tranche, and the piece
-that closes it. §4 asked for height, truncation and a tooltip; measuring asked first what those rows
-were saying.
+Octavo trabajo del tramo 4 de la §4. Pedía altura, truncado y tooltip; lo que la medición encontró
+primero fue **qué decían esas filas**. / §4's fourth tranche; §4 asked for height, truncation and a
+tooltip, and measuring asked first what those rows were saying.
+
+**Corrección: cuando esto se escribió decía que cerraba el tramo, y no lo cerraba.** Quedaba
+`LooseFileBanner`, cuya viñeta nunca se había tachado — [su auditoría](audit-loose-file-band.md). /
+Correction: this said it closed the tranche, and it did not.
 
 Fecha / Date: 2026-08-21. Rama / Branch: `codex/ap-reelume-mvp-x64`.
 

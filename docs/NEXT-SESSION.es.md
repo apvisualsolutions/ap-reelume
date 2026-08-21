@@ -2,38 +2,26 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `d288941`, verde; la rama por delante con dos commits del tramo 4.** La fase 6 va por
-**3 tramos de 9 cerrados y el 4 a una pieza**: Shell, Inicio, Biblioteca y fichas, y del Reproductor
-todo salvo **`LooseFileBanner`**.
+**`main` en `d288941`, verde; la rama por delante con tres commits que cierran el tramo 4.** La fase 6
+va por **4 tramos de 9 cerrados**: Shell, Inicio, Biblioteca y fichas, y el Reproductor entero.
 
-**⚠ Y esa pieza estuvo a punto de darse por cerrada sin mirarla.** La sección de estado que abría el
-día decía que al tramo 4 le quedaban dos cosas y no la nombraba, pero **su viñeta nunca se tachó**.
-Medida el 2026-08-21: el banner **sí está superpuesto al vídeo** —lo monta `ShellView.axaml` dentro del
-mismo `Panel` que los cuatro superpuestos, sobre el escenario—, así que la §4 tiene razón en esa mitad.
-**Un resumen propio confirma lo que uno cree haber hecho**: lo que cierra un tramo es su lista de
-vistas, no la frase que lo resume.
-
-**Lo siguiente, decidido y medido, en dos pasos:**
-
-1. **`LooseFileBanner` deja de estar superpuesto al vídeo.** Sale del `Panel` de superpuestos de
-   `ShellView` a una fila propia encima del escenario. Es la mitad de la §4 que es correcta.
-2. **Y la otra mitad de su fila se rechaza, con su medición: los 48 px de alto no caben.** El banner
-   no es un aviso de una línea — lleva encabezado, el nombre del archivo, una explicación que envuelve,
-   la acción, y **un panel de confirmación con su propia explicación y dos botones más**. La §4 marca
-   esa fila **«Bloqueado: el defecto medido el 17-08 impide que llegue a pantalla, así que no puedo
-   verificarlo»**: está escrita sin haber podido ver el control. **Quinta discrepancia §4↔árbol, y
-   manda el árbol.**
-
-Después, el tramo 5: **Ajustes (7 vistas)**, cuya fila está en la tabla de abajo.
-`AppearanceSettingsView` pasa de 3 botones de tema a **5**, y su `StackPanel` horizontal **tiene** que
-ser `WrapPanel` —cinco no caben en 620 px y **la división no se fija a mano**, porque en español
-pliega 4+1 y en inglés cae en otro sitio—; y `PrivacySettingsView` debe distinguir **ausente de
+**Lo siguiente, sin nada que deliberar: el tramo 5, Ajustes (7 vistas)**, cuya fila está en la tabla de
+abajo. `AppearanceSettingsView` pasa de 3 botones de tema a **5**, y su `StackPanel` horizontal
+**tiene** que ser `WrapPanel` —cinco no caben en 620 px y **la división no se fija a mano**, porque en
+español pliega 4+1 y en inglés cae en otro sitio—; y `PrivacySettingsView` debe distinguir **ausente de
 deshabilitado**.
 
 **Antes de escribir nada, mide la vista contra su fila de la §4.** La regla se ha pagado sola **las
 cinco veces**, y en el tramo 4 encontró de golpe el peor defecto medido hasta hoy: **las dos listas del
 lateral pintaban el `ToString()` de un record de dominio**, dos GUID y el nombre de la clase, a la
 vista de cualquiera.
+
+**⚠ Y el tramo 4 estuvo a punto de cerrarse con una vista sin mirar.** Esta misma sección decía que le
+quedaban **dos** piezas y no nombraba `LooseFileBanner`; **su viñeta nunca se había tachado**. Al
+medirla: sí estaba superpuesta al vídeo, y además **viajaba a la ventana del mini reproductor** dentro
+de `PlayerStage`, pidiendo 336 px de alto en una ventana de 270. **Lo que cierra un tramo es su lista
+de vistas, no la frase que lo resume** — la misma forma con la que el 2026-08-20 se declaró cerrado el
+paso 6 contra un resumen propio.
 
 ### Lo que la sesión del 2026-08-21 dejó, y no está sólo en los commits
 
@@ -286,9 +274,20 @@ filas en `WrapPanel` desde el andamio.
   - `TrackSelectorView` no es una lista sino dos `ComboBox`, y `PlayerVersionsView` es un
     `ItemsControl` cuya etiqueta hoy **envuelve**: 36 px fijos con `Wrap` cortan el texto, así que
     ahí el truncado sustituye al envoltorio.
-- **`LooseFileBanner`**: la §4 pide banda superior de 48 px no superpuesta al vídeo; hoy tiene
-  `MaxHeight=320` y sus dos filas de acciones ya son `WrapPanel`. **Ojo: el paquete lo marcaba
-  «bloqueado» y ya no lo está** — el defecto que impedía verlo se corrigió el 2026-08-17.
+- ~~**`LooseFileBanner`: banda superior no superpuesta al vídeo**~~ **HECHO el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-loose-file-band.md)), **y con eso el tramo 4 cierra**.
+  - **Los 48 px de alto se rechazan, con su número.** El banner pide **660×286 a 1280 de ancho, 318 a
+    900 y 336 a 480**: lleva encabezado, nombre de archivo, explicación que envuelve, la acción y un
+    panel de confirmación con dos botones más. La §4 marca esa fila «Bloqueado … no puedo
+    verificarlo»: está escrita sin haber visto el control. **Quinta discrepancia §4↔árbol.**
+  - **Y la razón que el documento no podía ver:** `PlayerStage` es el control que el shell **entrega a
+    la ventana del mini reproductor**, así que lo que esté dentro viaja — 336 px de banner en una
+    ventana de 270. Sale a una fila propia **hermana de `PlayerHost`**, nunca dentro: al volver del
+    modo mini `ShellView.axaml.cs` hace `host.Content = stage`, que **sustituiría cualquier cosa
+    declarada ahí al lado y no la devolvería nunca**.
+  - **`MaxHeight=320` estaba recortando** —el banner pide 336 en estrecho—; la fila `Auto` acota ahora
+    por contenido. `VerticalAlignment="Top"` se queda: es la guarda que sigue haciendo algo cuando la
+    puerta de desbordamiento lo monta a solas.
 - ~~**Los tres avisos de `AudioOutputView`**~~ **HECHOS el 2026-08-21**
   ([su evidencia](evidence/stable/audit-audio-warnings.md)), y **`SubtitleStyleView` el 2026-08-21**
   ([su evidencia](evidence/stable/audit-subtitle-preview.md)) — donde medir encontró que **la vista

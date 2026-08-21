@@ -170,6 +170,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El aviso de «este archivo no está en tu biblioteca» ya no se dibuja encima de la película.** Pasa a
+  una banda propia encima de la imagen, con su acción a la derecha. Antes se superponía al vídeo y,
+  como lleva fondo, se comía las pulsaciones destinadas a lo que había detrás; y al pasar al mini
+  reproductor **se iba con él**, a una ventana en la que pedía más alto del que la ventana tiene.
+
+
 - **Las cuatro listas del lateral del reproductor tienen filas de la misma altura.** Marcadores,
   detecciones, pistas y versiones pasan a filas de 36 píxeles que nunca se desplazan de lado: lo que no
   cabe se corta con puntos suspensivos y se lee entero en el globo de ayuda. En la lista de versiones,

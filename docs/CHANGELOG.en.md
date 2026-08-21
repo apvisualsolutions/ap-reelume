@@ -169,6 +169,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The "this file is not in your library" notice is no longer drawn over the film.** It moves to a
+  band of its own above the picture, with its action on the right. It used to sit on top of the video
+  and, because it carries a background, swallowed clicks meant for what was behind it; and switching to
+  the mini player **took it along**, into a window where it asked for more height than the window has.
+
+
 - **The four lists in the player's side column have rows of one height.** Markers, detections, tracks,
   and versions move to 36-pixel rows that never scroll sideways: what does not fit is cut with an
   ellipsis and read in full in the tooltip. In the versions list a long label used to take several

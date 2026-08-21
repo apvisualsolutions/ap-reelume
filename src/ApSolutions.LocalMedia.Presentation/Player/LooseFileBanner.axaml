@@ -13,20 +13,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource LooseFileAccessibleName}"
     automation:AutomationProperties.LiveSetting="Polite">
   <!--
-    A notice, and it has to be sized to itself. Without the alignments it stretches to whatever
-    contains it, and in the shell that is the whole player stage: measured on 2026-08-17 at 1280x1400
-    over a 1280x1400 stage. It carries a background, so unlike the resume prompt it also swallowed
-    every click meant for the picture behind it. Both dimensions are bounded and not just declared:
-    a MaxWidth alone leaves the height stretching, which is the half of this defect that keeps coming
-    back. It sits at the top because it describes where the session came from, not what it is doing.
+    A band across the top of the player column, which is where §4 puts it and where it stopped being an
+    overlay on 2026-08-21. Two guards left with that move and one stayed.
+
+    MaxHeight left because it was clipping: measured, this banner asks for 336 px at the mini player's
+    480 and 318 at 900, so a 320 cap cut the confirmation off exactly where a narrow window needed it.
+    It was there to stop the control stretching to a 1280x1400 stage - the defect of 2026-08-17 - and
+    the Auto row it lives in now bounds the height by what the content asks for instead.
+
+    MaxWidth left because a band is the width of what it sits above; the explanation keeps a MaxWidth
+    of its own so a wide window does not turn it into one long line.
+
+    VerticalAlignment stayed. It is the guard that still does something: mounted on its own - which is
+    what the overflow gate does - Stretch would take the whole window's height back.
   -->
   <Border
       x:Name="LooseFileSurface"
-      HorizontalAlignment="Center"
       VerticalAlignment="Top"
       Margin="16"
-      MaxWidth="720"
-      MaxHeight="320"
       Padding="16"
       Background="{DynamicResource CardSurfaceBrush}"
       BorderBrush="{DynamicResource ShellBorderBrush}"
@@ -48,7 +52,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource LooseFileDescription}"
           TextWrapping="Wrap" />
 
-      <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+      <!-- The action to the right, which is what §4 asks of a band: the reading runs left to right and
+           ends where the thing to press is. Still a WrapPanel, for the reason every row here is one. -->
+      <WrapPanel
+          HorizontalAlignment="Right"
+          ItemSpacing="{DynamicResource Space8}"
+          LineSpacing="{DynamicResource Space8}">
         <Button
             Classes="primary-action"
             x:Name="AddContainingFolderButton"
