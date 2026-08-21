@@ -75,7 +75,7 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 | ~~2~~ | ~~**Inicio** (5)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-home-tranche.md). Los tres estados del carril, la barra de 3 px al pie y `Space24` en la rejilla. **Dos discrepancias con la §4**: no hay portadas en toda la aplicación (0 `<Image>` en `src/`) y `LibraryEntryView` **no es la ficha que el documento describe**. Y el hallazgo: `RecentlyAdded` se leía de SQLite y no lo pintaba nadie, así que Inicio gana una vista, `RecentlyAddedRailView`. |
 | ~~3~~ | ~~**Biblioteca y fichas** (5)~~ **HECHA el 2026-08-20** | Sus evidencias: [el distintivo](evidence/stable/audit-unavailable-badge.md), [las filas y el peaje](evidence/stable/audit-wrapping-rows-and-the-ratchet-toll.md), [sin resultados y la fila de episodio](evidence/stable/audit-library-no-results-and-episode-row.md), [el botón de borrar](evidence/stable/audit-library-clear-search.md) y [el selector y la cuadrícula](evidence/stable/audit-season-picker-and-the-grid-that-lost.md). **La cuadrícula fluida NO se hace, y está medido**: `WrapPanel` cuesta 7× el tiempo y 455× los controles vivos, y en Avalonia 12.1.1 no existe nada que reflowe y virtualice a la vez. |
 | 4 | **Reproductor** (16) | Superficie propia `#0B0D10` y columna fija de 320 px; el fallo pasa a `DangerSurfaceBrush` con glifo; `VideoStatusOverlay` **partido en dos gramáticas** (dato vs aviso); los tres superpuestos con **alineación explícita y `MaxWidth 420`** — es la forma que causó el panel de 1280×1400; las cuatro listas a filas de 36 px sin scroll horizontal. |
-| 5 | **Ajustes** (7) | `AppearanceSettingsView` de 3 botones de tema a **5**, y su `StackPanel` horizontal **tiene** que ser `WrapPanel`: cinco no caben en 620 px y **la división no se fija a mano**, porque en español pliega 4+1 y en inglés cae en otro sitio. `PrivacySettingsView` debe **distinguir ausente de deshabilitado**. |
+| 5 | **Ajustes** (7) | **Medido el 2026-08-21 sin escribir código, abajo.** Los 3 botones de tema **no pasan a 5** —`ThemePreference` tiene tres y el árbol lleva escrito por qué—; el `StackPanel` horizontal sí pasa a `WrapPanel`, pero **por la otra razón**. Las tres vistas del «mismo esqueleto» **no lo comparten**: cuatro titulan con `FontSizeSubtitle` y una con `FontSizeTitle`. `PrivacySettingsView` debe **distinguir ausente de deshabilitado**, y las dos gramáticas ya están localizadas en ella. |
 | 6 | **Revisión, Metadatos, Catálogo** (7) | La bandeja vacía es **el estado deseable**: `PositiveSurfaceBrush` con glifo, no un vacío triste. |
 | 7 | **Copias, Primeros pasos, Recuperación, Créditos** (5) | `RestoreWizardView`: sólo la raíz ausente gana campo editable y su estado pasa a «Reasignada» al escribir; **se elimina el «Restaurar» duplicado siempre habilitado**. `DatabaseRecoveryView` no gana ruta desde el shell. |
 | 8 | **`UpdateView` y `PlayerView`** | Ya tienen su maqueta; les falta **la gramática de sus mensajes**: 23 en cuatro gramáticas, y 6 motivos de fallo con acciones **condicionadas por motivo** (`CanChooseAnotherVersion` es un flag **independiente**). Y `PlayerRecoveryChooseAnotherVersion` **pasa de `TextBlock` a `Button`**: es el único cambio de tipo del paquete. |
@@ -92,6 +92,56 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 3. **No se reescribe la etiqueta de un botón existente.** `Content` y `AutomationProperties.Name`
    apuntan a la misma clave, así que reescribir una etiqueta **es renombrar el control** y rompe el
    paseo. El paquete declara **0 renombrados** a propósito.
+
+#### El tramo 5 (Ajustes), medido el 2026-08-21 sin escribir código
+
+**Siete vistas, y lo primero que la medición dice es que la fila de la §4 se equivoca en su cabecera.**
+
+**⚠ Los 3 botones de tema NO pasan a 5, y la razón está escrita en el árbol con su porqué.**
+`ThemePreference` tiene **exactamente tres** valores, y `Theme/ThemePreference.cs` lleva la decisión
+escrita encima de los dos de alto contraste: «*son un estado, no una cuarta elección: las tres píldoras
+de Apariencia se quedan como están, y cuál de estas se aplica se lee del sistema en vez de elegirse*».
+El alto contraste de Windows **es un ajuste de accesibilidad del sistema**; una aplicación que ofrece su
+propio selector o lo ignora o lo duplica. **Sexta discrepancia §4↔árbol, y manda el árbol** — y aquí no
+por medición sino porque **la decisión contraria ya estaba tomada y razonada**.
+
+**Y con eso se cae también el argumento del `WrapPanel`** («cinco no caben en 620 px»). Pero **la forma
+sigue siendo la correcta por el otro motivo**, el que este árbol lleva medido ocho veces: un
+`StackPanel` horizontal ofrece anchura infinita. Hay **dos** filas así en la vista —tres píldoras de
+tema y dos de idioma—, y sus etiquetas cambian de largo con el idioma. Medir si caben en 620 px **en
+los dos idiomas** antes de decidir.
+
+**Lo que sí falta en `AppearanceSettingsView`, medido:** el aviso de movimiento reducido es **una frase
+estática** («AP Reelume respeta la preferencia…») que no dice si está activo. `IReducedMotionService`
+existe, está registrado y lo consume `FluentThemeService`: **la aplicación conoce el estado y no lo
+pinta**. La §4 pide ese aviso «activo o no».
+
+**El «mismo esqueleto» de las tres vistas no es el mismo esqueleto:**
+
+| Qué | `AppearanceSettingsView` | `ScanSettingsView` | `RecommendationSettingsView` | `SegmentDetectionSettingsView` |
+|---|---|---|---|---|
+| Título H1 | `FontSizeTitle` | `FontSizeSubtitle` | `FontSizeSubtitle` | `FontSizeSubtitle` |
+| `Padding` del contenedor | 32 | **ninguno** | **ninguno** | **ninguno** |
+| Anchura de los controles | `MaxWidth 620` | **ninguna** | `640` en los textos | **ninguna** |
+
+`LifecycleSettingsView` también titula con `FontSizeSubtitle`. **Cuatro páginas de ajustes cuyo H1 es
+más pequeño que el de la quinta**: eso es lo que la §4 llama «mismo esqueleto» y no lo es.
+
+**`PrivacySettingsView`: las dos gramáticas conviven, y está medido dónde.** `CanRefreshAutomatically`
+gobierna un `IsVisible` (**ausente**) y `DiagnosticsEnabled` un `IsEnabled` (**deshabilitado**), en la
+misma vista. **Antes de añadir el borde punteado, comprueba si ya llega**: `DesignTokens.axaml` tiene un
+estilo `:disabled` que cubre diez tipos de control. Y **la lista de hosts**: la §4 le pide estado vacío,
+pero `NetworkPurposes` se **inyecta**, así que hay que medir si puede quedar vacía de verdad — una
+cadena que nadie puede llegar a ver es peor que no tenerla.
+
+**`DiagnosticsPreviewView`:** `MaxHeight="320"` ya está; la fuente es el literal
+`"Consolas,Cascadia Mono,monospace"` y **no hay `FontSize`**, así que los 13 px de la §4 no están; y
+lleva `TextWrapping="NoWrap"` donde la §4 pide que envuelva — es texto que alguien lee **para decidir si
+lo comparte**, así que no debería pedir scroll lateral.
+
+**`LifecycleSettingsView`:** hay un bloque `AccentSubtleBrush` (el consentimiento); **no hay ningún
+`WarningSurfaceBrush`** en la vista, así que el aviso de «sin bandeja» que la §4 quiere como advertencia
+hoy no lo es.
 
 #### Lo que el tramo 2 (Inicio) dejó escrito, hecho el 2026-08-20
 
