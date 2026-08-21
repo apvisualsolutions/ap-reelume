@@ -179,8 +179,25 @@ public sealed class LifecycleSettingsTests
         }
     }
 
+    /// <summary>
+    /// Every word on this screen comes from a resource, and a symbol is not a word.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This asked for no literal of any kind until 2026-08-21, when the "no tray on this system"
+    /// notice took the warning grammar the rest of the tree uses and brought its <c>⚠</c> with it.
+    /// The glyph is literal in every other view that carries it, and none of them has a gate saying
+    /// otherwise, so this one view was stricter than the tree by accident rather than by decision.
+    /// </para>
+    /// <para>
+    /// <b>What the gate protects is untranslated words</b>, and that is what it now says: a literal is
+    /// allowed only if it holds <b>no letter at all</b>. A word cannot slip through as a symbol — one
+    /// letter anywhere in the value fails it — and it is asserted alongside the whitelist so an empty
+    /// run of symbols cannot make this pass by measuring nothing.
+    /// </para>
+    /// </remarks>
     [Fact]
-    public void Every_visible_string_on_the_lifecycle_screen_comes_from_a_resource()
+    public void Every_visible_word_on_the_lifecycle_screen_comes_from_a_resource()
     {
         var view = Path.Combine(
             RepositoryLayout.Root,
@@ -190,14 +207,19 @@ public sealed class LifecycleSettingsTests
             "LifecycleSettingsView.axaml");
         var document = XDocument.Load(view);
 
-        var literals = document.Descendants()
+        var painted = document.Descendants()
             .Attributes()
             .Where(attribute => attribute.Name.LocalName is "Text" or "Content" or "ToolTip.Tip" or "Header")
             .Where(attribute => !attribute.Value.TrimStart().StartsWith('{'))
             .Select(attribute => $"{attribute.Name.LocalName}={attribute.Value}")
             .ToArray();
 
-        Assert.Empty(literals);
+        var words = painted.Where(literal => literal.Split('=', 2)[1].Any(char.IsLetter)).ToArray();
+        Assert.Empty(words);
+
+        // The symbols that are left are asserted as present, because "no words" is also what a screen
+        // with nothing painted on it would report.
+        Assert.NotEmpty(painted);
     }
 
     private sealed class InMemorySettings(LifecyclePreferences preferences) : ILifecycleSettings

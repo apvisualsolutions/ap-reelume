@@ -152,6 +152,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El aviso de «este sistema no tiene bandeja» parecía un dato más.** Se decía en texto llano, del
+  mismo color que las etiquetas de al lado, cuando lo que dice es que algo que pediste no se pudo
+  hacer. Ahora lleva recuadro ámbar y símbolo, como el resto de avisos.
+
+
+- **La vista previa de diagnósticos obligaba a desplazarse de lado.** Es el texto que lees para decidir
+  si compartes algo, así que ahora se ajusta al ancho y se lee entero.
+
+
 - **Un ajuste de escaneo no tenía etiqueta a la vista.** La casilla del intervalo de recuperación
   anunciaba «Intervalo de recuperación en minutos» a un lector de pantalla y en la pantalla no se veía
   nada: sólo una caja de números. Ahora la etiqueta está escrita donde se lee.

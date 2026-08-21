@@ -40,11 +40,37 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsChecked="{Binding MinimizeToTrayOnClose}"
         IsEnabled="{Binding CanMinimizeToTray}"
         automation:AutomationProperties.Name="{DynamicResource LifecycleCloseToTrayLabel}" />
-    <TextBlock
-        MaxWidth="640"
-        IsVisible="{Binding !CanMinimizeToTray}"
-        Text="{DynamicResource LifecycleCloseToTrayUnavailable}"
-        TextWrapping="Wrap" />
+    <!--
+      A tray this system does not have is not a fact about the machine, it is a choice that could not
+      be honoured - the same thing the three audio notices say - so it takes the same surface, border
+      and glyph. The glyph is what keeps the signal off colour alone.
+
+      A Grid and not a horizontal StackPanel: a stack offers its children infinite width, so wrapping
+      text beside a glyph never wraps and runs off the side. Nine measurements of that shape here.
+    -->
+    <Border
+        x:Name="TrayUnavailableNotice"
+        Padding="12"
+        Background="{DynamicResource WarningSurfaceBrush}"
+        BorderBrush="{DynamicResource WarningBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
+        IsVisible="{Binding !CanMinimizeToTray}">
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock
+            Grid.Column="0"
+            Margin="0,0,8,0"
+            VerticalAlignment="Top"
+            FontWeight="Bold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="⚠" />
+        <TextBlock
+            Grid.Column="1"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource LifecycleCloseToTrayUnavailable}"
+            TextWrapping="Wrap" />
+      </Grid>
+    </Border>
 
     <CheckBox
         x:Name="StartWithWindowsCheckBox"

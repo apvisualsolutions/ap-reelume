@@ -2,8 +2,9 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` y la rama en `dc4ce60`, CI verde, árbol limpio.** La fase 6 va por **4 tramos de 9 cerrados**
-—Shell, Inicio, Biblioteca y fichas, y el Reproductor entero— **y el 5 por la mitad**:
+**`main` en `dc4ce60`; la rama por delante con el tramo 5 entero.** La fase 6 va por **5 tramos de 9
+cerrados**
+—Shell, Inicio, Biblioteca y fichas, el Reproductor entero y **Ajustes**—:
 `AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del
 «mismo esqueleto»** ([su evidencia](evidence/stable/audit-settings-skeleton.md)) y **la estructura de la
 página entera** ([su evidencia](evidence/stable/audit-settings-page-structure.md)) están hechas.
@@ -15,8 +16,9 @@ nivel 1 en una página y un escalón de 158 px por el medio. **Una decisión sob
 la pantalla ensamblada**, que es la mitad que una tabla por vista no puede ver. Es la segunda vez que
 esta regla se cobra algo: la primera fue `LibraryEntryView`.
 
-**Quedan dos piezas del tramo 5: `LifecycleSettingsView` y `DiagnosticsPreviewView`.**
-`PrivacySettingsView` **no necesita nada de su fila**, y está medido: sus dos gramáticas ya conviven
+~~**Quedan dos piezas del tramo 5: `LifecycleSettingsView` y `DiagnosticsPreviewView`.**~~ **HECHAS el
+2026-08-21 ([su evidencia](evidence/stable/audit-settings-notices.md)), y con eso EL TRAMO 5 CIERRA.**
+La §4 va por **5 tramos de 9**. `PrivacySettingsView` cerró **sin tocarla**, y está medido: sus dos gramáticas ya conviven
 —`CanRefreshAutomatically` gobierna un `IsVisible` y `DiagnosticsEnabled` un `IsEnabled`—, **un hijo
 invisible no deja hueco** (medido: el hermano siguiente sube de y=72 a y=36, así que el `Spacing` del
 `StackPanel` salta los invisibles), el **contorno punteado ya llega** a un botón deshabilitado (medido:
@@ -24,13 +26,11 @@ invisible no deja hueco** (medido: el hermano siguiente sube de y=72 a y=36, as�
 `NetworkPurposeRegistry.Declared` declara **4** y es estática. El estado vacío que la §4 le pide **no lo
 puede ver nadie** — séptima discrepancia §4↔árbol.
 
-**Lo siguiente, sin nada que deliberar: las tres vistas que le quedan al tramo 5**, todas medidas y con
-su discrepancia anotada abajo. Por orden de calado: `PrivacySettingsView` distinguiendo **ausente de
-deshabilitado** —y **antes de añadir el borde punteado, comprueba si ya llega**: `DesignTokens.axaml`
-tiene un `:disabled` que cubre diez tipos—; `LifecycleSettingsView` con su aviso de «sin bandeja» como
-advertencia **y su título, que se quedó en `FontSizeSubtitle` mientras las otras cuatro subían a
-`FontSizeTitle`**; y `DiagnosticsPreviewView`, que envuelve el texto que alguien lee **para decidir si
-lo comparte**.
+**Lo siguiente, sin nada que deliberar: el tramo 6 — Revisión, Metadatos y Catálogo (7 vistas)**, cuya
+fila está en la tabla de abajo. Lo de más calado que pide: **la bandeja vacía de `ReviewInboxView` es el
+estado deseable**, así que se pinta en `PositiveSurfaceBrush` con glifo y no como un vacío triste; y
+`CandidateCardView` lleva portada de 92 px — **que no existe**, porque no hay portadas en toda la
+aplicación y eso está decidido fuera de 0.2.0.
 
 **Antes de escribir nada, mide la vista contra su fila de la §4.** La regla se ha pagado sola **las
 cinco veces**, y en el tramo 4 encontró de golpe el peor defecto medido hasta hoy: **las dos listas del

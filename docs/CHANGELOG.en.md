@@ -151,6 +151,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The "this system has no tray" notice looked like another fact.** It was a plain sentence in the
+  same colour as the labels beside it, when what it says is that something you asked for could not be
+  done. It now carries an amber box and a symbol, like every other warning.
+
+
+- **The diagnostics preview made you scroll sideways.** It is the text you read to decide whether to
+  share something, so it now wraps and can be read in full.
+
+
 - **One scan setting had no visible label.** The recovery-interval box announced "Recovery interval in
   minutes" to a screen reader and showed nothing at all on screen: just a number box. The label is now
   written where it can be read.
