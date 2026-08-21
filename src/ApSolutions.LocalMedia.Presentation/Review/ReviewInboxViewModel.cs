@@ -80,9 +80,12 @@ public sealed class CandidateCardViewModel(MatchCandidate candidate)
 
     public bool IsSuggested => ReviewState == ReviewState.Suggested;
 
+    /// <summary>
+    /// The codes as codes. What the screen shows is their words, resolved by the converter the
+    /// recommendation reasons already go through - a summary joined here would be one built out of
+    /// code paths, which is exactly what the help text used to announce.
+    /// </summary>
     public IReadOnlyList<string> ExplanationCodes => Candidate.ExplanationCodes;
-
-    public string ExplanationSummary => string.Join(", ", Candidate.ExplanationCodes);
 }
 
 public sealed class ReviewInboxViewModel : INotifyPropertyChanged
