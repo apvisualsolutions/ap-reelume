@@ -10,6 +10,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The library search gains a button to clear it.** Getting the whole library back meant selecting
+  what you had typed, deleting it, and pressing Apply. It is now one press. With the box empty the
+  button stays where it is, greyed out, so the row of controls does not move on every keystroke.
+
+
 - **Searching and finding nothing now tells you.** Until now a search with no matches left the screen
   blank, without a single line of text. It now says there are no results and why — the current search
   and filters — and it does **not** say your library is empty, because it is not.

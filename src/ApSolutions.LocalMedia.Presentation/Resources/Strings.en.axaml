@@ -61,6 +61,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="LibraryTitle">Library</x:String>
   <x:String x:Key="LibrarySearchLabel">Search the library</x:String>
   <x:String x:Key="LibrarySearchPlaceholder">Title, cast, or genre</x:String>
+  <x:String x:Key="LibrarySearchClearAction">Clear the search</x:String>
   <x:String x:Key="LibraryFilterLabel">Filter</x:String>
   <x:String x:Key="LibrarySortLabel">Sort</x:String>
   <x:String x:Key="LibraryApplyAction">Apply</x:String>

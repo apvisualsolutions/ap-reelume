@@ -23,6 +23,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 {
     private readonly ICatalogQueryService _queryService;
     private readonly RelayCommand _back;
+    private readonly AsyncRelayCommand _clearSearch;
     private IReadOnlyList<CatalogItemViewModel> _items = [];
     private string? _search;
     private CatalogFilter _filters;
@@ -47,6 +48,10 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         OpenDetailsCommand = new RelayCommand(
             parameter => OpenDetails((CatalogItemViewModel)parameter!),
             parameter => parameter is CatalogItemViewModel);
+        _clearSearch = new AsyncRelayCommand(
+            () => ClearSearchAsync(CancellationToken.None),
+            () => !string.IsNullOrWhiteSpace(Search));
+        ClearSearchCommand = _clearSearch;
         _back = new RelayCommand(_ => BackToLibrary(), _ => Surface != LibrarySurface.Browse);
         BackCommand = _back;
     }
@@ -73,6 +78,11 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             if (SetField(ref _search, value))
             {
                 OnPropertyChanged(nameof(IsSearchWithoutResults));
+
+                // The clear button is bound to a predicate over this, so it has to be told: a command
+                // that never announces is asked once at construction and keeps that first answer,
+                // which is the defect ARQ-004 went through twenty-four classes to remove.
+                _clearSearch.RaiseCanExecuteChanged();
             }
         }
     }
@@ -147,6 +157,9 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 
     public ICommand RefreshCommand { get; }
 
+    /// <summary>Empties the search box and asks again, so getting back to everything is one press.</summary>
+    public ICommand ClearSearchCommand { get; }
+
     public ICommand LoadMoreCommand { get; }
 
     public ICommand OpenDetailsCommand { get; }
@@ -177,6 +190,15 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         Items = page.Items.Select(item => new CatalogItemViewModel(item)).ToArray();
         _nextCursor = page.NextCursor;
         OnPropertyChanged(nameof(HasMore));
+    }
+
+    /// <summary>
+    /// Clears the search and re-runs the query, which is the only thing that puts the results back.
+    /// </summary>
+    public async Task ClearSearchAsync(CancellationToken cancellationToken = default)
+    {
+        Search = null;
+        await LoadAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task LoadMoreAsync(CancellationToken cancellationToken = default)

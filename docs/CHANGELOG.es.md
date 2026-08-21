@@ -10,6 +10,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La búsqueda de la biblioteca gana un botón para borrarla.** Volver a ver la biblioteca entera era
+  seleccionar lo escrito, borrarlo y pulsar Aplicar. Ahora es una pulsación. Con la caja vacía el botón
+  sigue ahí, apagado, para que la fila de controles no se mueva cada vez que escribes una letra.
+
+
 - **Buscar y no encontrar nada ya te lo dice.** Hasta ahora una búsqueda sin resultados dejaba la
   pantalla en blanco, sin una sola línea de texto. Ahora dice que no hay resultados y por qué —la
   búsqueda y los filtros actuales—, y **no** dice que tu biblioteca esté vacía, porque no lo está.

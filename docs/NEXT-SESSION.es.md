@@ -25,6 +25,13 @@ a pedirlas en Biblioteca y en las fichas.
    Cobertura línea a línea — la primera hipótesis, el `WaitAsync` de al lado, era falsa y ya tenía
    prueba.
 
+**DOS TAREAS NUEVAS, pedidas el 2026-08-20 y ya en la tabla como pasos 11 y 12:** la **página del
+repositorio en GitHub con capturas** y una **landing preparada para su dominio**. Las dos van
+**después de que la §4 termine** —una captura de una interfaz a medio rediseñar hay que rehacerla, que
+es el mismo argumento por el que 0.2.0 no se corta antes— y **comparten las capturas**. Su análisis,
+con lo que ya está decidido y lo que no, está abajo en «11 y 12». Lo único que se puede adelantar es
+el **guion** que genera las capturas, que es código de pruebas.
+
 **Lo siguiente por orden es el tramo 3: Biblioteca y fichas (5 vistas).** Su fila de la §4 está en la
 tabla de abajo, y **hay que medirla vista por vista antes de escribir nada**: en los dos tramos
 anteriores la mitad de lo que pedía ya estaba hecho, y en éste una de sus filas —la cuadrícula fluida
@@ -118,12 +125,14 @@ con `EnumeratedCount`), el vacío de `ShowDetailsView` (`ShowDetailsEmpty`), «s
 
 **Lo que falta, por vista:**
 
-- **`LibraryView`**, lo que queda: **la cuadrícula fluida con mínimo de 180 px**, que tiene **una
-  decisión dentro** —un `WrapPanel` da el reflujo y **pierde la virtualización** que hoy sostiene una
-  biblioteca grande—, y **el botón de borrar la búsqueda**, que es **un control nuevo** y por tanto
-  llega con su prueba de nombre accesible y su línea de paseo en el mismo cambio. ~~La fila de
-  filtros~~ y ~~«buscando sin resultados»~~ están **HECHAS el 2026-08-20**
-  ([su evidencia](evidence/stable/audit-library-no-results-and-episode-row.md)).
+- **`LibraryView`**, lo único que queda: **la cuadrícula fluida con mínimo de 180 px**, y tiene **una
+  decisión dentro que hay que tomar con datos** — un `WrapPanel` da el reflujo y **pierde la
+  virtualización** que hoy sostiene una biblioteca grande, así que la salida probable es
+  `ItemsRepeater` con `UniformGridLayout`, **y lo primero es comprobar si el paquete está
+  referenciado**. ~~La fila de filtros~~, ~~«buscando sin resultados»~~ y ~~el botón de borrar la
+  búsqueda~~ están **HECHAS el 2026-08-20**
+  ([1](evidence/stable/audit-library-no-results-and-episode-row.md),
+  [2](evidence/stable/audit-library-clear-search.md)).
 - **⚠ Y una trampa del paquete, medida:** de sus 22 cadenas de vacío, la primera pareja
   —`LibraryEmptyTitle` / `LibraryEmptyDescription`— **ya existe con otro nombre**: son
   `EmptyLibraryTitle` / `EmptyLibraryDescription`, y **las pinta `ShellView`**, no `LibraryView`.
@@ -146,7 +155,11 @@ con `EnumeratedCount`), el vacío de `ShowDetailsView` (`ShowDetailsEmpty`), «s
   queda «dos columnas con portada fija de 320 px», que choca con que no hay portadas.
 - **`ShowDetailsView`**: **no tiene selector de temporada**. Hoy apila todas las temporadas en un
   `ItemsControl`. El selector es **un control nuevo** (con su escena), y «una sola temporada oculta el
-  selector» es un estado más.
+  selector» es un estado más. **Se empezó el 2026-08-20 y se revirtió entero** al llegar una prioridad
+  nueva: el modelo ya tenía `SelectedSeason` y `HasSeasonChoice`, y dejar propiedades que ninguna
+  vista pinta es la sexta forma del defecto de la casa. **Su decisión ya está tomada y no se
+  re-delibera: con una sola temporada el selector es AUSENTE, no deshabilitado**, porque un control
+  que sólo puede contestar lo que ya dice es una pregunta que nadie hizo.
 - ~~**`EpisodeRowView`**~~ **HECHA el 2026-08-20**: 56 px y número monoespaciado en columna fija.
   **Lo que se afirma es que la columna cuadra** —el 9 y el 10 terminan en la misma x—, no cómo se
   llama la fuente: el ancho fijo con alineación es el fin y la familia es el medio.
@@ -408,6 +421,70 @@ rehacerlo entero.
 | 8 | Cortar 0.2.0, hasta el instante de firmar | agente | — |
 | 9 | Firmar y publicar | **propietario** | — |
 | 10 | `REL-004` y la restauración trimestral de la clave | **propietario** | — |
+| **11** | **La página del repositorio en GitHub, con capturas** — pedida el 2026-08-20 | agente | 0 |
+| **12** | **La landing, preparada para su dominio** — pedida el 2026-08-20 | agente + propietario | 0 |
+
+#### 11 y 12: la página del repositorio y la landing, pedidas el 2026-08-20
+
+**Las dos van después del paso 6 y comparten una misma pieza: las capturas.** Van al final de la tabla
+porque una captura de una interfaz a medio rediseñar hay que rehacerla, que es el mismo argumento por
+el que 0.2.0 no se corta antes. **No se empiezan antes de que la §4 termine**, salvo la parte que no
+depende de la pantalla y está señalada abajo.
+
+##### 11. La página del repositorio, con capturas
+
+**Punto de partida medido el 2026-08-20:** `README.es.md` y `README.en.md` existen, están completos y
+**no tienen ni una sola imagen**. Quien llega al repositorio lee una descripción excelente de algo que
+no ha visto nunca.
+
+**Lo que hay que decidir, y no está decidido:**
+
+- **De dónde salen las capturas.** Este proyecto tiene algo que casi ninguno: puede generarlas **por
+  ejecución y de forma reproducible**. `LibraryNavigationTests` ya guarda PNG con
+  `window.CaptureRenderedFrame()` en `artifacts/ui-captures/`, en los dos idiomas. Lo mismo vale para
+  cualquier pantalla, en los cuatro temas y a la escala que se quiera. **Hechas a mano envejecen; hechas
+  por un guion se rehacen en el commit que cambia la vista.**
+- **⚠ Y hay una razón de privacidad, no de comodidad, para que sea así.** `RepositoryPrivacyTests`
+  existe porque «una ruta en pantalla es como una captura deja de poder compartirse». Una captura
+  tomada a mano de la biblioteca real del propietario lleva **títulos suyos y rutas suyas** dentro de
+  un PNG que ninguna prueba puede leer. Las capturas se toman de una ejecución con **raíz de datos
+  aislada y biblioteca sembrada**, como hace el paseo.
+- **Si se versionan o no.** Un README de GitHub necesita las imágenes **en el repositorio**; enlazarlas
+  a un artefacto de CI no funciona. Así que se versionan, y eso pide decidir **cuántas y a qué tamaño**
+  — hoy el árbol versiona 7 imágenes en total.
+- **Cuáles.** Lo mínimo honesto: Inicio, Biblioteca, una ficha, el reproductor y la bandeja de
+  revisión. Cinco, no quince.
+- **Y qué más lleva la página además de las capturas**: insignia de CI, licencia, plataforma, el
+  enlace de descarga de la release, y la atribución de TMDB, que es **obligación legal** y ya está
+  resuelta en la aplicación.
+
+**Lo que se puede adelantar sin esperar a la §4:** el **guion** que genera las capturas, porque es
+código de pruebas y no depende de cómo queden las vistas. Lo que no se adelanta son los PNG.
+
+##### 12. La landing, preparada para su dominio
+
+**El propietario la pidió «preparada para luego ponerla en un dominio»**, así que se **construye**
+ahora y se **publica** cuando haya versión que descargar: una landing con un botón de descarga que no
+lleva a ninguna parte es peor que no tenerla.
+
+**Lo que hay que decidir, y tres cosas ya están decididas por el propio producto:**
+
+- **⚠ Dónde vive, y es una trampa medida.** Una carpeta nueva **en la raíz** rompe
+  `RepositoryPrivacyTests`, que trata todo directorio de raíz no declarado como carpeta personal y
+  reporta cientos de líneas — pasó con `design/` el 2026-08-17. **Se declara en
+  `VersionedDirectories`, nunca se relaja la prueba.**
+- **Sin nada externo, y esto no es estética.** Una landing que carga tipografías de Google o una
+  analítica **contradice el producto entero** —«nada sale de este equipo»— y la primera persona que
+  mire la pestaña de red lo verá. Autocontenida: sin CDN, sin fuentes remotas, sin analítica.
+- **Bilingüe**, como todo lo público de este repositorio.
+- **Cómo se publica:** GitHub Pages desde el repositorio público es lo natural y no cuesta nada, con
+  el dominio propio apuntando ahí. **El dominio es del propietario** y ya está en `REL-004`.
+- **Lo que la bloquea a medias:** el **vectorial de la marca**, que es lo mismo que bloquea los 35
+  activos de instalación. Se puede construir entera con un marcador y cambiarlo el día que llegue.
+
+**Y lo que la landing debe decir, que es lo que la hace distinta de la de cualquier otro reproductor:**
+que no hay cuenta, que no hay nube, que no sube nada, y que el catálogo se queda donde está. Eso ya
+está escrito y medido en la declaración de privacidad; **la landing lo repite, no lo inventa**.
 
 #### ~~1. La sesión suelta no se ve~~ — hecha el 2026-08-17
 
