@@ -28,14 +28,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource DiagnosticsPreviewDescription}"
           TextWrapping="Wrap" />
+      <!--
+        It wraps. This is the one piece of text in the application that exists to be read before a
+        decision - what would leave the machine if somebody pressed export - and text like that does
+        not get to hide its right-hand half behind a sideways scroll. The ceiling stays, so a long dump
+        scrolls downwards inside its own box instead of pushing the page.
+
+        §4 asks for 13 px and it is refused with this tree's own rule: the scale is 28/20/14/12 and has
+        no 13, and a scalar declared for one consumer is the defect already named twice here -
+        FontSizeMono was considered on exactly that ground and left undeclared. FontSizeBody is a token
+        the markup does not have to write as a number.
+
+        Two families, so a host without the first still draws fixed-width instead of whatever it likes.
+      -->
       <TextBox
           x:Name="DiagnosticsPreviewText"
           MaxHeight="320"
           AcceptsReturn="True"
           FontFamily="Consolas,Cascadia Mono,monospace"
+          FontSize="{DynamicResource FontSizeBody}"
           IsReadOnly="True"
           Text="{Binding PreviewJson, Mode=OneWay}"
-          TextWrapping="NoWrap"
+          TextWrapping="Wrap"
           automation:AutomationProperties.Name="{DynamicResource DiagnosticsPreviewTitle}" />
     </StackPanel>
   </Border>
