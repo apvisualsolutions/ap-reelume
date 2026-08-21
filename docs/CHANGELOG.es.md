@@ -122,6 +122,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   ninguna parte: se leían y se tiraban. Ahora hay un carril con ellos, con el título en dos líneas como
   mucho, el año en un tono secundario y el aviso de que un medio no está disponible ahora mismo.
 
+### Corregido
+
+- **Los avisos que aparecen sobre el vídeo dejan de poder ocupar la pantalla entera.** La oferta de
+  continuar, el aviso del episodio siguiente y la pregunta de cambio de versión se centraban, pero
+  seguían creciendo sin límite: con un texto largo dentro, uno de ellos ocupaba 1278 píxeles de una
+  pantalla de 1280. Ahora tienen un ancho máximo. Y el botón de saltar la cabecera se coloca abajo a la
+  derecha, fuera del paso.
+
 ### Cambiado
 
 - **El reproductor tiene su propio fondo, y es el mismo con cualquier tema.** Todo lo demás en la

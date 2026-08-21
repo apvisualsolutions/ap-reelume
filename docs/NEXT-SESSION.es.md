@@ -223,9 +223,11 @@ filas en `WrapPanel` desde el andamio.
 - **`VideoStatusOverlay`** pinta sus **seis** estados con **un solo `ShellSurfaceBrush`**, y la §4 lo
   parte en dos gramáticas: HDR10, tonemapping, SDR y aceleración son **datos** (texto secundario, sin
   caja) y la caída a software y el formato no soportado son **avisos** (`WarningSurfaceBrush`).
-- **`ResumePromptView` (420)**, **`NextEpisodeOverlay` (420)** y **`VersionSwitchDialog` (520)**: les
-  falta el `MaxWidth`, que es la mitad que evita el panel de 1280×1400. **`SkipMarkerButton` no tiene
-  alineación ninguna.**
+- ~~**Los cuatro superpuestos**~~ **HECHOS el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-overlay-caps.md)), y la medición encontró que **el defecto
+  del 2026-08-17 seguía medio vivo**: con las dos alineaciones puestas y una frase larga dentro,
+  `ResumePromptSurface` ocupó **1278 px de un escenario de 1280**. **Centrar impide que un panel se
+  desplace, no que crezca.** Puestos los topes (420/420/520) y la esquina del botón de saltar.
 - **`TransportControlsView`**: glifos de Segoe Fluent Icons y 44 px de área pulsable. **Ojo: el nombre
   accesible sigue viniendo de la clave de recurso, no del glifo** — cambiar el `Content` de un botón
   por un glifo **no puede** tocar su `AutomationProperties.Name`, o el paseo lo pierde.

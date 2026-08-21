@@ -14,6 +14,7 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -173,6 +174,78 @@ public sealed class PlayerViewDesignTests
                 + "would be read against the player's background."));
 
         window.Close();
+    }
+
+    /// <summary>
+    /// Every panel that floats over the picture is sized to itself, and none of them can stretch.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Three of these already carry explicit alignment, which was the correction of 2026-08-17 after
+    /// the walk found the resume offer drawn at <b>1280×1400</b> over a 1280×1400 stage with its two
+    /// buttons in the corner. Alignment stops the stretch in the axis it names; §4 adds the width cap,
+    /// which is what keeps a long sentence from making the card as wide as the film.
+    /// </para>
+    /// <para>
+    /// Measured rather than read: each view is mounted alone in a 1280 px window, which is the widest
+    /// thing that can contain it, and what is asserted is the width it actually took. A view with no
+    /// data context leaves every <c>IsVisible</c> at its default, so every branch is on screen at once
+    /// — an upper bound rather than a scene, which is the same trick <c>ViewOverflowTests</c> uses.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void No_panel_over_the_picture_stretches_to_the_stage()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var caps = new (Func<Control> Build, string Surface, double Cap)[]
+        {
+            (() => new ResumePromptView(), "ResumePromptSurface", 420),
+            (() => new NextEpisodeOverlay(), "NextEpisodeSurface", 420),
+            (() => new VersionSwitchDialog(), "VersionSwitchSurface", 520),
+        };
+
+        foreach (var (build, surfaceName, cap) in caps)
+        {
+            var view = build();
+            var window = new Window { Width = 1280, Height = 800, Content = view };
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            // A long sentence is put in on purpose, because that is the only thing the cap protects
+            // against: with the short strings these views carry today they do not reach 420 px on their
+            // own, so measuring them as they come would pass before anything was capped at all — the
+            // false green would be the normal case.
+            var line = view.GetVisualDescendants().OfType<TextBlock>().First();
+            line.Text = string.Join(' ', Enumerable.Repeat("una frase larguísima que nadie previó", 12));
+            Dispatcher.UIThread.RunJobs();
+            window.InvalidateMeasure();
+            Dispatcher.UIThread.RunJobs();
+
+            var surface = Assert.Single(
+                view.GetVisualDescendants().OfType<Control>(),
+                control => control.Name == surfaceName);
+            Assert.True(
+                surface.Bounds.Width <= cap,
+                $"{surfaceName} took {surface.Bounds.Width:F0} px of a 1280 px stage, past its {cap} px cap.");
+            window.Close();
+        }
+
+        // The skip button is not a panel, so what it needs is a corner rather than a cap: bottom-right
+        // with a margin, out of the way of the transport and of the picture's middle.
+        var skip = new SkipMarkerButton();
+        var skipWindow = new Window { Width = 1280, Height = 800, Content = skip };
+        skipWindow.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var button = Assert.Single(
+            skip.GetVisualDescendants().OfType<Control>(),
+            control => control.Name == "SkipMarkerButtonControl");
+        Assert.Equal(HorizontalAlignment.Right, button.HorizontalAlignment);
+        Assert.Equal(VerticalAlignment.Bottom, button.VerticalAlignment);
+        Assert.Equal(new Thickness(24), button.Margin);
+        skipWindow.Close();
     }
 
     /// <summary>A theme brush's colour, asked for by the variant in force.</summary>

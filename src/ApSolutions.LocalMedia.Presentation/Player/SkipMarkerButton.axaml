@@ -12,6 +12,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource SkipMarkerAccessibleName}">
   <Button
       x:Name="SkipMarkerButtonControl"
+      Margin="24"
+      HorizontalAlignment="Right"
+      VerticalAlignment="Bottom"
       IsVisible="{Binding IsVisible}"
       Command="{Binding SkipCommand}"
       automation:AutomationProperties.Name="{DynamicResource SkipMarkerAccessibleName}">

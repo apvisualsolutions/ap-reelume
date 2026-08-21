@@ -122,6 +122,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   title on at most two lines, the year in a secondary tone, and the badge for a medium that is not
   reachable right now.
 
+### Fixed
+
+- **The notices that appear over the video can no longer take the whole screen.** The resume offer, the
+  next-episode notice, and the version-switch question were centred but still grew without limit: with
+  a long text inside, one of them took 1278 pixels of a 1280-pixel screen. They now have a maximum
+  width. And the skip button sits at the bottom right, out of the way.
+
 ### Changed
 
 - **The player has a background of its own, and it is the same under every theme.** Everything else in
