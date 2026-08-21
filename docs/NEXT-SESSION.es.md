@@ -234,9 +234,17 @@ filas en `WrapPanel` desde el andamio.
   accesible sigue viniendo de la clave de recurso, no del glifo** — cambiar el `Content` de un botón
   por un glifo **no puede** tocar su `AutomationProperties.Name`, o el paseo lo pierde.
 - ~~**Los tres avisos de `AudioOutputView`**~~ **HECHOS el 2026-08-21**
-  ([su evidencia](evidence/stable/audit-audio-warnings.md)). Quedan **`SubtitleStyleView`** —la vista
-  previa del subtítulo sobre la superficie del reproductor y no la del shell— y
-  **`ShortcutSettingsView`** —dos columnas y su cadena de vacío—.
+  ([su evidencia](evidence/stable/audit-audio-warnings.md)), y **`SubtitleStyleView` el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-subtitle-preview.md)) — donde medir encontró que **la vista
+  previa previsualizaba una cosa de cinco**. Queda **`ShortcutSettingsView`**: dos columnas y su
+  cadena de vacío.
+- **⚠ Y dos trampas nuevas, medidas el 2026-08-21.** (1) `HighContrastTests.No_state_is_told_by_colour_alone`
+  **prohíbe cualquier `Background`/`Foreground` con `{Binding`**, y una muestra de color legítima la
+  dispara: se declara en su **lista de excepciones nombrada** —vista, propiedad y origen— que sólo
+  encoge, nunca se relaja la regla. (2) **`eng/run-accessibility.ps1` no limpia
+  `artifacts/accessibility` entre ejecuciones** y su recuento lee todos los JSON que encuentre, así
+  que tras un fallo la siguiente ejecución informa defectos que ya no existen. Borra la carpeta
+  antes de creerte el número.
 - **⚠ Y una trampa que mordió dos veces seguidas el 2026-08-21, con la puerta de desbordamiento
   cazándola:** un glifo al lado de un texto que envuelve **no puede ir en un `StackPanel`
   horizontal** —ofrece anchura infinita, así que el texto no envuelve y se sale: `x=921` en una

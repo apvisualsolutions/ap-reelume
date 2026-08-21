@@ -10,6 +10,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:SubtitleStyleViewModel"
     automation:AutomationProperties.Name="{DynamicResource SubtitleStyleAccessibleName}">
+  <UserControl.Resources>
+    <player:SubtitleColourConverter x:Key="SubtitleColour" />
+  </UserControl.Resources>
   <StackPanel x:Name="SubtitleStyleSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
@@ -93,19 +96,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Value="{Binding OutlineThickness, Mode=TwoWay}" />
     </StackPanel>
 
+    <!--
+      The preview previews. It used to take the shell's card surface and the theme's text colour, so
+      four of the five controls above it — the two colours, the opacity and the outline — changed
+      nothing anybody could see, and the one thing it did show was the font family. It now sits on the
+      player's own surface, because that is what a subtitle sits on when it matters, and it paints the
+      colours that were chosen rather than the ones the theme would pick.
+    -->
     <Border
         x:Name="SubtitlePreviewSurface"
         Padding="12"
-        Background="{DynamicResource CardSurfaceBrush}"
+        Background="{DynamicResource PlayerSurfaceBrush}"
         CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource SubtitleStylePreviewLabel}">
-      <TextBlock
-          x:Name="SubtitlePreviewText"
+      <Border
+          x:Name="SubtitlePreviewBox"
+          Padding="8,2"
           HorizontalAlignment="Center"
-          FontFamily="{Binding FontFamily}"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SubtitleStylePreviewSample}"
-          TextWrapping="Wrap" />
+          Background="{Binding BackgroundHex, Converter={StaticResource SubtitleColour}, ConverterParameter={Binding BackgroundOpacity}}"
+          CornerRadius="{DynamicResource CornerRadiusSmall}">
+        <TextBlock
+            x:Name="SubtitlePreviewText"
+            HorizontalAlignment="Center"
+            FontFamily="{Binding FontFamily}"
+            Foreground="{Binding ForegroundHex, Converter={StaticResource SubtitleColour}}"
+            Text="{DynamicResource SubtitleStylePreviewSample}"
+            TextWrapping="Wrap" />
+      </Border>
     </Border>
   </StackPanel>
 </UserControl>

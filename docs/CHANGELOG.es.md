@@ -138,6 +138,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   pantalla de 1280. Ahora tienen un ancho máximo. Y el botón de saltar la cabecera se coloca abajo a la
   derecha, fuera del paso.
 
+### Corregido
+
+- **La vista previa del subtítulo enseña por fin el subtítulo que has elegido.** Sólo mostraba la
+  tipografía: el color del texto, el del fondo, la opacidad y el contorno cambiaban sin que se viera
+  nada. Y ahora se ve sobre el mismo negro del reproductor, porque un color juzgado contra el gris de
+  una pantalla de ajustes no es el que verás sobre una película.
+
 ### Cambiado
 
 - **Los tres avisos de sonido se ven como avisos.** Que no haya ningún dispositivo, que la mezcla se

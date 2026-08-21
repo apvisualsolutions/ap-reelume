@@ -137,6 +137,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   a long text inside, one of them took 1278 pixels of a 1280-pixel screen. They now have a maximum
   width. And the skip button sits at the bottom right, out of the way.
 
+### Fixed
+
+- **The subtitle preview finally shows the subtitle you chose.** It only ever showed the font: the text
+  colour, the background colour, the opacity, and the outline all changed with nothing to see for it.
+  And it now sits on the same black as the player, because a colour judged against the grey of a
+  settings page is not the one you will see over a film.
+
 ### Changed
 
 - **The three sound notices look like notices.** No device at all, a downmixed layout, or a device that
