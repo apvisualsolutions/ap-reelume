@@ -11,10 +11,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="shell:ShellViewModel"
     automation:AutomationProperties.Name="{DynamicResource MiniPlayerChromeAccessibleName}">
   <!--
-    A WrapPanel and not a row: the window's own minimum is 320 and five buttons carrying translated
-    words do not fit on one line there. Wrapping keeps every one of them inside the window at any
-    width the window allows, which is the shape that has put a control outside the window six times
-    in this repository.
+    A WrapPanel and not a row: the window's own minimum is 320, and the five carried translated words
+    until 2026-08-21 - measured folding into three rows inside 480x270, which is what the glyphs of §4
+    were for. The wrapping stays, because a glyph shrinks the row without proving it can never wrap:
+    this is the shape that has put a control outside the window six times in this repository.
+  -->
+  <!--
+    Only Content changed here. AutomationProperties.Name still points at the resource key, so the five
+    answer to the same names the walk presses and a screen reader still reads a word rather than a
+    private-use codepoint. The font list lives in the player-chrome class, in one place for all eleven.
   -->
   <!--
     The spacing is the panel's and not the buttons'. It lived in the player-chrome class as a Margin
@@ -31,31 +36,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
         x:Name="MiniPlayerPlayPause"
         Classes="player-chrome"
         Command="{Binding Player.Player.TogglePlaybackCommand}"
-        Content="{DynamicResource MiniPlayerPlayPause}"
+        Content="&#xE768;"
         automation:AutomationProperties.Name="{DynamicResource MiniPlayerPlayPause}" />
     <Button
         x:Name="MiniPlayerSkipBack"
         Classes="player-chrome"
         Command="{Binding Player.Player.Transport.SkipBackwardCommand}"
-        Content="{DynamicResource MiniPlayerSkipBack}"
+        Content="&#xE72B;"
         automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipBack}" />
     <Button
         x:Name="MiniPlayerSkipForward"
         Classes="player-chrome"
         Command="{Binding Player.Player.Transport.SkipForwardCommand}"
-        Content="{DynamicResource MiniPlayerSkipForward}"
+        Content="&#xE72A;"
         automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipForward}" />
     <Button
         x:Name="MiniPlayerRestore"
         Classes="player-chrome"
         Command="{Binding ToggleMiniPlayerCommand}"
-        Content="{DynamicResource MiniPlayerRestore}"
+        Content="&#xE73F;"
         automation:AutomationProperties.Name="{DynamicResource MiniPlayerRestore}" />
     <Button
         x:Name="MiniPlayerClose"
         Classes="player-chrome"
         Command="{Binding ClosePlayerCommand}"
-        Content="{DynamicResource MiniPlayerClose}"
+        Content="&#xE8BB;"
         automation:AutomationProperties.Name="{DynamicResource MiniPlayerClose}" />
   </WrapPanel>
 </UserControl>

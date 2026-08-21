@@ -157,18 +157,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
             IsVisible="{Binding CanResume}"
             automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
             Command="{Binding ResumeCommand}"
-            Content="{DynamicResource PlayerPlayAction}" />
+            Content="&#xE768;" />
         <Button
             Classes="player-chrome"
             IsVisible="{Binding CanPause}"
             automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
             Command="{Binding PauseCommand}"
-            Content="{DynamicResource PlayerPauseAction}" />
+            Content="&#xE769;" />
         <Button
             Classes="player-chrome"
             automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
             Command="{Binding StopCommand}"
-            Content="{DynamicResource PlayerStopAction}" />
+            Content="&#xE71A;" />
         <TextBlock
             VerticalAlignment="Center"
             IsVisible="{Binding IsIdle}"
