@@ -14,6 +14,7 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -75,6 +76,56 @@ public sealed class PlayerViewDesignTests
 
         Assert.Equal(LeadingAction, leading);
         window.Close();
+    }
+
+    /// <summary>
+    /// A session that will not open is a failure, and it says so with a surface and a glyph of its own.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It used to wear <c>ShellSurfaceBrush</c> — the same surface as everything else the shell draws
+    /// — so the one screen that has to say "this did not work" looked exactly like the one that says
+    /// what codec is in use. §4 gives it <c>DangerSurfaceBrush</c> with a border and a glyph.
+    /// </para>
+    /// <para>
+    /// The glyph is asserted to <b>differ from the warning's</b>, which is the whole point of having
+    /// one: a failure and a notice that shared a glyph and differed only in colour would be telling
+    /// them apart by colour alone, which is the thing this redesign spends its whole grammar avoiding.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_failure_wears_the_danger_surface_and_a_glyph_that_is_not_the_warning_one()
+    {
+        var (window, view) = Show();
+
+        var failure = Assert.Single(
+            view.GetVisualDescendants().OfType<Border>(),
+            border => border.Name == "PlayerFailureSurface");
+        Assert.Equal(
+            ThemeColour("DangerSurfaceBrush"),
+            Assert.IsAssignableFrom<ISolidColorBrush>(failure.Background).Color);
+        Assert.Equal(
+            ThemeColour("DangerBorderBrush"),
+            Assert.IsAssignableFrom<ISolidColorBrush>(failure.BorderBrush).Color);
+        Assert.NotEqual(ThemeColour("DangerSurfaceBrush"), ThemeColour("ShellSurfaceBrush"));
+
+        var glyph = Assert.Single(
+            failure.GetVisualDescendants().OfType<TextBlock>(),
+            block => block.Text == "\u2715");
+        Assert.NotNull(glyph);
+
+        window.Close();
+    }
+
+    /// <summary>A theme brush's colour, asked for by the variant in force.</summary>
+    private static Color ThemeColour(string key)
+    {
+        var application = Avalonia.Application.Current;
+        Assert.NotNull(application);
+        Assert.True(
+            application.TryGetResource(key, application.ActualThemeVariant, out var value),
+            $"{key} is not declared in this theme variant.");
+        return Assert.IsAssignableFrom<ISolidColorBrush>(value).Color;
     }
 
     /// <summary>

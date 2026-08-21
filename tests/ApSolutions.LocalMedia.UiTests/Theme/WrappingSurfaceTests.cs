@@ -34,6 +34,7 @@ public sealed class WrappingSurfaceTests
         ("Library/LibraryView.axaml", "LibraryFilterSurface"),
         ("Movie/MovieDetailsView.axaml", "MovieActionsSurface"),
         ("Show/ShowDetailsView.axaml", "ShowActionsSurface"),
+        ("Player/PlayerView.axaml", "RecoveryActionsSurface"),
     ];
 
     [Fact]
@@ -67,6 +68,6 @@ public sealed class WrappingSurfaceTests
 
         // A floor against blindness: a regex that stopped matching would find nothing and agree with
         // an empty list of problems.
-        Assert.Equal(4, Wrapping.Length);
+        Assert.Equal(5, Wrapping.Length);
     }
 }
