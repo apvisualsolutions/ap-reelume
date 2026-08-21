@@ -65,6 +65,24 @@ dos van en los dos idiomas, y la prueba las afirma **en las dos direcciones**: u
 siempre «activo» cumpliría la mitad. / The model picks the key and not the words, and the test asserts
 both directions.
 
+## Y lo que la puerta de cobertura destapó de paso / And what the coverage gate turned up on the way
+
+La segunda vuelta de CI pidió subir **dos** suelos, y el segundo dice algo:
+`WindowsReducedMotionService.cs` estaba en **0/0** y pasa a **87/50**. Cero significa que **nada en toda
+la suite preguntaba jamás si el movimiento reducido estaba activo**. / Zero means nothing in the whole
+suite ever asked whether reduced motion was on.
+
+El servicio estaba registrado, tenía consumidor —`FluentThemeService`— y ese consumidor sólo lo leía
+desde `AnimationsEnabled` y `MotionDuration`, **que nadie llamaba**. Es el defecto de la casa en su
+forma más callada: no un registro sin resolver, sino **una cadena entera de resolución cuyo último
+eslabón no ejercía nadie**. Darle al aviso su primer lector real le dio también su primera medición. /
+A whole resolution chain whose last link nobody exercised.
+
+El otro suelo, `AppearanceSettingsViewModel.cs`, sube de **97/65 a 97/66**: la propiedad nueva llegó con
+sus dos ramas cubiertas. Los dos se levantan **copiando entero el artefacto `coverage-debt` del run**,
+que es la única forma que la puerta admite. / Both floors are raised by copying the run's artefact
+whole, which is the only way the gate accepts.
+
 ## El verde / The green
 
 ```
