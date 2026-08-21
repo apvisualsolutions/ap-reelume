@@ -2,8 +2,8 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `d288941`, verde; la rama por delante con tres commits que cierran el tramo 4.** La fase 6
-va por **4 tramos de 9 cerrados**: Shell, Inicio, Biblioteca y fichas, y el Reproductor entero.
+**`main` y la rama en `14786ba`, CI verde, árbol limpio.** La fase 6 va por **4 tramos de 9 cerrados**:
+Shell, Inicio, Biblioteca y fichas, y el Reproductor entero.
 
 **Lo siguiente, sin nada que deliberar: el tramo 5, Ajustes (7 vistas)**, cuya fila está en la tabla de
 abajo. `AppearanceSettingsView` pasa de 3 botones de tema a **5**, y su `StackPanel` horizontal
@@ -60,6 +60,17 @@ Ninguna se improvisó y todas tienen su número:
 
 - **Dos vueltas de CI**, siempre. El trinquete de cobertura falla **también cuando algo mejora**, así
   que toda pieza con prueba nueva pide declarar su suelo en una segunda vuelta. Pasó cuatro veces.
+- **⚠ Y un `.cs` NUEVO en `src/` no tiene deuda posible: 96/96 o rojo.** El trinquete de
+  `eng/coverage-debt.txt` es para archivos que ya existían; para uno añadido contra `origin/main` la
+  puerta dice `New files below 96% lines / 96% branches` y **no hay lista de excepciones** (sólo exime
+  que el contenido ya existiera en la base, ≥85 %, que es un movimiento). Mídelo **antes** de empujar:
+  `dotnet test <suite> --results-directory X --collect:'XPlat Code Coverage'` y lee `line-rate` y
+  `branch-rate` de esa clase en el cobertura.
+- **Y la causa típica no es que falten pruebas: es una guarda que nada puede tomar.** El converter del
+  tramo 4 dio 100 % de líneas y **4 de 8 ramas de una sola línea**, y las cuatro eran defensivas
+  (`Application.Current is not null` en algo que construye el AXAML, un `?.ToString() ?? key` sobre un
+  recurso que siempre existe). **La respuesta es quitar la guarda, no escribirle una prueba
+  imposible.**
 - **Una vista nueva cuesta además una entrada en `eng/coverage-debt.txt`**, porque todos los `.axaml`
   miden 100/50, y **el trinquete no sube**: se paga sacando otro archivo de la lista, mejorándolo.
 
