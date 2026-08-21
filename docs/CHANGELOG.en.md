@@ -10,6 +10,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The shortcut list says something when nothing is bound.** A blank panel suggested the application
+  ignores the keyboard; what is happening is that nothing is bound, and the system's own media keys
+  keep working either way.
+
+
 - **The four lists in the player's side column say something when they are empty.** Markers,
   detections, tracks, and versions used to go blank, with no way to tell "there is nothing" from
   "still loading". Each now explains its own empty: markers say nothing is written to your video file,

@@ -36,7 +36,7 @@ el **guion** que genera las capturas, que es código de pruebas.
 nueve. Su fila de la §4 está en la tabla de abajo, y **hay que medirla vista por vista antes de
 escribir nada**: en los tres tramos anteriores, la mitad de lo que cada uno pedía ya estaba hecho.
 
-**La fase 6 va por 3 tramos de 9.** El tramo 3 cerró el 2026-08-20 con el paseo en **135 de 135 y 0
+**La fase 6 va por 3 tramos de 9, y el 4 a una sola pieza de cerrar: la columna de 320 px.** El tramo 3 cerró el 2026-08-20 con el paseo en **135 de 135 y 0
 pendientes**, dos controles nuevos —el botón de borrar la búsqueda y el selector de temporada— cada
 uno con su escena, y **una fila que no se hace con su número delante**: la cuadrícula fluida.
 
@@ -236,8 +236,8 @@ filas en `WrapPanel` desde el andamio.
 - ~~**Los tres avisos de `AudioOutputView`**~~ **HECHOS el 2026-08-21**
   ([su evidencia](evidence/stable/audit-audio-warnings.md)), y **`SubtitleStyleView` el 2026-08-21**
   ([su evidencia](evidence/stable/audit-subtitle-preview.md)) — donde medir encontró que **la vista
-  previa previsualizaba una cosa de cinco**. Queda **`ShortcutSettingsView`**: dos columnas y su
-  cadena de vacío.
+  previa previsualizaba una cosa de cinco**. ~~Y `ShortcutSettingsView`~~ **el mismo día**: ya estaba
+  en columnas, así que sólo le faltaba su cadena de vacío — **12 de las 22 del paquete gastadas**.
 - **⚠ Y dos trampas nuevas, medidas el 2026-08-21.** (1) `HighContrastTests.No_state_is_told_by_colour_alone`
   **prohíbe cualquier `Background`/`Foreground` con `{Binding`**, y una muestra de color legítima la
   dispara: se declara en su **lista de excepciones nombrada** —vista, propiedad y origen— que sólo

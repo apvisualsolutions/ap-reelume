@@ -30,6 +30,7 @@ public sealed class ShortcutSettingsViewModel : INotifyPropertyChanged
     // second map that no key press ever reads (ARQ-002).
     public ShortcutSettingsViewModel(ShortcutMap map)
     {
+        Bindings.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));
         _map = map ?? throw new ArgumentNullException(nameof(map));
         RestoreDefaultsCommand = new RelayCommand(RestoreDefaults);
         Refresh();
@@ -38,6 +39,16 @@ public sealed class ShortcutSettingsViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ObservableCollection<ShortcutRow> Bindings { get; } = [];
+
+    /// <summary>
+    /// Nothing is bound to a key, which is not the same as the application ignoring the keyboard.
+    /// </summary>
+    /// <remarks>
+    /// Derived from the list and announced by the list: a row can arrive or leave from more than one
+    /// path, and one that forgot to announce would leave the panel saying it is empty over a list with
+    /// shortcuts in it.
+    /// </remarks>
+    public bool IsEmpty => Bindings.Count == 0;
 
     public ICommand RestoreDefaultsCommand { get; }
 

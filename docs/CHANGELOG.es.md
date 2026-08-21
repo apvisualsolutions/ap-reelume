@@ -10,6 +10,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La lista de atajos dice algo cuando no hay ninguno asignado.** Un panel en blanco daba a entender
+  que la aplicación no escucha el teclado; lo que ocurre es que no hay nada asignado, y las teclas
+  multimedia del sistema siguen funcionando igual.
+
+
 - **Las cuatro listas del lateral del reproductor dicen algo cuando están vacías.** Marcadores,
   detecciones, pistas y versiones se quedaban en blanco, sin forma de distinguir «no hay nada» de
   «todavía está cargando». Ahora cada una explica su propio vacío: los marcadores dicen que nada se
