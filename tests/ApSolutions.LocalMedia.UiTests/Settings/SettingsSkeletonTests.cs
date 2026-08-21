@@ -19,11 +19,10 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Measured on 2026-08-21: all three titled with <c>FontSizeSubtitle</c> where the appearance page
-/// titles with <c>FontSizeTitle</c>, none of them had a container padding, and none had the 620 the
-/// document asks controls to sit inside. <b>Four settings pages whose first heading was smaller than
-/// the fifth's</b> — which is the sort of thing nobody notices one page at a time and everybody notices
-/// walking through them.
+/// Measured on 2026-08-21: none of the three had a container padding, and none had the 620 the
+/// document asks controls to sit inside, while the appearance section had both. Sections of one page
+/// that start in different places read as several pages glued together — the sort of thing nobody
+/// notices one section at a time and everybody notices scrolling past them.
 /// </para>
 /// <para>
 /// And measuring found a defect the row did not know about. <c>ScanSettingsView</c>'s spinner carried
@@ -41,27 +40,40 @@ public sealed class SettingsSkeletonTests
     private const double SurfacePadding = 32;
 
     /// <summary>
-    /// The three title at the size the fourth does, and the size comes from the token.
+    /// The four title at one size, and the size comes from the token.
     /// </summary>
     /// <remarks>
-    /// The resolved token is compared rather than the number 28, because a test carrying its own copy
-    /// of 28 would agree with itself the day the scale moved. The appearance page is included as the
-    /// one that was already right: if the scale changed under all of them, this says so instead of
-    /// quietly holding four pages to a value nobody chose.
+    /// <para>
+    /// <b>A section's heading and not a page's.</b> This first asked for level one at
+    /// <c>FontSizeTitle</c>, because §4 says "title 28" and each of these reads like a page on its
+    /// own. Assembled, they are not: all seven are stacked in one <c>ScrollViewer</c>, so four of them
+    /// claiming level one put four top-level landmarks inside one destination, and giving them a
+    /// page's geometry stepped them 158 px away from the other three. The page owns the level one now
+    /// and these own a level two — see <c>SettingsPageStructureTests</c>, which measures that.
+    /// </para>
+    /// <para>
+    /// The resolved token is compared rather than the number 20, because a test carrying its own copy
+    /// would agree with itself the day the scale moved.
+    /// </para>
     /// </remarks>
     [AvaloniaFact]
-    public void The_four_settings_pages_title_at_the_same_size_and_it_is_the_token()
+    public void The_four_settings_sections_title_at_the_same_size_and_it_is_the_token()
     {
-        var expected = Assert.IsType<double>(Resource("FontSizeTitle"));
-        Assert.True(expected > 0, "FontSizeTitle resolved to nothing, so this proves nothing.");
+        var expected = Assert.IsType<double>(Resource("FontSizeSubtitle"));
+        Assert.True(expected > 0, "FontSizeSubtitle resolved to nothing, so this proves nothing.");
 
         foreach (var (name, view) in Pages())
         {
-            var heading = Assert.Single(
-                view.GetVisualDescendants().OfType<TextBlock>(),
-                block => (int)AutomationProperties.GetHeadingLevel(block) == 1);
+            var heading = view.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(block => (int)AutomationProperties.GetHeadingLevel(block) == 2);
             Assert.Equal(expected, heading.FontSize);
             Assert.False(string.IsNullOrWhiteSpace(heading.Text), $"{name} has an empty first heading.");
+            Assert.DoesNotContain(
+                1,
+                view.GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .Select(block => (int)AutomationProperties.GetHeadingLevel(block)));
         }
     }
 

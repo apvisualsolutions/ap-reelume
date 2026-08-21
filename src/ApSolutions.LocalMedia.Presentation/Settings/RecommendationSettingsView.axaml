@@ -15,11 +15,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space8}">
     <TextBlock
-        FontSize="{DynamicResource FontSizeTitle}"
+        FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource RecommendationSettingsTitle}"
-        automation:AutomationProperties.HeadingLevel="1" />
+        automation:AutomationProperties.HeadingLevel="2" />
     <TextBlock
         Text="{DynamicResource RecommendationSettingsDescription}"
         TextWrapping="Wrap" />
@@ -41,7 +41,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           FontSize="{DynamicResource FontSizeBody}"
           FontWeight="SemiBold"
           Text="{DynamicResource RecommendationSettingsThresholdLabel}"
-          automation:AutomationProperties.HeadingLevel="2" />
+          automation:AutomationProperties.HeadingLevel="3" />
       <TextBlock
             Text="{DynamicResource RecommendationSettingsThresholdDescription}"
           TextWrapping="Wrap" />
