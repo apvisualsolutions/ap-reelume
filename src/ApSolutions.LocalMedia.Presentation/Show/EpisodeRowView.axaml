@@ -10,13 +10,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:EpisodeRowViewModel">
-  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
-    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
-      <TextBlock Text="{DynamicResource EpisodePrefix}" />
-      <TextBlock FontWeight="SemiBold" Text="{Binding EpisodeNumberText}" />
+  <!--
+    A fixed 56 px row rather than one that grows with its contents: a season is a column of these, and
+    rows of different heights read as a list that is still loading. The number is monospaced and
+    right-aligned inside a fixed width so that 9 and 10 end on the same pixel — what lines the column
+    up is the width and the alignment; the family only keeps the digits themselves even.
+  -->
+  <Grid Height="56" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
+    <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+      <TextBlock VerticalAlignment="Center" Text="{DynamicResource EpisodePrefix}" />
+      <TextBlock
+          Width="32"
+          VerticalAlignment="Center"
+          FontFamily="Consolas, Courier New, monospace"
+          FontWeight="SemiBold"
+          Text="{Binding EpisodeNumberText}"
+          TextAlignment="Right" />
     </StackPanel>
 
-    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+    <StackPanel
+        Grid.Column="1"
+        VerticalAlignment="Center"
+        Orientation="Horizontal"
+        Spacing="{DynamicResource Space8}">
       <TextBlock IsVisible="{Binding IsWatched}" Text="{DynamicResource WatchStatusWatched}" />
       <TextBlock IsVisible="{Binding IsInProgress}" Text="{DynamicResource WatchStatusInProgress}" />
       <TextBlock IsVisible="{Binding IsNotStarted}" Text="{DynamicResource WatchStatusNotStarted}" />
@@ -27,6 +43,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <Button
         Grid.Column="2"
+        VerticalAlignment="Center"
         Click="OnPlayClick"
         Content="{DynamicResource EpisodePlayAction}"
         IsEnabled="{Binding IsPlayable}"
