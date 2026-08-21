@@ -150,6 +150,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   nada. Y ahora se ve sobre el mismo negro del reproductor, porque un color juzgado contra el gris de
   una pantalla de ajustes no es el que verás sobre una película.
 
+### Añadido
+
+- **La bandeja de revisión dice cuando no queda nada que revisar, y lo dice como la buena noticia que
+  es.** Estar vacía significa que AP Reelume identificó todo lo que encontró sin necesitar tu ayuda;
+  antes era un panel en blanco, que parece más bien que algo no cargó.
+
 ### Corregido
 
 - **La bandeja de revisión explicaba sus decisiones con nombres internos del programa.** Al revisar por

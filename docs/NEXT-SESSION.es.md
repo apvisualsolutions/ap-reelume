@@ -2,7 +2,8 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` y la rama en `8ded2ea`, CI verde, árbol limpio.** La fase 6 va por **5 tramos de 9 cerrados**
+**`main` en `c227383`, verde; la rama por delante con el tramo 6 empezado.** La fase 6 va por **5 tramos
+de 9 cerrados**
 —Shell, Inicio, Biblioteca y fichas, el Reproductor entero y **Ajustes**—:
 `AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del
 «mismo esqueleto»** ([su evidencia](evidence/stable/audit-settings-skeleton.md)) y **la estructura de la
@@ -150,7 +151,7 @@ ficha se titula con un identificador.
 
 | Vista | Lo que la §4 pide | Lo que hay |
 |---|---|---|
-| `ReviewInboxView` | bandeja vacía en `PositiveSurfaceBrush` con glifo — **es el estado deseable** | ni `Empty`, ni `PositiveSurfaceBrush`, ni estado de carga |
+| ~~`ReviewInboxView`~~ **HECHA** ([evidencia](evidence/stable/audit-review-inbox-empty.md)) | bandeja vacía en `PositiveSurfaceBrush` con glifo — **es el estado deseable** | `IsEmpty` llevaba en el modelo desde siempre **sin un lector**, y los dos pinceles `Positive*` estaban declarados en los cuatro temas **sin gastarlos nadie**. El estado «cargando» **no se hace**: nada en el modelo sabe que lo está |
 | `CandidateCardView` | portada 92 px + título + año + puntuación, acciones en `WrapPanel` | **no hay portada** (decidido fuera de 0.2.0) y **no hay acciones en la ficha**; su borde usa `SystemControlForegroundBaseMediumBrush`, una clave del tema Fluent y no `ShellBorderBrush` |
 | `DuplicateReviewView` | `UniformGrid` de 2 columnas, la diferencia en monoespaciado, vacío con cadena nueva | `ItemsControl` en una columna, sin monoespaciado, sin vacío; y su `Border` tiene `BorderThickness="1"` **sin `BorderBrush`** |
 | `MetadataEditorView` | los 3 mensajes a bloques con glifo: conflicto y sin identificar en `WarningSurfaceBrush`, sin respuesta como dato neutro | por medir |

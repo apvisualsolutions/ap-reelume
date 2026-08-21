@@ -149,6 +149,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   And it now sits on the same black as the player, because a colour judged against the grey of a
   settings page is not the one you will see over a film.
 
+### Added
+
+- **The review inbox says when there is nothing left to review, and says it as the good news it is.**
+  An empty tray means AP Reelume identified everything it found without needing you; it used to be a
+  blank panel, which reads more like something failed to load.
+
 ### Fixed
 
 - **The review inbox explained its decisions with the program's internal names.** When reviewing why AP

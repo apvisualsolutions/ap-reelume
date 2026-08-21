@@ -14,6 +14,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -373,6 +374,132 @@ public sealed class ReviewInboxTests
 
         Assert.Equal(1, announced.Count(name => name == nameof(ReviewInboxViewModel.ManualSearch)));
         Assert.Equal(1, announced.Count(name => name == nameof(ReviewInboxViewModel.SelectedItem)));
+    }
+
+    /// <summary>
+    /// An empty tray is the good outcome, and it is painted like one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// §4 is explicit about this: the empty inbox is <b>the desirable state</b> — everything was
+    /// identified without anybody being asked — so it takes <c>PositiveSurfaceBrush</c> and a glyph
+    /// rather than being a blank panel that reads like something failed to load.
+    /// </para>
+    /// <para>
+    /// Measured on 2026-08-21: the view had no empty state at all, while <c>IsEmpty</c> had existed on
+    /// the model all along with <b>no view reading it</b>. And the two positive brushes were declared
+    /// in all four themes and spent by nobody — this is what finally spends them.
+    /// </para>
+    /// <para>
+    /// The list is asserted hidden in the same breath: an empty state that appears <em>above</em> an
+    /// empty list is two ways of saying nothing at once.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task An_empty_tray_is_painted_as_the_good_outcome_it_is()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var viewModel = CreateViewModel(new UiReviewRepository([]));
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.True(viewModel.IsEmpty, "the repository was empty and the model does not say so.");
+
+        var (window, view) = ShowInbox(viewModel);
+
+        var surface = Assert.Single(
+            view.GetVisualDescendants().OfType<Border>(),
+            border => border.Name == "ReviewInboxEmptySurface");
+        Assert.True(surface.IsEffectivelyVisible);
+        Assert.Equal(ThemeColour("PositiveSurfaceBrush"), Colour(surface.Background));
+        Assert.Equal(ThemeColour("PositiveBorderBrush"), Colour(surface.BorderBrush));
+        Assert.True(surface.BorderThickness.Top > 0, "the empty state has no border, so colour is its only signal.");
+        Assert.Contains(surface.GetVisualDescendants().OfType<TextBlock>(), block => block.Text == "✓");
+
+        var painted = surface.GetVisualDescendants().OfType<TextBlock>().Select(block => block.Text).ToArray();
+        Assert.Contains(Resource("ReviewInboxEmptyTitle"), painted, StringComparer.Ordinal);
+        Assert.Contains(Resource("ReviewInboxEmptyDescription"), painted, StringComparer.Ordinal);
+
+        var list = Assert.Single(
+            view.GetVisualDescendants().OfType<ListBox>(),
+            box => box.Name == "ReviewCandidates");
+        Assert.False(list.IsEffectivelyVisible, "an empty list under an empty state says nothing twice.");
+
+        window.Close();
+    }
+
+    /// <summary>
+    /// With something to review, the list is what shows and the good news is not claimed.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task A_tray_with_something_in_it_shows_the_list_and_not_the_good_news()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var viewModel = CreateViewModel(new UiReviewRepository([
+            Candidate("waiting", 0.62, ReviewState.Pending, "Identification.Signal.Title"),
+        ]));
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.False(viewModel.IsEmpty);
+
+        var (window, view) = ShowInbox(viewModel);
+
+        var surface = Assert.Single(
+            view.GetVisualDescendants().OfType<Border>(),
+            border => border.Name == "ReviewInboxEmptySurface");
+        Assert.False(surface.IsEffectivelyVisible, "the tray has something in it and still says there is nothing.");
+
+        var list = Assert.Single(
+            view.GetVisualDescendants().OfType<ListBox>(),
+            box => box.Name == "ReviewCandidates");
+        Assert.True(list.IsEffectivelyVisible);
+
+        window.Close();
+    }
+
+    /// <summary>Both sentences exist in both languages, and neither survived translation untranslated.</summary>
+    [AvaloniaFact]
+    public void The_empty_trays_words_are_written_in_both_languages()
+    {
+        var byLanguage = new Dictionary<string, string[]>(StringComparer.Ordinal);
+        foreach (var culture in new[] { "es-ES", "en-US" })
+        {
+            Assert.NotNull(Avalonia.Application.Current);
+            App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo(culture));
+            byLanguage[culture] = [Resource("ReviewInboxEmptyTitle"), Resource("ReviewInboxEmptyDescription")];
+        }
+
+        Assert.NotEqual(byLanguage["es-ES"][0], byLanguage["en-US"][0]);
+        Assert.NotEqual(byLanguage["es-ES"][1], byLanguage["en-US"][1]);
+    }
+
+    private static (Window Window, ReviewInboxView View) ShowInbox(ReviewInboxViewModel viewModel)
+    {
+        var view = new ReviewInboxView { DataContext = viewModel };
+        var window = new Window { Width = 1000, Height = 800, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        return (window, view);
+    }
+
+    private static Color Colour(IBrush? brush) => Assert.IsAssignableFrom<ISolidColorBrush>(brush).Color;
+
+    private static Color ThemeColour(string key)
+    {
+        var application = Avalonia.Application.Current!;
+        Assert.True(
+            application.TryGetResource(key, application.ActualThemeVariant, out var value),
+            $"{key} is not declared in this theme, so nothing can paint it.");
+        return Assert.IsAssignableFrom<ISolidColorBrush>(value).Color;
+    }
+
+    private static string Resource(string key)
+    {
+        Assert.True(
+            Avalonia.Application.Current!.TryFindResource(key, out var value),
+            $"{key} is not declared, so nothing can paint it.");
+        return Assert.IsType<string>(value);
     }
 
     private static ReviewInboxViewModel CreateViewModel(

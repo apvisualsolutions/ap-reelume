@@ -98,6 +98,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ScanSettingsDescription">AP Reelume watches your folders and adds whatever turns up in them. If watching fails or the system interrupts it, it goes back over them every so often.</x:String>
   <x:String x:Key="ScanSettingsWatchLocal">Watch changes in local roots</x:String>
   <x:String x:Key="ScanSettingsFallbackMinutes">Recovery interval in minutes</x:String>
+  <!-- The empty tray is the good outcome, not a blank panel: everything was identified without
+       anybody being asked. IsEmpty had existed on the model all along with no view reading it. -->
+  <x:String x:Key="ReviewInboxEmptyTitle">Nothing left to review</x:String>
+  <x:String x:Key="ReviewInboxEmptyDescription">AP Reelume identified everything it found without needing you. When something is unclear, it will turn up here.</x:String>
   <x:String x:Key="ReviewInboxAccessibleName">Match review inbox</x:String>
   <x:String x:Key="ReviewInboxTitle">Review matches</x:String>
   <x:String x:Key="ReassignmentSectionAccessibleName">Moved files awaiting confirmation</x:String>
