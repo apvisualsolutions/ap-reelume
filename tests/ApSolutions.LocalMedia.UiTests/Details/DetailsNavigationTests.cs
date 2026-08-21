@@ -387,6 +387,58 @@ public sealed class DetailsNavigationTests
     }
 
     /// <summary>
+    /// One season is on screen at a time, and with only one season the picker is absent.
+    /// </summary>
+    /// <remarks>
+    /// Absent rather than disabled: a control whose only possible answer is the one it already shows
+    /// is a question nobody asked, and this card has no room to spend on one. The second half is the
+    /// point of the picker at all — choosing another season has to change which episodes are drawn,
+    /// which a test that only checked the combo box's presence would never notice.
+    /// </remarks>
+    [AvaloniaFact]
+    public void One_season_at_a_time_and_a_single_season_gets_no_picker()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
+
+        var alone = new ShowDetailsViewModel();
+        alone.Apply(
+            Item(ShowId, CatalogTitleKind.Show, "Crónicas", isAvailable: true),
+            [EpisodeEntry(401, season: 1, number: 1, isAvailable: true, hasFile: true)],
+            new Dictionary<ContentKey, WatchState>());
+        Assert.False(alone.HasSeasonChoice);
+        using (var host = Mounted(alone))
+        {
+            Assert.DoesNotContain(
+                host.View.GetVisualDescendants().OfType<ComboBox>(),
+                picker => picker.IsEffectivelyVisible);
+        }
+
+        var many = new ShowDetailsViewModel();
+        many.Apply(
+            Item(ShowId, CatalogTitleKind.Show, "Crónicas", isAvailable: true),
+            [
+                EpisodeEntry(411, season: 1, number: 1, isAvailable: true, hasFile: true),
+                EpisodeEntry(412, season: 2, number: 1, isAvailable: true, hasFile: true),
+                EpisodeEntry(413, season: 2, number: 2, isAvailable: true, hasFile: true),
+            ],
+            new Dictionary<ContentKey, WatchState>());
+        Assert.True(many.HasSeasonChoice);
+        Assert.Equal(1, many.SelectedSeason?.SeasonNumber);
+        using (var host = Mounted(many))
+        {
+            Assert.Contains(
+                host.View.GetVisualDescendants().OfType<ComboBox>(),
+                picker => picker.IsEffectivelyVisible);
+            Assert.Single(host.View.GetVisualDescendants().OfType<EpisodeRowView>());
+
+            many.SelectedSeason = many.Seasons[1];
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(2, host.View.GetVisualDescendants().OfType<EpisodeRowView>().Count());
+        }
+    }
+
+    /// <summary>
     /// An episode row is 56 px tall and its numbers end on the same pixel, whatever their width.
     /// </summary>
     /// <remarks>
@@ -497,6 +549,21 @@ public sealed class DetailsNavigationTests
             StartedUtc = Noon.AddHours(-1),
             UpdatedUtc = Noon,
         };
+
+    /// <summary>A show card in a window, closed when the caller is done with it.</summary>
+    private static MountedShow Mounted(ShowDetailsViewModel viewModel)
+    {
+        var view = new ShowDetailsView { DataContext = viewModel };
+        var window = new Window { Width = 1024, Height = 720, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        return new MountedShow(window, view);
+    }
+
+    private sealed record MountedShow(Window Window, ShowDetailsView View) : IDisposable
+    {
+        public void Dispose() => Window.Close();
+    }
 
     private static EpisodeSequenceEntry EpisodeEntry(
         int seed,

@@ -29,6 +29,7 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     private string? _overview;
     private string? _trailerLink;
     private IReadOnlyList<SeasonViewModel> _seasons = [];
+    private SeasonViewModel? _selectedSeason;
 
     public ShowDetailsViewModel(
         Func<PlayDetailsRequest, Task>? onPlay = null,
@@ -91,6 +92,23 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         private set => SetField(ref _seasons, value);
     }
 
+    /// <summary>
+    /// The season on screen. One season at a time rather than every season stacked: a long-running
+    /// series is otherwise a page nobody can reach the end of, and the seasons above the one being
+    /// watched are dead weight on every visit.
+    /// </summary>
+    public SeasonViewModel? SelectedSeason
+    {
+        get => _selectedSeason;
+        set => SetField(ref _selectedSeason, value);
+    }
+
+    /// <summary>
+    /// Whether the picker is worth showing. With one season it is <b>absent</b>, not disabled: a
+    /// control that can only answer what it already says is a question nobody asked.
+    /// </summary>
+    public bool HasSeasonChoice => Seasons.Count > 1;
+
     /// <summary>True when the catalogue knows the series but no episode of it.</summary>
     public bool IsEmpty => Seasons.Count == 0;
 
@@ -124,8 +142,10 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
                             watchStates.GetValueOrDefault(ContentKey.ForEpisode(entry.ShowId, entry.Id))))
                     ]))
         ];
+        SelectedSeason = Seasons.Count > 0 ? Seasons[0] : null;
         foreach (var name in new[]
         {
+            nameof(HasSeasonChoice),
             nameof(Title),
             nameof(Overview),
             nameof(HasOverview),

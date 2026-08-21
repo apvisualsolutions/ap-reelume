@@ -2824,13 +2824,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Directory.CreateDirectory(media);
         var first = Path.Combine(media, "Chained.S01E01.mp4");
         var second = Path.Combine(media, "Chained.S01E02.mp4");
+        var third = Path.Combine(media, "Chained.S02E01.mp4");
         File.Copy(sample, first);
         File.Copy(sample, second);
+        File.Copy(sample, third);
 
         var factory = await SeedRootAsync(media, ScanPolicy.Manual);
         var firstFile = await SeedMediaFileAsync(factory, media, first, TimeSpan.FromSeconds(12));
         var secondFile = await SeedMediaFileAsync(factory, media, second, TimeSpan.FromSeconds(12));
-        _ = await SeedSeriesAsync(factory, firstFile, secondFile);
+        var thirdFile = await SeedMediaFileAsync(factory, media, third, TimeSpan.FromSeconds(12));
+
+        // Two seasons, because the picker is absent with one: a scene that pressed it against a
+        // single-season series would be pressing a control the application deliberately does not draw.
+        _ = await SeedSeriesAsync(factory, firstFile, secondFile, thirdFile);
 
         using var host = ShowShell(height: 1200);
         Navigate(host, AppRoute.Library);
@@ -2844,6 +2850,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Dispatcher.UIThread.RunJobs();
         host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
+
+        // A drop-down's effect is that it opens: what is chosen inside lands in a popup root of its
+        // own, which is a separate top level and not this window's business.
+        await PressAsync(
+            host,
+            "SeasonPickerLabel",
+            () => Resolve(host, "SeasonPickerLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the season picker never opened the list of seasons");
+        host.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+        Dispatcher.UIThread.RunJobs();
+
+        // The card opens on the first season, so the episode below is still the one this scene names.
+        Assert.Equal(1, library.ShowDetails.SelectedSeason?.SeasonNumber);
 
         // The second episode, not the first: a season lists them in order, and pressing the one at
         // the top would be indistinguishable from a card that plays whatever it feels like.
@@ -4763,14 +4782,21 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// catalogue writes these rows during identification, which needs the network the harness does
     /// not have.
     /// </summary>
+    /// <param name="secondSeasonFile">
+    /// Given, the series gets a second season with one episode in it. Only the scene that presses the
+    /// season picker asks for one: with a single season the picker is absent by design, so a seed that
+    /// always had two would hide the state the rest of the scenes are in.
+    /// </param>
     private static async Task<Guid> SeedSeriesAsync(
         SqliteConnectionFactory factory,
         Guid firstFile,
-        Guid secondFile)
+        Guid secondFile,
+        Guid? secondSeasonFile = null)
     {
         var showId = Guid.NewGuid();
         var firstEpisode = Guid.NewGuid();
         var secondEpisode = Guid.NewGuid();
+        var seasonTwoEpisode = Guid.NewGuid();
         await using var connection = await factory.OpenAsync(TestContext.Current.CancellationToken);
         await using var command = connection.CreateCommand();
         command.CommandText = """
@@ -4790,6 +4816,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         command.Parameters.AddWithValue("$f1", firstFile.ToString("D"));
         command.Parameters.AddWithValue("$f2", secondFile.ToString("D"));
         await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+
+        if (secondSeasonFile is { } seasonTwoFile)
+        {
+            await using var second = connection.CreateCommand();
+            second.CommandText = """
+                INSERT INTO seasons (show_id, season_number, title) VALUES ($show, 2, 'T2');
+                INSERT INTO episodes (id, show_id, season_number, episode_number, absolute_number,
+                                      title, sort_order, is_available)
+                VALUES ($e3, $show, 2, 1, 3, 'E3', 3, 1);
+                INSERT INTO episode_media (episode_id, media_file_id) VALUES ($e3, $f3);
+                """;
+            second.Parameters.AddWithValue("$show", showId.ToString("D"));
+            second.Parameters.AddWithValue("$e3", seasonTwoEpisode.ToString("D"));
+            second.Parameters.AddWithValue("$f3", seasonTwoFile.ToString("D"));
+            await second.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
         return showId;
     }
 
