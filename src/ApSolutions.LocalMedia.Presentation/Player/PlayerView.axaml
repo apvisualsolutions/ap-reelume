@@ -15,6 +15,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         x:Name="VideoSurface"
         FrameSource="{Binding FrameSource}"
         automation:AutomationProperties.Name="{DynamicResource PlayerVideoSurfaceName}" />
+    <!--
+      A session that will not open is a failure and says so with its own surface, not with the one the
+      shell paints everything else on. The glyph is ✕ and not the ⚠ the unavailable badge carries: a
+      failure and a notice that shared a glyph would differ only in colour, which is the one thing this
+      grammar exists to avoid.
+    -->
     <Border
         x:Name="PlayerFailureSurface"
         IsVisible="{Binding HasFailed}"
@@ -22,15 +28,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Padding="16"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
-        Background="{DynamicResource ShellSurfaceBrush}"
-        BorderBrush="{DynamicResource ShellBorderBrush}"
+        Background="{DynamicResource DangerSurfaceBrush}"
+        BorderBrush="{DynamicResource DangerBorderBrush}"
         BorderThickness="1"
         CornerRadius="{DynamicResource CornerRadiusMedium}">
       <StackPanel Spacing="{DynamicResource Space8}">
-        <TextBlock
-            FontWeight="SemiBold"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource PlayerStateFailed}" />
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+          <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="✕" />
+          <TextBlock
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource PlayerStateFailed}" />
+        </StackPanel>
         <TextBlock
             IsVisible="{Binding FileWasNotFound}"
             Foreground="{DynamicResource TextPrimaryBrush}"
@@ -71,10 +80,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Foreground="{DynamicResource TextPrimaryBrush}"
             Text="{DynamicResource PlayerRecoveryExternalFailed}"
             TextWrapping="Wrap" />
-        <StackPanel
+        <WrapPanel
             x:Name="RecoveryActionsSurface"
-            Orientation="Horizontal"
-            Spacing="{DynamicResource Space8}">
+            ItemSpacing="{DynamicResource Space8}"
+            LineSpacing="{DynamicResource Space8}">
           <!--
             The one action of the one screen here that is for an action. Opening the file elsewhere
             sits beside it as the secondary, and the transport gets none at all.
@@ -90,7 +99,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.Name="{DynamicResource PlayerRecoveryOpenExternally}"
               Command="{Binding OpenExternallyCommand}"
               Content="{DynamicResource PlayerRecoveryOpenExternally}" />
-        </StackPanel>
+        </WrapPanel>
       </StackPanel>
     </Border>
     <Border

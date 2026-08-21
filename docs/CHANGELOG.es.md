@@ -124,6 +124,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Un vídeo que no se puede abrir se ve como un fallo, no como un dato más.** El aviso de que algo no
+  ha funcionado se pintaba sobre la misma superficie que usa el resto de la aplicación, así que la
+  única pantalla que tiene que decir «esto no ha salido» se parecía a la que dice qué códec estás
+  usando. Ahora tiene fondo, borde y símbolo propios, y su símbolo es **distinto** del de «no
+  disponible ahora mismo»: dos cosas que sólo se distinguieran por el color no se distinguirían para
+  todo el mundo. Y sus dos botones se reparten en varias líneas cuando no caben.
+
+
 - **La ficha de una serie enseña una temporada cada vez.** Antes apilaba todas: una serie de ocho
   temporadas era una página sin final a la vista. Ahora hay un selector arriba y debajo los episodios
   de la temporada elegida. Con una sola temporada el selector **no aparece**, porque no habría nada que

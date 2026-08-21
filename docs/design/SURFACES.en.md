@@ -15,9 +15,10 @@ visible is left undesigned.
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` and `Strings.en.axaml`.
   `BilingualHeadingTests` compares the structure of the public documents, and a new visible string
   goes into both files or it does not go in.
-- **The only four literal texts in the tree are symbols, not language**: `○ ◐ ●` (watched state),
-  `→` (a rename's source and destination), `!` (the transport's warning) and `⚠` (a medium out of
-  reach). If the redesign replaces
+- **The only five literal texts in the tree are symbols, not language**: `○ ◐ ●` (watched state),
+  `→` (a rename's source and destination), `!` (the transport's warning), `⚠` (a medium out of
+  reach) and `✕` (a session that will not open). **The last two differ on purpose**: a failure and a
+  notice sharing a glyph would be told apart by colour alone. If the redesign replaces
   them with icons, the accessible name still comes from `AutomationProperties`, which is already set.
 - **Every interactive control has an accessible name**, and 80 accessibility tests require it. A
   redesign may change the shape, not take the name away.

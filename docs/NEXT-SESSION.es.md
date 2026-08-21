@@ -189,14 +189,14 @@ filas en `WrapPanel` desde el andamio.
 
 **Lo que falta, por vista:**
 
-- **`PlayerView`** — cuatro cosas. (1) El bloque de fallo se pinta con **`ShellSurfaceBrush`**, la
-  superficie del shell, y debe pasar a **`DangerSurfaceBrush` con glifo y encabezado propios**: el
-  segundo de los seis pinceles de gramática que se gasta. (2) `RecoveryActionsSurface` es un
-  `StackPanel` horizontal y debe ser `WrapPanel` — **entra en la tabla cerrada de
-  `WrappingSurfaceTests`**, que hoy tiene cuatro filas. (3) La superficie propia: hoy es
-  `Panel Background="Black"` y la §4 pide `#0B0D10`; **el token no existe**, así que hay que declararlo
-  y gastarlo en el mismo cambio. (4) La columna fija de 320 px **no existe en absoluto**: es el cambio
-  estructural más grande del tramo, porque hoy los paneles laterales son superpuestos y no una columna.
+- **`PlayerView`** — ~~(1) el bloque de fallo a `DangerSurfaceBrush` con glifo propio~~ y ~~(2)
+  `RecoveryActionsSurface` a `WrapPanel`~~ están **HECHOS el 2026-08-20**
+  ([su evidencia](evidence/stable/audit-player-failure-grammar.md)); la tabla de
+  `WrappingSurfaceTests` sube a cinco filas. Quedan: **(3) la superficie propia** —hoy es
+  `Panel Background="Black"` y la §4 pide `#0B0D10`; **el token no existe**, así que se declara y se
+  gasta en el mismo cambio— y **(4) la columna fija de 320 px, que no existe en absoluto**: es el
+  cambio estructural más grande del tramo, porque hoy los paneles laterales son superpuestos y no una
+  columna.
 - **Las cuatro listas de la columna** —`MarkerEditorView`, `DetectedMarkerReviewView`,
   `TrackSelectorView`, `PlayerVersionsView`— **no tienen ni una cadena de vacío entre las cuatro**
   (medido: cero coincidencias de `Empty` en los cuatro archivos), y ninguna tiene filas de 36 px.

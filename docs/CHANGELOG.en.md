@@ -124,6 +124,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **A video that will not open looks like a failure rather than one more piece of information.** The
+  notice that something went wrong was painted on the same surface as everything else, so the one
+  screen that has to say "this did not work" looked like the one that tells you which codec you are
+  using. It now has its own fill, border, and symbol — and its symbol **differs** from the "not
+  available right now" one: two things told apart by colour alone are not told apart for everybody.
+  Its two buttons also wrap when they do not fit.
+
+
 - **A series' card shows one season at a time.** It used to stack them all, so an eight-season series
   was a page with no end in sight. There is now a picker at the top and the chosen season's episodes
   below it. With a single season the picker **does not appear**, because there would be nothing to

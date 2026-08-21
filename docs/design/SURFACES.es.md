@@ -15,8 +15,10 @@ diseñar.
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` y `Strings.en.axaml`.
   `BilingualHeadingTests` compara la estructura de los documentos públicos, y una cadena visible
   nueva va en los dos archivos o no va.
-- **Los únicos cuatro textos literales del árbol son símbolos, no idioma**: `○ ◐ ●` (estado de visto),
-  `→` (origen y destino de un renombrado), `!` (aviso del transporte) y `⚠` (medio fuera de alcance). Si el rediseño los sustituye
+- **Los únicos cinco textos literales del árbol son símbolos, no idioma**: `○ ◐ ●` (estado de visto),
+  `→` (origen y destino de un renombrado), `!` (aviso del transporte), `⚠` (medio fuera de alcance) y
+  `✕` (una sesión que no abre). **Los dos últimos son distintos a propósito**: un fallo y un aviso que
+  compartieran glifo se distinguirían sólo por el color. Si el rediseño los sustituye
   por iconos, el nombre accesible sigue viniendo de `AutomationProperties`, que ya está puesto.
 - **Cada control interactivo tiene nombre accesible**, y hay 80 pruebas de accesibilidad que lo
   exigen. Un rediseño puede cambiar la forma, no quitarle el nombre.
