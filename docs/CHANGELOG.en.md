@@ -139,6 +139,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The three sound notices look like notices.** No device at all, a downmixed layout, or a device that
+  disappears mid-session were plain sentences in the same colour as the labels beside them. All three
+  mean the same thing: what you are hearing is not what you asked for. They now carry an amber box and
+  a symbol, like every other warning in the application.
+
+
 - **The video status badge tells a fact apart from a warning.** It said six things that all looked the
   same: HDR passing through, or the graphics card decoding — facts about a video playing perfectly —
   looked exactly like "this fell back to software decoding". The facts are now secondary text and the

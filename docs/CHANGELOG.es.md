@@ -140,6 +140,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los tres avisos de sonido se ven como avisos.** Que no haya ningún dispositivo, que la mezcla se
+  haya degradado o que el dispositivo desaparezca a mitad de sesión se decían en texto llano, del mismo
+  color que las etiquetas de al lado. Los tres significan lo mismo: lo que oyes no es lo que pediste.
+  Ahora llevan recuadro ámbar y símbolo, como el resto de avisos de la aplicación.
+
+
 - **El distintivo de estado del vídeo distingue lo que es un dato de lo que es un aviso.** Decía seis
   cosas con el mismo aspecto: que el HDR pasa tal cual o que decodifica la tarjeta gráfica —que son
   datos sobre un vídeo que va perfectamente— se veían igual que «esto ha caído a decodificación por

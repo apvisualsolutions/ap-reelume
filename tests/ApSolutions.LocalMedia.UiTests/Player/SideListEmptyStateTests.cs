@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Player;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -43,6 +44,44 @@ public sealed class SideListEmptyStateTests
         Assert.Contains(Resource("DetectedMarkersEmptyTitle"), VisibleTexts(new DetectedMarkerReviewView()));
         Assert.Contains(Resource("TracksEmptyTitle"), VisibleTexts(new TrackSelectorView()));
         Assert.Contains(Resource("PlayerVersionsEmptyTitle"), VisibleTexts(new PlayerVersionsView()));
+    }
+
+    /// <summary>
+    /// What comes out of the speakers not being what was asked for is a warning, not a line of text.
+    /// </summary>
+    /// <remarks>
+    /// The three of them — no device at all, a layout the hardware refused, a device that went away —
+    /// were plain sentences in the same colour as the labels above them, so the one thing on this panel
+    /// that needed reading looked like the two that did not. None is a failure: sound still plays, or
+    /// is about to. They take the same surface as the unavailable badge, and the glyph is what keeps
+    /// the signal off colour alone.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_three_audio_notices_are_warnings_rather_than_sentences()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var view = new AudioOutputView();
+        var window = new Window { Width = 420, Height = 600, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var application = Avalonia.Application.Current!;
+        Assert.True(application.TryGetResource("WarningSurfaceBrush", application.ActualThemeVariant, out var warning));
+        var expected = Assert.IsAssignableFrom<ISolidColorBrush>(warning).Color;
+
+        foreach (var name in new[] { "NoOutputNotice", "DegradedLayoutNotice", "DeviceFallbackNotice" })
+        {
+            var notice = Assert.Single(
+                view.GetVisualDescendants().OfType<Border>(),
+                border => border.Name == name);
+            Assert.Equal(expected, Assert.IsAssignableFrom<ISolidColorBrush>(notice.Background).Color);
+            Assert.True(notice.BorderThickness.Top > 0, $"{name} has no border, so its only signal is colour.");
+            Assert.Contains(notice.GetVisualDescendants().OfType<TextBlock>(), block => block.Text == "⚠");
+        }
+
+        window.Close();
     }
 
     /// <summary>

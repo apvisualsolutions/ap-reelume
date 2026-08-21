@@ -233,9 +233,15 @@ filas en `WrapPanel` desde el andamio.
 - **`TransportControlsView`**: glifos de Segoe Fluent Icons y 44 px de área pulsable. **Ojo: el nombre
   accesible sigue viniendo de la clave de recurso, no del glifo** — cambiar el `Content` de un botón
   por un glifo **no puede** tocar su `AutomationProperties.Name`, o el paseo lo pierde.
-- **`AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`**: los tres avisos de audio a
-  `WarningSurfaceBrush`; la vista previa del subtítulo sobre la superficie del reproductor y no la del
-  shell; los atajos en dos columnas, con su cadena de vacío.
+- ~~**Los tres avisos de `AudioOutputView`**~~ **HECHOS el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-audio-warnings.md)). Quedan **`SubtitleStyleView`** —la vista
+  previa del subtítulo sobre la superficie del reproductor y no la del shell— y
+  **`ShortcutSettingsView`** —dos columnas y su cadena de vacío—.
+- **⚠ Y una trampa que mordió dos veces seguidas el 2026-08-21, con la puerta de desbordamiento
+  cazándola:** un glifo al lado de un texto que envuelve **no puede ir en un `StackPanel`
+  horizontal** —ofrece anchura infinita, así que el texto no envuelve y se sale: `x=921` en una
+  ventana de 900—. Va en `Grid ColumnDefinitions="Auto,*"`. **Los avisos del estado de vídeo
+  tenían el mismo defecto sin que nadie lo hubiera visto**, y se corrigieron en el mismo cambio.
 
 **⚠ Y la discrepancia que ya está anotada desde el 2026-08-18 y sigue valiendo:** la §4 dice «7 motivos
 de fallo» y **son 6**. El séptimo, `UnsupportedCapability`, viaja en `VideoOutputDecision` y sale por

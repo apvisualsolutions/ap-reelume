@@ -81,9 +81,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           BorderThickness="1"
           CornerRadius="{DynamicResource CornerRadiusSmall}"
           IsVisible="{Binding HasDecodeWarnings}">
-        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
           <TextBlock VerticalAlignment="Top" Text="⚠" />
-          <StackPanel Spacing="{DynamicResource Space4}">
+          <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
             <TextBlock
                 x:Name="SoftwareFallbackText"
                 IsVisible="{Binding FellBackToSoftware}"
@@ -97,7 +97,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 Text="{DynamicResource VideoStatusUnsupportedFormat}"
                 TextWrapping="Wrap" />
           </StackPanel>
-        </StackPanel>
+        </Grid>
       </Border>
     </StackPanel>
   </Border>
