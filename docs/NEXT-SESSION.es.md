@@ -207,6 +207,19 @@ filas en `WrapPanel` desde el andamio.
   `TrackSelectorView`, `PlayerVersionsView`— **no tienen ni una cadena de vacío entre las cuatro**
   (medido: cero coincidencias de `Empty` en los cuatro archivos), y ninguna tiene filas de 36 px.
   **Son 8 de las 22 cadenas de vacío del paquete**, ya escritas en los dos idiomas.
+- **⚠ Y «vacío» NO significa lo mismo en las cuatro, medido el 2026-08-21. Decidido, para no
+  deliberarlo al escribirlo:**
+  - `Markers` y `Detections`: vacío es `Count == 0`, y no hay más que hablar.
+  - **`TrackSelectorView` NUNCA está a cero**: `SubtitleTracks` lleva siempre la opción
+    «desactivado» que el propio modelo añade. Así que «sin pistas que elegir» es **una sola opción
+    real por tipo**, no cero elementos — y el texto del paquete lo dice bien: «este archivo trae una
+    sola pista de cada tipo». Contar elementos aquí daría un vacío que no llega nunca.
+  - **`PlayerVersionsView` ya resuelve su vacío AL REVÉS que la §4**: hoy la vista entera se oculta
+    con `IsVisible="{Binding HasAlternatives}"`, que es **ausente**; el paquete le pide una cadena,
+    que es **presente y vacío**. **Manda la §4 aquí y no el árbol**, y la razón es que esta lista vive
+    en una columna junto a otras tres: una que desaparece mueve las demás, y quien busca «¿hay otra
+    versión?» merece leer «una sola» en vez de no encontrar dónde estaba. Es la excepción a la
+    gramática de ausente, y se anota porque contradice a `PrivacySettingsView`.
 - **`VideoStatusOverlay`** pinta sus **seis** estados con **un solo `ShellSurfaceBrush`**, y la §4 lo
   parte en dos gramáticas: HDR10, tonemapping, SDR y aceleración son **datos** (texto secundario, sin
   caja) y la caída a software y el formato no soportado son **avisos** (`WarningSurfaceBrush`).
