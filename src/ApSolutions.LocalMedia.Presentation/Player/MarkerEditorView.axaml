@@ -8,8 +8,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    xmlns:continuity="clr-namespace:ApSolutions.LocalMedia.Domain.Continuity;assembly=ApSolutions.LocalMedia.Domain"
     x:DataType="player:MarkerEditorViewModel"
     automation:AutomationProperties.Name="{DynamicResource MarkerEditorAccessibleName}">
+  <UserControl.Resources>
+    <player:MarkerRowLabelConverter x:Key="MarkerRowLabel" />
+  </UserControl.Resources>
   <StackPanel x:Name="MarkerEditorSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         x:Name="MarkerEditorHeadline"
@@ -28,13 +32,30 @@ SPDX-License-Identifier: GPL-3.0-or-later
           TextWrapping="Wrap" />
     </StackPanel>
 
+    <!--
+    The template is the whole point. Until 2026-08-21 there was none, so the row painted the record's
+    generated ToString() - two GUIDs and a type name - clipped with no ellipsis and no tooltip. The
+    row's height, its truncation and its 36 come from the side-list and row-label classes, where the
+    four lists of this column share them.
+    -->
     <ListBox
         x:Name="MarkerList"
+        Classes="side-list"
         IsVisible="{Binding !IsEmpty}"
         MinHeight="96"
         ItemsSource="{Binding Markers}"
+        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
         SelectedItem="{Binding SelectedMarker, Mode=TwoWay}"
-        automation:AutomationProperties.Name="{DynamicResource MarkerEditorListName}" />
+        automation:AutomationProperties.Name="{DynamicResource MarkerEditorListName}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="continuity:IntroMarker">
+          <TextBlock
+              Classes="row-label"
+              Text="{Binding ., Converter={StaticResource MarkerRowLabel}}"
+              ToolTip.Tip="{Binding ., Converter={StaticResource MarkerRowLabel}}" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
 
     <!--
     A WrapPanel and not a horizontal StackPanel, for the reason measured five times in this
@@ -44,12 +65,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
     one line.
     -->
     <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+      <!--
+        The three kinds used to paint the enum member's own name - Intro, Recap, Credits - in whatever
+        language the application was in, because no key existed for them. The converter that labels the
+        rows labels these too, so the words in the picker and the words in the list are the same words.
+      -->
       <ComboBox
           x:Name="MarkerKindSelector"
+          Classes="side-list"
           MinWidth="160"
           ItemsSource="{x:Static player:MarkerEditorViewModel.Kinds}"
           SelectedItem="{Binding SelectedKind, Mode=TwoWay}"
-          automation:AutomationProperties.Name="{DynamicResource MarkerEditorKindLabel}" />
+          automation:AutomationProperties.Name="{DynamicResource MarkerEditorKindLabel}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="continuity:MarkerKind">
+            <TextBlock
+                Classes="row-label"
+                Text="{Binding ., Converter={StaticResource MarkerRowLabel}}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
       <NumericUpDown
           x:Name="MarkerStartSelector"
           Minimum="0"

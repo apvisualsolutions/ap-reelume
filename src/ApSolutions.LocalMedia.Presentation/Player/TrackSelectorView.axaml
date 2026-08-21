@@ -32,13 +32,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource TrackSelectorAudioLabel}" />
+      <!--
+        A template and not DisplayMemberBinding, which is what this had: the two are exclusive, and
+        only a template can say that a track name too long for 320 px ends in an ellipsis with the
+        whole of it in a tooltip. A track's name is the one string in this column nobody can shorten -
+        it comes out of the file.
+      -->
       <ComboBox
           x:Name="AudioTrackSelector"
+          Classes="side-list"
           MinWidth="260"
           automation:AutomationProperties.Name="{DynamicResource TrackSelectorAudioLabel}"
-          DisplayMemberBinding="{Binding Display}"
           ItemsSource="{Binding AudioTracks}"
-          SelectedItem="{Binding SelectedAudio, Mode=TwoWay}" />
+          SelectedItem="{Binding SelectedAudio, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="player:TrackOption">
+            <TextBlock
+                Classes="row-label"
+                Text="{Binding Display}"
+                ToolTip.Tip="{Binding Display}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
     </StackPanel>
 
     <StackPanel Spacing="{DynamicResource Space4}">
@@ -47,11 +62,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource TrackSelectorSubtitleLabel}" />
       <ComboBox
           x:Name="SubtitleTrackSelector"
+          Classes="side-list"
           MinWidth="260"
           automation:AutomationProperties.Name="{DynamicResource TrackSelectorSubtitleLabel}"
-          DisplayMemberBinding="{Binding Display}"
           ItemsSource="{Binding SubtitleTracks}"
-          SelectedItem="{Binding SelectedSubtitle, Mode=TwoWay}" />
+          SelectedItem="{Binding SelectedSubtitle, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="player:TrackOption">
+            <TextBlock
+                Classes="row-label"
+                Text="{Binding Display}"
+                ToolTip.Tip="{Binding Display}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
     </StackPanel>
 
     <CheckBox

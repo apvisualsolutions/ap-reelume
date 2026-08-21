@@ -250,6 +250,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="SkipMarkerIntro">Saltar introducción</x:String>
   <x:String x:Key="SkipMarkerRecap">Saltar resumen</x:String>
   <x:String x:Key="SkipMarkerCredits">Saltar créditos</x:String>
+  <!-- The three values of MarkerKind. Until 2026-08-21 the selector and both lists painted the
+       enum member's own name, untranslated, because no key existed for them. -->
+  <x:String x:Key="MarkerKindIntro">Introducción</x:String>
+  <x:String x:Key="MarkerKindRecap">Resumen</x:String>
+  <x:String x:Key="MarkerKindCredits">Créditos</x:String>
   <x:String x:Key="MarkerEditorAccessibleName">Marcas de la serie</x:String>
   <x:String x:Key="MarkerEditorDescription">Las marcas de introducción, resumen y créditos se guardan por serie y las creas tú. Una marca manual manda siempre sobre cualquier detección automática del mismo tipo.</x:String>
   <x:String x:Key="MarkerEditorListName">Lista de marcas</x:String>
@@ -274,6 +279,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="DetectedMarkerReviewAccept">Aceptar detección</x:String>
   <x:String x:Key="DetectedMarkerReviewCorrect">Corregir rango</x:String>
   <x:String x:Key="DetectedMarkerReviewDelete">Eliminar detección</x:String>
+  <!-- What accepting or correcting a detection writes into it, and what protects it from the next
+       detector run. Nothing painted it, so accepting changed nothing you could see. -->
+  <x:String x:Key="DetectedMarkerReviewConfirmed">confirmada</x:String>
   <x:String x:Key="HomeAccessibleName">Inicio</x:String>
   <x:String x:Key="HomeTitle">Inicio</x:String>
   <x:String x:Key="HomeResumeAccessibleName">Continuar viendo</x:String>
