@@ -151,6 +151,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The player buttons are easier to hit.** Play, pause, stop, and the two skips go from 36 to 44
+  pixels of target area: that is what the accessibility guidelines ask for a comfortable target, and
+  these are the controls people press in a hurry, in the dark, and sometimes on a laptop trackpad.
+
+
 - **The three sound notices look like notices.** No device at all, a downmixed layout, or a device that
   disappears mid-session were plain sentences in the same colour as the labels beside them. All three
   mean the same thing: what you are hearing is not what you asked for. They now carry an amber box and

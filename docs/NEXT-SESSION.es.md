@@ -1,64 +1,54 @@
 # Dónde retomar
 
-## Estado al abrir (2026-08-20, cierre de la sesión de noche)
+## Estado al abrir (2026-08-21)
 
-**La rama al día y verde en local; `main` espera el verde de CI de este commit.** La fase 6 va por
-**2 tramos de 9**: el 1 (Shell) y el 2 (Inicio) están hechos.
+**`main` y la rama al día, CI verde, árbol limpio.** La fase 6 va por **3 tramos de 9 cerrados y el 4
+casi**: Shell, Inicio, Biblioteca y fichas, y del Reproductor todo salvo **los glifos del transporte y
+las filas de 36 px de las cuatro listas**.
 
-**Lo que el tramo 2 enseñó, y no es de Inicio sino del método:** medir la fila contra el árbol **antes
-de escribir** encontró dos discrepancias con el documento y **un defecto de la casa** que ninguna
-suite podía ver. Está entero abajo, en «Lo que el tramo 2 dejó escrito». Lo más caro de los tres:
-**no hay portadas en toda la aplicación**, y la §4 las da por hechas en tres filas de Inicio y volverá
-a pedirlas en Biblioteca y en las fichas.
+**Lo siguiente, sin nada que deliberar:** cerrar el tramo 4 con esas dos piezas. **Las dos están
+decididas y escritas abajo**, incluidos el porqué de los glifos —hay un defecto medido que resuelven— y
+cómo hacerlos sin mover la identidad de ningún control.
 
-**Lo que sigue vigente de los rojos de CI de la tanda anterior:**
+### Lo que la sesión del 2026-08-21 dejó, y no está sólo en los commits
 
-1. **Una mejora real sin declarar.** `RouteStateConverter.cs` subió a 100/85 al ganar la rama del
-   `Kind` nuevo con su prueba. El trinquete **falla también cuando algo mejora**, y esto va a repetirse
-   en casi todos los tramos: **cuenta con una segunda vuelta de CI por tramo**, que es el precio
-   conocido de que los suelos los mida CI.
-2. **Un suelo que sube y NO es una mejora.** `PlaybackProgressTracker.cs` leyó 83 en tres runs y 85 en
-   el cuarto, con **una línea de un `.txt`** como único cambio del árbol entre ellos: un `.cs` no
-   mejora por eso. **Lo que distingue una mejora de un baile es el diff del árbol entre los dos runs.**
-   Subir un suelo que baila es **peor** que dejarlo bajo, porque convierte un rojo ocasional en un rojo
-   por estar **por debajo**. Se estabilizó pidiendo la rama a propósito, y la causa salió comparando los
-   Cobertura línea a línea — la primera hipótesis, el `WaitAsync` de al lado, era falsa y ya tenía
-   prueba.
+**Cinco defectos que ninguna suite podía ver**, todos por medir la fila de la §4 contra el árbol
+**antes** de escribir: los títulos recientes que se leían de SQLite y no pintaba nadie; el carril de
+recomendaciones apagado afirmando que no había nada que sugerir sobre un catálogo que no se había
+leído; el distintivo de «no disponible» copiado a mano en seis vistas; la búsqueda sin resultados que
+no decía ni una palabra; y **la vista previa del subtítulo, que previsualizaba una cosa de cinco**.
 
-**DOS TAREAS NUEVAS, pedidas el 2026-08-20 y ya en la tabla como pasos 11 y 12:** la **página del
-repositorio en GitHub con capturas** y una **landing preparada para su dominio**. Las dos van
-**después de que la §4 termine** —una captura de una interfaz a medio rediseñar hay que rehacerla, que
-es el mismo argumento por el que 0.2.0 no se corta antes— y **comparten las capturas**. Su análisis,
-con lo que ya está decidido y lo que no, está abajo en «11 y 12». Lo único que se puede adelantar es
-el **guion** que genera las capturas, que es código de pruebas.
+**Y uno que se creía cerrado y estaba a medias:** los tres paneles superpuestos que el paseo cazó el
+2026-08-17 se arreglaron con alineación explícita, y **centrar no impide crecer**: con una frase larga,
+uno ocupaba **1278 px de un escenario de 1280**. La §4 pedía el `MaxWidth` que faltaba, y tenía razón.
 
-**Lo siguiente por orden es el tramo 4: el Reproductor (16 vistas)**, que es el más grande de los
-nueve. Su fila de la §4 está en la tabla de abajo, y **hay que medirla vista por vista antes de
-escribir nada**: en los tres tramos anteriores, la mitad de lo que cada uno pedía ya estaba hecho.
+**⚠ Y UN ERROR MÍO QUE LLEGÓ A ESTE DOCUMENTO Y HAY QUE NO REPETIR.** Escribí que «la columna fija de
+320 px no existe en absoluto». **Existe y siempre existió**: la monta `ShellView.axaml` con
+`ColumnDefinitions="*,320"`. Lo escribí buscando `320` en `PlayerView.axaml`, que es la vista del vídeo
+y no la que monta la columna. **Un grep vacío en el archivo equivocado se lee igual que una ausencia**:
+antes de escribir «esto no existe», pregunta **quién lo montaría** y mira ahí.
 
-**La fase 6 va por 3 tramos de 9, y el 4 a una sola pieza de cerrar: la columna de 320 px.** El tramo 3 cerró el 2026-08-20 con el paseo en **135 de 135 y 0
-pendientes**, dos controles nuevos —el botón de borrar la búsqueda y el selector de temporada— cada
-uno con su escena, y **una fila que no se hace con su número delante**: la cuadrícula fluida.
+### Las cuatro discrepancias medidas entre la §4 y el árbol
 
-**EL PASO 6 ESTÁ EN SU FASE 6 DE 6, Y ESA FASE ESTÁ CASI ENTERA POR HACER.** Lo que se cerró el
-2026-08-20 fueron **las fases 1 a 5 de `design/PROMPT.md`** más los prerrequisitos de la 6 — y se
-declaró «paso 6 cerrado», que era **falso**. Medido contra el paquete ese mismo día:
+Ninguna se improvisó y todas tienen su número:
 
-| Qué pide el paquete | Propuesto | Hoy | Falta |
-|---|---|---|---|
-| Controles | 202 | **133** | **69** |
-| Cadenas nuevas | +47 | **0** | **47** |
-| Animaciones | 4 | **0** | **4** |
+1. **No hay portadas en toda la aplicación** (cero `<Image>` en `src/`). **Decidido: no entran en
+   0.2.0**, con su razón abajo.
+2. **La cuadrícula fluida de la biblioteca no se hace**: `WrapPanel` cuesta **7× el tiempo y 455× los
+   controles vivos** sobre diez mil entradas, y en Avalonia 12.1.1 no existe nada que reflowe y
+   virtualice a la vez. **Va con las portadas: son la misma tarea.**
+3. **`LibraryEntryView` no es la ficha 2:3 que el documento describe**, sino el bloque de entrada a la
+   biblioteca.
+4. **Los datos del distintivo de vídeo conservan su caja**, aunque la §4 los quiera sin ninguna: ese
+   distintivo **flota sobre la película**, así que un texto sin superficie se lee contra un fotograma
+   arbitrario y no hay contraste que garantizar ni medir.
 
-**El error no fue de ejecución sino de comprobación: se dio por cerrado un paso contra la propia
-lectura de este documento en vez de contra el documento que lo define**, que es `design/PROMPT.md`. Su
-punto 6 dice «el resto de las vistas, un cambio por vista, siguiendo la §4 de `Propuesta de diseño`», y
-la §4 son 48 filas con cambios estructurales y estados condicionales que hoy no existen.
+### Lo que cuesta cada tramo, para presupuestarlo
 
-**Lo hecho no es trabajo perdido: es el andamio de la §4.** Las tres escalas, la acción principal de
-las 48 vistas y la puerta de desbordamiento son exactamente lo que la §4 gasta —escribe `SpaceLarge`,
-`CornerRadiusMedium` y `WrapPanel` por todas partes—, y ahora hay puerta que impide que se degrade
-mientras se rediseña.
+- **Dos vueltas de CI**, siempre. El trinquete de cobertura falla **también cuando algo mejora**, así
+  que toda pieza con prueba nueva pide declarar su suelo en una segunda vuelta. Pasó cuatro veces.
+- **Una vista nueva cuesta además una entrada en `eng/coverage-debt.txt`**, porque todos los `.axaml`
+  miden 100/50, y **el trinquete no sube**: se paga sacando otro archivo de la lista, mejorándolo.
 
 ### La fase 6, área por área, en el orden de la §4
 
@@ -195,9 +185,14 @@ filas en `WrapPanel` desde el andamio.
   `WrappingSurfaceTests` sube a cinco filas. ~~(3) La superficie propia~~ está **HECHA el 2026-08-21**
   ([su evidencia](evidence/stable/audit-player-surface.md)): `PlayerSurfaceBrush` = `#0B0D10` en los
   cuatro temas, que es el **único token del árbol que no sigue el tema**, y `MiniPlayerWindow` lo
-  gasta también. Queda **(4) la columna fija de 320 px, que no existe en absoluto**: es el cambio
-  estructural más grande del tramo, porque hoy los paneles laterales son superpuestos y no una
-  columna.
+  gasta también.
+- **⚠ Y (4), «la columna fija de 320 px», ERA UNA NOTA FALSA MÍA, corregida el 2026-08-21.** La
+  columna **ya existe y siempre existió**: `ShellView.axaml` monta la zona del reproductor con
+  `ColumnDefinitions="*,320"` y apila dentro los cinco paneles laterales, con un comentario que
+  dice «this column is 320 px wide by definition». **Escribí que no existía buscando `320` en
+  `PlayerView.axaml`**, que es la vista del vídeo y no la que monta la columna. Es la forma de
+  siempre: **un grep vacío en el archivo equivocado se lee como ausencia**. Antes de escribir «esto
+  no existe», pregunta **quién lo montaría** y mira ahí.
 - **⚠ Y una puerta que salta con cualquier token de tema nuevo:** `ContrastTokenTests.RequiredKeys`
   es una **lista cerrada** —cada diccionario debe llevar exactamente esas claves— y una clave nueva
   la rompe hasta que se declara ahí. Además, si la superficie nueva **no** entra en la lista de
@@ -230,9 +225,27 @@ filas en `WrapPanel` desde el andamio.
   del 2026-08-17 seguía medio vivo**: con las dos alineaciones puestas y una frase larga dentro,
   `ResumePromptSurface` ocupó **1278 px de un escenario de 1280**. **Centrar impide que un panel se
   desplace, no que crezca.** Puestos los topes (420/420/520) y la esquina del botón de saltar.
-- **`TransportControlsView`**: glifos de Segoe Fluent Icons y 44 px de área pulsable. **Ojo: el nombre
-  accesible sigue viniendo de la clave de recurso, no del glifo** — cambiar el `Content` de un botón
-  por un glifo **no puede** tocar su `AutomationProperties.Name`, o el paseo lo pierde.
+- **`TransportControlsView`**: ~~44 px de área pulsable~~ **HECHOS el 2026-08-21** —la clase
+  `player-chrome` sube de 36 a 44 y su prueba con ella—. **Quedan los glifos, y la decisión ya está
+  tomada: SÍ se hacen, y así.**
+  - **Por qué sí:** hay un defecto medido que resuelven. Con cinco botones de texto el cromo se
+    plegó en **tres filas dentro de 480×270** el 2026-08-19 y `BesidePoint` murió con «is surrounded
+    by other command controls». Las palabras no caben en el mini reproductor.
+  - **Cómo, sin romper nada:** se cambia **sólo el `Content`**. El `AutomationProperties.Name` sigue
+    apuntando a su clave de recurso —que es a lo que apunta el paseo y lo que lee un lector de
+    pantalla—, así que la identidad del control no se mueve. **Reescribir la clave sí lo rompería.**
+  - **La fuente existe**: `Segoe Fluent Icons` está instalada (medido el 2026-08-21, junto a
+    `Segoe MDL2 Assets`). Es de Windows 11, que es el único destino. **Si el runner no la tuviera**,
+    lo diría la puerta de desbordamiento al medir anchuras raras, no un fallo silencioso.
+  - **Lo que hay que revisar en el mismo cambio:** las escenas del paseo que pulsan el transporte no
+    dependen del `Content`, pero **sí hay pruebas que buscan por texto**; y el mini reproductor
+    comparte la clase, así que sus cinco botones cambian a la vez.
+- **Las cuatro listas: filas de 36 px, sin scroll horizontal y truncado con tooltip.** Medido: hoy
+  `MarkerEditorView` tiene `MinHeight=96` y `DetectedMarkerReviewView` `MinHeight=72` en sus
+  `ListBox`, y **ninguna fija la altura de fila**. Es lo último del tramo junto a los glifos.
+- **`LooseFileBanner`**: la §4 pide banda superior de 48 px no superpuesta al vídeo; hoy tiene
+  `MaxHeight=320` y sus dos filas de acciones ya son `WrapPanel`. **Ojo: el paquete lo marcaba
+  «bloqueado» y ya no lo está** — el defecto que impedía verlo se corrigió el 2026-08-17.
 - ~~**Los tres avisos de `AudioOutputView`**~~ **HECHOS el 2026-08-21**
   ([su evidencia](evidence/stable/audit-audio-warnings.md)), y **`SubtitleStyleView` el 2026-08-21**
   ([su evidencia](evidence/stable/audit-subtitle-preview.md)) — donde medir encontró que **la vista
@@ -290,6 +303,32 @@ hay imagen mientras la está viendo.
 puerta de desbordamiento (que es exactamente la red de los `WrapPanel` que la §4 pide) y el paseo en 0.
 
 **Los 35 activos de instalación NO entran**: bloqueados esperando el vectorial de la marca.
+
+### Las portadas NO entran en 0.2.0, decidido el 2026-08-21
+
+Es la decisión de alcance que quedaba abierta, y va aquí para que no se re-delibere.
+
+**Qué son:** la §4 las da por hechas en tres filas de Inicio, en la cuadrícula de Biblioteca y en las
+dos fichas. Hoy **no existe ni una imagen en toda la aplicación** —cero `<Image>` en los `.axaml` de
+`src/`— y `PosterPath` se produce, se fusiona y se persiste sin que ninguna vista lo lea.
+
+**Por qué no entran:**
+
+1. **No son una vista, son una función.** Una ruta de TMDB es **remota**, así que traerla es una
+   conexión que declarar en `NetworkPurposeRegistry`, una caché en disco con su tamaño y su caducidad
+   —y la de TMDB tiene un **techo duro de 180 días** que sus términos imponen—, y una política de qué
+   pasa cuando no hay red o el token no está. Eso es un tramo propio del tamaño de varios de los nueve.
+2. **0.2.0 es el rediseño.** Meter funcionalidad nueva dentro del corte lo convierte en otra cosa, y el
+   orden 6 → 7 → 8 se decidió precisamente para que el paseo físico juzgue **una interfaz terminada**,
+   no una a la que aún le crecen partes.
+3. **Y arrastran la cuadrícula.** Una rejilla de fichas sin imagen es una rejilla de cajas de texto,
+   que no es mejor que la lista de hoy, y **cuesta 7× el tiempo y 455× los controles vivos** por perder
+   la virtualización. **Las portadas y la cuadrícula son la misma tarea** y se hacen juntas o ninguna.
+
+**Cuándo, entonces:** se decide **cuando 0.2.0 esté publicada**, con la hoja de ruta delante y no con
+el paquete de diseño, porque a esas alturas la pregunta ya no es «qué pedía la §4» sino «qué le falta a
+esto para que alguien lo instale». Hasta entonces, las tres filas de la §4 quedan **anotadas como
+discrepancia medida**, que es lo que son.
 
 ### El orden, que ya estaba escrito y no se re-delibera
 
@@ -518,7 +557,7 @@ depende de la pantalla y está señalada abajo.
 **no tienen ni una sola imagen**. Quien llega al repositorio lee una descripción excelente de algo que
 no ha visto nunca.
 
-**Lo que hay que decidir, y no está decidido:**
+**Decidido el 2026-08-21, para que la sesión que lo haga ejecute en vez de deliberar:**
 
 - **De dónde salen las capturas.** Este proyecto tiene algo que casi ninguno: puede generarlas **por
   ejecución y de forma reproducible**. `LibraryNavigationTests` ya guarda PNG con
@@ -533,8 +572,19 @@ no ha visto nunca.
 - **Si se versionan o no.** Un README de GitHub necesita las imágenes **en el repositorio**; enlazarlas
   a un artefacto de CI no funciona. Así que se versionan, y eso pide decidir **cuántas y a qué tamaño**
   — hoy el árbol versiona 7 imágenes en total.
-- **Cuáles.** Lo mínimo honesto: Inicio, Biblioteca, una ficha, el reproductor y la bandeja de
-  revisión. Cinco, no quince.
+- **Cuáles: cinco, y éstas.** Inicio, Biblioteca, la ficha de una serie, el reproductor con su columna
+  y la bandeja de revisión. Cinco cubre lo que la aplicación es sin convertir el README en un catálogo,
+  y **la ficha de serie antes que la de película** porque es la que enseña el selector de temporada y
+  las filas de episodio, que es donde se ve que esto cataloga y no sólo reproduce.
+- **Se versionan, en `docs/assets/`**, porque un README de GitHub necesita las imágenes en el
+  repositorio y enlazarlas a un artefacto de CI no funciona. `docs/` ya está en `VersionedDirectories`,
+  así que no hay carpeta nueva en la raíz y `RepositoryPrivacyTests` no se entera.
+- **A 1600×1000 y en tema oscuro**, que es la variante sobre la que el paquete diseña y donde vive el
+  reproductor. Una sola escala: dos juegos de capturas es el doble de cosas que envejecen.
+- **En los dos idiomas no.** El README bilingüe comparte las mismas imágenes: una captura en español
+  dentro del README inglés se lee peor que una sin texto, pero **duplicar cinco capturas para traducir
+  cuatro etiquetas no lo compensa** — y el guion las regenera, así que la decisión se puede revisar sin
+  coste. Se toma la versión en **inglés**, que es la que un visitante internacional de GitHub espera.
 - **Y qué más lleva la página además de las capturas**: insignia de CI, licencia, plataforma, el
   enlace de descarga de la release, y la atribución de TMDB, que es **obligación legal** y ya está
   resuelta en la aplicación.
@@ -548,7 +598,7 @@ código de pruebas y no depende de cómo queden las vistas. Lo que no se adelant
 ahora y se **publica** cuando haya versión que descargar: una landing con un botón de descarga que no
 lleva a ninguna parte es peor que no tenerla.
 
-**Lo que hay que decidir, y tres cosas ya están decididas por el propio producto:**
+**Decidido el 2026-08-21; tres de estas cosas las decide el propio producto y no el gusto:**
 
 - **⚠ Dónde vive, y es una trampa medida.** Una carpeta nueva **en la raíz** rompe
   `RepositoryPrivacyTests`, que trata todo directorio de raíz no declarado como carpeta personal y
@@ -558,8 +608,16 @@ lleva a ninguna parte es peor que no tenerla.
   analítica **contradice el producto entero** —«nada sale de este equipo»— y la primera persona que
   mire la pestaña de red lo verá. Autocontenida: sin CDN, sin fuentes remotas, sin analítica.
 - **Bilingüe**, como todo lo público de este repositorio.
-- **Cómo se publica:** GitHub Pages desde el repositorio público es lo natural y no cuesta nada, con
-  el dominio propio apuntando ahí. **El dominio es del propietario** y ya está en `REL-004`.
+- **Cómo se publica: GitHub Pages desde `docs/` de una rama propia**, con el dominio apuntando ahí por
+  `CNAME`. No cuesta nada, no añade proveedor, y **el repositorio ya es público**, así que no expone
+  nada que no estuviera expuesto. **El dominio es del propietario** y ya está en `REL-004`.
+- **Dónde vive: `site/`**, declarada en `VersionedDirectories` en el mismo cambio. No en `docs/`, para
+  que la landing no se mezcle con la documentación que `verify-docs.ps1` y `BilingualHeadingTests`
+  vigilan con otras reglas — una página de marketing no tiene por qué tener los mismos encabezados que
+  un documento técnico, y meterla ahí obligaría a relajar una puerta o a inventarle excepciones.
+- **Qué lleva:** lo que la aplicación es en una frase, las cinco capturas del paso 11 —**las mismas, no
+  otras**—, el botón de descarga apuntando a la release, la licencia, y la atribución de TMDB, que es
+  **obligación legal** y ya está resuelta dentro de la aplicación.
 - **Lo que la bloquea a medias:** el **vectorial de la marca**, que es lo mismo que bloquea los 35
   activos de instalación. Se puede construir entera con un marcador y cambiarlo el día que llegue.
 

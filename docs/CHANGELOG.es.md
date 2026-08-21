@@ -152,6 +152,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los botones del reproductor son más fáciles de acertar.** Reproducir, pausar, detener y los dos
+  saltos pasan de 36 a 44 píxeles de zona pulsable: es lo que piden las guías de accesibilidad para un
+  objetivo cómodo, y son los controles que se pulsan deprisa, a oscuras y a veces en el panel táctil de
+  un portátil.
+
+
 - **Los tres avisos de sonido se ven como avisos.** Que no haya ningún dispositivo, que la mezcla se
   haya degradado o que el dispositivo desaparezca a mitad de sesión se decían en texto llano, del mismo
   color que las etiquetas de al lado. Los tres significan lo mismo: lo que oyes no es lo que pediste.

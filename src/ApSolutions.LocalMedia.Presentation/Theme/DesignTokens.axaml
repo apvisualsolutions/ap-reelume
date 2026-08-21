@@ -1055,9 +1055,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
     twenty apart. What is the control's is its target area and its corner; where it sits belongs to
     whoever puts it there, and both panels now say so themselves.
   -->
+  <!--
+    44 and not 36: §4 asks for it and the reason is not the design's, it is the pointer's. 36 px is the
+    smallest target WCAG 2.2 accepts at AA; 44 is what it asks for at AAA and what every touch guideline
+    converges on, and these five are the controls somebody presses in a hurry, in the dark, sometimes on
+    a laptop trackpad. Raising it costs nothing here because the transport wraps.
+  -->
   <Style Selector="Button.player-chrome">
-    <Setter Property="MinWidth" Value="36" />
-    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="MinWidth" Value="44" />
+    <Setter Property="MinHeight" Value="44" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
   </Style>
 
