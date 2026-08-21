@@ -175,7 +175,7 @@ src/ApSolutions.LocalMedia.Presentation/Player/ShortcutSettingsView.axaml       
 src/ApSolutions.LocalMedia.Presentation/Player/ShortcutSettingsViewModel.cs                   98  95
 src/ApSolutions.LocalMedia.Presentation/Player/SkipMarkerButton.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleView.axaml                       100  50
-src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs                     100  90
+src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs                     100  93
 src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorView.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorViewModel.cs                      96  75
 src/ApSolutions.LocalMedia.Presentation/Player/TransportControlsView.axaml                   100  50
