@@ -134,7 +134,7 @@ src/ApSolutions.LocalMedia.Presentation/Home/LibraryEntryView.axaml             
 src/ApSolutions.LocalMedia.Presentation/Home/RecentlyAddedRailView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsRailView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      93  85
-src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  75
+src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  78
 src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Language/LanguageService.cs                          100  88
 src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                       83 100
