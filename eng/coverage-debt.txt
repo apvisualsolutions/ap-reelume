@@ -184,7 +184,7 @@ src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchDialog.axaml        
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchViewModel.cs                      97  85
 src/ApSolutions.LocalMedia.Presentation/Player/VideoFrameView.cs                              79  70
 src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusOverlay.axaml                      100  50
-src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusViewModel.cs                        95  81
+src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusViewModel.cs                        96  87
 src/ApSolutions.LocalMedia.Presentation/Recovery/DatabaseRecoveryView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Recovery/DatabaseRecoveryViewModel.cs                100  50
 src/ApSolutions.LocalMedia.Presentation/Resources/Brand.axaml                                100  50
