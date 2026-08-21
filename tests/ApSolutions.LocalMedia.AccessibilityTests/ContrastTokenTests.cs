@@ -32,6 +32,7 @@ public sealed class ContrastTokenTests
     private static readonly string[] RequiredKeys =
     [
         "ShellSurfaceBrush",
+        "PlayerSurfaceBrush",
         "NavigationSurfaceBrush",
         "CardSurfaceBrush",
         "ControlFillBrush",

@@ -117,6 +117,64 @@ public sealed class PlayerViewDesignTests
         window.Close();
     }
 
+    /// <summary>
+    /// The player has a surface of its own, and it is the same in all four themes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Every other surface in this tree follows the theme; this one does not, because what sits on it
+    /// is the picture. That is a decision rather than an oversight, so it is asserted rather than left
+    /// to whoever edits the dictionaries next — and it is asserted as <b>four identical
+    /// declarations</b>, because a brush that is only right in the variant a test happens to run under
+    /// is a brush nobody is watching.
+    /// </para>
+    /// <para>
+    /// Both halves are checked: the markup, which says where the colour comes from, and the painted
+    /// value, which says it reached the screen. Neither alone is the assertion.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_player_surface_is_its_own_colour_in_all_four_themes()
+    {
+        var (window, view) = Show();
+
+        var panel = Assert.Single(
+            view.GetVisualDescendants().OfType<Panel>(),
+            candidate => candidate.Background is ISolidColorBrush);
+        Assert.Equal(
+            ThemeColour("PlayerSurfaceBrush"),
+            Assert.IsAssignableFrom<ISolidColorBrush>(panel.Background).Color);
+        Assert.NotEqual(ThemeColour("ShellSurfaceBrush"), ThemeColour("PlayerSurfaceBrush"));
+
+        var tokens = File.ReadAllText(RepositoryLayout.PathFromRoot(
+            "src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml"));
+        var declarations = Regex.Matches(
+            tokens,
+            @"<SolidColorBrush x:Key=""PlayerSurfaceBrush"" Color=""(?<colour>#[0-9A-Fa-f]{6})"" />",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(2));
+
+        Assert.Equal(4, declarations.Count);
+        Assert.Single(declarations.Select(match => match.Groups["colour"].Value).Distinct(StringComparer.OrdinalIgnoreCase));
+        Assert.Equal("#0B0D10", declarations[0].Groups["colour"].Value, ignoreCase: true);
+
+        // And nothing reads against it. ContrastTokenTests measures primary text on every surface it
+        // can land on, and this one is deliberately not on that list: everything the player draws over
+        // the picture carries a background of its own, so no text is ever read against #0B0D10 in a
+        // theme whose text is dark. That is the assertion, because leaving it out of the contrast list
+        // with no reason written looks exactly like forgetting to add it.
+        var overPicture = panel.Children.OfType<Control>().Where(child => child is not VideoFrameView);
+        Assert.NotEmpty(overPicture);
+        Assert.All(
+            overPicture,
+            child => Assert.True(
+                child is Border { Background: not null },
+                $"{child.GetType().Name} sits over the picture with no surface of its own, so its text "
+                + "would be read against the player's background."));
+
+        window.Close();
+    }
+
     /// <summary>A theme brush's colour, asked for by the variant in force.</summary>
     private static Color ThemeColour(string key)
     {
