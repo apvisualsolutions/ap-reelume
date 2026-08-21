@@ -912,6 +912,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Apply never re-ran the query the search box was holding");
         Assert.Equal("Dune.2021", Assert.Single(library.Items).Title);
 
+        // Clearing is pressed here, with a search in the box and a narrowed list on screen, because
+        // that is the only state in which it does anything: the probe is the count going back up.
+        await PressAsync(
+            host,
+            "LibrarySearchClearAction",
+            () => library.Items.Count,
+            "clicking Clear never emptied the search and brought the rest of the library back");
+        Assert.True(string.IsNullOrEmpty(library.Search));
+        Assert.Equal(2, library.Items.Count);
+
+        // And put it back where the rest of the scene expects it.
+        library.Search = "Dune";
+        await library.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal("Dune.2021", Assert.Single(library.Items).Title);
+
         await PressAsync(
             host,
             "Dune.2021",

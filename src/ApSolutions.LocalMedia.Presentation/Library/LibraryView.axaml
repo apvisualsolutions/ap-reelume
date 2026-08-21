@@ -61,6 +61,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
             automation:AutomationProperties.Name="{DynamicResource LibrarySearchLabel}"
             Text="{Binding Search}"
             PlaceholderText="{DynamicResource LibrarySearchPlaceholder}" />
+        <!--
+          Disabled rather than absent while the box is empty: it is one of a row of controls that
+          stay put, and a button that comes and goes would move the three beside it every time
+          somebody types a letter.
+        -->
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource LibrarySearchClearAction}"
+            Command="{Binding ClearSearchCommand}"
+            Content="{DynamicResource LibrarySearchClearAction}" />
         <ComboBox
             automation:AutomationProperties.Name="{DynamicResource LibraryFilterLabel}"
             SelectedValue="{Binding Filters}"
