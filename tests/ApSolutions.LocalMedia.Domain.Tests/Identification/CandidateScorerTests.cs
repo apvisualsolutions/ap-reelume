@@ -86,6 +86,39 @@ public sealed class CandidateScorerTests
         Assert.Contains("Identification.Warning.AmbiguousName", candidate.ExplanationCodes);
     }
 
+    /// <summary>
+    /// A provider that says nothing about a signal the name carries neither penalises nor invents.
+    /// </summary>
+    /// <remarks>
+    /// This reaches the far half of each optional condition: the name <b>was</b> parsed with a season,
+    /// an episode and a year, and the provider still answered none of them — the ordinary reply from a
+    /// source that only knows the series, or a film whose year it does not publish. Every other test
+    /// either parses without them, where the left half is false and the right is never evaluated, or
+    /// supplies both. The signal is dropped and its weight renormalises onto the title, so a silent
+    /// provider scores the same as one that was never asked.
+    /// </remarks>
+    [Fact]
+    public void A_provider_silent_on_an_optional_signal_drops_it_instead_of_scoring_it()
+    {
+        var scorer = new CandidateScorer();
+
+        var episode = scorer.Score(
+            new MediaFileId(Guid.NewGuid()),
+            ParsedEpisode(warnings: []),
+            Facts("tv:1399", CandidateContentKind.Episode, title: 0.90));
+
+        Assert.Equal(0.90, episode.Score, precision: 4);
+        Assert.Equal(["Identification.Signal.Title"], episode.Signals.Select(signal => signal.Code));
+
+        var film = scorer.Score(
+            new MediaFileId(Guid.NewGuid()),
+            ParsedMovie(year: 2021),
+            Facts("tmdb:movie:438631", CandidateContentKind.Movie, title: 0.90));
+
+        Assert.Equal(0.90, film.Score, precision: 4);
+        Assert.Equal(["Identification.Signal.Title"], film.Signals.Select(signal => signal.Code));
+    }
+
     [Fact]
     public void Kind_conflict_rejects_the_candidate()
     {

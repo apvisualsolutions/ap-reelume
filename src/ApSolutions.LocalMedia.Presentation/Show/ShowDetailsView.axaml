@@ -27,14 +27,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <library:UnavailableBadge />
     </StackPanel>
 
+    <!--
+      Same shape as the film card's row, and for the same reason: the personal actions and the trailer
+      link carry translated words, so they wrap instead of pushing each other off the side.
+    -->
     <StackPanel Grid.Row="1" Spacing="{DynamicResource Space8}">
-      <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
-      <Button
-          HorizontalAlignment="Left"
-          Command="{Binding OpenTrailerLinkCommand}"
-          Content="{DynamicResource DetailsTrailerLinkAction}"
-          IsVisible="{Binding HasTrailerLink}"
-          automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
+      <WrapPanel
+          x:Name="ShowActionsSurface"
+          ItemSpacing="{DynamicResource Space8}"
+          LineSpacing="{DynamicResource Space8}">
+        <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
+        <Button
+            Command="{Binding OpenTrailerLinkCommand}"
+            Content="{DynamicResource DetailsTrailerLinkAction}"
+            IsVisible="{Binding HasTrailerLink}"
+            automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
+      </WrapPanel>
       <TextBlock
           IsVisible="{Binding IsEmpty}"
           Text="{DynamicResource ShowDetailsEmpty}"
