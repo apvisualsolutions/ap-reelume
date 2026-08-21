@@ -98,6 +98,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ScanSettingsDescription">AP Reelume vigila tus carpetas y añade lo que aparezca en ellas. Si la vigilancia falla o el sistema la interrumpe, vuelve a revisarlas cada cierto tiempo.</x:String>
   <x:String x:Key="ScanSettingsWatchLocal">Vigilar cambios en raíces locales</x:String>
   <x:String x:Key="ScanSettingsFallbackMinutes">Intervalo de recuperación en minutos</x:String>
+  <!-- The empty tray is the good outcome, not a blank panel: everything was identified without
+       anybody being asked. IsEmpty had existed on the model all along with no view reading it. -->
+  <x:String x:Key="ReviewInboxEmptyTitle">No queda nada por revisar</x:String>
+  <x:String x:Key="ReviewInboxEmptyDescription">AP Reelume identificó todo lo que encontró sin necesitar tu ayuda. Cuando algo no esté claro, aparecerá aquí.</x:String>
   <x:String x:Key="ReviewInboxAccessibleName">Bandeja de revisión de coincidencias</x:String>
   <x:String x:Key="ReviewInboxTitle">Revisar coincidencias</x:String>
   <x:String x:Key="ReassignmentSectionAccessibleName">Archivos movidos pendientes de confirmación</x:String>

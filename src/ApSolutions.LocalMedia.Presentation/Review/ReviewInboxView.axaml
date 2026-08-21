@@ -100,9 +100,57 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding SearchManuallyCommand}"
           Content="{DynamicResource ReviewManualSearchAction}" />
     </Grid>
+    <!--
+      An empty tray is the good outcome and it is painted like one: everything was identified without
+      anybody being asked. §4 asks for PositiveSurfaceBrush and a glyph rather than a blank panel,
+      which reads like something failed to load - and the two positive brushes were declared in all
+      four themes and spent by nobody until this.
+
+      IsEmpty had been on the model since it was written, with no view reading it. The list hides in
+      the same breath: an empty list under an empty state says nothing twice.
+
+      A Grid and not a horizontal StackPanel, for the reason measured nine times here: a stack offers
+      infinite width, so wrapping text beside a glyph never wraps.
+    -->
+    <Border
+        x:Name="ReviewInboxEmptySurface"
+        Grid.Row="3"
+        VerticalAlignment="Top"
+        Padding="16"
+        Background="{DynamicResource PositiveSurfaceBrush}"
+        BorderBrush="{DynamicResource PositiveBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
+        IsVisible="{Binding IsEmpty}"
+        automation:AutomationProperties.Name="{DynamicResource ReviewInboxEmptyTitle}"
+        automation:AutomationProperties.LiveSetting="Polite">
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock
+            Grid.Column="0"
+            Margin="0,0,12,0"
+            VerticalAlignment="Top"
+            FontWeight="Bold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="&#x2713;" />
+        <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
+          <TextBlock
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource ReviewInboxEmptyTitle}"
+              TextWrapping="Wrap" />
+          <TextBlock
+              MaxWidth="600"
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              Text="{DynamicResource ReviewInboxEmptyDescription}"
+              TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Border>
     <ListBox
         x:Name="ReviewCandidates"
         Grid.Row="3"
+        IsVisible="{Binding !IsEmpty}"
         automation:AutomationProperties.Name="{DynamicResource ReviewCandidateListName}"
         ItemsSource="{Binding Items}"
         SelectedItem="{Binding SelectedItem}">
