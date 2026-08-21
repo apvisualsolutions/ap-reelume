@@ -79,24 +79,10 @@ public sealed class ShellNavigationBarTests
         window.Close();
     }
 
-    /// <summary>
-    /// The title actions wrap, because three buttons carrying translated words in a horizontal
-    /// <c>StackPanel</c> is the shape that has drawn a control off the side seven times here.
-    /// </summary>
-    [AvaloniaFact]
-    public void The_title_actions_wrap_instead_of_running_off_the_side()
-    {
-        var markup = File.ReadAllText(RepositoryLayout.PathFromRoot(
-            "src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml"));
-        var declaration = Regex.Match(
-            markup,
-            @"<(?<panel>\w+)\s[^>]*x:Name=""TitleActionsSurface""",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(2));
-
-        Assert.True(declaration.Success, "TitleActionsSurface is not declared any more.");
-        Assert.Equal("WrapPanel", declaration.Groups["panel"].Value);
-    }
+    // The title actions' WrapPanel used to be asserted here. It moved to WrappingSurfaceTests, which
+    // holds the closed table of every row of actions §4 has decided, so the rule has one mechanism
+    // rather than one per view — two of them age differently, and the second one to be written is the
+    // one nobody remembers to extend.
 
     /// <summary>The bar of one destination, by the accessible name its button is declared under.</summary>
     private static Border? BarOf(ShellView view, string key)

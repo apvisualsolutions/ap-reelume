@@ -27,7 +27,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <library:UnavailableBadge />
     </StackPanel>
 
-    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+    <!--
+      Four buttons carrying translated words is the shape that has drawn a control off the side of
+      this window seven times, so the row wraps rather than pushing the last one out of reach.
+    -->
+    <WrapPanel
+        x:Name="MovieActionsSurface"
+        Grid.Row="1"
+        ItemSpacing="{DynamicResource Space8}"
+        LineSpacing="{DynamicResource Space8}">
       <Button
           Classes="primary-action"
           Command="{Binding ResumeCommand}"
@@ -52,7 +60,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Content="{DynamicResource DetailsTrailerLinkAction}"
           IsVisible="{Binding HasTrailerLink}"
           automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
-    </StackPanel>
+    </WrapPanel>
 
     <StackPanel Grid.Row="2" Spacing="{DynamicResource Space8}">
       <catalog:WatchStatusControl DataContext="{Binding WatchStatus}" />

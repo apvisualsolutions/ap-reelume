@@ -114,6 +114,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The rows of buttons in the library and on the cards wrap onto more than one line when they do not
+  fit.** The search and filter row, and the action rows on a film and on a series, used to leave the
+  last button off the window as soon as the screen was narrow or the translation long. They now move
+  down a line, which is what the title bar buttons already did.
+
+
 - **A medium that is not there stops looking like an error.** The "not available right now" badge — the
   one on titles from an unplugged drive or a network share that is down — takes the shape of a warning:
   amber fill, a border, and a symbol in front, so it never depends on telling a colour apart. And it is

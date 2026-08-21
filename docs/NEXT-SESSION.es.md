@@ -140,15 +140,28 @@ con `EnumeratedCount`), el vacío de `ShowDetailsView` (`ShowDetailsEmpty`), «s
   bordes— estaban declarados en los cuatro diccionarios **sin un solo lector**, esperando a la §4, que
   los gasta en los tramos 3, 4 y 6. **El badge gastó el primero**; los otros cinco siguen sin lectores.
   `ScalarTokenTests` no los vigila porque **no son escalares**.
-- **`MovieDetailsView`**: la fila de acciones es un `StackPanel` horizontal con **cuatro botones y un
-  texto** y tiene que ser `WrapPanel`. Lo de «dos columnas con portada fija de 320 px» choca con que
-  no hay portadas.
+- ~~**Las tres filas a `WrapPanel`**~~ **HECHAS el 2026-08-20**
+  ([su evidencia](evidence/stable/audit-wrapping-rows-and-the-ratchet-toll.md)): la de filtros de
+  `LibraryView` y las de acciones de las dos fichas, con **tabla cerrada** en `WrappingSurfaceTests`
+  que absorbe la que el tramo 1 dejó suelta en `ShellNavigationBarTests`. De `MovieDetailsView`
+  queda «dos columnas con portada fija de 320 px», que choca con que no hay portadas.
 - **`ShowDetailsView`**: **no tiene selector de temporada**. Hoy apila todas las temporadas en un
   `ItemsControl`. El selector es **un control nuevo** (con su escena), y «una sola temporada oculta el
   selector» es un estado más.
 - **`EpisodeRowView`**: fila de **56 px** y número **monoespaciado alineado a la derecha**. Ojo:
   **`FontSizeMono` no existe** —se decidió no declarar un escalar que nadie gasta—, así que lo
   monoespaciado se pide por `FontFamily`, no por tamaño.
+
+**⚠ Y UNA TERCERA, QUE APARECIÓ AL AÑADIR LA PRIMERA VISTA DE LA FASE 6: AÑADIR UNA SUPERFICIE
+CUESTA UNA ENTRADA EN EL TRINQUETE DE COBERTURA.** Todos los `.axaml` de vista de este árbol miden
+**100/50** —es el código que genera Avalonia para el marcado, con una rama que nadie ejerce—, así que
+**una vista nueva añade siempre una línea a `eng/coverage-debt.txt`**, y esa lista **sólo encoge**. El
+trinquete ha ido 219 → 218 → 217 y **no sube**: subirlo porque hemos añadido superficie sería una
+regla que se relaja sola. **Se paga sacando otro archivo de la lista, mejorándolo de verdad**, que es
+la única forma de salir de ella. El 2026-08-20 lo pagó `CandidateScorer.cs`, de 95 a 100 % de ramas, y
+la rama que faltaba se encontró **leyendo el informe línea a línea**: era «el nombre trae temporada o
+episodio y el proveedor no los contesta». **Presupuesta esa mejora como parte del coste de cada vista
+nueva.**
 
 **⚠ DOS TRAMPAS DEL DOCUMENTO, medidas, que valen para los ocho tramos:**
 

@@ -40,7 +40,7 @@ src/ApSolutions.LocalMedia.Application/Discovery/RootWatchBackground.cs         
 src/ApSolutions.LocalMedia.Application/Discovery/RootWatchCoordinator.cs                      96  78
 src/ApSolutions.LocalMedia.Application/Discovery/ScanCoordinator.cs                           98  86
 src/ApSolutions.LocalMedia.Application/Events/CatalogEvents.cs                                90 100
-src/ApSolutions.LocalMedia.Application/Home/GetHome.cs                                        96  91
+src/ApSolutions.LocalMedia.Application/Home/GetHome.cs                                        97  91
 src/ApSolutions.LocalMedia.Application/Identification/GetReviewInbox.cs                       92  57
 src/ApSolutions.LocalMedia.Application/Identification/IdentifyingScanCoordinator.cs          100  50
 src/ApSolutions.LocalMedia.Application/Identification/IdentifyMediaFile.cs                    97  50
@@ -63,7 +63,6 @@ src/ApSolutions.LocalMedia.Application/Privacy/CreateDiagnostics.cs             
 src/ApSolutions.LocalMedia.Domain/Backup/RootRemapPolicy.cs                                  100  90
 src/ApSolutions.LocalMedia.Domain/Continuity/SegmentDetectionPolicy.cs                       100  92
 src/ApSolutions.LocalMedia.Domain/Discovery/RenameOperation.cs                                95  50
-src/ApSolutions.LocalMedia.Domain/Identification/CandidateScorer.cs                          100  95
 src/ApSolutions.LocalMedia.Domain/Identification/MatchModels.cs                              100  60
 src/ApSolutions.LocalMedia.Domain/Identification/MediaNameParser.cs                          100  91
 src/ApSolutions.LocalMedia.Domain/Metadata/IMetadataProvider.cs                               93 100
@@ -129,11 +128,12 @@ src/ApSolutions.LocalMedia.Presentation/Catalog/PersonalActionsViewModel.cs     
 src/ApSolutions.LocalMedia.Presentation/Catalog/WatchStatusControl.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Catalog/WatchStatusViewModel.cs                      100  70
 src/ApSolutions.LocalMedia.Presentation/Home/HomeView.axaml                                  100  50
-src/ApSolutions.LocalMedia.Presentation/Home/HomeViewModel.cs                                 98  81
+src/ApSolutions.LocalMedia.Presentation/Home/HomeViewModel.cs                                 99  81
 src/ApSolutions.LocalMedia.Presentation/Home/InProgressRailView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Home/LibraryEntryView.axaml                          100  50
+src/ApSolutions.LocalMedia.Presentation/Home/RecentlyAddedRailView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsRailView.axaml                   100  50
-src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      93  83
+src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      93  85
 src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  75
 src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Language/LanguageService.cs                          100  88

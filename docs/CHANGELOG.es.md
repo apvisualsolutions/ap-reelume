@@ -114,6 +114,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Las filas de botones de la biblioteca y de las fichas se reparten en varias líneas cuando no
+  caben.** La fila de búsqueda y filtros, y las de acciones de una película y de una serie, dejaban al
+  último botón fuera de la ventana en cuanto la pantalla era estrecha o la traducción larga. Ahora
+  bajan de línea, que es lo que ya hacían los botones de la barra de título.
+
+
 - **Un medio que no está deja de parecer un error.** El distintivo de «no disponible ahora mismo» —el
   que llevan los títulos de un USB desenchufado o de una carpeta de red caída— pasa a la forma de aviso:
   fondo ámbar, borde y un símbolo delante, para que no dependa de distinguir un color. Y se dice de una
