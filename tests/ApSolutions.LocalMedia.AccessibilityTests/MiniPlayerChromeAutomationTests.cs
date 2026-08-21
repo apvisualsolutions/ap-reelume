@@ -18,11 +18,12 @@ namespace ApSolutions.LocalMedia.AccessibilityTests;
 /// each language.
 /// </summary>
 /// <remarks>
-/// The window is 480 logical pixels wide and the labels had to be short to fit five of them, which is
-/// exactly the pressure that produces a control announced as nothing at all. So the name is asserted
-/// in both languages rather than in the one the machine happens to be set to, and the two are
-/// required to differ: a label that survived translation by not being translated is the failure this
-/// catches.
+/// The window is 480 logical pixels wide and five short labels never fitted in it - which is what
+/// §4's glyphs were for, and exactly the pressure that produces a control announced as nothing at
+/// all. Since the five paint a glyph, the name is the only thing left carrying their identity, so it
+/// is asserted in both languages rather than in the one the machine happens to be set to, and the two
+/// are required to differ: a label that survived translation by not being translated is the failure
+/// this catches.
 /// </remarks>
 public sealed class MiniPlayerChromeAutomationTests
 {
@@ -62,10 +63,24 @@ public sealed class MiniPlayerChromeAutomationTests
                 control.Focusable,
                 $"{control.Name} cannot take focus, so the keyboard cannot reach it."));
 
-            // The label and the name come from one key, so the visible text is what is announced.
-            Assert.All(controls, control => Assert.Equal(
-                AutomationProperties.GetName(control),
-                control.Content as string));
+            // Until 2026-08-21 the label and the name came from one key, and this asserted that the
+            // visible text was what got announced. §4's glyphs separate the two on purpose, so what
+            // is asserted now is the half that must not move: the name is still the word the key
+            // holds, and the content is a glyph rather than that word. A name that had followed the
+            // content would leave a screen reader announcing a private-use codepoint, which is the
+            // one way this change could have broken five controls without any layout looking wrong.
+            Assert.All(controls, control =>
+            {
+                Assert.True(
+                    Avalonia.Application.Current!.TryFindResource(control.Name!, out var word),
+                    $"{control.Name} names itself from a key that is not declared.");
+                Assert.Equal(word as string, AutomationProperties.GetName(control));
+
+                var content = Assert.IsType<string>(control.Content);
+                Assert.Equal(1, content.Length);
+                Assert.InRange(content[0], '\uE000', '\uF8FF');
+                Assert.NotEqual(word as string, content);
+            });
 
             namesByLanguage[cultureName] = controls.ToDictionary(
                 control => control.Name!,

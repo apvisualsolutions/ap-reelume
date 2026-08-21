@@ -1061,10 +1061,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
     converges on, and these five are the controls somebody presses in a hurry, in the dark, sometimes on
     a laptop trackpad. Raising it costs nothing here because the transport wraps.
   -->
+  <!--
+    Two families and not one. Segoe Fluent Icons ships with Windows 11, which is the only target this
+    application has; Segoe MDL2 Assets is its predecessor, carries the same codepoints in the same
+    places, and is on every Windows since 10. So a host that has only the older one draws the same
+    pictogram instead of the empty box a missing glyph paints — and the fallback is asserted by
+    measuring both, because a font list nobody measured is a font list that quietly ends at $Default.
+  -->
   <Style Selector="Button.player-chrome">
     <Setter Property="MinWidth" Value="44" />
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
   </Style>
 
   <Style Selector="Button.theme-option">

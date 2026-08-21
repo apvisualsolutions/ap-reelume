@@ -2,13 +2,17 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` y la rama al día, CI verde, árbol limpio.** La fase 6 va por **3 tramos de 9 cerrados y el 4
-casi**: Shell, Inicio, Biblioteca y fichas, y del Reproductor todo salvo **los glifos del transporte y
-las filas de 36 px de las cuatro listas**.
+**`main` en `d288941`, verde; la rama por delante con los glifos del transporte.** La fase 6 va por
+**3 tramos de 9 cerrados y el 4 a una pieza**: Shell, Inicio, Biblioteca y fichas, y del Reproductor
+todo salvo **las filas de 36 px de las cuatro listas**.
 
-**Lo siguiente, sin nada que deliberar:** cerrar el tramo 4 con esas dos piezas. **Las dos están
-decididas y escritas abajo**, incluidos el porqué de los glifos —hay un defecto medido que resuelven— y
-cómo hacerlos sin mover la identidad de ningún control.
+**Lo siguiente, sin nada que deliberar:** cerrar el tramo 4 con esa pieza, que está decidida y escrita
+abajo. Y **medida el 2026-08-21, antes de escribirla**: las dos listas de la columna **pintan el
+`ToString()` de un record de dominio** —`IntroMarker { Id = …GUID…, SeriesId = SeriesId { Value =
+…GUID… }, … }`— y el selector de tipo de marcador pinta `Intro`/`Recap`/`Credits` **sin traducir**,
+porque no existen claves para los tres valores de `MarkerKind`. Con `TextTrimming=None` y 292 px de
+ancho, ese texto se corta sin elipsis y sin tooltip. **Fijar la fila a 36 px sin arreglar la etiqueta
+formalizaría el defecto**, así que las dos cosas van en el mismo cambio.
 
 ### Lo que la sesión del 2026-08-21 dejó, y no está sólo en los commits
 
@@ -225,24 +229,41 @@ filas en `WrapPanel` desde el andamio.
   del 2026-08-17 seguía medio vivo**: con las dos alineaciones puestas y una frase larga dentro,
   `ResumePromptSurface` ocupó **1278 px de un escenario de 1280**. **Centrar impide que un panel se
   desplace, no que crezca.** Puestos los topes (420/420/520) y la esquina del botón de saltar.
-- **`TransportControlsView`**: ~~44 px de área pulsable~~ **HECHOS el 2026-08-21** —la clase
-  `player-chrome` sube de 36 a 44 y su prueba con ella—. **Quedan los glifos, y la decisión ya está
-  tomada: SÍ se hacen, y así.**
-  - **Por qué sí:** hay un defecto medido que resuelven. Con cinco botones de texto el cromo se
-    plegó en **tres filas dentro de 480×270** el 2026-08-19 y `BesidePoint` murió con «is surrounded
-    by other command controls». Las palabras no caben en el mini reproductor.
-  - **Cómo, sin romper nada:** se cambia **sólo el `Content`**. El `AutomationProperties.Name` sigue
-    apuntando a su clave de recurso —que es a lo que apunta el paseo y lo que lee un lector de
-    pantalla—, así que la identidad del control no se mueve. **Reescribir la clave sí lo rompería.**
-  - **La fuente existe**: `Segoe Fluent Icons` está instalada (medido el 2026-08-21, junto a
-    `Segoe MDL2 Assets`). Es de Windows 11, que es el único destino. **Si el runner no la tuviera**,
-    lo diría la puerta de desbordamiento al medir anchuras raras, no un fallo silencioso.
-  - **Lo que hay que revisar en el mismo cambio:** las escenas del paseo que pulsan el transporte no
-    dependen del `Content`, pero **sí hay pruebas que buscan por texto**; y el mini reproductor
-    comparte la clase, así que sus cinco botones cambian a la vez.
-- **Las cuatro listas: filas de 36 px, sin scroll horizontal y truncado con tooltip.** Medido: hoy
-  `MarkerEditorView` tiene `MinHeight=96` y `DetectedMarkerReviewView` `MinHeight=72` en sus
-  `ListBox`, y **ninguna fija la altura de fila**. Es lo último del tramo junto a los glifos.
+- ~~**`TransportControlsView`: 44 px y los glifos**~~ **HECHOS el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-transport-glyphs.md)). Once botones cambiaron **sólo el
+  `Content`** a los pictogramas de Windows; los ocho puntos de código se midieron **en las dos
+  familias declaradas** (`Segoe Fluent Icons` y `Segoe MDL2 Assets`) y en ninguna de texto, porque el
+  glifo cero es `.notdef` y preguntar por presencia sin excluirlo aprueba la fuente que no dibuja
+  nada. Los cinco del mini reproductor caben ahora **en una sola fila a 320 px**, que es el mínimo de
+  su ventana y más estrecho que los 480 donde se plegaron.
+  - **⚠ Y el hallazgo, que es una regla: un cambio se anota contra la vista que lo recibe, no contra
+    la fila que lo pidió.** Los 44 px del 2026-08-21 se anotaron contra la fila de la §4 que dice
+    `TransportControlsView`, pero subieron la clase `player-chrome`, **que esta vista nunca ha
+    llevado**: medido, sus tres botones seguían en `MinWidth 0` y `MinHeight 36`. La llevan ahora.
+  - **Y una aserción heredada se reescribe, no se borra.** `MiniPlayerChromeAutomationTests`
+    afirmaba `Content == AutomationProperties.Name`, cierto mientras los dos salían de la misma
+    clave. Ahora afirma **la mitad que no puede moverse**: el nombre es la palabra de la clave, el
+    contenido es un punto de código de uso privado, y los dos son distintos.
+- **Las cuatro listas: filas de 36 px, sin scroll horizontal y truncado con tooltip.** **Es lo último
+  del tramo 4**, y lo que la medición del 2026-08-21 encontró dentro es más de lo que la §4 pedía:
+  - `MarkerEditorView` tiene `MinHeight=96` y `DetectedMarkerReviewView` `MinHeight=72` en sus
+    `ListBox`, y **ninguna fija la altura de fila**: medida, la fila sale a **44 px** y sale de sumar
+    el relleno del `ListBoxItem` al alto del texto, así que `Height` a solas no la baja a 36 —es la
+    misma trampa del `ProgressBar`— y hay que tocar el relleno con ella.
+  - **⚠ Y EL DEFECTO, séptima forma del de la casa: las dos listas pintan el `ToString()` de un
+    record de dominio.** Literal, en la columna de 320 px: `IntroMarker { Id = …GUID…, SeriesId =
+    SeriesId { Value = …GUID… }, Kind = Intro, Start = 00:00:30, … }`. Ninguna de las dos declara
+    `ItemTemplate`, así que pinta el volcado que el compilador genera. Y **el selector de tipo de
+    marcador pinta `Intro`/`Recap`/`Credits` sin traducir**, porque `MarkerKind` no tiene claves.
+  - **Lo que ya está bien:** el scroll horizontal ya es `Disabled` en las dos, medido.
+  - **La forma decidida:** un `ItemTemplate` con un `TextBlock` de `TextTrimming="CharacterEllipsis"`
+    y `ToolTip.Tip` con el texto entero, y la etiqueta por **converter de presentación** —hay
+    precedente: `ResourceKeyConverter`, `RouteStateConverter`, `SubtitleColourConverter`— para no
+    cambiar el tipo de las colecciones y arrastrar a `SelectedMarker`, a `Selected` y al paseo. Las
+    tres claves de `MarkerKind` **van en los dos idiomas**.
+  - `TrackSelectorView` no es una lista sino dos `ComboBox`, y `PlayerVersionsView` es un
+    `ItemsControl` cuya etiqueta hoy **envuelve**: 36 px fijos con `Wrap` cortan el texto, así que
+    ahí el truncado sustituye al envoltorio.
 - **`LooseFileBanner`**: la §4 pide banda superior de 48 px no superpuesta al vídeo; hoy tiene
   `MaxHeight=320` y sus dos filas de acciones ya son `WrapPanel`. **Ojo: el paquete lo marcaba
   «bloqueado» y ya no lo está** — el defecto que impedía verlo se corrigió el 2026-08-17.

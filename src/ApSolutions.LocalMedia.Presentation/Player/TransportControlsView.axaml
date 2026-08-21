@@ -11,27 +11,40 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="player:TransportControlsViewModel"
     automation:AutomationProperties.Name="{DynamicResource TransportAccessibleName}">
   <StackPanel x:Name="TransportSurface" Spacing="{DynamicResource Space12}">
+    <!--
+      The three wear player-chrome, which is what §4 asks of this view by name and what the view did
+      not have: measured on 2026-08-21 they sat at MinWidth 0 and MinHeight 36, because the rise from
+      36 to 44 landed on a class these three never took. A glyph needs a square target more than a
+      word does, so the class and the glyph arrive together.
+
+      Only Content changed. AutomationProperties.Name still points at the resource key, which is what
+      the walk aims at and what a screen reader reads out, so none of the three was renamed - and the
+      seconds each skip covers stay in HelpText, where they were, because the glyph cannot say "ten".
+    -->
     <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <Button
           x:Name="SkipBackwardButton"
+          Classes="player-chrome"
           automation:AutomationProperties.Name="{DynamicResource TransportSkipBackward}"
           automation:AutomationProperties.AcceleratorKey="Left"
           automation:AutomationProperties.HelpText="{Binding BackwardSkipLabel}"
           Command="{Binding SkipBackwardCommand}"
-          Content="{DynamicResource TransportSkipBackward}" />
+          Content="&#xE72B;" />
       <Button
           x:Name="SkipForwardButton"
+          Classes="player-chrome"
           automation:AutomationProperties.Name="{DynamicResource TransportSkipForward}"
           automation:AutomationProperties.AcceleratorKey="Right"
           automation:AutomationProperties.HelpText="{Binding ForwardSkipLabel}"
           Command="{Binding SkipForwardCommand}"
-          Content="{DynamicResource TransportSkipForward}" />
+          Content="&#xE72A;" />
       <Button
           x:Name="MuteButton"
+          Classes="player-chrome"
           automation:AutomationProperties.Name="{DynamicResource TransportToggleMute}"
           automation:AutomationProperties.AcceleratorKey="M"
           Command="{Binding ToggleMuteCommand}"
-          Content="{DynamicResource TransportToggleMute}" />
+          Content="&#xE74F;" />
       <TextBlock
           x:Name="SpeedReadout"
           VerticalAlignment="Center"

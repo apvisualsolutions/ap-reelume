@@ -2030,7 +2030,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         // The five are measured against the window before a single click, because a control that
         // falls outside it is the shape that has cost this repository six measurements - and here the
-        // window is 480 wide and holds five buttons carrying translated words.
+        // window is 480 wide and holds five buttons. They carried translated words until 2026-08-21,
+        // which is what folded this chrome into three rows; they carry glyphs now, and the accessible
+        // names the presses below aim at did not move with them.
         foreach (var anchor in new[]
         {
             "MiniPlayerPlayPause",

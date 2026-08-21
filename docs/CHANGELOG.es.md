@@ -152,6 +152,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los botones del reproductor llevan símbolos en vez de palabras.** Reproducir, pausar, detener,
+  los dos saltos, silenciar y los cinco del mini reproductor pasan a los pictogramas de Windows. No es
+  una preferencia: con palabras traducidas, el mini reproductor plegaba sus cinco botones en tres filas
+  dentro de una ventana de 480×270, y su ancho mínimo es aún menor. **Lo que cada botón le dice a un
+  lector de pantalla no ha cambiado**, y sigue traducido en los dos idiomas; lo que cambia es lo que se
+  ve. Los segundos que cubre cada salto se siguen anunciando igual.
+
+
 - **Los botones del reproductor son más fáciles de acertar.** Reproducir, pausar, detener y los dos
   saltos pasan de 36 a 44 píxeles de zona pulsable: es lo que piden las guías de accesibilidad para un
   objetivo cómodo, y son los controles que se pulsan deprisa, a oscuras y a veces en el panel táctil de

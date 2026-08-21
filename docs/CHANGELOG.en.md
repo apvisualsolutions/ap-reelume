@@ -151,6 +151,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The player buttons carry symbols instead of words.** Play, pause, stop, both skips, mute, and the
+  mini player's five now use the Windows pictograms. This is not a preference: with translated words
+  the mini player folded its five buttons into three rows inside a 480x270 window, and its minimum
+  width is narrower still. **What each button tells a screen reader has not changed**, and it is still
+  translated into both languages; what changed is what you see. The seconds each skip covers are still
+  announced the same way.
+
+
 - **The player buttons are easier to hit.** Play, pause, stop, and the two skips go from 36 to 44
   pixels of target area: that is what the accessibility guidelines ask for a comfortable target, and
   these are the controls people press in a hurry, in the dark, and sometimes on a laptop trackpad.
