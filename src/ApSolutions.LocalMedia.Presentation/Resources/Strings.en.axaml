@@ -489,4 +489,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="UpdateRefusedUndeclaredSize">The version does not say how large it is, so an interrupted download could not be told from a complete one.</x:String>
   <x:String x:Key="UpdateRefusedIncompleteSummary">The version does not explain what changed in both languages.</x:String>
   <x:String x:Key="UpdateRefusedUndeclaredHost">The download would leave for a domain the privacy statement does not cover.</x:String>
+  <x:String x:Key="MarkersEmptyTitle">No markers yet</x:String>
+  <x:String x:Key="MarkersEmptyDescription">Set a start and an end and save. Nothing is written to your video file.</x:String>
+  <x:String x:Key="DetectedMarkersEmptyTitle">Nothing detected in this title</x:String>
+  <x:String x:Key="DetectedMarkersEmptyDescription">Either detection is off, or this file has no repeated opening to recognise.</x:String>
+  <x:String x:Key="TracksEmptyTitle">No tracks to choose from</x:String>
+  <x:String x:Key="TracksEmptyDescription">This file carries a single track of each kind.</x:String>
+  <x:String x:Key="PlayerVersionsEmptyTitle">Only one version</x:String>
+  <x:String x:Key="PlayerVersionsEmptyDescription">There is nothing to choose between for this title.</x:String>
 </ResourceDictionary>

@@ -16,9 +16,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource MarkerEditorDescription}"
         TextWrapping="Wrap" />
+    <StackPanel
+        VerticalAlignment="Top"
+        IsVisible="{Binding IsEmpty}"
+        Spacing="{DynamicResource Space4}">
+      <TextBlock FontWeight="SemiBold" Text="{DynamicResource MarkersEmptyTitle}" />
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource MarkersEmptyDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
 
     <ListBox
         x:Name="MarkerList"
+        IsVisible="{Binding !IsEmpty}"
         MinHeight="96"
         ItemsSource="{Binding Markers}"
         SelectedItem="{Binding SelectedMarker, Mode=TwoWay}"

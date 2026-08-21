@@ -10,13 +10,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:PlayerVersionsViewModel"
     automation:AutomationProperties.Name="{DynamicResource PlayerVersionsAccessibleName}">
-  <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasAlternatives}">
+  <!--
+    This one says "only one version" rather than disappearing, which is the opposite of the grammar
+    the rest of the tree uses for an absent thing. The reason is where it lives: this list sits in the
+    player's side column beside three others, and one that vanishes moves the rest — so somebody
+    asking "is there another version of this?" reads the answer instead of finding nothing where the
+    list used to be.
+  -->
+  <StackPanel Spacing="{DynamicResource Space8}">
     <TextBlock
         FontSize="{DynamicResource FontSizeBody}"
         FontWeight="SemiBold"
         Text="{DynamicResource PlayerVersionsTitle}"
         automation:AutomationProperties.HeadingLevel="2" />
-    <ItemsControl ItemsSource="{Binding Alternatives}">
+    <StackPanel
+        VerticalAlignment="Top"
+        IsVisible="{Binding !HasAlternatives}"
+        Spacing="{DynamicResource Space4}">
+      <TextBlock FontWeight="SemiBold" Text="{DynamicResource PlayerVersionsEmptyTitle}" />
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource PlayerVersionsEmptyDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+    <ItemsControl IsVisible="{Binding HasAlternatives}" ItemsSource="{Binding Alternatives}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="player:PlayerVersionRowViewModel">
           <!--

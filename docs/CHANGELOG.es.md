@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las cuatro listas del lateral del reproductor dicen algo cuando están vacías.** Marcadores,
+  detecciones, pistas y versiones se quedaban en blanco, sin forma de distinguir «no hay nada» de
+  «todavía está cargando». Ahora cada una explica su propio vacío: los marcadores dicen que nada se
+  escribe en tu archivo de vídeo, el selector de pistas que este archivo trae una sola de cada tipo, y
+  la lista de versiones dice «una sola versión» **en vez de desaparecer**, para que la columna no se
+  mueva y la respuesta esté donde la buscas.
+
+
 - **La búsqueda de la biblioteca gana un botón para borrarla.** Volver a ver la biblioteca entera era
   seleccionar lo escrito, borrarlo y pulsar Aplicar. Ahora es una pulsación. Con la caja vacía el botón
   sigue ahí, apagado, para que la fila de controles no se mueva cada vez que escribes una letra.

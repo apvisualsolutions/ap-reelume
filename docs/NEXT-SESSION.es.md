@@ -203,10 +203,9 @@ filas en `WrapPanel` desde el andamio.
   la rompe hasta que se declara ahí. Además, si la superficie nueva **no** entra en la lista de
   contraste de texto, la razón se escribe **con su aserción**: dejarla fuera en silencio es
   indistinguible de haberlo olvidado.
-- **Las cuatro listas de la columna** —`MarkerEditorView`, `DetectedMarkerReviewView`,
-  `TrackSelectorView`, `PlayerVersionsView`— **no tienen ni una cadena de vacío entre las cuatro**
-  (medido: cero coincidencias de `Empty` en los cuatro archivos), y ninguna tiene filas de 36 px.
-  **Son 8 de las 22 cadenas de vacío del paquete**, ya escritas en los dos idiomas.
+- ~~**Las cuatro listas de la columna y sus ocho cadenas de vacío**~~ **HECHAS el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-side-list-empties.md)); van **10 de las 22** del paquete.
+  Les siguen faltando **las filas de 36 px** y el truncado con tooltip.
 - **⚠ Y «vacío» NO significa lo mismo en las cuatro, medido el 2026-08-21. Decidido, para no
   deliberarlo al escribirlo:**
   - `Markers` y `Detections`: vacío es `Count == 0`, y no hay más que hablar.

@@ -52,6 +52,16 @@ public sealed class TrackSelectorViewModel : INotifyPropertyChanged
 
     public ObservableCollection<TrackOption> SubtitleTracks { get; } = [];
 
+    /// <summary>
+    /// There is nothing to choose between, which here is <b>not</b> an empty list.
+    /// </summary>
+    /// <remarks>
+    /// The subtitle list always carries the "off" option this view model adds itself, so it never
+    /// reaches zero: counting items would define a state that cannot happen. One audio track and at
+    /// most one subtitle track beside "off" is what leaves a person with no decision to make.
+    /// </remarks>
+    public bool HasNothingToChoose => AudioTracks.Count <= 1 && SubtitleTracks.Count <= 2;
+
     /// <summary>Localised label of the "no subtitles" entry, supplied by the composition root.</summary>
     public string DisabledSubtitleDisplay { get; }
 
@@ -125,6 +135,7 @@ public sealed class TrackSelectorViewModel : INotifyPropertyChanged
             SubtitleTracks.Add(new TrackOption(track, Describe(track)));
         }
 
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasNothingToChoose)));
         SelectedAudio = AudioTracks.FirstOrDefault(option => option.Track?.Id == activeAudio?.Id);
         SelectedSubtitle = SubtitleTracks.FirstOrDefault(option => option.Track?.Id == activeSubtitle?.Id)
             ?? SubtitleTracks[0];

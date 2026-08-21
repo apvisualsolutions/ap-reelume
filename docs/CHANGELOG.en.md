@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The four lists in the player's side column say something when they are empty.** Markers,
+  detections, tracks, and versions used to go blank, with no way to tell "there is nothing" from
+  "still loading". Each now explains its own empty: markers say nothing is written to your video file,
+  the track selector says this file carries a single track of each kind, and the versions list says
+  "only one version" **instead of disappearing**, so the column does not shift and the answer is where
+  you looked for it.
+
+
 - **The library search gains a button to clear it.** Getting the whole library back meant selecting
   what you had typed, deleting it, and pressing Apply. It is now one press. With the box empty the
   button stays where it is, greyed out, so the row of controls does not move on every keystroke.
