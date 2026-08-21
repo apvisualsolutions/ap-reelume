@@ -10,20 +10,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="settings:ScanSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource ScanSettingsAccessibleName}">
-  <StackPanel Spacing="{DynamicResource Space12}">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
-        FontWeight="SemiBold"
-        Text="{DynamicResource ScanSettingsTitle}"
-        automation:AutomationProperties.HeadingLevel="1" />
-    <CheckBox
-        automation:AutomationProperties.Name="{DynamicResource ScanSettingsWatchLocal}"
-        Content="{DynamicResource ScanSettingsWatchLocal}"
-        IsChecked="{Binding WatchLocalRoots}" />
-    <NumericUpDown
-        automation:AutomationProperties.Name="{DynamicResource ScanSettingsFallbackMinutes}"
-        Minimum="1"
-        Maximum="1440"
-        Value="{Binding FallbackIntervalMinutes}" />
-  </StackPanel>
+  <!--
+    The surface and the 620 column are §4's skeleton for a settings page, and this one had neither -
+    nor a title at the size the appearance page uses, nor a sentence saying what any of it does.
+  -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel MaxWidth="620" Spacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeTitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource ScanSettingsTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource ScanSettingsDescription}"
+          TextWrapping="Wrap" />
+      <CheckBox
+          automation:AutomationProperties.Name="{DynamicResource ScanSettingsWatchLocal}"
+          Content="{DynamicResource ScanSettingsWatchLocal}"
+          IsChecked="{Binding WatchLocalRoots}" />
+      <!--
+        The label is painted and not only announced. A checkbox carries its own words in its content;
+        a spinner does not, so this one had "Recovery interval in minutes" as its accessible name and
+        nothing on screen - a screen reader heard it and anybody looking saw a bare number box. The
+        string was already there. Both point at the same key, which is what keeps them one label.
+      -->
+      <StackPanel Spacing="{DynamicResource Space4}">
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource ScanSettingsFallbackMinutes}" />
+        <NumericUpDown
+            automation:AutomationProperties.Name="{DynamicResource ScanSettingsFallbackMinutes}"
+            Minimum="1"
+            Maximum="1440"
+            Value="{Binding FallbackIntervalMinutes}" />
+      </StackPanel>
+    </StackPanel>
+  </Border>
 </UserControl>
