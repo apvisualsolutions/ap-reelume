@@ -91,16 +91,26 @@ public sealed class MarkerRowLabelConverter : IValueConverter
     /// The words behind a key, asked of the application the way a theme-dependent resource has to be.
     /// </summary>
     /// <remarks>
-    /// A key with nothing behind it comes back as the key rather than as an empty row: the row would
-    /// otherwise lose the only thing that says which range it is, and a visible key is a defect
-    /// somebody reports instead of a blank somebody explains away.
+    /// <para>
+    /// A key with nothing behind it — or with something behind it that is not words — comes back as
+    /// the key rather than as an empty row. The row would otherwise lose the only thing that says
+    /// which range it is, and <b>a visible key is a defect somebody reports</b> instead of a blank
+    /// somebody explains away. Both of those are reachable: a <c>MarkerKind</c> can gain a fourth
+    /// value before its words do.
+    /// </para>
+    /// <para>
+    /// <c>Application.Current</c> is not guarded, and that is deliberate. This converter is built by
+    /// AXAML and runs while the application is up, so a null there is not a state to recover from —
+    /// it is a bug, and a guard would turn it into a row quietly painting resource keys. A branch
+    /// nothing can take is the defect of the house with the face of caution.
+    /// </para>
     /// </remarks>
     private static string Resource(string key)
     {
-        var application = Avalonia.Application.Current;
-        return application is not null
-            && application.TryGetResource(key, application.ActualThemeVariant, out var value)
-                ? value?.ToString() ?? key
+        var application = Avalonia.Application.Current!;
+        return application.TryGetResource(key, application.ActualThemeVariant, out var value)
+            && value is string word
+                ? word
                 : key;
     }
 }

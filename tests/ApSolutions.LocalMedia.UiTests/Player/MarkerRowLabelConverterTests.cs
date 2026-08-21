@@ -106,6 +106,42 @@ public sealed class MarkerRowLabelConverterTests
         Assert.Equal(string.Empty, Convert(value));
     }
 
+    /// <summary>
+    /// A kind whose words nobody wrote shows its key, and so does one whose key holds something else.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Both are reachable rather than defensive: <c>MarkerKind</c> can gain a fourth value in a commit
+    /// that forgets the two dictionaries, and a key can be redefined as something that is not words.
+    /// In either case the row says <c>MarkerKind99</c> — ugly, reported within a day, and far better
+    /// than a row that has quietly lost the only thing saying which range it is.
+    /// </para>
+    /// <para>
+    /// The second half is arranged rather than waited for: the key is put into the application's own
+    /// dictionary holding a number, and taken out again, so the assertion is about the branch and not
+    /// about the state some other test happened to leave behind.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_kind_with_no_words_behind_it_shows_its_key()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+        var resources = Avalonia.Application.Current!.Resources;
+
+        Assert.Equal("MarkerKind98", Convert((MarkerKind)98));
+
+        resources.Add("MarkerKind99", 123);
+        try
+        {
+            Assert.Equal("MarkerKind99", Convert((MarkerKind)99));
+        }
+        finally
+        {
+            resources.Remove("MarkerKind99");
+        }
+    }
+
     /// <summary>A label is read out of a range and never written back into one.</summary>
     [Fact]
     public void The_conversion_does_not_go_the_other_way()
