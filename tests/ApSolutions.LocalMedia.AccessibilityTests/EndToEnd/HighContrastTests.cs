@@ -83,18 +83,46 @@ public sealed partial class HighContrastTests
         audit.Complete();
     }
 
+    /// <summary>
+    /// Where a bound colour is the <b>subject</b> rather than a state, named one at a time.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The rule this list excepts is a good one and is not relaxed: a colour standing in for a state
+    /// leaves anybody who cannot see that colour with nothing. What a swatch does is different in kind
+    /// — the colour is not standing for something else, it <b>is</b> the thing being chosen, and the
+    /// value itself is on screen beside it in a text box somebody can read and edit.
+    /// </para>
+    /// <para>
+    /// An entry is a view and the exact binding it is allowed, so a second bound colour in the same
+    /// view still fails. The list may only shrink, and the count is asserted so that a typo which
+    /// stopped matching would not quietly except everything.
+    /// </para>
+    /// </remarks>
+    private static readonly (string View, string Property, string Source)[] ColourIsTheSubject =
+    [
+        ("SubtitleStyleView", "Foreground", "ForegroundHex"),
+        ("SubtitleStyleView", "Background", "BackgroundHex"),
+    ];
+
     [AvaloniaFact]
     public void No_state_is_told_by_colour_alone()
     {
         var audit = new AuditLog(nameof(No_state_is_told_by_colour_alone));
+        Assert.Equal(2, ColourIsTheSubject.Length);
 
         foreach (var view in ViewFiles())
         {
+            var name = Path.GetFileNameWithoutExtension(view);
             var document = XDocument.Load(view);
             var colourBoundToState = document.Descendants()
                 .Attributes()
                 .Where(attribute => BrushAttributes.Contains(attribute.Name.LocalName, StringComparer.Ordinal))
                 .Where(attribute => attribute.Value.Contains("{Binding", StringComparison.Ordinal))
+                .Where(attribute => !ColourIsTheSubject.Any(allowed =>
+                    allowed.View == name
+                    && allowed.Property == attribute.Name.LocalName
+                    && attribute.Value.Contains(allowed.Source, StringComparison.Ordinal)))
                 .ToArray();
 
             foreach (var binding in colourBoundToState)
