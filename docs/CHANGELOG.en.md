@@ -151,6 +151,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **One scan setting had no visible label.** The recovery-interval box announced "Recovery interval in
+  minutes" to a screen reader and showed nothing at all on screen: just a number box. The label is now
+  written where it can be read.
+
+
+- **The scan page did not say what it did.** It had a title and two controls and nothing between them.
+
+
 - **The reduced-motion notice said the same thing whether the setting was on or off.** "AP Reelume
   respects the Windows reduced-motion preference" is a sentence about the program's intentions, not
   about the state of your machine — and the program already knew the answer. It now says which of the
@@ -174,6 +182,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   now says so: "Credits · 46:40–50:00 · confirmed".
 
 ### Changed
+
+- **The settings pages look like each other.** Scanning, recommendations, and segment detection had a
+  smaller title than the appearance page, no margin around them, and no reading width. All four now
+  share the same skeleton.
+
 
 - **The "this file is not in your library" notice is no longer drawn over the film.** It moves to a
   band of its own above the picture, with its action on the right. It used to sit on top of the video

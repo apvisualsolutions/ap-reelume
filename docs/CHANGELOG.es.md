@@ -152,6 +152,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Un ajuste de escaneo no tenía etiqueta a la vista.** La casilla del intervalo de recuperación
+  anunciaba «Intervalo de recuperación en minutos» a un lector de pantalla y en la pantalla no se veía
+  nada: sólo una caja de números. Ahora la etiqueta está escrita donde se lee.
+
+
+- **La página de escaneo no decía qué hacía.** Tenía un título y dos controles y nada entre ellos.
+
+
 - **El aviso de movimiento reducido decía lo mismo estuviera activo o no.** «AP Reelume respeta la
   preferencia de reducción de movimiento de Windows» es una frase sobre las intenciones del programa,
   no sobre el estado de tu equipo — y el programa ya sabía la respuesta. Ahora dice cuál de los dos
@@ -175,6 +183,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Ahora la fila lo dice: «Créditos · 46:40–50:00 · confirmada».
 
 ### Cambiado
+
+- **Las páginas de ajustes se parecen entre ellas.** Escaneo, recomendaciones y detección de segmentos
+  tenían el título más pequeño que la de apariencia, sin margen alrededor y sin ancho de lectura. Las
+  cuatro comparten ahora el mismo esqueleto.
+
 
 - **El aviso de «este archivo no está en tu biblioteca» ya no se dibuja encima de la película.** Pasa a
   una banda propia encima de la imagen, con su acción a la derecha. Antes se superponía al vídeo y,

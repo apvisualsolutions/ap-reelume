@@ -93,6 +93,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="NavigationCurrentStatus">Current destination</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Scan settings</x:String>
   <x:String x:Key="ScanSettingsTitle">Scanning and watching</x:String>
+  <!-- The page had a title and two controls and nothing between them: a page of switches with no
+       sentence saying what turning them on does is a page somebody guesses at. -->
+  <x:String x:Key="ScanSettingsDescription">AP Reelume watches your folders and adds whatever turns up in them. If watching fails or the system interrupts it, it goes back over them every so often.</x:String>
   <x:String x:Key="ScanSettingsWatchLocal">Watch changes in local roots</x:String>
   <x:String x:Key="ScanSettingsFallbackMinutes">Recovery interval in minutes</x:String>
   <x:String x:Key="ReviewInboxAccessibleName">Match review inbox</x:String>

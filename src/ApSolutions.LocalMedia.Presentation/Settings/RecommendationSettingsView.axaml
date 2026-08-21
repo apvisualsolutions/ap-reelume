@@ -10,14 +10,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="settings:RecommendationSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsAccessibleName}">
-  <StackPanel Spacing="{DynamicResource Space8}">
+  <!-- §4's skeleton for a settings page. The MaxWidth of 640 that three of these text blocks carried
+       went with it: a cap wider than the column it sits in is a number nobody can ever spend. -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel MaxWidth="620" Spacing="{DynamicResource Space8}">
     <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
+        FontSize="{DynamicResource FontSizeTitle}"
         FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource RecommendationSettingsTitle}"
         automation:AutomationProperties.HeadingLevel="1" />
     <TextBlock
-        MaxWidth="640"
         Text="{DynamicResource RecommendationSettingsDescription}"
         TextWrapping="Wrap" />
     <CheckBox
@@ -31,7 +34,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding IsDisabled}"
         Text="{DynamicResource RecommendationsOff}" />
     <TextBlock
-        MaxWidth="640"
         Text="{DynamicResource RecommendationSettingsPrivacyNotice}"
         TextWrapping="Wrap" />
     <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasWatchedThreshold}">
@@ -41,8 +43,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource RecommendationSettingsThresholdLabel}"
           automation:AutomationProperties.HeadingLevel="2" />
       <TextBlock
-          MaxWidth="640"
-          Text="{DynamicResource RecommendationSettingsThresholdDescription}"
+            Text="{DynamicResource RecommendationSettingsThresholdDescription}"
           TextWrapping="Wrap" />
       <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
         <Slider
@@ -66,5 +67,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <TextBlock Text="{Binding RecalculatedCount}" />
       </StackPanel>
     </StackPanel>
-  </StackPanel>
+    </StackPanel>
+  </Border>
 </UserControl>

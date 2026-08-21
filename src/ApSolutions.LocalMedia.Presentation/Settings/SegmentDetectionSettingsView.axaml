@@ -10,20 +10,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="settings:SegmentDetectionSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsAccessibleName}">
-  <StackPanel x:Name="SegmentDetectionSurface" Spacing="{DynamicResource Space12}">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
-        FontWeight="SemiBold"
-        Text="{DynamicResource SegmentDetectionSettingsTitle}"
-        automation:AutomationProperties.HeadingLevel="1" />
-    <TextBlock
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        Text="{DynamicResource SegmentDetectionSettingsDescription}"
-        TextWrapping="Wrap" />
-    <CheckBox
-        x:Name="SegmentDetectionSwitch"
-        automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsEnable}"
-        Content="{DynamicResource SegmentDetectionSettingsEnable}"
-        IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
-  </StackPanel>
+  <!-- §4's skeleton for a settings page: the padded surface, the 620 column, and a title at the size
+       the appearance page already used. The name stays on the panel it was on. -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel x:Name="SegmentDetectionSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeTitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource SegmentDetectionSettingsTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource SegmentDetectionSettingsDescription}"
+          TextWrapping="Wrap" />
+      <CheckBox
+          x:Name="SegmentDetectionSwitch"
+          automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsEnable}"
+          Content="{DynamicResource SegmentDetectionSettingsEnable}"
+          IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+    </StackPanel>
+  </Border>
 </UserControl>

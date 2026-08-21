@@ -3,15 +3,18 @@
 ## Estado al abrir (2026-08-21)
 
 **`main` y la rama en `dc4ce60`, CI verde, árbol limpio.** La fase 6 va por **4 tramos de 9 cerrados**
-—Shell, Inicio, Biblioteca y fichas, y el Reproductor entero— **y el 5 empezado**:
-`AppearanceSettingsView` está hecha ([su evidencia](evidence/stable/audit-appearance-page.md)).
+—Shell, Inicio, Biblioteca y fichas, y el Reproductor entero— **y el 5 por la mitad**:
+`AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)) y las **tres del
+«mismo esqueleto»** ([su evidencia](evidence/stable/audit-settings-skeleton.md)) están hechas.
+**Quedan tres: `PrivacySettingsView`, `LifecycleSettingsView` y `DiagnosticsPreviewView`.**
 
-**Lo siguiente, sin nada que deliberar: seguir el tramo 5 por las seis vistas que quedan**, todas
-medidas y con su discrepancia anotada abajo. Por orden de calado: las **tres del «mismo esqueleto»**
-—que no lo comparten: cuatro páginas de ajustes titulan con `FontSizeSubtitle` y una con
-`FontSizeTitle`, y tres no tienen ni `Padding` ni los 620 px—; `PrivacySettingsView` distinguiendo
-**ausente de deshabilitado**; `LifecycleSettingsView` con su aviso de «sin bandeja» como advertencia; y
-`DiagnosticsPreviewView`, que envuelve el texto que alguien lee **para decidir si lo comparte**.
+**Lo siguiente, sin nada que deliberar: las tres vistas que le quedan al tramo 5**, todas medidas y con
+su discrepancia anotada abajo. Por orden de calado: `PrivacySettingsView` distinguiendo **ausente de
+deshabilitado** —y **antes de añadir el borde punteado, comprueba si ya llega**: `DesignTokens.axaml`
+tiene un `:disabled` que cubre diez tipos—; `LifecycleSettingsView` con su aviso de «sin bandeja» como
+advertencia **y su título, que se quedó en `FontSizeSubtitle` mientras las otras cuatro subían a
+`FontSizeTitle`**; y `DiagnosticsPreviewView`, que envuelve el texto que alguien lee **para decidir si
+lo comparte**.
 
 **Antes de escribir nada, mide la vista contra su fila de la §4.** La regla se ha pagado sola **las
 cinco veces**, y en el tramo 4 encontró de golpe el peor defecto medido hasta hoy: **las dos listas del
@@ -130,7 +133,9 @@ estática** («AP Reelume respeta la preferencia…») que no dice si está acti
 existe, está registrado y lo consume `FluentThemeService`: **la aplicación conoce el estado y no lo
 pinta**. La §4 pide ese aviso «activo o no».
 
-**El «mismo esqueleto» de las tres vistas no es el mismo esqueleto:**
+**⚠ HECHO el 2026-08-21 ([su evidencia](evidence/stable/audit-settings-skeleton.md)): el «mismo
+esqueleto» de las tres vistas no era el mismo esqueleto, y `ScanSettingsView` tenía además un
+`NumericUpDown` cuya etiqueta sólo oía un lector de pantalla.**
 
 | Qué | `AppearanceSettingsView` | `ScanSettingsView` | `RecommendationSettingsView` | `SegmentDetectionSettingsView` |
 |---|---|---|---|---|
