@@ -321,7 +321,7 @@ public sealed class PlayerViewDesignTests
             Assert.True(button is not null, $"{key} is not on the transport.");
             Assert.Contains("player-chrome", button!.Classes);
             Assert.True(
-                button.MinWidth >= 36 && button.MinHeight >= 36,
+                button.MinWidth >= 44 && button.MinHeight >= 44,
                 $"{key} is smaller than the target area: {button.MinWidth}x{button.MinHeight}.");
 
             var presenter = button.GetVisualDescendants().OfType<ContentPresenter>().FirstOrDefault();
