@@ -36,25 +36,70 @@ SPDX-License-Identifier: GPL-3.0-or-later
           SelectedItem="{Binding SelectedLayout, Mode=TwoWay}" />
     </StackPanel>
 
-    <TextBlock
+    <!--
+      The three of them are warnings and not information, which is the distinction §4 draws here: what
+      is coming out of the speakers is not what was asked for. No device at all, a layout the hardware
+      would not take, a device that went away mid-session — none is a failure, because sound is still
+      playing or about to; and none is a fact either, because each one means somebody's choice was not
+      honoured. They read the same way as the unavailable badge, on purpose.
+    -->
+    <Border
         x:Name="NoOutputNotice"
-        IsVisible="{Binding HasNoOutput}"
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        Text="{DynamicResource AudioOutputNoneAvailable}"
-        TextWrapping="Wrap" />
+        Padding="8,4"
+        Background="{DynamicResource WarningSurfaceBrush}"
+        BorderBrush="{DynamicResource WarningBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusSmall}"
+        IsVisible="{Binding HasNoOutput}">
+      <!--
+        A Grid and not a horizontal StackPanel: a StackPanel offers its children infinite width,
+        so a wrapping TextBlock beside a glyph never wraps and runs off the side. The overflow
+        gate measured exactly that here — a TextBlock ending at x=921 in a 900 px window.
+      -->
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
+        <TextBlock VerticalAlignment="Top" Text="⚠" />
+        <TextBlock
+            Grid.Column="1"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource AudioOutputNoneAvailable}"
+            TextWrapping="Wrap" />
+      </Grid>
+    </Border>
 
-    <TextBlock
+    <Border
         x:Name="DegradedLayoutNotice"
-        IsVisible="{Binding LayoutWasDegraded}"
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        Text="{DynamicResource AudioOutputLayoutDegraded}"
-        TextWrapping="Wrap" />
+        Padding="8,4"
+        Background="{DynamicResource WarningSurfaceBrush}"
+        BorderBrush="{DynamicResource WarningBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusSmall}"
+        IsVisible="{Binding LayoutWasDegraded}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
+        <TextBlock VerticalAlignment="Top" Text="⚠" />
+        <TextBlock
+            Grid.Column="1"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource AudioOutputLayoutDegraded}"
+            TextWrapping="Wrap" />
+      </Grid>
+    </Border>
 
-    <TextBlock
+    <Border
         x:Name="DeviceFallbackNotice"
-        IsVisible="{Binding FellBackToDefaultDevice}"
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        Text="{DynamicResource AudioOutputDeviceFallback}"
-        TextWrapping="Wrap" />
+        Padding="8,4"
+        Background="{DynamicResource WarningSurfaceBrush}"
+        BorderBrush="{DynamicResource WarningBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusSmall}"
+        IsVisible="{Binding FellBackToDefaultDevice}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
+        <TextBlock VerticalAlignment="Top" Text="⚠" />
+        <TextBlock
+            Grid.Column="1"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource AudioOutputDeviceFallback}"
+            TextWrapping="Wrap" />
+      </Grid>
+    </Border>
   </StackPanel>
 </UserControl>
