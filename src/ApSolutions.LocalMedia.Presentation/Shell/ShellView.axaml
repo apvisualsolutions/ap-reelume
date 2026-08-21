@@ -337,7 +337,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
         ColumnDefinitions="*,320"
         IsVisible="{Binding IsPlayerVisible}"
         automation:AutomationProperties.Name="{DynamicResource PlayerSessionAccessibleName}">
-      <ContentControl x:Name="PlayerHost">
+      <!--
+      Two rows and not one panel, and the banner is in the first of them. §4 asks that it not be drawn
+      over the video, and there is a second reason the document could not see: PlayerStage is the
+      control the shell hands to the mini player window and takes back, so anything inside it travels
+      - and this banner asks for 336 px of height at the mini player's 480, in a window 270 tall.
+
+      It sits beside PlayerHost rather than inside it, which is the trap: coming back from mini mode
+      ShellView.axaml.cs runs host.Content = stage, so anything declared next to the stage inside that
+      host is replaced by the stage on the first return and never comes back.
+      -->
+      <Grid Grid.Column="0" RowDefinitions="Auto,*">
+      <ContentControl Grid.Row="0" IsVisible="{Binding HasLooseFile}">
+        <player:LooseFileBanner DataContext="{Binding Player.LooseFile}" />
+      </ContentControl>
+      <ContentControl Grid.Row="1" x:Name="PlayerHost">
         <Panel x:Name="PlayerStage">
         <player:PlayerView DataContext="{Binding Player.Player}" />
         <ContentControl IsVisible="{Binding HasVideoStatus}">
@@ -355,11 +369,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <ContentControl IsVisible="{Binding HasVersionSwitch}">
           <player:VersionSwitchDialog DataContext="{Binding Player.VersionSwitch}" />
         </ContentControl>
-        <ContentControl IsVisible="{Binding HasLooseFile}">
-          <player:LooseFileBanner DataContext="{Binding Player.LooseFile}" />
-        </ContentControl>
         </Panel>
       </ContentControl>
+      </Grid>
       <ScrollViewer Grid.Column="1" Margin="16">
         <StackPanel Spacing="{DynamicResource Space16}">
           <!--
