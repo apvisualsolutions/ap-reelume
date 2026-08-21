@@ -178,6 +178,47 @@ la rama que faltaba se encontró **leyendo el informe línea a línea**: era «e
 episodio y el proveedor no los contesta». **Presupuesta esa mejora como parte del coste de cada vista
 nueva.**
 
+#### El tramo 4 (Reproductor, 16 vistas), medido el 2026-08-20 sin escribir código
+
+Es **el más grande de los nueve**. Medido contra el árbol, vista por vista:
+
+**Lo que ya está y no hay que rehacer:** `ResumePromptView`, `NextEpisodeOverlay` y `VersionSwitchDialog`
+**ya llevan alineación explícita** (`Center`/`Bottom`), que es la mitad de lo que la §4 les pide;
+`LooseFileBanner` ya tiene sus dos filas de acciones en `WrapPanel`; y `PlayerView` ya tiene una de sus
+filas en `WrapPanel` desde el andamio.
+
+**Lo que falta, por vista:**
+
+- **`PlayerView`** — cuatro cosas. (1) El bloque de fallo se pinta con **`ShellSurfaceBrush`**, la
+  superficie del shell, y debe pasar a **`DangerSurfaceBrush` con glifo y encabezado propios**: el
+  segundo de los seis pinceles de gramática que se gasta. (2) `RecoveryActionsSurface` es un
+  `StackPanel` horizontal y debe ser `WrapPanel` — **entra en la tabla cerrada de
+  `WrappingSurfaceTests`**, que hoy tiene cuatro filas. (3) La superficie propia: hoy es
+  `Panel Background="Black"` y la §4 pide `#0B0D10`; **el token no existe**, así que hay que declararlo
+  y gastarlo en el mismo cambio. (4) La columna fija de 320 px **no existe en absoluto**: es el cambio
+  estructural más grande del tramo, porque hoy los paneles laterales son superpuestos y no una columna.
+- **Las cuatro listas de la columna** —`MarkerEditorView`, `DetectedMarkerReviewView`,
+  `TrackSelectorView`, `PlayerVersionsView`— **no tienen ni una cadena de vacío entre las cuatro**
+  (medido: cero coincidencias de `Empty` en los cuatro archivos), y ninguna tiene filas de 36 px.
+  **Son 8 de las 22 cadenas de vacío del paquete**, ya escritas en los dos idiomas.
+- **`VideoStatusOverlay`** pinta sus **seis** estados con **un solo `ShellSurfaceBrush`**, y la §4 lo
+  parte en dos gramáticas: HDR10, tonemapping, SDR y aceleración son **datos** (texto secundario, sin
+  caja) y la caída a software y el formato no soportado son **avisos** (`WarningSurfaceBrush`).
+- **`ResumePromptView` (420)**, **`NextEpisodeOverlay` (420)** y **`VersionSwitchDialog` (520)**: les
+  falta el `MaxWidth`, que es la mitad que evita el panel de 1280×1400. **`SkipMarkerButton` no tiene
+  alineación ninguna.**
+- **`TransportControlsView`**: glifos de Segoe Fluent Icons y 44 px de área pulsable. **Ojo: el nombre
+  accesible sigue viniendo de la clave de recurso, no del glifo** — cambiar el `Content` de un botón
+  por un glifo **no puede** tocar su `AutomationProperties.Name`, o el paseo lo pierde.
+- **`AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`**: los tres avisos de audio a
+  `WarningSurfaceBrush`; la vista previa del subtítulo sobre la superficie del reproductor y no la del
+  shell; los atajos en dos columnas, con su cadena de vacío.
+
+**⚠ Y la discrepancia que ya está anotada desde el 2026-08-18 y sigue valiendo:** la §4 dice «7 motivos
+de fallo» y **son 6**. El séptimo, `UnsupportedCapability`, viaja en `VideoOutputDecision` y sale por
+`VideoStatusOverlay` **con el vídeo reproduciéndose**; pintarlo como fallo le diría a alguien que no
+hay imagen mientras la está viendo.
+
 **⚠ DOS TRAMPAS DEL DOCUMENTO, medidas, que valen para los ocho tramos:**
 
 1. **La §4 nombra los escalares con los nombres VIEJOS.** Cita `SpaceXSmall`, `SpaceSmall`,
