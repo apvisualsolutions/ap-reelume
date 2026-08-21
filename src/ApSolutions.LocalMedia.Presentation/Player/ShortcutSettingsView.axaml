@@ -22,8 +22,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource ShortcutSettingsDescription}"
         TextWrapping="Wrap" />
 
+    <!--
+      Nothing bound is not the application ignoring the keyboard, which is what a blank panel would
+      suggest: the system's own media keys keep working either way, and that is the half worth saying.
+    -->
+    <StackPanel
+        VerticalAlignment="Top"
+        IsVisible="{Binding IsEmpty}"
+        Spacing="{DynamicResource Space4}">
+      <TextBlock FontWeight="SemiBold" Text="{DynamicResource ShortcutsEmptyTitle}" />
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource ShortcutsEmptyDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+
     <ItemsControl
         x:Name="ShortcutList"
+        IsVisible="{Binding !IsEmpty}"
         ItemsSource="{Binding Bindings}"
         automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsListName}">
       <ItemsControl.ItemTemplate>

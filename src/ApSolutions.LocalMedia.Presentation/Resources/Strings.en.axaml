@@ -497,4 +497,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="TracksEmptyDescription">This file carries a single track of each kind.</x:String>
   <x:String x:Key="PlayerVersionsEmptyTitle">Only one version</x:String>
   <x:String x:Key="PlayerVersionsEmptyDescription">There is nothing to choose between for this title.</x:String>
+  <x:String x:Key="ShortcutsEmptyTitle">No shortcuts assigned</x:String>
+  <x:String x:Key="ShortcutsEmptyDescription">The system media keys still work.</x:String>
 </ResourceDictionary>

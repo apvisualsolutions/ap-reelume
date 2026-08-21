@@ -15,16 +15,16 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The four lists in the player's side column say something when there is nothing in them.
+/// The five lists in the player's side column say something when there is nothing in them.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Measured on 2026-08-20: not one of the four carried an empty string, so a person who opened the
+/// Measured on 2026-08-20: not one of them carried an empty string, so a person who opened the
 /// track selector on a file with a single audio track found a panel with nothing in it and no way to
 /// tell that from something still loading.
 /// </para>
 /// <para>
-/// <b>"Empty" is not the same state in the four</b>, which is the substance of this. Markers and
+/// <b>"Empty" is not the same state in all of them</b>, which is the substance of this. Markers and
 /// detections are empty at zero. The track selector <b>never reaches zero</b> — its subtitle list
 /// always carries the "off" option the view model adds itself — so its empty is one real option per
 /// kind. And the versions list resolves it the other way round from the rest of the tree: it says
@@ -35,7 +35,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 public sealed class SideListEmptyStateTests
 {
     [AvaloniaFact]
-    public void Each_of_the_four_side_lists_says_what_its_own_empty_means()
+    public void Each_of_the_five_side_lists_says_what_its_own_empty_means()
     {
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
@@ -44,6 +44,7 @@ public sealed class SideListEmptyStateTests
         Assert.Contains(Resource("DetectedMarkersEmptyTitle"), VisibleTexts(new DetectedMarkerReviewView()));
         Assert.Contains(Resource("TracksEmptyTitle"), VisibleTexts(new TrackSelectorView()));
         Assert.Contains(Resource("PlayerVersionsEmptyTitle"), VisibleTexts(new PlayerVersionsView()));
+        Assert.Contains(Resource("ShortcutsEmptyTitle"), VisibleTexts(new ShortcutSettingsView()));
     }
 
     /// <summary>
