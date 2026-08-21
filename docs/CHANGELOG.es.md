@@ -158,6 +158,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El editor de metadatos tenía ocho campos sin etiqueta a la vista.** Título, título original,
+  sinopsis, año, géneros, cartel, fondo y el texto alternativo: los ocho anunciaban su nombre a un
+  lector de pantalla y en la pantalla eran ocho cajas idénticas. Ahora cada uno lleva su etiqueta
+  escrita encima.
+
+
+- **Los avisos del editor de metadatos parecían texto suelto.** Un conflicto y un título sin
+  identificar son dos formas de «lo que pediste no ocurrió», así que ahora llevan recuadro ámbar y
+  símbolo; que el proveedor no conteste ahora mismo no es un fallo de nadie y se queda como dato.
+
+
 - **La bandeja de revisión explicaba sus decisiones con nombres internos del programa.** Al revisar por
   qué AP Reelume cree que un archivo es una película concreta, la lista de motivos decía cosas como
   `Identification.Signal.Title` — y eso es exactamente para lo que existe esa pantalla. Ahora dice «El

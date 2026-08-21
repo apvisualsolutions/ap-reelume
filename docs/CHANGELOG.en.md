@@ -157,6 +157,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The metadata editor had eight fields with no visible label.** Title, original title, overview,
+  year, genres, poster, backdrop, and the artwork's alternative text: all eight announced their name to
+  a screen reader and were eight identical boxes on screen. Each now carries its label above it.
+
+
+- **The metadata editor's notices looked like loose text.** A conflict and an unidentified title are
+  two forms of "what you asked for did not happen", so they now carry an amber box and a symbol; a
+  provider with no answer right now is nobody's failure and stays a plain fact.
+
+
 - **The review inbox explained its decisions with the program's internal names.** When reviewing why AP
   Reelume thinks a file is a particular film, the list of reasons said things like
   `Identification.Signal.Title` — which is exactly what that screen is for. It now says "The title
