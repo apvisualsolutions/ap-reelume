@@ -11,40 +11,122 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="metadata:MetadataEditorViewModel"
     automation:AutomationProperties.Name="{DynamicResource MetadataEditorAccessibleName}">
   <ScrollViewer>
-    <Grid Margin="24" ColumnDefinitions="2*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space8}" ColumnSpacing="{DynamicResource Space12}">
-      <TextBlock Grid.ColumnSpan="2" FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource MetadataEditorTitle}" />
+    <Grid Margin="24" ColumnDefinitions="2*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space8}" ColumnSpacing="{DynamicResource Space12}">
+      <!-- A section of the library pane, whose level one belongs to LibraryView. -->
+      <TextBlock
+          Grid.ColumnSpan="2"
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource MetadataEditorTitle}"
+          automation:AutomationProperties.HeadingLevel="2" />
 
-      <TextBox Grid.Row="1" Text="{Binding Title}" automation:AutomationProperties.Name="{DynamicResource MetadataTitleLabel}" />
+      <StackPanel Grid.Row="1" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataTitleLabel}" />
+        <TextBox Text="{Binding Title}" automation:AutomationProperties.Name="{DynamicResource MetadataTitleLabel}" />
+      </StackPanel>
       <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding LockTitle}" Content="{DynamicResource MetadataLockTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataLockTitle}" />
 
-      <TextBox Grid.Row="2" Text="{Binding OriginalTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataOriginalTitleLabel}" />
+      <StackPanel Grid.Row="2" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataOriginalTitleLabel}" />
+        <TextBox Text="{Binding OriginalTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataOriginalTitleLabel}" />
+      </StackPanel>
       <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding LockOriginalTitle}" Content="{DynamicResource MetadataLockOriginalTitle}" automation:AutomationProperties.Name="{DynamicResource MetadataLockOriginalTitle}" />
 
-      <TextBox Grid.Row="3" AcceptsReturn="True" MinHeight="72" Text="{Binding Overview}" automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+      <StackPanel Grid.Row="3" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataOverviewLabel}" />
+        <TextBox AcceptsReturn="True" MinHeight="72" Text="{Binding Overview}" automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+      </StackPanel>
       <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding LockOverview}" Content="{DynamicResource MetadataLockOverview}" automation:AutomationProperties.Name="{DynamicResource MetadataLockOverview}" />
 
-      <TextBox Grid.Row="4" Text="{Binding ReleaseYear}" automation:AutomationProperties.Name="{DynamicResource MetadataReleaseYearLabel}" />
+      <StackPanel Grid.Row="4" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataReleaseYearLabel}" />
+        <TextBox Text="{Binding ReleaseYear}" automation:AutomationProperties.Name="{DynamicResource MetadataReleaseYearLabel}" />
+      </StackPanel>
       <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding LockReleaseYear}" Content="{DynamicResource MetadataLockReleaseYear}" automation:AutomationProperties.Name="{DynamicResource MetadataLockReleaseYear}" />
 
-      <TextBox Grid.Row="5" Text="{Binding Genres}" automation:AutomationProperties.Name="{DynamicResource MetadataGenresLabel}" />
+      <StackPanel Grid.Row="5" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataGenresLabel}" />
+        <TextBox Text="{Binding Genres}" automation:AutomationProperties.Name="{DynamicResource MetadataGenresLabel}" />
+      </StackPanel>
       <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding LockGenres}" Content="{DynamicResource MetadataLockGenres}" automation:AutomationProperties.Name="{DynamicResource MetadataLockGenres}" />
 
-      <TextBox Grid.Row="6" Text="{Binding PosterPath}" automation:AutomationProperties.Name="{DynamicResource MetadataPosterLabel}" />
+      <StackPanel Grid.Row="6" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataPosterLabel}" />
+        <TextBox Text="{Binding PosterPath}" automation:AutomationProperties.Name="{DynamicResource MetadataPosterLabel}" />
+      </StackPanel>
       <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding LockPosterPath}" Content="{DynamicResource MetadataLockPoster}" automation:AutomationProperties.Name="{DynamicResource MetadataLockPoster}" />
 
-      <TextBox Grid.Row="7" Text="{Binding BackdropPath}" automation:AutomationProperties.Name="{DynamicResource MetadataBackdropLabel}" />
+      <StackPanel Grid.Row="7" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataBackdropLabel}" />
+        <TextBox Text="{Binding BackdropPath}" automation:AutomationProperties.Name="{DynamicResource MetadataBackdropLabel}" />
+      </StackPanel>
       <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding LockBackdropPath}" Content="{DynamicResource MetadataLockBackdrop}" automation:AutomationProperties.Name="{DynamicResource MetadataLockBackdrop}" />
 
-      <TextBox Name="ArtworkAlternativeText" Grid.Row="8" Grid.ColumnSpan="2" Text="{Binding ArtworkPicker.AlternativeText}" automation:AutomationProperties.Name="{DynamicResource ArtworkAlternativeTextLabel}" />
+      <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Spacing="{DynamicResource Space4}">
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource ArtworkAlternativeTextLabel}" />
+        <TextBox Name="ArtworkAlternativeText" Text="{Binding ArtworkPicker.AlternativeText}" automation:AutomationProperties.Name="{DynamicResource ArtworkAlternativeTextLabel}" />
+      </StackPanel>
 
-      <TextBlock Grid.Row="9" Grid.ColumnSpan="2" IsVisible="{Binding HasConflict}" Text="{DynamicResource MetadataConflictMessage}" />
-      <TextBlock Name="UnidentifiedMessage" Grid.Row="9" Grid.ColumnSpan="2" TextWrapping="Wrap" IsVisible="{Binding IsUnidentified}" Text="{DynamicResource MetadataUnidentifiedMessage}" />
-      <TextBlock Name="NoProviderAnswerMessage" Grid.Row="9" Grid.ColumnSpan="2" TextWrapping="Wrap" IsVisible="{Binding HasNoProviderAnswer}" Text="{DynamicResource MetadataNoProviderAnswerMessage}" />
-      <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+      <!--
+        Three rows and not one. The three flags come out of a single result.Outcome in a single
+        method, so exactly one is ever true and today they cannot overlap - §4 suspected they could
+        and the code had already ruled it out. They are separated anyway: that guarantee lives inside
+        a private method, and a shared row turns any future second writer into three messages painted
+        on top of each other, which is the kind of thing nobody sees until somebody reports it.
+
+        Two of them are warnings and the third is not. A conflict and a title nobody has identified
+        are both "what you asked for did not happen"; a provider with no answer right now is neither a
+        failure nor anybody's fault, so it stays a plain fact. The glyph is what tells the two apart
+        from the third where colour cannot - the two high contrast themes.
+      -->
+      <Border
+          Name="ConflictMessage"
+          Grid.Row="9"
+          Grid.ColumnSpan="2"
+          Padding="12"
+          Background="{DynamicResource WarningSurfaceBrush}"
+          BorderBrush="{DynamicResource WarningBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusMedium}"
+          IsVisible="{Binding HasConflict}"
+          automation:AutomationProperties.LiveSetting="Polite">
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Top" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Text="⚠" />
+          <TextBlock Grid.Column="1" Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataConflictMessage}" TextWrapping="Wrap" />
+        </Grid>
+      </Border>
+      <Border
+          Name="UnidentifiedMessage"
+          Grid.Row="10"
+          Grid.ColumnSpan="2"
+          Padding="12"
+          Background="{DynamicResource WarningSurfaceBrush}"
+          BorderBrush="{DynamicResource WarningBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusMedium}"
+          IsVisible="{Binding IsUnidentified}"
+          automation:AutomationProperties.LiveSetting="Polite">
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Top" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Text="⚠" />
+          <TextBlock Grid.Column="1" Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataUnidentifiedMessage}" TextWrapping="Wrap" />
+        </Grid>
+      </Border>
+      <TextBlock
+          Name="NoProviderAnswerMessage"
+          Grid.Row="11"
+          Grid.ColumnSpan="2"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          IsVisible="{Binding HasNoProviderAnswer}"
+          Text="{DynamicResource MetadataNoProviderAnswerMessage}"
+          TextWrapping="Wrap"
+          automation:AutomationProperties.LiveSetting="Polite" />
+      <!-- A WrapPanel, for the reason written eight times in this repository. -->
+      <WrapPanel Grid.Row="12" Grid.ColumnSpan="2" ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
         <Button Classes="primary-action" Command="{Binding SaveCommand}" Content="{DynamicResource MetadataSaveAction}" automation:AutomationProperties.Name="{DynamicResource MetadataSaveAction}" />
         <Button Name="RefreshProviderMetadata" Command="{Binding RefreshProviderCommand}" Content="{DynamicResource MetadataRefreshAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRefreshAction}" />
         <Button Name="RestoreProviderMetadata" Command="{Binding RestoreProviderCommand}" Content="{DynamicResource MetadataRestoreAction}" automation:AutomationProperties.Name="{DynamicResource MetadataRestoreAction}" />
-      </StackPanel>
+      </WrapPanel>
     </Grid>
   </ScrollViewer>
 </UserControl>
