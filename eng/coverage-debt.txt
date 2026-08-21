@@ -196,7 +196,7 @@ src/ApSolutions.LocalMedia.Presentation/Review/DuplicateReviewViewModel.cs      
 src/ApSolutions.LocalMedia.Presentation/Review/ReviewInboxView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Review/ReviewInboxView.axaml.cs                       35  25
 src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsView.axaml                100  50
-src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsViewModel.cs               97  65
+src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsViewModel.cs               97  66
 src/ApSolutions.LocalMedia.Presentation/Settings/DiagnosticsPreviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsView.axaml                 100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsViewModel.cs               100  95
@@ -219,7 +219,7 @@ src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsViewModel.cs            
 src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml                             100  50
 src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           90  69
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
-src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs                0   0
+src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         89  64
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  75
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
