@@ -124,6 +124,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La ficha de una serie enseña una temporada cada vez.** Antes apilaba todas: una serie de ocho
+  temporadas era una página sin final a la vista. Ahora hay un selector arriba y debajo los episodios
+  de la temporada elegida. Con una sola temporada el selector **no aparece**, porque no habría nada que
+  elegir.
+
+
 - **Las filas de episodios de una serie miden todas lo mismo y sus números cuadran en columna.** Cada
   fila tiene la misma altura, así que una temporada ya no parece una lista a medio cargar, y el número
   del episodio va alineado a la derecha en una columna fija: el 9 y el 10 terminan en el mismo punto.

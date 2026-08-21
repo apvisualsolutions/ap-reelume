@@ -124,6 +124,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **A series' card shows one season at a time.** It used to stack them all, so an eight-season series
+  was a page with no end in sight. There is now a picker at the top and the chosen season's episodes
+  below it. With a single season the picker **does not appear**, because there would be nothing to
+  choose.
+
+
 - **A series' episode rows are all the same height and their numbers line up in a column.** Every row
   is the same height, so a season no longer looks like a list that is half loaded, and the episode
   number is right-aligned in a fixed column: 9 and 10 end at the same point.

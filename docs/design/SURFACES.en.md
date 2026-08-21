@@ -97,7 +97,7 @@ Measured on 2026-08-18, and the distinction matters because these are **two gram
 
 ## The lists and their empty state
 
-Measured on 2026-08-20: **24 lists with data** in the tree — taking a list to be a `ListBox`,
+Measured on 2026-08-20: **23 lists with data** in the tree — taking a list to be a `ListBox`,
 `ItemsControl` or `ItemsRepeater` with `ItemsSource` — and **five have a string written for
 when they are empty**:
 
@@ -109,7 +109,7 @@ when they are empty**:
 | Recently added | `RecentlyAddedRailView` (`HomeRecentlyAddedEmpty`) |
 | A series' episodes | `ShowDetailsView` (`ShowDetailsEmpty`) |
 
-The **other nineteen say nothing when empty**, and none of them says anything while loading or when
+The **other eighteen say nothing when empty**, and none of them says anything while loading or when
 it fails. A redesign has to decide those three states per list, not only the full one.
 
 **And there is one nobody sees coming**: the library's empty state is painted by `ShellView`, not by

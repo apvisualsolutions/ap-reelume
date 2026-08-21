@@ -190,6 +190,51 @@ public sealed class LibraryNavigationTests
                 results: [Item(1, CatalogTitleKind.Movie, "Arrival")]));
     }
 
+    /// <summary>
+    /// The library materialises a handful of rows out of ten thousand, and that is why it is not the
+    /// fluid grid §4 asks for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Measured on 2026-08-20, ten thousand entries in a 1280×800 window: <c>VirtualizingStackPanel</c>
+    /// took <b>285 ms and realised 22</b>; a <c>WrapPanel</c> — the only way Avalonia 12.1.1 offers to
+    /// reflow items, since neither <c>ItemsRepeater</c> nor <c>UniformGridLayout</c> exists in
+    /// <c>Avalonia.Controls</c> — took <b>2079 ms and realised 10003</b>. That is 7× the time and 455×
+    /// the live controls, with a plain text row rather than the real card, on a fast machine.
+    /// </para>
+    /// <para>
+    /// The README promises ten thousand files without blocking the interface, so the grid loses. The
+    /// way to have both is to group the items into rows in the view model and let the panel virtualise
+    /// rows — a real control, not a line of markup — and the grid is worth that only once there is
+    /// artwork to put in it, which is the other thing §4 assumes and this application does not have.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_library_realises_a_handful_of_rows_out_of_ten_thousand()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
+        var many = Enumerable.Range(0, 10_000)
+            .Select(seed => Item(seed, CatalogTitleKind.Movie, $"Title {seed:D5}"))
+            .ToArray();
+        var viewModel = new LibraryViewModel(new RecordingQueryService(new CatalogPage(many, null)));
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        var view = new LibraryView { DataContext = viewModel };
+        var window = new Window { Width = 1280, Height = 800, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var list = Assert.Single(view.GetVisualDescendants().OfType<ListBox>());
+        Assert.IsType<VirtualizingStackPanel>(list.ItemsPanelRoot);
+        var realised = list.GetRealizedContainers().Count();
+        Assert.True(
+            realised < 200,
+            $"The library realised {realised} of 10,000 rows, so it has stopped virtualising.");
+
+        window.Close();
+    }
+
     private static async Task<string[]> VisibleTextsAsync(string? search, CatalogItem[] results)
     {
         var viewModel = new LibraryViewModel(new RecordingQueryService(new CatalogPage(results, null)))

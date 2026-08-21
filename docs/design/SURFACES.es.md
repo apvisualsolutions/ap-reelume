@@ -96,7 +96,7 @@ Medido el 2026-08-18, y la distinción importa porque son **dos gramáticas, no 
 
 ## Las listas y su estado vacío
 
-Medido el 2026-08-20: **24 listas con datos** en el árbol —entendiendo por lista un `ListBox`,
+Medido el 2026-08-20: **23 listas con datos** en el árbol —entendiendo por lista un `ListBox`,
 `ItemsControl` o `ItemsRepeater` con `ItemsSource`—, y **cinco tienen escrita una cadena para
 cuando están vacías**:
 
@@ -108,7 +108,7 @@ cuando están vacías**:
 | Añadido recientemente | `RecentlyAddedRailView` (`HomeRecentlyAddedEmpty`) |
 | Episodios de una serie | `ShowDetailsView` (`ShowDetailsEmpty`) |
 
-Las **diecinueve restantes no dicen nada cuando están vacías**, y ninguna dice nada mientras carga ni
+Las **dieciocho restantes no dicen nada cuando están vacías**, y ninguna dice nada mientras carga ni
 cuando falla. Un rediseño tiene que decidir esos tres estados por lista, no sólo el lleno.
 
 **Y hay uno que nadie ve venir**: el vacío de la biblioteca lo pinta `ShellView`, no `LibraryView`,

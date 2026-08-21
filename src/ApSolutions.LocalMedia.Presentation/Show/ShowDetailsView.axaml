@@ -62,41 +62,65 @@ SPDX-License-Identifier: GPL-3.0-or-later
         TextWrapping="Wrap"
         automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
 
-    <ScrollViewer Grid.Row="3" IsVisible="{Binding HasSeasons}">
-      <ItemsControl ItemsSource="{Binding Seasons}">
-        <ItemsControl.ItemTemplate>
+    <Grid Grid.Row="3" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space8}">
+      <!--
+        One season at a time. The picker is ABSENT with a single season rather than disabled: a
+        control whose only possible answer is the one it already shows is a question nobody asked,
+        and this is the same grammar PrivacySettingsView draws for its connection switch.
+      -->
+      <ComboBox
+          x:Name="SeasonPicker"
+          IsVisible="{Binding HasSeasonChoice}"
+          ItemsSource="{Binding Seasons}"
+          SelectedItem="{Binding SelectedSeason}"
+          automation:AutomationProperties.Name="{DynamicResource SeasonPickerLabel}">
+        <ComboBox.ItemTemplate>
           <DataTemplate x:DataType="show:SeasonViewModel">
-            <StackPanel Margin="0,0,0,16" Spacing="{DynamicResource Space8}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock
-                    FontSize="{DynamicResource FontSizeSubtitle}"
-                    FontWeight="SemiBold"
-                    IsVisible="{Binding IsRegular}"
-                    Text="{DynamicResource SeasonHeading}" />
-                <TextBlock
-                    FontSize="{DynamicResource FontSizeSubtitle}"
-                    FontWeight="SemiBold"
-                    IsVisible="{Binding IsRegular}"
-                    Text="{Binding SeasonNumberText}" />
-                <TextBlock
-                    FontSize="{DynamicResource FontSizeSubtitle}"
-                    FontWeight="SemiBold"
-                    IsVisible="{Binding IsSpecials}"
-                    Text="{DynamicResource SeasonSpecialsHeading}" />
-                <TextBlock VerticalAlignment="Center" Text="{Binding EpisodeCountText}" />
-                <TextBlock VerticalAlignment="Center" Text="{DynamicResource SeasonEpisodeCountLabel}" />
-              </StackPanel>
-              <ItemsControl ItemsSource="{Binding Episodes}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="show:EpisodeRowViewModel">
-                    <show:EpisodeRowView Margin="0,2" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+              <TextBlock IsVisible="{Binding IsRegular}" Text="{DynamicResource SeasonHeading}" />
+              <TextBlock IsVisible="{Binding IsRegular}" Text="{Binding SeasonNumberText}" />
+              <TextBlock IsVisible="{Binding IsSpecials}" Text="{DynamicResource SeasonSpecialsHeading}" />
             </StackPanel>
           </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </ScrollViewer>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <ScrollViewer Grid.Row="1" IsVisible="{Binding HasSeasons}">
+        <ContentControl Content="{Binding SelectedSeason}">
+          <ContentControl.ContentTemplate>
+            <DataTemplate x:DataType="show:SeasonViewModel">
+              <StackPanel Spacing="{DynamicResource Space8}">
+                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeSubtitle}"
+                      FontWeight="SemiBold"
+                      IsVisible="{Binding IsRegular}"
+                      Text="{DynamicResource SeasonHeading}" />
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeSubtitle}"
+                      FontWeight="SemiBold"
+                      IsVisible="{Binding IsRegular}"
+                      Text="{Binding SeasonNumberText}" />
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeSubtitle}"
+                      FontWeight="SemiBold"
+                      IsVisible="{Binding IsSpecials}"
+                      Text="{DynamicResource SeasonSpecialsHeading}" />
+                  <TextBlock VerticalAlignment="Center" Text="{Binding EpisodeCountText}" />
+                  <TextBlock VerticalAlignment="Center" Text="{DynamicResource SeasonEpisodeCountLabel}" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Episodes}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="show:EpisodeRowViewModel">
+                      <show:EpisodeRowView Margin="0,2" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </DataTemplate>
+          </ContentControl.ContentTemplate>
+        </ContentControl>
+      </ScrollViewer>
+    </Grid>
   </Grid>
 </UserControl>

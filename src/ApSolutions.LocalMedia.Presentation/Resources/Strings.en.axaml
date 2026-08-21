@@ -303,6 +303,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MovieVersionPreferred">Chosen by you</x:String>
   <x:String x:Key="ShowDetailsEmpty">This show has no episodes in the catalog yet.</x:String>
   <x:String x:Key="SeasonHeading">Season</x:String>
+  <x:String x:Key="SeasonPickerLabel">Choose a season</x:String>
   <x:String x:Key="SeasonSpecialsHeading">Specials</x:String>
   <x:String x:Key="SeasonEpisodeCountLabel">episodes</x:String>
   <x:String x:Key="EpisodePrefix">Episode</x:String>

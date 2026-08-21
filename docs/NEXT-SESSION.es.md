@@ -32,10 +32,13 @@ es el mismo argumento por el que 0.2.0 no se corta antes— y **comparten las ca
 con lo que ya está decidido y lo que no, está abajo en «11 y 12». Lo único que se puede adelantar es
 el **guion** que genera las capturas, que es código de pruebas.
 
-**Lo siguiente por orden es el tramo 3: Biblioteca y fichas (5 vistas).** Su fila de la §4 está en la
-tabla de abajo, y **hay que medirla vista por vista antes de escribir nada**: en los dos tramos
-anteriores la mitad de lo que pedía ya estaba hecho, y en éste una de sus filas —la cuadrícula fluida
-con mínimo de 180 px por ficha— vuelve a rozar la portada que no existe.
+**Lo siguiente por orden es el tramo 4: el Reproductor (16 vistas)**, que es el más grande de los
+nueve. Su fila de la §4 está en la tabla de abajo, y **hay que medirla vista por vista antes de
+escribir nada**: en los tres tramos anteriores, la mitad de lo que cada uno pedía ya estaba hecho.
+
+**La fase 6 va por 3 tramos de 9.** El tramo 3 cerró el 2026-08-20 con el paseo en **135 de 135 y 0
+pendientes**, dos controles nuevos —el botón de borrar la búsqueda y el selector de temporada— cada
+uno con su escena, y **una fila que no se hace con su número delante**: la cuadrícula fluida.
 
 **EL PASO 6 ESTÁ EN SU FASE 6 DE 6, Y ESA FASE ESTÁ CASI ENTERA POR HACER.** Lo que se cerró el
 2026-08-20 fueron **las fases 1 a 5 de `design/PROMPT.md`** más los prerrequisitos de la 6 — y se
@@ -67,7 +70,7 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 |---|---|---|
 | ~~1~~ | ~~**Shell** (2)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-shell-navigation-bar.md). Los 248 px y el glifo **ya estaban**; se añadió la barra de 3 px —que **existe o no existe**, no se atenúa— y `TitleActionsSurface` pasó a `WrapPanel`. `StartupView` no necesitaba nada. |
 | ~~2~~ | ~~**Inicio** (5)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-home-tranche.md). Los tres estados del carril, la barra de 3 px al pie y `Space24` en la rejilla. **Dos discrepancias con la §4**: no hay portadas en toda la aplicación (0 `<Image>` en `src/`) y `LibraryEntryView` **no es la ficha que el documento describe**. Y el hallazgo: `RecentlyAdded` se leía de SQLite y no lo pintaba nadie, así que Inicio gana una vista, `RecentlyAddedRailView`. |
-| 3 | **Biblioteca y fichas** (5) | Cuadrícula **fluida** con mínimo de 180 px; fila de filtros a `WrapPanel`; búsqueda con botón de borrar; **«buscando sin resultados», que hoy no existe**; `UnavailableBadge` pasa de error a **aviso** (`WarningSurfaceBrush` + borde + glifo). |
+| ~~3~~ | ~~**Biblioteca y fichas** (5)~~ **HECHA el 2026-08-20** | Sus evidencias: [el distintivo](evidence/stable/audit-unavailable-badge.md), [las filas y el peaje](evidence/stable/audit-wrapping-rows-and-the-ratchet-toll.md), [sin resultados y la fila de episodio](evidence/stable/audit-library-no-results-and-episode-row.md), [el botón de borrar](evidence/stable/audit-library-clear-search.md) y [el selector y la cuadrícula](evidence/stable/audit-season-picker-and-the-grid-that-lost.md). **La cuadrícula fluida NO se hace, y está medido**: `WrapPanel` cuesta 7× el tiempo y 455× los controles vivos, y en Avalonia 12.1.1 no existe nada que reflowe y virtualice a la vez. |
 | 4 | **Reproductor** (16) | Superficie propia `#0B0D10` y columna fija de 320 px; el fallo pasa a `DangerSurfaceBrush` con glifo; `VideoStatusOverlay` **partido en dos gramáticas** (dato vs aviso); los tres superpuestos con **alineación explícita y `MaxWidth 420`** — es la forma que causó el panel de 1280×1400; las cuatro listas a filas de 36 px sin scroll horizontal. |
 | 5 | **Ajustes** (7) | `AppearanceSettingsView` de 3 botones de tema a **5**, y su `StackPanel` horizontal **tiene** que ser `WrapPanel`: cinco no caben en 620 px y **la división no se fija a mano**, porque en español pliega 4+1 y en inglés cae en otro sitio. `PrivacySettingsView` debe **distinguir ausente de deshabilitado**. |
 | 6 | **Revisión, Metadatos, Catálogo** (7) | La bandeja vacía es **el estado deseable**: `PositiveSurfaceBrush` con glifo, no un vacío triste. |
