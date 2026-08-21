@@ -23,6 +23,46 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </summary>
 public sealed class VideoStatusOverlayTests
 {
+    /// <summary>
+    /// A fact about the decode and a warning about it are not painted the same way.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// All six lines used to share one surface, so "HDR10 is passing through" — a video playing exactly
+    /// as asked — looked identical to "this fell back to software". §4 splits them: the four facts read
+    /// as quiet caption text, the two warnings take the warning surface and the glyph.
+    /// </para>
+    /// <para>
+    /// What is asserted is that the warning box is <b>absent</b> while only facts are on screen. A test
+    /// that merely found the box when a warning was present would pass a badge that drew it always.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_decode_fact_and_a_decode_warning_are_not_the_same_surface()
+    {
+        // Build already mounts the view in a window; a second one would try to reparent it.
+        var view = Build(out var viewModel);
+
+        var warning = Assert.Single(
+            view.GetVisualDescendants().OfType<Border>(),
+            border => border.Name == "VideoStatusWarningSurface");
+
+        viewModel.Apply(
+            new PlaybackCapabilities(true, true, HdrFormat.Hdr10, true, VideoOutputPath.Hdr10Passthrough),
+            fellBackToSoftware: false);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(viewModel.HasDecodeFacts);
+        Assert.False(viewModel.HasDecodeWarnings);
+        Assert.False(warning.IsVisible);
+
+        viewModel.Apply(
+            new PlaybackCapabilities(false, false, HdrFormat.None, false, VideoOutputPath.Sdr),
+            fellBackToSoftware: true);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(viewModel.HasDecodeWarnings);
+        Assert.True(warning.IsVisible);
+    }
+
     [AvaloniaFact]
     public void Nothing_is_shown_until_the_engine_has_reported_something()
     {
@@ -37,7 +77,12 @@ public sealed class VideoStatusOverlayTests
     public void Each_reported_path_shows_exactly_its_own_line()
     {
         var view = Build(out var viewModel);
-        var lines = view.GetVisualDescendants().OfType<TextBlock>().ToDictionary(block => block.Name!, block => block);
+        // Keyed by name, so the warning box's glyph — which has none — is left out rather than
+        // throwing on a null key.
+        var lines = view.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => !string.IsNullOrEmpty(block.Name))
+            .ToDictionary(block => block.Name!, block => block);
 
         viewModel.Apply(
             new PlaybackCapabilities(true, true, HdrFormat.Hdr10, true, VideoOutputPath.Hdr10Passthrough),

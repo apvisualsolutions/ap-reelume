@@ -37,6 +37,26 @@ public sealed class VideoStatusViewModel : INotifyPropertyChanged
 
     public bool DisplaySupportsHdr => _capabilities?.DisplaySupportsHdr == true;
 
+    /// <summary>
+    /// Something worth stating about how this is being decoded — a fact, not a problem.
+    /// </summary>
+    /// <remarks>
+    /// Which path the video took and whether the GPU is doing the work are things somebody may want to
+    /// read; none of them is anything going wrong, and painting them in a warning box would say
+    /// otherwise about a video that is playing perfectly.
+    /// </remarks>
+    public bool HasDecodeFacts =>
+        IsHdrPassthrough || IsToneMapped || IsStandardDynamicRange || IsHardwareAccelerated;
+
+    /// <summary>
+    /// What is being played is not quite what was asked for, which is a warning and not a failure.
+    /// </summary>
+    /// <remarks>
+    /// Falling back to software still plays; an unsupported HDR format still shows a picture. Neither
+    /// is a failure — the failure surface is <c>PlayerView</c>'s and it says something else entirely.
+    /// </remarks>
+    public bool HasDecodeWarnings => FellBackToSoftware || IsUnsupportedFormat;
+
     /// <summary>Applies what the engine reported; the view never computes this itself.</summary>
     public void Apply(PlaybackCapabilities? capabilities, bool fellBackToSoftware)
     {
@@ -52,6 +72,8 @@ public sealed class VideoStatusViewModel : INotifyPropertyChanged
             nameof(FellBackToSoftware),
             nameof(IsUnsupportedFormat),
             nameof(DisplaySupportsHdr),
+            nameof(HasDecodeFacts),
+            nameof(HasDecodeWarnings),
         })
         {
             OnPropertyChanged(name);
