@@ -489,4 +489,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="UpdateRefusedUndeclaredSize">La versión no dice cuánto ocupa, así que una descarga cortada no podría distinguirse de una completa.</x:String>
   <x:String x:Key="UpdateRefusedIncompleteSummary">La versión no explica qué cambia en los dos idiomas.</x:String>
   <x:String x:Key="UpdateRefusedUndeclaredHost">La descarga saldría a un dominio que la declaración de privacidad no cubre.</x:String>
+  <x:String x:Key="MarkersEmptyTitle">Sin marcadores todavía</x:String>
+  <x:String x:Key="MarkersEmptyDescription">Pon un inicio y un fin y guarda. Nada se escribe en tu archivo de vídeo.</x:String>
+  <x:String x:Key="DetectedMarkersEmptyTitle">Nada detectado en este título</x:String>
+  <x:String x:Key="DetectedMarkersEmptyDescription">O la detección está apagada, o este archivo no tiene una apertura repetida que reconocer.</x:String>
+  <x:String x:Key="TracksEmptyTitle">Sin pistas que elegir</x:String>
+  <x:String x:Key="TracksEmptyDescription">Este archivo trae una sola pista de cada tipo.</x:String>
+  <x:String x:Key="PlayerVersionsEmptyTitle">Una sola versión</x:String>
+  <x:String x:Key="PlayerVersionsEmptyDescription">No hay nada entre lo que elegir para este título.</x:String>
 </ResourceDictionary>

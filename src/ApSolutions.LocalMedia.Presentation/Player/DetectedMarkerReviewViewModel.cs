@@ -32,6 +32,10 @@ public sealed class DetectedMarkerReviewViewModel : INotifyPropertyChanged
         Func<Guid, TimeSpan, TimeSpan, Task<DetectedMarker?>>? onCorrect = null,
         Func<Guid, Task<bool>>? onDelete = null)
     {
+        // The empty state is derived from the list, so the list is what announces it: every
+        // path that adds or clears one would otherwise have to remember, and one that forgot
+        // would leave the panel saying it is empty over a list with something in it.
+        Detections.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));
         _onLoad = onLoad;
         _onAccept = onAccept;
         _onCorrect = onCorrect;
@@ -51,6 +55,9 @@ public sealed class DetectedMarkerReviewViewModel : INotifyPropertyChanged
     public ICommand DeleteCommand { get; }
 
     public ObservableCollection<DetectedMarker> Detections { get; } = [];
+
+    /// <summary>Nothing was detected in this file, which is not the same as detection being off.</summary>
+    public bool IsEmpty => Detections.Count == 0;
 
     public DetectedMarker? Selected
     {

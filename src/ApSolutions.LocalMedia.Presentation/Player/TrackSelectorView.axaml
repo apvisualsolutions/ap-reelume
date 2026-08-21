@@ -11,6 +11,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="player:TrackSelectorViewModel"
     automation:AutomationProperties.Name="{DynamicResource TrackSelectorAccessibleName}">
   <StackPanel x:Name="TrackSelectorSurface" Spacing="{DynamicResource Space12}">
+    <!--
+      Said above the two pickers rather than instead of them: the pickers stay, because the one track
+      each of them holds is still what is playing and a person may want to read which one it is. What
+      is missing is the choice, not the information.
+    -->
+    <StackPanel
+        VerticalAlignment="Top"
+        IsVisible="{Binding HasNothingToChoose}"
+        Spacing="{DynamicResource Space4}">
+      <TextBlock FontWeight="SemiBold" Text="{DynamicResource TracksEmptyTitle}" />
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource TracksEmptyDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+
     <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"

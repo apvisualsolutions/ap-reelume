@@ -85,6 +85,10 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
         Func<MarkerKind, TimeSpan, TimeSpan, Guid?, Task<SaveManualMarkerResult>>? onSave = null,
         Func<Guid, Task<bool>>? onDelete = null)
     {
+        // The empty state is derived from the list, so the list is what announces it: every
+        // path that adds or clears one would otherwise have to remember, and one that forgot
+        // would leave the panel saying it is empty over a list with something in it.
+        Markers.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));
         _onSave = onSave;
         _onDelete = onDelete;
         SaveCommand = new AsyncRelayCommand(SaveAsync);
@@ -101,6 +105,12 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
     public static IReadOnlyList<MarkerKind> Kinds { get; } = [.. Enum.GetValues<MarkerKind>()];
 
     public ObservableCollection<IntroMarker> Markers { get; } = [];
+
+    /// <summary>
+    /// No ranges stored for this series yet. Bound to the list itself rather than kept in a field,
+    /// because every path that adds or clears a marker would otherwise have to remember to announce it.
+    /// </summary>
+    public bool IsEmpty => Markers.Count == 0;
 
     public SeriesId SeriesId => _seriesId;
 
