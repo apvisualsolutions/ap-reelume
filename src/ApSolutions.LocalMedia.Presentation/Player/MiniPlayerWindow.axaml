@@ -24,6 +24,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   -->
   <DockPanel LastChildFill="True">
     <player:MiniPlayerChromeView x:Name="MiniPlayerChrome" DockPanel.Dock="Bottom" />
-    <Panel x:Name="MiniPlayerSurface" Background="Black" />
+    <Panel x:Name="MiniPlayerSurface" Background="{DynamicResource PlayerSurfaceBrush}" />
   </DockPanel>
 </Window>

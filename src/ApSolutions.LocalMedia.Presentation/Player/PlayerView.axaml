@@ -10,7 +10,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:PlayerViewModel"
     automation:AutomationProperties.Name="{DynamicResource PlayerAccessibleName}">
-  <Panel Background="Black">
+  <!--
+    The player has a surface of its own and it is the same in all four themes: what sits on it is
+    the picture, so the theme does not get a say. It is #0B0D10 and not pure black, which keeps the
+    letterbox from reading as a hole in the screen beside a frame that is never quite black.
+  -->
+  <Panel Background="{DynamicResource PlayerSurfaceBrush}">
     <player:VideoFrameView
         x:Name="VideoSurface"
         FrameSource="{Binding FrameSource}"

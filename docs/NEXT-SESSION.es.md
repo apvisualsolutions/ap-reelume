@@ -192,11 +192,17 @@ filas en `WrapPanel` desde el andamio.
 - **`PlayerView`** — ~~(1) el bloque de fallo a `DangerSurfaceBrush` con glifo propio~~ y ~~(2)
   `RecoveryActionsSurface` a `WrapPanel`~~ están **HECHOS el 2026-08-20**
   ([su evidencia](evidence/stable/audit-player-failure-grammar.md)); la tabla de
-  `WrappingSurfaceTests` sube a cinco filas. Quedan: **(3) la superficie propia** —hoy es
-  `Panel Background="Black"` y la §4 pide `#0B0D10`; **el token no existe**, así que se declara y se
-  gasta en el mismo cambio— y **(4) la columna fija de 320 px, que no existe en absoluto**: es el
-  cambio estructural más grande del tramo, porque hoy los paneles laterales son superpuestos y no una
+  `WrappingSurfaceTests` sube a cinco filas. ~~(3) La superficie propia~~ está **HECHA el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-player-surface.md)): `PlayerSurfaceBrush` = `#0B0D10` en los
+  cuatro temas, que es el **único token del árbol que no sigue el tema**, y `MiniPlayerWindow` lo
+  gasta también. Queda **(4) la columna fija de 320 px, que no existe en absoluto**: es el cambio
+  estructural más grande del tramo, porque hoy los paneles laterales son superpuestos y no una
   columna.
+- **⚠ Y una puerta que salta con cualquier token de tema nuevo:** `ContrastTokenTests.RequiredKeys`
+  es una **lista cerrada** —cada diccionario debe llevar exactamente esas claves— y una clave nueva
+  la rompe hasta que se declara ahí. Además, si la superficie nueva **no** entra en la lista de
+  contraste de texto, la razón se escribe **con su aserción**: dejarla fuera en silencio es
+  indistinguible de haberlo olvidado.
 - **Las cuatro listas de la columna** —`MarkerEditorView`, `DetectedMarkerReviewView`,
   `TrackSelectorView`, `PlayerVersionsView`— **no tienen ni una cadena de vacío entre las cuatro**
   (medido: cero coincidencias de `Empty` en los cuatro archivos), y ninguna tiene filas de 36 px.

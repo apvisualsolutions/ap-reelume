@@ -81,6 +81,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#E2E8F0" />
@@ -280,6 +281,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
+          <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#1F2937" />
@@ -485,6 +487,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         -->
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastLight}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#FFFFFF" />
@@ -684,6 +687,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ResourceDictionary>
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
+          <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#000000" />

@@ -124,6 +124,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El reproductor tiene su propio fondo, y es el mismo con cualquier tema.** Todo lo demás en la
+  aplicación sigue el tema claro u oscuro que elijas; el reproductor no, porque lo que se apoya encima
+  es la imagen. Es un negro muy oscuro pero no negro puro, para que las bandas de arriba y abajo no
+  parezcan un agujero al lado de un fotograma que casi nunca es negro del todo.
+
+
 - **Un vídeo que no se puede abrir se ve como un fallo, no como un dato más.** El aviso de que algo no
   ha funcionado se pintaba sobre la misma superficie que usa el resto de la aplicación, así que la
   única pantalla que tiene que decir «esto no ha salido» se parecía a la que dice qué códec estás

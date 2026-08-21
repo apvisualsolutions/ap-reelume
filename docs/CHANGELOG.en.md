@@ -124,6 +124,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The player has a background of its own, and it is the same under every theme.** Everything else in
+  the application follows the light or dark theme you pick; the player does not, because what sits on
+  it is the picture. It is a very dark grey rather than pure black, so the bars above and below do not
+  read as a hole beside a frame that is almost never fully black.
+
+
 - **A video that will not open looks like a failure rather than one more piece of information.** The
   notice that something went wrong was painted on the same surface as everything else, so the one
   screen that has to say "this did not work" looked like the one that tells you which codec you are
