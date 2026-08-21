@@ -12,12 +12,29 @@ namespace ApSolutions.LocalMedia.Presentation.Home;
 /// </summary>
 public sealed class ResourceKeyConverter : IValueConverter
 {
+    /// <summary>What joins several keys into the one sentence a reader hears.</summary>
+    private const string Separator = ", ";
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         _ = targetType;
         _ = parameter;
         _ = culture;
-        if (value is not string key || string.IsNullOrWhiteSpace(key))
+
+        // A list as well as a key, because a help text is one string and an explanation is several
+        // codes. Joining them here rather than in a view model is what keeps resource resolution -
+        // which needs the application and its theme variant - out of the models.
+        if (value is IEnumerable<string> keys)
+        {
+            return string.Join(Separator, keys.Select(Resolve));
+        }
+
+        return value is string key ? Resolve(key) : string.Empty;
+    }
+
+    private static string Resolve(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
         {
             return string.Empty;
         }

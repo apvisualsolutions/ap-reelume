@@ -151,6 +151,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The review inbox explained its decisions with the program's internal names.** When reviewing why AP
+  Reelume thinks a file is a particular film, the list of reasons said things like
+  `Identification.Signal.Title` — which is exactly what that screen is for. It now says "The title
+  matches", "The year matches", "The file name reads more than one way", and the other eight, in both
+  languages. A screen reader recited them too, and now hears words as well.
+
+
 - **The "this system has no tray" notice looked like another fact.** It was a plain sentence in the
   same colour as the labels beside it, when what it says is that something you asked for could not be
   done. It now carries an amber box and a symbol, like every other warning.

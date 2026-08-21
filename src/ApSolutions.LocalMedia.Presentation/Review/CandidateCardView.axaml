@@ -7,8 +7,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
     xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
     x:DataType="review:CandidateCardViewModel">
+  <!--
+    The explanation is the answer to "why do you think this file is this film", and until 2026-08-21 it
+    answered with a namespace: the codes are dotted paths the domain writes, and both the visible list
+    and the help text carried them raw. The converter that translates recommendation reasons one view
+    away does the same job here, for the list and for the sentence a screen reader hears.
+  -->
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="ExplanationText" />
+  </UserControl.Resources>
   <Border
       Margin="0,4"
       Padding="12"
@@ -16,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderThickness="1"
       CornerRadius="{DynamicResource CornerRadiusMedium}"
       automation:AutomationProperties.Name="{Binding StableKey}"
-      automation:AutomationProperties.HelpText="{Binding ExplanationSummary}">
+      automation:AutomationProperties.HelpText="{Binding ExplanationCodes, Converter={StaticResource ExplanationText}}">
     <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="{DynamicResource Space8}">
       <TextBlock FontWeight="SemiBold" Text="{Binding StableKey}" />
       <TextBlock Grid.Column="1" Text="{Binding ScorePercent}" />
@@ -27,8 +37,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
       <ItemsControl Grid.Row="2" Grid.ColumnSpan="2" ItemsSource="{Binding ExplanationCodes}">
         <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+          <!-- x:DataType, because this control declares one and a template without its own inherits
+               it: the binding would resolve against the card's model instead of against the code. -->
+          <DataTemplate x:DataType="x:String">
+            <TextBlock Text="{Binding ., Converter={StaticResource ExplanationText}}" TextWrapping="Wrap" />
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>

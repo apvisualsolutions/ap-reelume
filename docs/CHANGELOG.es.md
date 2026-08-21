@@ -152,6 +152,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La bandeja de revisión explicaba sus decisiones con nombres internos del programa.** Al revisar por
+  qué AP Reelume cree que un archivo es una película concreta, la lista de motivos decía cosas como
+  `Identification.Signal.Title` — y eso es exactamente para lo que existe esa pantalla. Ahora dice «El
+  título coincide», «El año coincide», «El nombre del archivo admite más de una lectura» y los otros
+  ocho, en los dos idiomas. Un lector de pantalla también los recitaba, y también los dice ya en
+  palabras.
+
+
 - **El aviso de «este sistema no tiene bandeja» parecía un dato más.** Se decía en texto llano, del
   mismo color que las etiquetas de al lado, cuando lo que dice es que algo que pediste no se pudo
   hacer. Ahora lleva recuadro ámbar y símbolo, como el resto de avisos.

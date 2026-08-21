@@ -128,21 +128,19 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 
 **Siete vistas, y lo primero que aparece es el peor defecto medido en toda la fase 6.**
 
-**⚠ `CandidateCardView` PINTA CÓDIGOS INTERNOS EN CRUDO.** `ExplanationCodes` es
-`IReadOnlyList<string>` y lo que lleva son rutas con puntos —`Identification.Error.KindConflict`,
-`Identification.Signal.Title`, `Identification.Warning.AmbiguousName`—, y la plantilla las pinta con
-`Text="{Binding}"`, sin converter. Medido: **once códigos** en `src/ApSolutions.LocalMedia.Domain`, y
-**cero** de ellos tiene cadena en `Strings.es.axaml` ni en `.en.axaml`.
-
-- **Es el corazón de la pantalla**: la explicación es la respuesta a «¿por qué crees que este archivo es
-  esta película?». Quien revisa una identificación lee hoy `Identification.Signal.Year`.
-- **El árbol ya resuelve esto al lado.** `RecommendationsRailView` pinta sus motivos con
-  `ResourceKeyConverter`, cuyo propio resumen dice: «los códigos de motivo viajan como claves para que
-  las palabras sigan al idioma». La misma clase de dato, traducida en una vista y en crudo en la otra.
-- **`ExplanationSummary` tiene el mismo problema y es peor**: es `string.Join(", ", codes)` y va en
-  `AutomationProperties.HelpText`, así que **un lector de pantalla también recita las rutas**.
-- **Cuesta 11 cadenas × 2 idiomas.** Van con su prueba de que la lista de códigos del dominio y la de
-  claves declaradas **coinciden exactamente**, o el duodécimo código nacerá crudo como estos once.
+- ~~**`CandidateCardView` pinta códigos internos en crudo**~~ **HECHO el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-explanation-codes.md)). `ExplanationCodes` llevaba rutas con
+  puntos —`Identification.Error.KindConflict`, `Identification.Signal.Title`— y la plantilla las pintaba
+  con `Text="{Binding}"`: **once códigos en el dominio y cero cadenas** para ellos. Era el corazón de la
+  pantalla contestando con un espacio de nombres, y `ExplanationSummary` las recitaba además por
+  `HelpText`. Tres cosas que valen para lo que queda:
+  - **La clave ES el código.** Una transformación sería un segundo sitio donde se escribe el mismo
+    nombre, y los dos divergirían al primer renombrado.
+  - **La puerta recorre `src/` buscando el literal**, como la de hosts de red no declarados, así que el
+    duodécimo código no puede nacer crudo. Afirma primero que el barrido encontró once: un barrido
+    vacío recorre el bucle sin medir nada.
+  - **`ResourceKeyConverter` aprendió a resolver una lista**, para que el `HelpText` se una en el
+    converter y no en un modelo de vista — resolver un recurso necesita la aplicación y su variante.
 
 **Y el título de la ficha es `StableKey`**, la clave estable del candidato, tanto en `Text` como en
 `AutomationProperties.Name`. Hay que medir qué contiene antes de decidir: si es un identificador, la

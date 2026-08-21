@@ -289,6 +289,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <!-- What accepting or correcting a detection writes into it, and what protects it from the next
        detector run. Nothing painted it, so accepting changed nothing you could see. -->
   <x:String x:Key="DetectedMarkerReviewConfirmed">confirmada</x:String>
+  <!-- Why a file was matched to a title. The domain writes these as dotted codes and they travelled
+       to the screen raw until 2026-08-21: the answer to "why do you think this is that film" was a
+       namespace. A test scans src/ for the code literals, so a twelfth cannot be born without words.
+       The key IS the code: a mapping would be a second place where the same name is written. -->
+  <x:String x:Key="Identification.Duplicate.NeedsReview">Se parecen lo bastante como para que alguien decida si son el mismo</x:String>
+  <x:String x:Key="Identification.Duplicate.SameEpisode">Es el mismo episodio que otro archivo de tu biblioteca</x:String>
+  <x:String x:Key="Identification.Duplicate.SameMovie">Es la misma película que otro archivo de tu biblioteca</x:String>
+  <x:String x:Key="Identification.Error.KindConflict">El archivo parece del otro tipo: una serie donde se esperaba una película, o al revés</x:String>
+  <x:String x:Key="Identification.Signal.Duration">La duración coincide</x:String>
+  <x:String x:Key="Identification.Signal.Episode">El número de episodio coincide</x:String>
+  <x:String x:Key="Identification.Signal.Season">El número de temporada coincide</x:String>
+  <x:String x:Key="Identification.Signal.Title">El título coincide</x:String>
+  <x:String x:Key="Identification.Signal.Year">El año coincide</x:String>
+  <x:String x:Key="Identification.Warning.AmbiguousName">El nombre del archivo admite más de una lectura</x:String>
+  <x:String x:Key="Identification.Warning.EpisodeContradiction">El nombre del archivo y sus datos no dicen el mismo episodio</x:String>
   <x:String x:Key="HomeAccessibleName">Inicio</x:String>
   <x:String x:Key="HomeTitle">Inicio</x:String>
   <x:String x:Key="HomeResumeAccessibleName">Continuar viendo</x:String>
