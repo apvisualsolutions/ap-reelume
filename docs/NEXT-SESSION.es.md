@@ -4,9 +4,25 @@
 
 **`main` y la rama en `dc4ce60`, CI verde, árbol limpio.** La fase 6 va por **4 tramos de 9 cerrados**
 —Shell, Inicio, Biblioteca y fichas, y el Reproductor entero— **y el 5 por la mitad**:
-`AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)) y las **tres del
-«mismo esqueleto»** ([su evidencia](evidence/stable/audit-settings-skeleton.md)) están hechas.
-**Quedan tres: `PrivacySettingsView`, `LifecycleSettingsView` y `DiagnosticsPreviewView`.**
+`AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del
+«mismo esqueleto»** ([su evidencia](evidence/stable/audit-settings-skeleton.md)) y **la estructura de la
+página entera** ([su evidencia](evidence/stable/audit-settings-page-structure.md)) están hechas.
+
+**⚠ Y esa tercera CORRIGIÓ a la segunda el mismo día**, que es la lección más cara del tramo: la §4
+describe cada vista en su propio artboard, así que «título 28» se leyó como «cada una es una página». No
+lo son — **las siete están apiladas en un solo `ScrollViewer`**—, y aplicarlo puso cuatro encabezados de
+nivel 1 en una página y un escalón de 158 px por el medio. **Una decisión sobre jerarquía se mide sobre
+la pantalla ensamblada**, que es la mitad que una tabla por vista no puede ver. Es la segunda vez que
+esta regla se cobra algo: la primera fue `LibraryEntryView`.
+
+**Quedan dos piezas del tramo 5: `LifecycleSettingsView` y `DiagnosticsPreviewView`.**
+`PrivacySettingsView` **no necesita nada de su fila**, y está medido: sus dos gramáticas ya conviven
+—`CanRefreshAutomatically` gobierna un `IsVisible` y `DiagnosticsEnabled` un `IsEnabled`—, **un hijo
+invisible no deja hueco** (medido: el hermano siguiente sube de y=72 a y=36, así que el `Spacing` del
+`StackPanel` salta los invisibles), el **contorno punteado ya llega** a un botón deshabilitado (medido:
+`DisabledOutline.IsShown` pasa de `False` a `True`), y **la lista de hosts no puede estar vacía**:
+`NetworkPurposeRegistry.Declared` declara **4** y es estática. El estado vacío que la §4 le pide **no lo
+puede ver nadie** — séptima discrepancia §4↔árbol.
 
 **Lo siguiente, sin nada que deliberar: las tres vistas que le quedan al tramo 5**, todas medidas y con
 su discrepancia anotada abajo. Por orden de calado: `PrivacySettingsView` distinguiendo **ausente de

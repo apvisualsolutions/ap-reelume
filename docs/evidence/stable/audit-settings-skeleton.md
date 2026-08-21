@@ -5,6 +5,13 @@ descripción, controles a 620 px, Padding SpaceXLarge`. **Ninguna de las tres lo
 apareció algo que la fila no sabía. / §4 groups three views under "same skeleton"; none of the three
 had it, and measuring them turned up something the row did not know.
 
+**⚠ Corrección: la mitad del título de este trabajo se deshizo el mismo día.** Subir esos títulos a
+`FontSizeTitle` (28) y nivel 1 fue leer la §4 vista por vista; **medido sobre el shell ensamblado**, las
+siete vistas de ajustes están apiladas en un solo `ScrollViewer`, así que eso puso cuatro encabezados de
+nivel 1 en una página y un escalón de 158 px por el medio. La superficie y la columna **sí** eran
+correctas, y se extendieron a las siete. Ver [su auditoría](audit-settings-page-structure.md). /
+Correction: the title half of this was undone the same day by the assembled measurement.
+
 Fecha / Date: 2026-08-21. Rama / Branch: `codex/ap-reelume-mvp-x64`.
 
 ## Lo que era el «mismo esqueleto» / What the "same skeleton" was

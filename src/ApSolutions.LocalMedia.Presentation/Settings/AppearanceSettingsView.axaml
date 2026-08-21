@@ -18,11 +18,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space16}">
       <TextBlock
-          FontSize="{DynamicResource FontSizeTitle}"
+          FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource AppearanceTitle}"
-          automation:AutomationProperties.HeadingLevel="1" />
+          automation:AutomationProperties.HeadingLevel="2" />
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource AppearanceDescription}"
@@ -71,11 +71,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </Button>
       </WrapPanel>
       <TextBlock
-          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontSize="{DynamicResource FontSizeBody}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource LanguageTitle}"
-          automation:AutomationProperties.HeadingLevel="2" />
+          automation:AutomationProperties.HeadingLevel="3" />
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource LanguageDescription}"

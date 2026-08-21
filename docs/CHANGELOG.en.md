@@ -183,6 +183,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Settings is one page and now reads like one.** Its seven sections started in two different places,
+  four of them titled at the size of a page title, and the page had no title of its own. The page is
+  now headed "Settings" and the seven sections are aligned and one size. For anybody navigating by
+  heading with a screen reader, this used to be one destination with four top levels inside it.
+
+
 - **The settings pages look like each other.** Scanning, recommendations, and segment detection had a
   smaller title than the appearance page, no margin around them, and no reading width. All four now
   share the same skeleton.

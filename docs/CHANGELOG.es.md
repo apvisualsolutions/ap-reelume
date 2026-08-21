@@ -184,6 +184,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Ajustes es una página y ahora se lee como una.** Sus siete apartados empezaban en dos sitios
+  distintos, cuatro de ellos con el título del tamaño de un título de página, y la página no tenía
+  título propio. Ahora la página se titula «Ajustes» y los siete apartados están alineados y al mismo
+  tamaño. Para quien navega por encabezados con un lector de pantalla, esto era antes un destino con
+  cuatro primeros niveles dentro.
+
+
 - **Las páginas de ajustes se parecen entre ellas.** Escaneo, recomendaciones y detección de segmentos
   tenían el título más pequeño que la de apariencia, sin margen alrededor y sin ancho de lectura. Las
   cuatro comparten ahora el mismo esqueleto.

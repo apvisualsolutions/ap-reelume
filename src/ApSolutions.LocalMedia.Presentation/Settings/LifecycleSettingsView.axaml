@@ -10,7 +10,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="settings:LifecycleSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource LifecycleSettingsAccessibleName}">
-  <StackPanel x:Name="LifecycleSettingsSurface" Spacing="{DynamicResource Space12}">
+  <!-- §4's skeleton for a settings section: the padded surface and the 620 reading column that every
+       section on this page shares. Without it this one started 158 px to the left of the others. -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+  <StackPanel x:Name="LifecycleSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -86,4 +89,5 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource LifecycleSettingsPrivacyNotice}"
         TextWrapping="Wrap" />
   </StackPanel>
+  </Border>
 </UserControl>

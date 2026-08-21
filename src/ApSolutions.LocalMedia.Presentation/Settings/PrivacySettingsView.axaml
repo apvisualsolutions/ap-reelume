@@ -15,7 +15,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="PrivacyResourceKey" />
   </UserControl.Resources>
-  <StackPanel x:Name="PrivacySurface" Spacing="{DynamicResource Space12}">
+  <!-- §4's skeleton for a settings section: the padded surface and the 620 reading column that every
+       section on this page shares. Without it this one started 158 px to the left of the others. -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+  <StackPanel x:Name="PrivacySurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -123,4 +126,5 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource PrivacyOfflineNotice}"
         TextWrapping="Wrap" />
   </StackPanel>
+  </Border>
 </UserControl>
