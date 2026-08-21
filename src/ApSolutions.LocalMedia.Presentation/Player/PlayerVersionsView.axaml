@@ -45,13 +45,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
             version nobody could switch to. The label takes the star column and wraps; the button
             keeps its own width and its place.
           -->
-          <Grid Margin="0,2" ColumnDefinitions="*,Auto">
+          <!--
+            36 tall, which is what §4 gives a row of this column, and the 2 above and below is the gap
+            between rows rather than part of one. The label truncates instead of wrapping: in a row of
+            fixed height a second line is hidden rather than read, so the whole string goes to the
+            tooltip and the first line ends in an ellipsis.
+          -->
+          <Grid Height="36" Margin="0,2" ColumnDefinitions="*,Auto">
             <TextBlock
                 Grid.Column="0"
+                Classes="row-label"
                 Margin="0,0,12,0"
-                VerticalAlignment="Center"
                 Text="{Binding QualityLabel}"
-                TextWrapping="Wrap" />
+                ToolTip.Tip="{Binding QualityLabel}" />
             <Button
                 Grid.Column="1"
                 automation:AutomationProperties.Name="{DynamicResource PlayerVersionsSwitchAction}"

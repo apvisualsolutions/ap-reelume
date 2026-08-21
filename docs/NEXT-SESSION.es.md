@@ -2,17 +2,38 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `d288941`, verde; la rama por delante con los glifos del transporte.** La fase 6 va por
+**`main` en `d288941`, verde; la rama por delante con dos commits del tramo 4.** La fase 6 va por
 **3 tramos de 9 cerrados y el 4 a una pieza**: Shell, Inicio, Biblioteca y fichas, y del Reproductor
-todo salvo **las filas de 36 px de las cuatro listas**.
+todo salvo **`LooseFileBanner`**.
 
-**Lo siguiente, sin nada que deliberar:** cerrar el tramo 4 con esa pieza, que está decidida y escrita
-abajo. Y **medida el 2026-08-21, antes de escribirla**: las dos listas de la columna **pintan el
-`ToString()` de un record de dominio** —`IntroMarker { Id = …GUID…, SeriesId = SeriesId { Value =
-…GUID… }, … }`— y el selector de tipo de marcador pinta `Intro`/`Recap`/`Credits` **sin traducir**,
-porque no existen claves para los tres valores de `MarkerKind`. Con `TextTrimming=None` y 292 px de
-ancho, ese texto se corta sin elipsis y sin tooltip. **Fijar la fila a 36 px sin arreglar la etiqueta
-formalizaría el defecto**, así que las dos cosas van en el mismo cambio.
+**⚠ Y esa pieza estuvo a punto de darse por cerrada sin mirarla.** La sección de estado que abría el
+día decía que al tramo 4 le quedaban dos cosas y no la nombraba, pero **su viñeta nunca se tachó**.
+Medida el 2026-08-21: el banner **sí está superpuesto al vídeo** —lo monta `ShellView.axaml` dentro del
+mismo `Panel` que los cuatro superpuestos, sobre el escenario—, así que la §4 tiene razón en esa mitad.
+**Un resumen propio confirma lo que uno cree haber hecho**: lo que cierra un tramo es su lista de
+vistas, no la frase que lo resume.
+
+**Lo siguiente, decidido y medido, en dos pasos:**
+
+1. **`LooseFileBanner` deja de estar superpuesto al vídeo.** Sale del `Panel` de superpuestos de
+   `ShellView` a una fila propia encima del escenario. Es la mitad de la §4 que es correcta.
+2. **Y la otra mitad de su fila se rechaza, con su medición: los 48 px de alto no caben.** El banner
+   no es un aviso de una línea — lleva encabezado, el nombre del archivo, una explicación que envuelve,
+   la acción, y **un panel de confirmación con su propia explicación y dos botones más**. La §4 marca
+   esa fila **«Bloqueado: el defecto medido el 17-08 impide que llegue a pantalla, así que no puedo
+   verificarlo»**: está escrita sin haber podido ver el control. **Quinta discrepancia §4↔árbol, y
+   manda el árbol.**
+
+Después, el tramo 5: **Ajustes (7 vistas)**, cuya fila está en la tabla de abajo.
+`AppearanceSettingsView` pasa de 3 botones de tema a **5**, y su `StackPanel` horizontal **tiene** que
+ser `WrapPanel` —cinco no caben en 620 px y **la división no se fija a mano**, porque en español
+pliega 4+1 y en inglés cae en otro sitio—; y `PrivacySettingsView` debe distinguir **ausente de
+deshabilitado**.
+
+**Antes de escribir nada, mide la vista contra su fila de la §4.** La regla se ha pagado sola **las
+cinco veces**, y en el tramo 4 encontró de golpe el peor defecto medido hasta hoy: **las dos listas del
+lateral pintaban el `ToString()` de un record de dominio**, dos GUID y el nombre de la clase, a la
+vista de cualquiera.
 
 ### Lo que la sesión del 2026-08-21 dejó, y no está sólo en los commits
 
@@ -244,8 +265,9 @@ filas en `WrapPanel` desde el andamio.
     afirmaba `Content == AutomationProperties.Name`, cierto mientras los dos salían de la misma
     clave. Ahora afirma **la mitad que no puede moverse**: el nombre es la palabra de la clave, el
     contenido es un punto de código de uso privado, y los dos son distintos.
-- **Las cuatro listas: filas de 36 px, sin scroll horizontal y truncado con tooltip.** **Es lo último
-  del tramo 4**, y lo que la medición del 2026-08-21 encontró dentro es más de lo que la §4 pedía:
+- ~~**Las cuatro listas: filas de 36 px, sin scroll horizontal y truncado con tooltip**~~ **HECHAS el
+  2026-08-21** ([su evidencia](evidence/stable/audit-side-list-rows.md)). Lo que la medición encontró
+  dentro era más de lo que la §4 pedía:
   - `MarkerEditorView` tiene `MinHeight=96` y `DetectedMarkerReviewView` `MinHeight=72` en sus
     `ListBox`, y **ninguna fija la altura de fila**: medida, la fila sale a **44 px** y sale de sumar
     el relleno del `ListBoxItem` al alto del texto, así que `Height` a solas no la baja a 36 —es la

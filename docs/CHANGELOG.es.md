@@ -150,7 +150,31 @@ evidencia, es [FEATURES.md](FEATURES.md).
   nada. Y ahora se ve sobre el mismo negro del reproductor, porque un color juzgado contra el gris de
   una pantalla de ajustes no es el que verás sobre una película.
 
+### Corregido
+
+- **Las listas de marcas y de detecciones enseñaban el contenido interno del programa.** Cada fila
+  pintaba algo como `IntroMarker { Id = 1111…, SeriesId = SeriesId { Value = d1f7… }, Kind = Intro,
+  … }`: dos identificadores internos y el nombre de una clase, cortados por el borde de la columna sin
+  manera de leer el resto. Ahora cada fila dice lo que es —«Introducción · 0:30–2:00»— y, si el texto
+  no cabe, termina en puntos suspensivos con el texto entero en el globo de ayuda.
+
+
+- **El selector de tipo de marca estaba sin traducir.** Ofrecía «Intro», «Recap» y «Credits» en
+  español, que son los nombres internos de los tres tipos. Ahora dice «Introducción», «Resumen» y
+  «Créditos», y las mismas palabras aparecen en las listas.
+
+
+- **Aceptar una detección no cambiaba nada visible.** Aceptar o corregir un segmento detectado es lo
+  que lo protege de la siguiente pasada del detector, y la lista quedaba exactamente igual que antes.
+  Ahora la fila lo dice: «Créditos · 46:40–50:00 · confirmada».
+
 ### Cambiado
+
+- **Las cuatro listas del lateral del reproductor tienen filas de la misma altura.** Marcadores,
+  detecciones, pistas y versiones pasan a filas de 36 píxeles que nunca se desplazan de lado: lo que no
+  cabe se corta con puntos suspensivos y se lee entero en el globo de ayuda. En la lista de versiones,
+  una etiqueta larga ocupaba varias líneas de altura variable.
+
 
 - **Los botones del reproductor llevan símbolos en vez de palabras.** Reproducir, pausar, detener,
   los dos saltos, silenciar y los cinco del mini reproductor pasan a los pictogramas de Windows. No es

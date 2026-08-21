@@ -149,7 +149,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   And it now sits on the same black as the player, because a colour judged against the grey of a
   settings page is not the one you will see over a film.
 
+### Fixed
+
+- **The marker and detection lists were showing the program's own internals.** Each row painted
+  something like `IntroMarker { Id = 1111…, SeriesId = SeriesId { Value = d1f7… }, Kind = Intro, … }`:
+  two internal identifiers and a class name, cut off at the edge of the column with no way to read the
+  rest. Each row now says what it is — "Intro · 0:30–2:00" — and when the text does not fit it ends in
+  an ellipsis with the whole of it in the tooltip.
+
+
+- **The marker kind picker was untranslated.** It offered "Intro", "Recap", and "Credits" in Spanish,
+  which are the three kinds' internal names. It now uses real words, and the same words appear in the
+  lists.
+
+
+- **Accepting a detection changed nothing you could see.** Accepting or correcting a detected segment
+  is what protects it from the next detector run, and the list looked exactly as it had before. The row
+  now says so: "Credits · 46:40–50:00 · confirmed".
+
 ### Changed
+
+- **The four lists in the player's side column have rows of one height.** Markers, detections, tracks,
+  and versions move to 36-pixel rows that never scroll sideways: what does not fit is cut with an
+  ellipsis and read in full in the tooltip. In the versions list a long label used to take several
+  lines of varying height.
+
 
 - **The player buttons carry symbols instead of words.** Play, pause, stop, both skips, mute, and the
   mini player's five now use the Windows pictograms. This is not a preference: with translated words

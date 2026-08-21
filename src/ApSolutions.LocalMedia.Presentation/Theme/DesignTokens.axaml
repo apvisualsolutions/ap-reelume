@@ -1075,6 +1075,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
   </Style>
 
+  <!--
+    The four lists of the player's 320 px column. §4 asks for rows of 36, never a sideways scroll, and
+    text truncated into a tooltip; the height and the truncation live here because the four are one
+    change, and repeating them per view is how three of them end up agreeing and the fourth does not.
+
+    Height and not MinHeight: measured on 2026-08-21, a marker row came out at 44 with MinHeight 0,
+    because the row's height is the container's padding plus a line of text. That is the same shape as
+    the progress bar that read 4 where 3 was asked - the setter that names the number is not always the
+    one that decides it - so the padding loses its vertical half in the same breath.
+
+    A descendant selector and not a child one: the container is generated inside the items panel, so
+    ListBox.side-list > ListBoxItem matches nothing at all and would fail silently.
+  -->
+  <Style Selector="ListBox.side-list ListBoxItem">
+    <Setter Property="Height" Value="36" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="ComboBox.side-list ComboBoxItem">
+    <Setter Property="Height" Value="36" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!--
+    The label of such a row. It never wraps, because a row of fixed height that wrapped would hide the
+    second line rather than shorten the first; what it does instead is end in an ellipsis and hand the
+    whole string to a tooltip, which is the only reason truncating is acceptable at all.
+  -->
+  <Style Selector="TextBlock.row-label">
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="TextWrapping" Value="NoWrap" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
   <Style Selector="Button.theme-option">
     <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
