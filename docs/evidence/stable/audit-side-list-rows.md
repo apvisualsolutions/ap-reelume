@@ -104,10 +104,36 @@ hace a una opción. Y los contenedores se buscan por el **árbol lógico**, porq
 vive en una raíz de ventana emergente propia y no está bajo los visuales del control. / The containers
 are found through the logical tree: an open dropdown lives in a popup root of its own.
 
+## Y la vuelta de CI que costó, que fue una guarda muerta / And the CI round it cost, which was a dead guard
+
+El primer intento de este cambio se fue en rojo por la puerta de cobertura, y **no por el trinquete**:
+`MarkerRowLabelConverter.cs` es **archivo nuevo**, y para esos la puerta no admite deuda — 96/96 o rojo.
+Medido, el archivo estaba en **100 % de líneas y 50 % de ramas de una sola línea**: / Measured, the file
+was at 100% of lines and 50% of the branches of a single line:
+
+```
+MarkerRowLabelConverter.cs  lines=56/56
+   line 101  50% (4/8)
+```
+
+Las cuatro ramas sin cubrir eran **guardas que nada puede tomar**: `Application.Current is not null` en
+un converter que **construye el AXAML** y que corre con la aplicación en pie, y el
+`value?.ToString() ?? key` de un recurso que siempre existe y siempre es texto. **Una rama que nadie
+puede tomar es el defecto de la casa con cara de prudencia**, y la respuesta no era escribirle una
+prueba imposible: era quitarla. / A branch nothing can take is the defect of the house with the face of
+caution, and the answer was not to write it an impossible test but to remove it.
+
+Lo que **sí** es alcanzable se quedó, y ahora tiene prueba: un `MarkerKind` puede ganar un cuarto valor
+en un commit que se olvide de los dos diccionarios, y una clave puede quedar redefinida con algo que no
+son palabras. Las dos se prueban de verdad — la segunda **metiendo la clave en el diccionario de la
+aplicación con un número dentro y sacándola después**, para que la aserción sea sobre la rama y no sobre
+el estado que otra prueba dejó. Resultado: `line-rate=1 branch-rate=1`. / Both are reachable and now
+tested, the second by arranging the resource rather than waiting for it.
+
 ## El verde / The green
 
 ```
-UiTests             655/655
+UiTests             658/658
 AccessibilityTests  135/135
 IntegrationTests    456/457, 1 omitida por diseño / 1 skipped by design
 DocumentationTests  87/87
