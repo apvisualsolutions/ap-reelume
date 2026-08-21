@@ -2,8 +2,7 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `dc4ce60`; la rama por delante con el tramo 5 entero.** La fase 6 va por **5 tramos de 9
-cerrados**
+**`main` y la rama en `8ded2ea`, CI verde, árbol limpio.** La fase 6 va por **5 tramos de 9 cerrados**
 —Shell, Inicio, Biblioteca y fichas, el Reproductor entero y **Ajustes**—:
 `AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del
 «mismo esqueleto»** ([su evidencia](evidence/stable/audit-settings-skeleton.md)) y **la estructura de la
@@ -124,6 +123,48 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 3. **No se reescribe la etiqueta de un botón existente.** `Content` y `AutomationProperties.Name`
    apuntan a la misma clave, así que reescribir una etiqueta **es renombrar el control** y rompe el
    paseo. El paquete declara **0 renombrados** a propósito.
+
+#### El tramo 6 (Revisión, Metadatos, Catálogo), medido el 2026-08-21 sin escribir código
+
+**Siete vistas, y lo primero que aparece es el peor defecto medido en toda la fase 6.**
+
+**⚠ `CandidateCardView` PINTA CÓDIGOS INTERNOS EN CRUDO.** `ExplanationCodes` es
+`IReadOnlyList<string>` y lo que lleva son rutas con puntos —`Identification.Error.KindConflict`,
+`Identification.Signal.Title`, `Identification.Warning.AmbiguousName`—, y la plantilla las pinta con
+`Text="{Binding}"`, sin converter. Medido: **once códigos** en `src/ApSolutions.LocalMedia.Domain`, y
+**cero** de ellos tiene cadena en `Strings.es.axaml` ni en `.en.axaml`.
+
+- **Es el corazón de la pantalla**: la explicación es la respuesta a «¿por qué crees que este archivo es
+  esta película?». Quien revisa una identificación lee hoy `Identification.Signal.Year`.
+- **El árbol ya resuelve esto al lado.** `RecommendationsRailView` pinta sus motivos con
+  `ResourceKeyConverter`, cuyo propio resumen dice: «los códigos de motivo viajan como claves para que
+  las palabras sigan al idioma». La misma clase de dato, traducida en una vista y en crudo en la otra.
+- **`ExplanationSummary` tiene el mismo problema y es peor**: es `string.Join(", ", codes)` y va en
+  `AutomationProperties.HelpText`, así que **un lector de pantalla también recita las rutas**.
+- **Cuesta 11 cadenas × 2 idiomas.** Van con su prueba de que la lista de códigos del dominio y la de
+  claves declaradas **coinciden exactamente**, o el duodécimo código nacerá crudo como estos once.
+
+**Y el título de la ficha es `StableKey`**, la clave estable del candidato, tanto en `Text` como en
+`AutomationProperties.Name`. Hay que medir qué contiene antes de decidir: si es un identificador, la
+ficha se titula con un identificador.
+
+**Lo demás de la fila, medido vista por vista:**
+
+| Vista | Lo que la §4 pide | Lo que hay |
+|---|---|---|
+| `ReviewInboxView` | bandeja vacía en `PositiveSurfaceBrush` con glifo — **es el estado deseable** | ni `Empty`, ni `PositiveSurfaceBrush`, ni estado de carga |
+| `CandidateCardView` | portada 92 px + título + año + puntuación, acciones en `WrapPanel` | **no hay portada** (decidido fuera de 0.2.0) y **no hay acciones en la ficha**; su borde usa `SystemControlForegroundBaseMediumBrush`, una clave del tema Fluent y no `ShellBorderBrush` |
+| `DuplicateReviewView` | `UniformGrid` de 2 columnas, la diferencia en monoespaciado, vacío con cadena nueva | `ItemsControl` en una columna, sin monoespaciado, sin vacío; y su `Border` tiene `BorderThickness="1"` **sin `BorderBrush`** |
+| `MetadataEditorView` | los 3 mensajes a bloques con glifo: conflicto y sin identificar en `WarningSurfaceBrush`, sin respuesta como dato neutro | por medir |
+| `RenamePreviewView` | origen y destino monoespaciados; el `→` se queda con su nombre accesible | por medir |
+| `PersonalActionsView`, `WatchStatusControl` | `○ ◐ ●` se quedan y ganan el tamaño óptico de los glifos Fluent | por medir |
+
+**⚠ Y una decisión que hay que tomar en este tramo y no antes: el monoespaciado.** La §4 lo pide aquí
+**dos veces** (duplicados y renombrado) y ya se gastó una en `DiagnosticsPreviewView`, que lo lleva
+literal (`"Consolas,Cascadia Mono,monospace"`). Con **tres consumidores**, una familia declarada deja de
+ser el defecto de la casa y pasa a ser una escala que el árbol pide — que es exactamente el criterio de
+`Space12`. **Ojo: lo que se rechazó fue `FontSizeMono` (un tamaño para un solo consumidor), no una
+familia.** Son cosas distintas y conviene no confundirlas al releer esto.
 
 #### El tramo 5 (Ajustes), medido el 2026-08-21 sin escribir código
 
