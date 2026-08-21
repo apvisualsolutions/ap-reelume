@@ -89,8 +89,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding RefreshCommand}"
             Content="{DynamicResource LibraryApplyAction}" />
       </WrapPanel>
+      <!--
+        Searching and finding nothing is its own answer. The empty library is painted by ShellView and
+        would say something false here: the library is not empty, the search is what found nothing.
+        With no search and no filter this stays away and the shell speaks instead.
+      -->
+      <StackPanel
+          Grid.Row="3"
+          VerticalAlignment="Top"
+          IsVisible="{Binding IsSearchWithoutResults}"
+          Spacing="{DynamicResource Space8}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Text="{DynamicResource LibrarySearchNoResultsTitle}" />
+        <TextBlock Text="{DynamicResource LibrarySearchNoResultsDescription}" TextWrapping="Wrap" />
+      </StackPanel>
+
       <ListBox
           Grid.Row="3"
+          IsVisible="{Binding !IsSearchWithoutResults}"
           ItemsSource="{Binding Items}"
           automation:AutomationProperties.Name="{DynamicResource LibraryResultsListName}">
         <ListBox.ItemsPanel>

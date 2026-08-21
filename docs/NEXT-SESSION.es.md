@@ -118,18 +118,17 @@ con `EnumeratedCount`), el vacío de `ShowDetailsView` (`ShowDetailsEmpty`), «s
 
 **Lo que falta, por vista:**
 
-- **`LibraryView`** es la que más trabajo lleva. (1) La lista es un `ListBox` **vertical** con
-  `VirtualizingStackPanel`, no una cuadrícula fluida; y **la cuadrícula tiene una decisión dentro**:
-  un `WrapPanel` da el reflujo y **pierde la virtualización** que hoy tiene, que es lo que sostiene una
-  biblioteca grande. (2) La fila de filtros es un `Grid` de cuatro columnas y debe ser `WrapPanel` —
-  es la forma que ha sacado un control fuera de la ventana **siete veces**. (3) La búsqueda no tiene
-  botón de borrar: **es un control nuevo**, así que llega con su prueba de nombre accesible y su línea
-  de paseo. (4) «Buscando sin resultados» no existe.
+- **`LibraryView`**, lo que queda: **la cuadrícula fluida con mínimo de 180 px**, que tiene **una
+  decisión dentro** —un `WrapPanel` da el reflujo y **pierde la virtualización** que hoy sostiene una
+  biblioteca grande—, y **el botón de borrar la búsqueda**, que es **un control nuevo** y por tanto
+  llega con su prueba de nombre accesible y su línea de paseo en el mismo cambio. ~~La fila de
+  filtros~~ y ~~«buscando sin resultados»~~ están **HECHAS el 2026-08-20**
+  ([su evidencia](evidence/stable/audit-library-no-results-and-episode-row.md)).
 - **⚠ Y una trampa del paquete, medida:** de sus 22 cadenas de vacío, la primera pareja
   —`LibraryEmptyTitle` / `LibraryEmptyDescription`— **ya existe con otro nombre**: son
   `EmptyLibraryTitle` / `EmptyLibraryDescription`, y **las pinta `ShellView`**, no `LibraryView`.
-  Añadir las del paquete sería duplicar. Las que sí faltan son
-  `LibrarySearchNoResultsTitle` / `…Description`.
+  Añadir las del paquete sería duplicar. `LibrarySearchNoResultsTitle` / `…Description` **ya están
+  gastadas** (2 de sus 22).
 - ~~**`UnavailableBadge`**~~ **HECHO el 2026-08-20** ([su evidencia](evidence/stable/audit-unavailable-badge.md)):
   aviso con borde y glifo `⚠`, y **las cinco copias hechas a mano** —`InProgressRailView`,
   `RecentlyAddedRailView`, `MovieDetailsView`, `ShowDetailsView` y `EpisodeRowView`— montan ya el
@@ -148,9 +147,9 @@ con `EnumeratedCount`), el vacío de `ShowDetailsView` (`ShowDetailsEmpty`), «s
 - **`ShowDetailsView`**: **no tiene selector de temporada**. Hoy apila todas las temporadas en un
   `ItemsControl`. El selector es **un control nuevo** (con su escena), y «una sola temporada oculta el
   selector» es un estado más.
-- **`EpisodeRowView`**: fila de **56 px** y número **monoespaciado alineado a la derecha**. Ojo:
-  **`FontSizeMono` no existe** —se decidió no declarar un escalar que nadie gasta—, así que lo
-  monoespaciado se pide por `FontFamily`, no por tamaño.
+- ~~**`EpisodeRowView`**~~ **HECHA el 2026-08-20**: 56 px y número monoespaciado en columna fija.
+  **Lo que se afirma es que la columna cuadra** —el 9 y el 10 terminan en la misma x—, no cómo se
+  llama la fuente: el ancho fijo con alineación es el fin y la familia es el medio.
 
 **⚠ Y UNA TERCERA, QUE APARECIÓ AL AÑADIR LA PRIMERA VISTA DE LA FASE 6: AÑADIR UNA SUPERFICIE
 CUESTA UNA ENTRADA EN EL TRINQUETE DE COBERTURA.** Todos los `.axaml` de vista de este árbol miden

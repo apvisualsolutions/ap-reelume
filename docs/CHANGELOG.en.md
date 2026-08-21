@@ -10,6 +10,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Searching and finding nothing now tells you.** Until now a search with no matches left the screen
+  blank, without a single line of text. It now says there are no results and why — the current search
+  and filters — and it does **not** say your library is empty, because it is not.
+
+
 - **A check that stops a control from ending up off the screen.** It is the defect that has come up
   most often in this application — seven times — always the same: a row of buttons with translated
   text that does not fit and leaves the last one half outside, where nobody can press it. All
@@ -113,6 +118,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   reachable right now.
 
 ### Changed
+
+- **A series' episode rows are all the same height and their numbers line up in a column.** Every row
+  is the same height, so a season no longer looks like a list that is half loaded, and the episode
+  number is right-aligned in a fixed column: 9 and 10 end at the same point.
+
 
 - **The rows of buttons in the library and on the cards wrap onto more than one line when they do not
   fit.** The search and filter row, and the action rows on a film and on a series, used to leave the

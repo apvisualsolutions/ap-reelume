@@ -14,6 +14,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Library;
@@ -161,6 +162,61 @@ public sealed class LibraryNavigationTests
             Assert.True(File.Exists(artifactPath));
             window.Close();
         }
+    }
+
+    /// <summary>
+    /// Searching and finding nothing says so, and says something different from an empty library.
+    /// </summary>
+    /// <remarks>
+    /// The empty library is painted by <c>ShellView</c>, not by this view, so until now a search that
+    /// matched nothing showed <b>no text at all</b> — and the empty-library sentence would have been
+    /// false anyway: the library is not empty, the search is what found nothing. The third case is the
+    /// one that keeps this honest: with no search and no filter, an empty result is the empty library
+    /// and this view stays quiet, because saying both would be two answers to one question.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Searching_and_finding_nothing_says_so_without_claiming_the_library_is_empty()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
+        var title = Resource("LibrarySearchNoResultsTitle");
+
+        Assert.Contains(title, await VisibleTextsAsync(search: "nada de esto existe", results: []));
+        Assert.DoesNotContain(title, await VisibleTextsAsync(search: null, results: []));
+        Assert.DoesNotContain(
+            title,
+            await VisibleTextsAsync(
+                search: "arrival",
+                results: [Item(1, CatalogTitleKind.Movie, "Arrival")]));
+    }
+
+    private static async Task<string[]> VisibleTextsAsync(string? search, CatalogItem[] results)
+    {
+        var viewModel = new LibraryViewModel(new RecordingQueryService(new CatalogPage(results, null)))
+        {
+            Search = search,
+        };
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        var view = new LibraryView { DataContext = viewModel };
+        var window = new Window { Width = 1024, Height = 720, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var texts = view.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => block.IsEffectivelyVisible)
+            .Select(block => block.Text ?? string.Empty)
+            .ToArray();
+        window.Close();
+        return texts;
+    }
+
+    private static string Resource(string key)
+    {
+        Assert.True(
+            Avalonia.Application.Current!.TryFindResource(key, out var value),
+            $"{key} is not declared, so nothing can paint it.");
+        return Assert.IsType<string>(value);
     }
 
     private static CatalogItem Item(int seed, CatalogTitleKind kind, string title) => new(

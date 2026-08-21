@@ -11,6 +11,7 @@ using ApSolutions.LocalMedia.Presentation.Catalog;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Show;
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -383,6 +384,51 @@ public sealed class DetailsNavigationTests
         Assert.Throws<ArgumentOutOfRangeException>(() => new SeasonViewModel(-1, []));
         Assert.Throws<ArgumentNullException>(() => new SeasonViewModel(1, null!));
         Assert.Throws<ArgumentNullException>(() => new EpisodeRowViewModel(null!, null));
+    }
+
+    /// <summary>
+    /// An episode row is 56 px tall and its numbers end on the same pixel, whatever their width.
+    /// </summary>
+    /// <remarks>
+    /// §4 asks for the number to be monospaced and right-aligned "so the column lines up", and what
+    /// lines a column up is measurable: episode 9 and episode 10 have to finish at the same x. Asserted
+    /// that way rather than on the font family, because a family name is a means and the alignment is
+    /// the end — and a proportional font in a fixed, right-aligned column would satisfy the row's
+    /// purpose while a monospaced one in a loose column would not.
+    /// </remarks>
+    [AvaloniaFact]
+    public void An_episode_row_is_56_px_tall_and_its_numbers_end_on_the_same_pixel()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
+
+        var show = new ShowDetailsViewModel();
+        show.Apply(
+            Item(ShowId, CatalogTitleKind.Show, "Crónicas", isAvailable: true),
+            [
+                EpisodeEntry(301, season: 1, number: 9, isAvailable: true, hasFile: true),
+                EpisodeEntry(302, season: 1, number: 10, isAvailable: true, hasFile: true),
+            ],
+            new Dictionary<ContentKey, WatchState>());
+
+        var view = new ShowDetailsView { DataContext = show };
+        var window = new Window { Width = 1024, Height = 720, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var rows = view.GetVisualDescendants().OfType<EpisodeRowView>().ToArray();
+        Assert.Equal(2, rows.Length);
+        Assert.All(rows, row => Assert.Equal(56, row.Bounds.Height));
+
+        var rightEdges = rows
+            .Select(row => Assert.Single(
+                row.GetVisualDescendants().OfType<TextBlock>(),
+                block => block.Text is "9" or "10"))
+            .Select(block => block.TranslatePoint(new Point(block.Bounds.Width, 0), window)!.Value.X)
+            .ToArray();
+        Assert.Equal(rightEdges[0], rightEdges[1], precision: 3);
+
+        window.Close();
     }
 
     [AvaloniaFact]

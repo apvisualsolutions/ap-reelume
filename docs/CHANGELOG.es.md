@@ -10,6 +10,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Buscar y no encontrar nada ya te lo dice.** Hasta ahora una búsqueda sin resultados dejaba la
+  pantalla en blanco, sin una sola línea de texto. Ahora dice que no hay resultados y por qué —la
+  búsqueda y los filtros actuales—, y **no** dice que tu biblioteca esté vacía, porque no lo está.
+
+
 - **Una comprobación que impide que un mando quede fuera de la pantalla.** Es el defecto que más veces
   ha aparecido en esta aplicación —siete—, siempre igual: una fila de botones con textos traducidos
   que no cabe y deja el último medio fuera, donde nadie puede pulsarlo. Ahora las cuarenta y ocho
@@ -113,6 +118,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   mucho, el año en un tono secundario y el aviso de que un medio no está disponible ahora mismo.
 
 ### Cambiado
+
+- **Las filas de episodios de una serie miden todas lo mismo y sus números cuadran en columna.** Cada
+  fila tiene la misma altura, así que una temporada ya no parece una lista a medio cargar, y el número
+  del episodio va alineado a la derecha en una columna fija: el 9 y el 10 terminan en el mismo punto.
+
 
 - **Las filas de botones de la biblioteca y de las fichas se reparten en varias líneas cuando no
   caben.** La fila de búsqueda y filtros, y las de acciones de una película y de una serie, dejaban al

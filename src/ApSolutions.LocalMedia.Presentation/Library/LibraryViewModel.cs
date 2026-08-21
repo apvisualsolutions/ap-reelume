@@ -56,19 +56,37 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     public IReadOnlyList<CatalogItemViewModel> Items
     {
         get => _items;
-        private set => SetField(ref _items, value);
+        private set
+        {
+            if (SetField(ref _items, value))
+            {
+                OnPropertyChanged(nameof(IsSearchWithoutResults));
+            }
+        }
     }
 
     public string? Search
     {
         get => _search;
-        set => SetField(ref _search, value);
+        set
+        {
+            if (SetField(ref _search, value))
+            {
+                OnPropertyChanged(nameof(IsSearchWithoutResults));
+            }
+        }
     }
 
     public CatalogFilter Filters
     {
         get => _filters;
-        set => SetField(ref _filters, value);
+        set
+        {
+            if (SetField(ref _filters, value))
+            {
+                OnPropertyChanged(nameof(IsSearchWithoutResults));
+            }
+        }
     }
 
     public CatalogSort Sort
@@ -115,6 +133,17 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     public bool IsShowDetails => Surface == LibrarySurface.ShowDetails;
 
     public bool HasMore => _nextCursor is not null;
+
+    /// <summary>
+    /// The query narrowed the catalogue and nothing came back.
+    /// </summary>
+    /// <remarks>
+    /// Told apart from an empty library on purpose, and the empty library is not this view's sentence
+    /// anyway — <c>ShellView</c> paints it. Without the narrowing test this would claim the library is
+    /// empty every time somebody mistypes a title, which is false and unhelpful at the same time.
+    /// </remarks>
+    public bool IsSearchWithoutResults =>
+        Items.Count == 0 && (!string.IsNullOrWhiteSpace(Search) || Filters != CatalogFilter.None);
 
     public ICommand RefreshCommand { get; }
 

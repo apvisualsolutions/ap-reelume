@@ -320,6 +320,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="LibraryFilterFavorite">Favorites</x:String>
   <x:String x:Key="LibraryFilterWatchLater">Watch later</x:String>
   <x:String x:Key="LibraryFilterRated">Rated</x:String>
+  <x:String x:Key="LibrarySearchNoResultsTitle">No results</x:String>
+  <x:String x:Key="LibrarySearchNoResultsDescription">No title matches the current search and filters.</x:String>
   <x:String x:Key="RecommendationsAccessibleName">Local recommendations</x:String>
   <x:String x:Key="RecommendationsHeading">You might like</x:String>
   <x:String x:Key="RecommendationsToggleAction">Turn recommendations on or off</x:String>
