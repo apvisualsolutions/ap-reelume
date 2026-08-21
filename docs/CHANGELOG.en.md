@@ -151,6 +151,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The reduced-motion notice said the same thing whether the setting was on or off.** "AP Reelume
+  respects the Windows reduced-motion preference" is a sentence about the program's intentions, not
+  about the state of your machine — and the program already knew the answer. It now says which of the
+  two states you are in.
+
+
 - **The marker and detection lists were showing the program's own internals.** Each row painted
   something like `IntroMarker { Id = 1111…, SeriesId = SeriesId { Value = d1f7… }, Kind = Intro, … }`:
   two internal identifiers and a class name, cut off at the edge of the column with no way to read the

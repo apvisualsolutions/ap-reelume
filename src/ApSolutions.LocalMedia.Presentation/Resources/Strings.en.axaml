@@ -47,7 +47,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ThemeSystem">System</x:String>
   <x:String x:Key="ThemeLight">Light</x:String>
   <x:String x:Key="ThemeDark">Dark</x:String>
+  <!-- Two states and not one. The page holds IThemeService, whose AnimationsEnabled is the
+       negation of the reduced-motion service, so until 2026-08-21 it knew the answer and said the
+       same sentence either way. -->
   <x:String x:Key="ReducedMotionNotice">AP Reelume respects the Windows reduced-motion preference.</x:String>
+  <x:String x:Key="ReducedMotionActiveNotice">Windows reduced motion is on: AP Reelume animates nothing.</x:String>
   <x:String x:Key="StartupAccessibleName">AP Reelume startup</x:String>
   <x:String x:Key="StartupStatus">Preparing your library…</x:String>
   <x:String x:Key="RecoveryAccessibleName">Safe library recovery</x:String>

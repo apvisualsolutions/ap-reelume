@@ -32,6 +32,18 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
 
     public string DarkStateCue => GetStateCue(ThemePreference.Dark);
 
+    /// <summary>
+    /// Which of the two reduced-motion sentences the page shows, as a key rather than as words.
+    /// </summary>
+    /// <remarks>
+    /// A key and not a sentence, the same way the recommendation reasons travel, so the words follow
+    /// the chosen language instead of being decided when this property was read. And the answer was
+    /// already here: <c>AnimationsEnabled</c> is the negation of the reduced-motion service, so this
+    /// page held the thing that knew and said the same sentence whether Windows was animating or not.
+    /// </remarks>
+    public string ReducedMotionNoticeKey =>
+        _themeService.AnimationsEnabled ? "ReducedMotionNotice" : "ReducedMotionActiveNotice";
+
     public string CurrentLanguage => _languageService?.Current ?? "es";
 
     public string SpanishStateCue => CurrentLanguage == "es" ? "●" : "○";

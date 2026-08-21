@@ -152,6 +152,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El aviso de movimiento reducido decía lo mismo estuviera activo o no.** «AP Reelume respeta la
+  preferencia de reducción de movimiento de Windows» es una frase sobre las intenciones del programa,
+  no sobre el estado de tu equipo — y el programa ya sabía la respuesta. Ahora dice cuál de los dos
+  estados tienes.
+
+
 - **Las listas de marcas y de detecciones enseñaban el contenido interno del programa.** Cada fila
   pintaba algo como `IntroMarker { Id = 1111…, SeriesId = SeriesId { Value = d1f7… }, Kind = Intro,
   … }`: dos identificadores internos y el nombre de una clase, cortados por el borde de la columna sin

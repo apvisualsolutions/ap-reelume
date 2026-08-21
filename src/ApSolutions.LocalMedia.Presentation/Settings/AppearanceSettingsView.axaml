@@ -7,10 +7,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme"
     x:DataType="settings:AppearanceSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource AppearanceAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="AppearanceResourceKey" />
+  </UserControl.Resources>
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space16}">
       <TextBlock
@@ -23,7 +27,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource AppearanceDescription}"
           TextWrapping="Wrap" />
-      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
+      <!--
+        A WrapPanel and not a horizontal StackPanel. §4 gives the reason as "five will not fit in 620",
+        and that reason is void: there are three, and measured on 2026-08-21 they total 263 px in
+        Spanish and 241 in English inside a 620-wide column. What earns the change is the shape - a
+        horizontal StackPanel offers its children infinite width and draws them where they fall, which
+        is how a control has ended up outside the window eight times here - and the fact that the
+        length of these labels belongs to a translator rather than to this file.
+
+        Three and not five, and that is decided rather than pending: ThemePreference.cs says the two
+        high-contrast variants are a state read from Windows, not a fourth and fifth choice to pick.
+      -->
+      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
         <Button
             Classes="theme-option"
             automation:AutomationProperties.Name="{DynamicResource ThemeSystem}"
@@ -54,7 +69,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <TextBlock Text="{DynamicResource ThemeDark}" />
           </StackPanel>
         </Button>
-      </StackPanel>
+      </WrapPanel>
       <TextBlock
           FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
@@ -65,7 +80,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource LanguageDescription}"
           TextWrapping="Wrap" />
-      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
+      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
         <Button
             Classes="theme-option"
             automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
@@ -86,8 +101,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <TextBlock Text="{DynamicResource LanguageEnglish}" />
           </StackPanel>
         </Button>
-      </StackPanel>
+      </WrapPanel>
+      <!--
+        Which of the two sentences this shows is a key the view model picks, the way the recommendation
+        reasons travel, so the words follow the chosen language. It said the same thing either way
+        until 2026-08-21, while holding the service that knew: AnimationsEnabled is the negation of the
+        reduced-motion preference.
+      -->
       <Border
+          x:Name="ReducedMotionSurface"
           Padding="16"
           Background="{DynamicResource AccentSubtleBrush}"
           BorderBrush="{DynamicResource ShellBorderBrush}"
@@ -95,7 +117,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           CornerRadius="{DynamicResource CornerRadiusMedium}">
         <TextBlock
             Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource ReducedMotionNotice}"
+            Text="{Binding ReducedMotionNoticeKey, Converter={StaticResource AppearanceResourceKey}}"
             TextWrapping="Wrap" />
       </Border>
     </StackPanel>

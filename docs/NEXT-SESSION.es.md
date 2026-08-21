@@ -2,14 +2,16 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` y la rama en `14786ba`, CI verde, árbol limpio.** La fase 6 va por **4 tramos de 9 cerrados**:
-Shell, Inicio, Biblioteca y fichas, y el Reproductor entero.
+**`main` y la rama en `dc4ce60`, CI verde, árbol limpio.** La fase 6 va por **4 tramos de 9 cerrados**
+—Shell, Inicio, Biblioteca y fichas, y el Reproductor entero— **y el 5 empezado**:
+`AppearanceSettingsView` está hecha ([su evidencia](evidence/stable/audit-appearance-page.md)).
 
-**Lo siguiente, sin nada que deliberar: el tramo 5, Ajustes (7 vistas)**, cuya fila está en la tabla de
-abajo. `AppearanceSettingsView` pasa de 3 botones de tema a **5**, y su `StackPanel` horizontal
-**tiene** que ser `WrapPanel` —cinco no caben en 620 px y **la división no se fija a mano**, porque en
-español pliega 4+1 y en inglés cae en otro sitio—; y `PrivacySettingsView` debe distinguir **ausente de
-deshabilitado**.
+**Lo siguiente, sin nada que deliberar: seguir el tramo 5 por las seis vistas que quedan**, todas
+medidas y con su discrepancia anotada abajo. Por orden de calado: las **tres del «mismo esqueleto»**
+—que no lo comparten: cuatro páginas de ajustes titulan con `FontSizeSubtitle` y una con
+`FontSizeTitle`, y tres no tienen ni `Padding` ni los 620 px—; `PrivacySettingsView` distinguiendo
+**ausente de deshabilitado**; `LifecycleSettingsView` con su aviso de «sin bandeja» como advertencia; y
+`DiagnosticsPreviewView`, que envuelve el texto que alguien lee **para decidir si lo comparte**.
 
 **Antes de escribir nada, mide la vista contra su fila de la §4.** La regla se ha pagado sola **las
 cinco veces**, y en el tramo 4 encontró de golpe el peor defecto medido hasta hoy: **las dos listas del
@@ -108,7 +110,8 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 
 **Siete vistas, y lo primero que la medición dice es que la fila de la §4 se equivoca en su cabecera.**
 
-**⚠ Los 3 botones de tema NO pasan a 5, y la razón está escrita en el árbol con su porqué.**
+**⚠ HECHO el 2026-08-21 ([su evidencia](evidence/stable/audit-appearance-page.md)): los 3 botones de
+tema NO pasan a 5, y la razón está escrita en el árbol con su porqué.**
 `ThemePreference` tiene **exactamente tres** valores, y `Theme/ThemePreference.cs` lleva la decisión
 escrita encima de los dos de alto contraste: «*son un estado, no una cuarta elección: las tres píldoras
 de Apariencia se quedan como están, y cuál de estas se aplica se lee del sistema en vez de elegirse*».
