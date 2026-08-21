@@ -219,9 +219,12 @@ filas en `WrapPanel` desde el andamio.
     en una columna junto a otras tres: una que desaparece mueve las demás, y quien busca «¿hay otra
     versión?» merece leer «una sola» en vez de no encontrar dónde estaba. Es la excepción a la
     gramática de ausente, y se anota porque contradice a `PrivacySettingsView`.
-- **`VideoStatusOverlay`** pinta sus **seis** estados con **un solo `ShellSurfaceBrush`**, y la §4 lo
-  parte en dos gramáticas: HDR10, tonemapping, SDR y aceleración son **datos** (texto secundario, sin
-  caja) y la caída a software y el formato no soportado son **avisos** (`WarningSurfaceBrush`).
+- ~~**`VideoStatusOverlay` en dos gramáticas**~~ **HECHO el 2026-08-21**
+  ([su evidencia](evidence/stable/audit-video-status-grammars.md)): los cuatro datos a texto de
+  leyenda secundario y los dos avisos con su caja ámbar y el glifo — **tercer par de los seis
+  pinceles de gramática gastado**. **⚠ Discrepancia decidida:** la §4 pide los datos **sin caja** y
+  conservan la del distintivo, porque **flota sobre el vídeo** y un texto sin superficie se lee
+  contra un fotograma arbitrario: no hay contraste que garantizar ni medir.
 - ~~**Los cuatro superpuestos**~~ **HECHOS el 2026-08-21**
   ([su evidencia](evidence/stable/audit-overlay-caps.md)), y la medición encontró que **el defecto
   del 2026-08-17 seguía medio vivo**: con las dos alineaciones puestas y una frase larga dentro,

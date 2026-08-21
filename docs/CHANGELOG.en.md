@@ -139,6 +139,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The video status badge tells a fact apart from a warning.** It said six things that all looked the
+  same: HDR passing through, or the graphics card decoding — facts about a video playing perfectly —
+  looked exactly like "this fell back to software decoding". The facts are now secondary text and the
+  two warnings carry their own amber box with a symbol. None of the six is an error: the video is
+  playing.
+
+
 - **The player has a background of its own, and it is the same under every theme.** Everything else in
   the application follows the light or dark theme you pick; the player does not, because what sits on
   it is the picture. It is a very dark grey rather than pure black, so the bars above and below do not

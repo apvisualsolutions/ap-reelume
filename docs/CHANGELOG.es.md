@@ -140,6 +140,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El distintivo de estado del vídeo distingue lo que es un dato de lo que es un aviso.** Decía seis
+  cosas con el mismo aspecto: que el HDR pasa tal cual o que decodifica la tarjeta gráfica —que son
+  datos sobre un vídeo que va perfectamente— se veían igual que «esto ha caído a decodificación por
+  software». Ahora los datos son texto secundario y los dos avisos llevan su propio recuadro ámbar con
+  símbolo. Ninguno de los seis es un error: el vídeo se está viendo.
+
+
 - **El reproductor tiene su propio fondo, y es el mismo con cualquier tema.** Todo lo demás en la
   aplicación sigue el tema claro u oscuro que elijas; el reproductor no, porque lo que se apoya encima
   es la imagen. Es un negro muy oscuro pero no negro puro, para que las bandas de arriba y abajo no

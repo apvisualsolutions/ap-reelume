@@ -29,43 +29,76 @@ SPDX-License-Identifier: GPL-3.0-or-later
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="{DynamicResource CornerRadiusMedium}">
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          x:Name="HdrPassthroughText"
-          IsVisible="{Binding IsHdrPassthrough}"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource VideoStatusHdrPassthrough}"
-          TextWrapping="Wrap" />
-      <TextBlock
-          x:Name="ToneMappedText"
-          IsVisible="{Binding IsToneMapped}"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource VideoStatusToneMapped}"
-          TextWrapping="Wrap" />
-      <TextBlock
-          x:Name="StandardRangeText"
-          IsVisible="{Binding IsStandardDynamicRange}"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource VideoStatusStandardRange}"
-          TextWrapping="Wrap" />
-      <TextBlock
-          x:Name="HardwareText"
-          IsVisible="{Binding IsHardwareAccelerated}"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource VideoStatusHardware}"
-          TextWrapping="Wrap" />
-      <TextBlock
-          x:Name="SoftwareFallbackText"
-          IsVisible="{Binding FellBackToSoftware}"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource VideoStatusSoftwareFallback}"
-          TextWrapping="Wrap" />
-      <TextBlock
-          x:Name="UnsupportedFormatText"
-          IsVisible="{Binding IsUnsupportedFormat}"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource VideoStatusUnsupportedFormat}"
-          TextWrapping="Wrap" />
+    <StackPanel Spacing="{DynamicResource Space8}">
+      <!--
+        Two grammars in one badge, because these six lines are not the same kind of thing. Which path
+        the video took and whether the GPU is decoding are FACTS about a video that is playing
+        perfectly, so they read as secondary caption text. Falling back to software and an unsupported
+        HDR format are WARNINGS — what plays is not quite what was asked for — and they get the warning
+        surface and the glyph. Neither is a failure; that surface belongs to PlayerView.
+
+        §4 asks for the facts with NO BOX AT ALL, and they keep the badge's. That is a discrepancy on
+        purpose: this badge floats over the video, so text with no surface under it is read against an
+        arbitrary frame and there is no contrast anybody can guarantee. The hierarchy §4 wants is kept
+        — a fact is quieter than a warning — without making a line that some films render unreadable.
+      -->
+      <StackPanel IsVisible="{Binding HasDecodeFacts}" Spacing="{DynamicResource Space4}">
+        <TextBlock
+            x:Name="HdrPassthroughText"
+            IsVisible="{Binding IsHdrPassthrough}"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource VideoStatusHdrPassthrough}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="ToneMappedText"
+            IsVisible="{Binding IsToneMapped}"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource VideoStatusToneMapped}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="StandardRangeText"
+            IsVisible="{Binding IsStandardDynamicRange}"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource VideoStatusStandardRange}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="HardwareText"
+            IsVisible="{Binding IsHardwareAccelerated}"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource VideoStatusHardware}"
+            TextWrapping="Wrap" />
+      </StackPanel>
+
+      <Border
+          x:Name="VideoStatusWarningSurface"
+          Padding="8,4"
+          Background="{DynamicResource WarningSurfaceBrush}"
+          BorderBrush="{DynamicResource WarningBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusSmall}"
+          IsVisible="{Binding HasDecodeWarnings}">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+          <TextBlock VerticalAlignment="Top" Text="⚠" />
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <TextBlock
+                x:Name="SoftwareFallbackText"
+                IsVisible="{Binding FellBackToSoftware}"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{DynamicResource VideoStatusSoftwareFallback}"
+                TextWrapping="Wrap" />
+            <TextBlock
+                x:Name="UnsupportedFormatText"
+                IsVisible="{Binding IsUnsupportedFormat}"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{DynamicResource VideoStatusUnsupportedFormat}"
+                TextWrapping="Wrap" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
     </StackPanel>
   </Border>
 </UserControl>
