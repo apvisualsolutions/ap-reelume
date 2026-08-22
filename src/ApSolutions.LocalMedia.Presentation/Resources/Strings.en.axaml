@@ -40,9 +40,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootAddAction">Add folder</x:String>
   <x:String x:Key="RootScanConsentDescription">The folder is saved. Confirm before its first scan starts.</x:String>
   <x:String x:Key="RootScanConsentAction">Allow first scan</x:String>
+  <x:String x:Key="SettingStateOn">On</x:String>
+  <x:String x:Key="SettingStateOff">Off</x:String>
   <x:String x:Key="AppearanceAccessibleName">Appearance settings</x:String>
   <x:String x:Key="AppearanceTitle">Appearance</x:String>
   <x:String x:Key="AppearanceDescription">Follow the Windows theme or choose light or dark. Changes apply immediately.</x:String>
+  <x:String x:Key="AppearanceThemeLabel">Theme</x:String>
   <x:String x:Key="LanguageTitle">Language</x:String>
   <x:String x:Key="LanguageDescription">The interface, the update summaries, and the metadata speak the same language. The interface changes immediately; metadata uses the new language after the application restarts.</x:String>
   <x:String x:Key="LanguageSpanish">Español</x:String>

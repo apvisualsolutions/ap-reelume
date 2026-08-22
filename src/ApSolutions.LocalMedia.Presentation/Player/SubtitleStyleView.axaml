@@ -23,81 +23,139 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource SubtitleStyleAccessibleName}"
         automation:AutomationProperties.HeadingLevel="2" />
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SubtitleStyleSizeLabel}" />
-      <Slider
-          x:Name="SubtitleSizeSlider"
-          Minimum="{x:Static player:SubtitleStyleViewModel.MinimumFontSizePercent}"
-          Maximum="{x:Static player:SubtitleStyleViewModel.MaximumFontSizePercent}"
-          TickFrequency="10"
-          IsSnapToTickEnabled="True"
-          automation:AutomationProperties.Name="{DynamicResource SubtitleStyleSizeLabel}"
-          Value="{Binding FontSizePercent, Mode=TwoWay}" />
-    </StackPanel>
+    <!--
+      Six row-cards, which is the shape the rest of the settings page took: the label beside its
+      control instead of above it, and the three sliders finally showing the number they are setting.
+      The number is a StringFormat and not a ToString, and that distinction is measured: the per-cent
+      sign sits outside the numeric specifier, where it is a literal. Inside it, "0 %" multiplies by a
+      hundred and writes 8000 for eighty.
+    -->
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Classes="setting-name"
+            VerticalAlignment="Center"
+            Text="{DynamicResource SubtitleStyleSizeLabel}" />
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space12}"
+            VerticalAlignment="Center">
+          <Slider
+              x:Name="SubtitleSizeSlider"
+              Width="170"
+              Minimum="{x:Static player:SubtitleStyleViewModel.MinimumFontSizePercent}"
+              Maximum="{x:Static player:SubtitleStyleViewModel.MaximumFontSizePercent}"
+              TickFrequency="10"
+              IsSnapToTickEnabled="True"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource SubtitleStyleSizeLabel}"
+              Value="{Binding FontSizePercent, Mode=TwoWay}" />
+          <TextBlock Classes="setting-state" Text="{Binding FontSizePercent, StringFormat={}{0:0} %}" />
+        </StackPanel>
+      </Grid>
+    </Border>
 
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SubtitleStyleFamilyLabel}" />
-      <ComboBox
-          x:Name="SubtitleFamilySelector"
-          MinWidth="220"
-          automation:AutomationProperties.Name="{DynamicResource SubtitleStyleFamilyLabel}"
-          ItemsSource="{x:Static player:SubtitleStyleViewModel.SafeFontFamilies}"
-          SelectedItem="{Binding FontFamily, Mode=TwoWay}" />
-    </StackPanel>
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Classes="setting-name"
+            VerticalAlignment="Center"
+            Text="{DynamicResource SubtitleStyleFamilyLabel}" />
+        <ComboBox
+            x:Name="SubtitleFamilySelector"
+            Grid.Column="1"
+            MinWidth="220"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource SubtitleStyleFamilyLabel}"
+            ItemsSource="{x:Static player:SubtitleStyleViewModel.SafeFontFamilies}"
+            SelectedItem="{Binding FontFamily, Mode=TwoWay}" />
+      </Grid>
+    </Border>
 
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SubtitleStyleForegroundLabel}" />
-      <TextBox
-          x:Name="SubtitleForegroundBox"
-          MinWidth="140"
-          automation:AutomationProperties.Name="{DynamicResource SubtitleStyleForegroundLabel}"
-          Text="{Binding ForegroundHex, Mode=TwoWay}" />
-    </StackPanel>
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Classes="setting-name"
+            VerticalAlignment="Center"
+            Text="{DynamicResource SubtitleStyleForegroundLabel}" />
+        <TextBox
+            x:Name="SubtitleForegroundBox"
+            Grid.Column="1"
+            Width="140"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource SubtitleStyleForegroundLabel}"
+            Text="{Binding ForegroundHex, Mode=TwoWay}" />
+      </Grid>
+    </Border>
 
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SubtitleStyleBackgroundLabel}" />
-      <TextBox
-          x:Name="SubtitleBackgroundBox"
-          MinWidth="140"
-          automation:AutomationProperties.Name="{DynamicResource SubtitleStyleBackgroundLabel}"
-          Text="{Binding BackgroundHex, Mode=TwoWay}" />
-    </StackPanel>
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Classes="setting-name"
+            VerticalAlignment="Center"
+            Text="{DynamicResource SubtitleStyleBackgroundLabel}" />
+        <TextBox
+            x:Name="SubtitleBackgroundBox"
+            Grid.Column="1"
+            Width="140"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource SubtitleStyleBackgroundLabel}"
+            Text="{Binding BackgroundHex, Mode=TwoWay}" />
+      </Grid>
+    </Border>
 
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SubtitleStyleBackgroundOpacityLabel}" />
-      <Slider
-          x:Name="SubtitleBackgroundOpacitySlider"
-          Minimum="0"
-          Maximum="1"
-          TickFrequency="0.1"
-          IsSnapToTickEnabled="True"
-          automation:AutomationProperties.Name="{DynamicResource SubtitleStyleBackgroundOpacityLabel}"
-          Value="{Binding BackgroundOpacity, Mode=TwoWay}" />
-    </StackPanel>
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Classes="setting-name"
+            VerticalAlignment="Center"
+            Text="{DynamicResource SubtitleStyleBackgroundOpacityLabel}" />
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space12}"
+            VerticalAlignment="Center">
+          <Slider
+              x:Name="SubtitleBackgroundOpacitySlider"
+              Width="170"
+              Minimum="0"
+              Maximum="1"
+              TickFrequency="0.1"
+              IsSnapToTickEnabled="True"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource SubtitleStyleBackgroundOpacityLabel}"
+              Value="{Binding BackgroundOpacity, Mode=TwoWay}" />
+          <TextBlock Classes="setting-state" Text="{Binding BackgroundOpacity, StringFormat={}{0:0.0}}" />
+        </StackPanel>
+      </Grid>
+    </Border>
 
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SubtitleStyleOutlineLabel}" />
-      <Slider
-          x:Name="SubtitleOutlineSlider"
-          Minimum="0"
-          Maximum="{x:Static player:SubtitleStyleViewModel.MaximumOutlineThickness}"
-          TickFrequency="0.5"
-          IsSnapToTickEnabled="True"
-          automation:AutomationProperties.Name="{DynamicResource SubtitleStyleOutlineLabel}"
-          Value="{Binding OutlineThickness, Mode=TwoWay}" />
-    </StackPanel>
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Classes="setting-name"
+            VerticalAlignment="Center"
+            Text="{DynamicResource SubtitleStyleOutlineLabel}" />
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space12}"
+            VerticalAlignment="Center">
+          <Slider
+              x:Name="SubtitleOutlineSlider"
+              Width="170"
+              Minimum="0"
+              Maximum="{x:Static player:SubtitleStyleViewModel.MaximumOutlineThickness}"
+              TickFrequency="0.5"
+              IsSnapToTickEnabled="True"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource SubtitleStyleOutlineLabel}"
+              Value="{Binding OutlineThickness, Mode=TwoWay}" />
+          <TextBlock Classes="setting-state" Text="{Binding OutlineThickness, StringFormat={}{0:0.0}}" />
+        </StackPanel>
+      </Grid>
+    </Border>
 
     <!--
       The preview previews. It used to take the shell's card surface and the theme's text colour, so
