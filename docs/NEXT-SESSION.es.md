@@ -1,6 +1,82 @@
 # Dónde retomar
 
-## LO PRIMERO: el plan de seis pasos del rediseño está HECHO (2026-08-22, noche)
+## LO PRIMERO (2026-08-22, madrugada): «Añadir medios» hecho, y el reproductor empezado
+
+**De las cuatro piezas que la sesión anterior dejó nombradas, la 1 está hecha y la 2 está empezada.**
+
+1. ~~**«Añadir medios» al pie del carril.**~~ **HECHA.** Cadena `NavigationAddMedia` en los dos
+   idiomas —**516 → 517 por idioma**, que es justo el objetivo del paquete—, clase
+   `Button.navigation-action` con el borde que el prototipo le da y les niega a los cinco destinos, y
+   el carril pasa de `StackPanel` a `DockPanel` **con el botón declarado primero**, porque un
+   `DockPanel` reparte en orden de declaración y el último hijo se queda con lo que sobra.
+   - **No es un segundo «Biblioteca», y eso costó pensarlo.** `AppRoute` está afirmado en exactamente
+     cinco nombres y la superficie donde se añade una carpeta vive **dentro** de la ruta Biblioteca,
+     así que navegar era todo lo que podía hacer. Lo que lo distingue es la segunda mitad:
+     `BeginAddMedia` navega **y vacía el formulario**, y eran **tres restos reales** — la ruta que
+     nadie limpiaba al aceptar una carpeta (y que hacía que un segundo intento contestara «ya está en
+     la biblioteca»), la negativa que sólo se borraba al acertar, y una retirada dejada a medio
+     confirmar.
+2. **EL REPRODUCTOR — primer tramo hecho: el transporte.** Ver abajo lo que queda.
+3. **Ajustes, Revisión, Metadatos, Catálogo, Copias** — 16 vistas, sin tocar.
+4. **Los iconos de las demás vistas** — la lupa, el `+` — sin tocar.
+
+### El reproductor: lo hecho y lo que queda, medido contra el prototipo
+
+**Hecho (commit «The player says where you are…»):**
+
+- La franja del transporte es **de ancho completo con un hairline arriba**, sobre la superficie del
+  reproductor, en vez de una tarjeta flotante con 16 px de margen por la que se veía la imagen a
+  izquierda y derecha.
+- **La barra de posición existe por primera vez.** `Position`, `Duration` y `SeekAsync` llevaban
+  siempre en el modelo y **ninguna vista los leía**. Ahora: transcurrido · barra · duración, con la
+  hora sólo cuando la hay, y `PlaybackClock` como único sitio donde vive ese formato.
+- La cifra del volumen, que tampoco estaba.
+- Dos tokens nuevos, `PlayerChromeBrush` y `PlayerHairlineBrush`, **sólidos en los dos altos
+  contrastes** y afirmados ahí.
+
+**⚠ Y un defecto que encontró su propia prueba, que NO se deduce del XAML:** un `Slider` de Avalonia
+recorta lo que se escribe en `Value` contra el `Maximum` **de ese instante**. El modelo anunciaba la
+posición antes que la duración, así que 120 segundos entraban en una barra de máximo 1, se recortaban
+a 1, y el manejador convertía el recorte en un salto: **la barra movía la película sola**. Corregido
+por los dos lados —el orden de notificación y una guarda que compara el máximo con la duración—.
+Ninguno de los dos sobra.
+
+**Lo que queda del reproductor, en orden:**
+
+1. **La cabecera del prototipo**: `[✕] título · subtítulo [Sesión N] … [Audio][Subtítulos][Vídeo]
+   [Marcadores][mini][pantalla completa]`. Los tres botones de la derecha **ya existen** —
+   `PlayerCloseAction`, `PlayerMiniModeAction`, `PlayerFullscreenAction`— y hoy viven con palabras
+   dentro de la columna de 320; moverlos a una cabecera con glifos es la mitad barata.
+   - **⚠ El título NO se puede pintar todavía, y está medido**: `PlayerSurfaces` no lleva el título
+     del medio y `PlayerViewModel` sólo tiene `MediaPath`. Pintar una ruta como título es lo
+     contrario de lo que hace esta aplicación. Es la misma omisión declarada que el año de las
+     recomendaciones.
+2. **La columna de 320 pasa a ser un panel conmutable** con los cuatro botones de arriba, en vez de
+   cinco vistas apiladas siempre visibles. Es el cambio más grande que queda del área.
+3. **El orden `atrás · reproducir · adelante`** del prototipo: hoy reproducir/pausar/detener van
+   después de los saltos. Está medido por qué: los tres son del **coordinador de sesión** y los saltos
+   de **`ControlPlayback`**, dos modelos construidos en momentos distintos, así que intercalarlos es
+   mover órdenes entre modelos y no botones dentro de un panel.
+4. **La línea de atajos del pie. DECIDIDO: no se hace.** Los atajos de esta aplicación se configuran
+   en `ShortcutSettingsView`, así que una línea fija diría algo que puede ser falso.
+
+### Y una trampa de medición que costó tres capturas, y ya está en la memoria
+
+**Un script de PowerShell que no declara conciencia de DPI recibe de `GetWindowRect` un rectángulo
+virtualizado** —1195 × 767 para una ventana que mide 1770 × 1140— y `PrintWindow` pinta el contenido
+real dentro de ese mapa de bits más pequeño. Se pierde la esquina inferior derecha, que es justo donde
+estaba el control que se quería mirar: **tres capturas dijeron «el botón no se dibuja» y el botón
+estaba ahí**. Lo zanjó UIAutomation, que sí es consciente del DPI.
+`SetProcessDpiAwarenessContext(-4)` antes de capturar.
+
+**Y para el prototipo, que necesita HTTP y scripts:** `python -m http.server` sobre `design/`, y
+`chrome --headless=new --window-size=1600,1000 --virtual-time-budget=6000 --screenshot=…`. Para llegar
+a una pantalla que no es la inicial, se copia el `.dc.html` al borrador y se cambia su estado inicial
+—`player: {...}` en vez de `player: null`— porque el prototipo no lee la URL.
+
+## Lo que la sesión del 2026-08-22 (noche) dejó escrito, y sigue valiendo
+
+### El plan de seis pasos del rediseño está HECHO (2026-08-22, noche)
 
 **Los seis pasos de abajo están construidos y empujados**, cada uno con su commit, sus mediciones y su
 comprobación con la aplicación abierta. Lo que sigue debajo es el plan tal como se escribió, con cada
@@ -57,7 +133,7 @@ porque cuatro archivos **mejoraron**. Cerrado el mismo día copiando el artefact
   dos idiomas** queda atado: `App.TitleBarHeight` y la primera fila de `ShellView` son el mismo
   número, y hay prueba.
 
-## La siguiente sesión, en orden, y con lo que cuesta cada pieza
+### La lista de cuatro piezas, tal como se escribió (la 1 está hecha; la 2, empezada)
 
 **El encargo sigue siendo el mismo: que la aplicación se parezca al prototipo.** Lo que queda no es
 una fase, son piezas nombradas, y este es el orden por el que se gana más parecido por unidad de

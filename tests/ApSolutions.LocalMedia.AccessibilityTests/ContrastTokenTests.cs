@@ -34,6 +34,7 @@ public sealed class ContrastTokenTests
         "ShellSurfaceBrush",
         "PlayerSurfaceBrush",
         "PlayerChromeBrush",
+        "PlayerPanelBrush",
         "PlayerHairlineBrush",
         "NavigationSurfaceBrush",
         "CardSurfaceBrush",
@@ -182,6 +183,11 @@ public sealed class ContrastTokenTests
         {
             var brushes = themes[theme];
             Assert.Equal(brushes["PlayerSurfaceBrush"], brushes["PlayerChromeBrush"]);
+
+            // The panel column too: in high contrast a surface that is nearly the one beside it is a
+            // surface somebody cannot find the edge of, so it stops being its own shade and the
+            // hairline does the separating.
+            Assert.Equal(brushes["PlayerSurfaceBrush"], brushes["PlayerPanelBrush"]);
             Assert.Equal(
                 7,
                 brushes["PlayerChromeBrush"].Length);

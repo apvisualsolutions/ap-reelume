@@ -1,10 +1,25 @@
 # Where to resume
 
-## State on opening (2026-08-22)
+## State on opening (2026-08-22, small hours)
 
-**Tranches 7 and 8 are closed. Only tranche 9 is left: the four animations, still 0 in the tree.**
-The Spanish note is the one kept current — read [NEXT-SESSION.es.md](NEXT-SESSION.es.md) for the
-detail. What matters in either language:
+**The redesign's six-step plan is built. Of the four pieces named after it, "Add media" is done and
+the player has had its first tranche.** The Spanish note is the one kept current — read
+[NEXT-SESSION.es.md](NEXT-SESSION.es.md) for the detail. In either language:
+
+- **"Add media" sits at the foot of the navigation rail**, and it is an action rather than a sixth
+  destination: `AppRoute` is asserted to hold exactly five names, and what makes this its own control
+  is that it clears the form as well as navigating — three real leftovers, one of which made a second
+  press answer "it is already in the library".
+- **The player's transport is a band across the foot and it finally says where you are.**
+  `Position`, `Duration` and `SeekAsync` had been in the model all along with no view reading them.
+- **A defect its own test found, which never shipped**: an Avalonia `Slider` clamps what is written
+  into `Value` against the `Maximum` it holds at that instant, and the model announced the position
+  before the duration — so the bar moved the film by itself, to second one.
+- **A measurement trap worth keeping**: a PowerShell script that does not declare DPI awareness is
+  handed a virtualised `GetWindowRect`, and `PrintWindow` then crops the bottom-right corner. Three
+  screenshots said a control was not drawn; UIAutomation said it was.
+
+### What the earlier tranches left, and still holds
 
 - **`RootOnboardingView` closed tranche 7.** Three buttons set a kind no view painted; a label written
   in both languages that only the screen reader heard; a refusal, a folder removal and a request for

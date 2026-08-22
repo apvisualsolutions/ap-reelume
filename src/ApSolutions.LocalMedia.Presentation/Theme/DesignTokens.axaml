@@ -142,6 +142,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           -->
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#E60B0D10" />
+          <SolidColorBrush x:Key="PlayerPanelBrush" Color="#111820" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#1AFFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
@@ -344,6 +345,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#E60B0D10" />
+          <SolidColorBrush x:Key="PlayerPanelBrush" Color="#111820" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#1AFFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
@@ -552,6 +554,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerPanelBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
@@ -754,6 +757,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerPanelBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />

@@ -10,6 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The player leaves the rail in view, heads itself, and only takes the column it uses.** Three
+  things the prototype draws and this did differently: the session covered both columns, so **opening
+  a film took the five destinations away with it**; its three buttons — close, mini player and
+  fullscreen — carried words at the head of a column of panels, and are now three pictograms in a band
+  above the picture, with the same names for anybody using a screen reader; and that 320 px column was
+  there **whether or not one of its five panels existed**, so a file with a single audio track, no
+  markers and no other version left an empty rectangle taking a fifth of the picture's width. The
+  width goes back to the film when there is nothing to put in it.
+
+
 - **The player says where you are and how much is left, and its transport is a band rather than a
   card.** The model had a position bar all along — position, duration and a jump to a chosen minute —
   and **nothing painted it**: all three were read on every state change and thrown away, so somebody

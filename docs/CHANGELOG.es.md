@@ -10,6 +10,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El reproductor deja el carril a la vista, se pone cabecera propia y sólo ocupa la columna que
+  usa.** Tres cosas que el prototipo dibuja y que aquí eran distintas: la sesión tapaba las dos
+  columnas, así que **abrir una película se llevaba por delante los cinco destinos**; sus tres botones
+  —cerrar, minirreproductor y pantalla completa— iban con palabras encabezando una columna de paneles,
+  y ahora son tres pictogramas en una franja sobre la imagen, con los mismos nombres para quien usa un
+  lector de pantalla; y esa columna de 320 px estaba ahí **existiera o no alguno de sus cinco
+  paneles**, así que un archivo con una sola pista de audio, sin marcadores y sin otra versión dejaba
+  un rectángulo vacío ocupando un quinto del ancho de la imagen. Ahora la anchura vuelve a la película
+  cuando no hay nada que poner en ella.
+
+
 - **El reproductor dice dónde vas y cuánto queda, y su transporte es una franja y no una tarjeta.**
   Había una barra de posición en el modelo desde siempre —posición, duración y el salto a un minuto
   concreto— y **no se pintaba en ninguna parte**: se leía en cada cambio de estado y se tiraba, así

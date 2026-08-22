@@ -319,6 +319,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(HasNextEpisode));
                 OnPropertyChanged(nameof(HasVersionSwitch));
                 OnPropertyChanged(nameof(HasPlayerVersions));
+                OnPropertyChanged(nameof(HasPlayerPanels));
                 OnPropertyChanged(nameof(HasVideoStatus));
                 OnPropertyChanged(nameof(HasLooseFile));
                 OnPropertyChanged(nameof(IsPrimaryContentVisible));
@@ -382,6 +383,18 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     /// <summary>True only when the playing title has other versions to move the session to.</summary>
     public bool HasPlayerVersions => Player?.Versions is { HasAlternatives: true };
+
+    /// <summary>
+    /// Whether the session's side column has anything in it at all.
+    /// </summary>
+    /// <remarks>
+    /// The column is 320 px of the window and it used to be there whether or not a single one of its
+    /// five panels existed — a file with one audio track, no markers and no other version left an
+    /// empty rectangle taking a fifth of the picture's width. The prototype gives the column to a
+    /// panel when there is one and gives the width back to the film when there is not.
+    /// </remarks>
+    public bool HasPlayerPanels =>
+        HasTracks || HasAudioOutput || HasMarkers || HasDetectedReview || HasPlayerVersions;
 
     public bool HasVideoStatus => Player?.VideoStatus is not null;
 
