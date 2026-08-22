@@ -1,23 +1,29 @@
 # Where to resume
 
-## State on opening (2026-08-22, small hours)
+## State on opening (2026-08-22, evening)
 
-**The redesign's six-step plan is built. Of the four pieces named after it, "Add media" is done and
-the player has had its first tranche.** The Spanish note is the one kept current — read
+**Three of the redesign's four pieces are built**, in four commits on the branch, each with its suites
+green locally: 735 UI tests, 139 accessibility tests with the physical walk among them, and
+`check-walk-coverage` at 0 pending. The Spanish note is the one kept current — read
 [NEXT-SESSION.es.md](NEXT-SESSION.es.md) for the detail. In either language:
 
-- **"Add media" sits at the foot of the navigation rail**, and it is an action rather than a sixth
-  destination: `AppRoute` is asserted to hold exactly five names, and what makes this its own control
-  is that it clears the form as well as navigating — three real leftovers, one of which made a second
-  press answer "it is already in the library".
-- **The player's transport is a band across the foot and it finally says where you are.**
-  `Position`, `Duration` and `SeekAsync` had been in the model all along with no view reading them.
-- **A defect its own test found, which never shipped**: an Avalonia `Slider` clamps what is written
-  into `Value` against the `Maximum` it holds at that instant, and the model announced the position
-  before the duration — so the bar moved the film by itself, to second one.
-- **A measurement trap worth keeping**: a PowerShell script that does not declare DPI awareness is
-  handed a virtualised `GetWindowRect`, and `PrintWindow` then crops the bottom-right corner. Three
-  screenshots said a control was not drawn; UIAutomation said it was.
+- **Settings moved to the prototype's row-card**: eighteen cards plus the template behind the eleven
+  shortcut rows, across eight of the page's ten sections. Three strings, all the prototype's own and
+  in both languages.
+- **The review inbox draws the candidate card**: the whole border tinted by state, the badge in the
+  top right corner, and a confidence bar that never existed, drawn from the same number the percentage
+  is written from.
+- **The player's column switches instead of stacking.** Five tabs, one per panel, each present only
+  when its panel is. Zero lines of C# and zero new strings: Avalonia 12.1.1 skips an invisible tab when
+  it auto-selects, which was measured rather than assumed.
+- **A real accessibility defect, found and fixed on the way**: in the light theme, primary text on the
+  player's surface read **1.10:1** — invisible — and the gate that should have caught it measured seven
+  surfaces with the player's three not among them. Two brushes and nine surfaces now.
+- **What the walk taught**: switching the column put four scenes in the red at once, because a panel
+  that is not the open tab is not in the visual tree. They open their tab with the mouse first now.
+
+**What is left is the fourth piece**: Settings' side index of twelve sections, and the two pill tabs
+of the metadata editor. Both change navigation rather than drawing, and both touch `ShellView`.
 
 ### What the earlier tranches left, and still holds
 

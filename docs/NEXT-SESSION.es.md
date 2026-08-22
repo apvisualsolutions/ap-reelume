@@ -1,126 +1,88 @@
 # Dónde retomar
 
-## LO PRIMERO (2026-08-22, madrugada): «Añadir medios» hecho, y el reproductor empezado
+## LO PRIMERO (2026-08-22, noche): tres de las cuatro piezas del rediseño, hechas
 
-**De las cuatro piezas que la sesión anterior dejó nombradas, la 1 está hecha y la 2 está empezada.**
+**Cuatro commits en la rama, todos con sus suites en verde en local (735 de UI, 139 de accesibilidad
+con el paseo dentro, y `check-walk-coverage` en 0 pendientes).** Lo que sigue es lo que queda.
 
-1. ~~**«Añadir medios» al pie del carril.**~~ **HECHA.** Cadena `NavigationAddMedia` en los dos
-   idiomas —**516 → 517 por idioma**, que es justo el objetivo del paquete—, clase
-   `Button.navigation-action` con el borde que el prototipo le da y les niega a los cinco destinos, y
-   el carril pasa de `StackPanel` a `DockPanel` **con el botón declarado primero**, porque un
-   `DockPanel` reparte en orden de declaración y el último hijo se queda con lo que sobra.
-   - **No es un segundo «Biblioteca», y eso costó pensarlo.** `AppRoute` está afirmado en exactamente
-     cinco nombres y la superficie donde se añade una carpeta vive **dentro** de la ruta Biblioteca,
-     así que navegar era todo lo que podía hacer. Lo que lo distingue es la segunda mitad:
-     `BeginAddMedia` navega **y vacía el formulario**, y eran **tres restos reales** — la ruta que
-     nadie limpiaba al aceptar una carpeta (y que hacía que un segundo intento contestara «ya está en
-     la biblioteca»), la negativa que sólo se borraba al acertar, y una retirada dejada a medio
-     confirmar.
-2. **EL REPRODUCTOR — dos tramos hechos: el transporte y la cabecera.** Ver abajo lo que queda.
-3. **Ajustes, Revisión, Metadatos, Catálogo, Copias** — 16 vistas, sin tocar.
-4. ~~**Los iconos de las demás vistas** — la lupa, el `+`.~~ **HECHOS los dos que la lista nombra.**
-   La lupa va **dentro** del campo, que es donde el prototipo la pone (`left: 9` sobre un campo con
-   34 de relleno izquierdo; las dos cifras viven juntas en el tema, porque el relleno existe para
-   dejarle sitio al glifo), y es **decoración**: `IsHitTestVisible="False"` y sin nombre accesible,
-   porque el campo ya lo lleva y un segundo nombre lo diría dos veces. El `+` va **al lado de la
-   palabra**, como el prototipo, no en su lugar.
+1. ~~**Ajustes: la fila-tarjeta por ajuste.**~~ **HECHA, y más allá de lo pedido.** Dieciocho tarjetas
+   más la plantilla que produce las once filas de atajos, en **ocho de las diez secciones** de la
+   página: nombre, la frase que ya existía debajo, y el control contra el borde derecho con la palabra
+   de estado a su izquierda. Los interruptores pierden la etiqueta que llevaban dentro y **conservan el
+   nombre accesible**; la palabra de estado es `AccessibilityView="Raw"` para que el lector no diga dos
+   veces lo que la casilla ya anuncia. Tres cadenas, las tres del prototipo y en los dos idiomas:
+   `SettingStateOn`, `SettingStateOff`, `AppearanceThemeLabel`.
+2. ~~**Revisión: la tarjeta de candidato.**~~ **HECHA.** Borde **entero** tintado —acento si es
+   sugerida, ámbar si está pendiente; el prototipo tiñe `borderColor`, no un borde izquierdo, y es la
+   única señal que sobrevive a los dos altos contrastes—, distintivo arriba a la derecha y dos columnas
+   debajo, con **una barra de confianza que no existía**, dibujada del mismo número que escribe el
+   porcentaje. Dos cadenas del prototipo: `ReviewProposedCandidate`, `ReviewConfidence`.
+3. ~~**El panel conmutable de la columna del reproductor.**~~ **HECHO.** Cinco pestañas, una por panel,
+   y **cada una existe sólo si su panel existe**. Cero líneas de C# y cero cadenas: cada pestaña lleva
+   el nombre que su panel ya declaraba, y **Avalonia 12.1.1 salta una pestaña invisible al elegir la
+   primera** —medido—, así que nada en el shell tiene que calcular cuál abrir.
+4. **El índice lateral de Ajustes y las pestañas de Metadatos. NO HECHAS: son la pieza que queda.**
+   Tocan `ShellView` y cambian navegación, no dibujo. Ver abajo lo que ya está medido de ellas.
 
-### El reproductor: lo hecho y lo que queda, medido contra el prototipo
+### Y un defecto de accesibilidad encontrado por el camino, medido y corregido
 
-**Hecho (commit «The player says where you are…»):**
+**En el tema claro la columna del reproductor tenía el texto invisible.** `TextPrimaryBrush` (#111827)
+sobre `PlayerSurfaceBrush` (#0B0D10) da **1,10:1** donde WCAG AA pide 4,5:1. Las superficies del
+reproductor son oscuras en los cuatro modos —decidido desde el principio— y la tinta del tema es
+oscura en dos de ellos, así que en cualquier equipo con Windows en claro **no se podían leer** el
+selector de pistas, la salida de audio, las marcas, las detecciones, las versiones, los relojes del
+transporte ni sus tres pictogramas.
 
-- La franja del transporte es **de ancho completo con un hairline arriba**, sobre la superficie del
-  reproductor, en vez de una tarjeta flotante con 16 px de margen por la que se veía la imagen a
-  izquierda y derecha.
-- **La barra de posición existe por primera vez.** `Position`, `Duration` y `SeekAsync` llevaban
-  siempre en el modelo y **ninguna vista los leía**. Ahora: transcurrido · barra · duración, con la
-  hora sólo cuando la hay, y `PlaybackClock` como único sitio donde vive ese formato.
-- La cifra del volumen, que tampoco estaba.
-- Dos tokens nuevos, `PlayerChromeBrush` y `PlayerHairlineBrush`, **sólidos en los dos altos
-  contrastes** y afirmados ahí.
+**Y la puerta que debía cazarlo miraba a otro lado**: `ContrastTokenTests` medía el texto primario
+sobre **siete** superficies y las tres del reproductor no estaban. Ahora son nueve. La corrección son
+dos pinceles, `PlayerTextBrush` y `PlayerTextSecondaryBrush`, claros en los cuatro modos y puestos
+**en el contenedor** donde se puede, porque Avalonia hereda `Foreground` — y en un `Border` eso se
+escribe `TextElement.Foreground`, porque un `Border` no es `TemplatedControl` y no tiene `Foreground`
+propio.
 
-**⚠ Y un defecto que encontró su propia prueba, que NO se deduce del XAML:** un `Slider` de Avalonia
-recorta lo que se escribe en `Value` contra el `Maximum` **de ese instante**. El modelo anunciaba la
-posición antes que la duración, así que 120 segundos entraban en una barra de máximo 1, se recortaban
-a 1, y el manejador convertía el recorte en un salto: **la barra movía la película sola**. Corregido
-por los dos lados —el orden de notificación y una guarda que compara el máximo con la duración—.
-Ninguno de los dos sobra.
+### Lo que el paseo enseñó al conmutar la columna, y hay que recordar
 
-**El segundo tramo, también hecho:** la sesión **deja el carril a la vista** (`Grid.Column="1"`, que
-es el `left: 64` del prototipo — antes ocupaba las dos columnas y **abrir una película se llevaba los
-cinco destinos**), se pone **cabecera propia** con los tres botones de sesión convertidos en
-pictogramas (`E8BB`, `E73F`, `E740`, comprobados dibujados en un render), y la **columna de 320 sólo
-ocupa sitio cuando alguno de sus cinco paneles existe**.
+Las pestañas pusieron **cuatro escenas del paseo en rojo a la vez**, todas diciendo «coincidió con 0
+controles en pantalla». Tenían razón: **un panel que no es la pestaña abierta no está en el árbol
+visual**, así que el clic no tenía dónde caer. Se arregló con un ayudante `OpenPlayerPanelAsync` que
+abre la pestaña **con el ratón** y afirma que el clic la abrió. Un `TabItem` **no** cuenta en el
+inventario del paseo —sólo `Button`, `CheckBox`, `ComboBox`, `Slider`, `ToggleButton`, `RadioButton` y
+`ToggleSwitch`—, así que el trinquete sigue en 0.
 
-**Lo que queda del reproductor, en orden:**
+### La pieza 4, con lo que ya está medido de ella
 
-1. **La columna pasa a ser un panel conmutable** con cuatro botones en la cabecera —Audio, Subtítulos,
-   Vídeo, Marcadores— en vez de cinco vistas montadas a la vez. Es el cambio más grande que queda.
-2. **El título y el distintivo de sesión en la cabecera. NO SE PUEDEN PINTAR, y está medido**:
-   `PlayerSurfaces` no lleva el título del medio y `PlayerViewModel` sólo tiene `MediaPath`. Pintar
-   una ruta como título es lo contrario de lo que hace esta aplicación, y `RepositoryPrivacyTests`
-   existe por eso. Es la misma omisión declarada que el año de las recomendaciones.
-3. **El orden `atrás · reproducir · adelante`** del prototipo: hoy reproducir/pausar/detener van
-   después de los saltos. Está medido por qué: los tres son del **coordinador de sesión** y los saltos
-   de **`ControlPlayback`**, dos modelos construidos en momentos distintos, así que intercalarlos es
-   mover órdenes entre modelos y no botones dentro de un panel.
-4. **La línea de atajos del pie. DECIDIDO: no se hace.** Los atajos de esta aplicación se configuran
-   en `ShortcutSettingsView`, así que una línea fija diría algo que puede ser falso.
+**Ajustes: el índice lateral de doce secciones.** El prototipo enseña **una sección a la vez** con la
+activa resaltada. Aquí Ajustes es una página con diez secciones apiladas en un `ScrollViewer` de
+`ShellView`. **Ojo con la tabla del índice**: dos de sus doce —Copias y restauración, Créditos— son hoy
+destino propio o viven en otra vista, y ya hay decisión escrita de no cambiar un destino por otro.
 
-### La pieza 3, ya MEDIDA contra el prototipo — no vuelvas a extraerla
+**Metadatos: dos pestañas píldora** («Metadatos» / «Renombrado seguro») bajo unas migas «Volver ·
+Biblioteca». Hoy `MetadataEditorView` y `RenamePreviewView` son dos `ContentControl` apilados en la
+ruta Biblioteca, visibles a la vez. El editor va en dos columnas de campos, con el botón de candado a
+la derecha de cada etiqueta y un panel «Arte» aparte.
 
-Capturado el 2026-08-22 con el prototipo en cada ruta (`chrome --headless=new`, cambiando `route:` en
-una copia del `.dc.html`). **Las tres diferencias son estructurales, no de estilo**, y esto es lo que
-cuesta cada área:
+**Y ahora se sabe cómo hacerlo barato**: el `TabControl` de la columna del reproductor es el precedente
+—cero C#, cero cadenas, la selección la lleva el propio control y salta lo invisible—. Lo que **no**
+resuelve es el índice lateral, que no es una pestaña sino una lista con la sección a la derecha.
 
-**Ajustes (7 vistas) — la diferencia más grande de las tres.** El prototipo tiene **un índice lateral
-de doce secciones** —Apariencia, Biblioteca y escaneo, Reproducción, Audio, Subtítulos, Accesibilidad,
-Privacidad, Detección de segmentos, Atajos, Copias y restauración, Actualización, Créditos y
-atribución— con la activa resaltada, y **enseña UNA sección a la vez** a la derecha. Aquí Ajustes es
-**una sola página con diez secciones apiladas** dentro de un `ScrollViewer` de `ShellView`.
-- Y dentro de una sección, la unidad es **una fila-tarjeta por ajuste**: nombre en negrita, descripción
-  debajo en secundario, y **el control alineado a la derecha**, con la palabra de estado
-  («Activado»/«Desactivado») a la izquierda del interruptor y el valor a la derecha del deslizador.
-  Eso sí se puede hacer sin tocar la estructura, y probablemente sea la mitad del parecido por una
-  décima parte del riesgo.
-- **Ojo con la tabla del índice**: dos de sus doce secciones —Copias y restauración, Créditos— son hoy
-  **destino propio** o viven en otra vista. El índice del prototipo y los cinco destinos del carril no
-  son la misma lista, y ya hay una decisión escrita sobre no cambiar un destino por otro.
+### Herramientas de esta sesión que conviene reusar
 
-**Revisión (3 vistas).** Cada candidato es una **tarjeta ancha con borde izquierdo de acento** —azul
-para «Sugerido (60–89 %)», ámbar para «Pendiente (< 60 %)», y el distintivo arriba a la derecha—, con
-miniatura 2:3 a la izquierda y **dos columnas dentro**: «CANDIDATO PROPUESTO» (título, tipo, barra de
-confianza con su porcentaje) y «SEÑALES CONSIDERADAS» (viñetas). Los cuatro botones al pie de la
-tarjeta, con Aceptar como primario. `PosterCardView` ya existe y la miniatura podría salir de ahí.
+- **`shoot.ps1`** (en el scratchpad de la sesión): captura la app con conciencia de DPI, admite
+  `-Invoke <nombre accesible>` para navegar por UIAutomation, `-ScrollPercent` para desplazar el primer
+  `ScrollViewer` desplazable, y `-Exe` para apuntar a otro ejecutable.
+- **Un proyecto `preview` de una sola clase** que pone `App.ShellFactory` y monta la vista que sea, con
+  el tema real. Es lo que permitió **medir** que Avalonia salta una pestaña invisible y **ver** el
+  defecto de contraste antes de tocar nada. Referencia `Presentation` y no toca el árbol.
 
-**Metadatos (2 vistas) — y aquí el prototipo cambia la navegación, no sólo el dibujo.** El editor y el
-renombrado son **dos pestañas píldora de una misma pantalla** («Metadatos» / «Renombrado seguro»), bajo
-unas migas «Volver · Biblioteca» y un antetítulo con el tipo. Hoy `MetadataEditorView` y
-`RenamePreviewView` son **dos `ContentControl` apilados** en la ruta Biblioteca, visibles a la vez.
-- El editor va en **dos columnas de campos**, cada etiqueta con su botón de candado
-  («Bloqueado»/«Desbloqueado») **a la derecha de la etiqueta**, y un panel «Arte» aparte a la derecha
-  con miniaturas elegibles. El pie lleva la nota y «Guardar cambios» alineado a la derecha.
+### La trampa de medición que sigue valiendo
 
-**Catálogo (2) y Copias (2)** siguen la misma gramática de fila-tarjeta; no hacen falta capturas
-propias para empezar.
+**Un script de PowerShell sin conciencia de DPI recibe de `GetWindowRect` un rectángulo virtualizado**
+y `PrintWindow` recorta la esquina inferior derecha. `SetProcessDpiAwarenessContext(-4)` antes de
+capturar; UIAutomation zanja las dudas.
 
-**El orden por parecido ganado / riesgo:** primero la **fila-tarjeta** en Ajustes (sin tocar la
-estructura), luego la **tarjeta de candidato** de Revisión, y sólo después el índice lateral y las
-pestañas, que son cambios de navegación y tocan `ShellView`.
-
-### Y una trampa de medición que costó tres capturas, y ya está en la memoria
-
-**Un script de PowerShell que no declara conciencia de DPI recibe de `GetWindowRect` un rectángulo
-virtualizado** —1195 × 767 para una ventana que mide 1770 × 1140— y `PrintWindow` pinta el contenido
-real dentro de ese mapa de bits más pequeño. Se pierde la esquina inferior derecha, que es justo donde
-estaba el control que se quería mirar: **tres capturas dijeron «el botón no se dibuja» y el botón
-estaba ahí**. Lo zanjó UIAutomation, que sí es consciente del DPI.
-`SetProcessDpiAwarenessContext(-4)` antes de capturar.
-
-**Y para el prototipo, que necesita HTTP y scripts:** `python -m http.server` sobre `design/`, y
-`chrome --headless=new --window-size=1600,1000 --virtual-time-budget=6000 --screenshot=…`. Para llegar
-a una pantalla que no es la inicial, se copia el `.dc.html` al borrador y se cambia su estado inicial
-—`player: {...}` en vez de `player: null`— porque el prototipo no lee la URL.
+**Y para el prototipo:** `python -m http.server` sobre `design/`, y
+`chrome --headless=new --window-size=1600,1000 --virtual-time-budget=6000 --screenshot=…`, con una
+copia del `.dc.html` cuyo estado inicial se cambia, porque el prototipo no lee la URL.
 
 ## Lo que la sesión del 2026-08-22 (noche) dejó escrito, y sigue valiendo
 
