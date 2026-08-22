@@ -12,11 +12,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource RecoveryAccessibleName}">
   <Border Padding="48" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="720" Spacing="{DynamicResource Space16}">
+      <!-- A level one: this is not a section of anything. It is its own window, shown when the
+           database will not open, and the shell deliberately has no route to it. -->
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource RecoveryTitle}" />
+          Text="{DynamicResource RecoveryTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource RecoveryDescription}"
@@ -26,21 +29,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource RecoveryDatabasePathLabel}" />
       <TextBlock
+          FontFamily="{DynamicResource FontFamilyMono}"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{Binding DatabasePath}"
-          TextWrapping="Wrap" />
+          TextWrapping="WrapWithOverflow" />
       <TextBlock
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource RecoveryBackupPathLabel}" />
       <TextBlock
+          FontFamily="{DynamicResource FontFamilyMono}"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{Binding BackupPath}"
-          TextWrapping="Wrap" />
+          TextWrapping="WrapWithOverflow" />
+      <!--
+        The danger surface and not the accent. Accent is what this tree uses for "here is something to
+        consider"; this is the one screen in the application that exists because something broke, and
+        the detail is the reason it could not start.
+      -->
       <Border
+          x:Name="RecoveryFailureSurface"
           Padding="12"
-          Background="{DynamicResource AccentSubtleBrush}"
-          BorderBrush="{DynamicResource ShellBorderBrush}"
+          Background="{DynamicResource DangerSurfaceBrush}"
+          BorderBrush="{DynamicResource DangerBorderBrush}"
           BorderThickness="1"
           CornerRadius="{DynamicResource CornerRadiusMedium}">
         <TextBlock
@@ -48,7 +59,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Text="{Binding FailureDetail}"
             TextWrapping="Wrap" />
       </Border>
-      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
+      <!--
+        Two paths written in fixed width, because somebody reads them to go and find the backup by
+        hand. Measured on 2026-08-22 with a 105-character UNC path in this 720 column: Wrap and
+        WrapWithOverflow lay out identically - 686 x 33, ending at x=776 in a 900 window - because a
+        backslash is a break opportunity, so §4's worry about overflow does not happen here. The row
+        asks for WrapWithOverflow and gets it; this is written down so nobody "fixes" it back.
+      -->
+      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
         <Button
             Classes="primary-action"
             automation:AutomationProperties.Name="{DynamicResource RecoveryOpenBackupFolder}"
@@ -60,7 +78,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding RecoveryCommand}"
             CommandParameter="{x:Static recovery:DatabaseRecoveryAction.Exit}"
             Content="{DynamicResource RecoveryExit}" />
-      </StackPanel>
+      </WrapPanel>
     </StackPanel>
   </Border>
 </UserControl>

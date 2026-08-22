@@ -171,6 +171,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La pantalla de recuperación de la base decía en color suave que algo se había roto.** El detalle del
+  fallo iba sobre el mismo fondo que los avisos amables, cuando esa pantalla sólo aparece si tu
+  biblioteca no ha podido abrirse. Ahora se ve como lo que es. Y las dos rutas van en ancho fijo, que es
+  lo que necesitas para ir a buscar tu copia a mano.
+
+
 - **La vista previa de renombrado escondía justo la parte que cambia.** Las dos rutas se cortaban por
   el final, y el final es el nombre del archivo — lo único que distingue el origen del destino. Ahora
   se acortan por el medio, conservando los dos extremos, y van en ancho fijo para que se lean una

@@ -169,6 +169,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The database recovery screen said something had broken in the gentle colour.** The failure detail
+  sat on the same background as friendly notices, when that screen only appears because your library
+  could not be opened. It now looks like what it is. And both paths are in a fixed-width font, which is
+  what you need to go and find your backup by hand.
+
+
 - **The rename preview was hiding the part that changes.** Both paths were cut off at the end, and the
   end is the file name — the only thing that tells the source from the destination. They now shorten in
   the middle, keeping both ends, and use a fixed-width font so they line up under each other. The arrow

@@ -2,7 +2,7 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `83dc1b1`, verde; la rama por delante con el tramo 6 CERRADO.** La fase 6 va por **5 tramos
+**`main` en `ac3fc65`, verde; el tramo 6 CERRADO y el 7 empezado** (`DatabaseRecoveryView`, [su evidencia](evidence/stable/audit-database-recovery.md)). La fase 6 va por **5 tramos
 de 9 cerrados**
 —Shell, Inicio, Biblioteca y fichas, el Reproductor entero y **Ajustes**—:
 `AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del
@@ -109,7 +109,7 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 | 4 | **Reproductor** (16) | Superficie propia `#0B0D10` y columna fija de 320 px; el fallo pasa a `DangerSurfaceBrush` con glifo; `VideoStatusOverlay` **partido en dos gramáticas** (dato vs aviso); los tres superpuestos con **alineación explícita y `MaxWidth 420`** — es la forma que causó el panel de 1280×1400; las cuatro listas a filas de 36 px sin scroll horizontal. |
 | 5 | **Ajustes** (7) | **Medido el 2026-08-21 sin escribir código, abajo.** Los 3 botones de tema **no pasan a 5** —`ThemePreference` tiene tres y el árbol lleva escrito por qué—; el `StackPanel` horizontal sí pasa a `WrapPanel`, pero **por la otra razón**. Las tres vistas del «mismo esqueleto» **no lo comparten**: cuatro titulan con `FontSizeSubtitle` y una con `FontSizeTitle`. `PrivacySettingsView` debe **distinguir ausente de deshabilitado**, y las dos gramáticas ya están localizadas en ella. |
 | 6 | **Revisión, Metadatos, Catálogo** (7) | La bandeja vacía es **el estado deseable**: `PositiveSurfaceBrush` con glifo, no un vacío triste. |
-| 7 | **Copias, Primeros pasos, Recuperación, Créditos** (5) | `RestoreWizardView`: sólo la raíz ausente gana campo editable y su estado pasa a «Reasignada» al escribir; **se elimina el «Restaurar» duplicado siempre habilitado**. `DatabaseRecoveryView` no gana ruta desde el shell. |
+| 7 | **Copias, Primeros pasos, Recuperación, Créditos** (5) — `DatabaseRecoveryView` **hecha** | `RestoreWizardView`: sólo la raíz ausente gana campo editable y su estado pasa a «Reasignada» al escribir; **se elimina el «Restaurar» duplicado siempre habilitado**. `DatabaseRecoveryView` no gana ruta desde el shell. |
 | 8 | **`UpdateView` y `PlayerView`** | Ya tienen su maqueta; les falta **la gramática de sus mensajes**: 23 en cuatro gramáticas, y 6 motivos de fallo con acciones **condicionadas por motivo** (`CanChooseAnotherVersion` es un flag **independiente**). Y `PlayerRecoveryChooseAnotherVersion` **pasa de `TextBlock` a `Button`**: es el único cambio de tipo del paquete. |
 | 9 | **Las cuatro animaciones** | `apr-in`, `apr-shim`, `apr-tip`, `apr-pulse`, más la transición de la manija. El conducto ya existe (`IReducedMotionService` → `MotionDuration`); **movimiento reducido las lleva a 0 ms, no las acorta**. Hoy no hay ni un `<Animation>` en el árbol. |
 
