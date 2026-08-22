@@ -175,6 +175,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Restaurar pedía una carpeta nueva para cada raíz, incluidas las que están donde deben.** Ahora la
+  caja para escribir una ruta sólo aparece donde hace falta: cuando la carpeta no está o cuando hay un
+  conflicto. Y en cuanto escribes una, la fila deja de decir que falta.
+
+
 - **Una copia de seguridad que falla ya no se ve igual que una que salió bien.** «No hay espacio
   suficiente en el disco» se pintaba sobre el mismo fondo que «Listo». Cancelar sigue sin ser un fallo:
   no se creó nada a medias.

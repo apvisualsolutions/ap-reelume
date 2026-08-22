@@ -85,20 +85,38 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.Name="{DynamicResource RestoreRootsAccessibleName}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="backup:RootRemapRowViewModel">
-          <StackPanel Margin="0,0,0,12" Spacing="{DynamicResource Space4}">
+          <!--
+            Two columns: the folder the backup recorded, and what this row is. §4 asks for the path
+            trimmed from the left because paths are told apart by their end; PathSegmentEllipsis keeps
+            the end and the drive letter, which matters when two roots live on different drives, and it
+            is what the rename preview already uses for the same problem. Fixed width so two of them
+            read one under the other.
+
+            The box only appears where somebody is being asked for something. Every row carried one, so
+            a restore of five roots offered five invitations to change a folder and four of them
+            answered a question nobody asked.
+          -->
+          <Grid Margin="0,0,0,12" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+            <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
+              <TextBlock
+                  FontFamily="{DynamicResource FontFamilyMono}"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  Text="{Binding OldPath}"
+                  TextTrimming="PathSegmentEllipsis" />
+              <TextBox
+                  MaxWidth="520"
+                  HorizontalAlignment="Left"
+                  FontFamily="{DynamicResource FontFamilyMono}"
+                  IsVisible="{Binding NeedsFolder}"
+                  Text="{Binding NewPath}"
+                  automation:AutomationProperties.Name="{DynamicResource RestoreNewFolderLabel}" />
+            </StackPanel>
             <TextBlock
-                Foreground="{DynamicResource TextPrimaryBrush}"
-                Text="{Binding OldPath}"
-                TextWrapping="Wrap" />
-            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Top"
                 Foreground="{DynamicResource TextPrimaryBrush}"
                 Text="{Binding StatusKey, Converter={StaticResource RestoreResourceKey}}" />
-            <TextBox
-                MaxWidth="520"
-                HorizontalAlignment="Left"
-                Text="{Binding NewPath}"
-                automation:AutomationProperties.Name="{DynamicResource RestoreNewFolderLabel}" />
-          </StackPanel>
+          </Grid>
         </DataTemplate>
       </ItemsControl.ItemTemplate>
     </ItemsControl>

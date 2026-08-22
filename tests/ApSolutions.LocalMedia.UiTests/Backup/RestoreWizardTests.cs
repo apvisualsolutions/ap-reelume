@@ -1,11 +1,17 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Globalization;
 using System.Xml.Linq;
 using ApSolutions.LocalMedia.Application.Backup;
 using ApSolutions.LocalMedia.Domain.Backup;
+using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.TestSupport;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Backup;
@@ -400,6 +406,109 @@ public sealed class RestoreWizardTests
         {
             Assert.Contains($"RestoreFinding{kind}", spanish);
         }
+    }
+
+    /// <summary>
+    /// Only the root that needs a folder gets a box to type one into.
+    /// </summary>
+    /// <remarks>
+    /// Every row had a text box, including the ones whose folder is exactly where the backup left it,
+    /// so a restore of five roots offered five invitations to change something and four of them were
+    /// answers to a question nobody asked. A missing folder is a fact rather than a mistake — the
+    /// domain says so where the status is defined — and it is the one that needs an answer.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Only_the_root_that_needs_a_folder_offers_a_box_to_type_one()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var wizard = CreateWizard(preview: (_, _, _) => Task.FromResult(Preview(
+            [
+                new RootRemapDecision(@"R:\mediailms", @"R:\mediailms", RootRemapStatus.Unchanged),
+                new RootRemapDecision(@"Q:\gone\shows", @"Q:\gone\shows", RootRemapStatus.Missing),
+            ],
+            [],
+            10,
+            0)));
+        await wizard.PreviewAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(2, wizard.Roots.Count);
+
+        var view = new RestoreWizardView { DataContext = wizard };
+        var window = new Window { Width = 900, Height = 900, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var boxes = view.GetVisualDescendants()
+            .OfType<TextBox>()
+            .Where(box => box.IsEffectivelyVisible)
+            .ToArray();
+        Assert.Single(boxes);
+
+        window.Close();
+    }
+
+    /// <summary>
+    /// The old paths are fixed-width and keep their end, which is what tells two of them apart.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task The_old_paths_are_fixed_width_and_keep_the_end_that_tells_them_apart()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var wizard = CreateWizard(preview: (_, _, _) => Task.FromResult(Preview(
+            [new RootRemapDecision(@"Q:\gone\shows", @"Q:\gone\shows", RootRemapStatus.Missing)],
+            [],
+            10,
+            0)));
+        await wizard.PreviewAsync(TestContext.Current.CancellationToken);
+
+        var view = new RestoreWizardView { DataContext = wizard };
+        var window = new Window { Width = 900, Height = 900, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var application = Avalonia.Application.Current!;
+        Assert.True(application.TryFindResource("FontFamilyMono", out var mono));
+        var family = Assert.IsType<Avalonia.Media.FontFamily>(mono);
+
+        var path = Assert.Single(
+            view.GetVisualDescendants().OfType<TextBlock>(),
+            block => (block.Text ?? string.Empty).Contains("gone", StringComparison.Ordinal));
+        Assert.Equal(family.Name, path.FontFamily.Name);
+        Assert.Equal(Avalonia.Media.TextTrimming.PathSegmentEllipsis, path.TextTrimming);
+
+        window.Close();
+    }
+
+    /// <summary>
+    /// Typing a folder says "reassigned" straight away, rather than still saying "missing".
+    /// </summary>
+    /// <remarks>
+    /// The status came from the last dry run, so a row kept saying the folder was missing while
+    /// somebody was looking at the folder they had just typed. A conflict is not masked this way: it
+    /// is the one status that blocks the restore, and it stays what it is until a run says otherwise.
+    /// </remarks>
+    [Fact]
+    public void Typing_a_folder_says_reassigned_and_a_conflict_still_says_conflict()
+    {
+        var missing = new RootRemapRowViewModel(
+            new RootRemapDecision(@"Q:\gone\shows", @"Q:\gone\shows", RootRemapStatus.Missing));
+        Assert.Equal("RestoreRootMissing", missing.StatusKey);
+        Assert.True(missing.NeedsFolder);
+
+        missing.NewPath = @"S:\shows";
+        Assert.Equal("RestoreRootRemapped", missing.StatusKey);
+
+        var unchanged = new RootRemapRowViewModel(
+            new RootRemapDecision(@"R:\media", @"R:\media", RootRemapStatus.Unchanged));
+        Assert.False(unchanged.NeedsFolder);
+
+        var conflict = new RootRemapRowViewModel(
+            new RootRemapDecision(@"R:\media", @"S:\other", RootRemapStatus.Conflict));
+        Assert.Equal("RestoreRootConflict", conflict.StatusKey);
+        Assert.True(conflict.NeedsFolder);
     }
 
     private static RestorePreview Preview(

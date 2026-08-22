@@ -173,6 +173,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Restoring asked for a new folder for every root, including the ones that are where they should be.**
+  The box for typing a path now appears only where it is needed: when the folder is not there, or when
+  there is a conflict. And as soon as you type one, the row stops saying the folder is missing.
+
+
 - **A backup that fails no longer looks like one that worked.** "There is not enough room on the disk"
   was painted on the same background as "Done". Cancelling is still not a failure: nothing was left
   half-written.

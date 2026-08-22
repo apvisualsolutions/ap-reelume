@@ -2,11 +2,21 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `100f8f4`, verde; el tramo 6 CERRADO y al 7 le quedan dos vistas**
-—`RestoreWizardView` y `RootOnboardingView`—; `BackupView` queda hecha salvo **el bloque de ruta de la
+**`main` en `b5c0088`, verde; el tramo 6 CERRADO y al 7 le queda UNA vista** —`RootOnboardingView`—.
+De `RestoreWizardView` quedan anotadas dos cosas de su fila: los **pasos numerados**, que son una
+reorganización de la vista entera y no una fila; y el **estado vacío**, que hay que medir antes porque
+«sin raíces que reasignar» no es «la lista está vacía» sino «ninguna fila pide nada»
+([evidencia](evidence/stable/audit-restore-roots.md)); `BackupView` queda hecha salvo **el bloque de ruta de la
 base**, que la §4 pide y `BackupViewModel` no puede dar: **no conoce ninguna ruta**, así que traerlo es
 cablear `IAppDataPaths` hasta él y es una pieza con su propio consumidor
 ([evidencia](evidence/stable/audit-backup-status.md)).
+
+**⚠ LA FORMA QUE MÁS HA COSTADO ESTA TANDA: la guarda que nada puede tomar, CUATRO veces.** El
+converter de marcadores, el de recursos, las notificaciones de `BackupViewModel` y el `StatusKey` de
+`RootRemapRowViewModel`. Las cuatro las encontró **la cobertura, antes que el razonamiento**, y una de
+ellas llegó a poner CI en rojo por bajar un suelo. **Al añadir una condición delante de algo que ya
+decidía, pregunta qué camino acabas de dejar muerto** — y míralo con `--collect:'XPlat Code Coverage'`
+antes de empujar, que cuesta un comando.
 
 **⚠ Y una regla que vivía DOS VECES, unificada el 2026-08-22.** «Ningún literal en esta vista» estaba
 copiada en `BackupViewTests` y en `LifecycleSettingsTests`, cada una vigilando su propio archivo, y
