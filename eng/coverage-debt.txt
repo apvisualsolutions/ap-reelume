@@ -121,7 +121,7 @@ src/ApSolutions.LocalMedia.Presentation/Backup/BackupView.axaml                 
 src/ApSolutions.LocalMedia.Presentation/Backup/BackupViewModel.cs                            100  84
 src/ApSolutions.LocalMedia.Presentation/Backup/RestoreWizardView.axaml                        95  50
 src/ApSolutions.LocalMedia.Presentation/Backup/RestoreWizardViewModel.cs                     100  88
-src/ApSolutions.LocalMedia.Presentation/Backup/RootRemapRowViewModel.cs                      100  75
+src/ApSolutions.LocalMedia.Presentation/Backup/RootRemapRowViewModel.cs                      100  93
 src/ApSolutions.LocalMedia.Presentation/Catalog/PersonalActionsView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Catalog/PersonalActionsView.axaml.cs                 100  50
 src/ApSolutions.LocalMedia.Presentation/Catalog/PersonalActionsViewModel.cs                  100  83
