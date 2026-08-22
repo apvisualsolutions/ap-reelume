@@ -116,7 +116,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Updates/GitHubReleaseUpdateProvider.cs
 src/ApSolutions.LocalMedia.Infrastructure/Updates/Minisign.cs                                 92  55
 src/ApSolutions.LocalMedia.Presentation/About/CreditsView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/App.axaml                                              0   0
-src/ApSolutions.LocalMedia.Presentation/App.axaml.cs                                          34  11
+src/ApSolutions.LocalMedia.Presentation/App.axaml.cs                                          40  11
 src/ApSolutions.LocalMedia.Presentation/Backup/BackupView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/Backup/BackupViewModel.cs                            100  84
 src/ApSolutions.LocalMedia.Presentation/Backup/RestoreWizardView.axaml                        95  50
@@ -178,7 +178,7 @@ src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs        
 src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorView.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorViewModel.cs                      96  75
 src/ApSolutions.LocalMedia.Presentation/Player/TransportControlsView.axaml                   100  50
-src/ApSolutions.LocalMedia.Presentation/Player/TransportControlsViewModel.cs                  94  83
+src/ApSolutions.LocalMedia.Presentation/Player/TransportControlsViewModel.cs                  96  85
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchDialog.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchViewModel.cs                      97  85
 src/ApSolutions.LocalMedia.Presentation/Player/VideoFrameView.cs                              79  70
@@ -216,7 +216,7 @@ src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml.cs            
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsView.axaml                           100  50
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsViewModel.cs                         100  80
 src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml                             100  50
-src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           90  69
+src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs                           97  92
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         89  64

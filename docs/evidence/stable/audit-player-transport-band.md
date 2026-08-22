@@ -97,3 +97,22 @@ los saltos son de **`ControlPlayback`**, dos modelos que se construyen en moment
 Intercalarlos no es mover botones dentro de un panel, es mover órdenes entre dos modelos — y eso es un
 cambio de construcción que toca `CompositionRoot` y varias escenas, por el orden de dos botones. /
 Interleaving them means moving commands between two models, not buttons within a panel.
+
+## Y cómo se cerró el trinquete, que costó una vuelta de más / How the ratchet closed
+
+El artefacto del primer run quería **añadir** `TransportControlsView.axaml.cs` a la deuda con 94/91, y
+esa lista **sólo encoge**: 217 archivos contra un trinquete de 216. Subirlo no era una opción, así que
+se pagó sacando el propio archivo, y las dos cosas que faltaban valían por sí solas:
+
+- **La línea sin cubrir era el `return` de la guarda**, es decir, la mitad del arreglo que el orden de
+  notificación no cubre. Ahora hay una prueba que reproduce el estado exacto del defecto — máximo que
+  no es la duración, pulgar movido — y afirma que la sesión **no** se movió.
+- **La rama sin cubrir era «el `sender` no es el slider»**, y **nada puede tomarla**: el manejador
+  cuelga de ese control y de ningún otro. `sender is Slider slider` compra una rama que ninguna prueba
+  puede cubrir, que es la misma forma que hundió `FluentThemeService` el mismo día. El slider se nombra
+  en su lugar, y la condición pasa de cuatro ramas a dos, las dos reales.
+
+Verificado midiendo el archivo en local antes de empujar —la guarda dejó de aparecer con condición
+incompleta y el total de ramas bajó de doce a diez—, y confirmado por CI: **216 archivos**, con
+`App.axaml.cs` 34/11 → 40/11, `TransportControlsViewModel.cs` 94/83 → 96/85 y `FluentThemeService.cs`
+90/69 → **97/92**. Ninguno baja. / Three floors rise and none falls.
