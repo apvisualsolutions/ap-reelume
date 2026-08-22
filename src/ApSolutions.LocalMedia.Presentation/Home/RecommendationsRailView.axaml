@@ -73,7 +73,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           The card's caption is empty here and the reasons take its place: this is the one rail that
           has to say why a title is in front of somebody, and a year would say less.
           -->
-          <StackPanel Width="148" Spacing="{DynamicResource Space4}">
+          <StackPanel Width="{DynamicResource PosterCardWidth}" Spacing="{DynamicResource Space4}">
             <library:PosterCardView />
             <TextBlock
                 FontSize="{DynamicResource FontSizeCaption}"

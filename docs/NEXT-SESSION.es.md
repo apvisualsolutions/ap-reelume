@@ -45,11 +45,41 @@ reducido—, así que el servicio deja de tener su copia del 160 y la preferenci
    otro sería quitarle la puerta a una función para dársela a una vista.
 
 **Y una deuda de proceso, no de código: el trinquete de cobertura.** Los runs de CI del 2026-08-22
-dan **todas las suites en verde, el paseo incluido (135/135)**, y sólo falla `check-coverage` porque
-cuatro archivos **mejoraron**: `CatalogItemViewModel` llega a **100/100 y sale de la lista** —el
-trinquete baja a 216—, y `RecommendationsViewModel` (94/85), `LibraryView.axaml.cs` (100/78) y
-`LibraryViewModel.cs` (95/85) suben de suelo. **Se cierra copiando entero el artefacto `coverage-debt`
-del último run**, nunca a mano ni con una medición local.
+dieron **todas las suites en verde, el paseo incluido (135/135)**, y sólo falló `check-coverage`
+porque cuatro archivos **mejoraron**. Cerrado el mismo día copiando el artefacto `coverage-debt`, con
+**dos suelos que bajaban y no se aceptaron**:
+
+- `RouteStateConverter` bajaba a 100/81 al perder la rama del glifo. Tenía **tres guardas que nada en
+  este repositorio puede tomar**; quitadas, llega a **100/100 y sale de la lista**. El trinquete pasa
+  de 217 a **216**.
+- `App.axaml.cs` bajaba por dilución —dos líneas que ninguna suite ejecuta—, así que la barra de
+  título se extrae a **`App.ApplyDesignedChrome`**, que sí se afirma, y con ella el **44 que vivía en
+  dos idiomas** queda atado: `App.TitleBarHeight` y la primera fila de `ShellView` son el mismo
+  número, y hay prueba.
+
+## La siguiente sesión, en orden, y con lo que cuesta cada pieza
+
+**El encargo sigue siendo el mismo: que la aplicación se parezca al prototipo.** Lo que queda no es
+una fase, son piezas nombradas, y este es el orden por el que se gana más parecido por unidad de
+riesgo:
+
+1. **«Añadir medios» al pie del carril** — decidido arriba. Control nuevo: cadena en los dos idiomas,
+   prueba de nombre accesible, línea en `LeadingActionTests` si lidera, **y su escena de paseo en el
+   mismo commit**. Es lo que el prototipo pone ahí y lo primero que necesita quien abre con la
+   biblioteca vacía.
+2. **Recomponer el REPRODUCTOR contra el prototipo** — 17 vistas, el área más grande sin recomponer.
+   Pasó por auditoría contra la §4 en el tramo 4, que no es lo mismo. El prototipo le da superficie
+   propia `#0B0D10`, transporte con glifos de 44 px y la columna de 320.
+3. **Ajustes, Revisión, Metadatos, Catálogo, Copias** — 16 vistas, mismo criterio.
+4. **Los iconos de las demás vistas** — la lupa de la búsqueda, el `+` de añadir. Sin cadenas nuevas
+   y sin controles nuevos: sólo `Content` y `FontFamilyIcons`, que ya es token.
+
+**Lo que ninguna de esas cuatro puede hacer, y hay que pedirlo:** las **dos cadenas del distintivo de
+tipo** (punto 2 de arriba) y **las portadas reales** (ART-A01), que son decisión del propietario.
+
+**Cómo medir el parecido, y no es opinable:** `docs/design/SURFACES.es.md` lleva las 51 vistas por
+área. Un área está recompuesta cuando cada una de sus vistas se ha abierto **al lado del prototipo**,
+no cuando su fila de la §4 está tachada. Ver [[ap-reelume-implementar-no-auditar]].
 
 ## ⚠⚠ Por qué el plan existe: EL REDISEÑO SE ESTABA HACIENDO MAL, Y ESTO LO CORRIGE (2026-08-22, tarde)
 
