@@ -1,5 +1,107 @@
 # Dónde retomar
 
+## ⚠⚠ LO PRIMERO: EL REDISEÑO SE ESTABA HACIENDO MAL, Y ESTO LO CORRIGE (2026-08-22, tarde)
+
+**El encargo era que la aplicación se pareciese al prototipo de `design/`. Lo que se ha hecho durante
+ocho tramos es otra cosa: auditar cada vista contra la §4 y corregir defectos.** Cuando la diferencia
+con el documento era grande —«no hay portadas en toda la aplicación», «`LibraryEntryView` no es la
+ficha que el documento describe», «la cuadrícula fluida no se hace»— se **registró como discrepancia**
+y se pasó a la siguiente. Once veces. Eso convirtió «haz que se parezca a esto» en «documenta en qué se
+diferencia».
+
+**La prueba está en las capturas**: con la aplicación abierta al lado del prototipo, lo que se ve es
+texto plano donde el prototipo tiene un héroe, carriles de fichas y un carril de iconos.
+
+### Lo que sí está hecho y no hay que rehacer, medido el 2026-08-22
+
+| Del paquete | Objetivo | Hoy |
+| --- | --- | --- |
+| Cadenas por idioma | 517 | **516** |
+| Diccionarios de tema | 4 | **4** (`Light`, `Dark`, `HighContrastLight`, `HighContrastDark`) |
+| Los cinco estados de control | 5 | **hechos**, por redirección de las claves Fluent |
+| Anillo doble de foco | sí | **hecho**, `FocusAdornerTemplate` de dos bordes |
+| Diez selectores de foco | 10 | **10**, `ToggleSwitch` y `RadioButton` incluidos |
+| Punteado del deshabilitado | sí | **hecho**, en `Theme/DisabledOutline.cs` |
+| Controles interactivos | 202 | **136** — faltan 66 |
+| Animaciones | 4 | **0** |
+
+Los estados están **medidos color a color** y funcionan: reposo `#e2e8f0` = `ControlFillBrush`, sobre
+`#d6dfea` = `ControlFillHoverBrush`, pulsado `#c4d0df` = `ControlFillPressedBrush`, deshabilitado
+`#eef3f7` = `ControlFillDisabledBrush`, y lo mismo en oscuro. **No vuelvas a medirlo.**
+
+**⚠ Y una alarma falsa que costó una hora**: un `grep` de `{DynamicResource X}` dice que seis tokens de
+estado no los gasta nadie. **Es falso.** El consumo es por sintaxis de elemento —
+`<StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />` — y una
+expresión que sólo busca llaves no lo ve.
+
+### La decisión que faltaba, y que se toma aquí
+
+`design/README.md` dice que los `.dc.html` «no son código para copiar» y que la implementación sigue la
+§4. Pero **la §4 y el prototipo no coinciden**, y el propietario aprueba mirando el prototipo:
+
+| | Prototipo | §4 |
+| --- | --- | --- |
+| Navegación | carril de **64 px** con iconos, sin texto | «Navegación de **248 px**… barra de 3 px y el glifo» |
+| Destinos | Inicio · Biblioteca · Revisión · **Duplicados** · Ajustes, y **«Añadir medios»** al pie | los cinco de hoy, con Copias |
+
+**Decisión: para la composición manda el prototipo; para tokens, estados, cadenas y accesibilidad manda
+la §4.** Razón: la §4 describe retoques sobre el árbol actual y el prototipo describe el producto que
+se aprobó. Donde uno pida menos que el otro, gana el que pida el diseño nuevo. Queda escrito que esto
+contradice una línea del README, a sabiendas.
+
+### El plan, en orden, y ninguna parte necesita red
+
+**Nada de esto toca TMDB.** La §4 ya dice qué pintar sin portada: «**iniciales sobre
+`ControlFillBrush`, nunca un hueco**». El prototipo tampoco usa fotos: pinta degradados.
+
+1. **La ficha 2:3** (`PosterCardView`, nueva). Arte 2:3 con las iniciales del título sobre
+   `ControlFillBrush`, radio `CornerRadiusMedium`, título a **dos líneas máximo**, año en
+   `TextSecondaryBrush`. Es la pieza que se repite en la biblioteca y en los tres carriles, así que va
+   primero. `CatalogItemViewModel` gana `Initials`.
+2. **La cuadrícula que reflowa y virtualiza.** La decisión de no hacer la cuadrícula fluida se tomó
+   porque «en Avalonia 12.1.1 no existe nada que reflowe y virtualice a la vez». **Medido el
+   2026-08-22: `Avalonia.Controls.ItemsRepeater` y `WrapLayout` SÍ existen en 12.1.1.** Falta la
+   medición que quedó a medias: 10.000 elementos, contar controles vivos y milisegundos, y comparar con
+   `WrapPanel` y con `VirtualizingStackPanel`. Si virtualiza, la cuadrícula de la §4 —«anchura fluida,
+   mínimo 180 px por ficha»— se hace, y esa decisión se revierte con su número.
+3. **Los tres carriles** con tarjetas: `InProgressRailView` con barra de progreso de 3 px al pie,
+   `RecentlyAddedRailView` y `RecommendationsRailView`.
+4. **El héroe de Inicio** (`ResumeHeroView`): título grande, metadatos en una línea, barra de progreso y
+   dos acciones. Estado: sin nada que reanudar, **el héroe no se pinta**.
+5. **La barra de título propia y el carril de navegación.**
+6. **Los iconos**, glifos de Segoe Fluent Icons — lo exige el punto 5 de las restricciones del paquete,
+   así que los SVG del prototipo se traducen, no se copian. Hoy **1 de 50 vistas** usa la familia.
+
+### La geometría del prototipo, ya medida — no la vuelvas a extraer
+
+Servido con `python -m http.server 8765 --directory design` y medido en el navegador a 1600×1000:
+
+```
+barra de título     1600 x 44,  padding-left 14, gap 10
+carril               64 de ancho; destinos de 46 x 42, radio 12, separación 6
+                     cinco arriba (y=50, 98, 146, 194, 242) y uno al pie (y=944)
+                     activo: fondo rgba(127,145,170,.16) + barra a la izquierda
+contenido            empieza en x = 96
+héroe: título        52 px, peso 300
+héroe: primario      alto 44, radio 999, padding 0 26, gap 9, fondo claro sobre oscuro
+héroe: secundario    alto 44, radio 999, padding 0 22, fondo blanco al 6 %
+tarjeta de carril    281 x 268, radio 12; arte 16:9 de 279 x 157
+ficha de portada     133 x 244, gap 8; arte 2:3 de 133 x 200, radio 10
+fondo de la app      #0B0D10
+```
+
+`design/support.js` es el **runtime** de Claude Design —parsea `<x-dc>` y monta React—, no una fuente de
+diseño. La plantilla y los estilos están en el `<x-dc>` de `AP Reelume.dc.html`.
+
+### Lo que queda FUERA, y es decisión del propietario
+
+**Las portadas de verdad.** `ArtworkCache` está entero —descarga, allowlist, techo de 10 MB, texto
+alternativo— y **fuera del contenedor a propósito** desde el 2026-08-09 (ART-A01), porque el MVP se
+publica **sin token de TMDB**: «No token, no connection… the shipped artifact carries none». Y
+`CatalogItem` no tiene ningún campo de imagen. Traer portadas reales es una vertical por las cinco capas
+más superficie de red. **No la abras sin que el propietario lo pida.** El diseño se implementa entero
+sin ella.
+
 ## Estado al abrir (2026-08-22)
 
 **`main` en `44f72ca`, verde; el tramo 7 CERRADO, y quedan el 8 y el 9.**
