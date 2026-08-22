@@ -10,6 +10,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **«Añadir medios», al pie del carril de navegación.** Es lo que el prototipo pone ahí y lo primero
+  que necesita quien abre la aplicación con la biblioteca vacía. Lleva a la pantalla donde se añade
+  una carpeta **y deja el formulario vacío al llegar**, que es la mitad que lo distingue del destino
+  «Biblioteca»: hasta ahora nada limpiaba la ruta después de aceptar una carpeta, así que quien
+  añadía una y volvía se encontraba la anterior escrita y un segundo intento contestaba «ya está en
+  la biblioteca» — una negativa causada por la pantalla y no por la persona. Lo mismo con un aviso de
+  ruta rechazada y con una retirada que alguien dejó a medio confirmar.
+
+
 - **La marca y la firma del editor vuelven a Créditos, que es su sitio.** Estaban al pie de la
   navegación de 248 px; con el carril de 64 no caben, y repetir el nombre en la barra de título lo
   habría escrito dos veces —Windows ya lo dibuja ahí—. **Y esto no era sólo colocación**: los términos

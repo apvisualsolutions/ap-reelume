@@ -10,6 +10,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **«Add media», at the foot of the navigation rail.** It is what the prototype puts there and the
+  first thing somebody opening the application with an empty library needs. It goes to the screen a
+  folder is added on **and arrives with the form empty**, which is the half that tells it apart from
+  the Library destination: nothing cleared the path after a folder was accepted, so somebody who
+  added one and came back found the previous folder still typed in and a second press answered "it is
+  already in the library" — a refusal caused by the screen rather than by them. The same for a warning
+  about a rejected path, and for a removal somebody left half-confirmed.
+
+
 - **The brand and the publisher's signature move to Credits, which is where they belong.** They were
   at the foot of the 248 px navigation; the 64 px rail has no room for them, and repeating the name in
   the title bar would have written it twice — Windows already draws it there. **And this was not only

@@ -242,6 +242,30 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         _ => "RootAddInvalidPath",
     };
 
+    /// <summary>
+    /// Puts the form back to nothing, so the next folder is typed into an empty box.
+    /// </summary>
+    /// <remarks>
+    /// Three leftovers, and each one was a way for this screen to answer for something a person did
+    /// not do. Nothing emptied <see cref="Path"/> after a folder was accepted, so the folder just
+    /// added stayed typed in and pressing Add again said "it is already in the library". A refusal
+    /// stayed on screen until the next attempt <em>succeeded</em>, so a rejected path kept explaining
+    /// itself over a box that had since been changed. And a removal somebody walked away from was
+    /// still waiting to be confirmed on the way back.
+    /// <para>
+    /// The scan consent is deliberately left alone: it is a question about a folder already saved,
+    /// and dropping it would silently cancel the first scan of somebody's library.
+    /// </para>
+    /// </remarks>
+    public void BeginAdd()
+    {
+        Path = string.Empty;
+        SelectedKind = RootKind.Local;
+        PendingRemoval = null;
+        FailureKey = null;
+        OnPropertyChanged(nameof(HasFailure));
+    }
+
     /// <summary>Reads the folders the catalog holds right now; without the reader there is no list.</summary>
     public async Task RefreshRootsAsync(CancellationToken cancellationToken = default)
     {

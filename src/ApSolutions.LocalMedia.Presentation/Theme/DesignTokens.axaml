@@ -1149,6 +1149,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
+    The one control at the foot of the rail, and it is not a destination: the prototype puts "Add
+    media" there, below the flexible gap, and gives it the one thing it withholds from the five above
+    - a hairline border. That border is the whole difference in the drawing and it carries the whole
+    difference in meaning: the five say where you are, this one does something. Nothing about it is
+    ever "current", so it has no fill and no 3 px bar to be given.
+
+    Same 46 x 42 as a destination, because they share a 46 px column and a button narrower than its
+    neighbours in a rail of six reads as an accident rather than as a distinction.
+  -->
+  <Style Selector="Button.navigation-action">
+    <Setter Property="Width" Value="46" />
+    <Setter Property="Height" Value="42" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+  </Style>
+
+  <!--
     apr-tip, the first of the package's four animations: a tooltip arriving 6 px from the left rather
     than appearing whole. It belongs to the rail's six destinations, which is where the words went
     when the rail became pictograms - a tooltip is how somebody finds out what a glyph means, so the

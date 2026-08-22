@@ -33,6 +33,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly AsyncRelayCommand _closePlayer;
     private readonly AsyncRelayCommand _toggleMini;
     private readonly AsyncRelayCommand _toggleFullscreen;
+    private readonly AsyncRelayCommand _addMedia;
     private MetadataEditorViewModel? _metadataEditor;
     private RenamePreviewViewModel? _rename;
     private DuplicateReviewViewModel? _duplicates;
@@ -176,6 +177,13 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         _toggleFullscreen = new AsyncRelayCommand(
             () => TogglePlaybackModeAsync(PlaybackMode.Fullscreen, CancellationToken.None),
             () => _player is not null && _surfaces.ChangePlaybackMode is not null);
+        _addMedia = new AsyncRelayCommand(
+            () =>
+            {
+                BeginAddMedia();
+                return Task.CompletedTask;
+            },
+            () => Onboarding is not null);
 
         if (Library is { } libraryViewModel)
         {
@@ -213,6 +221,19 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public ICommand ToggleMiniPlayerCommand => _toggleMini;
 
     public ICommand ToggleFullscreenCommand => _toggleFullscreen;
+
+    /// <summary>
+    /// The one control at the foot of the navigation rail: it opens the surface a folder is added on
+    /// and clears the form before it gets there.
+    /// </summary>
+    /// <remarks>
+    /// The clearing is what makes this a command rather than a second Biblioteca. Nothing emptied the
+    /// path after a folder was accepted, so somebody who added one and came back found their previous
+    /// folder still typed in and a second press answered "it is already in the library" — a refusal
+    /// caused by the screen rather than by them. The same for a refusal left over from a rejected
+    /// path, and for a removal somebody walked away from half-confirmed.
+    /// </remarks>
+    public ICommand AddMediaCommand => _addMedia;
 
     public AppearanceSettingsViewModel? AppearanceSettings => _surfaces.AppearanceSettings;
 
@@ -397,6 +418,20 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         }
 
         Player = await open(request, cancellationToken).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Goes to the surface a media folder is added on, with the form ready to be typed into.
+    /// </summary>
+    /// <remarks>
+    /// Two halves, and the second is the one that is easy to leave out. Navigating alone would make
+    /// this a second Biblioteca; what the name promises is that the form is ready, and only the
+    /// clearing delivers that.
+    /// </remarks>
+    public void BeginAddMedia()
+    {
+        _navigationService.Navigate(AppRoute.Library);
+        Onboarding?.BeginAdd();
     }
 
     /// <summary>
