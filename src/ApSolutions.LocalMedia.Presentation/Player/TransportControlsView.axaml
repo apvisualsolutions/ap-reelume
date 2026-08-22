@@ -123,12 +123,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock
           x:Name="VolumeReadout"
           VerticalAlignment="Center"
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Foreground="{DynamicResource PlayerTextBrush}"
           Text="{Binding VolumeLabel}" />
       <TextBlock
           x:Name="SpeedReadout"
           VerticalAlignment="Center"
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Foreground="{DynamicResource PlayerTextBrush}"
           automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}"
           Text="{Binding SpeedLabel}" />
     </WrapPanel>

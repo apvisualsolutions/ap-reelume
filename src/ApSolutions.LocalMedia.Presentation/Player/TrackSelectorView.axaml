@@ -23,14 +23,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock FontWeight="SemiBold" Text="{DynamicResource TracksEmptyTitle}" />
       <TextBlock
           FontSize="{DynamicResource FontSizeCaption}"
-          Foreground="{DynamicResource TextSecondaryBrush}"
+          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
           Text="{DynamicResource TracksEmptyDescription}"
           TextWrapping="Wrap" />
     </StackPanel>
 
     <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource TrackSelectorAudioLabel}" />
       <!--
         A template and not DisplayMemberBinding, which is what this had: the two are exclusive, and
@@ -58,7 +58,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource TrackSelectorSubtitleLabel}" />
       <ComboBox
           x:Name="SubtitleTrackSelector"

@@ -20,7 +20,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource DetectedMarkerReviewTitle}"
         automation:AutomationProperties.HeadingLevel="2" />
     <TextBlock
-        Foreground="{DynamicResource TextPrimaryBrush}"
+        Foreground="{DynamicResource PlayerTextBrush}"
         Text="{DynamicResource DetectedMarkerReviewDescription}"
         TextWrapping="Wrap" />
     <StackPanel
@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock FontWeight="SemiBold" Text="{DynamicResource DetectedMarkersEmptyTitle}" />
       <TextBlock
           FontSize="{DynamicResource FontSizeCaption}"
-          Foreground="{DynamicResource TextSecondaryBrush}"
+          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
           Text="{DynamicResource DetectedMarkersEmptyDescription}"
           TextWrapping="Wrap" />
     </StackPanel>
@@ -83,7 +83,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <TextBlock
         x:Name="DetectedRangeErrorText"
         IsVisible="{Binding HasRangeError}"
-        Foreground="{DynamicResource TextPrimaryBrush}"
+        Foreground="{DynamicResource PlayerTextBrush}"
         Text="{DynamicResource DetectedMarkerReviewRangeError}"
         TextWrapping="Wrap" />
 

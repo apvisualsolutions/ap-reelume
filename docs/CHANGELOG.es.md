@@ -10,6 +10,27 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **En el tema claro, la columna del reproductor tenía el texto invisible, y la puerta que debía
+  cazarlo miraba a otro lado.** Medido el 2026-08-22: `TextPrimaryBrush` (#111827) sobre
+  `PlayerSurfaceBrush` (#0B0D10) da **1,10:1** donde WCAG AA pide 4,5:1. Las superficies del
+  reproductor son oscuras **en los cuatro modos** —eso está decidido desde el principio, para que la
+  imagen conserve su contraste—, mientras que la tinta del tema es oscura en dos de ellos. El
+  resultado: en cualquier equipo con Windows en claro, el selector de pistas, la salida de audio, la
+  lista de marcadores, las detecciones y el panel de versiones **no se podían leer**, y tampoco los
+  relojes del transporte ni sus tres pictogramas.
+  - `ContrastTokenTests` medía el texto primario sobre **siete** superficies, y **las tres del
+    reproductor no estaban entre ellas**. El agujero tenía exactamente la forma del defecto. Ahora
+    son nueve, en los cuatro modos, con la banda translúcida del transporte fuera por la razón que ya
+    estaba escrita —una relación de contraste contra un color translúcido es una conjetura sobre lo
+    que hay detrás— y medida en su lugar contra la superficie sobre la que se dibuja.
+  - La corrección son dos pinceles, `PlayerTextBrush` y `PlayerTextSecondaryBrush`, claros en los
+    cuatro modos, y **puestos en el contenedor** allí donde se puede: Avalonia hereda `Foreground`, así
+    que la cabecera, la columna y la banda del transporte cubren de una vez todo el texto que no lleva
+    pincel propio. Los tres avisos ámbar de la salida de audio y los cinco superpuestos sobre la imagen
+    **no cambian**: pintan su propio fondo con los colores del tema, y ahí la tinta del tema es la
+    correcta.
+
+
 - **La bandeja de revisión pinta la tarjeta de candidato del prototipo: el borde tintado por el
   estado, el distintivo arriba a la derecha y dos columnas debajo.** Antes era un rectángulo con
   borde neutro donde la clave, el porcentaje, la palabra del estado y el encabezado «Por qué» iban

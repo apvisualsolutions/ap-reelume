@@ -13,7 +13,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <StackPanel x:Name="AudioOutputSurface" Spacing="{DynamicResource Space12}">
     <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource AudioOutputDeviceLabel}" />
       <ComboBox
           x:Name="AudioDeviceSelector"
@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource AudioOutputLayoutLabel}" />
       <ComboBox
           x:Name="AudioLayoutSelector"

@@ -144,6 +144,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#E60B0D10" />
           <SolidColorBrush x:Key="PlayerPanelBrush" Color="#111820" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#1AFFFFFF" />
+          <!--
+            The player's ink, and it exists because the player's surfaces are dark in all four modes
+            while TextPrimaryBrush is dark in two of them. Measured on 2026-08-22: in Light,
+            TextPrimaryBrush (#111827) on PlayerSurfaceBrush (#0B0D10) reads <b>1.10:1</b>, which is
+            text nobody can see - the track pickers, the marker list and the versions panel all of
+            them, on a machine whose Windows is set to light.
+
+            The gate had a hole exactly that shape: it measured primary text on seven surfaces and
+            the player's three were not among them. The eighth and ninth are measured now.
+          -->
+          <SolidColorBrush x:Key="PlayerTextBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#94A3B8" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#E2E8F0" />
@@ -347,6 +359,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#E60B0D10" />
           <SolidColorBrush x:Key="PlayerPanelBrush" Color="#111820" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#1AFFFFFF" />
+          <SolidColorBrush x:Key="PlayerTextBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#94A3B8" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#1F2937" />
@@ -556,6 +570,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerPanelBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PlayerTextBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#FFFFFF" />
@@ -759,6 +775,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerPanelBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PlayerTextBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#000000" />
@@ -1142,6 +1160,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
     <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
+    <!--
+      The player's ink and not the theme's: these glyphs sit on the chrome band, which is dark in all
+      four modes, and the base ControlTheme's foreground is dark in two of them.
+    -->
+    <Setter Property="Foreground" Value="{DynamicResource PlayerTextBrush}" />
   </Style>
 
   <!--
@@ -1177,7 +1200,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="TextBlock.transport-clock">
     <Setter Property="MinWidth" Value="58" />
     <Setter Property="VerticalAlignment" Value="Center" />
-    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource PlayerTextBrush}" />
   </Style>
 
   <!--

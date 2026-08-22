@@ -10,6 +10,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **In the light theme the player's panel column had invisible text, and the gate that should have
+  caught it was looking elsewhere.** Measured on 2026-08-22: `TextPrimaryBrush` (#111827) on
+  `PlayerSurfaceBrush` (#0B0D10) is **1.10:1** where WCAG AA asks for 4.5:1. The player's surfaces are
+  dark **in all four modes** — decided from the start, so the picture keeps its contrast — while the
+  theme's ink is dark in two of them. The result: on any machine with Windows set to light, the track
+  pickers, the audio output, the marker list, the detections and the versions panel **could not be
+  read**, and neither could the transport's clocks or its three pictograms.
+  - `ContrastTokenTests` measured primary text on **seven** surfaces, and **the player's three were
+    not among them**. The hole was exactly the shape of the defect. There are nine now, across all
+    four modes, with the transport's translucent band left out for the reason already written there —
+    a contrast ratio against a translucent colour is a guess at what is behind it — and measured
+    instead against the surface it is drawn over.
+  - The fix is two brushes, `PlayerTextBrush` and `PlayerTextSecondaryBrush`, light in all four modes,
+    and **set on the container** wherever that is possible: Avalonia inherits `Foreground`, so the
+    header, the column and the transport band cover in one go all the text that carries no brush of
+    its own. The three amber notices in the audio output and the five overlays above the picture **do
+    not change**: they paint their own background from the theme's colours, and there the theme's ink
+    is the right one.
+
+
 - **The review inbox draws the prototype's candidate card: the border tinted by state, the badge in
   the top right corner, and two columns underneath.** It used to be a neutral-bordered rectangle where
   the key, the percentage, the state word and the "Why" heading ran together over a line and a half,

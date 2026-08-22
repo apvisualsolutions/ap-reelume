@@ -445,6 +445,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
         opposite of what this application is for. Declared rather than invented, which is what the
         recommendation card already does with the year it does not know.
       -->
+      <!--
+        Foreground on the container and not on each block: Avalonia inherits it, so this is what
+        reaches the text that carries no brush of its own - and in Light that text was
+        TextPrimaryBrush on a surface it reads 1.10:1 against, which is text nobody can see.
+      -->
       <Border
           x:Name="PlayerHeaderSurface"
           Grid.Row="0"
@@ -452,7 +457,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Padding="14,10"
           Background="{DynamicResource PlayerChromeBrush}"
           BorderBrush="{DynamicResource PlayerHairlineBrush}"
-          BorderThickness="0,0,0,1">
+          BorderThickness="0,0,0,1"
+          TextElement.Foreground="{DynamicResource PlayerTextBrush}">
         <Grid ColumnDefinitions="Auto,*,Auto">
           <Button
               Grid.Column="0"
@@ -545,6 +551,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Width="320"
           Padding="16"
           Background="{DynamicResource PlayerPanelBrush}"
+          Foreground="{DynamicResource PlayerTextBrush}"
           IsVisible="{Binding HasPlayerPanels}">
         <StackPanel Spacing="{DynamicResource Space16}">
           <ContentControl IsVisible="{Binding HasTracks}">
