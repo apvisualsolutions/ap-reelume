@@ -38,6 +38,14 @@ public sealed partial class App : Avalonia.Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var shell = ShellFactory?.Invoke() ?? CreateDefaultShell();
+            // The title bar is the application's own, 44 px, which is what the prototype puts above
+            // everything and where the brand now lives. Windows keeps drawing minimise, maximise and
+            // close over the extended area, so this adds no control anybody would have to press and
+            // the autonomous walk's inventory is untouched; dragging stays the system's too.
+            //
+            // Avalonia 12.1.1 has no ExtendClientAreaChromeHints any more - the two properties below
+            // are the whole surface it kept - so what the chrome does is measured rather than asked
+            // for.
             var window = new Window
             {
                 Width = 1180,
@@ -45,6 +53,8 @@ public sealed partial class App : Avalonia.Application
                 MinWidth = 900,
                 MinHeight = 600,
                 Title = GetResourceText(this, "ProductDisplayName"),
+                ExtendClientAreaToDecorationsHint = true,
+                ExtendClientAreaTitleBarHeightHint = 44,
                 Content = shell,
             };
             BackdropService?.TryApply(window);

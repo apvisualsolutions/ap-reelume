@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Navigation becomes a 64 px rail of icons, and the application draws its own title bar.** It is
+  the prototype's composition: the five destinations are pictograms from the font Windows 11 ships,
+  the open one is marked by a fill **and** a 3 px bar — two signals, one of them not colour — and each
+  destination's name still reaches the tooltip and the screen reader. **No label was rewritten**, so
+  all five answer to the names they always had. The 44 px title bar makes the window one unbroken
+  surface from the top down; Windows keeps drawing minimise, maximise and close over it.
+
+
 - **The "Continue watching" block is now the hero the design asks for.** The title is large and
   light, an overline labels it without spending a heading level, and the progress bar is the same
   3 px rule the cards carry, with the percentage in words beside it. **What it does not carry, and

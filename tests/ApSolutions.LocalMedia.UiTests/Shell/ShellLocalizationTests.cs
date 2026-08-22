@@ -96,9 +96,20 @@ public sealed class ShellLocalizationTests
             .ToArray();
 
         Assert.NotEmpty(visibleAttributes);
-        Assert.All(
-            visibleAttributes,
-            attribute => Assert.StartsWith("{", attribute.Value, StringComparison.Ordinal));
+
+        // A literal passes only if it holds no letter at all, which is the rule ViewLiteralTests
+        // states once over every view. Asserting "starts with {" here was stricter than the tree and
+        // it fired on the five pictograms of the navigation rail — the same shape that had the ⚠
+        // refused in two views and literal in the other four, and the reason that rule was unified
+        // in the first place. What the shell may never do is paint a word it did not translate.
+        var words = visibleAttributes
+            .Where(attribute => !attribute.Value.TrimStart().StartsWith('{'))
+            .Where(attribute => attribute.Value.Any(char.IsLetter))
+            .Select(attribute => $"{attribute.Name.LocalName}='{attribute.Value}'")
+            .ToArray();
+        Assert.True(
+            words.Length == 0,
+            "the shell paints words the dictionaries should have written: " + string.Join(", ", words));
 
         var publisherReferences = shell.Descendants()
             .Where(element => element.Attributes().Any(attribute =>

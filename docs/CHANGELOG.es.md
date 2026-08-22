@@ -10,6 +10,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La navegación pasa a un carril de 64 px con iconos, y la aplicación dibuja su propia barra de
+  título.** Es la composición del prototipo: los cinco destinos son pictogramas de la fuente que
+  Windows 11 trae de serie, el abierto se marca con relleno **y** con una barra de 3 px —dos señales,
+  y una no es color—, y el nombre de cada destino sigue estando en el tooltip y en lo que lee un
+  lector de pantalla. **Ninguna etiqueta se ha reescrito**, así que los cinco responden a los mismos
+  nombres de siempre. La barra de título de 44 px hace que la ventana sea una sola superficie de
+  arriba abajo; Windows sigue dibujando minimizar, maximizar y cerrar sobre ella.
+
+
 - **El bloque de «Continuar viendo» es ahora el héroe que el diseño pide.** El título va en grande y
   en peso ligero, el antetítulo lo etiqueta sin gastar un nivel de encabezado, y la barra de progreso
   es la misma regla de 3 px que llevan las fichas, con el porcentaje en palabras al lado. **Lo que no

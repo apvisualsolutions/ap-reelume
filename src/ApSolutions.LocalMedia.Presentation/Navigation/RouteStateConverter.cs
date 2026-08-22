@@ -7,11 +7,15 @@ using Avalonia.Data.Converters;
 namespace ApSolutions.LocalMedia.Presentation.Navigation;
 
 /// <summary>What the converter answers about a destination.</summary>
+/// <remarks>
+/// There used to be a <c>Glyph</c> here, answering <c>●</c> or <c>○</c> beside each destination's
+/// word. The rail is 64 px of pictograms now and has room for one mark, which is the one that says
+/// <em>which</em> destination this is; what says it is <em>open</em> is the fill and the 3 px bar,
+/// two signals with one of them not colour. The kind went with its last reader rather than staying
+/// as an enum value nothing asks for.
+/// </remarks>
 public enum RouteStateKind
 {
-    /// <summary>A filled or hollow mark, so the current destination is not told by colour alone.</summary>
-    Glyph,
-
     /// <summary>The status a screen reader announces for the destination that is open.</summary>
     Status,
 
@@ -30,7 +34,7 @@ public enum RouteStateKind
 /// </summary>
 public sealed class RouteStateConverter : IValueConverter
 {
-    public RouteStateKind Kind { get; set; } = RouteStateKind.Glyph;
+    public RouteStateKind Kind { get; set; } = RouteStateKind.Status;
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -39,7 +43,6 @@ public sealed class RouteStateConverter : IValueConverter
         var isCurrent = value is AppRoute current && parameter is AppRoute candidate && current == candidate;
         return Kind switch
         {
-            RouteStateKind.Glyph => isCurrent ? "●" : "○",
             RouteStateKind.IsCurrent => isCurrent,
             _ => isCurrent ? ReadStatusText() : string.Empty,
         };

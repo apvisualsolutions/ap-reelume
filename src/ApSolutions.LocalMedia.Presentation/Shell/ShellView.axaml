@@ -22,160 +22,200 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="shell:ShellViewModel"
     automation:AutomationProperties.Name="{DynamicResource ShellAccessibleName}">
   <UserControl.Resources>
-    <navigation:RouteStateConverter x:Key="RouteGlyph" Kind="Glyph" />
     <navigation:RouteStateConverter x:Key="RouteStatus" Kind="Status" />
     <navigation:RouteStateConverter x:Key="RouteIsCurrent" Kind="IsCurrent" />
   </UserControl.Resources>
-  <Grid Background="{DynamicResource ShellSurfaceBrush}" ColumnDefinitions="248,*">
+  <Grid Background="{DynamicResource ShellSurfaceBrush}" RowDefinitions="44,*" ColumnDefinitions="64,*">
+    <!--
+      The application's own title bar, 44 px, which is what the prototype puts above everything: one
+      unbroken surface from the top of the window down, instead of a system caption sitting on top of
+      a different colour. Windows keeps drawing minimise, maximise, close and the window's title over
+      it, so this adds no control anybody has to press and the walk's inventory is untouched.
+
+      What it holds is the publisher's signature, which used to sit at the foot of a 248 px rail that
+      is 64 wide now. The name is NOT repeated here: the system already draws it at the left of this
+      same bar, and it carries no heading level any more either - the shell used to declare the
+      product name as level one while every screen inside it declared its own, which is the two-H1
+      shape the settings page was fixed for. The heading of a screen is the name of the screen.
+    -->
     <Border
-        Padding="20"
+        x:Name="TitleBarSurface"
+        Grid.Row="0"
+        Grid.ColumnSpan="2"
+        Padding="14,0"
+        Background="{DynamicResource NavigationSurfaceBrush}"
+        BorderBrush="{DynamicResource ShellHairlineBrush}"
+        BorderThickness="0,0,0,1">
+      <StackPanel
+          x:Name="AboutBrandSurface"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Center"
+          Orientation="Horizontal"
+          Spacing="{DynamicResource Space12}"
+          automation:AutomationProperties.Name="{DynamicResource AboutAccessibleName}">
+        <TextBlock
+            VerticalAlignment="Center"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource PublisherSignature}" />
+      </StackPanel>
+    </Border>
+    <!--
+      The rail: 64 px of glyphs where there were 248 px of words. It is the composition the prototype
+      was approved at, and the trade it makes is written down - a word tells somebody what a
+      destination is without them having to know a pictogram, so the words stay in
+      AutomationProperties.Name and in the tooltip, and the glyph is what the eye lands on.
+    -->
+    <Border
+        Grid.Row="1"
+        Padding="9,8"
         Background="{DynamicResource NavigationSurfaceBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="0,0,1,0">
-      <Grid RowDefinitions="Auto,*,Auto">
-        <TextBlock
-            FontSize="{DynamicResource FontSizeSubtitle}"
-            FontWeight="SemiBold"
-            Text="{DynamicResource ProductDisplayName}"
-            automation:AutomationProperties.HeadingLevel="1" />
-
-        <StackPanel
-            Grid.Row="1"
-            Margin="0,28,0,0"
-            Spacing="{DynamicResource Space8}"
-            automation:AutomationProperties.Name="{DynamicResource MainNavigationAccessibleName}">
+      <StackPanel
+          VerticalAlignment="Top"
+          Spacing="{DynamicResource Space8}"
+          automation:AutomationProperties.Name="{DynamicResource MainNavigationAccessibleName}">
           <Button
               Classes="navigation-destination"
-              HorizontalContentAlignment="Left"
+              ToolTip.Tip="{DynamicResource NavigationHome}"
               automation:AutomationProperties.Name="{DynamicResource NavigationHome}"
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Home}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Home}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <Panel>
               <!--
-                The second signal, and it is a bar that exists or does not rather than one that
-                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+                Two signals for the open destination, and one of them is not colour: the fill, and a
+                3 px bar that is present or absent rather than tinted. Absent is not dimmed.
               -->
+              <Border
+                  Background="{DynamicResource AccentSubtleBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusMedium}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
               <Border
                   Classes="navigation-current-bar"
                   Width="3"
+                  Margin="0,7"
+                  HorizontalAlignment="Left"
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
-              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
-              <TextBlock Text="{DynamicResource NavigationHome}" />
-            </StackPanel>
+              <TextBlock Classes="navigation-glyph" Text="&#xE80F;" />
+            </Panel>
           </Button>
           <Button
               Classes="navigation-destination"
-              HorizontalContentAlignment="Left"
+              ToolTip.Tip="{DynamicResource NavigationLibrary}"
               automation:AutomationProperties.Name="{DynamicResource NavigationLibrary}"
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Library}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Library}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <Panel>
               <!--
-                The second signal, and it is a bar that exists or does not rather than one that
-                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+                Two signals for the open destination, and one of them is not colour: the fill, and a
+                3 px bar that is present or absent rather than tinted. Absent is not dimmed.
               -->
+              <Border
+                  Background="{DynamicResource AccentSubtleBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusMedium}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
               <Border
                   Classes="navigation-current-bar"
                   Width="3"
+                  Margin="0,7"
+                  HorizontalAlignment="Left"
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
-              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
-              <TextBlock Text="{DynamicResource NavigationLibrary}" />
-            </StackPanel>
+              <TextBlock Classes="navigation-glyph" Text="&#xE8F1;" />
+            </Panel>
           </Button>
           <Button
               Classes="navigation-destination"
-              HorizontalContentAlignment="Left"
+              ToolTip.Tip="{DynamicResource NavigationReview}"
               automation:AutomationProperties.Name="{DynamicResource NavigationReview}"
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Review}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Review}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <Panel>
               <!--
-                The second signal, and it is a bar that exists or does not rather than one that
-                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+                Two signals for the open destination, and one of them is not colour: the fill, and a
+                3 px bar that is present or absent rather than tinted. Absent is not dimmed.
               -->
+              <Border
+                  Background="{DynamicResource AccentSubtleBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusMedium}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
               <Border
                   Classes="navigation-current-bar"
                   Width="3"
+                  Margin="0,7"
+                  HorizontalAlignment="Left"
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
-              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
-              <TextBlock Text="{DynamicResource NavigationReview}" />
-            </StackPanel>
+              <TextBlock Classes="navigation-glyph" Text="&#xE8FD;" />
+            </Panel>
           </Button>
           <Button
               Classes="navigation-destination"
-              HorizontalContentAlignment="Left"
+              ToolTip.Tip="{DynamicResource NavigationBackups}"
               automation:AutomationProperties.Name="{DynamicResource NavigationBackups}"
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Backups}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Backups}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <Panel>
               <!--
-                The second signal, and it is a bar that exists or does not rather than one that
-                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+                Two signals for the open destination, and one of them is not colour: the fill, and a
+                3 px bar that is present or absent rather than tinted. Absent is not dimmed.
               -->
+              <Border
+                  Background="{DynamicResource AccentSubtleBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusMedium}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
               <Border
                   Classes="navigation-current-bar"
                   Width="3"
+                  Margin="0,7"
+                  HorizontalAlignment="Left"
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
-              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
-              <TextBlock Text="{DynamicResource NavigationBackups}" />
-            </StackPanel>
+              <TextBlock Classes="navigation-glyph" Text="&#xE8C8;" />
+            </Panel>
           </Button>
           <Button
               Classes="navigation-destination"
-              HorizontalContentAlignment="Left"
+              ToolTip.Tip="{DynamicResource NavigationSettings}"
               automation:AutomationProperties.Name="{DynamicResource NavigationSettings}"
               automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Settings}}"
               Command="{Binding NavigateCommand}"
               CommandParameter="{x:Static navigation:AppRoute.Settings}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <Panel>
               <!--
-                The second signal, and it is a bar that exists or does not rather than one that
-                changes colour: absent is not the same as dimmed. The glyph beside it is the first.
+                Two signals for the open destination, and one of them is not colour: the fill, and a
+                3 px bar that is present or absent rather than tinted. Absent is not dimmed.
               -->
+              <Border
+                  Background="{DynamicResource AccentSubtleBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusMedium}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
               <Border
                   Classes="navigation-current-bar"
                   Width="3"
+                  Margin="0,7"
+                  HorizontalAlignment="Left"
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
-              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
-              <TextBlock Text="{DynamicResource NavigationSettings}" />
-            </StackPanel>
+              <TextBlock Classes="navigation-glyph" Text="&#xE713;" />
+            </Panel>
           </Button>
-        </StackPanel>
-
-        <Border
-            x:Name="AboutBrandSurface"
-            Grid.Row="2"
-            Padding="12"
-            Background="{DynamicResource AccentSubtleBrush}"
-            CornerRadius="{DynamicResource CornerRadiusMedium}"
-            automation:AutomationProperties.Name="{DynamicResource AboutAccessibleName}">
-          <StackPanel Spacing="{DynamicResource Space4}">
-            <TextBlock
-                FontWeight="SemiBold"
-                Text="{DynamicResource ProductDisplayName}" />
-            <TextBlock
-                FontSize="{DynamicResource FontSizeCaption}"
-                Text="{DynamicResource PublisherSignature}" />
-          </StackPanel>
-        </Border>
-      </Grid>
+      </StackPanel>
     </Border>
 
     <Grid
+        Grid.Row="1"
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsPrimaryContentVisible}"
@@ -214,11 +254,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Border>
     </Grid>
     <ContentControl
+        Grid.Row="1"
         Grid.Column="1"
         IsVisible="{Binding IsHomeVisible}">
       <home:HomeView DataContext="{Binding Home}" />
     </ContentControl>
     <ScrollViewer
+        Grid.Row="1"
         Grid.Column="1"
         IsVisible="{Binding IsSettingsVisible}">
       <!-- Named so a gate can walk the sections instead of recognising them by class name: the
@@ -284,6 +326,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer
+        Grid.Row="1"
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsLibraryVisible}">
@@ -335,6 +378,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer
+        Grid.Row="1"
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsReviewVisible}">
@@ -346,6 +390,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </ScrollViewer>
     <ScrollViewer
+        Grid.Row="1"
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsBackupsVisible}">
@@ -359,6 +404,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <Grid
         x:Name="PlayerSurface"
+        Grid.Row="1"
         Grid.Column="0"
         Grid.ColumnSpan="2"
         Background="{DynamicResource ShellSurfaceBrush}"

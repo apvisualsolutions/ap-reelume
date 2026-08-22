@@ -139,9 +139,35 @@ contradice una línea del README, a sabiendas.
      de biblioteca deja de caber en la primera pantalla. **Se aprueba en vez de esconderse**: el héroe
      del prototipo mide **398 px**, así que nada que se parezca al diseño aprobado cabe sobre un
      pliegue de 384, y desde el paso 1 Inicio se desplaza.
-5. **La barra de título propia y el carril de navegación.**
-6. **Los iconos**, glifos de Segoe Fluent Icons — lo exige el punto 5 de las restricciones del paquete,
-   así que los SVG del prototipo se traducen, no se copian. Hoy **1 de 50 vistas** usa la familia.
+5. ~~**La barra de título propia y el carril de navegación.**~~ **HECHOS el 2026-08-22.** El carril
+   pasa de **248 px de palabras a 64 px de pictogramas**; los destinos son 46 × 42 con radio
+   `CornerRadiusMedium` —el prototipo dibuja 12 y esta escala tiene dos radios a propósito—, y el
+   abierto lleva **relleno + barra de 3 px**: dos señales, y la barra existe o no existe, así que una
+   no es color. La barra de título propia mide 44 px y hace de la ventana una sola superficie.
+   - **Ningún control nuevo, y el paseo lo confirma: 135 identidades, 0 pendientes.** Sólo cambió el
+     `Content`; `AutomationProperties.Name` sigue apuntando a la misma clave, que es lo que el paseo
+     persigue y lo que un lector anuncia. Y cada destino gana `ToolTip.Tip` con su palabra, porque un
+     pictograma que nadie ha visto antes no dice qué es.
+   - **`ExtendClientAreaChromeHints` NO existe en Avalonia 12.1.1**: quedan
+     `ExtendClientAreaToDecorationsHint` y `ExtendClientAreaTitleBarHeightHint`, y nada más. Windows
+     sigue pintando minimizar, maximizar, cerrar **y el título** sobre el área extendida — medido con
+     la aplicación abierta—, así que la barra propia **no repite el nombre**: lo dibujaba dos veces,
+     solapado. Lleva la firma del editor a la derecha.
+   - **Y con eso el nombre del producto deja de ser un encabezado de nivel 1.** Lo era en el carril
+     mientras cada pantalla declaraba el suyo: dos H1 a la vez, que es exactamente lo que se corrigió
+     en la página de Ajustes. El encabezado de una pantalla es el nombre de la pantalla.
+   - **Dos piezas que quedan fuera, dichas**: el destino **«Duplicados»** del prototipo, porque los
+     cinco de hoy son funciones reales y `Copias` no se sacrifica por una vista que vive dentro de
+     Revisar; y **«Añadir medios» al pie del carril**, que sería un control nuevo con su cadena, su
+     prueba de nombre y su escena de paseo.
+   - **Y una regla que vivía dos veces, otra vez.** `ShellLocalizationTests` exigía que **todo**
+     `Text`/`Content` del shell empezara por `{` — más estricto que el árbol, que desde el 2026-08-22
+     dice «un literal pasa sólo si no contiene ninguna letra» sobre las 51 vistas. Saltó con los cinco
+     pictogramas. Ahora dice lo que protege: el shell no pinta palabras que no haya traducido.
+6. ~~**Los iconos**, glifos de Segoe Fluent Icons.~~ **HECHOS con el paso 5** para el carril:
+   `FontFamilyIcons` se declara como token —dos consumidores, el cromo del reproductor y el carril—
+   y `Button.player-chrome` deja de escribir la lista de fuentes a mano. **Lo que queda**: los SVG del
+   prototipo en las demás vistas, que es una traducción vista por vista.
 
 ### La geometría del prototipo, ya medida — no la vuelvas a extraer
 
