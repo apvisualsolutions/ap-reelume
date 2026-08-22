@@ -10,6 +10,26 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La columna del reproductor enseña un panel a la vez, con sus nombres al principio.** Es lo que
+  hace el prototipo y era el cambio más grande que quedaba: hasta ahora los cinco paneles —pistas,
+  salida de audio, marcas de la serie, segmentos detectados y otras versiones— **se montaban todos a
+  la vez** y había que bajar por 320 px de columna para llegar al último. Ahora cada uno tiene su
+  pestaña, y **la pestaña sólo existe si su panel existe**.
+  - **Ningún modelo decide cuál se abre, y eso está medido.** Avalonia 12.1.1 **salta una pestaña
+    invisible** al elegir la primera —comprobado el 2026-08-22 con la primera de tres oculta, que abrió
+    en la segunda—, así que una sesión sin pistas abre en lo que sí tenga, sin que nada en el shell
+    tenga que calcularlo. Cero líneas de código y cero cadenas nuevas: cada pestaña lleva el nombre que
+    su propio panel ya declaraba.
+  - **Cinco pestañas y no las cuatro del prototipo.** Sus cuatro nombres —Audio, Subtítulos, Vídeo,
+    Marcadores— son su reparto, no el de esta aplicación, que guarda cinco paneles; agrupar dos bajo
+    una pestaña pediría o una palabra que nadie ha aprobado o un sexto booleano en el shell.
+  - **Y lo cazó el paseo, que es exactamente para lo que existe.** Cuatro escenas se pusieron en rojo a
+    la vez diciendo «coincidió con 0 controles en pantalla», y tenían razón: un panel que no es la
+    pestaña abierta **no está en el árbol**, así que el clic no tenía dónde caer. Las cuatro abren
+    ahora su pestaña con el ratón antes de pulsar dentro, y el trinquete sigue en **0 pendientes**
+    (137 identidades, 137 pulsadas).
+
+
 - **En el tema claro, la columna del reproductor tenía el texto invisible, y la puerta que debía
   cazarlo miraba a otro lado.** Medido el 2026-08-22: `TextPrimaryBrush` (#111827) sobre
   `PlayerSurfaceBrush` (#0B0D10) da **1,10:1** donde WCAG AA pide 4,5:1. Las superficies del

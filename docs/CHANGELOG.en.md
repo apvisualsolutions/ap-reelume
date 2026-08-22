@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The player's column shows one panel at a time, with their names at the head of it.** That is what
+  the prototype does and it was the largest change left: until now the five panels — tracks, audio
+  output, series markers, detected segments and other versions — **were all mounted at once**, and
+  reaching the last one meant scrolling 320 px of column. Each has its own tab now, and **a tab only
+  exists if its panel does**.
+  - **No view model decides which one opens, and that is measured.** Avalonia 12.1.1 **skips an
+    invisible tab** when it picks the first — checked on 2026-08-22 with the first of three hidden,
+    which opened on the second — so a session with no tracks opens on whatever it does have, with
+    nothing in the shell working it out. Zero lines of code and zero new strings: each tab carries the
+    name its own panel already declared.
+  - **Five tabs and not the prototype's four.** Its four names — Audio, Subtitles, Video, Markers —
+    are its division, not this application's, which keeps five panels; grouping two under one tab
+    would need either a word nobody has approved or a sixth boolean on the shell.
+  - **And the walk caught it, which is exactly what it is for.** Four scenes went red at once saying
+    "matched 0 controls on screen", and they were right: a panel that is not the open tab **is not in
+    the tree**, so the click had nowhere to land. All four now open their tab with the mouse before
+    pressing inside it, and the ratchet stays at **0 pending** (137 identities, 137 pressed).
+
+
 - **In the light theme the player's panel column had invisible text, and the gate that should have
   caught it was looking elsewhere.** Measured on 2026-08-22: `TextPrimaryBrush` (#111827) on
   `PlayerSurfaceBrush` (#0B0D10) is **1.10:1** where WCAG AA asks for 4.5:1. The player's surfaces are

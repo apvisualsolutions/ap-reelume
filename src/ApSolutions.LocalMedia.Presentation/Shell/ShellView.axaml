@@ -535,42 +535,63 @@ SPDX-License-Identifier: GPL-3.0-or-later
         makes an invisible column measure zero rather than reserve its place.
 
         The three session buttons that used to head it moved to the header above, which is where the
-        prototype draws them. What is left is what the prototype puts here — except that the prototype
-        shows one panel at a time and these five are all mounted whenever their view model exists.
-        That is the next tranche.
+        prototype draws them.
 
-        The measurement that put those buttons in a WrapPanel is kept because the header inherits it:
-        this column is 320 px by definition, the three buttons were about 800 px of words, and a
-        horizontal StackPanel offers its children infinite width — Mini player sat at x=1737 in a 1600
-        px window on 2026-08-16 and Fullscreen was further out still.
+        And the column is switched now instead of stacked, which is what the prototype does: one panel
+        at a time, chosen at the head of the column. Five tabs and not the prototype's four, because
+        the four are its names for what this application keeps in five panels, and a tab that grouped
+        two of them would need either a word nobody has approved or a sixth boolean on the shell. Each
+        tab carries the name its own panel already declares.
+
+        <b>No view model decides which one opens, and that is measured.</b> Avalonia 12.1.1 skips an
+        invisible TabItem when it auto-selects — checked on 2026-08-22 with the first of three hidden,
+        which opened on the second — so a session with no tracks opens on whatever it does have.
+
+        The measurement that put the header's buttons in a WrapPanel is what the tab strip inherits:
+        this column is 320 px by definition, these five names are a translator's, and a horizontal
+        strip offers its children infinite width — Mini player sat at x=1737 in a 1600 px window on
+        2026-08-16 and Fullscreen was further out still.
       -->
-      <ScrollViewer
+      <TabControl
           x:Name="PlayerPanelColumn"
+          Classes="player-panels"
           Grid.Row="1"
           Grid.Column="1"
           Width="320"
-          Padding="16"
           Background="{DynamicResource PlayerPanelBrush}"
           Foreground="{DynamicResource PlayerTextBrush}"
           IsVisible="{Binding HasPlayerPanels}">
-        <StackPanel Spacing="{DynamicResource Space16}">
-          <ContentControl IsVisible="{Binding HasTracks}">
+        <TabControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel />
+          </ItemsPanelTemplate>
+        </TabControl.ItemsPanel>
+        <TabItem Header="{DynamicResource TrackSelectorAccessibleName}" IsVisible="{Binding HasTracks}">
+          <ScrollViewer Padding="16">
             <player:TrackSelectorView DataContext="{Binding Player.Tracks}" />
-          </ContentControl>
-          <ContentControl IsVisible="{Binding HasAudioOutput}">
+          </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{DynamicResource AudioOutputAccessibleName}" IsVisible="{Binding HasAudioOutput}">
+          <ScrollViewer Padding="16">
             <player:AudioOutputView DataContext="{Binding Player.AudioOutput}" />
-          </ContentControl>
-          <ContentControl IsVisible="{Binding HasMarkers}">
+          </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{DynamicResource MarkerEditorAccessibleName}" IsVisible="{Binding HasMarkers}">
+          <ScrollViewer Padding="16">
             <player:MarkerEditorView DataContext="{Binding Player.Markers}" />
-          </ContentControl>
-          <ContentControl IsVisible="{Binding HasDetectedReview}">
+          </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{DynamicResource DetectedMarkerReviewTitle}" IsVisible="{Binding HasDetectedReview}">
+          <ScrollViewer Padding="16">
             <player:DetectedMarkerReviewView DataContext="{Binding Player.DetectedReview}" />
-          </ContentControl>
-          <ContentControl IsVisible="{Binding HasPlayerVersions}">
+          </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{DynamicResource PlayerVersionsTitle}" IsVisible="{Binding HasPlayerVersions}">
+          <ScrollViewer Padding="16">
             <player:PlayerVersionsView DataContext="{Binding Player.Versions}" />
-          </ContentControl>
-        </StackPanel>
-      </ScrollViewer>
+          </ScrollViewer>
+        </TabItem>
+      </TabControl>
     </Grid>
   </Grid>
 </UserControl>

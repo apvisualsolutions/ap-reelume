@@ -283,9 +283,27 @@ public sealed class AssembledJourneyTests : IDisposable
         Assert.True(host.ViewModel.HasVersionSwitch);
         Dispatcher.UIThread.RunJobs();
         Assert.NotNull(Find<PlayerView>(host));
+
+        // Until 2026-08-22 the three panels were all mounted at once and this asserted all three
+        // views were in the tree. The column switches now, so a panel that is not the open tab is
+        // not in the tree at all - what says the session wired them is that each has a tab to be
+        // reached by, and that the open one is mounted behind it.
+        var tabs = host.Shell.GetVisualDescendants()
+            .OfType<TabItem>()
+            .Where(item => item.IsEffectivelyVisible)
+            .Select(item => item.Header as string)
+            .ToArray();
+        foreach (var key in new[]
+        {
+            "TrackSelectorAccessibleName",
+            "AudioOutputAccessibleName",
+            "MarkerEditorAccessibleName",
+        })
+        {
+            Assert.Contains(Resource(key), tabs, StringComparer.Ordinal);
+        }
+
         Assert.NotNull(Find<TrackSelectorView>(host));
-        Assert.NotNull(Find<AudioOutputView>(host));
-        Assert.NotNull(Find<MarkerEditorView>(host));
 
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
         Assert.False(host.ViewModel.IsPlayerVisible);

@@ -169,9 +169,11 @@ public sealed class ShellPlayerWindowTests
 
         // And the column: this session has no panel at all, so it takes no width.
         Assert.False(viewModel.HasPlayerPanels);
+        // By name and not by type: the column became a TabControl when it stopped stacking its five
+        // panels and started switching between them, and what this measures is its width.
         var column = view.GetVisualDescendants()
-            .OfType<ScrollViewer>()
-            .Single(scroller => scroller.Name == "PlayerPanelColumn");
+            .OfType<Control>()
+            .Single(control => control.Name == "PlayerPanelColumn");
         Assert.False(column.IsVisible);
         Assert.Equal(0, column.Bounds.Width);
         window.Close();
