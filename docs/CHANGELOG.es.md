@@ -158,6 +158,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los círculos de estado dejan de verse pequeños.** Los `○ ◐ ●` que marcan si has visto algo, en qué
+  destino estás y qué tema tienes puesto se dibujaban a dos tercios del tamaño de los símbolos del
+  reproductor, lo justo para parecer un carácter suelto en vez de un estado. Los trece pasan al mismo
+  tamaño.
+
+
 - **Los duplicados se comparan lado a lado.** Las copias del mismo título se apilaban una debajo de
   otra, así que compararlas era desplazarse entre ellas — que es justo lo que esa pantalla existe para
   evitar. Ahora van en dos columnas, con las cifras de calidad en ancho fijo para que se lean unas

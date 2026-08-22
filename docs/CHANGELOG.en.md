@@ -157,6 +157,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The state circles stop looking small.** The `○ ◐ ●` that mark whether you have watched something,
+  which destination you are in, and which theme is on were drawn at two thirds the size of the player's
+  symbols — just enough to read as a stray character instead of a state. All thirteen move to one size.
+
+
 - **Duplicates are compared side by side.** Copies of the same title were stacked one under another,
   so comparing them meant scrolling between them — which is what that screen exists to avoid. They now
   sit in two columns, with the quality figures in a fixed-width font so they line up under each other,

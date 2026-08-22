@@ -45,7 +45,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding ApplyThemeCommand}"
             CommandParameter="{x:Static theme:ThemePreference.System}">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Text="{Binding SystemStateCue}" />
+            <TextBlock Classes="state-glyph" Text="{Binding SystemStateCue}" />
             <TextBlock Text="{DynamicResource ThemeSystem}" />
           </StackPanel>
         </Button>
@@ -55,7 +55,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding ApplyThemeCommand}"
             CommandParameter="{x:Static theme:ThemePreference.Light}">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Text="{Binding LightStateCue}" />
+            <TextBlock Classes="state-glyph" Text="{Binding LightStateCue}" />
             <TextBlock Text="{DynamicResource ThemeLight}" />
           </StackPanel>
         </Button>
@@ -65,7 +65,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding ApplyThemeCommand}"
             CommandParameter="{x:Static theme:ThemePreference.Dark}">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Text="{Binding DarkStateCue}" />
+            <TextBlock Classes="state-glyph" Text="{Binding DarkStateCue}" />
             <TextBlock Text="{DynamicResource ThemeDark}" />
           </StackPanel>
         </Button>
@@ -87,7 +87,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding ApplyLanguageCommand}"
             CommandParameter="es">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Text="{Binding SpanishStateCue}" />
+            <TextBlock Classes="state-glyph" Text="{Binding SpanishStateCue}" />
             <TextBlock Text="{DynamicResource LanguageSpanish}" />
           </StackPanel>
         </Button>
@@ -97,7 +97,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding ApplyLanguageCommand}"
             CommandParameter="en">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Text="{Binding EnglishStateCue}" />
+            <TextBlock Classes="state-glyph" Text="{Binding EnglishStateCue}" />
             <TextBlock Text="{DynamicResource LanguageEnglish}" />
           </StackPanel>
         </Button>

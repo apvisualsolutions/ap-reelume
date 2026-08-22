@@ -2,7 +2,7 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `99c94bf`, verde; al tramo 6 le quedan las dos del catálogo.** La fase 6 va por **5 tramos
+**`main` en `83dc1b1`, verde; la rama por delante con el tramo 6 CERRADO.** La fase 6 va por **5 tramos
 de 9 cerrados**
 —Shell, Inicio, Biblioteca y fichas, el Reproductor entero y **Ajustes**—:
 `AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del
@@ -127,7 +127,16 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 
 #### El tramo 6 (Revisión, Metadatos, Catálogo), medido el 2026-08-21 sin escribir código
 
-**Siete vistas, y lo primero que aparece es el peor defecto medido en toda la fase 6.**
+**CERRADO el 2026-08-22.** Siete vistas, y lo primero que apareció fue el peor defecto medido en toda
+la fase 6.
+
+**⚠ Y una roja conocida que NO es del código, medida el 2026-08-22:** la escena del paseo
+`A_session_that_will_not_open_is_handed_over_and_retried_with_the_mouse` falló una vez con
+`stopped=True failed=False` sobre el archivo de dos bytes, y **al repetirla sola dio verde, y la suite
+entera 135/135**. Con dos bytes LibVLC unas veces falla al abrir y otras para, según el sondeo de
+demultiplexores. **No se ensancha la espera para aceptar `stopped`**: la escena existe para comprobar
+la pantalla de recuperación, y aceptar «paró» la haría pasar sin que esa pantalla apareciera nunca —
+una prueba se vuelve ciega antes que falsa. **CI corre el paseo dos veces, así que puede salir allí.**
 
 - ~~**`CandidateCardView` pinta códigos internos en crudo**~~ **HECHO el 2026-08-21**
   ([su evidencia](evidence/stable/audit-explanation-codes.md)). `ExplanationCodes` llevaba rutas con
@@ -156,7 +165,7 @@ ficha se titula con un identificador.
 | ~~`DuplicateReviewView`~~ **HECHA** ([evidencia](evidence/stable/audit-duplicate-review.md)) | `UniformGrid` de 2 columnas, la diferencia en monoespaciado, vacío con cadena nueva | Dos columnas y monoespaciado hechos, y el `Border` gana su pincel. **El vacío se rechaza**: `GroupMediaVersions` lanza con menos de dos versiones y la vista sólo se monta con grupo, así que esa cadena no la vería nadie — décima discrepancia |
 | ~~`MetadataEditorView`~~ **HECHA** ([evidencia](evidence/stable/audit-metadata-editor.md)) | los 3 mensajes a bloques con glifo: conflicto y sin identificar en `WarningSurfaceBrush`, sin respuesta como dato neutro | **No pueden solaparse**: los tres salen del mismo `result.Outcome` en el mismo método — novena discrepancia §4↔árbol, y de la buena. Se separan igual, porque la garantía vive en un método privado. Y la medición encontró **ocho `TextBox` sin etiqueta a la vista**, con sus ocho cadenas ya existentes |
 | ~~`RenamePreviewView`~~ **HECHA** ([evidencia](evidence/stable/audit-rename-preview.md)) | origen y destino monoespaciados; el `→` se queda con su nombre accesible | Las dos rutas se truncaban por el **final**, que es el nombre del archivo — lo único que cambia. Van a `PathSegmentEllipsis`, que quita del medio. **`FontFamilyMono` se declara por fin**: tres consumidores. ⚠ **Queda `RenameConflict.Detail`**, que pinta una frase inglesa de `SafeFileRenamer` o una ruta pelada, mientras `RenameConflictKind` no lo pinta nadie |
-| `PersonalActionsView`, `WatchStatusControl` | `○ ◐ ●` se quedan y ganan el tamaño óptico de los glifos Fluent | por medir |
+| ~~`PersonalActionsView`, `WatchStatusControl`~~ **HECHAS** ([evidencia](evidence/stable/audit-state-glyphs.md)) | `○ ◐ ●` se quedan y ganan el tamaño óptico de los glifos Fluent | Medido: un glifo Fluent llena su caja em (14×14 a tamaño 14) y el círculo mide **9 — un 64 %**. Pasan a `FontSizeSubtitle`, que da 13 (93 %) y es un escalón que la escala ya tiene. **Trece bloques y no tres**: los cinco del carril y las cinco píldoras también |
 
 **⚠ Y una decisión que hay que tomar en este tramo y no antes: el monoespaciado.** La §4 lo pide aquí
 **dos veces** (duplicados y renombrado) y ya se gastó una en `DiagnosticsPreviewView`, que lo lleva

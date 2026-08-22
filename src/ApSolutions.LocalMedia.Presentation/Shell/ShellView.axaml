@@ -62,7 +62,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
-              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
+              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
               <TextBlock Text="{DynamicResource NavigationHome}" />
             </StackPanel>
           </Button>
@@ -84,7 +84,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
-              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
+              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
               <TextBlock Text="{DynamicResource NavigationLibrary}" />
             </StackPanel>
           </Button>
@@ -106,7 +106,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
-              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
+              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
               <TextBlock Text="{DynamicResource NavigationReview}" />
             </StackPanel>
           </Button>
@@ -128,7 +128,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
-              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
+              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
               <TextBlock Text="{DynamicResource NavigationBackups}" />
             </StackPanel>
           </Button>
@@ -150,7 +150,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
-              <TextBlock Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
+              <TextBlock Classes="state-glyph" Text="{Binding CurrentRoute, Converter={StaticResource RouteGlyph}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
               <TextBlock Text="{DynamicResource NavigationSettings}" />
             </StackPanel>
           </Button>
