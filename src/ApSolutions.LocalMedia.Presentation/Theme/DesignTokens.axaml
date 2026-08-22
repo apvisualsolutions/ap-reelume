@@ -1427,4 +1427,88 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
+  <!--
+    The review inbox's candidate card. The prototype tints its <b>whole</b> border rather than a left
+    edge - `borderColor: accent` above 60 %, `warn` below it - and the border is the one signal that
+    survives a high contrast, where CardSurfaceBrush and ShellSurfaceBrush are the same colour.
+
+    The class is switched from the model with Classes.suggested / Classes.pending rather than through
+    a converter, because the two states are already two booleans on the card and a converter would be
+    a third place that decides which is which.
+  -->
+  <Style Selector="Border.candidate-card">
+    <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="Padding" Value="16" />
+  </Style>
+
+  <Style Selector="Border.candidate-card.suggested">
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="Border.candidate-card.pending">
+    <Setter Property="BorderBrush" Value="{DynamicResource WarningBorderBrush}" />
+  </Style>
+
+  <!--
+    The badge in the card's top right corner. The prototype draws a pill; this draws the radius the
+    scale has, because a third radius declared for one consumer is what FontSizeMono was refused for.
+
+    It keeps a border where the prototype has a transparent one: the two tinted backgrounds collapse
+    into the surface in both high contrasts, and a badge told apart from its card by fill alone would
+    stop existing there.
+  -->
+  <Style Selector="Border.state-chip">
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="Padding" Value="10,2" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
+  </Style>
+
+  <Style Selector="Border.state-chip.suggested">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="Border.state-chip.pending">
+    <Setter Property="Background" Value="{DynamicResource WarningSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource WarningBorderBrush}" />
+  </Style>
+
+  <Style Selector="Border.state-chip TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+
+  <!--
+    The label over a value - "Candidato propuesto", "Confianza", "Por qué". Small and secondary, which
+    is the only way a card can name five things without any of them shouting.
+  -->
+  <Style Selector="TextBlock.card-eyebrow">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+
+  <!--
+    Six px and not the poster's three: this bar is the value, not a mark across a picture, and it is
+    the height the prototype gives it. MinHeight and MinWidth go with it for the reason PosterCardView
+    measured - the base ControlTheme sets a minimum of its own, and Height alone lost to it.
+  -->
+  <Style Selector="ProgressBar.confidence">
+    <Setter Property="Height" Value="6" />
+    <Setter Property="MinHeight" Value="6" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="ProgressBar.confidence.pending">
+    <Setter Property="Foreground" Value="{DynamicResource WarningBorderBrush}" />
+  </Style>
 </Styles>

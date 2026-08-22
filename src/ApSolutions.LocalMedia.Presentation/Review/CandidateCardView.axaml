@@ -19,31 +19,118 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="ExplanationText" />
   </UserControl.Resources>
+  <!--
+    The prototype's candidate card: the tinted border, the badge in the top right corner, and the two
+    columns underneath - what is proposed on the left, why on the right. Three things it draws that
+    this cannot, and they are omissions rather than oversights:
+
+    - <b>The 2:3 thumbnail.</b> MatchCandidate carries an id, a key, a kind, a score and its signals,
+      and no artwork - so an empty 78x117 rectangle in every row would promise a picture that does not
+      exist. Same declared omission as the recommendation year and the player's title.
+    - <b>The candidate's title and its kind.</b> The key is what the domain holds - "movie:329865" -
+      and the kind would need the words "Película" / "Serie", which the string package does not
+      propose and this tree does not invent. Both were already decided on 2026-08-22.
+    - <b>The four buttons at the card's foot.</b> They exist, one row lower: Accept and Reject act on
+      whatever the list has selected, and moving them into every card would turn one decision per
+      inbox into one decision per row - a change to how the surface works, not to how it is drawn.
+  -->
   <Border
       Margin="0,4"
-      Padding="12"
-      BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-      BorderThickness="1"
-      CornerRadius="{DynamicResource CornerRadiusMedium}"
+      Classes="candidate-card"
+      Classes.pending="{Binding IsPending}"
+      Classes.suggested="{Binding IsSuggested}"
       automation:AutomationProperties.Name="{Binding StableKey}"
       automation:AutomationProperties.HelpText="{Binding ExplanationCodes, Converter={StaticResource ExplanationText}}">
-    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="{DynamicResource Space8}">
-      <TextBlock FontWeight="SemiBold" Text="{Binding StableKey}" />
-      <TextBlock Grid.Column="1" Text="{Binding ScorePercent}" />
-      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-        <TextBlock IsVisible="{Binding IsPending}" Text="{DynamicResource ReviewStatusPending}" />
-        <TextBlock IsVisible="{Binding IsSuggested}" Text="{DynamicResource ReviewStatusSuggested}" />
-        <TextBlock Text="{DynamicResource ReviewExplanationHeading}" />
+    <Grid
+        RowDefinitions="Auto,Auto"
+        ColumnDefinitions="*,Auto"
+        RowSpacing="{DynamicResource Space12}"
+        ColumnSpacing="{DynamicResource Space12}">
+      <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{DynamicResource Space4}">
+        <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewProposedCandidate}" />
+        <TextBlock
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding StableKey}"
+            TextWrapping="Wrap" />
       </StackPanel>
-      <ItemsControl Grid.Row="2" Grid.ColumnSpan="2" ItemsSource="{Binding ExplanationCodes}">
-        <ItemsControl.ItemTemplate>
-          <!-- x:DataType, because this control declares one and a template without its own inherits
-               it: the binding would resolve against the card's model instead of against the code. -->
-          <DataTemplate x:DataType="x:String">
-            <TextBlock Text="{Binding ., Converter={StaticResource ExplanationText}}" TextWrapping="Wrap" />
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+      <!--
+        Two badges and not one with two labels inside: a candidate that has been accepted or rejected
+        is neither pending nor suggested, and a single badge would then be an empty tinted rectangle
+        with nothing in it.
+      -->
+      <Border
+          Grid.Row="0"
+          Grid.Column="1"
+          Classes="state-chip suggested"
+          IsVisible="{Binding IsSuggested}">
+        <TextBlock Text="{DynamicResource ReviewStatusSuggested}" />
+      </Border>
+      <Border
+          Grid.Row="0"
+          Grid.Column="1"
+          Classes="state-chip pending"
+          IsVisible="{Binding IsPending}">
+        <TextBlock Text="{DynamicResource ReviewStatusPending}" />
+      </Border>
+      <Grid
+          Grid.Row="1"
+          Grid.ColumnSpan="2"
+          ColumnDefinitions="*,*"
+          ColumnSpacing="{DynamicResource Space16}">
+        <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewConfidence}" />
+            <TextBlock
+                Grid.Column="1"
+                FontSize="{DynamicResource FontSizeCaption}"
+                FontWeight="SemiBold"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{Binding ScorePercent}" />
+          </Grid>
+          <!--
+            The score is the same number the percentage above it is written from, so the bar and the
+            figure cannot disagree: Maximum is 1 because that is the range Score is scored on, and
+            ScorePercent is that same double formatted with P0.
+          -->
+          <ProgressBar
+              Classes="confidence"
+              Classes.pending="{Binding IsPending}"
+              Maximum="1"
+              Value="{Binding Candidate.Score}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
+          <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewExplanationHeading}" />
+          <ItemsControl ItemsSource="{Binding ExplanationCodes}">
+            <ItemsControl.ItemTemplate>
+              <!-- x:DataType, because this control declares one and a template without its own inherits
+                   it: the binding would resolve against the card's model instead of against the code. -->
+              <DataTemplate x:DataType="x:String">
+                <!--
+                  A Grid and not a horizontal StackPanel. The bullet sits beside text that wraps, and a
+                  stack offers its children infinite width, so the sentence would never wrap and would
+                  run off the side - measured nine times in this repository, always this shape.
+                -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
+                  <TextBlock
+                      Grid.Column="0"
+                      VerticalAlignment="Top"
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      Text="•"
+                      automation:AutomationProperties.AccessibilityView="Raw" />
+                  <TextBlock
+                      Grid.Column="1"
+                      FontSize="{DynamicResource FontSizeCaption}"
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      Text="{Binding ., Converter={StaticResource ExplanationText}}"
+                      TextWrapping="Wrap" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Grid>
     </Grid>
   </Border>
 </UserControl>
