@@ -82,17 +82,23 @@ public sealed class FluentThemeService : IThemeService
     /// no stored setting has to migrate.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Read when the theme is applied — at startup and on every change of preference. Turning high
     /// contrast on in Windows while the application is already open therefore reaches it on the next
     /// launch; following it live needs a settings-change message, which is not this.
+    /// </para>
+    /// <para>
+    /// It validated the preference again until 2026-08-22, and <b>nothing could take that branch</b>:
+    /// its two callers are <see cref="Apply"/>, which throws on an undefined value before getting
+    /// here, and the constructor, which passes a value it just normalised. A guard no caller can
+    /// reach is not caution, it is two branches no test can cover — the same shape
+    /// <c>RouteStateConverter</c> lost three of, and the reason this file's branch coverage went
+    /// backwards while its code stood still. The <c>default</c> arm of the switch below is what
+    /// actually answers an impossible value, and it answers it with the system theme.
+    /// </para>
     /// </remarks>
     private void ApplyToApplication(ThemePreference preference)
     {
-        if (!Enum.IsDefined(preference))
-        {
-            throw new ArgumentOutOfRangeException(nameof(preference));
-        }
-
         if (_highContrastService.IsEnabled)
         {
             _application.RequestedThemeVariant = _highContrastService.IsLight
