@@ -14,6 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
       <TextBlock
           x:Name="NotStartedGlyph"
+          Classes="state-glyph"
           IsVisible="{Binding IsNotStarted}"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="○" />
@@ -25,6 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
       <TextBlock
           x:Name="InProgressGlyph"
+          Classes="state-glyph"
           IsVisible="{Binding IsInProgress}"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="◐" />
@@ -36,6 +38,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
       <TextBlock
           x:Name="WatchedGlyph"
+          Classes="state-glyph"
           IsVisible="{Binding IsWatched}"
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="●" />

@@ -1124,6 +1124,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
 
+  <!--
+    The three circles this application uses for state. Measured on 2026-08-22 at FontSizeBody: a Fluent
+    glyph renders 14 wide by 14 tall, because an icon font fills its em box, and ● renders 9 - the
+    circle was reading at 64% of the icon and looking like a stray character instead of a state.
+
+    FontSizeSubtitle brings it to 13, or 93%, and it is a step the scale already has. Nothing between
+    the two exists in it, and a scalar declared for this alone would be the token-with-one-reader this
+    repository refuses - so the nearest existing step is what it gets, and the missing 7% is a
+    difference nobody can see between two screens.
+
+    One class for all thirteen: three in the watch status, five in the navigation rail and five in the
+    appearance pills. Three of thirteen at one size and ten at another is the inconsistency this batch
+    keeps finding assembled.
+  -->
+  <Style Selector="TextBlock.state-glyph">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSubtitle}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
   <Style Selector="Button.theme-option">
     <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
