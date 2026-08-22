@@ -15,7 +15,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -35,7 +35,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -55,7 +55,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -75,7 +75,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -95,7 +95,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -115,7 +115,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -135,7 +135,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 307,
+    "LibraryEntryBottom": 429,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -155,7 +155,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 307,
+    "LibraryEntryBottom": 429,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -175,7 +175,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 307,
+    "LibraryEntryBottom": 429,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -195,7 +195,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 307,
+    "LibraryEntryBottom": 429,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -215,7 +215,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 307,
+    "LibraryEntryBottom": 429,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -235,7 +235,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 307,
+    "LibraryEntryBottom": 429,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -255,8 +255,8 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 430,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -275,8 +275,8 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 430,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -295,8 +295,8 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 430,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -315,8 +315,8 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 430,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -335,8 +335,8 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 430,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -355,8 +355,8 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 430,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -375,7 +375,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 311,
+    "LibraryEntryBottom": 433,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -395,7 +395,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 311,
+    "LibraryEntryBottom": 433,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -415,7 +415,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 311,
+    "LibraryEntryBottom": 433,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -435,7 +435,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 311,
+    "LibraryEntryBottom": 433,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -455,7 +455,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 311,
+    "LibraryEntryBottom": 433,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -475,7 +475,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 311,
+    "LibraryEntryBottom": 433,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -495,7 +495,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 431,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -515,7 +515,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 431,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -535,7 +535,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 431,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -555,7 +555,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 431,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -575,7 +575,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 431,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -595,7 +595,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 431,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -615,7 +615,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -635,7 +635,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -655,7 +655,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -675,7 +675,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -695,7 +695,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -715,7 +715,7 @@
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 308,
+    "LibraryEntryBottom": 430,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   }

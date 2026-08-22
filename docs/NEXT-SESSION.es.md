@@ -116,10 +116,29 @@ contradice una línea del README, a sabiendas.
      virtualización de la lista de una columna y **nombraba la solución en su propio comentario**
      («agrupar en filas en el modelo de vista y dejar que el panel virtualice filas»).
      `LibraryGridTests` lo afirma sobre la ficha real, que es más.
-3. **Los tres carriles** con tarjetas: `InProgressRailView` con barra de progreso de 3 px al pie,
-   `RecentlyAddedRailView` y `RecommendationsRailView`.
-4. **El héroe de Inicio** (`ResumeHeroView`): título grande, metadatos en una línea, barra de progreso y
-   dos acciones. Estado: sin nada que reanudar, **el héroe no se pinta**.
+3. ~~**Los tres carriles** con tarjetas.~~ **HECHOS con el paso 1**, que es de donde salieron: los
+   tres montan `PosterCardView`, la barra de 3 px va **al pie de la portada** —que es donde la §4 la
+   pide— y los tres `ListBox` pierden su caja (`ListBox.poster-rail`: un carril es una fila de fichas
+   sobre la superficie del shell, no una lista dentro de un marco).
+4. ~~**El héroe de Inicio** (`ResumeHeroView`).~~ **HECHO el 2026-08-22.** Antetítulo en `FontSizeCaption`
+   y `TextSecondaryBrush`, título en `FontSizeDisplay` con peso **Light** —el prototipo lo escribe a
+   52 px y peso 300, y la escala llega a 32; un `FontSizeHero` con un solo lector es la forma por la
+   que se rechazó `FontSizeMono`, así que la diferencia la carga el peso y el espacio—, metadatos en
+   una línea, barra de 300 × 3 con el porcentaje en palabras, y la acción en `WrapPanel`. Sin nada que
+   reanudar **el héroe no se pinta**, que ya era así.
+   - **Y dos cosas del prototipo que NO lleva, las dos por una razón medida y no por alcance.**
+     **La portada**: unas iniciales junto a un título ya escrito a 32 px dicen dos veces lo mismo —las
+     iniciales sirven en una rejilla, donde distinguen una ficha de la siguiente—; vuelve con portadas
+     de verdad. **El botón «Detalles»**: abrir la ficha de un título pide un `CatalogItem`,
+     `ResumeItem` **no lleva ni el año ni la disponibilidad** que ese record tiene, y ningún modelo de
+     lectura contesta «dame el elemento con este id» —`ICatalogQueryService` consulta páginas con
+     filtros—. Construirlo con lo que el héroe sabe sería **inventarse dos campos**. Es una vertical
+     por tres capas para un botón secundario.
+   - **Coste medido en la baseline `T30`**: el héroe crece **122 px**, así que `LibraryEntryBottom` se
+     mueve en los 36 registros y en **6** —1366 × 768 al 200 %, viewport de 384 px lógicos— el bloque
+     de biblioteca deja de caber en la primera pantalla. **Se aprueba en vez de esconderse**: el héroe
+     del prototipo mide **398 px**, así que nada que se parezca al diseño aprobado cabe sobre un
+     pliegue de 384, y desde el paso 1 Inicio se desplaza.
 5. **La barra de título propia y el carril de navegación.**
 6. **Los iconos**, glifos de Segoe Fluent Icons — lo exige el punto 5 de las restricciones del paquete,
    así que los SVG del prototipo se traducen, no se copian. Hoy **1 de 50 vistas** usa la familia.

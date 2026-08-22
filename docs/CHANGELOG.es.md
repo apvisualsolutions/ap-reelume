@@ -10,6 +10,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El bloque de «Continuar viendo» es ahora el héroe que el diseño pide.** El título va en grande y
+  en peso ligero, el antetítulo lo etiqueta sin gastar un nivel de encabezado, y la barra de progreso
+  es la misma regla de 3 px que llevan las fichas, con el porcentaje en palabras al lado. **Lo que no
+  lleva, y por qué**: no lleva portada, porque unas iniciales junto a un título ya escrito en grande
+  dicen dos veces lo mismo; y no lleva el botón «Detalles» del prototipo, porque abrir la ficha de un
+  título pide un dato del catálogo que la pantalla de inicio no tiene y que ninguna consulta sabe
+  devolver por identificador.
+
+
 - **La biblioteca se ve como una cuadrícula que se adapta a la ventana.** Donde había una lista de una
   columna hay ahora fichas en rejilla, y al estrechar la ventana se reacomodan solas. Medido sobre
   diez mil títulos: la cuadrícula tarda **6 ms** y mantiene **36** fichas vivas, frente a los **4559 ms**

@@ -106,6 +106,18 @@ public sealed class HomeLayoutTests
         Assert.Contains(viewModel.InProgress, item => !item.IsAvailable);
     }
 
+    /// <summary>
+    /// Home's shape across every window, scale, theme and language, against an approved record.
+    /// </summary>
+    /// <remarks>
+    /// <b>What the 2026-08-22 approval changed, and why.</b> The hero grew 122 px when it became the
+    /// one §4 describes, so <c>LibraryEntryBottom</c> moves in all thirty-six records, and in six of
+    /// them — 1366x768 at 200%, a viewport 384 logical px tall — the library block stops fitting in
+    /// the first screenful. That is a real loss and it is approved rather than hidden: the
+    /// prototype's own hero is <b>398 px tall</b>, so nothing that looks like the approved design
+    /// fits above a 384 px fold, and since the same day Home scrolls, which is what makes everything
+    /// under it reachable at all. The record says so; a green here would not.
+    /// </remarks>
     [AvaloniaFact]
     public async Task Home_matches_its_approved_structural_baseline_across_every_combination()
     {

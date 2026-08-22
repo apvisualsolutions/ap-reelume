@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The "Continue watching" block is now the hero the design asks for.** The title is large and
+  light, an overline labels it without spending a heading level, and the progress bar is the same
+  3 px rule the cards carry, with the percentage in words beside it. **What it does not carry, and
+  why**: no artwork, because initials next to a title already written large say the same thing twice;
+  and not the prototype's "Details" button, because opening a title's card needs catalogue data Home
+  does not hold and no query can return by id.
+
+
 - **The library looks like a grid that follows the window.** Where there was a one-column list there
   are now cards in a grid, and narrowing the window rearranges them. Measured over ten thousand
   titles: the grid takes **6 ms** and keeps **36** cards alive, against **4559 ms** and **ten
