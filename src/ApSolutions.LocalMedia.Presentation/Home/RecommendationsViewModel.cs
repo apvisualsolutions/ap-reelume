@@ -8,6 +8,7 @@ using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation.Commands;
+using ApSolutions.LocalMedia.Presentation.Library;
 
 namespace ApSolutions.LocalMedia.Presentation.Home;
 
@@ -94,6 +95,7 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
 
 /// <summary>One suggestion, with the resource keys that explain it.</summary>
 public sealed class RecommendationItemViewModel(Recommendation recommendation, string title)
+    : IPosterCard
 {
     private readonly Recommendation _recommendation = recommendation
         ?? throw new ArgumentNullException(nameof(recommendation));
@@ -103,6 +105,25 @@ public sealed class RecommendationItemViewModel(Recommendation recommendation, s
     public string Title { get; } = title ?? string.Empty;
 
     public double Score => _recommendation.Score;
+
+    public string Initials => PosterInitials.From(Title);
+
+    /// <summary>
+    /// Empty, because a suggestion is looked up by title alone.
+    /// </summary>
+    /// <remarks>
+    /// <c>Recommendation</c> carries a content id, a score and its reasons; the year would be a
+    /// second lookup through <c>_titleLookup</c>'s sibling, which does not exist. The reasons under
+    /// the card are what this rail has to say instead, and they say more than a year would.
+    /// </remarks>
+    public string CaptionText => string.Empty;
+
+    public bool HasCaption => false;
+
+    /// <summary>A suggestion is something not started, so there is nothing to draw.</summary>
+    public bool HasKnownProgress => false;
+
+    public double CompletedFraction => 0;
 
     /// <summary>Resource keys for the signals behind this suggestion, heaviest first.</summary>
     public IReadOnlyList<string> ReasonKeys { get; } =

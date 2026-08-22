@@ -26,6 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ListBox
         x:Name="RecentlyAddedRail"
         Grid.Row="1"
+        Classes="poster-rail"
         Margin="0,8,0,0"
         IsVisible="{Binding HasRecentlyAdded}"
         ItemsSource="{Binding RecentlyAdded}"
@@ -39,27 +40,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ListBox.ItemsPanel>
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="home:RecentlyAddedItemViewModel">
-          <Border Width="220" Padding="12">
-            <StackPanel Spacing="{DynamicResource Space4}">
-              <!--
-              Two lines and no more: a title that wraps freely makes the cards of one rail different
-              heights, and one that never wraps hides half of every long name behind an ellipsis.
-              MaxLines needs the wrapping to have something to break, so the two go together.
-              -->
-              <TextBlock
-                  FontWeight="SemiBold"
-                  MaxLines="2"
-                  Text="{Binding Title}"
-                  TextTrimming="CharacterEllipsis"
-                  TextWrapping="Wrap" />
-              <TextBlock
-                  FontSize="{DynamicResource FontSizeCaption}"
-                  Foreground="{DynamicResource TextSecondaryBrush}"
-                  IsVisible="{Binding HasYear}"
-                  Text="{Binding YearText}" />
-              <library:UnavailableBadge />
-            </StackPanel>
-          </Border>
+          <!--
+          The card is PosterCardView and the badge stays outside it: whether a medium is reachable is
+          something this rail knows and the suggestions rail does not, so the card never claims it.
+          -->
+          <StackPanel Spacing="{DynamicResource Space8}">
+            <library:PosterCardView />
+            <library:UnavailableBadge HorizontalAlignment="Left" />
+          </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>

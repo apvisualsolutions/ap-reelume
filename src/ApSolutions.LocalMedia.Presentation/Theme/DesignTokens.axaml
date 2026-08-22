@@ -1114,6 +1114,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
+    A rail of posters is a row of cards on the shell's own surface, not a list in a box. The base
+    ListBox brings a fill, a border and a padding of its own, and all three drew a pale panel behind
+    the three rails on Home the moment the cards became 2:3 - a container nobody asked for around
+    content that is already separated by the cards' own shape.
+
+    It is a class here rather than three copies of the same three setters, which is the shape the
+    unavailable badge already had to be rescued from.
+  -->
+  <Style Selector="ListBox.poster-rail">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+
+  <!--
     The label of such a row. It never wraps, because a row of fixed height that wrapped would hide the
     second line rather than shorten the first; what it does instead is end in an ellipsis and hand the
     whole string to a tooltip, which is the only reason truncating is acceptable at all.

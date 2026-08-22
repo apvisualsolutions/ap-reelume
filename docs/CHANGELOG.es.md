@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las películas y las series se ven como fichas.** Donde había una línea de texto por título hay
+  ahora una ficha de 2:3 con las iniciales del título, el título a dos líneas como mucho y el año
+  debajo, en los tres carriles de Inicio. No hay portadas y no las va a haber en esta versión —esta
+  aplicación se publica sin ninguna conexión que las traiga—, así que las iniciales no son un hueco
+  esperando una imagen: son lo que la ficha enseña, y son distintas en cada una, que es lo que hace
+  que una pared de fichas se pueda recorrer con la vista.
+
+
 - **Al elegir el tipo de carpeta se ve cuál está elegido.** Los tres botones —Local, USB, UNC o NAS—
   cambiaban un ajuste que la pantalla no enseñaba en ninguna parte: pulsar «USB» dejaba todo
   exactamente igual que pulsar «Local». Ahora llevan el mismo círculo que las opciones de tema y de
@@ -148,6 +156,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   mucho, el año en un tono secundario y el aviso de que un medio no está disponible ahora mismo.
 
 ### Corregido
+
+- **Inicio llegaba hasta la mitad y el resto se dibujaba fuera de la ventana.** «Añadido
+  recientemente» y «Quizá te interese» existían, tenían su texto en los dos idiomas y no aparecían en
+  pantalla: la fila del carril se quedaba con todo el espacio sobrante y las dos secciones de debajo
+  caían por el borde inferior. Medido a 1600 × 1000. Ahora Inicio se desplaza y las cinco secciones se
+  alcanzan.
+
 
 - **La pantalla de fallo ya no ofrece elegir otra versión cuando no hay otra versión.** Se decidía
   sólo por el motivo del fallo, sin mirar si el contenido tenía alguna alternativa catalogada, así

@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     x:DataType="home:RecommendationsViewModel"
     automation:AutomationProperties.Name="{DynamicResource RecommendationsAccessibleName}">
   <UserControl.Resources>
@@ -55,6 +56,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <ListBox
         Grid.Row="1"
+        Classes="poster-rail"
         IsVisible="{Binding HasRecommendations}"
         ItemsSource="{Binding Items}"
         ScrollViewer.HorizontalScrollBarVisibility="Auto"
@@ -67,25 +69,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ListBox.ItemsPanel>
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="home:RecommendationItemViewModel">
-          <Border Width="220" Padding="12">
-            <StackPanel Spacing="{DynamicResource Space4}">
-              <TextBlock
-                  FontWeight="SemiBold"
-                  Text="{Binding Title}"
-                  TextTrimming="CharacterEllipsis" />
-              <TextBlock
-                  FontSize="{DynamicResource FontSizeCaption}"
-                  IsVisible="{Binding HasReasons}"
-                  Text="{DynamicResource RecommendationsWhyLabel}" />
-              <ItemsControl ItemsSource="{Binding ReasonKeys}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{Binding Converter={StaticResource ReasonTextConverter}}" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
+          <!--
+          The card's caption is empty here and the reasons take its place: this is the one rail that
+          has to say why a title is in front of somebody, and a year would say less.
+          -->
+          <StackPanel Width="148" Spacing="{DynamicResource Space4}">
+            <library:PosterCardView />
+            <TextBlock
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                IsVisible="{Binding HasReasons}"
+                Text="{DynamicResource RecommendationsWhyLabel}" />
+            <ItemsControl ItemsSource="{Binding ReasonKeys}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeCaption}"
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      Text="{Binding Converter={StaticResource ReasonTextConverter}}"
+                      TextWrapping="Wrap" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>

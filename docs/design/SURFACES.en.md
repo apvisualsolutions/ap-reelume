@@ -9,7 +9,7 @@ visible is left undesigned.
 
 ## The rule that already holds, and needs no redoing
 
-- **All 50 views use localised strings.** Not one carries untranslated text: the measurement found no
+- **All 51 views use localised strings.** Not one carries untranslated text: the measurement found no
   view without `DynamicResource`.
 - **480 string keys in Spanish and 480 in English**, in
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` and `Strings.en.axaml`.
@@ -23,13 +23,13 @@ visible is left undesigned.
 - **Every interactive control has an accessible name**, and 80 accessibility tests require it. A
   redesign may change the shape, not take the name away.
 
-## The 50 views, by area
+## The 51 views, by area
 
 | Area | Views |
 | --- | --- |
 | Shell (2) | `ShellView`, `StartupView` |
 | Home (6) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecentlyAddedRailView`, `RecommendationsRailView`, `LibraryEntryView` |
-| Library (2) | `LibraryView`, `UnavailableBadge` |
+| Library (3) | `LibraryView`, `UnavailableBadge`, `PosterCardView` |
 | Film card (1) | `MovieDetailsView` |
 | Series card (2) | `ShowDetailsView`, `EpisodeRowView` |
 | Player (17) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow`, `MiniPlayerChromeView` |

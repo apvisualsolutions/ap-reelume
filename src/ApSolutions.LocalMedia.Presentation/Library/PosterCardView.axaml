@@ -1,0 +1,92 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The 2:3 card, and the one piece the redesign repeats most: the library grid and the three rails on
+Home all show it, so it is a view of its own rather than four templates that would drift apart.
+
+Its size is written rather than fluid, and 148 x 222 is exactly 2:3 - the prototype's grid asks for
+minmax(148px, 1fr) and its rails for 132, so this is the wider of the two shapes it was approved at.
+A card that stretched would need its height to follow its width, and Avalonia has no aspect ratio;
+what a fluid grid changes is how many fit on a row, which is the grid's decision and not the card's.
+
+There is no artwork here and there is not going to be in 0.2.0: the application ships with no TMDB
+token, so the initials are not a placeholder waiting for a picture, they are what the card shows.
+They are marked Raw for automation because the card is already announced by its title - a reader
+that heard "EF, El Faro de Piedra" would be hearing the same title twice, once spelled out.
+
+It carries no accessible name of its own: in the library the button around it is named by the title,
+and a name here would be a second announcement of the same card.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Library.PosterCardView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
+    Width="148"
+    x:DataType="library:IPosterCard">
+  <StackPanel Spacing="{DynamicResource Space8}">
+    <!--
+    The hairline and not the control border: this rectangle separates a card from the one beside it
+    and is not something to press, so it is the 1.8:1 brush the token split was made for.
+    -->
+    <Border
+        Height="222"
+        Background="{DynamicResource ControlFillBrush}"
+        BorderBrush="{DynamicResource ShellHairlineBrush}"
+        BorderThickness="1"
+        ClipToBounds="True"
+        CornerRadius="{DynamicResource CornerRadiusMedium}">
+      <Panel>
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="{DynamicResource FontSizeDisplay}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{Binding Initials}"
+            automation:AutomationProperties.AccessibilityView="Raw" />
+        <!--
+        Three px and not the theme's four, and at the foot of the artwork rather than under the
+        title: it is a rule across the poster, not a control to read. MinHeight goes with Height
+        because the base ControlTheme sets a minimum of its own and Height alone measures 4.
+
+        MinWidth is the same shape and was measured here: the base theme gives a ProgressBar 200, so
+        stretching inside a 148 px poster produced a bar 54 px wider than the picture it belongs to,
+        clipped rather than fitted. The setter that names a number is not always the one that
+        decides it.
+        -->
+        <ProgressBar
+            Height="3"
+            MinHeight="3"
+            MinWidth="0"
+            VerticalAlignment="Bottom"
+            Background="{DynamicResource ControlFillBrush}"
+            Foreground="{DynamicResource AccentBrush}"
+            IsVisible="{Binding HasKnownProgress}"
+            Maximum="1"
+            Value="{Binding CompletedFraction}"
+            automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+      </Panel>
+    </Border>
+    <!--
+    Two lines and no more: a title that wraps freely makes the cards of one row different heights,
+    and one that never wraps hides half of every long name behind an ellipsis. MaxLines needs the
+    wrapping to have something to break, so the two go together.
+    -->
+    <TextBlock
+        FontWeight="SemiBold"
+        MaxLines="2"
+        Text="{Binding Title}"
+        TextTrimming="CharacterEllipsis"
+        TextWrapping="Wrap" />
+    <TextBlock
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        IsVisible="{Binding HasCaption}"
+        Text="{Binding CaptionText}"
+        TextTrimming="CharacterEllipsis" />
+  </StackPanel>
+</UserControl>

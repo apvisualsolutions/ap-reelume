@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Films and series look like cards.** Where there was a line of text per title there is now a 2:3
+  card carrying the title's initials, the title on at most two lines and the year underneath, across
+  the three rails on Home. There is no artwork and there will be none in this version — this
+  application ships with no connection that could fetch any — so the initials are not a hole waiting
+  for a picture: they are what the card shows, and they differ from card to card, which is what makes
+  a wall of them scannable.
+
+
 - **Choosing a folder kind shows which one is chosen.** The three buttons - Local, USB, UNC or NAS -
   set a choice the screen never showed anywhere: pressing "USB" left everything exactly as pressing
   "Local" did. They now carry the same circle the theme and language options use. The path box also
@@ -147,6 +155,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   reachable right now.
 
 ### Fixed
+
+- **Home stopped halfway and the rest was drawn outside the window.** "Recently added" and
+  "You might like" existed, had their text in both languages and never reached the screen: the rail's
+  row took all the leftover space and the two sections under it fell past the bottom edge. Measured at
+  1600 x 1000. Home scrolls now and all five sections can be reached.
+
 
 - **The failure screen no longer offers another version when there is no other version.** It was
   decided by the failure reason alone, without looking at whether the content had any alternative

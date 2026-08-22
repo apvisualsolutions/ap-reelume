@@ -70,6 +70,7 @@ public sealed class LeadingActionTests
         // Library
         ["LibraryView"] = null,
         ["UnavailableBadge"] = null,
+        ["PosterCardView"] = null,
 
         // Details
         ["MovieDetailsView"] = "MovieResumeAction",

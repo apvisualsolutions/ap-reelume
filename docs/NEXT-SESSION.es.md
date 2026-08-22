@@ -54,10 +54,34 @@ contradice una línea del README, a sabiendas.
 **Nada de esto toca TMDB.** La §4 ya dice qué pintar sin portada: «**iniciales sobre
 `ControlFillBrush`, nunca un hueco**». El prototipo tampoco usa fotos: pinta degradados.
 
-1. **La ficha 2:3** (`PosterCardView`, nueva). Arte 2:3 con las iniciales del título sobre
-   `ControlFillBrush`, radio `CornerRadiusMedium`, título a **dos líneas máximo**, año en
-   `TextSecondaryBrush`. Es la pieza que se repite en la biblioteca y en los tres carriles, así que va
-   primero. `CatalogItemViewModel` gana `Initials`.
+1. ~~**La ficha 2:3** (`PosterCardView`, nueva).~~ **HECHA el 2026-08-22.** 148 × 222 —exactamente
+   2:3, y el ancho al que el prototipo la aprueba en su cuadrícula—, iniciales sobre
+   `ControlFillBrush` en `FontSizeDisplay` y `TextSecondaryBrush`, radio `CornerRadiusMedium`, borde
+   `ShellHairlineBrush` —separa fichas, no delimita nada pulsable—, título a dos líneas y pie en
+   secundario. Montada en **los tres carriles**; en la biblioteca entra con el paso 2, que es quien
+   decide el panel. **Los cuatro modelos de vista implementan `IPosterCard`**, y eso es lo que hace
+   que las omisiones se declaren en vez de pintarse solas: `RecommendationItemViewModel` no conoce el
+   año ni la disponibilidad, así que la ficha no los inventa, y `CatalogItemViewModel` **no dibuja
+   barra** porque `CatalogItem.HasProgress` dice *que* se empezó y no *cuánto* — una barra a cero para
+   algo visto a medias es peor respuesta que ninguna barra. **`UnavailableBadge` se queda fuera de la
+   ficha** por lo mismo: dos de los cuatro carriles saben si el medio está a mano y uno no.
+   - **Y lo que la ficha destapó, que no se veía en ocho tramos verdes: Inicio se dibujaba fuera de la
+     ventana.** `HomeView` daba el `*` a la fila del carril, así que «Añadido recientemente» y «Quizá
+     te interese» **no llegaban a pantalla** —medido a 1600 × 1000 en la aplicación real, con las
+     tarjetas viejas y con las nuevas— y el carril que sí tenía sitio enseñaba media ficha. Las seis
+     filas pasan a `Auto` dentro de un `ScrollViewer`. **Coste medido**: la baseline `T30` se mueve en
+     `LibraryEntryBottom` **+3 px lógicos en 12 de sus 36 registros** —los de 4K con viewport de 2160
+     y 1440, que son justo aquellos en los que Inicio pasó a ser más alto que su ventana—, y
+     `LibraryEntryWithinFirstViewport` sigue en `True` en los 36.
+   - **Y una trampa de AXAML que costó una roja: `ProgressBar` trae `MinWidth 200` del tema base.**
+     Estirada dentro de una portada de 148 salía 54 px más ancha que la imagen a la que pertenece,
+     recortada por `ClipToBounds` en vez de ajustada. Es la misma forma que `MinHeight` con `Height`:
+     **el setter que nombra el número no siempre es el que decide**.
+   - **⚠ Y un hallazgo que NO se ha tocado y es del shell, no de la ficha:** en la aplicación real a
+     1600 × 1000 el bloque «Tu biblioteca» **se dibuja más allá del borde derecho** y su borde nunca
+     cierra. Ya pasaba antes de este cambio —está en la captura previa—, así que no es una regresión:
+     es la primera limitación que `ViewOverflowTests` lleva escrita, «una vista demasiado ancha sólo
+     una vez anidada», ocurriendo de verdad. Va con el paso 5, que es el que toca el shell.
 2. **La cuadrícula que reflowa y virtualiza.** La decisión de no hacer la cuadrícula fluida se tomó
    porque «en Avalonia 12.1.1 no existe nada que reflowe y virtualice a la vez». **Medido el
    2026-08-22: `Avalonia.Controls.ItemsRepeater` y `WrapLayout` SÍ existen en 12.1.1.** Falta la

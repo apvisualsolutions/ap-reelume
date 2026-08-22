@@ -14,19 +14,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
   One column, and the rows are separated by the largest step in the scale: Home is a stack of
   independent blocks — hero, library, rails — and at Space12 the rails read as part of whatever is
   above them. The hero is the only accented action on the screen, so nothing else competes with it.
+
+  Every row is Auto and the page scrolls, which it did not until the cards became 2:3. The in-progress
+  rail used to take the star and everything under it was drawn past the bottom of the window:
+  measured on 2026-08-22 at 1600x1000, "Añadido recientemente" and the suggestions rail were not on
+  the screen at all, and the rail that did have the space showed half of each card. A star row
+  distributes what is left over, which is the wrong question for a stack that is taller than its
+  window — there is nothing left over, and the rows that follow it need somewhere to go.
   -->
-  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="{DynamicResource Space24}">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeTitle}"
-        FontWeight="SemiBold"
-        Text="{DynamicResource HomeTitle}"
-        automation:AutomationProperties.HeadingLevel="1" />
-    <home:ResumeHeroView x:Name="ResumeHero" Grid.Row="1" />
-    <home:LibraryEntryView x:Name="LibraryEntry" Grid.Row="2" />
-    <home:InProgressRailView Grid.Row="3" />
-    <home:RecentlyAddedRailView Grid.Row="4" />
-    <ContentControl Grid.Row="5" IsVisible="{Binding HasRecommendationsRail}">
-      <home:RecommendationsRailView DataContext="{Binding Recommendations}" />
-    </ContentControl>
-  </Grid>
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space24}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeTitle}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource HomeTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <home:ResumeHeroView x:Name="ResumeHero" Grid.Row="1" />
+      <home:LibraryEntryView x:Name="LibraryEntry" Grid.Row="2" />
+      <home:InProgressRailView Grid.Row="3" />
+      <home:RecentlyAddedRailView Grid.Row="4" />
+      <ContentControl Grid.Row="5" IsVisible="{Binding HasRecommendationsRail}">
+        <home:RecommendationsRailView DataContext="{Binding Recommendations}" />
+      </ContentControl>
+    </Grid>
+  </ScrollViewer>
 </UserControl>
