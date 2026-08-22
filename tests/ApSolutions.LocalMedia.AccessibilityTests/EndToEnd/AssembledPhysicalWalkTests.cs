@@ -960,8 +960,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// route the navigation service holds.
     /// </para>
     /// <para>
-    /// Home is pressed last of the five and left as the current route on purpose, so the two card
-    /// actions that follow start from a shell that is <b>not</b> already on the surface they open.
+    /// The route the shell opened on is pressed last of the five, which is what leaves the two card
+    /// actions that follow starting from somewhere. Since 2026-08-22 that route is the library rather
+    /// than home: Add media is pressed first and takes the shell there, and the loop reads where it
+    /// is rather than being told.
     /// </para>
     /// </remarks>
     [AvaloniaFact(Timeout = 120_000)]
@@ -977,6 +979,28 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         _ = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromMinutes(116));
 
         using var host = ShowShell(height: 1600);
+
+        // The rail's sixth control, and the only one on it that is not a destination: "Add media" at
+        // the foot. It goes first because what it does is only visible from somewhere else — it takes
+        // the shell to the surface a folder is added on and clears the form on the way — so it has to
+        // be pressed while the shell is still on the route it opened on.
+        //
+        // The probe is both halves in one string. Two probes would let a press that navigated and
+        // cleared nothing pass the first one, and clearing is the half that makes this control
+        // something Biblioteca does not already do.
+        var onboarding = host.ViewModel.Onboarding;
+        Assert.NotNull(onboarding);
+        onboarding!.Path = @"R:\left-over";
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotEqual(AppRoute.Library, host.ViewModel.CurrentRoute);
+
+        await PressAsync(
+            host,
+            "NavigationAddMedia",
+            () => $"{host.ViewModel.CurrentRoute}|{onboarding.Path}",
+            "clicking Add media never opened the folder surface with an empty form");
+        Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
+        Assert.Equal(string.Empty, onboarding.Path);
 
         // Every destination the rail offers, taken from the shell rather than from a list written
         // here: a destination added later is pressed by this scene the day it is added.

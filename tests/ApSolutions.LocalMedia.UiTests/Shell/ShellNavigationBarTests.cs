@@ -79,28 +79,82 @@ public sealed class ShellNavigationBarTests
         window.Close();
     }
 
+    /// <summary>
+    /// «Añadir medios» sits at the foot of the rail, is named in the language in force, and is not a
+    /// sixth destination.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Three things, and each is one the drawing could get wrong on its own. The name, because the
+    /// rail traded words for pictograms and the only place the word survives is here and in the
+    /// tooltip. Below the five, because the prototype puts it under the flexible gap and a DockPanel
+    /// hands its bands out in declaration order — written after the destinations it would take the
+    /// whole rail and push them off. And no <c>navigation-current-bar</c>, because it is an action:
+    /// nothing about it is ever the open destination, so a bar would be saying something untrue.
+    /// </para>
+    /// <para>
+    /// The vertical comparison is against the <b>last</b> destination rather than the first, which is
+    /// the half that fails if the button is merely somewhere in the rail.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void Add_media_is_named_sits_below_every_destination_and_is_not_a_destination()
+    {
+        var (window, view) = Show();
+
+        var add = view.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "AddMediaAction");
+        var label = Avalonia.Application.Current!.TryFindResource("NavigationAddMedia", out var resolved)
+            ? resolved as string
+            : null;
+
+        Assert.Equal("Añadir medios", label);
+        Assert.Equal(label, Avalonia.Automation.AutomationProperties.GetName(add));
+        Assert.Equal(label, ToolTip.GetTip(add));
+        Assert.DoesNotContain(
+            add.GetVisualDescendants().OfType<Border>(),
+            border => border.Classes.Contains("navigation-current-bar"));
+        Assert.Contains("navigation-action", add.Classes);
+        Assert.DoesNotContain("navigation-destination", add.Classes);
+
+        var lowest = Destinations
+            .Select(name => DestinationButton(view, name))
+            .Select(button => Assert.IsType<Button>(button))
+            .Max(button => button.TranslatePoint(new Point(0, button.Bounds.Height), window)!.Value.Y);
+        var top = add.TranslatePoint(new Point(0, 0), window)!.Value.Y;
+        Assert.True(
+            top >= lowest,
+            $"Add media starts at y={top}, above the foot of the last destination at y={lowest}.");
+
+        // Same 46 px column as the five above it, so a rail of six reads as one column.
+        Assert.Equal(DestinationButton(view, "NavigationHome")!.Bounds.Width, add.Bounds.Width);
+        window.Close();
+    }
+
     // The title actions' WrapPanel used to be asserted here. It moved to WrappingSurfaceTests, which
     // holds the closed table of every row of actions §4 has decided, so the rule has one mechanism
     // rather than one per view — two of them age differently, and the second one to be written is the
     // one nobody remembers to extend.
 
     /// <summary>The bar of one destination, by the accessible name its button is declared under.</summary>
-    private static Border? BarOf(ShellView view, string key)
+    private static Border? BarOf(ShellView view, string key) =>
+
+        // A class and not an x:Name: five destinations carry one each, and a name has to be unique
+        // within the control's scope — the first attempt at this threw on the second destination.
+        DestinationButton(view, key)?.GetVisualDescendants()
+            .OfType<Border>()
+            .FirstOrDefault(border => border.Classes.Contains("navigation-current-bar"));
+
+    /// <summary>One destination's button, found the way a screen reader would name it.</summary>
+    private static Button? DestinationButton(ShellView view, string key)
     {
         var label = Avalonia.Application.Current!.TryFindResource(key, out var resolved)
             ? resolved as string
             : null;
 
-        var button = view.GetVisualDescendants()
+        return view.GetVisualDescendants()
             .OfType<Button>()
             .FirstOrDefault(candidate =>
                 string.Equals(Avalonia.Automation.AutomationProperties.GetName(candidate), label, StringComparison.Ordinal));
-
-        // A class and not an x:Name: five destinations carry one each, and a name has to be unique
-        // within the control's scope — the first attempt at this threw on the second destination.
-        return button?.GetVisualDescendants()
-            .OfType<Border>()
-            .FirstOrDefault(border => border.Classes.Contains("navigation-current-bar"));
     }
 
     private static (Window Window, ShellView View) Show()

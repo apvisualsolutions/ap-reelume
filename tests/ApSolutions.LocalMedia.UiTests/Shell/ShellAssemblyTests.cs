@@ -365,6 +365,84 @@ public sealed class ShellAssemblyTests
         Assert.NotNull(shell.Library);
     }
 
+    /// <summary>
+    /// The rail's «Añadir medios» goes to the surface a folder is added on <b>and</b> empties the
+    /// form, which is the half that makes it something Biblioteca does not already do.
+    /// </summary>
+    /// <remarks>
+    /// Asserted in C# rather than through the view, and that is on purpose: what the button pays for
+    /// is three leftovers being cleared, and none of the three is a thing a screenshot shows. It is
+    /// set up as the state somebody actually leaves behind — a folder added, so the path is still
+    /// typed in and the catalogue would refuse it a second time.
+    /// </remarks>
+    [Fact]
+    public async Task Add_media_opens_the_folder_surface_with_the_form_cleared()
+    {
+        var roots = new RecordingRoots();
+        var onboarding = new RootOnboardingViewModel(new AddLibraryRoot(roots, new StubNormalizer()))
+        {
+            Path = "R:\\media",
+        };
+        var shell = new ShellViewModel(
+            new NavigationService(),
+            new ShellSurfaces { Onboarding = onboarding });
+
+        // The state somebody is left in after adding one folder and then being refused a second.
+        await onboarding.AddAsync(TestContext.Current.CancellationToken);
+        onboarding.Path = "R:\\media";
+        await onboarding.AddAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("RootAddDuplicate", onboarding.FailureKey);
+        Assert.NotEqual(AppRoute.Library, shell.CurrentRoute);
+
+        Assert.True(shell.AddMediaCommand.CanExecute(null));
+        shell.AddMediaCommand.Execute(null);
+
+        Assert.Equal(AppRoute.Library, shell.CurrentRoute);
+        Assert.Equal(string.Empty, onboarding.Path);
+        Assert.Null(onboarding.FailureKey);
+        Assert.False(onboarding.HasFailure);
+        Assert.Equal(RootKind.Local, onboarding.SelectedKind);
+
+        // And the folder that was added is still in the catalogue: clearing the form is not undoing
+        // the work, which is the one way this could have been read wrong.
+        Assert.NotNull(roots.Added);
+    }
+
+    /// <summary>
+    /// A half-answered removal does not survive into the next add, and the shell without the surface
+    /// offers the button disabled rather than offering nothing.
+    /// </summary>
+    [Fact]
+    public async Task Add_media_calls_off_a_pending_removal_and_needs_the_surface_to_be_offered_at_all()
+    {
+        var roots = new RecordingRoots();
+        var onboarding = new RootOnboardingViewModel(
+            new AddLibraryRoot(roots, new StubNormalizer()),
+            removeLibraryRoot: null,
+            roots)
+        {
+            Path = "R:\\media",
+        };
+        var shell = new ShellViewModel(
+            new NavigationService(),
+            new ShellSurfaces { Onboarding = onboarding });
+
+        await onboarding.AddAsync(TestContext.Current.CancellationToken);
+        await onboarding.RefreshRootsAsync(TestContext.Current.CancellationToken);
+        onboarding.RequestRemoveCommand.Execute(Assert.Single(onboarding.Roots));
+        Assert.True(onboarding.IsConfirmingRemoval);
+
+        shell.AddMediaCommand.Execute(null);
+
+        Assert.False(onboarding.IsConfirmingRemoval);
+        Assert.Equal(string.Empty, onboarding.PendingRemovalPath);
+
+        // Without the surface there is nothing for the button to open, so it says so instead of
+        // pressing into nothing.
+        var bare = new ShellViewModel(new NavigationService(), new ShellSurfaces());
+        Assert.False(bare.AddMediaCommand.CanExecute(null));
+    }
+
     [Fact]
     public async Task A_folder_added_with_no_way_to_scan_it_simply_waits()
     {

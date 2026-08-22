@@ -12,6 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="NavigationReview">Review</x:String>
   <x:String x:Key="NavigationBackups">Backups</x:String>
   <x:String x:Key="NavigationSettings">Settings</x:String>
+  <x:String x:Key="NavigationAddMedia">Add media</x:String>
   <x:String x:Key="AboutAccessibleName">About AP Reelume</x:String>
   <x:String x:Key="AboutCreditsHeading">Credits</x:String>
   <x:String x:Key="AboutTmdbLogoAlt">TMDB logo</x:String>
