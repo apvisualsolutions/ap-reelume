@@ -2,9 +2,22 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `f6f6076`, verde; el tramo 6 CERRADO y el 7 por la mitad**
-(`DatabaseRecoveryView` [evidencia](evidence/stable/audit-database-recovery.md) y `CreditsView`
-[evidencia](evidence/stable/audit-settings-sections-blind-spot.md)).
+**`main` en `100f8f4`, verde; el tramo 6 CERRADO y al 7 le quedan dos vistas**
+—`RestoreWizardView` y `RootOnboardingView`—; `BackupView` queda hecha salvo **el bloque de ruta de la
+base**, que la §4 pide y `BackupViewModel` no puede dar: **no conoce ninguna ruta**, así que traerlo es
+cablear `IAppDataPaths` hasta él y es una pieza con su propio consumidor
+([evidencia](evidence/stable/audit-backup-status.md)).
+
+**⚠ Y una regla que vivía DOS VECES, unificada el 2026-08-22.** «Ningún literal en esta vista» estaba
+copiada en `BackupViewTests` y en `LifecycleSettingsTests`, cada una vigilando su propio archivo, y
+**las dos saltaron con el mismo glifo `⚠` en dos piezas seguidas**. Cubrían dos vistas de cincuenta y
+eran **más estrictas que el árbol**. Ahora es `ViewLiteralTests`, una sola, sobre todos los `.axaml` de
+`src/`, enunciada como lo que protege: **un literal pasa sólo si no contiene ninguna letra**. Medido
+antes de escribirla: cero literales con letra en las cincuenta vistas.
+
+Antes de esas dos: `DatabaseRecoveryView`
+([evidencia](evidence/stable/audit-database-recovery.md)) y `CreditsView`
+([evidencia](evidence/stable/audit-settings-sections-blind-spot.md)).
 
 **⚠ Y una puerta propia que era ciega, corregida el 2026-08-22.**
 `SettingsPageStructureTests` buscaba las secciones de Ajustes **por el nombre de su clase**

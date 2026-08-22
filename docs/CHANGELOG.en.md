@@ -173,6 +173,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A backup that fails no longer looks like one that worked.** "There is not enough room on the disk"
+  was painted on the same background as "Done". Cancelling is still not a failure: nothing was left
+  half-written.
+
+
+- **The backup screen did not show the copy you had just made.** The program kept the name of the last
+  copy and the last export and showed them nowhere, so the only way to check was to open a file
+  manager.
+
+
 - **The database recovery screen said something had broken in the gentle colour.** The failure detail
   sat on the same background as friendly notices, when that screen only appears because your library
   could not be opened. It now looks like what it is. And both paths are in a fixed-width font, which is

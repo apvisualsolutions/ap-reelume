@@ -175,6 +175,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una copia de seguridad que falla ya no se ve igual que una que salió bien.** «No hay espacio
+  suficiente en el disco» se pintaba sobre el mismo fondo que «Listo». Cancelar sigue sin ser un fallo:
+  no se creó nada a medias.
+
+
+- **La pantalla de copias no enseñaba la copia que acababas de hacer.** El programa guardaba el nombre
+  de la última copia y de la última exportación y no los mostraba en ninguna parte, así que sólo podías
+  comprobarlo abriendo el explorador de archivos.
+
+
 - **La pantalla de recuperación de la base decía en color suave que algo se había roto.** El detalle del
   fallo iba sobre el mismo fondo que los avisos amables, cuando esa pantalla sólo aparece si tu
   biblioteca no ha podido abrirse. Ahora se ve como lo que es. Y las dos rutas van en ancho fijo, que es

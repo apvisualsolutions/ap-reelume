@@ -49,8 +49,43 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.Name="{DynamicResource BackupCancelLabel}" />
     </WrapPanel>
 
+    <!--
+      A failed copy is painted as one. This block said "there was not enough room on the disk" on the
+      same surface as "done" until 2026-08-22, so the two read alike. Two borders and not one bound
+      background, because HighContrastTests refuses a Background that comes from a binding - and
+      rightly: a state told apart by a colour a binding chose is a state nobody can gate.
+
+      Cancelled stays on the neutral one. Its own words say nothing was left half-written.
+    -->
+    <Border
+        x:Name="BackupFailureSurface"
+        Padding="16"
+        Background="{DynamicResource DangerSurfaceBrush}"
+        BorderBrush="{DynamicResource DangerBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
+        IsVisible="{Binding HasFailed}"
+        automation:AutomationProperties.Name="{DynamicResource BackupStatusAccessibleName}"
+        automation:AutomationProperties.LiveSetting="Polite">
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock
+            Grid.Column="0"
+            Margin="0,0,8,0"
+            VerticalAlignment="Top"
+            FontWeight="Bold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="⚠" />
+        <TextBlock
+            Grid.Column="1"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding StatusKey, Converter={StaticResource BackupResourceKey}}"
+            TextWrapping="Wrap" />
+      </Grid>
+    </Border>
+
     <Border
         x:Name="BackupStatusSurface"
+        IsVisible="{Binding !HasFailed}"
         Padding="16"
         Background="{DynamicResource AccentSubtleBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
@@ -81,6 +116,30 @@ SPDX-License-Identifier: GPL-3.0-or-later
             automation:AutomationProperties.Name="{DynamicResource BackupProgressAccessibleName}" />
       </StackPanel>
     </Border>
+
+    <!--
+      What exists now. Both names were built for a screen - "the name, never the path" - and no view
+      painted either, so somebody who had just made a copy could only find out by opening a file
+      manager. The names are safe to show for the same reason they were shaped that way.
+    -->
+    <StackPanel Spacing="{DynamicResource Space4}">
+      <TextBlock
+          x:Name="BackupLastCopyText"
+          MaxWidth="640"
+          FontFamily="{DynamicResource FontFamilyMono}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          IsVisible="{Binding HasLastCopy}"
+          Text="{Binding LastCopyName}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          x:Name="BackupLastArchiveText"
+          MaxWidth="640"
+          FontFamily="{DynamicResource FontFamilyMono}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          IsVisible="{Binding HasLastArchive}"
+          Text="{Binding LastArchiveName}"
+          TextWrapping="Wrap" />
+    </StackPanel>
 
     <TextBlock
         MaxWidth="640"
