@@ -19,16 +19,41 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.HeadingLevel="2" />
 
     <!--
+      The product's own name and the publisher's signature, and this is where they belong. They used
+      to sit at the foot of a 248 px navigation rail; the rail is 64 px of pictograms now and has room
+      for neither, and repeating the name in the title bar would print it twice — Windows already
+      draws it there.
+
+      This is also the screen that carries TMDB's logo, and their terms ask for it to be "less
+      prominent than your own". That comparison used to be made across two screens; here it is made on
+      one, which is what the condition actually means. TmdbLogoTests reads both numbers from this file.
+    -->
+    <StackPanel
+        x:Name="AboutBrandSurface"
+        Spacing="{DynamicResource Space4}"
+        automation:AutomationProperties.Name="{DynamicResource AboutAccessibleName}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeTitle}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource ProductDisplayName}" />
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource PublisherSignature}" />
+    </StackPanel>
+
+    <!--
       TMDB's terms ask for their logo, not for the word. This is their own vector: the file they
       publish is versioned beside this view as Assets/tmdb-logo.svg and TmdbLogoTests compares the
       two, because an approximation of somebody's trademark would survive a screenshot review.
       Avalonia draws no SVG, and pulling in a renderer for one mark would put half a dozen packages
       and their licences inside the artifact, so the geometry is carried here.
 
-      It is drawn at 16 against the 24 the product's own name is drawn at in the navigation rail,
-      which is how "less prominent than your own" becomes a number a test can compare. It says where
-      the data comes from rather than inviting anyone to go there, so it is announced to a screen
-      reader and it is not a link.
+      It is drawn at 16 against the FontSizeTitle the product's own name is drawn at just above it,
+      which is how "less prominent than your own" becomes a number a test can compare — and both
+      numbers are now on the same screen, which is what the condition means. It says where the data
+      comes from rather than inviting anyone to go there, so it is announced to a screen reader and it
+      is not a link.
     -->
     <Path
         Height="16"

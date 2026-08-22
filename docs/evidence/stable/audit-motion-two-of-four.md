@@ -71,6 +71,25 @@ título se extrae a `App.ApplyDesignedChrome`**, que sí se puede afirmar — y 
 que vivía dos veces: `App.TitleBarHeight` y la primera fila de `ShellView` son **el mismo 44**, y una
 prueba lo dice. / The number that lived twice is now asserted against itself.
 
+## Y lo que sólo dijo CI: una obligación de TMDB sin base / What only CI said
+
+Quitar el nombre del producto del carril —para que no se escribiera dos veces sobre el título que
+Windows dibuja— dejó a la aplicación **sin escribir su propio nombre en ninguna pantalla**. Y los
+términos de TMDB piden que su logotipo se vea **«menos prominente que el tuyo propio»**, así que
+`TmdbLogoTests` comparaba el alto del logo contra el tamaño del nombre en el carril. Sin carril, la
+comparación se quedó sin ancla: *«The shell no longer draws the product name, so there is nothing to
+compare against.»* / A term of somebody else's licence, left without its anchor.
+
+**La marca y la firma van a `CreditsView`**, que es la pantalla que trata de la aplicación **y** la
+que lleva el logo. La comparación pasa de hacerse entre dos pantallas a hacerse **en una**, que es lo
+que la condición significa. / The comparison moves from across two screens to within one.
+
+**Y la lección de proceso: el shell toca `IntegrationTests`.** Esta sesión corrió en local `UiTests`,
+`AccessibilityTests` y `DocumentationTests` en cada tramo, y el defecto salió en la cuarta vuelta de
+CI. Una vista del shell puede tener consecuencias de **licencia** en una suite que no parece suya. /
+A shell view can have licence consequences in a suite that does not look like its own.
+
 ```
-Suites / Suites: UiTests 727 · AccessibilityTests 135 (paseo 135/135, 0 pendientes) · Documentation 87
+Suites / Suites: UiTests 728 · IntegrationTests 456 · AccessibilityTests 135 (paseo 135/135,
+0 pendientes) · Documentation 87 · Architecture 30
 ```

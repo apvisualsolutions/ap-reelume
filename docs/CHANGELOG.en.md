@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The brand and the publisher's signature move to Credits, which is where they belong.** They were
+  at the foot of the 248 px navigation; the 64 px rail has no room for them, and repeating the name in
+  the title bar would have written it twice — Windows already draws it there. **And this was not only
+  placement**: TMDB's terms ask for their logo to be **less prominent than the product's own name**,
+  and taking the name out of the rail left the application not writing its own name anywhere. Both are
+  on one screen now, which is what that condition actually means.
+
+
 - **Two of the package's four animations, and a system preference that really switches them off.**
   Each rail destination's tooltip slides in, and the dot beside "Scanning" breathes while a scan runs
   — the only thing on that row that says it is still working between two jumps of the counter. With

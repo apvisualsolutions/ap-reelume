@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La marca y la firma del editor vuelven a Créditos, que es su sitio.** Estaban al pie de la
+  navegación de 248 px; con el carril de 64 no caben, y repetir el nombre en la barra de título lo
+  habría escrito dos veces —Windows ya lo dibuja ahí—. **Y esto no era sólo colocación**: los términos
+  de TMDB piden que su logotipo se vea **menos prominente que el nombre del producto**, y al quitarlo
+  del carril la aplicación dejó de escribir su propio nombre en ninguna parte. Ahora los dos están en
+  la misma pantalla, que es lo que esa condición significa de verdad.
+
+
 - **Dos de las cuatro animaciones del paquete, y una preferencia del sistema que de verdad las apaga.**
   El tooltip de cada destino del carril entra deslizándose, y el punto junto a «Escaneando» late
   mientras el escaneo corre — que es lo único en toda la pantalla que dice que sigue trabajando entre
