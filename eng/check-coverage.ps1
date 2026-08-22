@@ -347,8 +347,12 @@ try {
     <#
         Everything else in src/, held at the floor it meets today. The watched list above is the
         opposite promise -- files that reached the bar and are kept there -- and this one is the
-        debt: 219 files on 2026-08-18, 217 on 2026-08-19, each pinned so it cannot get worse while
-        the number comes down. It works the way eng/walk-pending.txt worked, and that list went from
+        debt: 219 files on 2026-08-18, 217 on 2026-08-19, 216 on 2026-08-22 — each pinned so it
+        cannot get worse while the number comes down. The 2026-08-22 move is two entries changing
+        places: CatalogItemViewModel reached 100/100 when the five properties the poster card added
+        stopped being read by nothing but a DataTemplate, PosterCardView.axaml arrived at the 100/50
+        every view file measures, and RouteStateConverter reached the bar by losing three guards
+        nothing in this repository could take. It works the way eng/walk-pending.txt worked, and that list went from
         126 to 0.
 
         A file leaves eng/coverage-debt.txt by reaching 96/96, never by being edited out: a floor
@@ -361,7 +365,7 @@ try {
         is why -WriteDebt is run by the workflow on every build, pass or fail — moving a floor is
         then copying a measurement rather than guessing at one.
     #>
-    $debtRatchet = 217
+    $debtRatchet = 216
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     if ($WriteDebt) {

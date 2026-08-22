@@ -1,6 +1,57 @@
 # Dónde retomar
 
-## ⚠⚠ LO PRIMERO: EL REDISEÑO SE ESTABA HACIENDO MAL, Y ESTO LO CORRIGE (2026-08-22, tarde)
+## LO PRIMERO: el plan de seis pasos del rediseño está HECHO (2026-08-22, noche)
+
+**Los seis pasos de abajo están construidos y empujados**, cada uno con su commit, sus mediciones y su
+comprobación con la aplicación abierta. Lo que sigue debajo es el plan tal como se escribió, con cada
+paso tachado y lo que costó anotado dentro — se deja entero a propósito, porque las razones valen más
+que la lista.
+
+**Las cuatro animaciones: dos hechas, y las otras dos CONTESTADAS, no aplazadas.** El conducto ya
+existe y es el que `ReducedMotionTests` describía: el token `MotionDuration` es un `TimeSpan` que las
+animaciones leen y que **`FluentThemeService` escribe** —pone `TimeSpan.Zero` con movimiento
+reducido—, así que el servicio deja de tener su copia del 160 y la preferencia llega de verdad.
+
+- **`apr-tip`** — el tooltip de los destinos del carril entrando 6 px desde la izquierda. Es la
+  animación que más se gana: los destinos perdieron sus palabras al pasar a pictogramas, y el tooltip
+  es donde están ahora.
+- **`apr-pulse`** — el punto junto a «Escaneando», que late mientras el escaneo corre. Es lo único de
+  esa fila que distingue «sigue trabajando» de «se paró», porque el contador salta a tirones.
+- **`apr-shim` NO SE HACE, y la razón está medida**: es el brillo sobre un esqueleto **mientras una
+  lista carga**, y en esta aplicación **nada sabe que está cargando** —la auditoría de
+  `ReviewInboxView` ya lo midió: ningún modelo de vista lleva estado de carga—. Llega con el primer
+  modelo de lectura que lo informe.
+- **`apr-in` NO SE HACE, y también está medida**: es la subida de 6 px en cada cambio de pantalla, y
+  **el shell no cambia de pantalla**: monta las once y alterna `IsVisible`, que Avalonia no anima
+  porque un control invisible no se dibuja y no hay fotograma del que partir. Conseguirla exige
+  rehacer el shell alrededor de **un solo `ContentControl` cuyo contenido se sustituye**, que es un
+  cambio en cómo se hospeda toda la aplicación, no una línea de marcado.
+
+**Lo que queda del paquete de diseño, y no es poco:**
+
+1. **Los iconos en el resto de las vistas.** `FontFamilyIcons` ya es token y el carril ya los usa; la
+   lupa de la búsqueda y el `+` de añadir son traducciones vista por vista.
+2. **El distintivo de película/serie sobre la portada**, que el prototipo dibuja. **DECIDIDO: no se
+   hace todavía, y no por esfuerzo.** Necesita dos cadenas en singular —«Película» / «Serie»— que
+   **el paquete `Cadenas nuevas` no propone**, y este árbol no inventa cadenas visibles: van en los
+   dos idiomas y aprobadas, o no van. Además `RecommendationItemViewModel` **no sabe el tipo**, así
+   que sería la misma omisión declarada que el año.
+3. **«Añadir medios» al pie del carril. DECIDIDO: entra, y es la primera pieza de la siguiente
+   sesión.** Es lo que el prototipo pone ahí y lo que más falta le hace a quien abre la aplicación con
+   la biblioteca vacía. Cuesta un control nuevo con su cadena, su prueba de nombre accesible **y su
+   escena de paseo en el mismo cambio** — el trinquete está en 0 y no sube.
+4. **El destino «Duplicados» del prototipo. DECIDIDO: no sustituye a «Copias».** Los cinco destinos de
+   hoy son funciones reales de la aplicación y los duplicados viven dentro de Revisar; cambiar uno por
+   otro sería quitarle la puerta a una función para dársela a una vista.
+
+**Y una deuda de proceso, no de código: el trinquete de cobertura.** Los runs de CI del 2026-08-22
+dan **todas las suites en verde, el paseo incluido (135/135)**, y sólo falla `check-coverage` porque
+cuatro archivos **mejoraron**: `CatalogItemViewModel` llega a **100/100 y sale de la lista** —el
+trinquete baja a 216—, y `RecommendationsViewModel` (94/85), `LibraryView.axaml.cs` (100/78) y
+`LibraryViewModel.cs` (95/85) suben de suelo. **Se cierra copiando entero el artefacto `coverage-debt`
+del último run**, nunca a mano ni con una medición local.
+
+## ⚠⚠ Por qué el plan existe: EL REDISEÑO SE ESTABA HACIENDO MAL, Y ESTO LO CORRIGE (2026-08-22, tarde)
 
 **El encargo era que la aplicación se pareciese al prototipo de `design/`. Lo que se ha hecho durante
 ocho tramos es otra cosa: auditar cada vista contra la §4 y corregir defectos.** Cuando la diferencia
@@ -353,12 +404,18 @@ antes de escribir «esto no existe», pregunta **quién lo montaría** y mira ah
 Ninguna se improvisó y todas tienen su número:
 
 1. **No hay portadas en toda la aplicación** (cero `<Image>` en `src/`). **Decidido: no entran en
-   0.2.0**, con su razón abajo.
-2. **La cuadrícula fluida de la biblioteca no se hace**: `WrapPanel` cuesta **7× el tiempo y 455× los
-   controles vivos** sobre diez mil entradas, y en Avalonia 12.1.1 no existe nada que reflowe y
-   virtualice a la vez. **Va con las portadas: son la misma tarea.**
+   0.2.0**, con su razón abajo. **Y desde el 2026-08-22 eso ya no impide la ficha**: la §4 dice qué
+   pintar sin portada —«iniciales sobre `ControlFillBrush`, nunca un hueco»— y eso es lo que
+   `PosterCardView` pinta. La discrepancia sigue siendo cierta y ha dejado de bloquear nada.
+2. ~~**La cuadrícula fluida de la biblioteca no se hace.**~~ **REVERTIDA el 2026-08-22 con su
+   número**: `ItemsControl` en un `ScrollViewer` sobre filas agrupadas cuesta **6 ms y 36 controles
+   vivos** contra los **4559 ms y 10 000** del `WrapPanel`. Y las dos mitades de la razón original
+   eran falsas: no iba «con las portadas» —la ficha de iniciales es contenido suficiente— y
+   `ItemsRepeater`/`WrapLayout` **no existen** en 12.1.1, que era lo que se buscaba y no lo que hacía
+   falta.
 3. **`LibraryEntryView` no es la ficha 2:3 que el documento describe**, sino el bloque de entrada a la
-   biblioteca.
+   biblioteca. **Sigue siendo cierto y ya no falta nada**: la ficha existe y es `PosterCardView`, así
+   que lo que la fila de la §4 tiene mal es el **nombre de la vista**, no la pieza.
 4. **Los datos del distintivo de vídeo conservan su caja**, aunque la §4 los quiera sin ninguna: ese
    distintivo **flota sobre la película**, así que un texto sin superficie se lee contra un fotograma
    arbitrario y no hay contraste que garantizar ni medir.
@@ -389,7 +446,7 @@ de trabajo; **la unidad de commit es la vista**, salvo donde la §4 agrupa varia
 
 | # | Área | Lo que la §4 pide de más calado |
 |---|---|---|
-| ~~1~~ | ~~**Shell** (2)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-shell-navigation-bar.md). Los 248 px y el glifo **ya estaban**; se añadió la barra de 3 px —que **existe o no existe**, no se atenúa— y `TitleActionsSurface` pasó a `WrapPanel`. `StartupView` no necesitaba nada. |
+| ~~1~~ | ~~**Shell** (2)~~ **HECHA el 2026-08-20, y REHECHA el 2026-08-22** | [Su evidencia](evidence/stable/audit-shell-navigation-bar.md). Entonces: los 248 px y el glifo **ya estaban**; se añadió la barra de 3 px —que **existe o no existe**, no se atenúa— y `TitleActionsSurface` pasó a `WrapPanel`. **Ahora el carril es de 64 px con pictogramas y la ventana dibuja su propia barra de título**, que es la composición del prototipo; la barra de 3 px se queda y el `● / ○` se va con las palabras. |
 | ~~2~~ | ~~**Inicio** (5)~~ **HECHA el 2026-08-20** | [Su evidencia](evidence/stable/audit-home-tranche.md). Los tres estados del carril, la barra de 3 px al pie y `Space24` en la rejilla. **Dos discrepancias con la §4**: no hay portadas en toda la aplicación (0 `<Image>` en `src/`) y `LibraryEntryView` **no es la ficha que el documento describe**. Y el hallazgo: `RecentlyAdded` se leía de SQLite y no lo pintaba nadie, así que Inicio gana una vista, `RecentlyAddedRailView`. |
 | ~~3~~ | ~~**Biblioteca y fichas** (5)~~ **HECHA el 2026-08-20** | Sus evidencias: [el distintivo](evidence/stable/audit-unavailable-badge.md), [las filas y el peaje](evidence/stable/audit-wrapping-rows-and-the-ratchet-toll.md), [sin resultados y la fila de episodio](evidence/stable/audit-library-no-results-and-episode-row.md), [el botón de borrar](evidence/stable/audit-library-clear-search.md) y [el selector y la cuadrícula](evidence/stable/audit-season-picker-and-the-grid-that-lost.md). **La cuadrícula fluida NO se hace, y está medido**: `WrapPanel` cuesta 7× el tiempo y 455× los controles vivos, y en Avalonia 12.1.1 no existe nada que reflowe y virtualice a la vez. |
 | 4 | **Reproductor** (16) | Superficie propia `#0B0D10` y columna fija de 320 px; el fallo pasa a `DangerSurfaceBrush` con glifo; `VideoStatusOverlay` **partido en dos gramáticas** (dato vs aviso); los tres superpuestos con **alineación explícita y `MaxWidth 420`** — es la forma que causó el panel de 1280×1400; las cuatro listas a filas de 36 px sin scroll horizontal. |

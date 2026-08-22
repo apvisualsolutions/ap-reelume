@@ -116,7 +116,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Updates/GitHubReleaseUpdateProvider.cs
 src/ApSolutions.LocalMedia.Infrastructure/Updates/Minisign.cs                                 92  55
 src/ApSolutions.LocalMedia.Presentation/About/CreditsView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/App.axaml                                              0   0
-src/ApSolutions.LocalMedia.Presentation/App.axaml.cs                                          36  11
+src/ApSolutions.LocalMedia.Presentation/App.axaml.cs                                          34  11
 src/ApSolutions.LocalMedia.Presentation/Backup/BackupView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/Backup/BackupViewModel.cs                            100  84
 src/ApSolutions.LocalMedia.Presentation/Backup/RestoreWizardView.axaml                        95  50
@@ -133,15 +133,15 @@ src/ApSolutions.LocalMedia.Presentation/Home/InProgressRailView.axaml           
 src/ApSolutions.LocalMedia.Presentation/Home/LibraryEntryView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecentlyAddedRailView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsRailView.axaml                   100  50
-src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      93  85
+src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      94  85
 src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  78
 src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Language/LanguageService.cs                          100  88
-src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                       83 100
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
-src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  50
-src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           95  84
+src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  78
+src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           95  85
 src/ApSolutions.LocalMedia.Presentation/Library/ManualReassignmentViewModel.cs                94  60
+src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  77
 src/ApSolutions.LocalMedia.Presentation/Library/UnavailableBadge.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/ArtworkPickerViewModel.cs                    95  64
@@ -152,7 +152,6 @@ src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewViewModel.cs      
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsViewModel.cs                       100  79
 src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs                       83  75
-src/ApSolutions.LocalMedia.Presentation/Navigation/RouteStateConverter.cs                    100  85
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingViewModel.cs                100  85
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50

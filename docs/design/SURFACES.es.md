@@ -141,6 +141,22 @@ no existe y no deja hueco; **deshabilitado** significa que existe y no se puede 
 **Las dos gramáticas conviven en la misma pantalla** en privacidad y en actualización, y por eso hay
 que distinguirlas a la vista.
 
+## Las animaciones, y las dos que no existen
+
+El paquete pide cuatro. Dos están, y las otras dos **no están aplazadas: están contestadas**, con lo
+que se midió.
+
+| Animación | Dónde | Estado |
+| --- | --- | --- |
+| `apr-tip` | Tooltip de los seis destinos del carril | **Hecha** |
+| `apr-pulse` | El punto junto a «Escaneando» en `LibraryView` | **Hecha** |
+| `apr-shim` | Brillo sobre un esqueleto mientras carga | **No se hace**: ningún modelo de vista lleva estado de carga, así que el esqueleto no tiene de qué serlo |
+| `apr-in` | Subida de 6 px en cada cambio de pantalla | **No se hace**: el shell no cambia de pantalla, monta las once y alterna `IsVisible`, que Avalonia no anima |
+
+**Todas leen `MotionDuration`, y `FluentThemeService` escribe ese recurso.** Con movimiento reducido
+escribe `TimeSpan.Zero`, que es lo que hace que la preferencia llegue a una animación — una animación
+no puede preguntarle nada a un servicio, lee un recurso.
+
 ## Los temas, medidos
 
 | Medida | Valor |

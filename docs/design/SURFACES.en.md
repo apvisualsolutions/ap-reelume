@@ -142,6 +142,22 @@ exist and leaves no gap; **disabled** means it exists and cannot be used.
 **The two grammars share a screen** in privacy and in update, which is why they have to be told apart
 by sight.
 
+## The animations, and the two that do not exist
+
+The package asks for four. Two are here, and the other two are **not deferred: they are answered**,
+with what was measured.
+
+| Animation | Where | State |
+| --- | --- | --- |
+| `apr-tip` | The tooltip on the rail's six destinations | **Done** |
+| `apr-pulse` | The dot beside "Scanning" in `LibraryView` | **Done** |
+| `apr-shim` | Shimmer over a skeleton while a list loads | **Not done**: no view model carries a loading state, so the skeleton has nothing to be a skeleton of |
+| `apr-in` | Six-pixel rise on every screen change | **Not done**: the shell does not change screens, it mounts all eleven and toggles `IsVisible`, which Avalonia does not animate |
+
+**All of them read `MotionDuration`, and `FluentThemeService` writes that resource.** Under reduced
+motion it writes `TimeSpan.Zero`, which is what makes the preference reach an animation — an animation
+cannot ask a service anything, it reads a resource.
+
 ## The themes, measured
 
 | Measure | Value |

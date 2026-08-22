@@ -11,12 +11,20 @@ namespace ApSolutions.LocalMedia.Presentation.Theme;
 public sealed class FluentThemeService : IThemeService
 {
     private const string PreferenceKey = "theme.preference";
-    private static readonly TimeSpan StandardMotionDuration = TimeSpan.FromMilliseconds(160);
+
+    /// <summary>The resource the theme declares the standard duration in, and the one this writes.</summary>
+    private const string MotionDurationKey = "MotionDuration";
+
+    /// <summary>
+    /// What the token says when nothing has overridden it, for a host with no theme merged in.
+    /// </summary>
+    private static readonly TimeSpan FallbackMotionDuration = TimeSpan.FromMilliseconds(160);
     private readonly Avalonia.Application _application;
     private readonly ISettingsStore _settingsStore;
     private readonly IBackdropService _backdropService;
     private readonly IReducedMotionService _reducedMotionService;
     private readonly IHighContrastService _highContrastService;
+    private readonly TimeSpan _standardMotionDuration;
 
     public FluentThemeService(
         Avalonia.Application application,
@@ -35,7 +43,9 @@ public sealed class FluentThemeService : IThemeService
         CurrentPreference = Enum.IsDefined(storedPreference)
             ? storedPreference
             : ThemePreference.System;
+        _standardMotionDuration = ReadDeclaredMotionDuration();
         ApplyToApplication(CurrentPreference);
+        ApplyMotion();
     }
 
     public ThemePreference CurrentPreference { get; private set; }
@@ -44,7 +54,7 @@ public sealed class FluentThemeService : IThemeService
 
     public bool AnimationsEnabled => !_reducedMotionService.IsEnabled;
 
-    public TimeSpan MotionDuration => AnimationsEnabled ? StandardMotionDuration : TimeSpan.Zero;
+    public TimeSpan MotionDuration => AnimationsEnabled ? _standardMotionDuration : TimeSpan.Zero;
 
     public void Apply(ThemePreference preference)
     {
@@ -54,6 +64,7 @@ public sealed class FluentThemeService : IThemeService
         }
 
         ApplyToApplication(preference);
+        ApplyMotion();
         _settingsStore.Write(PreferenceKey, preference);
         CurrentPreference = preference;
     }
@@ -97,4 +108,29 @@ public sealed class FluentThemeService : IThemeService
             _ => ThemeVariant.Default,
         };
     }
+
+    /// <summary>
+    /// The duration the theme declares, read once, so this service holds no copy of the number.
+    /// </summary>
+    /// <remarks>
+    /// A 160 written here beside a 160 in the token file is the shape the scalars gate deleted the
+    /// last pair for: two numbers that will disagree the first time one of them moves. The fallback
+    /// is for a host with no theme merged in, which is how several suites mount a single view.
+    /// </remarks>
+    private TimeSpan ReadDeclaredMotionDuration() =>
+        _application.TryFindResource(MotionDurationKey, null, out var declared) && declared is TimeSpan duration
+            ? duration
+            : FallbackMotionDuration;
+
+    /// <summary>
+    /// Writes the duration every animation reads, which is what makes reduced motion reach them.
+    /// </summary>
+    /// <remarks>
+    /// Reduced motion takes animations to <b>zero</b> rather than shortening them, and an animation
+    /// cannot ask a service anything: it reads a resource. So the service writes the resource. The
+    /// application's own dictionary wins over the merged theme, which is why setting it here
+    /// overrides the declared 160 without editing the token.
+    /// </remarks>
+    private void ApplyMotion() =>
+        _application.Resources[MotionDurationKey] = MotionDuration;
 }

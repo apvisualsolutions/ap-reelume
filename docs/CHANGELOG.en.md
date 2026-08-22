@@ -10,6 +10,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Two of the package's four animations, and a system preference that really switches them off.**
+  Each rail destination's tooltip slides in, and the dot beside "Scanning" breathes while a scan runs
+  — the only thing on that row that says it is still working between two jumps of the counter. With
+  "Show animations in Windows" off they last **zero**, not less: the theme writes the duration the
+  animations read.
+
+
 - **Navigation becomes a 64 px rail of icons, and the application draws its own title bar.** It is
   the prototype's composition: the five destinations are pictograms from the font Windows 11 ships,
   the open one is marked by a fill **and** a 3 px bar — two signals, one of them not colour — and each

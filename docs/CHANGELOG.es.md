@@ -10,6 +10,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Dos de las cuatro animaciones del paquete, y una preferencia del sistema que de verdad las apaga.**
+  El tooltip de cada destino del carril entra deslizándose, y el punto junto a «Escaneando» late
+  mientras el escaneo corre — que es lo único en toda la pantalla que dice que sigue trabajando entre
+  dos saltos del contador. Con «Mostrar animaciones en Windows» desactivado **duran cero**, no menos:
+  el tema escribe la duración que las animaciones leen.
+
+
 - **La navegación pasa a un carril de 64 px con iconos, y la aplicación dibuja su propia barra de
   título.** Es la composición del prototipo: los cinco destinos son pictogramas de la fuente que
   Windows 11 trae de serie, el abierto se marca con relleno **y** con una barra de 3 px —dos señales,
