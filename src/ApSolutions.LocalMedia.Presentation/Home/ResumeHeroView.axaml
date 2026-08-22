@@ -2,6 +2,24 @@
 SPDX-FileCopyrightText: 2026 AP Solutions
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
+<!--
+The hero, and it is not painted at all when there is nothing to continue - IsVisible on the root, not
+a placeholder saying so, because "nothing to resume" is the state of somebody who has finished
+everything and it does not need a sentence.
+
+Two things the prototype's hero has and this one deliberately does not.
+
+No artwork. The prototype bleeds a picture behind the text; there is none in this application, and a
+poster of initials beside a title already written at 32 px says the same two letters twice. Initials
+earn their place in a grid, where they tell one card from the next; here they tell the title from
+itself. It comes back with real artwork, and not before.
+
+No second action. §4 and the prototype both offer "Details" beside Continue, and it is blocked on
+data rather than on effort: opening a title's card needs a CatalogItem, ResumeItem carries neither
+the year nor the availability one holds, and no read model in this tree answers "give me the item
+with this id" - ICatalogQueryService queries pages with filters. Building one out of what the hero
+knows would be inventing two fields. It is a vertical through three layers for a secondary button.
+-->
 <UserControl
     x:Class="ApSolutions.LocalMedia.Presentation.Home.ResumeHeroView"
     xmlns="https://github.com/avaloniaui"
@@ -12,49 +30,81 @@ SPDX-License-Identifier: GPL-3.0-or-later
     IsVisible="{Binding HasResume}"
     automation:AutomationProperties.Name="{DynamicResource HomeResumeAccessibleName}">
   <Border
-      Padding="20"
+      Padding="32"
       Background="{DynamicResource CardSurfaceBrush}"
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
       CornerRadius="{DynamicResource CornerRadiusMedium}">
-    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
-      <StackPanel Spacing="{DynamicResource Space4}">
+    <StackPanel Spacing="{DynamicResource Space16}">
+      <!--
+        The overline: caption size and the secondary colour, which is how the prototype labels a
+        section without spending a heading level on it. Its letter-spacing is left out on purpose -
+        it would be a scalar with exactly one reader, which is this repository's characteristic
+        defect wearing a tidy name, and ScalarTokenTests reads LetterSpacing as a spacing anyway. It
+        arrives with the second overline. The words are the ones that were already written: rewriting
+        a label is renaming a control in this tree.
+      -->
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource HomeResumeHeading}" />
+      <!--
+        Display size and Light weight: the prototype writes this at 52 px and weight 300, and the
+        scale tops out at 32. A FontSizeHero read by this one TextBlock is the shape FontSizeMono was
+        refused for, so what carries the difference is the weight and the space around it, both of
+        which are free.
+      -->
+      <TextBlock
+          FontSize="{DynamicResource FontSizeDisplay}"
+          FontWeight="Light"
+          Text="{Binding ResumeTitle}"
+          TextTrimming="CharacterEllipsis" />
+      <TextBlock
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          IsVisible="{Binding HasResumeSubtitle}"
+          Text="{Binding ResumeSubtitle}"
+          TextTrimming="CharacterEllipsis" />
+      <!--
+        One bar, 3 px like every other progress rule in this application, and the percentage in words
+        beside it so the bar is never the only carrier. MinHeight and MinWidth both go with their
+        setter: the base ControlTheme has a minimum of each, and Height alone measures 4.
+      -->
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+        <ProgressBar
+            Width="300"
+            Height="3"
+            MinHeight="3"
+            MinWidth="0"
+            VerticalAlignment="Center"
+            Background="{DynamicResource ControlFillBrush}"
+            Foreground="{DynamicResource AccentBrush}"
+            Maximum="1"
+            Value="{Binding ResumeCompletedFraction}"
+            automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
         <TextBlock
-            FontSize="{DynamicResource FontSizeBody}"
-            Text="{DynamicResource HomeResumeHeading}" />
+            VerticalAlignment="Center"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{Binding ResumeCompletedText}" />
         <TextBlock
-            FontSize="{DynamicResource FontSizeSubtitle}"
-            FontWeight="SemiBold"
-            Text="{Binding ResumeTitle}"
-            TextTrimming="CharacterEllipsis" />
-        <TextBlock
-            FontSize="{DynamicResource FontSizeBody}"
-            IsVisible="{Binding HasResumeSubtitle}"
-            Text="{Binding ResumeSubtitle}"
-            TextTrimming="CharacterEllipsis" />
-        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-          <ProgressBar
-              Width="220"
-              VerticalAlignment="Center"
-              Maximum="1"
-              Value="{Binding ResumeCompletedFraction}"
-              automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
-          <TextBlock
-              VerticalAlignment="Center"
-              Text="{Binding ResumeCompletedText}" />
-          <TextBlock
-              VerticalAlignment="Center"
-              Text="{DynamicResource HomePercentSuffix}" />
-        </StackPanel>
+            VerticalAlignment="Center"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource HomePercentSuffix}" />
       </StackPanel>
-      <Button
-          x:Name="ResumeHeroAction"
-          Grid.Column="1"
-          VerticalAlignment="Center"
-          Classes="primary-action"
-          Command="{Binding ResumeCommand}"
-          Content="{DynamicResource HomeResumeAction}"
-          automation:AutomationProperties.Name="{DynamicResource HomeResumeAction}" />
-    </Grid>
+      <!--
+        A WrapPanel with one child, because the row of actions is what this repository has measured
+        eight times: a horizontal StackPanel offers its children infinite width, and the second action
+        arrives here the day the read model can answer for it.
+      -->
+      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space8}">
+        <Button
+            x:Name="ResumeHeroAction"
+            Classes="primary-action"
+            Command="{Binding ResumeCommand}"
+            Content="{DynamicResource HomeResumeAction}"
+            automation:AutomationProperties.Name="{DynamicResource HomeResumeAction}" />
+      </WrapPanel>
+    </StackPanel>
   </Border>
 </UserControl>

@@ -3,7 +3,13 @@
 
 using System.Globalization;
 
+using ApSolutions.LocalMedia.Application.Catalog;
+using ApSolutions.LocalMedia.Application.Home;
+using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation;
+using ApSolutions.LocalMedia.Presentation.Home;
 using ApSolutions.LocalMedia.Presentation.Library;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -127,6 +133,93 @@ public sealed class PosterCardTests
         Assert.True(bar.IsEffectivelyVisible);
         Assert.Equal(0.42, bar.Value);
         Assert.Equal(3, bar.Bounds.Height);
+    }
+
+    /// <summary>
+    /// The four models the card is fed by, each answering for what it knows and no more.
+    /// </summary>
+    /// <remarks>
+    /// Asserted in C# and not only through the markup, and the coverage gate is why: five properties
+    /// read by nothing but a binding took <c>CatalogItemViewModel</c> from 83/100 to <b>38/50</b> on
+    /// the first CI run after the card landed. A property only a <c>DataTemplate</c> reads is a
+    /// property no test can be wrong about, which is the same shape as a service registered and never
+    /// resolved.
+    /// <para>
+    /// What each one is asserted <b>not</b> to have matters as much: the suggestion has no caption
+    /// because nothing looked its year up, and the catalogue draws no bar because
+    /// <c>CatalogItem.HasProgress</c> says a title was started and not how far it got.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Each_of_the_four_models_answers_for_exactly_what_it_knows()
+    {
+        var catalogued = new CatalogItemViewModel(new CatalogItem(
+            new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000001")),
+            CatalogTitleKind.Movie,
+            "El Faro de Piedra",
+            2019,
+            IsAvailable: true,
+            HasProgress: true,
+            IsPersonal: false,
+            DateTimeOffset.UnixEpoch,
+            null));
+        Assert.Equal("EF", catalogued.Initials);
+        Assert.Equal("2019", catalogued.CaptionText);
+        Assert.True(catalogued.HasCaption);
+        Assert.False(catalogued.HasKnownProgress);
+        Assert.Equal(0, catalogued.CompletedFraction);
+
+        var undated = new CatalogItemViewModel(new CatalogItem(
+            new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000002")),
+            CatalogTitleKind.Show,
+            "Crónicas",
+            null,
+            IsAvailable: false,
+            HasProgress: false,
+            IsPersonal: false,
+            DateTimeOffset.UnixEpoch,
+            null));
+        Assert.Equal(string.Empty, undated.CaptionText);
+        Assert.False(undated.HasCaption);
+        Assert.Equal("MediaUnavailable", undated.AvailabilityKey);
+
+        var started = new InProgressItemViewModel(new InProgressItem(
+            ContentKey.ForTitle(new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000003"))),
+            new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000003")),
+            CatalogTitleKind.Movie,
+            "Vientos del Norte",
+            null,
+            null,
+            null,
+            0.42,
+            IsAvailable: true,
+            DateTimeOffset.UnixEpoch));
+        Assert.Equal("VD", started.Initials);
+        Assert.True(started.HasKnownProgress);
+        Assert.Equal(0.42, started.CompletedFraction);
+        Assert.False(started.HasCaption);
+
+        var added = new RecentlyAddedItemViewModel(new RecentlyAddedItem(
+            new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000004")),
+            CatalogTitleKind.Movie,
+            "La Ciudad Dormida",
+            2021,
+            IsAvailable: true,
+            DateTimeOffset.UnixEpoch));
+        Assert.Equal("LC", added.Initials);
+        Assert.Equal("2021", added.CaptionText);
+        Assert.True(added.HasCaption);
+        Assert.False(added.HasKnownProgress);
+        Assert.Equal(0, added.CompletedFraction);
+
+        var suggested = new RecommendationItemViewModel(
+            new Recommendation(new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000005")), 0.9, []),
+            "Ocho Cartas");
+        Assert.Equal("OC", suggested.Initials);
+        Assert.Equal(string.Empty, suggested.CaptionText);
+        Assert.False(suggested.HasCaption);
+        Assert.False(suggested.HasKnownProgress);
+        Assert.Equal(0, suggested.CompletedFraction);
     }
 
     private static PosterCardView Mount(IPosterCard model)
