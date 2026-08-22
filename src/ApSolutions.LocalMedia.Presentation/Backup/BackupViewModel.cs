@@ -85,8 +85,24 @@ public sealed class BackupViewModel : INotifyPropertyChanged
     public string StatusKey
     {
         get => _statusKey;
-        private set => SetField(ref _statusKey, value);
+        private set
+        {
+            if (SetField(ref _statusKey, value))
+            {
+                OnPropertyChanged(nameof(HasFailed));
+            }
+        }
     }
+
+    /// <summary>
+    /// True for the two outcomes that are failures, and false for the one that only looks like one.
+    /// </summary>
+    /// <remarks>
+    /// Cancelled is not here on purpose: its own words say nothing was left half-written, and somebody
+    /// who pressed cancel does not need to be told in red that what they stopped stopped. Derived
+    /// rather than set, so a third failure cannot appear without passing through here.
+    /// </remarks>
+    public bool HasFailed => StatusKey is "BackupStatusFailed" or "BackupStatusNoSpace";
 
     public string? StageKey
     {
@@ -110,15 +126,39 @@ public sealed class BackupViewModel : INotifyPropertyChanged
     public string? LastCopyName
     {
         get => _lastCopyName;
-        private set => SetField(ref _lastCopyName, value);
+        private set
+        {
+            if (SetField(ref _lastCopyName, value))
+            {
+                OnPropertyChanged(nameof(HasLastCopy));
+            }
+        }
     }
 
     /// <summary>The name of the archive file, never the folder it was written into.</summary>
     public string? LastArchiveName
     {
         get => _lastArchiveName;
-        private set => SetField(ref _lastArchiveName, value);
+        private set
+        {
+            if (SetField(ref _lastArchiveName, value))
+            {
+                OnPropertyChanged(nameof(HasLastArchive));
+            }
+        }
     }
+
+    /// <summary>
+    /// Whether there is a copy to name, and whether there is an export to name.
+    /// </summary>
+    /// <remarks>
+    /// Both names were shaped for a screen from the day they were written - "the name, never the path"
+    /// - and no view painted either, so somebody who had made a copy could only find out by going to
+    /// look in the file manager. These say when there is something to show.
+    /// </remarks>
+    public bool HasLastCopy => !string.IsNullOrWhiteSpace(LastCopyName);
+
+    public bool HasLastArchive => !string.IsNullOrWhiteSpace(LastArchiveName);
 
     public async Task CreateCopyAsync(CancellationToken cancellationToken = default)
     {

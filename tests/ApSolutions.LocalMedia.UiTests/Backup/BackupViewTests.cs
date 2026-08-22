@@ -2,10 +2,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Diagnostics;
+using System.Globalization;
 using System.Xml.Linq;
 using ApSolutions.LocalMedia.Application.Backup;
+using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.TestSupport;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Backup;
@@ -322,20 +329,16 @@ public sealed class BackupViewTests
     }
 
     [Fact]
-    public void Every_visible_string_on_the_view_comes_from_the_resource_dictionary()
+    public void Every_key_this_view_paints_exists_in_the_dictionary()
     {
         var presentationRoot = RepositoryLayout.PathFromRoot("src", "ApSolutions.LocalMedia.Presentation");
         var view = XDocument.Load(Path.Combine(presentationRoot, "Backup", "BackupView.axaml"));
         var spanish = LoadResourceKeys(Path.Combine(presentationRoot, "Resources", "Strings.es.axaml"));
 
-        var literals = view.Descendants()
-            .SelectMany(element => element.Attributes())
-            .Where(attribute => attribute.Name.LocalName is "Text" or "Content" or "Header")
-            .Select(attribute => attribute.Value)
-            .Where(value => !value.StartsWith('{'))
-            .ToArray();
-
-        Assert.Empty(literals);
+        // The "no literal words" half of this moved to ViewLiteralTests on 2026-08-22, which states it
+        // once over every view instead of twice over two - and states it as what it protects, so the
+        // glyphs this tree writes on purpose stop tripping it. What stays here is the half that is
+        // this view's own: the keys it paints exist in the dictionary.
         foreach (var key in new[]
         {
             "BackupTitle",
@@ -360,6 +363,113 @@ public sealed class BackupViewTests
         {
             Assert.Contains(key, spanish);
         }
+    }
+
+    /// <summary>
+    /// A copy that failed looks like a failure, and one that was cancelled does not.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The status block was <c>AccentSubtleBrush</c> whatever it said, so "there was not enough room
+    /// on the disk" was painted exactly like "done". §4 asks for the failed state to read as one.
+    /// </para>
+    /// <para>
+    /// <b>Cancelled is deliberately not a failure.</b> Its own string says nothing was left
+    /// half-written, and somebody who pressed cancel does not need to be told in red that the thing
+    /// they asked to stop stopped. The two failure keys are the ones the model can reach:
+    /// <c>BackupStatusFailed</c> and <c>BackupStatusNoSpace</c>.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task A_copy_that_failed_is_painted_as_a_failure_and_a_cancelled_one_is_not()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var failing = CreateViewModel(onCopy: (_, _) =>
+            throw new InsufficientBackupSpaceException(requiredBytes: 4_000_000_000, availableBytes: 1_000));
+        await failing.CreateCopyAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("BackupStatusNoSpace", failing.StatusKey);
+        AssertFailureSurface(failing, expected: true);
+
+        var cancelled = CreateViewModel(onCopy: (_, _) => throw new OperationCanceledException());
+        await cancelled.CreateCopyAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("BackupStatusCancelled", cancelled.StatusKey);
+        AssertFailureSurface(cancelled, expected: false);
+
+        var done = CreateViewModel();
+        await done.CreateCopyAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("BackupStatusDone", done.StatusKey);
+        AssertFailureSurface(done, expected: false);
+    }
+
+    /// <summary>
+    /// The last copy and the last export are shown, having been produced and shown to nobody.
+    /// </summary>
+    /// <remarks>
+    /// Both properties were shaped for a screen — their summaries say "the name of the copy folder,
+    /// never the path that leads to it" and "the name of the archive file, never the folder it was
+    /// written into" — and <b>no view painted either</b>. Somebody who made a copy had no way to see
+    /// that one exists without going to look in the file manager.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_last_copy_and_the_last_export_are_shown_once_they_exist()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var viewModel = CreateViewModel();
+        var (emptyWindow, emptyView) = ShowBackup(viewModel);
+        Assert.DoesNotContain(
+            emptyView.GetVisualDescendants().OfType<Control>(),
+            control => control.Name == "BackupLastCopyText" && control.IsEffectivelyVisible);
+        emptyWindow.Close();
+
+        await viewModel.CreateCopyAsync(TestContext.Current.CancellationToken);
+        await viewModel.ExportAsync(TestContext.Current.CancellationToken);
+        Assert.False(string.IsNullOrWhiteSpace(viewModel.LastCopyName));
+        Assert.False(string.IsNullOrWhiteSpace(viewModel.LastArchiveName));
+
+        var (window, view) = ShowBackup(viewModel);
+        var painted = view.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Select(block => block.Text ?? string.Empty)
+            .ToArray();
+        Assert.Contains(painted, text => text.Contains(viewModel.LastCopyName!, StringComparison.Ordinal));
+        Assert.Contains(painted, text => text.Contains(viewModel.LastArchiveName!, StringComparison.Ordinal));
+        window.Close();
+    }
+
+    private static void AssertFailureSurface(BackupViewModel viewModel, bool expected)
+    {
+        var (window, view) = ShowBackup(viewModel);
+        var surface = Assert.Single(
+            view.GetVisualDescendants().OfType<Border>(),
+            border => border.Name == "BackupFailureSurface");
+        Assert.Equal(expected, surface.IsEffectivelyVisible);
+        if (expected)
+        {
+            var application = Avalonia.Application.Current!;
+            Assert.True(application.TryGetResource(
+                "DangerSurfaceBrush",
+                application.ActualThemeVariant,
+                out var danger));
+            Assert.Equal(
+                Assert.IsAssignableFrom<ISolidColorBrush>(danger).Color,
+                Assert.IsAssignableFrom<ISolidColorBrush>(surface.Background).Color);
+            Assert.Contains(surface.GetVisualDescendants().OfType<TextBlock>(), block => block.Text == "⚠");
+        }
+
+        window.Close();
+    }
+
+    private static (Window Window, BackupView View) ShowBackup(BackupViewModel viewModel)
+    {
+        var view = new BackupView { DataContext = viewModel };
+        var window = new Window { Width = 900, Height = 800, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        return (window, view);
     }
 
     private static BackupManifest Manifest() => new(
