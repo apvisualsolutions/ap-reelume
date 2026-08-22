@@ -123,6 +123,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ReviewRejectAction">Reject match</x:String>
   <x:String x:Key="ReviewLoadMoreAction">Load more</x:String>
   <x:String x:Key="ReviewConflictMessage">The match changed in another operation. The saved decision is preserved.</x:String>
+  <x:String x:Key="ReviewProposedCandidate">Proposed candidate</x:String>
+  <x:String x:Key="ReviewConfidence">Confidence</x:String>
   <x:String x:Key="ReviewStatusPending">Pending</x:String>
   <x:String x:Key="ReviewStatusSuggested">Suggested</x:String>
   <x:String x:Key="ReviewExplanationHeading">Why</x:String>

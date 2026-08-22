@@ -10,6 +10,32 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La bandeja de revisión pinta la tarjeta de candidato del prototipo: el borde tintado por el
+  estado, el distintivo arriba a la derecha y dos columnas debajo.** Antes era un rectángulo con
+  borde neutro donde la clave, el porcentaje, la palabra del estado y el encabezado «Por qué» iban
+  seguidos en una línea y media, sin decir cuál de ellos era la respuesta. Ahora **el borde entero se
+  tiñe** —acento cuando la coincidencia es sugerida, ámbar cuando está pendiente—, que es lo que hace
+  el prototipo y **la única señal que sobrevive a los dos altos contrastes**, donde la superficie de
+  la tarjeta y la de la página son el mismo color. Debajo, lo propuesto a la izquierda con **una barra
+  de confianza que nunca existió** —dibujada del mismo número que escribe el porcentaje, así que no
+  pueden discrepar— y las razones a la derecha, en viñetas.
+  - Dos cadenas, las dos del prototipo y en los dos idiomas: `ReviewProposedCandidate` y
+    `ReviewConfidence`. «Señales consideradas» no entra: `ReviewExplanationHeading` —«Por qué»— ya
+    decía eso y llevaba dos días diciéndolo.
+  - **Tres cosas que el prototipo dibuja y esto no puede, y son omisiones medidas, no descuidos.**
+    `MatchCandidate` lleva un id, una clave, un tipo, una puntuación y sus señales, y **ningún arte**:
+    una miniatura 2:3 vacía en cada fila prometería una imagen que no existe. El **título** del
+    candidato no está —lo que hay es la clave del proveedor, `movie:329865`— y el **tipo** necesitaría
+    las palabras «Película» / «Serie», que el paquete de cadenas no propone y que ya se decidió el
+    2026-08-22 no inventar. Y **los cuatro botones al pie de la tarjeta** existen una fila más abajo:
+    Aceptar y Rechazar actúan sobre lo que la lista tenga seleccionado, y meterlos en cada tarjeta
+    convertiría una decisión por bandeja en una decisión por fila — un cambio de cómo funciona la
+    superficie, no de cómo se dibuja.
+  - El estado escoge la clase desde el modelo, con `Classes.suggested` y `Classes.pending`, y no a
+    través de un convertidor: los dos estados ya son dos booleanos de la tarjeta, y un convertidor
+    sería un tercer sitio decidiendo cuál es cuál.
+
+
 - **Ajustes pasa a la fila-tarjeta del prototipo: nombre, la frase debajo, y el control contra el
   borde derecho.** Es la unidad con la que el prototipo dibuja un ajuste, y aquí no existía ninguna:
   un interruptor con la etiqueta dentro, luego una frase suelta sobre ese interruptor, luego el

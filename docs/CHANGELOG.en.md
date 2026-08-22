@@ -10,6 +10,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The review inbox draws the prototype's candidate card: the border tinted by state, the badge in
+  the top right corner, and two columns underneath.** It used to be a neutral-bordered rectangle where
+  the key, the percentage, the state word and the "Why" heading ran together over a line and a half,
+  with nothing saying which of them was the answer. Now **the whole border is tinted** — accent when
+  the match is suggested, amber when it is pending — which is what the prototype does and **the only
+  signal that survives both high contrasts**, where the card's surface and the page's are the same
+  colour. Underneath, what is proposed on the left with **a confidence bar that never existed** —
+  drawn from the same number the percentage is written from, so the two cannot disagree — and the
+  reasons on the right, as bullets.
+  - Two strings, both the prototype's own and in both languages: `ReviewProposedCandidate` and
+    `ReviewConfidence`. "Signals considered" does not join them: `ReviewExplanationHeading` — "Why" —
+    already said that and had been saying it for two days.
+  - **Three things the prototype draws and this cannot, and they are measured omissions rather than
+    oversights.** `MatchCandidate` carries an id, a key, a kind, a score and its signals, and **no
+    artwork**: an empty 2:3 thumbnail in every row would promise a picture that does not exist. The
+    candidate's **title** is not there — what is there is the provider's key, `movie:329865` — and the
+    **kind** would need the words "Película" / "Serie", which the string package does not propose and
+    which was already decided against on 2026-08-22. And **the four buttons at the card's foot** exist
+    one row lower: Accept and Reject act on whatever the list has selected, and moving them into every
+    card would turn one decision per inbox into one decision per row — a change to how the surface
+    works, not to how it is drawn.
+  - The state picks the class from the model, with `Classes.suggested` and `Classes.pending`, rather
+    than through a converter: the two states are already two booleans on the card, and a converter
+    would be a third place deciding which is which.
+
+
 - **Settings moves to the prototype's row-card: the name, the sentence underneath it, and the
   control against the right edge.** That is the unit the prototype draws a setting with, and there
   was not one here: a switch with its label inside it, then a loose sentence about that switch, then
