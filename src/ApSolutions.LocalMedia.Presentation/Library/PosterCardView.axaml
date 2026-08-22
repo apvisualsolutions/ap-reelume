@@ -6,10 +6,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
 The 2:3 card, and the one piece the redesign repeats most: the library grid and the three rails on
 Home all show it, so it is a view of its own rather than four templates that would drift apart.
 
-Its size is written rather than fluid, and 148 x 222 is exactly 2:3 - the prototype's grid asks for
-minmax(148px, 1fr) and its rails for 132, so this is the wider of the two shapes it was approved at.
-A card that stretched would need its height to follow its width, and Avalonia has no aspect ratio;
-what a fluid grid changes is how many fit on a row, which is the grid's decision and not the card's.
+Its size is written rather than fluid, and PosterCardWidth x PosterCardHeight is exactly 2:3. A card
+that stretched would need its height to follow its width, and Avalonia has no aspect ratio; what a
+fluid grid changes is how many fit on a row, which is the grid's decision and not the card's - and
+that is why the two numbers are tokens: the grid divides its width by the first one.
 
 There is no artwork here and there is not going to be in 0.2.0: the application ships with no TMDB
 token, so the initials are not a placeholder waiting for a picture, they are what the card shows.
@@ -25,7 +25,7 @@ and a name here would be a second announcement of the same card.
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
-    Width="148"
+    Width="{DynamicResource PosterCardWidth}"
     x:DataType="library:IPosterCard">
   <StackPanel Spacing="{DynamicResource Space8}">
     <!--
@@ -33,7 +33,7 @@ and a name here would be a second announcement of the same card.
     and is not something to press, so it is the 1.8:1 brush the token split was made for.
     -->
     <Border
-        Height="222"
+        Height="{DynamicResource PosterCardHeight}"
         Background="{DynamicResource ControlFillBrush}"
         BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="1"
