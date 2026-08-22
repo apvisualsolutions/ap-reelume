@@ -32,34 +32,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
       a different colour. Windows keeps drawing minimise, maximise, close and the window's title over
       it, so this adds no control anybody has to press and the walk's inventory is untouched.
 
-      What it holds is the publisher's signature, which used to sit at the foot of a 248 px rail that
-      is 64 wide now. The name is NOT repeated here: the system already draws it at the left of this
-      same bar, and it carries no heading level any more either - the shell used to declare the
-      product name as level one while every screen inside it declared its own, which is the two-H1
-      shape the settings page was fixed for. The heading of a screen is the name of the screen.
+      It holds nothing of its own, and that is the point. Windows draws the product's name and the
+      three window buttons over it, so anything the shell painted here would be a second copy of one
+      or sit underneath the other. The brand and the publisher's signature, which used to be at the
+      foot of a 248 px rail, moved to Credits — the screen that is about the application, and the one
+      that carries TMDB's logo, whose terms want it less prominent than the product's own name.
+
+      The name also stopped being a level-one heading with that move: the shell declared it while
+      every screen inside declared its own, which is the two-H1 shape the settings page was fixed for.
+      The heading of a screen is the name of the screen.
     -->
     <Border
         x:Name="TitleBarSurface"
         Grid.Row="0"
         Grid.ColumnSpan="2"
-        Padding="14,0"
         Background="{DynamicResource NavigationSurfaceBrush}"
         BorderBrush="{DynamicResource ShellHairlineBrush}"
-        BorderThickness="0,0,0,1">
-      <StackPanel
-          x:Name="AboutBrandSurface"
-          HorizontalAlignment="Right"
-          VerticalAlignment="Center"
-          Orientation="Horizontal"
-          Spacing="{DynamicResource Space12}"
-          automation:AutomationProperties.Name="{DynamicResource AboutAccessibleName}">
-        <TextBlock
-            VerticalAlignment="Center"
-            FontSize="{DynamicResource FontSizeCaption}"
-            Foreground="{DynamicResource TextSecondaryBrush}"
-            Text="{DynamicResource PublisherSignature}" />
-      </StackPanel>
-    </Border>
+        BorderThickness="0,0,0,1" />
     <!--
       The rail: 64 px of glyphs where there were 248 px of words. It is the composition the prototype
       was approved at, and the trade it makes is written down - a word tells somebody what a

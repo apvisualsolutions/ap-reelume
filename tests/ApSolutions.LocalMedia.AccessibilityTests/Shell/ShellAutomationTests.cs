@@ -61,21 +61,34 @@ public sealed class ShellAutomationTests
         window.Close();
     }
 
+    /// <summary>
+    /// The surface that names the application announces itself and carries the signature.
+    /// </summary>
+    /// <remarks>
+    /// Mounted from <c>CreditsView</c> rather than looked for inside the shell, and the move is the
+    /// reason: the brand sat at the foot of a 248 px navigation rail until 2026-08-22, when the rail
+    /// became 64 px of pictograms with room for neither the name nor the signature. It lives on
+    /// Credits now — the screen that is about the application, and the one carrying TMDB's logo,
+    /// whose terms want it less prominent than the product's own name. Inside the shell that screen
+    /// is behind an invisible settings page, so its descendants are not in the visual tree at all,
+    /// and a search there would have failed for the wrong reason.
+    /// </remarks>
     [AvaloniaFact]
     public void About_brand_surface_has_an_accessible_name_and_contains_the_publisher_signature()
     {
         var assembly = Assembly.Load(PresentationAssemblyName);
         ApplySpanishResources(assembly);
-        var (shell, _) = CreateShell(assembly);
+        var credits = (Control)Activator.CreateInstance(
+            RequireType(assembly, "ApSolutions.LocalMedia.Presentation.About.CreditsView"))!;
         var window = new Window
         {
             Width = 1024,
             Height = 720,
-            Content = shell,
+            Content = credits,
         };
         window.Show();
         Dispatcher.UIThread.RunJobs();
-        var about = shell.GetVisualDescendants()
+        var about = credits.GetVisualDescendants()
             .OfType<Control>()
             .Single(control => control.Name == "AboutBrandSurface");
 
@@ -83,6 +96,9 @@ public sealed class ShellAutomationTests
         Assert.Contains(
             about.GetVisualDescendants().OfType<TextBlock>(),
             text => text.Text == "by AP Solutions");
+        Assert.Contains(
+            about.GetVisualDescendants().OfType<TextBlock>(),
+            text => text.Text == "AP Reelume");
         window.Close();
     }
 

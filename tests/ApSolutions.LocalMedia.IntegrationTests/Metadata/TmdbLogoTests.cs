@@ -39,7 +39,6 @@ public sealed class TmdbLogoTests
 
     private const string CreditsPath = "src/ApSolutions.LocalMedia.Presentation/About/CreditsView.axaml";
 
-    private const string ShellPath = "src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml";
 
     private const string TokensPath =
         "src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml";
@@ -155,16 +154,25 @@ public sealed class TmdbLogoTests
             .Groups["value"].Value;
 
     /// <summary>The size the product's own name is rendered at, read from the view that draws it.</summary>
+    /// <remarks>
+    /// Read from <b>Credits</b>, which is the same screen the logo is on. It used to be read from the
+    /// navigation rail, and on 2026-08-22 that rail became 64 px of pictograms with no room for a
+    /// word: the name moved here and this check went with it. Comparing two sizes on one screen is
+    /// also closer to what "less prominent than your own" means than comparing across two.
+    /// </remarks>
     private static string ProductNameFontSize()
     {
-        var shell = File.ReadAllText(FromRoot(ShellPath));
-        var index = shell.IndexOf("ProductDisplayName", StringComparison.Ordinal);
-        Assert.True(index > 0, "The shell no longer draws the product name, so there is nothing to compare against.");
+        var credits = File.ReadAllText(FromRoot(CreditsPath));
+        var index = credits.IndexOf("ProductDisplayName", StringComparison.Ordinal);
+        Assert.True(
+            index > 0,
+            "Credits no longer draws the product name, so the logo has nothing to be less prominent "
+                + "than — which is TMDB's condition and not a detail of this test.");
 
         // The TextBlock's own attributes, taken from the element that carries the binding.
-        var start = shell.LastIndexOf("<TextBlock", index, StringComparison.Ordinal);
+        var start = credits.LastIndexOf("<TextBlock", index, StringComparison.Ordinal);
         Assert.True(start >= 0, "The product name is no longer drawn by a TextBlock.");
-        return Resolve(Attribute(shell[start..(index + "ProductDisplayName".Length)], "FontSize"));
+        return Resolve(Attribute(credits[start..(index + "ProductDisplayName".Length)], "FontSize"));
     }
 
     /// <summary>

@@ -111,7 +111,15 @@ public sealed class ShellLocalizationTests
             words.Length == 0,
             "the shell paints words the dictionaries should have written: " + string.Join(", ", words));
 
-        var publisherReferences = shell.Descendants()
+        // The signature is confined to the About surface, and on 2026-08-22 that surface moved: it was
+        // at the foot of a 248 px navigation rail and the rail became 64 px of pictograms, so the
+        // brand went to Credits — the screen that is about the application. What the rule protects is
+        // unchanged, and it is asserted where it now lives; the shell is asserted not to have kept a
+        // copy, which is the half that would otherwise rot silently.
+        Assert.DoesNotContain("PublisherSignature", File.ReadAllText(requiredFiles[1]), StringComparison.Ordinal);
+
+        var credits = XDocument.Load(Path.Combine(presentationRoot, "About", "CreditsView.axaml"));
+        var publisherReferences = credits.Descendants()
             .Where(element => element.Attributes().Any(attribute =>
                 attribute.Value.Contains("PublisherSignature", StringComparison.Ordinal)))
             .ToArray();
