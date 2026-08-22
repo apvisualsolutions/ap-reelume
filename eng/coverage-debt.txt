@@ -118,7 +118,7 @@ src/ApSolutions.LocalMedia.Presentation/About/CreditsView.axaml                 
 src/ApSolutions.LocalMedia.Presentation/App.axaml                                              0   0
 src/ApSolutions.LocalMedia.Presentation/App.axaml.cs                                          36  11
 src/ApSolutions.LocalMedia.Presentation/Backup/BackupView.axaml                              100  50
-src/ApSolutions.LocalMedia.Presentation/Backup/BackupViewModel.cs                            100  82
+src/ApSolutions.LocalMedia.Presentation/Backup/BackupViewModel.cs                            100  84
 src/ApSolutions.LocalMedia.Presentation/Backup/RestoreWizardView.axaml                        95  50
 src/ApSolutions.LocalMedia.Presentation/Backup/RestoreWizardViewModel.cs                     100  88
 src/ApSolutions.LocalMedia.Presentation/Backup/RootRemapRowViewModel.cs                      100  75
