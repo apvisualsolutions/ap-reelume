@@ -2,10 +2,29 @@
 
 ## Estado al abrir (2026-08-22)
 
-**`main` en `44f72ca`, verde; el tramo 7 CERRADO, y quedan el 8 y el 9.** El 8 son las gramáticas de
-mensajes de `UpdateView` —23 mensajes, cuatro gramáticas, 6 motivos de fallo, y
-`PlayerRecoveryChooseAnotherVersion` de `TextBlock` a `Button`—. El 9 son las cuatro animaciones
-(`apr-in`, `apr-shim`, `apr-tip`, `apr-pulse`), que siguen a **0 en el árbol**.
+**`main` en `44f72ca`, verde; el tramo 7 CERRADO, y quedan el 8 y el 9.**
+
+**Del 8, `UpdateView` CIERRA SIN TOCARLA, y está medido** ([evidencia](evidence/stable/audit-update-and-player-grammars.md)):
+sus **14 estados + 7 rechazos + el aviso** ya llevan las cuatro gramáticas, y el mapa de los **diez**
+valores de `UpdateRejection` contra las **siete** cadenas **cierra entero**. Los tres que parecían
+huecos no lo son: `NoReleaseAvailable` y `NotNewer` son `UpToDate` a propósito —«no tener nada más
+nuevo y haber preguntado a una fuente que no publicó nada son la misma noticia»—, y `UndeclaredHost`
+**no sale de una comprobación**: sólo lo emite `VerifiedUpdateDownloader` al descargar, y llega por el
+`catch`. Décima alarma falsa apagada midiendo.
+
+**Y lo que SÍ queda del 8 es del reproductor, y es más grande que su fila.** `CanChooseAnotherVersion`
+se decide **sólo por el código de fallo**, sin mirar si existe otra versión — al contrario que sus dos
+hermanas, que sí comprueban que la acción se pueda ejecutar y son las dos que tienen botón. **En el
+caso más común, un archivo sin otras versiones, la pantalla dice «Elige otra versión del mismo
+contenido» a quien sólo tiene una**, y lo dice como texto sin nada que pulsar. La pieza siguiente está
+medida entera en la evidencia; sus cuatro partes: el `Func<bool>` en diferido —`player` se construye
+antes que `versions`—, el cambio de tipo conservando la clave, el destino real —`PlayerVersionsView`
+**ya está en la misma pantalla** cuando hay alternativas, así que la frase manda a otro sitio— y **una
+escena de paseo nueva**, porque hace falta un fallo de reproducción **y** un grupo de versiones a la
+vez, y el paseo tiene las dos cosas por separado.
+
+El 9 son las cuatro animaciones (`apr-in`, `apr-shim`, `apr-tip`, `apr-pulse`), que siguen a **0 en el
+árbol**.
 
 **⚠ Y el hallazgo del tramo 7 que no es de ninguna vista: un control que se ve y no se puede pulsar.**
 `RootOnboardingView` creció 25 px y el paseo físico se puso en rojo **determinista** — 4 s en verde con
