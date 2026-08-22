@@ -15,13 +15,19 @@ nuevo y haber preguntado a una fuente que no publicó nada son la misma noticia�
 **Y lo que SÍ queda del 8 es del reproductor, y es más grande que su fila.** `CanChooseAnotherVersion`
 se decide **sólo por el código de fallo**, sin mirar si existe otra versión — al contrario que sus dos
 hermanas, que sí comprueban que la acción se pueda ejecutar y son las dos que tienen botón. **En el
-caso más común, un archivo sin otras versiones, la pantalla dice «Elige otra versión del mismo
-contenido» a quien sólo tiene una**, y lo dice como texto sin nada que pulsar. La pieza siguiente está
-medida entera en la evidencia; sus cuatro partes: el `Func<bool>` en diferido —`player` se construye
-antes que `versions`—, el cambio de tipo conservando la clave, el destino real —`PlayerVersionsView`
-**ya está en la misma pantalla** cuando hay alternativas, así que la frase manda a otro sitio— y **una
-escena de paseo nueva**, porque hace falta un fallo de reproducción **y** un grupo de versiones a la
-vez, y el paseo tiene las dos cosas por separado.
+caso más común, un archivo sin otras versiones, la pantalla decía «Elige otra versión del mismo
+contenido» a quien sólo tiene una**. **Corregido el mismo día**: ahora exige la acción del dominio **y**
+que exista otra versión, preguntado con un `Func<bool>` y no guardado, porque `player` se construye
+antes de leer el grupo.
+
+**⚠ Y el botón que la §4 pide NO se hizo, con la medición delante.** `ShellView.axaml` pone `PlayerView`
+en `Grid.Column="0"` y `PlayerVersionsView` en la columna lateral de 320: **las dos en pantalla a la
+vez**, y con la misma condición que enciende la frase. El botón llevaría a un sitio que ya se ve desde
+donde estaría el botón. Segunda razón medida: **`PlayerStage` viaja a la ventana del mini** —
+`host.Content = stage` al volver— y `PlayerView` va dentro, así que el bloque de fallo puede verse **sin
+columna al lado**; por eso la frase nueva tampoco dice dónde. Si alguien decide hacerlo igualmente,
+**cuesta una escena de paseo que no existe**: hace falta un fallo de reproducción **y** un grupo de
+versiones a la vez, y el paseo tiene las dos cosas por separado.
 
 El 9 son las cuatro animaciones (`apr-in`, `apr-shim`, `apr-tip`, `apr-pulse`), que siguen a **0 en el
 árbol**.

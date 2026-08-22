@@ -148,6 +148,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The failure screen no longer offers another version when there is no other version.** It was
+  decided by the failure reason alone, without looking at whether the content had any alternative
+  catalogued, so in the commonest case - a file that is the only one of its title - it invited you to
+  choose between one. It now appears only when there is genuinely something to switch to, and says so
+  instead of sending you to another screen.
+
+
 - **A button in the library could be seen and could not be pressed.** "Review versions" sat flush with
   the bottom edge of the scrolling area: thirteen of its thirty-six pixels were inside it and its
   middle was not, so a click on it never reached the button. The list now leaves a margin at the end,

@@ -74,19 +74,43 @@ CanOpenExternally   => acción del dominio  &&  hay lanzador  &&  MediaPath no e
 CanChooseAnotherVersion => acción del dominio          ← y nada más
 ```
 
-## Lo que la pieza siguiente tiene que hacer, ya medido / What the next piece has to do, already measured
+## La corrección, hecha el mismo día / The fix, made the same day
 
-1. **`CanChooseAnotherVersion` pasa a exigir que existan alternativas.** `player` se construye en
-   `CompositionRoot` **antes** que `versions`, así que la vía es un `Func<bool>` capturado en diferido,
-   igual que `_externalLauncher` es un puerto opcional del constructor.
-2. **El `TextBlock` pasa a `Button`** — el único cambio de tipo del paquete —, y su clave cambia de
-   frase a etiqueta en los dos idiomas. La clave **se conserva**, para no dejar una cadena huérfana.
-3. **El destino no es «la ficha de versiones»**: cuando hay alternativas, `PlayerVersionsView` **ya
-   está en la misma pantalla**, porque `HasPlayerVersions` sólo pide que las haya. La frase manda a
-   otro sitio a hacer algo que está debajo.
-4. **Y cuesta una escena de paseo**: un botón nuevo entra en `eng/walk-pending.txt`, que está en **0 y
-   no vuelve a subir**, así que hace falta una escena con un fallo de reproducción **y** un grupo de
-   versiones. El paseo tiene las dos cosas por separado y ninguna junta.
+`CanChooseAnotherVersion` pasa a exigir **la acción del dominio y que exista otra versión**, que es la
+forma que sus dos hermanas ya tenían. Se pregunta con un `Func<bool>` y **no se guarda un valor**,
+porque la sesión se arma en ese orden: `player` se construye en `CompositionRoot` **antes** de leer el
+grupo de versiones, así que un valor pasado ahí sería siempre el de antes de mirar. La prueba afirma
+las dos mitades **desde el mismo fallo** —para que no pueda pasar porque la acción dejara de ofrecerse—
+y también que se pregunta tarde. / Asked with a delegate and not stored, because the session is
+assembled in that order.
+
+## ⚠ Y el botón que la §4 pide NO se hace, con la medición delante / And the button §4 asks for is NOT made
+
+La fila lo llama «el único cambio de tipo del paquete», y la razón que lo justificaba **no se sostiene
+contra el árbol**. Medido en `ShellView.axaml` el 2026-08-22:
+
+```
+Grid.Column="0"   PlayerView, y dentro su bloque de fallo
+Grid.Column="1"   la columna lateral de 320 px, y en ella PlayerVersionsView
+```
+
+**Las dos columnas están en pantalla a la vez**, y `HasPlayerVersions` sólo pide que existan
+alternativas — exactamente la misma condición que ahora enciende la frase. Así que el botón llevaría a
+un sitio que ya se está viendo desde donde está el botón, y este repositorio tiene nombre para lo que se
+registra y no hace nada. / The two columns are on screen at once, so the button would lead to a place
+already visible from where the button is.
+
+Y hay una segunda razón, medida: **`PlayerStage` viaja a la ventana del mini reproductor** —
+`ShellView.axaml.cs` hace `host.Content = stage` al volver—, y `PlayerView` va dentro. El bloque de
+fallo puede verse **sin ninguna columna al lado**, así que un destino prometido no está garantizado en
+todas las disposiciones. Por eso la frase nueva tampoco dice **dónde**: dice que las versiones existen y
+que se puede cambiar, que es cierto en las dos. / The failure block can be seen with no column beside
+it, so the sentence names no place.
+
+Lo que sí queda escrito para quien retome: si el botón se hiciera de todas formas, **cuesta una escena
+de paseo** que hoy no existe — hace falta un fallo de reproducción **y** un grupo de versiones a la vez,
+y el paseo tiene las dos cosas por separado. `eng/walk-pending.txt` está en 0 y no vuelve a subir. / It
+would cost a walk scene the walk does not have.
 
 ## Y una asimetría sin coste, anotada y no tocada / And a costless asymmetry, noted and not touched
 

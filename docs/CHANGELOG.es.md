@@ -149,6 +149,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La pantalla de fallo ya no ofrece elegir otra versión cuando no hay otra versión.** Se decidía
+  sólo por el motivo del fallo, sin mirar si el contenido tenía alguna alternativa catalogada, así
+  que en el caso más corriente —un archivo que es el único de su título— invitaba a elegir entre uno.
+  Ahora aparece únicamente cuando de verdad hay a qué cambiar, y dice eso en lugar de mandarte a otra
+  pantalla.
+
+
 - **Un botón de la biblioteca se veía y no se podía pulsar.** «Revisar versiones» quedaba a ras del
   borde inferior de la zona desplazable: trece de sus treinta y seis píxeles de alto estaban dentro y
   su punto medio no, así que un clic sobre él no llegaba al botón. Ahora la lista deja un margen al
