@@ -38,14 +38,6 @@ public sealed partial class App : Avalonia.Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var shell = ShellFactory?.Invoke() ?? CreateDefaultShell();
-            // The title bar is the application's own, 44 px, which is what the prototype puts above
-            // everything and where the brand now lives. Windows keeps drawing minimise, maximise and
-            // close over the extended area, so this adds no control anybody would have to press and
-            // the autonomous walk's inventory is untouched; dragging stays the system's too.
-            //
-            // Avalonia 12.1.1 has no ExtendClientAreaChromeHints any more - the two properties below
-            // are the whole surface it kept - so what the chrome does is measured rather than asked
-            // for.
             var window = new Window
             {
                 Width = 1180,
@@ -53,16 +45,53 @@ public sealed partial class App : Avalonia.Application
                 MinWidth = 900,
                 MinHeight = 600,
                 Title = GetResourceText(this, "ProductDisplayName"),
-                ExtendClientAreaToDecorationsHint = true,
-                ExtendClientAreaTitleBarHeightHint = 44,
                 Content = shell,
             };
+            ApplyDesignedChrome(window);
             BackdropService?.TryApply(window);
             WindowConfigurator?.Invoke(window);
             desktop.MainWindow = window;
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// The height of the application's own title bar, in the one place both halves of it can read.
+    /// </summary>
+    /// <remarks>
+    /// The window asks the platform to extend its client area by this much, and <c>ShellView</c>
+    /// draws a row of the same height into it. Written twice they would disagree the first time the
+    /// design moved one of them, so a test asserts the shell's first row against this number.
+    /// </remarks>
+    public const double TitleBarHeight = 44;
+
+    /// <summary>
+    /// Gives a window the title bar the design draws instead of the system's own.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The prototype puts a 44 px bar above everything, so the window is one unbroken surface from
+    /// the top down rather than a system caption sitting on a different colour. Windows keeps drawing
+    /// minimise, maximise, close and the window's title over the extended area, which is why this
+    /// adds no control anybody has to press and the autonomous walk's inventory is untouched, and why
+    /// <c>ShellView</c> does not repeat the product name inside it.
+    /// </para>
+    /// <para>
+    /// <c>ExtendClientAreaChromeHints</c> does not exist in Avalonia 12.1.1 — these two properties
+    /// are the whole surface it kept — so what the chrome does was measured with the application open
+    /// rather than asked for.
+    /// </para>
+    /// <para>
+    /// Separate from the window's construction so it can be asserted: everything else here runs only
+    /// under a desktop lifetime, which no headless suite has.
+    /// </para>
+    /// </remarks>
+    public static void ApplyDesignedChrome(Window window)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+        window.ExtendClientAreaToDecorationsHint = true;
+        window.ExtendClientAreaTitleBarHeightHint = TitleBarHeight;
     }
 
     public static void ApplyLanguage(Avalonia.Application application, CultureInfo culture)

@@ -36,9 +36,11 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// difference nobody can see between two screens.
 /// </para>
 /// <para>
-/// <b>Thirteen text blocks paint one of the three</b>, in three files: the watch status control, the
-/// five destinations of the navigation rail, and the five appearance pills. They take one class, since
-/// three of thirteen at one size and ten at another is the inconsistency this batch keeps finding.
+/// <b>Every text block that paints one of the three takes the same class</b>, since three at one size
+/// and ten at another is the inconsistency this batch keeps finding. They were thirteen in three files
+/// — the watch status control, the navigation rail and the appearance pills — and the rail's five went
+/// with its words when it became 64 px of pictograms, while the scan's pulsing dot joined them. The
+/// floor below is what the count is held to; it is not a census.
 /// </para>
 /// </remarks>
 public sealed class StateGlyphTests

@@ -33,6 +33,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Spacing="{DynamicResource Space8}"
           automation:AutomationProperties.Name="{DynamicResource ScanProgressAccessibleName}"
           automation:AutomationProperties.LiveSetting="Polite">
+        <!--
+          The dot is the only thing on this row that says a scan is still going: the count beside it
+          moves in steps, and between two steps a scan that is working and one that has stopped look
+          identical. It is a symbol and not a word, so it stays literal like the other five; the
+          sentence beside it is what a reader hears.
+        -->
+        <TextBlock
+            x:Name="ScanProgressPulse"
+            Classes="state-glyph scan-pulse"
+            IsVisible="{Binding IsRunning}"
+            Text="●"
+            automation:AutomationProperties.AccessibilityView="Raw" />
         <TextBlock
             x:Name="ScanProgressRunningText"
             IsVisible="{Binding IsRunning}"

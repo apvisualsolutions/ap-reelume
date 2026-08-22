@@ -52,13 +52,21 @@ public sealed class RouteStateConverter : IValueConverter
         throw new NotSupportedException("A destination state is derived, never written back.");
 
     /// <summary>The status text in the language in force, so the shell never holds a translation.</summary>
+    /// <remarks>
+    /// Three guards used to stand here — a null application, a missing resource and a null value —
+    /// and <b>nothing in this repository could take any of them</b>: a converter only runs inside a
+    /// running application, and the key is declared in both dictionaries with a gate that says so.
+    /// They cost four branches that no test could reach and dragged this file's branch coverage down
+    /// with them, which is the shape <c>eng/check-coverage.ps1</c> keeps finding. The answer to an
+    /// unreachable guard is to remove it, not to write it an impossible test — and what is left says
+    /// the true thing out loud: if the key is ever missing, the key itself is what appears on screen,
+    /// which is a bug somebody can see rather than one this quietly hid.
+    /// </remarks>
     private static string ReadStatusText()
     {
         const string Key = "NavigationCurrentStatus";
-        var application = Avalonia.Application.Current;
-        return application is not null
-            && application.TryGetResource(Key, application.ActualThemeVariant, out var resource)
-                ? resource?.ToString() ?? Key
-                : Key;
+        var application = Avalonia.Application.Current!;
+        _ = application.TryGetResource(Key, application.ActualThemeVariant, out var resource);
+        return resource as string ?? Key;
     }
 }

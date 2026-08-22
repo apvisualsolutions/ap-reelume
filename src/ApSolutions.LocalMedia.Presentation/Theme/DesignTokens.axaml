@@ -5,6 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 <Styles
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme">
   <Styles.Resources>
     <ResourceDictionary>
@@ -66,6 +67,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
         148 is the width the prototype's library grid is approved at (minmax(148px, 1fr)); its rails
         use 132, and the wider of the two is the one a grid of them is measured against.
       -->
+      <!--
+        The one duration in the application, and the reason it is a TimeSpan token rather than a
+        number: the animations read it and FluentThemeService WRITES it. When Windows asks for less
+        motion the service puts TimeSpan.Zero here, so every animation goes to 0 ms - which is what
+        reduced motion means, not a shorter animation.
+
+        It used to be MotionDurationStandardMilliseconds, deleted with the scalars gate because
+        nothing spent it and it was a parallel copy of a 160 living in the service. This is the same
+        number arriving the way ReducedMotionTests said it should: declared once, read by the views,
+        and the service reading from it instead of holding its own.
+      -->
+      <sys:TimeSpan x:Key="MotionDuration">00:00:00.160</sys:TimeSpan>
       <x:Double x:Key="PosterCardWidth">148</x:Double>
       <x:Double x:Key="PosterCardHeight">222</x:Double>
       <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>
@@ -1133,6 +1146,56 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
+  </Style>
+
+  <!--
+    apr-tip, the first of the package's four animations: a tooltip arriving 6 px from the left rather
+    than appearing whole. It belongs to the rail's six destinations, which is where the words went
+    when the rail became pictograms - a tooltip is how somebody finds out what a glyph means, so the
+    one animation that helps rather than decorates is the one on it.
+
+    The duration comes from the MotionDuration token, and that is the whole reduced-motion contract:
+    FluentThemeService writes TimeSpan.Zero into it when Windows asks for less motion, so this goes
+    to 0 ms instead of getting shorter. ReducedMotionTests refuses a duration written any other way.
+  -->
+  <Style Selector="ToolTip">
+    <Style.Animations>
+      <Animation Duration="{DynamicResource MotionDuration}" Easing="CubicEaseOut" FillMode="None">
+        <KeyFrame Cue="0%">
+          <Setter Property="Opacity" Value="0" />
+          <Setter Property="TranslateTransform.X" Value="-6" />
+        </KeyFrame>
+        <KeyFrame Cue="100%">
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="TranslateTransform.X" Value="0" />
+        </KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+
+  <!--
+    apr-pulse, the second: the dot beside "scanning" breathing while a scan is running. It is the one
+    place in the application where something is happening that nobody started and nothing else says
+    is still going - the count beside it changes in steps, and between two steps a still dot and a
+    finished scan look the same.
+
+    It loops, which is why it is the only one here with an iteration count, and it stops being drawn
+    at all when the scan ends, because the dot's own IsVisible follows IsRunning. Under reduced
+    motion the duration is zero and the dot simply sits there at full opacity.
+  -->
+  <Style Selector="TextBlock.scan-pulse">
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Style.Animations>
+      <Animation Duration="{DynamicResource MotionDuration}" IterationCount="INFINITE" PlaybackDirection="Alternate">
+        <KeyFrame Cue="0%">
+          <Setter Property="Opacity" Value="1" />
+        </KeyFrame>
+        <KeyFrame Cue="100%">
+          <Setter Property="Opacity" Value="0.25" />
+        </KeyFrame>
+      </Animation>
+    </Style.Animations>
   </Style>
 
   <Style Selector="TextBlock.navigation-glyph">

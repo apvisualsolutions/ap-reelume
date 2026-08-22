@@ -33,6 +33,40 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// </remarks>
 public sealed class ShellOverflowTests
 {
+    /// <summary>
+    /// The bar the window extends into and the row the shell draws there are the same 44.
+    /// </summary>
+    /// <remarks>
+    /// Two halves of one number, in two languages: the window asks the platform for the height and
+    /// the shell paints a row into it. A row shorter than the extended area leaves the system's
+    /// caption hanging over the content; a taller one puts the brand below where the buttons are
+    /// drawn. Neither shows up in any other gate, and both were only ever going to be found by
+    /// opening the application.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_title_bar_row_is_the_height_the_window_extends_into()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
+
+        var shell = new ShellView();
+        var window = new Window { Width = 1200, Height = 800, Content = shell };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var root = shell.GetVisualDescendants().OfType<Grid>().First(grid => grid.RowDefinitions.Count > 0);
+        Assert.Equal(App.TitleBarHeight, root.RowDefinitions[0].Height.Value);
+        Assert.True(root.RowDefinitions[0].Height.IsAbsolute);
+
+        // And the chrome the window is given actually carries that number.
+        App.ApplyDesignedChrome(window);
+        Assert.True(window.ExtendClientAreaToDecorationsHint);
+        Assert.Equal(App.TitleBarHeight, window.ExtendClientAreaTitleBarHeightHint);
+        Assert.Throws<ArgumentNullException>(() => App.ApplyDesignedChrome(null!));
+
+        window.Close();
+    }
+
     [AvaloniaFact]
     public void No_surface_the_shell_mounts_is_drawn_past_the_right_edge()
     {

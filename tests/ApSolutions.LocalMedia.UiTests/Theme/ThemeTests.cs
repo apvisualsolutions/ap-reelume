@@ -82,6 +82,14 @@ public sealed class ThemeTests
         Assert.Equal(false, GetProperty(harness.Service, "AnimationsEnabled"));
         Assert.Equal(TimeSpan.Zero, GetProperty(harness.Service, "MotionDuration"));
         Assert.Equal(ThemeVariant.Light, Avalonia.Application.Current!.RequestedThemeVariant);
+
+        // And the half that reaches the animations. They cannot ask a service anything — they read a
+        // resource — so the service writes the resource, and that write is what reduced motion is.
+        // Asserting only the property would leave every animation running at 160 ms with a green
+        // test beside it.
+        Assert.Equal(
+            TimeSpan.Zero,
+            Assert.IsType<TimeSpan>(Avalonia.Application.Current.Resources["MotionDuration"]));
     }
 
     /// <summary>The other half: with motion allowed, the duration is short rather than absent.</summary>
@@ -101,6 +109,16 @@ public sealed class ThemeTests
         Assert.Equal(true, GetProperty(harness.Service, "AnimationsEnabled"));
         var duration = Assert.IsType<TimeSpan>(GetProperty(harness.Service, "MotionDuration"));
         Assert.InRange(duration.TotalMilliseconds, 1, 250);
+
+        // The service holds no number of its own any more: it reads the token the animations read,
+        // and writes it back. Compared against the declared value rather than against 160, so the
+        // day the design moves it there is one place to change.
+        Assert.True(
+            Avalonia.Application.Current!.TryGetResource(
+                "MotionDuration",
+                Avalonia.Application.Current.ActualThemeVariant,
+                out var declared));
+        Assert.Equal(declared, duration);
     }
 
     [AvaloniaFact]
