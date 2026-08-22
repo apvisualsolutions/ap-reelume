@@ -115,6 +115,36 @@ public sealed class LibraryGridTests
         window.Close();
     }
 
+    /// <summary>
+    /// A grid that was hidden when the window was sized still counts its columns when it appears.
+    /// </summary>
+    /// <remarks>
+    /// This is how the library is actually mounted: the shell opens on Home, so <c>LibraryView</c> is
+    /// in the tree with <c>IsVisible</c> false and is never measured. If the column count only ever
+    /// came from a resize, somebody who opened the library and never touched the window would see one
+    /// column of cards — the state the model starts in — and nothing in this suite would have said so,
+    /// because every other test here sets the data context before showing the window.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task A_grid_that_appears_after_the_window_was_sized_still_counts_its_columns()
+    {
+        var viewModel = await BrowseAsync(24);
+        var view = new LibraryView { IsVisible = false };
+        var window = new Window { Width = 1352, Height = 1000, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(1, viewModel.Columns);
+
+        view.DataContext = viewModel;
+        view.IsVisible = true;
+        Dispatcher.UIThread.RunJobs();
+        window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(8, viewModel.Columns);
+        window.Close();
+    }
+
     [AvaloniaFact]
     public async Task The_grid_reflows_with_the_window_and_never_draws_past_its_edge()
     {
