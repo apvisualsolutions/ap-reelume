@@ -1,6 +1,29 @@
 # Where to resume
 
-## State on opening (2026-08-20, end of the afternoon session)
+## State on opening (2026-08-22)
+
+**Tranches 7 and 8 are closed. Only tranche 9 is left: the four animations, still 0 in the tree.**
+The Spanish note is the one kept current — read [NEXT-SESSION.es.md](NEXT-SESSION.es.md) for the
+detail. What matters in either language:
+
+- **`RootOnboardingView` closed tranche 7.** Three buttons set a kind no view painted; a label written
+  in both languages that only the screen reader heard; a refusal, a folder removal and a request for
+  permission all wearing one brush; and the fourth form SURFACES lists — no roots at all — with
+  nothing to paint, which is how the screen starts.
+- **A control could be seen and could not be pressed.** Growing that view by 25 px put "Review
+  versions" at y=939 with a height of 36 inside a viewer whose viewport ended at 952: thirteen pixels
+  in, its middle out, so the click reached the shell behind. The library stack gained a bottom margin.
+- **And the harness was blind, not wrong.** `Fits` asked the window alone, and a scroller clips its
+  content, so `Reveal` scrolled nothing and eight presses went to whatever the clip left behind. It
+  now asks every viewer between the control and the window, which hardens the gate rather than
+  loosening it. Three consecutive full passes, 135/135, ledger at 0 pending.
+- **`UpdateView` closed untouched, measured**: fourteen states, seven rejections and the confirmation
+  notice already carry the four grammars, and the ten-value rejection map closes with no hole.
+- **The failure screen offered another version to somebody who had one file**, because the recovery
+  was decided by failure code alone. Fixed. The button §4 asks for is deliberately not made, and the
+  measurement is written down in the evidence.
+
+### What the previous note said (2026-08-20, end of the afternoon session)
 
 **`main` and the branch are level, CI green, working tree clean, nothing in flight.** Phase 6 has
 started: **tranche 1 (Shell) is done** and **tranche 2 (Home) is measured** without writing code.
