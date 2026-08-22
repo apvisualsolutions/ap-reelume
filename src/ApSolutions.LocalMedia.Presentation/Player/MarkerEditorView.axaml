@@ -17,7 +17,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <StackPanel x:Name="MarkerEditorSurface" Spacing="{DynamicResource Space12}">
     <TextBlock
         x:Name="MarkerEditorHeadline"
-        Foreground="{DynamicResource TextPrimaryBrush}"
+        Foreground="{DynamicResource PlayerTextBrush}"
         Text="{DynamicResource MarkerEditorDescription}"
         TextWrapping="Wrap" />
     <StackPanel
@@ -27,7 +27,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock FontWeight="SemiBold" Text="{DynamicResource MarkersEmptyTitle}" />
       <TextBlock
           FontSize="{DynamicResource FontSizeCaption}"
-          Foreground="{DynamicResource TextSecondaryBrush}"
+          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
           Text="{DynamicResource MarkersEmptyDescription}"
           TextWrapping="Wrap" />
     </StackPanel>
@@ -100,14 +100,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <TextBlock
         x:Name="MarkerRangeErrorText"
         IsVisible="{Binding HasRangeError}"
-        Foreground="{DynamicResource TextPrimaryBrush}"
+        Foreground="{DynamicResource PlayerTextBrush}"
         Text="{DynamicResource MarkerEditorRangeError}"
         TextWrapping="Wrap" />
 
     <TextBlock
         x:Name="MarkerOverlapErrorText"
         IsVisible="{Binding HasOverlapError}"
-        Foreground="{DynamicResource TextPrimaryBrush}"
+        Foreground="{DynamicResource PlayerTextBrush}"
         Text="{DynamicResource MarkerEditorOverlapError}"
         TextWrapping="Wrap" />
 

@@ -36,6 +36,8 @@ public sealed class ContrastTokenTests
         "PlayerChromeBrush",
         "PlayerPanelBrush",
         "PlayerHairlineBrush",
+        "PlayerTextBrush",
+        "PlayerTextSecondaryBrush",
         "NavigationSurfaceBrush",
         "CardSurfaceBrush",
         "ControlFillBrush",
@@ -100,6 +102,27 @@ public sealed class ContrastTokenTests
             })
             {
                 AssertContrastAtLeast(brushes, "TextPrimaryBrush", surface, TextMinimum, $"{theme} primary text on {surface}");
+            }
+
+            // The player's own three surfaces, which this gate did not measure until 2026-08-22 -
+            // and the hole was exactly the shape of the defect: primary text on PlayerSurfaceBrush
+            // read 1.10:1 in Light, so the track pickers, the marker list and the versions panel
+            // were unreadable on any machine whose Windows is set to light. The player's ink is its
+            // own pair of tokens because its surfaces are dark in all four modes while
+            // TextPrimaryBrush is dark in two of them.
+            // The chrome band is not in this list because it is translucent in Light and Dark, and a
+            // ratio against a translucent token is a guess at what it is drawn over. What it is drawn
+            // over is the player surface, which is here, and in the two high contrasts it is that
+            // surface exactly - asserted one test below.
+            foreach (var surface in new[] { "PlayerSurfaceBrush", "PlayerPanelBrush" })
+            {
+                AssertContrastAtLeast(brushes, "PlayerTextBrush", surface, TextMinimum, $"{theme} player ink on {surface}");
+                AssertContrastAtLeast(
+                    brushes,
+                    "PlayerTextSecondaryBrush",
+                    surface,
+                    TextMinimum,
+                    $"{theme} player secondary ink on {surface}");
             }
 
             AssertContrastAtLeast(brushes, "TextSecondaryBrush", "ShellSurfaceBrush", TextMinimum, $"{theme} secondary text");

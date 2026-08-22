@@ -139,6 +139,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Padding="20,14,20,16"
         VerticalAlignment="Bottom"
         Background="{DynamicResource PlayerChromeBrush}"
+        TextElement.Foreground="{DynamicResource PlayerTextBrush}"
         BorderBrush="{DynamicResource PlayerHairlineBrush}"
         BorderThickness="0,1,0,0"
         Opacity="{Binding ControlsOpacity}"
@@ -203,27 +204,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <TextBlock
               VerticalAlignment="Center"
               IsVisible="{Binding IsIdle}"
-              Foreground="{DynamicResource TextPrimaryBrush}"
+              Foreground="{DynamicResource PlayerTextBrush}"
               Text="{DynamicResource PlayerStateIdle}" />
           <TextBlock
               VerticalAlignment="Center"
               IsVisible="{Binding IsOpening}"
-              Foreground="{DynamicResource TextPrimaryBrush}"
+              Foreground="{DynamicResource PlayerTextBrush}"
               Text="{DynamicResource PlayerStateOpening}" />
           <TextBlock
               VerticalAlignment="Center"
               IsVisible="{Binding IsPlaying}"
-              Foreground="{DynamicResource TextPrimaryBrush}"
+              Foreground="{DynamicResource PlayerTextBrush}"
               Text="{DynamicResource PlayerStatePlaying}" />
           <TextBlock
               VerticalAlignment="Center"
               IsVisible="{Binding IsPaused}"
-              Foreground="{DynamicResource TextPrimaryBrush}"
+              Foreground="{DynamicResource PlayerTextBrush}"
               Text="{DynamicResource PlayerStatePaused}" />
           <TextBlock
               VerticalAlignment="Center"
               IsVisible="{Binding IsStopped}"
-              Foreground="{DynamicResource TextPrimaryBrush}"
+              Foreground="{DynamicResource PlayerTextBrush}"
               Text="{DynamicResource PlayerStateStopped}" />
         </WrapPanel>
       </StackPanel>

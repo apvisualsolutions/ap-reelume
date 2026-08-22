@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock FontWeight="SemiBold" Text="{DynamicResource PlayerVersionsEmptyTitle}" />
       <TextBlock
           FontSize="{DynamicResource FontSizeCaption}"
-          Foreground="{DynamicResource TextSecondaryBrush}"
+          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
           Text="{DynamicResource PlayerVersionsEmptyDescription}"
           TextWrapping="Wrap" />
     </StackPanel>
