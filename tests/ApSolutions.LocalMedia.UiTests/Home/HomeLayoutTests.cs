@@ -19,6 +19,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
@@ -187,7 +188,7 @@ public sealed class HomeLayoutTests
         var film = await CreateViewModelAsync(MovieProgress());
         Assert.False(film.HasResumeSubtitle);
         Assert.Equal(string.Empty, film.ResumeSubtitle);
-        Assert.False(film.InProgress[0].HasSubtitle);
+        Assert.False(film.InProgress[0].HasCaption);
         Assert.False(film.InProgress[0].IsShow);
 
         var empty = await CreateViewModelAsync();
@@ -204,9 +205,9 @@ public sealed class HomeLayoutTests
 
         var card = Assert.Single(viewModel.InProgress);
         Assert.True(card.IsShow);
-        Assert.True(card.HasSubtitle);
-        Assert.Contains("1", card.Subtitle, StringComparison.Ordinal);
-        Assert.Contains("2", card.Subtitle, StringComparison.Ordinal);
+        Assert.True(card.HasCaption);
+        Assert.Contains("1", card.CaptionText, StringComparison.Ordinal);
+        Assert.Contains("2", card.CaptionText, StringComparison.Ordinal);
         Assert.Equal("20", card.CompletedText);
         Assert.Equal(ContentKey.ForEpisode(Show, Episode), card.Content);
         Assert.Equal(Show, card.TitleId);
@@ -325,8 +326,12 @@ public sealed class HomeLayoutTests
     /// decides whether either reaches the screen, which is the house defect wearing a setter.
     /// </para>
     /// <para>
-    /// The bar is asserted to be <b>last</b>, because the design has it under the card rather than in
-    /// the middle of it, and a rule about position that only checks existence passes either way.
+    /// Its <b>position</b> is asserted and not merely its existence, because a rule about where
+    /// something sits passes either way if all it checks is that the thing is there. §4 puts the bar
+    /// "at the foot of each poster", so what is asserted is that it is inside the artwork, aligned to
+    /// its bottom, and as wide as the artwork is: under the card it would be a fourth line of text
+    /// rather than a rule across the picture. It used to be the last child of the card, which is
+    /// where it lived before <c>PosterCardView</c> existed.
     /// </para>
     /// </remarks>
     [AvaloniaFact]
@@ -349,9 +354,15 @@ public sealed class HomeLayoutTests
         Assert.Contains(ThemeColour("AccentBrush"), painted);
         Assert.Contains(ThemeColour("ControlFillBrush"), painted);
 
-        var card = bar.GetVisualAncestors().OfType<StackPanel>().First();
-        var siblings = card.Children.OfType<Control>().Where(child => child.IsVisible).ToArray();
-        Assert.Same(bar, siblings[^1]);
+        var artwork = Assert.Single(
+            bar.GetVisualAncestors().OfType<Border>(),
+            border => border.Background is ISolidColorBrush fill
+                && fill.Color == ThemeColour("ControlFillBrush"));
+        Assert.Equal(VerticalAlignment.Bottom, bar.VerticalAlignment);
+        Assert.Equal(artwork.Bounds.Width - artwork.BorderThickness.Left * 2, bar.Bounds.Width);
+        var barBottom = bar.TranslatePoint(new Point(0, bar.Bounds.Height), artwork);
+        Assert.NotNull(barBottom);
+        Assert.Equal(artwork.Bounds.Height - artwork.BorderThickness.Bottom, barBottom!.Value.Y);
     }
 
     [Fact]
@@ -377,11 +388,11 @@ public sealed class HomeLayoutTests
 
         Assert.True(viewModel.HasRecentlyAdded);
         Assert.Equal(2, viewModel.RecentlyAdded.Count);
-        Assert.True(viewModel.RecentlyAdded[0].HasYear);
-        Assert.Equal("2016", viewModel.RecentlyAdded[0].YearText);
+        Assert.True(viewModel.RecentlyAdded[0].HasCaption);
+        Assert.Equal("2016", viewModel.RecentlyAdded[0].CaptionText);
         Assert.True(viewModel.RecentlyAdded[0].IsAvailable);
-        Assert.False(viewModel.RecentlyAdded[1].HasYear);
-        Assert.Equal(string.Empty, viewModel.RecentlyAdded[1].YearText);
+        Assert.False(viewModel.RecentlyAdded[1].HasCaption);
+        Assert.Equal(string.Empty, viewModel.RecentlyAdded[1].CaptionText);
         Assert.True(viewModel.RecentlyAdded[1].IsShow);
         Assert.False(viewModel.RecentlyAdded[1].IsAvailable);
         Assert.Equal(Movie, viewModel.RecentlyAdded[0].Id);

@@ -9,6 +9,7 @@ using ApSolutions.LocalMedia.Application.Home;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Presentation.Commands;
+using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 
 namespace ApSolutions.LocalMedia.Presentation.Home;
@@ -169,7 +170,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
 }
 
 /// <summary>One card of the in-progress rail. An unreachable file is shown, never quietly dropped.</summary>
-public sealed class InProgressItemViewModel(InProgressItem item)
+public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard
 {
     private readonly InProgressItem _item = item ?? throw new ArgumentNullException(nameof(item));
 
@@ -179,15 +180,21 @@ public sealed class InProgressItemViewModel(InProgressItem item)
 
     public string Title => _item.Title;
 
-    public string Subtitle => _item is { SeasonNumber: { } season, EpisodeNumber: { } episode }
+    /// <summary>Season and episode for a series, empty for a film; never a path or a file name.</summary>
+    public string CaptionText => _item is { SeasonNumber: { } season, EpisodeNumber: { } episode }
         ? string.Create(CultureInfo.CurrentCulture, $"T{season} · E{episode}")
         : string.Empty;
 
-    public bool HasSubtitle => Subtitle.Length > 0;
+    public bool HasCaption => CaptionText.Length > 0;
 
     public bool IsAvailable => _item.IsAvailable;
 
     public bool IsShow => _item.Kind == CatalogTitleKind.Show;
+
+    public string Initials => PosterInitials.From(Title);
+
+    /// <summary>The one rail that reads the fraction, which is why the card can draw a bar at all.</summary>
+    public bool HasKnownProgress => true;
 
     public double CompletedFraction => _item.CompletedFraction;
 
@@ -195,7 +202,7 @@ public sealed class InProgressItemViewModel(InProgressItem item)
 }
 
 /// <summary>One card of the recently added rail.</summary>
-public sealed class RecentlyAddedItemViewModel(RecentlyAddedItem item)
+public sealed class RecentlyAddedItemViewModel(RecentlyAddedItem item) : IPosterCard
 {
     private readonly RecentlyAddedItem _item = item ?? throw new ArgumentNullException(nameof(item));
 
@@ -203,13 +210,20 @@ public sealed class RecentlyAddedItemViewModel(RecentlyAddedItem item)
 
     public string Title => _item.Title;
 
-    public string YearText => _item.Year is { } year
+    public string CaptionText => _item.Year is { } year
         ? year.ToString(CultureInfo.CurrentCulture)
         : string.Empty;
 
-    public bool HasYear => _item.Year is not null;
+    public bool HasCaption => _item.Year is not null;
 
     public bool IsAvailable => _item.IsAvailable;
 
     public bool IsShow => _item.Kind == CatalogTitleKind.Show;
+
+    public string Initials => PosterInitials.From(Title);
+
+    /// <summary>What was just added has not been watched yet, so there is no bar to draw.</summary>
+    public bool HasKnownProgress => false;
+
+    public double CompletedFraction => 0;
 }
