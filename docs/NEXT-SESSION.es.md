@@ -2,7 +2,7 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `24044cc`, verde; la rama por delante con el tramo 6 a dos vistas de cerrar.** La fase 6 va por **5 tramos
+**`main` en `99c94bf`, verde; al tramo 6 le quedan las dos del catálogo.** La fase 6 va por **5 tramos
 de 9 cerrados**
 —Shell, Inicio, Biblioteca y fichas, el Reproductor entero y **Ajustes**—:
 `AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del
@@ -153,7 +153,7 @@ ficha se titula con un identificador.
 |---|---|---|
 | ~~`ReviewInboxView`~~ **HECHA** ([evidencia](evidence/stable/audit-review-inbox-empty.md)) | bandeja vacía en `PositiveSurfaceBrush` con glifo — **es el estado deseable** | `IsEmpty` llevaba en el modelo desde siempre **sin un lector**, y los dos pinceles `Positive*` estaban declarados en los cuatro temas **sin gastarlos nadie**. El estado «cargando» **no se hace**: nada en el modelo sabe que lo está |
 | `CandidateCardView` | portada 92 px + título + año + puntuación, acciones en `WrapPanel` | **no hay portada** (decidido fuera de 0.2.0) y **no hay acciones en la ficha**; su borde usa `SystemControlForegroundBaseMediumBrush`, una clave del tema Fluent y no `ShellBorderBrush` |
-| `DuplicateReviewView` | `UniformGrid` de 2 columnas, la diferencia en monoespaciado, vacío con cadena nueva | `ItemsControl` en una columna, sin monoespaciado, sin vacío; y su `Border` tiene `BorderThickness="1"` **sin `BorderBrush`** |
+| ~~`DuplicateReviewView`~~ **HECHA** ([evidencia](evidence/stable/audit-duplicate-review.md)) | `UniformGrid` de 2 columnas, la diferencia en monoespaciado, vacío con cadena nueva | Dos columnas y monoespaciado hechos, y el `Border` gana su pincel. **El vacío se rechaza**: `GroupMediaVersions` lanza con menos de dos versiones y la vista sólo se monta con grupo, así que esa cadena no la vería nadie — décima discrepancia |
 | ~~`MetadataEditorView`~~ **HECHA** ([evidencia](evidence/stable/audit-metadata-editor.md)) | los 3 mensajes a bloques con glifo: conflicto y sin identificar en `WarningSurfaceBrush`, sin respuesta como dato neutro | **No pueden solaparse**: los tres salen del mismo `result.Outcome` en el mismo método — novena discrepancia §4↔árbol, y de la buena. Se separan igual, porque la garantía vive en un método privado. Y la medición encontró **ocho `TextBox` sin etiqueta a la vista**, con sus ocho cadenas ya existentes |
 | ~~`RenamePreviewView`~~ **HECHA** ([evidencia](evidence/stable/audit-rename-preview.md)) | origen y destino monoespaciados; el `→` se queda con su nombre accesible | Las dos rutas se truncaban por el **final**, que es el nombre del archivo — lo único que cambia. Van a `PathSegmentEllipsis`, que quita del medio. **`FontFamilyMono` se declara por fin**: tres consumidores. ⚠ **Queda `RenameConflict.Detail`**, que pinta una frase inglesa de `SafeFileRenamer` o una ruta pelada, mientras `RenameConflictKind` no lo pinta nadie |
 | `PersonalActionsView`, `WatchStatusControl` | `○ ◐ ●` se quedan y ganan el tamaño óptico de los glifos Fluent | por medir |

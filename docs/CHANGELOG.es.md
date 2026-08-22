@@ -156,6 +156,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   es.** Estar vacía significa que AP Reelume identificó todo lo que encontró sin necesitar tu ayuda;
   antes era un panel en blanco, que parece más bien que algo no cargó.
 
+### Cambiado
+
+- **Los duplicados se comparan lado a lado.** Las copias del mismo título se apilaban una debajo de
+  otra, así que compararlas era desplazarse entre ellas — que es justo lo que esa pantalla existe para
+  evitar. Ahora van en dos columnas, con las cifras de calidad en ancho fijo para que se lean unas
+  debajo de otras, y una tercera copia baja sola a la fila siguiente.
+
 ### Corregido
 
 - **La vista previa de renombrado escondía justo la parte que cambia.** Las dos rutas se cortaban por

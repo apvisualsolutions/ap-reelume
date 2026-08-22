@@ -155,6 +155,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   An empty tray means AP Reelume identified everything it found without needing you; it used to be a
   blank panel, which reads more like something failed to load.
 
+### Changed
+
+- **Duplicates are compared side by side.** Copies of the same title were stacked one under another,
+  so comparing them meant scrolling between them — which is what that screen exists to avoid. They now
+  sit in two columns, with the quality figures in a fixed-width font so they line up under each other,
+  and a third copy drops to the next row on its own.
+
 ### Fixed
 
 - **The rename preview was hiding the part that changes.** Both paths were cut off at the end, and the
