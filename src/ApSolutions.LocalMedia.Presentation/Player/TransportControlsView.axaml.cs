@@ -46,4 +46,45 @@ public sealed partial class TransportControlsView : UserControl
 
         GuardedEvent.Run(() => viewModel.SetVolumeAsync(requested));
     }
+
+    /// <summary>
+    /// Carries a position chosen on the scrubber to the session that is playing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The same shape as the volume, and it exists for the same reason: <c>SeekAsync</c> had callers
+    /// in the keyboard and in the skip buttons and none on a bar, because there was no bar. Nothing
+    /// in this application could take somebody to a chosen minute of a film with a pointer.
+    /// </para>
+    /// <para>
+    /// Both sides are rounded to whole seconds, which is what keeps this from looping <em>and</em>
+    /// from firing on its own: the engine's position arrives in fractions and the one-way binding
+    /// writes each of them into the thumb, so an exact comparison would call a seek on every tick of
+    /// playback — a seek to where the session already is, several times a second.
+    /// </para>
+    /// </remarks>
+    private void OnPositionChanged(object? sender, RangeBaseValueChangedEventArgs e)
+    {
+        if (DataContext is not TransportControlsViewModel viewModel)
+        {
+            return;
+        }
+
+        // A bar whose maximum is not the file's length has not finished being told what it is, and a
+        // value that arrived while that was true is a clamp rather than a choice. This is the second
+        // half of the same defect the notification order above describes: with only the order fixed,
+        // any future path that set Value before Maximum would seek somebody's film to one second.
+        if (sender is Slider slider && Math.Abs(slider.Maximum - viewModel.DurationSeconds) > 0.5)
+        {
+            return;
+        }
+
+        var requested = Math.Round(e.NewValue);
+        if (Math.Abs(requested - Math.Round(viewModel.PositionSeconds)) < 0.5)
+        {
+            return;
+        }
+
+        GuardedEvent.Run(() => viewModel.SeekAsync(TimeSpan.FromSeconds(requested)));
+    }
 }

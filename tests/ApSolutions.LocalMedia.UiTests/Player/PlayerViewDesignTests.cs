@@ -47,8 +47,19 @@ public sealed class PlayerViewDesignTests
     private static readonly string[] LeadingAction = ["PlayerRecoveryRetry"];
 
     /// <summary>The three surfaces the redesign gives a corner to.</summary>
+    /// <summary>
+    /// The two surfaces on the player that are cards, and therefore have corners.
+    /// </summary>
+    /// <remarks>
+    /// <c>TransportControlsSurface</c> was the third until 2026-08-22, when it stopped being a card:
+    /// it was a floating panel with a 16 px margin on all four sides and the picture showed through
+    /// underneath it on the left and the right, where the prototype draws a band across the whole
+    /// foot. A band meets three edges of the window, and a rounded corner meeting a straight window
+    /// edge is a gap. It is asserted below to have <b>no</b> corner rather than dropped from the list
+    /// in silence — the second half is what would otherwise rot.
+    /// </remarks>
     private static readonly string[] BorderedSurfaces =
-        ["PlayerFailureSurface", "AudioAbsenceNotice", "TransportControlsSurface"];
+        ["PlayerFailureSurface", "AudioAbsenceNotice"];
 
     /// <summary>The large transport's own three, which take the chrome the mini player defined.</summary>
     private static readonly string[] TransportChrome =
@@ -293,6 +304,15 @@ public sealed class PlayerViewDesignTests
             Assert.True(border is not null, $"{name} is not on the player surface.");
             Assert.Equal(expected, border!.CornerRadius);
         }
+
+        // And the band, which is the opposite assertion and the reason it left the list above: it
+        // runs to three edges of the window, and only its top edge is drawn.
+        var band = view.GetVisualDescendants()
+            .OfType<Border>()
+            .SingleOrDefault(candidate => candidate.Name == "TransportControlsSurface");
+        Assert.True(band is not null, "The transport band is not on the player surface.");
+        Assert.Equal(default, band!.CornerRadius);
+        Assert.Equal(new Thickness(0, 1, 0, 0), band.BorderThickness);
 
         window.Close();
     }

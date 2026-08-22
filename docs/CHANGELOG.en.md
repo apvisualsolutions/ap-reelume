@@ -10,6 +10,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The player says where you are and how much is left, and its transport is a band rather than a
+  card.** The model had a position bar all along — position, duration and a jump to a chosen minute —
+  and **nothing painted it**: all three were read on every state change and thrown away, so somebody
+  watching a film could not see where they were in it or take it somewhere else with a pointer. It is
+  there now, elapsed on the left and length on the right, with **the hour shown only when there is
+  one**. Below it the controls sit on one line, with the volume level written as a number — which was
+  also missing — and the speed. The bar **stays away until the engine says how long the file is**: a
+  thumb halfway along a bar of unknown length points at nothing, and a greyed bar would say "not for
+  you" where the truth is "not yet".
+
+
 - **«Add media», at the foot of the navigation rail.** It is what the prototype puts there and the
   first thing somebody opening the application with an empty library needs. It goes to the screen a
   folder is added on **and arrives with the form empty**, which is the half that tells it apart from
@@ -202,6 +213,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   reachable right now.
 
 ### Fixed
+
+- **The position bar could take playback to second one by itself.** It never shipped: it was
+  measured while writing its test, the same day the bar arrived. An Avalonia `Slider` clamps whatever
+  is written into its value against the maximum it holds **at that instant**, and the model announced
+  the position before the duration — so 120 seconds went into a bar whose maximum was still 1, the bar
+  clamped them to 1, and the handler turned that clamp into a real seek. The first state after a
+  two-minute seek came back reading 0:01.
+
 
 - **Home stopped halfway and the rest was drawn outside the window.** "Recently added" and
   "You might like" existed, had their text in both languages and never reached the screen: the rail's

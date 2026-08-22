@@ -33,6 +33,8 @@ public sealed class ContrastTokenTests
     [
         "ShellSurfaceBrush",
         "PlayerSurfaceBrush",
+        "PlayerChromeBrush",
+        "PlayerHairlineBrush",
         "NavigationSurfaceBrush",
         "CardSurfaceBrush",
         "ControlFillBrush",
@@ -157,6 +159,38 @@ public sealed class ContrastTokenTests
                 Assert.Equal(brushes["ShellSurfaceBrush"], brushes[$"{state}SurfaceBrush"]);
                 Assert.Equal(brushes["ShellBorderBrush"], brushes[$"{state}BorderBrush"]);
             }
+        }
+    }
+
+    /// <summary>
+    /// The player's transport band is opaque and its edge is a real line in the two modes that ask
+    /// for one.
+    /// </summary>
+    /// <remarks>
+    /// In Light and Dark the band is the player surface at 90 % and its top edge is 10 % white, which
+    /// is what the prototype draws over a moving picture and is deliberately not measured here: what
+    /// sits behind a translucent band is a film, so it has whatever contrast that frame gives. High
+    /// contrast is the mode where that answer is not good enough — somebody asked the system for
+    /// edges they can see — so there both go solid, and here is where that is held.
+    /// </remarks>
+    [Fact]
+    public void High_contrast_gives_the_player_band_a_solid_surface_and_a_visible_edge()
+    {
+        var themes = LoadThemeBrushes();
+
+        foreach (var theme in new[] { "HighContrastLight", "HighContrastDark" })
+        {
+            var brushes = themes[theme];
+            Assert.Equal(brushes["PlayerSurfaceBrush"], brushes["PlayerChromeBrush"]);
+            Assert.Equal(
+                7,
+                brushes["PlayerChromeBrush"].Length);
+            AssertContrastAtLeast(
+                brushes,
+                "PlayerHairlineBrush",
+                "PlayerChromeBrush",
+                NonTextMinimum,
+                $"{theme} the edge of the player's transport band");
         }
     }
 

@@ -10,6 +10,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El reproductor dice dónde vas y cuánto queda, y su transporte es una franja y no una tarjeta.**
+  Había una barra de posición en el modelo desde siempre —posición, duración y el salto a un minuto
+  concreto— y **no se pintaba en ninguna parte**: se leía en cada cambio de estado y se tiraba, así
+  que quien veía una película no podía saber por dónde iba ni llevarla a otro punto con el ratón.
+  Ahora está, con el tiempo transcurrido a la izquierda y la duración a la derecha, y **la hora sólo
+  aparece cuando la hay**. Debajo, los mandos en una línea con el nivel de volumen escrito en cifras
+  —que tampoco estaba— y la velocidad. La barra **no aparece hasta que el motor dice cuánto dura el
+  archivo**: un cursor a mitad de una barra de longitud desconocida no señala nada, y una barra en
+  gris diría «no es para ti» donde la verdad es «todavía no».
+
+
 - **«Añadir medios», al pie del carril de navegación.** Es lo que el prototipo pone ahí y lo primero
   que necesita quien abre la aplicación con la biblioteca vacía. Lleva a la pantalla donde se añade
   una carpeta **y deja el formulario vacío al llegar**, que es la mitad que lo distingue del destino
@@ -205,6 +216,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   mucho, el año en un tono secundario y el aviso de que un medio no está disponible ahora mismo.
 
 ### Corregido
+
+- **La barra de posición podía llevarse la reproducción al segundo 1 ella sola.** No llegó a
+  publicarse: se midió al escribir su prueba, el mismo día que la barra. Un `Slider` de Avalonia
+  recorta lo que se escribe en su valor contra el máximo que tiene **en ese instante**, y el modelo
+  anunciaba la posición antes que la duración — así que los 120 segundos entraban en una barra cuyo
+  máximo seguía siendo 1, la barra los recortaba a 1, y el manejador convertía ese recorte en un
+  salto de verdad. El primer estado tras un salto a los dos minutos volvía leyendo 0:01.
+
 
 - **Inicio llegaba hasta la mitad y el resto se dibujaba fuera de la ventana.** «Añadido
   recientemente» y «Quizá te interese» existían, tenían su texto en los dos idiomas y no aparecían en

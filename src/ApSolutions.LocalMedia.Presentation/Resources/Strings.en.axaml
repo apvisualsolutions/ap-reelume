@@ -206,6 +206,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="TransportSkipForward">Skip forward</x:String>
   <x:String x:Key="TransportToggleMute">Mute</x:String>
   <x:String x:Key="TransportSpeedLabel">Playback speed</x:String>
+  <x:String x:Key="TransportPositionLabel">Playback position</x:String>
   <x:String x:Key="TransportVolumeLabel">Volume (percent)</x:String>
   <x:String x:Key="TransportBoostWarningTitle">Boosted volume</x:String>
   <x:String x:Key="TransportBoostWarningText">Volume is above 100%. The peak limiter is engaged to prevent distortion.</x:String>

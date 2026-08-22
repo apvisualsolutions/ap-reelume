@@ -1975,6 +1975,24 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => transport.VolumePercent,
             "clicking the volume slider never changed the level the session plays at");
 
+        // The scrubber, which arrived on 2026-08-22 and is the one control on this bar that says
+        // where in the film somebody is. The probe is the engine's position and not the thumb: a bar
+        // that moved its own thumb and left the session where it was is exactly the state the volume
+        // slider was in for four months.
+        //
+        // The session is sent near the end first, and that is the harness rather than the test: the
+        // walk presses a range control a quarter along, and after the two skips the playhead sat at
+        // roughly that quarter - so the click landed on the thumb itself, which starts a drag and
+        // changes no value. Measured here: "a click reaches Border inside thumb inside PART_Track".
+        Assert.True(transport.HasDuration, "The engine never said how long the file is, so there is no bar to press.");
+        await transport.SeekAsync(TimeSpan.FromSeconds(80), TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "TransportPositionLabel",
+            () => transport.Position,
+            "clicking the scrubber never moved the session to the chosen minute");
+
         await PressAsync(
             host,
             "PlayerStopAction",
