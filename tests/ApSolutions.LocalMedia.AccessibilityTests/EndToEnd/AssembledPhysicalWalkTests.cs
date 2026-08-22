@@ -4316,7 +4316,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     private static bool IsCommandControl(Control control) =>
         control is Button or CheckBox or ComboBox or Slider or Avalonia.Controls.Primitives.ToggleButton;
 
-    /// <summary>Whether the control's middle is inside the window as the layout has it.</summary>
+    /// <summary>Whether the control's middle is somewhere a click can actually land.</summary>
+    /// <remarks>
+    /// <para>
+    /// Inside the window, <b>and</b> inside every scroller between it and the window. Until
+    /// 2026-08-22 this asked the window alone, and that made it blind rather than wrong: a scroller
+    /// clips its content, so a control can sit well inside the window and be cut off by the viewer it
+    /// lives in. <c>Reveal</c> asks this before deciding whether to scroll, so a "yes" here meant it
+    /// scrolled nothing and the press went to whatever the clip left behind.
+    /// </para>
+    /// <para>
+    /// Measured the day it was found, in the walk's 1600x1000 window: Review versions sat at y=939
+    /// with a height of 36 inside a viewer whose viewport ended at 952. Its middle - 957 - was inside
+    /// the window and 5 px outside the viewer, so eight presses reached the shell's own Grid while
+    /// this function kept answering that the button was fine where it was.
+    /// </para>
+    /// </remarks>
     private static bool Fits(ShellHost host, Control control) =>
         RootOf(host, control) is { } window
         && control.TranslatePoint(
@@ -4325,7 +4340,16 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         && centre.X >= 0
         && centre.Y >= 0
         && centre.X < window.Bounds.Width
-        && centre.Y < window.Bounds.Height;
+        && centre.Y < window.Bounds.Height
+        && control.GetVisualAncestors().OfType<ScrollViewer>().All(scroller => IsInside(scroller, centre, window));
+
+    /// <summary>Whether a window point falls inside what this scroller is actually showing.</summary>
+    private static bool IsInside(ScrollViewer scroller, Point centre, Visual window) =>
+        scroller.TranslatePoint(new Point(0, 0), window) is not { } corner
+        || (centre.X >= corner.X
+            && centre.Y >= corner.Y
+            && centre.X <= corner.X + scroller.Viewport.Width
+            && centre.Y <= corner.Y + scroller.Viewport.Height);
 
     /// <summary>
     /// Presses a control with the mouse, at its centre in window coordinates, the way a person with a

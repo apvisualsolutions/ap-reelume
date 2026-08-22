@@ -25,6 +25,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootOnboardingTitle">Add your folders</x:String>
   <x:String x:Key="RootOnboardingDescription">AP Reelume catalogs videos in their original location. It never copies or moves them.</x:String>
   <x:String x:Key="RootListTitle">Library folders</x:String>
+  <x:String x:Key="RootListEmptyTitle">No folders yet</x:String>
+  <x:String x:Key="RootListEmptyDescription">Add the first one above: type its path, choose which kind it is and confirm. It will appear in this list.</x:String>
   <x:String x:Key="RootRemoveAction">Remove</x:String>
   <x:String x:Key="RootRemoveConfirmAccessibleName">Confirm removing the folder</x:String>
   <x:String x:Key="RootRemoveConfirmDescription">The folder is removed from the catalog. No video on disk is touched, and adding it again catalogs it anew.</x:String>

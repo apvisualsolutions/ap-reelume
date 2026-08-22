@@ -15,6 +15,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="OnboardingResourceKey" />
   </UserControl.Resources>
+  <!--
+    720 and not 620, which is the width of a settings section. The four full-screen views share this
+    one - StartupView, ReviewInboxView, DatabaseRecoveryView and this - and §4 itself calls the
+    recovery screen's column "the 720 px". Measured on 2026-08-22 rather than assumed.
+  -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="720" Spacing="{DynamicResource Space16}">
       <TextBlock
@@ -27,38 +32,84 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource RootOnboardingDescription}"
           TextWrapping="Wrap" />
-      <TextBox
-          automation:AutomationProperties.Name="{DynamicResource RootPathLabel}"
-          Text="{Binding Path}" />
-      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
+      <!--
+        The label is painted and not only announced. RootPathLabel was written in both languages and
+        spent by AutomationProperties.Name alone, so a screen reader said "folder path" and the
+        screen said nothing - the same defect the metadata editor had in eight fields, and this is
+        the shape that fixed it there.
+      -->
+      <StackPanel Spacing="{DynamicResource Space4}">
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource RootPathLabel}" />
+        <TextBox
+            automation:AutomationProperties.Name="{DynamicResource RootPathLabel}"
+            Text="{Binding Path}" />
+      </StackPanel>
+      <!--
+        A WrapPanel with a state circle on each, which is exactly what the theme and language pills
+        already are. Two things were wrong with three plain buttons in a horizontal stack.
+
+        Nothing read SelectedKind: the command set it, no view painted it, and the field starts at
+        Local - so pressing USB changed the screen in no way at all, and there was never even an
+        empty moment to make the absence obvious.
+
+        And the container: a horizontal StackPanel offers its children infinite width and draws them
+        where they fall, which is how a control has left this window eight times. Measured on
+        2026-08-22 the three total 262 px in Spanish and 267 in English inside the 720 column, so
+        today they fit on one line - written down so nobody reverts this believing it buys space. It
+        does not; what it buys is that the length of these labels belongs to a translator.
+      -->
+      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
         <Button
+            Classes="theme-option"
             automation:AutomationProperties.Name="{DynamicResource RootKindLocal}"
             Command="{Binding SelectKindCommand}"
-            CommandParameter="{x:Static discovery:RootKind.Local}"
-            Content="{DynamicResource RootKindLocal}" />
+            CommandParameter="{x:Static discovery:RootKind.Local}">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <TextBlock Classes="state-glyph" Text="{Binding LocalStateCue}" />
+            <TextBlock Text="{DynamicResource RootKindLocal}" />
+          </StackPanel>
+        </Button>
         <Button
+            Classes="theme-option"
             automation:AutomationProperties.Name="{DynamicResource RootKindUsb}"
             Command="{Binding SelectKindCommand}"
-            CommandParameter="{x:Static discovery:RootKind.Usb}"
-            Content="{DynamicResource RootKindUsb}" />
+            CommandParameter="{x:Static discovery:RootKind.Usb}">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <TextBlock Classes="state-glyph" Text="{Binding UsbStateCue}" />
+            <TextBlock Text="{DynamicResource RootKindUsb}" />
+          </StackPanel>
+        </Button>
         <Button
+            Classes="theme-option"
             automation:AutomationProperties.Name="{DynamicResource RootKindUnc}"
             Command="{Binding SelectKindCommand}"
-            CommandParameter="{x:Static discovery:RootKind.Unc}"
-            Content="{DynamicResource RootKindUnc}" />
-      </StackPanel>
+            CommandParameter="{x:Static discovery:RootKind.Unc}">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <TextBlock Classes="state-glyph" Text="{Binding UncStateCue}" />
+            <TextBlock Text="{DynamicResource RootKindUnc}" />
+          </StackPanel>
+        </Button>
+      </WrapPanel>
       <Button
           Classes="primary-action"
           HorizontalAlignment="Left"
           automation:AutomationProperties.Name="{DynamicResource RootAddAction}"
           Command="{Binding AddRootCommand}"
           Content="{DynamicResource RootAddAction}" />
+      <!--
+        Warning and not accent. The three sentences this can hold are refusals that explain
+        themselves - "it is already in the library and nothing was changed", "choose one that does
+        not overlap", "check that it exists" - which is a thing to know rather than a thing that
+        broke. That is the surface the metadata editor's three messages already use.
+      -->
       <Border
           x:Name="RootAddFailureSurface"
           IsVisible="{Binding HasFailure}"
           Padding="12"
-          Background="{DynamicResource AccentSubtleBrush}"
-          BorderBrush="{DynamicResource ShellBorderBrush}"
+          Background="{DynamicResource WarningSurfaceBrush}"
+          BorderBrush="{DynamicResource WarningBorderBrush}"
           BorderThickness="1"
           CornerRadius="{DynamicResource CornerRadiusMedium}"
           automation:AutomationProperties.Name="{DynamicResource RootAddFailureAccessibleName}"
@@ -67,6 +118,51 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Foreground="{DynamicResource TextPrimaryBrush}"
             Text="{Binding FailureKey, Converter={StaticResource OnboardingResourceKey}}"
             TextWrapping="Wrap" />
+      </Border>
+      <!--
+        The first of the four forms SURFACES lists for this view, and the only one that had nothing
+        to paint: with an empty catalog the heading and the rows were simply absent, so the most
+        common state of the first-run screen said nothing at all.
+
+        Accent and not positive. An empty review inbox is an achievement and wears the positive
+        surface; an empty library is where everybody starts and there is something left to do, so
+        painting it as done would be saying the wrong thing.
+
+        A Grid and not a horizontal StackPanel, for the reason measured nine times here: a stack
+        offers infinite width, so wrapping text beside a glyph never wraps.
+      -->
+      <Border
+          x:Name="RootListEmptySurface"
+          IsVisible="{Binding HasNoRoots}"
+          Padding="16"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusMedium}"
+          automation:AutomationProperties.Name="{DynamicResource RootListEmptyTitle}"
+          automation:AutomationProperties.LiveSetting="Polite">
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock
+              Grid.Column="0"
+              Margin="0,0,12,0"
+              VerticalAlignment="Top"
+              FontWeight="Bold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="&#x2192;" />
+          <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
+            <TextBlock
+                FontWeight="SemiBold"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{DynamicResource RootListEmptyTitle}"
+                TextWrapping="Wrap" />
+            <TextBlock
+                MaxWidth="600"
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="{DynamicResource RootListEmptyDescription}"
+                TextWrapping="Wrap" />
+          </StackPanel>
+        </Grid>
       </Border>
       <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasRoots}">
         <TextBlock
@@ -81,15 +177,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <!--
               A grid, because a folder path is as long as somebody's folders are. A horizontal
               StackPanel offers its children infinite width, so the path took all it wanted and put
-              Remove at x=2146 in a 1600 px window — measured on 2026-08-16, and the fourth control
+              Remove at x=2146 in a 1600 px window - measured on 2026-08-16, and the fourth control
               in one day hidden by the same container.
+
+              The path wraps and is not trimmed, which is the opposite of what the restore wizard's
+              rows do, and the measurement is why. There the column is 600 wide and shared with a
+              text box; here the path has 649 px to itself. Measured on 2026-08-22 in the 720
+              column: 12 and 74 characters render identically either way, and only at 139 does
+              wrapping cost a second line - 33 px tall, inside the 36 the Remove button already
+              imposes, so the row does not grow at all. Trimming would buy nothing and cost the end
+              of the path, which is what tells two of somebody's folders apart.
               -->
               <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
                 <TextBlock
                     VerticalAlignment="Center"
+                    FontFamily="{DynamicResource FontFamilyMono}"
                     Foreground="{DynamicResource TextPrimaryBrush}"
                     Text="{Binding Path}"
-                    TextWrapping="Wrap" />
+                    TextWrapping="WrapWithOverflow" />
                 <Button
                     Grid.Column="1"
                     VerticalAlignment="Center"
@@ -102,22 +207,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </ItemsControl.ItemTemplate>
         </ItemsControl>
       </StackPanel>
+      <!--
+        Danger, which §4 asks for and which this tree already spends on three surfaces. Until now the
+        three borders on this screen were the same accent: a refusal, a folder about to leave the
+        catalog and a request for permission, all painted alike. This is the one of the three that
+        destroys something, and the only one asking somebody to authorise it.
+      -->
       <Border
           x:Name="RootRemoveConfirmationSurface"
           IsVisible="{Binding IsConfirmingRemoval}"
           Padding="16"
-          Background="{DynamicResource AccentSubtleBrush}"
-          BorderBrush="{DynamicResource ShellBorderBrush}"
+          Background="{DynamicResource DangerSurfaceBrush}"
+          BorderBrush="{DynamicResource DangerBorderBrush}"
           BorderThickness="1"
           CornerRadius="{DynamicResource CornerRadiusMedium}"
           automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}"
           automation:AutomationProperties.LiveSetting="Assertive">
         <StackPanel Spacing="{DynamicResource Space12}">
           <TextBlock
+              FontFamily="{DynamicResource FontFamilyMono}"
               FontWeight="SemiBold"
               Foreground="{DynamicResource TextPrimaryBrush}"
               Text="{Binding PendingRemovalPath}"
-              TextWrapping="Wrap" />
+              TextWrapping="WrapWithOverflow" />
           <TextBlock
               Foreground="{DynamicResource TextPrimaryBrush}"
               Text="{DynamicResource RootRemoveConfirmDescription}"
@@ -134,6 +246,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </StackPanel>
         </StackPanel>
       </Border>
+      <!--
+        Accent stays here, and that is decided rather than left over. This one is not a refusal and
+        not a destruction: the folder is saved and the screen is asking whether the first scan may
+        start. The recovery audit names this exact surface as what accent is for.
+      -->
       <Border
           IsVisible="{Binding InitialScanConsentRequired}"
           Padding="16"

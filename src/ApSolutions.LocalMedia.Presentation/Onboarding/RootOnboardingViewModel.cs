@@ -72,11 +72,33 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         set => SetField(ref _path, value ?? string.Empty);
     }
 
+    /// <summary>
+    /// Which of the three kinds the next folder will be added as.
+    /// </summary>
+    /// <remarks>
+    /// The three buttons that set this painted nothing back: no view read the property, so the kind
+    /// was chosen and the screen looked identical whichever one was pressed - and it starts at
+    /// <c>Local</c>, so there was never even a moment with nothing selected to make the absence
+    /// obvious. The three cues below are what the buttons now show, the same way the theme and
+    /// language pills already do it.
+    /// </remarks>
     public RootKind SelectedKind
     {
         get => _selectedKind;
-        set => SetField(ref _selectedKind, value);
+        set
+        {
+            SetField(ref _selectedKind, value);
+            OnPropertyChanged(nameof(LocalStateCue));
+            OnPropertyChanged(nameof(UsbStateCue));
+            OnPropertyChanged(nameof(UncStateCue));
+        }
     }
+
+    public string LocalStateCue => StateCue(RootKind.Local);
+
+    public string UsbStateCue => StateCue(RootKind.Usb);
+
+    public string UncStateCue => StateCue(RootKind.Unc);
 
     public ScanPolicy SelectedScanPolicy
     {
@@ -120,10 +142,21 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
             _rootRows = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(HasRoots));
+            OnPropertyChanged(nameof(HasNoRoots));
         }
     }
 
     public bool HasRoots => Roots.Count > 0;
+
+    /// <summary>
+    /// True while the catalog holds no folder at all, which is how this screen starts.
+    /// </summary>
+    /// <remarks>
+    /// SURFACES lists four forms for this view and "no roots" is the first of them. It was also the
+    /// only one with nothing to paint: with an empty list the heading and the rows were simply
+    /// absent, and the most common state of the first-run screen said nothing whatsoever.
+    /// </remarks>
+    public bool HasNoRoots => Roots.Count == 0;
 
     /// <summary>The folder whose removal is awaiting a person's confirmation, if any.</summary>
     public LibraryRootRowViewModel? PendingRemoval
@@ -250,6 +283,9 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         InitialScanConsentRequired = false;
         CanStartInitialScan = true;
     }
+
+    /// <summary>The circle this repository uses for "chosen", and the one it uses for "not".</summary>
+    private string StateCue(RootKind kind) => SelectedKind == kind ? "●" : "○";
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {

@@ -25,6 +25,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootOnboardingTitle">Añade tus carpetas</x:String>
   <x:String x:Key="RootOnboardingDescription">AP Reelume cataloga los vídeos en su ubicación original. Nunca los copia ni los mueve.</x:String>
   <x:String x:Key="RootListTitle">Carpetas de la biblioteca</x:String>
+  <x:String x:Key="RootListEmptyTitle">Todavía no hay ninguna carpeta</x:String>
+  <x:String x:Key="RootListEmptyDescription">Añade la primera aquí arriba: escribe su ruta, elige de qué tipo es y confírmala. Aparecerá en esta lista.</x:String>
   <x:String x:Key="RootRemoveAction">Retirar</x:String>
   <x:String x:Key="RootRemoveConfirmAccessibleName">Confirmar la retirada de la carpeta</x:String>
   <x:String x:Key="RootRemoveConfirmDescription">La carpeta se retira del catálogo. Ningún vídeo del disco se toca, y si vuelves a añadirla se cataloga de nuevo.</x:String>
