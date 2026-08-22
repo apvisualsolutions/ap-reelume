@@ -95,6 +95,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <FontFamily x:Key="FontFamilyMono">Consolas,Cascadia Mono,monospace</FontFamily>
 
       <!--
+        The pictograms, and the same rule the mono family follows: declared once now that two places
+        spend it - the player's chrome and the navigation rail - where one reader would have been the
+        defect this repository names.
+
+        Two families and not one. Segoe Fluent Icons ships with Windows 11, which is the only target
+        this application has; Segoe MDL2 Assets is its predecessor, carries the same codepoints in the
+        same places, and is on every Windows since 10. So a host that has only the older one draws the
+        same pictogram instead of the empty box a missing glyph paints.
+      -->
+      <FontFamily x:Key="FontFamilyIcons">Segoe Fluent Icons,Segoe MDL2 Assets</FontFamily>
+
+      <!--
         Four dictionaries, and every one of them carries the same twenty-three brushes. A brush missing
         from one theme falls back to whatever the base theme draws, which no contrast check covers,
         so ContrastTokenTests reads these dictionaries — the ones the application actually paints —
@@ -1086,17 +1098,48 @@ SPDX-License-Identifier: GPL-3.0-or-later
     a laptop trackpad. Raising it costs nothing here because the transport wraps.
   -->
   <!--
-    Two families and not one. Segoe Fluent Icons ships with Windows 11, which is the only target this
-    application has; Segoe MDL2 Assets is its predecessor, carries the same codepoints in the same
-    places, and is on every Windows since 10. So a host that has only the older one draws the same
-    pictogram instead of the empty box a missing glyph paints — and the fallback is asserted by
-    measuring both, because a font list nobody measured is a font list that quietly ends at $Default.
+    The font list moved to FontFamilyIcons when the navigation rail became the second thing that spends
+    it. The fallback it carries is asserted by measuring both, because a font list nobody measured is a
+    font list that quietly ends at $Default.
   -->
   <Style Selector="Button.player-chrome">
     <Setter Property="MinWidth" Value="44" />
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
-    <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
+  </Style>
+
+  <!--
+    The navigation rail of the redesign: 64 px of glyphs, where it used to be 248 px of words. The
+    destinations keep their AutomationProperties.Name, so a reader still hears "Biblioteca" and the
+    walk still presses the same five identities - only the Content changed, which is exactly the move
+    the mini player's chrome already made.
+
+    46 x 42 with a radius, from the prototype's own geometry, and the radius is CornerRadiusMedium
+    rather than the 12 it draws: this scale has two radii on purpose, and a third for one consumer is
+    the shape FontSizeMono was refused for.
+
+    The open destination is told by a fill AND a 3 px bar, which is two signals with one of them not
+    colour - the bar is present or absent rather than tinted. The hollow-and-filled circle that used
+    to be the second signal is gone with the words: a 64 px rail has room for one mark, and it is the
+    one that says which destination this is.
+  -->
+  <Style Selector="Button.navigation-destination">
+    <Setter Property="Width" Value="46" />
+    <Setter Property="Height" Value="42" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+  </Style>
+
+  <Style Selector="TextBlock.navigation-glyph">
+    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSubtitle}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
 
   <!--

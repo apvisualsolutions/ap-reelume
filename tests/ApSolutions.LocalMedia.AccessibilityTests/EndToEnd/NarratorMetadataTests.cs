@@ -204,18 +204,21 @@ public sealed class NarratorMetadataTests
     [AvaloniaFact]
     public void The_pieces_a_reader_hears_are_derived_and_never_written_back()
     {
-        var converter = new RouteStateConverter();
-        Assert.Equal("●", converter.Convert(AppRoute.Library, typeof(string), AppRoute.Library, Invariant));
-        Assert.Equal("○", converter.Convert(AppRoute.Home, typeof(string), AppRoute.Library, Invariant));
-        Assert.Equal("○", converter.Convert(null, typeof(string), AppRoute.Library, Invariant));
-        Assert.Equal("○", converter.Convert(AppRoute.Home, typeof(string), "not a route", Invariant));
+        // The ● / ○ mark went with the 248 px rail: 64 px of pictograms has room for one glyph, and it
+        // is the one that says which destination this is. What says a destination is open is now the
+        // fill and the 3 px bar, and IsCurrent is what both read.
+        var current = new RouteStateConverter { Kind = RouteStateKind.IsCurrent };
+        Assert.Equal(true, current.Convert(AppRoute.Library, typeof(bool), AppRoute.Library, Invariant));
+        Assert.Equal(false, current.Convert(AppRoute.Home, typeof(bool), AppRoute.Library, Invariant));
+        Assert.Equal(false, current.Convert(null, typeof(bool), AppRoute.Library, Invariant));
+        Assert.Equal(false, current.Convert(AppRoute.Home, typeof(bool), "not a route", Invariant));
 
         var status = new RouteStateConverter { Kind = RouteStateKind.Status };
         Assert.Equal(string.Empty, status.Convert(AppRoute.Home, typeof(string), AppRoute.Library, Invariant));
         Assert.False(string.IsNullOrWhiteSpace(
             status.Convert(AppRoute.Home, typeof(string), AppRoute.Home, Invariant)?.ToString()));
         Assert.Throws<NotSupportedException>(() =>
-            converter.ConvertBack("●", typeof(AppRoute), null, Invariant));
+            current.ConvertBack(true, typeof(AppRoute), null, Invariant));
 
         var available = new CatalogItemViewModel(CatalogEntry(isAvailable: true));
         var missing = new CatalogItemViewModel(CatalogEntry(isAvailable: false));
