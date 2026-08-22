@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La lupa dentro del campo de búsqueda y el `+` junto a «Añadir carpeta».** Los dos son del
+  prototipo y los dos cambian sólo lo que se dibuja: la lupa es **decoración y no control** —el campo
+  ya lleva el nombre accesible, y un segundo nombre ahí haría que un lector de pantalla dijera «Buscar
+  en la biblioteca» dos veces—, y el `+` va **al lado de la palabra y no en su lugar**, porque un
+  pictograma solo está bien en un carril de 64 px donde no cabe una palabra y mal en la única acción
+  de una pantalla que alguien ve por primera vez.
+
+
 - **El reproductor deja el carril a la vista, se pone cabecera propia y sólo ocupa la columna que
   usa.** Tres cosas que el prototipo dibuja y que aquí eran distintas: la sesión tapaba las dos
   columnas, así que **abrir una película se llevaba por delante los cinco destinos**; sus tres botones

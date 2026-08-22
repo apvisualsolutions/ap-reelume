@@ -68,11 +68,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Margin="0,16,0,12"
           ItemSpacing="{DynamicResource Space12}"
           LineSpacing="{DynamicResource Space8}">
-        <TextBox
-            Width="320"
-            automation:AutomationProperties.Name="{DynamicResource LibrarySearchLabel}"
-            Text="{Binding Search}"
-            PlaceholderText="{DynamicResource LibrarySearchPlaceholder}" />
+        <!--
+          The magnifier the prototype puts inside the field, and it is a decoration rather than a
+          control: the box already carries the accessible name, and the glyph does not take a click.
+          A Panel and not a Grid because the two overlap on purpose — the field's left padding is what
+          makes room for it, and both numbers live together in the theme.
+        -->
+        <Panel>
+          <TextBox
+              Classes="search-field"
+              Width="320"
+              automation:AutomationProperties.Name="{DynamicResource LibrarySearchLabel}"
+              Text="{Binding Search}"
+              PlaceholderText="{DynamicResource LibrarySearchPlaceholder}" />
+          <TextBlock Classes="search-adornment" Text="&#xE721;" />
+        </Panel>
         <!--
           Disabled rather than absent while the box is empty: it is one of a row of controls that
           stay put, and a button that comes and goes would move the three beside it every time

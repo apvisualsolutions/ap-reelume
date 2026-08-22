@@ -1151,6 +1151,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
     crossed from 9:59 to 10:00. Neither number belongs to a scale this repository tokenises - the
     three are the type sizes, the five spaces and the two radii - so this is where it is written.
   -->
+  <!--
+    The magnifier inside the search box, which the prototype draws at `left: 9` over a field padded to
+    34. It is a decoration and not a control: the box beside it already carries the accessible name, so
+    a second name here would have a screen reader say "Buscar en la biblioteca" twice, and
+    IsHitTestVisible="False" keeps a click on the glyph landing in the field where somebody aimed it.
+
+    Both numbers live here rather than in the view for the same reason the rail's 46 x 42 does: they
+    are a pair — the padding exists to leave room for the glyph — and a pair split across two files is
+    a pair that stops agreeing.
+  -->
+  <Style Selector="TextBox.search-field">
+    <Setter Property="Padding" Value="34,5,10,6" />
+  </Style>
+
+  <Style Selector="TextBlock.search-adornment">
+    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Margin" Value="10,0,0,0" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </Style>
+
   <Style Selector="TextBlock.transport-clock">
     <Setter Property="MinWidth" Value="58" />
     <Setter Property="VerticalAlignment" Value="Center" />

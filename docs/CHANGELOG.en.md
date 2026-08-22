@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The magnifier inside the search field and the `+` beside "Add folder".** Both come from the
+  prototype and both change only what is drawn: the magnifier is **decoration rather than a control**
+  — the field already carries the accessible name, and a second name there would have a screen reader
+  say "Search the library" twice — and the `+` sits **beside the word rather than instead of it**,
+  because a pictogram alone is right in a 64 px rail with no room for a word and wrong on the one
+  action of a screen somebody is seeing for the first time.
+
+
 - **The player leaves the rail in view, heads itself, and only takes the column it uses.** Three
   things the prototype draws and this did differently: the session covered both columns, so **opening
   a film took the five destinations away with it**; its three buttons — close, mini player and

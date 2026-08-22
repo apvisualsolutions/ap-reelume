@@ -76,3 +76,25 @@ The walk: 137 declared command controls in 136 identities; 136 pressed, 0 pendin
 
 El trinquete sigue en **0**. El bucle de destinos que sigue lee dónde está el shell en vez de que se
 le diga, así que ahora arranca desde Biblioteca sin que haya que tocarlo.
+
+## Y los otros dos iconos que la lista nombraba / The other two icons
+
+La cuarta pieza de la lista pedía «la lupa de la búsqueda y el `+` de añadir. Sin cadenas ni controles
+nuevos». Los dos están, y **cada uno resuelve una pregunta distinta sobre qué es un glifo**:
+
+- **La lupa es decoración, no control.** El prototipo la dibuja **dentro** del campo (`left: 9` sobre
+  un campo con 34 de relleno izquierdo), y aquí las dos cifras viven **juntas en el tema** —
+  `TextBox.search-field` y `TextBlock.search-adornment`— porque el relleno existe exactamente para
+  dejarle sitio al glifo, y una pareja repartida entre dos archivos es una pareja que deja de estar de
+  acuerdo. Lleva `IsHitTestVisible="False"`, así que un clic sobre el glifo aterriza en el campo donde
+  la persona apuntaba, y **no lleva nombre accesible**: el campo ya lo tiene, y un segundo nombre haría
+  que un lector dijese «Buscar en la biblioteca» dos veces.
+- **El `+` va al lado de la palabra, no en su lugar.** Es lo que el prototipo dibuja para ese botón
+  (`{{ icons.plus }}{{ addMediaLabel }}`), y es la distinción que importa: un pictograma solo está bien
+  en un carril de 64 px donde no cabe una palabra, y mal en la **única acción** de una pantalla que
+  alguien está viendo por primera vez. Va en un `Grid` y no en un `StackPanel` horizontal, por la razón
+  que este árbol ha medido nueve veces: un stack ofrece anchura infinita, así que una etiqueta
+  traducida junto a un glifo nunca envuelve — se sale por el lado.
+
+Medido en la aplicación abierta, en la ruta Biblioteca, con la ventana a 1792 × 1151 físicos. / Measured
+in the running application.

@@ -16,9 +16,14 @@
      nadie limpiaba al aceptar una carpeta (y que hacía que un segundo intento contestara «ya está en
      la biblioteca»), la negativa que sólo se borraba al acertar, y una retirada dejada a medio
      confirmar.
-2. **EL REPRODUCTOR — primer tramo hecho: el transporte.** Ver abajo lo que queda.
+2. **EL REPRODUCTOR — dos tramos hechos: el transporte y la cabecera.** Ver abajo lo que queda.
 3. **Ajustes, Revisión, Metadatos, Catálogo, Copias** — 16 vistas, sin tocar.
-4. **Los iconos de las demás vistas** — la lupa, el `+` — sin tocar.
+4. ~~**Los iconos de las demás vistas** — la lupa, el `+`.~~ **HECHOS los dos que la lista nombra.**
+   La lupa va **dentro** del campo, que es donde el prototipo la pone (`left: 9` sobre un campo con
+   34 de relleno izquierdo; las dos cifras viven juntas en el tema, porque el relleno existe para
+   dejarle sitio al glifo), y es **decoración**: `IsHitTestVisible="False"` y sin nombre accesible,
+   porque el campo ya lo lleva y un segundo nombre lo diría dos veces. El `+` va **al lado de la
+   palabra**, como el prototipo, no en su lugar.
 
 ### El reproductor: lo hecho y lo que queda, medido contra el prototipo
 
@@ -41,18 +46,20 @@ a 1, y el manejador convertía el recorte en un salto: **la barra movía la pel�
 por los dos lados —el orden de notificación y una guarda que compara el máximo con la duración—.
 Ninguno de los dos sobra.
 
+**El segundo tramo, también hecho:** la sesión **deja el carril a la vista** (`Grid.Column="1"`, que
+es el `left: 64` del prototipo — antes ocupaba las dos columnas y **abrir una película se llevaba los
+cinco destinos**), se pone **cabecera propia** con los tres botones de sesión convertidos en
+pictogramas (`E8BB`, `E73F`, `E740`, comprobados dibujados en un render), y la **columna de 320 sólo
+ocupa sitio cuando alguno de sus cinco paneles existe**.
+
 **Lo que queda del reproductor, en orden:**
 
-1. **La cabecera del prototipo**: `[✕] título · subtítulo [Sesión N] … [Audio][Subtítulos][Vídeo]
-   [Marcadores][mini][pantalla completa]`. Los tres botones de la derecha **ya existen** —
-   `PlayerCloseAction`, `PlayerMiniModeAction`, `PlayerFullscreenAction`— y hoy viven con palabras
-   dentro de la columna de 320; moverlos a una cabecera con glifos es la mitad barata.
-   - **⚠ El título NO se puede pintar todavía, y está medido**: `PlayerSurfaces` no lleva el título
-     del medio y `PlayerViewModel` sólo tiene `MediaPath`. Pintar una ruta como título es lo
-     contrario de lo que hace esta aplicación. Es la misma omisión declarada que el año de las
-     recomendaciones.
-2. **La columna de 320 pasa a ser un panel conmutable** con los cuatro botones de arriba, en vez de
-   cinco vistas apiladas siempre visibles. Es el cambio más grande que queda del área.
+1. **La columna pasa a ser un panel conmutable** con cuatro botones en la cabecera —Audio, Subtítulos,
+   Vídeo, Marcadores— en vez de cinco vistas montadas a la vez. Es el cambio más grande que queda.
+2. **El título y el distintivo de sesión en la cabecera. NO SE PUEDEN PINTAR, y está medido**:
+   `PlayerSurfaces` no lleva el título del medio y `PlayerViewModel` sólo tiene `MediaPath`. Pintar
+   una ruta como título es lo contrario de lo que hace esta aplicación, y `RepositoryPrivacyTests`
+   existe por eso. Es la misma omisión declarada que el año de las recomendaciones.
 3. **El orden `atrás · reproducir · adelante`** del prototipo: hoy reproducir/pausar/detener van
    después de los saltos. Está medido por qué: los tres son del **coordinador de sesión** y los saltos
    de **`ControlPlayback`**, dos modelos construidos en momentos distintos, así que intercalarlos es
