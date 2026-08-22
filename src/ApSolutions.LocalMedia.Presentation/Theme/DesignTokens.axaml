@@ -57,6 +57,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
       -->
       <CornerRadius x:Key="CornerRadiusSmall">4</CornerRadius>
       <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
+      <!--
+        The poster, in exactly 2:3, and here rather than inside PosterCardView because two things read
+        it: the card paints it, and the library grid divides its own width by it to decide how many
+        columns fit. Written in one place, the two cannot disagree — and they would, because the one
+        that divides is C# and the one that paints is markup.
+
+        148 is the width the prototype's library grid is approved at (minmax(148px, 1fr)); its rails
+        use 132, and the wider of the two is the one a grid of them is measured against.
+      -->
+      <x:Double x:Key="PosterCardWidth">148</x:Double>
+      <x:Double x:Key="PosterCardHeight">222</x:Double>
       <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>
       <!--
         Five sizes for the whole application, mapped from the thirteen literals the views carried:
@@ -1126,6 +1137,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="0" />
+  </Style>
+
+  <!--
+    A card in the library grid is a button whose whole face is the card, so it brings no chrome of its
+    own at rest: a border and a fill around every poster would draw a grid of boxes over a grid of
+    pictures. Only the resting state is given here. Hover, pressed, focus and disabled keep coming
+    from the selectors above, which is the point of setting one state rather than restyling the
+    control - the five states stay one decision, made once.
+  -->
+  <Style Selector="Button.poster-card">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Padding" Value="8" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
   </Style>
 
   <!--

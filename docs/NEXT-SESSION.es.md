@@ -82,12 +82,40 @@ contradice una línea del README, a sabiendas.
      cierra. Ya pasaba antes de este cambio —está en la captura previa—, así que no es una regresión:
      es la primera limitación que `ViewOverflowTests` lleva escrita, «una vista demasiado ancha sólo
      una vez anidada», ocurriendo de verdad. Va con el paso 5, que es el que toca el shell.
-2. **La cuadrícula que reflowa y virtualiza.** La decisión de no hacer la cuadrícula fluida se tomó
-   porque «en Avalonia 12.1.1 no existe nada que reflowe y virtualice a la vez». **Medido el
-   2026-08-22: `Avalonia.Controls.ItemsRepeater` y `WrapLayout` SÍ existen en 12.1.1.** Falta la
-   medición que quedó a medias: 10.000 elementos, contar controles vivos y milisegundos, y comparar con
-   `WrapPanel` y con `VirtualizingStackPanel`. Si virtualiza, la cuadrícula de la §4 —«anchura fluida,
-   mínimo 180 px por ficha»— se hace, y esa decisión se revierte con su número.
+2. ~~**La cuadrícula que reflowa y virtualiza.**~~ **HECHA el 2026-08-22, y la decisión revertida con
+   su número** ([evidencia](evidence/stable/audit-poster-card-and-the-grid-that-won.md)). Diez mil
+   fichas en 1600 × 1000, Release:
+
+   ```
+   VirtualizingStackPanel, una ficha por fila (lo de hoy)       13 ms        4 fichas vivas
+   WrapPanel                                                  4559 ms   10 000 fichas vivas
+   ListBox + VirtualizingStackPanel, filas de 9                108 ms       36 fichas vivas
+   ItemsControl en ScrollViewer, filas de 9                      6 ms       36 fichas vivas
+   reflujo a 1200 / 900 / 1600 px                          10 / 3 / 12 ms   28 / 20 / 36
+   ```
+
+   **760× el tiempo y 278× los controles vivos**, y el reflujo cuesta un fotograma. **Lo que faltaba
+   no era un control que Avalonia no tiene: era agrupar los elementos antes de dárselos al que sí
+   tiene.**
+   - **⚠ Y la premisa de este punto era falsa, medida.** «`ItemsRepeater` y `WrapLayout` SÍ existen en
+     12.1.1» **es falso**: una sonda de compilación contra las referencias reales del proyecto da
+     `CS0234` en los dos. Y por paquete tampoco llegan —`Avalonia.Controls.ItemsRepeater` se detiene
+     en **12.0.0** y `WrapLayout` **no es de Avalonia**, vive en `Avalonia.Labs.Panels`, que llega a
+     12.0.2—. **Undécima alarma falsa, y de las caras: habría hecho añadir dos dependencias por
+     detrás del Avalonia que el proyecto fija para resolver algo que el árbol ya podía.** Una
+     presencia se prueba igual que una ausencia.
+   - **El píxel vive en la vista y sólo ahí**: `LibraryView.axaml.cs` mide su superficie y le dice al
+     modelo cuántas caben; `LibraryViewModel` agrupa sin saber de píxeles. Y los dos números de la
+     ficha son **tokens** (`PosterCardWidth`, `PosterCardHeight`) porque los lee el marcado que la
+     pinta **y** el C# que divide por ellos.
+   - **La separación es una sola**: el padding de 8 del botón, a los dos lados, es todo el hueco. La
+     primera medición de esta cuadrícula falló exactamente ahí — contó ocho columnas en 1352 px y
+     dibujó la octava **72 px fuera**.
+   - **Y una prueba desaparece porque la sustituye otra**:
+     `LibraryNavigationTests.The_library_realises_a_handful_of_rows_out_of_ten_thousand` medía la
+     virtualización de la lista de una columna y **nombraba la solución en su propio comentario**
+     («agrupar en filas en el modelo de vista y dejar que el panel virtualice filas»).
+     `LibraryGridTests` lo afirma sobre la ficha real, que es más.
 3. **Los tres carriles** con tarjetas: `InProgressRailView` con barra de progreso de 3 px al pie,
    `RecentlyAddedRailView` y `RecommendationsRailView`.
 4. **El héroe de Inicio** (`ResumeHeroView`): título grande, metadatos en una línea, barra de progreso y

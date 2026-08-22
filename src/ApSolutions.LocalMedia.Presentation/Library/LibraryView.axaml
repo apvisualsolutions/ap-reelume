@@ -115,31 +115,68 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <TextBlock Text="{DynamicResource LibrarySearchNoResultsDescription}" TextWrapping="Wrap" />
       </StackPanel>
 
-      <ListBox
+      <!--
+        The fluid grid §4 asks for, and the decision not to build one is reversed here with its
+        number. It was taken because "nothing in Avalonia 12.1.1 reflows and virtualises at once",
+        which is true of the panels and false of the problem: a WrapPanel over ten thousand cards
+        costs 4559 ms and keeps all ten thousand alive, and the same cards grouped into rows inside a
+        VirtualizingStackPanel cost 6 ms and keep 36. ItemsRepeater and WrapLayout were the shape
+        looked for and neither exists here — the ItemsRepeater package stops at Avalonia 12.0.0 and
+        WrapLayout is not Avalonia's at all — and neither is needed.
+
+        LibraryView.axaml.cs measures this surface and tells the model how many fit. An ItemsControl
+        rather than a ListBox because a row is not something to select: the card inside it is a
+        button, which is what the keyboard reaches and what the walk presses.
+      -->
+      <ScrollViewer
+          x:Name="LibraryGridSurface"
           Grid.Row="3"
+          HorizontalScrollBarVisibility="Disabled"
           IsVisible="{Binding !IsSearchWithoutResults}"
-          ItemsSource="{Binding Items}"
-          automation:AutomationProperties.Name="{DynamicResource LibraryResultsListName}">
-        <ListBox.ItemsPanel>
-          <ItemsPanelTemplate>
-            <VirtualizingStackPanel />
-          </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-        <ListBox.ItemTemplate>
-          <DataTemplate x:DataType="library:CatalogItemViewModel">
-            <Button
-                HorizontalContentAlignment="Stretch"
-                Click="OnCatalogItemClick"
-                automation:AutomationProperties.Name="{Binding Title}"
-                automation:AutomationProperties.HelpText="{Binding AvailabilityKey, Converter={StaticResource CatalogResourceKey}}">
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
-                <TextBlock Text="{Binding Title}" />
-                <library:UnavailableBadge Grid.Column="1" />
-              </Grid>
-            </Button>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
+          SizeChanged="OnGridSurfaceSizeChanged">
+        <ItemsControl
+            ItemsSource="{Binding Rows}"
+            automation:AutomationProperties.Name="{DynamicResource LibraryResultsListName}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <!--
+                No spacing here and no margin under the row: the card button's own 8 px padding is the
+                whole gap, 8 from one card and 8 from the next, horizontally and vertically alike.
+                One source for it is what lets the column count be arithmetic - a second gap on top
+                of the padding is a number the counting would have to know about, and the first
+                measurement of this grid got it wrong exactly there: eight columns were counted into
+                1352 px and the eighth was drawn 72 px past the edge.
+              -->
+              <ItemsControl ItemsSource="{Binding}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="library:CatalogItemViewModel">
+                    <Button
+                        Classes="poster-card"
+                        Click="OnCatalogItemClick"
+                        automation:AutomationProperties.Name="{Binding Title}"
+                        automation:AutomationProperties.HelpText="{Binding AvailabilityKey, Converter={StaticResource CatalogResourceKey}}">
+                      <StackPanel Spacing="{DynamicResource Space8}">
+                        <library:PosterCardView />
+                        <library:UnavailableBadge HorizontalAlignment="Left" />
+                      </StackPanel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
     </Grid>
     <Grid IsVisible="{Binding IsMovieDetails}" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space12}">
       <Button

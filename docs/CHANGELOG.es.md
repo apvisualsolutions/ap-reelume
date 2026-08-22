@@ -10,9 +10,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La biblioteca se ve como una cuadrícula que se adapta a la ventana.** Donde había una lista de una
+  columna hay ahora fichas en rejilla, y al estrechar la ventana se reacomodan solas. Medido sobre
+  diez mil títulos: la cuadrícula tarda **6 ms** y mantiene **36** fichas vivas, frente a los **4559 ms**
+  y las **diez mil** de la forma ingenua. Con una biblioteca grande la diferencia es entre desplazarse
+  y esperar.
+
+
 - **Las películas y las series se ven como fichas.** Donde había una línea de texto por título hay
   ahora una ficha de 2:3 con las iniciales del título, el título a dos líneas como mucho y el año
-  debajo, en los tres carriles de Inicio. No hay portadas y no las va a haber en esta versión —esta
+  debajo, en la biblioteca y en los tres carriles de Inicio. No hay portadas y no las va a haber en esta versión —esta
   aplicación se publica sin ninguna conexión que las traiga—, así que las iniciales no son un hueco
   esperando una imagen: son lo que la ficha enseña, y son distintas en cada una, que es lo que hace
   que una pared de fichas se pueda recorrer con la vista.
