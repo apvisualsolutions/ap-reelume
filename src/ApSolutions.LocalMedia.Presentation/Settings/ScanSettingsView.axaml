@@ -26,26 +26,59 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource ScanSettingsDescription}"
           TextWrapping="Wrap" />
-      <CheckBox
-          automation:AutomationProperties.Name="{DynamicResource ScanSettingsWatchLocal}"
-          Content="{DynamicResource ScanSettingsWatchLocal}"
-          IsChecked="{Binding WatchLocalRoots}" />
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <TextBlock
+              Grid.Column="0"
+              Classes="setting-name"
+              Text="{DynamicResource ScanSettingsWatchLocal}"
+              VerticalAlignment="Center" />
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding WatchLocalRoots}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !WatchLocalRoots}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                automation:AutomationProperties.Name="{DynamicResource ScanSettingsWatchLocal}"
+                IsChecked="{Binding WatchLocalRoots}"
+                VerticalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+      </Border>
       <!--
         The label is painted and not only announced. A checkbox carries its own words in its content;
         a spinner does not, so this one had "Recovery interval in minutes" as its accessible name and
         nothing on screen - a screen reader heard it and anybody looking saw a bare number box. The
-        string was already there. Both point at the same key, which is what keeps them one label.
+        string was already there. Both point at the same key, which is what keeps them one label, and
+        the row-card is what puts it beside the box instead of above it.
       -->
-      <StackPanel Spacing="{DynamicResource Space4}">
-        <TextBlock
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource ScanSettingsFallbackMinutes}" />
-        <NumericUpDown
-            automation:AutomationProperties.Name="{DynamicResource ScanSettingsFallbackMinutes}"
-            Minimum="1"
-            Maximum="1440"
-            Value="{Binding FallbackIntervalMinutes}" />
-      </StackPanel>
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <TextBlock
+              Grid.Column="0"
+              Classes="setting-name"
+              Text="{DynamicResource ScanSettingsFallbackMinutes}"
+              VerticalAlignment="Center" />
+          <NumericUpDown
+              Grid.Column="1"
+              Width="150"
+              automation:AutomationProperties.Name="{DynamicResource ScanSettingsFallbackMinutes}"
+              Minimum="1"
+              Maximum="1440"
+              Value="{Binding FallbackIntervalMinutes}"
+              VerticalAlignment="Center" />
+        </Grid>
+      </Border>
     </StackPanel>
   </Border>
 </UserControl>

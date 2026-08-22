@@ -26,20 +26,80 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource LifecycleSettingsDescription}"
         TextWrapping="Wrap" />
 
-    <CheckBox
-        x:Name="TrayEnabledCheckBox"
-        Content="{DynamicResource LifecycleTrayLabel}"
-        IsChecked="{Binding TrayEnabled}"
-        automation:AutomationProperties.Name="{DynamicResource LifecycleTrayLabel}" />
-    <TextBlock IsVisible="{Binding TrayEnabled}" Text="{DynamicResource LifecycleTrayOn}" />
-    <TextBlock IsVisible="{Binding TrayIsDisabled}" Text="{DynamicResource LifecycleTrayOff}" />
+    <!--
+      The prototype's row-card, and the three sentences this page already had are what goes in it. They
+      were painted as loose lines under their checkbox - a switch, then a sentence about the switch,
+      then the next switch - which reads as six things where there are three. Underneath the name is
+      where the prototype puts the sentence, and it is the same string either way.
+    -->
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+          <TextBlock Classes="setting-name" Text="{DynamicResource LifecycleTrayLabel}" />
+          <TextBlock
+              Classes="setting-description"
+              IsVisible="{Binding TrayEnabled}"
+              Text="{DynamicResource LifecycleTrayOn}" />
+          <TextBlock
+              Classes="setting-description"
+              IsVisible="{Binding TrayIsDisabled}"
+              Text="{DynamicResource LifecycleTrayOff}" />
+        </StackPanel>
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space8}"
+            VerticalAlignment="Center">
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding TrayEnabled}"
+              Text="{DynamicResource SettingStateOn}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding TrayIsDisabled}"
+              Text="{DynamicResource SettingStateOff}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <CheckBox
+              x:Name="TrayEnabledCheckBox"
+              IsChecked="{Binding TrayEnabled}"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource LifecycleTrayLabel}" />
+        </StackPanel>
+      </Grid>
+    </Border>
 
-    <CheckBox
-        x:Name="MinimizeToTrayCheckBox"
-        Content="{DynamicResource LifecycleCloseToTrayLabel}"
-        IsChecked="{Binding MinimizeToTrayOnClose}"
-        IsEnabled="{Binding CanMinimizeToTray}"
-        automation:AutomationProperties.Name="{DynamicResource LifecycleCloseToTrayLabel}" />
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Grid.Column="0"
+            Classes="setting-name"
+            Text="{DynamicResource LifecycleCloseToTrayLabel}"
+            VerticalAlignment="Center" />
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space8}"
+            VerticalAlignment="Center">
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding MinimizeToTrayOnClose}"
+              Text="{DynamicResource SettingStateOn}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding !MinimizeToTrayOnClose}"
+              Text="{DynamicResource SettingStateOff}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <CheckBox
+              x:Name="MinimizeToTrayCheckBox"
+              IsChecked="{Binding MinimizeToTrayOnClose}"
+              IsEnabled="{Binding CanMinimizeToTray}"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource LifecycleCloseToTrayLabel}" />
+        </StackPanel>
+      </Grid>
+    </Border>
     <!--
       A tray this system does not have is not a fact about the machine, it is a choice that could not
       be honoured - the same thing the three audio notices say - so it takes the same surface, border
@@ -72,13 +132,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Grid>
     </Border>
 
-    <CheckBox
-        x:Name="StartWithWindowsCheckBox"
-        Content="{DynamicResource LifecycleStartupLabel}"
-        IsChecked="{Binding StartWithWindows}"
-        automation:AutomationProperties.Name="{DynamicResource LifecycleStartupLabel}" />
-    <TextBlock IsVisible="{Binding StartWithWindows}" Text="{DynamicResource LifecycleStartupOn}" />
-    <TextBlock IsVisible="{Binding StartupIsDisabled}" Text="{DynamicResource LifecycleStartupOff}" />
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+          <TextBlock Classes="setting-name" Text="{DynamicResource LifecycleStartupLabel}" />
+          <TextBlock
+              Classes="setting-description"
+              IsVisible="{Binding StartWithWindows}"
+              Text="{DynamicResource LifecycleStartupOn}" />
+          <TextBlock
+              Classes="setting-description"
+              IsVisible="{Binding StartupIsDisabled}"
+              Text="{DynamicResource LifecycleStartupOff}" />
+        </StackPanel>
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space8}"
+            VerticalAlignment="Center">
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding StartWithWindows}"
+              Text="{DynamicResource SettingStateOn}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding StartupIsDisabled}"
+              Text="{DynamicResource SettingStateOff}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <CheckBox
+              x:Name="StartWithWindowsCheckBox"
+              IsChecked="{Binding StartWithWindows}"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource LifecycleStartupLabel}" />
+        </StackPanel>
+      </Grid>
+    </Border>
 
     <Border
         x:Name="StartupConsentSurface"

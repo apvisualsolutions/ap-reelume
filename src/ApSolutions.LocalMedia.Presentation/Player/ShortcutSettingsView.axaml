@@ -46,27 +46,37 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding !IsEmpty}"
         ItemsSource="{Binding Bindings}"
         automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsListName}">
+      <!--
+        The rows are cards now, like every other setting on this page, and the gap between them comes
+        from the panel rather than from a margin on each row: an ItemsControl has no Spacing of its
+        own, so the one place that decides how far apart these sit is its ItemsPanel.
+      -->
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="{DynamicResource Space8}" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
       <ItemsControl.ItemTemplate>
         <DataTemplate DataType="player:ShortcutRow">
-          <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4">
-            <TextBlock
-                VerticalAlignment="Center"
-                Foreground="{DynamicResource TextPrimaryBrush}"
-                Text="{Binding CommandLabel}" />
-            <TextBlock
-                Grid.Column="1"
-                Margin="12,0"
-                VerticalAlignment="Center"
-                FontFamily="Consolas"
-                Foreground="{DynamicResource TextPrimaryBrush}"
-                Text="{Binding GestureLabel}" />
-            <TextBlock
-                Grid.Column="2"
-                VerticalAlignment="Center"
-                IsVisible="{Binding IsCustomised}"
-                Foreground="{DynamicResource TextPrimaryBrush}"
-                Text="{DynamicResource ShortcutSettingsCustomised}" />
-          </Grid>
+          <Border Classes="setting-row">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space12}">
+              <TextBlock
+                  Classes="setting-name"
+                  VerticalAlignment="Center"
+                  Text="{Binding CommandLabel}" />
+              <TextBlock
+                  Grid.Column="1"
+                  VerticalAlignment="Center"
+                  FontFamily="Consolas"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  Text="{Binding GestureLabel}" />
+              <TextBlock
+                  Grid.Column="2"
+                  Classes="setting-state"
+                  IsVisible="{Binding IsCustomised}"
+                  Text="{DynamicResource ShortcutSettingsCustomised}" />
+            </Grid>
+          </Border>
         </DataTemplate>
       </ItemsControl.ItemTemplate>
     </ItemsControl>

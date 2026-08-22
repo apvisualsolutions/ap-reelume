@@ -23,41 +23,83 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <TextBlock
         Text="{DynamicResource RecommendationSettingsDescription}"
         TextWrapping="Wrap" />
-    <CheckBox
-        Content="{DynamicResource RecommendationSettingsEnableLabel}"
-        IsChecked="{Binding IsEnabled}"
-        automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsEnableLabel}" />
-    <TextBlock
-        IsVisible="{Binding IsEnabled}"
-        Text="{DynamicResource RecommendationsOn}" />
-    <TextBlock
-        IsVisible="{Binding IsDisabled}"
-        Text="{DynamicResource RecommendationsOff}" />
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+          <TextBlock Classes="setting-name" Text="{DynamicResource RecommendationSettingsEnableLabel}" />
+          <TextBlock
+              Classes="setting-description"
+              IsVisible="{Binding IsEnabled}"
+              Text="{DynamicResource RecommendationsOn}" />
+          <TextBlock
+              Classes="setting-description"
+              IsVisible="{Binding IsDisabled}"
+              Text="{DynamicResource RecommendationsOff}" />
+        </StackPanel>
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space8}"
+            VerticalAlignment="Center">
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding IsEnabled}"
+              Text="{DynamicResource SettingStateOn}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding IsDisabled}"
+              Text="{DynamicResource SettingStateOff}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <CheckBox
+              IsChecked="{Binding IsEnabled}"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsEnableLabel}" />
+        </StackPanel>
+      </Grid>
+    </Border>
     <TextBlock
         Text="{DynamicResource RecommendationSettingsPrivacyNotice}"
         TextWrapping="Wrap" />
     <StackPanel Spacing="{DynamicResource Space8}" IsVisible="{Binding HasWatchedThreshold}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeBody}"
-          FontWeight="SemiBold"
-          Text="{DynamicResource RecommendationSettingsThresholdLabel}"
-          automation:AutomationProperties.HeadingLevel="3" />
-      <TextBlock
-            Text="{DynamicResource RecommendationSettingsThresholdDescription}"
-          TextWrapping="Wrap" />
-      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
-        <Slider
-            Width="240"
-            Minimum="{x:Static settings:RecommendationSettingsViewModel.MinimumWatchedThresholdPercent}"
-            Maximum="{x:Static settings:RecommendationSettingsViewModel.MaximumWatchedThresholdPercent}"
-            TickFrequency="1"
-            IsSnapToTickEnabled="True"
-            Value="{Binding WatchedThresholdPercent}"
-            automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsThresholdLabel}" />
-        <TextBlock
-            VerticalAlignment="Center"
-            Text="{Binding WatchedThresholdPercent, StringFormat={}{0:0} %}" />
-      </StackPanel>
+      <!--
+        The prototype's slider row: the name, the sentence underneath it, and the slider with its
+        value against the right edge - "the value to the right of the slider" is its own half of the
+        rule, and the number was already here. The heading level stays on the name, which is what it
+        was before it moved into the card.
+      -->
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-name"
+                FontSize="{DynamicResource FontSizeBody}"
+                Text="{DynamicResource RecommendationSettingsThresholdLabel}"
+                automation:AutomationProperties.HeadingLevel="3" />
+            <TextBlock
+                Classes="setting-description"
+                Text="{DynamicResource RecommendationSettingsThresholdDescription}" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space12}"
+              VerticalAlignment="Center">
+            <Slider
+                Width="170"
+                Minimum="{x:Static settings:RecommendationSettingsViewModel.MinimumWatchedThresholdPercent}"
+                Maximum="{x:Static settings:RecommendationSettingsViewModel.MaximumWatchedThresholdPercent}"
+                TickFrequency="1"
+                IsSnapToTickEnabled="True"
+                Value="{Binding WatchedThresholdPercent}"
+                VerticalAlignment="Center"
+                automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsThresholdLabel}" />
+            <TextBlock
+                Classes="setting-state"
+                Text="{Binding WatchedThresholdPercent, StringFormat={}{0:0} %}" />
+          </StackPanel>
+        </Grid>
+      </Border>
       <Button
           Content="{DynamicResource RecommendationSettingsThresholdApply}"
           Command="{Binding ApplyWatchedThresholdCommand}"

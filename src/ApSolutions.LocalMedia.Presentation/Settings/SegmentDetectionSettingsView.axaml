@@ -24,11 +24,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SegmentDetectionSettingsDescription}"
           TextWrapping="Wrap" />
-      <CheckBox
-          x:Name="SegmentDetectionSwitch"
-          automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsEnable}"
-          Content="{DynamicResource SegmentDetectionSettingsEnable}"
-          IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+      <!--
+        The prototype's unit for one setting: the name on the left, the control against the right
+        edge, both inside a card. The checkbox loses the Content it carried and keeps the accessible
+        name it already declared, so a reader hears the same words and only the paint moved - the
+        same trade the navigation rail made when its destinations became glyphs.
+      -->
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <TextBlock
+              Grid.Column="0"
+              Classes="setting-name"
+              Text="{DynamicResource SegmentDetectionSettingsEnable}"
+              VerticalAlignment="Center" />
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding IsEnabled}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !IsEnabled}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                x:Name="SegmentDetectionSwitch"
+                automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsEnable}"
+                IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                VerticalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+      </Border>
     </StackPanel>
   </Border>
 </UserControl>

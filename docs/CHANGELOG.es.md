@@ -10,6 +10,35 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Ajustes pasa a la fila-tarjeta del prototipo: nombre, la frase debajo, y el control contra el
+  borde derecho.** Es la unidad con la que el prototipo dibuja un ajuste, y aquí no existía ninguna:
+  un interruptor con la etiqueta dentro, luego una frase suelta sobre ese interruptor, luego el
+  siguiente — que se lee como seis cosas donde hay tres. Ahora son **dieciocho tarjetas más una
+  plantilla que produce las once de los atajos, en ocho de las diez secciones de la página**, y las
+  frases que las describen son las que la página ya escribía; no se ha inventado ninguna. Los
+  interruptores pierden la etiqueta que llevaban dentro y **conservan el nombre accesible que ya
+  declaraban**, así que un lector de pantalla oye exactamente lo mismo y sólo se ha movido la pintura:
+  la misma permuta que hizo el carril cuando sus destinos pasaron a pictogramas.
+  - **La palabra de estado a la izquierda del interruptor** —«Activado» / «Desactivado»—, que el
+    prototipo trae en los dos idiomas y este árbol no tenía. Es **muda para el lector de pantalla**:
+    la casilla de al lado ya anuncia si está marcada, y un segundo texto diciendo lo mismo lo diría
+    dos veces, la segunda con una voz que no puede equivocarse. La misma decisión que tomó la lupa.
+  - **Los once atajos de teclado y los seis controles del estilo de subtítulos** entran en la misma
+    gramática, y de paso **los tres deslizadores de subtítulos enseñan por primera vez el número que
+    están fijando**. El tamaño se escribe con `StringFormat` y el signo de porcentaje **fuera** del
+    especificador numérico, donde es un literal: dentro de él, `0 %` multiplica por cien y escribe
+    8000 para ochenta.
+  - **En Apariencia las píldoras van debajo del nombre y no a la derecha, y eso está medido, no
+    concedido.** Un `WrapPanel` en una columna `Auto` se mide con anchura infinita, así que pone
+    todas las píldoras en una línea y sólo vuelve a repartirlas al colocar — que es la forma de
+    anchura infinita que este repositorio lleva nueve medidas cazando, y justo la que
+    `AppearanceSettingsTests` existe para prohibir alrededor de estos botones. La tarjeta cambia; la
+    geometría de dentro, no.
+  - Y una cadena más, `AppearanceThemeLabel` —«Tema»—, porque ese ajuste **no tenía nombre propio**:
+    el que se le veía era el de su sección, y el título de una sección tiene que quedarse fuera de
+    las tarjetas o deja de empezar donde empiezan las otras nueve.
+
+
 - **La lupa dentro del campo de búsqueda y el `+` junto a «Añadir carpeta».** Los dos son del
   prototipo y los dos cambian sólo lo que se dibuja: la lupa es **decoración y no control** —el campo
   ya lleva el nombre accesible, y un segundo nombre ahí haría que un lector de pantalla dijera «Buscar

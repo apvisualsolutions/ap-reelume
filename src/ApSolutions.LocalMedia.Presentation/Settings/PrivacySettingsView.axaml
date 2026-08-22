@@ -31,32 +31,82 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource PrivacyDescription}"
         TextWrapping="Wrap" />
 
-    <CheckBox
-        x:Name="DiagnosticsCheckBox"
-        Content="{DynamicResource PrivacyDiagnosticsLabel}"
-        IsChecked="{Binding DiagnosticsEnabled}"
-        automation:AutomationProperties.Name="{DynamicResource PrivacyDiagnosticsLabel}" />
+    <Border Classes="setting-row">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+        <TextBlock
+            Grid.Column="0"
+            Classes="setting-name"
+            Text="{DynamicResource PrivacyDiagnosticsLabel}"
+            VerticalAlignment="Center" />
+        <StackPanel
+            Grid.Column="1"
+            Orientation="Horizontal"
+            Spacing="{DynamicResource Space8}"
+            VerticalAlignment="Center">
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding DiagnosticsEnabled}"
+              Text="{DynamicResource SettingStateOn}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <TextBlock
+              Classes="setting-state"
+              IsVisible="{Binding !DiagnosticsEnabled}"
+              Text="{DynamicResource SettingStateOff}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+          <CheckBox
+              x:Name="DiagnosticsCheckBox"
+              IsChecked="{Binding DiagnosticsEnabled}"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.Name="{DynamicResource PrivacyDiagnosticsLabel}" />
+        </StackPanel>
+      </Grid>
+    </Border>
 
     <!--
     LIB-016. The switch only exists where a connection is possible at all: with no consented
     connection the automatic refresh has nothing it could do, and offering it would be offering
     something that cannot happen.
+
+    The sentence under the name is the one this page already wrote, moved from beneath the checkbox
+    into the card's own left column - which is where the prototype puts a setting's description, and
+    what stops the 640-wide paragraph reaching further right than the switch it describes.
     -->
     <StackPanel
         x:Name="PrivacyAutoRefreshSurface"
         IsVisible="{Binding CanRefreshAutomatically}"
         Spacing="{DynamicResource Space4}">
-      <CheckBox
-          x:Name="AutoRefreshCheckBox"
-          Content="{DynamicResource PrivacyAutoRefreshLabel}"
-          IsChecked="{Binding AutomaticRefreshEnabled}"
-          automation:AutomationProperties.Name="{DynamicResource PrivacyAutoRefreshLabel}" />
-      <TextBlock
-          x:Name="AutoRefreshDescription"
-          MaxWidth="640"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource PrivacyAutoRefreshDescription}"
-          TextWrapping="Wrap" />
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+            <TextBlock Classes="setting-name" Text="{DynamicResource PrivacyAutoRefreshLabel}" />
+            <TextBlock
+                x:Name="AutoRefreshDescription"
+                Classes="setting-description"
+                Text="{DynamicResource PrivacyAutoRefreshDescription}" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding AutomaticRefreshEnabled}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !AutomaticRefreshEnabled}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                x:Name="AutoRefreshCheckBox"
+                IsChecked="{Binding AutomaticRefreshEnabled}"
+                VerticalAlignment="Center"
+                automation:AutomationProperties.Name="{DynamicResource PrivacyAutoRefreshLabel}" />
+          </StackPanel>
+        </Grid>
+      </Border>
     </StackPanel>
 
     <Border

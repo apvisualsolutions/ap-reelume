@@ -10,6 +10,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Settings moves to the prototype's row-card: the name, the sentence underneath it, and the
+  control against the right edge.** That is the unit the prototype draws a setting with, and there
+  was not one here: a switch with its label inside it, then a loose sentence about that switch, then
+  the next one — which reads as six things where there are three. There are now **eighteen cards plus
+  one template that produces the eleven shortcut rows, across eight of the page's ten sections**, and
+  the sentences describing them are the ones the page already wrote; none were invented. The switches
+  lose the label they carried inside and **keep the accessible name they already declared**, so a
+  screen reader hears exactly the same thing and only the paint moved: the same trade the rail made
+  when its destinations became pictograms.
+  - **The state word to the left of the switch** — "Activado" / "Desactivado" — which the prototype
+    carries in both languages and this tree did not have. It is **silent to the screen reader**: the
+    checkbox beside it already announces whether it is checked, and a second text saying the same
+    thing would say it twice, the second time in a voice that cannot be wrong about it. The same
+    decision the magnifier took.
+  - **The eleven keyboard shortcuts and the six subtitle-style controls** join the same grammar, and
+    on the way **the three subtitle sliders show the number they are setting for the first time**.
+    The size is written with `StringFormat` and the per-cent sign **outside** the numeric specifier,
+    where it is a literal: inside it, `0 %` multiplies by a hundred and writes 8000 for eighty.
+  - **In Appearance the pills sit under the name rather than against the right edge, and that is
+    measured rather than conceded.** A `WrapPanel` in an `Auto` column is measured with infinite
+    width, so it lays every pill on one line and only re-wraps at arrange time — the infinite-width
+    shape this repository has now caught nine times, and exactly the one `AppearanceSettingsTests`
+    exists to refuse around these buttons. The card changes; the geometry inside it does not.
+  - And one more string, `AppearanceThemeLabel` — "Theme" — because that setting **had no name of
+    its own**: the one on screen was its section's, and a section title has to stay outside the cards
+    or it stops starting where the other nine start.
+
+
 - **The magnifier inside the search field and the `+` beside "Add folder".** Both come from the
   prototype and both change only what is drawn: the magnifier is **decoration rather than a control**
   — the field already carries the accessible name, and a second name there would have a screen reader

@@ -1376,4 +1376,55 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
   </Style>
+
+  <!--
+    The row-card, which is the prototype's unit for one setting: the name, the sentence that says what
+    it does underneath it, and the control against the right edge. It draws
+    `padding:13px 16px; border-radius:10; gap:14` over the card surface with a hairline border, and what is
+    written here is 12/16, CornerRadiusMedium and Space16 - the steps this scale already has. Three
+    scalars declared to be within a pixel of the prototype would be three numbers nothing else spends,
+    which is the shape FontSizeMono was refused for, and the difference is invisible on a screen.
+
+    The hairline and not ShellBorderBrush: this border separates two surfaces rather than enclosing a
+    control, and it is solid black or solid white in the two high contrasts, where CardSurfaceBrush and
+    ShellSurfaceBrush are the same colour and the border is the only thing that says where the card is.
+
+    <b>The Grid that goes inside belongs to the view, and it has to be a Grid.</b> A horizontal
+    StackPanel offers its children infinite width, so the sentence on the left would never wrap and
+    the control would end up drawn off the side - nine measurements of that shape in this repository,
+    and one of them is why AppearanceSettingsTests refuses a stack around the theme pills. The starred
+    column holds the words and gives way; the Auto column holds the control and keeps the width it
+    asks for.
+  -->
+  <Style Selector="Border.setting-row">
+    <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="Padding" Value="16,12" />
+  </Style>
+
+  <Style Selector="TextBlock.setting-name">
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+
+  <Style Selector="TextBlock.setting-description">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+
+  <!--
+    The word beside the switch - "Activado" / "Desactivado" - which the prototype puts to the left of
+    every toggle. It is Raw to the accessibility tree on purpose: the checkbox next to it already
+    announces its own checked state, so a reader that also read this would hear the answer twice, and
+    the second time in a voice that cannot be wrong about it. Same decision the magnifier took.
+  -->
+  <Style Selector="TextBlock.setting-state">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
 </Styles>

@@ -28,80 +28,99 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource AppearanceDescription}"
           TextWrapping="Wrap" />
       <!--
-        A WrapPanel and not a horizontal StackPanel. §4 gives the reason as "five will not fit in 620",
-        and that reason is void: there are three, and measured on 2026-08-21 they total 263 px in
-        Spanish and 241 in English inside a 620-wide column. What earns the change is the shape - a
-        horizontal StackPanel offers its children infinite width and draws them where they fall, which
-        is how a control has ended up outside the window eight times here - and the fact that the
-        length of these labels belongs to a translator rather than to this file.
+        The two row-cards of this page put their pills UNDER the name rather than against the right
+        edge, and that is measured rather than conceded. A WrapPanel in an Auto column is measured
+        with infinite width, so it lays every pill on one line and only re-wraps at arrange time -
+        which is the infinite-width shape this repository has now caught nine times, and the one
+        AppearanceSettingsTests exists to refuse around exactly these buttons. The prototype's own
+        `seg` row wraps for the same reason: `flex-wrap: wrap` with a ceiling, not a fixed column.
 
-        Three and not five, and that is decided rather than pending: ThemePreference.cs says the two
-        high-contrast variants are a state read from Windows, not a fourth and fifth choice to pick.
+        So the card is what changes and the geometry inside it is not: the pills keep a bounded width
+        to wrap inside, which is what they had, and what they gain is the surface the rest of the page
+        now has. The pills against the right edge is a separate change with a separate measurement.
       -->
-      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
-        <Button
-            Classes="theme-option"
-            automation:AutomationProperties.Name="{DynamicResource ThemeSystem}"
-            Command="{Binding ApplyThemeCommand}"
-            CommandParameter="{x:Static theme:ThemePreference.System}">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding SystemStateCue}" />
-            <TextBlock Text="{DynamicResource ThemeSystem}" />
-          </StackPanel>
-        </Button>
-        <Button
-            Classes="theme-option"
-            automation:AutomationProperties.Name="{DynamicResource ThemeLight}"
-            Command="{Binding ApplyThemeCommand}"
-            CommandParameter="{x:Static theme:ThemePreference.Light}">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding LightStateCue}" />
-            <TextBlock Text="{DynamicResource ThemeLight}" />
-          </StackPanel>
-        </Button>
-        <Button
-            Classes="theme-option"
-            automation:AutomationProperties.Name="{DynamicResource ThemeDark}"
-            Command="{Binding ApplyThemeCommand}"
-            CommandParameter="{x:Static theme:ThemePreference.Dark}">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding DarkStateCue}" />
-            <TextBlock Text="{DynamicResource ThemeDark}" />
-          </StackPanel>
-        </Button>
-      </WrapPanel>
-      <TextBlock
-          FontSize="{DynamicResource FontSizeBody}"
-          FontWeight="SemiBold"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource LanguageTitle}"
-          automation:AutomationProperties.HeadingLevel="3" />
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource LanguageDescription}"
-          TextWrapping="Wrap" />
-      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
-        <Button
-            Classes="theme-option"
-            automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
-            Command="{Binding ApplyLanguageCommand}"
-            CommandParameter="es">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding SpanishStateCue}" />
-            <TextBlock Text="{DynamicResource LanguageSpanish}" />
-          </StackPanel>
-        </Button>
-        <Button
-            Classes="theme-option"
-            automation:AutomationProperties.Name="{DynamicResource LanguageEnglish}"
-            Command="{Binding ApplyLanguageCommand}"
-            CommandParameter="en">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding EnglishStateCue}" />
-            <TextBlock Text="{DynamicResource LanguageEnglish}" />
-          </StackPanel>
-        </Button>
-      </WrapPanel>
+      <Border Classes="setting-row">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceThemeLabel}" />
+          <!--
+            A WrapPanel and not a horizontal StackPanel. §4 gives the reason as "five will not fit in 620",
+            and that reason is void: there are three, and measured on 2026-08-21 they total 263 px in
+            Spanish and 241 in English inside a 620-wide column. What earns the change is the shape - a
+            horizontal StackPanel offers its children infinite width and draws them where they fall, which
+            is how a control has ended up outside the window eight times here - and the fact that the
+            length of these labels belongs to a translator rather than to this file.
+
+            Three and not five, and that is decided rather than pending: ThemePreference.cs says the two
+            high-contrast variants are a state read from Windows, not a fourth and fifth choice to pick.
+          -->
+          <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource ThemeSystem}"
+                Command="{Binding ApplyThemeCommand}"
+                CommandParameter="{x:Static theme:ThemePreference.System}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding SystemStateCue}" />
+                <TextBlock Text="{DynamicResource ThemeSystem}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource ThemeLight}"
+                Command="{Binding ApplyThemeCommand}"
+                CommandParameter="{x:Static theme:ThemePreference.Light}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding LightStateCue}" />
+                <TextBlock Text="{DynamicResource ThemeLight}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource ThemeDark}"
+                Command="{Binding ApplyThemeCommand}"
+                CommandParameter="{x:Static theme:ThemePreference.Dark}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding DarkStateCue}" />
+                <TextBlock Text="{DynamicResource ThemeDark}" />
+              </StackPanel>
+            </Button>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+      <Border Classes="setting-row">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <TextBlock
+              Classes="setting-name"
+              FontSize="{DynamicResource FontSizeBody}"
+              Text="{DynamicResource LanguageTitle}"
+              automation:AutomationProperties.HeadingLevel="3" />
+          <TextBlock
+              Classes="setting-description"
+              Text="{DynamicResource LanguageDescription}" />
+          <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
+                Command="{Binding ApplyLanguageCommand}"
+                CommandParameter="es">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding SpanishStateCue}" />
+                <TextBlock Text="{DynamicResource LanguageSpanish}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource LanguageEnglish}"
+                Command="{Binding ApplyLanguageCommand}"
+                CommandParameter="en">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding EnglishStateCue}" />
+                <TextBlock Text="{DynamicResource LanguageEnglish}" />
+              </StackPanel>
+            </Button>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
       <!--
         Which of the two sentences this shows is a key the view model picks, the way the recommendation
         reasons travel, so the words follow the chosen language. It said the same thing either way
