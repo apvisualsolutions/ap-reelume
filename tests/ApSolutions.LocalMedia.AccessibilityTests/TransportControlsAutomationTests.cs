@@ -127,6 +127,108 @@ public sealed class TransportControlsAutomationTests
         window.Close();
     }
 
+    /// <summary>
+    /// The scrubber: absent until the engine says how long the file is, then named, focusable, and
+    /// scaled to the duration — with both clocks beside it saying where the session is.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Asserted on the view model as well as on the control, and that is the lesson this repository
+    /// paid for on 2026-08-22: five properties read only by a <c>DataTemplate</c> are five properties
+    /// no test covers, and the file they lived in went from 83/100 to 38/50 on CI without a red.
+    /// </para>
+    /// <para>
+    /// The absent case goes first because it is the one a screenshot never shows. Until the engine
+    /// answers, <c>Duration</c> is null, and a bar whose maximum is unknown would put its thumb
+    /// wherever it liked.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_scrubber_arrives_with_the_duration_and_says_where_the_session_is()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(new StubEngine()));
+
+        // Nothing known yet: no bar, no length, and the position reads as a clock rather than blank.
+        Assert.False(viewModel.HasDuration);
+        Assert.Equal(string.Empty, viewModel.DurationLabel);
+        Assert.Equal("0:00", viewModel.PositionLabel);
+        Assert.Equal(1.0, viewModel.DurationSeconds);
+
+        var view = new TransportControlsView { DataContext = viewModel };
+        var window = new Window { Width = 640, Height = 320, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        // Present in the tree and not drawn, which is what IsVisible on the row means: Avalonia
+        // realises the children of a hidden panel, so "is it there" is the wrong question and
+        // "would anybody see it" is the right one.
+        var hidden = Assert.Single(
+            view.GetVisualDescendants().OfType<Slider>(),
+            slider => slider.Name == "PositionSlider");
+        Assert.False(hidden.IsEffectivelyVisible, "The scrubber is drawn before the duration is known.");
+
+        // The engine answers with a ten-minute file, and the row arrives with it.
+        await viewModel.SeekAsync(TimeSpan.FromMinutes(2), TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(viewModel.HasDuration);
+        Assert.Equal("2:00", viewModel.PositionLabel);
+        Assert.Equal("10:00", viewModel.DurationLabel);
+        Assert.Equal(120.0, viewModel.PositionSeconds);
+        Assert.Equal(600.0, viewModel.DurationSeconds);
+
+        var scrubber = Assert.Single(
+            view.GetVisualDescendants().OfType<Slider>(),
+            slider => slider.Name == "PositionSlider");
+        Assert.True(scrubber.IsEffectivelyVisible, "The scrubber never appeared with the duration.");
+        Assert.False(
+            string.IsNullOrWhiteSpace(AutomationProperties.GetName(scrubber)),
+            "The scrubber has no accessible name.");
+        Assert.True(scrubber.Focusable, "The scrubber cannot take focus.");
+        Assert.Equal(0, scrubber.Minimum);
+        Assert.Equal(600.0, scrubber.Maximum);
+        Assert.Equal(120.0, scrubber.Value);
+
+        // And the two clocks either side of it, which are the whole point of the row.
+        var clocks = view.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(text => text.Classes.Contains("transport-clock"))
+            .Select(text => text.Text ?? string.Empty)
+            .ToArray();
+        Assert.Equal(["2:00", "10:00"], clocks);
+        window.Close();
+    }
+
+    /// <summary>The hour appears only when there is one, which is what a two-hour film needs.</summary>
+    [Fact]
+    public void A_position_past_the_hour_is_written_with_it()
+    {
+        Assert.Equal("0:00", PlaybackClock.Format(TimeSpan.Zero));
+        Assert.Equal("9:59", PlaybackClock.Format(TimeSpan.FromSeconds(599)));
+        Assert.Equal("59:59", PlaybackClock.Format(TimeSpan.FromSeconds(3599)));
+        Assert.Equal("1:00:00", PlaybackClock.Format(TimeSpan.FromHours(1)));
+        Assert.Equal("2:00:00", PlaybackClock.Format(TimeSpan.FromHours(2)));
+    }
+
+    /// <summary>The volume is a number beside the thumb, which it never was.</summary>
+    [Fact]
+    public async Task The_volume_is_written_as_a_number_and_not_only_as_a_thumb()
+    {
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(new StubEngine()));
+
+        await viewModel.SetVolumeAsync(80, TestContext.Current.CancellationToken);
+        Assert.Equal("80 %", viewModel.VolumeLabel);
+
+        // Above a hundred is the case the readout is worth most: the limiter comes on there, and the
+        // thumb alone cannot say whether it is at 110 or at 200.
+        await viewModel.SetVolumeAsync(180, TestContext.Current.CancellationToken);
+        Assert.Equal("180 %", viewModel.VolumeLabel);
+        Assert.True(viewModel.IsBoosted);
+    }
+
     [AvaloniaFact]
     public async Task A_hundred_rapid_commands_leave_a_deterministic_state()
     {

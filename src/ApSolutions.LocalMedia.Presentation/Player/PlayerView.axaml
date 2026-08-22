@@ -124,76 +124,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource PlayerNoticeNoAudioTrack}"
           TextWrapping="Wrap" />
     </Border>
+    <!--
+      The transport is a band across the foot, which is what the prototype draws and what this was
+      not: a floating card with a 16 px margin on all four sides, so the picture showed through
+      underneath it on the left and the right. A band has one edge - the hairline along its top - and
+      the picture stops there.
+
+      Its surface is the player's own and not the shell's. Everything else in the application sits on
+      a themed background; this sits beside a frame, and a light-themed strip under a dark picture is
+      the seam the whole player surface exists to avoid.
+    -->
     <Border
         x:Name="TransportControlsSurface"
-        Margin="16"
-        Padding="12"
+        Padding="20,14,20,16"
         VerticalAlignment="Bottom"
-        Background="{DynamicResource ShellSurfaceBrush}"
-        BorderBrush="{DynamicResource ShellBorderBrush}"
-        BorderThickness="1"
-        CornerRadius="{DynamicResource CornerRadiusMedium}"
+        Background="{DynamicResource PlayerChromeBrush}"
+        BorderBrush="{DynamicResource PlayerHairlineBrush}"
+        BorderThickness="0,1,0,0"
         Opacity="{Binding ControlsOpacity}"
         automation:AutomationProperties.Name="{DynamicResource PlayerTransportName}">
-      <!--
-        No primary action here, and that is a decision rather than an omission: Play and Pause
-        alternate by state, so marking either would make the screen change what it is for depending
-        on what is happening, and Stop is the point of nothing.
-
-        The three wear player-chrome, which is where the mini player's chrome stops being the mini
-        player's. What they take from it is the 36x36 target area - a real accessibility gain and not
-        a layout one - and the corner. The separation is this panel's spacing, which is why the class
-        no longer carries a margin of its own.
-
-        A WrapPanel and not a horizontal StackPanel, which is what this was: measured on 2026-08-20,
-        the row ended 74px past the right edge of a 900-wide window, and 900 is the minimum the
-        application allows. It is the seventh time this exact shape has drawn a control outside the
-        window here, and the fix is the same one the other six got. The minimum target area this
-        change gives the three buttons makes the row wider, so it is measured rather than assumed.
-      -->
-      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
-        <Button
-            Classes="player-chrome"
-            IsVisible="{Binding CanResume}"
-            automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
-            Command="{Binding ResumeCommand}"
-            Content="&#xE768;" />
-        <Button
-            Classes="player-chrome"
-            IsVisible="{Binding CanPause}"
-            automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
-            Command="{Binding PauseCommand}"
-            Content="&#xE769;" />
-        <Button
-            Classes="player-chrome"
-            automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
-            Command="{Binding StopCommand}"
-            Content="&#xE71A;" />
-        <TextBlock
-            VerticalAlignment="Center"
-            IsVisible="{Binding IsIdle}"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource PlayerStateIdle}" />
-        <TextBlock
-            VerticalAlignment="Center"
-            IsVisible="{Binding IsOpening}"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource PlayerStateOpening}" />
-        <TextBlock
-            VerticalAlignment="Center"
-            IsVisible="{Binding IsPlaying}"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource PlayerStatePlaying}" />
-        <TextBlock
-            VerticalAlignment="Center"
-            IsVisible="{Binding IsPaused}"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource PlayerStatePaused}" />
-        <TextBlock
-            VerticalAlignment="Center"
-            IsVisible="{Binding IsStopped}"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource PlayerStateStopped}" />
+      <StackPanel Spacing="{DynamicResource Space8}">
+        <!--
+          The scrubber and the two clocks come first and take the whole width, which is the row this
+          application never had. It is declared here rather than beside the buttons because a bar
+          that shares a line with them is a bar as wide as whatever they left over.
+        -->
         <ContentControl
             x:Name="TransportControlsHost"
             IsVisible="{Binding Transport, Converter={x:Static ObjectConverters.IsNotNull}}"
@@ -204,7 +159,74 @@ SPDX-License-Identifier: GPL-3.0-or-later
             </DataTemplate>
           </ContentControl.ContentTemplate>
         </ContentControl>
-      </WrapPanel>
+        <!--
+          No primary action here, and that is a decision rather than an omission: Play and Pause
+          alternate by state, so marking either would make the screen change what it is for depending
+          on what is happening, and Stop is the point of nothing.
+
+          The three wear player-chrome for its 44 px target area, which is a real accessibility gain
+          and not a layout one. The separation is this panel's spacing, which is why the class no
+          longer carries a margin of its own.
+
+          A WrapPanel and not a horizontal StackPanel, which is what this was: measured on 2026-08-20,
+          the row ended 74px past the right edge of a 900-wide window, and 900 is the minimum the
+          application allows. It is the seventh time this exact shape has drawn a control outside the
+          window here, and the fix is the same one the other six got.
+
+          The prototype puts these three between the skips - back, play, forward - and here they come
+          after them. That is measured rather than left: Pause, Resume and Stop are the session
+          coordinator's and the skips are ControlPlayback's, and the two models are built at
+          different moments, so interleaving them means moving commands between them rather than
+          moving buttons in a panel.
+        -->
+        <WrapPanel
+            x:Name="SessionActionsSurface"
+            ItemSpacing="{DynamicResource Space8}"
+            LineSpacing="{DynamicResource Space8}">
+          <Button
+              Classes="player-chrome"
+              IsVisible="{Binding CanResume}"
+              automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
+              Command="{Binding ResumeCommand}"
+              Content="&#xE768;" />
+          <Button
+              Classes="player-chrome"
+              IsVisible="{Binding CanPause}"
+              automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
+              Command="{Binding PauseCommand}"
+              Content="&#xE769;" />
+          <Button
+              Classes="player-chrome"
+              automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
+              Command="{Binding StopCommand}"
+              Content="&#xE71A;" />
+          <TextBlock
+              VerticalAlignment="Center"
+              IsVisible="{Binding IsIdle}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource PlayerStateIdle}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              IsVisible="{Binding IsOpening}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource PlayerStateOpening}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              IsVisible="{Binding IsPlaying}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource PlayerStatePlaying}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              IsVisible="{Binding IsPaused}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource PlayerStatePaused}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              IsVisible="{Binding IsStopped}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource PlayerStateStopped}" />
+        </WrapPanel>
+      </StackPanel>
     </Border>
   </Panel>
 </UserControl>

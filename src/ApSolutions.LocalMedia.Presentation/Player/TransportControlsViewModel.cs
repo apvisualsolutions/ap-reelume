@@ -63,6 +63,17 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
 
     public int VolumePercent => _state.Volume.Percent;
 
+    /// <summary>
+    /// The level as it is written beside the slider, which had no number at all before.
+    /// </summary>
+    /// <remarks>
+    /// The percent sign is quoted, and it has to be: an unquoted <c>%</c> in a numeric format string
+    /// is the percent <em>specifier</em>, which multiplies by a hundred. Written the obvious way this
+    /// said "8000 %" at eighty, and the test that caught it was the one asserting the text rather
+    /// than the number behind it.
+    /// </remarks>
+    public string VolumeLabel => _state.Volume.Percent.ToString("0 '%'", CultureInfo.CurrentCulture);
+
     public bool IsMuted => _state.Volume.IsMuted;
 
     /// <summary>True while the level is above one hundred percent; the view shows text and an icon.</summary>
@@ -78,6 +89,46 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
     public string ForwardSkipLabel => FormatSeconds(_state.ForwardSkip);
 
     public string SpeedLabel => _state.SpeedMultiplier.ToString("0.##×", CultureInfo.CurrentCulture);
+
+    /// <summary>Where the session is, as a clock, which is what the transport paints on the left.</summary>
+    public string PositionLabel => PlaybackClock.Format(_state.Position);
+
+    /// <summary>
+    /// How long the file runs, as a clock, or nothing when the engine has not said.
+    /// </summary>
+    /// <remarks>
+    /// Empty rather than a zero, and that is the whole reason this is a string and not a
+    /// <see cref="TimeSpan"/> the view formats: a transport that answered "0:00" to "I do not know
+    /// yet" would be saying the film has no length. What it does instead is show the position alone
+    /// until the duration arrives, which is exactly how <see cref="HasDuration"/> is spent.
+    /// </remarks>
+    public string DurationLabel => _state.Duration is { } duration ? PlaybackClock.Format(duration) : string.Empty;
+
+    /// <summary>
+    /// True once the engine has said how long the file is, which is what a scrubber needs to exist.
+    /// </summary>
+    /// <remarks>
+    /// A slider whose maximum is unknown cannot be dragged to a meaningful place — a thumb halfway
+    /// along a bar of unknown length points at nothing. So the bar is absent rather than disabled
+    /// while the duration is: absent says "not yet", and a greyed bar would say "not for you".
+    /// </remarks>
+    public bool HasDuration => _state.Duration is { } duration && duration > TimeSpan.Zero;
+
+    /// <summary>The position in seconds, for the scrubber, which works in numbers rather than spans.</summary>
+    public double PositionSeconds => _state.Position.TotalSeconds;
+
+    /// <summary>
+    /// The scrubber's maximum, in seconds.
+    /// </summary>
+    /// <remarks>
+    /// One when nothing is known, and never zero: a <c>Slider</c> whose maximum equals its minimum
+    /// puts its thumb at whatever it likes and divides by that difference to place it. The bar is not
+    /// on screen in that state anyway — <see cref="HasDuration"/> keeps it away — and this keeps the
+    /// arithmetic behind it from being the reason somebody finds out.
+    /// </remarks>
+    public double DurationSeconds => _state.Duration is { } duration && duration > TimeSpan.Zero
+        ? duration.TotalSeconds
+        : 1.0;
 
     public async Task SetSpeedAsync(double multiplier, CancellationToken cancellationToken = default) =>
         Apply(await _control.SetSpeedAsync(multiplier, cancellationToken).ConfigureAwait(true));
@@ -104,9 +155,21 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
         {
             nameof(Position),
             nameof(Duration),
+            // The scale before the value, and the order is load-bearing rather than tidy. A Slider
+            // coerces whatever is written into Value against the Maximum it holds at that instant,
+            // and DurationSeconds answers 1 until the engine says otherwise — so announcing the
+            // position first put 120 seconds into a bar whose maximum was still 1, the bar clamped it
+            // to 1, and the handler below turned that clamp into a real seek. Measured on 2026-08-22:
+            // the first state after a two-minute seek came back reading 0:01.
+            nameof(HasDuration),
+            nameof(DurationSeconds),
+            nameof(DurationLabel),
+            nameof(PositionSeconds),
+            nameof(PositionLabel),
             nameof(SpeedMultiplier),
             nameof(SpeedLabel),
             nameof(VolumePercent),
+            nameof(VolumeLabel),
             nameof(IsMuted),
             nameof(IsBoosted),
             nameof(LimiterEngaged),

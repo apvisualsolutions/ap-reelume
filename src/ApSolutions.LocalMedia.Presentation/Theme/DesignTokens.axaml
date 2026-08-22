@@ -130,7 +130,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#F8FAFC" />
+          <!--
+            The player's three, and they are the same in Light and Dark on purpose: what sits beside
+            them is a picture, so the theme does not get a say. The chrome is the surface at 90 %,
+            which is the prototype's own transport band, and the hairline is 10 % white - enough to
+            separate the band from the frame above it without drawing a line across the film.
+
+            In the two high contrast dictionaries both go solid. A band at 90 % over a moving picture
+            has whatever contrast the frame behind it happens to give, and a 10 % hairline is not a
+            line at all to somebody who needs the theme that asks for one.
+          -->
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerChromeBrush" Color="#E60B0D10" />
+          <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#1AFFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#E2E8F0" />
@@ -331,6 +343,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerChromeBrush" Color="#E60B0D10" />
+          <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#1AFFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#1F2937" />
@@ -537,6 +551,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastLight}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#FFFFFF" />
@@ -737,6 +753,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
+          <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#000000" />
@@ -1120,6 +1138,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
     <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
+  </Style>
+
+  <!--
+    The two clocks either side of the scrubber. 58 is the prototype's own minimum and it is a minimum
+    rather than a width because the same bar has to hold 2:00:00 and 49:06: fixed at the shorter one
+    the hour would be clipped, and left to itself the bar would jump sideways every time the position
+    crossed from 9:59 to 10:00. Neither number belongs to a scale this repository tokenises - the
+    three are the type sizes, the five spaces and the two radii - so this is where it is written.
+  -->
+  <Style Selector="TextBlock.transport-clock">
+    <Setter Property="MinWidth" Value="58" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
   </Style>
 
   <!--

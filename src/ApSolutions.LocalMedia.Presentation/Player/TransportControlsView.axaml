@@ -10,18 +10,65 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     x:DataType="player:TransportControlsViewModel"
     automation:AutomationProperties.Name="{DynamicResource TransportAccessibleName}">
-  <StackPanel x:Name="TransportSurface" Spacing="{DynamicResource Space12}">
+  <StackPanel x:Name="TransportSurface" Spacing="{DynamicResource Space8}">
     <!--
-      The three wear player-chrome, which is what §4 asks of this view by name and what the view did
-      not have: measured on 2026-08-21 they sat at MinWidth 0 and MinHeight 36, because the rise from
-      36 to 44 landed on a class these three never took. A glyph needs a square target more than a
-      word does, so the class and the glyph arrive together.
+      The position, which this application did not show at all until 2026-08-22 and which the
+      prototype puts across the whole width of the transport: elapsed on the left, the bar, the
+      length on the right. It is the defect this repository has a name for — the model already held
+      Position, Duration and SeekAsync, three values read on every state change and painted nowhere,
+      so a person watching a film could not see where they were in it.
 
-      Only Content changed. AutomationProperties.Name still points at the resource key, which is what
-      the walk aims at and what a screen reader reads out, so none of the three was renamed - and the
-      seconds each skip covers stay in HelpText, where they were, because the glyph cannot say "ten".
+      The row is absent rather than disabled while the engine has not said how long the file is. A
+      thumb halfway along a bar of unknown length points at nothing, and a greyed bar would say "not
+      for you" where the truth is "not yet".
     -->
-    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+    <Grid
+        x:Name="PositionSurface"
+        ColumnDefinitions="Auto,*,Auto"
+        ColumnSpacing="{DynamicResource Space12}"
+        IsVisible="{Binding HasDuration}">
+      <TextBlock
+          Grid.Column="0"
+          Classes="transport-clock"
+          Text="{Binding PositionLabel}" />
+      <!--
+        Snapped to whole seconds, which is what makes the guard in OnPositionChanged a comparison
+        rather than an epsilon: the engine's position arrives in fractions, the thumb sits on an
+        integer, and both sides round to the same number when nobody has dragged anything.
+      -->
+      <Slider
+          x:Name="PositionSlider"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          Minimum="0"
+          Maximum="{Binding DurationSeconds}"
+          TickFrequency="1"
+          IsSnapToTickEnabled="True"
+          automation:AutomationProperties.Name="{DynamicResource TransportPositionLabel}"
+          ValueChanged="OnPositionChanged"
+          Value="{Binding PositionSeconds, Mode=OneWay}" />
+      <TextBlock
+          Grid.Column="2"
+          Classes="transport-clock"
+          Text="{Binding DurationLabel}" />
+    </Grid>
+
+    <!--
+      One row of controls, which is the prototype's shape and not what this was: the volume slider
+      used to sit under a label of its own on a second line, and the speed on a third. The three
+      buttons wear player-chrome for its 44 px target area - a glyph needs a square target more than
+      a word does - and the seconds each skip covers stay in HelpText, where a screen reader finds
+      them, because the glyph cannot say "ten".
+
+      A WrapPanel and not a horizontal StackPanel, for the reason this tree has measured nine times:
+      a stack offers its children infinite width and draws them where they fall. This row carries a
+      slider with a width of its own and two translated readouts, so it is exactly the shape that has
+      put a control outside the window before.
+    -->
+    <WrapPanel
+        x:Name="TransportRow"
+        ItemSpacing="{DynamicResource Space8}"
+        LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="SkipBackwardButton"
           Classes="player-chrome"
@@ -45,26 +92,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.AcceleratorKey="M"
           Command="{Binding ToggleMuteCommand}"
           Content="&#xE74F;" />
-      <TextBlock
-          x:Name="SpeedReadout"
-          VerticalAlignment="Center"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}"
-          Text="{Binding SpeedLabel}" />
-    </StackPanel>
-
-    <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource TransportVolumeLabel}" />
       <!--
         The binding stays one way on purpose: VolumePercent is what the session came back with, and
         a two-way binding would write the thumb's position into a property that has no setter. What
         carries a chosen level to the session is the handler, which is what this control did not have
         until 2026-08-15 - it moved, and nothing heard it.
+
+        132 is the prototype's width and it has no token: the three scales this repository gates are
+        the type sizes, the five spaces and the two radii, and the width of one slider is none of
+        them. Without a width a slider inside a WrapPanel measures to its own tiny default.
       -->
       <Slider
           x:Name="VolumeSlider"
+          Width="132"
+          VerticalAlignment="Center"
           Minimum="{x:Static player:TransportControlsViewModel.MinimumVolumePercent}"
           Maximum="{x:Static player:TransportControlsViewModel.MaximumVolumePercent}"
           TickFrequency="5"
@@ -73,7 +114,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.AcceleratorKey="Up"
           ValueChanged="OnVolumeChanged"
           Value="{Binding VolumePercent, Mode=OneWay}" />
-    </StackPanel>
+      <!--
+        The level as a number, which the slider alone never said. It is the same omission the
+        position was: VolumePercent existed, the thumb moved, and nothing on screen told anybody
+        whether they were at 80 or at 180 - which matters here, because above 100 the limiter comes
+        on and the warning below explains why.
+      -->
+      <TextBlock
+          x:Name="VolumeReadout"
+          VerticalAlignment="Center"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{Binding VolumeLabel}" />
+      <TextBlock
+          x:Name="SpeedReadout"
+          VerticalAlignment="Center"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}"
+          Text="{Binding SpeedLabel}" />
+    </WrapPanel>
 
     <Border
         x:Name="BoostWarningSurface"

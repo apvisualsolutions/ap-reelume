@@ -78,14 +78,11 @@ public sealed class MarkerRowLabelConverter : IValueConverter
     /// A position as a clock, with the hour only when there is one.
     /// </summary>
     /// <remarks>
-    /// The invariant culture, and on purpose: what comes out is digits and colons, and a culture that
-    /// wrote the separator differently would be describing a duration rather than a position in a
-    /// film. The words around it are the part that follows the language.
+    /// The format moved to <see cref="PlaybackClock"/> when the transport needed the same thing for
+    /// its position and its duration; the decision behind it — the invariant culture — travelled with
+    /// it and is written there.
     /// </remarks>
-    private static string Clock(TimeSpan value) =>
-        value.TotalHours >= 1
-            ? value.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture)
-            : value.ToString(@"m\:ss", CultureInfo.InvariantCulture);
+    private static string Clock(TimeSpan value) => PlaybackClock.Format(value);
 
     /// <summary>
     /// The words behind a key, asked of the application the way a theme-dependent resource has to be.
