@@ -148,6 +148,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MetadataSaveAction">Guardar cambios</x:String>
   <x:String x:Key="MetadataRefreshAction">Actualizar desde el proveedor</x:String>
   <x:String x:Key="MetadataRestoreAction">Restaurar campos del proveedor</x:String>
+  <!-- The arrow between the two paths stays a symbol; these are the words behind it, which is
+       the half a screen reader gets. Without them the row reads as two paths and a character. -->
+  <x:String x:Key="RenameSeparatorAccessibleName">se renombra a</x:String>
   <x:String x:Key="RenamePreviewAccessibleName">Previsualización segura de renombrado</x:String>
   <x:String x:Key="RenamePreviewTitle">Previsualizar renombrado</x:String>
   <x:String x:Key="RenamePreviewDescription">Revisa cada ruta de origen y destino. No se modificará ningún archivo hasta que confirmes expresamente.</x:String>

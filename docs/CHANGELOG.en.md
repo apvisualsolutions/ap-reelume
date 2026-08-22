@@ -157,6 +157,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The rename preview was hiding the part that changes.** Both paths were cut off at the end, and the
+  end is the file name — the only thing that tells the source from the destination. They now shorten in
+  the middle, keeping both ends, and use a fixed-width font so they line up under each other. The arrow
+  between them now says what it means to a screen reader.
+
+
 - **The metadata editor had eight fields with no visible label.** Title, original title, overview,
   year, genres, poster, backdrop, and the artwork's alternative text: all eight announced their name to
   a screen reader and were eight identical boxes on screen. Each now carries its label above it.

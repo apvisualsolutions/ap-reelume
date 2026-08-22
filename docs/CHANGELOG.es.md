@@ -158,6 +158,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La vista previa de renombrado escondía justo la parte que cambia.** Las dos rutas se cortaban por
+  el final, y el final es el nombre del archivo — lo único que distingue el origen del destino. Ahora
+  se acortan por el medio, conservando los dos extremos, y van en ancho fijo para que se lean una
+  debajo de otra. La flecha entre ambas dice ya qué significa a un lector de pantalla.
+
+
 - **El editor de metadatos tenía ocho campos sin etiqueta a la vista.** Título, título original,
   sinopsis, año, géneros, cartel, fondo y el texto alternativo: los ocho anunciaban su nombre a un
   lector de pantalla y en la pantalla eran ocho cajas idénticas. Ahora cada uno lleva su etiqueta

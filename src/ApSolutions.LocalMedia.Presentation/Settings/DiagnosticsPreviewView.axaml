@@ -39,13 +39,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
         FontSizeMono was considered on exactly that ground and left undeclared. FontSizeBody is a token
         the markup does not have to write as a number.
 
-        Two families, so a host without the first still draws fixed-width instead of whatever it likes.
+        The family is the shared token now that three views spend it; it lived here as a literal
+        while this was its only reader.
       -->
       <TextBox
           x:Name="DiagnosticsPreviewText"
           MaxHeight="320"
           AcceptsReturn="True"
-          FontFamily="Consolas,Cascadia Mono,monospace"
+          FontFamily="{DynamicResource FontFamilyMono}"
           FontSize="{DynamicResource FontSizeBody}"
           IsReadOnly="True"
           Text="{Binding PreviewJson, Mode=OneWay}"

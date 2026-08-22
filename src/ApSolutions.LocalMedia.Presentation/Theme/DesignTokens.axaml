@@ -61,14 +61,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <!--
         Five sizes for the whole application, mapped from the thirteen literals the views carried:
         34 and 32 to Display, 30/28/26 to Title, 24/22/20/18 to Subtitle, 17/16/14 to Body, 12 to
-        Caption. FontSizeMono is not declared, because nothing spends it yet and the scalars gate
-        refuses a token nobody reads — it arrives with the first path or hash that needs it.
+        Caption. FontSizeMono is still not declared: the three fixed-width surfaces read at body size
+        and none of them asks for a size of its own, so it would be a scalar with one reader - which
+        is what the scalars gate exists to refuse. The FAMILY is a different token and it is declared
+        below, because three views spend it.
       -->
       <x:Double x:Key="FontSizeDisplay">32</x:Double>
       <x:Double x:Key="FontSizeTitle">28</x:Double>
       <x:Double x:Key="FontSizeSubtitle">20</x:Double>
       <x:Double x:Key="FontSizeBody">14</x:Double>
       <x:Double x:Key="FontSizeCaption">12</x:Double>
+
+      <!--
+        Fixed width, for the three surfaces where characters have to line up under each other: the
+        diagnostics dump somebody reads before sharing it, the two paths of a rename, and the figures
+        that tell one duplicate from another. Declared once now that three views spend it - one reader
+        would have been the defect this repository names, which is why it lived as a literal until now.
+
+        Three families and not one: Consolas ships with Windows, Cascadia Mono is what the terminal
+        uses, and the generic name is what a host with neither falls back to.
+      -->
+      <FontFamily x:Key="FontFamilyMono">Consolas,Cascadia Mono,monospace</FontFamily>
 
       <!--
         Four dictionaries, and every one of them carries the same twenty-three brushes. A brush missing

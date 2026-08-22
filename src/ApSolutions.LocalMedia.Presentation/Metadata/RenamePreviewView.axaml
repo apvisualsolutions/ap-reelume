@@ -16,17 +16,45 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <home:ResourceKeyConverter x:Key="RenameResourceKey" />
   </UserControl.Resources>
   <Grid Margin="24" RowDefinitions="Auto,*,Auto,Auto,Auto" RowSpacing="{DynamicResource Space12}">
-    <StackPanel>
-      <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource RenamePreviewTitle}" />
+    <StackPanel Spacing="{DynamicResource Space4}">
+      <!-- A section of the library pane, whose level one belongs to LibraryView. -->
+      <TextBlock
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RenamePreviewTitle}"
+          automation:AutomationProperties.HeadingLevel="2" />
       <TextBlock Text="{DynamicResource RenamePreviewDescription}" TextWrapping="Wrap" />
     </StackPanel>
     <ListBox Grid.Row="1" ItemsSource="{Binding Operations}" automation:AutomationProperties.Name="{DynamicResource RenameOperationListName}">
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="discovery:RenameOperation">
+          <!--
+            Fixed width, so the two paths line up character under character and the eye finds the one
+            segment that differs instead of hunting for it.
+
+            PathSegmentEllipsis and not CharacterEllipsis, which is what these carried: character
+            trimming eats the END, and the end of a rename is the file name - the only part that
+            differs. This one drops middle segments and keeps both ends. §4 says the same thing about
+            the restore wizard's roots in its own words: paths are told apart by their end.
+
+            The arrow stays a symbol and gains the words behind it, which is the half a screen reader
+            gets; without them the row reads as two paths and a character.
+          -->
           <Grid Margin="4" ColumnDefinitions="*,Auto,*" ColumnSpacing="{DynamicResource Space8}">
-            <TextBlock Text="{Binding SourcePath}" TextTrimming="CharacterEllipsis" />
-            <TextBlock Grid.Column="1" Text="→" />
-            <TextBlock Grid.Column="2" Text="{Binding DestinationPath}" TextTrimming="CharacterEllipsis" />
+            <TextBlock
+                FontFamily="{DynamicResource FontFamilyMono}"
+                Text="{Binding SourcePath}"
+                TextTrimming="PathSegmentEllipsis" />
+            <TextBlock
+                Grid.Column="1"
+                Text="→"
+                automation:AutomationProperties.Name="{DynamicResource RenameSeparatorAccessibleName}" />
+            <TextBlock
+                Grid.Column="2"
+                FontFamily="{DynamicResource FontFamilyMono}"
+                Text="{Binding DestinationPath}"
+                TextTrimming="PathSegmentEllipsis" />
           </Grid>
         </DataTemplate>
       </ListBox.ItemTemplate>
@@ -51,7 +79,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsChecked="{Binding IsConfirmed}"
         Content="{DynamicResource RenameExplicitConsent}"
         automation:AutomationProperties.Name="{DynamicResource RenameExplicitConsent}" />
-    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+    <!-- A WrapPanel, for the reason written eight times in this repository. -->
+    <WrapPanel Grid.Row="4" ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           Classes="primary-action"
           Command="{Binding ExecuteCommand}"
@@ -61,6 +90,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding UndoCommand}"
           Content="{DynamicResource RenameUndoAction}"
           automation:AutomationProperties.Name="{DynamicResource RenameUndoAction}" />
-    </StackPanel>
+    </WrapPanel>
   </Grid>
 </UserControl>
