@@ -74,7 +74,13 @@ public sealed partial class TransportControlsView : UserControl
         // value that arrived while that was true is a clamp rather than a choice. This is the second
         // half of the same defect the notification order above describes: with only the order fixed,
         // any future path that set Value before Maximum would seek somebody's film to one second.
-        if (sender is Slider slider && Math.Abs(slider.Maximum - viewModel.DurationSeconds) > 0.5)
+        //
+        // The scrubber is named rather than taken from `sender`, and that is measured: written as
+        // `sender is Slider slider` the pattern adds a branch for "the sender is not the slider",
+        // which nothing can take — this handler is attached to that one control and to nothing else.
+        // A guard no caller can reach is a branch no test can cover, which is what dragged
+        // FluentThemeService's coverage backwards on the same day.
+        if (Math.Abs(PositionSlider.Maximum - viewModel.DurationSeconds) > 0.5)
         {
             return;
         }

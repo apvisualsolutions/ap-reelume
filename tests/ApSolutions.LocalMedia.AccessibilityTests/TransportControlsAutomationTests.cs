@@ -199,6 +199,15 @@ public sealed class TransportControlsAutomationTests
             .Select(text => text.Text ?? string.Empty)
             .ToArray();
         Assert.Equal(["2:00", "10:00"], clocks);
+
+        // The guard, and it is the half of the fix that the notification order does not cover: a
+        // value that arrives while the bar's maximum is not the file's length is a clamp and not a
+        // choice. Reproduced by giving the bar a maximum that is not the duration and then moving the
+        // thumb — which is exactly the state that took a two-minute position to 0:01 before the fix.
+        scrubber.Maximum = 300;
+        scrubber.Value = 150;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(TimeSpan.FromMinutes(2), viewModel.Position);
         window.Close();
     }
 

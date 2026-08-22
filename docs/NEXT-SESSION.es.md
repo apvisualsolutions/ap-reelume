@@ -67,6 +67,47 @@ ocupa sitio cuando alguno de sus cinco paneles existe**.
 4. **La línea de atajos del pie. DECIDIDO: no se hace.** Los atajos de esta aplicación se configuran
    en `ShortcutSettingsView`, así que una línea fija diría algo que puede ser falso.
 
+### La pieza 3, ya MEDIDA contra el prototipo — no vuelvas a extraerla
+
+Capturado el 2026-08-22 con el prototipo en cada ruta (`chrome --headless=new`, cambiando `route:` en
+una copia del `.dc.html`). **Las tres diferencias son estructurales, no de estilo**, y esto es lo que
+cuesta cada área:
+
+**Ajustes (7 vistas) — la diferencia más grande de las tres.** El prototipo tiene **un índice lateral
+de doce secciones** —Apariencia, Biblioteca y escaneo, Reproducción, Audio, Subtítulos, Accesibilidad,
+Privacidad, Detección de segmentos, Atajos, Copias y restauración, Actualización, Créditos y
+atribución— con la activa resaltada, y **enseña UNA sección a la vez** a la derecha. Aquí Ajustes es
+**una sola página con diez secciones apiladas** dentro de un `ScrollViewer` de `ShellView`.
+- Y dentro de una sección, la unidad es **una fila-tarjeta por ajuste**: nombre en negrita, descripción
+  debajo en secundario, y **el control alineado a la derecha**, con la palabra de estado
+  («Activado»/«Desactivado») a la izquierda del interruptor y el valor a la derecha del deslizador.
+  Eso sí se puede hacer sin tocar la estructura, y probablemente sea la mitad del parecido por una
+  décima parte del riesgo.
+- **Ojo con la tabla del índice**: dos de sus doce secciones —Copias y restauración, Créditos— son hoy
+  **destino propio** o viven en otra vista. El índice del prototipo y los cinco destinos del carril no
+  son la misma lista, y ya hay una decisión escrita sobre no cambiar un destino por otro.
+
+**Revisión (3 vistas).** Cada candidato es una **tarjeta ancha con borde izquierdo de acento** —azul
+para «Sugerido (60–89 %)», ámbar para «Pendiente (< 60 %)», y el distintivo arriba a la derecha—, con
+miniatura 2:3 a la izquierda y **dos columnas dentro**: «CANDIDATO PROPUESTO» (título, tipo, barra de
+confianza con su porcentaje) y «SEÑALES CONSIDERADAS» (viñetas). Los cuatro botones al pie de la
+tarjeta, con Aceptar como primario. `PosterCardView` ya existe y la miniatura podría salir de ahí.
+
+**Metadatos (2 vistas) — y aquí el prototipo cambia la navegación, no sólo el dibujo.** El editor y el
+renombrado son **dos pestañas píldora de una misma pantalla** («Metadatos» / «Renombrado seguro»), bajo
+unas migas «Volver · Biblioteca» y un antetítulo con el tipo. Hoy `MetadataEditorView` y
+`RenamePreviewView` son **dos `ContentControl` apilados** en la ruta Biblioteca, visibles a la vez.
+- El editor va en **dos columnas de campos**, cada etiqueta con su botón de candado
+  («Bloqueado»/«Desbloqueado») **a la derecha de la etiqueta**, y un panel «Arte» aparte a la derecha
+  con miniaturas elegibles. El pie lleva la nota y «Guardar cambios» alineado a la derecha.
+
+**Catálogo (2) y Copias (2)** siguen la misma gramática de fila-tarjeta; no hacen falta capturas
+propias para empezar.
+
+**El orden por parecido ganado / riesgo:** primero la **fila-tarjeta** en Ajustes (sin tocar la
+estructura), luego la **tarjeta de candidato** de Revisión, y sólo después el índice lateral y las
+pestañas, que son cambios de navegación y tocan `ShellView`.
+
 ### Y una trampa de medición que costó tres capturas, y ya está en la memoria
 
 **Un script de PowerShell que no declara conciencia de DPI recibe de `GetWindowRect` un rectángulo
