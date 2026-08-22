@@ -2433,6 +2433,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.False(dialog!.IsVisible, "The question was on screen before anything had been switched.");
 
         // ---- Confirm: the question is raised by the switch, and answered by keeping the position.
+        await OpenPlayerPanelAsync(host, "PlayerVersionsTitle");
         await PressAsync(
             host,
             "PlayerVersionsSwitchAction",
@@ -3240,6 +3241,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         Assert.Equal(string.Empty, await ManualRangesAsync());
 
+        await OpenPlayerPanelAsync(host, "MarkerEditorAccessibleName");
         await PressAsync(
             host,
             "MarkerEditorKindLabel",
@@ -3314,6 +3316,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // surface that changed its own copy and stored nothing looks identical on screen.
         review.Selected = review.Detections.Single(row => row.Id == proposals[0].Id);
         Dispatcher.UIThread.RunJobs();
+        await OpenPlayerPanelAsync(host, "DetectedMarkerReviewTitle");
         await PressAsync(
             host,
             "DetectedMarkerReviewAccept",
@@ -3587,6 +3590,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var audio = host.ViewModel.Player!.AudioOutput;
         Assert.NotNull(audio);
 
+        await OpenPlayerPanelAsync(host, "AudioOutputAccessibleName");
         await PressAsync(
             host,
             "AudioOutputDeviceLabel",
@@ -4222,6 +4226,48 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// screen reader reads out after the name.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// Opens one of the player column's panels by clicking its tab, the way a person would.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The column switched from five panels stacked to one at a time on 2026-08-22, and the walk is
+    /// what measured the cost: four scenes went red at once, each of them saying a control "matched 0
+    /// controls on screen". They were right - a panel that is not the open tab is not in the tree, so
+    /// the click had nowhere to land. That is the whole point of pressing with a mouse.
+    /// </para>
+    /// <para>
+    /// A tab is not a command control - the inventory counts Button, CheckBox, ComboBox, Slider,
+    /// ToggleButton, RadioButton and ToggleSwitch - so this does not record anything in the ledger.
+    /// What it does is put the panel on screen, and assert that the click did it, which is the same
+    /// contract PressAsync holds for everything else.
+    /// </para>
+    /// </remarks>
+    private static async Task OpenPlayerPanelAsync(ShellHost host, string headerKey)
+    {
+        var header = Avalonia.Application.Current!.TryFindResource(headerKey, out var resolved)
+            && resolved is string text
+                ? text
+                : headerKey;
+        var tabs = Reachable(host)
+            .OfType<TabItem>()
+            .Where(item => item.IsEffectivelyVisible)
+            .Where(item => (item.Header as string) == header)
+            .ToArray();
+        Assert.True(
+            tabs.Length == 1,
+            $"{headerKey} matched {tabs.Length} tabs in the player column; a click needs exactly one.");
+
+        var tab = tabs[0];
+        if (!tab.IsSelected)
+        {
+            Click(host, tab);
+            await SettleAsync();
+        }
+
+        Assert.True(tab.IsSelected, $"clicking the {header} tab did not open the panel behind it.");
+    }
+
     private static Control Resolve(ShellHost host, string anchor, string? helpText = null)
     {
         var expected = Avalonia.Application.Current!.TryFindResource(anchor, out var resolved) && resolved is string text

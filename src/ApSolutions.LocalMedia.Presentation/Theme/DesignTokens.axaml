@@ -1534,4 +1534,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="ProgressBar.confidence.pending">
     <Setter Property="Foreground" Value="{DynamicResource WarningBorderBrush}" />
   </Style>
+  <!--
+    The player's panel column, switched instead of stacked. The prototype shows one panel at a time
+    and puts its switch in the header; this puts it at the head of the column, which is the same
+    decision one control closer to what it opens.
+
+    A TabControl and no view model, and that is measured rather than assumed: on 2026-08-22, Avalonia
+    12.1.1 was checked to skip an invisible TabItem when it auto-selects - a column whose first panel
+    does not exist opens on the first one that does, with nothing in the shell having to work it out.
+
+    The headers wrap, because these five names are translated and a horizontal strip offers its
+    children infinite width - the shape this repository has measured nine times, and the column is
+    320 px by definition.
+
+    The ink is the player's, for the reason the whole column now carries: the base ControlTheme paints
+    a tab header with the theme's foreground, which is dark in two of the four modes, over a surface
+    that is dark in all four.
+  -->
+  <Style Selector="TabControl.player-panels TabItem">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource PlayerTextSecondaryBrush}" />
+  </Style>
+
+  <Style Selector="TabControl.player-panels TabItem:selected">
+    <Setter Property="Foreground" Value="{DynamicResource PlayerTextBrush}" />
+  </Style>
 </Styles>
