@@ -87,10 +87,8 @@ public sealed class BackupViewModel : INotifyPropertyChanged
         get => _statusKey;
         private set
         {
-            if (SetField(ref _statusKey, value))
-            {
-                OnPropertyChanged(nameof(HasFailed));
-            }
+            SetField(ref _statusKey, value);
+            OnPropertyChanged(nameof(HasFailed));
         }
     }
 
@@ -103,6 +101,11 @@ public sealed class BackupViewModel : INotifyPropertyChanged
     /// rather than set, so a third failure cannot appear without passing through here.
     /// </remarks>
     public bool HasFailed => StatusKey is "BackupStatusFailed" or "BackupStatusNoSpace";
+
+    // The derived flags are announced without asking whether the value moved. Guarding that would add
+    // a branch nothing can take for StatusKey - every run passes through "running", so the same key is
+    // never assigned twice in a row - and a redundant PropertyChanged on a bool bound to IsVisible
+    // costs nothing. A branch nobody can reach is the shape this repository has removed twice already.
 
     public string? StageKey
     {
@@ -128,10 +131,8 @@ public sealed class BackupViewModel : INotifyPropertyChanged
         get => _lastCopyName;
         private set
         {
-            if (SetField(ref _lastCopyName, value))
-            {
-                OnPropertyChanged(nameof(HasLastCopy));
-            }
+            SetField(ref _lastCopyName, value);
+            OnPropertyChanged(nameof(HasLastCopy));
         }
     }
 
@@ -141,10 +142,8 @@ public sealed class BackupViewModel : INotifyPropertyChanged
         get => _lastArchiveName;
         private set
         {
-            if (SetField(ref _lastArchiveName, value))
-            {
-                OnPropertyChanged(nameof(HasLastArchive));
-            }
+            SetField(ref _lastArchiveName, value);
+            OnPropertyChanged(nameof(HasLastArchive));
         }
     }
 

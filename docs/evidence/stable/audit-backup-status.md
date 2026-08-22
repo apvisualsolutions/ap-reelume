@@ -15,6 +15,7 @@ Los dos fallos que el modelo puede alcanzar son `BackupStatusFailed` y `BackupSt
 NO es uno**, y eso es una decisión con su razón: su propia cadena dice «Se ha cancelado. No se ha creado
 nada a medias», y a quien pulsa cancelar no hay que decirle en rojo que lo que paró paró. `HasFailed` se
 **deriva** de la clave en vez de asignarse, así que un tercer fallo no puede aparecer sin pasar por ahí.
+Su clave genérica tiene prueba propia — ver la corrección de abajo.
 / Cancelling is deliberately not a failure; `HasFailed` is derived rather than set.
 
 **Dos bordes y no un fondo enlazado**, porque `HighContrastTests` prohíbe un `Background` que venga de
@@ -50,10 +51,29 @@ a un árbol que la incumple. Las dos copias se van y sus mitades de comprobació
 donde estaban — **al borrar algo, la garantía se mueve, no se pierde**. / Stated once over all of them,
 with the guarantee moved rather than dropped.
 
+## ⚠ Y una roja de CI que era del código, no del trinquete / And a CI red that was the code's, not the ratchet's
+
+El primer intento se fue en rojo con **`BackupViewModel.cs` fell to 100/78, below the 100/82 it held**.
+No es el baile del trinquete: **bajé el suelo yo**, añadiendo ramas sin cubrirlas. La puerta hizo
+exactamente lo que existe para hacer. / Not the ratchet dance: I lowered the floor by adding branches
+without covering them.
+
+Medidas, las ramas nuevas sin cubrir eran los tres `if (SetField(ref …, value))` con los que notificaba
+las propiedades derivadas, y una de las dos claves de `HasFailed`. Y **la de `StatusKey` no la puede
+tomar nadie**: cada ejecución pasa por «copiando», así que la misma clave nunca se asigna dos veces
+seguidas. Es la guarda que nada puede tomar, por tercera vez en esta tanda. / One of them was a guard
+nothing can take, for the third time in this batch.
+
+Las tres notificaciones pasan a ser **incondicionales** —un `PropertyChanged` de más sobre un `bool`
+enlazado a `IsVisible` no cuesta nada— y la clave genérica `BackupStatusFailed` gana su prueba: una
+excepción sin tratamiento especial, que es el caso que alguien se encuentra de verdad. Resultado:
+**100 % de líneas y 84,1 % de ramas** sobre un suelo de 82. / The three notifications become
+unconditional and the generic key gets its test.
+
 ## El verde / The green
 
 ```
-UiTests             694/694
+UiTests             695/695
 AccessibilityTests  135/135
 IntegrationTests    456/457, 1 omitida por diseño / 1 skipped by design
 dotnet format       sin cambios / no changes

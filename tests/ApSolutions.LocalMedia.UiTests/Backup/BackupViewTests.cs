@@ -440,6 +440,26 @@ public sealed class BackupViewTests
         window.Close();
     }
 
+    /// <summary>
+    /// A failure with no special cause is a failure too.
+    /// </summary>
+    /// <remarks>
+    /// <c>HasFailed</c> names two keys and the suite only ever reached one of them. An exception with
+    /// no special handling gives <c>BackupStatusFailed</c>, which is the generic case and the one
+    /// somebody is most likely to meet — a disk that went away, a file the antivirus grabbed.
+    /// </remarks>
+    [Fact]
+    public async Task A_failure_with_no_special_cause_is_a_failure_too()
+    {
+        var viewModel = CreateViewModel(onCopy: (_, _) => throw new InvalidOperationException("no reason"));
+        await viewModel.CreateCopyAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal("BackupStatusFailed", viewModel.StatusKey);
+        Assert.True(viewModel.HasFailed);
+        Assert.False(viewModel.HasLastCopy);
+        Assert.False(viewModel.HasLastArchive);
+    }
+
     private static void AssertFailureSurface(BackupViewModel viewModel, bool expected)
     {
         var (window, view) = ShowBackup(viewModel);
