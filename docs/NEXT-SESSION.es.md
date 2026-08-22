@@ -2,7 +2,18 @@
 
 ## Estado al abrir (2026-08-21)
 
-**`main` en `ac3fc65`, verde; el tramo 6 CERRADO y el 7 empezado** (`DatabaseRecoveryView`, [su evidencia](evidence/stable/audit-database-recovery.md)). La fase 6 va por **5 tramos
+**`main` en `f6f6076`, verde; el tramo 6 CERRADO y el 7 por la mitad**
+(`DatabaseRecoveryView` [evidencia](evidence/stable/audit-database-recovery.md) y `CreditsView`
+[evidencia](evidence/stable/audit-settings-sections-blind-spot.md)).
+
+**⚠ Y una puerta propia que era ciega, corregida el 2026-08-22.**
+`SettingsPageStructureTests` buscaba las secciones de Ajustes **por el nombre de su clase**
+(`EndsWith("SettingsView")`) y **tres de las diez no se llaman así** —el estilo de subtítulos y los
+atajos viven en `Player/`, el actualizador en `Updates/`, los créditos en `About/`—, así que medía
+siete, las encontraba consistentes y pasaba mientras tres empezaban 158 px más a la izquierda. **Una
+convención de nombres no es una estructura.** El panel se llama ahora `SettingsSections`, la prueba lo
+recorre y afirma el recuento primero. **Vale para cualquier puerta que agrupe: identifica por dónde
+está montado, no por cómo se llama.** La fase 6 va por **5 tramos
 de 9 cerrados**
 —Shell, Inicio, Biblioteca y fichas, el Reproductor entero y **Ajustes**—:
 `AppearanceSettingsView` ([su evidencia](evidence/stable/audit-appearance-page.md)), las **tres del

@@ -78,29 +78,50 @@ public sealed class SettingsPageStructureTests
 
         // Level two and not every heading: a section's start is its own title, and a heading nested
         // inside one - the diagnostics preview sits on a surface of its own - is indented on purpose.
-        var lefts = SettingsHeadings(shell)
+        var titles = SettingsHeadings(shell)
             .Where(entry => entry.Owner is not null && entry.Level == 2)
-            .Select(entry => Math.Round(entry.Left, 0))
-            .Distinct()
             .ToArray();
 
+        // The count is asserted first, because the version of this that measured seven of ten passed.
+        Assert.True(
+            titles.Length >= 10,
+            $"only {titles.Length} sections were found, and the page has ten: "
+                + string.Join(", ", titles.Select(entry => entry.Owner)));
+
+        var lefts = titles.Select(entry => Math.Round(entry.Left, 0)).Distinct().ToArray();
         Assert.Single(lefts);
         window.Close();
     }
 
-    private static (int Level, string Text, double Left, string? Owner)[] SettingsHeadings(ShellView shell) =>
-        [.. shell.GetVisualDescendants()
-            .OfType<TextBlock>()
-            .Select(block => (
-                Level: (int)AutomationProperties.GetHeadingLevel(block),
-                Text: block.Text ?? string.Empty,
-                Left: block.TranslatePoint(new Point(0, 0), shell)?.X ?? double.NaN,
-                Owner: block.GetVisualAncestors()
-                    .OfType<UserControl>()
-                    .FirstOrDefault(owner => owner.GetType().Name.EndsWith("SettingsView", StringComparison.Ordinal))
-                    ?.GetType().Name))
-            .Where(entry => entry.Level > 0)
-            .Where(entry => entry.Owner is not null || entry.Text == Resource("NavigationSettings"))];
+    /// <summary>
+    /// The headings of the settings page, found by walking the panel that holds its sections.
+    /// </summary>
+    /// <remarks>
+    /// <b>This asked the owner's class name whether it ended in "SettingsView", and that was blind.</b>
+    /// Three of the ten sections are views from elsewhere mounted on this page — the subtitle style,
+    /// the updater and the credits — so the filter measured seven, found them consistent, and passed
+    /// while three started 158 px to the left. The panel is named now and this walks it: a section
+    /// cannot escape by being called something else.
+    /// </remarks>
+    private static (int Level, string Text, double Left, string? Owner)[] SettingsHeadings(ShellView shell)
+    {
+        var sections = shell.FindControl<StackPanel>("SettingsSections");
+        Assert.True(sections is not null, "the shell declares no named panel for the settings sections.");
+        return
+        [
+            .. sections!.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Select(block => (
+                    Level: (int)AutomationProperties.GetHeadingLevel(block),
+                    Text: block.Text ?? string.Empty,
+                    Left: block.TranslatePoint(new Point(0, 0), shell)?.X ?? double.NaN,
+                    Owner: block.GetVisualAncestors()
+                        .OfType<UserControl>()
+                        .FirstOrDefault(owner => owner is not ShellView)
+                        ?.GetType().Name))
+                .Where(entry => entry.Level > 0),
+        ];
+    }
 
     /// <summary>
     /// The shell without a view model, which is what puts the settings pane and all seven on screen.

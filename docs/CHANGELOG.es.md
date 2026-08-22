@@ -158,6 +158,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Ajustes termina de alinearse.** Tres de sus diez apartados —estilo de subtítulos, actualizaciones y
+  créditos— seguían empezando más a la izquierda que los otros siete. Ya no.
+
+
 - **Los círculos de estado dejan de verse pequeños.** Los `○ ◐ ●` que marcan si has visto algo, en qué
   destino estás y qué tema tienes puesto se dibujaban a dos tercios del tamaño de los símbolos del
   reproductor, lo justo para parecer un carácter suelto en vez de un estado. Los trece pasan al mismo

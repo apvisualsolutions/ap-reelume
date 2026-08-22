@@ -157,6 +157,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Settings finishes lining up.** Three of its ten sections — subtitle style, updates, and credits —
+  still started further left than the other seven. They no longer do.
+
+
 - **The state circles stop looking small.** The `○ ◐ ●` that mark whether you have watched something,
   which destination you are in, and which theme is on were drawn at two thirds the size of the player's
   symbols — just enough to read as a stray character instead of a state. All thirteen move to one size.

@@ -8,7 +8,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     automation:AutomationProperties.Name="{DynamicResource AboutCreditsAccessibleName}">
-  <StackPanel Spacing="{DynamicResource Space8}">
+  <!-- §4's skeleton for a settings section: the padded surface and the 620 reading column every
+       section of that page shares. Without it this one started 158 px left of the others. -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+  <StackPanel MaxWidth="620" Spacing="{DynamicResource Space8}">
     <TextBlock
         Text="{DynamicResource AboutCreditsHeading}"
         FontSize="{DynamicResource FontSizeSubtitle}"
@@ -43,6 +46,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </Path>
 
     <TextBlock Text="{DynamicResource AboutTmdbAttribution}" TextWrapping="Wrap" />
+    <!--
+      §4 asks for "licences in monospace" and it is refused, with what this screen actually holds:
+      AboutLicenseNotice is one sentence saying the application is GPL-3.0-or-later, not a listing.
+      Fixed width is for text whose characters have to line up under each other; prose set in it is
+      only harder to read. The third-party notices this row is thinking of are files inside the
+      package, and the day they get a screen of their own is the day monospace belongs to them.
+    -->
     <TextBlock Text="{DynamicResource AboutLicenseNotice}" TextWrapping="Wrap" />
   </StackPanel>
+  </Border>
 </UserControl>
