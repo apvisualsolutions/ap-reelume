@@ -878,10 +878,16 @@ public static partial class CompositionRoot
         }
 
         var transport = provider.GetRequiredService<TransportControlsViewModel>();
+
+        // Declared here and filled in far below, because the player is built before the version group
+        // has been read and it needs to be able to ask. A value passed at this point would always be
+        // the answer from before anybody looked.
+        PlayerVersionsViewModel? versions = null;
         var player = new PlayerViewModel(
             provider.GetRequiredService<IPlaybackSessionCoordinator>(),
             provider.GetRequiredService<IVideoFrameSource>(),
-            provider.GetRequiredService<IExternalPlaybackLauncher>())
+            provider.GetRequiredService<IExternalPlaybackLauncher>(),
+            () => versions?.HasAlternatives == true)
         {
             Transport = transport,
         };
@@ -1258,7 +1264,7 @@ public static partial class CompositionRoot
                     restartFromZero: choice == VersionSwitchChoice.Restart)
                 .ConfigureAwait(true);
         });
-        var versions = versionGroup is null
+        versions = versionGroup is null
             ? null
             : new PlayerVersionsViewModel([.. versionGroup.Versions
                 .Where(version => version.MediaFileId != mediaFileId)

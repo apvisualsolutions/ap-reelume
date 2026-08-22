@@ -19,6 +19,7 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
 {
     private readonly IPlaybackSessionCoordinator _coordinator;
     private readonly IExternalPlaybackLauncher? _externalLauncher;
+    private readonly Func<bool>? _alternativesExist;
     private PlaybackState _state = PlaybackState.Idle;
     private PlaybackFailureCode? _failureCode;
     private IReadOnlyList<PlaybackRecoveryAction> _recoveryActions = [];
@@ -28,13 +29,24 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     private bool _externalLaunchFailed;
     private bool _areControlsRevealed = true;
 
+    /// <param name="alternativesExist">
+    /// Whether the content being played has other versions catalogued, asked rather than stored.
+    /// </param>
+    /// <remarks>
+    /// It is a delegate and not a value because the session is assembled in that order: the player is
+    /// built before the version group has been read, so a value passed here would always be the one
+    /// that was true before anybody looked. Absent, this model answers that there are none, which is
+    /// what a player with no catalogue behind it should say.
+    /// </remarks>
     public PlayerViewModel(
         IPlaybackSessionCoordinator coordinator,
         IVideoFrameSource? frameSource = null,
-        IExternalPlaybackLauncher? externalLauncher = null)
+        IExternalPlaybackLauncher? externalLauncher = null,
+        Func<bool>? alternativesExist = null)
     {
         _coordinator = coordinator ?? throw new ArgumentNullException(nameof(coordinator));
         _externalLauncher = externalLauncher;
+        _alternativesExist = alternativesExist;
         FrameSource = frameSource;
         PauseCommand = new AsyncRelayCommand(() => _coordinator.PauseAsync(CancellationToken.None), () => CanPause);
         ResumeCommand = new AsyncRelayCommand(() => _coordinator.ResumeAsync(CancellationToken.None), () => CanResume);
@@ -137,7 +149,23 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     public bool CanRetry =>
         _recoveryActions.Contains(PlaybackRecoveryAction.Retry) && !string.IsNullOrWhiteSpace(MediaPath);
 
-    public bool CanChooseAnotherVersion => _recoveryActions.Contains(PlaybackRecoveryAction.ChooseAnotherVersion);
+    /// <summary>
+    /// True when the domain offers this recovery <b>and</b> there is another version to move to.
+    /// </summary>
+    /// <remarks>
+    /// The domain decides by failure code: five of the seven offer this, which makes it the most
+    /// offered of the three. It knows nothing about whether the title has a version group, so on its
+    /// own it said "choose another version of the same content" to somebody with one file - which is
+    /// the ordinary case, because most files have no alternative version at all.
+    /// <para>
+    /// Its two siblings both check that the action can actually be carried out - <c>CanRetry</c> wants
+    /// a path, <c>CanOpenExternally</c> wants a path and a launcher - and they are the two that have a
+    /// button. This one had neither the check nor the button.
+    /// </para>
+    /// </remarks>
+    public bool CanChooseAnotherVersion =>
+        _recoveryActions.Contains(PlaybackRecoveryAction.ChooseAnotherVersion)
+        && _alternativesExist?.Invoke() == true;
 
     public bool CanOpenExternally =>
         _externalLauncher is not null

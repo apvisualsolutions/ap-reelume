@@ -158,7 +158,11 @@ public sealed class PlayerViewModelTests
         {
             FailureOnStart = new PlaybackFailure(PlaybackFailureCode.UnsupportedCodec, "no decoder"),
         };
-        var viewModel = new PlayerViewModel(coordinator, frameSource: null, externalLauncher: launcher);
+        var viewModel = new PlayerViewModel(
+            coordinator,
+            frameSource: null,
+            externalLauncher: launcher,
+            alternativesExist: () => true);
 
         await viewModel.OpenAsync(new MediaFileId(Guid.NewGuid()), SamplePath, cancellationToken: TestContext.Current.CancellationToken);
 
@@ -232,7 +236,7 @@ public sealed class PlayerViewModelTests
     [Fact]
     public void External_playback_is_never_offered_without_a_launcher()
     {
-        var viewModel = new PlayerViewModel(new RecordingCoordinator());
+        var viewModel = new PlayerViewModel(new RecordingCoordinator(), alternativesExist: () => true);
 
         viewModel.ApplySessionState(
             PlaybackState.Failed,
@@ -241,6 +245,43 @@ public sealed class PlayerViewModelTests
         Assert.True(viewModel.CanChooseAnotherVersion);
         Assert.False(viewModel.CanOpenExternally);
         Assert.False(viewModel.OpenExternallyCommand.CanExecute(null));
+    }
+
+    /// <summary>
+    /// Another version is not offered to somebody who has one file, which is most people.
+    /// </summary>
+    /// <remarks>
+    /// The domain offers <c>ChooseAnotherVersion</c> for five of the seven failure codes, deciding by
+    /// the reason alone — it knows nothing about whether the title has a version group. So the failure
+    /// screen used to say "this content has other versions" over a file that had none, and said it as
+    /// text with nothing to press.
+    /// <para>
+    /// Both halves are asserted from the same failure, so this cannot pass by the recovery action
+    /// having quietly stopped being offered at all: the only difference between the two is whether
+    /// there is anything to switch to.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Another_version_is_offered_only_when_there_is_another_version()
+    {
+        var failure = new PlaybackFailure(PlaybackFailureCode.UnsupportedCodec, "no decoder");
+
+        var alone = new PlayerViewModel(new RecordingCoordinator());
+        alone.ApplySessionState(PlaybackState.Failed, failure);
+        Assert.False(alone.CanChooseAnotherVersion);
+
+        var grouped = new PlayerViewModel(new RecordingCoordinator(), alternativesExist: () => true);
+        grouped.ApplySessionState(PlaybackState.Failed, failure);
+        Assert.True(grouped.CanChooseAnotherVersion);
+
+        // Asked and not stored: the session is assembled before the version group is read, so a value
+        // captured at construction would always be the one from before anybody looked.
+        var alternatives = false;
+        var late = new PlayerViewModel(new RecordingCoordinator(), alternativesExist: () => alternatives);
+        late.ApplySessionState(PlaybackState.Failed, failure);
+        Assert.False(late.CanChooseAnotherVersion);
+        alternatives = true;
+        Assert.True(late.CanChooseAnotherVersion);
     }
 
     [Fact]

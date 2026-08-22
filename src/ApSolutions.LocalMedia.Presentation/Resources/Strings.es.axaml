@@ -183,7 +183,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerFailureNoPlayableTrack">El archivo no contiene ninguna pista de vídeo o audio reproducible.</x:String>
   <x:String x:Key="PlayerNoticeNoAudioTrack">Este archivo no tiene pista de audio.</x:String>
   <x:String x:Key="PlayerRecoveryRetry">Reintentar</x:String>
-  <x:String x:Key="PlayerRecoveryChooseAnotherVersion">Elige otra versión del mismo contenido en la ficha de versiones.</x:String>
+  <x:String x:Key="PlayerRecoveryChooseAnotherVersion">Este contenido tiene otras versiones catalogadas y puedes cambiar a una de ellas.</x:String>
   <x:String x:Key="PlayerRecoveryOpenExternally">Abrir con una aplicación externa</x:String>
   <x:String x:Key="PlayerRecoveryExternalFailed">Windows no tiene ninguna aplicación asociada a este archivo.</x:String>
   <x:String x:Key="TrackSelectorAccessibleName">Pistas de audio y subtítulos</x:String>
