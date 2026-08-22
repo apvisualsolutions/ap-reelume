@@ -287,7 +287,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Grid.Column="1"
         Margin="48"
         IsVisible="{Binding IsLibraryVisible}">
-      <StackPanel Spacing="{DynamicResource Space24}">
+      <!--
+        The bottom margin is a control's right to be pressed. Measured on 2026-08-22 in the walk's
+        1600x1000 window: the scrolled content ran to 927 px inside a 904 px viewport, and Review
+        versions - the last button on the route - sat at y=939 with a height of 36. Thirteen of its
+        pixels were inside the viewport and its middle was not, so a person could see the button and
+        a click on it reached the shell behind. The scroll had 23 px of travel for a control that
+        needed 23, and BringIntoView left it exactly where it started.
+
+        A stack whose last child ends flush with the viewport edge is one layout change away from
+        this every time; the folder panel above it grew by 25 px and that was the whole distance.
+      -->
+      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
         <ContentControl IsVisible="{Binding HasOnboarding}">
           <onboarding:RootOnboardingView DataContext="{Binding Onboarding}" />
         </ContentControl>

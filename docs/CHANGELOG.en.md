@@ -10,6 +10,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Choosing a folder kind shows which one is chosen.** The three buttons - Local, USB, UNC or NAS -
+  set a choice the screen never showed anywhere: pressing "USB" left everything exactly as pressing
+  "Local" did. They now carry the same circle the theme and language options use. The path box also
+  gains its visible label: it was written in both languages and only the screen reader heard it.
+
+
+- **An empty library says it is empty.** With no folder added - which is how everybody starts - the
+  first-steps screen said nothing at all: no list, no heading, no explanation. It now invites you to
+  add the first one and steps aside as soon as there is one.
+
+
 - **The shortcut list says something when nothing is bound.** A blank panel suggested the application
   ignores the keyboard; what is happening is that nothing is bound, and the system's own media keys
   keep working either way.
@@ -136,6 +147,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   reachable right now.
 
 ### Fixed
+
+- **A button in the library could be seen and could not be pressed.** "Review versions" sat flush with
+  the bottom edge of the scrolling area: thirteen of its thirty-six pixels were inside it and its
+  middle was not, so a click on it never reached the button. The list now leaves a margin at the end,
+  which is what makes the last control on a screen usable.
+
+
+- **A refusal, a folder removal, and a request for permission no longer look alike.** All three warned
+  in the same colour on the folders screen. A refusal now reads as a warning, removing a folder from
+  the catalog reads as what it is, and the request to allow the first scan keeps its neutral tone.
+
 
 - **The notices that appear over the video can no longer take the whole screen.** The resume offer, the
   next-episode notice, and the version-switch question were centred but still grew without limit: with

@@ -10,6 +10,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Al elegir el tipo de carpeta se ve cuál está elegido.** Los tres botones —Local, USB, UNC o NAS—
+  cambiaban un ajuste que la pantalla no enseñaba en ninguna parte: pulsar «USB» dejaba todo
+  exactamente igual que pulsar «Local». Ahora llevan el mismo círculo que las opciones de tema y de
+  idioma. La caja de la ruta gana además su etiqueta a la vista: estaba escrita en los dos idiomas y
+  sólo la oía el lector de pantalla.
+
+
+- **La biblioteca vacía dice que está vacía.** Con ninguna carpeta añadida —que es como empieza todo
+  el mundo— la pantalla de primeros pasos no decía nada en absoluto: ni lista, ni encabezado, ni
+  explicación. Ahora invita a añadir la primera y desaparece en cuanto hay una.
+
+
 - **La lista de atajos dice algo cuando no hay ninguno asignado.** Un panel en blanco daba a entender
   que la aplicación no escucha el teclado; lo que ocurre es que no hay nada asignado, y las teclas
   multimedia del sistema siguen funcionando igual.
@@ -136,6 +148,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   mucho, el año en un tono secundario y el aviso de que un medio no está disponible ahora mismo.
 
 ### Corregido
+
+- **Un botón de la biblioteca se veía y no se podía pulsar.** «Revisar versiones» quedaba a ras del
+  borde inferior de la zona desplazable: trece de sus treinta y seis píxeles de alto estaban dentro y
+  su punto medio no, así que un clic sobre él no llegaba al botón. Ahora la lista deja un margen al
+  final, que es lo que hace que el último control de una pantalla se pueda usar.
+
+
+- **Un rechazo, una retirada de carpeta y una petición de permiso dejan de pintarse iguales.** Las
+  tres avisaban con el mismo color en la pantalla de carpetas. Ahora un rechazo se lee como un aviso,
+  la retirada de una carpeta del catálogo se lee como lo que es, y la petición de permiso para el
+  primer escaneo mantiene su tono neutro.
+
 
 - **Los avisos que aparecen sobre el vídeo dejan de poder ocupar la pantalla entera.** La oferta de
   continuar, el aviso del episodio siguiente y la pregunta de cambio de versión se centraban, pero

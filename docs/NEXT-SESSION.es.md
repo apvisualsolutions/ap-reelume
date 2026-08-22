@@ -1,8 +1,36 @@
 # Dónde retomar
 
-## Estado al abrir (2026-08-21)
+## Estado al abrir (2026-08-22)
 
-**`main` en `b5c0088`, verde; el tramo 6 CERRADO y al 7 le queda UNA vista** —`RootOnboardingView`—.
+**`main` en `44f72ca`, verde; el tramo 7 CERRADO, y quedan el 8 y el 9.** El 8 son las gramáticas de
+mensajes de `UpdateView` —23 mensajes, cuatro gramáticas, 6 motivos de fallo, y
+`PlayerRecoveryChooseAnotherVersion` de `TextBlock` a `Button`—. El 9 son las cuatro animaciones
+(`apr-in`, `apr-shim`, `apr-tip`, `apr-pulse`), que siguen a **0 en el árbol**.
+
+**⚠ Y el hallazgo del tramo 7 que no es de ninguna vista: un control que se ve y no se puede pulsar.**
+`RootOnboardingView` creció 25 px y el paseo físico se puso en rojo **determinista** — 4 s en verde con
+el árbol limpio, 66 s en rojo con el cambio. Medido dentro del paseo, en su ventana de 1600 × 1000: el
+botón «Revisar versiones» quedaba en y=939 con 36 de alto, y el viewport del `ScrollViewer` acababa en
+952. **Trece de sus treinta y seis píxeles dentro, y su punto medio fuera**, así que el clic llegaba al
+`Grid` de detrás. El desplazamiento disponible eran 23 px para un control que necesitaba 23. El
+`StackPanel` de la ruta de biblioteca gana `Margin="0,0,0,24"` — el colchón es el derecho de un
+control a ser pulsado ([evidencia](evidence/stable/audit-root-onboarding.md)).
+
+**⚠⚠ Y el margen NO era la causa: el arnés estaba ciego.** Con el margen puesto, la suite completa
+seguía cayendo **una de cada dos veces**. `Fits` —la función con la que `Reveal` decide si hace falta
+desplazar— preguntaba **sólo por la ventana**, y un `ScrollViewer` recorta su contenido: el botón
+estaba dentro de la ventana de 1000 y cinco píxeles fuera del viewport que acaba en 952. Contestaba
+«cabe», no se desplazaba nada, y las ocho pulsaciones iban a lo que el recorte dejaba detrás. Es
+**«una prueba se vuelve ciega en vez de falsa»** otra vez. Ahora exige además el viewport de **cada**
+visor entre el control y la ventana, lo que **endurece** la puerta. Tres pasadas completas seguidas:
+135/135 las tres, ledger en 0 pendientes.
+
+**Y lo que esa medición destapó y NO se ha tocado**: `HasOnboarding` es `Onboarding is not null`, así
+que **nunca es falso**, y la vista de carpetas ocupa **426 px de los 904 del viewport**, siempre,
+encima de la biblioteca de quien ya tiene quinientas películas. SURFACES le pide gramática **ausente** a
+sus cuatro formas y la vista entera no es ausente nunca. Eso es el shell, no la vista, y es una pieza
+con su propio alcance: `ShellAssemblyTests` afirma `HasOnboarding` en cuatro sitios.
+
 De `RestoreWizardView` quedan anotadas dos cosas de su fila: los **pasos numerados**, que son una
 reorganización de la vista entera y no una fila; y el **estado vacío**, que hay que medir antes porque
 «sin raíces que reasignar» no es «la lista está vacía» sino «ninguna fila pide nada»
