@@ -1,13 +1,17 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Globalization;
+
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Playback;
+using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
@@ -111,6 +115,65 @@ public sealed class ShellPlayerWindowTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.NotNull(Stage(view));
+        window.Close();
+    }
+
+    /// <summary>
+    /// A session leaves the rail reachable, heads itself with three glyphs, and gives the picture the
+    /// side column's width whenever no panel is using it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// All three are the prototype's composition and all three were different: the player spanned
+    /// both columns so opening a film took the five destinations away with it, its three session
+    /// buttons carried words at the head of a 320 px column of panels, and that column was 320 px of
+    /// window whether or not one of its five panels existed.
+    /// </para>
+    /// <para>
+    /// The rail is asserted by measuring where the session starts rather than by looking for the
+    /// rail: a destination that is on the tree behind an opaque surface is a destination nobody can
+    /// press, and only the geometry says which it is.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task A_session_heads_itself_leaves_the_rail_alone_and_only_takes_the_column_it_uses()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+        var (window, view, viewModel) = Show();
+        await viewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(MediaFile, TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // The rail's 64 px are still the rail's.
+        var surface = view.GetVisualDescendants().OfType<Grid>().Single(grid => grid.Name == "PlayerSurface");
+        var left = surface.TranslatePoint(default, window)!.Value.X;
+        Assert.Equal(64, left);
+
+        // The header, and its three buttons named in the language in force rather than by their
+        // glyphs — the glyph is what the eye lands on and the name is what a reader hears.
+        var header = view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PlayerHeaderSurface");
+        var headed = header.GetVisualDescendants()
+            .OfType<Button>()
+            .Select(button => Avalonia.Automation.AutomationProperties.GetName(button) ?? string.Empty)
+            .ToArray();
+        Assert.Equal(
+            ["Cerrar el reproductor", "Mini reproductor", "Pantalla completa"],
+            headed);
+        Assert.All(
+            header.GetVisualDescendants().OfType<Button>(),
+            button => Assert.Contains("player-chrome", button.Classes));
+
+        // And the column: this session has no panel at all, so it takes no width.
+        Assert.False(viewModel.HasPlayerPanels);
+        var column = view.GetVisualDescendants()
+            .OfType<ScrollViewer>()
+            .Single(scroller => scroller.Name == "PlayerPanelColumn");
+        Assert.False(column.IsVisible);
+        Assert.Equal(0, column.Bounds.Width);
         window.Close();
     }
 
