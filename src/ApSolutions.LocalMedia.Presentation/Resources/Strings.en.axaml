@@ -148,6 +148,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MetadataSaveAction">Save changes</x:String>
   <x:String x:Key="MetadataRefreshAction">Refresh from provider</x:String>
   <x:String x:Key="MetadataRestoreAction">Restore provider fields</x:String>
+  <!-- The arrow between the two paths stays a symbol; these are the words behind it, which is
+       the half a screen reader gets. Without them the row reads as two paths and a character. -->
+  <x:String x:Key="RenameSeparatorAccessibleName">is renamed to</x:String>
   <x:String x:Key="RenamePreviewAccessibleName">Safe rename preview</x:String>
   <x:String x:Key="RenamePreviewTitle">Preview rename</x:String>
   <x:String x:Key="RenamePreviewDescription">Review every source and destination path. No file will change until you explicitly confirm.</x:String>
