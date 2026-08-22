@@ -8,6 +8,7 @@ using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
@@ -26,8 +27,8 @@ public sealed class DuplicateReviewTests
             new MediaVersionId(Guid.Parse("50000000-0000-0000-0000-000000000001")),
             "tv:show:s05e10",
             [
-                Version(1, "C:\\Private\\Shows\\Season 5\\Show.5x10.1080p.mkv", true, 1920, 1080, false, "H264"),
-                Version(2, "Z:\\Shows\\Season 5\\Show.5x10.2160p.HDR.mkv", false, 3840, 2160, true, "HEVC"),
+                Version(1, @"C:\\Private\\Shows\\Season 5\\Show.5x10.1080p.mkv", true, 1920, 1080, false, "H264"),
+                Version(2, @"Z:\\Shows\\Season 5\\Show.5x10.2160p.HDR.mkv", false, 3840, 2160, true, "HEVC"),
             ],
             PreferredMediaFileId: null);
         var viewModel = new DuplicateReviewViewModel(
@@ -72,6 +73,140 @@ public sealed class DuplicateReviewTests
             frame.Save(artifactPath, PngBitmapEncoderOptions.Default);
             window.Close();
         }
+    }
+
+    /// <summary>
+    /// The versions sit side by side, and a third wraps under the first.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// §4 asks for a two-column comparison and says why: with the rows stacked one under another, two
+    /// files are compared by scrolling between them. Two columns put them side by side, and a
+    /// <c>UniformGrid</c> of two wraps a third under the first without anybody choosing where.
+    /// </para>
+    /// <para>
+    /// It does not virtualize, and that is fine here and nowhere else: a version group is the copies
+    /// of one title, and <c>GroupMediaVersions</c> throws under two — this list is two or three long,
+    /// not ten thousand.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_versions_sit_side_by_side_and_a_third_wraps_under_the_first()
+    {
+        var group = new MediaVersionGroup(
+            new MediaVersionId(Guid.Parse("50000000-0000-0000-0000-000000000009")),
+            "movie:603",
+            [
+                Version(11, @"C:\Films\Matrix.1080p.mkv", true, 1920, 1080, false, "H264"),
+                Version(12, @"Z:\Films\Matrix.2160p.HDR.mkv", true, 3840, 2160, true, "HEVC"),
+                Version(13, @"Z:\Films\Matrix.720p.mkv", true, 1280, 720, false, "H264"),
+            ],
+            PreferredMediaFileId: null);
+        var (window, view) = ShowDuplicates(group);
+
+        var grid = Assert.Single(view.GetVisualDescendants().OfType<UniformGrid>());
+        Assert.Equal(2, grid.Columns);
+
+        var rows = grid.GetVisualChildren()
+            .OfType<Control>()
+            .Select(child => Math.Round(child.Bounds.Y, 0))
+            .Distinct()
+            .ToArray();
+        Assert.Equal(2, rows.Length);
+
+        window.Close();
+    }
+
+    /// <summary>
+    /// The figures that tell one copy from another are fixed width, and every card has a visible edge.
+    /// </summary>
+    /// <remarks>
+    /// "3840×2160 HDR HEVC" under "1920×1080 H264" only reads as a comparison when the characters line
+    /// up. And the cards carried <c>BorderThickness="1"</c> with <b>no brush at all</b>, so the border
+    /// that separates one file's facts from the next was whatever the base theme happened to give.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_quality_figures_are_fixed_width_and_every_card_has_an_edge()
+    {
+        var group = new MediaVersionGroup(
+            new MediaVersionId(Guid.Parse("50000000-0000-0000-0000-00000000000a")),
+            "movie:604",
+            [
+                Version(21, @"C:\Films\Arrival.1080p.mkv", true, 1920, 1080, false, "H264"),
+                Version(22, @"Z:\Films\Arrival.2160p.HDR.mkv", true, 3840, 2160, true, "HEVC"),
+            ],
+            PreferredMediaFileId: null);
+        var (window, view) = ShowDuplicates(group);
+        var mono = Assert.IsType<Avalonia.Media.FontFamily>(DuplicateResource("FontFamilyMono"));
+
+        var figures = view.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => (block.Text ?? string.Empty).Contains('×', StringComparison.Ordinal))
+            .ToArray();
+        Assert.Equal(2, figures.Length);
+        Assert.All(figures, block => Assert.Equal(mono.Name, block.FontFamily.Name));
+
+        var cards = view.GetVisualDescendants()
+            .OfType<Border>()
+            .Where(border => border.BorderThickness.Top > 0)
+            .ToArray();
+        Assert.NotEmpty(cards);
+        Assert.All(cards, border => Assert.True(
+            border.BorderBrush is not null,
+            "a card declares a border thickness and no brush, so its edge is whatever the base theme gives."));
+
+        window.Close();
+    }
+
+    /// <summary>The duplicates are a section of the review page, whose level one is the inbox's.</summary>
+    [AvaloniaFact]
+    public void The_duplicates_title_as_a_section_of_the_review_page()
+    {
+        var group = new MediaVersionGroup(
+            new MediaVersionId(Guid.Parse("50000000-0000-0000-0000-00000000000b")),
+            "movie:605",
+            [
+                Version(31, @"C:\Films\Dune.1080p.mkv", true, 1920, 1080, false, "H264"),
+                Version(32, @"Z:\Films\Dune.2160p.mkv", true, 3840, 2160, false, "HEVC"),
+            ],
+            PreferredMediaFileId: null);
+        var (window, view) = ShowDuplicates(group);
+
+        var heading = Assert.Single(
+            view.GetVisualDescendants().OfType<TextBlock>(),
+            block => (int)Avalonia.Automation.AutomationProperties.GetHeadingLevel(block) > 0);
+        Assert.Equal(2, (int)Avalonia.Automation.AutomationProperties.GetHeadingLevel(heading));
+        Assert.Equal(Assert.IsType<double>(DuplicateResource("FontSizeSubtitle")), heading.FontSize);
+
+        window.Close();
+    }
+
+    private static (Window Window, DuplicateReviewView View) ShowDuplicates(MediaVersionGroup group)
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        var view = new DuplicateReviewView
+        {
+            DataContext = new DuplicateReviewViewModel(
+                group,
+                new MediaVersionSelectionPolicy(),
+                new SetPreferredVersion(new ReadOnlyVersionRepository(group)),
+                new MediaVersionPreferences(PreferHdr: true)),
+        };
+        var window = new Window { Width = 1000, Height = 800, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        return (window, view);
+    }
+
+    private static object DuplicateResource(string key)
+    {
+        Assert.True(
+            Avalonia.Application.Current!.TryFindResource(key, out var value),
+            $"{key} is not declared, so nothing can paint it.");
+        Assert.NotNull(value);
+        return value!;
     }
 
     private static MediaVersion Version(

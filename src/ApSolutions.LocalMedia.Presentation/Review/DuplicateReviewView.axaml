@@ -11,11 +11,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="review:DuplicateReviewViewModel"
     automation:AutomationProperties.Name="{DynamicResource DuplicateReviewAccessibleName}">
   <Grid RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space12}">
-    <TextBlock FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold" Text="{DynamicResource DuplicateReviewTitle}" />
+    <!-- A section of the review page, whose level one belongs to ReviewInboxView. -->
+    <TextBlock
+        FontSize="{DynamicResource FontSizeSubtitle}"
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource DuplicateReviewTitle}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <!--
+      Two columns, so the copies sit side by side. Stacked one under another they were compared by
+      scrolling between them, which is what §4 asks this row to stop. A UniformGrid of two wraps a
+      third under the first without anybody deciding where it goes.
+
+      It does not virtualize, and that is fine here and nowhere else in this tree: a version group is
+      the copies of one title, and GroupMediaVersions throws under two - this list is two or three
+      long, never ten thousand.
+
+      §4 also asks for an empty state, and it is refused with its measurement: a group cannot hold
+      fewer than two versions, and the view is only built when there is a group, so the string would
+      be one nobody could ever reach.
+    -->
     <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <UniformGrid Columns="2" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="review:MediaVersionItemViewModel">
-          <Border Margin="0,4" Padding="12" BorderThickness="1" CornerRadius="{DynamicResource CornerRadiusMedium}">
+          <!-- The border carried a thickness and no brush, so the edge between one file's facts and
+               the next was whatever the base theme happened to give. -->
+          <Border
+              Margin="4"
+              Padding="12"
+              BorderBrush="{DynamicResource ShellBorderBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource CornerRadiusMedium}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}" RowDefinitions="Auto,Auto">
               <RadioButton
                   automation:AutomationProperties.Name="{Binding ShortPath}"
@@ -23,7 +54,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   CommandParameter="{Binding}"
                   IsChecked="{Binding IsEffective}" />
               <TextBlock Grid.Column="1" Text="{Binding ShortPath}" />
-              <TextBlock Grid.Column="2" Text="{Binding Quality}" />
+              <!-- Fixed width: "3840×2160 HDR HEVC" over "1920×1080 H264" only reads as a comparison
+                   when the characters line up under each other. -->
+              <TextBlock
+                  Grid.Column="2"
+                  FontFamily="{DynamicResource FontFamilyMono}"
+                  Text="{Binding Quality}" />
               <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
                 <TextBlock IsVisible="{Binding IsAvailable}" Text="{DynamicResource MediaVersionAvailable}" />
                 <TextBlock IsVisible="{Binding IsUnavailable}" Text="{DynamicResource MediaVersionUnavailable}" />
