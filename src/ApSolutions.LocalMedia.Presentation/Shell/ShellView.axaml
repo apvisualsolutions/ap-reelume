@@ -221,9 +221,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ScrollViewer
         Grid.Column="1"
         IsVisible="{Binding IsSettingsVisible}">
-      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
+      <!-- Named so a gate can walk the sections instead of recognising them by class name: the
+           first version of that test filtered on "SettingsView" and measured seven of ten. -->
+      <StackPanel x:Name="SettingsSections" Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
         <!--
-        Settings is one scrolling page with seven sections on it, and until 2026-08-21 it had no
+        Settings is one scrolling page with ten sections on it, and until 2026-08-21 it had no
         heading of its own while four of those sections each claimed level one. A reader jumping by
         heading found four top-level landmarks inside one destination. The page's name is the one the
         navigation rail already uses, because a destination and the page it opens are the same thing.

@@ -13,7 +13,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <player:SubtitleColourConverter x:Key="SubtitleColour" />
   </UserControl.Resources>
-  <StackPanel x:Name="SubtitleStyleSurface" Spacing="{DynamicResource Space12}">
+  <!-- §4's skeleton for a settings section: the padded surface and the 620 reading column every
+       section of that page shares. Without it this one started 158 px left of the others. -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+  <StackPanel x:Name="SubtitleStyleSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
     <TextBlock
         FontSize="{DynamicResource FontSizeSubtitle}"
         FontWeight="SemiBold"
@@ -125,4 +128,5 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Border>
     </Border>
   </StackPanel>
+  </Border>
 </UserControl>
