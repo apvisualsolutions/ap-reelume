@@ -39,7 +39,7 @@ public sealed class ShellNavigationBarTests
 {
     /// <summary>The five destinations, in the order the shell declares them.</summary>
     private static readonly string[] Destinations =
-        ["NavigationHome", "NavigationLibrary", "NavigationReview", "NavigationBackups", "NavigationSettings"];
+        ["NavigationHome", "NavigationLibrary", "NavigationReview", "NavigationDuplicates", "NavigationSettings"];
 
     [AvaloniaFact]
     public void Exactly_one_destination_shows_the_bar_that_says_it_is_open()

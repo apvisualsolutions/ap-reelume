@@ -206,6 +206,13 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         {
             onboarding.PropertyChanged += OnOnboardingChanged;
         }
+
+        if (DuplicatesOverview is { } duplicatesOverview)
+        {
+            // A row on the overview opens the same comparison the film card's action opens, through
+            // the same shell door - one surface, two ways in, never two answers.
+            duplicatesOverview.GroupOpener = OpenDuplicatesForAsync;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -256,6 +263,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public LifecycleSettingsViewModel? LifecycleSettings => _surfaces.LifecycleSettings;
 
     public BackupViewModel? Backups => _surfaces.Backups;
+
+    public DuplicatesOverviewViewModel? DuplicatesOverview => _surfaces.DuplicatesOverview;
 
     public RestoreWizardViewModel? Restore => _surfaces.Restore;
 
@@ -410,6 +419,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsPrivacySection));
                 OnPropertyChanged(nameof(IsUpdatesSection));
                 OnPropertyChanged(nameof(IsCreditsSection));
+                OnPropertyChanged(nameof(IsBackupsSection));
             }
         }
     }
@@ -501,7 +511,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public bool IsHomeVisible => CurrentRoute == AppRoute.Home && Home is not null;
 
-    public bool IsBackupsVisible => CurrentRoute == AppRoute.Backups && Backups is not null;
+    public bool IsDuplicatesVisible => CurrentRoute == AppRoute.Duplicates;
+
+    /// <summary>Copias lives in Settings now; its stack shows on its own index entry.</summary>
+    public bool IsBackupsSection => CurrentSettingsSection == SettingsSection.Backups;
 
     public bool IsReviewVisible => CurrentRoute == AppRoute.Review && ReviewInbox is not null;
 
@@ -512,7 +525,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         !IsSettingsVisible
         && !IsLibraryVisible
         && !IsHomeVisible
-        && !IsBackupsVisible
+        && !IsDuplicatesVisible
         && !IsReviewVisible
         && !IsPlayerVisible;
 
@@ -613,17 +626,24 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Loads the versions of the open title and moves to Review, because comparing two copies of the
-    /// same film is a correction and corrections live in one place.
+    /// Loads the versions of the open title and moves to the duplicates destination, which is the
+    /// rail's own door to the same comparison — one door for the card and one for the overview, and
+    /// both open the identical surface.
     /// </summary>
-    public async Task OpenDuplicatesAsync(CancellationToken cancellationToken = default)
+    public Task OpenDuplicatesAsync(CancellationToken cancellationToken = default) =>
+        SelectedTitleId is { } titleId
+            ? OpenDuplicatesForAsync(titleId, cancellationToken)
+            : Task.CompletedTask;
+
+    /// <summary>The shared half: one title's comparison, on the duplicates route.</summary>
+    public async Task OpenDuplicatesForAsync(TitleId titleId, CancellationToken cancellationToken = default)
     {
-        if (_surfaces.OpenDuplicates is { } open && SelectedTitleId is { } titleId)
+        if (_surfaces.OpenDuplicates is { } open)
         {
             Duplicates = await open(titleId, cancellationToken).ConfigureAwait(true);
             if (Duplicates is not null)
             {
-                _navigationService.Navigate(AppRoute.Review);
+                _navigationService.Navigate(AppRoute.Duplicates);
             }
         }
     }
@@ -703,9 +723,16 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsSettingsVisible));
         OnPropertyChanged(nameof(IsLibraryVisible));
         OnPropertyChanged(nameof(IsHomeVisible));
-        OnPropertyChanged(nameof(IsBackupsVisible));
+        OnPropertyChanged(nameof(IsDuplicatesVisible));
         OnPropertyChanged(nameof(IsReviewVisible));
         OnPropertyChanged(nameof(IsPrimaryContentVisible));
+        if (route == AppRoute.Duplicates && DuplicatesOverview is { } duplicates)
+        {
+            // The list is read on every visit: a group confirmed away in the review would otherwise
+            // keep its row until a restart.
+            await duplicates.LoadAsync(CancellationToken.None).ConfigureAwait(true);
+        }
+
         if (route == AppRoute.Library && Onboarding is { } onboarding)
         {
             // The folder list is read on every visit: managing folders is this route's job, and a

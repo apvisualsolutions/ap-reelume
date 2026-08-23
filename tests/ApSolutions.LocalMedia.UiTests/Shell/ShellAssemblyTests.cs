@@ -126,9 +126,12 @@ public sealed class ShellAssemblyTests
         Assert.False(shell.Rename!.IsConfirmed);
     }
 
-    /// <summary>Comparing two copies of the same film is a correction, so it lands under Review.</summary>
+    /// <summary>
+    /// Comparing two copies lands on the duplicates destination — the rail's own door since
+    /// 2026-08-23 — whichever of the two ways in was used.
+    /// </summary>
     [Fact]
-    public async Task Asking_for_the_versions_of_a_title_moves_to_review()
+    public async Task Asking_for_the_versions_of_a_title_moves_to_the_duplicates_destination()
     {
         var navigation = new NavigationService();
         var library = BuildLibrary();
@@ -138,7 +141,7 @@ public sealed class ShellAssemblyTests
         await shell.OpenDuplicatesAsync(TestContext.Current.CancellationToken);
 
         Assert.True(shell.HasDuplicates);
-        Assert.Equal(AppRoute.Review, navigation.CurrentRoute);
+        Assert.Equal(AppRoute.Duplicates, navigation.CurrentRoute);
     }
 
     [Fact]
@@ -512,7 +515,7 @@ public sealed class ShellAssemblyTests
         var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
 
         Assert.Equal(
-            [AppRoute.Home, AppRoute.Library, AppRoute.Review, AppRoute.Backups, AppRoute.Settings],
+            [AppRoute.Home, AppRoute.Library, AppRoute.Review, AppRoute.Duplicates, AppRoute.Settings],
             shell.Routes);
         Assert.False(shell.NavigateCommand.CanExecute("Library"));
         Assert.True(shell.NavigateCommand.CanExecute(AppRoute.Library));

@@ -8,7 +8,9 @@ public enum AppRoute
     Home,
     Library,
     Review,
-    Backups,
+
+    /// <summary>The prototype's fifth destination. Copias moved into Settings on 2026-08-23.</summary>
+    Duplicates,
     Settings,
 }
 

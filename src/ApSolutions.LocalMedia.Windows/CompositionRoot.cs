@@ -612,6 +612,7 @@ public static partial class CompositionRoot
             PrivacySettings = provider.GetRequiredService<PrivacySettingsViewModel>(),
             Updates = provider.GetRequiredService<UpdateViewModel>(),
             Onboarding = provider.GetRequiredService<RootOnboardingViewModel>(),
+            DuplicatesOverview = CreateDuplicatesOverview(provider),
             StartScan = (rootId, cancellationToken) => ScanRootAsync(provider, rootId, cancellationToken),
             ReviewInbox = provider.GetRequiredService<ReviewInboxViewModel>(),
             ScanSettings = provider.GetRequiredService<ScanSettingsViewModel>(),
@@ -649,6 +650,18 @@ public static partial class CompositionRoot
                     .ExecuteAsync(mode, cancellationToken)
                     .ConfigureAwait(false)).To,
         };
+    }
+
+    /// <summary>
+    /// The duplicates destination's list, wired to the same door the film card's action opens: a
+    /// row leads to the very review a person reaches from the card, so the two can never disagree.
+    /// </summary>
+    private static DuplicatesOverviewViewModel CreateDuplicatesOverview(IServiceProvider provider)
+    {
+        // The opener is the shell's to wire - its constructor points every row at the same door
+        // the film card uses - so the composition only builds the list half.
+        return new DuplicatesOverviewViewModel(
+            provider.GetRequiredService<ApSolutions.LocalMedia.Application.Catalog.GetDuplicateOverview>());
     }
 
     /// <summary>

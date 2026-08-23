@@ -112,6 +112,8 @@ public sealed class LeadingActionTests
         ["ReviewInboxView"] = "AcceptReviewAction",
         ["CandidateCardView"] = null,
         ["DuplicateReviewView"] = null,
+        // A list of rows that repeat: a hierarchy repeated N times is not a hierarchy.
+        ["DuplicatesOverviewView"] = null,
 
         // Metadata
         ["MetadataEditorView"] = "MetadataSaveAction",

@@ -158,10 +158,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "TitleReviewDuplicatesAction",
             () => host.ViewModel.HasDuplicates,
             "clicking Review duplicates never opened the group the two copies formed");
-        Assert.Equal(AppRoute.Review, host.ViewModel.CurrentRoute);
+        Assert.Equal(AppRoute.Duplicates, host.ViewModel.CurrentRoute);
 
-        // And the group is decided with the mouse. Opening it already moved to Review, where the
-        // comparison sits under the inbox; the layout still has to settle before a click can land.
+        // And the group is decided with the mouse. Opening it already moved to the duplicates
+        // destination, where the comparison sits under the overview; the layout still has to
+        // settle before a click can land.
         Dispatcher.UIThread.RunJobs();
         host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
@@ -184,6 +185,27 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking a version radio never stored the preference for the group",
             recordAs: "{Binding ShortPath}");
         Assert.Equal(chosen.Version.MediaFileId.Value, await PreferredVersionAsync(factory));
+
+        // The rail's own door lists the same group, and its row opens the same comparison: the
+        // second way in, pressed where a person finds it. Leaving and coming back is what loads
+        // the overview - the route reads its list on every visit.
+        Navigate(host, AppRoute.Home);
+        Navigate(host, AppRoute.Duplicates);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.DuplicatesOverview is { HasGroups: true }),
+            "the duplicates overview never listed the group the scan formed");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        var row = host.ViewModel.DuplicatesOverview!.Groups.Single();
+        await PressAsync(
+            host,
+            row.Title,
+            () => host.ViewModel.Duplicates,
+            "clicking the overview row never opened the group's comparison",
+            recordAs: "{Binding Title}");
+        Assert.True(host.ViewModel.HasDuplicates);
     }
 
     /// <summary>
@@ -2532,7 +2554,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         int PreservedDatabases() => Directory.GetFiles(_dataRoot, "library.db.pre-restore-*.bak").Length;
 
         using var host = ShowShell(height: 1400);
-        Navigate(host, AppRoute.Backups);
+        Navigate(host, AppRoute.Settings);
+        await PressAsync(
+            host,
+            "NavigationBackups",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Copias in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Backups, host.ViewModel.CurrentSettingsSection);
         var backups = host.ViewModel.Backups;
         var restore = host.ViewModel.Restore;
         Assert.NotNull(backups);
@@ -3961,7 +3989,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             : 0;
 
         using var host = ShowShell(height: 1400);
-        Navigate(host, AppRoute.Backups);
+        Navigate(host, AppRoute.Settings);
+        await PressAsync(
+            host,
+            "NavigationBackups",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Copias in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Backups, host.ViewModel.CurrentSettingsSection);
         var backups = host.ViewModel.Backups;
         Assert.NotNull(backups);
 

@@ -1,0 +1,93 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The rail's duplicates destination, which the prototype gives a door of its own: every title that
+resolves to more than one file, each row leading to the comparison the review has always drawn.
+The empty state is the desirable one and is painted as such — the approved pair of sentences on the
+positive surface, because "no duplicates" is the healthy answer, not a sad blank.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Review.DuplicatesOverviewView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
+    x:DataType="review:DuplicatesOverviewViewModel"
+    automation:AutomationProperties.Name="{DynamicResource DuplicatesOverviewAccessibleName}">
+  <StackPanel Spacing="{DynamicResource Space16}">
+    <TextBlock
+        FontSize="{DynamicResource FontSizeTitle}"
+        FontWeight="SemiBold"
+        Text="{DynamicResource NavigationDuplicates}"
+        automation:AutomationProperties.HeadingLevel="1" />
+    <Border
+        IsVisible="{Binding IsEmpty}"
+        Padding="16"
+        Background="{DynamicResource PositiveSurfaceBrush}"
+        BorderBrush="{DynamicResource PositiveBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusMedium}">
+      <StackPanel Spacing="{DynamicResource Space4}">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="state-glyph" Text="✓" automation:AutomationProperties.AccessibilityView="Raw" />
+          <TextBlock
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource DuplicatesEmptyTitle}" />
+        </StackPanel>
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource DuplicatesEmptyDescription}"
+            TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+    <ItemsControl IsVisible="{Binding HasGroups}" ItemsSource="{Binding Groups}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="{DynamicResource Space8}" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="review:DuplicateGroupRowViewModel">
+          <!--
+            The whole row is the button, named by the title it opens — the second of this
+            application's command controls whose accessible name is its own data, the same shape the
+            library's cards declared first.
+          -->
+          <Button
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Stretch"
+              Classes="poster-card"
+              Command="{Binding $parent[ItemsControl].((review:DuplicatesOverviewViewModel)DataContext).OpenGroupCommand}"
+              CommandParameter="{Binding}"
+              automation:AutomationProperties.Name="{Binding Title}">
+            <Border Classes="setting-row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource TextPrimaryBrush}"
+                    Text="{Binding Title}"
+                    TextTrimming="CharacterEllipsis" />
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="{DynamicResource Space4}"
+                    VerticalAlignment="Center">
+                  <TextBlock
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      Text="{Binding VersionCount}" />
+                  <TextBlock
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      Text="{DynamicResource DuplicateGroupCountLabel}" />
+                </StackPanel>
+              </Grid>
+            </Border>
+          </Button>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>
