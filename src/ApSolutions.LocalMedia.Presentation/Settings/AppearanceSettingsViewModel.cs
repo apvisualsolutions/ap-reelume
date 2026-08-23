@@ -28,6 +28,10 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
 
     public string SystemStateCue => GetStateCue(ThemePreference.System);
 
+    public string HighContrastLightStateCue => GetStateCue(ThemePreference.HighContrastLight);
+
+    public string HighContrastDarkStateCue => GetStateCue(ThemePreference.HighContrastDark);
+
     public string LightStateCue => GetStateCue(ThemePreference.Light);
 
     public string DarkStateCue => GetStateCue(ThemePreference.Dark);
@@ -60,6 +64,8 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
         _themeService.Apply(preference);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentPreference)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SystemStateCue)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighContrastLightStateCue)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighContrastDarkStateCue)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LightStateCue)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DarkStateCue)));
     }

@@ -268,9 +268,9 @@ public sealed class ContrastTokenTests
             .Where(attribute => attribute.Name.LocalName == "Text"
                 && attribute.Value.Contains("StateCue", StringComparison.Ordinal))
             .ToArray();
-        // Three theme choices plus the two language choices BUG-011 added; every option carries
-        // its non-color cue.
-        Assert.Equal(5, stateCueBindings.Length);
+        // Five theme choices — both high contrasts became pickable on 2026-08-23 — plus the two
+        // language choices BUG-011 added; every option carries its non-color cue.
+        Assert.Equal(7, stateCueBindings.Length);
     }
 
     [Fact]

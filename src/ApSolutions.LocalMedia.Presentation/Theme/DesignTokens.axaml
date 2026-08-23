@@ -1501,6 +1501,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Padding" Value="8,0" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <!--
+      As wide as their own words, not the panel: the row of an index is a label, and the strip to
+      its right is what gives the walk's beside-click somewhere that is inside no command — the
+      items sit flush above and below each other, so the side is the only free direction.
+    -->
+    <Setter Property="HorizontalAlignment" Value="Left" />
   </Style>
 
   <Style Selector="ComboBox.side-list ComboBoxItem">

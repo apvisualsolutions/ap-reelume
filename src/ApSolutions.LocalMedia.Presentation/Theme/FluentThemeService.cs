@@ -111,6 +111,8 @@ public sealed class FluentThemeService : IThemeService
         {
             ThemePreference.Light => ThemeVariant.Light,
             ThemePreference.Dark => ThemeVariant.Dark,
+            ThemePreference.HighContrastLight => AppThemeVariants.HighContrastLight,
+            ThemePreference.HighContrastDark => AppThemeVariants.HighContrastDark,
             _ => ThemeVariant.Default,
         };
     }
