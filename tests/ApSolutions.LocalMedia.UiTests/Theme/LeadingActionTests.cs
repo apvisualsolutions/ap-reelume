@@ -69,6 +69,8 @@ public sealed class LeadingActionTests
 
         // Library
         ["LibraryView"] = null,
+        // Managing the folders is upkeep, not the point of Settings: nothing leads.
+        ["RootManagementView"] = null,
         ["UnavailableBadge"] = null,
         ["PosterCardView"] = null,
 

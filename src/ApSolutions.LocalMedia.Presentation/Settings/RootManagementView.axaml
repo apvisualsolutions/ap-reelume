@@ -1,0 +1,166 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The prototype's «Biblioteca y escaneo» keeps the library's folders where every other lasting
+decision lives: in Settings. This view is that list — the folder as a row-card, its kind and its
+availability said in words, and the one destructive act this application has behind the same
+confirmation the onboarding taught.
+
+It shares RootOnboardingViewModel with the first-run surface rather than owning state of its own,
+and it reuses that surface's resource keys on purpose: for the walk a key is one identity with N
+instances, and the two surfaces can never be on screen together — this one lives on the Settings
+route, the onboarding on the Library route. What the sharing buys is that a folder added in the
+dialog, removed here, and listed there is one list that cannot disagree with itself.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.RootManagementView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
+    xmlns:onboarding="clr-namespace:ApSolutions.LocalMedia.Presentation.Onboarding"
+    x:DataType="onboarding:RootOnboardingViewModel"
+    automation:AutomationProperties.Name="{DynamicResource RootManagementAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="RootResourceKey" />
+  </UserControl.Resources>
+  <!--
+    The section skeleton every Settings peer shares — Padding 32, a 620 column, the title at the
+    subtitle size its peers use — because SettingsPageStructureTests measures the titles all
+    starting at the same place, and a section given a geometry of its own is what it exists to
+    refuse.
+  -->
+  <Border Padding="32">
+  <StackPanel MaxWidth="620" Spacing="{DynamicResource Space16}">
+    <TextBlock
+        FontSize="{DynamicResource FontSizeSubtitle}"
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource RootListTitle}"
+        automation:AutomationProperties.HeadingLevel="2" />
+    <TextBlock
+        Classes="setting-description"
+        Text="{DynamicResource RootOnboardingDescription}"
+        TextWrapping="Wrap" />
+    <!--
+      The empty state speaks here too: a Settings section whose list is silently blank would read
+      as a section that lost its content, and the first sentence anybody needs is where to add.
+    -->
+    <StackPanel IsVisible="{Binding HasNoRoots}" Spacing="{DynamicResource Space4}">
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RootListEmptyTitle}" />
+      <TextBlock
+          Classes="setting-description"
+          Text="{DynamicResource EmptyLibraryDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+    <ItemsControl IsVisible="{Binding HasRoots}" ItemsSource="{Binding Roots}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="{DynamicResource Space8}" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="onboarding:LibraryRootRowViewModel">
+          <!--
+            The row-card the prototype draws for one folder, over the grid shape the onboarding
+            measured: a path is as long as somebody's folders are, and a horizontal StackPanel put
+            Remove at x=2146 in a 1600 px window. The chip says available or not in words — in the
+            two high contrast themes its two fills are the same colour, and the words are the cue.
+          -->
+          <Border Classes="setting-row">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space12}">
+              <StackPanel Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+                <TextBlock
+                    FontFamily="{DynamicResource FontFamilyMono}"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource TextPrimaryBrush}"
+                    Text="{Binding Path}"
+                    TextWrapping="WrapWithOverflow" />
+                <TextBlock
+                    Classes="setting-description"
+                    Text="{Binding KindKey, Converter={StaticResource RootResourceKey}}" />
+              </StackPanel>
+              <Panel Grid.Column="1" VerticalAlignment="Center">
+                <!--
+                  The unavailable half is the one badge the whole application shares — a gate
+                  refuses any view that draws its own - and the available half is this view's,
+                  because "connected" is a sentence only this list says.
+                -->
+                <Border
+                    Padding="8,4"
+                    IsVisible="{Binding IsAvailable}"
+                    Background="{DynamicResource PositiveSurfaceBrush}"
+                    BorderBrush="{DynamicResource PositiveBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource CornerRadiusSmall}">
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeCaption}"
+                      Foreground="{DynamicResource TextPrimaryBrush}"
+                      Text="{DynamicResource MediaAvailable}" />
+                </Border>
+                <library:UnavailableBadge />
+              </Panel>
+              <Button
+                  Grid.Column="2"
+                  VerticalAlignment="Center"
+                  automation:AutomationProperties.Name="{DynamicResource RootRemoveAction}"
+                  Command="{Binding $parent[ItemsControl].((onboarding:RootOnboardingViewModel)DataContext).RequestRemoveCommand}"
+                  CommandParameter="{Binding}"
+                  Content="{DynamicResource RootRemoveAction}" />
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <!--
+      The same confirmation the onboarding draws, danger and assertive for the same reasons, plus
+      the two consequences the design package wrote for it: what stays (every video on disk) and
+      what leaves (the titles, their marks and their progress). One Border, so the announcement is
+      one announcement.
+    -->
+    <Border
+        x:Name="RootManagementRemoveConfirmationSurface"
+        IsVisible="{Binding IsConfirmingRemoval}"
+        Padding="16"
+        Background="{DynamicResource DangerSurfaceBrush}"
+        BorderBrush="{DynamicResource DangerBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusMedium}"
+        automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}"
+        automation:AutomationProperties.LiveSetting="Assertive">
+      <StackPanel Spacing="{DynamicResource Space12}">
+        <TextBlock
+            FontFamily="{DynamicResource FontFamilyMono}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding PendingRemovalPath}"
+            TextWrapping="WrapWithOverflow" />
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource RootRemoveKeepsFilesNotice}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource RootRemoveLosesMarksNotice}"
+            TextWrapping="Wrap" />
+        <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space8}">
+          <Button
+              automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAction}"
+              Command="{Binding ConfirmRemoveCommand}"
+              Content="{DynamicResource RootRemoveConfirmAction}" />
+          <Button
+              automation:AutomationProperties.Name="{DynamicResource RootRemoveCancelAction}"
+              Command="{Binding CancelRemoveCommand}"
+              Content="{DynamicResource RootRemoveCancelAction}" />
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+  </Border>
+</UserControl>
