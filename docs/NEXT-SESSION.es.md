@@ -1,5 +1,37 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-23 (noche) — F7–F10 cerradas, F11 a media matriz
+
+**Hecho hoy**: F7 (menú de velocidad, botón de «elegir otra versión» con flyout de las filas
+reales, MaxHeight en los tres overlays, los tres avisos de marcadores), F8 (pestañas
+Metadatos | Renombrado seguro), F9 (las cuatro gramáticas del actualizador con expansor y escena,
+bloque de la base en Copias, pasos numerados y avisos del asistente), F10 (apr-shim con
+`IsLoading`, privacidad en positivo, los 16 comentarios; manija ELEVADA al propietario — CheckBox
+es decisión medida), y de F11: SURFACES re-medido bilingüe, PRD-006 en FEATURES, 16 capturas del
+prototipo en `artifacts/ui-captures/T36-proto/`. Cinco archivos salieron de la deuda de cobertura
+(215, trinquete 215). Tres rojos de CI leídos y arreglados (ancla del repositorio, timeout del
+check, preferida sin fijar en la escena de recuperación).
+
+**CI**: el candidato a verde es `cce3b1f`. Con su verde → fast-forward de `main` (pendiente desde
+b21f8e3; **mirar el run de cce3b1f antes de avanzar**).
+
+**HALLAZGO ABIERTO (bloquea la mitad-app de la matriz de capturas)**: la aplicación REAL con un
+data root sembrado pinta el shell VACÍO (0 raíces, 0 títulos, onboarding de primer arranque)
+mientras que los repos directos y el harness leen las filas de esa misma BD. Medido, para no
+repetirlo: (1) la variable `AP_LOCALMEDIA_DATA_ROOT` LLEGA al hijo (un cmd hermano la imprime);
+(2) la app SÍ la usa (un root virgen recibe library.db + 18 .bak al arrancar); (3) sobre la BD
+sembrada, `LibraryRootRepository.ListAsync` da 1 raíz (herramienta `tools/seed` con `--check`);
+(4) la siembra pasó de SQL a `UpsertTitleAsync` (el FTS del catálogo lo exige) y aun así 0.
+Sospechosos, por orden: `ConfigureWindow` (lo único que el harness NO llama: autoscan, watchers,
+lifecycle) y las cargas de `NavigatedAsync` tragadas por `GuardedEvent.Run` con `onFailure` nulo.
+Siguiente paso escrito: darle a `OnNavigated` un `onFailure` que registre (o sonda headless con la
+misma BD) y LEER la excepción en vez de deducirla. Herramientas de la sesión:
+`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\seed\` (siembra la matriz;
+`--check` lee raíces) y `tools\preview\` (esta sesión lo dejó montando el reproductor de F7).
+
+**F11 restante**: matriz-app (bloqueada por el hallazgo), capturas HC (shell + reproductor + un
+formulario), recuento final contra el Inventario, CI verde + ff, checklist cerrado.
+
 ## EL PLAN MAESTRO DE PARIDAD (2026-08-23) — el hilo que no se vuelve a perder
 
 **Encargo del propietario, con sus palabras: la aplicación idéntica al prototipo en diseño — una
