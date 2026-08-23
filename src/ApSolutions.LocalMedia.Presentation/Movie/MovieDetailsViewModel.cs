@@ -105,6 +105,9 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
     public string Title => _item?.Title ?? string.Empty;
 
+    /// <summary>The banner poster's two letters, from the same well the grid's cards drink.</summary>
+    public string Initials => Library.PosterInitials.From(Title);
+
     /// <summary>
     /// What this film is about, as the stored metadata has it. It is handed in rather than read here,
     /// the same way the watch state and the versions are: this view model queries nothing.
@@ -175,6 +178,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         foreach (var name in new[]
         {
             nameof(Title),
+            nameof(Initials),
             nameof(Overview),
             nameof(HasOverview),
             nameof(Year),

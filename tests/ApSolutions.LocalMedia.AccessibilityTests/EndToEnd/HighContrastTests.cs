@@ -132,6 +132,11 @@ public sealed partial class HighContrastTests
         // is, the title is written beside it at display size, and the layer switches off through
         // PosterArtOpacity in both high contrasts — asserted below like the card's.
         ("ResumeHeroView", "Background", "ResumeTitle"),
+
+        // And the two detail banners, which are the hero's frame on the cards: same written title
+        // beside the colour, same opacity token, same assertion below.
+        ("MovieDetailsView", "Background", "Title"),
+        ("ShowDetailsView", "Background", "Title"),
     ];
 
     [AvaloniaFact]
@@ -139,7 +144,7 @@ public sealed partial class HighContrastTests
     {
         var audit = new AuditLog(nameof(No_state_is_told_by_colour_alone));
         Assert.Equal(2, ColourIsTheSubject.Length);
-        Assert.Equal(2, ColourRepeatsWhatIsWritten.Length);
+        Assert.Equal(4, ColourRepeatsWhatIsWritten.Length);
 
         foreach (var view in ViewFiles())
         {

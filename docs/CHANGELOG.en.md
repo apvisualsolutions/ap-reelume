@@ -10,6 +10,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The film and series cards carry the prototype's banner**: the poster raised over the title's own
+  colour wall under the directional veil, the display-size title, the synopsis and the actions on
+  the dark ground — the hero's frame coin for coin, with the same high-contrast payment the
+  colour-alone gate now asserts for all four surfaces that spend it. §4's two columns survive
+  inside: poster fixed, text fluid.
+  - The season picker wears the drop-down pill the Library taught, label inside.
+  - **The trailer's three approved consequences land**: what a local one costs (nothing), what the
+    link does (leaves through your browser, not this process), and how to make one exist when none
+    does — the convention is `TrailerDiscoveryPolicy`'s, and the series explains in a comment why it
+    has no local trailer to offer.
+
 - **Home's hero bleeds, which is what the prototype draws**: the title's own colour wall under the
   directional veil, over `PlayerSurfaceBrush` — the one surface that is `#0B0D10` in all four
   themes, with the player's text brushes and their measured 19.46:1. In both high contrasts the art

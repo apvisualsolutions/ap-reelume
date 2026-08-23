@@ -10,6 +10,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las fichas de película y de serie llevan el banner del prototipo**: la portada elevada sobre el
+  muro de color del propio título con el velo direccional, el título a tamaño display, la sinopsis y
+  las acciones sobre el fondo oscuro — el marco del héroe, moneda por moneda, con el mismo pago en
+  alto contraste que la puerta de color-solo afirma ahora para las cuatro superficies que lo gastan.
+  Las dos columnas de la §4 sobreviven dentro: portada fija, texto fluido.
+  - El selector de temporada viste la píldora de desplegable que la Biblioteca enseñó, con su
+    etiqueta dentro.
+  - **Las tres consecuencias del tráiler entran aprobadas**: qué cuesta el local (nada), qué hace el
+    enlace (sale por tu navegador, no por este proceso) y cómo hacer que exista uno cuando no hay —
+    la convención es de `TrailerDiscoveryPolicy`, y la serie explica en comentario por qué no tiene
+    tráiler local que ofrecer.
+
 - **El héroe de Inicio sangra, que es lo que el prototipo dibuja**: el muro de color del propio
   título con el velo direccional encima, sobre `PlayerSurfaceBrush` — la única superficie que es
   `#0B0D10` en los cuatro temas, con los pinceles de texto del reproductor y su contraste ya medido

@@ -53,7 +53,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   Detalles fantasma); carril «Continuar viendo» 16:9 con acciones por tarjeta; «Añadido
   recientemente» + «Ver toda la biblioteca →» que absorbe `LibraryEntryView`; `HomeLayoutTests`
   actualizado.
-- [ ] **F4 — Fichas**: banner con arte + velo 90°, portada elevada, chips, sinopsis, acciones
+- [x] **F4 — Fichas**: banner con arte + velo 90°, portada elevada, chips, sinopsis, acciones
   sobre el banner; secciones Versiones (filas elegibles, 5 formas) y «Otras acciones»; tráiler
   LIB-014 con sus tres `Trailer*`; serie con selector de temporada segmentado y filas de episodio
   de 56 px (número mono a la derecha, ○ ◐ ●).

@@ -12,75 +12,167 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:movie="clr-namespace:ApSolutions.LocalMedia.Presentation.Movie"
     x:DataType="movie:MovieDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource MovieDetailsAccessibleName}">
-  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
-    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeTitle}"
-          FontWeight="SemiBold"
-          Text="{Binding Title}"
-          TextTrimming="CharacterEllipsis"
-          automation:AutomationProperties.HeadingLevel="1" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding HasYear}"
-          Text="{Binding YearText}" />
-      <library:UnavailableBadge />
-    </StackPanel>
-
+  <UserControl.Resources>
+    <library:PosterArtConverter x:Key="DetailsArt" />
+  </UserControl.Resources>
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
     <!--
-      Four buttons carrying translated words is the shape that has drawn a control off the side of
-      this window seven times, so the row wraps rather than pushing the last one out of reach.
+      The banner the prototype draws: the title's own art wall bled edge to edge, the poster raised
+      over it, and the film's facts on the dark ground. The frame is the hero's, coin for coin — the
+      base is PlayerSurfaceBrush (#0B0D10 in all four themes), the text is the player's brushes with
+      their measured contrast, and the computed layers switch off in both high contrasts through
+      PosterArtOpacity, which the colour-alone gate asserts by name. §4's two columns survive inside
+      it: the poster fixed, the text fluid.
     -->
-    <WrapPanel
-        x:Name="MovieActionsSurface"
-        Grid.Row="1"
-        ItemSpacing="{DynamicResource Space8}"
-        LineSpacing="{DynamicResource Space8}">
-      <Button
-          Classes="primary-action"
-          Command="{Binding ResumeCommand}"
-          Content="{DynamicResource MovieResumeAction}"
-          IsVisible="{Binding CanResume}"
-          automation:AutomationProperties.Name="{DynamicResource MovieResumeAction}" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding CanResume}"
-          Text="{Binding ResumePositionText}" />
-      <Button
-          Command="{Binding PlayCommand}"
-          Content="{DynamicResource MoviePlayAction}"
-          automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}" />
-      <Button
-          Command="{Binding PlayTrailerCommand}"
-          Content="{DynamicResource MovieTrailerAction}"
-          IsVisible="{Binding HasTrailer}"
-          automation:AutomationProperties.Name="{DynamicResource MovieTrailerAction}" />
-      <Button
-          Command="{Binding OpenTrailerLinkCommand}"
-          Content="{DynamicResource DetailsTrailerLinkAction}"
-          IsVisible="{Binding HasTrailerLink}"
-          automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
-    </WrapPanel>
+    <Border ClipToBounds="True" CornerRadius="{DynamicResource CornerRadiusMedium}">
+      <Panel Background="{DynamicResource PlayerSurfaceBrush}">
+        <Panel Opacity="{DynamicResource PosterArtOpacity}">
+          <Border Background="{Binding Title, Converter={StaticResource DetailsArt}}" />
+          <Border Background="{Binding Title, Converter={StaticResource DetailsArt}, ConverterParameter=glow}" />
+          <Border>
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Offset="0" Color="#F2090C10" />
+                <GradientStop Offset="0.55" Color="#B8090C10" />
+                <GradientStop Offset="1" Color="#30090C10" />
+              </LinearGradientBrush>
+            </Border.Background>
+          </Border>
+        </Panel>
+        <Grid Margin="32" ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space24}">
+          <!--
+            The raised poster: the card's art alone, without the card — its title is already written
+            beside it at display size, and writing it twice under a poster this close would be the
+            initials defect with more letters. The initials themselves stay: two letters still say
+            which title this is before the colour has taught anybody anything.
+          -->
+          <Border
+              Width="158"
+              Height="237"
+              VerticalAlignment="Top"
+              ClipToBounds="True"
+              Background="{DynamicResource ControlFillBrush}"
+              BorderBrush="{DynamicResource PlayerHairlineBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource CornerRadiusMedium}">
+            <Panel>
+              <Panel Opacity="{DynamicResource PosterArtOpacity}">
+                <Border Background="{Binding Title, Converter={StaticResource DetailsArt}}" />
+                <Border Background="{Binding Title, Converter={StaticResource DetailsArt}, ConverterParameter=glow}" />
+              </Panel>
+              <TextBlock
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  FontSize="{DynamicResource FontSizeDisplay}"
+                  FontWeight="SemiBold"
+                  Foreground="{DynamicResource PosterInitialsBrush}"
+                  Text="{Binding Initials}"
+                  automation:AutomationProperties.AccessibilityView="Raw" />
+            </Panel>
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="{DynamicResource Space12}">
+            <TextBlock
+                FontSize="{DynamicResource FontSizeDisplay}"
+                FontWeight="Light"
+                Foreground="{DynamicResource PlayerTextBrush}"
+                Text="{Binding Title}"
+                TextTrimming="CharacterEllipsis"
+                automation:AutomationProperties.HeadingLevel="1" />
+            <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+              <TextBlock
+                  VerticalAlignment="Center"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  IsVisible="{Binding HasYear}"
+                  Text="{Binding YearText}" />
+              <library:UnavailableBadge />
+            </WrapPanel>
+            <!--
+              The synopsis is a paragraph, so it wraps and is capped: a banner that grows without
+              limit pushes the versions off the screen for the one title whose provider was
+              talkative.
+            -->
+            <TextBlock
+                MaxWidth="620"
+                MaxHeight="160"
+                HorizontalAlignment="Left"
+                Foreground="{DynamicResource PlayerTextBrush}"
+                IsVisible="{Binding HasOverview}"
+                Text="{Binding Overview}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="Wrap"
+                automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+            <!--
+              Four buttons carrying translated words is the shape that has drawn a control off the
+              side of this window seven times, so the row wraps rather than pushing the last one out
+              of reach.
+            -->
+            <WrapPanel
+                x:Name="MovieActionsSurface"
+                ItemSpacing="{DynamicResource Space8}"
+                LineSpacing="{DynamicResource Space8}">
+              <Button
+                  Classes="primary-action"
+                  Command="{Binding ResumeCommand}"
+                  Content="{DynamicResource MovieResumeAction}"
+                  IsVisible="{Binding CanResume}"
+                  automation:AutomationProperties.Name="{DynamicResource MovieResumeAction}" />
+              <TextBlock
+                  VerticalAlignment="Center"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  IsVisible="{Binding CanResume}"
+                  Text="{Binding ResumePositionText}" />
+              <Button
+                  Command="{Binding PlayCommand}"
+                  Content="{DynamicResource MoviePlayAction}"
+                  automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}" />
+              <Button
+                  Command="{Binding PlayTrailerCommand}"
+                  Content="{DynamicResource MovieTrailerAction}"
+                  IsVisible="{Binding HasTrailer}"
+                  automation:AutomationProperties.Name="{DynamicResource MovieTrailerAction}" />
+              <Button
+                  Command="{Binding OpenTrailerLinkCommand}"
+                  Content="{DynamicResource DetailsTrailerLinkAction}"
+                  IsVisible="{Binding HasTrailerLink}"
+                  automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
+            </WrapPanel>
+            <!--
+              The three consequences the design package wrote for the trailer, each beside the state
+              it explains: what a local trailer costs (nothing), what the browser link does (leaves
+              this process), and how to make a local one exist when none does — the convention is
+              TrailerDiscoveryPolicy's, not this view's invention.
+            -->
+            <StackPanel Spacing="{DynamicResource Space4}">
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  IsVisible="{Binding HasTrailer}"
+                  Text="{DynamicResource TrailerLocalFileNotice}"
+                  TextWrapping="Wrap" />
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  IsVisible="{Binding HasTrailerLink}"
+                  Text="{DynamicResource TrailerBrowserLeavesAppNotice}"
+                  TextWrapping="Wrap" />
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  IsVisible="{Binding !HasTrailer}"
+                  Text="{DynamicResource TrailerConventionHint}"
+                  TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Panel>
+    </Border>
 
-    <StackPanel Grid.Row="2" Spacing="{DynamicResource Space8}">
+    <StackPanel Grid.Row="1" Spacing="{DynamicResource Space8}">
       <catalog:WatchStatusControl DataContext="{Binding WatchStatus}" />
       <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
     </StackPanel>
 
-    <!--
-      The synopsis is a paragraph, so it wraps and is capped: a card that grows without limit pushes
-      the versions off the screen for the one title whose provider was talkative.
-    -->
-    <TextBlock
-        Grid.Row="3"
-        MaxHeight="160"
-        IsVisible="{Binding HasOverview}"
-        Text="{Binding Overview}"
-        TextTrimming="CharacterEllipsis"
-        TextWrapping="Wrap"
-        automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
-
-    <StackPanel Grid.Row="4" IsVisible="{Binding HasVersions}" Spacing="{DynamicResource Space8}">
+    <StackPanel Grid.Row="2" IsVisible="{Binding HasVersions}" Spacing="{DynamicResource Space8}">
       <TextBlock
           FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
