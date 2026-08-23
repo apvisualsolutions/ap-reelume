@@ -20,6 +20,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource PlayerTextBrush}"
         Text="{DynamicResource MarkerEditorDescription}"
         TextWrapping="Wrap" />
+    <!-- The consequence of an overlap, said before one is made rather than after. -->
+    <TextBlock
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+        Text="{DynamicResource MarkerOverlapConsequence}"
+        TextWrapping="Wrap" />
     <StackPanel
         VerticalAlignment="Top"
         IsVisible="{Binding IsEmpty}"

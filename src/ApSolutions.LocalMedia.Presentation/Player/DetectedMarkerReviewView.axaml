@@ -23,6 +23,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource PlayerTextBrush}"
         Text="{DynamicResource DetectedMarkerReviewDescription}"
         TextWrapping="Wrap" />
+    <!--
+      Two consequences, written where they happen: what detection is until somebody accepts it, and
+      what a discard costs. They say the outcome, not the mechanism - the approved batch's rule.
+    -->
+    <TextBlock
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+        Text="{DynamicResource MarkerDetectionIsSuggestionNotice}"
+        TextWrapping="Wrap" />
+    <TextBlock
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+        Text="{DynamicResource MarkerDiscardedNotice}"
+        TextWrapping="Wrap" />
     <StackPanel
         VerticalAlignment="Top"
         IsVisible="{Binding IsEmpty}"

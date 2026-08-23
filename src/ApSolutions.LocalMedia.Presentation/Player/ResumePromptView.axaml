@@ -21,6 +21,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border
       x:Name="ResumePromptSurface"
       MaxWidth="420"
+      MaxHeight="240"
       HorizontalAlignment="Center"
       VerticalAlignment="Center"
       Padding="16"

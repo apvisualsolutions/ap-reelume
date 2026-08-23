@@ -177,6 +177,49 @@ public sealed class PlayerViewModelTests
         Assert.False(viewModel.ExternalLaunchFailed);
     }
 
+    /// <summary>
+    /// The command pressed with no launcher behind it marks nothing: a failure flag raised by an
+    /// attempt that never existed would blame a launcher nobody has. The measured door is the
+    /// command's own <c>CanExecute</c> - <c>CanOpenExternally</c> wants the launcher - and the
+    /// method's inner guard stands behind it for whoever calls the work without asking first.
+    /// </summary>
+    [Fact]
+    public async Task A_press_with_no_launcher_behind_it_marks_no_failure()
+    {
+        var coordinator = new RecordingCoordinator
+        {
+            FailureOnStart = new PlaybackFailure(PlaybackFailureCode.UnsupportedCodec, "no decoder"),
+        };
+        var viewModel = new PlayerViewModel(coordinator, frameSource: null, externalLauncher: null);
+
+        await viewModel.OpenAsync(new MediaFileId(Guid.NewGuid()), SamplePath, cancellationToken: TestContext.Current.CancellationToken);
+        Assert.False(viewModel.CanOpenExternally);
+
+        viewModel.OpenExternallyCommand.Execute(null);
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        Assert.False(viewModel.ExternalLaunchFailed);
+    }
+
+    /// <summary>
+    /// The rows the recovery flyout shows are handed in by the composition and announced: a list
+    /// assigned that nobody hears about is a flyout that opens on yesterday's versions.
+    /// </summary>
+    [Fact]
+    public void The_versions_handed_in_are_held_and_announced()
+    {
+        var viewModel = new PlayerViewModel(new RecordingCoordinator());
+        var announced = new List<string>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+
+        Assert.Null(viewModel.Versions);
+        var versions = new PlayerVersionsViewModel([]);
+        viewModel.Versions = versions;
+
+        Assert.Same(versions, viewModel.Versions);
+        Assert.Contains(nameof(viewModel.Versions), announced);
+    }
+
     [Fact]
     public async Task Corrupted_media_reports_its_own_reason_and_a_refused_external_launch_is_visible()
     {

@@ -163,6 +163,22 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     /// button. This one had neither the check nor the button.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// The rows the recovery button's flyout shows. The composition hands over the same object the
+    /// side column binds, so choosing in either place is the same switch. Absent when the title has
+    /// no group - and <see cref="CanChooseAnotherVersion"/> is false then, so no button offers an
+    /// empty list.
+    /// </summary>
+    public PlayerVersionsViewModel? Versions
+    {
+        get;
+        set
+        {
+            field = value;
+            OnPropertyChanged(nameof(Versions));
+        }
+    }
+
     public bool CanChooseAnotherVersion =>
         _recoveryActions.Contains(PlaybackRecoveryAction.ChooseAnotherVersion)
         && _alternativesExist?.Invoke() == true;
@@ -277,17 +293,20 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         // Resume stayed disabled for good, which is a session a mouse can stop and never restart.
         // The keyboard was unaffected, because the player answers keys itself, and that is why it
         // survived this long.
+        // Cast hard on purpose: every one of the six is constructed as AsyncRelayCommand above,
+        // and one that stopped being it would stop being refreshed - which is the 2026-08-15
+        // defect returning in silence. A throw is the better failure.
         foreach (var command in new[]
         {
-            PauseCommand,
-            ResumeCommand,
-            StopCommand,
-            RetryCommand,
-            OpenExternallyCommand,
-            TogglePlaybackCommand,
+            (AsyncRelayCommand)PauseCommand,
+            (AsyncRelayCommand)ResumeCommand,
+            (AsyncRelayCommand)StopCommand,
+            (AsyncRelayCommand)RetryCommand,
+            (AsyncRelayCommand)OpenExternallyCommand,
+            (AsyncRelayCommand)TogglePlaybackCommand,
         })
         {
-            (command as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+            command.RaiseCanExecuteChanged();
         }
     }
 

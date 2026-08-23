@@ -1295,6 +1295,10 @@ public static partial class CompositionRoot
                     versionSwitch,
                     target => SwitchToVersionAsync(target, confirmed: false, restartFromZero: false)))]);
 
+        // The same rows twice on purpose: the side column and the recovery button's flyout must
+        // never disagree about what the alternatives are.
+        player.Versions = versions;
+
         return new PlayerSurfaces
         {
             Player = player,

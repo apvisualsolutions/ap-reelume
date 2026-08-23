@@ -125,12 +125,70 @@ SPDX-License-Identifier: GPL-3.0-or-later
           VerticalAlignment="Center"
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{Binding VolumeLabel}" />
-      <TextBlock
+      <!--
+        The prototype's speed menu: one button wearing the current multiplier, nine steps as radio
+        items behind it, and "back to 1x" only while away from 1x. It replaces what was a readout a
+        mouse could not act on — the keyboard changed speed and the pointer could only watch. Same
+        key as the readout carried, so the walk's identity is unchanged while the type is new.
+      -->
+      <Button
           x:Name="SpeedReadout"
+          Classes="player-chrome"
           VerticalAlignment="Center"
-          Foreground="{DynamicResource PlayerTextBrush}"
-          automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}"
-          Text="{Binding SpeedLabel}" />
+          automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+          <TextBlock Foreground="{DynamicResource PlayerTextBrush}" Text="{Binding SpeedLabel}" />
+        </StackPanel>
+        <Button.Flyout>
+          <MenuFlyout Placement="Top">
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="0.25"
+                Header="0,25×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="0.5"
+                Header="0,5×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="0.75"
+                Header="0,75×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="1"
+                Header="1×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="1.25"
+                Header="1,25×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="1.5"
+                Header="1,5×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="1.75"
+                Header="1,75×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="2"
+                Header="2×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="3"
+                Header="3×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="4"
+                Header="4×" />
+            <MenuItem
+                Command="{Binding SetSpeedCommand}"
+                CommandParameter="1"
+                Header="{DynamicResource TransportSpeedResetAction}"
+                IsVisible="{Binding IsAwayFromNormalSpeed}" />
+          </MenuFlyout>
+        </Button.Flyout>
+      </Button>
     </WrapPanel>
 
     <Border

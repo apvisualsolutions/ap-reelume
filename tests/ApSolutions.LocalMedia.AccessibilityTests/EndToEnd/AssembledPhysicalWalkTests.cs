@@ -2276,6 +2276,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => transport.Position,
             "clicking the scrubber never moved the session to the chosen minute");
 
+        // The speed menu that replaced the readout: a drop-down's effect is that it opens — what is
+        // chosen inside lands in a popup root of its own — and the command behind every item is
+        // measured in TransportControlsAutomationTests against the engine's own speed. Closed by the
+        // flyout's own door rather than Escape to the window: the popup is a top level of its own,
+        // and the window's Escape is not its business.
+        await PressAsync(
+            host,
+            "TransportSpeedLabel",
+            () => Resolve(host, "TransportSpeedLabel") is Button { Flyout.IsOpen: true },
+            "clicking the speed readout never opened the menu of speeds");
+        ((Button)Resolve(host, "TransportSpeedLabel")).Flyout!.Hide();
+        Dispatcher.UIThread.RunJobs();
+
         await PressAsync(
             host,
             "PlayerStopAction",
@@ -2861,6 +2874,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var absentFile = await SeedMediaFileAsync(factory, media, absent, TimeSpan.FromSeconds(8));
         File.Delete(absent);
 
+
         // Asserting this is not null is what proves the scene presses the isolated exit rather than
         // passing quietly against one that would have opened the system's player on whoever ran it.
         var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
@@ -2868,6 +2882,33 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var record = Path.Combine(handoff!, RecordingSystemHandoff.FileName);
 
         using var host = ShowShell(height: 1400);
+        IServiceProvider services = host.Application.Services;
+        // A group behind the broken file, because that is what turns the third recovery action into
+        // a button at all: corrupted media offers "choose another version" only when another version
+        // exists to choose. The member list reuses the scene's two files — what matters to the offer
+        // is membership, not that the other member opens.
+        await services.GetRequiredService<IMediaVersionGroupRepository>().SaveAsync(
+            new MediaVersionGroup(
+                new MediaVersionId(Guid.NewGuid()),
+                $"title:{Guid.NewGuid():D}",
+                [
+                    Version(brokenFile, broken, 8),
+
+                    // Described by hand because the helper weighs the file on disk, and this one's
+                    // whole part in the scene is not being there.
+                    new MediaVersion(
+                        new MediaFileId(absentFile),
+                        absent,
+                        IsAvailable: false,
+                        TimeSpan.FromSeconds(8),
+                        Width: 320,
+                        Height: 240,
+                        IsHdr: false,
+                        VideoCodec: "H264",
+                        SizeBytes: 2),
+                ],
+                PreferredMediaFileId: null),
+            TestContext.Current.CancellationToken);
 
         // ---- Open with an external application: the file that cannot be decoded.
         await host.ViewModel.OpenPlayerAsync(
@@ -2893,6 +2934,17 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Contains(
             $"{RecordingSystemHandoff.PlayExternallyVerb} {broken}",
             RecordedLines(record));
+
+        // The third way out, a button since 2026-08-23: its flyout holds the same rows the side
+        // column lists, so its effect is that it opens — the switch a row performs is measured by
+        // the version-switch scene on those very rows. Closed by its own door; see the speed menu.
+        await PressAsync(
+            host,
+            "PlayerRecoveryChooseAnotherVersion",
+            () => Resolve(host, "PlayerRecoveryChooseAnotherVersion") is Button { Flyout.IsOpen: true },
+            "clicking Choose another version never opened the list of versions");
+        ((Button)Resolve(host, "PlayerRecoveryChooseAnotherVersion")).Flyout!.Hide();
+        Dispatcher.UIThread.RunJobs();
 
         // ---- Retry: the file that was not there, put back between the two presses.
         await host.ViewModel.OpenPlayerAsync(
