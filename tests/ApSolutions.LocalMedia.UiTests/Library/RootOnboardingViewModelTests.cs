@@ -188,6 +188,89 @@ public sealed class RootOnboardingViewModelTests
         Assert.False(viewModel.IsConfirmingRemoval);
     }
 
+    /// <summary>
+    /// The dialog's grammar: the kind follows the path when a detector is wired, stands still when
+    /// none is, and each answer carries its key and its consequence for the surface to paint.
+    /// </summary>
+    [Fact]
+    public void The_kind_follows_the_path_only_where_a_detector_is_wired()
+    {
+        var undetected = Create(new StubRoots());
+        Assert.False(undetected.HasKindDetector);
+        undetected.Path = @"\\nas\cine";
+        Assert.Equal(RootKind.Local, undetected.SelectedKind);
+
+        var viewModel = Create(new StubRoots());
+        viewModel.KindDetector = path => path.StartsWith(@"\\", StringComparison.Ordinal)
+            ? RootKind.Unc
+            : RootKind.Usb;
+        Assert.True(viewModel.HasKindDetector);
+
+        viewModel.Path = @"\\nas\cine";
+        Assert.Equal(RootKind.Unc, viewModel.SelectedKind);
+        Assert.Equal("RootKindUnc", viewModel.DetectedKindKey);
+        Assert.Equal("RootKindUncHint", viewModel.DetectedKindHintKey);
+
+        viewModel.Path = "E:\\peliculas";
+        Assert.Equal(RootKind.Usb, viewModel.SelectedKind);
+        Assert.Equal("RootKindUsb", viewModel.DetectedKindKey);
+        Assert.Equal("RootKindUsbHint", viewModel.DetectedKindHintKey);
+
+        // Emptying the box detects nothing: there is no path to read a kind from.
+        viewModel.Path = string.Empty;
+        Assert.Equal(RootKind.Usb, viewModel.SelectedKind);
+
+        viewModel.SelectedKind = RootKind.Local;
+        Assert.Equal("RootKindLocal", viewModel.DetectedKindKey);
+        Assert.Equal("RootKindLocalHint", viewModel.DetectedKindHintKey);
+    }
+
+    /// <summary>
+    /// Browse puts the picker's answer in the box and a cancelled picker changes nothing, exactly
+    /// like every other picker in this application.
+    /// </summary>
+    [Fact]
+    public async Task Browse_asks_the_picker_and_a_cancelled_picker_changes_nothing()
+    {
+        var absent = Create(new StubRoots());
+        Assert.False(absent.HasFolderPicker);
+
+        var viewModel = Create(new StubRoots());
+        viewModel.FolderPicker = _ => Task.FromResult<string?>("R:\\chosen");
+        Assert.True(viewModel.HasFolderPicker);
+
+        viewModel.BrowseFolderCommand.Execute(null);
+        for (var attempt = 0; attempt < 100 && viewModel.Path.Length == 0; attempt++)
+        {
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+
+        Assert.Equal("R:\\chosen", viewModel.Path);
+
+        viewModel.FolderPicker = _ => Task.FromResult<string?>(null);
+        viewModel.BrowseFolderCommand.Execute(null);
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+        Assert.Equal("R:\\chosen", viewModel.Path);
+    }
+
+    /// <summary>
+    /// The list follows the catalogue it describes: a folder accepted lands on its own list without
+    /// anybody navigating away and back — the house defect, in its list shape.
+    /// </summary>
+    [Fact]
+    public async Task A_folder_accepted_reaches_the_list_without_a_second_ask()
+    {
+        var roots = new StubRoots();
+        var viewModel = CreateWithRemoval(roots);
+        Assert.True(viewModel.HasNoRoots);
+
+        viewModel.Path = "R:\\media";
+        await viewModel.AddAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(viewModel.HasRoots);
+        Assert.Contains(viewModel.Roots, row => row.Path == "R:\\media");
+    }
+
     private static RootOnboardingViewModel Create(StubRoots roots) =>
         new(new AddLibraryRoot(roots, new PassThroughNormalizer()));
 

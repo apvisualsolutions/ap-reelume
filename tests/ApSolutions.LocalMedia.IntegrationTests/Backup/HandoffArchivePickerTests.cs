@@ -109,7 +109,7 @@ public sealed class HandoffArchivePickerTests : IDisposable
     }
 
     /// <summary>
-    /// Both halves answer a cancellation the way the dialogs they replace do: by stopping, rather than
+    /// The halves answer a cancellation the way the dialogs they replace do: by stopping, rather than
     /// by naming a path nobody is going to use.
     /// </summary>
     [Fact]
@@ -123,9 +123,31 @@ public sealed class HandoffArchivePickerTests : IDisposable
             () => picker.ChooseDestinationAsync(cancelled.Token));
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
             () => picker.ChooseSourceAsync(cancelled.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => picker.ChooseMediaFolderAsync(cancelled.Token));
         Assert.False(
             Directory.Exists(Handoff),
             "A cancelled request created the folder it had just refused to answer with.");
+    }
+
+    /// <summary>
+    /// The fourth answer of the same exit: a media folder composed inside the handover root, created
+    /// because the dialog it stands in for can only ever hand back somewhere that exists — and the
+    /// same folder again on the next ask, because a run has one handover, not a trail of them.
+    /// </summary>
+    [Fact]
+    public async Task A_media_folder_is_composed_inside_the_handover_and_exists_when_named()
+    {
+        var picker = new HandoffArchivePicker(Handoff);
+
+        var first = await picker.ChooseMediaFolderAsync(TestContext.Current.CancellationToken);
+
+        Assert.NotNull(first);
+        Assert.True(Directory.Exists(first), "The picker named a folder it did not create.");
+        Assert.StartsWith(Handoff, first, StringComparison.OrdinalIgnoreCase);
+
+        var second = await picker.ChooseMediaFolderAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(first, second);
     }
 
     private async Task<string> WriteArchiveAsync(string name, DateTime writtenUtc)
