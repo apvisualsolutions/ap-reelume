@@ -24,6 +24,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private readonly ICatalogQueryService _queryService;
     private readonly RelayCommand _back;
     private readonly AsyncRelayCommand _clearSearch;
+    private readonly AsyncRelayCommand _clearFilters;
     private IReadOnlyList<CatalogItemViewModel> _items = [];
     private IReadOnlyList<IReadOnlyList<CatalogItemViewModel>> _rows = [];
     private int _columns = 1;
@@ -34,6 +35,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private CatalogItemViewModel? _selectedItem;
     private TitleId? _scrollAnchorId;
     private string? _nextCursor;
+    private bool _hasLoaded;
 
     public LibraryViewModel(
         ICatalogQueryService queryService,
@@ -56,6 +58,34 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         ClearSearchCommand = _clearSearch;
         _back = new RelayCommand(_ => BackToLibrary(), _ => Surface != LibrarySurface.Browse);
         BackCommand = _back;
+        SelectTypeCommand = new AsyncRelayCommand(
+            parameter =>
+            {
+                TypeFilter = (CatalogFilter)parameter!;
+                return LoadAsync(CancellationToken.None);
+            },
+            parameter => parameter is CatalogFilter);
+        _clearFilters = new AsyncRelayCommand(() =>
+        {
+            _search = null;
+            _filters = CatalogFilter.None;
+            _sort = CatalogSort.Title;
+            OnPropertyChanged(nameof(Search));
+            OnPropertyChanged(nameof(Filters));
+            OnPropertyChanged(nameof(Sort));
+            OnPropertyChanged(nameof(TypeFilter));
+            OnPropertyChanged(nameof(StatusFilter));
+            OnPropertyChanged(nameof(IsEveryKind));
+            OnPropertyChanged(nameof(IsMoviesOnly));
+            OnPropertyChanged(nameof(IsShowsOnly));
+            OnPropertyChanged(nameof(EveryKindStateCue));
+            OnPropertyChanged(nameof(MoviesOnlyStateCue));
+            OnPropertyChanged(nameof(ShowsOnlyStateCue));
+            OnPropertyChanged(nameof(IsFiltersDirty));
+            _clearSearch.RaiseCanExecuteChanged();
+            return LoadAsync(CancellationToken.None);
+        });
+        ClearFiltersCommand = _clearFilters;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -68,6 +98,8 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             if (SetField(ref _items, value))
             {
                 OnPropertyChanged(nameof(IsSearchWithoutResults));
+                OnPropertyChanged(nameof(IsLibraryEmpty));
+                OnPropertyChanged(nameof(ItemCount));
                 Regroup();
             }
         }
@@ -125,11 +157,13 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             if (SetField(ref _search, value))
             {
                 OnPropertyChanged(nameof(IsSearchWithoutResults));
+                OnPropertyChanged(nameof(IsLibraryEmpty));
 
                 // The clear button is bound to a predicate over this, so it has to be told: a command
                 // that never announces is asked once at construction and keeps that first answer,
                 // which is the defect ARQ-004 went through twenty-four classes to remove.
                 _clearSearch.RaiseCanExecuteChanged();
+                OnPropertyChanged(nameof(IsFiltersDirty));
             }
         }
     }
@@ -142,14 +176,105 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             if (SetField(ref _filters, value))
             {
                 OnPropertyChanged(nameof(IsSearchWithoutResults));
+                OnPropertyChanged(nameof(IsLibraryEmpty));
+                OnPropertyChanged(nameof(TypeFilter));
+                OnPropertyChanged(nameof(StatusFilter));
+                OnPropertyChanged(nameof(IsEveryKind));
+                OnPropertyChanged(nameof(IsMoviesOnly));
+                OnPropertyChanged(nameof(IsShowsOnly));
+                OnPropertyChanged(nameof(EveryKindStateCue));
+                OnPropertyChanged(nameof(MoviesOnlyStateCue));
+                OnPropertyChanged(nameof(ShowsOnlyStateCue));
+                OnPropertyChanged(nameof(IsFiltersDirty));
             }
         }
     }
 
+    /// <summary>The two bits the kind pills own, and nothing else.</summary>
+    private const CatalogFilter KindMask = CatalogFilter.Movie | CatalogFilter.Show;
+
+    /// <summary>
+    /// Which kind the three pills are on: <see cref="CatalogFilter.None"/> for all of them.
+    /// </summary>
+    /// <remarks>
+    /// Split from <see cref="StatusFilter"/> rather than sharing one property, because the prototype
+    /// asks for two controls over one field and the repository already supports it: the query builder
+    /// reads <c>Movie</c> and <c>Show</c> for the kind predicate and ANDs the rest in separately, so
+    /// "films I have not started" was always expressible and no view ever asked for it. A single
+    /// <c>ComboBox</c> bound to the whole flags value is what made the two exclusive — pressing
+    /// Películas would have cleared En curso, which is a control undoing another one.
+    /// </remarks>
+    public CatalogFilter TypeFilter
+    {
+        get => _filters & KindMask;
+        set => Filters = (_filters & ~KindMask) | (value & KindMask);
+    }
+
+    /// <summary>Everything the kind pills do not own: availability, progress, and the personal marks.</summary>
+    /// <remarks>
+    /// Setting it re-runs the query, because the drop-down applies as a choice is made — the Apply
+    /// button this replaced was a control whose whole job was repeating what this one had already
+    /// said. Through <see cref="RefreshCommand"/> rather than a bare call, so a failure lands in the
+    /// command's catch instead of on the application (ARQ-004). The binding pushing the current
+    /// value back at attach is a no-op: same value, no change, no query. And only once something
+    /// has loaded: before the first <see cref="LoadAsync"/> there is nothing to re-run, and a
+    /// constructor initializer that queried would eat a page the host was about to ask for.
+    /// </remarks>
+    public CatalogFilter StatusFilter
+    {
+        get => _filters & ~KindMask;
+        set
+        {
+            var next = (_filters & KindMask) | (value & ~KindMask);
+            if (next != _filters)
+            {
+                Filters = next;
+                if (_hasLoaded)
+                {
+                    RefreshCommand.Execute(null);
+                }
+            }
+        }
+    }
+
+    public bool IsEveryKind => TypeFilter is CatalogFilter.None or KindMask;
+
+    public bool IsMoviesOnly => TypeFilter == CatalogFilter.Movie;
+
+    public bool IsShowsOnly => TypeFilter == CatalogFilter.Show;
+
+    /// <summary>
+    /// The selected pill says so twice: the accent fill, and this glyph.
+    /// </summary>
+    /// <remarks>
+    /// The same pair the theme and language pills already spend, and the reason is the same one the
+    /// four themes force — in either high contrast dictionary the accent fill and the resting fill are
+    /// the same white or the same black, so a pill that said "selected" in colour alone would say
+    /// nothing at all there.
+    /// </remarks>
+    public string EveryKindStateCue => Cue(IsEveryKind);
+
+    public string MoviesOnlyStateCue => Cue(IsMoviesOnly);
+
+    public string ShowsOnlyStateCue => Cue(IsShowsOnly);
+
+    private static string Cue(bool selected) => selected ? "●" : "○";
+
+    /// <summary>Applies as it is chosen, same shape and same reason as <see cref="StatusFilter"/>.</summary>
     public CatalogSort Sort
     {
         get => _sort;
-        set => SetField(ref _sort, value);
+        set
+        {
+            if (SetField(ref _sort, value))
+            {
+                OnPropertyChanged(nameof(IsFiltersDirty));
+                if (_hasLoaded)
+                {
+                    RefreshCommand.Execute(null);
+                }
+            }
+        }
     }
 
     public LibrarySurface Surface
@@ -192,6 +317,17 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     public bool HasMore => _nextCursor is not null;
 
     /// <summary>
+    /// How many cards the grid is holding, which is what the header counts.
+    /// </summary>
+    /// <remarks>
+    /// The loaded page and not the catalogue, which is what the prototype counts too — its header
+    /// reads the length of the tile list. A catalogue-wide total would need a count query that
+    /// <see cref="ICatalogQueryService"/> does not offer, and inventing one to put a bigger number
+    /// beside a smaller grid would be a header describing something the screen is not showing.
+    /// </remarks>
+    public int ItemCount => Items.Count;
+
+    /// <summary>
     /// The query narrowed the catalogue and nothing came back.
     /// </summary>
     /// <remarks>
@@ -202,14 +338,51 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     public bool IsSearchWithoutResults =>
         Items.Count == 0 && (!string.IsNullOrWhiteSpace(Search) || Filters != CatalogFilter.None);
 
+    /// <summary>
+    /// Nothing in the library and nothing narrowing it: the fourth of §4's four states.
+    /// </summary>
+    /// <remarks>
+    /// The complement of <see cref="IsSearchWithoutResults"/> over an empty grid, and the two must
+    /// never both be true: an empty grid under a filter is an answer about the filter, an empty grid
+    /// under nothing is an answer about the library.
+    /// </remarks>
+    public bool IsLibraryEmpty =>
+        Items.Count == 0 && string.IsNullOrWhiteSpace(Search) && Filters == CatalogFilter.None;
+
     public ICommand RefreshCommand { get; }
 
     /// <summary>Empties the search box and asks again, so getting back to everything is one press.</summary>
     public ICommand ClearSearchCommand { get; }
 
+    /// <summary>
+    /// Puts the whole row back where it starts — search, kind, status and order — in one press.
+    /// </summary>
+    /// <remarks>
+    /// The prototype's «Quitar filtros», and it exists only while something is narrowed
+    /// (<see cref="IsFiltersDirty"/>): a reset that is always on offer reads as a control with a
+    /// job, and its job would be nothing. The fields are written directly and the query runs once
+    /// at the end, because going through the setters would run it up to three times.
+    /// </remarks>
+    public ICommand ClearFiltersCommand { get; }
+
+    /// <summary>Whether anything narrows the grid right now: search, a kind, a status, or an order that is not the default.</summary>
+    public bool IsFiltersDirty =>
+        !string.IsNullOrWhiteSpace(Search) || Filters != CatalogFilter.None || Sort != CatalogSort.Title;
+
     public ICommand LoadMoreCommand { get; }
 
     public ICommand OpenDetailsCommand { get; }
+
+    /// <summary>
+    /// The three kind pills, which narrow and re-run in one press.
+    /// </summary>
+    /// <remarks>
+    /// It queries rather than only setting the field, because the prototype has no Apply beside the
+    /// pills: pressing Películas is the whole gesture. The status and order drop-downs still wait for
+    /// Apply, which is the shape this tree already had, and the two are told apart on screen by the
+    /// pills being pills.
+    /// </remarks>
+    public ICommand SelectTypeCommand { get; }
 
     public ICommand BackCommand { get; }
 
@@ -236,6 +409,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             cancellationToken).ConfigureAwait(false);
         Items = page.Items.Select(item => new CatalogItemViewModel(item)).ToArray();
         _nextCursor = page.NextCursor;
+        _hasLoaded = true;
         OnPropertyChanged(nameof(HasMore));
     }
 

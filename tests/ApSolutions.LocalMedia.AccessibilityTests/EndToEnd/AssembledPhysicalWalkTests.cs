@@ -851,7 +851,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
     /// <summary>
     /// The first batch of the whole-application walk: the browse surface, driven by the mouse alone.
-    /// The two drop-downs open, the apply button re-runs the query the search box was given, a card
+    /// The two drop-downs open, the kind pills narrow and widen the grid as they are pressed, a card
     /// opens from its own entry in the list, and the back button returns to exactly what was there.
     /// </summary>
     /// <remarks>
@@ -868,12 +868,34 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         // No decoding happens on this surface, so the files only have to exist and be catalogued.
         var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var ids = new Dictionary<string, Guid>();
         foreach (var title in new[] { "Arrival.2016.mp4", "Dune.2021.mp4" })
         {
             var path = Path.Combine(media, title);
             await File.WriteAllBytesAsync(path, [0x41, 0x50], TestContext.Current.CancellationToken);
-            _ = await SeedMediaFileAsync(factory, media, path, TimeSpan.FromMinutes(116));
+            ids[title] = await SeedMediaFileAsync(factory, media, path, TimeSpan.FromMinutes(116));
         }
+
+        // One of the two is identified as a film, written the way identification writes it. The
+        // kind pills need a kind to find: a scanned file nobody has identified is deliberately
+        // neither a film nor a show — the catalogue lists it under a third kind — so a library
+        // seeded only with loose files would make Películas and Series both legitimately empty.
+        await new CatalogRepository(factory).UpsertTitleAsync(
+            new CatalogTitle(
+                new TitleId(ids["Dune.2021.mp4"]),
+                CatalogTitleKind.Movie,
+                "Dune.2021",
+                "Dune.2021",
+                2021,
+                [],
+                [],
+                [],
+                DateTimeOffset.UnixEpoch,
+                LastPlayedUtc: null,
+                HasProgress: false,
+                IsPersonal: false,
+                IsAvailable: true),
+            TestContext.Current.CancellationToken);
 
         using var host = ShowShell();
         Navigate(host, AppRoute.Library);
@@ -901,24 +923,56 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         host.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
         Dispatcher.UIThread.RunJobs();
 
-        // The apply button is the one that runs the query, so the search has to already say something
-        // the result can be told apart by: two entries before it, one after.
-        library.Search = "Dune";
-        Dispatcher.UIThread.RunJobs();
+        // The kind pills apply as they are pressed — choosing a kind IS the query, which is why the
+        // apply button could go. The library holds one identified film and one loose file, so every
+        // pill moves the count: Series to none, Películas to the film alone, Todo back to both.
         await PressAsync(
             host,
-            "LibraryApplyAction",
+            "LibraryFilterShows",
             () => library.Items.Count,
-            "clicking Apply never re-ran the query the search box was holding");
+            "pressing the Series pill never narrowed the grid to shows");
+        Assert.Empty(library.Items);
+
+        await PressAsync(
+            host,
+            "LibraryFilterMovies",
+            () => library.Items.Count,
+            "pressing the Películas pill never narrowed the grid to films");
         Assert.Equal("Dune.2021", Assert.Single(library.Items).Title);
 
-        // Clearing is pressed here, with a search in the box and a narrowed list on screen, because
-        // that is the only state in which it does anything: the probe is the count going back up.
+        await PressAsync(
+            host,
+            "LibraryFilterAll",
+            () => library.Items.Count,
+            "pressing the Todo pill never brought the whole library back");
+        Assert.Equal(2, library.Items.Count);
+
+        // Clearing the search lives inside the no-results state now — that is the exit the control
+        // was added for — so the scene walks in first: a search nothing matches, the box on screen,
+        // and the press brings the whole library back.
+        library.Search = "Zzz";
+        await library.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Empty(library.Items);
         await PressAsync(
             host,
             "LibrarySearchClearAction",
             () => library.Items.Count,
             "clicking Clear never emptied the search and brought the rest of the library back");
+        Assert.True(string.IsNullOrEmpty(library.Search));
+        Assert.Equal(2, library.Items.Count);
+
+        // The row's reset exists only while something narrows the grid, so it is pressed with a
+        // search applied: one card on screen, and the press puts the row back to everything.
+        library.Search = "Dune";
+        await library.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal("Dune.2021", Assert.Single(library.Items).Title);
+        await PressAsync(
+            host,
+            "LibraryClearFiltersAction",
+            () => library.Items.Count,
+            "clicking Quitar filtros never reset the narrowing and brought the library back");
         Assert.True(string.IsNullOrEmpty(library.Search));
         Assert.Equal(2, library.Items.Count);
 

@@ -1250,6 +1250,94 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="IsHitTestVisible" Value="False" />
   </Style>
 
+  <!--
+    The prototype's drop-down pill: the field's name in small type, the chosen value in bold, and a
+    chevron, all inside one pill — «Estado  Todos ▼». A ComboBox restyled rather than a button with a
+    flyout, which is what the control inventory prescribes ("en AXAML es una plantilla, no un control
+    nuevo"): the walk keeps pressing the same ComboBox and asserting IsDropDownOpen, and the
+    SelectedValue binding keeps carrying the choice.
+
+    The template keeps the Fluent theme's part names — Border#Background, ContentControl#ContentPresenter —
+    because that is what the five states hang from: the theme's own pseudo-class styles target those
+    names and read ComboBoxBackgroundPointerOver and its siblings, which this file already redirects
+    to the control-fill tokens. A template that renamed its parts would compile, render, and quietly
+    have one state, which is exactly the kind of silence regla 6 exists to prevent.
+
+    The label rides in Tag: it is presentation of a name the control already announces — each of
+    these ComboBoxes carries the same resource as its AutomationProperties.Name — so painting it is
+    the metadata editor's label-on-screen rule, not a second name.
+  -->
+  <Style Selector="ComboBox.filter-pill">
+    <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <Border
+              x:Name="Background"
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              CornerRadius="{TemplateBinding CornerRadius}">
+            <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="Auto,*,Auto">
+              <TextBlock
+                  Margin="0,0,8,0"
+                  VerticalAlignment="Center"
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource TextSecondaryBrush}"
+                  Text="{TemplateBinding Tag}" />
+              <ContentControl
+                  x:Name="ContentPresenter"
+                  Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Content="{TemplateBinding SelectionBoxItem}"
+                  FontWeight="SemiBold" />
+              <TextBlock
+                  x:Name="DropCaret"
+                  Grid.Column="2"
+                  Margin="8,0,0,0"
+                  VerticalAlignment="Center"
+                  FontFamily="{DynamicResource FontFamilyIcons}"
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource TextSecondaryBrush}"
+                  Text="&#xE70D;" />
+            </Grid>
+          </Border>
+          <Popup
+              Name="PART_Popup"
+              InheritsTransform="True"
+              IsLightDismissEnabled="True"
+              IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+              MaxHeight="{TemplateBinding MaxDropDownHeight}"
+              MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+              PlacementTarget="Background"
+              WindowManagerAddShadowHint="False">
+            <Border
+                Margin="0,4,0,0"
+                Padding="4"
+                Background="{DynamicResource CardSurfaceBrush}"
+                BorderBrush="{DynamicResource ShellBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource CornerRadiusMedium}">
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+              </ScrollViewer>
+            </Border>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="ComboBox.filter-pill:dropdownopen /template/ TextBlock#DropCaret">
+    <Setter Property="Text" Value="&#xE70E;" />
+  </Style>
+
+  <Style Selector="ComboBox.filter-pill:disabled /template/ TextBlock#DropCaret">
+    <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}" />
+  </Style>
+
   <Style Selector="TextBlock.transport-clock">
     <Setter Property="MinWidth" Value="58" />
     <Setter Property="VerticalAlignment" Value="Center" />
@@ -1453,6 +1541,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+
+  <!--
+    The chosen one of a group of pills, which is the prototype's seg(true): the subtle accent as fill
+    and the accent itself as border, against seg(false)'s plain fill and no border at all.
+
+    It is the second signal and never the only one. Every pill wearing this also carries the state
+    glyph beside its label, because both high contrast dictionaries resolve AccentSubtleBrush and
+    ControlFillBrush to the same white or the same black - the fill says nothing there, and the glyph
+    is what is left. That is the same reason the navigation rail spends a bar and a glyph rather than
+    a colour, and it is regla 6 of this tree read as a rule about signals rather than about numbers.
+  -->
+  <Style Selector="Button.theme-option.selected">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
   </Style>
 
   <!--

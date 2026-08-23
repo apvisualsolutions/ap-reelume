@@ -10,6 +10,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The Library now leads with the prototype's row: the count beside the title, the search against
+  the right edge, and the kind as three pills — Todo, Películas, Series — that query as they are
+  pressed.** The pills write the kind bits separately from the status bits, which the repository
+  could always combine: "films I have not started" was expressible in the query and unreachable from
+  the screen, because a single `ComboBox` bound to the whole flags value made exclusive what never
+  was. The house defect, in its filter shape.
+  - Both drop-downs become pills with their name inside — «Filtrar Todo», «Ordenar Título» — over a
+    template that keeps Fluent's part names, which is what the five states hang from. They apply on
+    pick, so **Apply is removed**: a button whose whole job was repeating what the control beside it
+    had already said. A deliberate deviation from the control inventory, which never listed it among
+    the eliminated.
+  - «Quitar filtros» exists only while something narrows the grid, and «Borrar la búsqueda» moves
+    into the no-results state, which is the exit the inventory added it for.
+  - The grid gains §4's fourth state — truly empty, with `LibraryEmpty*` in both languages — and the
+    scan row only exists while a scan runs.
+  - The walk's scene now seeds a genuinely identified film, because an unidentified file is neither
+    a film nor a show — the catalogue lists it under a third kind — and the pills over a library of
+    loose files were legitimately empty on both sides.
+
+
 - **Every button is a pill, across all ten screens at once.** That is what the prototype draws on
   every one of its own — `btnPri` and `btnSec` are both `border-radius: 999` — and §7 of the design
   proposal **gives the number rather than leaving it to the eye**: `CornerRadius=18`, half the control

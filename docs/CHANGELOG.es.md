@@ -10,6 +10,26 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La Biblioteca lidera con la fila del prototipo: el contador junto al título, la búsqueda contra
+  el borde derecho, y el tipo como tres píldoras —Todo, Películas, Series— que consultan al
+  pulsarse.** Las píldoras escriben los bits de tipo separados de los de estado, que el repositorio
+  siempre supo combinar: «películas sin empezar» era expresable en la consulta e inalcanzable desde
+  la pantalla, porque un solo `ComboBox` atado al valor completo hacía excluyente lo que no lo era.
+  El defecto de la casa, en su forma de filtro.
+  - Los dos desplegables pasan a píldora con su nombre dentro —«Filtrar Todo», «Ordenar Título»—
+    sobre una plantilla que conserva los nombres de parte de Fluent, que es de donde cuelgan los
+    cinco estados. Aplican al elegir, así que **«Aplicar» se retira**: era un botón cuyo único
+    trabajo era repetir lo que el control de al lado ya había dicho. Desviación deliberada del
+    inventario de controles, que no lo listaba entre los eliminados.
+  - «Quitar filtros» existe sólo mientras algo estrecha la cuadrícula, y «Borrar la búsqueda» se
+    muda al estado sin resultados, que es la salida para la que el inventario lo añadió.
+  - La cuadrícula gana el cuarto estado de la §4 —vacía de verdad, con `LibraryEmpty*` en los dos
+    idiomas— y la fila del escaneo sólo existe mientras escanea.
+  - La escena del paseo siembra ahora una película identificada de verdad, porque un archivo sin
+    identificar no es película ni serie —el catálogo lo lista bajo un tercer tipo— y las píldoras
+    sobre una biblioteca de archivos sueltos daban vacío legítimo por los dos lados.
+
+
 - **Todo botón es una píldora, en las diez pantallas a la vez.** Es lo que el prototipo dibuja en
   todas las suyas —`btnPri` y `btnSec` son los dos `border-radius: 999`—, y la §7 de la propuesta de
   diseño **da el número en vez de dejarlo a ojo**: `CornerRadius=18`, la mitad del alto de control, no

@@ -33,9 +33,9 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
 
 ### Las fases, con su casilla — se marca en el commit que cierra cada una
 
-- [ ] **F0** — este checklist volcado; copias `_proto-*` borradas del árbol; el árbol sucio de F1
+- [x] **F0** — este checklist volcado; copias `_proto-*` borradas del árbol; el árbol sucio de F1
   compilando.
-- [ ] **F1 — Biblioteca**: cabecera en una línea (título 28 + contador + búsqueda 280 a la
+- [x] **F1 — Biblioteca**: cabecera en una línea (título 28 + contador + búsqueda 280 a la
   derecha); píldoras Todo/Películas/Series sobre `TypeFilter` (bits de tipo separados del estado);
   desplegables «Estado» y «Orden» como píldora-menú que aplican al elegir; **«Aplicar» se quita**
   (el prototipo no lo tiene; desviación del Inventario, documentada); enlace «Quitar filtros» solo
