@@ -22,10 +22,17 @@ repetirlo: (1) la variable `AP_LOCALMEDIA_DATA_ROOT` LLEGA al hijo (un cmd herma
 (2) la app SÍ la usa (un root virgen recibe library.db + 18 .bak al arrancar); (3) sobre la BD
 sembrada, `LibraryRootRepository.ListAsync` da 1 raíz (herramienta `tools/seed` con `--check`);
 (4) la siembra pasó de SQL a `UpsertTitleAsync` (el FTS del catálogo lo exige) y aun así 0.
-Sospechosos, por orden: `ConfigureWindow` (lo único que el harness NO llama: autoscan, watchers,
-lifecycle) y las cargas de `NavigatedAsync` tragadas por `GuardedEvent.Run` con `onFailure` nulo.
-Siguiente paso escrito: darle a `OnNavigated` un `onFailure` que registre (o sonda headless con la
-misma BD) y LEER la excepción en vez de deducirla. Herramientas de la sesión:
+Dos mediciones más de esta misma noche: (5) una sonda en `OnNavigated` (onFailure que escribe a
+un archivo) quedó EN SILENCIO navegando a Biblioteca — la carga corre sin excepción y devuelve 0,
+así que NO es una excepción tragada —; (6) ojo con la sonda misma: el primer intento no compiló
+por el heredoc y dos capturas se hicieron con un binario viejo — verificar SIEMPRE `grep -c error`
+del build antes de creer una sonda—. Sospechoso restante: la app abre OTRO archivo de BD distinto
+del que se comprueba (¿normalización de la ruta? ¿cwd?) — confirmarlo imprimiendo
+`AppDataPaths.DatabasePath` desde dentro (una línea temporal en `FinishShell`).
+**VÍA ALTERNATIVA PARA LA MATRIZ (independiente del misterio)**: que LA PROPIA APP siembre —
+arrancar con un root virgen, añadir `artifacts/matrix-root/media` por la interfaz (el diálogo de
+añadir raíz, con Invoke), dejar que el escaneo real catalogue los archivos (quedan «sin
+identificar», que pinta fichas igualmente), y capturar. Cero dependencia del data root sembrado. Herramientas de la sesión:
 `%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\seed\` (siembra la matriz;
 `--check` lee raíces) y `tools\preview\` (esta sesión lo dejó montando el reproductor de F7).
 
