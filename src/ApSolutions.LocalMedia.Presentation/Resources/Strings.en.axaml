@@ -38,6 +38,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootKindUsb">USB</x:String>
   <x:String x:Key="RootKindUnc">UNC or NAS</x:String>
   <x:String x:Key="RootAddAction">Add folder</x:String>
+  <x:String x:Key="RootManagementAccessibleName">Library folder management</x:String>
+  <x:String x:Key="RootRemoveKeepsFilesNotice">The video files are not touched: they stay exactly where they are.</x:String>
+  <x:String x:Key="RootRemoveLosesMarksNotice">Its titles leave the catalogue, along with their marks and progress.</x:String>
   <x:String x:Key="RootScanConsentDescription">The folder is saved. Confirm before its first scan starts.</x:String>
   <x:String x:Key="RootScanConsentAction">Allow first scan</x:String>
   <x:String x:Key="SettingStateOn">On</x:String>

@@ -19,6 +19,22 @@ public sealed class LibraryRootRowViewModel(LibraryRoot root)
     public LibraryRootId Id => _root.Id;
 
     public string Path => _root.Path;
+
+    /// <summary>
+    /// The kind and the availability, as resource keys the surface translates — the same shape
+    /// <c>CatalogItemViewModel.AvailabilityKey</c> already has, and for the same reason: the words
+    /// follow the chosen language instead of being decided when the row was read.
+    /// </summary>
+    public string KindKey => _root.Kind switch
+    {
+        RootKind.Usb => "RootKindUsb",
+        RootKind.Unc => "RootKindUnc",
+        _ => "RootKindLocal",
+    };
+
+    public bool IsAvailable => _root.Availability == RootAvailability.Available;
+
+    public string AvailabilityKey => IsAvailable ? "MediaAvailable" : "MediaUnavailable";
 }
 
 public sealed class RootOnboardingViewModel : INotifyPropertyChanged

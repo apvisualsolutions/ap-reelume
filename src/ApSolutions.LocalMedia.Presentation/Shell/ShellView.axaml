@@ -301,6 +301,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
             IsVisible="{Binding HasRecommendationSettings}">
           <settings:RecommendationSettingsView DataContext="{Binding RecommendationSettings}" />
         </ContentControl>
+        <!--
+          The folders ahead of the switches that govern scanning them, which is the prototype's
+          «Biblioteca y escaneo» order. The list shares the onboarding's model — one list, two
+          surfaces, never both on screen: this one lives on the Settings route.
+        -->
+        <ContentControl
+            Margin="48,0"
+            IsVisible="{Binding HasOnboarding}">
+          <settings:RootManagementView DataContext="{Binding Onboarding}" />
+        </ContentControl>
         <ContentControl
             Margin="48,0"
             IsVisible="{Binding HasScanSettings}">

@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The library's folders gain their place in Settings**, which is where the prototype keeps them:
+  the list as row-cards — the path in monospace, the kind in words, the availability chip with the
+  shared badge — and removal behind the same red confirmation the first run taught, now carrying the
+  two consequences the design package wrote for it: what stays (the files) and what leaves (the
+  titles with their marks). The view shares the onboarding's model — one list, two surfaces never on
+  screen together — and two gates corrected the first attempt: the unavailable badge is the whole
+  application's, not a homemade drawing, and a Settings section brings no geometry of its own.
+
 - **The Library now leads with the prototype's row: the count beside the title, the search against
   the right edge, and the kind as three pills — Todo, Películas, Series — that query as they are
   pressed.** The pills write the kind bits separately from the status bits, which the repository

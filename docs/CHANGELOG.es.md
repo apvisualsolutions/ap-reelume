@@ -10,6 +10,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las carpetas de la biblioteca ganan su sitio en Ajustes**, que es donde el prototipo las tiene:
+  la lista como filas-tarjeta —ruta en monoespaciada, el tipo en palabras, el chip de disponibilidad
+  con el distintivo compartido— y el borrado tras la misma confirmación en rojo que enseñó el primer
+  arranque, ahora con las dos consecuencias que el paquete de diseño escribió para ella: qué se queda
+  (los archivos) y qué se va (los títulos con sus marcas). La vista comparte el modelo del onboarding
+  —una lista, dos superficies que nunca coinciden en pantalla— y dos puertas corrigieron el primer
+  intento: el distintivo de no disponible es el de toda la aplicación, no un dibujo propio, y una
+  sección de Ajustes no trae geometría propia.
+
 - **La Biblioteca lidera con la fila del prototipo: el contador junto al título, la búsqueda contra
   el borde derecho, y el tipo como tres píldoras —Todo, Películas, Series— que consultan al
   pulsarse.** Las píldoras escriben los bits de tipo separados de los de estado, que el repositorio
