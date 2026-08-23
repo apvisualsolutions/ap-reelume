@@ -172,6 +172,24 @@ public sealed class HandoffArchivePickerTests : IDisposable
             await (Task<string?>)method.Invoke(null, [cancelled.Token])!);
     }
 
+    /// <summary>
+    /// The trailer finder's two null exits, which no walk reaches: a blank path names nothing, and
+    /// a folder that does not exist names nothing — the same reflection seam the dialog guard uses,
+    /// because both are composition-owned answers with no window behind them.
+    /// </summary>
+    [Fact]
+    public void The_trailer_finder_answers_nothing_for_a_blank_path_or_a_missing_folder()
+    {
+        var method = typeof(ApSolutions.LocalMedia.Windows.CompositionRoot).GetMethod(
+            "FindTrailer",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.NotNull(method);
+
+        Assert.Null(method!.Invoke(null, [null]));
+        Assert.Null(method.Invoke(null, ["   "]));
+        Assert.Null(method.Invoke(null, ["Q:\\no-such-folder\\film.mp4"]));
+    }
+
     private async Task<string> WriteArchiveAsync(string name, DateTime writtenUtc)
     {
         Directory.CreateDirectory(Handoff);
