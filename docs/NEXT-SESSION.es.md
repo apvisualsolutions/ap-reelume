@@ -1,5 +1,117 @@
 # Dónde retomar
 
+## EL PLAN MAESTRO DE PARIDAD (2026-08-23) — el hilo que no se vuelve a perder
+
+**Encargo del propietario, con sus palabras: la aplicación idéntica al prototipo en diseño — una
+copia exacta — y que todo funcione.** El plan por fases de abajo se acordó con él tras leer el
+paquete `design/` ENTERO (README, PROMPT, Propuesta §1–§7, Inventario, Auditoría, Cadenas, Catálogo)
+y tras verificar contra el proyecto remoto de Claude Design que el `design/` local ES la
+especificación vigente: mismo recibo de sincronización (2026-08-17T20:09:57Z), y los dos documentos
+que el proyecto remoto tiene de más —«Especificación de diseño» y «Direcciones»— son borradores
+ANTERIORES ya superados (conservan el acento de alto contraste `#FFFF00` y el foco de anillo simple
+que la Propuesta corrigió). La especificación operativa sigue siendo: **§4 de la Propuesta (48
+filas) + Catálogo de elementos + el prototipo como referencia visual.**
+
+### Decisiones del propietario del 2026-08-23, que REVOCAN dos de más abajo
+
+- **Las 25 cadenas de consecuencia: APROBADAS tal cual** están en `Cadenas nuevas`. Con las 22 de
+  vacíos ya prometidas: 470 → 517 claves por idioma.
+- **Reparto entero de raíces**: diálogo superpuesto «Añadir raíz de medios» sobre la cuadrícula
+  (así lo hace el prototipo: `addOpen`, centrado, 520 de ancho) + lista de raíces en Ajustes →
+  «Biblioteca y escaneo». `RootOnboardingView` queda solo para el primer arranque con sus 4 formas.
+- **Clave nueva para la acción primaria de la cabecera de Biblioteca**: `LibraryAddMediaAction` =
+  «Añadir medios…» / «Add media…» — la elipsis es la convención de «abre un diálogo» y hace la
+  cadena única; el «+» del riel conserva `NavigationAddMedia` intacto.
+- **Los dos altos contrastes SÍ pasan a ser elegibles** (Apariencia con 5 píldoras y las claves
+  `ThemeHighContrastLight`/`ThemeHighContrastDark`) — revoca la decisión de la mañana del
+  2026-08-23 de abajo, por la vía que ella misma dejó abierta («si el propietario lo pide»): el
+  propietario aprobó el plan que las incluye.
+- **«Duplicados» SÍ entra al riel y «Copias» sale de él** — revoca la decisión del 2026-08-22 de
+  abajo. La puerta de Copias no se pierde: se muda a Ajustes → «Copias y restauración», que es
+  donde el prototipo la tiene (su mapa de navegación lo confirma, y el riel del prototipo son 5
+  destinos + añadir).
+
+### Las fases, con su casilla — se marca en el commit que cierra cada una
+
+- [ ] **F0** — este checklist volcado; copias `_proto-*` borradas del árbol; el árbol sucio de F1
+  compilando.
+- [ ] **F1 — Biblioteca**: cabecera en una línea (título 28 + contador + búsqueda 280 a la
+  derecha); píldoras Todo/Películas/Series sobre `TypeFilter` (bits de tipo separados del estado);
+  desplegables «Estado» y «Orden» como píldora-menú que aplican al elegir; **«Aplicar» se quita**
+  (el prototipo no lo tiene; desviación del Inventario, documentada); enlace «Quitar filtros» solo
+  con filtros activos; estados de la cuadrícula (vacía con `LibraryEmpty*`, sin resultados,
+  escaneando, con contenido); ficha con distintivo de tipo, ✓ visto, progreso 3 px, banda «No
+  disponible».
+- [ ] **F2 — Raíces**: el diálogo superpuesto (ruta mono + Examinar…, tipo detectado desde la ruta
+  con adaptador `DriveType` —plan B: las tres píldoras dentro del diálogo—, `RootKind*Hint`,
+  Cancelar/`RootAddAction`, fallo Assertive dentro); se abre desde la cabecera, el «+» del riel y
+  el vacío; Ajustes → «Biblioteca y escaneo» con la lista de raíces en filas-tarjeta y el borrado
+  confirmado en Danger con `RootRemove*`; onboarding reducido a primer arranque; TODAS las escenas
+  del paseo del formulario reescritas para abrir el diálogo primero (un panel oculto no está en el
+  árbol visual).
+- [ ] **F3 — Inicio**: héroe a sangre (arte + degradado, antetítulo, Continuar píldora clara +
+  Detalles fantasma); carril «Continuar viendo» 16:9 con acciones por tarjeta; «Añadido
+  recientemente» + «Ver toda la biblioteca →» que absorbe `LibraryEntryView`; `HomeLayoutTests`
+  actualizado.
+- [ ] **F4 — Fichas**: banner con arte + velo 90°, portada elevada, chips, sinopsis, acciones
+  sobre el banner; secciones Versiones (filas elegibles, 5 formas) y «Otras acciones»; tráiler
+  LIB-014 con sus tres `Trailer*`; serie con selector de temporada segmentado y filas de episodio
+  de 56 px (número mono a la derecha, ○ ◐ ●).
+- [ ] **F5 — Tinte de acento**: halo radial del acento en lo alto del contenido; contraste
+  verificado TAMBIÉN sobre el halo (la trampa de `ContrastTokenTests`: una puerta mide lo que
+  enumera).
+- [ ] **F6 — Shell**: riel de 5 destinos + añadir (entra Duplicados con ruta propia, sale Copias);
+  Ajustes con índice lateral `side-list` (los estilos declarados sin consumidor, por fin
+  alimentados) y secciones una a la vez en el orden del prototipo (Apariencia · Biblioteca y
+  escaneo · Reproducción · Audio · Subtítulos · Accesibilidad · Privacidad · Detección de
+  segmentos · Atajos · Copias y restauración · Actualización · Créditos); Apariencia 3 → 5
+  píldoras; `apr-in` SOLO si el shell pasa a hospedar rutas en un `ContentControl` (la medición de
+  abajo sigue valiendo: alternar `IsVisible` no se puede animar).
+- [ ] **F7 — Reproductor (16)**: motivos × acciones verificados; `PlayerRecoveryChooseAnotherVersion`
+  de `TextBlock` a botón; velocidad como menú (sustituye las 9 píldoras); `VideoStatusOverlay` en
+  dos gramáticas y −2 fichas duplicadas; superposiciones con alineación + `MaxWidth` + `MaxHeight`;
+  las 4 listas con sus vacíos (`MarkersEmpty*`, `DetectedMarkersEmpty*`, `TracksEmpty*`,
+  `PlayerVersionsEmpty*`) y los tres `Marker*` de consecuencia; `AudioOutputView` en Warning;
+  atajos a dos columnas + `ShortcutsEmpty*`; mini verificado a 320; `LooseFileBanner` diseñado
+  (verificación bloqueada, documentada).
+- [ ] **F8 — Revisión y editor**: bandeja vacía POSITIVA (`ReviewInboxEmpty*`); Duplicados en
+  `UniformGrid` 2 columnas, mono, `DuplicatesEmpty*`, sin acción de borrado ni desactivada; editor
+  con pestañas Metadatos | Renombrado; los 3 mensajes con glifo; renombrado origen → destino mono.
+- [ ] **F9 — Copias/Recuperación/Actualización**: `BackupView` con estado de la base +
+  `BackupHistoryEmpty*` + `BackupFailedIntactNotice`; `RestoreWizardView` con pasos numerados,
+  reasignación 2 columnas truncada por la izquierda, `RestoreRootsEmpty*` y los 3 `Restore*` + los
+  3 `RestoreRoot*Status`; `DatabaseRecoveryView` en Danger, mono, `WrapPanel`; **`UpdateView` con
+  las cuatro gramáticas** (hoy 0 de 4, medido), un solo `Border` `Polite`, motivo POR ENCIMA del
+  estado, expansor `UpdateRejectionDetail` + sus 3 cadenas; Créditos TMDB; `StartupView` costura
+  MSIX.
+- [ ] **F10 — Animaciones y barrido final**: `apr-shim` cuando un modelo sepa que carga (empezar
+  por `LibraryViewModel`); manija 160 ms; privacidad con las dos gramáticas + `PrivacyNoHosts*` +
+  `DiagnosticsEmptyFieldsNotice`; Lifecycle en Warning; los 16 comentarios de diseño en sus 9
+  archivos.
+- [ ] **F11 — Cierre**: `SURFACES.es/en.md` con los 10 cambios del Inventario; FEATURES y
+  CHANGELOG al día; matriz de evidencia de las 48 vistas (app con datos AL LADO del prototipo,
+  claro y oscuro; alto contraste en shell + reproductor + un formulario); recuentos (517 cadenas
+  por idioma; controles según Inventario con la desviación −«Aplicar» documentada); CI verde y
+  fast-forward a `main`.
+
+### Reglas por commit, sin excepción
+
+Bilingüe; control nuevo = nombre accesible + escena del paseo EN EL MISMO COMMIT (el trinquete
+está en 0 y no sube); vista tocada = su fila en `LeadingActionTests`; ningún número que tenga
+token; nada fuera de 900; toda fila de acciones `WrapPanel`; todo panel superpuesto con alineación
+y las DOS dimensiones acotadas; suites afectadas en local → commit → push a la rama → CI verde →
+fast-forward a `main`; evidencia por fase en `artifacts/ui-captures/` con la captura del prototipo
+al lado.
+
+### Fuera del alcance, y por qué
+
+Los 35 PNG de instalación y el icono de bandeja (bloqueados en el original vectorial de la marca);
+la verificación de `LooseFileBanner` (defecto medido el 17-08); la barra de título dibujada, el
+panel «Demostración», el selector de idioma de la barra y las 30 fichas de demostración (aparatos
+del prototipo, no producto: contarlos llevaría el inventario de 202 a 232 sin que exista ninguno).
+
+---
+
 ## LO PRIMERO (2026-08-23): el encargo cambió de tamaño, y hay que leer `design/` antes de tocar
 
 **El encargo ya no es «acercar unas cuantas vistas»: es paridad con el prototipo en TODA la
@@ -44,7 +156,7 @@ hash propio —`string.GetHashCode` lo aleatoriza por proceso— y apagado en lo
 
 ### Las decisiones tomadas, para no re-deliberarlas
 
-- **Los dos altos contrastes NO pasan a ser opciones elegibles**, aunque la §4 pida cinco píldoras de
+- **[REVOCADA el 2026-08-23 por el propietario — ver EL PLAN MAESTRO arriba.]** **Los dos altos contrastes NO pasan a ser opciones elegibles**, aunque la §4 pida cinco píldoras de
   tema con `ThemeHighContrastLight` y `ThemeHighContrastDark`. Razón: en Windows 11 el contraste es un
   ajuste **del sistema**, con su atajo y su página de Configuración; ofrecerlo como cuarta y quinta
   opción duplica un control del sistema y permite un estado que nadie modela —la aplicación en alto
@@ -143,7 +255,7 @@ reducido—, así que el servicio deja de tener su copia del 160 y la preferenci
    sesión.** Es lo que el prototipo pone ahí y lo que más falta le hace a quien abre la aplicación con
    la biblioteca vacía. Cuesta un control nuevo con su cadena, su prueba de nombre accesible **y su
    escena de paseo en el mismo cambio** — el trinquete está en 0 y no sube.
-4. **El destino «Duplicados» del prototipo. DECIDIDO: no sustituye a «Copias».** Los cinco destinos de
+4. **[REVOCADA el 2026-08-23 por el propietario — ver EL PLAN MAESTRO arriba.]** **El destino «Duplicados» del prototipo. DECIDIDO: no sustituye a «Copias».** Los cinco destinos de
    hoy son funciones reales de la aplicación y los duplicados viven dentro de Revisar; cambiar uno por
    otro sería quitarle la puerta a una función para dársela a una vista.
 
