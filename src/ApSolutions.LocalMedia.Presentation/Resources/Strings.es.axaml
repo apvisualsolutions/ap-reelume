@@ -130,6 +130,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MarkerDetectionIsSuggestionNotice">Nada se aplica hasta que lo aceptes.</x:String>
   <x:String x:Key="MarkerDiscardedNotice">No se volverá a ofrecer para este archivo.</x:String>
   <x:String x:Key="MarkerOverlapConsequence">Dos marcadores solapados hacen ambiguo el botón de saltar.</x:String>
+  <x:String x:Key="MetadataEditorTabLabel">Metadatos</x:String>
+  <x:String x:Key="RenamePreviewTabLabel">Renombrado</x:String>
   <x:String x:Key="TransportSpeedResetAction">Volver a 1×</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Configuración de escaneo</x:String>
   <x:String x:Key="ScanSettingsTitle">Escaneo y vigilancia</x:String>
