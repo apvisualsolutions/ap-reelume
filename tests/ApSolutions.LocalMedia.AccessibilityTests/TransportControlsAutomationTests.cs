@@ -309,8 +309,8 @@ public sealed class TransportControlsAutomationTests
     [AvaloniaFact]
     public void The_menus_literal_steps_are_the_policys_steps()
     {
-        var markup = File.ReadAllText(
-            Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Presentation", "Player", "TransportControlsView.axaml"));
+        var markup = File.ReadAllText(TestSupport.RepositoryLayout.PathFromRoot(
+            "src", "ApSolutions.LocalMedia.Presentation", "Player", "TransportControlsView.axaml"));
         var offered = System.Text.RegularExpressions.Regex
             .Matches(markup, "CommandParameter=\"([0-9.]+)\"")
             .Select(match => double.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture))
@@ -321,17 +321,6 @@ public sealed class TransportControlsAutomationTests
         Assert.Equal(PlaybackControlPolicy.SpeedSteps.OrderBy(step => step), offered);
     }
 
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory!.FullName;
-    }
 
     private static async Task WaitUntilAsync(Func<bool> condition, string complaint)
     {

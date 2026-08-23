@@ -693,12 +693,18 @@ public sealed class UpdateWorkflowTests : IDisposable
     public async Task A_package_that_arrives_too_slowly_is_reported_as_unreachable()
     {
         using var server = Server();
-        using var client = server.CreateClient(TimeSpan.FromMilliseconds(250));
+
+        // The short timeout belongs to the download alone. The check ran on it too until
+        // 2026-08-23, when a busy hosted runner spent the 250 ms on the check itself and the
+        // "too slow" this test measures arrived as a null release instead of the exception.
+        using var client = server.CreateClient();
+        using var slowClient = server.CreateClient(TimeSpan.FromMilliseconds(250));
         var check = await Check(client).ExecuteAsync(UpdateCheckTrigger.Requested, Cancellation);
+        Assert.NotNull(check.Release);
         server.Map(AssetPath, _ => FakeResponse.TooSlow());
 
         await Assert.ThrowsAsync<UpdateSourceUnavailableException>(() =>
-            Confirm(client, new RecordingLauncher()).StageAsync(check.Release!, null, Cancellation));
+            Confirm(slowClient, new RecordingLauncher()).StageAsync(check.Release!, null, Cancellation));
     }
 
     /// <summary>
