@@ -299,82 +299,150 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding IsHomeVisible}">
       <home:HomeView DataContext="{Binding Home}" />
     </ContentControl>
-    <ScrollViewer
+    <!--
+      Settings, as the prototype's page: the heading, a fixed side index, and one section at a time
+      on the right. §7's construction to the letter — no sticky, a Grid whose ScrollViewer lives
+      only in the right column — and the side-list styles that were declared in the theme with no
+      consumer finally get their consumer, which is the house defect run backwards.
+
+      One section at a time is a visibility decision with a measured trap behind it: a section that
+      is not open is NOT in the visual tree, so every walk scene that presses inside one opens it
+      through the index first — the same press a person makes, and the press that proves the index.
+    -->
+    <Grid
+        x:Name="SettingsPage"
         Grid.Row="1"
         Grid.Column="1"
+        RowDefinitions="Auto,Auto,*"
         IsVisible="{Binding IsSettingsVisible}">
-      <!-- Named so a gate can walk the sections instead of recognising them by class name: the
-           first version of that test filtered on "SettingsView" and measured seven of ten. -->
-      <StackPanel x:Name="SettingsSections" Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
-        <!--
-        Settings is one scrolling page with ten sections on it, and until 2026-08-21 it had no
-        heading of its own while four of those sections each claimed level one. A reader jumping by
-        heading found four top-level landmarks inside one destination. The page's name is the one the
-        navigation rail already uses, because a destination and the page it opens are the same thing.
-        -->
-        <TextBlock
-            Margin="48,32,48,0"
-            FontSize="{DynamicResource FontSizeTitle}"
-            FontWeight="SemiBold"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource NavigationSettings}"
-            automation:AutomationProperties.HeadingLevel="1" />
-        <ContentControl Margin="48,0">
-          <settings:AppearanceSettingsView DataContext="{Binding AppearanceSettings}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasRecommendationSettings}">
-          <settings:RecommendationSettingsView DataContext="{Binding RecommendationSettings}" />
-        </ContentControl>
-        <!--
-          The folders ahead of the switches that govern scanning them, which is the prototype's
-          «Biblioteca y escaneo» order. The list shares the onboarding's model — one list, two
-          surfaces, never both on screen: this one lives on the Settings route.
-        -->
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasOnboarding}">
-          <settings:RootManagementView DataContext="{Binding Onboarding}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasScanSettings}">
-          <settings:ScanSettingsView DataContext="{Binding ScanSettings}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasShortcuts}">
-          <player:ShortcutSettingsView DataContext="{Binding Shortcuts}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasSubtitleStyle}">
-          <player:SubtitleStyleView DataContext="{Binding SubtitleStyle}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasSegmentDetection}">
-          <settings:SegmentDetectionSettingsView DataContext="{Binding SegmentDetection}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasLifecycleSettings}">
-          <settings:LifecycleSettingsView DataContext="{Binding LifecycleSettings}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasPrivacySettings}">
-          <settings:PrivacySettingsView DataContext="{Binding PrivacySettings}" />
-        </ContentControl>
-        <ContentControl
-            Margin="48,0"
-            IsVisible="{Binding HasUpdates}">
-          <updates:UpdateView DataContext="{Binding Updates}" />
-        </ContentControl>
-        <about:CreditsView x:Name="CreditsSurface" Margin="48,0" />
-      </StackPanel>
-    </ScrollViewer>
+      <TextBlock
+          Margin="48,32,48,0"
+          FontSize="{DynamicResource FontSizeTitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource NavigationSettings}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+        <ListBox
+            x:Name="SettingsIndex"
+            Classes="side-list"
+            MinWidth="200"
+            Margin="48,24,0,24"
+            VerticalAlignment="Top"
+            SelectedValue="{Binding CurrentSettingsSection}"
+            SelectedValueBinding="{ReflectionBinding Tag}"
+            automation:AutomationProperties.Name="{DynamicResource SettingsIndexAccessibleName}">
+          <ListBoxItem
+              Content="{DynamicResource AppearanceTitle}"
+              Tag="{x:Static shell:SettingsSection.Appearance}"
+              automation:AutomationProperties.Name="{DynamicResource AppearanceTitle}" />
+          <ListBoxItem
+              Content="{DynamicResource SettingsSectionLibrary}"
+              IsVisible="{Binding HasLibrarySection}"
+              Tag="{x:Static shell:SettingsSection.Library}"
+              automation:AutomationProperties.Name="{DynamicResource SettingsSectionLibrary}" />
+          <ListBoxItem
+              Content="{DynamicResource RecommendationSettingsTitle}"
+              IsVisible="{Binding HasRecommendationSettings}"
+              Tag="{x:Static shell:SettingsSection.Recommendations}"
+              automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsTitle}" />
+          <ListBoxItem
+              Content="{DynamicResource SubtitleStyleAccessibleName}"
+              IsVisible="{Binding HasSubtitleStyle}"
+              Tag="{x:Static shell:SettingsSection.Subtitles}"
+              automation:AutomationProperties.Name="{DynamicResource SubtitleStyleAccessibleName}" />
+          <ListBoxItem
+              Content="{DynamicResource SegmentDetectionSettingsTitle}"
+              IsVisible="{Binding HasSegmentDetection}"
+              Tag="{x:Static shell:SettingsSection.SegmentDetection}"
+              automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsTitle}" />
+          <ListBoxItem
+              Content="{DynamicResource ShortcutSettingsAccessibleName}"
+              IsVisible="{Binding HasShortcuts}"
+              Tag="{x:Static shell:SettingsSection.Shortcuts}"
+              automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsAccessibleName}" />
+          <ListBoxItem
+              Content="{DynamicResource LifecycleSettingsTitle}"
+              IsVisible="{Binding HasLifecycleSettings}"
+              Tag="{x:Static shell:SettingsSection.Lifecycle}"
+              automation:AutomationProperties.Name="{DynamicResource LifecycleSettingsTitle}" />
+          <ListBoxItem
+              Content="{DynamicResource PrivacyTitle}"
+              IsVisible="{Binding HasPrivacySettings}"
+              Tag="{x:Static shell:SettingsSection.Privacy}"
+              automation:AutomationProperties.Name="{DynamicResource PrivacyTitle}" />
+          <ListBoxItem
+              Content="{DynamicResource UpdateTitle}"
+              IsVisible="{Binding HasUpdates}"
+              Tag="{x:Static shell:SettingsSection.Updates}"
+              automation:AutomationProperties.Name="{DynamicResource UpdateTitle}" />
+          <ListBoxItem
+              Content="{DynamicResource AboutCreditsHeading}"
+              Tag="{x:Static shell:SettingsSection.Credits}"
+              automation:AutomationProperties.Name="{DynamicResource AboutCreditsHeading}" />
+        </ListBox>
+        <ScrollViewer Grid.Column="1">
+          <StackPanel x:Name="SettingsSections" Margin="0,24,0,24" Spacing="{DynamicResource Space24}">
+            <ContentControl Margin="48,0" IsVisible="{Binding IsAppearanceSection}">
+              <settings:AppearanceSettingsView DataContext="{Binding AppearanceSettings}" />
+            </ContentControl>
+            <!--
+              The folders ahead of the switches that govern scanning them, which is the prototype's
+              «Biblioteca y escaneo» order. The list shares the onboarding's model — one list, two
+              surfaces, never both on screen: this one lives on the Settings route.
+            -->
+            <ContentControl IsVisible="{Binding IsLibrarySection}">
+              <StackPanel Spacing="{DynamicResource Space24}">
+                <ContentControl Margin="48,0" IsVisible="{Binding HasOnboarding}">
+                  <settings:RootManagementView DataContext="{Binding Onboarding}" />
+                </ContentControl>
+                <ContentControl Margin="48,0" IsVisible="{Binding HasScanSettings}">
+                  <settings:ScanSettingsView DataContext="{Binding ScanSettings}" />
+                </ContentControl>
+              </StackPanel>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsRecommendationsSection}">
+              <ContentControl IsVisible="{Binding HasRecommendationSettings}">
+                <settings:RecommendationSettingsView DataContext="{Binding RecommendationSettings}" />
+              </ContentControl>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsSubtitlesSection}">
+              <ContentControl IsVisible="{Binding HasSubtitleStyle}">
+                <player:SubtitleStyleView DataContext="{Binding SubtitleStyle}" />
+              </ContentControl>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsSegmentDetectionSection}">
+              <ContentControl IsVisible="{Binding HasSegmentDetection}">
+                <settings:SegmentDetectionSettingsView DataContext="{Binding SegmentDetection}" />
+              </ContentControl>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsShortcutsSection}">
+              <ContentControl IsVisible="{Binding HasShortcuts}">
+                <player:ShortcutSettingsView DataContext="{Binding Shortcuts}" />
+              </ContentControl>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsLifecycleSection}">
+              <ContentControl IsVisible="{Binding HasLifecycleSettings}">
+                <settings:LifecycleSettingsView DataContext="{Binding LifecycleSettings}" />
+              </ContentControl>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsPrivacySection}">
+              <ContentControl IsVisible="{Binding HasPrivacySettings}">
+                <settings:PrivacySettingsView DataContext="{Binding PrivacySettings}" />
+              </ContentControl>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsUpdatesSection}">
+              <ContentControl IsVisible="{Binding HasUpdates}">
+                <updates:UpdateView DataContext="{Binding Updates}" />
+              </ContentControl>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsCreditsSection}">
+              <about:CreditsView x:Name="CreditsSurface" />
+            </ContentControl>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Grid>
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"

@@ -10,6 +10,19 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Ajustes es la página del prototipo: encabezado, índice lateral fijo y una sección a la vez.**
+  La construcción es la de la §7 al pie de la letra —sin sticky, un Grid cuyo ScrollViewer vive
+  sólo en la columna derecha— y los estilos `side-list` que el tema declaraba sin consumidor por
+  fin lo tienen: el defecto de la casa, al revés. Una sección que no está abierta NO está en el
+  árbol visual, así que cada escena del paseo que pulsa dentro de una la abre primero desde el
+  índice — la misma pulsación que hace una persona, y la que prueba el índice: sus diez entradas
+  quedan todas pulsadas por las escenas que las necesitan.
+  - El contrato de estructura se reescribió al del rediseño: el H1 vive sobre el índice, y lo que
+    se sostiene es que la sección abierta empieza donde empiezan sus pares — el arnés sin modelo
+    sigue viendo las diez a la vez, que es lo que permite compararlas.
+  - «Biblioteca y escaneo» agrupa por fin carpetas y escaneo bajo una entrada, con la cadena nueva
+    del índice en los dos idiomas.
+
 - **El tinte de acento en lo alto del contenido**: el halo radial de 260 px del prototipo, sin
   ninguna brocha nueva — es `AccentBrush` a la intensidad del prototipo bajo una máscara de opacidad
   radial, dentro del mismo token que apaga el arte en los dos altos contrastes, donde un brillo

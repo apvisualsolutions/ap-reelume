@@ -10,6 +10,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Settings is the prototype's page: heading, fixed side index, one section at a time.** The
+  construction is §7's to the letter — no sticky, a Grid whose ScrollViewer lives only in the right
+  column — and the `side-list` styles the theme declared with no consumer finally have one: the
+  house defect, run backwards. A section that is not open is NOT in the visual tree, so every walk
+  scene that presses inside one opens it from the index first — the same press a person makes, and
+  the press that proves the index: all ten entries end up pressed by the scenes that need them.
+  - The structure contract was rewritten to the redesign's: the H1 lives above the index, and what
+    holds is that the open section starts where its peers start — the model-less harness still sees
+    all ten at once, which is what lets them be compared.
+  - «Biblioteca y escaneo» finally groups folders and scanning under one entry, with the index's
+    new string in both languages.
+
 - **The accent tint at the top of the content**: the prototype's 260 px radial halo, with no new
   brush — it is `AccentBrush` at the prototype's strength under a radial opacity mask, inside the
   same token that switches the art off in both high contrasts, where a decorative glow is exactly

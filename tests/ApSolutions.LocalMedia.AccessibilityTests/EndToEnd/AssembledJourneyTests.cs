@@ -85,19 +85,39 @@ public sealed class AssembledJourneyTests : IDisposable
 
         Navigate(host, AppRoute.Settings);
 
+        // One section at a time now, so each surface is asked for behind its own index entry: a
+        // view that is not the open section is not in the visual tree, and that is the design
+        // rather than an accident — what this journey holds is that every entry has its surface.
+        Show(host, SettingsSection.Appearance);
         Assert.NotNull(Find<AppearanceSettingsView>(host));
+        Show(host, SettingsSection.Recommendations);
         Assert.NotNull(Find<RecommendationSettingsView>(host));
 
         // The threshold section only exists when the application handed the use case over
         // (CNT-A01): a hidden section here would mean the settings were assembled without it.
         Assert.True(host.ViewModel.RecommendationSettings!.HasWatchedThreshold);
+        Show(host, SettingsSection.Library);
         Assert.NotNull(Find<ScanSettingsView>(host));
+        Assert.NotNull(Find<RootManagementView>(host));
+        Show(host, SettingsSection.Shortcuts);
         Assert.NotNull(Find<ShortcutSettingsView>(host));
+        Show(host, SettingsSection.Subtitles);
         Assert.NotNull(Find<SubtitleStyleView>(host));
+        Show(host, SettingsSection.Lifecycle);
         Assert.NotNull(Find<LifecycleSettingsView>(host));
+        Show(host, SettingsSection.Privacy);
         Assert.NotNull(Find<PrivacySettingsView>(host));
+        Show(host, SettingsSection.Updates);
         Assert.NotNull(Find<UpdateView>(host));
+        Show(host, SettingsSection.Credits);
         Assert.NotNull(Find<CreditsView>(host));
+    }
+
+    /// <summary>Opens one settings section the way the index does, and lets the tree settle.</summary>
+    private static void Show(ShellHost host, SettingsSection section)
+    {
+        host.ViewModel.CurrentSettingsSection = section;
+        Dispatcher.UIThread.RunJobs();
     }
 
     /// <summary>
@@ -137,6 +157,7 @@ public sealed class AssembledJourneyTests : IDisposable
     {
         using var host = ShowShell();
         Navigate(host, AppRoute.Settings);
+        Show(host, SettingsSection.Credits);
 
         var credits = Find<CreditsView>(host);
 

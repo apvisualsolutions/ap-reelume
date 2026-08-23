@@ -36,6 +36,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly AsyncRelayCommand _addMedia;
     private readonly AsyncRelayCommand _cancelAddMedia;
     private bool _isAddingRoot;
+    private SettingsSection _settingsSection = SettingsSection.Appearance;
     private MetadataEditorViewModel? _metadataEditor;
     private RenamePreviewViewModel? _rename;
     private DuplicateReviewViewModel? _duplicates;
@@ -358,6 +359,9 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public bool HasOnboarding => Onboarding is not null;
 
+    /// <summary>«Biblioteca y escaneo» exists if either of its two halves does.</summary>
+    public bool HasLibrarySection => HasOnboarding || HasScanSettings;
+
     /// <summary>
     /// Whether the add-root dialog is over the shell right now.
     /// </summary>
@@ -383,6 +387,52 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     /// <summary>Closes the add-root dialog without adding anything.</summary>
     public ICommand CancelAddMediaCommand => _cancelAddMedia;
+
+    /// <summary>
+    /// Which Settings section is open, one at a time, which is the prototype's page. Not a route:
+    /// leaving Settings and coming back finds the same section standing, the way the prototype's
+    /// own setSection survives its navigation.
+    /// </summary>
+    public SettingsSection CurrentSettingsSection
+    {
+        get => _settingsSection;
+        set
+        {
+            if (SetField(ref _settingsSection, value))
+            {
+                OnPropertyChanged(nameof(IsAppearanceSection));
+                OnPropertyChanged(nameof(IsLibrarySection));
+                OnPropertyChanged(nameof(IsRecommendationsSection));
+                OnPropertyChanged(nameof(IsSubtitlesSection));
+                OnPropertyChanged(nameof(IsSegmentDetectionSection));
+                OnPropertyChanged(nameof(IsShortcutsSection));
+                OnPropertyChanged(nameof(IsLifecycleSection));
+                OnPropertyChanged(nameof(IsPrivacySection));
+                OnPropertyChanged(nameof(IsUpdatesSection));
+                OnPropertyChanged(nameof(IsCreditsSection));
+            }
+        }
+    }
+
+    public bool IsAppearanceSection => CurrentSettingsSection == SettingsSection.Appearance;
+
+    public bool IsLibrarySection => CurrentSettingsSection == SettingsSection.Library;
+
+    public bool IsRecommendationsSection => CurrentSettingsSection == SettingsSection.Recommendations;
+
+    public bool IsSubtitlesSection => CurrentSettingsSection == SettingsSection.Subtitles;
+
+    public bool IsSegmentDetectionSection => CurrentSettingsSection == SettingsSection.SegmentDetection;
+
+    public bool IsShortcutsSection => CurrentSettingsSection == SettingsSection.Shortcuts;
+
+    public bool IsLifecycleSection => CurrentSettingsSection == SettingsSection.Lifecycle;
+
+    public bool IsPrivacySection => CurrentSettingsSection == SettingsSection.Privacy;
+
+    public bool IsUpdatesSection => CurrentSettingsSection == SettingsSection.Updates;
+
+    public bool IsCreditsSection => CurrentSettingsSection == SettingsSection.Credits;
 
     /// <summary>
     /// The first-run surface, only while it is the first run: no folders yet, or a consent still
