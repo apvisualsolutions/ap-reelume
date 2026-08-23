@@ -365,7 +365,7 @@ try {
         is why -WriteDebt is run by the workflow on every build, pass or fail — moving a floor is
         then copying a measurement rather than guessing at one.
     #>
-    $debtRatchet = 216
+    $debtRatchet = 215
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     if ($WriteDebt) {
