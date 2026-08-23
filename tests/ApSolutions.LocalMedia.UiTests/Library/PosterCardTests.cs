@@ -52,8 +52,20 @@ public sealed class PosterCardTests
     public void The_initials_are_the_first_letters_of_the_first_two_words(string? title, string expected) =>
         Assert.Equal(expected, PosterInitials.From(title));
 
+    /// <summary>
+    /// The card is a 2:3 rectangle of the title's own colour, with its initials on top.
+    /// </summary>
+    /// <remarks>
+    /// Until 2026-08-22 the rectangle was <c>ControlFillBrush</c> and nothing else, on the grounds
+    /// that the application ships with no artwork and no token to fetch any. Both are still true and
+    /// the conclusion was wrong: the prototype has no artwork either — every cover in it is a
+    /// gradient computed from the title's hue — so the wall of colour costs nothing this application
+    /// refuses to spend. The fill is still underneath, and in the two high contrasts it is all there
+    /// is: <c>PosterArtOpacity</c> is 0 there, because a hue chosen by a hash is a contrast ratio
+    /// nobody decided.
+    /// </remarks>
     [AvaloniaFact]
-    public void The_card_paints_initials_on_the_control_fill_in_a_two_by_three_rectangle()
+    public void The_card_paints_the_titles_colour_and_its_initials_in_a_two_by_three_rectangle()
     {
         var card = Mount(new PosterCardStub("El Faro de Piedra", "2019", false, 0));
 
@@ -69,11 +81,24 @@ public sealed class PosterCardTests
             artwork.CornerRadius.TopLeft > 0,
             "The artwork has square corners, so it is a rectangle rather than a poster.");
 
+        // The two computed layers, and that they are this title's rather than a fixed pair.
+        var painted = card.GetVisualDescendants()
+            .OfType<Border>()
+            .Select(border => border.Background)
+            .ToArray();
+        Assert.Contains(painted, brush => brush is LinearGradientBrush);
+        Assert.Contains(painted, brush => brush is RadialGradientBrush);
+        var basePaint = Assert.IsType<LinearGradientBrush>(
+            painted.First(brush => brush is LinearGradientBrush));
+        Assert.Equal(
+            ((LinearGradientBrush)PosterArt.BaseOf("El Faro de Piedra")).GradientStops[0].Color,
+            basePaint.GradientStops[0].Color);
+
         var initials = Assert.Single(
             card.GetVisualDescendants().OfType<TextBlock>(),
             block => block.Text == "EF");
         Assert.Equal(
-            ThemeColour("TextSecondaryBrush"),
+            ThemeColour("PosterInitialsBrush"),
             Assert.IsAssignableFrom<ISolidColorBrush>(initials.Foreground).Color);
         Assert.Equal(
             Avalonia.Automation.AccessibilityView.Raw,

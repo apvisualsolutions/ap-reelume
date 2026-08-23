@@ -27,6 +27,9 @@ and a name here would be a second announcement of the same card.
     xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     Width="{DynamicResource PosterCardWidth}"
     x:DataType="library:IPosterCard">
+  <UserControl.Resources>
+    <library:PosterArtConverter x:Key="PosterArt" />
+  </UserControl.Resources>
   <StackPanel Spacing="{DynamicResource Space8}">
     <!--
     The hairline and not the control border: this rectangle separates a card from the one beside it
@@ -40,12 +43,32 @@ and a name here would be a second announcement of the same card.
         ClipToBounds="True"
         CornerRadius="{DynamicResource CornerRadiusMedium}">
       <Panel>
+        <!--
+        The prototype's cover, which is not a picture: a two-stop gradient from the title's hue, a
+        radial glow in the top left corner, and a ring. Three layers instead of its four - the
+        diagonal hatch is a repeating gradient, which Avalonia has no brush for, and it is the layer
+        at 5.5 % alpha that nobody would miss.
+
+        PosterArtOpacity is 0 in the two high contrasts, where the card falls back to the fill and
+        the initials it has always had: a hue picked by a hash is a contrast ratio nobody decided.
+        -->
+        <Panel x:Name="PosterArtSurface" Opacity="{DynamicResource PosterArtOpacity}">
+          <Border Background="{Binding Title, Converter={StaticResource PosterArt}}" />
+          <Border Background="{Binding Title, Converter={StaticResource PosterArt}, ConverterParameter=glow}" />
+          <Ellipse
+              Width="92"
+              Height="92"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Stroke="{DynamicResource PosterRingBrush}"
+              StrokeThickness="2" />
+        </Panel>
         <TextBlock
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontSize="{DynamicResource FontSizeDisplay}"
             FontWeight="SemiBold"
-            Foreground="{DynamicResource TextSecondaryBrush}"
+            Foreground="{DynamicResource PosterInitialsBrush}"
             Text="{Binding Initials}"
             automation:AutomationProperties.AccessibilityView="Raw" />
         <!--

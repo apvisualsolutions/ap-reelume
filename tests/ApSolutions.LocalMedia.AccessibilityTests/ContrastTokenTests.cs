@@ -38,6 +38,8 @@ public sealed class ContrastTokenTests
         "PlayerHairlineBrush",
         "PlayerTextBrush",
         "PlayerTextSecondaryBrush",
+        "PosterInitialsBrush",
+        "PosterRingBrush",
         "NavigationSurfaceBrush",
         "CardSurfaceBrush",
         "ControlFillBrush",
@@ -183,6 +185,17 @@ public sealed class ContrastTokenTests
                 Assert.Equal(brushes["ShellSurfaceBrush"], brushes[$"{state}SurfaceBrush"]);
                 Assert.Equal(brushes["ShellBorderBrush"], brushes[$"{state}BorderBrush"]);
             }
+
+            // A poster's colour is a hue picked by a hash, which is a contrast ratio nobody decided,
+            // so PosterArtOpacity is 0 here and the initials fall back onto the card's fill. That is
+            // the one surface they land on that a token gate can measure, and this is where it is
+            // measured - in Light and Dark they sit over the computed gradient instead.
+            AssertContrastAtLeast(
+                brushes,
+                "PosterInitialsBrush",
+                "ControlFillBrush",
+                TextMinimum,
+                $"{theme} poster initials on the card fill");
         }
     }
 
