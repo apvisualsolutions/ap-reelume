@@ -19,6 +19,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border
       x:Name="NextEpisodeSurface"
       MaxWidth="420"
+      MaxHeight="240"
       HorizontalAlignment="Center"
       VerticalAlignment="Bottom"
       Margin="24"

@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El reproductor cierra su fase: la velocidad es el menú del prototipo y la tercera salida de un
+  fallo es por fin un botón.** El indicador de velocidad —un texto que el ratón sólo podía mirar
+  mientras el teclado sí cambiaba el paso— es ahora un botón con los nueve pasos de la política
+  como menú y «Volver a 1×» sólo mientras hay de dónde volver; una prueba compara los pasos del
+  marcado con `PlaybackControlPolicy.SpeedSteps` para que ratón y teclado no puedan discrepar. En
+  la superficie de fallo, «elegir otra versión» dejó de ser una frase informativa: el botón
+  despliega las mismas filas que lista la columna lateral —el mismo objeto, entregado por la
+  composición—, de modo que elegir ahí ES el cambio de versión y no hay una segunda gramática
+  que aprender. Las tres superposiciones que declaraban una sola dimensión (`ResumePrompt`,
+  `NextEpisode`, `VersionSwitchDialog`) declaran ahora las dos, y los tres avisos de consecuencia
+  de marcadores aprobados el 2026-08-23 están donde ocurre cada consecuencia. Dos escenas del
+  paseo abren los dos menús con el ratón —un desplegable se mide por abrirse: lo elegido dentro
+  cae en una ventana propia—.
+  - De camino, tres miembros del transporte que nadie consumía (`SpeedSteps`, `Duration`,
+    `ConfigureSkipsAsync`) salen del modelo: la forma catorce del defecto de la casa.
+
 - **Duplicados entra al riel y Copias se muda a Ajustes**, que es el mapa del prototipo y la
   decisión que el propietario tomó el 2026-08-23. La ruta nueva lista **todos los grupos** —una
   consulta que no existía: lector en Infrastructure, caso de uso en Application, y la fila abre la

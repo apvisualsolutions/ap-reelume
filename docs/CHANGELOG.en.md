@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The player closes its phase: speed is the prototype's menu and a failure's third exit is at
+  last a button.** The speed readout — text a mouse could only look at while the keyboard did
+  change the step — is now a button carrying the policy's nine steps as a menu, with “Back to
+  1×” only while there is something to come back from; a test compares the markup's steps against
+  `PlaybackControlPolicy.SpeedSteps` so mouse and keyboard cannot drift apart. On the failure
+  surface, “choose another version” stopped being an informative sentence: the button unfolds the
+  very rows the side column lists — the same object, handed over by the composition — so choosing
+  there IS the switch and there is no second grammar to learn. The three overlays that declared a
+  single dimension (`ResumePrompt`, `NextEpisode`, `VersionSwitchDialog`) now declare both, and
+  the three marker consequence notices approved on 2026-08-23 stand where each consequence
+  happens. Two walk scenes open both menus with the mouse — a drop-down is measured by opening:
+  what is chosen inside lands in a window of its own.
+  - Along the way, three transport members nobody consumed (`SpeedSteps`, `Duration`,
+    `ConfigureSkipsAsync`) leave the model: the house defect's fourteenth form.
+
 - **Duplicates joins the rail and Copias moves into Settings**, which is the prototype's map and
   the owner's 2026-08-23 decision. The new route lists **every group** — a query that did not
   exist: a reader in Infrastructure, a use case in Application, and a row opens the SAME comparison

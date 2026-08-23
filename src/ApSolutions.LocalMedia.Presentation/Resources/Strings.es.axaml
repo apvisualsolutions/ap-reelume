@@ -127,6 +127,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="NavigationCurrentStatus">Destino actual</x:String>
   <x:String x:Key="SettingsSectionLibrary">Biblioteca y escaneo</x:String>
   <x:String x:Key="SettingsIndexAccessibleName">Índice de ajustes</x:String>
+  <x:String x:Key="MarkerDetectionIsSuggestionNotice">Nada se aplica hasta que lo aceptes.</x:String>
+  <x:String x:Key="MarkerDiscardedNotice">No se volverá a ofrecer para este archivo.</x:String>
+  <x:String x:Key="MarkerOverlapConsequence">Dos marcadores solapados hacen ambiguo el botón de saltar.</x:String>
+  <x:String x:Key="TransportSpeedResetAction">Volver a 1×</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Configuración de escaneo</x:String>
   <x:String x:Key="ScanSettingsTitle">Escaneo y vigilancia</x:String>
   <!-- The page had a title and two controls and nothing between them: a page of switches with no

@@ -18,6 +18,7 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 public sealed class TransportControlsViewModel : INotifyPropertyChanged
 {
     private readonly ControlPlayback _control;
+    private Commands.AsyncRelayCommand? _setSpeed;
     private PlaybackControlState _state;
     private bool _isRunning;
 
@@ -49,15 +50,11 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
 
     public ICommand ToggleMuteCommand { get; }
 
-    public static IReadOnlyList<double> SpeedSteps => PlaybackControlPolicy.SpeedSteps;
-
     public static double MinimumVolumePercent => VolumeBoostPolicy.MinimumPercent;
 
     public static double MaximumVolumePercent => VolumeBoostPolicy.MaximumBoostPercent;
 
     public TimeSpan Position => _state.Position;
-
-    public TimeSpan? Duration => _state.Duration;
 
     public double SpeedMultiplier => _state.SpeedMultiplier;
 
@@ -130,6 +127,20 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
         ? duration.TotalSeconds
         : 1.0;
 
+    /// <summary>
+    /// The menu's press: the parameter arrives as the item's literal text, parsed invariant, so
+    /// «1.25» means the same step on every machine.
+    /// </summary>
+    public ICommand SetSpeedCommand => _setSpeed ??= new Commands.AsyncRelayCommand(
+        parameter => SetSpeedAsync(
+            double.Parse((string)parameter!, System.Globalization.CultureInfo.InvariantCulture),
+            CancellationToken.None),
+        parameter => parameter is string text
+            && double.TryParse(text, System.Globalization.CultureInfo.InvariantCulture, out _));
+
+    /// <summary>«Volver a 1×» exists only while there is something to come back from.</summary>
+    public bool IsAwayFromNormalSpeed => Math.Abs(SpeedMultiplier - 1.0) > 0.001;
+
     public async Task SetSpeedAsync(double multiplier, CancellationToken cancellationToken = default) =>
         Apply(await _control.SetSpeedAsync(multiplier, cancellationToken).ConfigureAwait(true));
 
@@ -138,12 +149,6 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
 
     public async Task SeekAsync(TimeSpan position, CancellationToken cancellationToken = default) =>
         Apply(await _control.SeekAsync(position, cancellationToken).ConfigureAwait(true));
-
-    public async Task ConfigureSkipsAsync(
-        TimeSpan backward,
-        TimeSpan forward,
-        CancellationToken cancellationToken = default) =>
-        Apply(await _control.ConfigureSkipsAsync(backward, forward, cancellationToken).ConfigureAwait(true));
 
     private static string FormatSeconds(TimeSpan interval) =>
         interval.TotalSeconds.ToString("0 s", CultureInfo.CurrentCulture);
@@ -154,7 +159,6 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
         foreach (var name in new[]
         {
             nameof(Position),
-            nameof(Duration),
             // The scale before the value, and the order is load-bearing rather than tidy. A Slider
             // coerces whatever is written into Value against the Maximum it holds at that instant,
             // and DurationSeconds answers 1 until the engine says otherwise — so announcing the
@@ -168,6 +172,7 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
             nameof(PositionLabel),
             nameof(SpeedMultiplier),
             nameof(SpeedLabel),
+            nameof(IsAwayFromNormalSpeed),
             nameof(VolumePercent),
             nameof(VolumeLabel),
             nameof(IsMuted),

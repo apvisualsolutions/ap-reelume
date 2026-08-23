@@ -75,11 +75,38 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Foreground="{DynamicResource TextPrimaryBrush}"
             Text="{DynamicResource PlayerFailureNoPlayableTrack}"
             TextWrapping="Wrap" />
-        <TextBlock
+        <!--
+          A button now, which is the control inventory's one change of type: the same key that used
+          to only inform opens the choice itself. The flyout holds the very rows the side column
+          lists, so choosing here IS the switch — one surface, two doors, no second grammar.
+        -->
+        <!--
+          The sentence wraps inside the button on purpose: the key is a consequence phrase, and a
+          Button's default presenter holds its line - measured 2026-08-23 as a full-width pill
+          standing on the detail text above it.
+        -->
+        <Button
+            HorizontalAlignment="Left"
             IsVisible="{Binding CanChooseAnotherVersion}"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource PlayerRecoveryChooseAnotherVersion}"
-            TextWrapping="Wrap" />
+            automation:AutomationProperties.Name="{DynamicResource PlayerRecoveryChooseAnotherVersion}">
+          <TextBlock
+              MaxWidth="520"
+              Text="{DynamicResource PlayerRecoveryChooseAnotherVersion}"
+              TextWrapping="Wrap" />
+          <Button.Flyout>
+            <Flyout Placement="Bottom">
+              <Border
+                  MaxWidth="420"
+                  MaxHeight="360"
+                  Background="{DynamicResource PlayerPanelBrush}"
+                  Padding="12">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                  <player:PlayerVersionsView DataContext="{Binding Versions}" />
+                </ScrollViewer>
+              </Border>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
         <TextBlock
             IsVisible="{Binding ExternalLaunchFailed}"
             Foreground="{DynamicResource TextPrimaryBrush}"

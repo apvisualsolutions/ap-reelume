@@ -19,6 +19,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border
       x:Name="VersionSwitchSurface"
       MaxWidth="520"
+      MaxHeight="560"
       HorizontalAlignment="Center"
       VerticalAlignment="Center"
       IsVisible="{Binding IsVisible}"

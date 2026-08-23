@@ -238,6 +238,112 @@ public sealed class TransportControlsAutomationTests
         Assert.True(viewModel.IsBoosted);
     }
 
+    /// <summary>
+    /// The speed menu's command: every item hands over its literal text, parsed invariant, so the
+    /// engine hears the same step on every machine's locale — and «Volver a 1×» exists only while
+    /// there is something to come back from.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task The_menus_press_reaches_the_engine_and_the_reset_row_knows_when_to_exist()
+    {
+        var engine = new StubEngine();
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(engine));
+        var announced = new List<string>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+
+        Assert.False(viewModel.IsAwayFromNormalSpeed);
+
+        Assert.True(viewModel.SetSpeedCommand.CanExecute("2"));
+        viewModel.SetSpeedCommand.Execute("2");
+        await WaitUntilAsync(() => engine.LastSpeed == 2.0, "the menu's 2× never reached the engine");
+        Assert.True(viewModel.IsAwayFromNormalSpeed);
+        Assert.Contains(nameof(viewModel.IsAwayFromNormalSpeed), announced);
+
+        // The literal is invariant on purpose: "1.25" must be a step, not a locale accident.
+        viewModel.SetSpeedCommand.Execute("1.25");
+        await WaitUntilAsync(() => engine.LastSpeed == 1.25, "the menu's 1,25× never reached the engine");
+
+        viewModel.SetSpeedCommand.Execute("1");
+        await WaitUntilAsync(() => engine.LastSpeed == 1.0, "coming back to 1× never reached the engine");
+        Assert.False(viewModel.IsAwayFromNormalSpeed);
+
+        // A parameter that is not a number never executes: the guard is the difference between a
+        // wrong menu item and a crash in a command whose exceptions nobody awaits.
+        Assert.False(viewModel.SetSpeedCommand.CanExecute("fast"));
+        Assert.False(viewModel.SetSpeedCommand.CanExecute(null));
+    }
+
+    /// <summary>
+    /// The constructor's null half, asked on purpose: the throw is a branch like any other, and a
+    /// model built over nothing must say so at the door rather than on the first press.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_transport_over_nothing_refuses_to_be_built()
+    {
+        Assert.Throws<ArgumentNullException>(() => new TransportControlsViewModel(null!));
+    }
+
+    /// <summary>
+    /// A duration that is known and zero long: the slider's arithmetic gets one, not zero, for the
+    /// same reason the unknown duration does - a maximum equal to the minimum divides by their
+    /// difference. The engine can say Zero for a stream it opened and cannot measure.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task A_zero_length_duration_keeps_the_bars_arithmetic_at_one()
+    {
+        var engine = new StubEngine { Duration = TimeSpan.Zero };
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(engine));
+
+        await viewModel.SetVolumeAsync(100, TestContext.Current.CancellationToken);
+
+        Assert.False(viewModel.HasDuration);
+        Assert.Equal(1.0, viewModel.DurationSeconds);
+    }
+
+    /// <summary>
+    /// The menu writes its steps as literals - a MenuFlyout with a conditional last row does not
+    /// bind an ItemsSource well - so this is the seam that keeps them being the policy's steps.
+    /// The keyboard walks <see cref="PlaybackControlPolicy.SpeedSteps"/>; a menu that drifted from
+    /// it would offer the mouse speeds the keyboard cannot reach.
+    /// </summary>
+    [AvaloniaFact]
+    public void The_menus_literal_steps_are_the_policys_steps()
+    {
+        var markup = File.ReadAllText(
+            Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Presentation", "Player", "TransportControlsView.axaml"));
+        var offered = System.Text.RegularExpressions.Regex
+            .Matches(markup, "CommandParameter=\"([0-9.]+)\"")
+            .Select(match => double.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture))
+            .Distinct()
+            .OrderBy(step => step)
+            .ToArray();
+
+        Assert.Equal(PlaybackControlPolicy.SpeedSteps.OrderBy(step => step), offered);
+    }
+
+    private static string RepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
+        {
+            directory = directory.Parent;
+        }
+
+        Assert.NotNull(directory);
+        return directory!.FullName;
+    }
+
+    private static async Task WaitUntilAsync(Func<bool> condition, string complaint)
+    {
+        for (var attempt = 0; attempt < 100 && !condition(); attempt++)
+        {
+            await Task.Delay(10);
+            Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        }
+
+        Assert.True(condition(), complaint);
+    }
+
     [AvaloniaFact]
     public async Task A_hundred_rapid_commands_leave_a_deterministic_state()
     {
@@ -293,8 +399,10 @@ public sealed class TransportControlsAutomationTests
 
         public Task StopAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
+        public TimeSpan? Duration { get; set; } = TimeSpan.FromMinutes(10);
+
         public Task<PlaybackSnapshot> GetSnapshotAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(PlaybackSnapshot.Create(State, Position, TimeSpan.FromMinutes(10), []));
+            Task.FromResult(PlaybackSnapshot.Create(State, Position, Duration, []));
 
         public Task SelectTrackAsync(
             MediaTrackKind kind,

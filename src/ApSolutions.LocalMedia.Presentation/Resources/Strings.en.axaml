@@ -127,6 +127,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="NavigationCurrentStatus">Current destination</x:String>
   <x:String x:Key="SettingsSectionLibrary">Library and scanning</x:String>
   <x:String x:Key="SettingsIndexAccessibleName">Settings index</x:String>
+  <x:String x:Key="MarkerDetectionIsSuggestionNotice">Nothing is applied until you accept it.</x:String>
+  <x:String x:Key="MarkerDiscardedNotice">It will not be offered again for this file.</x:String>
+  <x:String x:Key="MarkerOverlapConsequence">Two overlapping markers make the skip button ambiguous.</x:String>
+  <x:String x:Key="TransportSpeedResetAction">Back to 1×</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Scan settings</x:String>
   <x:String x:Key="ScanSettingsTitle">Scanning and watching</x:String>
   <!-- The page had a title and two controls and nothing between them: a page of switches with no

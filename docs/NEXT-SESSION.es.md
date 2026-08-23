@@ -67,7 +67,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   segmentos · Atajos · Copias y restauración · Actualización · Créditos); Apariencia 3 → 5
   píldoras; `apr-in` SOLO si el shell pasa a hospedar rutas en un `ContentControl` (la medición de
   abajo sigue valiendo: alternar `IsVisible` no se puede animar).
-- [ ] **F7 — Reproductor (16)**: motivos × acciones verificados; `PlayerRecoveryChooseAnotherVersion`
+- [x] **F7 — Reproductor (16)**: motivos × acciones verificados; `PlayerRecoveryChooseAnotherVersion`
   de `TextBlock` a botón; velocidad como menú (sustituye las 9 píldoras); `VideoStatusOverlay` en
   dos gramáticas y −2 fichas duplicadas; superposiciones con alineación + `MaxWidth` + `MaxHeight`;
   las 4 listas con sus vacíos (`MarkersEmpty*`, `DetectedMarkersEmpty*`, `TracksEmpty*`,
