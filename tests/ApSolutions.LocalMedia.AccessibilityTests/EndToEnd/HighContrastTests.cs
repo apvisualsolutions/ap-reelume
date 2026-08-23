@@ -105,11 +105,36 @@ public sealed partial class HighContrastTests
         ("SubtitleStyleView", "Background", "BackgroundHex"),
     ];
 
+    /// <summary>
+    /// Colour that repeats what is already written, rather than standing in for it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A second list rather than two more rows in the one above, because the reason is a different
+    /// one and merging them would let either reason excuse either case. There the colour <b>is</b>
+    /// the thing being chosen; here it says which title this is — and the title is written under the
+    /// card, its initials are on top of it, and the accessible name of the button around it is that
+    /// same title. Somebody who cannot see the colour loses nothing, because nothing is only there.
+    /// </para>
+    /// <para>
+    /// <b>And the exception is paid for.</b> A view on this list has to switch its computed colour
+    /// off in the two modes where colour is not allowed to mean anything, which is asserted below
+    /// rather than promised here: the layer carries <c>PosterArtOpacity</c>, and that token is 0 in
+    /// both high contrasts. Without that clause this list would be the loophole the other one is
+    /// careful not to be. It may only shrink, and its length is asserted for the same reason.
+    /// </para>
+    /// </remarks>
+    private static readonly (string View, string Property, string Source)[] ColourRepeatsWhatIsWritten =
+    [
+        ("PosterCardView", "Background", "Title"),
+    ];
+
     [AvaloniaFact]
     public void No_state_is_told_by_colour_alone()
     {
         var audit = new AuditLog(nameof(No_state_is_told_by_colour_alone));
         Assert.Equal(2, ColourIsTheSubject.Length);
+        Assert.Single(ColourRepeatsWhatIsWritten);
 
         foreach (var view in ViewFiles())
         {
@@ -120,6 +145,10 @@ public sealed partial class HighContrastTests
                 .Where(attribute => BrushAttributes.Contains(attribute.Name.LocalName, StringComparer.Ordinal))
                 .Where(attribute => attribute.Value.Contains("{Binding", StringComparison.Ordinal))
                 .Where(attribute => !ColourIsTheSubject.Any(allowed =>
+                    allowed.View == name
+                    && allowed.Property == attribute.Name.LocalName
+                    && attribute.Value.Contains(allowed.Source, StringComparison.Ordinal)))
+                .Where(attribute => !ColourRepeatsWhatIsWritten.Any(allowed =>
                     allowed.View == name
                     && allowed.Property == attribute.Name.LocalName
                     && attribute.Value.Contains(allowed.Source, StringComparison.Ordinal)))
@@ -139,6 +168,46 @@ public sealed partial class HighContrastTests
         }
 
         audit.Complete();
+    }
+
+    /// <summary>
+    /// A view excused for repeating what is written switches that colour off in high contrast.
+    /// </summary>
+    /// <remarks>
+    /// This is the clause that makes the second exception list safe to have. It is measured in two
+    /// halves, because either alone would pass while the other was broken: the view multiplies the
+    /// computed layer by <c>PosterArtOpacity</c>, and that token is 0 in both high contrast
+    /// dictionaries. A view that stopped reading the token, or a token that stopped being 0, is a
+    /// colour that started meaning something in the mode where it must not.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_colour_that_repeats_what_is_written_is_switched_off_in_high_contrast()
+    {
+        foreach (var (view, _, _) in ColourRepeatsWhatIsWritten)
+        {
+            var file = ViewFiles().Single(
+                candidate => Path.GetFileNameWithoutExtension(candidate) == view);
+            Assert.Contains(
+                "Opacity=\"{DynamicResource PosterArtOpacity}\"",
+                File.ReadAllText(file),
+                StringComparison.Ordinal);
+        }
+
+        var tokens = XDocument.Load(Path.Combine(
+            RepositoryLayout.Root,
+            "src",
+            "ApSolutions.LocalMedia.Presentation",
+            "Theme",
+            "DesignTokens.axaml"));
+        var declared = tokens.Descendants()
+            .Where(element => element.Name.LocalName == "Double")
+            .Where(element => element.Attributes()
+                .Any(attribute => attribute.Name.LocalName == "Key" && attribute.Value == "PosterArtOpacity"))
+            .Select(element => element.Value.Trim())
+            .ToArray();
+
+        Assert.Equal(4, declared.Length);
+        Assert.Equal(["0", "0", "1", "1"], declared.Order(StringComparer.Ordinal));
     }
 
     private static bool IsRendered(Control control) =>

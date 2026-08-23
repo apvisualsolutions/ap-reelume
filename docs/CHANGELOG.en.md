@@ -10,6 +10,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Every cover is painted in its title's own colour, which is what makes a library look like a
+  library.** They were all the same grey rectangle with two letters, and the reason written down was
+  that this application ships with no artwork and no token to fetch any. Both are still true and the
+  conclusion was false: **the prototype has no artwork either**. Reading its source on 2026-08-22,
+  every cover in it is four CSS gradients computed from **a single hue** —
+  `linear-gradient(200deg, hsl(H 38% 30%), hsl(H+34 46% 12%))` under a radial glow, a hatch and a ring
+  — with not one image in the file. So the wall of colour costs no network, no TMDB token and no file
+  on disk, and **none of the reasons artwork was ruled out of 0.2.0 apply to it**.
+  - The hue comes from the **title**, the one thing the four lists behind `IPosterCard` share. With a
+    rolling hash rather than `string.GetHashCode`, which .NET randomises per process: a library would
+    be a different set of colours on every launch, and a colour that changes is one nobody can learn.
+  - Three layers of the four. The diagonal hatch is a repeating gradient, which Avalonia has no brush
+    for, and it is exactly the layer at 5.5 % alpha nobody would miss.
+  - **The initials stay**, though the prototype has none: two letters say which title this is before
+    the colour has taught anybody anything, and a colour alone is a distinction somebody who cannot
+    see colour does not get.
+  - **In the two high contrasts the colour is not drawn.** `PosterArtOpacity` is 0 there and the card
+    falls back to the fill and its initials, whose contrast is measured: a hue picked by a hash is a
+    ratio nobody decided, and somebody who asked for high contrast asked for the opposite of a
+    decorative colour.
+  - **And the gate that forbade it was declared against rather than relaxed.**
+    `No_state_is_told_by_colour_alone` refuses a colour bound to the model, rightly. Instead of adding
+    two rows to its exception list — which only shrinks — there is a **second list with its own
+    reason**: here the colour stands in for nothing, it repeats what is already written under the
+    card, over it, and in the accessible name. And the exception **is paid for**: a view on that list
+    has to switch its colour off in high contrast, and a new test measures both halves — that the view
+    reads the token and that the token is 0.
+
+
 - **The player's column shows one panel at a time, with their names at the head of it.** That is what
   the prototype does and it was the largest change left: until now the five panels — tracks, audio
   output, series markers, detected segments and other versions — **were all mounted at once**, and

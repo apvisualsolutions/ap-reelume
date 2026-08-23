@@ -10,6 +10,35 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Cada portada se pinta del color de su título, que es lo que hace que una biblioteca parezca una
+  biblioteca.** Hasta ahora eran todas el mismo rectángulo gris con dos letras, y la razón escrita era
+  que esta aplicación no trae arte ni ficha con qué pedirlo. Las dos cosas siguen siendo ciertas y la
+  conclusión era falsa: **el prototipo tampoco tiene arte**. Leyendo su fuente el 2026-08-22, cada
+  portada suya son cuatro degradados CSS calculados a partir de **un solo tono** —
+  `linear-gradient(200deg, hsl(H 38% 30%), hsl(H+34 46% 12%))` bajo un halo radial, una trama y un
+  anillo—, y no hay ni una imagen en el archivo. Así que el muro de color no cuesta red, ni ficha de
+  TMDB, ni un archivo en disco, y **ninguna de las razones por las que el arte quedó fuera de 0.2.0 le
+  aplica**.
+  - El tono sale del **título**, que es lo único que las cuatro listas detrás de `IPosterCard` tienen
+    en común. Con un hash propio y no con `string.GetHashCode`, que .NET aleatoriza por proceso: una
+    biblioteca sería otro juego de colores en cada arranque, y un color que cambia no lo aprende nadie.
+  - Tres capas de las cuatro. La trama diagonal es un degradado repetido, que Avalonia no tiene como
+    pincel, y es justo la capa al 5,5 % de alfa que nadie echa de menos.
+  - **Las iniciales se quedan**, aunque el prototipo no las tenga: dos letras dicen qué título es antes
+    de que el color le haya enseñado nada a nadie, y un color a solas es una distinción que no recibe
+    quien no ve color.
+  - **En los dos altos contrastes el color no se pinta.** `PosterArtOpacity` vale 0 ahí y la ficha
+    vuelve al relleno y sus iniciales, con su contraste medido: un tono elegido por un hash es una
+    relación de contraste que no decidió nadie, y quien pide alto contraste está pidiendo lo contrario
+    de un color decorativo.
+  - **Y la puerta que lo prohibía se declaró en vez de aflojarse.** `No_state_is_told_by_colour_alone`
+    rechaza un color enlazado al modelo, con razón. En vez de meter dos filas en su lista de
+    excepciones —que sólo encoge—, hay una **segunda lista con su propia razón**: aquí el color no
+    sustituye a nada, repite lo que ya está escrito debajo, encima y en el nombre accesible. Y la
+    excepción **se paga**: una vista de esa lista tiene que apagar su color en alto contraste, y hay
+    una prueba nueva que lo mide por los dos lados — que la vista lee el token y que el token es 0.
+
+
 - **La columna del reproductor enseña un panel a la vez, con sus nombres al principio.** Es lo que
   hace el prototipo y era el cambio más grande que quedaba: hasta ahora los cinco paneles —pistas,
   salida de audio, marcas de la serie, segmentos detectados y otras versiones— **se montaban todos a

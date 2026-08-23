@@ -156,6 +156,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
           -->
           <SolidColorBrush x:Key="PlayerTextBrush" Color="#F8FAFC" />
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#94A3B8" />
+          <!--
+            The poster's colour, on or off. The prototype paints every cover as a gradient built from
+            the title's hue - four CSS gradients and not one image - and that is what makes a wall of
+            covers look like a wall of covers. In the two high contrasts it goes to 0 and the card
+            falls back to ControlFillBrush with its initials: an arbitrary hue behind two letters is a
+            contrast ratio nobody chose, and somebody who asked the system for high contrast asked for
+            the opposite of a decorative colour.
+          -->
+          <x:Double x:Key="PosterArtOpacity">1</x:Double>
+          <!--
+            The ink on a poster, and it lands on two different things. In Light and Dark it sits over
+            the title's own gradient, whose darkest stop is 12 % lightness and whose lightest is 30 %,
+            so near-white is legible over every hue the hash can pick - a ratio the token gate cannot
+            measure, because the surface is computed rather than declared. In the two high contrasts
+            PosterArtOpacity is 0, the gradient is not drawn, and the initials fall on
+            ControlFillBrush - which is measured, one test below.
+          -->
+          <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
+          <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#E2E8F0" />
@@ -361,6 +380,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#1AFFFFFF" />
           <SolidColorBrush x:Key="PlayerTextBrush" Color="#F8FAFC" />
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#94A3B8" />
+          <x:Double x:Key="PosterArtOpacity">1</x:Double>
+          <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
+          <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#1F2937" />
@@ -572,6 +594,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PlayerTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
+          <x:Double x:Key="PosterArtOpacity">0</x:Double>
+          <SolidColorBrush x:Key="PosterInitialsBrush" Color="#111827" />
+          <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#FFFFFF" />
@@ -777,6 +802,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerHairlineBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PlayerTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
+          <x:Double x:Key="PosterArtOpacity">0</x:Double>
+          <SolidColorBrush x:Key="PosterInitialsBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="ControlFillBrush" Color="#000000" />
