@@ -10,6 +10,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **«Añadir raíz de medios» is now the prototype's floating panel**, opened from the Library
+  header's primary action — new key «Add media…», the ellipsis that promises a dialog — and from the
+  rail's plus, which no longer navigates: the panel floats over whichever route, veil behind it and
+  both dimensions bounded, which is §4's grammar for every overlay.
+  - **The kind is detected from the path**, the prototype dialog's grammar: UNC from the prefix, USB
+    by asking the drive, local otherwise — with the package's three approved consequences riding
+    along. Where no detector is wired — previews, tests — the three pills stand in.
+  - **Browse asks with the Windows picker** starting at the Videos library, or answers from the
+    handover folder for a run that does not own the profile: the fourth answer of the exit the
+    backups already had.
+  - A successful add **closes the dialog itself** and leaves the first scan's consent to the
+    route's surface; the folder list refreshes itself on add, which was the house defect in its
+    list shape.
+  - The first run keeps its inline form with its four §4 shapes, and retires when it stops being
+    the first run; the Settings confirmation refuses with «Conservar» — the inventory's word —
+    because the updater already says «Cancelar» on the same page, and two visible commands
+    answering to one name is the ambiguity the walk refuses to walk past.
+
 - **The library's folders gain their place in Settings**, which is where the prototype keeps them:
   the list as row-cards — the path in monospace, the kind in words, the availability chip with the
   shared badge — and removal behind the same red confirmation the first run taught, now carrying the

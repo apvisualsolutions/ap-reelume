@@ -10,6 +10,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **«Añadir raíz de medios» es ahora el panel flotante del prototipo**, abierto desde la acción
+  primaria de la cabecera de Biblioteca —clave nueva «Añadir medios…», con la elipsis que promete un
+  diálogo— y desde el «+» del riel, que ya no navega: el panel flota sobre la ruta que esté, con velo
+  detrás y las dos dimensiones acotadas, que es la gramática de la §4 para todo panel superpuesto.
+  - **El tipo se detecta desde la ruta**, que es la gramática del diálogo del prototipo: UNC por el
+    prefijo, USB preguntándole a la unidad, local en el resto — y las tres consecuencias aprobadas
+    del paquete («se vigila en continuo…», «no siempre está conectada…», «por red…») acompañan al
+    tipo detectado. Donde no hay detector —previsualizaciones, pruebas— las tres píldoras siguen.
+  - **«Examinar…» pregunta con el selector de Windows** empezando en la biblioteca de Vídeos, o
+    responde desde la carpeta de entrega para una ejecución que no es dueña del perfil: la cuarta
+    respuesta de la misma salida que ya tenían las copias.
+  - Añadir con éxito **cierra el diálogo solo** y deja el consentimiento del primer escaneo a la
+    superficie de la ruta; añadir la primera lista se refresca sola, que era el defecto de la casa
+    en su forma de lista.
+  - El primer arranque conserva su formulario en línea con sus cuatro formas, y se retira cuando
+    deja de ser el primer arranque; la confirmación de borrado de Ajustes rehúsa con «Conservar» —
+    la palabra del inventario — porque «Cancelar» ya lo dice el actualizador en la misma página y
+    dos órdenes visibles con un nombre es la ambigüedad que el paseo se niega a pisar.
+
 - **Las carpetas de la biblioteca ganan su sitio en Ajustes**, que es donde el prototipo las tiene:
   la lista como filas-tarjeta —ruta en monoespaciada, el tipo en palabras, el chip de disponibilidad
   con el distintivo compartido— y el borrado tras la misma confirmación en rojo que enseñó el primer

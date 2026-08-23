@@ -1035,26 +1035,34 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         using var host = ShowShell(height: 1600);
 
         // The rail's sixth control, and the only one on it that is not a destination: "Add media" at
-        // the foot. It goes first because what it does is only visible from somewhere else — it takes
-        // the shell to the surface a folder is added on and clears the form on the way — so it has to
-        // be pressed while the shell is still on the route it opened on.
+        // the foot. What it opens now is the dialog floating over whichever route the shell is on —
+        // the prototype's grammar — and it still clears the form on the way, which is the half that
+        // makes it more than a shortcut.
         //
-        // The probe is both halves in one string. Two probes would let a press that navigated and
-        // cleared nothing pass the first one, and clearing is the half that makes this control
-        // something Biblioteca does not already do.
+        // The probe is both halves in one string. Two probes would let a press that opened and
+        // cleared nothing pass the first one.
         var onboarding = host.ViewModel.Onboarding;
         Assert.NotNull(onboarding);
         onboarding!.Path = @"R:\left-over";
         Dispatcher.UIThread.RunJobs();
-        Assert.NotEqual(AppRoute.Library, host.ViewModel.CurrentRoute);
+        Assert.False(host.ViewModel.IsAddingRoot);
 
         await PressAsync(
             host,
             "NavigationAddMedia",
-            () => $"{host.ViewModel.CurrentRoute}|{onboarding.Path}",
-            "clicking Add media never opened the folder surface with an empty form");
-        Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
+            () => $"{host.ViewModel.IsAddingRoot}|{onboarding.Path}",
+            "clicking Add media never opened the add-root dialog with an empty form");
+        Assert.True(host.ViewModel.IsAddingRoot);
         Assert.Equal(string.Empty, onboarding.Path);
+
+        // And closed again before the destinations are pressed: the scrim covers the rail while the
+        // dialog is up, exactly as a modal question should.
+        await PressAsync(
+            host,
+            "AddRootCancelAction",
+            () => host.ViewModel.IsAddingRoot,
+            "clicking Cancelar never put the add-root dialog away");
+        Assert.False(host.ViewModel.IsAddingRoot);
 
         // Every destination the rail offers, taken from the shell rather than from a list written
         // here: a destination added later is pressed by this scene the day it is added.
@@ -1244,6 +1252,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(folder, await RootPathsAsync(factory));
         Assert.Null(onboarding.FailureKey);
 
+        // While the consent is still owed the first-run form is still up, and its own removal
+        // confirmation is pressed here — asked and refused — because this is the only state in
+        // which the inline pair is reachable at all.
+        Assert.True(host.ViewModel.ShowsOnboarding);
+        await PressAsync(
+            host,
+            "RootRemoveAction",
+            () => onboarding.IsConfirmingRemoval,
+            "clicking Remove on the first-run list never asked for the confirmation it owes");
+        await PressAsync(
+            host,
+            "RootRemoveCancelAction",
+            () => onboarding.IsConfirmingRemoval,
+            "clicking Cancelar on the first-run list never called off the removal");
+        Assert.Equal(folder, await RootPathsAsync(factory));
+
         // Nothing is scanned until somebody says so, which is why the consent is a separate press.
         Assert.True(onboarding.InitialScanConsentRequired);
         await PressAsync(
@@ -1251,6 +1275,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "RootScanConsentAction",
             () => onboarding.CanStartInitialScan,
             "clicking the scan consent never granted it");
+
+        // With the folder added and its consent given, the first run is over: ShowsOnboarding puts
+        // the inline form away, and managing the folder is Settings' job now — the redistribution
+        // the owner decided. The same keys resolve there, on the only surface that shows them.
+        Assert.False(
+            host.ViewModel.ShowsOnboarding,
+            "The first-run form stayed on screen after the first run was over.");
+        Navigate(host, AppRoute.Settings);
 
         // The row for the folder that is now in the catalogue, which is what removal acts on.
         await onboarding.RefreshRootsAsync(TestContext.Current.CancellationToken);
@@ -1265,13 +1297,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => onboarding.IsConfirmingRemoval,
             "clicking Remove never asked for the confirmation it owes");
 
-        // Refused, and the folder is still there: this is the half that proves the confirmation is
-        // one rather than a formality.
+        // Refused with «Conservar», and the folder is still there: this is the half that proves
+        // the confirmation is one rather than a formality.
         await PressAsync(
             host,
-            "RootRemoveCancelAction",
+            "RootRemoveKeepAction",
             () => onboarding.IsConfirmingRemoval,
-            "clicking Cancel never called off the removal");
+            "clicking Conservar never called off the removal");
         Assert.Equal(folder, await RootPathsAsync(factory));
 
         await PressAsync(
@@ -1290,6 +1322,90 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // The folder itself is untouched: removing it from the library is not deleting anybody's
         // videos, and that distinction is the whole promise of this surface.
         Assert.True(Directory.Exists(folder));
+    }
+
+    /// <summary>
+    /// The ninth batch's other half: the add-root dialog, floating over a populated library. Opened
+    /// from the header's primary action, browsed with the isolated picker, the kind detected from
+    /// the path, a folder added through it — which closes it — and dismissed with the ✕.
+    /// </summary>
+    /// <remarks>
+    /// The library is seeded first so the first-run form is away: the dialog's controls must be the
+    /// only instances of their keys on screen, and this scene is also what proves they are.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_add_root_dialog_is_operated_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var film = Path.Combine(media, "Arrival.2016.mp4");
+        await File.WriteAllBytesAsync(film, [0x41, 0x50], TestContext.Current.CancellationToken);
+        _ = await SeedMediaFileAsync(factory, media, film, TimeSpan.FromMinutes(116));
+
+        using var host = ShowShell(height: 1600);
+        Navigate(host, AppRoute.Library);
+        var shell = host.ViewModel;
+        var onboarding = shell.Onboarding;
+        Assert.NotNull(onboarding);
+        await onboarding!.RefreshRootsAsync(TestContext.Current.CancellationToken);
+        var library = shell.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(shell.ShowsOnboarding, "A populated library still showed the first-run form.");
+
+        // The header's primary action opens the dialog.
+        await PressAsync(
+            host,
+            "LibraryAddMediaAction",
+            () => shell.IsAddingRoot,
+            "clicking Añadir medios… never opened the add-root dialog");
+        Assert.True(shell.IsAddingRoot);
+
+        // Browse answers from inside the handover root — the isolated exit the archive pickers
+        // taught — and the detector reads the answer's kind.
+        await PressAsync(
+            host,
+            "AddRootBrowseAction",
+            () => onboarding.Path,
+            "clicking Examinar… never put the picked folder in the path box");
+        Assert.True(Directory.Exists(onboarding.Path), "Browse answered a folder that does not exist.");
+        Assert.Equal(RootKind.Local, onboarding.SelectedKind);
+
+        // The kind follows the path: a UNC prefix is enough for the real detector.
+        onboarding.Path = @"\\nas\cine";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(RootKind.Unc, onboarding.SelectedKind);
+
+        // A real folder, added through the dialog: the catalogue gains it and the dialog closes
+        // itself — the form's job is done, and the consent the first scan needs is asked by the
+        // surface the route shows.
+        var second = Path.Combine(_dataRoot, "more-media");
+        Directory.CreateDirectory(second);
+        onboarding.Path = second;
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "RootAddAction",
+            () => RootPathsAsync(factory),
+            "clicking Añadir carpeta in the dialog never put the folder in the catalogue");
+        Assert.Contains(second, await RootPathsAsync(factory));
+        Assert.False(shell.IsAddingRoot, "A successful add left the dialog on screen.");
+        Assert.True(onboarding.InitialScanConsentRequired);
+
+        // Reopened and dismissed with the ✕, which is the other way out.
+        await PressAsync(
+            host,
+            "LibraryAddMediaAction",
+            () => shell.IsAddingRoot,
+            "clicking Añadir medios… never reopened the dialog");
+        await PressAsync(
+            host,
+            "AddRootDismissAction",
+            () => shell.IsAddingRoot,
+            "clicking the dialog's close never put it away");
+        Assert.False(shell.IsAddingRoot);
     }
 
     /// <summary>

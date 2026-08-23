@@ -366,14 +366,15 @@ public sealed class ShellAssemblyTests
     }
 
     /// <summary>
-    /// The rail's «Añadir medios» goes to the surface a folder is added on <b>and</b> empties the
-    /// form, which is the half that makes it something Biblioteca does not already do.
+    /// The rail's «Añadir medios» opens the add-root dialog over whichever route the shell is on
+    /// <b>and</b> empties the form, which is the half that makes it more than a shortcut.
     /// </summary>
     /// <remarks>
     /// Asserted in C# rather than through the view, and that is on purpose: what the button pays for
     /// is three leftovers being cleared, and none of the three is a thing a screenshot shows. It is
     /// set up as the state somebody actually leaves behind — a folder added, so the path is still
-    /// typed in and the catalogue would refuse it a second time.
+    /// typed in and the catalogue would refuse it a second time. The shell stays on its route: the
+    /// dialog floats, it does not navigate.
     /// </remarks>
     [Fact]
     public async Task Add_media_opens_the_folder_surface_with_the_form_cleared()
@@ -395,9 +396,11 @@ public sealed class ShellAssemblyTests
         Assert.NotEqual(AppRoute.Library, shell.CurrentRoute);
 
         Assert.True(shell.AddMediaCommand.CanExecute(null));
+        Assert.False(shell.IsAddingRoot);
         shell.AddMediaCommand.Execute(null);
 
-        Assert.Equal(AppRoute.Library, shell.CurrentRoute);
+        Assert.True(shell.IsAddingRoot);
+        Assert.NotEqual(AppRoute.Library, shell.CurrentRoute);
         Assert.Equal(string.Empty, onboarding.Path);
         Assert.Null(onboarding.FailureKey);
         Assert.False(onboarding.HasFailure);

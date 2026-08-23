@@ -42,7 +42,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   con filtros activos; estados de la cuadrícula (vacía con `LibraryEmpty*`, sin resultados,
   escaneando, con contenido); ficha con distintivo de tipo, ✓ visto, progreso 3 px, banda «No
   disponible».
-- [ ] **F2 — Raíces**: el diálogo superpuesto (ruta mono + Examinar…, tipo detectado desde la ruta
+- [x] **F2 — Raíces**: el diálogo superpuesto (ruta mono + Examinar…, tipo detectado desde la ruta
   con adaptador `DriveType` —plan B: las tres píldoras dentro del diálogo—, `RootKind*Hint`,
   Cancelar/`RootAddAction`, fallo Assertive dentro); se abre desde la cabecera, el «+» del riel y
   el vacío; Ajustes → «Biblioteca y escaneo» con la lista de raíces en filas-tarjeta y el borrado

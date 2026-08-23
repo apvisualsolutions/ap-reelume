@@ -278,6 +278,15 @@ public static partial class CompositionRoot
                 var shell = new ShellViewModel(
                     provider.GetRequiredService<INavigationService>(),
                     provider.GetRequiredService<ShellSurfaces>());
+
+                // The library's header button opens the shell's dialog: the shell owns the
+                // overlay, the library owns the header, and the wiring happens here the way
+                // DetailsLoader's already does.
+                if (shell.Library is { } library)
+                {
+                    library.AddMediaCommand = shell.AddMediaCommand;
+                }
+
                 provider.GetRequiredService<ShellHost>().Shell = shell;
                 return shell;
             })
@@ -1622,6 +1631,56 @@ public static partial class CompositionRoot
             FileTypeFilter = [new FilePickerFileType("ZIP") { Patterns = ["*.zip"] }],
         }).ConfigureAwait(true);
         return files.Count == 0 ? null : files[0].TryGetLocalPath();
+    }
+
+    /// <summary>
+    /// Asks which folder to catalogue. The Windows picker starts at the user's Videos library —
+    /// on a first run there is no "last used" to start from — and a cancelled dialog answers null,
+    /// which adds nothing.
+    /// </summary>
+    private static async Task<string?> ChooseMediaFolderDialogAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (Avalonia.Application.Current?.ApplicationLifetime
+            is not IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+        {
+            return null;
+        }
+
+        var start = await window.StorageProvider
+            .TryGetWellKnownFolderAsync(WellKnownFolder.Videos).ConfigureAwait(true);
+        var folders = await window.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = ReadResource("AddRootBrowseDialogTitle"),
+            AllowMultiple = false,
+            SuggestedStartLocation = start,
+        }).ConfigureAwait(true);
+        return folders.Count == 0 ? null : folders[0].TryGetLocalPath();
+    }
+
+    /// <summary>
+    /// A folder's kind, read from the path: UNC from the prefix, USB from the drive being
+    /// removable, local otherwise — and local again when the drive cannot be asked, because a wrong
+    /// "local" costs a slower watch policy while a thrown question costs the dialog.
+    /// </summary>
+    private static RootKind DetectRootKind(string path)
+    {
+        if (path.StartsWith(@"\\", StringComparison.Ordinal))
+        {
+            return RootKind.Unc;
+        }
+
+        try
+        {
+            return Path.GetPathRoot(path) is { Length: > 0 } root
+                && new DriveInfo(root).DriveType == DriveType.Removable
+                    ? RootKind.Usb
+                    : RootKind.Local;
+        }
+        catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException)
+        {
+            return RootKind.Local;
+        }
     }
 
     /// <summary>

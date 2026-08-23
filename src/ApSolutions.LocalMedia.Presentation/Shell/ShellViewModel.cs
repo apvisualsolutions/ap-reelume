@@ -34,6 +34,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly AsyncRelayCommand _toggleMini;
     private readonly AsyncRelayCommand _toggleFullscreen;
     private readonly AsyncRelayCommand _addMedia;
+    private readonly AsyncRelayCommand _cancelAddMedia;
+    private bool _isAddingRoot;
     private MetadataEditorViewModel? _metadataEditor;
     private RenamePreviewViewModel? _rename;
     private DuplicateReviewViewModel? _duplicates;
@@ -184,6 +186,13 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 return Task.CompletedTask;
             },
             () => Onboarding is not null);
+        _cancelAddMedia = new AsyncRelayCommand(
+            () =>
+            {
+                CloseAddMedia();
+                return Task.CompletedTask;
+            },
+            () => IsAddingRoot);
 
         if (Library is { } libraryViewModel)
         {
@@ -349,6 +358,42 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public bool HasOnboarding => Onboarding is not null;
 
+    /// <summary>
+    /// Whether the add-root dialog is over the shell right now.
+    /// </summary>
+    /// <remarks>
+    /// Shell state rather than the onboarding's, because it is about the surface: the same form
+    /// answers inline on a first run and floats over the grid the rest of the time, and which of
+    /// the two is on screen is this flag's whole job. While it is set the onboarding hides
+    /// (<see cref="ShowsOnboarding"/>), so the dialog's controls are the only instances of their
+    /// keys on screen — two visible controls with one name is a defect the walk refuses.
+    /// </remarks>
+    public bool IsAddingRoot
+    {
+        get => _isAddingRoot;
+        private set
+        {
+            if (SetField(ref _isAddingRoot, value))
+            {
+                OnPropertyChanged(nameof(ShowsOnboarding));
+                _cancelAddMedia.RaiseCanExecuteChanged();
+            }
+        }
+    }
+
+    /// <summary>Closes the add-root dialog without adding anything.</summary>
+    public ICommand CancelAddMediaCommand => _cancelAddMedia;
+
+    /// <summary>
+    /// The first-run surface, only while it is the first run: no folders yet, or a consent still
+    /// owed for the folder just added. With a populated library the folders live in Settings and
+    /// the grid owns the Library route — the redistribution the owner decided on 2026-08-23.
+    /// </summary>
+    public bool ShowsOnboarding =>
+        Onboarding is { } onboarding
+        && (onboarding.HasNoRoots || onboarding.InitialScanConsentRequired)
+        && !IsAddingRoot;
+
     public bool HasReviewInbox => ReviewInbox is not null;
 
     public bool HasScanSettings => ScanSettings is not null;
@@ -443,9 +488,12 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// </remarks>
     public void BeginAddMedia()
     {
-        _navigationService.Navigate(AppRoute.Library);
         Onboarding?.BeginAdd();
+        IsAddingRoot = true;
     }
+
+    /// <summary>Puts the dialog away; the form's own clearing happens on the next open.</summary>
+    public void CloseAddMedia() => IsAddingRoot = false;
 
     /// <summary>
     /// Opens one file from outside the library and shows the session it makes.
@@ -551,6 +599,27 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     private async Task OnboardingChangedAsync(PropertyChangedEventArgs args)
     {
+        // The pieces of ShowsOnboarding that live on the form: the dialog half is this model's own.
+        if (args.PropertyName is nameof(RootOnboardingViewModel.HasNoRoots)
+            or nameof(RootOnboardingViewModel.HasRoots)
+            or nameof(RootOnboardingViewModel.InitialScanConsentRequired))
+        {
+            OnPropertyChanged(nameof(ShowsOnboarding));
+        }
+
+        // A folder accepted from the dialog closes it: the form's job is done, and what is owed
+        // next - the first scan's consent - is asked by the surface the route shows.
+        if (args.PropertyName == nameof(RootOnboardingViewModel.AddedRoot)
+            && Onboarding is { AddedRoot: not null }
+            && IsAddingRoot)
+        {
+            CloseAddMedia();
+            if (Library is { } refreshed)
+            {
+                await refreshed.LoadAsync(CancellationToken.None).ConfigureAwait(true);
+            }
+        }
+
         // A removed folder leaves the catalog, so the library on screen reloads to say so
         // (LIB-A01); the videos on disk were never part of the removal.
         if (args.PropertyName == nameof(RootOnboardingViewModel.RemovedRootId)

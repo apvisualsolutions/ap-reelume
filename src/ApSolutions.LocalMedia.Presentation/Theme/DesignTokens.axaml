@@ -144,6 +144,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#F8FAFC" />
           <!--
+            The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
+            ordinary theme, and opaque in the two high contrasts, where a half-seen page behind a
+            dialog is clutter the theme exists to remove.
+          -->
+          <SolidColorBrush x:Key="ScrimBrush" Color="#9E090C10" />
+          <!--
             The player's three, and they are the same in Light and Dark on purpose: what sits beside
             them is a picture, so the theme does not get a say. The chrome is the surface at 90 %,
             which is the prototype's own transport band, and the hairline is 10 % white - enough to
@@ -387,6 +393,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
+          <!--
+            The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
+            ordinary theme, and opaque in the two high contrasts, where a half-seen page behind a
+            dialog is clutter the theme exists to remove.
+          -->
+          <SolidColorBrush x:Key="ScrimBrush" Color="#9E090C10" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#E60B0D10" />
           <SolidColorBrush x:Key="PlayerPanelBrush" Color="#111820" />
@@ -601,6 +613,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         -->
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastLight}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFFFFF" />
+          <!--
+            The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
+            ordinary theme, and opaque in the two high contrasts, where a half-seen page behind a
+            dialog is clutter the theme exists to remove.
+          -->
+          <SolidColorBrush x:Key="ScrimBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerPanelBrush" Color="#0B0D10" />
@@ -809,6 +827,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ResourceDictionary>
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
+          <!--
+            The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
+            ordinary theme, and opaque in the two high contrasts, where a half-seen page behind a
+            dialog is clutter the theme exists to remove.
+          -->
+          <SolidColorBrush x:Key="ScrimBrush" Color="#FF000000" />
           <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerChromeBrush" Color="#0B0D10" />
           <SolidColorBrush x:Key="PlayerPanelBrush" Color="#0B0D10" />
