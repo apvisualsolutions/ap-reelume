@@ -150,6 +150,28 @@ public sealed class HandoffArchivePickerTests : IDisposable
         Assert.Equal(first, second);
     }
 
+    /// <summary>
+    /// The dialog half of the media-folder pair, at the only seam a headless run can reach: with no
+    /// application lifetime there is no window to ask, and no window answers null — exactly what a
+    /// cancelled dialog answers — while a cancellation stops before asking anything.
+    /// </summary>
+    [Fact]
+    public async Task The_media_folder_dialog_answers_null_without_a_window_and_stops_when_cancelled()
+    {
+        var method = typeof(ApSolutions.LocalMedia.Windows.CompositionRoot).GetMethod(
+            "ChooseMediaFolderDialogAsync",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.NotNull(method);
+
+        var answer = await (Task<string?>)method!.Invoke(null, [CancellationToken.None])!;
+        Assert.Null(answer);
+
+        using var cancelled = new CancellationTokenSource();
+        await cancelled.CancelAsync();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await (Task<string?>)method.Invoke(null, [cancelled.Token])!);
+    }
+
     private async Task<string> WriteArchiveAsync(string name, DateTime writtenUtc)
     {
         Directory.CreateDirectory(Handoff);
