@@ -76,4 +76,21 @@ public sealed class HandoffArchivePicker
             .FirstOrDefault();
         return Task.FromResult(newest);
     }
+
+    /// <summary>
+    /// Which folder to catalogue, for a run that cannot open the Windows picker: a media folder
+    /// composed inside the handover root, created because the dialog it stands in for can only
+    /// ever hand back somewhere that exists.
+    /// </summary>
+    /// <remarks>
+    /// The fourth answer of the same exit, and confined the same way: a run handed a root of its
+    /// own writes nothing and opens nothing outside it.
+    /// </remarks>
+    public Task<string?> ChooseMediaFolderAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var folder = Path.Combine(_handoffDirectory, "media");
+        Directory.CreateDirectory(folder);
+        return Task.FromResult<string?>(folder);
+    }
 }

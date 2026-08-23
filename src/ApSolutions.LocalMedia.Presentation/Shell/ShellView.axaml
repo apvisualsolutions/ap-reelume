@@ -21,6 +21,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:updates="clr-namespace:ApSolutions.LocalMedia.Presentation.Updates"
     x:DataType="shell:ShellViewModel"
     automation:AutomationProperties.Name="{DynamicResource ShellAccessibleName}">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Escape" Command="{Binding CancelAddMediaCommand}" />
+  </UserControl.KeyBindings>
   <UserControl.Resources>
     <navigation:RouteStateConverter x:Key="RouteStatus" Kind="Status" />
     <navigation:RouteStateConverter x:Key="RouteIsCurrent" Kind="IsCurrent" />
@@ -366,7 +369,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         this every time; the folder panel above it grew by 25 px and that was the whole distance.
       -->
       <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
-        <ContentControl IsVisible="{Binding HasOnboarding}">
+        <ContentControl IsVisible="{Binding ShowsOnboarding}">
           <onboarding:RootOnboardingView DataContext="{Binding Onboarding}" />
         </ContentControl>
         <library:LibraryView DataContext="{Binding Library}" />
@@ -425,6 +428,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ContentControl>
       </StackPanel>
     </ScrollViewer>
+
+    <!--
+      The add-root dialog, over everything but a running session: the scrim covers the rail and the
+      title row too, because while a modal question is open the rest of the application is not an
+      offer. Both dimensions of the panel inside are bounded — the overlay that declared neither
+      was measured at 1280x1400, opaque over the transport.
+    -->
+    <Panel
+        x:Name="AddRootDialogSurface"
+        Grid.RowSpan="2"
+        Grid.ColumnSpan="2"
+        IsVisible="{Binding IsAddingRoot}">
+      <Border Background="{DynamicResource ScrimBrush}" />
+      <onboarding:AddRootDialogView />
+    </Panel>
 
     <Grid
         x:Name="PlayerSurface"

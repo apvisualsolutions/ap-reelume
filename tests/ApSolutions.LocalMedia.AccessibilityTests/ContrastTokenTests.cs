@@ -46,6 +46,10 @@ public sealed class ContrastTokenTests
         "ControlFillHoverBrush",
         "ControlFillPressedBrush",
         "ControlFillDisabledBrush",
+        // The veil under the add-root dialog. Declared here like every other brush so no theme can
+        // fall back silently; it carries no contrast pair of its own because nothing is read on it —
+        // what sits on the scrim is the dialog, which brings its own surface.
+        "ScrimBrush",
         "ShellBorderBrush",
         "ShellHairlineBrush",
         "TextPrimaryBrush",

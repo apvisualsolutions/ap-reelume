@@ -41,6 +41,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootManagementAccessibleName">Gestión de carpetas de la biblioteca</x:String>
   <x:String x:Key="RootRemoveKeepsFilesNotice">Los archivos de vídeo no se tocan: se quedan exactamente donde están.</x:String>
   <x:String x:Key="RootRemoveLosesMarksNotice">Sus títulos salen del catálogo, junto con sus marcas y su progreso.</x:String>
+  <x:String x:Key="LibraryAddMediaAction">Añadir medios…</x:String>
+  <x:String x:Key="AddRootDialogTitle">Añadir raíz de medios</x:String>
+  <x:String x:Key="AddRootDismissAction">Cerrar</x:String>
+  <x:String x:Key="AddRootCancelAction">Cancelar</x:String>
+  <x:String x:Key="AddRootBrowseAction">Examinar…</x:String>
+  <x:String x:Key="AddRootBrowseDialogTitle">Elige una carpeta que contenga tus vídeos</x:String>
+  <x:String x:Key="AddRootDetectedKindLabel">Tipo de origen detectado</x:String>
+  <x:String x:Key="RootKindLocalHint">Se vigila en continuo; los cambios aparecen en segundos.</x:String>
+  <x:String x:Key="RootKindUsbHint">No siempre está conectada. Sus títulos se quedan en el catálogo y se marcan como no disponibles mientras el disco no esté.</x:String>
+  <x:String x:Key="RootKindUncHint">Por red, así que el escaneo es más lento y pasa a comprobaciones periódicas.</x:String>
+  <x:String x:Key="RootRemoveKeepAction">Conservar</x:String>
   <x:String x:Key="RootScanConsentDescription">La carpeta se ha guardado. Confirma antes de iniciar su primer escaneo.</x:String>
   <x:String x:Key="RootScanConsentAction">Permitir primer escaneo</x:String>
   <x:String x:Key="SettingStateOn">Activado</x:String>

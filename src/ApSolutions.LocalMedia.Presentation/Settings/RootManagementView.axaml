@@ -154,10 +154,15 @@ dialog, removed here, and listed there is one list that cannot disagree with its
               automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAction}"
               Command="{Binding ConfirmRemoveCommand}"
               Content="{DynamicResource RootRemoveConfirmAction}" />
+          <!--
+            «Conservar», which is the inventory's own word for refusing this — and not «Cancelar»,
+            because the update section on this same page keeps a Cancel of its own, and two visible
+            commands answering to one name is the ambiguity the walk refuses to walk past.
+          -->
           <Button
-              automation:AutomationProperties.Name="{DynamicResource RootRemoveCancelAction}"
+              automation:AutomationProperties.Name="{DynamicResource RootRemoveKeepAction}"
               Command="{Binding CancelRemoveCommand}"
-              Content="{DynamicResource RootRemoveCancelAction}" />
+              Content="{DynamicResource RootRemoveKeepAction}" />
         </WrapPanel>
       </StackPanel>
     </Border>

@@ -55,7 +55,24 @@ public static partial class CompositionRoot
             .AddTransient<ReconcileScannedFiles>()
             .AddTransient<AddLibraryRoot>()
             .AddTransient<RemoveLibraryRoot>()
-            .AddTransient<RootOnboardingViewModel>()
+            .AddTransient(provider =>
+            {
+                var onboarding = new RootOnboardingViewModel(
+                    provider.GetRequiredService<AddLibraryRoot>(),
+                    provider.GetRequiredService<RemoveLibraryRoot>(),
+                    provider.GetRequiredService<ILibraryRootRepository>());
+
+                // The dialog's two host answers, decided here the way the archive pickers are:
+                // the kind is read from the path, and Browse goes to the Windows picker for the
+                // person whose profile this is, or stays inside the handover folder for a run
+                // that owns a data root of its own.
+                onboarding.KindDetector = DetectRootKind;
+                onboarding.FolderPicker = HandoffOrDialog(
+                    provider,
+                    picker => picker.ChooseMediaFolderAsync,
+                    ChooseMediaFolderDialogAsync);
+                return onboarding;
+            })
             .AddSingleton<ScanProgressViewModel>()
             .AddTransient<ManualReassignmentViewModel>()
             .AddTransient(CreateLibraryViewModel)

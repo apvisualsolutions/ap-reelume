@@ -78,14 +78,68 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         });
         CancelRemoveCommand = new RelayCommand(_ => PendingRemoval = null);
         ConfirmRemoveCommand = new AsyncRelayCommand(() => ConfirmRemoveAsync(CancellationToken.None));
+        BrowseFolderCommand = new AsyncRelayCommand(async () =>
+        {
+            if (FolderPicker is { } pick
+                && await pick(CancellationToken.None).ConfigureAwait(true) is { } chosen)
+            {
+                Path = chosen;
+            }
+        });
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Detects a folder's kind from its path, when the host wires one: UNC from the prefix, USB
+    /// from the drive. Null in tests and previews, where the three kind pills stand in.
+    /// </summary>
+    /// <remarks>
+    /// A delegate rather than a port, which is the shape the file pickers already have: the
+    /// composition decides once, and the model never learns where the answer comes from.
+    /// </remarks>
+    public Func<string, RootKind>? KindDetector { get; set; }
+
+    /// <summary>
+    /// Asks the host for a folder, when the host has a dialog to ask with. Null when it does not —
+    /// and then the Browse button is absent rather than disabled, because offering a dialog no run
+    /// can open would be offering something that cannot occur.
+    /// </summary>
+    public Func<CancellationToken, Task<string?>>? FolderPicker { get; set; }
+
+    public bool HasKindDetector => KindDetector is not null;
+
+    public bool HasFolderPicker => FolderPicker is not null;
+
+    /// <summary>The detected kind and its consequence, as resource keys the dialog paints.</summary>
+    public string DetectedKindKey => SelectedKind switch
+    {
+        RootKind.Usb => "RootKindUsb",
+        RootKind.Unc => "RootKindUnc",
+        _ => "RootKindLocal",
+    };
+
+    public string DetectedKindHintKey => SelectedKind switch
+    {
+        RootKind.Usb => "RootKindUsbHint",
+        RootKind.Unc => "RootKindUncHint",
+        _ => "RootKindLocalHint",
+    };
+
     public string Path
     {
         get => _path;
-        set => SetField(ref _path, value ?? string.Empty);
+        set
+        {
+            if (SetField(ref _path, value ?? string.Empty) && KindDetector is { } detect
+                && !string.IsNullOrWhiteSpace(_path))
+            {
+                // The kind follows the path as it is typed or picked, which is the dialog's
+                // grammar: the type is detected, not chosen. Where no detector is wired the three
+                // pills stay in charge and this does nothing.
+                SelectedKind = detect(_path);
+            }
+        }
     }
 
     /// <summary>
@@ -107,6 +161,8 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(LocalStateCue));
             OnPropertyChanged(nameof(UsbStateCue));
             OnPropertyChanged(nameof(UncStateCue));
+            OnPropertyChanged(nameof(DetectedKindKey));
+            OnPropertyChanged(nameof(DetectedKindHintKey));
         }
     }
 
@@ -139,6 +195,12 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
     public ICommand SelectKindCommand { get; }
 
     public ICommand AddRootCommand { get; }
+
+    /// <summary>
+    /// Opens the host's folder dialog and puts the answer in <see cref="Path"/>. A cancelled dialog
+    /// answers null and changes nothing, exactly like every other picker in this application.
+    /// </summary>
+    public ICommand BrowseFolderCommand { get; }
 
     public ICommand GrantInitialScanConsentCommand { get; }
 
@@ -243,6 +305,11 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(HasFailure));
         InitialScanConsentRequired = true;
         CanStartInitialScan = false;
+
+        // The list follows the catalogue it describes: without this, a folder added stayed off its
+        // own list — and off the first-run test that decides whether the form is still needed —
+        // until somebody navigated away and back.
+        await RefreshRootsAsync(cancellationToken).ConfigureAwait(true);
     }
 
     /// <summary>

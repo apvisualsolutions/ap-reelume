@@ -36,6 +36,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private TitleId? _scrollAnchorId;
     private string? _nextCursor;
     private bool _hasLoaded;
+    private ICommand? _addMedia;
 
     public LibraryViewModel(
         ICatalogQueryService queryService,
@@ -383,6 +384,17 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// pills being pills.
     /// </remarks>
     public ICommand SelectTypeCommand { get; }
+
+    /// <summary>
+    /// Opens the add-root dialog. The shell owns the dialog, so the shell hands this in during
+    /// composition — the same pattern as <see cref="DetailsLoader"/> — and the header button leads
+    /// the view with it. Null in previews, where the button disables rather than lies.
+    /// </summary>
+    public ICommand? AddMediaCommand
+    {
+        get => _addMedia;
+        set => SetField(ref _addMedia, value);
+    }
 
     public ICommand BackCommand { get; }
 

@@ -28,42 +28,67 @@ SPDX-License-Identifier: GPL-3.0-or-later
         The search box keeps a width because a TextBox asks for almost nothing and would otherwise
         arrive as a slot two characters wide; 280 is the prototype's 282 on this scale.
       -->
-      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
-        <TextBlock
-            FontSize="{DynamicResource FontSizeTitle}"
-            FontWeight="SemiBold"
-            Text="{DynamicResource LibraryTitle}"
-            VerticalAlignment="Center"
-            automation:AutomationProperties.HeadingLevel="1" />
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space12}">
         <StackPanel
-            Grid.Column="1"
             Orientation="Horizontal"
-            Spacing="{DynamicResource Space4}"
+            Spacing="{DynamicResource Space12}"
             VerticalAlignment="Center">
           <TextBlock
-              Foreground="{DynamicResource TextSecondaryBrush}"
-              Text="{Binding ItemCount}"
-              TextTrimming="CharacterEllipsis" />
-          <TextBlock
-              Foreground="{DynamicResource TextSecondaryBrush}"
-              Text="{DynamicResource LibraryItemCountLabel}"
-              TextTrimming="CharacterEllipsis" />
+              FontSize="{DynamicResource FontSizeTitle}"
+              FontWeight="SemiBold"
+              Text="{DynamicResource LibraryTitle}"
+              VerticalAlignment="Center"
+              automation:AutomationProperties.HeadingLevel="1" />
+          <StackPanel
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space4}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="{Binding ItemCount}" />
+            <TextBlock
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="{DynamicResource LibraryItemCountLabel}" />
+          </StackPanel>
         </StackPanel>
         <!--
-          The magnifier the prototype puts inside the field, and it is a decoration rather than a
-          control: the box already carries the accessible name, and the glyph does not take a click.
-          A Panel and not a Grid because the two overlap on purpose - the field's left padding is what
-          makes room for it, and both numbers live together in the theme.
+          The right half wraps rather than clips: at 200 % text scaling the search box and the
+          primary action together outgrow the row — measured, the button ended at 834 px in a 683 px
+          viewport — and a WrapPanel drops the button under the box instead of past the edge. Right
+          aligned, which is where the prototype keeps both. The box is 220 rather than the
+          prototype's 282, and that is the same measurement twice: at 200 % the title column takes
+          434 of 683 — DPI rounding moves it a few pixels between passes — and a fixed 280
+          overflowed its column by 23 px, a 240 by 3. The 220 leaves the rounding room to wobble.
+
+          The magnifier inside the field is a decoration rather than a control: the box already
+          carries the accessible name, and the glyph does not take a click. A Panel because the two
+          overlap on purpose - the field's left padding is what makes room for it.
         -->
-        <Panel Grid.Column="2">
-          <TextBox
-              Classes="search-field"
-              Width="280"
-              automation:AutomationProperties.Name="{DynamicResource LibrarySearchLabel}"
-              Text="{Binding Search}"
-              PlaceholderText="{DynamicResource LibrarySearchPlaceholder}" />
-          <TextBlock Classes="search-adornment" Text="&#xE721;" />
-        </Panel>
+        <WrapPanel
+            Grid.Column="1"
+            HorizontalAlignment="Right"
+            ItemSpacing="{DynamicResource Space12}"
+            LineSpacing="{DynamicResource Space8}">
+          <Panel>
+            <TextBox
+                Classes="search-field"
+                Width="220"
+                automation:AutomationProperties.Name="{DynamicResource LibrarySearchLabel}"
+                Text="{Binding Search}"
+                PlaceholderText="{DynamicResource LibrarySearchPlaceholder}" />
+            <TextBlock Classes="search-adornment" Text="&#xE721;" />
+          </Panel>
+          <!--
+            The header's primary action, which opens the add-root dialog. Its key is its own — the
+            rail's plus keeps «Añadir medios» untouched — because in this tree the label IS the
+            control's identity, and the ellipsis is the convention for "opens a dialog".
+          -->
+          <Button
+              Classes="primary-action"
+              automation:AutomationProperties.Name="{DynamicResource LibraryAddMediaAction}"
+              Command="{Binding AddMediaCommand}"
+              Content="{DynamicResource LibraryAddMediaAction}" />
+        </WrapPanel>
       </Grid>
       <!--
         Only while a scan runs, which is the prototype's grammar: a row that said "no scan is

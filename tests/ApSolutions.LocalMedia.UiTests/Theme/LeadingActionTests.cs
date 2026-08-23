@@ -68,7 +68,9 @@ public sealed class LeadingActionTests
         ["LibraryEntryView"] = null,
 
         // Library
-        ["LibraryView"] = null,
+        // The header's add: opening the dialog is what the screen offers someone whose next step
+        // is growing the library — the prototype leads with it too.
+        ["LibraryView"] = "LibraryAddMediaAction",
         // Managing the folders is upkeep, not the point of Settings: nothing leads.
         ["RootManagementView"] = null,
         ["UnavailableBadge"] = null,
@@ -126,6 +128,8 @@ public sealed class LeadingActionTests
 
         // Onboarding, recovery, credits, updates
         ["RootOnboardingView"] = "RootAddAction",
+        // The same decision in its floating frame: adding the folder is the point of the dialog.
+        ["AddRootDialogView"] = "RootAddAction",
         ["DatabaseRecoveryView"] = "RecoveryOpenBackupFolder",
         ["CreditsView"] = null,
         ["UpdateView"] = "UpdateCheckButton",
