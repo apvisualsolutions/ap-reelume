@@ -188,6 +188,26 @@ public sealed class AppearanceSettingsTests
         return Assert.IsType<string>(value);
     }
 
+    /// <summary>
+    /// The commands on a model nobody is listening to: every announcement's null half, the language
+    /// guard's third answer, and the theme guard's refusal — the branches only a subscriber-less
+    /// model can reach, which is exactly what a freshly built one is.
+    /// </summary>
+    [Fact]
+    public void The_commands_run_clean_with_no_subscriber_and_refuse_what_is_not_theirs()
+    {
+        var viewModel = new AppearanceSettingsViewModel(new StubTheme(animations: true));
+
+        // The stub theme service holds no state; what this press proves is that every
+        // announcement's null half runs clean, not what the stub remembers.
+        viewModel.ApplyThemeCommand.Execute(ThemePreference.Dark);
+        Assert.False(viewModel.ApplyThemeCommand.CanExecute("not a theme"));
+
+        viewModel.ApplyLanguageCommand.Execute("fr");
+        Assert.False(viewModel.ApplyLanguageCommand.CanExecute("fr"));
+        viewModel.ApplyLanguageCommand.Execute("en");
+    }
+
     private sealed class StubTheme(bool animations) : IThemeService
     {
         public ThemePreference CurrentPreference => ThemePreference.System;
