@@ -15,6 +15,15 @@ check, preferida sin fijar en la escena de recuperación).
 **CI**: el candidato a verde es `cce3b1f`. Con su verde → fast-forward de `main` (pendiente desde
 b21f8e3; **mirar el run de cce3b1f antes de avanzar**).
 
+**HALLAZGO RESUELTO (2026-08-23, madrugada)**: era LA HERRAMIENTA — `shoot.ps1` aísla cada
+ejecución poniendo su PROPIO `AP_LOCALMEDIA_DATA_ROOT` temporal (línea 20), pisando el de la
+matriz; la app estaba sana. El shoot ahora respeta un root ya puesto por el llamador, y la
+captura de Biblioteca salió con los 21 elementos, portadas de color computado, años y «No
+disponible». Queda fino de siembra para la HOME («En curso»/«Añadido recientemente» leen los
+enlaces del escaneo que el seed aún no escribe — mirar el SQL de `GetHome` y sembrar lo que una);
+`tools/seed` ya siembra por `UpsertTitleAsync` (el FTS lo exige). La crónica original del
+hallazgo, abajo, se conserva como registro del método:
+
 **HALLAZGO ABIERTO (bloquea la mitad-app de la matriz de capturas)**: la aplicación REAL con un
 data root sembrado pinta el shell VACÍO (0 raíces, 0 títulos, onboarding de primer arranque)
 mientras que los repos directos y el harness leen las filas de esa misma BD. Medido, para no
