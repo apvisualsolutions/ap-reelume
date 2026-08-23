@@ -4,41 +4,43 @@ An inventory of AP Reelume's visible surfaces, so a redesign can cover **all** o
 the ones anybody remembers. The Spanish version is in [SURFACES.es.md](SURFACES.es.md).
 
 This document decides no aesthetics. It states **what exists, where it lives and in which states it
-appears**, measured from the tree on 2026-08-15, measured again on 2026-08-18 and again on **2026-08-20**, so nothing
+appears**, measured from the tree on 2026-08-15, measured again on 2026-08-18, on 2026-08-20 and
+again on **2026-08-23**, so nothing
 visible is left undesigned.
 
 ## The rule that already holds, and needs no redoing
 
-- **All 51 views use localised strings.** Not one carries untranslated text: the measurement found no
+- **All 53 views use localised strings.** Not one carries untranslated text: the measurement found no
   view without `DynamicResource`.
-- **480 string keys in Spanish and 480 in English**, in
+- **576 string keys in Spanish and 576 in English**, in
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` and `Strings.en.axaml`.
   `BilingualHeadingTests` compares the structure of the public documents, and a new visible string
   goes into both files or it does not go in.
-- **The only five literal texts in the tree are symbols, not language**: `○ ◐ ●` (watched state),
-  `→` (a rename's source and destination), `!` (the transport's warning), `⚠` (a medium out of
-  reach) and `✕` (a session that will not open). **The last two differ on purpose**: a failure and a
-  notice sharing a glyph would be told apart by colour alone. If the redesign replaces
+- **The literal texts in the tree are symbols and figures, not language**: `○ ◐ ●` (watched state),
+  `→` (a rename's source and destination), `!` (a warning), `⚠` (a medium out of reach), `✕` (a
+  session that will not open), `✓` (the review inbox empty, which is the good news) and the speed
+  menu's ten steps (`0,25×` … `4×`, figure and multiplier). **`⚠` and `✕` differ on purpose**: a
+  failure and a notice sharing a glyph would be told apart by colour alone. If the redesign replaces
   them with icons, the accessible name still comes from `AutomationProperties`, which is already set.
 - **Every interactive control has an accessible name**, and 80 accessibility tests require it. A
   redesign may change the shape, not take the name away.
 
-## The 51 views, by area
+## The 53 views, by area
 
 | Area | Views |
 | --- | --- |
 | Shell (2) | `ShellView`, `StartupView` |
-| Home (6) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecentlyAddedRailView`, `RecommendationsRailView`, `LibraryEntryView` |
+| Home (5) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecentlyAddedRailView`, `RecommendationsRailView` — `LibraryEntryView` retired on 2026-08-23: its link lives in the rail's header |
 | Library (3) | `LibraryView`, `UnavailableBadge`, `PosterCardView` |
 | Film card (1) | `MovieDetailsView` |
 | Series card (2) | `ShowDetailsView`, `EpisodeRowView` |
 | Player (17) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow`, `MiniPlayerChromeView` |
-| Settings (7) | `AppearanceSettingsView`, `PrivacySettingsView`, `ScanSettingsView`, `LifecycleSettingsView`, `RecommendationSettingsView`, `SegmentDetectionSettingsView`, `DiagnosticsPreviewView` |
-| Review (3) | `ReviewInboxView`, `CandidateCardView`, `DuplicateReviewView` |
+| Settings (8) | `AppearanceSettingsView`, `PrivacySettingsView`, `ScanSettingsView`, `LifecycleSettingsView`, `RecommendationSettingsView`, `SegmentDetectionSettingsView`, `DiagnosticsPreviewView`, `RootManagementView` |
+| Review (4) | `ReviewInboxView`, `CandidateCardView`, `DuplicateReviewView`, `DuplicatesOverviewView` |
 | Metadata (2) | `MetadataEditorView`, `RenamePreviewView` |
 | Catalogue (2) | `PersonalActionsView`, `WatchStatusControl` |
 | Backup (2) | `BackupView`, `RestoreWizardView` |
-| First steps (1) | `RootOnboardingView` |
+| First steps (2) | `RootOnboardingView`, `AddRootDialogView` |
 | Recovery (1) | `DatabaseRecoveryView` |
 | Credits (1) | `CreditsView` |
 | Update (1) | `UpdateView` |
@@ -79,7 +81,11 @@ section: a redesign covering only "checking" and "ready" leaves most of it out.
   **one** container — splitting it in two splits the announcement.
 
 A refusal **is not a user error**: it is the updater declining to install something it could not
-verify. It deserves visual treatment distinct from a failure's.
+verify. Since 2026-08-23 **it has that treatment**: the living border dresses by grammar — neutral
+process, up-to-date in positive, refusal in Warning with the reason as the headline and the
+technical identifier behind a fold, a failure of the world in Danger — and adds three strings
+(`UpdateRejectionReasonLabel`, `UpdateNothingInstalledNotice`, `UpdateRejectionDetailAction`),
+leaving the view at twenty-six messages.
 
 ## The player, which has no single state either
 
@@ -98,25 +104,26 @@ Measured on 2026-08-18, and the distinction matters because these are **two gram
 
 ## The lists and their empty state
 
-Measured on 2026-08-20: **23 lists with data** in the tree — taking a list to be a `ListBox`,
-`ItemsControl` or `ItemsRepeater` with `ItemsSource` — and **five have a string written for
-when they are empty**:
+Measured again on 2026-08-23, after the redesign: **fourteen views paint an empty string**, and
+the ones the new phases brought say their emptiness **in positive terms when empty is the good
+news**:
 
 | List with an empty string | View that paints it |
 | --- | --- |
-| Library | `ShellView` (`EmptyLibraryTitle`, `EmptyLibraryDescription`) |
-| In progress | `InProgressRailView` (`HomeInProgressEmpty`) |
-| Recommendations | `RecommendationsRailView` (`RecommendationsEmpty`, plus `RecommendationsOffDescription` when the setting is off, which is not the same thing) |
-| Recently added | `RecentlyAddedRailView` (`HomeRecentlyAddedEmpty`) |
-| A series' episodes | `ShowDetailsView` (`ShowDetailsEmpty`) |
+| Library | `LibraryView` (`LibraryEmptyTitle/Description`), which also tells **searching and finding nothing** apart (`LibrarySearchEmpty*`) — the gap this document pointed at on 2026-08-20 |
+| In progress, Recommendations, Recently added | their three rails, as they were |
+| A series' episodes | `ShowDetailsView` |
+| Markers, Detected, Tracks, Versions | the player column's four lists (`MarkersEmpty*`, `DetectedMarkersEmpty*`, `TracksEmpty*`, `PlayerVersionsEmpty*`) |
+| Review inbox | `ReviewInboxView`, on the positive surface with `✓` |
+| Duplicate groups | `DuplicatesOverviewView` (`DuplicatesEmpty*`, "nothing was deleted to get here") |
+| Backup history | `BackupView` (`BackupHistoryEmpty*`) |
+| Roots to remap | `RestoreWizardView` (`RestoreRootsEmpty*`, "every folder exists") |
+| Declared connections | `PrivacySettingsView` (`PrivacyNoHosts*`, "nothing leaves this machine") |
+| Shortcuts | `ShortcutSettingsView` (`ShortcutsEmpty*`) |
 
-The **other eighteen say nothing when empty**, and none of them says anything while loading or when
-it fails. A redesign has to decide those three states per list, not only the full one.
-
-**And there is one nobody sees coming**: the library's empty state is painted by `ShellView`, not by
-`LibraryView`, so **searching and finding nothing shows no text at all** — not even the empty-library
-one, which would say something false anyway: the library is not empty, it is the search that finds
-nothing.
+Loading has its first drawn state: the Library's first visit wears a **skeleton** (`apr-shim`)
+while its query runs. The remaining lists paint their answer the frame it arrives, and a
+one-frame skeleton is a flicker, not information.
 
 ## Absent is not the same as disabled
 
@@ -151,7 +158,7 @@ with what was measured.
 | --- | --- | --- |
 | `apr-tip` | The tooltip on the rail's six destinations | **Done** |
 | `apr-pulse` | The dot beside "Scanning" in `LibraryView` | **Done** |
-| `apr-shim` | Shimmer over a skeleton while a list loads | **Not done**: no view model carries a loading state, so the skeleton has nothing to be a skeleton of |
+| `apr-shim` | The Library's first-query skeleton | **Done** on 2026-08-23: `LibraryViewModel.IsLoading` exists and six ghost cards breathe at the single token's pace; the prototype's 1.2 s sweep was refused on purpose — a second motion token would be the parallel copy returning |
 | `apr-in` | Six-pixel rise on every screen change | **Not done**: the shell does not change screens, it mounts all eleven and toggles `IsVisible`, which Avalonia does not animate |
 
 **All of them read `MotionDuration`, and `FluentThemeService` writes that resource.** Under reduced

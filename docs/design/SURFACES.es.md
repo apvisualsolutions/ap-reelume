@@ -4,41 +4,43 @@ Inventario de las superficies visibles de AP Reelume, para que un rediseño pued
 y no sólo las que se recuerdan. La versión inglesa está en [SURFACES.en.md](SURFACES.en.md).
 
 Este documento no decide estética. Dice **qué existe, dónde vive y en qué estados aparece**, medido
-del árbol el 2026-08-15, vuelto a medir el 2026-08-18 y otra vez el **2026-08-20**, para que nada visible se quede sin
-diseñar.
+del árbol el 2026-08-15, vuelto a medir el 2026-08-18, el 2026-08-20 y otra vez el **2026-08-23**,
+para que nada visible se quede sin diseñar.
 
 ## La regla que ya se cumple, y no hay que rehacer
 
-- **Las 51 vistas usan cadenas localizadas.** Ninguna tiene texto sin traducir: la medición no
+- **Las 53 vistas usan cadenas localizadas.** Ninguna tiene texto sin traducir: la medición no
   encontró ni una sola vista sin `DynamicResource`.
-- **480 claves de cadena en español y 480 en inglés**, en
+- **576 claves de cadena en español y 576 en inglés**, en
   `src/ApSolutions.LocalMedia.Presentation/Resources/Strings.es.axaml` y `Strings.en.axaml`.
   `BilingualHeadingTests` compara la estructura de los documentos públicos, y una cadena visible
   nueva va en los dos archivos o no va.
-- **Los únicos cinco textos literales del árbol son símbolos, no idioma**: `○ ◐ ●` (estado de visto),
-  `→` (origen y destino de un renombrado), `!` (aviso del transporte), `⚠` (medio fuera de alcance) y
-  `✕` (una sesión que no abre). **Los dos últimos son distintos a propósito**: un fallo y un aviso que
-  compartieran glifo se distinguirían sólo por el color. Si el rediseño los sustituye
-  por iconos, el nombre accesible sigue viniendo de `AutomationProperties`, que ya está puesto.
+- **Los textos literales del árbol son símbolos y cifras, no idioma**: `○ ◐ ●` (estado de visto),
+  `→` (origen y destino de un renombrado), `!` (aviso), `⚠` (medio fuera de alcance), `✕` (una
+  sesión que no abre), `✓` (la bandeja de revisión vacía, que es la buena noticia) y los diez pasos
+  del menú de velocidad (`0,25×` … `4×`, cifra y multiplicador). **`⚠` y `✕` son distintos a
+  propósito**: un fallo y un aviso que compartieran glifo se distinguirían sólo por el color. Si el
+  rediseño los sustituye por iconos, el nombre accesible sigue viniendo de `AutomationProperties`,
+  que ya está puesto.
 - **Cada control interactivo tiene nombre accesible**, y hay 80 pruebas de accesibilidad que lo
   exigen. Un rediseño puede cambiar la forma, no quitarle el nombre.
 
-## Las 51 vistas, por área
+## Las 53 vistas, por área
 
 | Área | Vistas |
 | --- | --- |
 | Shell (2) | `ShellView`, `StartupView` |
-| Inicio (6) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecentlyAddedRailView`, `RecommendationsRailView`, `LibraryEntryView` |
+| Inicio (5) | `HomeView`, `ResumeHeroView`, `InProgressRailView`, `RecentlyAddedRailView`, `RecommendationsRailView` — `LibraryEntryView` se retiró el 2026-08-23: su enlace vive en la cabecera del carril |
 | Biblioteca (3) | `LibraryView`, `UnavailableBadge`, `PosterCardView` |
 | Ficha de película (1) | `MovieDetailsView` |
 | Ficha de serie (2) | `ShowDetailsView`, `EpisodeRowView` |
 | Reproductor (17) | `PlayerView`, `TransportControlsView`, `VideoStatusOverlay`, `ResumePromptView`, `NextEpisodeOverlay`, `SkipMarkerButton`, `MarkerEditorView`, `DetectedMarkerReviewView`, `TrackSelectorView`, `AudioOutputView`, `SubtitleStyleView`, `ShortcutSettingsView`, `PlayerVersionsView`, `VersionSwitchDialog`, `LooseFileBanner`, `MiniPlayerWindow`, `MiniPlayerChromeView` |
-| Ajustes (7) | `AppearanceSettingsView`, `PrivacySettingsView`, `ScanSettingsView`, `LifecycleSettingsView`, `RecommendationSettingsView`, `SegmentDetectionSettingsView`, `DiagnosticsPreviewView` |
-| Revisión (3) | `ReviewInboxView`, `CandidateCardView`, `DuplicateReviewView` |
+| Ajustes (8) | `AppearanceSettingsView`, `PrivacySettingsView`, `ScanSettingsView`, `LifecycleSettingsView`, `RecommendationSettingsView`, `SegmentDetectionSettingsView`, `DiagnosticsPreviewView`, `RootManagementView` |
+| Revisión (4) | `ReviewInboxView`, `CandidateCardView`, `DuplicateReviewView`, `DuplicatesOverviewView` |
 | Metadatos (2) | `MetadataEditorView`, `RenamePreviewView` |
 | Catálogo (2) | `PersonalActionsView`, `WatchStatusControl` |
 | Copia de seguridad (2) | `BackupView`, `RestoreWizardView` |
-| Primeros pasos (1) | `RootOnboardingView` |
+| Primeros pasos (2) | `RootOnboardingView`, `AddRootDialogView` |
 | Recuperación (1) | `DatabaseRecoveryView` |
 | Créditos (1) | `CreditsView` |
 | Actualización (1) | `UpdateView` |
@@ -79,7 +81,11 @@ rediseño que sólo contemple «buscando» y «listo» deja fuera la mayoría.
   en **un solo** contenedor: partirla en dos parte el anuncio.
 
 Un rechazo **no es un error del usuario**: es la actualización negándose a instalar algo que no pudo
-verificar. Merece un tratamiento visual distinto del de un fallo.
+verificar. Desde el 2026-08-23 **lo tiene**: el borde vivo se viste por gramática —proceso neutro,
+al día en positivo, rechazo en Warning con el motivo como titular y el identificador técnico tras un
+plegado, fallo del mundo en Danger— y suma tres cadenas (`UpdateRejectionReasonLabel`,
+`UpdateNothingInstalledNotice`, `UpdateRejectionDetailAction`), lo que deja la vista en veintiséis
+mensajes.
 
 ## El reproductor, que tampoco tiene un solo estado
 
@@ -98,24 +104,26 @@ Medido el 2026-08-18, y la distinción importa porque son **dos gramáticas, no 
 
 ## Las listas y su estado vacío
 
-Medido el 2026-08-20: **23 listas con datos** en el árbol —entendiendo por lista un `ListBox`,
-`ItemsControl` o `ItemsRepeater` con `ItemsSource`—, y **cinco tienen escrita una cadena para
-cuando están vacías**:
+Vuelto a medir el 2026-08-23, después del rediseño: **catorce vistas pintan una cadena de vacío**,
+y las que llegaron con las fases nuevas dicen su vacío **en positivo cuando el vacío es la buena
+noticia**:
 
 | Lista con cadena de vacío | Vista que la pinta |
 | --- | --- |
-| Biblioteca | `ShellView` (`EmptyLibraryTitle`, `EmptyLibraryDescription`) |
-| En curso | `InProgressRailView` (`HomeInProgressEmpty`) |
-| Recomendaciones | `RecommendationsRailView` (`RecommendationsEmpty`, y `RecommendationsOffDescription` cuando el ajuste está apagado, que no es lo mismo) |
-| Añadido recientemente | `RecentlyAddedRailView` (`HomeRecentlyAddedEmpty`) |
-| Episodios de una serie | `ShowDetailsView` (`ShowDetailsEmpty`) |
+| Biblioteca | `LibraryView` (`LibraryEmptyTitle/Description`), que también distingue **buscar y no encontrar** (`LibrarySearchEmpty*`) — el hueco que este documento señaló el 2026-08-20 |
+| En curso, Recomendaciones, Añadido recientemente | sus tres carriles, como estaban |
+| Episodios de una serie | `ShowDetailsView` |
+| Marcadores, Detectados, Pistas, Versiones | las cuatro listas de la columna del reproductor (`MarkersEmpty*`, `DetectedMarkersEmpty*`, `TracksEmpty*`, `PlayerVersionsEmpty*`) |
+| Bandeja de revisión | `ReviewInboxView`, en superficie positiva con `✓` |
+| Grupos de duplicados | `DuplicatesOverviewView` (`DuplicatesEmpty*`, «nada se borró para llegar aquí») |
+| Historial de copias | `BackupView` (`BackupHistoryEmpty*`) |
+| Raíces por reasignar | `RestoreWizardView` (`RestoreRootsEmpty*`, «todas las carpetas existen») |
+| Conexiones declaradas | `PrivacySettingsView` (`PrivacyNoHosts*`, «nada sale de este equipo») |
+| Atajos | `ShortcutSettingsView` (`ShortcutsEmpty*`) |
 
-Las **dieciocho restantes no dicen nada cuando están vacías**, y ninguna dice nada mientras carga ni
-cuando falla. Un rediseño tiene que decidir esos tres estados por lista, no sólo el lleno.
-
-**Y hay uno que nadie ve venir**: el vacío de la biblioteca lo pinta `ShellView`, no `LibraryView`,
-así que **buscar y no encontrar nada no muestra ningún texto** — ni el de biblioteca vacía, que
-además diría algo falso: la biblioteca no está vacía, es la búsqueda la que no encuentra.
+La carga tiene su primer estado dibujado: la primera visita de la Biblioteca viste **esqueleto**
+(`apr-shim`) mientras corre su consulta. El resto de listas pintan su respuesta en el cuadro en que
+llega, y un esqueleto de un cuadro es un parpadeo, no información.
 
 ## Ausente no es lo mismo que deshabilitado
 
@@ -150,7 +158,7 @@ que se midió.
 | --- | --- | --- |
 | `apr-tip` | Tooltip de los seis destinos del carril | **Hecha** |
 | `apr-pulse` | El punto junto a «Escaneando» en `LibraryView` | **Hecha** |
-| `apr-shim` | Brillo sobre un esqueleto mientras carga | **No se hace**: ningún modelo de vista lleva estado de carga, así que el esqueleto no tiene de qué serlo |
+| `apr-shim` | Esqueleto de la primera consulta de la Biblioteca | **Hecha** el 2026-08-23: `LibraryViewModel.IsLoading` existe y seis tarjetas-fantasma respiran al paso del único token; el barrido de 1,2 s del prototipo se rehusó a propósito —un segundo token de movimiento sería la copia paralela volviendo— |
 | `apr-in` | Subida de 6 px en cada cambio de pantalla | **No se hace**: el shell no cambia de pantalla, monta las once y alterna `IsVisible`, que Avalonia no anima |
 
 **Todas leen `MotionDuration`, y `FluentThemeService` escribe ese recurso.** Con movimiento reducido
