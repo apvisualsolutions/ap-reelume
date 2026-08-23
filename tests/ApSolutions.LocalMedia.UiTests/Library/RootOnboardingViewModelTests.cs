@@ -271,6 +271,30 @@ public sealed class RootOnboardingViewModelTests
         Assert.Contains(viewModel.Roots, row => row.Path == "R:\\media");
     }
 
+    /// <summary>
+    /// The two seams around the detector and the picker: pressing Browse with no picker wired does
+    /// nothing at all, and writing the same path twice asks the detector once.
+    /// </summary>
+    [Fact]
+    public async Task Browse_without_a_picker_and_a_repeated_path_are_both_no_ops()
+    {
+        var viewModel = Create(new StubRoots());
+        viewModel.BrowseFolderCommand.Execute(null);
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+        Assert.Equal(string.Empty, viewModel.Path);
+
+        var asked = 0;
+        viewModel.KindDetector = _ =>
+        {
+            asked++;
+            return RootKind.Usb;
+        };
+        viewModel.Path = "E:\\peliculas";
+        viewModel.Path = "E:\\peliculas";
+        Assert.Equal(1, asked);
+        Assert.Equal(RootKind.Usb, viewModel.SelectedKind);
+    }
+
     private static RootOnboardingViewModel Create(StubRoots roots) =>
         new(new AddLibraryRoot(roots, new PassThroughNormalizer()));
 

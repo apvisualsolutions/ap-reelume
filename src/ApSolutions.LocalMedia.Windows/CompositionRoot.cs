@@ -1659,29 +1659,11 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
-    /// A folder's kind, read from the path: UNC from the prefix, USB from the drive being
-    /// removable, local otherwise — and local again when the drive cannot be asked, because a wrong
-    /// "local" costs a slower watch policy while a thrown question costs the dialog.
+    /// A folder's kind, which is <see cref="RootKindPolicy"/>'s decision: the only thing Windows
+    /// contributes is the one question a policy cannot ask, what type the drive is.
     /// </summary>
-    private static RootKind DetectRootKind(string path)
-    {
-        if (path.StartsWith(@"\\", StringComparison.Ordinal))
-        {
-            return RootKind.Unc;
-        }
-
-        try
-        {
-            return Path.GetPathRoot(path) is { Length: > 0 } root
-                && new DriveInfo(root).DriveType == DriveType.Removable
-                    ? RootKind.Usb
-                    : RootKind.Local;
-        }
-        catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException)
-        {
-            return RootKind.Local;
-        }
-    }
+    private static RootKind DetectRootKind(string path) =>
+        RootKindPolicy.Detect(path, root => new DriveInfo(root).DriveType);
 
     /// <summary>
     /// The path Windows would launch at sign-in. It is read from the running process rather than
