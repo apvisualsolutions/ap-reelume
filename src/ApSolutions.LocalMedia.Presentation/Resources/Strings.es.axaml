@@ -149,6 +149,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RestoreStepChooseLabel">Paso 1 · Elige el archivo</x:String>
   <x:String x:Key="RestoreStepRootsLabel">Paso 2 · Revisa las carpetas</x:String>
   <x:String x:Key="RestoreStepConfirmLabel">Paso 3 · Confirma</x:String>
+  <x:String x:Key="PrivacyNoHostsTitle">Ninguna conexión declarada</x:String>
+  <x:String x:Key="PrivacyNoHostsDescription">Nada sale de este equipo.</x:String>
+  <x:String x:Key="DiagnosticsEmptyFieldsNotice">Rutas, nombres de archivo, títulos e historial se listan vacíos para que veas que no se recogen, no que se omiten.</x:String>
   <x:String x:Key="TransportSpeedResetAction">Volver a 1×</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Configuración de escaneo</x:String>
   <x:String x:Key="ScanSettingsTitle">Escaneo y vigilancia</x:String>

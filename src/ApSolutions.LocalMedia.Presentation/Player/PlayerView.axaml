@@ -120,6 +120,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
             The one action of the one screen here that is for an action. Opening the file elsewhere
             sits beside it as the secondary, and the transport gets none at all.
           -->
+          <!--
+            Retry appears only where trying again could answer differently: a missing file may be a
+            disk somebody plugs back in, but bytes that failed to decode are still the same bytes,
+            and an engine that never initialised will not initialise for being asked twice - so
+            those states offer the other exits instead. And "no audio track" is a notice rather
+            than a failure on this surface: the picture is playing, which is what a player is for.
+          -->
           <Button
               Classes="primary-action"
               IsVisible="{Binding CanRetry}"

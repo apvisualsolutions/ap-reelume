@@ -36,6 +36,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private TitleId? _scrollAnchorId;
     private string? _nextCursor;
     private bool _hasLoaded;
+    private bool _isLoading;
     private ICommand? _addMedia;
 
     public LibraryViewModel(
@@ -414,15 +415,42 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// </summary>
     public Func<CatalogItemViewModel, Task>? DetailsLoader { get; set; }
 
+    /// <summary>
+    /// True while the first query of a visit runs; the grid wears its skeleton then. Only the
+    /// first: a reload over a grid already painted keeps the cards, because a skeleton replacing
+    /// content somebody is reading is worse than the wait it decorates.
+    /// </summary>
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set
+        {
+            if (SetField(ref _isLoading, value))
+            {
+                OnPropertyChanged(nameof(ShowsSkeleton));
+            }
+        }
+    }
+
+    public bool ShowsSkeleton => IsLoading && Items.Count == 0;
+
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
-        var page = await _queryService.QueryAsync(
-            CreateQuery(cursor: null),
-            cancellationToken).ConfigureAwait(false);
-        Items = page.Items.Select(item => new CatalogItemViewModel(item)).ToArray();
-        _nextCursor = page.NextCursor;
-        _hasLoaded = true;
-        OnPropertyChanged(nameof(HasMore));
+        IsLoading = true;
+        try
+        {
+            var page = await _queryService.QueryAsync(
+                CreateQuery(cursor: null),
+                cancellationToken).ConfigureAwait(false);
+            Items = page.Items.Select(item => new CatalogItemViewModel(item)).ToArray();
+            _nextCursor = page.NextCursor;
+            _hasLoaded = true;
+            OnPropertyChanged(nameof(HasMore));
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     /// <summary>

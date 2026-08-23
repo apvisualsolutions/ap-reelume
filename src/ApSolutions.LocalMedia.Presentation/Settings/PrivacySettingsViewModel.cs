@@ -70,6 +70,12 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
     public IReadOnlyList<NetworkPurpose> NetworkPurposes { get; }
 
     /// <summary>
+    /// True when nothing is declared at all - the best answer this page can give, painted in
+    /// positive terms. The registry is fixed at composition, so this never moves at runtime.
+    /// </summary>
+    public bool HasNoDeclaredHosts => NetworkPurposes.Count == 0;
+
+    /// <summary>
     /// Whether the automatic refresh can be offered at all. It is subordinate to the consented
     /// connection: without one, the provider serves only what it already cached, so a switch would
     /// promise something that cannot happen — and a preference nobody can act on is worse than an

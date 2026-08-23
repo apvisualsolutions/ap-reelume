@@ -149,6 +149,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RestoreStepChooseLabel">Step 1 · Choose the archive</x:String>
   <x:String x:Key="RestoreStepRootsLabel">Step 2 · Review the folders</x:String>
   <x:String x:Key="RestoreStepConfirmLabel">Step 3 · Confirm</x:String>
+  <x:String x:Key="PrivacyNoHostsTitle">No connection declared</x:String>
+  <x:String x:Key="PrivacyNoHostsDescription">Nothing leaves this machine.</x:String>
+  <x:String x:Key="DiagnosticsEmptyFieldsNotice">Paths, file names, titles and history are listed empty so you can see they are not collected, not that they are omitted.</x:String>
   <x:String x:Key="TransportSpeedResetAction">Back to 1×</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Scan settings</x:String>
   <x:String x:Key="ScanSettingsTitle">Scanning and watching</x:String>

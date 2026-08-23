@@ -134,6 +134,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding PreviewCommand}"
           Content="{DynamicResource PrivacyPreviewLabel}"
           automation:AutomationProperties.Name="{DynamicResource PrivacyPreviewLabel}" />
+      <!--
+        Export greys where the auto-refresh switch is absent, and the difference is the grammar:
+        absent means "cannot occur in this composition" (no consented connection - nothing the
+        switch could ever do), greyed means "possible, but not now" (turn diagnostics on and this
+        button wakes). Grey is a promise; absence is the truth that there is nothing to promise.
+      -->
       <Button
           x:Name="PrivacyExportButton"
           Command="{Binding ExportCommand}"
@@ -143,12 +149,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </WrapPanel>
 
     <settings:DiagnosticsPreviewView x:Name="PrivacyPreviewSurface" IsVisible="{Binding HasPreview}" />
+    <!-- Why the preview lists empty fields at all: seen-empty is proof, omitted is a claim. -->
+    <TextBlock
+        MaxWidth="640"
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        IsVisible="{Binding HasPreview}"
+        Text="{DynamicResource DiagnosticsEmptyFieldsNotice}"
+        TextWrapping="Wrap" />
 
     <TextBlock
         FontWeight="SemiBold"
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource PrivacyNetworkTitle}"
         automation:AutomationProperties.HeadingLevel="3" />
+    <!-- The empty host list is the best possible answer and says so, not a gap. -->
+    <StackPanel IsVisible="{Binding HasNoDeclaredHosts}" Spacing="{DynamicResource Space4}">
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource PrivacyNoHostsTitle}" />
+      <TextBlock
+          MaxWidth="640"
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource PrivacyNoHostsDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
     <ItemsControl
         x:Name="PrivacyNetworkList"
         ItemsSource="{Binding NetworkPurposes}"

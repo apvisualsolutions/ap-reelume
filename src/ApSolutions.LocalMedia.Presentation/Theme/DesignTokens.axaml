@@ -1466,6 +1466,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </Style.Animations>
   </Style>
 
+  <!--
+    apr-shim, the third: the placeholder a grid wears while its query runs. The prototype sweeps a
+    gloss rectangle across each card over 1.2 s; here the shimmer is the same breathing the scan dot
+    uses, because this repository holds ONE motion token - MotionDurationStandardMilliseconds and
+    its reduced twin were once a parallel copy that nothing spent, and the fix was one number the
+    service writes zero into. A second, slower token would be that defect returning dressed as a
+    sweep. Under reduced motion the placeholder simply stands still, which is what a skeleton is.
+  -->
+  <Style Selector="Border.apr-shim">
+    <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Style.Animations>
+      <Animation Duration="{DynamicResource MotionDuration}" IterationCount="INFINITE" PlaybackDirection="Alternate">
+        <KeyFrame Cue="0%">
+          <Setter Property="Opacity" Value="1" />
+        </KeyFrame>
+        <KeyFrame Cue="100%">
+          <Setter Property="Opacity" Value="0.55" />
+        </KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+
   <Style Selector="TextBlock.navigation-glyph">
     <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
     <Setter Property="FontSize" Value="{DynamicResource FontSizeSubtitle}" />

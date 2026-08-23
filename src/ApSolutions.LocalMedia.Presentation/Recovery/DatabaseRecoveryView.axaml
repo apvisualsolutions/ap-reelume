@@ -13,7 +13,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Border Padding="48" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="720" Spacing="{DynamicResource Space16}">
       <!-- A level one: this is not a section of anything. It is its own window, shown when the
-           database will not open, and the shell deliberately has no route to it. -->
+           database will not open, and the shell deliberately has no route to it. It keeps the
+           system title bar for the same reason the shell does: a person meeting this screen is
+           closing, moving or minimising a window in distress, and chrome that behaves like every
+           other window's is one less thing to learn while worried. -->
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
