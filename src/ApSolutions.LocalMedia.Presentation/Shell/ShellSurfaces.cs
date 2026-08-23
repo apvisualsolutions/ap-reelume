@@ -40,6 +40,9 @@ public sealed record ShellSurfaces
 
     public BackupViewModel? Backups { get; init; }
 
+    /// <summary>The duplicates destination's list; the per-title review stays on its own surface.</summary>
+    public DuplicatesOverviewViewModel? DuplicatesOverview { get; init; }
+
     public RestoreWizardViewModel? Restore { get; init; }
 
     public PrivacySettingsViewModel? PrivacySettings { get; init; }

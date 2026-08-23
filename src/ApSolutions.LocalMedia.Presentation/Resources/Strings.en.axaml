@@ -13,6 +13,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="NavigationBackups">Backups</x:String>
   <x:String x:Key="NavigationSettings">Settings</x:String>
   <x:String x:Key="NavigationAddMedia">Add media</x:String>
+  <x:String x:Key="NavigationDuplicates">Duplicates</x:String>
+  <x:String x:Key="DuplicatesOverviewAccessibleName">Duplicate groups</x:String>
+  <x:String x:Key="DuplicateGroupCountLabel">versions</x:String>
+  <x:String x:Key="DuplicatesEmptyTitle">No duplicates found</x:String>
+  <x:String x:Key="DuplicatesEmptyDescription">Every title resolves to a single file. Nothing was deleted to get here.</x:String>
   <x:String x:Key="AboutAccessibleName">About AP Reelume</x:String>
   <x:String x:Key="AboutCreditsHeading">Credits</x:String>
   <x:String x:Key="AboutTmdbLogoAlt">TMDB logo</x:String>

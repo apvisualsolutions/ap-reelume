@@ -60,7 +60,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
 - [x] **F5 — Tinte de acento**: halo radial del acento en lo alto del contenido; contraste
   verificado TAMBIÉN sobre el halo (la trampa de `ContrastTokenTests`: una puerta mide lo que
   enumera).
-- [ ] **F6 — Shell**: riel de 5 destinos + añadir (entra Duplicados con ruta propia, sale Copias);
+- [x] **F6 — Shell**: riel de 5 destinos + añadir (entra Duplicados con ruta propia, sale Copias);
   Ajustes con índice lateral `side-list` (los estilos declarados sin consumidor, por fin
   alimentados) y secciones una a la vez en el orden del prototipo (Apariencia · Biblioteca y
   escaneo · Reproducción · Audio · Subtítulos · Accesibilidad · Privacidad · Detección de

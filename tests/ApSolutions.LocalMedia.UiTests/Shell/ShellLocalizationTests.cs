@@ -45,7 +45,7 @@ public sealed class ShellLocalizationTests
         var routeType = RequireType(assembly, "ApSolutions.LocalMedia.Presentation.Navigation.AppRoute");
 
         Assert.Equal(
-            ["Home", "Library", "Review", "Backups", "Settings"],
+            ["Home", "Library", "Review", "Duplicates", "Settings"],
             Enum.GetNames(routeType));
 
         var navigationContract = RequireType(

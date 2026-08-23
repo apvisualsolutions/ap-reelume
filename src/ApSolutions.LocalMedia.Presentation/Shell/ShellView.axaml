@@ -196,13 +196,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <TextBlock Classes="navigation-glyph" Text="&#xE8FD;" />
             </Panel>
           </Button>
+          <!--
+            Duplicados, which the prototype gives the rail's fourth slot. Copias left the rail for
+            Settings on 2026-08-23: a destination is for a place somebody visits, and a backup is a
+            decision somebody configures.
+          -->
           <Button
               Classes="navigation-destination"
-              ToolTip.Tip="{DynamicResource NavigationBackups}"
-              automation:AutomationProperties.Name="{DynamicResource NavigationBackups}"
-              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Backups}}"
+              ToolTip.Tip="{DynamicResource NavigationDuplicates}"
+              automation:AutomationProperties.Name="{DynamicResource NavigationDuplicates}"
+              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Duplicates}}"
               Command="{Binding NavigateCommand}"
-              CommandParameter="{x:Static navigation:AppRoute.Backups}">
+              CommandParameter="{x:Static navigation:AppRoute.Duplicates}">
             <Panel>
               <!--
                 Two signals for the open destination, and one of them is not colour: the fill, and a
@@ -211,7 +216,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <Border
                   Background="{DynamicResource AccentSubtleBrush}"
                   CornerRadius="{DynamicResource CornerRadiusMedium}"
-                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Duplicates}}" />
               <Border
                   Classes="navigation-current-bar"
                   Width="3"
@@ -219,7 +224,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   HorizontalAlignment="Left"
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
-                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Backups}}" />
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Duplicates}}" />
               <TextBlock Classes="navigation-glyph" Text="&#xE8C8;" />
             </Panel>
           </Button>
@@ -372,6 +377,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Tag="{x:Static shell:SettingsSection.Privacy}"
               automation:AutomationProperties.Name="{DynamicResource PrivacyTitle}" />
           <ListBoxItem
+              Content="{DynamicResource NavigationBackups}"
+              Tag="{x:Static shell:SettingsSection.Backups}"
+              automation:AutomationProperties.Name="{DynamicResource NavigationBackups}" />
+          <ListBoxItem
               Content="{DynamicResource UpdateTitle}"
               IsVisible="{Binding HasUpdates}"
               Tag="{x:Static shell:SettingsSection.Updates}"
@@ -430,6 +439,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <ContentControl IsVisible="{Binding HasPrivacySettings}">
                 <settings:PrivacySettingsView DataContext="{Binding PrivacySettings}" />
               </ContentControl>
+            </ContentControl>
+            <ContentControl IsVisible="{Binding IsBackupsSection}">
+              <!--
+                The section skeleton its peers share — Padding 32, the 620 column — so the Copias
+                title starts where every section title starts. The two views keep their own inner
+                shapes; the frame is the page's.
+              -->
+              <Border Padding="32">
+                <StackPanel MaxWidth="620" Spacing="{DynamicResource Space24}">
+                  <backup:BackupView DataContext="{Binding Backups}" />
+                  <ContentControl IsVisible="{Binding HasRestore}">
+                    <backup:RestoreWizardView DataContext="{Binding Restore}" />
+                  </ContentControl>
+                </StackPanel>
+              </Border>
             </ContentControl>
             <ContentControl Margin="48,0" IsVisible="{Binding IsUpdatesSection}">
               <ContentControl IsVisible="{Binding HasUpdates}">
@@ -502,20 +526,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding IsReviewVisible}">
       <StackPanel Spacing="{DynamicResource Space24}">
         <review:ReviewInboxView DataContext="{Binding ReviewInbox}" />
-        <ContentControl IsVisible="{Binding HasDuplicates}">
-          <review:DuplicateReviewView DataContext="{Binding Duplicates}" />
-        </ContentControl>
       </StackPanel>
     </ScrollViewer>
+    <!--
+      The duplicates destination: the overview always, and under it the comparison the review has
+      always drawn, opened by a row the way the film card's own action opens it. The library's
+      pattern — list above, detail below — on the rail's fourth slot.
+    -->
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
         Margin="48"
-        IsVisible="{Binding IsBackupsVisible}">
+        IsVisible="{Binding IsDuplicatesVisible}">
       <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
-        <backup:BackupView DataContext="{Binding Backups}" />
-        <ContentControl IsVisible="{Binding HasRestore}">
-          <backup:RestoreWizardView DataContext="{Binding Restore}" />
+        <review:DuplicatesOverviewView DataContext="{Binding DuplicatesOverview}" />
+        <ContentControl IsVisible="{Binding HasDuplicates}">
+          <review:DuplicateReviewView DataContext="{Binding Duplicates}" />
         </ContentControl>
       </StackPanel>
     </ScrollViewer>

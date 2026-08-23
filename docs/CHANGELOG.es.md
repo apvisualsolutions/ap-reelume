@@ -10,6 +10,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Duplicados entra al riel y Copias se muda a Ajustes**, que es el mapa del prototipo y la
+  decisión que el propietario tomó el 2026-08-23. La ruta nueva lista **todos los grupos** —una
+  consulta que no existía: lector en Infrastructure, caso de uso en Application, y la fila abre la
+  MISMA comparación que la acción de la ficha, por la misma puerta del shell, para que las dos
+  entradas no puedan discrepar—. El vacío es el estado deseable y lo dice en positivo con las
+  cadenas aprobadas. Copias y restauración viven ahora bajo su entrada del índice con el esqueleto
+  de sección de sus pares, y las escenas del paseo llegan por donde llega una persona.
+  - La puerta de la casa cazó el registro sin resolución explícita del lector nuevo en el mismo
+    commit que lo introducía, que es exactamente para lo que existe.
+
 - **Los dos altos contrastes son elegibles: Apariencia pasa de tres a cinco píldoras**, con las
   claves `ThemeHighContrastLight` y `ThemeHighContrastDark` que el paquete traía y la decisión que
   el propietario revocó el 2026-08-23 por la vía que ella misma dejó abierta. El ajuste del sistema

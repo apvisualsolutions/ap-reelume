@@ -75,6 +75,9 @@ public static partial class CompositionRoot
             })
             .AddSingleton<ScanProgressViewModel>()
             .AddTransient<ManualReassignmentViewModel>()
+            .AddSingleton<Application.Catalog.IDuplicateOverviewReader, ApSolutions.LocalMedia.Infrastructure.Data.Repositories.DuplicateOverviewReader>()
+            .AddTransient(provider => new Application.Catalog.GetDuplicateOverview(
+                provider.GetRequiredService<Application.Catalog.IDuplicateOverviewReader>()))
             .AddTransient(CreateLibraryViewModel)
             .AddTransient(provider => new RecommendationsViewModel(
                 provider.GetRequiredService<GetRecommendations>(),

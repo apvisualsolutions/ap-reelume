@@ -80,7 +80,7 @@ public static class CanonicalJourney
         new(8, "resume", nameof(ResumePromptView), BuildResumePrompt, IsPage: false),
         new(8, "resume", nameof(HomeView), BuildHome),
         new(9, "favourite", nameof(PersonalActionsView), BuildPersonalActions, IsPage: false),
-        new(10, "backup", nameof(ShellView), () => BuildShell(AppRoute.Backups)),
+        new(10, "backup", nameof(ShellView), () => BuildShell(AppRoute.Settings, SettingsSection.Backups)),
         new(10, "backup", nameof(BackupView), BuildBackup),
         new(10, "backup", nameof(RestoreWizardView), BuildRestoreWizard),
         new(11, "settings", nameof(AppearanceSettingsView), BuildAppearanceSettings),
@@ -126,7 +126,7 @@ public static class CanonicalJourney
         App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo(cultureName));
     }
 
-    private static ShellView BuildShell(AppRoute route)
+    private static ShellView BuildShell(AppRoute route, SettingsSection? section = null)
     {
         var navigation = new NavigationService();
         var viewModel = new ShellViewModel(
@@ -139,6 +139,11 @@ public static class CanonicalJourney
             BuildBackupViewModel(),
             BuildRestoreWizardViewModel());
         navigation.Navigate(route);
+        if (section is { } chosen)
+        {
+            viewModel.CurrentSettingsSection = chosen;
+        }
+
         return new ShellView { DataContext = viewModel };
     }
 

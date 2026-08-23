@@ -10,6 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Duplicates joins the rail and Copias moves into Settings**, which is the prototype's map and
+  the owner's 2026-08-23 decision. The new route lists **every group** — a query that did not
+  exist: a reader in Infrastructure, a use case in Application, and a row opens the SAME comparison
+  the card's action opens, through the same shell door, so the two ways in can never disagree. The
+  empty state is the desirable one and says so with the approved strings. Backups and restore now
+  live behind their index entry with their peers' section skeleton, and the walk's scenes arrive
+  the way a person does.
+  - The house gate caught the new reader's registration without an explicit resolution in the very
+    commit that introduced it, which is exactly what it exists for.
+
 - **Both high contrasts are choosable: Appearance goes from three pills to five**, with the
   `ThemeHighContrastLight` and `ThemeHighContrastDark` keys the package carried and the decision the
   owner revoked on 2026-08-23 through the door it left open. The system's own setting still wins

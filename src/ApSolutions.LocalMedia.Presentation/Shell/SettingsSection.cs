@@ -21,6 +21,9 @@ public enum SettingsSection
     Shortcuts,
     Lifecycle,
     Privacy,
+
+    /// <summary>«Copias y restauración»: the rail's old destination, now where decisions live.</summary>
+    Backups,
     Updates,
     Credits,
 }
