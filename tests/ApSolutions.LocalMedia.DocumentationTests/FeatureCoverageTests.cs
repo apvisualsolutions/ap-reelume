@@ -22,7 +22,10 @@ public sealed class FeatureCoverageTests
     {
         // 54 since 2026-08-09: PLY-016 (low-resolution quality enhancement) entered the scope by
         // the owner's request, POST_STABLE and PLANNED, with its decisions taken in its plan.
-        Assert.Equal(54, FeatureMatrix.Rows.Count);
+        // 55 since 2026-08-23: PRD-006, the visual-parity undertaking itself, STABLE and
+        // IN_PROGRESS until the captures matrix lands - the redesign was scope without a row,
+        // which is exactly what this gate exists to refuse.
+        Assert.Equal(55, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,
