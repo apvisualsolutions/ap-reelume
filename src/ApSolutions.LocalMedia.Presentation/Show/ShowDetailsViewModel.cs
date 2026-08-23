@@ -66,6 +66,9 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     public string Title => _item?.Title ?? string.Empty;
 
+    /// <summary>The banner poster's two letters, from the same well the grid's cards drink.</summary>
+    public string Initials => Library.PosterInitials.From(Title);
+
     /// <summary>
     /// What this series is about, as the stored metadata has it. Handed in like everything else this
     /// view model shows; it queries nothing.
@@ -147,6 +150,7 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         {
             nameof(HasSeasonChoice),
             nameof(Title),
+            nameof(Initials),
             nameof(Overview),
             nameof(HasOverview),
             nameof(Year),

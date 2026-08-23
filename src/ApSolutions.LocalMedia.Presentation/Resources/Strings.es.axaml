@@ -105,6 +105,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="LibraryClearFiltersAction">Quitar filtros</x:String>
   <x:String x:Key="LibraryItemCountLabel">elementos</x:String>
   <x:String x:Key="LibraryTypeFilterAccessibleName">Tipo de título</x:String>
+  <x:String x:Key="TrailerLocalFileNotice">Este tráiler es un archivo de tu disco. Nada se descarga y nada se emite.</x:String>
+  <x:String x:Key="TrailerBrowserLeavesAppNotice">Este botón sale de la aplicación: la conexión la abre tu navegador, no este proceso.</x:String>
+  <x:String x:Key="TrailerConventionHint">Nombra el archivo como el vídeo más «-trailer», o ponlo en una carpeta Trailers junto a la película.</x:String>
   <x:String x:Key="MovieDetailsAccessibleName">Ficha de película</x:String>
   <x:String x:Key="ShowDetailsAccessibleName">Ficha de serie</x:String>
   <x:String x:Key="MediaUnavailable">No disponible</x:String>

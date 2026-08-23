@@ -12,57 +12,121 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:ShowDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource ShowDetailsAccessibleName}">
-  <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
-    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeTitle}"
-          FontWeight="SemiBold"
-          Text="{Binding Title}"
-          TextTrimming="CharacterEllipsis"
-          automation:AutomationProperties.HeadingLevel="1" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding HasYear}"
-          Text="{Binding YearText}" />
-      <library:UnavailableBadge />
-    </StackPanel>
-
+  <UserControl.Resources>
+    <library:PosterArtConverter x:Key="DetailsArt" />
+  </UserControl.Resources>
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
     <!--
-      Same shape as the film card's row, and for the same reason: the personal actions and the trailer
-      link carry translated words, so they wrap instead of pushing each other off the side.
+      The film card's banner, on the series card: the same frame, the same coin, the same payment —
+      PlayerSurfaceBrush under the title's art wall, the player's text brushes, and the computed
+      layers off in both high contrasts through PosterArtOpacity, asserted by the colour-alone gate.
     -->
-    <StackPanel Grid.Row="1" Spacing="{DynamicResource Space8}">
-      <WrapPanel
-          x:Name="ShowActionsSurface"
-          ItemSpacing="{DynamicResource Space8}"
-          LineSpacing="{DynamicResource Space8}">
-        <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
-        <Button
-            Command="{Binding OpenTrailerLinkCommand}"
-            Content="{DynamicResource DetailsTrailerLinkAction}"
-            IsVisible="{Binding HasTrailerLink}"
-            automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
-      </WrapPanel>
-      <TextBlock
-          IsVisible="{Binding IsEmpty}"
-          Text="{DynamicResource ShowDetailsEmpty}"
-          TextWrapping="Wrap" />
-    </StackPanel>
+    <Border ClipToBounds="True" CornerRadius="{DynamicResource CornerRadiusMedium}">
+      <Panel Background="{DynamicResource PlayerSurfaceBrush}">
+        <Panel Opacity="{DynamicResource PosterArtOpacity}">
+          <Border Background="{Binding Title, Converter={StaticResource DetailsArt}}" />
+          <Border Background="{Binding Title, Converter={StaticResource DetailsArt}, ConverterParameter=glow}" />
+          <Border>
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Offset="0" Color="#F2090C10" />
+                <GradientStop Offset="0.55" Color="#B8090C10" />
+                <GradientStop Offset="1" Color="#30090C10" />
+              </LinearGradientBrush>
+            </Border.Background>
+          </Border>
+        </Panel>
+        <Grid Margin="32" ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space24}">
+          <Border
+              Width="158"
+              Height="237"
+              VerticalAlignment="Top"
+              ClipToBounds="True"
+              Background="{DynamicResource ControlFillBrush}"
+              BorderBrush="{DynamicResource PlayerHairlineBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource CornerRadiusMedium}">
+            <Panel>
+              <Panel Opacity="{DynamicResource PosterArtOpacity}">
+                <Border Background="{Binding Title, Converter={StaticResource DetailsArt}}" />
+                <Border Background="{Binding Title, Converter={StaticResource DetailsArt}, ConverterParameter=glow}" />
+              </Panel>
+              <TextBlock
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  FontSize="{DynamicResource FontSizeDisplay}"
+                  FontWeight="SemiBold"
+                  Foreground="{DynamicResource PosterInitialsBrush}"
+                  Text="{Binding Initials}"
+                  automation:AutomationProperties.AccessibilityView="Raw" />
+            </Panel>
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="{DynamicResource Space12}">
+            <TextBlock
+                FontSize="{DynamicResource FontSizeDisplay}"
+                FontWeight="Light"
+                Foreground="{DynamicResource PlayerTextBrush}"
+                Text="{Binding Title}"
+                TextTrimming="CharacterEllipsis"
+                automation:AutomationProperties.HeadingLevel="1" />
+            <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+              <TextBlock
+                  VerticalAlignment="Center"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  IsVisible="{Binding HasYear}"
+                  Text="{Binding YearText}" />
+              <library:UnavailableBadge />
+            </WrapPanel>
+            <TextBlock
+                MaxWidth="620"
+                MaxHeight="160"
+                HorizontalAlignment="Left"
+                Foreground="{DynamicResource PlayerTextBrush}"
+                IsVisible="{Binding HasOverview}"
+                Text="{Binding Overview}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="Wrap"
+                automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+            <!--
+              Same shape as the film card's row, and for the same reason: the personal actions and
+              the trailer link carry translated words, so they wrap instead of pushing each other
+              off the side.
+            -->
+            <WrapPanel
+                x:Name="ShowActionsSurface"
+                ItemSpacing="{DynamicResource Space8}"
+                LineSpacing="{DynamicResource Space8}">
+              <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
+              <Button
+                  Command="{Binding OpenTrailerLinkCommand}"
+                  Content="{DynamicResource DetailsTrailerLinkAction}"
+                  IsVisible="{Binding HasTrailerLink}"
+                  automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
+            </WrapPanel>
+            <!--
+              A series carries no local trailer on purpose: the on-disk convention
+              (TrailerDiscoveryPolicy) names the trailer after a film's own video file, and a series
+              has no single file to name it after — so only the browser link exists here, with the
+              consequence that matters about it.
+            -->
+            <TextBlock
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                IsVisible="{Binding HasTrailerLink}"
+                Text="{DynamicResource TrailerBrowserLeavesAppNotice}"
+                TextWrapping="Wrap" />
+          </StackPanel>
+        </Grid>
+      </Panel>
+    </Border>
 
-    <!--
-      The synopsis is a paragraph, so it wraps and is capped: a card that grows without limit pushes
-      the seasons off the screen for the one series whose provider was talkative.
-    -->
     <TextBlock
-        Grid.Row="2"
-        MaxHeight="160"
-        IsVisible="{Binding HasOverview}"
-        Text="{Binding Overview}"
-        TextTrimming="CharacterEllipsis"
-        TextWrapping="Wrap"
-        automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
+        Grid.Row="1"
+        IsVisible="{Binding IsEmpty}"
+        Text="{DynamicResource ShowDetailsEmpty}"
+        TextWrapping="Wrap" />
 
-    <Grid Grid.Row="3" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space8}">
+    <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space8}">
       <!--
         One season at a time. The picker is ABSENT with a single season rather than disabled: a
         control whose only possible answer is the one it already shows is a question nobody asked,
@@ -70,6 +134,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
       -->
       <ComboBox
           x:Name="SeasonPicker"
+          Classes="filter-pill"
+          Tag="{DynamicResource SeasonPickerLabel}"
           IsVisible="{Binding HasSeasonChoice}"
           ItemsSource="{Binding Seasons}"
           SelectedItem="{Binding SelectedSeason}"
