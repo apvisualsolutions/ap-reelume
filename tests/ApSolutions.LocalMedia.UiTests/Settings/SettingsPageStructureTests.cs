@@ -16,9 +16,15 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Settings;
 
 /// <summary>
-/// Settings is one scrolling page with seven sections on it, and this is about the page rather than
-/// about any of them.
+/// Settings is one page whose sections stand behind a side index, one on screen at a time, and this
+/// is about the page rather than about any of them.
 /// </summary>
+/// <remarks>
+/// The harness mounts the shell without a view model, so every visibility binding is unresolved and
+/// every section renders at once — which is exactly what lets one pass measure all ten titles
+/// against each other. In the product the index shows one at a time; what these tests hold is that
+/// whichever one is open starts where its peers start.
+/// </remarks>
 /// <remarks>
 /// <para>
 /// Measured on the assembled shell on 2026-08-21, which is the half a per-view table cannot see:
@@ -48,12 +54,19 @@ public sealed class SettingsPageStructureTests
     {
         var (window, shell) = Show();
 
-        var headings = SettingsHeadings(shell);
-        Assert.NotEmpty(headings);
-
-        var top = headings.Where(entry => entry.Level == 1).ToArray();
+        // The page's own heading lives above the index now — outside the sections panel, inside
+        // the named page — which is the prototype's composition: heading, side index, one section.
+        var page = shell.FindControl<Grid>("SettingsPage");
+        Assert.True(page is not null, "the shell declares no named settings page.");
+        var top = page!.GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => (int)AutomationProperties.GetHeadingLevel(block) == 1)
+            .ToArray();
         Assert.Single(top);
         Assert.Equal(Resource("NavigationSettings"), top[0].Text);
+
+        var headings = SettingsHeadings(shell);
+        Assert.NotEmpty(headings);
 
         // Every section title is a level two, and nothing inside a section claims level one.
         var sections = headings.Where(entry => entry.Owner is not null).ToArray();

@@ -462,6 +462,31 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         using var host = ShowShell(height: 2000);
         Navigate(host, AppRoute.Settings);
 
+        // The side index is the way to every section now, so this scene presses it the way a person
+        // does: away to Credits, across to segment detection, and back to Appearance — which also
+        // proves the one entry no other scene needs, and gets the walk's ledger its three items.
+        Assert.Equal(SettingsSection.Appearance, host.ViewModel.CurrentSettingsSection);
+        await PressAsync(
+            host,
+            "AboutCreditsHeading",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Créditos in the settings index never opened the credits section");
+        Assert.Equal(SettingsSection.Credits, host.ViewModel.CurrentSettingsSection);
+
+        await PressAsync(
+            host,
+            "SegmentDetectionSettingsTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Detección de segmentos in the settings index never opened its section");
+        Assert.Equal(SettingsSection.SegmentDetection, host.ViewModel.CurrentSettingsSection);
+
+        await PressAsync(
+            host,
+            "AppearanceTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Apariencia in the settings index never opened the appearance section");
+        Assert.Equal(SettingsSection.Appearance, host.ViewModel.CurrentSettingsSection);
+
         var appearance = host.ViewModel.AppearanceSettings;
         Assert.NotNull(appearance);
         Assert.Equal(ThemePreference.System, appearance!.CurrentPreference);
@@ -510,6 +535,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(scan);
         await PressAsync(
             host,
+            "SettingsSectionLibrary",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Biblioteca y escaneo in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Library, host.ViewModel.CurrentSettingsSection);
+
+        await PressAsync(
+            host,
             "ScanSettingsWatchLocal",
             () => scan!.WatchLocalRoots,
             "clicking the local-watching box never changed whether local roots are watched");
@@ -518,6 +550,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // the probe is the use case: a switch that only moved its own bool would look identical.
         var segments = host.ViewModel.SegmentDetection;
         Assert.NotNull(segments);
+        await PressAsync(
+            host,
+            "SegmentDetectionSettingsTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Detección de segmentos in the settings index never reopened its section");
+        Assert.Equal(SettingsSection.SegmentDetection, host.ViewModel.CurrentSettingsSection);
+
         await PressAsync(
             host,
             "SegmentDetectionSettingsEnable",
@@ -553,6 +592,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         using var host = ShowShell(height: 2000);
         Navigate(host, AppRoute.Settings);
+
+        await PressAsync(
+            host,
+            "LifecycleSettingsTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Ciclo de vida in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Lifecycle, host.ViewModel.CurrentSettingsSection);
 
         var lifecycle = host.ViewModel.LifecycleSettings;
         Assert.NotNull(lifecycle);
@@ -642,6 +688,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             using var host = ShowShell(height: 2000);
             Navigate(host, AppRoute.Settings);
 
+            await PressAsync(
+                host,
+                "PrivacyTitle",
+                () => host.ViewModel.CurrentSettingsSection,
+                "clicking Privacidad in the settings index never opened its section");
+            Assert.Equal(SettingsSection.Privacy, host.ViewModel.CurrentSettingsSection);
+
             var privacy = host.ViewModel.PrivacySettings;
             Assert.NotNull(privacy);
             Assert.False(privacy!.DiagnosticsEnabled);
@@ -706,6 +759,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         using var host = ShowShell(height: 2000);
         Navigate(host, AppRoute.Settings);
 
+        await PressAsync(
+            host,
+            "RecommendationSettingsTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Recomendaciones in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Recommendations, host.ViewModel.CurrentSettingsSection);
+
         var recommendations = host.ViewModel.RecommendationSettings;
         Assert.NotNull(recommendations);
         await PressAsync(
@@ -739,6 +799,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             shortcuts!.TryRebind(PlaybackInputCommand.PlayPause, new KeyGesture(Key.F9)),
             "The rebind this scene needs was refused.");
         Assert.Equal(PlaybackInputCommand.PlayPause, shortcuts.Resolve(new KeyGesture(Key.F9)));
+
+        await PressAsync(
+            host,
+            "ShortcutSettingsAccessibleName",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Atajos de teclado in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Shortcuts, host.ViewModel.CurrentSettingsSection);
 
         await PressAsync(
             host,
@@ -1283,6 +1350,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host.ViewModel.ShowsOnboarding,
             "The first-run form stayed on screen after the first run was over.");
         Navigate(host, AppRoute.Settings);
+
+        await PressAsync(
+            host,
+            "SettingsSectionLibrary",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Biblioteca y escaneo in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Library, host.ViewModel.CurrentSettingsSection);
 
         // The row for the folder that is now in the catalogue, which is what removal acts on.
         await onboarding.RefreshRootsAsync(TestContext.Current.CancellationToken);
@@ -3575,6 +3649,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         using var host = ShowShell(height: 2000);
         Navigate(host, AppRoute.Settings);
 
+        await PressAsync(
+            host,
+            "SubtitleStyleAccessibleName",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Estilo de subtítulos in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Subtitles, host.ViewModel.CurrentSettingsSection);
+
         var style = host.ViewModel.SubtitleStyle;
         Assert.NotNull(style);
 
@@ -3980,6 +4061,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         using var host = ShowShell(height: 2000);
         Navigate(host, AppRoute.Settings);
 
+        await PressAsync(
+            host,
+            "UpdateTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Actualización in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Updates, host.ViewModel.CurrentSettingsSection);
+
         var updates = host.ViewModel.Updates;
         Assert.NotNull(updates);
         var settings = host.Application.Services.GetRequiredService<IUpdateSettings>();
@@ -4099,6 +4187,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         using var host = ShowShell(height: 2000);
         Navigate(host, AppRoute.Settings);
+
+        await PressAsync(
+            host,
+            "UpdateTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Actualización in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Updates, host.ViewModel.CurrentSettingsSection);
 
         var updates = host.ViewModel.Updates;
         Assert.NotNull(updates);
