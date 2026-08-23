@@ -41,7 +41,8 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 public sealed class AppearanceSettingsTests
 {
     /// <summary>
-    /// Three theme pills, because high contrast is read from Windows rather than picked.
+    /// Five theme pills: the owner revoked the picked-high-contrast refusal on 2026-08-23, so both
+    /// high contrasts are choices now — with Windows' own setting still overriding whichever is on.
     /// </summary>
     [AvaloniaFact]
     public void The_page_offers_one_pill_per_theme_preference_and_no_more()
@@ -49,7 +50,7 @@ public sealed class AppearanceSettingsTests
         var (window, view) = Show("es-ES");
 
         var themes = Enum.GetValues<ThemePreference>();
-        Assert.Equal(3, themes.Length);
+        Assert.Equal(5, themes.Length);
 
         var named = themes.Select(preference => Resource("Theme" + preference)).ToArray();
         var pills = view.GetVisualDescendants()

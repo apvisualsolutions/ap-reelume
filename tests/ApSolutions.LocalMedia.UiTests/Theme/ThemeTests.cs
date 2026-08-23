@@ -205,9 +205,9 @@ public sealed class ThemeTests
             .OfType<Button>()
             .Where(button => button.Classes.Contains("theme-option"))
             .ToArray();
-        // Three theme choices plus the two language choices BUG-011 added; all five share the
-        // option styling.
-        Assert.Equal(5, themeButtons.Length);
+        // Five theme choices — both high contrasts became pickable on 2026-08-23 — plus the two
+        // language choices BUG-011 added; all seven share the option styling.
+        Assert.Equal(7, themeButtons.Length);
 
         var dark = themeButtons.Single(button => button.CommandParameter?.ToString() == "Dark");
         Assert.NotNull(dark.Command);
@@ -322,7 +322,9 @@ public sealed class ThemeTests
         var preferenceType = RequireType(
             presentation,
             "ApSolutions.LocalMedia.Presentation.Theme.ThemePreference");
-        Assert.Equal(["System", "Light", "Dark"], Enum.GetNames(preferenceType));
+        Assert.Equal(
+            ["System", "Light", "Dark", "HighContrastLight", "HighContrastDark"],
+            Enum.GetNames(preferenceType));
 
         var storeType = RequireType(
             infrastructure,

@@ -524,6 +524,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking the dark theme never changed the preference");
         Assert.Equal(ThemePreference.Dark, appearance.CurrentPreference);
 
+        // The fourth and fifth pills, chosen and not only inherited: both high contrasts are
+        // applied for real here — the whole application wears them for a moment — and System at
+        // the end puts the ordinary theme back for the rest of the walk.
+        await PressAsync(
+            host,
+            "ThemeHighContrastLight",
+            () => appearance.CurrentPreference,
+            "clicking the high contrast light theme never changed the preference");
+        Assert.Equal(ThemePreference.HighContrastLight, appearance.CurrentPreference);
+
+        await PressAsync(
+            host,
+            "ThemeHighContrastDark",
+            () => appearance.CurrentPreference,
+            "clicking the high contrast dark theme never changed the preference");
+        Assert.Equal(ThemePreference.HighContrastDark, appearance.CurrentPreference);
+
         await PressAsync(
             host,
             "ThemeSystem",

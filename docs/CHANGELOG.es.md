@@ -10,6 +10,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Los dos altos contrastes son elegibles: Apariencia pasa de tres a cinco píldoras**, con las
+  claves `ThemeHighContrastLight` y `ThemeHighContrastDark` que el paquete traía y la decisión que
+  el propietario revocó el 2026-08-23 por la vía que ella misma dejó abierta. El ajuste del sistema
+  sigue mandando sobre la píldora elegida, el `WrapPanel` decide dónde pliegan las cinco en cada
+  idioma, y el paseo las aplica de verdad — la aplicación entera viste cada alto contraste un
+  instante y Sistema repone al final. Tres puertas que contaban tres se declararon a cinco.
+
 - **Ajustes es la página del prototipo: encabezado, índice lateral fijo y una sección a la vez.**
   La construcción es la de la §7 al pie de la letra —sin sticky, un Grid cuyo ScrollViewer vive
   sólo en la columna derecha— y los estilos `side-list` que el tema declaraba sin consumidor por

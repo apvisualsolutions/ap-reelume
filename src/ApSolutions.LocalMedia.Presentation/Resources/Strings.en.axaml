@@ -64,6 +64,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="LanguageDescription">The interface, the update summaries, and the metadata speak the same language. The interface changes immediately; metadata uses the new language after the application restarts.</x:String>
   <x:String x:Key="LanguageSpanish">Español</x:String>
   <x:String x:Key="LanguageEnglish">English</x:String>
+  <x:String x:Key="ThemeHighContrastLight">High contrast light</x:String>
+  <x:String x:Key="ThemeHighContrastDark">High contrast dark</x:String>
   <x:String x:Key="ThemeSystem">System</x:String>
   <x:String x:Key="ThemeLight">Light</x:String>
   <x:String x:Key="ThemeDark">Dark</x:String>

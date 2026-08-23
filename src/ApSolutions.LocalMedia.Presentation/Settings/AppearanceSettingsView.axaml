@@ -84,6 +84,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 <TextBlock Text="{DynamicResource ThemeDark}" />
               </StackPanel>
             </Button>
+            <!--
+              The fourth and fifth pills, chosen rather than only inherited — the owner revoked the
+              choosable-high-contrast refusal on 2026-08-23. The system's own high contrast still
+              wins over whichever pill is on, and the WrapPanel decides where five fold: with the
+              Spanish labels they break one way and with the English ones another, so no line is
+              fixed by hand.
+            -->
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource ThemeHighContrastLight}"
+                Command="{Binding ApplyThemeCommand}"
+                CommandParameter="{x:Static theme:ThemePreference.HighContrastLight}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding HighContrastLightStateCue}" />
+                <TextBlock Text="{DynamicResource ThemeHighContrastLight}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource ThemeHighContrastDark}"
+                Command="{Binding ApplyThemeCommand}"
+                CommandParameter="{x:Static theme:ThemePreference.HighContrastDark}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding HighContrastDarkStateCue}" />
+                <TextBlock Text="{DynamicResource ThemeHighContrastDark}" />
+              </StackPanel>
+            </Button>
           </WrapPanel>
         </StackPanel>
       </Border>

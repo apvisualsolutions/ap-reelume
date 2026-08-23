@@ -10,6 +10,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Both high contrasts are choosable: Appearance goes from three pills to five**, with the
+  `ThemeHighContrastLight` and `ThemeHighContrastDark` keys the package carried and the decision the
+  owner revoked on 2026-08-23 through the door it left open. The system's own setting still wins
+  over whichever pill is on, the `WrapPanel` decides where five fold in each language, and the walk
+  applies them for real — the whole application wears each high contrast for a moment and System
+  puts it back. Three gates that counted three were declared up to five.
+
 - **Settings is the prototype's page: heading, fixed side index, one section at a time.** The
   construction is §7's to the letter — no sticky, a Grid whose ScrollViewer lives only in the right
   column — and the `side-list` styles the theme declared with no consumer finally have one: the
