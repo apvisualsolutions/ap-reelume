@@ -1,29 +1,28 @@
 # Where to resume
 
-## State on opening (2026-08-22, evening)
+## State on opening (2026-08-23)
 
-**Three of the redesign's four pieces are built**, in four commits on the branch, each with its suites
-green locally: 735 UI tests, 139 accessibility tests with the physical walk among them, and
-`check-walk-coverage` at 0 pending. The Spanish note is the one kept current — read
-[NEXT-SESSION.es.md](NEXT-SESSION.es.md) for the detail. In either language:
+**The brief grew: it is now parity with the prototype across the whole application**, not a few
+views. The Spanish note is the one kept current — read [NEXT-SESSION.es.md](NEXT-SESSION.es.md) for
+the detail. The short version:
 
-- **Settings moved to the prototype's row-card**: eighteen cards plus the template behind the eleven
-  shortcut rows, across eight of the page's ten sections. Three strings, all the prototype's own and
-  in both languages.
-- **The review inbox draws the candidate card**: the whole border tinted by state, the badge in the
-  top right corner, and a confidence bar that never existed, drawn from the same number the percentage
-  is written from.
-- **The player's column switches instead of stacking.** Five tabs, one per panel, each present only
-  when its panel is. Zero lines of C# and zero new strings: Avalonia 12.1.1 skips an invisible tab when
-  it auto-selects, which was measured rather than assumed.
-- **A real accessibility defect, found and fixed on the way**: in the light theme, primary text on the
-  player's surface read **1.10:1** — invisible — and the gate that should have caught it measured seven
-  surfaces with the player's three not among them. Two brushes and nine surfaces now.
-- **What the walk taught**: switching the column put four scenes in the red at once, because a panel
-  that is not the open tab is not in the visual tree. They open their tab with the mouse first now.
-
-**What is left is the fourth piece**: Settings' side index of twelve sections, and the two pill tabs
-of the metadata editor. Both change navigation rather than drawing, and both touch `ShellView`.
+- **Read `design/README.md` in full before writing a line.** The `.dc.html` files are design
+  references, not code to copy; the specification is **§4 of `Propuesta de diseño`**, 48 rows view by
+  view. Pills are `CornerRadius=18`, half the control height. The hand-drawn title bar **is not
+  carried over** — the package says the application uses the system chrome.
+- **Seven commits this session**, all green locally: the settings row-card, the review candidate
+  card, the player's switchable column, a 1.10:1 contrast defect fixed, poster artwork, and every
+  button a pill.
+- **The finding that unlocked the resemblance**: the prototype has no artwork either. Every cover in
+  it is four CSS gradients over one hue. The reason covers were out of 0.2.0 — no artwork, no TMDB
+  token — is still true and does not apply. **Before calling part of the prototype impossible, look
+  at how it does it.**
+- **Decided, not to be re-litigated**: the two high contrasts do not become selectable theme options,
+  because Windows owns that setting; generated artwork ships even though §4 said initials, because
+  the initials stay on top of it; `UpdateRejectionDetail` lands with `UpdateView`.
+- **Left, by how much resemblance it moves**: Library's header and pill filters, Home's full-bleed
+  hero, the two detail screens, the accent tint, Settings' side index and the metadata tabs, and
+  then `UpdateView` and `PlayerView`.
 
 ### What the earlier tranches left, and still holds
 

@@ -1,88 +1,101 @@
 # Dónde retomar
 
-## LO PRIMERO (2026-08-22, noche): tres de las cuatro piezas del rediseño, hechas
+## LO PRIMERO (2026-08-23): el encargo cambió de tamaño, y hay que leer `design/` antes de tocar
 
-**Cuatro commits en la rama, todos con sus suites en verde en local (735 de UI, 139 de accesibilidad
-con el paseo dentro, y `check-walk-coverage` en 0 pendientes).** Lo que sigue es lo que queda.
+**El encargo ya no es «acercar unas cuantas vistas»: es paridad con el prototipo en TODA la
+aplicación.** Y la lección de esta sesión es de método, no de código: se trabajó tres piezas contra
+las descripciones de esta nota en vez de contra `design/`, y el propietario dijo, con razón, que la
+aplicación **no se parecía en nada** a su prototipo.
 
-1. ~~**Ajustes: la fila-tarjeta por ajuste.**~~ **HECHA, y más allá de lo pedido.** Dieciocho tarjetas
-   más la plantilla que produce las once filas de atajos, en **ocho de las diez secciones** de la
-   página: nombre, la frase que ya existía debajo, y el control contra el borde derecho con la palabra
-   de estado a su izquierda. Los interruptores pierden la etiqueta que llevaban dentro y **conservan el
-   nombre accesible**; la palabra de estado es `AccessibilityView="Raw"` para que el lector no diga dos
-   veces lo que la casilla ya anuncia. Tres cadenas, las tres del prototipo y en los dos idiomas:
-   `SettingStateOn`, `SettingStateOff`, `AppearanceThemeLabel`.
-2. ~~**Revisión: la tarjeta de candidato.**~~ **HECHA.** Borde **entero** tintado —acento si es
-   sugerida, ámbar si está pendiente; el prototipo tiñe `borderColor`, no un borde izquierdo, y es la
-   única señal que sobrevive a los dos altos contrastes—, distintivo arriba a la derecha y dos columnas
-   debajo, con **una barra de confianza que no existía**, dibujada del mismo número que escribe el
-   porcentaje. Dos cadenas del prototipo: `ReviewProposedCandidate`, `ReviewConfidence`.
-3. ~~**El panel conmutable de la columna del reproductor.**~~ **HECHO.** Cinco pestañas, una por panel,
-   y **cada una existe sólo si su panel existe**. Cero líneas de C# y cero cadenas: cada pestaña lleva
-   el nombre que su panel ya declaraba, y **Avalonia 12.1.1 salta una pestaña invisible al elegir la
-   primera** —medido—, así que nada en el shell tiene que calcular cuál abrir.
-4. **El índice lateral de Ajustes y las pestañas de Metadatos. NO HECHAS: son la pieza que queda.**
-   Tocan `ShellView` y cambian navegación, no dibujo. Ver abajo lo que ya está medido de ellas.
+**Lee `design/README.md` entero antes de escribir una línea.** Dice cosas que no se deducen mirando
+el `.dc.html` y que corrigen el rumbo:
 
-### Y un defecto de accesibilidad encontrado por el camino, medido y corregido
+- **Los `.dc.html` son referencia de diseño, NO código para copiar.** La especificación es la **§4 de
+  `Propuesta de diseño`**: 48 filas, vista por vista, con los estados que hay que pintar.
+- **Las píldoras son `CornerRadius=18`** —la mitad del alto de control—, y lo dice la §7 con ese
+  número. No el `999` de CSS.
+- **La barra de título dibujada a mano NO se traslada.** El paquete lo dice con todas las letras: «la
+  aplicación usa el cromo del sistema». Mirando el prototipo parece que falta; no falta, está decidido.
+- Y `Cadenas nuevas` trae las claves aprobadas en los dos idiomas. **Las 25 «de consecuencia» están
+  propuestas y NO aprobadas**: hay que preguntar antes de escribirlas.
 
-**En el tema claro la columna del reproductor tenía el texto invisible.** `TextPrimaryBrush` (#111827)
-sobre `PlayerSurfaceBrush` (#0B0D10) da **1,10:1** donde WCAG AA pide 4,5:1. Las superficies del
-reproductor son oscuras en los cuatro modos —decidido desde el principio— y la tinta del tema es
-oscura en dos de ellos, así que en cualquier equipo con Windows en claro **no se podían leer** el
-selector de pistas, la salida de audio, las marcas, las detecciones, las versiones, los relojes del
-transporte ni sus tres pictogramas.
+### Lo hecho en esta sesión — siete commits, todos con sus suites en verde
 
-**Y la puerta que debía cazarlo miraba a otro lado**: `ContrastTokenTests` medía el texto primario
-sobre **siete** superficies y las tres del reproductor no estaban. Ahora son nueve. La corrección son
-dos pinceles, `PlayerTextBrush` y `PlayerTextSecondaryBrush`, claros en los cuatro modos y puestos
-**en el contenedor** donde se puede, porque Avalonia hereda `Foreground` — y en un `Border` eso se
-escribe `TextElement.Foreground`, porque un `Border` no es `TemplatedControl` y no tiene `Foreground`
-propio.
+1. **Ajustes: la fila-tarjeta.** 18 tarjetas más la plantilla de los 11 atajos, en ocho de las diez
+   secciones. Tres cadenas del prototipo: `SettingStateOn`, `SettingStateOff`, `AppearanceThemeLabel`.
+2. **Revisión: la tarjeta de candidato.** Borde **entero** tintado —el prototipo tiñe `borderColor`,
+   no un borde izquierdo—, distintivo arriba a la derecha, dos columnas y una barra de confianza.
+3. **El panel conmutable del reproductor.** Cinco pestañas, cero C# y cero cadenas.
+4. **El texto invisible de la columna del reproductor**, medido en **1,10:1** y corregido.
+5. **El arte de portada**, que es el cambio que de verdad se nota. Ver abajo.
+6. **Todo botón es una píldora**, en las diez pantallas a la vez.
+7. La nota y el paquete `design/` leídos y contrastados.
 
-### Lo que el paseo enseñó al conmutar la columna, y hay que recordar
+### El hallazgo que desbloquea el parecido, y por qué estaba mal cerrado
 
-Las pestañas pusieron **cuatro escenas del paseo en rojo a la vez**, todas diciendo «coincidió con 0
-controles en pantalla». Tenían razón: **un panel que no es la pestaña abierta no está en el árbol
-visual**, así que el clic no tenía dónde caer. Se arregló con un ayudante `OpenPlayerPanelAsync` que
-abre la pestaña **con el ratón** y afirma que el clic la abrió. Un `TabItem` **no** cuenta en el
-inventario del paseo —sólo `Button`, `CheckBox`, `ComboBox`, `Slider`, `ToggleButton`, `RadioButton` y
-`ToggleSwitch`—, así que el trinquete sigue en 0.
+**El prototipo NO tiene arte.** Leyendo su fuente: cada portada suya son cuatro degradados CSS
+calculados sobre **un solo tono** —`art(h, v)` en la línea 1491 de `AP Reelume.dc.html`— y no hay ni
+una imagen en el archivo. La razón por la que las portadas estaban fuera de 0.2.0 —«no hay arte ni
+ficha de TMDB»— sigue siendo cierta y **no aplica** a esto: el muro de color no cuesta red, ni ficha,
+ni un archivo en disco. Está hecho en `Library/PosterArt.cs`, con el tono derivado del título por un
+hash propio —`string.GetHashCode` lo aleatoriza por proceso— y apagado en los dos altos contrastes.
 
-### La pieza 4, con lo que ya está medido de ella
+**La lección general: antes de dar por imposible una parte del prototipo, mira CÓMO la hace él.**
 
-**Ajustes: el índice lateral de doce secciones.** El prototipo enseña **una sección a la vez** con la
-activa resaltada. Aquí Ajustes es una página con diez secciones apiladas en un `ScrollViewer` de
-`ShellView`. **Ojo con la tabla del índice**: dos de sus doce —Copias y restauración, Créditos— son hoy
-destino propio o viven en otra vista, y ya hay decisión escrita de no cambiar un destino por otro.
+### Las decisiones tomadas, para no re-deliberarlas
 
-**Metadatos: dos pestañas píldora** («Metadatos» / «Renombrado seguro») bajo unas migas «Volver ·
-Biblioteca». Hoy `MetadataEditorView` y `RenamePreviewView` son dos `ContentControl` apilados en la
-ruta Biblioteca, visibles a la vez. El editor va en dos columnas de campos, con el botón de candado a
-la derecha de cada etiqueta y un panel «Arte» aparte.
+- **Los dos altos contrastes NO pasan a ser opciones elegibles**, aunque la §4 pida cinco píldoras de
+  tema con `ThemeHighContrastLight` y `ThemeHighContrastDark`. Razón: en Windows 11 el contraste es un
+  ajuste **del sistema**, con su atajo y su página de Configuración; ofrecerlo como cuarta y quinta
+  opción duplica un control del sistema y permite un estado que nadie modela —la aplicación en alto
+  contraste mientras el escritorio no lo está—. `HighContrastPolicy` e `IHighContrastService` ya leen
+  el estado real. Lo que la §4 quería —«hoy inalcanzable»— ya está: los cuatro diccionarios existen y
+  se aplican. **Reversible**: si el propietario lo pide, son dos cadenas y dos valores en
+  `ThemePreference`.
+- **El arte generado entra aunque la §4 dijera «iniciales sobre `ControlFillBrush`».** El prototipo
+  dibuja color, y las iniciales **se quedan encima**, así que se cumplen las dos: color para
+  reconocer de un vistazo, letras para quien no distingue color.
+- **`UpdateRejectionDetail`** —el noveno control que la §4 añade— entra cuando se haga `UpdateView`,
+  no antes.
+- **La barra de título** queda como está, por la decisión del propio paquete citada arriba.
 
-**Y ahora se sabe cómo hacerlo barato**: el `TabControl` de la columna del reproductor es el precedente
-—cero C#, cero cadenas, la selección la lleva el propio control y salta lo invisible—. Lo que **no**
-resuelve es el índice lateral, que no es una pestaña sino una lista con la sección a la derecha.
+### Lo que queda, por cuánto parecido mueve
 
-### Herramientas de esta sesión que conviene reusar
+1. **Biblioteca**: cabecera con contador, filtros píldora segmentados («Todo/Películas/Series»),
+   búsqueda a la derecha, «Añadir medios» como acción primaria, y **el formulario de carpetas fuera de
+   la mitad superior** — hoy ocupa media pantalla antes de la cuadrícula.
+2. **Inicio**: el héroe a sangre con degradado, en vez de la tarjeta con borde; y los carriles.
+3. **Detalle de película y de serie**: el prototipo pone la portada grande sobre un degradado del
+   propio arte, con las acciones en píldora y una columna de «Otras acciones».
+4. **El tinte de acento** en la parte alta del contenido, que hoy es fondo plano.
+5. **El índice lateral de Ajustes y las pestañas de Metadatos** — la pieza que ya venía pendiente.
+6. **`UpdateView`** con sus 23 mensajes en cuatro gramáticas, y **`PlayerView`** con sus 7 motivos.
 
-- **`shoot.ps1`** (en el scratchpad de la sesión): captura la app con conciencia de DPI, admite
-  `-Invoke <nombre accesible>` para navegar por UIAutomation, `-ScrollPercent` para desplazar el primer
-  `ScrollViewer` desplazable, y `-Exe` para apuntar a otro ejecutable.
-- **Un proyecto `preview` de una sola clase** que pone `App.ShellFactory` y monta la vista que sea, con
-  el tema real. Es lo que permitió **medir** que Avalonia salta una pestaña invisible y **ver** el
-  defecto de contraste antes de tocar nada. Referencia `Presentation` y no toca el árbol.
+### Dos hallazgos medidos que no son de esta tanda
 
-### La trampa de medición que sigue valiendo
+- **Las razones de red salen en inglés dentro de la interfaz española.** Se ven al final de Ajustes ·
+  Privacidad. Vienen de `NetworkPurpose.Reason`, que las escribe el registro en código y no los
+  recursos, así que se saltan la regla de bilingüismo. No se tocó: es un cambio de datos, no de dibujo.
+- **El rojo de CI del commit «The player column shows one panel at a time» no era del código.** El log
+  dice `Coverage gate: 216 file(s) still short of 96/96, ratchet 216, **1 improved**`: el trinquete
+  refunfuñó por una mejora de medición. Se comprobó descargando el artefacto `coverage-debt` del run
+  verde siguiente: **idéntico al del repositorio**, así que fue ruido y se resolvió solo. La confusión
+  la añade el `WARNING` del presupuesto de rendimiento, que aparece justo antes y **no** es la causa.
 
-**Un script de PowerShell sin conciencia de DPI recibe de `GetWindowRect` un rectángulo virtualizado**
-y `PrintWindow` recorta la esquina inferior derecha. `SetProcessDpiAwarenessContext(-4)` antes de
-capturar; UIAutomation zanja las dudas.
+### Herramientas de esta sesión, que ahorran horas
 
-**Y para el prototipo:** `python -m http.server` sobre `design/`, y
-`chrome --headless=new --window-size=1600,1000 --virtual-time-budget=6000 --screenshot=…`, con una
-copia del `.dc.html` cuyo estado inicial se cambia, porque el prototipo no lee la URL.
+- **`shoot.ps1`** (scratchpad): captura la app con conciencia de DPI. `-Invoke <nombre accesible>`
+  navega por UIAutomation, `-ScrollPercent` desplaza el primer `ScrollViewer`, `-Exe` apunta a otro
+  ejecutable.
+- **Un proyecto `preview` de una clase** que pone `App.ShellFactory` y monta la vista que sea con el
+  tema real, incluida la variante clara. Es lo que midió que un `TabControl` salta una pestaña
+  invisible y lo que enseñó el texto invisible antes de tocar nada.
+- **El prototipo, por rutas**: `python -m http.server 8765 --directory design`, copiar el `.dc.html`
+  cambiando `route: 'home'` por la ruta que sea, y
+  `chrome --headless=new --window-size=1500,1000 --virtual-time-budget=8000 --screenshot=…`. **Borra
+  las copias del árbol al terminar.**
+- **Los documentos de `design/` en texto plano**: los `.dc.html` de documento llevan el contenido
+  inline, así que un `re.sub` de etiquetas basta para leerlos enteros.
 
 ## Lo que la sesión del 2026-08-22 (noche) dejó escrito, y sigue valiendo
 
