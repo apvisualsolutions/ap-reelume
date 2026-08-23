@@ -2885,17 +2885,17 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         IServiceProvider services = host.Application.Services;
         // A group behind the broken file, because that is what turns the third recovery action into
         // a button at all: corrupted media offers "choose another version" only when another version
-        // exists to choose. The member list reuses the scene's two files — what matters to the offer
-        // is membership, not that the other member opens.
+        // exists to choose. The broken file is pinned as the group's preferred member on purpose:
+        // a group changes which version a session opens, and on a busy hosted runner an unpinned
+        // group let the open drift to the other member — measured 2026-08-23 as "stopped=True"
+        // where corrupted should stand. The alternative is the absent file, described by hand
+        // because the helper weighs files on disk and this one's whole part is not being there.
         await services.GetRequiredService<IMediaVersionGroupRepository>().SaveAsync(
             new MediaVersionGroup(
                 new MediaVersionId(Guid.NewGuid()),
                 $"title:{Guid.NewGuid():D}",
                 [
                     Version(brokenFile, broken, 8),
-
-                    // Described by hand because the helper weighs the file on disk, and this one's
-                    // whole part in the scene is not being there.
                     new MediaVersion(
                         new MediaFileId(absentFile),
                         absent,
@@ -2907,7 +2907,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                         VideoCodec: "H264",
                         SizeBytes: 2),
                 ],
-                PreferredMediaFileId: null),
+                PreferredMediaFileId: new MediaFileId(brokenFile)),
             TestContext.Current.CancellationToken);
 
         // ---- Open with an external application: the file that cannot be decoded.
