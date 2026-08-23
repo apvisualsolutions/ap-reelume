@@ -295,6 +295,48 @@ public sealed class RootOnboardingViewModelTests
         Assert.Equal(RootKind.Usb, viewModel.SelectedKind);
     }
 
+    /// <summary>
+    /// The row says its kind and its availability as resource keys, which is what the Settings list
+    /// paints; and the guards on the two parameterised commands swallow a parameter that is not
+    /// theirs instead of acting on it.
+    /// </summary>
+    [Fact]
+    public void The_row_translates_its_kind_and_the_guards_refuse_a_stranger()
+    {
+        var local = new LibraryRootRowViewModel(new LibraryRoot(
+            new LibraryRootId(Guid.NewGuid()), "D:\\cine", RootKind.Local,
+            RootAvailability.Available, ScanPolicy.Manual));
+        Assert.Equal("RootKindLocal", local.KindKey);
+        Assert.True(local.IsAvailable);
+        Assert.Equal("MediaAvailable", local.AvailabilityKey);
+
+        var usb = new LibraryRootRowViewModel(new LibraryRoot(
+            new LibraryRootId(Guid.NewGuid()), "E:\\pelis", RootKind.Usb,
+            RootAvailability.Unavailable, ScanPolicy.Manual));
+        Assert.Equal("RootKindUsb", usb.KindKey);
+        Assert.False(usb.IsAvailable);
+        Assert.Equal("MediaUnavailable", usb.AvailabilityKey);
+
+        var unc = new LibraryRootRowViewModel(new LibraryRoot(
+            new LibraryRootId(Guid.NewGuid()), "\\\\nas\\cine", RootKind.Unc,
+            RootAvailability.AccessDenied, ScanPolicy.Manual));
+        Assert.Equal("RootKindUnc", unc.KindKey);
+        Assert.Equal("MediaUnavailable", unc.AvailabilityKey);
+
+        var viewModel = Create(new StubRoots());
+        viewModel.SelectKindCommand.Execute("not a kind");
+        Assert.Equal(RootKind.Local, viewModel.SelectedKind);
+        viewModel.RequestRemoveCommand.Execute("not a row");
+        Assert.False(viewModel.IsConfirmingRemoval);
+
+        // The remaining two writable seams: a null path lands as empty, and the scan policy holds
+        // what it is given.
+        viewModel.Path = null!;
+        Assert.Equal(string.Empty, viewModel.Path);
+        viewModel.SelectedScanPolicy = ScanPolicy.Continuous;
+        Assert.Equal(ScanPolicy.Continuous, viewModel.SelectedScanPolicy);
+    }
+
     private static RootOnboardingViewModel Create(StubRoots roots) =>
         new(new AddLibraryRoot(roots, new PassThroughNormalizer()));
 
