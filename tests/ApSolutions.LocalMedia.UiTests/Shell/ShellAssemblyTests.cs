@@ -637,6 +637,48 @@ public sealed class ShellAssemblyTests
         }
     }
 
+    /// <summary>
+    /// The dialog's shell half: open puts the veil up and hides the first-run form, cancel is only
+    /// an offer while it is up, and a folder accepted closes it without being asked.
+    /// </summary>
+    [Fact]
+    public async Task The_add_dialog_opens_cancels_and_closes_itself_on_a_successful_add()
+    {
+        var roots = new RecordingRoots();
+        var onboarding = new RootOnboardingViewModel(
+            new AddLibraryRoot(roots, new StubNormalizer()), new RemoveLibraryRoot(roots), roots);
+        var shell = new ShellViewModel(
+            new NavigationService(),
+            new ShellSurfaces { Onboarding = onboarding });
+
+        // Nothing yet: no folders means the first run shows, and cancel has nothing to close.
+        Assert.True(shell.ShowsOnboarding);
+        Assert.False(shell.CancelAddMediaCommand.CanExecute(null));
+
+        shell.AddMediaCommand.Execute(null);
+        Assert.True(shell.IsAddingRoot);
+        Assert.False(shell.ShowsOnboarding);
+        Assert.True(shell.CancelAddMediaCommand.CanExecute(null));
+
+        shell.CancelAddMediaCommand.Execute(null);
+        Assert.False(shell.IsAddingRoot);
+        Assert.True(shell.ShowsOnboarding);
+
+        // Reopened, and this time the folder is accepted: the dialog closes itself, and what is
+        // owed next - the consent - keeps the first-run surface on duty.
+        shell.AddMediaCommand.Execute(null);
+        onboarding.Path = "R:\\media";
+        await onboarding.AddAsync(TestContext.Current.CancellationToken);
+        for (var attempt = 0; attempt < 100 && shell.IsAddingRoot; attempt++)
+        {
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+
+        Assert.False(shell.IsAddingRoot, "A successful add left the dialog open.");
+        Assert.True(onboarding.InitialScanConsentRequired);
+        Assert.True(shell.ShowsOnboarding);
+    }
+
     private sealed class StubRoots : ILibraryRootRepository
     {
         public Task<LibraryRoot?> GetAsync(LibraryRootId id, CancellationToken cancellationToken = default) =>
