@@ -20,6 +20,9 @@ the detail. The short version:
 - **Decided, not to be re-litigated**: the two high contrasts do not become selectable theme options,
   because Windows owns that setting; generated artwork ships even though §4 said initials, because
   the initials stay on top of it; `UpdateRejectionDetail` lands with `UpdateView`.
+- **The session's tools live outside the tree**, in
+  `%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\`: a DPI-aware screenshot script
+  and a one-class `preview` project that mounts any view with the real theme.
 - **Left, by how much resemblance it moves**: Library's header and pill filters, Home's full-bleed
   hero, the two detail screens, the accent tint, Settings' side index and the metadata tabs, and
   then `UpdateView` and `PlayerView`.

@@ -84,7 +84,11 @@ hash propio —`string.GetHashCode` lo aleatoriza por proceso— y apagado en lo
 
 ### Herramientas de esta sesión, que ahorran horas
 
-- **`shoot.ps1`** (scratchpad): captura la app con conciencia de DPI. `-Invoke <nombre accesible>`
+**Las tres viven fuera del árbol, en `%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\`**,
+que persiste entre sesiones: son herramientas de inspección, no puertas, y no ensucian el
+repositorio.
+
+- **`shoot.ps1`**: captura la app con conciencia de DPI. `-Invoke <nombre accesible>`
   navega por UIAutomation, `-ScrollPercent` desplaza el primer `ScrollViewer`, `-Exe` apunta a otro
   ejecutable.
 - **Un proyecto `preview` de una clase** que pone `App.ShellFactory` y monta la vista que sea con el
