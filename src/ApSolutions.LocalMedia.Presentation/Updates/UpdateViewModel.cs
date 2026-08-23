@@ -85,8 +85,35 @@ public sealed class UpdateViewModel : INotifyPropertyChanged
     public string StatusKey
     {
         get => _statusKey;
-        private set => SetField(ref _statusKey, value);
+        private set
+        {
+            if (SetField(ref _statusKey, value))
+            {
+                OnPropertyChanged(nameof(IsStatusPositive));
+                OnPropertyChanged(nameof(IsStatusRejection));
+                OnPropertyChanged(nameof(IsStatusFailure));
+            }
+        }
     }
+
+    /// <summary>Up to date: the one answer worth painting as good news.</summary>
+    public bool IsStatusPositive => StatusKey == "UpdateStatusUpToDate";
+
+    /// <summary>
+    /// A guardian said no - the release is unusable, what arrived does not match, or the package
+    /// changed after being checked. Nothing was installed, and that is the grammar's whole point:
+    /// the refusal is the system working, so it wears Warning rather than Danger.
+    /// </summary>
+    public bool IsStatusRejection => StatusKey
+        is "UpdateStatusUnusableRelease"
+        or "UpdateStatusVerificationFailed"
+        or "UpdateStatusTampered";
+
+    /// <summary>The world failed - nothing answered, the download cut out, or Windows refused.</summary>
+    public bool IsStatusFailure => StatusKey
+        is "UpdateStatusUnreachable"
+        or "UpdateStatusInterrupted"
+        or "UpdateStatusLaunchRefused";
 
     /// <summary>
     /// Which rule refused a release, when one did. It is separate from the status because "this
@@ -96,8 +123,27 @@ public sealed class UpdateViewModel : INotifyPropertyChanged
     public string? DetailKey
     {
         get => _detailKey;
-        private set => SetField(ref _detailKey, value);
+        private set
+        {
+            if (SetField(ref _detailKey, value))
+            {
+                OnPropertyChanged(nameof(RejectionCode));
+                OnPropertyChanged(nameof(HasRejectionReason));
+            }
+        }
     }
+
+    /// <summary>The reason stands as the headline only when a rule gave one.</summary>
+    public bool HasRejectionReason => DetailKey is not null;
+
+    /// <summary>
+    /// The rule's own identifier, for the technical detail behind the expander: what
+    /// <c>UpdateRefusedUnusableHash</c> says in prose, this says in the word a bug report or a
+    /// publisher's checklist can carry verbatim.
+    /// </summary>
+    public string? RejectionCode => DetailKey?.StartsWith("UpdateRefused", StringComparison.Ordinal) == true
+        ? DetailKey["UpdateRefused".Length..]
+        : DetailKey;
 
     /// <summary>
     /// Whether one of the three steps is running. The setter announces unconditionally because it is

@@ -64,12 +64,24 @@ public sealed class RestoreWizardViewModel : INotifyPropertyChanged
 
     public ObservableCollection<RootRemapRowViewModel> Roots { get; } = [];
 
+    /// <summary>
+    /// Every folder in the archive exists on this machine: the desirable answer of step two, said
+    /// in positive terms instead of an empty gap where questions would be.
+    /// </summary>
+    public bool HasNothingToRemap => HasPreview && Roots.All(row => !row.NeedsFolder);
+
     public ObservableCollection<RestoreFindingViewModel> Findings { get; } = [];
 
     public bool HasPreview
     {
         get => _hasPreview;
-        private set => SetField(ref _hasPreview, value);
+        private set
+        {
+            if (SetField(ref _hasPreview, value))
+            {
+                OnPropertyChanged(nameof(HasNothingToRemap));
+            }
+        }
     }
 
     public bool CanRestore
@@ -231,6 +243,7 @@ public sealed class RestoreWizardViewModel : INotifyPropertyChanged
     private void Apply(RestorePreview preview)
     {
         MergeRoots(preview.Roots);
+        OnPropertyChanged(nameof(HasNothingToRemap));
         Findings.Clear();
         foreach (var finding in preview.Findings)
         {

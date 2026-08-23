@@ -10,6 +10,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Actualización, Copias y Restauración hablan las cuatro gramáticas de la §4.** El estado del
+  actualizador vive en UN solo borde vivo —un lector de pantalla suscrito a una región no debe ver
+  esa región sustituida— que ahora se viste según la noticia: proceso neutro, al día en positivo,
+  rechazo de un guardián en Warning con **el motivo como titular por encima del estado** y el
+  identificador técnico plegado tras «Ver el detalle técnico» —un control nuevo, con su escena:
+  el paseo sirve una versión para una arquitectura que no existe, ve llegar el rechazo con su
+  motivo y despliega el detalle con el ratón—, y fallo del mundo en Danger. Copias gana el bloque
+  de la base activa —ruta alcanzable sin necesitar un fallo—, el historial vacío dice lo que
+  cuesta la primera copia, y el fallo añade que nada quedó a medias. La restauración numera sus
+  tres pasos en el orden en que una persona los camina —Confirmar bajó a su paso: ofrecerlo antes
+  de elegir nada era el orden de lectura mintiendo sobre el orden de la tarea—, dice en positivo
+  cuando no hay nada que reasignar, marca bajo cada carpeta sin resolver su consecuencia exacta, y
+  las etiquetas de estado de las filas son las aprobadas del paquete.
+
 - **Las dos herramientas de un título comparten un panel con pestañas de verdad.** Editar
   metadatos y previsualizar el renombrado vivían apilados —abrir los dos era leerlos uno debajo
   del otro—; ahora un solo panel los sostiene con pestañas Metadatos | Renombrado, cada puerta

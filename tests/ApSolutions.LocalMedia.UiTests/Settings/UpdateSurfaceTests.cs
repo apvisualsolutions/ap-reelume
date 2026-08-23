@@ -136,6 +136,46 @@ public sealed class UpdateSurfaceTests
     }
 
     /// <summary>
+    /// §4's four grammars, read from the one classification the surface dresses by: up to date is
+    /// the positive, a guardian's refusal is the warning with the reason as the headline and the
+    /// rule's identifier behind the technical-detail fold, an unreachable source is the failure,
+    /// and everything else is neutral process wearing none of the three.
+    /// </summary>
+    [Fact]
+    public async Task Each_status_wears_exactly_the_grammar_of_its_news()
+    {
+        var upToDate = Build(check: _ => UpToDate());
+        await upToDate.CheckAsync(Cancellation);
+        Assert.True(upToDate.IsStatusPositive);
+        Assert.False(upToDate.IsStatusRejection);
+        Assert.False(upToDate.IsStatusFailure);
+        Assert.False(upToDate.HasRejectionReason);
+
+        var refused = Build(check: _ => Task.FromResult(new UpdateCheckResult(
+            UpdateCheckStatus.Answered,
+            UpdateDecision.Refused(UpdateRejection.UnusableHash, "because"),
+            null)));
+        await refused.CheckAsync(Cancellation);
+        Assert.True(refused.IsStatusRejection);
+        Assert.False(refused.IsStatusPositive);
+        Assert.False(refused.IsStatusFailure);
+        Assert.True(refused.HasRejectionReason);
+        Assert.Equal("UnusableHash", refused.RejectionCode);
+
+        var unreachable = Build(check: _ => Task.FromResult(
+            new UpdateCheckResult(UpdateCheckStatus.Unreachable, null, null)));
+        await unreachable.CheckAsync(Cancellation);
+        Assert.True(unreachable.IsStatusFailure);
+        Assert.False(unreachable.IsStatusPositive);
+        Assert.False(unreachable.IsStatusRejection);
+
+        var idle = Build(check: _ => UpToDate());
+        Assert.False(idle.IsStatusPositive);
+        Assert.False(idle.IsStatusRejection);
+        Assert.False(idle.IsStatusFailure);
+    }
+
+    /// <summary>
     /// Being told there is nothing newer is the same news whether the source said so or the policy
     /// worked it out, so both arrive on screen as "up to date".
     /// </summary>

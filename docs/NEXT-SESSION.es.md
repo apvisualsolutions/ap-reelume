@@ -77,7 +77,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
 - [x] **F8 — Revisión y editor**: bandeja vacía POSITIVA (`ReviewInboxEmpty*`); Duplicados en
   `UniformGrid` 2 columnas, mono, `DuplicatesEmpty*`, sin acción de borrado ni desactivada; editor
   con pestañas Metadatos | Renombrado; los 3 mensajes con glifo; renombrado origen → destino mono.
-- [ ] **F9 — Copias/Recuperación/Actualización**: `BackupView` con estado de la base +
+- [x] **F9 — Copias/Recuperación/Actualización**: `BackupView` con estado de la base +
   `BackupHistoryEmpty*` + `BackupFailedIntactNotice`; `RestoreWizardView` con pasos numerados,
   reasignación 2 columnas truncada por la izquierda, `RestoreRootsEmpty*` y los 3 `Restore*` + los
   3 `RestoreRoot*Status`; `DatabaseRecoveryView` en Danger, mono, `WrapPanel`; **`UpdateView` con

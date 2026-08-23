@@ -27,6 +27,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource RestoreDescription}"
         TextWrapping="Wrap" />
 
+    <!--
+      §4 numbers the steps, and the order is the walk a person makes: choose, review, confirm. The
+      confirmation moved from the top row to its own step for that reason - a Confirm offered
+      before anything was chosen was reading order lying about task order. LeadingActionTests holds
+      it as this view's one primary action; the table measures uniqueness, not position.
+    -->
+    <TextBlock
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        Text="{DynamicResource RestoreStepChooseLabel}" />
     <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           x:Name="ChooseArchiveButton"
@@ -34,13 +44,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Content="{DynamicResource RestoreChooseArchiveLabel}"
           IsEnabled="{Binding IsIdle}"
           automation:AutomationProperties.Name="{DynamicResource RestoreChooseArchiveLabel}" />
-      <Button
-          Classes="primary-action"
-          x:Name="ConfirmRestoreButton"
-          Command="{Binding ConfirmCommand}"
-          Content="{DynamicResource RestoreConfirmLabel}"
-          IsEnabled="{Binding CanRestore}"
-          automation:AutomationProperties.Name="{DynamicResource RestoreConfirmLabel}" />
     </WrapPanel>
 
     <Border
@@ -78,6 +81,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </Border>
 
+    <TextBlock
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        IsVisible="{Binding HasPreview}"
+        Text="{DynamicResource RestoreStepRootsLabel}" />
+    <!-- Step two's desirable answer, in positive terms: every folder exists, nothing to ask. -->
+    <StackPanel IsVisible="{Binding HasNothingToRemap}" Spacing="{DynamicResource Space4}">
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RestoreRootsEmptyTitle}" />
+      <TextBlock
+          MaxWidth="640"
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource RestoreRootsEmptyDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
     <ItemsControl
         x:Name="RestoreRootsList"
         IsVisible="{Binding HasPreview}"
@@ -110,6 +131,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   IsVisible="{Binding NeedsFolder}"
                   Text="{Binding NewPath}"
                   automation:AutomationProperties.Name="{DynamicResource RestoreNewFolderLabel}" />
+              <!-- The consequence of confirming as it stands, under the row it belongs to. -->
+              <StackPanel
+                  IsVisible="{Binding IsUnresolved}"
+                  Orientation="Horizontal"
+                  Spacing="{DynamicResource Space8}">
+                <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="!" />
+                <TextBlock
+                    MaxWidth="500"
+                    FontSize="{DynamicResource FontSizeCaption}"
+                    Foreground="{DynamicResource TextPrimaryBrush}"
+                    Text="{DynamicResource RestoreUnresolvedRootWarning}"
+                    TextWrapping="Wrap" />
+              </StackPanel>
             </StackPanel>
             <TextBlock
                 Grid.Column="1"
@@ -121,6 +155,35 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ItemsControl.ItemTemplate>
     </ItemsControl>
 
+    <TextBlock
+        FontWeight="SemiBold"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        IsVisible="{Binding HasPreview}"
+        Text="{DynamicResource RestoreStepConfirmLabel}" />
+    <!-- What confirming does and does not touch, said before the press rather than after. -->
+    <TextBlock
+        MaxWidth="640"
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        IsVisible="{Binding HasPreview}"
+        Text="{DynamicResource RestorePreservesDatabaseNotice}"
+        TextWrapping="Wrap" />
+    <TextBlock
+        MaxWidth="640"
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        IsVisible="{Binding HasPreview}"
+        Text="{DynamicResource RestoreArtworkNotIncludedNotice}"
+        TextWrapping="Wrap" />
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+      <Button
+          Classes="primary-action"
+          x:Name="ConfirmRestoreButton"
+          Command="{Binding ConfirmCommand}"
+          Content="{DynamicResource RestoreConfirmLabel}"
+          IsEnabled="{Binding CanRestore}"
+          automation:AutomationProperties.Name="{DynamicResource RestoreConfirmLabel}" />
+    </WrapPanel>
     <TextBlock
         MaxWidth="640"
         Foreground="{DynamicResource TextPrimaryBrush}"

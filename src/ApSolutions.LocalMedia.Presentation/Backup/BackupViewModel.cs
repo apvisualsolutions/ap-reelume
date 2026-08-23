@@ -38,8 +38,10 @@ public sealed class BackupViewModel : INotifyPropertyChanged
     public BackupViewModel(
         Func<IProgress<BackupProgress>, CancellationToken, Task<BackupResult>> createCopy,
         Func<string, IProgress<BackupProgress>, CancellationToken, Task<ExportResult>> export,
-        Func<CancellationToken, Task<string?>> chooseDestination)
+        Func<CancellationToken, Task<string?>> chooseDestination,
+        string? databasePath = null)
     {
+        DatabasePath = databasePath;
         _createCopy = createCopy ?? throw new ArgumentNullException(nameof(createCopy));
         _export = export ?? throw new ArgumentNullException(nameof(export));
         _chooseDestination = chooseDestination ?? throw new ArgumentNullException(nameof(chooseDestination));
@@ -133,6 +135,7 @@ public sealed class BackupViewModel : INotifyPropertyChanged
         {
             SetField(ref _lastCopyName, value);
             OnPropertyChanged(nameof(HasLastCopy));
+            OnPropertyChanged(nameof(HasNoHistory));
         }
     }
 
@@ -144,6 +147,7 @@ public sealed class BackupViewModel : INotifyPropertyChanged
         {
             SetField(ref _lastArchiveName, value);
             OnPropertyChanged(nameof(HasLastArchive));
+            OnPropertyChanged(nameof(HasNoHistory));
         }
     }
 
@@ -155,6 +159,18 @@ public sealed class BackupViewModel : INotifyPropertyChanged
     /// - and no view painted either, so somebody who had made a copy could only find out by going to
     /// look in the file manager. These say when there is something to show.
     /// </remarks>
+    /// <summary>
+    /// Where the active database lives, so what the recovery screen says is reachable in normal
+    /// operation - §4's one addition to this view. Null in a composition that has no host paths,
+    /// and the block simply is not painted then.
+    /// </summary>
+    public string? DatabasePath { get; }
+
+    public bool HasDatabasePath => !string.IsNullOrWhiteSpace(DatabasePath);
+
+    /// <summary>The empty history said in positive terms, not as a blank under two absent names.</summary>
+    public bool HasNoHistory => !HasLastCopy && !HasLastArchive;
+
     public bool HasLastCopy => !string.IsNullOrWhiteSpace(LastCopyName);
 
     public bool HasLastArchive => !string.IsNullOrWhiteSpace(LastArchiveName);

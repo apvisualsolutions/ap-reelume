@@ -10,6 +10,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Updates, Backups and Restore speak §4's four grammars.** The updater's status lives on ONE
+  living border — a screen reader subscribed to a region must not have it swapped out — that now
+  dresses by the news: neutral process, up-to-date in positive, a guardian's refusal in Warning
+  with **the reason as the headline above the status** and the technical identifier folded behind
+  “See the technical detail” — a new control, with its scene: the walk serves a release for an
+  architecture that does not exist, watches the refusal arrive with its reason, and unfolds the
+  detail with the mouse — and a failure of the world in Danger. Backups gains the active
+  database's block — the path reachable without needing a failure —, the empty history says what
+  the first copy costs, and the failure adds that nothing was left half-written. Restore numbers
+  its three steps in the order a person walks them — Confirm moved down to its own step: offering
+  it before anything was chosen was reading order lying about task order —, says in positive when
+  there is nothing to remap, marks under each unresolved folder its exact consequence, and the
+  rows' status labels are the approved ones from the package.
+
 - **A title's two tools share one panel behind real tabs.** Editing metadata and previewing the
   rename lived stacked — opening both meant reading them one under the other —; now a single
   panel holds them behind Metadatos | Renombrado tabs, each door selects its own tab as it opens,

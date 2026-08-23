@@ -94,7 +94,8 @@ public static partial class CompositionRoot
                     .ExecuteAsync(progress, cancellationToken),
                 (destination, progress, cancellationToken) => provider.GetRequiredService<ExportLibrary>()
                     .ExecuteAsync(destination, progress, cancellationToken),
-                HandoffOrDialog(provider, picker => picker.ChooseDestinationAsync, ChooseArchiveDestinationAsync)));
+                HandoffOrDialog(provider, picker => picker.ChooseDestinationAsync, ChooseArchiveDestinationAsync),
+                provider.GetRequiredService<IAppDataPaths>().DatabasePath));
 
     /// <summary>
     /// The isolated picker's answer, or the Windows dialog, decided by the resolved data root.
