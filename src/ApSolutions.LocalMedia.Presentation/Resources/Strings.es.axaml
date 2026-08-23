@@ -131,7 +131,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MarkerDiscardedNotice">No se volverá a ofrecer para este archivo.</x:String>
   <x:String x:Key="MarkerOverlapConsequence">Dos marcadores solapados hacen ambiguo el botón de saltar.</x:String>
   <x:String x:Key="MetadataEditorTabLabel">Metadatos</x:String>
-  <x:String x:Key="RenamePreviewTabLabel">Renombrado</x:String>
+  <x:String x:Key="RenamePreviewTabLabel">Renombrado seguro</x:String>
   <x:String x:Key="UpdateRejectionReasonLabel">Motivo del rechazo</x:String>
   <x:String x:Key="UpdateNothingInstalledNotice">No se instaló nada. La versión que tienes sigue intacta.</x:String>
   <x:String x:Key="UpdateRejectionDetailAction">Ver el detalle técnico</x:String>
