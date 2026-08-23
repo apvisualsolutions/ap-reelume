@@ -184,6 +184,60 @@ public sealed class LibraryFilterRowTests
         Assert.Equal(expected, service.Queries.Count);
     }
 
+    /// <summary>
+    /// The skeleton stands only during the first query of an empty grid, and never over cards
+    /// somebody is already reading: a reload keeps the content and loads behind it.
+    /// </summary>
+    [Fact]
+    public async Task The_skeleton_stands_while_the_first_query_runs_and_never_over_content()
+    {
+        var gate = new TaskCompletionSource<CatalogPage>();
+        var viewModel = new LibraryViewModel(new GatedQueryService(gate.Task));
+        Assert.False(viewModel.ShowsSkeleton);
+
+        var announced = new List<string>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+
+        var loading = viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.True(viewModel.IsLoading);
+        Assert.True(viewModel.ShowsSkeleton);
+
+        gate.SetResult(new CatalogPage([Card("Arrival")], null));
+        await loading;
+
+        Assert.False(viewModel.IsLoading);
+        Assert.False(viewModel.ShowsSkeleton);
+        Assert.Contains(nameof(viewModel.ShowsSkeleton), announced);
+
+        // The reload: cards on screen, the query running again, and no skeleton over them.
+        var second = new TaskCompletionSource<CatalogPage>();
+        typeof(LibraryViewModel).GetField("_queryService", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(viewModel, new GatedQueryService(second.Task));
+        var reloading = viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.True(viewModel.IsLoading);
+        Assert.False(viewModel.ShowsSkeleton);
+        second.SetResult(new CatalogPage([Card("Arrival")], null));
+        await reloading;
+    }
+
+    private static CatalogItem Card(string title) => new(
+        new TitleId(Guid.NewGuid()),
+        CatalogTitleKind.Movie,
+        title,
+        2016,
+        IsAvailable: true,
+        HasProgress: false,
+        IsPersonal: false,
+        DateTimeOffset.UnixEpoch,
+        LastPlayedUtc: null);
+
+    private sealed class GatedQueryService(Task<CatalogPage> answer) : ICatalogQueryService
+    {
+        public Task<CatalogPage> QueryAsync(
+            CatalogQuery query,
+            CancellationToken cancellationToken = default) => answer;
+    }
+
     private sealed class RecordingQueryService(params CatalogPage[] pages) : ICatalogQueryService
     {
         private int _index;

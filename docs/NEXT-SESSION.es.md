@@ -84,10 +84,13 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   las cuatro gramáticas** (hoy 0 de 4, medido), un solo `Border` `Polite`, motivo POR ENCIMA del
   estado, expansor `UpdateRejectionDetail` + sus 3 cadenas; Créditos TMDB; `StartupView` costura
   MSIX.
-- [ ] **F10 — Animaciones y barrido final**: `apr-shim` cuando un modelo sepa que carga (empezar
+- [x] **F10 — Animaciones y barrido final**: `apr-shim` cuando un modelo sepa que carga (empezar
   por `LibraryViewModel`); manija 160 ms; privacidad con las dos gramáticas + `PrivacyNoHosts*` +
   `DiagnosticsEmptyFieldsNotice`; Lifecycle en Warning; los 16 comentarios de diseño en sus 9
-  archivos.
+  archivos. [ANOTADO] La manija queda elevada al propietario: el árbol conmuta con `CheckBox` por
+  decisión medida (18 usos, 73 recursos, `CheckBoxStateTests`); migrar a `ToggleSwitch` revoca esa
+  decisión y cuesta su constelación de estados en 4 temas. Inicio no lleva esqueleto: sus carriles
+  pintan en el cuadro en que llega la respuesta.
 - [ ] **F11 — Cierre**: `SURFACES.es/en.md` con los 10 cambios del Inventario; FEATURES y
   CHANGELOG al día; matriz de evidencia de las 48 vistas (app con datos AL LADO del prototipo,
   claro y oscuro; alto contraste en shell + reproductor + un formulario); recuentos (517 cadenas

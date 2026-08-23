@@ -10,6 +10,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The Library's first visit wears a skeleton, and privacy says its two best answers.** Six ghost
+  cards breathe at the single motion token's pace while the first query runs — and only the first:
+  a skeleton over cards somebody is reading is worse than the wait it decorates. The prototype
+  sweeps for 1.2 s; here the shimmer is the scan dot's own breathing, because this repository
+  holds ONE motion token and a second, slower one would be the parallel-copy defect returning
+  dressed as a sweep — the deviation is commented on the style. Privacy paints the empty
+  connection list in positive terms (“No connection declared · Nothing leaves this machine”) and
+  explains under the preview why empty fields are listed: seen-empty is proof, omitted is a claim.
+  The package's 16 design comments stand in their 9 files — the six missing ones were written
+  today. Two phase limits, decided and noted: Home carries no skeleton because its rails paint
+  their answer the frame it arrives, and the switch handle is raised to the owner — the tree
+  toggles with CheckBox by a measured decision (18 uses, 73 theme resources, its own suite) and
+  migrating to ToggleSwitch revokes it.
+
 - **Updates, Backups and Restore speak §4's four grammars.** The updater's status lives on ONE
   living border — a screen reader subscribed to a region must not have it swapped out — that now
   dresses by the news: neutral process, up-to-date in positive, a guardian's refusal in Warning

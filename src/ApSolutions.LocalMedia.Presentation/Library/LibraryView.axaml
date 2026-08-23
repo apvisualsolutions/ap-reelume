@@ -275,6 +275,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
         §7 prescribes because a Border has no dashed stroke. The button that adds the first folder
         arrives with the add-root dialog; text first, so the state exists before its action does.
       -->
+      <!--
+        The skeleton of the first visit: six card-shaped placeholders breathing at the motion
+        token's pace while the first query runs. Only while the grid holds nothing - see the model.
+      -->
+      <WrapPanel
+          Grid.Row="3"
+          IsVisible="{Binding ShowsSkeleton}"
+          ItemSpacing="{DynamicResource Space16}"
+          LineSpacing="{DynamicResource Space16}">
+        <Border Classes="apr-shim" Width="158" Height="237" />
+        <Border Classes="apr-shim" Width="158" Height="237" />
+        <Border Classes="apr-shim" Width="158" Height="237" />
+        <Border Classes="apr-shim" Width="158" Height="237" />
+        <Border Classes="apr-shim" Width="158" Height="237" />
+        <Border Classes="apr-shim" Width="158" Height="237" />
+      </WrapPanel>
       <Panel
           x:Name="LibraryEmptySurface"
           Grid.Row="3"

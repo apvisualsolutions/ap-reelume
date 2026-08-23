@@ -10,6 +10,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La primera visita a la Biblioteca viste esqueleto, y la privacidad dice sus dos mejores
+  respuestas.** Seis tarjetas-fantasma respiran al paso del único token de movimiento mientras
+  corre la primera consulta —y sólo la primera: un esqueleto sobre tarjetas que alguien ya lee es
+  peor que la espera que decora—. El barrido del prototipo dura 1,2 s; aquí el brillo es el mismo
+  aliento del punto de escaneo porque este repositorio tiene UN token de movimiento y un segundo
+  más lento sería el defecto de la copia paralela volviendo vestido de barrido —la desviación
+  está comentada en el estilo—. Privacidad pinta en positivo la lista de conexiones vacía
+  («Ninguna conexión declarada · Nada sale de este equipo») y explica bajo la previsualización
+  por qué los campos vacíos se listan: verlos vacíos es prueba; omitirlos, una promesa. Los 16
+  comentarios de diseño del paquete están en sus 9 archivos —los seis que faltaban se escribieron
+  hoy—. Dos límites de la fase, decididos y anotados: Inicio no lleva esqueleto porque sus
+  carriles pintan su respuesta en el mismo cuadro en que llega, y la manija de interruptor queda
+  elevada al propietario —el árbol conmuta con CheckBox por decisión medida (18 usos, 73 recursos
+  de tema, suite propia) y migrar a ToggleSwitch la revoca—.
+
 - **Actualización, Copias y Restauración hablan las cuatro gramáticas de la §4.** El estado del
   actualizador vive en UN solo borde vivo —un lector de pantalla suscrito a una región no debe ver
   esa región sustituida— que ahora se viste según la noticia: proceso neutro, al día en positivo,
