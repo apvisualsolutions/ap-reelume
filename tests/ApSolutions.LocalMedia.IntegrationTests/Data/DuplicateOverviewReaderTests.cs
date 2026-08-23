@@ -62,6 +62,12 @@ public sealed class DuplicateOverviewReaderTests
         Assert.Equal(2, entry.VersionCount);
     }
 
+    [Fact]
+    public void A_reader_over_no_store_refuses_to_be_built()
+    {
+        Assert.Throws<ArgumentNullException>(() => new DuplicateOverviewReader(null!));
+    }
+
     private static MediaVersionGroup Group(Guid titleId, params MediaVersion[] versions) => new(
         new MediaVersionId(Guid.NewGuid()),
         $"title:{titleId:D}",
