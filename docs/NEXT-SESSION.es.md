@@ -49,7 +49,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   confirmado en Danger con `RootRemove*`; onboarding reducido a primer arranque; TODAS las escenas
   del paseo del formulario reescritas para abrir el diálogo primero (un panel oculto no está en el
   árbol visual).
-- [ ] **F3 — Inicio**: héroe a sangre (arte + degradado, antetítulo, Continuar píldora clara +
+- [x] **F3 — Inicio**: héroe a sangre (arte + degradado, antetítulo, Continuar píldora clara +
   Detalles fantasma); carril «Continuar viendo» 16:9 con acciones por tarjeta; «Añadido
   recientemente» + «Ver toda la biblioteca →» que absorbe `LibraryEntryView`; `HomeLayoutTests`
   actualizado.

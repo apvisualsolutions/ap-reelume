@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El héroe de Inicio sangra, que es lo que el prototipo dibuja**: el muro de color del propio
+  título con el velo direccional encima, sobre `PlayerSurfaceBrush` — la única superficie que es
+  `#0B0D10` en los cuatro temas, con los pinceles de texto del reproductor y su contraste ya medido
+  (19,46:1). En los dos altos contrastes la capa de arte se apaga por `PosterArtOpacity` y el texto
+  queda sobre el fondo liso: cero brochas nuevas. La razón por la que no sangraba —«no hay arte»—
+  caducó el día que el arte generado entró; «Detalles» sigue fuera y sigue bloqueado en datos, no en
+  esfuerzo.
+  - La lista de la puerta «ningún estado se dice sólo con color» gana la fila del héroe con la misma
+    moneda que la ficha: el color repite un título escrito al lado, y el pago —apagarse en alto
+    contraste— queda afirmado por la misma prueba.
+- **«Abrir biblioteca» pasa a la cabecera del carril «En curso»** y la tarjeta de acceso se retira
+  del árbol: mismo comando, mismas palabras, mismo nombre de control, en el único carril que la
+  puerta puede sostener dentro del primer viewport a 1366×768. La línea base estructural de Inicio
+  se regrabó con el único campo que cambia (el acceso sube de 430 a 404 px) verificado en las 36
+  combinaciones.
+
 - **«Añadir raíz de medios» es ahora el panel flotante del prototipo**, abierto desde la acción
   primaria de la cabecera de Biblioteca —clave nueva «Añadir medios…», con la elipsis que promete un
   diálogo— y desde el «+» del riel, que ya no navega: el panel flota sobre la ruta que esté, con velo

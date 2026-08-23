@@ -65,7 +65,6 @@ public sealed class LeadingActionTests
         ["InProgressRailView"] = null,
         ["RecentlyAddedRailView"] = null,
         ["RecommendationsRailView"] = null,
-        ["LibraryEntryView"] = null,
 
         // Library
         // The header's add: opening the dialog is what the screen offers someone whose next step

@@ -23,17 +23,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
   window — there is nothing left over, and the rows that follow it need somewhere to go.
   -->
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space24}">
+    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space24}">
       <TextBlock
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Text="{DynamicResource HomeTitle}"
           automation:AutomationProperties.HeadingLevel="1" />
       <home:ResumeHeroView x:Name="ResumeHero" Grid.Row="1" />
-      <home:LibraryEntryView x:Name="LibraryEntry" Grid.Row="2" />
-      <home:InProgressRailView Grid.Row="3" />
-      <home:RecentlyAddedRailView Grid.Row="4" />
-      <ContentControl Grid.Row="5" IsVisible="{Binding HasRecommendationsRail}">
+      <home:InProgressRailView x:Name="InProgress" Grid.Row="2" />
+      <home:RecentlyAddedRailView Grid.Row="3" />
+      <ContentControl Grid.Row="4" IsVisible="{Binding HasRecommendationsRail}">
         <home:RecommendationsRailView DataContext="{Binding Recommendations}" />
       </ContentControl>
     </Grid>

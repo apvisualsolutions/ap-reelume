@@ -10,6 +10,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Home's hero bleeds, which is what the prototype draws**: the title's own colour wall under the
+  directional veil, over `PlayerSurfaceBrush` — the one surface that is `#0B0D10` in all four
+  themes, with the player's text brushes and their measured 19.46:1. In both high contrasts the art
+  layer switches off through `PosterArtOpacity` and the text stands on the plain ground: zero new
+  brushes. The reason it did not bleed — "there is no artwork" — expired the day the generated art
+  landed; "Details" stays out and stays blocked on data, not effort.
+  - The "no state told by colour alone" gate's list gains the hero's row for the card's own coin:
+    the colour repeats a title written beside it, and the payment — switching off in high
+    contrast — is asserted by the same test.
+- **«Abrir biblioteca» moves to the «En curso» rail header** and the entry card leaves the tree:
+  same command, same words, same control name, on the only rail the gate can hold inside the first
+  viewport at 1366×768. Home's structural baseline was re-recorded with the single changing field
+  (the access rises from 430 to 404 px) verified across all 36 combinations.
+
 - **«Añadir raíz de medios» is now the prototype's floating panel**, opened from the Library
   header's primary action — new key «Add media…», the ellipsis that promises a dialog — and from the
   rail's plus, which no longer navigates: the panel floats over whichever route, veil behind it and

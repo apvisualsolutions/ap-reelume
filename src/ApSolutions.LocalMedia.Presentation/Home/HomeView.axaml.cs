@@ -19,7 +19,8 @@ public sealed partial class HomeView : UserControl
         base.OnLoaded(e);
 
         // Continue is the primary action only when there is something to continue; otherwise the
-        // library shortcut takes the focus, so the first key press always does something useful.
+        // library link on the rail takes the focus, so the first key press always does something
+        // useful.
         Dispatcher.UIThread.Post(FocusPrimaryAction, DispatcherPriority.Loaded);
     }
 
@@ -27,7 +28,7 @@ public sealed partial class HomeView : UserControl
     {
         var target = DataContext is HomeViewModel { HasResume: true }
             ? ResumeHero.PrimaryAction
-            : LibraryEntry.PrimaryAction;
+            : InProgress.PrimaryAction;
         target.Focus();
     }
 }

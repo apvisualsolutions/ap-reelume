@@ -12,10 +12,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="home:HomeViewModel"
     automation:AutomationProperties.Name="{DynamicResource HomeInProgressAccessibleName}">
   <Grid RowDefinitions="Auto,*">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
-        FontWeight="SemiBold"
-        Text="{DynamicResource HomeInProgressHeading}" />
+    <!--
+      The rail header carries the way into the library — the prototype keeps this link on a rail
+      header, and this is the rail the gate can hold to the first viewport at 1366x768. It absorbs
+      LibraryEntryView whole: same command, same words, same control name, so the walk and the
+      focus fallback find it where they always did. No glyph beside it: a label that says where it
+      goes needs no arrow, and home's strings all come from resources.
+    -->
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource HomeInProgressHeading}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <Button
+          x:Name="LibraryEntryAction"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          automation:AutomationProperties.Name="{DynamicResource HomeLibraryAction}"
+          Command="{Binding OpenLibraryCommand}"
+          Content="{DynamicResource HomeLibraryAction}" />
+    </Grid>
     <TextBlock
         Grid.Row="1"
         Margin="0,8,0,0"
