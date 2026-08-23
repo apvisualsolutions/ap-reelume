@@ -59,6 +59,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <CornerRadius x:Key="CornerRadiusSmall">4</CornerRadius>
       <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
       <!--
+        The pill, and it is a third radius where the scale deliberately had two. What earns it is the
+        rule the scale itself is held to: not "does the step make sense" but "does the tree contradict
+        it". It does not - every button in the prototype is a pill, and §7 of the design proposal
+        names the number rather than leaving it to be guessed: <b>CornerRadius=18, half the control
+        height, not CSS's 999</b>. So it is one value spent by every button rather than a step for one
+        consumer, which is the shape FontSizeMono was refused for.
+
+        Half of ControlHeight, and the two are written apart because a CornerRadius is not a Double
+        and AXAML has no arithmetic. ScalarTokenTests would not catch them disagreeing, so the comment
+        is where the pair is declared: if the control height moves, this moves with it.
+      -->
+      <CornerRadius x:Key="CornerRadiusPill">18</CornerRadius>
+      <!--
         The poster, in exactly 2:3, and here rather than inside PosterCardView because two things read
         it: the card paints it, and the library grid divides its own width by it to decide how many
         columns fit. Written in one place, the two cannot disagree — and they would, because the one
@@ -1011,8 +1024,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </ResourceDictionary>
   </Styles.Resources>
 
+  <!--
+    Every button is a pill. The prototype draws one on every screen it has - btnPri and btnSec are
+    both `border-radius: 999` - and this is the one place that decides it, so a view never writes a
+    corner of its own. The three classes that are not pills say so themselves further down, and they
+    win because a class selector declared later beats this one.
+  -->
   <Style Selector="Button">
     <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="Padding" Value="16,0" />
   </Style>
   <!--
     The ring is drawn twice, in two colours, one inside the other. Borrowing the control's own border
@@ -1159,6 +1180,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    <!-- btnPri is the wider and heavier of the prototype's two: 0 20 against the secondary's 0 16. -->
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="20,0" />
   </Style>
 
   <!--
@@ -1214,6 +1238,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   -->
   <Style Selector="TextBox.search-field">
     <Setter Property="Padding" Value="34,5,10,6" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
   </Style>
 
   <Style Selector="TextBlock.search-adornment">
@@ -1384,6 +1409,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     control - the five states stay one decision, made once.
   -->
   <Style Selector="Button.poster-card">
+    <!-- Not a pill: a card is a card. -->
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="Padding" Value="8" />

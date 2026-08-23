@@ -10,6 +10,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Todo botón es una píldora, en las diez pantallas a la vez.** Es lo que el prototipo dibuja en
+  todas las suyas —`btnPri` y `btnSec` son los dos `border-radius: 999`—, y la §7 de la propuesta de
+  diseño **da el número en vez de dejarlo a ojo**: `CornerRadius=18`, la mitad del alto de control, no
+  el 999 de CSS. Un tercer radio donde la escala tenía dos a propósito, y lo que se lo gana es la regla
+  a la que la propia escala está sometida: la pregunta no es «¿tiene sentido el escalón?» sino «¿lo
+  contradice algo del árbol?». No lo contradice nada — lo gastan **todos** los botones—, así que no es
+  el escalón-para-un-consumidor por el que se rechazó `FontSizeMono`.
+  - Tres clases dicen que no son píldoras y lo dicen ellas: el destino del carril, el cromo del
+    reproductor y la ficha de portada. Ganan porque un selector de clase declarado después vence.
+  - El campo de búsqueda también, que es como lo dibuja el prototipo.
+
+
 - **Cada portada se pinta del color de su título, que es lo que hace que una biblioteca parezca una
   biblioteca.** Hasta ahora eran todas el mismo rectángulo gris con dos letras, y la razón escrita era
   que esta aplicación no trae arte ni ficha con qué pedirlo. Las dos cosas siguen siendo ciertas y la

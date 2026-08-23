@@ -10,6 +10,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Every button is a pill, across all ten screens at once.** That is what the prototype draws on
+  every one of its own — `btnPri` and `btnSec` are both `border-radius: 999` — and §7 of the design
+  proposal **gives the number rather than leaving it to the eye**: `CornerRadius=18`, half the control
+  height, not CSS's 999. A third radius where the scale deliberately had two, and what earns it is the
+  rule the scale itself is held to: the question is not "does the step make sense" but "does anything
+  in the tree contradict it". Nothing does — **every** button spends it — so it is not the
+  step-for-one-consumer `FontSizeMono` was refused for.
+  - Three classes say they are not pills, and they say it themselves: the rail's destination, the
+    player's chrome and the poster card. They win because a class selector declared later beats the
+    base one.
+  - The search field too, which is how the prototype draws it.
+
+
 - **Every cover is painted in its title's own colour, which is what makes a library look like a
   library.** They were all the same grey rectangle with two letters, and the reason written down was
   that this application ships with no artwork and no token to fetch any. Both are still true and the
