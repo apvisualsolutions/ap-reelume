@@ -131,7 +131,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MarkerDiscardedNotice">It will not be offered again for this file.</x:String>
   <x:String x:Key="MarkerOverlapConsequence">Two overlapping markers make the skip button ambiguous.</x:String>
   <x:String x:Key="MetadataEditorTabLabel">Metadata</x:String>
-  <x:String x:Key="RenamePreviewTabLabel">Renaming</x:String>
+  <x:String x:Key="RenamePreviewTabLabel">Safe renaming</x:String>
   <x:String x:Key="UpdateRejectionReasonLabel">Rejection reason</x:String>
   <x:String x:Key="UpdateNothingInstalledNotice">Nothing was installed. The version you have is untouched.</x:String>
   <x:String x:Key="UpdateRejectionDetailAction">See the technical detail</x:String>
