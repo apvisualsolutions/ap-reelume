@@ -7,18 +7,19 @@ The hero, and it is not painted at all when there is nothing to continue - IsVis
 a placeholder saying so, because "nothing to resume" is the state of somebody who has finished
 everything and it does not need a sentence.
 
-Two things the prototype's hero has and this one deliberately does not.
+It bleeds now, the way the prototype's does. The reason it did not — "there is no artwork in this
+application" — expired the day PosterArt shipped: the prototype's own hero is the same synthetic
+gradient, not a picture, so the wall of colour behind this text is exactly what the reference draws.
+The ground under everything is PlayerSurfaceBrush, the one surface that is #0B0D10 in all four
+themes: the hero is a frame of film in the prototype's grammar, the player's text brushes already
+carry measured contrast on it (19,46:1), and in the two high contrasts the art layer switches off
+through PosterArtOpacity and the text stands on the plain dark ground — no new brush anywhere.
 
-No artwork. The prototype bleeds a picture behind the text; there is none in this application, and a
-poster of initials beside a title already written at 32 px says the same two letters twice. Initials
-earn their place in a grid, where they tell one card from the next; here they tell the title from
-itself. It comes back with real artwork, and not before.
-
-No second action. §4 and the prototype both offer "Details" beside Continue, and it is blocked on
-data rather than on effort: opening a title's card needs a CatalogItem, ResumeItem carries neither
-the year nor the availability one holds, and no read model in this tree answers "give me the item
-with this id" - ICatalogQueryService queries pages with filters. Building one out of what the hero
-knows would be inventing two fields. It is a vertical through three layers for a secondary button.
+One thing the prototype's hero has and this one still does not: the second action. §4 offers
+"Details" beside Continue, and it is blocked on data rather than on effort: opening a title's card
+needs a CatalogItem, ResumeItem carries neither the year nor the availability one holds, and no read
+model in this tree answers "give me the item with this id". Building one out of what the hero knows
+would be inventing two fields. It is a vertical through three layers for a secondary button.
 -->
 <UserControl
     x:Class="ApSolutions.LocalMedia.Presentation.Home.ResumeHeroView"
@@ -26,16 +27,35 @@ knows would be inventing two fields. It is a vertical through three layers for a
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     x:DataType="home:HomeViewModel"
     IsVisible="{Binding HasResume}"
     automation:AutomationProperties.Name="{DynamicResource HomeResumeAccessibleName}">
-  <Border
-      Padding="32"
-      Background="{DynamicResource CardSurfaceBrush}"
-      BorderBrush="{DynamicResource ShellBorderBrush}"
-      BorderThickness="1"
-      CornerRadius="{DynamicResource CornerRadiusMedium}">
-    <StackPanel Spacing="{DynamicResource Space16}">
+  <UserControl.Resources>
+    <library:PosterArtConverter x:Key="HeroArt" />
+  </UserControl.Resources>
+  <Border ClipToBounds="True" CornerRadius="{DynamicResource CornerRadiusMedium}">
+    <Panel Background="{DynamicResource PlayerSurfaceBrush}">
+      <!--
+        The bleed: the title's own art wall, and over it the prototype's directional veil so the
+        text's left edge always sits on something dark whatever hue the hash dealt. Both live under
+        the opacity token that is 0 in the two high contrasts — a hue picked by a hash is a contrast
+        ratio nobody decided, and there the plain dark ground is the whole picture.
+      -->
+      <Panel Opacity="{DynamicResource PosterArtOpacity}">
+        <Border Background="{Binding ResumeTitle, Converter={StaticResource HeroArt}}" />
+        <Border Background="{Binding ResumeTitle, Converter={StaticResource HeroArt}, ConverterParameter=glow}" />
+        <Border>
+          <Border.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+              <GradientStop Offset="0" Color="#F2090C10" />
+              <GradientStop Offset="0.55" Color="#B8090C10" />
+              <GradientStop Offset="1" Color="#30090C10" />
+            </LinearGradientBrush>
+          </Border.Background>
+        </Border>
+      </Panel>
+      <StackPanel Margin="32" Spacing="{DynamicResource Space16}">
       <!--
         The overline: caption size and the secondary colour, which is how the prototype labels a
         section without spending a heading level on it. Its letter-spacing is left out on purpose -
@@ -46,7 +66,7 @@ knows would be inventing two fields. It is a vertical through three layers for a
       -->
       <TextBlock
           FontSize="{DynamicResource FontSizeCaption}"
-          Foreground="{DynamicResource TextSecondaryBrush}"
+          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
           Text="{DynamicResource HomeResumeHeading}" />
       <!--
         Display size and Light weight: the prototype writes this at 52 px and weight 300, and the
@@ -57,10 +77,11 @@ knows would be inventing two fields. It is a vertical through three layers for a
       <TextBlock
           FontSize="{DynamicResource FontSizeDisplay}"
           FontWeight="Light"
+          Foreground="{DynamicResource PlayerTextBrush}"
           Text="{Binding ResumeTitle}"
           TextTrimming="CharacterEllipsis" />
       <TextBlock
-          Foreground="{DynamicResource TextSecondaryBrush}"
+          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
           IsVisible="{Binding HasResumeSubtitle}"
           Text="{Binding ResumeSubtitle}"
           TextTrimming="CharacterEllipsis" />
@@ -76,7 +97,7 @@ knows would be inventing two fields. It is a vertical through three layers for a
             MinHeight="3"
             MinWidth="0"
             VerticalAlignment="Center"
-            Background="{DynamicResource ControlFillBrush}"
+            Background="{DynamicResource PlayerHairlineBrush}"
             Foreground="{DynamicResource AccentBrush}"
             Maximum="1"
             Value="{Binding ResumeCompletedFraction}"
@@ -84,12 +105,12 @@ knows would be inventing two fields. It is a vertical through three layers for a
         <TextBlock
             VerticalAlignment="Center"
             FontSize="{DynamicResource FontSizeCaption}"
-            Foreground="{DynamicResource TextSecondaryBrush}"
+            Foreground="{DynamicResource PlayerTextSecondaryBrush}"
             Text="{Binding ResumeCompletedText}" />
         <TextBlock
             VerticalAlignment="Center"
             FontSize="{DynamicResource FontSizeCaption}"
-            Foreground="{DynamicResource TextSecondaryBrush}"
+            Foreground="{DynamicResource PlayerTextSecondaryBrush}"
             Text="{DynamicResource HomePercentSuffix}" />
       </StackPanel>
       <!--
@@ -105,6 +126,7 @@ knows would be inventing two fields. It is a vertical through three layers for a
             Content="{DynamicResource HomeResumeAction}"
             automation:AutomationProperties.Name="{DynamicResource HomeResumeAction}" />
       </WrapPanel>
-    </StackPanel>
+      </StackPanel>
+    </Panel>
   </Border>
 </UserControl>

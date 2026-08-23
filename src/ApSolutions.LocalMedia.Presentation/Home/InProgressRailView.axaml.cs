@@ -11,4 +11,7 @@ public sealed partial class InProgressRailView : UserControl
     {
         InitializeComponent();
     }
+
+    /// <summary>The library link, which takes the focus when there is nothing to continue.</summary>
+    public Avalonia.Controls.Button PrimaryAction => LibraryEntryAction;
 }
