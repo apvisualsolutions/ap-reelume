@@ -57,7 +57,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   sobre el banner; secciones Versiones (filas elegibles, 5 formas) y «Otras acciones»; tráiler
   LIB-014 con sus tres `Trailer*`; serie con selector de temporada segmentado y filas de episodio
   de 56 px (número mono a la derecha, ○ ◐ ●).
-- [ ] **F5 — Tinte de acento**: halo radial del acento en lo alto del contenido; contraste
+- [x] **F5 — Tinte de acento**: halo radial del acento en lo alto del contenido; contraste
   verificado TAMBIÉN sobre el halo (la trampa de `ContrastTokenTests`: una puerta mide lo que
   enumera).
 - [ ] **F6 — Shell**: riel de 5 destinos + añadir (entra Duplicados con ruta propia, sale Copias);

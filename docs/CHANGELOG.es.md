@@ -10,6 +10,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El tinte de acento en lo alto del contenido**: el halo radial de 260 px del prototipo, sin
+  ninguna brocha nueva — es `AccentBrush` a la intensidad del prototipo bajo una máscara de opacidad
+  radial, dentro del mismo token que apaga el arte en los dos altos contrastes, donde un brillo
+  decorativo es justo el color que el tema existe para quitar. Las superficies opacas del riel y de
+  la banda de título lo recortan solas.
+
 - **Las fichas de película y de serie llevan el banner del prototipo**: la portada elevada sobre el
   muro de color del propio título con el velo direccional, el título a tamaño display, la sinopsis y
   las acciones sobre el fondo oscuro — el marco del héroe, moneda por moneda, con el mismo pago en

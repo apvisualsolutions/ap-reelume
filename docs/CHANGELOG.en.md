@@ -10,6 +10,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The accent tint at the top of the content**: the prototype's 260 px radial halo, with no new
+  brush — it is `AccentBrush` at the prototype's strength under a radial opacity mask, inside the
+  same token that switches the art off in both high contrasts, where a decorative glow is exactly
+  the colour the theme exists to remove. The rail's and title band's opaque surfaces clip it on
+  their own.
+
 - **The film and series cards carry the prototype's banner**: the poster raised over the title's own
   colour wall under the directional veil, the display-size title, the synopsis and the actions on
   the dark ground — the hero's frame coin for coin, with the same high-contrast payment the
