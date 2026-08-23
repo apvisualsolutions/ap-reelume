@@ -74,7 +74,7 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   `PlayerVersionsEmpty*`) y los tres `Marker*` de consecuencia; `AudioOutputView` en Warning;
   atajos a dos columnas + `ShortcutsEmpty*`; mini verificado a 320; `LooseFileBanner` diseñado
   (verificación bloqueada, documentada).
-- [ ] **F8 — Revisión y editor**: bandeja vacía POSITIVA (`ReviewInboxEmpty*`); Duplicados en
+- [x] **F8 — Revisión y editor**: bandeja vacía POSITIVA (`ReviewInboxEmpty*`); Duplicados en
   `UniformGrid` 2 columnas, mono, `DuplicatesEmpty*`, sin acción de borrado ni desactivada; editor
   con pestañas Metadatos | Renombrado; los 3 mensajes con glifo; renombrado origen → destino mono.
 - [ ] **F9 — Copias/Recuperación/Actualización**: `BackupView` con estado de la base +

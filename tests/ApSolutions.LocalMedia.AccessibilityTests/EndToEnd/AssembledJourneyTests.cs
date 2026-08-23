@@ -239,9 +239,17 @@ public sealed class AssembledJourneyTests : IDisposable
         await host.ViewModel.OpenDuplicatesAsync(TestContext.Current.CancellationToken);
         Assert.False(host.ViewModel.HasDuplicates);
 
+        // One panel, two tabs, one surface materialised at a time - the owner's fifth point. The
+        // renaming was opened last, so its tab stands in front; the editor is still open behind its
+        // header and comes forward when its tab is chosen, the way the player's panel works.
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(1, host.ViewModel.EditorTab);
+        Assert.NotNull(Find<RenamePreviewView>(host));
+        Assert.Null(Find<MetadataEditorView>(host));
+
+        host.ViewModel.EditorTab = 0;
         Dispatcher.UIThread.RunJobs();
         Assert.NotNull(Find<MetadataEditorView>(host));
-        Assert.NotNull(Find<RenamePreviewView>(host));
     }
 
     /// <summary>

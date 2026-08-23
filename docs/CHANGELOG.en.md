@@ -10,6 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A title's two tools share one panel behind real tabs.** Editing metadata and previewing the
+  rename lived stacked — opening both meant reading them one under the other —; now a single
+  panel holds them behind Metadatos | Renombrado tabs, each door selects its own tab as it opens,
+  and a tab whose surface is not open hides its header rather than offering a blank page — the
+  player side panel's pattern. The assembled journey asserts the new semantics: one surface
+  materialised at a time, and the one behind comes forward when its tab is chosen. For the rest of
+  the phase, measurement ruled: the positive empty inbox, the two-column comparison with its
+  figures in monospace, and the editor's three glyph messages were already in the tree with their
+  gates green.
+
 - **The player closes its phase: speed is the prototype's menu and a failure's third exit is at
   last a button.** The speed readout — text a mouse could only look at while the keyboard did
   change the step — is now a button carrying the policy's nine steps as a menu, with “Back to

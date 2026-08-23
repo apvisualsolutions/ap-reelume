@@ -10,6 +10,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las dos herramientas de un título comparten un panel con pestañas de verdad.** Editar
+  metadatos y previsualizar el renombrado vivían apilados —abrir los dos era leerlos uno debajo
+  del otro—; ahora un solo panel los sostiene con pestañas Metadatos | Renombrado, cada puerta
+  selecciona su pestaña al abrirse, y una pestaña cuya superficie no está abierta esconde su
+  cabecera en vez de ofrecer una página en blanco —el patrón del panel lateral del reproductor—.
+  La travesía ensamblada afirma la semántica nueva: una superficie materializada a la vez, y la
+  de atrás vuelve cuando su pestaña se elige. Del resto de la fase, la medición mandó: la bandeja
+  vacía positiva, la comparación en dos columnas con las cifras en monoespaciado y los tres
+  mensajes con glifo del editor ya estaban en el árbol con sus puertas en verde.
+
 - **El reproductor cierra su fase: la velocidad es el menú del prototipo y la tercera salida de un
   fallo es por fin un botón.** El indicador de velocidad —un texto que el ratón sólo podía mirar
   mientras el teclado sí cambiaba el paso— es ahora un botón con los nueve pasos de la política

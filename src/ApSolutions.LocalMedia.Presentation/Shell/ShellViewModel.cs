@@ -38,6 +38,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private bool _isAddingRoot;
     private SettingsSection _settingsSection = SettingsSection.Appearance;
     private MetadataEditorViewModel? _metadataEditor;
+    private int _editorTab;
     private RenamePreviewViewModel? _rename;
     private DuplicateReviewViewModel? _duplicates;
     private PlayerSurfaces? _player;
@@ -292,9 +293,24 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             if (SetField(ref _metadataEditor, value))
             {
                 OnPropertyChanged(nameof(HasMetadataEditor));
+                OnPropertyChanged(nameof(HasEditorPanel));
             }
         }
     }
+
+    /// <summary>
+    /// The tab standing in front of the editor panel: 0 is the metadata, 1 the renaming. Each door
+    /// sets it as it opens, so pressing «Previsualizar renombrado» never leaves the metadata tab
+    /// standing in front of the preview somebody just asked for.
+    /// </summary>
+    public int EditorTab
+    {
+        get => _editorTab;
+        set => SetField(ref _editorTab, value);
+    }
+
+    /// <summary>One panel for the two title tools; the tabs decide, the way the player's panel does.</summary>
+    public bool HasEditorPanel => HasMetadataEditor || HasRename;
 
     public RenamePreviewViewModel? Rename
     {
@@ -304,6 +320,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             if (SetField(ref _rename, value))
             {
                 OnPropertyChanged(nameof(HasRename));
+                OnPropertyChanged(nameof(HasEditorPanel));
             }
         }
     }
@@ -614,6 +631,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         if (_surfaces.OpenMetadataEditor is { } open && SelectedTitleId is { } titleId)
         {
             MetadataEditor = await open(titleId, cancellationToken).ConfigureAwait(true);
+            EditorTab = 0;
         }
     }
 
@@ -622,6 +640,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         if (_surfaces.OpenRename is { } open && SelectedTitleId is { } titleId)
         {
             Rename = await open(titleId, cancellationToken).ConfigureAwait(true);
+            EditorTab = 1;
         }
     }
 

@@ -511,11 +511,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Command="{Binding ReviewDuplicatesCommand}"
               Content="{DynamicResource TitleReviewDuplicatesAction}" />
         </WrapPanel>
-        <ContentControl IsVisible="{Binding HasMetadataEditor}">
-          <metadata:MetadataEditorView DataContext="{Binding MetadataEditor}" />
-        </ContentControl>
-        <ContentControl IsVisible="{Binding HasRename}">
-          <metadata:RenamePreviewView DataContext="{Binding Rename}" />
+        <!--
+          The owner's fifth point: the two title tools share one panel behind real tabs, the way the
+          player's side column holds its four lists. Each door selects its own tab as it opens; a
+          tab whose surface is not open hides its header rather than offering a blank page.
+        -->
+        <ContentControl IsVisible="{Binding HasEditorPanel}">
+          <TabControl SelectedIndex="{Binding EditorTab}">
+            <TabItem
+                Header="{DynamicResource MetadataEditorTabLabel}"
+                IsVisible="{Binding HasMetadataEditor}">
+              <metadata:MetadataEditorView DataContext="{Binding MetadataEditor}" Margin="0,12,0,0" />
+            </TabItem>
+            <TabItem
+                Header="{DynamicResource RenamePreviewTabLabel}"
+                IsVisible="{Binding HasRename}">
+              <metadata:RenamePreviewView DataContext="{Binding Rename}" Margin="0,12,0,0" />
+            </TabItem>
+          </TabControl>
         </ContentControl>
       </StackPanel>
     </ScrollViewer>
