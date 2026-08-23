@@ -267,6 +267,50 @@ public sealed class BackupViewTests
         Assert.Equal(0, exports);
     }
 
+    /// <summary>
+    /// §4's one addition to this view: where the active database lives, reachable without a
+    /// failure. Handed in by the composition; a build without host paths paints no block.
+    /// </summary>
+    [Fact]
+    public void The_database_path_handed_in_is_held_and_its_absence_paints_nothing()
+    {
+        var with = new BackupViewModel(
+            (_, _) => Task.FromResult(new BackupResult(new BackupCopy("D:\\copies\\copy", Noon, true), Manifest(), [])),
+            (path, _, _) => Task.FromResult(new ExportResult(path, Manifest(), [])),
+            _ => Task.FromResult<string?>(null),
+            "D:\\data\\library.db");
+        Assert.True(with.HasDatabasePath);
+        Assert.Equal("D:\\data\\library.db", with.DatabasePath);
+
+        var without = new BackupViewModel(
+            (_, _) => Task.FromResult(new BackupResult(new BackupCopy("D:\\copies\\copy", Noon, true), Manifest(), [])),
+            (path, _, _) => Task.FromResult(new ExportResult(path, Manifest(), [])),
+            _ => Task.FromResult<string?>(null));
+        Assert.False(without.HasDatabasePath);
+    }
+
+    /// <summary>
+    /// The empty history is the fresh installation's state and it is said in positive terms; the
+    /// first finished copy takes its place, and the announcement is what the surface repaints by.
+    /// </summary>
+    [Fact]
+    public async Task No_history_stands_until_the_first_copy_lands_and_says_so()
+    {
+        var viewModel = new BackupViewModel(
+            (_, _) => Task.FromResult(new BackupResult(new BackupCopy("D:\\copies\\copy-2026", Noon, true), Manifest(), [])),
+            (path, _, _) => Task.FromResult(new ExportResult(path, Manifest(), [])),
+            _ => Task.FromResult<string?>(null));
+        Assert.True(viewModel.HasNoHistory);
+
+        var announced = new List<string>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+
+        await viewModel.CreateCopyAsync(TestContext.Current.CancellationToken);
+
+        Assert.False(viewModel.HasNoHistory);
+        Assert.Contains(nameof(viewModel.HasNoHistory), announced);
+    }
+
     [Fact]
     public async Task A_copy_started_while_the_destination_dialog_is_open_wins_and_the_export_stands_down()
     {

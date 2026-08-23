@@ -36,16 +36,60 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsChecked="{Binding AutomaticCheckEnabled}"
         automation:AutomationProperties.Name="{DynamicResource UpdateAutomaticCheckLabel}" />
 
+    <!--
+      §4's four grammars on ONE living Border - the LiveSetting stays on a single surface because a
+      screen reader subscribed to one region must not have that region swapped out from under it.
+      What changes is the dress: neutral process on the card surface, up to date on Positive, a
+      guardian's refusal on Warning with the reason as the headline, and a failure of the world on
+      Danger. The classification lives on the model, so the styles here and the tests read one map.
+    -->
     <Border
         x:Name="UpdateStatusSurface"
         Padding="16"
-        Background="{DynamicResource AccentSubtleBrush}"
+        Background="{DynamicResource CardSurfaceBrush}"
         BorderBrush="{DynamicResource ShellBorderBrush}"
         BorderThickness="1"
         CornerRadius="{DynamicResource CornerRadiusMedium}"
+        Classes.status-positive="{Binding IsStatusPositive}"
+        Classes.status-rejection="{Binding IsStatusRejection}"
+        Classes.status-failure="{Binding IsStatusFailure}"
         automation:AutomationProperties.Name="{DynamicResource UpdateStatusAccessibleName}"
         automation:AutomationProperties.LiveSetting="Polite">
+      <Border.Styles>
+        <Style Selector="Border.status-positive">
+          <Setter Property="Background" Value="{DynamicResource PositiveSurfaceBrush}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource PositiveBorderBrush}" />
+        </Style>
+        <Style Selector="Border.status-rejection">
+          <Setter Property="Background" Value="{DynamicResource WarningSurfaceBrush}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource WarningBorderBrush}" />
+        </Style>
+        <Style Selector="Border.status-failure">
+          <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
+        </Style>
+      </Border.Styles>
       <StackPanel Spacing="{DynamicResource Space8}">
+        <!--
+          On a refusal the reason is the news and the status is the context, so the reason stands
+          first, as the block's heading, under its small label. Both live inside the one region.
+        -->
+        <StackPanel IsVisible="{Binding HasRejectionReason}" Spacing="{DynamicResource Space4}">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="!" />
+            <TextBlock
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="{DynamicResource UpdateRejectionReasonLabel}" />
+          </StackPanel>
+          <TextBlock
+              x:Name="UpdateRejectionReasonText"
+              MaxWidth="600"
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{Binding DetailKey, Converter={StaticResource UpdateResourceKey}}"
+              TextWrapping="Wrap" />
+        </StackPanel>
         <TextBlock
             x:Name="UpdateStatusText"
             MaxWidth="600"
@@ -53,12 +97,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Text="{Binding StatusKey, Converter={StaticResource UpdateResourceKey}}"
             TextWrapping="Wrap" />
         <TextBlock
-            x:Name="UpdateDetailText"
             MaxWidth="600"
+            IsVisible="{Binding IsStatusRejection}"
             Foreground="{DynamicResource TextPrimaryBrush}"
-            IsVisible="{Binding DetailKey, Converter={x:Static ObjectConverters.IsNotNull}}"
-            Text="{Binding DetailKey, Converter={StaticResource UpdateResourceKey}}"
+            Text="{DynamicResource UpdateNothingInstalledNotice}"
             TextWrapping="Wrap" />
+        <!--
+          The technical detail folds away because its audience is a bug report, not the decision:
+          the rule's own identifier, monospaced, for whoever needs the word verbatim.
+        -->
+        <ToggleButton
+            x:Name="UpdateRejectionDetail"
+            IsVisible="{Binding HasRejectionReason}"
+            Content="{DynamicResource UpdateRejectionDetailAction}"
+            automation:AutomationProperties.Name="{DynamicResource UpdateRejectionDetailAction}" />
+        <TextBlock
+            x:Name="UpdateRejectionCodeText"
+            FontFamily="{DynamicResource FontFamilyMono}"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            IsVisible="{Binding #UpdateRejectionDetail.IsChecked}"
+            Text="{Binding RejectionCode}" />
         <ProgressBar
             x:Name="UpdateProgressBar"
             Maximum="{Binding Total}"

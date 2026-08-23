@@ -43,6 +43,7 @@ public sealed class RootRemapRowViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(HasRemap));
             OnPropertyChanged(nameof(NeedsFolder));
             OnPropertyChanged(nameof(StatusKey));
+            OnPropertyChanged(nameof(IsUnresolved));
         }
     }
 
@@ -84,10 +85,16 @@ public sealed class RootRemapRowViewModel : INotifyPropertyChanged
     public string StatusKey => _status switch
     {
         RootRemapStatus.Conflict => "RestoreRootConflict",
-        RootRemapStatus.Unchanged => "RestoreRootUnchanged",
-        RootRemapStatus.Missing when !HasRemap => "RestoreRootMissing",
-        _ => "RestoreRootRemapped",
+        RootRemapStatus.Unchanged => "RestoreRootFoundStatus",
+        RootRemapStatus.Missing when !HasRemap => "RestoreRootMissingStatus",
+        _ => "RestoreRootRemappedStatus",
     };
+
+    /// <summary>
+    /// True while the folder is gone and nobody has pointed it anywhere: the row that restores its
+    /// titles as unavailable if confirmed as it stands, which is what the warning under it says.
+    /// </summary>
+    public bool IsUnresolved => _status == RootRemapStatus.Missing && !HasRemap;
 
     public bool IsBlocking => _status == RootRemapStatus.Conflict;
 

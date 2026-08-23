@@ -4281,6 +4281,78 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// nothing arrived, so the staging folder is asked afterwards.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// Batch: the refusal grammar, pressed. A guardian's no is the system working, and §4 gives it
+    /// the reason as the headline and the rule's identifier behind a fold — so the scene serves a
+    /// release this machine cannot run, watches the refusal arrive with the reason named, and
+    /// unfolds the technical detail with the mouse.
+    /// </summary>
+    /// <remarks>
+    /// The manifest's runtime is an architecture nobody ships, which makes the refusal
+    /// <c>WrongRuntime</c>: the one rejection a scene can cause without touching the hash pipeline.
+    /// Nothing is contacted — the source reads this run's own handover folder, like every updater
+    /// scene. The fold's effect is its own state: what unfolds is a TextBlock in the same region,
+    /// not a popup, so the probe reads the toggle it pressed.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task A_refused_release_names_its_rule_and_unfolds_the_detail_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        await PressAsync(
+            host,
+            "UpdateTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Actualización in the settings index never opened its section");
+
+        var updates = host.ViewModel.Updates;
+        Assert.NotNull(updates);
+
+        // A release for a machine that does not exist: parseable, complete, and refused by the
+        // policy for its runtime alone.
+        var handoff = new AppDataPaths(_dataRoot).SystemHandoffDirectory;
+        Assert.NotNull(handoff);
+        Directory.CreateDirectory(handoff!);
+        await File.WriteAllTextAsync(
+            Path.Combine(handoff!, HandoffUpdateManifest.FileName),
+            """
+            {
+              "version": "999.0.0",
+              "runtime": "alien-arch",
+              "url": "https://updates.handoff.invalid/apreelume-999.0.0.msix",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "sizeInBytes": 64,
+              "summaryEs": "Lo que cambia en esta versión.",
+              "summaryEn": "What changed in this version.",
+              "packageFile": "apreelume-999.0.0.msix"
+            }
+            """,
+            TestContext.Current.CancellationToken);
+
+        await PressAsync(
+            host,
+            "UpdateCheckLabel",
+            () => updates!.StatusKey,
+            "clicking Check for updates never asked anything");
+
+        Assert.Equal("UpdateStatusUnusableRelease", updates!.StatusKey);
+        Assert.Equal("UpdateRefusedWrongRuntime", updates.DetailKey);
+        Assert.True(updates.IsStatusRejection, "The refusal never wore its own grammar.");
+
+        await PressAsync(
+            host,
+            "UpdateRejectionDetailAction",
+            () => Resolve(host, "UpdateRejectionDetailAction") is Avalonia.Controls.Primitives.ToggleButton { IsChecked: true },
+            "clicking the technical-detail fold never unfolded it");
+
+        Assert.Equal("WrongRuntime", updates.RejectionCode);
+    }
+
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_fetch_still_arriving_is_cancelled_with_the_mouse()
     {

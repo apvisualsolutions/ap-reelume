@@ -62,7 +62,7 @@ public sealed class RestoreWizardTests
         Assert.Equal("RestoreStatusPreviewed", wizard.StatusKey);
         var row = Assert.Single(wizard.Roots);
         Assert.Equal("D:\\media", row.OldPath);
-        Assert.Equal("RestoreRootMissing", row.StatusKey);
+        Assert.Equal("RestoreRootMissingStatus", row.StatusKey);
         Assert.False(restored);
     }
 
@@ -127,7 +127,7 @@ public sealed class RestoreWizardTests
         Assert.Equal("D:\\media", Assert.Single(seen[1]).OldPath);
         Assert.Equal("F:\\library", seen[1][0].NewPath);
         Assert.Equal(3, wizard.PathChangeCount);
-        Assert.Equal("RestoreRootRemapped", wizard.Roots[0].StatusKey);
+        Assert.Equal("RestoreRootRemappedStatus", wizard.Roots[0].StatusKey);
     }
 
     [Fact]
@@ -355,6 +355,38 @@ public sealed class RestoreWizardTests
         Assert.True(notifications > 0, "The surface was never told the confirmation became possible.");
     }
 
+    /// <summary>
+    /// Step two's desirable answer: every folder exists, nothing to ask. It stands only with a
+    /// preview - before one there is no answer to give - and a missing folder takes it down.
+    /// </summary>
+    [Fact]
+    public async Task Nothing_to_remap_stands_only_when_every_folder_was_found()
+    {
+        var allFound = CreateWizard(preview: (_, _, _) => Task.FromResult(Preview(
+            [new RootRemapDecision(@"R:\media\films", @"R:\media\films", RootRemapStatus.Unchanged)],
+            [],
+            3,
+            0)));
+        Assert.False(allFound.HasNothingToRemap);
+        await allFound.PreviewAsync(TestContext.Current.CancellationToken);
+        Assert.True(allFound.HasNothingToRemap);
+
+        var oneGone = CreateWizard(preview: (_, _, _) => Task.FromResult(Preview(
+            [new RootRemapDecision(@"Q:\gone\shows", @"Q:\gone\shows", RootRemapStatus.Missing)],
+            [],
+            3,
+            0)));
+        await oneGone.PreviewAsync(TestContext.Current.CancellationToken);
+        Assert.False(oneGone.HasNothingToRemap);
+
+        // And the row itself carries the consequence: unresolved while gone and unpointed, resolved
+        // the moment somebody writes a destination.
+        var row = oneGone.Roots[0];
+        Assert.True(row.IsUnresolved);
+        row.NewPath = @"D:\somewhere\shows";
+        Assert.False(row.IsUnresolved);
+    }
+
     [Fact]
     public void Every_visible_string_on_the_wizard_comes_from_the_resource_dictionary()
     {
@@ -367,6 +399,9 @@ public sealed class RestoreWizardTests
             .Where(attribute => attribute.Name.LocalName is "Text" or "Content" or "Header" or "Watermark")
             .Select(attribute => attribute.Value)
             .Where(value => !value.StartsWith('{'))
+            // The exclamation glyph is one of the repository's five permitted literals; it marks
+            // the unresolved-root warning and is not a sentence anybody reads.
+            .Where(value => value != "!")
             .ToArray();
 
         Assert.Empty(literals);
@@ -381,9 +416,9 @@ public sealed class RestoreWizardTests
             "RestoreStatusRefused",
             "RestoreStatusRestored",
             "RestoreStatusFailed",
-            "RestoreRootUnchanged",
-            "RestoreRootRemapped",
-            "RestoreRootMissing",
+            "RestoreRootFoundStatus",
+            "RestoreRootRemappedStatus",
+            "RestoreRootMissingStatus",
             "RestoreRootConflict",
             "RestoreFindingHashMismatch",
             "RestoreFindingRootConflict",
@@ -495,11 +530,11 @@ public sealed class RestoreWizardTests
     {
         var missing = new RootRemapRowViewModel(
             new RootRemapDecision(@"Q:\gone\shows", @"Q:\gone\shows", RootRemapStatus.Missing));
-        Assert.Equal("RestoreRootMissing", missing.StatusKey);
+        Assert.Equal("RestoreRootMissingStatus", missing.StatusKey);
         Assert.True(missing.NeedsFolder);
 
         missing.NewPath = @"S:\shows";
-        Assert.Equal("RestoreRootRemapped", missing.StatusKey);
+        Assert.Equal("RestoreRootRemappedStatus", missing.StatusKey);
 
         var unchanged = new RootRemapRowViewModel(
             new RootRemapDecision(@"R:\media", @"R:\media", RootRemapStatus.Unchanged));

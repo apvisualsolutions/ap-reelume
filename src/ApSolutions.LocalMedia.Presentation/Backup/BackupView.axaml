@@ -27,6 +27,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource BackupDescription}"
         TextWrapping="Wrap" />
 
+    <!--
+      The base's whereabouts, reachable in normal operation: what the recovery screen says about
+      the database should not require a failure to read. Label and path, nothing interactive.
+    -->
+    <StackPanel IsVisible="{Binding HasDatabasePath}" Spacing="{DynamicResource Space4}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource RecoveryDatabasePathLabel}" />
+      <TextBlock
+          x:Name="BackupDatabasePathText"
+          MaxWidth="640"
+          FontFamily="{DynamicResource FontFamilyMono}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{Binding DatabasePath}"
+          TextWrapping="WrapWithOverflow" />
+    </StackPanel>
+
     <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
       <Button
           Classes="primary-action"
@@ -75,11 +93,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
             FontWeight="Bold"
             Foreground="{DynamicResource TextPrimaryBrush}"
             Text="⚠" />
-        <TextBlock
-            Grid.Column="1"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{Binding StatusKey, Converter={StaticResource BackupResourceKey}}"
-            TextWrapping="Wrap" />
+        <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
+          <TextBlock
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{Binding StatusKey, Converter={StaticResource BackupResourceKey}}"
+              TextWrapping="Wrap" />
+          <!-- The reassurance the approved batch wrote for exactly this block. -->
+          <TextBlock
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource BackupFailedIntactNotice}"
+              TextWrapping="Wrap" />
+        </StackPanel>
       </Grid>
     </Border>
 
@@ -122,6 +146,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
       painted either, so somebody who had just made a copy could only find out by opening a file
       manager. The names are safe to show for the same reason they were shaped that way.
     -->
+    <!-- No history yet, said in positive terms: what the first copy costs, not what is missing. -->
+    <StackPanel IsVisible="{Binding HasNoHistory}" Spacing="{DynamicResource Space4}">
+      <TextBlock
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource BackupHistoryEmptyTitle}" />
+      <TextBlock
+          MaxWidth="640"
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource BackupHistoryEmptyDescription}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+
     <StackPanel Spacing="{DynamicResource Space4}">
       <TextBlock
           x:Name="BackupLastCopyText"
