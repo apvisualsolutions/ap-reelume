@@ -146,6 +146,10 @@ public sealed class UpdateSurfaceTests
     {
         var upToDate = Build(check: _ => UpToDate());
         await upToDate.CheckAsync(Cancellation);
+
+        // Asked twice and the news is the same: the second set changes nothing and says nothing,
+        // which is the announcement side a status only ever set once cannot reach.
+        await upToDate.CheckAsync(Cancellation);
         Assert.True(upToDate.IsStatusPositive);
         Assert.False(upToDate.IsStatusRejection);
         Assert.False(upToDate.IsStatusFailure);
@@ -173,6 +177,49 @@ public sealed class UpdateSurfaceTests
         Assert.False(idle.IsStatusPositive);
         Assert.False(idle.IsStatusRejection);
         Assert.False(idle.IsStatusFailure);
+
+        // The other alternatives of each grammar, read in their own states: a pattern's arm only
+        // counts as exercised when the read reaches it, and CI measured exactly these as never
+        // taken. Verification failure and a tampered package wear the refusal; an interrupted
+        // fetch and a refused launch wear the failure of the world.
+        var verificationFailed = Build(
+            check: _ => Offered(),
+            stage: (_, _, _) => throw new UpdateVerificationException(
+                "APSolutions.LocalMedia_0.2.0_x64.msix", "aaaa", "bbbb", 1024, 1024));
+        await verificationFailed.CheckAsync(Cancellation);
+        await verificationFailed.DownloadAsync(Cancellation);
+        Assert.Equal("UpdateStatusVerificationFailed", verificationFailed.StatusKey);
+        Assert.True(verificationFailed.IsStatusRejection);
+        Assert.False(verificationFailed.IsStatusFailure);
+
+        var tampered = Build(
+            check: _ => Offered(),
+            stage: (release, _, _) => Task.FromResult(new StagedUpdate(release, StagedPath)),
+            install: (_, _, _) => Task.FromResult(new UpdateInstallation(UpdateOutcome.Tampered, "detail")));
+        await tampered.CheckAsync(Cancellation);
+        await tampered.DownloadAsync(Cancellation);
+        await tampered.InstallAsync(Cancellation);
+        Assert.Equal("UpdateStatusTampered", tampered.StatusKey);
+        Assert.True(tampered.IsStatusRejection);
+
+        var interrupted = Build(
+            check: _ => Offered(),
+            stage: (_, _, _) => throw new UpdateInterruptedException("APSolutions.LocalMedia_0.2.0_x64.msix", 512, 1024));
+        await interrupted.CheckAsync(Cancellation);
+        await interrupted.DownloadAsync(Cancellation);
+        Assert.Equal("UpdateStatusInterrupted", interrupted.StatusKey);
+        Assert.True(interrupted.IsStatusFailure);
+        Assert.False(interrupted.IsStatusRejection);
+
+        var launchRefused = Build(
+            check: _ => Offered(),
+            stage: (release, _, _) => Task.FromResult(new StagedUpdate(release, StagedPath)),
+            install: (_, _, _) => Task.FromResult(new UpdateInstallation(UpdateOutcome.LaunchRefused, "detail")));
+        await launchRefused.CheckAsync(Cancellation);
+        await launchRefused.DownloadAsync(Cancellation);
+        await launchRefused.InstallAsync(Cancellation);
+        Assert.Equal("UpdateStatusLaunchRefused", launchRefused.StatusKey);
+        Assert.True(launchRefused.IsStatusFailure);
     }
 
     /// <summary>

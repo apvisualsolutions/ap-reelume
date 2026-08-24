@@ -220,6 +220,31 @@ public sealed class LibraryFilterRowTests
         await reloading;
     }
 
+    /// <summary>
+    /// Two loads in flight at once - a double press on a refresh - and the second finds the flag
+    /// already raised: the set that changes nothing says nothing, which is the announcement side
+    /// CI measured as never taken.
+    /// </summary>
+    [Fact]
+    public async Task Overlapping_loads_raise_the_flag_once_and_the_second_set_stays_quiet()
+    {
+        var gate = new TaskCompletionSource<CatalogPage>();
+        var viewModel = new LibraryViewModel(new GatedQueryService(gate.Task));
+
+        var first = viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.True(viewModel.IsLoading);
+
+        var announced = new List<string>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+        var second = viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.DoesNotContain(nameof(viewModel.ShowsSkeleton), announced);
+
+        gate.SetResult(new CatalogPage([Card("Arrival")], null));
+        await first;
+        await second;
+        Assert.False(viewModel.IsLoading);
+    }
+
     private static CatalogItem Card(string title) => new(
         new TitleId(Guid.NewGuid()),
         CatalogTitleKind.Movie,
