@@ -74,7 +74,10 @@ function Get-CommandControlInventory {
     param([string]$SourceRoot)
 
     # ToggleSwitch is here for the shape the redesign may bring, not because one exists today.
-    $elements = 'Button', 'CheckBox', 'ComboBox', 'Slider', 'ToggleButton', 'RadioButton', 'ToggleSwitch'
+    # ListBoxItem arrived 2026-08-24 with the settings index: its eleven entries are commands a
+    # person presses, every one carries an accessible name, and the walk was already pressing them
+    # - this gate only met them the first time a run survived long enough to reach it.
+    $elements = 'Button', 'CheckBox', 'ComboBox', 'Slider', 'ToggleButton', 'RadioButton', 'ToggleSwitch', 'ListBoxItem'
     # The (?![\w.]) is not decoration: without it <ComboBoxItem> counts as <ComboBox> and the total
     # reads 142 instead of 129.
     $pattern = '<(?<el>' + ($elements -join '|') + ')(?![\w.])(?<attrs>[^>]*?)/?>'

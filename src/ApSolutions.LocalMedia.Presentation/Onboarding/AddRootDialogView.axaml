@@ -10,7 +10,8 @@ alignment and BOTH dimensions bounded — because the panel that declared neithe
 
 Its data is the same RootOnboardingViewModel the first run uses; only the frame is new. The kind is
 detected from the path when the host wires a detector — the dialog's grammar is "the type is
-detected", with the three pills standing in where no detector exists (previews, unit tests). The
+detected". A composition without a detector simply states no kind - the assembled application
+always carries one, so pills for that branch were controls no person could ever reach. The
 Browse button is absent rather than disabled without a picker, because a dialog no run can open is
 an offer of something that cannot occur.
 -->
@@ -110,41 +111,6 @@ an offer of something that cannot occur.
               Text="{Binding DetectedKindHintKey, Converter={StaticResource DialogResourceKey}}"
               TextWrapping="Wrap" />
         </StackPanel>
-        <WrapPanel
-            IsVisible="{Binding !HasKindDetector}"
-            ItemSpacing="{DynamicResource Space12}"
-            LineSpacing="{DynamicResource Space12}">
-          <Button
-              Classes="theme-option"
-              automation:AutomationProperties.Name="{DynamicResource RootKindLocal}"
-              Command="{Binding SelectKindCommand}"
-              CommandParameter="{x:Static discovery:RootKind.Local}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding LocalStateCue}" />
-              <TextBlock Text="{DynamicResource RootKindLocal}" />
-            </StackPanel>
-          </Button>
-          <Button
-              Classes="theme-option"
-              automation:AutomationProperties.Name="{DynamicResource RootKindUsb}"
-              Command="{Binding SelectKindCommand}"
-              CommandParameter="{x:Static discovery:RootKind.Usb}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding UsbStateCue}" />
-              <TextBlock Text="{DynamicResource RootKindUsb}" />
-            </StackPanel>
-          </Button>
-          <Button
-              Classes="theme-option"
-              automation:AutomationProperties.Name="{DynamicResource RootKindUnc}"
-              Command="{Binding SelectKindCommand}"
-              CommandParameter="{x:Static discovery:RootKind.Unc}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding UncStateCue}" />
-              <TextBlock Text="{DynamicResource RootKindUnc}" />
-            </StackPanel>
-          </Button>
-        </WrapPanel>
         <Border
             Padding="12"
             Background="{DynamicResource AccentSubtleBrush}"
