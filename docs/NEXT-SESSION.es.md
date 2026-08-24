@@ -170,9 +170,11 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
 - [x] **F10 — Animaciones y barrido final**: `apr-shim` cuando un modelo sepa que carga (empezar
   por `LibraryViewModel`); manija 160 ms; privacidad con las dos gramáticas + `PrivacyNoHosts*` +
   `DiagnosticsEmptyFieldsNotice`; Lifecycle en Warning; los 16 comentarios de diseño en sus 9
-  archivos. [ANOTADO] La manija queda elevada al propietario: el árbol conmuta con `CheckBox` por
-  decisión medida (18 usos, 73 recursos, `CheckBoxStateTests`); migrar a `ToggleSwitch` revoca esa
-  decisión y cuesta su constelación de estados en 4 temas. Inicio no lleva esqueleto: sus carriles
+  archivos. [DECIDIDO 2026-08-24] La manija NO se migra: el árbol conmuta con `CheckBox` por decisión
+  medida (18 usos, 73 recursos, `CheckBoxStateTests`); un `ToggleSwitch` costaría su constelación
+  de estados en 4 temas y su transición queda fuera del alcance de las puertas de movimiento — el
+  costo no compra elegancia proporcional y la conmutación con casilla es igual de legítima en
+  Fluent. Si el propietario la quiere algún día, es un tramo propio con dos vueltas de CI. Inicio no lleva esqueleto: sus carriles
   pintan en el cuadro en que llega la respuesta.
 - [ ] **F11 — Cierre**: `SURFACES.es/en.md` con los 10 cambios del Inventario; FEATURES y
   CHANGELOG al día; matriz de evidencia de las 48 vistas (app con datos AL LADO del prototipo,

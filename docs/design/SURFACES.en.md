@@ -231,7 +231,7 @@ five scales each; and the tray one in five **real** sizes, 16/20/24/32/48, which
 nothing. A tray icon with a painted background reads as a square the moment somebody changes the bar
 colour, so that one needs real alpha.
 
-The tile and splash background colour (`#111827`) is decided here too.
+The tile and splash background colour (`#08090C`) is decided here too.
 
 ## What this document does not cover
 

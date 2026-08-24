@@ -231,7 +231,7 @@ placa; los otros cuatro, en cinco escalas cada uno; y el de bandeja en cinco tam
 16/20/24/32/48, que no son escalas de nada. Un icono de bandeja con fondo pintado se ve como un
 cuadrado en cuanto alguien cambia el color de la barra, así que ése necesita alfa de verdad.
 
-El color de fondo del mosaico y del arranque (`#111827`) también se decide aquí.
+El color de fondo del mosaico y del arranque (`#08090C`) también se decide aquí.
 
 ## Lo que este documento no cubre
 

@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     No progress bar, on purpose: this screen stands for under a second on the disk this application
     targets, and a bar that appears and dies unread is motion without information - what takes long
     (the first scan) reports inside the shell, where its numbers mean something. The surface is the
-    shell's own token, whose dark value is #111827, and MSIX's static splash is set to the same
+    shell's own token, whose dark value is #08090C, and MSIX's static splash is set to the same
     colour so the seam between the two screens does not flash. The title bar stays the system's:
     the one window chrome decision of this application, taken once in App.axaml.cs, holds here too.
   -->
