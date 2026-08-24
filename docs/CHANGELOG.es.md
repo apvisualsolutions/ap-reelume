@@ -555,6 +555,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El título de una ficha ocupa una línea, y un conmutador es la misma píldora que el botón de al
+  lado.** Dos cosas que se vieron mirando la aplicación de verdad. La primera: un título que se
+  iba a una segunda línea empujaba su propio año por debajo del año de la ficha vecina, y una fila
+  de fichas se leía como un borde dentado; ahora se corta con puntos suspensivos —el título
+  completo lo sigue anunciando el botón que envuelve la ficha, que lo lleva como nombre—. La
+  segunda: la forma de píldora estaba declarada sólo para `Button`, y un `ToggleButton` no
+  coincide con ese selector, así que «Favorito» y «Ver más tarde» conservaban la caja más baja del
+  tema base, su esquina cuadrada y su relleno propio, junto a las píldoras de su misma fila. Los
+  tres conmutadores del árbol se alinean ya con los botones, y una prueba lo afirma comparando la
+  geometría de los dos controles.
+
 - **Los bordes decorativos son por fin la línea capilar del prototipo.** Dieciocho contornos —los
   paneles de aviso y estado, el diálogo de añadir carpeta, el chip del tipo detectado, el banner
   del archivo suelto, la costura del riel y las dos tarjetas del actualizador— vestían el borde

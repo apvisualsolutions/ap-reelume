@@ -1084,8 +1084,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     both `border-radius: 999` - and this is the one place that decides it, so a view never writes a
     corner of its own. The three classes that are not pills say so themselves further down, and they
     win because a class selector declared later beats this one.
+
+    ToggleButton is named too: a toggle is a button that stays pressed, and it stands in the same
+    rows as the ordinary ones - "Favorito" beside "Marcar como visto". A ToggleButton does not match
+    the Button selector, so without this it kept the base theme's shorter box, its square corner and
+    its own asymmetric padding, and the row read as two kinds of control.
   -->
-  <Style Selector="Button">
+  <Style Selector="Button, ToggleButton">
     <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="Padding" Value="16,0" />

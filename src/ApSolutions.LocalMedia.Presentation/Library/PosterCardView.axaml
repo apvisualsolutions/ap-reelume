@@ -96,16 +96,15 @@ and a name here would be a second announcement of the same card.
       </Panel>
     </Border>
     <!--
-    Two lines and no more: a title that wraps freely makes the cards of one row different heights,
-    and one that never wraps hides half of every long name behind an ellipsis. MaxLines needs the
-    wrapping to have something to break, so the two go together.
+    One line and no more, ended by an ellipsis: a second line pushed the caption of one card below
+    the caption of the card beside it, so a row of cards read as a ragged edge instead of a grid.
+    The full title is still announced - the button around the card carries it as its name.
     -->
     <TextBlock
         FontWeight="SemiBold"
-        MaxLines="2"
         Text="{Binding Title}"
         TextTrimming="CharacterEllipsis"
-        TextWrapping="Wrap" />
+        TextWrapping="NoWrap" />
     <TextBlock
         FontSize="{DynamicResource FontSizeCaption}"
         Foreground="{DynamicResource TextSecondaryBrush}"

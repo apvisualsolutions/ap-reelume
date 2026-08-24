@@ -541,6 +541,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **A card's title takes one line, and a toggle is the same pill as the button beside it.** Two
+  things seen by looking at the real application. The first: a title that went to a second line
+  pushed its own year below the year of the card next to it, and a row of cards read as a ragged
+  edge; it now ends in an ellipsis — the full title is still announced by the button that wraps the
+  card, which carries it as its name. The second: the pill shape was declared for `Button` alone,
+  and a `ToggleButton` does not match that selector, so "Favorito" and "Ver más tarde" kept the
+  base theme's shorter box, its square corner and its own padding, beside the pills in their own
+  row. The tree's three toggles now line up with the buttons, and a test asserts it by comparing
+  the two controls' geometry.
+
 - **Decorative borders are finally the prototype's hairline.** Eighteen outlines — the notice and
   status panels, the add-folder dialog, the detected-kind chip, the loose-file banner, the rail's
   seam and the updater's two cards — wore the strong border the house reserves for control

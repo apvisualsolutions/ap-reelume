@@ -105,14 +105,19 @@ public sealed class PosterCardTests
             Avalonia.Automation.AutomationProperties.GetAccessibilityView(initials));
     }
 
-    /// <summary>The title gets two lines and the caption is set apart from it.</summary>
+    /// <summary>The title holds one line, ending in an ellipsis, and the caption is set apart.</summary>
     /// <remarks>
+    /// One line and not two, decided on 2026-08-24 by the owner looking at the real grid: a title
+    /// that took a second line pushed its own caption below the caption of the card beside it, so a
+    /// row read as a ragged edge. The full title is still announced — the button around the card
+    /// carries it as its accessible name.
+    ///
     /// The caption's colour is compared against the title's as well as against the token: a card
     /// where both were secondary would satisfy "the year is <c>TextSecondaryBrush</c>" and lose the
     /// contrast the rule is about.
     /// </remarks>
     [AvaloniaFact]
-    public void The_title_gets_two_lines_and_the_caption_is_a_quieter_colour()
+    public void The_title_holds_one_line_and_the_caption_is_a_quieter_colour()
     {
         var card = Mount(new PosterCardStub(
             "Ocho Cartas para un Invierno Muy Largo",
@@ -122,8 +127,8 @@ public sealed class PosterCardTests
 
         var blocks = card.GetVisualDescendants().OfType<TextBlock>().ToArray();
         var title = Assert.Single(blocks, block => block.Text!.StartsWith("Ocho", StringComparison.Ordinal));
-        Assert.Equal(2, title.MaxLines);
-        Assert.Equal(TextWrapping.Wrap, title.TextWrapping);
+        Assert.Equal(TextWrapping.NoWrap, title.TextWrapping);
+        Assert.Equal(TextTrimming.CharacterEllipsis, title.TextTrimming);
 
         var caption = Assert.Single(blocks, block => block.Text == "2023");
         var captionColour = Assert.IsAssignableFrom<ISolidColorBrush>(caption.Foreground).Color;

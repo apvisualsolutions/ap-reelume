@@ -4,6 +4,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -233,6 +234,38 @@ public sealed class ControlStateTests
                 window.Close();
                 Avalonia.Application.Current.RequestedThemeVariant = ThemeVariant.Default;
             }
+        }
+    }
+
+    /// <summary>
+    /// A toggle is a button that stays pressed, and it stands in the same rows as the ordinary ones:
+    /// "Favorito" beside "Marcar como visto". The pill geometry is declared on the Button selector,
+    /// which a ToggleButton does not match, so it kept the base theme's shorter box with its own
+    /// padding — a square corner and a text baseline out of line with the pills beside it.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_toggle_is_the_same_pill_as_the_button_beside_it()
+    {
+        var toggle = new ToggleButton { Content = "Favorito" };
+        var button = new Button { Content = "Marcar como visto" };
+        var window = new Window
+        {
+            Width = 420,
+            Height = 200,
+            Content = new StackPanel { Children = { toggle, button } },
+        };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            Assert.Equal(button.CornerRadius, toggle.CornerRadius);
+            Assert.Equal(button.MinHeight, toggle.MinHeight);
+            Assert.Equal(button.Padding, toggle.Padding);
+        }
+        finally
+        {
+            window.Close();
         }
     }
 
