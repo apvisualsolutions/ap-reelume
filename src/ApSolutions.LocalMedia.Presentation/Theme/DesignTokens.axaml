@@ -142,7 +142,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       -->
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FBFCFE" />
           <!--
             The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
             ordinary theme, and opaque in the two high contrasts, where a half-seen page behind a
@@ -194,29 +194,35 @@ SPDX-License-Identifier: GPL-3.0-or-later
           -->
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
-          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#EEF3F7" />
+          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#E9EEF4" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
-          <SolidColorBrush x:Key="ControlFillBrush" Color="#E2E8F0" />
-          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#D6DFEA" />
-          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#C4D0DF" />
-          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#EEF3F7" />
-          <SolidColorBrush x:Key="ShellBorderBrush" Color="#64748B" />
+          <SolidColorBrush x:Key="ControlFillBrush" Color="#EDF1F6" />
+          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#E3E9F1" />
+          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#D8E0EA" />
+          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#F3F6FA" />
+          <SolidColorBrush x:Key="ShellBorderBrush" Color="#6E7B8B" />
           <SolidColorBrush x:Key="ShellHairlineBrush" Color="#170F172A" />
-          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#111827" />
-          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#475569" />
-          <SolidColorBrush x:Key="TextDisabledBrush" Color="#64748B" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#101828" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#5A6675" />
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#5F6B7A" />
           <SolidColorBrush x:Key="FocusStrokeBrush" Color="#005A9C" />
-          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FBFCFE" />
           <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
-          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#DCEAF6" />
+          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#E4EFF9" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#111827" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
-          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FCF0D0" />
-          <SolidColorBrush x:Key="WarningBorderBrush" Color="#8A6100" />
-          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FDECEA" />
-          <SolidColorBrush x:Key="DangerBorderBrush" Color="#B3261E" />
-          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#E4F2E9" />
-          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#14653B" />
+          <SolidColorBrush x:Key="PrimaryActionBrush" Color="#1769AA" />
+          <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="#15619D" />
+          <SolidColorBrush x:Key="PrimaryActionPressedBrush" Color="#115586" />
+          <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#FFFFFF" />
+          <BoxShadows x:Key="ElevationShadow">0 1 2 0 #0D0F172A, 0 8 20 0 #0F0F172A</BoxShadows>
+          <BoxShadows x:Key="ElevationShadowStrong">0 24 56 0 #330F172A</BoxShadows>
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFF4E5" />
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#7A4A00" />
+          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FDECEE" />
+          <SolidColorBrush x:Key="DangerBorderBrush" Color="#8E1123" />
+          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#E6F4EA" />
+          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#0F5132" />
           <StaticResource x:Key="ButtonBackground" ResourceKey="ControlFillBrush" />
           <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
@@ -392,7 +398,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="TextControlPlaceholderForegroundDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#111827" />
+          <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#08090C" />
           <!--
             The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
             ordinary theme, and opaque in the two high contrasts, where a half-seen page behind a
@@ -408,29 +414,41 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <x:Double x:Key="PosterArtOpacity">1</x:Double>
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
-          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#172033" />
-          <SolidColorBrush x:Key="CardSurfaceBrush" Color="#1F2937" />
-          <SolidColorBrush x:Key="ControlFillBrush" Color="#1F2937" />
-          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#2A3648" />
-          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#354357" />
-          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#172033" />
-          <SolidColorBrush x:Key="ShellBorderBrush" Color="#94A3B8" />
+          <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#050608" />
+          <SolidColorBrush x:Key="CardSurfaceBrush" Color="#12151B" />
+          <SolidColorBrush x:Key="ControlFillBrush" Color="#171B22" />
+          <SolidColorBrush x:Key="ControlFillHoverBrush" Color="#1E232C" />
+          <SolidColorBrush x:Key="ControlFillPressedBrush" Color="#262C37" />
+          <SolidColorBrush x:Key="ControlFillDisabledBrush" Color="#101318" />
+          <SolidColorBrush x:Key="ShellBorderBrush" Color="#5C6878" />
           <SolidColorBrush x:Key="ShellHairlineBrush" Color="#12FFFFFF" />
-          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F8FAFC" />
-          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
-          <SolidColorBrush x:Key="TextDisabledBrush" Color="#7A8AA0" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#EDF1F6" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8B97A8" />
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#6A7686" />
           <SolidColorBrush x:Key="FocusStrokeBrush" Color="#7CC4FF" />
-          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#111827" />
+          <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#08090C" />
           <SolidColorBrush x:Key="AccentBrush" Color="#62AEE8" />
-          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#203B55" />
-          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#F8FAFC" />
-          <SolidColorBrush x:Key="AccentTextBrush" Color="#111827" />
-          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#3A2E0B" />
-          <SolidColorBrush x:Key="WarningBorderBrush" Color="#E8B84B" />
-          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#3B1A17" />
-          <SolidColorBrush x:Key="DangerBorderBrush" Color="#F2B8B5" />
-          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#12301F" />
-          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#7BD3A0" />
+          <SolidColorBrush x:Key="AccentSubtleBrush" Color="#0B1E2F" />
+          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#EDF1F6" />
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#0A0C10" />
+          <!--
+            The prototype's primary is a LIGHT pill in the dark theme - #F3F6FA wearing near-black
+            ink - not an accent-blue button. Its own family, so the accent stays the mark of state
+            and the primary stays the mark of the one leading action.
+          -->
+          <SolidColorBrush x:Key="PrimaryActionBrush" Color="#F3F6FA" />
+          <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PrimaryActionPressedBrush" Color="#E2E8F0" />
+          <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#0A0C10" />
+          <!-- The prototype's two elevations, verbatim: rgba(0,0,0,.5)/.42 and .66. -->
+          <BoxShadows x:Key="ElevationShadow">0 1 2 0 #80000000, 0 12 32 0 #6B000000</BoxShadows>
+          <BoxShadows x:Key="ElevationShadowStrong">0 28 70 0 #A8000000</BoxShadows>
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#2D281D" />
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#F2C879" />
+          <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#2E2226" />
+          <SolidColorBrush x:Key="DangerBorderBrush" Color="#F5A3AC" />
+          <SolidColorBrush x:Key="PositiveSurfaceBrush" Color="#12251D" />
+          <SolidColorBrush x:Key="PositiveBorderBrush" Color="#8FDBA6" />
           <StaticResource x:Key="ButtonBackground" ResourceKey="ControlFillBrush" />
           <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="ControlFillPressedBrush" />
@@ -645,6 +663,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PrimaryActionBrush" Color="#0000FF" />
+          <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="#0000FF" />
+          <SolidColorBrush x:Key="PrimaryActionPressedBrush" Color="#0000FF" />
+          <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#FFFFFF" />
+          <!-- High contrast draws no shadows: elevation is a colour nobody chose. -->
+          <BoxShadows x:Key="ElevationShadow">0 0 0 0 #00000000</BoxShadows>
+          <BoxShadows x:Key="ElevationShadowStrong">0 0 0 0 #00000000</BoxShadows>
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#000000" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FFFFFF" />
@@ -864,6 +889,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#000000" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#000000" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#000000" />
+          <SolidColorBrush x:Key="PrimaryActionBrush" Color="#00FFFF" />
+          <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="#00FFFF" />
+          <SolidColorBrush x:Key="PrimaryActionPressedBrush" Color="#00FFFF" />
+          <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#000000" />
+          <BoxShadows x:Key="ElevationShadow">0 0 0 0 #00000000</BoxShadows>
+          <BoxShadows x:Key="ElevationShadowStrong">0 0 0 0 #00000000</BoxShadows>
           <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="WarningBorderBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#000000" />
@@ -1200,10 +1231,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
     The setters go on the presenter because that is what paints a button — measured in phase 2a, a
     Background setter on the Button itself loses to the base theme.
   -->
+  <Style Selector="Button.primary-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PrimaryActionHoverBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource PrimaryActionTextBrush}" />
+  </Style>
+  <Style Selector="Button.primary-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource PrimaryActionPressedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource PrimaryActionTextBrush}" />
+  </Style>
   <Style Selector="Button.primary-action">
-    <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    <Setter Property="Background" Value="{DynamicResource PrimaryActionBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryActionBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource PrimaryActionTextBrush}" />
     <!-- btnPri is the wider and heavier of the prototype's two: 0 20 against the secondary's 0 16. -->
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Padding" Value="20,0" />
@@ -1648,6 +1687,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
     <Setter Property="Padding" Value="16,12" />
+    <!-- The prototype's elev shadow, and most of what reads as depth: a hairline alone is a drawing. -->
+    <Setter Property="BoxShadow" Value="{DynamicResource ElevationShadow}" />
   </Style>
 
   <Style Selector="TextBlock.setting-name">

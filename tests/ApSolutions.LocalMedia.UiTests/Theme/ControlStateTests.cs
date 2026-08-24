@@ -112,10 +112,13 @@ public sealed class ControlStateTests
 
         try
         {
+            // Re-declared 2026-08-24: the primary wears its own family - in dark the prototype's
+            // light pill - so the accent stays the mark of state and the primary the mark of the
+            // one leading action.
             var rest = Read(button, state: null);
-            Assert.Equal(Token(theme, "AccentBrush"), rest.Background);
-            Assert.Equal(Token(theme, "AccentTextBrush"), rest.Foreground);
-            Assert.Equal(Token(theme, "AccentBrush"), rest.Border);
+            Assert.Equal(Token(theme, "PrimaryActionBrush"), rest.Background);
+            Assert.Equal(Token(theme, "PrimaryActionTextBrush"), rest.Foreground);
+            Assert.Equal(Token(theme, "PrimaryActionBrush"), rest.Border);
 
             // It has to lead, and that is a number: the ordinary button's resting fill is what it is
             // being told apart from.
@@ -136,18 +139,18 @@ public sealed class ControlStateTests
                 second.Close();
             }
 
-            // And the same grammar as everything else once a hand reaches it. This is not luck about
-            // which style wins: the control theme sets the presenter's fill per pseudo-class and
-            // leaves the resting one to the template binding, so a setter on the button reaches rest
-            // and only rest. Phase 2f met the same mechanism as a defect; here it is the design, and
-            // it is asserted rather than assumed — including disabled, which nothing else claims.
-            Assert.Equal(Token(theme, "ControlFillHoverBrush"), Read(button, ":pointerover").Background);
-            Assert.Equal(Token(theme, "ControlFillPressedBrush"), Read(button, ":pressed").Background);
+            // Re-declared 2026-08-24 with the primary's own family: under the hand it stays the
+            // primary - the prototype's light pill brightens rather than falling to the common
+            // grammar, because a leading action that dressed down on hover stopped leading exactly
+            // when somebody was about to take it. Disabled still falls to the common fill below:
+            // a primary that cannot be pressed has nothing left to lead.
+            Assert.Equal(Token(theme, "PrimaryActionHoverBrush"), Read(button, ":pointerover").Background);
+            Assert.Equal(Token(theme, "PrimaryActionPressedBrush"), Read(button, ":pressed").Background);
             Assert.Equal(Token(theme, "ControlFillDisabledBrush"), Read(button, ":disabled").Background);
             foreach (var state in new[] { ":pointerover", ":pressed" })
             {
                 var painted = Read(button, state);
-                Assert.Equal(Token(theme, "ControlTextActiveBrush"), painted.Foreground);
+                Assert.Equal(Token(theme, "PrimaryActionTextBrush"), painted.Foreground);
                 Assert.True(
                     Contrast(painted.Foreground, painted.Background) >= 4.5,
                     $"{themeName} {state}: the primary action's label stops being readable.");

@@ -37,6 +37,7 @@ an offer of something that cannot occur.
       Background="{DynamicResource CardSurfaceBrush}"
       BorderBrush="{DynamicResource ShellBorderBrush}"
       BorderThickness="1"
+      BoxShadow="{DynamicResource ElevationShadowStrong}"
       CornerRadius="{DynamicResource CornerRadiusMedium}">
     <StackPanel Spacing="{DynamicResource Space16}">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">

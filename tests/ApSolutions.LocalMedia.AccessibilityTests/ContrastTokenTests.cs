@@ -61,6 +61,13 @@ public sealed class ContrastTokenTests
         "AccentBrush",
         "AccentSubtleBrush",
         "AccentTextBrush",
+
+        // The leading action's own family, added 2026-08-24 with the prototype's palette: in dark
+        // it is a light pill, so it cannot share the accent's tokens or its measured pairs.
+        "PrimaryActionBrush",
+        "PrimaryActionHoverBrush",
+        "PrimaryActionPressedBrush",
+        "PrimaryActionTextBrush",
         "WarningSurfaceBrush",
         "WarningBorderBrush",
         "DangerSurfaceBrush",
@@ -157,6 +164,13 @@ public sealed class ContrastTokenTests
             // accent is a pale blue, and white on it reads 2.40:1. The colour follows the accent's
             // luminance, not the theme's name.
             AssertContrastAtLeast(brushes, "AccentTextBrush", "AccentBrush", TextMinimum, $"{theme} text on the accent");
+
+            // The leading action's ink on each of its three fills: the primary is its own family
+            // since 2026-08-24, and a pill whose hover loses its ink is a button that blinks.
+            AssertContrastAtLeast(brushes, "PrimaryActionTextBrush", "PrimaryActionBrush", TextMinimum, $"{theme} text on the primary");
+            AssertContrastAtLeast(brushes, "PrimaryActionTextBrush", "PrimaryActionHoverBrush", TextMinimum, $"{theme} text on the hovered primary");
+            AssertContrastAtLeast(brushes, "PrimaryActionTextBrush", "PrimaryActionPressedBrush", TextMinimum, $"{theme} text on the pressed primary");
+            AssertContrastAtLeast(brushes, "PrimaryActionBrush", "ShellSurfaceBrush", NonTextMinimum, $"{theme} primary against the shell");
             Assert.False(
                 string.Equals(brushes["AccentBrush"], brushes["FocusStrokeBrush"], StringComparison.OrdinalIgnoreCase),
                 $"{theme} paints the accent and the focus ring in the same colour, so the mark and the "

@@ -40,6 +40,7 @@ and a name here would be a second announcement of the same card.
         Background="{DynamicResource ControlFillBrush}"
         BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="1"
+        BoxShadow="{DynamicResource ElevationShadow}"
         ClipToBounds="True"
         CornerRadius="{DynamicResource CornerRadiusMedium}">
       <Panel>
