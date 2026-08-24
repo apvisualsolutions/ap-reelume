@@ -113,3 +113,17 @@ La desviación del Inventario de controles sigue siendo una y está documentada:
 existe**, porque el prototipo aplica al elegir y un botón cuyo único trabajo era repetir lo que el
 control de al lado ya había dicho es la definición de un control de más. / The one deviation from
 the control inventory remains documented: there is no "Apply" button.
+
+## Una corrección posterior, del arnés y no del producto / A later correction, of the harness
+
+Las veintiuna capturas se tomaron a **1600 × 2186** aunque se pidiera 1600 × 1000, y la causa era el
+propio guion: en PowerShell `$H` y `$h` son la misma variable, así que el manejador de la ventana
+pisaba la altura. Está medido y corregido en
+[el arnés mentía sobre su propia geometría](audit-harness-geometry-lied.md). **No invalida nada de
+lo anterior** —una ventana más alta enseña más de cada vista, y esta matriz nunca declaró una
+resolución—, pero se deja escrito aquí porque la afirmación «la aplicación al lado de su prototipo»
+sólo vale si se sabe con qué geometría se tomó cada mitad. / The twenty-one captures were taken at
+1600 × 2186 although 1600 × 1000 was asked for, and the cause was the script itself. It invalidates
+nothing above — a taller window shows more of each view, and this matrix never declared a resolution
+— but it is written here because "the application beside its prototype" only holds if the geometry
+of each half is known.

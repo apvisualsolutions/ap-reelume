@@ -39,9 +39,53 @@ alto—; montada sola a 900 px se pinta entera. Se comprobó cambiando el arnés
 **Recuentos finales**: 53 vistas, **576** cadenas por idioma (el plan estimaba 517), 48 filas en
 `LeadingActionTests`, 0 pendientes del paseo, deuda de cobertura 215.
 
-**Qué queda**: mirar CI de `3d4fd49` y avanzar `main` por fast-forward hasta el último verde. Del
-alcance abierto, lo de siempre: PRD-003 (ARM64, bloqueado por hardware), REL-001/REL-004 y
-PLY-004 (5.1/7.1, bloqueado).
+**Cerrado y verificado**: `main` = `1c1eaa9`, con CI en verde leído por `--json conclusion` sobre
+los cuatro commits. Ese run corre el superconjunto —`verify.ps1` + accesibilidad ×2 + recuperación
+×2 + cobertura del paseo—, y la deuda de cobertura que emitió es **idéntica** a la del árbol: 215
+entradas, ni una bajada.
+
+**Un defecto del arnés, encontrado al cerrar y corregido**
+([evidencia](evidence/stable/audit-harness-geometry-lied.md)): las 21 capturas salieron a
+1600 × 2186 pidiendo 1600 × 1000 porque **en PowerShell `$H` y `$h` son la misma variable** y el
+manejador de la ventana pisaba la altura. Cuatro hipótesis se midieron y se refutaron antes de dar
+con ella —la anchura era correcta, y eso descarta la escala de DPI por sí solo—. `shoot.ps1` usa ya
+`-Width`/`-Height` y **verifica su propia geometría** antes de disparar. No invalida la matriz: una
+ventana más alta enseña más de cada vista, y la matriz nunca declaró resolución.
+
+### Lo siguiente, y por qué es esto
+
+**El paso 11 —la página del repositorio con capturas— queda DESBLOQUEADO hoy.** Su única condición
+era «no se empieza antes de que la §4 termine», y la §4 terminó. Está **enteramente decidido** en
+este mismo documento (buscar «11. La página del repositorio»): cinco capturas —Inicio, Biblioteca,
+ficha de serie, reproductor con su columna, bandeja de revisión—, en **inglés**, tema **oscuro**, a
+**1600 × 1000**, versionadas en `docs/assets/` porque un README de GitHub no puede enlazar a un
+artefacto de CI. **No hay nada que deliberar: hay que ejecutar.**
+
+Y ahora se puede: hasta hoy `shoot.ps1` no sabía dar 1600 × 1000 aunque se le pidiese. **La
+herramienta está probada de punta a punta con las tres condiciones a la vez** —inglés, oscuro y
+1600 × 1000— en `artifacts/ui-captures/T36-app/probe-en-1600x1000.png` (fuera del control de versiones), que dice «Home», «Continue
+watching» y «Open library». El idioma se fija como el tema, escribiendo `ui.language` (valores `es`
+o `en`, medidos en `StoredLanguageService`) en el `settings.json` de la raíz antes de arrancar.
+
+La invocación, tal cual, para no reconstruirla: / The invocation, as is:
+
+```powershell
+# Desde la raíz del repositorio. / From the repository root.
+$tools = "$env:USERPROFILE\.claude\projects\D--Proyectos-ap-reelume\tools"
+$env:AP_LOCALMEDIA_DATA_ROOT = "$tools\matrix-root"
+$exe = ".\src\ApSolutions.LocalMedia.Windows\bin\Release\net10.0-windows10.0.22621.0\ApSolutions.LocalMedia.Windows.exe"
+& "$tools\shoot.ps1" -Out ".\docs\assets\home.png" -Wait 16 -Theme Dark -Language en -Width 1600 -Height 1000 -Exe $exe
+& "$tools\shoot.ps1" -Out ".\docs\assets\show.png" -Wait 16 -Theme Dark -Language en -Width 1600 -Height 1000 -Invoke 'Library;Historias del Muelle' -Exe $exe
+```
+
+**Dos avisos medidos para quien las tome**: la aplicación tarda **más de 9 segundos** en dar
+ventana, así que `-Wait 16`; y con `-Language en` los nombres accesibles de `-Invoke` son los
+**ingleses** (`Library`, `Review`, `Duplicates`, `Settings`), porque UIAutomation busca por el
+nombre que la interfaz muestra.
+
+**Del alcance abierto, lo de siempre**: PRD-003 (ARM64, bloqueado por hardware), REL-001/REL-004 y
+PLY-004 (5.1/7.1, bloqueado). Y el **paso 7, el paseo físico del propietario**, que sigue siendo lo
+único que bloquea el corte de 0.2.0 (paso 8).
 
 ## Estado al cierre del 2026-08-24 (madrugada) — fidelidad de paleta HECHA y verificada en pantalla
 
@@ -61,7 +105,7 @@ anterior al prototipo. Hecho en `0667010`:
   Ajustes, Duplicados, Revisar) junto a `T36-proto/`.
 
 **El data root de la matriz vive FUERA del árbol**:
-`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\matrix-root` — `artifacts/` lo
+`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume\tools\matrix-root` — `artifacts/` lo
 barren las suites (se comió el primero). `tools/shoot.ps1` ya respeta un
 `AP_LOCALMEDIA_DATA_ROOT` puesto por el llamador.
 
@@ -120,7 +164,7 @@ del que se comprueba (¿normalización de la ruta? ¿cwd?) — confirmarlo impri
 arrancar con un root virgen, añadir `artifacts/matrix-root/media` por la interfaz (el diálogo de
 añadir raíz, con Invoke), dejar que el escaneo real catalogue los archivos (quedan «sin
 identificar», que pinta fichas igualmente), y capturar. Cero dependencia del data root sembrado. Herramientas de la sesión:
-`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\seed\` (siembra la matriz;
+`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume\tools\seed\` (siembra la matriz;
 `--check` lee raíces) y `tools\preview\` (esta sesión lo dejó montando el reproductor de F7).
 
 **F11 restante**: matriz-app (bloqueada por el hallazgo), capturas HC (shell + reproductor + un
@@ -330,7 +374,7 @@ hash propio —`string.GetHashCode` lo aleatoriza por proceso— y apagado en lo
 
 ### Herramientas de esta sesión, que ahorran horas
 
-**Las tres viven fuera del árbol, en `%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\`**,
+**Las tres viven fuera del árbol, en `%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume\tools\`**,
 que persiste entre sesiones: son herramientas de inspección, no puertas, y no ensucian el
 repositorio.
 
