@@ -266,7 +266,7 @@ public sealed class HomeLayoutTests
     /// the two, not the name of one token.
     /// </remarks>
     [AvaloniaFact]
-    public async Task A_recently_added_card_holds_the_title_to_two_lines_and_sets_the_year_apart()
+    public async Task A_recently_added_card_holds_the_title_to_one_line_and_sets_the_year_apart()
     {
         ApplyLanguage("es-ES");
         var viewModel = await CreateViewModelWithRecentAsync(
@@ -278,8 +278,10 @@ public sealed class HomeLayoutTests
         var title = Assert.Single(blocks, block => block.Text == "Arrival");
         var year = Assert.Single(blocks, block => block.Text == "2016");
 
-        Assert.Equal(2, title.MaxLines);
-        Assert.Equal(TextWrapping.Wrap, title.TextWrapping);
+        // One line, ended by an ellipsis: a second line pushed this card's year below the year of
+        // the card beside it, and a rail of cards read as a ragged edge (owner, 2026-08-24).
+        Assert.Equal(TextWrapping.NoWrap, title.TextWrapping);
+        Assert.Equal(TextTrimming.CharacterEllipsis, title.TextTrimming);
         Assert.Equal(
             ThemeColour("TextSecondaryBrush"),
             Assert.IsAssignableFrom<ISolidColorBrush>(year.Foreground).Color);
