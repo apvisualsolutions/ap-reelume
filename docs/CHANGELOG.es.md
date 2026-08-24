@@ -555,6 +555,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Inicio arrancaba vacío aunque hubiera algo a medio ver, y se llenaba solo al salir y volver.**
+  La ruta con la que nace la aplicación no pasa por el navegador de rutas, así que el aviso de
+  «se ha navegado» —el único sitio donde las superficies se alimentan— no sonaba nunca para la
+  primera pantalla: Inicio sabía leerse y nadie se lo pedía hasta que se visitaba otra sección y
+  se regresaba. Es la decimocuarta forma del defecto de la casa, esta vez en el minuto que todos
+  los usuarios ven. Ahora el shell, nada más construirse, reproduce su ruta inicial por el mismo
+  camino que una navegación de verdad, de modo que la primera pantalla y las navegadas comparten
+  la única vía de carga que existe.
+
 - **La barra de posición podía llevarse la reproducción al segundo 1 ella sola.** No llegó a
   publicarse: se midió al escribir su prueba, el mismo día que la barra. Un `Slider` de Avalonia
   recorta lo que se escribe en su valor contra el máximo que tiene **en ese instante**, y el modelo

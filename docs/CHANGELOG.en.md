@@ -541,6 +541,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Home started empty even with something half-watched, and only filled itself after leaving and
+  coming back.** The route the application is born on never goes through the route navigator, so
+  the "navigated" notice — the only place surfaces are fed — never sounded for the first screen:
+  Home knew how to read itself and nobody asked until another section was visited and abandoned.
+  It is the house defect's fourteenth shape, this time in the minute every user sees. Now the
+  shell, as soon as it is built, replays its initial route through the same path a real navigation
+  takes, so the first screen and the navigated ones share the only load path there is.
+
 - **The position bar could take playback to second one by itself.** It never shipped: it was
   measured while writing its test, the same day the bar arrived. An Avalonia `Slider` clamps whatever
   is written into its value against the maximum it holds **at that instant**, and the model announced
