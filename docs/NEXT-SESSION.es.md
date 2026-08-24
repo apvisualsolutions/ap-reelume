@@ -78,10 +78,30 @@ $exe = ".\src\ApSolutions.LocalMedia.Windows\bin\Release\net10.0-windows10.0.226
 & "$tools\shoot.ps1" -Out ".\docs\assets\show.png" -Wait 16 -Theme Dark -Language en -Width 1600 -Height 1000 -Invoke 'Library;Historias del Muelle' -Exe $exe
 ```
 
-**Dos avisos medidos para quien las tome**: la aplicación tarda **más de 9 segundos** en dar
-ventana, así que `-Wait 16`; y con `-Language en` los nombres accesibles de `-Invoke` son los
-**ingleses** (`Library`, `Review`, `Duplicates`, `Settings`), porque UIAutomation busca por el
-nombre que la interfaz muestra.
+**Tres avisos medidos para quien las tome**: la aplicación tarda **más de 9 segundos** en dar
+ventana, así que `-Wait 16`; con `-Language en` los nombres accesibles de `-Invoke` son los
+**ingleses** (`Library`, `Review`, `Duplicates`, `Settings`, `Resume`, `Play from the start`),
+porque UIAutomation busca por el nombre que la interfaz muestra; y `-Settle <segundos>` espera una
+vez más antes de disparar, para una superficie que sigue trabajando después de la pulsación.
+
+**Y un obstáculo real, ya medido, para la captura del reproductor** —la cuarta de las cinco—: los
+archivos que siembra `tools/seed` son de **2 bytes**, así que no hay nada que reproducir. Con
+`ffmpeg` —presente en esta máquina— se genera uno real encima del sembrado, conservando el nombre
+para que la fila del catálogo siga apuntando a él:
+
+```
+ffmpeg -y -f lavfi -i "testsrc2=size=1920x1080:rate=24:duration=120" -f lavfi -i "sine=frequency=440:duration=120" -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -shortest <media>/El.Faro.de.Piedra.2019.mkv
+```
+
+Hecho eso, `-Invoke 'Library;El Faro de Piedra;Resume'` **abre el reproductor de verdad** —sus
+controles salen en la captura—, pero **`PrintWindow` no compone su capa de vídeo**: la superficie
+llega transparente y se ve la ficha por debajo, con los botones del reproductor dibujados como
+marcos vacíos. Es la trampa conocida del contenido acelerado por GPU. **Tres salidas, sin decidir
+todavía porque la decisión pide medir cuál da la imagen que el README merece**: capturar la pantalla
+en vez de la ventana (`BitBlt` sobre el escritorio, con la app al frente); usar
+`Windows.Graphics.Capture`, que sí compone la GPU; o aceptar el reproductor con su fotograma en
+negro, que es honesto pero pobre para una portada. La primera es la más barata y la que yo probaría
+antes.
 
 **Del alcance abierto, lo de siempre**: PRD-003 (ARM64, bloqueado por hardware), REL-001/REL-004 y
 PLY-004 (5.1/7.1, bloqueado). Y el **paso 7, el paseo físico del propietario**, que sigue siendo lo
