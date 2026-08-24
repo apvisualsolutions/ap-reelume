@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "manifestSha256": "5e341b5f9214455708b26c57476e33339855917abe7353615817e0a75f695402",
+  "manifestSha256": "07dda8458b0bbce240a7f195766a769ad7617e17c44dc6391f721878f3982113",
   "machine": {
     "cleanVirtualMachine": true,
     "elevated": true,
@@ -75,7 +75,7 @@
       "outcome": "Passed",
       "detail": "Windows refused the older package and kept 0.2.0.0",
       "id": "windows-downgrade-refused",
-      "refusal": "Deployment failed with HRESULT: 0x80073D06, No se pudo instalar el paquete porque ya hay instalada una versión superior de este paquete.\r\n\r\nWindows no puede instalar el paquete APSolutions.LocalMedia_0.1.0.0_x64__8sg7nj2tbse8g porque tiene la versión 0.1.0.0. Ya está instalada una versión superior 0.2.0.0 de este paquete.\n\nNOTE: For additional information, look for [ActivityId] 70a4d428-2d82-0005-65f5-a470822ddd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID 70a4d428-2d82-0005-65f5-a470822ddd01\n",
+      "refusal": "Deployment failed with HRESULT: 0x80073D06, No se pudo instalar el paquete porque ya hay instalada una versión superior de este paquete.\r\n\r\nWindows no puede instalar el paquete APSolutions.LocalMedia_0.1.0.0_x64__8sg7nj2tbse8g porque tiene la versión 0.1.0.0. Ya está instalada una versión superior 0.2.0.0 de este paquete.\n\nNOTE: For additional information, look for [ActivityId] e2c2bff4-339e-0003-1996-c3e29e33dd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID e2c2bff4-339e-0003-1996-c3e29e33dd01\n",
       "version": "0.2.0.0"
     },
     {
