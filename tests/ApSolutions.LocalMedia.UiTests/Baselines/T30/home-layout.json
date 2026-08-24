@@ -11,12 +11,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -31,12 +34,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -51,12 +57,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -71,12 +80,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -91,12 +103,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -111,12 +126,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -131,12 +149,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 403,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -151,12 +172,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 403,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -171,12 +195,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 403,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -191,12 +218,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 403,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -211,12 +241,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 403,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -231,12 +264,15 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 403,
-    "LibraryEntryWithinFirstViewport": true,
+    "LibraryEntryBottom": 827,
+    "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
   {
@@ -251,11 +287,13 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 827,
     "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
@@ -271,11 +309,13 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 827,
     "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
@@ -291,11 +331,13 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 827,
     "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
@@ -311,11 +353,13 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 827,
     "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
@@ -331,11 +375,13 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 827,
     "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
@@ -351,11 +397,13 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 827,
     "LibraryEntryWithinFirstViewport": false,
     "RecommendationsRailVisible": true
   },
@@ -371,11 +419,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 406,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -391,11 +442,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 406,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -411,11 +465,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 406,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -431,11 +488,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 406,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -451,11 +511,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 406,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -471,11 +534,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 406,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -491,11 +557,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -511,11 +580,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -531,11 +603,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -551,11 +626,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -571,11 +649,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -591,11 +672,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 829,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -611,11 +695,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 828,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -631,11 +718,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 828,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -651,11 +741,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 828,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -671,11 +764,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 828,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -691,11 +787,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 828,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   },
@@ -711,11 +810,14 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroDetails",
+      "ContinueCardResume",
+      "ContinueCardResume",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
     "LibraryEntryVisible": true,
-    "LibraryEntryBottom": 404,
+    "LibraryEntryBottom": 828,
     "LibraryEntryWithinFirstViewport": true,
     "RecommendationsRailVisible": true
   }

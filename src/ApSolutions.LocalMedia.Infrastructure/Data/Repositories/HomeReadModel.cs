@@ -31,6 +31,9 @@ public sealed class HomeReadModel : IHomeReadModel
             SELECT state.content_key, state.title_id, state.episode_id, titles.kind, titles.primary_title,
                    episodes.season_number, episodes.episode_number, episodes.title,
                    state.position_ticks, state.observed_duration_ticks, state.status,
+                   titles.release_year,
+                   (SELECT group_concat(g.genre, '|') FROM title_genres g WHERE g.title_id = titles.id)
+                       AS genres,
                    CASE
                        WHEN state.episode_id IS NULL THEN titles.is_available
                        ELSE CASE WHEN COALESCE(episodes.is_available, 0) = 1
@@ -64,8 +67,14 @@ public sealed class HomeReadModel : IHomeReadModel
                 TimeSpan.FromTicks(reader.GetInt64(8)),
                 reader.IsDBNull(9) ? null : TimeSpan.FromTicks(reader.GetInt64(9)),
                 (WatchStatus)reader.GetInt32(10),
-                reader.GetInt32(11) == 1,
-                ParseDate(reader.GetString(12))));
+                // Thirteen and fourteen, not eleven and twelve: the year and the genres were added
+                // to this SELECT for the hero's line, and every column after them moved along.
+                reader.GetInt32(13) == 1,
+                ParseDate(reader.GetString(14)),
+                reader.IsDBNull(11) ? null : reader.GetInt32(11),
+                reader.IsDBNull(12)
+                    ? []
+                    : reader.GetString(12).Split('|', StringSplitOptions.RemoveEmptyEntries)));
         }
 
         return entries;

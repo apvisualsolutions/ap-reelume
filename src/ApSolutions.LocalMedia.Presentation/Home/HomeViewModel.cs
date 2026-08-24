@@ -11,6 +11,7 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Navigation;
+using ApSolutions.LocalMedia.Presentation.Player;
 
 namespace ApSolutions.LocalMedia.Presentation.Home;
 
@@ -23,6 +24,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
     private readonly GetHome _getHome;
     private readonly INavigationService? _navigation;
     private readonly Func<ContentKey, Task>? _onResume;
+    private readonly Func<TitleId, Task>? _onOpenDetails;
     private HomeSnapshot _snapshot = new(null, [], [], new LibrarySummary(0, 0, 0));
     private IReadOnlyList<InProgressItemViewModel> _inProgress = [];
     private IReadOnlyList<RecentlyAddedItemViewModel> _recentlyAdded = [];
@@ -31,14 +33,23 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         GetHome getHome,
         INavigationService? navigation = null,
         Func<ContentKey, Task>? onResume = null,
-        RecommendationsViewModel? recommendations = null)
+        RecommendationsViewModel? recommendations = null,
+        Func<TitleId, Task>? onOpenDetails = null)
     {
         _getHome = getHome ?? throw new ArgumentNullException(nameof(getHome));
         _navigation = navigation;
         _onResume = onResume;
+        _onOpenDetails = onOpenDetails;
         Recommendations = recommendations;
         ResumeCommand = new AsyncRelayCommand(ResumeAsync, () => HasResume);
+        OpenResumeDetailsCommand = new AsyncRelayCommand(OpenResumeDetailsAsync, () => HasResume);
         OpenLibraryCommand = new AsyncRelayCommand(OpenLibraryAsync);
+        ResumeItemCommand = new AsyncRelayCommand(
+            parameter => ResumeItemAsync(parameter as InProgressItemViewModel),
+            parameter => parameter is InProgressItemViewModel { IsAvailable: true });
+        OpenItemDetailsCommand = new AsyncRelayCommand(
+            parameter => OpenItemDetailsAsync(parameter as IRailCard),
+            parameter => parameter is IRailCard);
         RefreshCommand = new AsyncRelayCommand(() => LoadAsync(CancellationToken.None));
     }
 
@@ -46,7 +57,33 @@ public sealed class HomeViewModel : INotifyPropertyChanged
 
     public ICommand ResumeCommand { get; }
 
+    /// <summary>
+    /// The hero's second action: the card for what it offers to continue.
+    /// </summary>
+    /// <remarks>
+    /// The prototype puts Detalles beside Continuar, and the note on the old one-button row said the
+    /// second would arrive «the day the read model can answer for it». It answers now: the resume
+    /// item carries its title id, and opening a card from a rail is what the library already knows
+    /// how to do — so this is a hook the composition fills, exactly like onResume, rather than a
+    /// second way into the same surface.
+    /// </remarks>
+    public ICommand OpenResumeDetailsCommand { get; }
+
     public ICommand OpenLibraryCommand { get; }
+
+    /// <summary>
+    /// Continues one card of the rail, which the prototype puts a button on.
+    /// </summary>
+    /// <remarks>
+    /// The rail used to be a row of covers with no action on them at all: the card was a list item,
+    /// and pressing it selected. The prototype gives every card the two things the hero has — resume
+    /// at its own minute, and open its card — and these are those, taking the card as their
+    /// parameter so one command serves the whole rail.
+    /// </remarks>
+    public ICommand ResumeItemCommand { get; }
+
+    /// <summary>Opens the card of whichever rail item is passed to it.</summary>
+    public ICommand OpenItemDetailsCommand { get; }
 
     public ICommand RefreshCommand { get; }
 
@@ -72,6 +109,89 @@ public sealed class HomeViewModel : INotifyPropertyChanged
     public double ResumeCompletedFraction => _snapshot.Resume?.CompletedFraction ?? 0;
 
     public string ResumeCompletedText => FormatPercentage(ResumeCompletedFraction);
+
+    /// <summary>
+    /// The hero's own line: «2019 · Drama · Misterio · quedan 1:09:00».
+    /// </summary>
+    /// <remarks>
+    /// The prototype writes what this is and how much of it is left, and this said neither — it had
+    /// a percentage beside the bar instead, which answers a different question. What is left is the
+    /// one number somebody deciding whether to press Continue actually weighs.
+    ///
+    /// <para>
+    /// Each piece is dropped when the catalogue has nothing to say, so a title with no year, no
+    /// genre and no known length leaves no separators behind. For a series the season and episode
+    /// take the place of the year, which is what the prototype does with its own.
+    /// </para>
+    /// </remarks>
+    public string ResumeMetaText
+    {
+        get
+        {
+            if (_snapshot.Resume is not { } resume)
+            {
+                return string.Empty;
+            }
+
+            var pieces = new List<string>();
+            if (HasResumeSubtitle)
+            {
+                pieces.Add(ResumeSubtitle);
+            }
+            else if (resume.Year is { } year)
+            {
+                pieces.Add(year.ToString(CultureInfo.CurrentCulture));
+            }
+
+            if (resume.Genres is { Count: > 0 } genres)
+            {
+                pieces.AddRange(genres.Take(2));
+            }
+
+            if (resume.ObservedDuration is { } duration && duration > resume.Position)
+            {
+                pieces.Add(Remaining(duration - resume.Position));
+            }
+
+            return string.Join(" · ", pieces);
+        }
+    }
+
+    public bool HasResumeMeta => ResumeMetaText.Length > 0;
+
+    /// <summary>«Continuar · 49:00», which is the prototype's own label for this button.</summary>
+    /// <remarks>
+    /// The time is in the button because it is what the button does: it does not resume "the film",
+    /// it resumes it at that minute, and a person who left off at 49:00 recognises the number before
+    /// they read the word.
+    /// </remarks>
+    public string ResumeActionText => _snapshot.Resume is { } resume
+        ? Resource("HomeResumeAction", "Continue") + " · " + PlaybackClock.Format(resume.Position)
+        : Resource("HomeResumeAction", "Continue");
+
+    private static string Remaining(TimeSpan left) =>
+        Resource("HomeResumeRemaining", "left {0}").Replace(
+            "{0}",
+            PlaybackClock.Format(left),
+            StringComparison.Ordinal);
+
+    /// <summary>
+    /// The words behind a key, resolved where the resources are.
+    /// </summary>
+    /// <remarks>
+    /// Two of this model's strings are patterns rather than picks — «Continuar · 49:00» and «quedan
+    /// 1:09:00» — so they are built here. The fallback matters: a headless test mounts this model
+    /// without the string dictionaries, and a null would make the hero's button say the time alone.
+    /// </remarks>
+    private static string Resource(string key, string fallback) => Word(key, fallback);
+
+    /// <summary>The words behind a key, for the three models on this page that build a label.</summary>
+    internal static string Word(string key, string fallback) =>
+        Avalonia.Application.Current is { } application
+            && application.TryGetResource(key, application.ActualThemeVariant, out var value)
+            && value is string text
+                ? text
+                : fallback;
 
     public IReadOnlyList<InProgressItemViewModel> InProgress
     {
@@ -125,6 +245,9 @@ public sealed class HomeViewModel : INotifyPropertyChanged
             nameof(HasResumeSubtitle),
             nameof(ResumeCompletedFraction),
             nameof(ResumeCompletedText),
+            nameof(ResumeMetaText),
+            nameof(HasResumeMeta),
+            nameof(ResumeActionText),
             nameof(HasInProgress),
             nameof(HasRecentlyAdded),
             nameof(MovieCount),
@@ -138,6 +261,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         }
 
         (ResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (OpenResumeDetailsCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     internal static string FormatPercentage(double fraction) =>
@@ -165,12 +289,36 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         return true;
     }
 
+    private async Task ResumeItemAsync(InProgressItemViewModel? card)
+    {
+        if (card is not null && _onResume is { } resume)
+        {
+            await resume(card.Content).ConfigureAwait(true);
+        }
+    }
+
+    private async Task OpenItemDetailsAsync(IRailCard? card)
+    {
+        if (card is not null && _onOpenDetails is { } open)
+        {
+            await open(card.TitleId).ConfigureAwait(true);
+        }
+    }
+
+    private async Task OpenResumeDetailsAsync()
+    {
+        if (_snapshot.Resume is { } resume && _onOpenDetails is { } open)
+        {
+            await open(resume.TitleId).ConfigureAwait(true);
+        }
+    }
+
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 /// <summary>One card of the in-progress rail. An unreachable file is shown, never quietly dropped.</summary>
-public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard
+public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard, IRailCard
 {
     private readonly InProgressItem _item = item ?? throw new ArgumentNullException(nameof(item));
 
@@ -200,6 +348,44 @@ public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard
 
     public string CompletedText => HomeViewModel.FormatPercentage(_item.CompletedFraction);
 
+    /// <summary>
+    /// The line under the title on this rail's card: «T02·E05 · Puerto de invierno» for an episode,
+    /// «Película · 2020» for a film.
+    /// </summary>
+    /// <remarks>
+    /// The kind is spelled out for a film because there is no episode to say instead, which is the
+    /// prototype's own asymmetry: what the line answers is "which one of these am I looking at",
+    /// and for an episode that is the number and its title.
+    /// </remarks>
+    public string RailSubtitle => IsShow
+        ? CaptionText + (_item.EpisodeTitle is { Length: > 0 } title ? " · " + title : string.Empty)
+        : string.Join(
+            " · ",
+            new[]
+            {
+                HomeViewModel.Word("CatalogKindMovie", "Film"),
+                _item.Year?.ToString(CultureInfo.CurrentCulture) ?? string.Empty,
+            }.Where(piece => piece.Length > 0));
+
+    /// <summary>«Continuar · 17:00», the same label the hero's button carries.</summary>
+    public string ResumeActionText =>
+        HomeViewModel.Word("HomeResumeAction", "Continue") + " · " + PlaybackClock.Format(_item.Position);
+
+    /// <summary>
+    /// What a reader hears on this card's two buttons, which is the label and what it acts on.
+    /// </summary>
+    /// <remarks>
+    /// A rail of three cards has three Continues and three Detalles on it, and named by their words
+    /// alone they are three controls a screen reader cannot tell apart — measured by the audit the
+    /// moment the buttons arrived. The title is what tells them apart, and it is the same thing the
+    /// eye uses: the button sits under it.
+    /// </remarks>
+    public string ResumeAccessibleName => ResumeActionText + " · " + Title;
+
+    /// <summary>The same, for the card's second button.</summary>
+    public string DetailsAccessibleName =>
+        HomeViewModel.Word("HomeResumeDetailsAction", "Details") + " · " + Title;
+
     public string KindKey => IsShow ? "CatalogKindShow" : "CatalogKindMovie";
 
     public bool HasKind => true;
@@ -221,11 +407,13 @@ public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard
 }
 
 /// <summary>One card of the recently added rail.</summary>
-public sealed class RecentlyAddedItemViewModel(RecentlyAddedItem item) : IPosterCard
+public sealed class RecentlyAddedItemViewModel(RecentlyAddedItem item) : IPosterCard, IRailCard
 {
     private readonly RecentlyAddedItem _item = item ?? throw new ArgumentNullException(nameof(item));
 
     public TitleId Id => _item.Id;
+
+    public TitleId TitleId => _item.Id;
 
     public string Title => _item.Title;
 

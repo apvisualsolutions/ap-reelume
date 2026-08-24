@@ -126,17 +126,15 @@ public sealed partial class HighContrastTests
     /// </remarks>
     private static readonly (string View, string Property, string Source)[] ColourRepeatsWhatIsWritten =
     [
-        ("PosterCardView", "Background", "Title"),
-
-        // The hero's bleed is the same coin, paid the same way: the colour says which title this
-        // is, the title is written beside it at display size, and the layer switches off through
-        // PosterArtOpacity in both high contrasts — asserted below like the card's.
-        ("ResumeHeroView", "Background", "ResumeTitle"),
-
-        // And the two detail banners, which are the hero's frame on the cards: same written title
-        // beside the colour, same opacity token, same assertion below.
-        ("MovieDetailsView", "Background", "Title"),
-        ("ShowDetailsView", "Background", "Title"),
+        // One view, and it used to be four. Five surfaces draw the prototype's cover — the library
+        // card, the continue rail's card, Home's hero and the two detail banners — and each of them
+        // spelled out the same four layers, so each of them had to be allowed to bind a colour to a
+        // title. On 2026-08-25 the picture moved into PosterArtView and they all mount it, which is
+        // why this list shrank rather than growing when a fifth surface arrived.
+        //
+        // The exception is paid for exactly as before: the layer rides PosterArtOpacity, which is 0
+        // in both high contrasts, and that clause is asserted below rather than promised here.
+        ("PosterArtView", "Background", "Title"),
     ];
 
     [AvaloniaFact]
@@ -144,7 +142,7 @@ public sealed partial class HighContrastTests
     {
         var audit = new AuditLog(nameof(No_state_is_told_by_colour_alone));
         Assert.Equal(2, ColourIsTheSubject.Length);
-        Assert.Equal(4, ColourRepeatsWhatIsWritten.Length);
+        Assert.Single(ColourRepeatsWhatIsWritten);
 
         foreach (var view in ViewFiles())
         {

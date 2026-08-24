@@ -221,6 +221,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             ControlFillBrush - which is measured, one test below.
           -->
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#E9EEF4" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
@@ -441,6 +442,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#94A3B8" />
           <x:Double x:Key="PosterArtOpacity">1</x:Double>
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#050608" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#12151B" />
@@ -673,6 +675,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
           <x:Double x:Key="PosterArtOpacity">0</x:Double>
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#101828" />
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
@@ -894,6 +897,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
           <x:Double x:Key="PosterArtOpacity">0</x:Double>
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#F8FAFC" />
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
@@ -1352,6 +1356,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentTextBrush}" />
     <Setter Property="TextElement.FontSize" Value="{DynamicResource FontSizeCaption}" />
     <Setter Property="TextElement.FontWeight" Value="Bold" />
+  </Style>
+
+  <!--
+    The overline the prototype writes over its hero and over each candidate card: small, spaced and
+    in capitals. The letter spacing is written here rather than tokenised because it is one number
+    with one meaning - a scalar declared for a single reader is this repository's characteristic
+    defect wearing a tidy name - and ScalarTokenTests names LetterSpacing among what it does not
+    watch for exactly that reason.
+  -->
+  <Style Selector="TextBlock.hero-overline">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="LetterSpacing" Value="1.9" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+
+  <!--
+    A link that happens to be a button: the prototype writes «Ver toda la biblioteca ›» in the accent
+    colour with no fill and no border, because it goes somewhere rather than doing something. It
+    keeps the 36 px height every other control has, so a row it sits in does not change height.
+  -->
+  <Style Selector="Button.link-action">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Padding" Value="8,0" />
   </Style>
 
   <Style Selector="Border.poster-chip">

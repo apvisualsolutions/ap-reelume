@@ -23,16 +23,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
   window — there is nothing left over, and the rows that follow it need somewhere to go.
   -->
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space24}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeTitle}"
-          FontWeight="SemiBold"
-          Text="{DynamicResource HomeTitle}"
-          automation:AutomationProperties.HeadingLevel="1" />
-      <home:ResumeHeroView x:Name="ResumeHero" Grid.Row="1" />
-      <home:InProgressRailView x:Name="InProgress" Grid.Row="2" />
-      <home:RecentlyAddedRailView Grid.Row="3" />
-      <ContentControl Grid.Row="4" IsVisible="{Binding HasRecommendationsRail}">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space24}">
+      <!--
+        No page title over the hero, which is the prototype's own decision and not an omission: Home
+        opens on what you were watching, at forty-two pixels, and a word saying "Home" over it is a
+        label on a room you are already standing in. The heading level did not go with it — the
+        hero's own title carries level 1 now, so a screen reader still lands on a heading first.
+
+        The hero bleeds: no page margin around it, because the prototype runs its artwork to the
+        window's edge and stops it under the rail. Everything below keeps the 24 px it had, which is
+        why the margin moved from this grid onto the rows that still want one.
+      -->
+      <home:ResumeHeroView x:Name="ResumeHero" />
+      <home:InProgressRailView x:Name="InProgress" Grid.Row="1" Margin="24,0" />
+      <home:RecentlyAddedRailView x:Name="RecentlyAdded" Grid.Row="2" Margin="24,0" />
+      <ContentControl Grid.Row="3" Margin="24,0,24,24" IsVisible="{Binding HasRecommendationsRail}">
         <home:RecommendationsRailView DataContext="{Binding Recommendations}" />
       </ContentControl>
     </Grid>

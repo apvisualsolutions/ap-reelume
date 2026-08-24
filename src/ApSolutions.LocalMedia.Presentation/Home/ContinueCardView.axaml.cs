@@ -5,9 +5,9 @@ using Avalonia.Controls;
 
 namespace ApSolutions.LocalMedia.Presentation.Home;
 
-public sealed partial class InProgressRailView : UserControl
+public sealed partial class ContinueCardView : UserControl
 {
-    public InProgressRailView()
+    public ContinueCardView()
     {
         InitializeComponent();
     }

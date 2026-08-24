@@ -62,24 +62,39 @@ public sealed class HomeLayoutTests
         }
     }
 
+    /// <summary>
+    /// Home carries a way into the library, and it is reachable without a pointer.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This used to ask for it inside the first viewport at 1366x768, and it moved on 2026-08-25
+    /// when the link went where the prototype writes it: at the right of "Añadido recientemente",
+    /// which at 768 px of height is below the fold. That is the prototype's own layout, and it can
+    /// afford it because the navigation rail is on screen at every height and its second
+    /// destination IS the library — the promise the old assertion protected is kept by the rail,
+    /// and the walk presses it there.
+    /// </para>
+    /// <para>
+    /// What stays asserted here is the part Home owns: the link exists, it is visible, it is inside
+    /// the window's width, and it can take focus, so a keyboard reaches it by tabbing rather than
+    /// by aiming.
+    /// </para>
+    /// </remarks>
     [AvaloniaFact]
-    public async Task Library_access_stays_inside_the_first_viewport_at_1366_by_768()
+    public async Task Library_access_is_on_home_and_reachable_without_a_pointer()
     {
         ApplyLanguage("es-ES");
         var viewModel = await CreateViewModelAsync(EpisodeProgress(), MovieProgress());
         using var host = Host(viewModel, 1366, 768, 1.0);
 
         var library = Named(host, "LibraryEntryAction");
-        var bounds = library.Bounds;
         var origin = library.TranslatePoint(new Point(0, 0), host.Window) ?? new Point(-1, -1);
 
         Assert.True(library.IsVisible, "The library entry must be visible on Home.");
+        Assert.True(library.Focusable, "The library entry must be reachable by keyboard.");
         Assert.True(
-            origin.Y + bounds.Height <= 768,
-            $"Library access ended at {origin.Y + bounds.Height:F0} px, past the 768 px viewport.");
-        Assert.True(
-            origin.X + bounds.Width <= 1366,
-            $"Library access ended at {origin.X + bounds.Width:F0} px, past the 1366 px viewport.");
+            origin.X + library.Bounds.Width <= 1366,
+            $"Library access ended at {origin.X + library.Bounds.Width:F0} px, past the 1366 px viewport.");
     }
 
     [AvaloniaFact]
@@ -309,11 +324,23 @@ public sealed class HomeLayoutTests
         var withProgress = await CreateViewModelWithRailAsync(EpisodeProgress());
         using (var host = Host(withProgress, 1366, 768, 1.0))
         {
+            // Continue is the accent, and since 2026-08-25 it is the accent in more than one place:
+            // the prototype gives every card on the continue rail the same light pill the hero has,
+            // because each of them resumes its own session. What the rule protects is that nothing
+            // ELSE competes — so what is asserted is that every accent on this page is a Continue,
+            // and that the hero's is among them, rather than that there is exactly one.
             var accented = host.View.GetVisualDescendants()
                 .OfType<Control>()
                 .Where(control => control.Classes.Contains("primary-action"))
                 .ToArray();
-            Assert.Equal("ResumeHeroAction", Assert.Single(accented).Name);
+            Assert.Contains(accented, control => control.Name == "ResumeHeroAction");
+            Assert.All(
+                accented,
+                control => Assert.True(
+                    control.Name == "ResumeHeroAction"
+                        || control.GetVisualAncestors().OfType<ContinueCardView>().Any(),
+                    $"{control.Name ?? "an unnamed control"} accents itself on Home and is neither the "
+                        + "hero's Continue nor a rail card's."));
         }
 
         var withoutProgress = await CreateViewModelWithRailAsync();
@@ -359,6 +386,19 @@ public sealed class HomeLayoutTests
         var bar = Assert.Single(rail.GetVisualDescendants().OfType<ProgressBar>());
         Assert.Equal(3, bar.Bounds.Height);
 
+        // The card is landscape since 2026-08-25 — the prototype's own shape for a session rather
+        // than for a title — so the artwork the bar crosses is the card's picture panel and not the
+        // 2:3 cover. What the rule says is unchanged: the bar is INSIDE the picture, along its foot,
+        // and as wide as it is.
+        // The picture is the bar's own parent: everything above it in the tree is also a Panel, so
+        // asking for "an ancestor of about this size" matched the rail and the page as well.
+        var picture = Assert.IsType<Panel>(bar.GetVisualParent());
+        Assert.Equal(VerticalAlignment.Bottom, bar.VerticalAlignment);
+        Assert.Equal(picture.Bounds.Width, bar.Bounds.Width);
+        var footOfPicture = bar.TranslatePoint(new Point(0, bar.Bounds.Height), picture);
+        Assert.NotNull(footOfPicture);
+        Assert.Equal(picture.Bounds.Height, footOfPicture!.Value.Y);
+
         var painted = bar.GetVisualDescendants()
             .OfType<Border>()
             .Select(border => border.Background)
@@ -367,16 +407,6 @@ public sealed class HomeLayoutTests
             .ToArray();
         Assert.Contains(ThemeColour("AccentBrush"), painted);
         Assert.Contains(ThemeColour("ControlFillBrush"), painted);
-
-        var artwork = Assert.Single(
-            bar.GetVisualAncestors().OfType<Border>(),
-            border => border.Background is ISolidColorBrush fill
-                && fill.Color == ThemeColour("ControlFillBrush"));
-        Assert.Equal(VerticalAlignment.Bottom, bar.VerticalAlignment);
-        Assert.Equal(artwork.Bounds.Width - artwork.BorderThickness.Left * 2, bar.Bounds.Width);
-        var barBottom = bar.TranslatePoint(new Point(0, bar.Bounds.Height), artwork);
-        Assert.NotNull(barBottom);
-        Assert.Equal(artwork.Bounds.Height - artwork.BorderThickness.Bottom, barBottom!.Value.Y);
     }
 
     [Fact]

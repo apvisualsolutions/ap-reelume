@@ -63,6 +63,14 @@ public sealed class LeadingActionTests
         ["HomeView"] = null,
         ["ResumeHeroView"] = "ResumeHeroAction",
         ["InProgressRailView"] = null,
+
+        // The cover, which draws four layers and no controls at all.
+        ["PosterArtView"] = null,
+
+        // The card the continue rail draws since 2026-08-25. It leads with Continue for the same
+        // reason the hero does: it is the one thing this card is for, and the prototype gives every
+        // card on that rail the same light pill. Detalles sits beside it without an accent.
+        ["ContinueCardView"] = "ContinueCardResume",
         ["RecentlyAddedRailView"] = null,
         ["RecommendationsRailView"] = null,
 

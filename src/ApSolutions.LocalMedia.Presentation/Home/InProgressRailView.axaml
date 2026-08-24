@@ -13,26 +13,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource HomeInProgressAccessibleName}">
   <Grid RowDefinitions="Auto,*">
     <!--
-      The rail header carries the way into the library — the prototype keeps this link on a rail
-      header, and this is the rail the gate can hold to the first viewport at 1366x768. It absorbs
-      LibraryEntryView whole: same command, same words, same control name, so the walk and the
-      focus fallback find it where they always did. No glyph beside it: a label that says where it
-      goes needs no arrow, and home's strings all come from resources.
+      A heading and the line the prototype writes beside it. The way into the library used to be
+      here; it moved to the rail below on 2026-08-25, which is where the prototype keeps it — «Ver
+      toda la biblioteca ›» at the right of "Añadido recientemente". The focus fallback moved with
+      it rather than being left pointing at a control that is no longer on this rail.
     -->
-    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
       <TextBlock
           FontSize="{DynamicResource FontSizeSubtitle}"
           FontWeight="SemiBold"
           Text="{DynamicResource HomeInProgressHeading}"
           automation:AutomationProperties.HeadingLevel="2" />
-      <Button
-          x:Name="LibraryEntryAction"
-          Grid.Column="1"
-          VerticalAlignment="Center"
-          automation:AutomationProperties.Name="{DynamicResource HomeLibraryAction}"
-          Command="{Binding OpenLibraryCommand}"
-          Content="{DynamicResource HomeLibraryAction}" />
-    </Grid>
+      <!--
+        The prototype's second line on a rail heading: what the rail is for, in the quiet colour,
+        beside the heading rather than under it.
+      -->
+      <TextBlock
+          VerticalAlignment="Bottom"
+          Margin="0,0,0,3"
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource HomeInProgressSubheading}" />
+    </StackPanel>
     <TextBlock
         Grid.Row="1"
         Margin="0,8,0,0"
@@ -56,17 +58,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ListBox.ItemsPanel>
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="home:InProgressItemViewModel">
-          <!--
-          PosterCardView draws the bar at the foot of the artwork, which is where §4 asks for it. The
-          percentage stays here in words, so the bar is never the only carrier of how far this got.
-          -->
-          <StackPanel Spacing="{DynamicResource Space8}">
-            <library:PosterCardView />
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
-              <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{Binding CompletedText}" />
-              <TextBlock FontSize="{DynamicResource FontSizeCaption}" Text="{DynamicResource HomePercentSuffix}" />
-            </StackPanel>
-          </StackPanel>
+          <home:ContinueCardView />
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>

@@ -1,0 +1,89 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The card on the "continue watching" rail, which is the prototype's and not the library's.
+
+It is landscape where the library's is 2:3, and the difference is not decoration: this card is about
+a session rather than a title. The wide frame is the shape of the picture you were watching, the bar
+across its foot is where you got to, and the two buttons are the two things anybody does from here —
+carry on at that minute, or go and look at the card first. The 2:3 poster answers "which film is
+this", which is the library's question and not this rail's.
+
+The artwork is the same four layers every cover in this application draws, with the ring where the
+prototype puts it on a wide frame: off to the right and high, rather than centred.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Home.ContinueCardView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
+    Width="332"
+    x:DataType="home:InProgressItemViewModel">
+  <Border
+      Background="{DynamicResource CardSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellHairlineBrush}"
+      BorderThickness="1"
+      BoxShadow="{DynamicResource ElevationShadow}"
+      ClipToBounds="True"
+      CornerRadius="{DynamicResource CornerRadiusMedium}">
+    <StackPanel>
+      <Panel Height="190">
+        <library:PosterArtView Classes="wide" Title="{Binding Title}" />
+        <library:UnavailableBadge
+            Margin="8"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top" />
+        <ProgressBar
+            Height="3"
+            MinHeight="3"
+            MinWidth="0"
+            VerticalAlignment="Bottom"
+            Background="{DynamicResource ControlFillBrush}"
+            Foreground="{DynamicResource AccentBrush}"
+            Maximum="1"
+            Value="{Binding CompletedFraction}"
+            automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+      </Panel>
+      <StackPanel Margin="12" Spacing="{DynamicResource Space8}">
+        <TextBlock
+            FontWeight="SemiBold"
+            Text="{Binding Title}"
+            TextTrimming="CharacterEllipsis"
+            TextWrapping="NoWrap" />
+        <TextBlock
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{Binding RailSubtitle}"
+            TextTrimming="CharacterEllipsis"
+            TextWrapping="NoWrap" />
+        <!--
+          A WrapPanel and not a horizontal StackPanel, for the reason this tree has measured nine
+          times over: a StackPanel offers its children infinite width, and these two carry translated
+          words inside a card 332 px wide.
+        -->
+        <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+          <Button
+              x:Name="ContinueCardResume"
+              Classes="primary-action"
+              Command="{Binding $parent[ItemsControl].((home:HomeViewModel)DataContext).ResumeItemCommand}"
+              CommandParameter="{Binding}"
+              automation:AutomationProperties.Name="{Binding ResumeAccessibleName}">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+              <Path Classes="icon size-14 filled" VerticalAlignment="Center" Data="{DynamicResource IconPlay}" />
+              <TextBlock VerticalAlignment="Center" Text="{Binding ResumeActionText}" />
+            </StackPanel>
+          </Button>
+          <Button
+              Command="{Binding $parent[ItemsControl].((home:HomeViewModel)DataContext).OpenItemDetailsCommand}"
+              CommandParameter="{Binding}"
+              Content="{DynamicResource HomeResumeDetailsAction}"
+              automation:AutomationProperties.Name="{Binding DetailsAccessibleName}" />
+        </WrapPanel>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>
