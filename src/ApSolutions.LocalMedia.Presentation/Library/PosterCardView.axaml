@@ -24,11 +24,13 @@ and a name here would be a second announcement of the same card.
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
     xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     Width="{DynamicResource PosterCardWidth}"
     x:DataType="library:IPosterCard">
   <UserControl.Resources>
     <library:PosterArtConverter x:Key="PosterArt" />
+    <home:ResourceKeyConverter x:Key="CardWord" />
   </UserControl.Resources>
   <StackPanel Spacing="{DynamicResource Space8}">
     <!--
@@ -46,9 +48,8 @@ and a name here would be a second announcement of the same card.
       <Panel>
         <!--
         The prototype's cover, which is not a picture: a two-stop gradient from the title's hue, a
-        radial glow in the top left corner, and a ring. Three layers instead of its four - the
-        diagonal hatch is a repeating gradient, which Avalonia has no brush for, and it is the layer
-        at 5.5 % alpha that nobody would miss.
+        radial glow in the top left corner, a diagonal hatch and a ring. All four of its layers since
+        2026-08-24; the hatch was the missing one, and a repeating LinearGradientBrush draws it.
 
         PosterArtOpacity is 0 in the two high contrasts, where the card falls back to the fill and
         the initials it has always had: a hue picked by a hash is a contrast ratio nobody decided.
@@ -94,6 +95,53 @@ and a name here would be a second announcement of the same card.
             Maximum="1"
             Value="{Binding CompletedFraction}"
             automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+        <!--
+        The kind chip, top left of the cover, which is where the prototype puts it and what it puts
+        there: one word on a dark tint, over the artwork rather than under it. Announced Raw - the
+        button around this card already says the title, and a reader that heard "Film, El Faro de
+        Piedra, 2019, not started" would be hearing the shelf read out along with the book.
+        -->
+        <Border
+            Margin="8"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Classes="poster-chip"
+            IsVisible="{Binding HasKind}">
+          <TextBlock
+              FontSize="{DynamicResource FontSizeCaption}"
+              Text="{Binding KindKey, Converter={StaticResource CardWord}}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+        </Border>
+        <!--
+        An unreachable medium says so INSIDE the cover, along its foot, which is where the prototype
+        writes it. It used to sit under the card, where it pushed the title of that card below the
+        titles beside it - the same ragged edge the caption's single line exists to prevent. It is
+        the same control the detail cards and the episode row mount; only its place moved.
+        -->
+        <library:UnavailableBadge
+            Margin="6"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom" />
+        <!--
+        And a tick, top right, for something seen to the end.
+        -->
+        <Border
+            Width="22"
+            Height="22"
+            Margin="8"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Background="{DynamicResource AccentBrush}"
+            CornerRadius="{DynamicResource CornerRadiusPill}"
+            IsVisible="{Binding IsWatched}">
+          <Path
+              Classes="icon size-14"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Stroke="{DynamicResource AccentTextBrush}"
+              Data="{DynamicResource IconCheck}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
+        </Border>
       </Panel>
     </Border>
     <!--
@@ -106,11 +154,37 @@ and a name here would be a second announcement of the same card.
         Text="{Binding Title}"
         TextTrimming="CharacterEllipsis"
         TextWrapping="NoWrap" />
+    <!--
+    The prototype's two lines under the title, and they are two rather than one because they answer
+    different questions: what this is - "2024 - 111 min - Suspense" - and where you are in it. The
+    second is a status for a film and a count for a series, never both.
+    -->
     <TextBlock
         FontSize="{DynamicResource FontSizeCaption}"
         Foreground="{DynamicResource TextSecondaryBrush}"
-        IsVisible="{Binding HasCaption}"
-        Text="{Binding CaptionText}"
-        TextTrimming="CharacterEllipsis" />
+        IsVisible="{Binding HasMeta}"
+        Text="{Binding MetaText}"
+        TextTrimming="CharacterEllipsis"
+        TextWrapping="NoWrap" />
+    <TextBlock
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        IsVisible="{Binding !CountsEpisodes}"
+        Text="{Binding StatusKey, Converter={StaticResource CardWord}}"
+        TextTrimming="CharacterEllipsis"
+        TextWrapping="NoWrap" />
+    <StackPanel
+        Orientation="Horizontal"
+        Spacing="{DynamicResource Space4}"
+        IsVisible="{Binding CountsEpisodes}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{Binding EpisodeCountText}" />
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource CatalogEpisodesSuffix}" />
+    </StackPanel>
   </StackPanel>
 </UserControl>

@@ -199,6 +199,25 @@ public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard
     public double CompletedFraction => _item.CompletedFraction;
 
     public string CompletedText => HomeViewModel.FormatPercentage(_item.CompletedFraction);
+
+    public string KindKey => IsShow ? "CatalogKindShow" : "CatalogKindMovie";
+
+    public bool HasKind => true;
+
+    /// <summary>The season and episode this rail already had, in the line the card gives it.</summary>
+    public string MetaText => CaptionText;
+
+    public bool HasMeta => CaptionText.Length > 0;
+
+    /// <summary>Every card on this rail is by definition part way through.</summary>
+    public string StatusKey => "WatchStatusInProgress";
+
+    /// <summary>This rail counts nothing: it shows one episode, not how many are left.</summary>
+    public string EpisodeCountText => string.Empty;
+
+    public bool CountsEpisodes => false;
+
+    public bool IsWatched => false;
 }
 
 /// <summary>One card of the recently added rail.</summary>
@@ -226,4 +245,21 @@ public sealed class RecentlyAddedItemViewModel(RecentlyAddedItem item) : IPoster
     public bool HasKnownProgress => false;
 
     public double CompletedFraction => 0;
+
+    public string KindKey => IsShow ? "CatalogKindShow" : "CatalogKindMovie";
+
+    public bool HasKind => true;
+
+    public string MetaText => CaptionText;
+
+    public bool HasMeta => CaptionText.Length > 0;
+
+    /// <summary>Newly added and not yet started, which is the one thing this rail knows.</summary>
+    public string StatusKey => "WatchStatusNotStarted";
+
+    public string EpisodeCountText => string.Empty;
+
+    public bool CountsEpisodes => false;
+
+    public bool IsWatched => false;
 }

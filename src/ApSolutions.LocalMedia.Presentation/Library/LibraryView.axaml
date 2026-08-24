@@ -373,7 +373,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
                         automation:AutomationProperties.HelpText="{Binding AvailabilityKey, Converter={StaticResource CatalogResourceKey}}">
                       <StackPanel Spacing="{DynamicResource Space8}">
                         <library:PosterCardView />
-                        <library:UnavailableBadge HorizontalAlignment="Left" />
                       </StackPanel>
                     </Button>
                   </DataTemplate>

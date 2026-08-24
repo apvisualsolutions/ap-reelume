@@ -194,6 +194,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
               <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconReview}" />
+              <!--
+                The prototype's badge: how many proposals are waiting, in the corner of the icon that
+                takes you to them. It is announced through the button's own ItemStatus rather than as
+                a second name — a reader that heard "Review, 5" twice would be hearing the rail read
+                itself out. Absent at zero: a badge saying nought is a badge that says nothing.
+              -->
+              <Border
+                  Classes="rail-badge"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  IsVisible="{Binding HasReviewPending}">
+                <TextBlock
+                    Text="{Binding ReviewPendingText}"
+                    automation:AutomationProperties.AccessibilityView="Raw" />
+              </Border>
             </Panel>
           </Button>
           <!--

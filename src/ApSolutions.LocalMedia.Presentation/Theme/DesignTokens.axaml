@@ -1331,6 +1331,36 @@ SPDX-License-Identifier: GPL-3.0-or-later
     pressed and disabled exactly as the glyph it replaces did. Binding it is what keeps a white icon
     from staying white on the light pill of a primary action.
   -->
+  <!--
+    The chip the prototype puts in the corner of every cover: one word, small, on a dark tint over
+    the artwork. Its background is a tint and not a token colour because it lands on twelve different
+    hues and has to stay legible on all of them - the prototype's own `rgba(9,12,16,.72)`.
+  -->
+  <!--
+    The rail's badge, at the prototype's own measurements: a pill of at least 17 by 17 on the accent,
+    in 10.5 px bold, tucked into the icon's top right corner. It is the one number the shell paints
+    over another control, so it carries no border of its own - the accent against the rail's own
+    surface is the boundary.
+  -->
+  <Style Selector="Border.rail-badge">
+    <Setter Property="MinWidth" Value="17" />
+    <Setter Property="Height" Value="17" />
+    <Setter Property="Margin" Value="0,4,3,0" />
+    <Setter Property="Padding" Value="5,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentTextBrush}" />
+    <Setter Property="TextElement.FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="TextElement.FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="Border.poster-chip">
+    <Setter Property="Padding" Value="7,2" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="Background" Value="#B8090C10" />
+    <Setter Property="TextElement.Foreground" Value="#EDF1F6" />
+  </Style>
+
   <Style Selector="Path.icon">
     <Setter Property="Stroke" Value="{Binding $self.(TextElement.Foreground)}" />
     <Setter Property="StrokeThickness" Value="1.2" />

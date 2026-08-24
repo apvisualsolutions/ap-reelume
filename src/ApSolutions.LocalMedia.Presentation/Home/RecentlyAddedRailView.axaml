@@ -46,7 +46,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
           -->
           <StackPanel Spacing="{DynamicResource Space8}">
             <library:PosterCardView />
-            <library:UnavailableBadge HorizontalAlignment="Left" />
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>

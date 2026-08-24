@@ -108,22 +108,37 @@ public sealed class RecommendationItemViewModel(Recommendation recommendation, s
 
     public string Initials => PosterInitials.From(Title);
 
-    /// <summary>
-    /// Empty, because a suggestion is looked up by title alone.
-    /// </summary>
-    /// <remarks>
-    /// <c>Recommendation</c> carries a content id, a score and its reasons; the year would be a
-    /// second lookup through <c>_titleLookup</c>'s sibling, which does not exist. The reasons under
-    /// the card are what this rail has to say instead, and they say more than a year would.
-    /// </remarks>
-    public string CaptionText => string.Empty;
-
-    public bool HasCaption => false;
-
     /// <summary>A suggestion is something not started, so there is nothing to draw.</summary>
     public bool HasKnownProgress => false;
 
     public double CompletedFraction => 0;
+
+    /// <summary>
+    /// Empty, and it is the same omission as the caption: a suggestion carries an id, a score and
+    /// its reasons, and the kind would be a lookup this rail does not make.
+    /// </summary>
+    public string KindKey => string.Empty;
+
+    public bool HasKind => false;
+
+    public string MetaText => string.Empty;
+
+    public bool HasMeta => false;
+
+    /// <summary>A suggestion is something not started; that is what makes it a suggestion.</summary>
+    public string StatusKey => "WatchStatusNotStarted";
+
+    public string EpisodeCountText => string.Empty;
+
+    public bool CountsEpisodes => false;
+
+    public bool IsWatched => false;
+
+    /// <summary>
+    /// True, and it is an omission rather than a fact: this rail is built from scores and never
+    /// reads the file behind them, so it cannot say a medium is missing and must not pretend to.
+    /// </summary>
+    public bool IsAvailable => true;
 
     /// <summary>Resource keys for the signals behind this suggestion, heaviest first.</summary>
     public IReadOnlyList<string> ReasonKeys { get; } =

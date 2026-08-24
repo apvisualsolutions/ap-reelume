@@ -123,18 +123,23 @@ public sealed class PosterCardTests
             "Ocho Cartas para un Invierno Muy Largo",
             "2023",
             false,
-            0));
+            0)
+        { MetaText = "2023" });
 
         var blocks = card.GetVisualDescendants().OfType<TextBlock>().ToArray();
         var title = Assert.Single(blocks, block => block.Text!.StartsWith("Ocho", StringComparison.Ordinal));
         Assert.Equal(TextWrapping.NoWrap, title.TextWrapping);
         Assert.Equal(TextTrimming.CharacterEllipsis, title.TextTrimming);
 
-        var caption = Assert.Single(blocks, block => block.Text == "2023");
-        var captionColour = Assert.IsAssignableFrom<ISolidColorBrush>(caption.Foreground).Color;
-        Assert.Equal(ThemeColour("TextSecondaryBrush"), captionColour);
+        // The line under the title is the meta line since 2026-08-24 — "2024 · 111 min · Suspense"
+        // where the catalogue knows all three, and the year alone where it knows one. It is asked
+        // for by its text so that the chip and the status line, which are also quieter than the
+        // title, cannot stand in for it.
+        var meta = Assert.Single(blocks, block => block.Text == "2023");
+        var metaColour = Assert.IsAssignableFrom<ISolidColorBrush>(meta.Foreground).Color;
+        Assert.Equal(ThemeColour("TextSecondaryBrush"), metaColour);
         Assert.NotEqual(
-            captionColour,
+            metaColour,
             Assert.IsAssignableFrom<ISolidColorBrush>(title.Foreground).Color);
     }
 
@@ -194,8 +199,12 @@ public sealed class PosterCardTests
             DateTimeOffset.UnixEpoch,
             null));
         Assert.Equal("EF", catalogued.Initials);
-        Assert.Equal("2019", catalogued.CaptionText);
-        Assert.True(catalogued.HasCaption);
+        Assert.Equal("2019", catalogued.MetaText);
+        Assert.True(catalogued.HasMeta);
+        Assert.Equal("CatalogKindMovie", catalogued.KindKey);
+        Assert.Equal("WatchStatusNotStarted", catalogued.StatusKey);
+        Assert.False(catalogued.CountsEpisodes);
+        Assert.False(catalogued.IsWatched);
         Assert.False(catalogued.HasKnownProgress);
         Assert.Equal(0, catalogued.CompletedFraction);
 
@@ -209,8 +218,9 @@ public sealed class PosterCardTests
             IsPersonal: false,
             DateTimeOffset.UnixEpoch,
             null));
-        Assert.Equal(string.Empty, undated.CaptionText);
-        Assert.False(undated.HasCaption);
+        Assert.Equal(string.Empty, undated.MetaText);
+        Assert.False(undated.HasMeta);
+        Assert.Equal("CatalogKindShow", undated.KindKey);
         Assert.Equal("MediaUnavailable", undated.AvailabilityKey);
 
         var started = new InProgressItemViewModel(new InProgressItem(
@@ -227,7 +237,8 @@ public sealed class PosterCardTests
         Assert.Equal("VD", started.Initials);
         Assert.True(started.HasKnownProgress);
         Assert.Equal(0.42, started.CompletedFraction);
-        Assert.False(started.HasCaption);
+        Assert.False(started.HasMeta);
+        Assert.Equal("WatchStatusInProgress", started.StatusKey);
 
         var added = new RecentlyAddedItemViewModel(new RecentlyAddedItem(
             new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000004")),
@@ -237,8 +248,9 @@ public sealed class PosterCardTests
             IsAvailable: true,
             DateTimeOffset.UnixEpoch));
         Assert.Equal("LC", added.Initials);
-        Assert.Equal("2021", added.CaptionText);
-        Assert.True(added.HasCaption);
+        Assert.Equal("2021", added.MetaText);
+        Assert.True(added.HasMeta);
+        Assert.Equal("WatchStatusNotStarted", added.StatusKey);
         Assert.False(added.HasKnownProgress);
         Assert.Equal(0, added.CompletedFraction);
 
@@ -246,8 +258,9 @@ public sealed class PosterCardTests
             new Recommendation(new TitleId(Guid.Parse("00000000-0000-0000-0000-000000000005")), 0.9, []),
             "Ocho Cartas");
         Assert.Equal("OC", suggested.Initials);
-        Assert.Equal(string.Empty, suggested.CaptionText);
-        Assert.False(suggested.HasCaption);
+        Assert.Equal(string.Empty, suggested.MetaText);
+        Assert.False(suggested.HasMeta);
+        Assert.False(suggested.HasKind);
         Assert.False(suggested.HasKnownProgress);
         Assert.Equal(0, suggested.CompletedFraction);
     }
@@ -274,6 +287,15 @@ public sealed class PosterCardTests
         return Assert.IsAssignableFrom<ISolidColorBrush>(value).Color;
     }
 
+    /// <summary>
+    /// A card with only what these tests are about, and defaults for the rest.
+    /// </summary>
+    /// <remarks>
+    /// The nine that follow the four arrived with the prototype's card on 2026-08-24 — the kind chip,
+    /// the meta line, the status, the episode count, the tick and whether the medium is reachable.
+    /// They carry initialisers rather than positional parameters so that a test that cares about one
+    /// of them says so and the other eight stay out of its way.
+    /// </remarks>
     private sealed record PosterCardStub(
         string Title,
         string CaptionText,
@@ -283,5 +305,23 @@ public sealed class PosterCardTests
         public string Initials => PosterInitials.From(Title);
 
         public bool HasCaption => CaptionText.Length > 0;
+
+        public string KindKey { get; init; } = "CatalogKindMovie";
+
+        public bool HasKind { get; init; } = true;
+
+        public string MetaText { get; init; } = string.Empty;
+
+        public bool HasMeta => MetaText.Length > 0;
+
+        public string StatusKey { get; init; } = "WatchStatusNotStarted";
+
+        public string EpisodeCountText { get; init; } = string.Empty;
+
+        public bool CountsEpisodes { get; init; }
+
+        public bool IsWatched { get; init; }
+
+        public bool IsAvailable { get; init; } = true;
     }
 }
