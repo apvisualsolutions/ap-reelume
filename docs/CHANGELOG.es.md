@@ -10,6 +10,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La paleta es la del prototipo, medida de su propio código.** El propietario miró las capturas
+  y dijo la verdad: ni los colores ni la elegancia eran los del prototipo. La causa era doble: los
+  valores del árbol venían de una instantánea anterior (#111827 azulado donde el prototipo pinta
+  #050608/#08090C casi negro) y faltaba la capa de acabado. Hoy los dos diccionarios ordinarios se
+  re-valoran al canón leído del propio `tokens()` del prototipo —fondo, tarjetas #12151B, rellenos,
+  bordes sutiles #5C6878 (el único punto donde el canón cede ante la puerta: su #3A424F da 1,96:1 y
+  el límite de 3:1 es de la casa), textos #EDF1F6/#8B97A8, estados tradu¬idos a mezclas opacas—;
+  el **primario es por fin la píldora clara del prototipo** (#F3F6FA con tinta casi negra en
+  oscuro), con familia de tokens propia, sus cuatro pares medidos en la puerta y la prueba de
+  estados re-declarada: bajo la mano SIGUE siendo el primario —un líder que se viste de gris justo
+  cuando van a pulsarlo dejaba de liderar—; y las **dos elevaciones del prototipo** existen como
+  tokens tipados y se gastan donde él las gasta: filas de ajustes, fichas de la biblioteca y el
+  diálogo flotante. Alto contraste intacto: sin sombras y con su par ya declarado. Verificado en
+  pantalla con la biblioteca sembrada junto a la captura del prototipo.
+
 - **La primera visita a la Biblioteca viste esqueleto, y la privacidad dice sus dos mejores
   respuestas.** Seis tarjetas-fantasma respiran al paso del único token de movimiento mientras
   corre la primera consulta —y sólo la primera: un esqueleto sobre tarjetas que alguien ya lee es

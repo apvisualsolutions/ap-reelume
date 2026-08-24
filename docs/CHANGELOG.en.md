@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The palette is the prototype's, measured from its own code.** The owner looked at the captures
+  and said the truth: neither the colours nor the elegance matched. The cause was twofold: the
+  tree's values came from an earlier snapshot (bluish #111827 where the prototype paints
+  #050608/#08090C near-black) and the finishing layer was missing. Both ordinary dictionaries are
+  now re-valued to the canon read from the prototype's own `tokens()` — background, #12151B cards,
+  fills, subtle #5C6878 borders (the one place the canon yields to the gate: its #3A424F reads
+  1.96:1 against the 3:1 floor), #EDF1F6/#8B97A8 text, states translated to opaque mixes —; the
+  **primary is at last the prototype's light pill** (#F3F6FA with near-black ink in dark), with its
+  own token family, its four pairs measured in the gate, and the state test re-declared: under the
+  hand it STAYS the primary — a leader that dressed down exactly when about to be pressed stopped
+  leading —; and the **prototype's two elevations** exist as typed tokens and are spent where it
+  spends them: settings rows, library cards, and the floating dialog. High contrast untouched: no
+  shadows, and its pair already declared. Verified on screen with the seeded library beside the
+  prototype capture.
+
 - **The Library's first visit wears a skeleton, and privacy says its two best answers.** Six ghost
   cards breathe at the single motion token's pace while the first query runs — and only the first:
   a skeleton over cards somebody is reading is worse than the wait it decorates. The prototype
