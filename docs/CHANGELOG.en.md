@@ -10,6 +10,37 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The repository page, with captures of the real application.** Both READMEs open on Home and
+  carry four more captures — the library, a series card, the player with its column, and the review
+  inbox with its three candidates — in English, dark theme and 1600 × 1000, versioned under
+  `docs/assets/`. A script takes them against the built application over an isolated data root with
+  a **fictional** library: a capture of the real one carries somebody's titles and somebody's paths
+  inside a PNG no test can read, and the page says so itself. The page also carries the platform,
+  the licence, the download link, and what it means for a commit to reach `main`. **It carries no CI
+  badge, for a measured reason**: the workflow deliberately does not run on `main` — which receives
+  the same SHA by fast-forward — so a badge pointing there freezes on whatever it last saw and goes
+  on saying it, which is a blind check under another name.
+
+### Fixed
+
+- **The player had neither a scrubber nor a clock while it played.** Found while taking the fourth
+  capture against a real film: `TransportControlsViewModel` changed state on its own commands and on
+  nothing else, so `HasDuration` stayed false for the whole session and the scrubber row and both
+  clocks never came to exist — pressing a skip was enough to make them appear. The playhead already
+  reached `CompositionRoot`, whose handler feeds the tracker and the skip offer, each with its own
+  comment about having been "reachable and never fed"; the transport was the third, and the one a
+  person watches. Fifteenth shape of the house defect. With it, the two physical walks that press
+  skips now measure them on a **paused** session: with a live playhead, the click beside a skip moves
+  the position as surely as the skip does.
+
+- **A series' season picker printed a class name on screen.** The `filter-pill` template binds
+  `SelectionBoxItem` into its `ContentControl` and did not bind `ItemTemplate`, so every series card
+  read `ApSolutions.LocalMedia.Presentation.Show.SeasonViewModel` where it should read "Season 1".
+  It was in the previous day's parity matrix and nobody saw it; the README's capture caught it. The
+  library's two drop-downs never showed it because their rows are `ComboBoxItem`s with text inside.
+
+### Added
+
 - **The palette is the prototype's, measured from its own code.** The owner looked at the captures
   and said the truth: neither the colours nor the elegance matched. The cause was twofold: the
   tree's values came from an earlier snapshot (bluish #111827 where the prototype paints

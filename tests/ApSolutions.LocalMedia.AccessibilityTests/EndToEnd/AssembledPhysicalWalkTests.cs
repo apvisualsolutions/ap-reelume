@@ -2247,25 +2247,32 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => player.IsPaused,
             "clicking Pause never paused the session the engine was decoding");
 
+        // The skips are measured on a PAUSED session, and the order is load-bearing rather than
+        // tidy. Every press here is proved twice — a click beside it must change nothing, then the
+        // click itself must change something — and since 2026-08-24 the bar follows the playhead, so
+        // on a playing session the beside-click "changes" the position too, by a second of film
+        // going by. Paused, the only thing that can move the playhead is the press. The clock is
+        // read in whole seconds for the same reason: a trailing event from the pause carries
+        // milliseconds, and a skip carries ten seconds.
+        await PressAsync(
+            host,
+            "TransportSkipForward",
+            () => Math.Round(transport!.Position.TotalSeconds),
+            "clicking the forward skip never moved the playhead");
+
+        // The bar's own rule: one skip in flight refuses the next, so each press is given its answer
+        // before the following one.
+        await PressAsync(
+            host,
+            "TransportSkipBackward",
+            () => Math.Round(transport!.Position.TotalSeconds),
+            "clicking the backward skip never moved the playhead");
+
         await PressAsync(
             host,
             "PlayerPlayAction",
             () => player.IsPlaying,
             "clicking Play never resumed the paused session");
-
-        // The skips are the bar's own rule: one in flight refuses the next, so each press is given
-        // its answer before the following one.
-        await PressAsync(
-            host,
-            "TransportSkipForward",
-            () => transport!.Position,
-            "clicking the forward skip never moved the playhead");
-
-        await PressAsync(
-            host,
-            "TransportSkipBackward",
-            () => transport!.Position,
-            "clicking the backward skip never moved the playhead");
 
         await PressAsync(
             host,
@@ -2417,27 +2424,32 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                     + "mini player, so a press would land outside the window it lives in.");
         }
 
-        await PressAsync(
-            host,
-            "MiniPlayerSkipForward",
-            () => transport!.Position,
-            "clicking the mini player's forward skip never moved the playhead");
-
-        await PressAsync(
-            host,
-            "MiniPlayerSkipBack",
-            () => transport!.Position,
-            "clicking the mini player's backward skip never moved the playhead");
-
         // One control for two answers: what it does is read from the state, so pressing it on a
         // playing session pauses it. That the same button resumes is PlayerViewModelTests' question,
         // and asking it here would need a second press this ledger would not record.
+        //
+        // It is pressed FIRST so the two skips below are measured on a stopped playhead: the bar
+        // follows the engine since 2026-08-24, and on a playing session the click beside a skip
+        // moves the position as surely as the skip does, which leaves the walk unable to tell a
+        // press from a second of film.
         await PressAsync(
             host,
             "MiniPlayerPlayPause",
             () => player.IsPaused,
             "clicking the mini player's pause never paused the session the engine was decoding");
         Assert.True(player.IsPaused);
+
+        await PressAsync(
+            host,
+            "MiniPlayerSkipForward",
+            () => Math.Round(transport!.Position.TotalSeconds),
+            "clicking the mini player's forward skip never moved the playhead");
+
+        await PressAsync(
+            host,
+            "MiniPlayerSkipBack",
+            () => Math.Round(transport!.Position.TotalSeconds),
+            "clicking the mini player's backward skip never moved the playhead");
 
         await PressAsync(
             host,

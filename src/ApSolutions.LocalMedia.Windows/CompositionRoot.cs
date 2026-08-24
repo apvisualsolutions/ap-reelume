@@ -1070,6 +1070,13 @@ public static partial class CompositionRoot
             // same class of defect the video status overlay had — so the ranges are handed to it
             // here, on the interface thread its bindings live on.
             Avalonia.Threading.Dispatcher.UIThread.Post(() => skip.Apply(sessionMarkers, args.Position));
+
+            // And so does the transport bar, which is the third surface in this handler to have been
+            // built, tested and fed by nobody — and the one a person actually watches. Its state
+            // changed on its own commands alone, so a session ran with no scrubber and no clock
+            // until somebody pressed a button: found by playing a real film for the README's
+            // capture, on 2026-08-24.
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => transport.Observe(args.Position, args.Duration));
         }
 
         void OnStateChanged(object? sender, PlaybackStateChangedEventArgs args)

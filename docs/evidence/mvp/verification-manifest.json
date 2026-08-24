@@ -487,7 +487,8 @@
         "ApSolutions.LocalMedia.UiTests"
       ],
       "evidence": [
-        "docs/evidence/mvp/T21-controls-limiter.md"
+        "docs/evidence/mvp/T21-controls-limiter.md",
+        "docs/evidence/stable/audit-readme-captures.md"
       ]
     },
     {

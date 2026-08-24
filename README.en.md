@@ -6,6 +6,17 @@ nothing sent anywhere.
 
 *Lea esto en [español](README.es.md).*
 
+![The home screen: what was left part-way through, what is in progress, and what arrived recently](docs/assets/home.png)
+
+**Windows 11 x64** · **GPL-3.0-or-later** · [Download the latest release](https://github.com/apvisualsolutions/ap-reelume/releases/latest)
+
+Every commit that reaches `main` has been through [the full
+verification](https://github.com/apvisualsolutions/ap-reelume/actions/workflows/ci.yml) on a hosted
+runner: format, build, the whole test suite, the accessibility and recovery gates twice over,
+packaging, and the coverage floors. There is no status badge above on purpose — the workflow runs on
+the working branch and `main` receives that same commit by fast-forward, so a badge pointing at
+`main` would freeze on whatever it last saw and go on saying it.
+
 ## What it is
 
 One person, one PC, their files. AP Reelume reads the folders you point it at — local, USB, or NAS
@@ -23,6 +34,31 @@ catalogue it.
   within ±5 s even after an unexpected shutdown.
 - **Yours.** Favourites, watch later, a personal rating, and local recommendations that explain
   themselves and can be turned off.
+
+## What it looks like
+
+The library in these captures is **seeded and fictional**, and that is a rule rather than a
+convenience: a screenshot of a real library carries somebody's titles and somebody's paths inside a
+PNG that no test can read, so the captures are taken from a run with its own data root over invented
+films. They are taken by a script against the built application, which is why they can be retaken in
+the commit that changes a view.
+
+![The library: identified titles with their year, files still waiting to be identified by their file name, and one marked unavailable](docs/assets/library.png)
+
+A series card: the season picker, the episodes underneath, and the personal actions that belong to
+the whole series.
+
+![A series card, with its season picker, its two episodes and the personal actions](docs/assets/show.png)
+
+Playback, with the track column open. The scrubber says where the session is; closing the window and
+opening it again resumes within five seconds of it.
+
+![The player: video, the transport with its scrubber and clocks, and the audio and subtitle column](docs/assets/player.png)
+
+What the identification could not settle waits here rather than deciding for itself, and every
+proposal says why it was proposed.
+
+![The review inbox: three proposed candidates, each with its confidence and the reasons behind it](docs/assets/review.png)
 
 ## What it is not
 

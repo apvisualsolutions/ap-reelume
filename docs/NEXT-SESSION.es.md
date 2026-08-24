@@ -1,5 +1,69 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-24 (noche) — PASO 11 HECHO: la página del repositorio tiene sus capturas
+
+**Los dos README abren con Inicio y llevan las cinco capturas decididas** —Inicio, Biblioteca, la
+ficha de una serie, el reproductor con su columna y la bandeja de revisión—, en inglés, tema oscuro,
+1600 × 1000, versionadas en `docs/assets/`. Con plataforma, licencia, enlace de descarga y la
+atribución de TMDB, que ya estaba. **El paso 11 queda cerrado**, y con él se desbloquea el 12 —la
+landing—, que esperaba precisamente a estas cinco imágenes.
+
+**Y las capturas hicieron su trabajo: tres defectos, los tres con su rojo, su corrección y su
+puerta** ([evidencia](evidence/stable/audit-readme-captures.md)):
+
+1. **El reproductor no tenía ni barra ni reloj mientras reproducía.** `TransportControlsViewModel`
+   sólo cambiaba de estado con sus propias órdenes, así que `HasDuration` seguía en falso toda la
+   sesión; pulsar un salto los hacía aparecer de golpe. El cabezal ya llegaba a
+   `CompositionRoot.OnPositionChanged`, que alimenta al rastreador y a la oferta de salto —las dos
+   con su comentario de haber estado «alcanzables y sin alimentar»—; el transporte era el tercero.
+   **Decimoquinta forma del defecto de la casa, y la que más se mira.**
+2. **El selector de temporada escribía `…Show.SeasonViewModel` en pantalla.** La píldora
+   `filter-pill` enlazaba `SelectionBoxItem` y no `ItemTemplate`. **Estaba en la matriz de paridad de
+   ayer y nadie lo vio**: una captura sólo sirve si alguien la lee entera.
+3. **La biblioteca sembrada listaba cada archivo dos veces** —«Cartas desde Antares» junto a
+   «Cartas.desde.Antares.2017»—. Defecto del sembrador, no del producto: el id de un título **es el
+   del archivo** (lo dice `ApplyIdentification` y lo exige la proyección de `CatalogRepository`), y
+   el sembrador acuñaba un GUID nuevo. Corregido fuera del árbol; de paso desapareció que la
+   reproducción escribiera el progreso bajo una clave que Inicio no lee.
+
+**Lo que cambió en el arnés, todo medido** (vive en
+`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume\tools\`): `shoot.ps1` gana `-Screen`
+(`CopyFromScreen` sobre `DWMWA_EXTENDED_FRAME_BOUNDS` con las esquinas cuadradas por
+`DWMWA_WINDOW_CORNER_PREFERENCE`, que es lo que compone la capa de vídeo sin arrastrar el
+escritorio), `-Downscale`, `-Click 'x,y;x,y'` y búsqueda acotada `'Padre>Hijo'`.
+
+**Y tres cosas que quien tome capturas debe saber, porque costaron su medición:**
+
+- **Pedir 1600 × 1000 daba a la aplicación 1067 × 667 lógicos**, porque esta pantalla pinta al 150 %.
+  Con eso la banda de transporte cae fuera de la ventana y la ficha de serie nace desplazada. Se pide
+  **2400 × 1500 y se guarda con `-Downscale 1.5`**: la app recibe los 1600 × 1000 que el diseño
+  dibuja y el texto llega sobremuestreado. `AVALONIA_SCREEN_SCALE_FACTORS` **no** fuerza el 1:1: se
+  midió y la captura salió idéntica.
+- **Con el reproductor abierto, UIAutomation deja de poder recorrer la ventana**: `FindFirst` y
+  `FindAll` contestan «Unexpected HRESULT has been returned from a call to a COM component» para todo
+  lo que no encuentren antes de llegar a la superficie de vídeo. Por eso el aviso de reanudación se
+  descarta con `-Click` y no por nombre.
+- **El vídeo del reproductor es un fotograma generado con `ffmpeg`** —un faro sobre el mar, en la
+  paleta del producto— codificado a 1 h 36 m, que es lo que el catálogo declara para «El Faro de
+  Piedra», para que la posición sembrada del 54 % sea válida: la captura dice `52:12 / 1:36:00`.
+  Los archivos que siembra `tools/seed` son de 2 bytes y no hay nada que reproducir.
+
+**Sin insignia de CI, y es una decisión medida.** El flujo no corre en `main` a propósito, así que
+`gh run list --branch main` se queda en el 2026-08-23 con `main` varios commits por delante: una
+insignia ahí es verde para siempre y no significa nada. La página lo dice en palabras y enlaza al
+flujo.
+
+### Lo siguiente, y por qué es esto
+
+**El paso 12, la landing**, que estaba esperando exactamente a esto: usa **las mismas cinco
+capturas**, vive en `site/` declarada en `VersionedDirectories`, es autocontenida (sin CDN, sin
+fuentes remotas, sin analítica), bilingüe, y se publica cuando haya versión que descargar. Está
+enteramente decidida en este documento (buscar «12. La landing»). La bloquea a medias el vectorial de
+la marca, que se puede sustituir por un marcador.
+
+**Y el paso 7, el paseo físico del propietario**, que sigue siendo lo único que bloquea el corte de
+0.2.0 (paso 8).
+
 ## Estado al cierre del 2026-08-24 (tarde) — F11 CERRADA: el plan de paridad está completo
 
 **Las once fases del plan maestro están hechas.** PRD-006 pasa a `VERIFIED` con su

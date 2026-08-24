@@ -10,6 +10,38 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La página del repositorio, con capturas de la aplicación de verdad.** Los dos README abren con
+  Inicio y llevan cuatro capturas más —Biblioteca, la ficha de una serie, el reproductor con su
+  columna, y la bandeja de revisión con sus tres candidatos—, en inglés, tema oscuro y 1600 × 1000,
+  versionadas en `docs/assets/`. Las toma un guion contra la aplicación compilada, sobre una raíz de
+  datos aislada con una biblioteca **ficticia**: una captura de la biblioteca real lleva dentro
+  títulos y rutas de alguien, en un PNG que ninguna prueba puede leer, y eso se dice en la propia
+  página. La página añade además plataforma, licencia, enlace de descarga y qué significa que un
+  commit llegue a `main`. **No lleva insignia de CI, y por una razón medida**: el flujo no corre en
+  `main` a propósito —recibe el mismo SHA por avance rápido—, así que una insignia apuntando ahí se
+  congela en lo último que vio y sigue diciéndolo, que es una prueba ciega con otro nombre.
+
+### Corregido
+
+- **El reproductor no tenía ni barra ni reloj mientras reproducía.** Encontrado al tomar la cuarta
+  captura con una película real: `TransportControlsViewModel` sólo cambiaba de estado con sus
+  propias órdenes, así que `HasDuration` seguía en falso toda la sesión y la fila del scrubber y los
+  dos relojes no llegaban a existir; bastaba pulsar un salto para que aparecieran. El cabezal ya
+  llegaba a `CompositionRoot` —el manejador que lo reparte alimenta al rastreador y a la oferta de
+  salto, ambos con su comentario de haber estado «alcanzables y sin alimentar»—; el transporte era
+  el tercero, y el único que una persona mira. Decimoquinta forma del defecto de la casa. Con ella,
+  los dos paseos físicos que pulsan saltos pasan a medirlos con la sesión **en pausa**: con el
+  cabezal vivo, el clic de al lado mueve la posición tanto como el salto.
+
+- **El selector de temporada de una serie escribía un nombre de clase en pantalla.** La píldora
+  `filter-pill` enlaza `SelectionBoxItem` en su `ContentControl` y no enlazaba `ItemTemplate`, así
+  que la ficha de cualquier serie mostraba `ApSolutions.LocalMedia.Presentation.Show.SeasonViewModel`
+  donde debía leerse «Temporada 1». Estaba en la matriz de paridad del día anterior y nadie lo vio;
+  lo cazó la captura del README. Los dos desplegables de la biblioteca nunca lo enseñaron porque sus
+  filas son `ComboBoxItem` con texto dentro.
+
+### Añadido
+
 - **La paleta es la del prototipo, medida de su propio código.** El propietario miró las capturas
   y dijo la verdad: ni los colores ni la elegancia eran los del prototipo. La causa era doble: los
   valores del árbol venían de una instantánea anterior (#111827 azulado donde el prototipo pinta
