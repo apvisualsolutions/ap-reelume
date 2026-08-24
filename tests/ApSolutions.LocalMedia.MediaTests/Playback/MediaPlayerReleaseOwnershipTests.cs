@@ -45,12 +45,17 @@ public sealed class MediaPlayerReleaseOwnershipTests
                 path,
                 useHardwareAcceleration: false),
             TestContext.Current.CancellationToken);
-        var restingBefore = LibVlcFactory.PendingDeferredReleaseCount;
+        // The total and not the pending count, because the pending count is a level the drain lowers
+        // a second after each media reaches it. Asserting on it raced the drain and lost on a hosted
+        // runner four times slower than this machine, where the stop itself outlasts the quiescence
+        // window: red on CI on 2026-08-24, green here, with nothing between the two but speed. What
+        // the contract says is that the media passed through the queue, and a total says that.
+        var handedOverBefore = LibVlcFactory.DeferredReleaseTotal;
 
         await engine.StopAsync(TestContext.Current.CancellationToken);
 
         Assert.True(
-            LibVlcFactory.PendingDeferredReleaseCount > restingBefore,
+            LibVlcFactory.DeferredReleaseTotal > handedOverBefore,
             "Stopping detached the media without handing it to the factory's deferred release, so it "
                 + "is being freed by something else — and whatever that is, its failure is not the one "
                 + "the drain was hardened against.");

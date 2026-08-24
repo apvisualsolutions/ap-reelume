@@ -53,6 +53,19 @@ escritorio), `-Downscale`, `-Click 'x,y;x,y'` y búsqueda acotada `'Padre>Hijo'`
 insignia ahí es verde para siempre y no significa nada. La página lo dice en palabras y enlaza al
 flujo.
 
+**Y un rojo de CI que no era del cambio, corregido cambiando el instrumento.**
+`MediaPlayerReleaseOwnershipTests` afirmaba sobre `PendingDeferredReleaseCount`, que es un **nivel**
+—lo que la cola de liberación tiene ahora mismo— y el drenaje lo vacía un segundo después de que
+cada media llegue. En el ejecutor hospedado, cuatro veces más lento que esta máquina (6 m 28 s
+contra 1 m 33 s en la misma suite), `StopAsync` dura más que esa ventana y el nivel ya ha vuelto a su
+sitio cuando se lee. `LibVlcFactory` expone ahora `DeferredReleaseTotal`, un **total monótono**, y la
+prueba afirma sobre él: lo que el contrato dice es que la media pasó por la cola. **Se cambió lo que
+se mide, no la tolerancia.**
+
+**Y una observación local que NO se tocó**: `PlaybackGateEnduranceTests` falló una de cuatro pasadas
+aquí con 217 recursos contra un techo de 200, y en CI pasó. Es un techo de recursos nativos tras 50
+ciclos y aflojarlo sería aflojar una puerta; queda anotado, sin tocar, para quien lo vea repetirse.
+
 ### Lo siguiente, y por qué es esto
 
 **El paso 12, la landing**, que estaba esperando exactamente a esto: usa **las mismas cinco

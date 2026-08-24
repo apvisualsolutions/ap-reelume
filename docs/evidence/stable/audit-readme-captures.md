@@ -141,6 +141,28 @@ film — and a real film in a README is a rights problem. A still is generated w
 encoded to the duration the catalogue declares, so the seeded 54 % is a valid position and the
 capture's clock reads `52:12 / 1:36:00`.
 
+## El rojo de CI que trajo esta tanda, y por qué no era del cambio / The CI red this batch brought, and why it was not the change's
+
+`MediaPlayerReleaseOwnershipTests.A_detached_media_rests_in_the_factorys_queue` falló en CI y pasó
+aquí. La suite no referencia ni `Presentation` ni `Windows` —lo único que este cambio toca del
+producto—, así que el rojo no podía venir de él; lo que sí depende del ejecutor es lo que la prueba
+mide. / The test failed on CI and passed here. The suite references neither of the two projects this
+change touches, so the red could not come from it; what does depend on the runner is what the test
+measures.
+
+**La causa es el instrumento**: afirmaba sobre `PendingDeferredReleaseCount`, que es un **nivel** —lo
+que la cola tiene ahora mismo— y el drenaje lo vacía un segundo después de que cada media llegue. Si
+`StopAsync` tarda más que esa ventana de reposo, el nivel ya ha vuelto a su sitio cuando se lee.
+Medido: la suite tarda **1 m 33 s aquí y 6 m 28 s en el ejecutor**, cuatro veces más lento. / The
+assertion read a level the drain lowers a second later; on a runner four times slower, the stop
+outlasts the quiescence window and the level is back before it is read.
+
+**Corregido cambiando lo que se mide, no la tolerancia**: `LibVlcFactory` expone
+`DeferredReleaseTotal`, un total monótono que se incrementa dentro de `DeferRelease`, y la prueba
+afirma sobre él. Lo que el contrato dice es que la media **pasó por la cola**, y eso no se lo puede
+llevar nadie. / Fixed by changing what is measured, not the tolerance: a monotone total, incremented
+inside the queue's own door, says what the contract says.
+
 ## Verificación / Verification
 
 | Puerta | Resultado |
