@@ -36,6 +36,7 @@ public sealed class LibVlcFactory : IAsyncDisposable
     private static readonly Lock ReleaseSync = new();
     private static readonly Queue<DeferredMedia> DeferredReleases = new();
     private static bool isDrainScheduled;
+    private static long deferredReleaseTotal;
 
     private readonly Lock _sync = new();
     private readonly List<MediaPlayer> _mediaPlayers = [];
@@ -68,6 +69,27 @@ public sealed class LibVlcFactory : IAsyncDisposable
     /// </remarks>
     public static IReadOnlyList<string> InstanceOptions(bool headless) =>
         headless ? HeadlessOptions : BaseOptions;
+
+    /// <summary>How many media have ever been handed to <see cref="DeferRelease"/>.</summary>
+    /// <remarks>
+    /// A total rather than a level, and the difference is what makes it assertable.
+    /// <see cref="PendingDeferredReleaseCount"/> is what the queue holds <em>now</em>, and the drain
+    /// empties it a second after each media arrives — so a test that stops a session and then reads
+    /// the level is racing the drain, and loses whenever the stop itself takes longer than the
+    /// quiescence window. Measured on 2026-08-24: green on this machine and red on a hosted runner
+    /// four times slower. What the release contract actually says is that the media <b>passed
+    /// through here</b>, and nothing can take that back.
+    /// </remarks>
+    public static long DeferredReleaseTotal
+    {
+        get
+        {
+            lock (ReleaseSync)
+            {
+                return deferredReleaseTotal;
+            }
+        }
+    }
 
     /// <summary>Media handed to <see cref="DeferRelease"/> and not yet disposed.</summary>
     public static int PendingDeferredReleaseCount
@@ -130,6 +152,7 @@ public sealed class LibVlcFactory : IAsyncDisposable
         lock (ReleaseSync)
         {
             DeferredReleases.Enqueue(new DeferredMedia(media, Stopwatch.GetTimestamp()));
+            deferredReleaseTotal++;
             if (isDrainScheduled)
             {
                 return;
