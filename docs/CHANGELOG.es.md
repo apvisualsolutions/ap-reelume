@@ -553,6 +553,19 @@ evidencia, es [FEATURES.md](FEATURES.md).
   ninguna parte: se leían y se tiraban. Ahora hay un carril con ellos, con el título en dos líneas como
   mucho, el año en un tono secundario y el aviso de que un medio no está disponible ahora mismo.
 
+### Cambiado
+
+- **Los bordes decorativos son por fin la línea capilar del prototipo.** Dieciocho contornos —los
+  paneles de aviso y estado, el diálogo de añadir carpeta, el chip del tipo detectado, el banner
+  del archivo suelto, la costura del riel y las dos tarjetas del actualizador— vestían el borde
+  fuerte que la casa reserva para los límites de control, donde el 3:1 es obligación. El prototipo
+  los pinta con su línea capilar (blanco al 7 % en oscuro, tinta al 9 % en claro), que este árbol
+  ya tenía calcada y gastaba solo en las filas de ajustes y las fichas. La tarjeta de comparación
+  de duplicados gana además el fondo de tarjeta que el prototipo le da, en vez de flotar como una
+  caja dibujada. Se quedan como estaban, con aritmética: el vacío discontinuo de la Biblioteca
+  (el prototipo lo traza con su borde fuerte) y las cinco superposiciones del reproductor, cuyo
+  blanco al 18 % del prototipo, compuesto sobre su fondo, es justo el borde fuerte que ya tenían.
+
 ### Corregido
 
 - **Inicio arrancaba vacío aunque hubiera algo a medio ver, y se llenaba solo al salir y volver.**

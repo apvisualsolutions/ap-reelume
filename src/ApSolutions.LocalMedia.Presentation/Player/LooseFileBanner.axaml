@@ -33,7 +33,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       Margin="16"
       Padding="16"
       Background="{DynamicResource CardSurfaceBrush}"
-      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderBrush="{DynamicResource ShellHairlineBrush}"
       BorderThickness="1"
       CornerRadius="{DynamicResource CornerRadiusMedium}">
     <StackPanel Spacing="{DynamicResource Space8}">
@@ -71,7 +71,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           x:Name="AddFolderConfirmationSurface"
           Padding="12"
           Background="{DynamicResource AccentSubtleBrush}"
-          BorderBrush="{DynamicResource ShellBorderBrush}"
+          BorderBrush="{DynamicResource ShellHairlineBrush}"
           BorderThickness="1"
           CornerRadius="{DynamicResource CornerRadiusMedium}"
           IsVisible="{Binding IsAddFolderConfirmationPending}"

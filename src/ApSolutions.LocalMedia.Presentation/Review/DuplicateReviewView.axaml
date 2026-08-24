@@ -39,12 +39,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ItemsControl.ItemsPanel>
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="review:MediaVersionItemViewModel">
-          <!-- The border carried a thickness and no brush, so the edge between one file's facts and
-               the next was whatever the base theme happened to give. -->
+          <!-- The prototype's comparison card: a card ground under a hairline, so each file's facts
+               sit on their own surface instead of floating inside a drawn box. -->
           <Border
               Margin="4"
               Padding="12"
-              BorderBrush="{DynamicResource ShellBorderBrush}"
+              Background="{DynamicResource CardSurfaceBrush}"
+              BorderBrush="{DynamicResource ShellHairlineBrush}"
               BorderThickness="1"
               CornerRadius="{DynamicResource CornerRadiusMedium}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}" RowDefinitions="Auto,Auto">

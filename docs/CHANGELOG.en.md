@@ -539,6 +539,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   title on at most two lines, the year in a secondary tone, and the badge for a medium that is not
   reachable right now.
 
+### Changed
+
+- **Decorative borders are finally the prototype's hairline.** Eighteen outlines — the notice and
+  status panels, the add-folder dialog, the detected-kind chip, the loose-file banner, the rail's
+  seam and the updater's two cards — wore the strong border the house reserves for control
+  boundaries, where 3:1 is an obligation. The prototype paints them with its hairline (white at
+  7% in dark, ink at 9% in light), which this tree already had traced and spent only on setting
+  rows and cards. The duplicates comparison card also gains the card ground the prototype gives
+  it, instead of floating as a drawn box. Two stay as they were, with arithmetic: the library's
+  dashed empty state (the prototype draws it with its strong border) and the player's five
+  overlays, whose prototype white at 18%, composed over their ground, is exactly the strong
+  border they already wore.
+
 ### Fixed
 
 - **Home started empty even with something half-watched, and only filled itself after leaving and

@@ -196,7 +196,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding RequiresBoostWarning}"
         Padding="8"
         Background="{DynamicResource AccentSubtleBrush}"
-        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="1"
         CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource TransportBoostWarningTitle}">

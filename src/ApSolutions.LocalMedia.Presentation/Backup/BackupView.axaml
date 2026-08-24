@@ -112,7 +112,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsVisible="{Binding !HasFailed}"
         Padding="16"
         Background="{DynamicResource AccentSubtleBrush}"
-        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="1"
         CornerRadius="{DynamicResource CornerRadiusMedium}"
         automation:AutomationProperties.Name="{DynamicResource BackupStatusAccessibleName}"
