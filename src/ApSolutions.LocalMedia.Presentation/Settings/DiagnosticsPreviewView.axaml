@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       x:Name="DiagnosticsPreviewSurface"
       Padding="16"
       Background="{DynamicResource CardSurfaceBrush}"
-      BorderBrush="{DynamicResource ShellBorderBrush}"
+      BorderBrush="{DynamicResource ShellHairlineBrush}"
       BorderThickness="1"
       CornerRadius="{DynamicResource CornerRadiusMedium}">
     <StackPanel Spacing="{DynamicResource Space8}">

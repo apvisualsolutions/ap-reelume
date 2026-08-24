@@ -41,7 +41,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 Margin="0,4"
                 Padding="12"
                 Background="{DynamicResource AccentSubtleBrush}"
-                BorderBrush="{DynamicResource ShellBorderBrush}"
+                BorderBrush="{DynamicResource ShellHairlineBrush}"
                 BorderThickness="1"
                 CornerRadius="{DynamicResource CornerRadiusMedium}">
               <StackPanel Spacing="{DynamicResource Space8}">

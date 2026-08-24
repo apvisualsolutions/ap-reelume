@@ -85,7 +85,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Grid.Row="1"
         Padding="9,8"
         Background="{DynamicResource NavigationSurfaceBrush}"
-        BorderBrush="{DynamicResource ShellBorderBrush}"
+        BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="0,0,1,0">
       <DockPanel automation:AutomationProperties.Name="{DynamicResource MainNavigationAccessibleName}">
         <!--
