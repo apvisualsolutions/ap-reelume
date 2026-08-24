@@ -209,7 +209,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FBFCFE" />
           <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#E4EFF9" />
-          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#111827" />
+          <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#101828" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PrimaryActionBrush" Color="#1769AA" />
           <SolidColorBrush x:Key="PrimaryActionHoverBrush" Color="#15619D" />
@@ -644,7 +644,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
           <x:Double x:Key="PosterArtOpacity">0</x:Double>
-          <SolidColorBrush x:Key="PosterInitialsBrush" Color="#111827" />
+          <SolidColorBrush x:Key="PosterInitialsBrush" Color="#101828" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
