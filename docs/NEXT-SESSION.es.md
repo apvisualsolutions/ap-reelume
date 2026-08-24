@@ -1,5 +1,48 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-24 (tarde) — F11 CERRADA: el plan de paridad está completo
+
+**Las once fases del plan maestro están hechas.** PRD-006 pasa a `VERIFIED` con su
+[matriz de paridad](evidence/stable/PRD006-parity-matrix.md): 21 capturas de la aplicación **real**
+—compilada en Release, arrancada como proceso, con una biblioteca sembrada de 21 elementos y
+navegada por UIAutomation— junto a las 16 del prototipo, en los cuatro diccionarios.
+
+**Y la matriz sirvió para lo que sirven las capturas: cazar lo que ninguna puerta mira.** Tres
+defectos, los tres con su rojo archivado y su corrección:
+
+1. **Inicio arrancaba vacía** ([evidencia](evidence/stable/audit-initial-route-never-navigates.md)).
+   La ruta con la que nace `NavigationService` no pasa por `Navigate`, así que `Navigated` nunca
+   suena para la primera pantalla, y toda alimentación de superficies colgaba de ese evento. El
+   shell reproduce ahora su ruta inicial por el mismo camino. Decimocuarta forma del defecto de la
+   casa, y la que más se ve: el minuto en que todos miran.
+2. **El título de una ficha se iba a dos líneas** y empujaba su año por debajo del año de la ficha
+   vecina. Una línea con puntos suspensivos (decisión del propietario, mirando la app).
+3. **Un `ToggleButton` no era una píldora**: la forma estaba declarada sólo para `Button` y ese
+   selector no lo alcanza, así que «Favorito» y «Ver más tarde» llevaban la caja baja del tema base
+   junto a las píldoras de su fila. `ControlStateTests` lo afirma comparando las dos geometrías.
+
+**Fase B de fidelidad, hecha**: dieciocho bordes decorativos bajaron de `ShellBorderBrush` a
+`ShellHairlineBrush` (el capilar del prototipo), la tarjeta de duplicados ganó su fondo de tarjeta,
+y se quedan con borde fuerte —con aritmética— el vacío discontinuo de Biblioteca y las cinco
+superposiciones del reproductor. El halo del acento ya estaba en 0.156; la nota anterior lo daba
+por pendiente y era falso.
+
+**Herramientas de captura mejoradas** (viven fuera del árbol, en
+`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume\tools\`): `shoot.ps1` acepta `-Theme` (fija
+`theme.preference` antes de arrancar) e `-Invoke` con secuencia separada por `;`; ya no borra una
+raíz de datos que no creó él. `preview` acepta `APR_PREVIEW_THEME` y `APR_PREVIEW_SCENE=player`.
+
+**Una alarma falsa medida y descartada**: el panel de fallo del reproductor parecía solaparse con la
+banda de transporte. Era el arnés —la vista apilada con un segundo control recibía una fracción del
+alto—; montada sola a 900 px se pinta entera. Se comprobó cambiando el arnés, no razonando.
+
+**Recuentos finales**: 53 vistas, **576** cadenas por idioma (el plan estimaba 517), 48 filas en
+`LeadingActionTests`, 0 pendientes del paseo, deuda de cobertura 215.
+
+**Qué queda**: mirar CI de `3d4fd49` y avanzar `main` por fast-forward hasta el último verde. Del
+alcance abierto, lo de siempre: PRD-003 (ARM64, bloqueado por hardware), REL-001/REL-004 y
+PLY-004 (5.1/7.1, bloqueado).
+
 ## Estado al cierre del 2026-08-24 (madrugada) — fidelidad de paleta HECHA y verificada en pantalla
 
 **El propietario miró las capturas y pidió fidelidad** («ni los colores ni la elegancia»; React
@@ -176,11 +219,14 @@ filas) + Catálogo de elementos + el prototipo como referencia visual.**
   costo no compra elegancia proporcional y la conmutación con casilla es igual de legítima en
   Fluent. Si el propietario la quiere algún día, es un tramo propio con dos vueltas de CI. Inicio no lleva esqueleto: sus carriles
   pintan en el cuadro en que llega la respuesta.
-- [ ] **F11 — Cierre**: `SURFACES.es/en.md` con los 10 cambios del Inventario; FEATURES y
-  CHANGELOG al día; matriz de evidencia de las 48 vistas (app con datos AL LADO del prototipo,
-  claro y oscuro; alto contraste en shell + reproductor + un formulario); recuentos (517 cadenas
-  por idioma; controles según Inventario con la desviación −«Aplicar» documentada); CI verde y
-  fast-forward a `main`.
+- [x] **F11 — Cierre** (2026-08-24): `SURFACES.es/en.md` re-medido y declarado cerrado; PRD-006 pasa
+  a VERIFIED en FEATURES con su evidencia; [matriz de paridad](evidence/stable/PRD006-parity-matrix.md)
+  con 21 capturas de la aplicación REAL sobre biblioteca sembrada —16 parejas app-vs-prototipo en
+  claro y oscuro, más shell, formulario, ficha y reproductor en alto contraste—; recuentos medidos
+  (53 vistas, **576** cadenas por idioma —no las 517 que el plan estimó—, 48 filas de acción líder,
+  0 pendientes del paseo) con la desviación −«Aplicar» documentada. La matriz cazó tres defectos
+  que ninguna puerta veía: Inicio arrancaba vacía, el título de ficha se iba a dos líneas y un
+  conmutador no era una píldora.
 
 ### Reglas por commit, sin excepción
 

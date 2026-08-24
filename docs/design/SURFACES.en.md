@@ -4,9 +4,14 @@ An inventory of AP Reelume's visible surfaces, so a redesign can cover **all** o
 the ones anybody remembers. The Spanish version is in [SURFACES.es.md](SURFACES.es.md).
 
 This document decides no aesthetics. It states **what exists, where it lives and in which states it
-appears**, measured from the tree on 2026-08-15, measured again on 2026-08-18, on 2026-08-20 and
-again on **2026-08-23**, so nothing
+appears**, measured from the tree on 2026-08-15, measured again on 2026-08-18, on 2026-08-20, on
+2026-08-23 and again on **2026-08-24**, so nothing
 visible is left undesigned.
+
+**The redesign is closed.** The parity plan's eleven phases finished on 2026-08-24, and their
+evidence — 21 captures of the real application beside the prototype's 16, across the four
+dictionaries — is in [the parity matrix](../evidence/stable/PRD006-parity-matrix.md). This inventory
+stops being a list of what is left to design and becomes the census of what is there.
 
 ## The rule that already holds, and needs no redoing
 

@@ -1,5 +1,38 @@
 # Where to resume
 
+## State at close (2026-08-24) — F11 closed: the parity plan is complete
+
+**All eleven phases of the master plan are done.** PRD-006 moves to `VERIFIED` with its
+[parity matrix](evidence/stable/PRD006-parity-matrix.md): 21 captures of the **real** application —
+built in Release, started as a process, over a seeded 21-item library, navigated by UIAutomation —
+beside the prototype's 16, across the four dictionaries.
+
+**And the matrix did what captures are for: catching what no gate looks at.** Three defects, each
+with its archived red and its fix:
+
+1. **Home started empty.** The route `NavigationService` is born on never goes through `Navigate`,
+   so `Navigated` never fires for the first screen, and every surface feed hung off that event. The
+   shell now replays its initial route through the same path. The house defect's fourteenth shape,
+   in the minute every user sees.
+2. **A card's title took two lines** and pushed its year below its neighbour's. One line with an
+   ellipsis (the owner's decision, looking at the application).
+3. **A `ToggleButton` was not a pill**: the shape was declared for `Button` alone and that selector
+   does not reach it, so "Favorito" and "Ver más tarde" wore the base theme's short box beside the
+   pills in their row. `ControlStateTests` asserts it by comparing the two geometries.
+
+**Fidelity phase B, done**: eighteen decorative borders dropped from `ShellBorderBrush` to
+`ShellHairlineBrush` (the prototype's hairline), the duplicates card gained its card ground, and two
+keep the strong border by the prototype's own arithmetic — the library's dashed empty state and the
+player's five overlays. The accent halo was already at 0.156; the previous note called it pending
+and was wrong.
+
+**Final counts**: 53 views, **576** string keys per language (the plan estimated 517), 48 rows in
+`LeadingActionTests`, 0 walk scenes outstanding, coverage debt 215.
+
+**What remains**: read CI for `3d4fd49` and fast-forward `main` to the last green. Of the open
+scope, the usual: PRD-003 (ARM64, blocked on hardware), REL-001/REL-004 and PLY-004 (5.1/7.1,
+blocked).
+
 ## State on opening (2026-08-23)
 
 **The brief grew: it is now parity with the prototype across the whole application**, not a few

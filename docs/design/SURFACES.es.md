@@ -4,8 +4,13 @@ Inventario de las superficies visibles de AP Reelume, para que un rediseño pued
 y no sólo las que se recuerdan. La versión inglesa está en [SURFACES.en.md](SURFACES.en.md).
 
 Este documento no decide estética. Dice **qué existe, dónde vive y en qué estados aparece**, medido
-del árbol el 2026-08-15, vuelto a medir el 2026-08-18, el 2026-08-20 y otra vez el **2026-08-23**,
-para que nada visible se quede sin diseñar.
+del árbol el 2026-08-15, vuelto a medir el 2026-08-18, el 2026-08-20, el 2026-08-23 y otra vez el
+**2026-08-24**, para que nada visible se quede sin diseñar.
+
+**El rediseño está cerrado.** Las once fases del plan de paridad terminaron el 2026-08-24, y su
+evidencia —21 capturas de la aplicación real junto a las 16 del prototipo, en los cuatro
+diccionarios— está en [la matriz de paridad](../evidence/stable/PRD006-parity-matrix.md). Este
+inventario deja de ser una lista de lo que falta por diseñar y pasa a ser el censo de lo que hay.
 
 ## La regla que ya se cumple, y no hay que rehacer
 
