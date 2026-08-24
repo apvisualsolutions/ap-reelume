@@ -13,10 +13,7 @@ enviar nada a ninguna parte.
 Todo commit que llega a `main` ha pasado [la verificación
 completa](https://github.com/apvisualsolutions/ap-reelume/actions/workflows/ci.yml) en un ejecutor
 hospedado: formato, compilación, la suite entera, las puertas de accesibilidad y de recuperación por
-partida doble, el empaquetado y los suelos de cobertura. Arriba no hay insignia de estado a
-propósito: el flujo corre sobre la rama de trabajo y `main` recibe ese mismo commit por avance
-rápido, así que una insignia apuntando a `main` se congelaría en lo último que vio y seguiría
-diciéndolo.
+partida doble, el empaquetado y los suelos de cobertura.
 
 ## Qué es
 
