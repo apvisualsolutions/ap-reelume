@@ -75,23 +75,34 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.Name="{DynamicResource TransportSkipBackward}"
           automation:AutomationProperties.AcceleratorKey="Left"
           automation:AutomationProperties.HelpText="{Binding BackwardSkipLabel}"
-          Command="{Binding SkipBackwardCommand}"
-          Content="&#xE72B;" />
+          Command="{Binding SkipBackwardCommand}">
+        <Path Classes="icon size-20" Data="{DynamicResource IconSkipBackward}" />
+      </Button>
       <Button
           x:Name="SkipForwardButton"
           Classes="player-chrome"
           automation:AutomationProperties.Name="{DynamicResource TransportSkipForward}"
           automation:AutomationProperties.AcceleratorKey="Right"
           automation:AutomationProperties.HelpText="{Binding ForwardSkipLabel}"
-          Command="{Binding SkipForwardCommand}"
-          Content="&#xE72A;" />
+          Command="{Binding SkipForwardCommand}">
+        <Path Classes="icon size-20" Data="{DynamicResource IconSkipForward}" />
+      </Button>
       <Button
           x:Name="MuteButton"
           Classes="player-chrome"
           automation:AutomationProperties.Name="{DynamicResource TransportToggleMute}"
           automation:AutomationProperties.AcceleratorKey="M"
-          Command="{Binding ToggleMuteCommand}"
-          Content="&#xE74F;" />
+          Command="{Binding ToggleMuteCommand}">
+        <!--
+          Two shapes and not one: the prototype swaps its speaker for a crossed speaker the moment
+          the session is muted, and this button was drawing the crossed one in both states — a
+          control that says the same thing whatever it has done.
+        -->
+        <Panel>
+          <Path Classes="icon" Data="{DynamicResource IconVolume}" IsVisible="{Binding !IsMuted}" />
+          <Path Classes="icon" Data="{DynamicResource IconMute}" IsVisible="{Binding IsMuted}" />
+        </Panel>
+      </Button>
       <!--
         The binding stays one way on purpose: VolumePercent is what the session came back with, and
         a two-way binding would write the thumb's position into a property that has no setter. What

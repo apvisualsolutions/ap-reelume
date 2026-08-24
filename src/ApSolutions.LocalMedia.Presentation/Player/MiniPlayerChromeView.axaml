@@ -36,31 +36,36 @@ SPDX-License-Identifier: GPL-3.0-or-later
         x:Name="MiniPlayerPlayPause"
         Classes="player-chrome"
         Command="{Binding Player.Player.TogglePlaybackCommand}"
-        Content="&#xE768;"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerPlayPause}" />
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerPlayPause}">
+      <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlay}" />
+    </Button>
     <Button
         x:Name="MiniPlayerSkipBack"
         Classes="player-chrome"
         Command="{Binding Player.Player.Transport.SkipBackwardCommand}"
-        Content="&#xE72B;"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipBack}" />
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipBack}">
+      <Path Classes="icon size-20" Data="{DynamicResource IconSkipBackward}" />
+    </Button>
     <Button
         x:Name="MiniPlayerSkipForward"
         Classes="player-chrome"
         Command="{Binding Player.Player.Transport.SkipForwardCommand}"
-        Content="&#xE72A;"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipForward}" />
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipForward}">
+      <Path Classes="icon size-20" Data="{DynamicResource IconSkipForward}" />
+    </Button>
     <Button
         x:Name="MiniPlayerRestore"
         Classes="player-chrome"
         Command="{Binding ToggleMiniPlayerCommand}"
-        Content="&#xE73F;"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerRestore}" />
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerRestore}">
+      <Path Classes="icon size-20" Data="{DynamicResource IconExitFullscreen}" />
+    </Button>
     <Button
         x:Name="MiniPlayerClose"
         Classes="player-chrome"
         Command="{Binding ClosePlayerCommand}"
-        Content="&#xE8BB;"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerClose}" />
+        automation:AutomationProperties.Name="{DynamicResource MiniPlayerClose}">
+      <Path Classes="icon size-20" Data="{DynamicResource IconClose}" />
+    </Button>
   </WrapPanel>
 </UserControl>

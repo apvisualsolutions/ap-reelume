@@ -60,7 +60,7 @@ an offer of something that cannot occur.
             ToolTip.Tip="{DynamicResource AddRootDismissAction}"
             automation:AutomationProperties.Name="{DynamicResource AddRootDismissAction}"
             Command="{Binding CancelAddMediaCommand}">
-          <TextBlock Classes="navigation-glyph" Text="&#xE711;" />
+          <Path Classes="icon size-16 navigation-glyph" Data="{DynamicResource IconClose}" />
         </Button>
       </Grid>
       <StackPanel DataContext="{Binding Onboarding}" Spacing="{DynamicResource Space16}">

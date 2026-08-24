@@ -222,19 +222,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Classes="player-chrome"
               IsVisible="{Binding CanResume}"
               automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
-              Command="{Binding ResumeCommand}"
-              Content="&#xE768;" />
+              Command="{Binding ResumeCommand}">
+            <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlay}" />
+          </Button>
           <Button
               Classes="player-chrome"
               IsVisible="{Binding CanPause}"
               automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
-              Command="{Binding PauseCommand}"
-              Content="&#xE769;" />
+              Command="{Binding PauseCommand}">
+            <Path Classes="icon size-22" Data="{DynamicResource IconPause}" />
+          </Button>
           <Button
               Classes="player-chrome"
               automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
-              Command="{Binding StopCommand}"
-              Content="&#xE71A;" />
+              Command="{Binding StopCommand}">
+            <Path Classes="icon size-22" Data="{DynamicResource IconStop}" />
+          </Button>
           <TextBlock
               VerticalAlignment="Center"
               IsVisible="{Binding IsIdle}"
