@@ -28,7 +28,7 @@ public sealed partial class HomeView : UserControl
     {
         var target = DataContext is HomeViewModel { HasResume: true }
             ? ResumeHero.PrimaryAction
-            : InProgress.PrimaryAction;
+            : RecentlyAdded.PrimaryAction;
         target.Focus();
     }
 }

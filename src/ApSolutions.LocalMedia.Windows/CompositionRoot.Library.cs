@@ -116,5 +116,32 @@ public static partial class CompositionRoot
                             ProgressPolicy.ClampPosition(state.Position, state.ObservedDuration)),
                         CancellationToken.None).ConfigureAwait(true);
                 },
-                provider.GetRequiredService<RecommendationsViewModel>()));
+                provider.GetRequiredService<RecommendationsViewModel>(),
+
+                // Detalles, the hero's second action, which the prototype has had all along. It
+                // lands where the library's own grid lands: the shell navigates to the library and
+                // the library opens that title's card, so there is one way into a card and not two.
+                // The catalogue is asked for the row rather than the row being carried from Home:
+                // what a card needs is the whole CatalogItem, and the read model behind the hero
+                // answers with a title id.
+                onOpenDetails: async titleId =>
+                {
+                    if (provider.GetRequiredService<ShellHost>().Shell is not { Library: { } library } shell)
+                    {
+                        return;
+                    }
+
+                    var page = await provider.GetRequiredService<ICatalogQueryService>()
+                        .QueryAsync(new CatalogQuery(PageSize: 100), CancellationToken.None)
+                        .ConfigureAwait(true);
+                    if (page.Items.FirstOrDefault(item => item.Id == titleId) is not { } row)
+                    {
+                        return;
+                    }
+
+                    shell.NavigateCommand.Execute(AppRoute.Library);
+                    await library.OpenDetailsAsync(
+                        new CatalogItemViewModel(row),
+                        CancellationToken.None).ConfigureAwait(true);
+                }));
 }

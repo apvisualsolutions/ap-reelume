@@ -38,6 +38,7 @@ public sealed class ContrastTokenTests
         "PlayerHairlineBrush",
         "PlayerTextBrush",
         "PlayerTextSecondaryBrush",
+        "PosterChipInkBrush",
         "PosterInitialsBrush",
         "PosterRingBrush",
         "NavigationSurfaceBrush",

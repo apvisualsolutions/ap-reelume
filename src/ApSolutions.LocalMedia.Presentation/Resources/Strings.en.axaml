@@ -385,10 +385,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="HomeTitle">Home</x:String>
   <x:String x:Key="HomeResumeAccessibleName">Continue watching</x:String>
   <x:String x:Key="HomeResumeHeading">Continue watching</x:String>
+  <x:String x:Key="HomeResumeRemaining">left {0}</x:String>
+  <x:String x:Key="HomeResumeDetailsAction">Details</x:String>
   <x:String x:Key="HomeResumeAction">Continue</x:String>
   <x:String x:Key="HomeResumeProgressLabel">Progress</x:String>
   <x:String x:Key="HomePercentSuffix">%</x:String>
   <x:String x:Key="HomeInProgressAccessibleName">Items in progress</x:String>
+  <x:String x:Key="HomeInProgressSubheading">Pick up where you left off</x:String>
   <x:String x:Key="HomeInProgressHeading">In progress</x:String>
   <x:String x:Key="HomeInProgressEmpty">You have not started anything yet. Open the library and pick something.</x:String>
   <x:String x:Key="HomeRecentlyAddedAccessibleName">Recently added</x:String>
@@ -396,7 +399,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="HomeRecentlyAddedEmpty">Nothing new since the last scan.</x:String>
   <x:String x:Key="HomeLibraryEntryAccessibleName">Library access</x:String>
   <x:String x:Key="HomeLibraryHeading">Your library</x:String>
-  <x:String x:Key="HomeLibraryAction">Open library</x:String>
+  <x:String x:Key="HomeLibraryAction">See the whole library</x:String>
   <x:String x:Key="HomeLibraryMoviesLabel">movies</x:String>
   <x:String x:Key="HomeLibraryShowsLabel">shows</x:String>
   <x:String x:Key="HomeLibraryUnavailableLabel">out of reach right now</x:String>

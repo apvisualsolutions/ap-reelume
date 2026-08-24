@@ -10,6 +10,32 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La referencia con la que se comparaba estaba a media luz.** Las dieciséis capturas del prototipo
+  archivadas se tomaron a mitad de su animación de entrada (`apr-in`, de opacidad 0 a 1): medido
+  sobre las ocho vistas, todo lo que anima salía entre **1,3 y 1,9 veces más oscuro**, mientras el
+  fondo de la página —que no anima— coincidía con su token. Un póster medía `#2A1722` donde el
+  prototipo pinta `#6A2C46`, que es exactamente lo que da su propia fórmula `hsl(330 38% 30%)`. La
+  referencia se ha vuelto a tomar con `--force-prefers-reduced-motion`, que es lo que el prototipo
+  ya prevé, y **cada una está comprobada contra una segunda captura**: dieciséis vistas, dieciséis
+  coincidencias píxel a píxel.
+
+- **Inicio es la portada del prototipo.** El héroe sangra hasta el borde, sin tarjeta ni margen, con
+  su antetítulo espaciado, la línea «2019 · Drama · Misterio · quedan 44:00», la barra sin
+  porcentaje y **dos** botones —«▶ Continuar · 52:00» y «Detalles»—, que es el par que el prototipo
+  siempre tuvo y el árbol dejó a medias con una nota diciendo que el segundo llegaría «el día que el
+  modelo de lectura pueda responder por él». El raíl de en curso deja de ser una fila de carátulas y
+  pasa a ser lo que el prototipo dibuja: **tarjetas apaisadas** con su imagen, su barra al pie, el
+  título, «Película · 2019» y los mismos dos botones en cada una. Y el enlace a la biblioteca se va
+  al encabezado de «Añadido recientemente», con su punta de flecha, que es donde el prototipo lo
+  escribe.
+
+- **El arte de las portadas se pinta en un solo sitio.** Cinco superficies deletreaban las mismas
+  cuatro capas, y a tres les faltaba la trama. Ahora todas montan `PosterArtView`, y con eso **la
+  lista de excepciones de la puerta de color-por-sí-solo pasa de cuatro entradas a una**: esa lista
+  sólo puede encoger, y así es como encogió.
+
+### Corregido
+
 - **El texto de todos los botones estaba pegado arriba, no centrado.** Lo vio el propietario antes
   que ninguna puerta. `VerticalContentAlignment` empieza en `Stretch`, el estilo de este árbol fijaba
   alto, radio y relleno y nunca lo tocaba, y un `TextBlock` estirado llena el botón entero y dibuja

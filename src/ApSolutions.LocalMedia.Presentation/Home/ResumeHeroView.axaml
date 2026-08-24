@@ -31,10 +31,12 @@ would be inventing two fields. It is a vertical through three layers for a secon
     x:DataType="home:HomeViewModel"
     IsVisible="{Binding HasResume}"
     automation:AutomationProperties.Name="{DynamicResource HomeResumeAccessibleName}">
-  <UserControl.Resources>
-    <library:PosterArtConverter x:Key="HeroArt" />
-  </UserControl.Resources>
-  <Border ClipToBounds="True" CornerRadius="{DynamicResource CornerRadiusMedium}">
+  <!--
+    Square and full width, which is the prototype's hero: its artwork starts under the title bar and
+    runs to the right edge of the window. A rounded card inset by a page margin is what this was, and
+    it read as one more block on a list of blocks instead of as the thing the page opens on.
+  -->
+  <Border ClipToBounds="True" MinHeight="380">
     <Panel Background="{DynamicResource PlayerSurfaceBrush}">
       <!--
         The bleed: the title's own art wall, and over it the prototype's directional veil so the
@@ -42,10 +44,8 @@ would be inventing two fields. It is a vertical through three layers for a secon
         the opacity token that is 0 in the two high contrasts — a hue picked by a hash is a contrast
         ratio nobody decided, and there the plain dark ground is the whole picture.
       -->
-      <Panel Opacity="{DynamicResource PosterArtOpacity}">
-        <Border Background="{Binding ResumeTitle, Converter={StaticResource HeroArt}}" />
-        <Border Background="{Binding ResumeTitle, Converter={StaticResource HeroArt}, ConverterParameter=glow}" />
-        <Border Background="{DynamicResource PosterHatchBrush}" />
+      <Panel>
+        <library:PosterArtView Classes="wide" Title="{Binding ResumeTitle}" />
         <Border>
           <Border.Background>
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
@@ -56,7 +56,10 @@ would be inventing two fields. It is a vertical through three layers for a secon
           </Border.Background>
         </Border>
       </Panel>
-      <StackPanel Margin="32" Spacing="{DynamicResource Space16}">
+      <StackPanel
+          Margin="40,44"
+          VerticalAlignment="Top"
+          Spacing="{DynamicResource Space16}">
       <!--
         The overline: caption size and the secondary colour, which is how the prototype labels a
         section without spending a heading level on it. Its letter-spacing is left out on purpose -
@@ -66,7 +69,7 @@ would be inventing two fields. It is a vertical through three layers for a secon
         a label is renaming a control in this tree.
       -->
       <TextBlock
-          FontSize="{DynamicResource FontSizeCaption}"
+          Classes="hero-overline"
           Foreground="{DynamicResource PlayerTextSecondaryBrush}"
           Text="{DynamicResource HomeResumeHeading}" />
       <!--
@@ -80,52 +83,67 @@ would be inventing two fields. It is a vertical through three layers for a secon
           FontWeight="Light"
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{Binding ResumeTitle}"
-          TextTrimming="CharacterEllipsis" />
+          TextTrimming="CharacterEllipsis"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <!--
+        What this is and how much of it is left, in one line, which is what the prototype writes
+        under the title: «2019 · Drama · Misterio · quedan 1:09:00». It replaces the season-and-
+        episode line rather than joining it — for a series those two are the first piece of it.
+      -->
       <TextBlock
           Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-          IsVisible="{Binding HasResumeSubtitle}"
-          Text="{Binding ResumeSubtitle}"
+          IsVisible="{Binding HasResumeMeta}"
+          Text="{Binding ResumeMetaText}"
           TextTrimming="CharacterEllipsis" />
       <!--
         One bar, 3 px like every other progress rule in this application, and the percentage in words
         beside it so the bar is never the only carrier. MinHeight and MinWidth both go with their
         setter: the base ControlTheme has a minimum of each, and Height alone measures 4.
       -->
-      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-        <ProgressBar
-            Width="300"
-            Height="3"
-            MinHeight="3"
-            MinWidth="0"
-            VerticalAlignment="Center"
-            Background="{DynamicResource PlayerHairlineBrush}"
-            Foreground="{DynamicResource AccentBrush}"
-            Maximum="1"
-            Value="{Binding ResumeCompletedFraction}"
-            automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
-        <TextBlock
-            VerticalAlignment="Center"
-            FontSize="{DynamicResource FontSizeCaption}"
-            Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-            Text="{Binding ResumeCompletedText}" />
-        <TextBlock
-            VerticalAlignment="Center"
-            FontSize="{DynamicResource FontSizeCaption}"
-            Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-            Text="{DynamicResource HomePercentSuffix}" />
-      </StackPanel>
+      <!--
+        One bar and no percentage beside it, which is the prototype's grammar: how much is LEFT is
+        the number somebody weighs before pressing Continue, and it is in the line above. The bar is
+        still never the only carrier - the same line says it in words, and the button says the minute
+        it would resume at.
+      -->
+      <ProgressBar
+          Width="300"
+          Height="3"
+          MinHeight="3"
+          MinWidth="0"
+          HorizontalAlignment="Left"
+          Background="{DynamicResource PlayerHairlineBrush}"
+          Foreground="{DynamicResource AccentBrush}"
+          Maximum="1"
+          Value="{Binding ResumeCompletedFraction}"
+          automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
       <!--
         A WrapPanel with one child, because the row of actions is what this repository has measured
         eight times: a horizontal StackPanel offers its children infinite width, and the second action
         arrives here the day the read model can answer for it.
+      -->
+      <!--
+        A WrapPanel, because the row of actions is what this repository has measured eight times: a
+        horizontal StackPanel offers its children infinite width. Two children now - the prototype's
+        own pair - and the second one is what the earlier note said would arrive «the day the read
+        model can answer for it».
       -->
       <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space8}">
         <Button
             x:Name="ResumeHeroAction"
             Classes="primary-action"
             Command="{Binding ResumeCommand}"
-            Content="{DynamicResource HomeResumeAction}"
-            automation:AutomationProperties.Name="{DynamicResource HomeResumeAction}" />
+            automation:AutomationProperties.Name="{DynamicResource HomeResumeAction}">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <Path Classes="icon size-14 filled" VerticalAlignment="Center" Data="{DynamicResource IconPlay}" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding ResumeActionText}" />
+          </StackPanel>
+        </Button>
+        <Button
+            x:Name="ResumeHeroDetails"
+            Command="{Binding OpenResumeDetailsCommand}"
+            Content="{DynamicResource HomeResumeDetailsAction}"
+            automation:AutomationProperties.Name="{DynamicResource HomeResumeDetailsAction}" />
       </WrapPanel>
       </StackPanel>
     </Panel>

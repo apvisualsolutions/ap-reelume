@@ -22,7 +22,9 @@ public sealed record HomeProgressEntry(
     TimeSpan? ObservedDuration,
     WatchStatus Status,
     bool IsAvailable,
-    DateTimeOffset UpdatedUtc);
+    DateTimeOffset UpdatedUtc,
+    int? Year = null,
+    IReadOnlyList<string>? Genres = null);
 
 /// <summary>The single thing Home offers to continue, or nothing at all.</summary>
 public sealed record ResumeItem(
@@ -35,7 +37,9 @@ public sealed record ResumeItem(
     string? EpisodeTitle,
     TimeSpan Position,
     TimeSpan? ObservedDuration,
-    double CompletedFraction);
+    double CompletedFraction,
+    int? Year = null,
+    IReadOnlyList<string>? Genres = null);
 
 /// <summary>An item on the in-progress rail, including one whose file is currently out of reach.</summary>
 public sealed record InProgressItem(
@@ -48,7 +52,9 @@ public sealed record InProgressItem(
     string? EpisodeTitle,
     double CompletedFraction,
     bool IsAvailable,
-    DateTimeOffset UpdatedUtc);
+    DateTimeOffset UpdatedUtc,
+    TimeSpan Position = default,
+    int? Year = null);
 
 public sealed record RecentlyAddedItem(
     TitleId Id,
@@ -172,7 +178,9 @@ public sealed class GetHome
                 entry.EpisodeTitle,
                 position,
                 entry.ObservedDuration,
-                CompletedFraction(position, entry.ObservedDuration));
+                CompletedFraction(position, entry.ObservedDuration),
+                entry.Year,
+                entry.Genres);
         }
 
         return null;
@@ -190,7 +198,9 @@ public sealed class GetHome
             ProgressPolicy.ClampPosition(entry.Position, entry.ObservedDuration),
             entry.ObservedDuration),
         entry.IsAvailable,
-        entry.UpdatedUtc);
+        entry.UpdatedUtc,
+        ProgressPolicy.ClampPosition(entry.Position, entry.ObservedDuration),
+        entry.Year);
 
     /// <summary>Zero when the length was never observed; an unobserved media has no percentage.</summary>
     private static double CompletedFraction(TimeSpan position, TimeSpan? duration) =>

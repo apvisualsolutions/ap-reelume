@@ -12,11 +12,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="home:HomeViewModel"
     automation:AutomationProperties.Name="{DynamicResource HomeRecentlyAddedAccessibleName}">
   <Grid RowDefinitions="Auto,*">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
-        FontWeight="SemiBold"
-        Text="{DynamicResource HomeRecentlyAddedHeading}"
-        automation:AutomationProperties.HeadingLevel="2" />
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource HomeRecentlyAddedHeading}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <!--
+        The way into the library, which the prototype writes at the right of THIS heading rather
+        than the one above: «Ver toda la biblioteca ›», as a link with a chevron and no fill. It
+        keeps the control name it had on the other rail, so the walk and the focus fallback find the
+        same control they always did — only the rail it belongs to changed.
+      -->
+      <Button
+          x:Name="LibraryEntryAction"
+          Grid.Column="1"
+          Classes="link-action"
+          VerticalAlignment="Center"
+          automation:AutomationProperties.Name="{DynamicResource HomeLibraryAction}"
+          Command="{Binding OpenLibraryCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+          <TextBlock VerticalAlignment="Center" Text="{DynamicResource HomeLibraryAction}" />
+          <Path Classes="icon size-14" VerticalAlignment="Center" Data="{DynamicResource IconChevronRight}" />
+        </StackPanel>
+      </Button>
+    </Grid>
     <TextBlock
         Grid.Row="1"
         Margin="0,8,0,0"

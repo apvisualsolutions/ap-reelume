@@ -1,0 +1,62 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The cover, in one place.
+
+The prototype builds every picture in the application from one function and four backgrounds: a
+two-stop gradient from the title's hue, a radial glow in the top left corner, a diagonal hatch, and a
+ring. Five surfaces here draw that picture — the library card, the continue rail's card, Home's hero
+and the two detail banners — and until 2026-08-25 each of them spelled the four layers out again.
+
+Two things came of gathering them. The hatch had been missing from three of the five, and adding it
+in one place is what makes that impossible to repeat; and the accessibility audit's list of views
+allowed to bind a colour to state went from four entries to one, because only this view binds it now.
+That list may only shrink, and this is how it shrank.
+
+The ring is where the two shapes differ, and it is the only difference: centred and large on a 2:3
+poster, small and high on the right on a wide frame, which is what `art(h, 'p')` and `art(h, 'w')` do
+in the prototype's own source.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Library.PosterArtView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library">
+  <UserControl.Resources>
+    <library:PosterArtConverter x:Key="Art" />
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <!--
+      The wide frame's ring, from the prototype: 26 px of radius at 76 % across and 32 % down, rather
+      than the poster's 44 px in the middle. A class and not a second view, because everything else
+      about the picture is the same.
+    -->
+    <Style Selector="library|PosterArtView.wide Ellipse#Ring">
+      <Setter Property="Width" Value="54" />
+      <Setter Property="Height" Value="54" />
+      <Setter Property="Margin" Value="0,44,58,0" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+  </UserControl.Styles>
+  <!--
+    PosterArtOpacity is 0 in the two high contrasts, where a hue picked by a hash is a contrast ratio
+    nobody decided and the plain dark ground is the whole picture. It is what pays for this view
+    being allowed to bind a colour to state at all.
+  -->
+  <Panel x:Name="PosterArtSurface" Opacity="{DynamicResource PosterArtOpacity}">
+    <Border Background="{Binding $parent[library:PosterArtView].Title, Converter={StaticResource Art}}" />
+    <Border Background="{Binding $parent[library:PosterArtView].Title, Converter={StaticResource Art}, ConverterParameter=glow}" />
+    <Border Background="{DynamicResource PosterHatchBrush}" />
+    <Ellipse
+        x:Name="Ring"
+        Width="92"
+        Height="92"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Stroke="{DynamicResource PosterRingBrush}"
+        StrokeThickness="2" />
+  </Panel>
+</UserControl>

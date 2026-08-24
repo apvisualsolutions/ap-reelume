@@ -10,6 +10,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The reference everything was compared against was half-lit.** The sixteen archived prototype
+  captures were taken mid fade-in (`apr-in`, opacity 0 to 1): measured across the eight views,
+  everything that animates came out **1.3 to 1.9 times darker**, while the page background — which
+  does not animate — matched its token exactly. A poster read `#2A1722` where the prototype paints
+  `#6A2C46`, which is what its own `hsl(330 38% 30%)` gives. The reference was retaken with
+  `--force-prefers-reduced-motion`, which the prototype already provides for, and **each capture is
+  checked against a second one**: sixteen views, sixteen pixel-for-pixel matches.
+
+- **Home is the prototype's front page.** The hero bleeds to the edge with no card and no margin,
+  with its spaced overline, the line "2019 · Drama · Misterio · 44:00 left", the bar without a
+  percentage, and **two** buttons — "▶ Continue · 52:00" and "Details" — which is the pair the
+  prototype always had and this tree left half-built with a note saying the second would arrive "the
+  day the read model can answer for it". The continue rail stops being a row of covers and becomes
+  what the prototype draws: **landscape cards** with their picture, the bar across its foot, the
+  title, "Film · 2019" and the same two buttons on each. And the way into the library moves to the
+  "Recently added" heading with its chevron, which is where the prototype writes it.
+
+- **The cover is painted in one place.** Five surfaces spelled out the same four layers and three of
+  them were missing the hatch. They all mount `PosterArtView` now, and with it **the colour-alone
+  gate's exception list goes from four entries to one**: that list may only shrink, and this is how
+  it shrank.
+
+### Fixed
+
 - **Every button's label sat at the top of it rather than in the middle.** The owner saw it before
   any gate did. `VerticalContentAlignment` starts at `Stretch`, this tree's own style set a height, a
   radius and a padding and never touched it, and a stretched `TextBlock` fills the whole button and
