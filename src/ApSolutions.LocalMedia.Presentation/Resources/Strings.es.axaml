@@ -96,6 +96,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="LibraryFilterLabel">Filtrar</x:String>
   <x:String x:Key="LibrarySortLabel">Ordenar</x:String>
   <x:String x:Key="LibraryFilterAll">Todo</x:String>
+  <x:String x:Key="CatalogKindMovie">Película</x:String>
+  <x:String x:Key="CatalogKindShow">Serie</x:String>
+  <x:String x:Key="CatalogKindFile">Archivo</x:String>
+  <x:String x:Key="CatalogRuntimeMinutes">{0} min</x:String>
+  <x:String x:Key="CatalogEpisodesSuffix">episodios</x:String>
   <x:String x:Key="LibraryFilterMovies">Películas</x:String>
   <x:String x:Key="LibraryFilterShows">Series</x:String>
   <x:String x:Key="LibraryFilterAvailable">Disponible</x:String>

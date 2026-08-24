@@ -100,6 +100,24 @@ public sealed class ProgressWiringTests
         Assert.Equal(9, viewModel.PositionSeconds);
     }
 
+    /// <summary>The rail's badge is fed, and it is the event bus's first listener.</summary>
+    /// <remarks>
+    /// <c>ReviewInboxChanged</c> was published by two use cases and subscribed to by nobody, and
+    /// <c>InProcessApplicationEventPublisher.Published</c> had no handler anywhere in <c>src/</c>:
+    /// an application event bus with a publisher and no listener. The prototype's number over the
+    /// review icon is what finally reads it, so this asserts both halves — that something listens,
+    /// and that what it hears reaches the shell.
+    /// </remarks>
+    [Fact]
+    public void The_review_badge_is_counted_and_recounted()
+    {
+        var composition = CompositionRootSource();
+
+        Assert.Contains("events.Published +=", composition, StringComparison.Ordinal);
+        Assert.Contains("is ReviewInboxChanged", composition, StringComparison.Ordinal);
+        Assert.Contains("shell.ApplyReviewPendingCount(", composition, StringComparison.Ordinal);
+    }
+
     private static string CompositionRootSource()
     {
         return CompositionSourceText.Read();

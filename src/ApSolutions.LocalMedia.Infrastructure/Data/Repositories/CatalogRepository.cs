@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Continuity;
 using Microsoft.Data.Sqlite;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
@@ -216,13 +217,30 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
         await using var command = connection.CreateCommand();
         command.CommandText = $"""
             WITH catalog_items AS (
+                -- A title's id is its media file's id (ApplyIdentification says so), which is what
+                -- lets the running time be a lookup rather than a join through the versions.
                 SELECT t.id, t.kind, t.primary_title, t.sort_title, t.release_year,
                        t.is_available, t.has_progress, t.is_personal,
-                       t.added_utc, t.last_played_utc
+                       t.added_utc, t.last_played_utc,
+                       (SELECT media.duration_ticks FROM media_files media WHERE media.id = t.id)
+                           AS duration_ticks,
+                       (SELECT group_concat(g.genre, '|') FROM title_genres g WHERE g.title_id = t.id)
+                           AS genres,
+                       (SELECT w.status FROM watch_state w
+                        WHERE w.title_id = t.id AND w.episode_id IS NULL) AS watch_status,
+                       (SELECT w.position_ticks FROM watch_state w
+                        WHERE w.title_id = t.id AND w.episode_id IS NULL) AS watch_position,
+                       (SELECT w.observed_duration_ticks FROM watch_state w
+                        WHERE w.title_id = t.id AND w.episode_id IS NULL) AS watch_duration,
+                       (SELECT COUNT(*) FROM episodes e WHERE e.show_id = t.id) AS episode_count,
+                       (SELECT COUNT(*) FROM watch_state w
+                        INNER JOIN episodes e ON e.id = w.episode_id
+                        WHERE e.show_id = t.id AND w.status = 2) AS episodes_watched
                 FROM titles t
                 UNION ALL
                 SELECT scanned.media_file_id, 2, scanned.display_title, scanned.sort_title, NULL,
-                       media.is_available, 0, 0, scanned.added_utc, NULL
+                       media.is_available, 0, 0, scanned.added_utc, NULL,
+                       media.duration_ticks, NULL, NULL, NULL, NULL, 0, 0
                 FROM scanned_titles scanned
                 INNER JOIN media_files media ON media.id = scanned.media_file_id
                 WHERE NOT EXISTS (
@@ -230,7 +248,9 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
             )
             SELECT t.id, t.kind, t.primary_title, t.release_year, t.is_available,
                    t.has_progress, t.is_personal, t.added_utc, t.last_played_utc,
-                   {sortExpression} AS sort_key
+                   {sortExpression} AS sort_key,
+                   t.duration_ticks, t.genres, t.watch_status, t.watch_position, t.watch_duration,
+                   t.episode_count, t.episodes_watched
             FROM catalog_items t
             {where}
             ORDER BY {sortExpression} {direction}, t.id {direction}
@@ -252,6 +272,8 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
         var rows = new List<CatalogRow>(query.PageSize + 1);
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
+            var position = reader.IsDBNull(13) ? 0L : reader.GetInt64(13);
+            var observed = reader.IsDBNull(14) ? 0L : reader.GetInt64(14);
             rows.Add(new CatalogRow(
                 new CatalogItem(
                     new TitleId(Guid.Parse(reader.GetString(0))),
@@ -262,7 +284,18 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                     reader.GetInt32(5) == 1,
                     reader.GetInt32(6) == 1,
                     ParseDate(reader.GetString(7)),
-                    reader.IsDBNull(8) ? null : ParseDate(reader.GetString(8))),
+                    reader.IsDBNull(8) ? null : ParseDate(reader.GetString(8)),
+                    reader.IsDBNull(10) ? null : TimeSpan.FromTicks(reader.GetInt64(10)),
+                    reader.IsDBNull(11)
+                        ? []
+                        : reader.GetString(11).Split('|', StringSplitOptions.RemoveEmptyEntries),
+                    reader.IsDBNull(12) ? WatchStatus.NotStarted : (WatchStatus)reader.GetInt32(12),
+                    // Zero rather than a division by nothing: a session that never reported a length
+                    // has a position and no scale to read it against, and a bar drawn from that would
+                    // be a number the catalogue invented.
+                    observed > 0 ? Math.Clamp((double)position / observed, 0, 1) : 0,
+                    reader.IsDBNull(15) ? 0 : reader.GetInt32(15),
+                    reader.IsDBNull(16) ? 0 : reader.GetInt32(16)),
                 Convert.ToString(reader.GetValue(9), CultureInfo.InvariantCulture) ?? string.Empty));
         }
 

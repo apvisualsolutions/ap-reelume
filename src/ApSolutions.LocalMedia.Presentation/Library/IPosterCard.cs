@@ -29,15 +29,47 @@ public interface IPosterCard
     /// <summary>The letters standing in for artwork; see <see cref="PosterInitials"/>.</summary>
     string Initials { get; }
 
-    /// <summary>The line under the title: a year, or a season and episode.</summary>
-    string CaptionText { get; }
-
-    /// <summary>Whether there is a caption at all; an empty line would still take its height.</summary>
-    bool HasCaption { get; }
-
     /// <summary>Whether <see cref="CompletedFraction"/> is a number this list actually read.</summary>
     bool HasKnownProgress { get; }
 
     /// <summary>How much of it has been watched, from 0 to 1.</summary>
     double CompletedFraction { get; }
+
+    /// <summary>
+    /// The word in the chip at the top left of the cover, as a resource key: film or series.
+    /// </summary>
+    /// <remarks>
+    /// A key and not a word, like every other string a view model hands over here: the chip says
+    /// «Película» in one language and "Film" in the other, and deciding that in a model would put a
+    /// language inside something that has none. The five below follow the same rule where they can —
+    /// the running time and the genres are the title's own data and carry no wording at all.
+    /// </remarks>
+    string KindKey { get; }
+
+    /// <summary>Whether there is a chip to draw at all; a rail that cannot say has none.</summary>
+    bool HasKind { get; }
+
+    /// <summary>The line under the title: «2024 · 111 min · Suspense», already joined.</summary>
+    string MetaText { get; }
+
+    /// <summary>Whether there is a meta line at all.</summary>
+    bool HasMeta { get; }
+
+    /// <summary>
+    /// The line under that one, as a resource key: not started, in progress, watched — or nothing,
+    /// when the card counts episodes instead.
+    /// </summary>
+    string StatusKey { get; }
+
+    /// <summary>«10/16», for a series; empty for anything else.</summary>
+    string EpisodeCountText { get; }
+
+    /// <summary>Whether this card counts episodes rather than naming a status.</summary>
+    bool CountsEpisodes { get; }
+
+    /// <summary>Whether the whole thing has been seen, which the cover marks with a tick.</summary>
+    bool IsWatched { get; }
+
+    /// <summary>Whether the file behind it is reachable; the cover says so when it is not.</summary>
+    bool IsAvailable { get; }
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Continuity;
 
 namespace ApSolutions.LocalMedia.Application.Catalog;
 
@@ -41,6 +42,15 @@ public sealed record CatalogQuery(
     string? Cursor = null,
     bool Descending = false);
 
+/// <summary>One row of the library grid, with everything the card on it paints.</summary>
+/// <remarks>
+/// The last five arrived on 2026-08-24, when the owner compared the grid with the prototype's. Its
+/// card carries three lines and two badges — a kind chip, the title, «2024 · 111 min · Suspense», a
+/// watch status or an episode count, and a tick when the whole thing has been seen — and this record
+/// carried a title, a year and two flags. Every one of the five is in the database already; what was
+/// missing was the journey from there to here, which is why they are defaulted rather than required:
+/// four view models build a card and only the catalogue's own query can answer all five.
+/// </remarks>
 public sealed record CatalogItem(
     TitleId Id,
     CatalogTitleKind Kind,
@@ -50,7 +60,13 @@ public sealed record CatalogItem(
     bool HasProgress,
     bool IsPersonal,
     DateTimeOffset AddedUtc,
-    DateTimeOffset? LastPlayedUtc);
+    DateTimeOffset? LastPlayedUtc,
+    TimeSpan? Runtime = null,
+    IReadOnlyList<string>? Genres = null,
+    WatchStatus Status = WatchStatus.NotStarted,
+    double CompletedFraction = 0,
+    int EpisodeCount = 0,
+    int EpisodesWatched = 0);
 
 public sealed record CatalogPage(
     IReadOnlyList<CatalogItem> Items,

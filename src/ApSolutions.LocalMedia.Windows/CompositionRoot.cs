@@ -324,6 +324,10 @@ public static partial class CompositionRoot
                 host.Content = refusal is null
                     ? services.GetRequiredService<ShellView>()
                     : CreateRecoveryView(services, paths.DatabasePath, migrationRunner.LastBackupPath, refusal);
+                if (refusal is null)
+                {
+                    await StartReviewBadgeAsync(services).ConfigureAwait(true);
+                }
             },
             // Nothing else can report a failure here: the window is already on screen with a startup
             // view in it, and leaving that view up for good would be the one outcome that says
@@ -332,6 +336,56 @@ public static partial class CompositionRoot
                 CreateRecoveryView(services, paths.DatabasePath, migrationRunner.LastBackupPath, exception.Message));
 
         return host;
+    }
+
+    /// <summary>
+    /// Counts what is waiting in the review inbox, and keeps counting it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The rail's badge is the prototype's, and this is the wire behind it. It is also the first
+    /// subscriber the application event bus has ever had: <c>ReviewInboxChanged</c> is published by
+    /// <c>ResolveMatch</c> and <c>RejectMatch</c>, and <c>InProcessApplicationEventPublisher.Published</c>
+    /// had no handler anywhere in <c>src/</c> — a bus with a publisher and no listener, which is the
+    /// house defect wearing its widest hat.
+    /// </para>
+    /// <para>
+    /// The count is taken once at startup and again on every decision, because those are the two
+    /// moments it can change: nothing else adds to the inbox while the application is open except a
+    /// scan, and a scan that identifies a file publishes the same event.
+    /// </para>
+    /// </remarks>
+    private static async Task StartReviewBadgeAsync(IServiceProvider services)
+    {
+        var shell = services.GetRequiredService<ShellHost>().Shell;
+        if (shell is null)
+        {
+            return;
+        }
+
+        var inbox = services.GetRequiredService<GetReviewInbox>();
+        var events = services.GetRequiredService<InProcessApplicationEventPublisher>();
+        events.Published += published =>
+        {
+            if (published is ReviewInboxChanged)
+            {
+                GuardedEvent.Run(() => CountAsync(inbox, shell));
+            }
+        };
+
+        await CountAsync(inbox, shell).ConfigureAwait(true);
+    }
+
+    /// <summary>One count, on the interface thread, with the page size the use case allows.</summary>
+    private static async Task CountAsync(GetReviewInbox inbox, ShellViewModel shell)
+    {
+        var page = await inbox
+            .ExecuteAsync(new GetReviewInboxQuery(PageSize: 100), CancellationToken.None)
+            .ConfigureAwait(true);
+
+        // A hundred is the ceiling the use case takes, and NextOffset is how it says there are more.
+        var pending = page.NextOffset is null ? page.Items.Count : 101;
+        Avalonia.Threading.Dispatcher.UIThread.Post(() => shell.ApplyReviewPendingCount(pending));
     }
 
     /// <summary>

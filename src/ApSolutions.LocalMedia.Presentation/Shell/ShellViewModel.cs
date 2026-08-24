@@ -36,6 +36,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly AsyncRelayCommand _addMedia;
     private readonly AsyncRelayCommand _cancelAddMedia;
     private bool _isAddingRoot;
+    private int _reviewPendingCount;
     private SettingsSection _settingsSection = SettingsSection.Appearance;
     private MetadataEditorViewModel? _metadataEditor;
     private int _editorTab;
@@ -552,6 +553,51 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         && !IsPlayerVisible;
 
     /// <summary>Opens one media file and shows everything that session puts on screen.</summary>
+    /// <summary>
+    /// How many proposals are waiting in the review inbox, which the rail draws over its icon.
+    /// </summary>
+    /// <remarks>
+    /// The prototype puts a number there and this rail had none, which is the last of the eight
+    /// differences the owner's comparison turned up. What made it worth doing rather than faking:
+    /// <c>ReviewInboxChanged</c> has been published by <c>ResolveMatch</c> and <c>RejectMatch</c>
+    /// since they were written and <b>subscribed to by nobody</b> — the whole application event bus
+    /// had a publisher and no listener in the product. The badge is the first thing that listens.
+    /// </remarks>
+    public int ReviewPendingCount
+    {
+        get => _reviewPendingCount;
+        private set
+        {
+            if (_reviewPendingCount == value)
+            {
+                return;
+            }
+
+            _reviewPendingCount = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasReviewPending));
+            OnPropertyChanged(nameof(ReviewPendingText));
+        }
+    }
+
+    /// <summary>Whether there is a badge at all: an empty inbox draws no zero.</summary>
+    public bool HasReviewPending => _reviewPendingCount > 0;
+
+    /// <summary>
+    /// The number as the badge writes it, which stops at what the inbox can count.
+    /// </summary>
+    /// <remarks>
+    /// <c>GetReviewInbox</c> refuses a page over a hundred, so a hundred and one means "at least
+    /// this many" and the badge says so rather than printing a number it did not count.
+    /// </remarks>
+    public string ReviewPendingText => _reviewPendingCount > 100
+        ? "99+"
+        : _reviewPendingCount.ToString(System.Globalization.CultureInfo.CurrentCulture);
+
+    /// <summary>Takes a fresh count, from whoever counted it.</summary>
+    public void ApplyReviewPendingCount(int pending) =>
+        ReviewPendingCount = Math.Max(0, pending);
+
     public async Task OpenPlayerAsync(PlayDetailsRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
