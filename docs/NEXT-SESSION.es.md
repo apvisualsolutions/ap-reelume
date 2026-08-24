@@ -1,5 +1,40 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-24 (madrugada) — fidelidad de paleta HECHA y verificada en pantalla
+
+**El propietario miró las capturas y pidió fidelidad** («ni los colores ni la elegancia»; React
+descartado por decisión suya). La causa era real: los valores del árbol venían de una instantánea
+anterior al prototipo. Hecho en `0667010`:
+- **Paleta leída del `tokens()` del propio prototipo** y re-valorada en Dark y Light: fondo
+  #050608/#08090C, tarjetas #12151B, rellenos #171B22, textos #EDF1F6/#8B97A8, estados como
+  mezclas opacas. Única cesión al canón: el borde (su #3A424F da 1,96:1; quedó #5C6878 por el
+  suelo de 3:1 de `ContrastTokenTests`).
+- **El primario es la píldora clara del prototipo** (#F3F6FA/tinta #0A0C10 en oscuro) con familia
+  `PrimaryAction*` propia en los 4 temas, pares en la puerta, y `ControlStateTests` re-declarado:
+  bajo la mano SIGUE siendo primario; deshabilitado cae al gris común.
+- **Elevaciones tipadas** (`ElevationShadow`/`Strong` como `BoxShadows`) gastadas en setting-row,
+  PosterCard y el diálogo; HC sin sombras. `ScalarTokenTests` vigila que se gasten.
+- Verificado en pantalla: `artifacts/ui-captures/T36-app/*-v2.png` (biblioteca con 21 elementos,
+  Ajustes, Duplicados, Revisar) junto a `T36-proto/`.
+
+**El data root de la matriz vive FUERA del árbol**:
+`%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume	ools\matrix-root` — `artifacts/` lo
+barren las suites (se comió el primero). `tools/shoot.ps1` ya respeta un
+`AP_LOCALMEDIA_DATA_ROOT` puesto por el llamador.
+
+**CI**: candidato `0667010` (paleta) tras `96bf0b3` (trinquete: 215, dos suelos subidos, dos pagos
+—la rama de cargas solapadas de `IsLoading` y las cuatro lecturas de gramática del updater más la
+noticia repetida—). **OJO al mirar runs**: `gh run watch --exit-status | tail` ENMASCARA el exit
+—leer SIEMPRE la conclusión con `gh run view --json conclusion`—; ya costó un ff erróneo (deshecho
+en un minuto con force-with-lease de vuelta a b21f8e3).
+
+**Fidelidad, fase B (pendiente fino)**: tinte del shell del prototipo es rgba(98,174,232,.156) —el
+halo actual usa 0.14—; bordes decorativos que aún usen `ShellBorderBrush` → hairline; capturas
+light comparadas; la home de la matriz necesita los enlaces del escaneo en el seed («En curso» no
+pinta con la siembra actual; ver SQL simple de `HomeReadModel` — watch_state+titles debería
+bastar: DEPURAR por qué no sale, quizá la ruta inicial no dispara `NavigatedAsync` al arrancar,
+que también explicaría la home vacía con click en su propio botón de riel ya activo).
+
 ## Estado al cierre del 2026-08-23 (noche) — F7–F10 cerradas, F11 a media matriz
 
 **Hecho hoy**: F7 (menú de velocidad, botón de «elegir otra versión» con flyout de las filas
