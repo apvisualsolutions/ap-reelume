@@ -214,6 +214,11 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             // the same shell door - one surface, two ways in, never two answers.
             duplicatesOverview.GroupOpener = OpenDuplicatesForAsync;
         }
+
+        // The route the service is born on never raises Navigated, so the surface it shows is fed
+        // here: without this, Home waits for a navigation that already happened and starts empty
+        // until somebody leaves and comes back.
+        GuardedEvent.Run(() => NavigatedAsync(_navigationService.CurrentRoute));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

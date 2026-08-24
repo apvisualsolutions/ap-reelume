@@ -4,6 +4,7 @@
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Discovery;
+using ApSolutions.LocalMedia.Application.Home;
 using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Playback;
@@ -13,6 +14,7 @@ using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
 using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Domain.Playback;
+using ApSolutions.LocalMedia.Presentation.Home;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Metadata;
 using ApSolutions.LocalMedia.Presentation.Movie;
@@ -75,6 +77,37 @@ public sealed class ShellAssemblyTests
 
         Assert.True(shell.IsReviewVisible);
         Assert.False(shell.IsPrimaryContentVisible);
+    }
+
+    /// <summary>
+    /// The route the service is born on never raises Navigated, so nobody else will ever feed the
+    /// surface it shows: a Home that waits for a navigation that already happened starts empty and
+    /// stays empty until somebody leaves and comes back.
+    /// </summary>
+    [Fact]
+    public void The_route_the_shell_is_born_on_feeds_its_surface_without_a_navigation()
+    {
+        var home = new HomeViewModel(new GetHome(new StubHomeReadModel(
+        [
+            new HomeProgressEntry(
+                ContentKey.ForTitle(Title),
+                Title,
+                CatalogTitleKind.Movie,
+                "Arrival",
+                SeasonNumber: null,
+                EpisodeNumber: null,
+                EpisodeTitle: null,
+                TimeSpan.FromMinutes(30),
+                TimeSpan.FromMinutes(90),
+                WatchStatus.InProgress,
+                IsAvailable: true,
+                DateTimeOffset.UnixEpoch),
+        ])));
+
+        _ = new ShellViewModel(new NavigationService(), FullSurfaces() with { Home = home });
+
+        Assert.True(home.HasInProgress);
+        Assert.True(home.HasResume);
     }
 
     /// <summary>
@@ -617,6 +650,31 @@ public sealed class ShellAssemblyTests
         VideoStatus = new VideoStatusViewModel(),
         LooseFile = new LooseFileViewModel(),
     };
+
+    private sealed class StubHomeReadModel(HomeProgressEntry[] entries) : IHomeReadModel
+    {
+        public Task<IReadOnlyList<HomeProgressEntry>> ReadProgressAsync(
+            int limit,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<IReadOnlyList<HomeProgressEntry>>(entries);
+        }
+
+        public Task<IReadOnlyList<RecentlyAddedItem>> ReadRecentlyAddedAsync(
+            int limit,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<IReadOnlyList<RecentlyAddedItem>>([]);
+        }
+
+        public Task<LibrarySummary> ReadLibrarySummaryAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(new LibrarySummary(1, 0, 0));
+        }
+    }
 
     private sealed class StubCatalog(CatalogTitleKind kind = CatalogTitleKind.Movie) : ICatalogQueryService
     {
