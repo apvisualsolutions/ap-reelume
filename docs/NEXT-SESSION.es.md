@@ -100,8 +100,15 @@ marcos vacíos. Es la trampa conocida del contenido acelerado por GPU. **Tres sa
 todavía porque la decisión pide medir cuál da la imagen que el README merece**: capturar la pantalla
 en vez de la ventana (`BitBlt` sobre el escritorio, con la app al frente); usar
 `Windows.Graphics.Capture`, que sí compone la GPU; o aceptar el reproductor con su fotograma en
-negro, que es honesto pero pobre para una portada. La primera es la más barata y la que yo probaría
-antes.
+negro, que es honesto pero pobre para una portada.
+
+**La primera se probó ya, y no salió gratis**: `CopyFromScreen` sobre el rectángulo de la ventana sí
+compone lo que la GPU pinta, pero **arrastra el escritorio en los bordes redondeados** —la ventana
+tiene esquinas curvas y sombra, y el rectángulo incluye píxeles de lo que haya detrás—, así que pide
+o un fondo controlado o un recorte de unos píxeles por lado. Y en esa misma pasada el reproductor
+**no llegó a abrirse** pese a invocarse los tres botones, lo que apunta a que abrir un MKV de 220 MB
+necesita más margen del que se le dio. Las dos cosas son medibles en una tanda corta; ninguna está
+decidida, y quien la haga debe decidirla **habiendo medido**, no leyendo esta nota.
 
 **Del alcance abierto, lo de siempre**: PRD-003 (ARM64, bloqueado por hardware), REL-001/REL-004 y
 PLY-004 (5.1/7.1, bloqueado). Y el **paso 7, el paseo físico del propietario**, que sigue siendo lo
