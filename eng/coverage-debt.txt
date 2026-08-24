@@ -138,7 +138,7 @@ src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml               
 src/ApSolutions.LocalMedia.Presentation/Language/LanguageService.cs                          100  88
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  78
-src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           97  89
+src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           97  90
 src/ApSolutions.LocalMedia.Presentation/Library/ManualReassignmentViewModel.cs                94  60
 src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  77
