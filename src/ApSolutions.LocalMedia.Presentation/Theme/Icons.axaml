@@ -1,0 +1,51 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+  The prototype's icons, which are not a font.
+
+  Measured on 2026-08-24 by reading `design/AP Reelume.dc.html`: every pictogram in it is drawn by
+  one function, `icon(n, s)`, as an SVG of 24 by 24 with `fill:none`, `stroke:currentColor`,
+  `stroke-width:1.6` and round caps and joins. Thirty-five shapes, all of them line drawings. This
+  application was painting Segoe Fluent glyphs instead — solid, filled pictograms from a different
+  drawing tradition — in twenty-seven places, and that is the difference the owner named first when
+  he said the player's icons are not the prototype's.
+
+  So the shapes come from there, converted rather than redrawn: paths verbatim, and the prototype's
+  `rect` and `circle` elements turned into the arcs that draw them. Two shapes are this
+  application's own and say so: `Stop`, because its transport has a stop where the prototype's has a
+  single toggle, and `ChevronUp`, which is `ChevronDown` the other way up.
+
+  They are geometries and not a control: a geometry can be handed to a `Path` inside a
+  `ControlTemplate`, which is where two of them live, and a control could not. The stroke, the caps
+  and the four sizes belong to the `Path.icon` styles in DesignTokens.axaml, so the whole set can be
+  re-weighted in one place — which is exactly what a font gave and what this had to keep giving.
+-->
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <StreamGeometry x:Key="IconHome">M3 11 12 4l9 7 M5.5 9.5V20h13V9.5</StreamGeometry>
+  <StreamGeometry x:Key="IconLibrary">M5,3.5 H9 A1.5,1.5 0 0 1 10.5,5 V9 A1.5,1.5 0 0 1 9,10.5 H5 A1.5,1.5 0 0 1 3.5,9 V5 A1.5,1.5 0 0 1 5,3.5 Z M15,3.5 H19 A1.5,1.5 0 0 1 20.5,5 V9 A1.5,1.5 0 0 1 19,10.5 H15 A1.5,1.5 0 0 1 13.5,9 V5 A1.5,1.5 0 0 1 15,3.5 Z M5,13.5 H9 A1.5,1.5 0 0 1 10.5,15 V19 A1.5,1.5 0 0 1 9,20.5 H5 A1.5,1.5 0 0 1 3.5,19 V15 A1.5,1.5 0 0 1 5,13.5 Z M15,13.5 H19 A1.5,1.5 0 0 1 20.5,15 V19 A1.5,1.5 0 0 1 19,20.5 H15 A1.5,1.5 0 0 1 13.5,19 V15 A1.5,1.5 0 0 1 15,13.5 Z</StreamGeometry>
+  <StreamGeometry x:Key="IconReview">M3.5,12 A8.5,8.5 0 1 0 20.5,12 A8.5,8.5 0 1 0 3.5,12 Z M12 7.8v5 M12 16.1v.1</StreamGeometry>
+  <StreamGeometry x:Key="IconDuplicates">M5.5,3.5 H13.5 A2,2 0 0 1 15.5,5.5 V13.5 A2,2 0 0 1 13.5,15.5 H5.5 A2,2 0 0 1 3.5,13.5 V5.5 A2,2 0 0 1 5.5,3.5 Z M8 20.5h12.5V8</StreamGeometry>
+  <StreamGeometry x:Key="IconSettings">M4 7h16 M4 12h16 M4 17h16 M6.8,7 A2.2,2.2 0 1 0 11.2,7 A2.2,2.2 0 1 0 6.8,7 Z M12.8,12 A2.2,2.2 0 1 0 17.2,12 A2.2,2.2 0 1 0 12.8,12 Z M4.8,17 A2.2,2.2 0 1 0 9.2,17 A2.2,2.2 0 1 0 4.8,17 Z</StreamGeometry>
+  <StreamGeometry x:Key="IconSearch">M4.6,11 A6.4,6.4 0 1 0 17.4,11 A6.4,6.4 0 1 0 4.6,11 Z M15.8 15.8 20 20</StreamGeometry>
+  <StreamGeometry x:Key="IconPlay">M8 5.4 19 12 8 18.6Z</StreamGeometry>
+  <StreamGeometry x:Key="IconPause">M8.4,5.5 H9.8 A1,1 0 0 1 10.8,6.5 V17.5 A1,1 0 0 1 9.8,18.5 H8.4 A1,1 0 0 1 7.4,17.5 V6.5 A1,1 0 0 1 8.4,5.5 Z M14.2,5.5 H15.6 A1,1 0 0 1 16.6,6.5 V17.5 A1,1 0 0 1 15.6,18.5 H14.2 A1,1 0 0 1 13.2,17.5 V6.5 A1,1 0 0 1 14.2,5.5 Z</StreamGeometry>
+  <StreamGeometry x:Key="IconStop">M7.5,6.5 H16.5 A2,2 0 0 1 18.5,8.5 V17.5 A2,2 0 0 1 16.5,19.5 H7.5 A2,2 0 0 1 5.5,17.5 V8.5 A2,2 0 0 1 7.5,6.5 Z</StreamGeometry>
+  <StreamGeometry x:Key="IconSkipBackward">M4 12a8 8 0 1 0 3-6.2 M4 4.4v4.2h4.2</StreamGeometry>
+  <StreamGeometry x:Key="IconSkipForward">M20 12a8 8 0 1 1-3-6.2 M20 4.4v4.2h-4.2</StreamGeometry>
+  <StreamGeometry x:Key="IconVolume">M4 9.5h3.6L12 6v12L7.6 14.5H4z M15.6 9.6a4 4 0 0 1 0 4.8 M18 7.6a7 7 0 0 1 0 8.8</StreamGeometry>
+  <StreamGeometry x:Key="IconMute">M4 9.5h3.6L12 6v12L7.6 14.5H4z M16 10l4 4 M20 10l-4 4</StreamGeometry>
+  <StreamGeometry x:Key="IconFullscreen">M4 9V4h5 M20 15v5h-5 M15 4h5v5 M9 20H4v-5</StreamGeometry>
+  <StreamGeometry x:Key="IconExitFullscreen">M9 4v5H4 M15 20v-5h5 M20 9h-5V4 M4 15h5v5</StreamGeometry>
+  <StreamGeometry x:Key="IconMiniPlayer">M5.5,4.5 H18.5 A2,2 0 0 1 20.5,6.5 V17.5 A2,2 0 0 1 18.5,19.5 H5.5 A2,2 0 0 1 3.5,17.5 V6.5 A2,2 0 0 1 5.5,4.5 Z M12.5,11.5 H18 A1,1 0 0 1 19,12.5 V17 A1,1 0 0 1 18,18 H12.5 A1,1 0 0 1 11.5,17 V12.5 A1,1 0 0 1 12.5,11.5 Z</StreamGeometry>
+  <StreamGeometry x:Key="IconClose">M6.2 6.2l11.6 11.6 M17.8 6.2 6.2 17.8</StreamGeometry>
+  <StreamGeometry x:Key="IconChevronRight">M9.5 5.5 16 12l-6.5 6.5</StreamGeometry>
+  <StreamGeometry x:Key="IconChevronDown">M5.5 9 12 15.5 18.5 9</StreamGeometry>
+  <StreamGeometry x:Key="IconChevronUp">M5.5 15 12 8.5 18.5 15</StreamGeometry>
+  <StreamGeometry x:Key="IconAdd">M12 5.5v13 M5.5 12h13</StreamGeometry>
+  <StreamGeometry x:Key="IconCheck">M5.5 12.4 10 16.9 18.6 7.6</StreamGeometry>
+</ResourceDictionary>

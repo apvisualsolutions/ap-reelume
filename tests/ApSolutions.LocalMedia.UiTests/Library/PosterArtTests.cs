@@ -4,6 +4,7 @@
 using System.Globalization;
 
 using ApSolutions.LocalMedia.Presentation.Library;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Media;
 using Xunit;
 
@@ -153,6 +154,77 @@ public sealed class PosterArtTests
             converter.Convert("Astillero", typeof(IBrush), "glow", CultureInfo.InvariantCulture));
         Assert.IsType<LinearGradientBrush>(
             converter.Convert(42, typeof(IBrush), null, CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>Every surface that paints a cover paints all of its layers, hatch included.</summary>
+    /// <remarks>
+    /// <para>
+    /// The prototype's covers are four backgrounds and this application built two of them. The
+    /// missing one is the diagonal hatch — <c>repeating-linear-gradient(115deg,
+    /// rgba(255,255,255,.055) 0 2px, transparent 2px 10px)</c> — which is why a wall of covers here
+    /// read flat beside the same wall there. The owner said it in three words: the striped
+    /// backgrounds are missing.
+    /// </para>
+    /// <para>
+    /// This counts rather than renders, and on purpose: the layer is one <c>Border</c> with one
+    /// brush, so what can go wrong is not how it draws but that a sixth surface gets added later
+    /// with the base and the glow and without it. Pairing the two counts is what catches that.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_surface_that_glows_is_also_hatched()
+    {
+        var offenders = new List<string>();
+        foreach (var view in Directory.EnumerateFiles(
+            RepositoryLayout.PathFromRoot("src"),
+            "*.axaml",
+            SearchOption.AllDirectories))
+        {
+            var markup = File.ReadAllText(view);
+            var glows = Occurrences(markup, "ConverterParameter=glow");
+            // The reference and not the name: the dictionary that declares the brush writes it once
+            // as a key and paints no cover at all, so counting the bare word would fail on the one
+            // file that has to carry it.
+            var hatches = Occurrences(markup, "{DynamicResource PosterHatchBrush}");
+            if (glows != hatches)
+            {
+                offenders.Add($"{Path.GetFileName(view)}: {glows} glow, {hatches} hatch");
+            }
+        }
+
+        Assert.True(
+            offenders.Count == 0,
+            "A cover is base, glow, ring and hatch. These paint a different number of glows than "
+                + $"hatches: {string.Join("; ", offenders)}.");
+    }
+
+    /// <summary>The hatch repeats, or it is one stripe across a whole card.</summary>
+    [Fact]
+    public void The_hatch_repeats_every_ten_pixels_at_the_prototypes_angle()
+    {
+        var tokens = File.ReadAllText(
+            RepositoryLayout.PathFromRoot("src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml"));
+        var declaration = tokens[tokens.IndexOf("x:Key=\"PosterHatchBrush\"", StringComparison.Ordinal)..];
+        declaration = declaration[..declaration.IndexOf("</LinearGradientBrush>", StringComparison.Ordinal)];
+
+        // Ten pixels at 115 degrees clockwise from north is (sin 115, -cos 115) x 10 = (9.06, 4.23),
+        // and without SpreadMethod="Repeat" that vector paints one stripe and then nothing.
+        Assert.Contains("SpreadMethod=\"Repeat\"", declaration, StringComparison.Ordinal);
+        Assert.Contains("EndPoint=\"9.06,4.23\"", declaration, StringComparison.Ordinal);
+        Assert.Equal(2, Occurrences(declaration, "#0EFFFFFF"));
+    }
+
+    private static int Occurrences(string text, string needle)
+    {
+        var count = 0;
+        var index = text.IndexOf(needle, StringComparison.Ordinal);
+        while (index >= 0)
+        {
+            count++;
+            index = text.IndexOf(needle, index + needle.Length, StringComparison.Ordinal);
+        }
+
+        return count;
     }
 
     [Fact]

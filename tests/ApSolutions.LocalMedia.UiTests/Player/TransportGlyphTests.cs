@@ -16,57 +16,64 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The transport's eleven buttons carry a glyph, and carrying one does not change what they are.
+/// The transport's eleven buttons carry a picture, and carrying one does not change what they are.
 /// </summary>
 /// <remarks>
 /// <para>
-/// §4 asks for glyphs from <c>Segoe Fluent Icons</c>, and the reason is measured rather than
-/// aesthetic: on 2026-08-19 five buttons carrying translated words folded the mini player's chrome
-/// into <b>three rows inside 480x270</b>, and the walk's beside-point probe died with "is surrounded
-/// by other command controls". The words do not fit in the window the mini player is allowed to be.
+/// The pictures are drawings and no longer glyphs, and that changed on 2026-08-24 <b>against a line
+/// of the design package</b>, which is worth writing down rather than hiding. The Proposal and the
+/// package's README both prescribe <c>Segoe Fluent Icons</c> — "los iconos son glifos de Segoe
+/// Fluent Icons", chosen because the font ships with Windows and costs no download. The prototype
+/// itself does something else: every pictogram in it is an SVG of 24 by 24 with
+/// <c>stroke-width:1.6</c> and round caps, a line drawing. The owner looked at the built application
+/// and said the player's icons are not the prototype's, and he is right: a solid Fluent glyph and a
+/// thin stroked drawing are two different alphabets.
 /// </para>
 /// <para>
-/// <b>Only <c>Content</c> moves.</b> <c>AutomationProperties.Name</c> keeps pointing at the resource
+/// So the shapes now come from the prototype, converted into geometries that live in the repository
+/// — which keeps the package's actual rule, the one about downloads and CDNs, intact. What the font
+/// gave and this had to keep giving is one place to re-weight the whole set, and that is what the
+/// <c>Path.icon</c> styles are.
+/// </para>
+/// <para>
+/// <b>Only the picture moves.</b> <c>AutomationProperties.Name</c> keeps pointing at the resource
 /// key, which is what the walk aims at and what a screen reader reads out, so the identity of the
 /// control does not move at all — and that is asserted here rather than assumed, because rewriting
 /// the key is the one edit that would silently rename eleven controls and break the ledger.
 /// </para>
 /// <para>
-/// The glyph is asserted to <b>resolve in a family the markup itself declares</b>, and to resolve in
-/// <em>none</em> of the text families. Without that second half the lookup would pass for any
-/// codepoint at all: a font that answers every question answers none of them.
+/// The drawing is asserted to be <b>the geometry the dictionary holds under that name</b>, and not
+/// merely to be present: a Path with no data is a button with nothing in it, and it would satisfy
+/// any check that only asked whether an icon was there.
 /// </para>
 /// </remarks>
 public sealed class TransportGlyphTests
 {
     /// <summary>The three the transport owns: seek back, seek forward, silence.</summary>
-    private static readonly (string Name, string Key, string Glyph)[] TransportOwn =
+    private static readonly (string Name, string Key, string Icon)[] TransportOwn =
     [
-        ("SkipBackwardButton", "TransportSkipBackward", "\uE72B"),
-        ("SkipForwardButton", "TransportSkipForward", "\uE72A"),
-        ("MuteButton", "TransportToggleMute", "\uE74F"),
+        ("SkipBackwardButton", "TransportSkipBackward", "IconSkipBackward"),
+        ("SkipForwardButton", "TransportSkipForward", "IconSkipForward"),
+        ("MuteButton", "TransportToggleMute", "IconVolume"),
     ];
 
     /// <summary>The large transport's three, which carry no name and are found by the key behind theirs.</summary>
-    private static readonly (string Key, string Glyph)[] LargeTransport =
+    private static readonly (string Key, string Icon)[] LargeTransport =
     [
-        ("PlayerPlayAction", "\uE768"),
-        ("PlayerPauseAction", "\uE769"),
-        ("PlayerStopAction", "\uE71A"),
+        ("PlayerPlayAction", "IconPlay"),
+        ("PlayerPauseAction", "IconPause"),
+        ("PlayerStopAction", "IconStop"),
     ];
 
     /// <summary>The mini player's five, whose names and keys are the same string.</summary>
-    private static readonly (string Name, string Key, string Glyph)[] MiniChrome =
+    private static readonly (string Name, string Key, string Icon)[] MiniChrome =
     [
-        ("MiniPlayerPlayPause", "MiniPlayerPlayPause", "\uE768"),
-        ("MiniPlayerSkipBack", "MiniPlayerSkipBack", "\uE72B"),
-        ("MiniPlayerSkipForward", "MiniPlayerSkipForward", "\uE72A"),
-        ("MiniPlayerRestore", "MiniPlayerRestore", "\uE73F"),
-        ("MiniPlayerClose", "MiniPlayerClose", "\uE8BB"),
+        ("MiniPlayerPlayPause", "MiniPlayerPlayPause", "IconPlay"),
+        ("MiniPlayerSkipBack", "MiniPlayerSkipBack", "IconSkipBackward"),
+        ("MiniPlayerSkipForward", "MiniPlayerSkipForward", "IconSkipForward"),
+        ("MiniPlayerRestore", "MiniPlayerRestore", "IconExitFullscreen"),
+        ("MiniPlayerClose", "MiniPlayerClose", "IconClose"),
     ];
-
-    /// <summary>Families that must not answer, so that a family answering means something.</summary>
-    private static readonly string[] TextFamilies = ["Segoe UI", "Arial"];
 
     /// <summary>
     /// Each of the eleven paints its glyph and still answers to its own name.
@@ -81,72 +88,83 @@ public sealed class TransportGlyphTests
     {
         using var scope = Mount();
 
-        foreach (var (name, key, glyph) in TransportOwn)
+        foreach (var (name, key, icon) in TransportOwn)
         {
-            Check(ByName(scope.Transport, name), key, glyph);
+            Check(ByName(scope.Transport, name), key, icon);
         }
 
-        foreach (var (key, glyph) in LargeTransport)
+        foreach (var (key, icon) in LargeTransport)
         {
-            Check(ByKey(scope.Player, key), key, glyph);
+            Check(ByKey(scope.Player, key), key, icon);
         }
 
-        foreach (var (name, key, glyph) in MiniChrome)
+        foreach (var (name, key, icon) in MiniChrome)
         {
-            Check(ByName(scope.Mini, name), key, glyph);
+            Check(ByName(scope.Mini, name), key, icon);
         }
 
-        static void Check(Button button, string key, string glyph)
+        static void Check(Button button, string key, string icon)
         {
             var word = Resource(key);
             Assert.True(
                 word.Length > 1 && word.Any(char.IsLetter),
-                $"{key} does not resolve to a word, so this test cannot tell a name from a glyph.");
-            Assert.Equal(glyph, button.Content as string);
+                $"{key} does not resolve to a word, so this test cannot tell a name from a picture.");
             Assert.Equal(word, AutomationProperties.GetName(button));
+
+            // Asked of the button and not of the application: a control resolves a resource by
+            // walking up to the styles the application loaded, which is the same walk the
+            // DynamicResource in the markup makes. Application.FindResource does not make it —
+            // measured, it answers UnsetValue for a key the very same view is drawing — because
+            // ApplyLanguage replaces Application.Resources wholesale on every language switch.
+            Assert.True(
+                button.TryFindResource(icon, out var expected),
+                $"{icon} does not resolve from the control that draws it.");
+            var drawn = button.GetVisualDescendants()
+                .OfType<Avalonia.Controls.Shapes.Path>()
+                .Select(path => path.Data)
+                .ToArray();
+            Assert.Contains(expected, drawn);
         }
     }
 
-    /// <summary>
-    /// Every glyph the transport paints exists in a family the markup itself declares.
-    /// </summary>
+    /// <summary>Every picture the transport paints is a drawing with something in it.</summary>
     /// <remarks>
     /// <para>
-    /// The families are read off the button rather than written down here, so this asks about the
-    /// declaration and not about a copy of it. Two are declared on purpose: <c>Segoe Fluent Icons</c>
-    /// ships with Windows 11, which is the only target, and <c>Segoe MDL2 Assets</c> is its
-    /// predecessor and carries the same codepoints — so a host that has only the older one still
-    /// draws a pictogram instead of a box.
+    /// What this replaced asked of a font: that each codepoint resolved in one of the two families
+    /// the markup declared and in neither text family, because a font that answers every question
+    /// answers none of them. The same question, now that the pictures are geometries, is whether the
+    /// drawing has any figures at all — a <c>Path</c> whose <c>Data</c> is an empty geometry paints
+    /// nothing, takes its size from the style anyway, and would satisfy any check that only asked
+    /// whether an icon was in the button.
     /// </para>
     /// <para>
-    /// Glyph zero is <c>.notdef</c>, which is the box. Asking for presence without excluding zero
-    /// would pass on the font that draws nothing.
+    /// And the weight, because that is the other half of what a font gave: the prototype strokes
+    /// every icon at 1.6 in a box of 24, so a picture drawn at 20 has to be stroked at 1.33 or it
+    /// reads heavier than the same shape beside it at 22. Avalonia scales the geometry and not the
+    /// pen, which is why each size class carries its own number rather than inheriting one.
     /// </para>
     /// </remarks>
     [AvaloniaFact]
-    public void Every_glyph_resolves_in_a_family_the_markup_declares_and_in_no_text_family()
+    public void Every_picture_the_transport_paints_is_a_drawing_and_is_stroked_for_its_size()
     {
         using var scope = Mount();
-        var button = ByName(scope.Mini, "MiniPlayerPlayPause");
-        var declared = button.FontFamily.FamilyNames.ToArray();
 
-        var glyphs = TransportOwn.Select(entry => entry.Glyph)
-            .Concat(LargeTransport.Select(entry => entry.Glyph))
-            .Concat(MiniChrome.Select(entry => entry.Glyph))
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
-
-        foreach (var glyph in glyphs)
+        foreach (var button in TransportOwn.Select(entry => ByName(scope.Transport, entry.Name))
+            .Concat(LargeTransport.Select(entry => ByKey(scope.Player, entry.Key)))
+            .Concat(MiniChrome.Select(entry => ByName(scope.Mini, entry.Name))))
         {
-            var codepoint = (uint)char.ConvertToUtf32(glyph, 0);
-            var drawn = declared.Where(family => GlyphIndex(family, codepoint) != 0).ToArray();
-            Assert.True(
-                drawn.Length >= 2,
-                $"U+{codepoint:X4} is drawn by [{string.Join(", ", drawn)}] out of "
-                    + $"[{string.Join(", ", declared)}], so there is no font behind the first one.");
-            foreach (var family in TextFamilies)
+            foreach (var path in button.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>())
             {
-                Assert.Equal(0, GlyphIndex(family, codepoint));
+                Assert.NotNull(path.Data);
+                Assert.False(
+                    path.Data!.Bounds.Width == 0 && path.Data.Bounds.Height == 0,
+                    $"{AutomationProperties.GetName(button)} carries a geometry that draws nothing.");
+
+                var expected = Math.Round(1.6 * path.Width / 24d, 2);
+                Assert.True(
+                    Math.Abs(path.StrokeThickness - expected) <= 0.02 || path.Stroke is null,
+                    $"{AutomationProperties.GetName(button)} draws a {path.Width} px icon stroked at "
+                        + $"{path.StrokeThickness}, where the prototype's 1.6 in 24 gives {expected}.");
             }
         }
     }

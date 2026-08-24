@@ -8,6 +8,34 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Corregido
+
+- **El texto de todos los botones estaba pegado arriba, no centrado.** Lo vio el propietario antes
+  que ninguna puerta. `VerticalContentAlignment` empieza en `Stretch`, el estilo de este árbol fijaba
+  alto, radio y relleno y nunca lo tocaba, y un `TextBlock` estirado llena el botón entero y dibuja
+  su línea **arriba del todo**: medido, una píldora de 36 px con una caja de etiqueta de 34 y las
+  palabras siete píxeles por encima del centro. El prototipo escribe la regla en una línea de CSS
+  —`display:inline-flex; align-items:center; justify-content:center`— y eso es lo que hay ahora, con
+  `ButtonInkTests` midiendo los dos huecos y que la caja sea del tamaño de una línea y no del botón.
+
+- **Faltaba la trama diagonal de las portadas.** Las carátulas del prototipo son **cuatro** fondos
+  sobre un tono y esta aplicación pintaba dos: el degradado y el halo. El que faltaba es
+  `repeating-linear-gradient(115deg, rgba(255,255,255,.055) 0 2px, transparent 2px 10px)`, y por eso
+  un muro de portadas se veía liso donde el del prototipo se ve tejido. Avalonia no tiene degradado
+  repetido y no le hace falta: `SpreadMethod="Repeat"` sobre un vector de diez píxeles en el ángulo
+  del prototipo dibuja exactamente esas dos rayas de cada diez. Puerta: ninguna superficie pinta el
+  halo sin pintar la trama.
+
+- **Los iconos eran de otro alfabeto.** El prototipo dibuja **treinta y cinco** pictogramas con SVG
+  de 24×24, trazo de 1,6 y extremos redondos; la aplicación pintaba glifos de Segoe Fluent —sólidos,
+  de otra tradición— en veintisiete sitios, y ahí estaba la diferencia que el propietario nombró
+  primero. Ahora las formas vienen del prototipo, convertidas a geometrías que viven en el
+  repositorio: el riel, el reproductor entero, el mini reproductor, la lupa, el calderón de las
+  píldoras y el aspa del diálogo. **Se desvía de una línea del paquete de diseño** —la Propuesta y su
+  README prescriben «glifos de Segoe Fluent Icons»— y la regla que esa línea protege, la de no
+  descargar nada, queda intacta. De paso, el botón de silencio **dice ahora en qué estado está**:
+  dibujaba el altavoz tachado tanto callado como sonando.
+
 ### Añadido
 
 - **La página del repositorio, con capturas de la aplicación de verdad.** Los dos README abren con

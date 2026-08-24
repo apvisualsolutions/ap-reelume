@@ -1,5 +1,28 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-24 (madrugada del 25) — el propietario miró y tenía razón
+
+**Tres diferencias con el prototipo, las tres medidas y corregidas**
+([evidencia](evidence/stable/audit-prototype-fidelity-round-two.md)):
+
+1. **El texto de TODOS los botones estaba pegado arriba.** `VerticalContentAlignment` empieza en
+   `Stretch` y este árbol nunca lo tocó: la etiqueta ocupaba 42 px de un botón de 44 y su línea se
+   dibujaba arriba del todo. Puerta: `ButtonInkTests`, que mide los dos huecos **y** exige que cada
+   uno sea real — una etiqueta estirada está centrada trivialmente y habría pasado.
+2. **Faltaba la cuarta capa de las portadas**, la trama diagonal. `SpreadMethod="Repeat"` sobre un
+   vector de diez píxeles a 115° la dibuja exactamente.
+3. **Los iconos eran de otro alfabeto**: veintisiete glifos de Segoe Fluent contra los treinta y
+   cinco dibujos de línea del prototipo. Portados a geometrías; **se desvía de una línea de la
+   Propuesta**, que prescribe la fuente del sistema, y la regla que esa línea protege —no descargar
+   nada— queda entera.
+
+**Lo que sigue sin parecerse, ya medido y SIN tocar** (la tabla está en la evidencia): el distintivo
+de tipo en la portada, la línea de datos (año · duración · género), la línea de estado, la marca de
+visto, el «no disponible» dentro de la portada, los filtros con punto de radio y la insignia numérica
+del riel. **Ocho diferencias, ninguna arreglada en esta tanda.** Ése es el siguiente trabajo de
+fidelidad, y conviene hacerlo leyendo `proto-*.png` al lado de la captura de la aplicación en vez de
+por memoria.
+
 ## Estado al cierre del 2026-08-24 (noche) — PASO 11 HECHO: la página del repositorio tiene sus capturas
 
 **Los dos README abren con Inicio y llevan las cinco capturas decididas** —Inicio, Biblioteca, la

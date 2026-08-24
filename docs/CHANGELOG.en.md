@@ -8,6 +8,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Fixed
+
+- **Every button's label sat at the top of it rather than in the middle.** The owner saw it before
+  any gate did. `VerticalContentAlignment` starts at `Stretch`, this tree's own style set a height, a
+  radius and a padding and never touched it, and a stretched `TextBlock` fills the whole button and
+  draws its line at the **top** of that box: measured, a 36 px pill held a 34 px label box with the
+  words about seven pixels above centre. The prototype writes the rule as one line of CSS —
+  `display:inline-flex; align-items:center; justify-content:center` — and that is what is there now,
+  with `ButtonInkTests` measuring both gaps and that the box is the size of a line, not of a button.
+
+- **The covers' diagonal hatch was missing.** The prototype's covers are **four** backgrounds over
+  one hue and this application painted two: the gradient and the glow. The missing one is
+  `repeating-linear-gradient(115deg, rgba(255,255,255,.055) 0 2px, transparent 2px 10px)`, which is
+  why a wall of covers here read flat where the prototype's reads woven. Avalonia has no repeating
+  gradient and does not need one: `SpreadMethod="Repeat"` over a ten-pixel vector at the prototype's
+  own angle paints exactly those two stripes in every ten. Gate: no surface paints the glow without
+  painting the hatch.
+
+- **The icons were a different alphabet.** The prototype draws **thirty-five** pictograms as 24×24
+  SVGs stroked at 1.6 with round caps; the application painted solid Segoe Fluent glyphs — another
+  drawing tradition — in twenty-seven places, and that is the difference the owner named first. The
+  shapes now come from the prototype, converted into geometries that live in the repository: the
+  rail, the whole player, the mini player, the magnifier, the pills' caret and the dialog's cross.
+  **It departs from a line of the design package** — the Proposal and its README both prescribe
+  "glyphs from Segoe Fluent Icons" — and the rule that line protects, downloading nothing, is intact.
+  On the way, the mute button now **says which state it is in**: it drew the crossed speaker whether
+  the session was muted or not.
+
 ### Added
 
 - **The repository page, with captures of the real application.** Both READMEs open on Home and

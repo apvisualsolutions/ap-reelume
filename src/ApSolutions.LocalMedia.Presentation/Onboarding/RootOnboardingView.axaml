@@ -107,11 +107,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.Name="{DynamicResource RootAddAction}"
           Command="{Binding AddRootCommand}">
         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
-          <TextBlock
+          <Path
               Grid.Column="0"
+              Classes="icon size-16"
               VerticalAlignment="Center"
-              FontFamily="{DynamicResource FontFamilyIcons}"
-              Text="&#xE710;" />
+              Data="{DynamicResource IconAdd}" />
           <TextBlock
               Grid.Column="1"
               VerticalAlignment="Center"

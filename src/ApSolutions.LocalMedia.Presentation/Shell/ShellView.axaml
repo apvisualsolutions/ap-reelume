@@ -110,7 +110,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             ToolTip.Tip="{DynamicResource NavigationAddMedia}"
             automation:AutomationProperties.Name="{DynamicResource NavigationAddMedia}"
             Command="{Binding AddMediaCommand}">
-          <TextBlock Classes="navigation-glyph" Text="&#xE710;" />
+          <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconAdd}" />
         </Button>
         <StackPanel
             VerticalAlignment="Top"
@@ -139,7 +139,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
-              <TextBlock Classes="navigation-glyph" Text="&#xE80F;" />
+              <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconHome}" />
             </Panel>
           </Button>
           <Button
@@ -166,7 +166,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
-              <TextBlock Classes="navigation-glyph" Text="&#xE8F1;" />
+              <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconLibrary}" />
             </Panel>
           </Button>
           <Button
@@ -193,7 +193,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
-              <TextBlock Classes="navigation-glyph" Text="&#xE8FD;" />
+              <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconReview}" />
             </Panel>
           </Button>
           <!--
@@ -225,7 +225,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Duplicates}}" />
-              <TextBlock Classes="navigation-glyph" Text="&#xE8C8;" />
+              <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconDuplicates}" />
             </Panel>
           </Button>
           <Button
@@ -252,7 +252,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Background="{DynamicResource AccentBrush}"
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
-              <TextBlock Classes="navigation-glyph" Text="&#xE713;" />
+              <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconSettings}" />
             </Panel>
           </Button>
         </StackPanel>
@@ -623,8 +623,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Classes="player-chrome"
               automation:AutomationProperties.Name="{DynamicResource PlayerCloseAction}"
               ToolTip.Tip="{DynamicResource PlayerCloseAction}"
-              Command="{Binding ClosePlayerCommand}"
-              Content="&#xE8BB;" />
+              Command="{Binding ClosePlayerCommand}">
+            <Path Classes="icon size-20" Data="{DynamicResource IconClose}" />
+          </Button>
           <!--
             A WrapPanel for two buttons, which is not about these two wrapping: it is the container
             this tree reaches for whenever a row of controls can grow, and the 44 px target area these
@@ -639,14 +640,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 Classes="player-chrome"
                 automation:AutomationProperties.Name="{DynamicResource PlayerMiniModeAction}"
                 ToolTip.Tip="{DynamicResource PlayerMiniModeAction}"
-                Command="{Binding ToggleMiniPlayerCommand}"
-                Content="&#xE73F;" />
+                Command="{Binding ToggleMiniPlayerCommand}">
+              <Path Classes="icon size-20" Data="{DynamicResource IconExitFullscreen}" />
+            </Button>
             <Button
                 Classes="player-chrome"
                 automation:AutomationProperties.Name="{DynamicResource PlayerFullscreenAction}"
                 ToolTip.Tip="{DynamicResource PlayerFullscreenAction}"
-                Command="{Binding ToggleFullscreenCommand}"
-                Content="&#xE740;" />
+                Command="{Binding ToggleFullscreenCommand}">
+              <Path Classes="icon size-20" Data="{DynamicResource IconFullscreen}" />
+            </Button>
           </WrapPanel>
         </Grid>
       </Border>

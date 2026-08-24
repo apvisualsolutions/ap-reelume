@@ -9,6 +9,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme">
   <Styles.Resources>
     <ResourceDictionary>
+      <!--
+        The icon shapes ride in here rather than in App.axaml, and that is a measured choice: the
+        four headless test applications load this file and nothing else of the theme, so an icon
+        merged anywhere else would be missing from every suite that mounts a view — present in the
+        product and absent from the gates, which is the worst of the two failures.
+      -->
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://ApSolutions.LocalMedia.Presentation/Theme/Icons.axaml" />
+      </ResourceDictionary.MergedDictionaries>
       <Thickness x:Key="FocusStrokeThickness">2</Thickness>
       <Thickness x:Key="FocusInnerStrokeThickness">1</Thickness>
       <x:Double x:Key="ControlHeight">36</x:Double>
@@ -120,17 +129,36 @@ SPDX-License-Identifier: GPL-3.0-or-later
       -->
       <FontFamily x:Key="FontFamilyMono">Consolas,Cascadia Mono,monospace</FontFamily>
 
+      
       <!--
-        The pictograms, and the same rule the mono family follows: declared once now that two places
-        spend it - the player's chrome and the navigation rail - where one reader would have been the
-        defect this repository names.
+        The diagonal hatch over every poster, and it is the prototype's fourth layer — the one this
+        application never drew. Its covers are four CSS backgrounds over one hue, listed top first:
+        `repeating-linear-gradient(115deg, rgba(255,255,255,.055) 0 2px, transparent 2px 10px)`, a
+        ring, a radial glow, and the two-stop gradient underneath. PosterArt built the glow and the
+        base and stopped there, so the wall of colour was flat where the prototype's is woven — which
+        is what the owner meant by the striped backgrounds being missing.
 
-        Two families and not one. Segoe Fluent Icons ships with Windows 11, which is the only target
-        this application has; Segoe MDL2 Assets is its predecessor, carries the same codepoints in the
-        same places, and is on every Windows since 10. So a host that has only the older one draws the
-        same pictogram instead of the empty box a missing glyph paints.
+        Avalonia has no repeating gradient, and does not need one: a LinearGradientBrush with
+        SpreadMethod="Repeat" tiles its own vector. The vector is ten pixels long at the CSS angle —
+        115 degrees clockwise from north is (sin 115, -cos 115) = (0.906, 0.423) in screen
+        coordinates, so (9.06, 4.23) — and the two hard stops at a fifth of it paint the first two of
+        those ten pixels and leave the other eight alone. Absolute points rather than percentages,
+        because a hatch that scaled with its card would be a different pattern on every tile.
+
+        One brush for the four themes: the hatch is a fact about the artwork and not about the
+        palette, exactly as it is in the prototype, and the two high contrast dictionaries switch the
+        whole layer off through PosterArtOpacity rather than by having a hatch of their own.
       -->
-      <FontFamily x:Key="FontFamilyIcons">Segoe Fluent Icons,Segoe MDL2 Assets</FontFamily>
+      <LinearGradientBrush
+          x:Key="PosterHatchBrush"
+          SpreadMethod="Repeat"
+          StartPoint="0,0"
+          EndPoint="9.06,4.23">
+        <GradientStop Offset="0" Color="#0EFFFFFF" />
+        <GradientStop Offset="0.2" Color="#0EFFFFFF" />
+        <GradientStop Offset="0.2" Color="#00FFFFFF" />
+        <GradientStop Offset="1" Color="#00FFFFFF" />
+      </LinearGradientBrush>
 
       <!--
         Four dictionaries, and every one of them carries the same twenty-three brushes. A brush missing
@@ -1090,10 +1118,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
     the Button selector, so without this it kept the base theme's shorter box, its square corner and
     its own asymmetric padding, and the row read as two kinds of control.
   -->
+  <!--
+    A button puts its content in the middle of itself, and until 2026-08-24 none of them did.
+    `VerticalContentAlignment` starts at `Stretch`, this style set a height, a radius and a padding
+    and never touched it, and a stretched TextBlock fills the whole button and draws its line at the
+    TOP of that box: measured, a 36 px pill held a 34 px label box with the words riding about seven
+    pixels above centre. Every button in the application, and the owner saw it before any gate did.
+
+    The prototype writes the same rule as one line of CSS on every button it draws —
+    `display:inline-flex; align-items:center; justify-content:center` — and this is that line. The
+    two rail classes and the poster card declare their own alignment further down and keep it: they
+    are later in this file, and in Avalonia the last style that matches wins.
+  -->
   <Style Selector="Button, ToggleButton">
     <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="Padding" Value="16,0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
   <!--
     The ring is drawn twice, in two colours, one inside the other. Borrowing the control's own border
@@ -1271,18 +1313,78 @@ SPDX-License-Identifier: GPL-3.0-or-later
     a laptop trackpad. Raising it costs nothing here because the transport wraps.
   -->
   <!--
-    The font list moved to FontFamilyIcons when the navigation rail became the second thing that spends
-    it. The fallback it carries is asserted by measuring both, because a font list nobody measured is a
-    font list that quietly ends at $Default.
+    How the prototype's icons are drawn, in one place.
+
+    Its own `icon(n, s)` returns an SVG of 24 by 24 with `fill:none`, `stroke:currentColor`,
+    `stroke-width:1.6`, and round caps and joins, at whatever size the call site asks for. Three of
+    those four are the same for every icon in the application and live here; the fourth is the size,
+    and it comes in the four the prototype actually spends — 14 for a caret, 16 for a menu row, 18
+    for a banner or a volume, 20 for a rail destination and a skip, 22 for the play toggle.
+
+    <b>The thickness is not one number.</b> Avalonia scales the geometry to the control's bounds and
+    then strokes it with a pen of the thickness written here, in the control's own coordinates — so a
+    single 1.6 would draw a 20 px icon at the weight of a 24 px one. Each size carries the weight the
+    prototype's SVG would compute for it: 1.6 x size / 24.
+
+    <b>The ink is inherited and not set.</b> Measured on 2026-08-24: a Path does take
+    TextElement.Foreground from the button it sits in, so an icon follows its control through hover,
+    pressed and disabled exactly as the glyph it replaces did. Binding it is what keeps a white icon
+    from staying white on the light pill of a primary action.
   -->
+  <Style Selector="Path.icon">
+    <Setter Property="Stroke" Value="{Binding $self.(TextElement.Foreground)}" />
+    <Setter Property="StrokeThickness" Value="1.2" />
+    <Setter Property="StrokeLineCap" Value="Round" />
+    <Setter Property="StrokeJoin" Value="Round" />
+    <Setter Property="Stretch" Value="Uniform" />
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <!-- A picture inside a control is not a second target inside it. -->
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </Style>
+
+  <Style Selector="Path.icon.size-14">
+    <Setter Property="Width" Value="14" />
+    <Setter Property="Height" Value="14" />
+    <Setter Property="StrokeThickness" Value="0.93" />
+  </Style>
+
+  <Style Selector="Path.icon.size-16">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="StrokeThickness" Value="1.07" />
+  </Style>
+
+  <Style Selector="Path.icon.size-20">
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="StrokeThickness" Value="1.33" />
+  </Style>
+
+  <Style Selector="Path.icon.size-22">
+    <Setter Property="Width" Value="22" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="StrokeThickness" Value="1.47" />
+  </Style>
+
+  <!--
+    One of the thirty-five is filled rather than stroked, and it is the prototype's decision: a play
+    triangle drawn as an outline reads as a hollow arrow at 22 px. `fill: currentColor, stroke: none`
+    are its own words.
+  -->
+  <Style Selector="Path.icon.filled">
+    <Setter Property="Fill" Value="{Binding $self.(TextElement.Foreground)}" />
+    <Setter Property="Stroke" Value="{x:Null}" />
+  </Style>
+
   <Style Selector="Button.player-chrome">
     <Setter Property="MinWidth" Value="44" />
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
-    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
     <!--
-      The player's ink and not the theme's: these glyphs sit on the chrome band, which is dark in all
-      four modes, and the base ControlTheme's foreground is dark in two of them.
+      The player's ink and not the theme's: these icons sit on the chrome band, which is dark in all
+      four modes, and the base ControlTheme's foreground is dark in two of them. The icons take it by
+      inheritance, exactly as the glyphs they replaced did.
     -->
     <Setter Property="Foreground" Value="{DynamicResource PlayerTextBrush}" />
   </Style>
@@ -1309,13 +1411,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
   </Style>
 
-  <Style Selector="TextBlock.search-adornment">
-    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
-    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  <Style Selector="Path.search-adornment">
+    <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Margin" Value="10,0,0,0" />
-    <Setter Property="IsHitTestVisible" Value="False" />
   </Style>
 
   <!--
@@ -1368,15 +1468,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Content="{TemplateBinding SelectionBoxItem}"
                   ContentTemplate="{TemplateBinding ItemTemplate}"
                   FontWeight="SemiBold" />
-              <TextBlock
+              <Path
                   x:Name="DropCaret"
                   Grid.Column="2"
+                  Classes="icon size-14"
                   Margin="8,0,0,0"
                   VerticalAlignment="Center"
-                  FontFamily="{DynamicResource FontFamilyIcons}"
-                  FontSize="{DynamicResource FontSizeCaption}"
-                  Foreground="{DynamicResource TextSecondaryBrush}"
-                  Text="&#xE70D;" />
+                  Stroke="{DynamicResource TextSecondaryBrush}"
+                  Data="{DynamicResource IconChevronDown}" />
             </Grid>
           </Border>
           <Popup
@@ -1405,12 +1504,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </Setter>
   </Style>
 
-  <Style Selector="ComboBox.filter-pill:dropdownopen /template/ TextBlock#DropCaret">
-    <Setter Property="Text" Value="&#xE70E;" />
+  <Style Selector="ComboBox.filter-pill:dropdownopen /template/ Path#DropCaret">
+    <Setter Property="Data" Value="{DynamicResource IconChevronUp}" />
   </Style>
 
-  <Style Selector="ComboBox.filter-pill:disabled /template/ TextBlock#DropCaret">
-    <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}" />
+  <Style Selector="ComboBox.filter-pill:disabled /template/ Path#DropCaret">
+    <Setter Property="Stroke" Value="{DynamicResource TextDisabledBrush}" />
   </Style>
 
   <Style Selector="TextBlock.transport-clock">
@@ -1540,9 +1639,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </Style.Animations>
   </Style>
 
-  <Style Selector="TextBlock.navigation-glyph">
-    <Setter Property="FontFamily" Value="{DynamicResource FontFamilyIcons}" />
-    <Setter Property="FontSize" Value="{DynamicResource FontSizeSubtitle}" />
+  <!--
+    The rail's six pictures, centred in the 46 x 42 they share. It stopped being a font on
+    2026-08-24 — the rail is one of the nine places that drew a Segoe glyph where the prototype
+    draws a line icon — so what is left here is the placement, and the drawing belongs to Path.icon.
+  -->
+  <Style Selector="Path.navigation-glyph">
     <Setter Property="HorizontalAlignment" Value="Center" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
@@ -1619,6 +1721,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Padding" Value="8" />
     <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <!--
+      A card fills itself, which is what it did before the base style started centring: its content
+      is a poster and a title that own the whole tile, not a label to be placed in the middle of one.
+    -->
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
   </Style>
 
   <!--

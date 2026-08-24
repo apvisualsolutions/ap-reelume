@@ -64,11 +64,11 @@ public sealed class MiniPlayerChromeAutomationTests
                 $"{control.Name} cannot take focus, so the keyboard cannot reach it."));
 
             // Until 2026-08-21 the label and the name came from one key, and this asserted that the
-            // visible text was what got announced. §4's glyphs separate the two on purpose, so what
+            // visible text was what got announced. The pictures separate the two on purpose, so what
             // is asserted now is the half that must not move: the name is still the word the key
-            // holds, and the content is a glyph rather than that word. A name that had followed the
-            // content would leave a screen reader announcing a private-use codepoint, which is the
-            // one way this change could have broken five controls without any layout looking wrong.
+            // holds, and what the control carries is a drawing rather than that word. That drawing was a
+            // Segoe glyph until 2026-08-24 and is a geometry now — the prototype's own line icons, ported
+            // when the owner said the two alphabets do not match. What is asked is unchanged in substance.
             Assert.All(controls, control =>
             {
                 Assert.True(
@@ -76,10 +76,9 @@ public sealed class MiniPlayerChromeAutomationTests
                     $"{control.Name} names itself from a key that is not declared.");
                 Assert.Equal(word as string, AutomationProperties.GetName(control));
 
-                var content = Assert.IsType<string>(control.Content);
-                Assert.Equal(1, content.Length);
-                Assert.InRange(content[0], '\uE000', '\uF8FF');
-                Assert.NotEqual(word as string, content);
+                var picture = Assert.IsType<Avalonia.Controls.Shapes.Path>(control.Content);
+                Assert.NotNull(picture.Data);
+                Assert.Contains("icon", picture.Classes);
             });
 
             namesByLanguage[cultureName] = controls.ToDictionary(

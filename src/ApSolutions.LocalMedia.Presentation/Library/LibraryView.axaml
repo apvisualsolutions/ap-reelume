@@ -76,7 +76,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource LibrarySearchLabel}"
                 Text="{Binding Search}"
                 PlaceholderText="{DynamicResource LibrarySearchPlaceholder}" />
-            <TextBlock Classes="search-adornment" Text="&#xE721;" />
+            <Path Classes="icon size-16 search-adornment" Data="{DynamicResource IconSearch}" />
           </Panel>
           <!--
             The header's primary action, which opens the add-root dialog. Its key is its own — the

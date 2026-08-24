@@ -56,6 +56,7 @@ and a name here would be a second announcement of the same card.
         <Panel x:Name="PosterArtSurface" Opacity="{DynamicResource PosterArtOpacity}">
           <Border Background="{Binding Title, Converter={StaticResource PosterArt}}" />
           <Border Background="{Binding Title, Converter={StaticResource PosterArt}, ConverterParameter=glow}" />
+          <Border Background="{DynamicResource PosterHatchBrush}" />
           <Ellipse
               Width="92"
               Height="92"

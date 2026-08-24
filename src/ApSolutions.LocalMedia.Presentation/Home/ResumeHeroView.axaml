@@ -45,6 +45,7 @@ would be inventing two fields. It is a vertical through three layers for a secon
       <Panel Opacity="{DynamicResource PosterArtOpacity}">
         <Border Background="{Binding ResumeTitle, Converter={StaticResource HeroArt}}" />
         <Border Background="{Binding ResumeTitle, Converter={StaticResource HeroArt}, ConverterParameter=glow}" />
+        <Border Background="{DynamicResource PosterHatchBrush}" />
         <Border>
           <Border.Background>
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
