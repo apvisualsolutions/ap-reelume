@@ -1374,6 +1374,30 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Cancelar on the first-run list never called off the removal");
         Assert.Equal(folder, await RootPathsAsync(factory));
 
+        // And accepted: the inline confirmation destroys for real - the folder leaves the
+        // catalogue and the first run is back at its empty form - then the walk adds it again,
+        // because the rest of this scene is about the consent a kept folder owes.
+        await PressAsync(
+            host,
+            "RootRemoveAction",
+            () => onboarding.IsConfirmingRemoval,
+            "clicking Remove on the first-run list a second time never asked again");
+        await PressAsync(
+            host,
+            "RootRemoveConfirmAction",
+            () => RootPathsAsync(factory),
+            "confirming on the first-run list never took the folder out of the catalogue");
+        Assert.Equal(string.Empty, await RootPathsAsync(factory));
+
+        onboarding.Path = folder;
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "RootAddAction",
+            () => RootPathsAsync(factory),
+            "re-adding the folder after the inline removal never put it back");
+        Assert.Equal(folder, await RootPathsAsync(factory));
+
         // Nothing is scanned until somebody says so, which is why the consent is a separate press.
         Assert.True(onboarding.InitialScanConsentRequired);
         await PressAsync(
