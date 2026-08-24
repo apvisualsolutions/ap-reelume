@@ -153,6 +153,31 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
     private static string FormatSeconds(TimeSpan interval) =>
         interval.TotalSeconds.ToString("0 s", CultureInfo.CurrentCulture);
 
+    /// <summary>Takes the playhead from the engine, which is the only thing that moves this bar.</summary>
+    /// <remarks>
+    /// Every other value here changes because somebody pressed something, and until this existed the
+    /// position did too: <see cref="Apply"/> runs on this bar's own commands and on nothing else, so
+    /// a film could play for an hour and a half with no scrubber and no clock on the screen —
+    /// <see cref="HasDuration"/> stays false while the duration is null, and nothing was ever going
+    /// to set it. Measured on 2026-08-24 against a real film; the bar appeared the instant a skip was
+    /// pressed, which is what said where the wire was missing rather than what it carried.
+    ///
+    /// <para>
+    /// The duration is taken only when the engine gives one: the first ticks of a session arrive
+    /// before the length is known, and writing a zero would put a bar on the screen whose maximum is
+    /// a lie. The rest of the state — speed, volume, the two skips — is the person's, and a tick of
+    /// the playhead has nothing to say about it.
+    /// </para>
+    /// </remarks>
+    public void Observe(TimeSpan position, TimeSpan? duration)
+    {
+        Apply(_state with
+        {
+            Position = position,
+            Duration = duration ?? _state.Duration,
+        });
+    }
+
     private void Apply(PlaybackControlState state)
     {
         _state = state;

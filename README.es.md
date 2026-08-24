@@ -6,6 +6,18 @@ enviar nada a ninguna parte.
 
 *Read this in [English](README.en.md).*
 
+![La pantalla de inicio: lo que quedó a medias, lo que está en curso y lo que llegó hace poco](docs/assets/home.png)
+
+**Windows 11 x64** · **GPL-3.0-or-later** · [Descargar la última versión](https://github.com/apvisualsolutions/ap-reelume/releases/latest)
+
+Todo commit que llega a `main` ha pasado [la verificación
+completa](https://github.com/apvisualsolutions/ap-reelume/actions/workflows/ci.yml) en un ejecutor
+hospedado: formato, compilación, la suite entera, las puertas de accesibilidad y de recuperación por
+partida doble, el empaquetado y los suelos de cobertura. Arriba no hay insignia de estado a
+propósito: el flujo corre sobre la rama de trabajo y `main` recibe ese mismo commit por avance
+rápido, así que una insignia apuntando a `main` se congelaría en lo último que vio y seguiría
+diciéndolo.
+
 ## Qué es
 
 Una persona, un PC, sus archivos. AP Reelume lee las carpetas que usted le indica —locales, USB o
@@ -24,6 +36,31 @@ catalogarlo.
   dentro de ±5 s incluso tras un cierre inesperado.
 - **Suyo.** Favoritos, ver más tarde, valoración y recomendaciones locales que se explican y se
   pueden desactivar.
+
+## Qué aspecto tiene
+
+La biblioteca de estas capturas es **sembrada y ficticia**, y eso es una regla antes que una
+comodidad: una captura de una biblioteca real lleva dentro los títulos y las rutas de alguien, en un
+PNG que ninguna prueba puede leer, así que se toman de una ejecución con su propia raíz de datos
+sobre películas inventadas. Las toma un guion contra la aplicación compilada, que es lo que permite
+rehacerlas en el commit que cambia una vista.
+
+![La biblioteca: títulos identificados con su año, archivos aún por identificar con su nombre de archivo, y uno marcado como no disponible](docs/assets/library.png)
+
+La ficha de una serie: el selector de temporada, los episodios debajo y las acciones personales que
+son de la serie entera.
+
+![La ficha de una serie, con su selector de temporada, sus dos episodios y las acciones personales](docs/assets/show.png)
+
+La reproducción, con la columna de pistas abierta. La barra dice dónde va la sesión; al cerrar la
+ventana y volver a abrirla se reanuda dentro de cinco segundos de ahí.
+
+![El reproductor: el vídeo, la banda de transporte con su barra y sus relojes, y la columna de audio y subtítulos](docs/assets/player.png)
+
+Lo que la identificación no pudo resolver espera aquí en vez de decidirse solo, y cada propuesta dice
+por qué se propone.
+
+![La bandeja de revisión: tres candidatos propuestos, cada uno con su confianza y sus motivos](docs/assets/review.png)
 
 ## Qué no es
 

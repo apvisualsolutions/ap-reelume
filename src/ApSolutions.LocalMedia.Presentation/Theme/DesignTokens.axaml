@@ -1355,11 +1355,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   FontSize="{DynamicResource FontSizeCaption}"
                   Foreground="{DynamicResource TextSecondaryBrush}"
                   Text="{TemplateBinding Tag}" />
+              <!--
+                The item's template travels with the item, or the presenter is handed a view model
+                and no way to draw it and prints its type name: the season picker of a series read
+                `ApSolutions.LocalMedia.Presentation.Show.SeasonViewModel` on screen until a capture
+                caught it. The base theme's template binds both, and this one had only the first.
+              -->
               <ContentControl
                   x:Name="ContentPresenter"
                   Grid.Column="1"
                   VerticalAlignment="Center"
                   Content="{TemplateBinding SelectionBoxItem}"
+                  ContentTemplate="{TemplateBinding ItemTemplate}"
                   FontWeight="SemiBold" />
               <TextBlock
                   x:Name="DropCaret"

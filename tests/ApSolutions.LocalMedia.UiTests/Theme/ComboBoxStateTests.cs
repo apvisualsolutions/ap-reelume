@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -202,6 +203,54 @@ public sealed class ComboBoxStateTests
         Assert.True(
             ratio >= NonTextMinimum,
             $"{themeName}: an open drop-down is bounded at {ratio:F2}:1 against its own fill.");
+    }
+
+    /// <summary>A closed pill shows the row as its template draws it, not as the object prints itself.</summary>
+    /// <remarks>
+    /// Found in a capture, not by a gate: the season picker of a series read
+    /// <c>ApSolutions.LocalMedia.Presentation.Show.SeasonViewModel</c> where it should read
+    /// <c>Season 1</c>. The pill's own template binds <c>SelectionBoxItem</c> into a
+    /// <c>ContentControl</c> and stopped there, so the presenter had a view model and no template and
+    /// fell back to <c>ToString()</c>. The base theme's template binds <c>ItemTemplate</c> alongside
+    /// the item, and this one had dropped that line. The two <c>ComboBox</c>es of the library never
+    /// showed it because their rows are <c>ComboBoxItem</c>s whose content is already a string.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_closed_pill_draws_its_selection_with_the_item_template()
+    {
+        var box = new ComboBox
+        {
+            Classes = { "filter-pill" },
+            Width = 320,
+            ItemsSource = new object[] { new Unprintable() },
+            ItemTemplate = new FuncDataTemplate<Unprintable>(
+                (_, _) => new TextBlock { Text = "Season 1" },
+                supportsRecycling: true),
+            SelectedIndex = 0,
+        };
+        var window = new Window { Width = 480, Height = 200, Content = box };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            var presenter = box.GetVisualDescendants()
+                .OfType<ContentControl>()
+                .First(c => c.Name == "ContentPresenter");
+            var drawn = presenter.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
+
+            Assert.Contains("Season 1", drawn);
+            Assert.DoesNotContain(typeof(Unprintable).FullName, drawn);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>A row that prints its own type name, which is what a view model without a template does.</summary>
+    private sealed class Unprintable
+    {
     }
 
     [AvaloniaFact]
