@@ -13,9 +13,7 @@ nothing sent anywhere.
 Every commit that reaches `main` has been through [the full
 verification](https://github.com/apvisualsolutions/ap-reelume/actions/workflows/ci.yml) on a hosted
 runner: format, build, the whole test suite, the accessibility and recovery gates twice over,
-packaging, and the coverage floors. There is no status badge above on purpose — the workflow runs on
-the working branch and `main` receives that same commit by fast-forward, so a badge pointing at
-`main` would freeze on whatever it last saw and go on saying it.
+packaging, and the coverage floors.
 
 ## What it is
 
