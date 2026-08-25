@@ -114,6 +114,12 @@
       "name": "match_candidate_title",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0019_match_candidate_title.sql",
       "sha256": "31E8546CE7653D459A77A1717A8E4742D77ECAE71ED6359912AF277E0B34F712"
+    },
+    {
+      "version": 20,
+      "name": "five_star_rating",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0020_five_star_rating.sql",
+      "sha256": "25AD4997F089911E4435BB0C500F314742F02A3390AAE4534E44AB7319F30F51"
     }
   ]
 }

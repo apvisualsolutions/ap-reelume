@@ -26,6 +26,11 @@ public enum PersonalActionKind
 public sealed record PersonalActionRequest(PersonalActionKind Kind, int? Rating);
 
 /// <summary>
+/// One star of the rating row: which score it stands for, and whether it is filled right now.
+/// </summary>
+public sealed record RatingStar(int Value, bool IsFilled);
+
+/// <summary>
 /// Favourite, watch later, and rating on one piece of content. Each state is announced in words as
 /// well as shown, so none of the three is a colour-only difference.
 /// </summary>
@@ -62,9 +67,17 @@ public sealed class PersonalActionsViewModel : INotifyPropertyChanged
 
     public ICommand ClearRatingCommand { get; }
 
-    /// <summary>The ten scores the surface offers, so the range never has to be written by hand.</summary>
-    public IReadOnlyList<int> RatingChoices { get; } =
-        [.. Enumerable.Range(PersonalStatePolicy.MinimumRating, PersonalStatePolicy.MaximumRating)];
+    /// <summary>
+    /// The stars a person can give, each one carrying whether it is filled right now.
+    /// </summary>
+    /// <remarks>
+    /// The range is the domain's and not this page's, so it never has to be written by hand — and it
+    /// changed from ten to five on 2026-08-25 without a line here moving. What each star carries is
+    /// its own number and its own state, because a template over a bare integer cannot see the
+    /// rating: the row would have needed a converter that reaches back up to its parent for a fact
+    /// this can simply hand it.
+    /// </remarks>
+    public IReadOnlyList<RatingStar> RatingChoices { get; private set; } = Stars(null);
 
     public bool IsFavorite => _state.IsFavorite;
 
@@ -88,6 +101,7 @@ public sealed class PersonalActionsViewModel : INotifyPropertyChanged
     public void Apply(PersonalState state)
     {
         _state = state ?? throw new ArgumentNullException(nameof(state));
+        RatingChoices = Stars(_state.Rating);
         foreach (var name in new[]
         {
             nameof(IsFavorite),
@@ -98,6 +112,7 @@ public sealed class PersonalActionsViewModel : INotifyPropertyChanged
             nameof(HasRating),
             nameof(HasNoRating),
             nameof(RatingText),
+            nameof(RatingChoices),
         })
         {
             OnPropertyChanged(name);
@@ -105,6 +120,21 @@ public sealed class PersonalActionsViewModel : INotifyPropertyChanged
 
         (ClearRatingCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
+
+    /// <summary>
+    /// The five stars, filled up to the score in force.
+    /// </summary>
+    /// <remarks>
+    /// Filled and not merely marked: a row of five where the third carries a dot would say «this one»
+    /// rather than «three of five», and three of five is what a rating means. The count is the
+    /// domain's, so a scale that moves again moves here with it.
+    /// </remarks>
+    private static IReadOnlyList<RatingStar> Stars(int? rating) =>
+    [
+        .. Enumerable
+            .Range(PersonalStatePolicy.MinimumRating, PersonalStatePolicy.MaximumRating)
+            .Select(value => new RatingStar(value, rating >= value)),
+    ];
 
     /// <summary>A value outside one to ten, or anything that is not a number, is not a rating.</summary>
     private static int? ReadRating(object? parameter)

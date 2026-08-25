@@ -361,11 +361,11 @@ public sealed class DetailsNavigationTests
             Item(ShowId, CatalogTitleKind.Show, "Crónicas", isAvailable: true),
             [EpisodeEntry(501, season: 1, number: 1, isAvailable: true, hasFile: true)],
             new Dictionary<ContentKey, WatchState>(),
-            PersonalState.Empty(ContentKey.ForTitle(ShowId)).WithFavorite(true).WithRating(9));
+            PersonalState.Empty(ContentKey.ForTitle(ShowId)).WithFavorite(true).WithRating(5));
 
         Assert.Equal(ShowId, viewModel.TitleId);
         Assert.True(viewModel.PersonalActions.IsFavorite);
-        Assert.Equal(9, viewModel.PersonalActions.Rating);
+        Assert.Equal(5, viewModel.PersonalActions.Rating);
 
         viewModel.PersonalActions.ToggleWatchLaterCommand.Execute(null);
         var request = Assert.Single(requests);

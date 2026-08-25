@@ -47,7 +47,7 @@ public sealed class RecommendationReadModelTests
         await watchStates.SaveAsync(Watched(hated), TestContext.Current.CancellationToken);
         var personal = new PersonalStateRepository(factory);
         await personal.SaveAsync(
-            PersonalState.Empty(ContentKey.ForTitle(loved)).WithRating(10),
+            PersonalState.Empty(ContentKey.ForTitle(loved)).WithRating(5),
             Noon,
             TestContext.Current.CancellationToken);
         await personal.SaveAsync(
@@ -60,7 +60,7 @@ public sealed class RecommendationReadModelTests
 
         Assert.True(taste.Genres["Drama"] > taste.Genres["Terror"]);
         Assert.True(taste.Cast["Ada"] > taste.Cast["Bruno"]);
-        Assert.Equal(5.5, taste.AverageRating!.Value, 6);
+        Assert.Equal(3, taste.AverageRating!.Value, 6);
         Assert.Equal(2015, taste.PreferredYear);
     }
 
@@ -83,7 +83,7 @@ public sealed class RecommendationReadModelTests
             Watched(watched),
             TestContext.Current.CancellationToken);
         await new PersonalStateRepository(factory).SaveAsync(
-            PersonalState.Empty(ContentKey.ForTitle(watched)).WithRating(8),
+            PersonalState.Empty(ContentKey.ForTitle(watched)).WithRating(4),
             Noon,
             TestContext.Current.CancellationToken);
 
@@ -96,7 +96,7 @@ public sealed class RecommendationReadModelTests
         Assert.Equal(["Ada", "Bruno"], first.Cast.Order(StringComparer.Ordinal));
         Assert.True(first.IsAvailable);
         Assert.True(first.IsWatched);
-        Assert.Equal(8, first.Rating);
+        Assert.Equal(4, first.Rating);
         Assert.Equal(2010, first.Year);
 
         var second = candidates.Single(candidate => candidate.Id == offline);
@@ -146,7 +146,7 @@ public sealed class RecommendationReadModelTests
             Watched(Title(102)),
             TestContext.Current.CancellationToken);
         await new PersonalStateRepository(factory).SaveAsync(
-            PersonalState.Empty(ContentKey.ForTitle(Title(102))).WithRating(10),
+            PersonalState.Empty(ContentKey.ForTitle(Title(102))).WithRating(5),
             Noon,
             TestContext.Current.CancellationToken);
         var useCase = new GetRecommendations(new RecommendationReadModel(factory));

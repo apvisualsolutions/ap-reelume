@@ -333,7 +333,7 @@ public sealed class PlayerViewDesignTests
         // puts back, play and forward together, and a player mounted without a transport model now
         // has no play button to measure.
         var (window, view) = Show(withTransport: true);
-        var expected = ChromeCorner();
+        var expected = ChromeButtonCorner();
 
         foreach (var key in TransportChrome)
         {
@@ -445,6 +445,26 @@ public sealed class PlayerViewDesignTests
             $"{offside.Length} transport control(s) fall outside a {window.Width}x{window.Height} "
                 + $"window: {string.Join("; ", offside)}");
         window.Close();
+    }
+
+    /// <summary>
+    /// The corner a chromed <b>button</b> takes, which is the pill and therefore a circle.
+    /// </summary>
+    /// <remarks>
+    /// It was the medium radius until 2026-08-25, which on a 44 by 44 target is a square with its
+    /// corners taken off: «todos los botones o son redondos o son píldoras, pero nunca cuadrados».
+    /// The surfaces around them keep the medium radius — a band is not a button.
+    /// </remarks>
+    private static CornerRadius ChromeButtonCorner()
+    {
+        var expected = Assert.IsType<CornerRadius>(
+            Avalonia.Application.Current!.TryFindResource("CornerRadiusPill", out var token)
+                ? token
+                : null);
+        Assert.True(
+            expected.TopLeft > 0,
+            "CornerRadiusPill resolved to nothing, so comparing against it proves nothing.");
+        return expected;
     }
 
     /// <summary>The corner every chromed surface of the player takes, resolved rather than copied.</summary>

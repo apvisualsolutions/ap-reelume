@@ -289,7 +289,7 @@ public static class CanonicalJourney
     /// </summary>
     private static PersonalActionsView BuildPersonalActions()
     {
-        var state = PersonalState.Empty(ContentKey.ForTitle(MovieId)).WithFavorite(true).WithRating(7);
+        var state = PersonalState.Empty(ContentKey.ForTitle(MovieId)).WithFavorite(true).WithRating(4);
         PersonalActionsViewModel? viewModel = null;
         viewModel = new PersonalActionsViewModel(request =>
         {
@@ -386,7 +386,7 @@ public static class CanonicalJourney
                         40),
                 ],
                 new MediaFileId(CreateGuid(31))),
-            PersonalState.Empty(ContentKey.ForTitle(MovieId)).WithFavorite(true).WithRating(7));
+            PersonalState.Empty(ContentKey.ForTitle(MovieId)).WithFavorite(true).WithRating(4));
         return viewModel;
     }
 

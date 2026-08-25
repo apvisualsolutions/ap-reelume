@@ -83,15 +83,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="sys:Int32">
+          <DataTemplate x:DataType="catalog:RatingStar">
             <Button
                 Width="28"
                 Classes="rating-choice"
+                Classes.given="{Binding IsFilled}"
                 Click="OnRatingClick"
-                Content="{Binding}"
-                Tag="{Binding}"
+                Tag="{Binding Value}"
                 automation:AutomationProperties.Name="{DynamicResource PersonalRatingLabel}"
-                automation:AutomationProperties.HelpText="{Binding}" />
+                automation:AutomationProperties.HelpText="{Binding Value}">
+              <Path Classes="icon size-20" Data="{DynamicResource IconStar}" />
+            </Button>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>

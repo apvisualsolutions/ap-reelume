@@ -1805,15 +1805,16 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Watch later never recorded the film for later");
         Assert.True(personal.IsWatchLater);
 
-        // The ten scores share one accessible name by design and are told apart by the score itself,
-        // which is what a screen reader reads after the name.
+        // The five stars share one accessible name by design and are told apart by the score itself,
+        // which is what a screen reader reads after the name. Four of five since 2026-08-25, when
+        // the row stopped being ten numbered squares.
         await PressAsync(
             host,
             "PersonalRatingLabel",
             () => personal.Rating,
-            "clicking a score never recorded the rating",
-            helpText: "7");
-        Assert.Equal(7, personal.Rating);
+            "clicking a star never recorded the rating",
+            helpText: "4");
+        Assert.Equal(4, personal.Rating);
 
         await PressAsync(
             host,

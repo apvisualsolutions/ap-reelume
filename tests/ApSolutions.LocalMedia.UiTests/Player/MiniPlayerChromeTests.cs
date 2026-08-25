@@ -134,11 +134,13 @@ public sealed class MiniPlayerChromeTests
     {
         var (window, view, _) = await ShowPlayingAsync();
         var mini = MiniWindow(view);
+        // The pill and not the medium radius since 2026-08-25: on a 44 by 44 target the medium one
+        // is a square with its corners taken off, and «nunca cuadrados» is the rule now.
         var expected = Assert.IsType<CornerRadius>(
-            Avalonia.Application.Current!.TryFindResource("CornerRadiusMedium", out var token)
+            Avalonia.Application.Current!.TryFindResource("CornerRadiusPill", out var token)
                 ? token
                 : null);
-        Assert.True(expected.TopLeft > 0, "CornerRadiusMedium resolved to nothing, so this proves nothing.");
+        Assert.True(expected.TopLeft > 0, "CornerRadiusPill resolved to nothing, so this proves nothing.");
 
         foreach (var name in Chrome)
         {
