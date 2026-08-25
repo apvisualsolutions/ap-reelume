@@ -1343,7 +1343,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host,
             card.DetailsAccessibleName,
             () => host.ViewModel.CurrentRoute,
-            "clicking Details on a rail card never opened that title's card");
+            "clicking Details on a rail card never opened that title's card",
+            recordAs: "{Binding DetailsAccessibleName}");
         Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
 
         Navigate(host, AppRoute.Home);
@@ -1351,7 +1352,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host,
             card.ResumeAccessibleName,
             () => host.ViewModel.Player is not null,
-            "clicking Continue on a rail card never opened the session it offers");
+            "clicking Continue on a rail card never opened the session it offers",
+            recordAs: "{Binding ResumeAccessibleName}");
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "a rail card's Continue opened a session that never reached the playing state");
@@ -3375,14 +3377,16 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host,
             seasons[1].SeasonLabel,
             () => library.ShowDetails.SelectedSeason?.SeasonNumber ?? 0,
-            "clicking the second season's pill never put that season on the card");
+            "clicking the second season's pill never put that season on the card",
+            recordAs: "{Binding SeasonLabel}");
         Assert.Equal(2, library.ShowDetails.SelectedSeason?.SeasonNumber);
 
         await PressAsync(
             host,
             seasons[0].SeasonLabel,
             () => library.ShowDetails.SelectedSeason?.SeasonNumber ?? 0,
-            "clicking the first season's pill never brought that season back");
+            "clicking the first season's pill never brought that season back",
+            recordAs: "{Binding SeasonLabel}");
 
         // The card opens on the first season, so the episode below is still the one this scene names.
         Assert.Equal(1, library.ShowDetails.SelectedSeason?.SeasonNumber);
