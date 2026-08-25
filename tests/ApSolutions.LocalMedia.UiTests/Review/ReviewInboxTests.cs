@@ -129,6 +129,70 @@ public sealed class ReviewInboxTests
         window.Close();
     }
 
+    /// <summary>
+    /// The tray counts what is in it, and a card's own «search manually» aims the box at its file.
+    /// </summary>
+    /// <remarks>
+    /// The count is the line the prototype writes under the intro, and the aiming is what the card's
+    /// third button does: it selects the card and puts the file's own name in the box, which is what
+    /// a person would type first. It fills the box only when the box is empty — overwriting words
+    /// somebody had already typed would be the button answering a question nobody asked.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_tray_counts_what_waits_and_a_card_aims_the_search_at_its_file()
+    {
+        var repository = new UiReviewRepository([
+            Candidate("first", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
+            Candidate("second", 0.70, ReviewState.Suggested, "Identification.Signal.Title"),
+        ]);
+        var viewModel = CreateViewModel(
+            repository,
+            new SearchForMatch(
+                new IdentifyMediaFile(new MediaNameParser(), new CandidateScorer(), new UiCandidateSource(), repository),
+                SilentIdentification.Create()));
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, viewModel.Count);
+
+        var card = viewModel.Items[0];
+        card.SearchManuallyCommand.Execute(null);
+        Assert.Same(card, viewModel.SelectedItem);
+
+        // The stub's candidates carry no file, so there is nothing to put in the box and the button
+        // has still done its half: the tray now knows which file a search would be about.
+        Assert.True(string.IsNullOrEmpty(viewModel.ManualSearch));
+
+        // And with a file behind it the box starts from the file's own name without its extension,
+        // which is what a person would type first and what the parser already knows how to read.
+        var withFile = new UiReviewRepository([
+            Candidate(
+                "third",
+                0.55,
+                ReviewState.Pending,
+                "Identification.Signal.Title",
+                @"D:\Cine\La.Llegada.2016.1080p.mkv"),
+        ]);
+        var aimed = CreateViewModel(withFile);
+        await aimed.LoadAsync(TestContext.Current.CancellationToken);
+        var withPath = Assert.Single(aimed.Items);
+        Assert.Equal("La.Llegada.2016.1080p.mkv", withPath.FileName);
+
+        withPath.SearchManuallyCommand.Execute(null);
+        Assert.Equal("La.Llegada.2016.1080p", aimed.ManualSearch);
+
+        // Words already typed are left alone.
+        viewModel.ManualSearch = "La llegada 2016";
+        viewModel.Items[1].SearchManuallyCommand.Execute(null);
+        Assert.Equal("La llegada 2016", viewModel.ManualSearch);
+        Assert.Same(viewModel.Items[1], viewModel.SelectedItem);
+
+        // And the tray's own Search button runs the search the box holds, through the command rather
+        // than through the method behind it.
+        Assert.True(viewModel.SearchManuallyCommand.CanExecute(null));
+        viewModel.SearchManuallyCommand.Execute(null);
+        await WaitForAsync(() => viewModel.Items.Any(item => item.StableKey == "movie:329865"));
+    }
+
     [AvaloniaFact]
     public async Task Reject_and_manual_search_are_explicit_actions()
     {
@@ -518,7 +582,12 @@ public sealed class ReviewInboxTests
             manualSearch: manualSearch);
     }
 
-    private static MatchCandidate Candidate(string stableKey, double score, ReviewState state, string explanation)
+    private static MatchCandidate Candidate(
+        string stableKey,
+        double score,
+        ReviewState state,
+        string explanation,
+        string? path = null)
     {
         var mediaFileId = new MediaFileId(CandidateId.FromStableKey($"file:{stableKey}").Value);
         return new MatchCandidate(
@@ -530,7 +599,10 @@ public sealed class ReviewInboxTests
             CandidateScorer.ScoringModelVersion,
             state,
             [new MatchSignal("Identification.Signal.Title", score, 0.5)],
-            [explanation]);
+            [explanation],
+            Revision: 0,
+            IsDecisionLocked: false,
+            path);
     }
 
     private static async Task WaitForAsync(Func<bool> condition)

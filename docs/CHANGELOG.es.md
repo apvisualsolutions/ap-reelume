@@ -10,6 +10,19 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Dos mandos que ya no leía nadie, y dos ramas que nada podía ejecutar.** Al llevar las decisiones
+  a la tarjeta, `AcceptSelectedCommand` y `RejectSelectedCommand` quedaron declarados sin consumidor
+  —el defecto de la casa, introducido por el propio cambio— y se retiran. Las guardas de nulo dentro
+  del trabajo de los tres mandos de la tarjeta también: `AsyncRelayCommand` pregunta a `CanExecute`
+  antes de correr, así que una segunda comprobación era una rama que nada puede tomar.
+
+- **El raspador del reproductor se pulsa con la sesión detenida.** Desde que el transporte observa la
+  posición del motor, una sesión en marcha mueve la propia sonda del paseo: el clic de al lado, que
+  debe no cambiar nada, cambiaba algo en cuanto el ejecutor iba un poco lento. Medido en CI, dos
+  veces.
+
+### Corregido
+
 - **El héroe de Inicio termina en la página, no en una línea.** El prototipo dibuja dos velos sobre
   la obra: el direccional que ya estaba y el color de la propia página subiendo desde el borde
   inferior. Va como pincel de superficie tras una máscara de opacidad y no como degradado de colores,

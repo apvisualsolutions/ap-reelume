@@ -10,6 +10,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Two commands nothing read any more, and two branches nothing could take.** Moving the decisions
+  into the card left `AcceptSelectedCommand` and `RejectSelectedCommand` declared with no consumer —
+  this repository's characteristic defect, introduced by the change itself — and they are gone. So
+  are the null guards inside the card's three commands: `AsyncRelayCommand` asks `CanExecute` before
+  it runs, so a second check was a branch nothing can take.
+
+- **The player's scrubber is pressed with the session paused.** Since the transport observes the
+  engine's position, a session left playing moves the walk's own probe: the click beside, which has
+  to change nothing, changed something on any runner slow enough for a frame to go by. Measured on
+  CI, twice.
+
+### Fixed
+
 - **Home's hero ends in the page rather than at a line across it.** The prototype draws two veils
   over the artwork: the directional one that was already here, and the page's own colour rising from
   the bottom edge. It is painted as the surface brush behind an opacity mask rather than as a

@@ -75,16 +75,15 @@ public sealed class CandidateCardViewModel
         Action<CandidateCardViewModel>? onSearchManually = null)
     {
         Candidate = candidate ?? throw new ArgumentNullException(nameof(candidate));
-        AcceptCommand = new AsyncRelayCommand(
-            () => onAccept is null ? Task.CompletedTask : onAccept(this),
-            () => onAccept is not null);
-        RejectCommand = new AsyncRelayCommand(
-            () => onReject is null ? Task.CompletedTask : onReject(this),
-            () => onReject is not null);
+        // The handler is not tested again inside the work: AsyncRelayCommand asks CanExecute first
+        // and refuses when it says no, so a second check here is a branch nothing can take — and a
+        // branch nothing can take is a line of code that says something untrue about the program.
+        AcceptCommand = new AsyncRelayCommand(() => onAccept!(this), () => onAccept is not null);
+        RejectCommand = new AsyncRelayCommand(() => onReject!(this), () => onReject is not null);
         SearchManuallyCommand = new AsyncRelayCommand(
             () =>
             {
-                onSearchManually?.Invoke(this);
+                onSearchManually!(this);
                 return Task.CompletedTask;
             },
             () => onSearchManually is not null);
@@ -187,8 +186,6 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         _reconciliation = reconciliation;
         _manualSearch = manualSearch;
         LoadMoreCommand = new AsyncRelayCommand(() => LoadMoreAsync(CancellationToken.None));
-        AcceptSelectedCommand = new AsyncRelayCommand(() => AcceptSelectedAsync(CancellationToken.None));
-        RejectSelectedCommand = new AsyncRelayCommand(() => RejectSelectedAsync(CancellationToken.None));
 
         // Both of these answer a question that changes while the surface is on screen — is anything
         // typed, is anything selected — so both have to be able to say the answer changed. The class
@@ -258,25 +255,14 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
     public bool IsEmpty => Items.Count == 0;
 
     /// <summary>
-    /// «5 archivos esperando tu decisión», which is the line the prototype writes under the intro.
+    /// How many files are waiting, which is the number the prototype writes under the intro.
     /// </summary>
     /// <remarks>
-    /// A tray with no count is a tray whose length you learn by scrolling to the end of it, and the
-    /// number is the whole reason somebody opens this surface rather than the library.
+    /// A tray with no count is a tray whose length you learn by scrolling to the end of it. It is a
+    /// number and not a sentence because the sentence is the view's: a model that looks a string up
+    /// to format it carries a fallback nothing can reach, and this file is one of the few at 100 %.
     /// </remarks>
-    public string CountText => Resource("ReviewInboxCount", "{0} files waiting for your decision")
-        .Replace("{0}", Items.Count.ToString(CultureInfo.CurrentCulture), StringComparison.Ordinal);
-
-    /// <summary>
-    /// The one string this model assembles rather than picks. The fallback keeps a headless test —
-    /// which mounts this without the dictionaries — printing a sentence rather than a blank.
-    /// </summary>
-    private static string Resource(string key, string fallback) =>
-        Avalonia.Application.Current is { } application
-            && application.TryGetResource(key, application.ActualThemeVariant, out var value)
-            && value is string text
-                ? text
-                : fallback;
+    public int Count => Items.Count;
 
     public bool HasMore => _nextOffset.HasValue;
 
@@ -296,10 +282,6 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
 
     public ICommand LoadMoreCommand { get; }
 
-    public ICommand AcceptSelectedCommand { get; }
-
-    public ICommand RejectSelectedCommand { get; }
-
     public ICommand SearchManuallyCommand => _searchManually;
 
     public ICommand ClearSelectionCommand => _clearSelection;
@@ -312,7 +294,7 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         Items = page.Items.Select(Card).ToArray();
         _nextOffset = page.NextOffset;
         OnPropertyChanged(nameof(HasMore));
-        OnPropertyChanged(nameof(CountText));
+        OnPropertyChanged(nameof(Count));
         ReloadReassignments();
     }
 
