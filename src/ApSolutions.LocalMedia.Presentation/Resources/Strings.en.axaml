@@ -188,7 +188,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ReassignmentConfirmAction">Same file, reassign</x:String>
   <x:String x:Key="ReassignmentKeepAction">It is a new file</x:String>
   <x:String x:Key="ReviewInboxIntro">Doubtful files are never filed on their own. None of this has been applied to your library yet.</x:String>
-  <x:String x:Key="ReviewInboxCount">{0} files waiting for your decision</x:String>
+  <x:String x:Key="ReviewInboxCountSuffix">files waiting for your decision</x:String>
   <x:String x:Key="ReviewPendingFile">PENDING FILE</x:String>
   <x:String x:Key="ReviewManualSearchLabel">Search for a match manually</x:String>
   <x:String x:Key="ReviewManualSearchPlaceholder">Title and year</x:String>

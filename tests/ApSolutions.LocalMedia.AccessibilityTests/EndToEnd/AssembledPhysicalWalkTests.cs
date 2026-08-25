@@ -1307,7 +1307,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // The hero's second action, which the prototype has had all along: the card of the same
         // title, reached the way the grid reaches it. The route is what is probed because that is
         // what changes — the card it opens is the library's, and Home is left behind.
+        // A layout pass between the route change and the click: the hero is drawn by the navigation
+        // and a control that has not been arranged yet reports itself as not on screen, which is
+        // what "matched 0 controls" means when the same press lands on a faster machine.
         Navigate(host, AppRoute.Home);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        await WaitForAsync(
+            () => Task.FromResult(Reachable(host).Any(control =>
+                control.IsEffectivelyVisible
+                && AutomationProperties.GetName(control) == (
+                    Avalonia.Application.Current!.TryFindResource("HomeResumeDetailsAction", out var details)
+                        && details is string word
+                            ? word
+                            : "HomeResumeDetailsAction"))),
+            "Home came back without the hero's Details on it");
         await PressAsync(
             host,
             "HomeResumeDetailsAction",
@@ -2369,6 +2384,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // roughly that quarter - so the click landed on the thumb itself, which starts a drag and
         // changes no value. Measured here: "a click reaches Border inside thumb inside PART_Track".
         Assert.True(transport.HasDuration, "The engine never said how long the file is, so there is no bar to press.");
+
+        // Paused first, and that is the harness rather than the test: since 2026-08-24 the transport
+        // OBSERVES the engine's position, so a session left playing moves the probe by itself — and
+        // the click beside, which has to change nothing, changes something on any runner slow enough
+        // for a frame to go by between the two reads. Measured on CI, twice.
+        player.PauseCommand.Execute(null);
+        await WaitForAsync(() => Task.FromResult(player.IsPaused), "the session never paused for the scrubber");
         await transport.SeekAsync(TimeSpan.FromSeconds(80), TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
         await PressAsync(

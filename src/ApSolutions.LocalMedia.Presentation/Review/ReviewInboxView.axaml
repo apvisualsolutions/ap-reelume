@@ -31,11 +31,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextSecondaryBrush}"
           Text="{DynamicResource ReviewInboxIntro}"
           TextWrapping="Wrap" />
-      <TextBlock
-          FontSize="{DynamicResource FontSizeCaption}"
-          Foreground="{DynamicResource TextSecondaryBrush}"
-          IsVisible="{Binding !IsEmpty}"
-          Text="{Binding CountText}" />
+      <StackPanel
+          Orientation="Horizontal"
+          Spacing="{DynamicResource Space4}"
+          IsVisible="{Binding !IsEmpty}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{Binding Count}" />
+        <TextBlock
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource ReviewInboxCountSuffix}" />
+      </StackPanel>
     </StackPanel>
     <StackPanel
         Grid.Row="1"

@@ -322,6 +322,218 @@ public sealed class DetailCardTextTests
         Assert.Equal(string.Empty, untouched.MetaText.Replace(untouched.MetaText, string.Empty, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// The corners of both cards that no screen reaches: a card built over nothing, a command with
+    /// no hand behind it, and the identifiers the shell reads off whichever card is open.
+    /// </summary>
+    /// <remarks>
+    /// Each of these is a branch that only runs when something upstream is absent, which is exactly
+    /// when a crash is least welcome — the shell asks a card for its title id while the card is
+    /// still empty, and a trailer button is offered by a card whose host never wired one.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_card_over_nothing_answers_without_throwing()
+    {
+        var emptyFilm = new MovieDetailsViewModel();
+        Assert.Equal(default, emptyFilm.TitleId);
+        Assert.False(emptyFilm.HasYear);
+        Assert.False(emptyFilm.IsAvailable);
+        Assert.Equal(string.Empty, emptyFilm.MetaText);
+        emptyFilm.PlayTrailerCommand.Execute(null);
+        emptyFilm.OpenTrailerLinkCommand.Execute(null);
+
+        var emptyShow = new ShowDetailsViewModel();
+        Assert.Equal(default, emptyShow.TitleId);
+        Assert.False(emptyShow.IsAvailable);
+        Assert.False(emptyShow.HasProgress);
+        Assert.Equal(0, emptyShow.EpisodeTotal);
+        emptyShow.ContinueCommand.Execute(null);
+        emptyShow.OpenTrailerLinkCommand.Execute(null);
+
+        // Neither the episode command nor the season command answers to something that is not one.
+        emptyShow.PlayEpisodeCommand.Execute("not an episode");
+        emptyShow.SelectSeasonCommand.Execute(42);
+        Assert.Null(emptyShow.SelectedSeason);
+    }
+
+    /// <summary>
+    /// A film with a running time and nothing else still writes a line, and one whose card has no
+    /// hand behind Play reaches nobody rather than throwing.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_film_with_only_a_running_time_still_writes_a_line()
+    {
+        var runtimeOnly = new MovieDetailsViewModel();
+        runtimeOnly.Apply(
+            Film(year: null, genres: null, runtime: TimeSpan.FromMinutes(118)),
+            watchState: null,
+            versions: null);
+
+        Assert.True(runtimeOnly.HasMeta);
+        Assert.Contains("118", runtimeOnly.MetaText, StringComparison.Ordinal);
+        Assert.DoesNotContain("·", runtimeOnly.MetaText, StringComparison.Ordinal);
+        Assert.Equal(MovieId, runtimeOnly.TitleId);
+        Assert.True(runtimeOnly.IsAvailable);
+
+        // Nothing is wired behind Play here, which is what a card looks like before its host hands
+        // one in: the command answers and the card stays standing.
+        runtimeOnly.PlayCommand.Execute(null);
+        runtimeOnly.ResumeCommand.Execute(null);
+    }
+
+    /// <summary>
+    /// An episode whose file never reported a duration falls back to what the watch state observed,
+    /// and one that is in progress at its very start says so in words rather than in a time.
+    /// </summary>
+    [AvaloniaFact]
+    public void An_episode_with_no_stored_length_falls_back_to_what_was_observed()
+    {
+        var show = new ShowDetailsViewModel();
+        show.Apply(
+            Series(2021, null),
+            [
+                Episode(0, 1, hasFile: true, runtime: null, "Especial"),
+                Episode(1, 1, hasFile: true, runtime: null, "Sin duración"),
+            ],
+            new Dictionary<ContentKey, WatchState>
+            {
+                [ContentKey.ForEpisode(ShowId, Ep(1, 1))] = State(
+                    WatchStatus.InProgress,
+                    TimeSpan.FromMinutes(12),
+                    TimeSpan.FromMinutes(48)),
+                [ContentKey.ForEpisode(ShowId, Ep(0, 1))] = State(
+                    WatchStatus.InProgress,
+                    TimeSpan.Zero,
+                    TimeSpan.FromMinutes(20)),
+            });
+
+        var regular = show.Seasons.Single(season => season.IsRegular);
+        Assert.True(regular.IsRegular);
+        var started = regular.Episodes[0];
+        Assert.Equal(12d / 48d, started.CompletedFraction, 3);
+        Assert.True(started.HasProgress);
+
+        // A running time nobody read means the row says only its state — and a state of «in progress»
+        // with nothing behind it says the words rather than «Resume at 0:00».
+        var specials = show.Seasons.Single(season => season.IsSpecials);
+        var atZero = specials.Episodes[0];
+        Assert.Equal(0, atZero.CompletedFraction);
+        Assert.False(atZero.HasProgress);
+        Assert.DoesNotContain("0:00", atZero.MetaText, StringComparison.Ordinal);
+        Assert.NotEqual(string.Empty, atZero.MetaText);
+    }
+
+    /// <summary>
+    /// Starting something from a card carries what the card calls it, and the trailer and the
+    /// version list have the same silent halves.
+    /// </summary>
+    /// <remarks>
+    /// The player's header writes the title and the line under it, and both travel on the request
+    /// rather than being looked up again — so what a card hands over is asserted here, on the object
+    /// itself, and not only through a session that would have to be opened to see it.
+    /// </remarks>
+    [AvaloniaFact]
+    public void What_a_card_hands_over_carries_the_name_the_card_used()
+    {
+        var requests = new List<PlayDetailsRequest>();
+        var film = new MovieDetailsViewModel(request =>
+        {
+            requests.Add(request);
+            return Task.CompletedTask;
+        });
+        film.Apply(
+            Film(2016, ["Drama"], TimeSpan.FromMinutes(116)),
+            watchState: null,
+            versions: null,
+            file: File(TimeSpan.FromMinutes(116), 4_509_715_660));
+
+        film.PlayCommand.Execute(null);
+        var request = Assert.Single(requests);
+        Assert.Equal("Arrival", request.Title);
+        Assert.Contains("2016", request.Subtitle!, StringComparison.Ordinal);
+
+        // A group with nothing in it lists nothing: the card asks the policy for an effective
+        // version and a policy with no versions has none to answer with.
+        var empty = new MovieDetailsViewModel();
+        empty.Apply(
+            Film(2016, null, null),
+            watchState: null,
+            new MediaVersionGroup(
+                new MediaVersionId(Guid.Parse("e4000000-0000-4000-8000-000000000001")),
+                ContentKey.ForTitle(MovieId).Value,
+                [],
+                PreferredMediaFileId: null));
+        Assert.Empty(empty.Versions);
+        Assert.False(empty.HasVersions);
+    }
+
+    /// <summary>The trailer beside the film, and the one behind a link, each reaching its own hand.</summary>
+    [AvaloniaFact]
+    public void Both_trailers_reach_the_hand_that_opens_them()
+    {
+        var played = new List<string>();
+        var opened = new List<string>();
+        var film = new MovieDetailsViewModel(
+            onPlayTrailer: path =>
+            {
+                played.Add(path);
+                return Task.CompletedTask;
+            },
+            onOpenTrailerLink: link =>
+            {
+                opened.Add(link);
+                return Task.CompletedTask;
+            });
+        film.Apply(
+            Film(2016, null, null),
+            watchState: null,
+            versions: null,
+            trailerPath: @"D:\Cine\Arrival-trailer.mkv",
+            trailerKey: "dQw4w9WgXcQ");
+
+        Assert.True(film.HasTrailer);
+        Assert.True(film.HasTrailerLink);
+        film.PlayTrailerCommand.Execute(null);
+        film.OpenTrailerLinkCommand.Execute(null);
+
+        Assert.Equal(@"D:\Cine\Arrival-trailer.mkv", Assert.Single(played));
+        Assert.Contains("dQw4w9WgXcQ", Assert.Single(opened), StringComparison.Ordinal);
+    }
+
+    /// <summary>The series card's own button starts the episode it names.</summary>
+    [AvaloniaFact]
+    public void Continue_on_a_series_starts_the_episode_the_banner_names()
+    {
+        var requests = new List<PlayDetailsRequest>();
+        var show = new ShowDetailsViewModel(request =>
+        {
+            requests.Add(request);
+            return Task.CompletedTask;
+        });
+        show.Apply(
+            Series(2021, null),
+            [
+                Episode(1, 1, hasFile: true, TimeSpan.FromMinutes(48)),
+                Episode(1, 2, hasFile: true, TimeSpan.FromMinutes(51), "Cuaderno"),
+            ],
+            new Dictionary<ContentKey, WatchState>
+            {
+                [ContentKey.ForEpisode(ShowId, Ep(1, 1))] = State(
+                    WatchStatus.Watched,
+                    TimeSpan.FromMinutes(48),
+                    TimeSpan.FromMinutes(48)),
+            });
+
+        Assert.True(show.ContinueCommand.CanExecute(null));
+        show.ContinueCommand.Execute(null);
+
+        var request = Assert.Single(requests);
+        Assert.Equal(show.NextEpisode!.MediaFileId, request.MediaFileId);
+        Assert.Equal("Puerto Sombra", request.Title);
+        Assert.Contains("Cuaderno", request.Subtitle!, StringComparison.Ordinal);
+        Assert.Null(request.StartPosition);
+    }
+
     private static CatalogItem Film(
         int? year,
         IReadOnlyList<string>? genres,

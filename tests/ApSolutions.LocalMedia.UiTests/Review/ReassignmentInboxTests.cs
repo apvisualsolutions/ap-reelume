@@ -8,6 +8,8 @@ using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Review;
+using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Review;
@@ -36,7 +38,9 @@ public sealed class ReassignmentInboxTests
         Assert.Equal(@"R:\media\old\film.mkv", Assert.Single(offer.Candidates).Path);
     }
 
-    [Fact]
+    // On the UI thread since 2026-08-25: the row's own command is what is pressed now, and an
+    // async command settles on a dispatcher continuation.
+    [AvaloniaFact]
     public async Task Confirming_a_candidate_reassigns_the_entity_and_clears_the_offer()
     {
         var repository = new InMemoryMediaFiles();
@@ -54,10 +58,12 @@ public sealed class ReassignmentInboxTests
         var viewModel = CreateViewModel(repository, queue);
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
 
-        await viewModel.ConfirmReassignmentAsync(
-            pending,
-            pending.Candidates[0],
-            TestContext.Current.CancellationToken);
+        // Through the row's own command, which is what the view presses: the method behind it was
+        // measured and the command that reaches it was not, and a command nothing reads is this
+        // repository's characteristic defect wearing a binding.
+        var offer = Assert.Single(viewModel.Reassignments);
+        Assert.Single(offer.Candidates).ConfirmCommand.Execute(null);
+        await WaitForAsync(() => !viewModel.HasReassignments);
 
         var settled = await repository.FindByPathAsync(
             Root,
@@ -69,7 +75,9 @@ public sealed class ReassignmentInboxTests
         Assert.False(viewModel.HasReassignments);
     }
 
-    [Fact]
+    // On the UI thread since 2026-08-25: the row's own command is what is pressed now, and an
+    // async command settles on a dispatcher continuation.
+    [AvaloniaFact]
     public async Task Keeping_the_file_as_new_stores_its_identity_and_clears_the_offer()
     {
         var repository = new InMemoryMediaFiles();
@@ -84,7 +92,8 @@ public sealed class ReassignmentInboxTests
         var viewModel = CreateViewModel(repository, queue);
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
 
-        await viewModel.KeepAsNewAsync(pending, TestContext.Current.CancellationToken);
+        Assert.Single(viewModel.Reassignments).KeepAsNewCommand.Execute(null);
+        await WaitForAsync(() => !viewModel.HasReassignments);
 
         Assert.Equal(
             identity,
@@ -356,4 +365,25 @@ public sealed class ReassignmentInboxTests
             LibraryRootId rootId,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
+
+    /// <summary>
+    /// A command answers on its own continuation, so what is asserted is the state it leaves rather
+    /// than the moment it was pressed.
+    /// </summary>
+    private static async Task WaitForAsync(Func<bool> condition)
+    {
+        for (var attempt = 0; attempt < 50; attempt++)
+        {
+            Dispatcher.UIThread.RunJobs();
+            if (condition())
+            {
+                return;
+            }
+
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+
+        Assert.Fail("The reassignment command did not settle.");
+    }
+
 }
