@@ -25,7 +25,6 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSource, IActiveTrackSource
 {
     private const int ParseTimeoutMilliseconds = 10_000;
-    private const int DisabledTrack = -1;
     private const uint MaximumFrameWidth = 3840;
     private const uint MaximumFrameHeight = 2160;
 
@@ -202,8 +201,18 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
                 // whatever the packed format makes of untouched bytes.
                 _sourceWidth = source.Width;
                 _sourceHeight = source.Height;
-                Capabilities = _acceleration
-                    .Decide(source, _displays.GetCurrentDisplay(), request.UseHardwareAcceleration)
+                // Neither requested nor active, and both halves are the truth. This engine composes
+                // subtitles into the picture it hands out, which a graphics-card surface cannot be
+                // asked to do — so it does not ask for one. Reporting the caller's wish instead
+                // would light the «hardware acceleration was not available» warning over every
+                // session forever, which is a complaint about a machine rather than a description
+                // of a decision this engine took on purpose.
+                Capabilities = VideoOutputPolicy
+                    .Decide(
+                        source,
+                        _displays.GetCurrentDisplay(),
+                        hardwareRequested: false,
+                        hardwareAvailable: false)
                     .ToCapabilities();
                 _duration = media.Duration > 0 ? TimeSpan.FromMilliseconds(media.Duration) : null;
                 _mediaPlayer!.Media = media;
@@ -286,7 +295,7 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
 
             // LibVLC identifies tracks with the integers it announced; -1 disables the kind.
             var identifier = trackId is null
-                ? DisabledTrack
+                ? LibVlcTrackIdentity.Disabled
                 : int.Parse(trackId, CultureInfo.InvariantCulture);
             if (kind == MediaTrackKind.Audio)
             {
@@ -658,20 +667,19 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     }
 
     /// <summary>
-    /// The identifier LibVLC reports for one kind, or null when it reports the disabled sentinel.
+    /// The identifier LibVLC reports for one kind, or null when there is nothing to report.
     /// </summary>
-    private string? ReadActiveTrack(Func<MediaPlayer, int> read)
-    {
-        if (_mediaPlayer is not { } player || _media is null)
-        {
-            return null;
-        }
-
-        var identifier = read(player);
-        return identifier == DisabledTrack
-            ? null
-            : identifier.ToString(CultureInfo.InvariantCulture);
-    }
+    /// <remarks>
+    /// What <em>-1 means</em> is <see cref="LibVlcTrackIdentity"/>'s and not this method's, and the
+    /// split is not tidiness: this file is measured by a gate that counts branches, and a branch
+    /// here is one only a machine with a decoder can take. The same branch in a pure function is
+    /// taken by a test on any machine, which is the difference between a rule that is covered and a
+    /// rule that happens to be covered where the hardware allows it.
+    /// </remarks>
+    private string? ReadActiveTrack(Func<MediaPlayer, int> read) =>
+        _mediaPlayer is { } player && _media is not null
+            ? LibVlcTrackIdentity.Announced(read(player))
+            : null;
 
     private TimeSpan? ReadDuration()
     {

@@ -158,10 +158,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 «start again».
               -->
               <Button
-                  Classes="player-chrome"
+                  Classes="icon-action"
                   Command="{Binding PlayCommand}"
                   automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}">
-                <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlayBack}" />
+                <Path Classes="icon size-16" Data="{DynamicResource IconRestart}" />
               </Button>
               <Button
                   Command="{Binding PlayTrailerCommand}"
