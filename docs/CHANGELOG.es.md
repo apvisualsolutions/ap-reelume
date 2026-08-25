@@ -10,6 +10,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Dos de las tres herramientas del título aparecían sin tener nada que hacer.** «Revisar versiones»
+  abre una comparación, y una película con una sola copia nunca se agrupa: la superficie de detrás
+  respondía con nada y la ruta no cambiaba, así que era una puerta a una habitación que no existe —y
+  en una serie no existe nunca, porque sus episodios son archivos con claves propias—.
+  «Previsualizar renombrado» abre un plan, y un archivo que ya se llama como esta aplicación lo
+  llamaría produce un plan sin operaciones; lo dice la propia `RenamePolicy`, que convierte ese caso
+  en un conflicto `NoChange`. Las dos se preguntan al abrir la ficha y sólo se dibujan si la
+  respuesta es sí. «Editar metadatos» es la tercera y no tiene condición: siempre se puede.
+
+- **El botón del tráiler externo dice menos y muestra más.** «Ver el tráiler en el navegador» era tan
+  ancho como las tres herramientas juntas; ahora dice «Ver tráiler» con la flecha de salida que el
+  prototipo dibuja al lado, y que sale al navegador se lo cuenta al lector el texto de ayuda. El
+  tráiler local pasa a «Reproducir tráiler», que es lo que hace y lo distingue del otro.
+
+
+### Corregido
+
 - **La forma de la ficha de tipo la decide un estilo, no un convertidor.** `KindShapeConverter` tenía
   que pedir la aplicación y buscar un recurso por nombre, y sus dos ramas de «no encontrado» no las
   puede tomar nada: las dos claves de icono están declaradas y hay una puerta sobre ese inventario.

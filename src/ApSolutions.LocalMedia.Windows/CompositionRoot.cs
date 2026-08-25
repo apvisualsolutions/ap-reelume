@@ -608,13 +608,18 @@ public static partial class CompositionRoot
                 var showPersonal = await personalFilters
                     .GetAsync(showKey, CancellationToken.None)
                     .ConfigureAwait(true);
+                var showRename = await WouldRenameChangeAnythingAsync(
+                    provider,
+                    item.Item.Id,
+                    CancellationToken.None).ConfigureAwait(true);
                 showDetails.Apply(
                     item.Item,
                     sequence,
                     states,
                     showPersonal,
                     overview: overview,
-                    trailerKey: trailerKey);
+                    trailerKey: trailerKey,
+                    renameWouldChangeTheName: showRename);
             }
             else
             {
@@ -635,6 +640,10 @@ public static partial class CompositionRoot
                     .ConfigureAwait(true);
                 var filmPath = versions?.Versions.FirstOrDefault(version => version.IsAvailable)?.Path
                     ?? file?.Path;
+                var movieRename = await WouldRenameChangeAnythingAsync(
+                    provider,
+                    item.Item.Id,
+                    CancellationToken.None).ConfigureAwait(true);
                 movieDetails.Apply(
                     item.Item,
                     state,
@@ -643,7 +652,8 @@ public static partial class CompositionRoot
                     overview: overview,
                     trailerPath: FindTrailer(filmPath),
                     trailerKey: trailerKey,
-                    file: file);
+                    file: file,
+                    renameWouldChangeTheName: movieRename);
             }
         };
         return library;
@@ -795,7 +805,39 @@ public static partial class CompositionRoot
     /// An entry with nothing better to propose produces no request at all rather than a request that
     /// asks for the current name back.
     /// </remarks>
+    /// <summary>
+    /// Whether renaming this title's file would change its name at all.
+    /// </summary>
+    /// <remarks>
+    /// Asked when a card opens, so the card can leave the button out when the answer is no: a
+    /// request whose destination equals its source becomes a <c>NoChange</c> conflict rather than an
+    /// operation, and a preview of no operations is a button promising work there is none of. It
+    /// builds the same plan the preview does rather than a second rule about names, because two
+    /// rules drift apart on the file nobody tested.
+    /// </remarks>
+    private static async Task<bool> WouldRenameChangeAnythingAsync(
+        IServiceProvider provider,
+        TitleId titleId,
+        CancellationToken cancellationToken) =>
+        await BuildRenamePlanAsync(provider, titleId, cancellationToken).ConfigureAwait(true)
+            is { Operations.Count: > 0 };
+
     private static async Task<RenamePreviewViewModel?> OpenRenameAsync(
+        IServiceProvider provider,
+        TitleId titleId,
+        CancellationToken cancellationToken)
+    {
+        var plan = await BuildRenamePlanAsync(provider, titleId, cancellationToken).ConfigureAwait(true);
+        return plan is null
+            ? null
+            : new RenamePreviewViewModel(
+                plan,
+                provider.GetRequiredService<ExecuteRename>(),
+                provider.GetRequiredService<UndoRename>());
+    }
+
+    /// <summary>The plan itself, which both the preview and the card's question are built on.</summary>
+    private static async Task<RenamePlan?> BuildRenamePlanAsync(
         IServiceProvider provider,
         TitleId titleId,
         CancellationToken cancellationToken)
@@ -843,13 +885,9 @@ public static partial class CompositionRoot
             EpisodeTitle: null,
             Path.GetExtension(file.Path)));
 
-        var plan = provider.GetRequiredService<PreviewRename>().Execute(new PreviewRenameCommand(
+        return provider.GetRequiredService<PreviewRename>().Execute(new PreviewRenameCommand(
             root.Path,
             proposal is null ? [] : [new RenameRequest(file.Path, proposal)]));
-        return new RenamePreviewViewModel(
-            plan,
-            provider.GetRequiredService<ExecuteRename>(),
-            provider.GetRequiredService<UndoRename>());
     }
 
     /// <summary>The versions of one title, or nothing when only one copy of it exists.</summary>

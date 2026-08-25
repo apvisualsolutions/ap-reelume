@@ -59,6 +59,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     private CatalogItem? _item;
     private string? _overview;
     private WatchState? _watchState;
+    private bool _renameWouldChangeTheName;
     private MediaFile? _file;
     private IReadOnlyList<MediaVersionRowViewModel> _versions = [];
 
@@ -215,6 +216,28 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
     public bool HasVersions => Versions.Count > 0;
 
+    /// <summary>
+    /// Whether there is more than one copy of this film, which is the only case «Revisar versiones»
+    /// has anything to open.
+    /// </summary>
+    /// <remarks>
+    /// A film with a single copy is never grouped — <c>GroupMediaVersions</c> refuses fewer than two
+    /// — so the surface behind that button answers with nothing and the route never changes. The
+    /// button was there anyway, offering a comparison of one thing against itself.
+    /// </remarks>
+    public bool HasOtherVersions => Versions.Count > 1;
+
+    /// <summary>
+    /// Whether renaming this film's file would change its name at all.
+    /// </summary>
+    /// <remarks>
+    /// <c>RenamePolicy</c> already answers it: a request whose destination equals its source becomes
+    /// a <c>NoChange</c> conflict rather than an operation, so an empty plan means the file is
+    /// already called what this application would call it. Asked when the card is opened, because a
+    /// button that opens a preview of nothing is a button that promises work there is none of.
+    /// </remarks>
+    public bool CanPreviewRename => _renameWouldChangeTheName;
+
     /// <summary>Applies what was already read; the view never queries anything itself.</summary>
     public void Apply(
         CatalogItem item,
@@ -224,8 +247,10 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         string? overview = null,
         string? trailerPath = null,
         string? trailerKey = null,
-        MediaFile? file = null)
+        MediaFile? file = null,
+        bool renameWouldChangeTheName = false)
     {
+        _renameWouldChangeTheName = renameWouldChangeTheName;
         _item = item ?? throw new ArgumentNullException(nameof(item));
         _file = file;
         _overview = overview;
@@ -257,6 +282,8 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
             nameof(ResumePosition),
             nameof(ResumePositionText),
             nameof(HasVersions),
+            nameof(HasOtherVersions),
+            nameof(CanPreviewRename),
             nameof(HasTrailer),
             nameof(HasTrailerLink),
         })

@@ -10,6 +10,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Two of the three title tools appeared with nothing to do.** «Review versions» opens a comparison,
+  and a film with a single copy is never grouped: the surface behind it answered with nothing and the
+  route never changed, so it was a door onto a room that does not exist — and on a series it never
+  exists, because its episodes are files under keys of their own. «Preview rename» opens a plan, and
+  a file already called what this application would call it produces a plan of no operations, which
+  `RenamePolicy` itself says by turning that case into a `NoChange` conflict. Both are asked when the
+  card opens and drawn only if the answer is yes. «Edit details» is the third and has no condition.
+
+- **The external trailer button says less and shows more.** «Watch the trailer in your browser» was
+  as wide as the three title tools together; it says «Watch trailer» now, with the leaving arrow the
+  prototype draws beside it, and the help text tells a reader where it goes. The local trailer
+  becomes «Play trailer», which is what it does and what tells it from the other one.
+
+
+### Fixed
+
 - **The kind chip's shape is decided by a style, not by a converter.** `KindShapeConverter` had to
   ask for the application and look a resource up by name, and neither of its "not found" arms can be
   taken: both icon keys are declared and there is a gate over that inventory. It is removed. The card

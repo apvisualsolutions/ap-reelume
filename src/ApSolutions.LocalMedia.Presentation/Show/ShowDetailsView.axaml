@@ -169,12 +169,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 x:Name="ShowActionsSurface"
                 ItemSpacing="{DynamicResource Space8}"
                 LineSpacing="{DynamicResource Space8}">
-              <catalog:TitleActionsView />
+              <catalog:TitleActionsView CanPreviewRename="{Binding CanPreviewRename}" />
+              <!--
+                The one button here that leaves the application, and it says so twice: with the arrow
+                the prototype draws beside it, and in the name a reader hears. The label itself is
+                short because the row it sits in is full of short labels and «Ver el tráiler en el
+                navegador» was as wide as the three title tools put together.
+              -->
               <Button
                   Command="{Binding OpenTrailerLinkCommand}"
-                  Content="{DynamicResource DetailsTrailerLinkAction}"
                   IsVisible="{Binding HasTrailerLink}"
-                  automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
+                  automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}"
+                  automation:AutomationProperties.HelpText="{DynamicResource DetailsTrailerLinkHelpText}">
+                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                  <TextBlock VerticalAlignment="Center" Text="{DynamicResource DetailsTrailerLinkAction}" />
+                  <Path
+                      Classes="icon size-14"
+                      VerticalAlignment="Center"
+                      Data="{DynamicResource IconExternal}"
+                      automation:AutomationProperties.AccessibilityView="Raw" />
+                </StackPanel>
+              </Button>
             </WrapPanel>
             <!--
               A series carries no local trailer on purpose: the on-disk convention

@@ -28,6 +28,7 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     private CatalogItem? _item;
     private string? _overview;
     private string? _trailerLink;
+    private bool _renameWouldChangeTheName;
     private IReadOnlyList<SeasonViewModel> _seasons = [];
     private SeasonViewModel? _selectedSeason;
 
@@ -102,6 +103,22 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     /// <summary>True only when the stored key was well formed; anything else offers nothing.</summary>
     public bool HasTrailerLink => _trailerLink is not null;
+
+    /// <summary>
+    /// Whether renaming this series' file would change its name at all; see the film card's own.
+    /// </summary>
+    public bool CanPreviewRename => _renameWouldChangeTheName;
+
+    /// <summary>
+    /// Always false: a series is not grouped into versions, so there is nothing to compare.
+    /// </summary>
+    /// <remarks>
+    /// Version groups are keyed by a title's own content key and a series' episodes are separate
+    /// files under separate keys, so the surface behind «Revisar versiones» answers with nothing
+    /// here whatever the library holds. The button stayed on this card anyway, which is a door onto
+    /// a room that does not exist rather than an empty one.
+    /// </remarks>
+    public static bool HasOtherVersions => false;
 
     public int? Year => _item?.Year;
 
@@ -233,8 +250,10 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         IReadOnlyDictionary<ContentKey, WatchState> watchStates,
         PersonalState? personalState = null,
         string? overview = null,
-        string? trailerKey = null)
+        string? trailerKey = null,
+        bool renameWouldChangeTheName = false)
     {
+        _renameWouldChangeTheName = renameWouldChangeTheName;
         _item = item ?? throw new ArgumentNullException(nameof(item));
         _overview = overview;
         _trailerLink = TrailerLinkPolicy.TryBuildWatchLink(trailerKey);
@@ -259,6 +278,7 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         foreach (var name in new[]
         {
             nameof(HasSeasonChoice),
+            nameof(CanPreviewRename),
             nameof(Title),
             nameof(Initials),
             nameof(Overview),
