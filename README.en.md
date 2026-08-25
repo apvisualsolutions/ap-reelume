@@ -43,20 +43,21 @@ the commit that changes a view.
 
 ![The library: identified titles with their year, files still waiting to be identified by their file name, and one marked unavailable](docs/assets/library.png)
 
-A series card: the season picker, the episodes underneath, and the personal actions that belong to
-the whole series.
+A series card: how many episodes are done, the one it is waiting on named and ready to start, the
+seasons on the surface, and every episode with its length and its state.
 
-![A series card, with its season picker, its two episodes and the personal actions](docs/assets/show.png)
+![A series card: the episode it is waiting on with its button, the seasons as pills and the episodes as cards](docs/assets/show.png)
 
 Playback, with the track column open. The scrubber says where the session is; closing the window and
 opening it again resumes within five seconds of it.
 
 ![The player: video, the transport with its scrubber and clocks, and the audio and subtitle column](docs/assets/player.png)
 
-What the identification could not settle waits here rather than deciding for itself, and every
-proposal says why it was proposed.
+What the identification could not settle waits here rather than deciding for itself. Every card says
+which file it is about, what it proposes, how confident it is and why — and carries its three
+decisions.
 
-![The review inbox: three proposed candidates, each with its confidence and the reasons behind it](docs/assets/review.png)
+![The review inbox: every pending file with its candidate, its confidence, its signals and its three decisions](docs/assets/review.png)
 
 ## What it is not
 
