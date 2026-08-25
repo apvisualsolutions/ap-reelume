@@ -12,13 +12,20 @@ namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 /// no file backs is returned all the same, marked as not playable, because hiding it would make the
 /// season look shorter than it is.
 /// </summary>
+/// <remarks>
+/// The title and the running time joined the projection on 2026-08-25, for the series card's episode
+/// rows: a row that says only «Episodio 3» is a number where the prototype writes a name and a
+/// length. Both are nullable on purpose — the title of an episode nobody identified is the catalogue
+/// row's own placeholder, and the running time is absent for an episode with no file behind it.
+/// </remarks>
 public sealed class EpisodeSequenceRepository : IEpisodeSequenceRepository
 {
     private const string Projection = """
         SELECT episodes.id, episodes.show_id, episodes.season_number, episodes.episode_number,
                media.id, media.normalized_path,
                CASE WHEN episodes.is_available = 1 AND COALESCE(media.is_available, 0) = 1
-                    THEN 1 ELSE 0 END AS effective_availability
+                    THEN 1 ELSE 0 END AS effective_availability,
+               episodes.title, media.duration_ticks
         FROM episodes
         LEFT JOIN episode_media link ON link.episode_id = episodes.id
         LEFT JOIN media_files media ON media.id = link.media_file_id
@@ -88,5 +95,7 @@ public sealed class EpisodeSequenceRepository : IEpisodeSequenceRepository
         reader.GetInt32(3),
         reader.IsDBNull(4) ? null : new MediaFileId(Guid.Parse(reader.GetString(4))),
         reader.IsDBNull(5) ? null : reader.GetString(5),
-        reader.GetInt32(6) == 1);
+        reader.GetInt32(6) == 1,
+        reader.IsDBNull(7) ? null : reader.GetString(7),
+        reader.IsDBNull(8) ? null : TimeSpan.FromTicks(reader.GetInt64(8)));
 }

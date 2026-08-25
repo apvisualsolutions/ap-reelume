@@ -12,9 +12,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:ShowDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource ShowDetailsAccessibleName}">
-  <UserControl.Resources>
-  </UserControl.Resources>
-  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
+  <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{DynamicResource Space16}">
     <!--
       The film card's banner, on the series card: the same frame, the same coin, the same payment —
       PlayerSurfaceBrush under the title's art wall, the player's text brushes, and the computed
@@ -28,16 +26,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <Border.Background>
               <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
                 <GradientStop Offset="0" Color="#F2090C10" />
-                <GradientStop Offset="0.55" Color="#B8090C10" />
-                <GradientStop Offset="1" Color="#30090C10" />
+                <GradientStop Offset="0.56" Color="#B8090C10" />
+                <GradientStop Offset="1" Color="#4D090C10" />
               </LinearGradientBrush>
             </Border.Background>
           </Border>
         </Panel>
-        <Grid Margin="32" ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space24}">
+        <Grid Margin="28" ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space24}">
           <Border
-              Width="158"
-              Height="237"
+              Width="136"
+              Height="204"
               VerticalAlignment="Top"
               ClipToBounds="True"
               Background="{DynamicResource ControlFillBrush}"
@@ -59,19 +57,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StackPanel Grid.Column="1" Spacing="{DynamicResource Space12}">
             <TextBlock
                 FontSize="{DynamicResource FontSizeDisplay}"
-                FontWeight="Light"
+                FontWeight="SemiBold"
                 Foreground="{DynamicResource PlayerTextBrush}"
                 Text="{Binding Title}"
                 TextTrimming="CharacterEllipsis"
                 automation:AutomationProperties.HeadingLevel="1" />
-            <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
-              <TextBlock
-                  VerticalAlignment="Center"
-                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-                  IsVisible="{Binding HasYear}"
-                  Text="{Binding YearText}" />
-              <library:UnavailableBadge />
-            </WrapPanel>
+            <TextBlock
+                Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                IsVisible="{Binding HasMeta}"
+                Text="{Binding MetaText}"
+                TextTrimming="CharacterEllipsis" />
             <TextBlock
                 MaxWidth="620"
                 MaxHeight="160"
@@ -83,15 +78,83 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 TextWrapping="Wrap"
                 automation:AutomationProperties.Name="{DynamicResource MetadataOverviewLabel}" />
             <!--
-              Same shape as the film card's row, and for the same reason: the personal actions and
-              the trailer link carry translated words, so they wrap instead of pushing each other
-              off the side.
+              How far through the series you are, which is the one number a person opening a series
+              card is looking for. The bar is announced with its own name and the sentence under it
+              says the same thing in words, because a bar alone is a proportion nobody can read.
+            -->
+            <StackPanel
+                Width="360"
+                HorizontalAlignment="Left"
+                IsVisible="{Binding HasProgress}"
+                Spacing="{DynamicResource Space4}">
+              <ProgressBar
+                  Height="4"
+                  MinHeight="4"
+                  MinWidth="0"
+                  Background="{DynamicResource PlayerHairlineBrush}"
+                  Foreground="{DynamicResource AccentBrush}"
+                  Maximum="1"
+                  Value="{Binding WatchedFraction}"
+                  automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  Text="{Binding ProgressText}" />
+            </StackPanel>
+            <!--
+              The one episode this series is waiting on, named and startable in one place. Without it
+              the card answered «here are three seasons» to the question «where was I», and the
+              answer was somewhere down a list.
+            -->
+            <Border
+                MaxWidth="540"
+                Padding="14,12"
+                HorizontalAlignment="Left"
+                Background="{DynamicResource PlayerPanelBrush}"
+                CornerRadius="{DynamicResource CornerRadiusMedium}"
+                IsVisible="{Binding HasNextEpisode}">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock
+                      Classes="hero-overline"
+                      Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                      Text="{DynamicResource ShowNextEpisodeHeading}" />
+                  <TextBlock
+                      FontWeight="SemiBold"
+                      Foreground="{DynamicResource PlayerTextBrush}"
+                      Text="{Binding NextEpisodeLabel}"
+                      TextTrimming="CharacterEllipsis"
+                      TextWrapping="NoWrap" />
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeCaption}"
+                      Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                      Text="{Binding NextEpisodeSubText}" />
+                </StackPanel>
+                <Button
+                    Grid.Column="1"
+                    Classes="primary-action"
+                    x:Name="ShowContinueAction"
+                    VerticalAlignment="Center"
+                    Command="{Binding ContinueCommand}"
+                    automation:AutomationProperties.Name="{DynamicResource HomeResumeAction}"
+                    automation:AutomationProperties.HelpText="{Binding NextEpisodeLabel}">
+                  <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                    <Path Classes="icon size-14 filled" Data="{DynamicResource IconPlay}" />
+                    <TextBlock Text="{DynamicResource HomeResumeAction}" />
+                  </StackPanel>
+                </Button>
+              </Grid>
+            </Border>
+            <!--
+              The banner's own row, and only what the prototype puts in it. The personal marks used
+              to be here, which put a rating of ten buttons over the artwork and pushed the episodes
+              off the first screen; they live in the column beside the episodes now, where the film
+              card already keeps them.
             -->
             <WrapPanel
                 x:Name="ShowActionsSurface"
                 ItemSpacing="{DynamicResource Space8}"
                 LineSpacing="{DynamicResource Space8}">
-              <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
               <Button
                   Command="{Binding OpenTrailerLinkCommand}"
                   Content="{DynamicResource DetailsTrailerLinkAction}"
@@ -121,67 +184,86 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource ShowDetailsEmpty}"
         TextWrapping="Wrap" />
 
-    <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space8}">
+    <!--
+      The prototype's own division of a details card, which the film card already draws: what there
+      is on the left, what you can do about it on the right. The series card carried its personal
+      marks inside the banner instead, which is the one place the prototype never puts a control.
+    -->
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space24}">
+      <StackPanel
+          Grid.Column="1"
+          Width="320"
+          VerticalAlignment="Top"
+          Spacing="{DynamicResource Space8}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Text="{DynamicResource MovieOtherActionsHeading}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
+      </StackPanel>
+      <Grid RowDefinitions="Auto,Auto" RowSpacing="{DynamicResource Space8}">
       <!--
-        One season at a time. The picker is ABSENT with a single season rather than disabled: a
-        control whose only possible answer is the one it already shows is a question nobody asked,
-        and this is the same grammar PrivacySettingsView draws for its connection switch.
-      -->
-      <ComboBox
-          x:Name="SeasonPicker"
-          Classes="filter-pill"
-          Tag="{DynamicResource SeasonPickerLabel}"
-          IsVisible="{Binding HasSeasonChoice}"
-          ItemsSource="{Binding Seasons}"
-          SelectedItem="{Binding SelectedSeason}"
-          automation:AutomationProperties.Name="{DynamicResource SeasonPickerLabel}">
-        <ComboBox.ItemTemplate>
-          <DataTemplate x:DataType="show:SeasonViewModel">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
-              <TextBlock IsVisible="{Binding IsRegular}" Text="{DynamicResource SeasonHeading}" />
-              <TextBlock IsVisible="{Binding IsRegular}" Text="{Binding SeasonNumberText}" />
-              <TextBlock IsVisible="{Binding IsSpecials}" Text="{DynamicResource SeasonSpecialsHeading}" />
-            </StackPanel>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
+        The seasons, all of them on the surface. This was a dropdown, which is the right control for
+        a list nobody wants to see and the wrong one for three items: it hid two thirds of a series
+        behind a click and printed the chosen one in a box. The pills say what there is and which one
+        is open, and the pill of the season on screen is the only one filled — enforced in the view
+        model rather than here, so a second one cannot light up.
 
-      <ScrollViewer Grid.Row="1" IsVisible="{Binding HasSeasons}">
-        <ContentControl Content="{Binding SelectedSeason}">
-          <ContentControl.ContentTemplate>
+        They wrap, because a series with nine seasons is a row that would otherwise run off a 900 px
+        window.
+      -->
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
+        <TextBlock
+            VerticalAlignment="Center"
+            FontWeight="SemiBold"
+            Text="{DynamicResource ShowEpisodesHeading}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <ItemsControl
+            x:Name="SeasonPicker"
+            IsVisible="{Binding HasSeasonChoice}"
+            ItemsSource="{Binding Seasons}"
+            automation:AutomationProperties.Name="{DynamicResource SeasonPickerLabel}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="show:SeasonViewModel">
-              <StackPanel Spacing="{DynamicResource Space8}">
-                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                  <TextBlock
-                      FontSize="{DynamicResource FontSizeSubtitle}"
-                      FontWeight="SemiBold"
-                      IsVisible="{Binding IsRegular}"
-                      Text="{DynamicResource SeasonHeading}" />
-                  <TextBlock
-                      FontSize="{DynamicResource FontSizeSubtitle}"
-                      FontWeight="SemiBold"
-                      IsVisible="{Binding IsRegular}"
-                      Text="{Binding SeasonNumberText}" />
-                  <TextBlock
-                      FontSize="{DynamicResource FontSizeSubtitle}"
-                      FontWeight="SemiBold"
-                      IsVisible="{Binding IsSpecials}"
-                      Text="{DynamicResource SeasonSpecialsHeading}" />
-                  <TextBlock VerticalAlignment="Center" Text="{Binding EpisodeCountText}" />
-                  <TextBlock VerticalAlignment="Center" Text="{DynamicResource SeasonEpisodeCountLabel}" />
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding Episodes}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="show:EpisodeRowViewModel">
-                      <show:EpisodeRowView Margin="0,2" />
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
+              <!--
+                The pill is named by what it says, like the continue rail's cards: three pills that
+                all announced «Elegir temporada» would be three identical sentences, and the walk
+                would have nothing to aim at. Checked one way only — the command decides which
+                season is on screen, so a click that unchecked a pill would leave the card showing a
+                season no pill claims.
+              -->
+              <ToggleButton
+                  Classes="segment"
+                  Command="{Binding $parent[ItemsControl].((show:ShowDetailsViewModel)DataContext).SelectSeasonCommand}"
+                  CommandParameter="{Binding}"
+                  Content="{Binding SeasonLabel}"
+                  IsChecked="{Binding IsSelected, Mode=OneWay}"
+                  automation:AutomationProperties.Name="{Binding SeasonLabel}" />
             </DataTemplate>
-          </ContentControl.ContentTemplate>
-        </ContentControl>
-      </ScrollViewer>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <ContentControl Grid.Row="1" Content="{Binding SelectedSeason}" IsVisible="{Binding HasSeasons}">
+        <ContentControl.ContentTemplate>
+            <DataTemplate x:DataType="show:SeasonViewModel">
+              <ItemsControl ItemsSource="{Binding Episodes}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="show:EpisodeRowViewModel">
+                    <show:EpisodeRowView Margin="0,4" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </DataTemplate>
+        </ContentControl.ContentTemplate>
+      </ContentControl>
+      </Grid>
     </Grid>
   </Grid>
 </UserControl>

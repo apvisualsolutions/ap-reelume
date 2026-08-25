@@ -14,6 +14,7 @@ using ApSolutions.LocalMedia.Presentation.Show;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -410,8 +411,8 @@ public sealed class DetailsNavigationTests
         using (var host = Mounted(alone))
         {
             Assert.DoesNotContain(
-                host.View.GetVisualDescendants().OfType<ComboBox>(),
-                picker => picker.IsEffectivelyVisible);
+                host.View.GetVisualDescendants().OfType<ToggleButton>(),
+                pill => pill.Classes.Contains("segment") && pill.IsEffectivelyVisible);
         }
 
         var many = new ShowDetailsViewModel();
@@ -427,19 +428,27 @@ public sealed class DetailsNavigationTests
         Assert.Equal(1, many.SelectedSeason?.SeasonNumber);
         using (var host = Mounted(many))
         {
-            Assert.Contains(
-                host.View.GetVisualDescendants().OfType<ComboBox>(),
-                picker => picker.IsEffectivelyVisible);
+            var pills = host.View.GetVisualDescendants()
+                .OfType<ToggleButton>()
+                .Where(pill => pill.Classes.Contains("segment") && pill.IsEffectivelyVisible)
+                .ToArray();
+            Assert.Equal(2, pills.Length);
+
+            // Exactly one is lit, and it is the season on screen. Two lit pills would be a chooser
+            // showing two answers, which is what a per-pill IsChecked with no owner produces.
+            Assert.Single(pills, pill => pill.IsChecked == true);
             Assert.Single(host.View.GetVisualDescendants().OfType<EpisodeRowView>());
 
             many.SelectedSeason = many.Seasons[1];
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(2, host.View.GetVisualDescendants().OfType<EpisodeRowView>().Count());
+            Assert.Single(pills, pill => pill.IsChecked == true);
+            Assert.True(pills[1].IsChecked, "The second season is on screen and its pill is not lit.");
         }
     }
 
     /// <summary>
-    /// An episode row is 56 px tall and its numbers end on the same pixel, whatever their width.
+    /// Every episode row is the same height and their numbers end on the same pixel.
     /// </summary>
     /// <remarks>
     /// §4 asks for the number to be monospaced and right-aligned "so the column lines up", and what
@@ -447,9 +456,15 @@ public sealed class DetailsNavigationTests
     /// that way rather than on the font family, because a family name is a means and the alignment is
     /// the end — and a proportional font in a fixed, right-aligned column would satisfy the row's
     /// purpose while a monospaced one in a loose column would not.
+    /// <para>
+    /// The height was 56 until 2026-08-25, when the row gained the prototype's still, the episode's
+    /// name and its running time. What is asserted is that the rows AGREE rather than that they
+    /// measure any particular number: rows of different heights read as a list that is still
+    /// loading, and that is the property the number was ever standing in for.
+    /// </para>
     /// </remarks>
     [AvaloniaFact]
-    public void An_episode_row_is_56_px_tall_and_its_numbers_end_on_the_same_pixel()
+    public void Every_episode_row_is_the_same_height_and_its_numbers_end_on_the_same_pixel()
     {
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
@@ -470,12 +485,13 @@ public sealed class DetailsNavigationTests
 
         var rows = view.GetVisualDescendants().OfType<EpisodeRowView>().ToArray();
         Assert.Equal(2, rows.Length);
-        Assert.All(rows, row => Assert.Equal(56, row.Bounds.Height));
+        Assert.True(rows[0].Bounds.Height > 0, "The episode rows measured nothing at all.");
+        Assert.Equal(rows[0].Bounds.Height, rows[1].Bounds.Height, precision: 3);
 
         var rightEdges = rows
             .Select(row => Assert.Single(
                 row.GetVisualDescendants().OfType<TextBlock>(),
-                block => block.Text is "9" or "10"))
+                block => block.Text is "E09" or "E10"))
             .Select(block => block.TranslatePoint(new Point(block.Bounds.Width, 0), window)!.Value.X)
             .ToArray();
         Assert.Equal(rightEdges[0], rightEdges[1], precision: 3);

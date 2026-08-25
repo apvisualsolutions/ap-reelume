@@ -16,7 +16,9 @@ public sealed record EpisodeSequenceEntry(
     int EpisodeNumber,
     MediaFileId? MediaFileId,
     string? Path,
-    bool IsAvailable)
+    bool IsAvailable,
+    string? Title = null,
+    TimeSpan? Runtime = null)
 {
     /// <summary>Season zero is the specials season, which is never chained into automatically.</summary>
     public bool IsSpecial => SeasonNumber == 0;

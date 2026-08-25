@@ -1287,6 +1287,44 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "Continue opened a session that never reached the playing state");
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
 
+        // The hero's second action, which the prototype has had all along: the card of the same
+        // title, reached the way the grid reaches it. The route is what is probed because that is
+        // what changes — the card it opens is the library's, and Home is left behind.
+        Navigate(host, AppRoute.Home);
+        await PressAsync(
+            host,
+            "HomeResumeDetailsAction",
+            () => host.ViewModel.CurrentRoute,
+            "clicking Details on the hero never opened the card of what it offers");
+        Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
+        Assert.True(
+            host.ViewModel.Library?.IsMovieDetails == true,
+            "Details from the hero reached the library and stopped at the grid.");
+
+        // The continue rail's own card, which carries the same two actions per title since
+        // 2026-08-25. Its buttons are named by their words AND the title, so a rail of three does
+        // not announce the same sentence three times — and that name is what is pressed here.
+        Navigate(host, AppRoute.Home);
+        Assert.True(home.InProgress.Count > 0, "The continue rail never offered the film with progress on it.");
+        var card = home.InProgress[0];
+        await PressAsync(
+            host,
+            card.DetailsAccessibleName,
+            () => host.ViewModel.CurrentRoute,
+            "clicking Details on a rail card never opened that title's card");
+        Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
+
+        Navigate(host, AppRoute.Home);
+        await PressAsync(
+            host,
+            card.ResumeAccessibleName,
+            () => host.ViewModel.Player is not null,
+            "clicking Continue on a rail card never opened the session it offers");
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "a rail card's Continue opened a session that never reached the playing state");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
         // And the way into the library, which is the other thing Home is for.
         Navigate(host, AppRoute.Home);
         await PressAsync(
@@ -3273,18 +3311,46 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
-        // A drop-down's effect is that it opens: what is chosen inside lands in a popup root of its
-        // own, which is a separate top level and not this window's business.
+        // The seasons are pills since 2026-08-25, not a drop-down, and a pill's effect is on this
+        // window rather than in a popup root of its own: what it changes is which season the card
+        // lists. Pressed both ways on purpose — a chooser that has only ever been pushed forwards is
+        // a chooser nobody has shown can be gone back through.
+        var seasons = library.ShowDetails.Seasons;
+        Assert.True(seasons.Count > 1, "The seeded series never produced a second season to choose.");
         await PressAsync(
             host,
-            "SeasonPickerLabel",
-            () => Resolve(host, "SeasonPickerLabel") is ComboBox { IsDropDownOpen: true },
-            "clicking the season picker never opened the list of seasons");
-        host.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
-        Dispatcher.UIThread.RunJobs();
+            seasons[1].SeasonLabel,
+            () => library.ShowDetails.SelectedSeason?.SeasonNumber ?? 0,
+            "clicking the second season's pill never put that season on the card");
+        Assert.Equal(2, library.ShowDetails.SelectedSeason?.SeasonNumber);
+
+        await PressAsync(
+            host,
+            seasons[0].SeasonLabel,
+            () => library.ShowDetails.SelectedSeason?.SeasonNumber ?? 0,
+            "clicking the first season's pill never brought that season back");
 
         // The card opens on the first season, so the episode below is still the one this scene names.
         Assert.Equal(1, library.ShowDetails.SelectedSeason?.SeasonNumber);
+
+        // And the banner's own button, which is the point of a series card: the episode it names is
+        // the one the series is waiting on, and pressing it opens that episode rather than the first.
+        Assert.True(
+            library.ShowDetails.HasNextEpisode,
+            "The series card offered no next episode, so its Continue could not be pressed.");
+        var expected = library.ShowDetails.NextEpisode!.MediaFileId;
+        await PressAsync(
+            host,
+            "HomeResumeAction",
+            () => host.ViewModel.Player is not null,
+            "clicking Continue on the series card never opened the episode it names",
+            helpText: library.ShowDetails.NextEpisodeLabel);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the series card's Continue opened a session that never reached the playing state");
+        Assert.NotNull(expected);
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
 
         // The second episode, not the first: a season lists them in order, and pressing the one at
         // the top would be indistinguishable from a card that plays whatever it feels like.

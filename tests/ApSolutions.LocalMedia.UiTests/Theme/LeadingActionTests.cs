@@ -85,7 +85,10 @@ public sealed class LeadingActionTests
 
         // Details
         ["MovieDetailsView"] = "MovieResumeAction",
-        ["ShowDetailsView"] = null,
+        // The series card leads with the episode it is waiting on, since 2026-08-25. A card whose
+        // point is «where was I» has one answer, and it was a list of seasons until the banner could
+        // name that episode and start it.
+        ["ShowDetailsView"] = "ShowContinueAction",
         ["EpisodeRowView"] = null,
 
         // Player

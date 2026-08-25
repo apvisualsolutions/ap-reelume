@@ -49,9 +49,9 @@ would be inventing two fields. It is a vertical through three layers for a secon
         <Border>
           <Border.Background>
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
-              <GradientStop Offset="0" Color="#F2090C10" />
-              <GradientStop Offset="0.55" Color="#B8090C10" />
-              <GradientStop Offset="1" Color="#30090C10" />
+              <GradientStop Offset="0.04" Color="#F5050608" />
+              <GradientStop Offset="0.46" Color="#BD050608" />
+              <GradientStop Offset="0.86" Color="#24050608" />
             </LinearGradientBrush>
           </Border.Background>
         </Border>

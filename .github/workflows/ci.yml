@@ -57,11 +57,20 @@ jobs:
       # A machine that already carries ffmpeg is left untouched; the system-wide install only
       # happens on hosted images, which arrive without it. The version is pinned so a floating
       # community tag cannot change what runs here between one build and the next.
+      # The community feed answers 503 often enough to have cost two runs on 2026-08-24 alone, and a
+      # build that never compiled is not a verdict about the code. Three attempts with a widening
+      # wait; the version stays pinned, so what a retry can change is the transport and nothing else.
       - name: Install ffmpeg
         shell: pwsh
         run: |
-          if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.' }
-          else { choco install ffmpeg --version 9.0.0 -y --no-progress }
+          if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.'; exit 0 }
+          foreach ($attempt in 1..3) {
+            choco install ffmpeg --version 9.0.0 -y --no-progress
+            if ($LASTEXITCODE -eq 0) { exit 0 }
+            "Attempt $attempt failed ($LASTEXITCODE); the community feed is the usual reason."
+            if ($attempt -lt 3) { Start-Sleep -Seconds (20 * $attempt) }
+          }
+          throw 'ffmpeg could not be installed after three attempts.'
       # This builds and seals both architectures. The separate ARM64 restore check that used to live
       # below was weaker than what replaced it: a restore resolves packages without ever compiling,
       # which is why `-r win-arm64` passed here for months while the build itself failed outright.
