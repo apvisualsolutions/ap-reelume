@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El héroe de Inicio termina en la página, no en una línea.** El prototipo dibuja dos velos sobre
+  la obra: el direccional que ya estaba y el color de la propia página subiendo desde el borde
+  inferior. Va como pincel de superficie tras una máscara de opacidad y no como degradado de colores,
+  porque el color tiene que ser el del tema —son cuatro diccionarios, y un hexadecimal escrito ahí
+  acierta en uno.
+
+### Corregido
+
 - **Las tres herramientas del título están en la ficha, no bajo la biblioteca.** «Editar metadatos»,
   «Previsualizar renombrado» y «Revisar versiones» eran una fila de botones bajo la cuadrícula, que
   actuaban sobre «el título abierto» en una pantalla donde puede no haber ninguno abierto. El

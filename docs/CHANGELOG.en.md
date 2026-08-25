@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Home's hero ends in the page rather than at a line across it.** The prototype draws two veils
+  over the artwork: the directional one that was already here, and the page's own colour rising from
+  the bottom edge. It is painted as the surface brush behind an opacity mask rather than as a
+  gradient of colours, because the colour has to be the theme's — four dictionaries, and a hex
+  written there is right in one of them.
+
+### Fixed
+
 - **The three title tools are in the card rather than under the library.** «Edit metadata», «Preview
   rename» and «Review versions» were a row of buttons under the grid, acting on «the open title» on a
   screen where none need be open. The prototype puts them in the banner's action row, and that is
