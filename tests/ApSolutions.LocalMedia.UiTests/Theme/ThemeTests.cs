@@ -206,8 +206,10 @@ public sealed class ThemeTests
             .Where(button => button.Classes.Contains("theme-option"))
             .ToArray();
         // Five theme choices — both high contrasts became pickable on 2026-08-23 — plus the two
-        // language choices BUG-011 added; all seven share the option styling.
-        Assert.Equal(7, themeButtons.Length);
+        // language choices BUG-011 added, plus the three densities and the three roundings the
+        // Appearance page grew with the prototype's other nine rows. All thirteen share the option
+        // styling, which is what makes counting them mean anything.
+        Assert.Equal(13, themeButtons.Length);
 
         var dark = themeButtons.Single(button => button.CommandParameter?.ToString() == "Dark");
         Assert.NotNull(dark.Command);

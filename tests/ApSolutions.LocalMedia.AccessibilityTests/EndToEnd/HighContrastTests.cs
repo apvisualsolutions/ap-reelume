@@ -65,6 +65,7 @@ public sealed partial class HighContrastTests
                 .Attributes()
                 .Where(attribute => BrushAttributes.Contains(attribute.Name.LocalName, StringComparer.Ordinal))
                 .Where(attribute => LiteralColour().IsMatch(attribute.Value))
+                .Where(attribute => !IsSwatch(attribute))
                 .ToArray();
 
             foreach (var literal in literals)
@@ -99,10 +100,50 @@ public sealed partial class HighContrastTests
     /// stopped matching would not quietly except everything.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// A swatch paints the colour it stands for, and that is not a colour escaping the theme.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The rule is a good one and is not relaxed: a literal colour in a view is a colour no contrast
+    /// check covers and high contrast cannot override. A swatch is the one shape where that is
+    /// backwards — the colour is not standing for a state, it <b>is</b> the value being chosen, and a
+    /// swatch painted from a token would be a colour picker that cannot show colours.
+    /// </para>
+    /// <para>
+    /// <b>And it is paid for.</b> Every swatch carries its own hexadecimal as its accessible name,
+    /// the value in force is written beside the row in a fixed-width face, and which one is chosen is
+    /// said with a ring — geometry, so it survives both high contrast dictionaries. Somebody who
+    /// cannot see the colours loses the preview and keeps the choice.
+    /// </para>
+    /// <para>
+    /// The class is what carries the exception rather than a list of files, because the class is what
+    /// carries the behaviour: a Background literal anywhere else in the same view still fails.
+    /// </para>
+    /// </remarks>
+    private static bool IsSwatch(XAttribute attribute) =>
+        attribute.Parent?.Attribute("Classes")?.Value is { } classes
+        && classes.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Contains("accent-swatch", StringComparer.Ordinal);
+
     private static readonly (string View, string Property, string Source)[] ColourIsTheSubject =
     [
         ("SubtitleStyleView", "Foreground", "ForegroundHex"),
         ("SubtitleStyleView", "Background", "BackgroundHex"),
+
+        // The two colour pickers and the accent one, added on 2026-08-25 when the two hexadecimal
+        // fields became swatches. Each entry is the picker wearing the value in force — the circle
+        // on the row, the large circle inside the flyout, and one cell of the grid — and each is
+        // paid for the same way the two above are: the value is written beside it in a fixed-width
+        // face, every swatch carries its own hexadecimal as its accessible name, and which one is
+        // chosen is said with a ring rather than with the fill.
+        ("SubtitleStyleView", "Background", "ForegroundHex"),
+        ("SubtitleStyleView", "Fill", "ForegroundHex"),
+        ("SubtitleStyleView", "Fill", "BackgroundHex"),
+        ("SubtitleStyleView", "Background", "{Binding ., Converter"),
+        ("AppearanceSettingsView", "Background", "AccentHex"),
+        ("AppearanceSettingsView", "Fill", "AccentHex"),
+        ("AppearanceSettingsView", "Background", "{Binding ., Converter"),
     ];
 
     /// <summary>
@@ -141,7 +182,7 @@ public sealed partial class HighContrastTests
     public void No_state_is_told_by_colour_alone()
     {
         var audit = new AuditLog(nameof(No_state_is_told_by_colour_alone));
-        Assert.Equal(2, ColourIsTheSubject.Length);
+        Assert.Equal(9, ColourIsTheSubject.Length);
         Assert.Single(ColourRepeatsWhatIsWritten);
 
         foreach (var view in ViewFiles())

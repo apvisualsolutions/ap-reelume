@@ -23,8 +23,8 @@ public sealed class SubtitleCustomizationTests
     [
         "SubtitleSizeSlider",
         "SubtitleFamilySelector",
-        "SubtitleForegroundBox",
-        "SubtitleBackgroundBox",
+        "SubtitleForegroundFirst",
+        "SubtitleBackgroundFirst",
         "SubtitleBackgroundOpacitySlider",
         "SubtitleOutlineSlider",
     ];
@@ -68,7 +68,14 @@ public sealed class SubtitleCustomizationTests
                         $"Open the subtitle settings in {language} and tab to {name}.");
                 }
 
-                var announcesValue = peer.GetProvider<IRangeValueProvider>() is not null
+                // A swatch's name IS its value — the accessible name of the first ink is «#FFFFFF» —
+                // so there is nothing left for a value pattern to announce. The two colours were
+                // text boxes until 2026-08-25 and a text box does carry one; what replaced them is a
+                // row of buttons, and a button that announced "#FFFFFF, value #FFFFFF" would be
+                // saying it twice. The name is still asserted above, which is the part that matters.
+                var nameIsTheValue = name is "SubtitleForegroundFirst" or "SubtitleBackgroundFirst";
+                var announcesValue = nameIsTheValue
+                    || peer.GetProvider<IRangeValueProvider>() is not null
                     || peer.GetProvider<IValueProvider>() is not null
                     || peer.GetProvider<ISelectionProvider>() is not null;
                 if (!announcesValue)

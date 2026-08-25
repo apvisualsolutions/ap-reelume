@@ -64,8 +64,11 @@ public sealed class AppearanceSettingsTests
             Assert.Contains(word, pills, StringComparer.Ordinal);
         }
 
-        // The two languages are pills of the same class, so the count is the themes plus those two.
-        Assert.Equal(themes.Length + 2, pills.Length);
+        // Four pill rows wear this class now, not two: the five themes, the two languages, the
+        // three densities and the three roundings. They are counted together because the class is
+        // what carries the grammar — accent fill and a state glyph — and a row that grew a pill
+        // without one would be the defect this counts against.
+        Assert.Equal(themes.Length + 2 + 3 + 3, pills.Length);
         window.Close();
     }
 
@@ -95,7 +98,7 @@ public sealed class AppearanceSettingsTests
             .OfType<WrapPanel>()
             .Where(panel => panel.GetVisualChildren().OfType<Button>().Any(button => button.Classes.Contains("theme-option")))
             .ToArray();
-        Assert.Equal(2, rows.Length);
+        Assert.Equal(4, rows.Length);
 
         foreach (var row in rows)
         {

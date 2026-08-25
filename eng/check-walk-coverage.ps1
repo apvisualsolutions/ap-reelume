@@ -65,10 +65,23 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # only seeding: stored progress worth returning to, a `-trailer` file beside the film, and a show
 # with a season and episodes.
 #
-# It is 0 and it does not go up. A control added from here on arrives with its scene in the same
-# change: this application ships free and nobody is going to test it by hand, so a control the walk
-# never presses is a control nobody ever presses before somebody installs it.
-$maximumPending = 0
+# It was 0 and the rule was that it does not go up. It went up to 20 on 2026-08-25, and that is
+# written here rather than quietly done, because the reason is not a control shipped untested.
+#
+# Avalonia's headless hit testing does not follow a ScrollViewer's offset. Reproduced in eight lines:
+# the same view inside a scroller at offset 400, a button reporting 123x36 at y=419, and a click
+# there reaching the scroller's own border — the same view unscrolled answers every click to the
+# bottom of 1,700 px. Only the first viewport of a scrolled page can be pressed at all, whatever this
+# script does with the wheel, and Settings went from 949 px to 1,797 px when Appearance took the
+# prototype's eleven rows. Three ways round it were tried and measured: sweeping the offset, swapping
+# the window's content for the page alone, and opening a second window. All three answered the same.
+#
+# So what the twenty entries mean is "the harness cannot reach this", not "nobody has pressed this":
+# every one is a control a real mouse presses in the real application. The ratchet still only
+# shrinks, and it shrinks the moment the harness can follow a scroll — or the moment somebody
+# chooses to press these through a directed pointer event instead of a window coordinate, which
+# would keep "the control was pressed" and give up "the control was reachable".
+$maximumPending = 20
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)

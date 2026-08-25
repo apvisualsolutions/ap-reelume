@@ -77,15 +77,32 @@ public sealed record SubtitleStyle
             Math.Clamp(backgroundOpacity, 0, 1),
             Math.Clamp(outlineThickness, 0, MaximumOutlineThickness));
 
+    /// <summary>
+    /// Whether a string is a colour this accepts: <c>#RRGGBB</c> or <c>#AARRGGBB</c>.
+    /// </summary>
+    /// <remarks>
+    /// Public because the swatches ask before they offer: a control that hands over a value this
+    /// would throw on is a control that crashes the page it is on, and the check that decides it has
+    /// to be the same one — a second copy is what disagrees the first time either moves.
+    /// </remarks>
+    public static bool IsColour(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        var trimmed = value.Trim();
+        return trimmed.StartsWith('#')
+            && (trimmed.Length is 7 or 9)
+            && trimmed[1..].All(character => Uri.IsHexDigit(character));
+    }
+
     private static string RequireColour(string value, string parameterName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value, parameterName);
-        var trimmed = value.Trim();
-        var isHex = trimmed.StartsWith('#')
-            && (trimmed.Length is 7 or 9)
-            && trimmed[1..].All(character => Uri.IsHexDigit(character));
-        return isHex
-            ? trimmed.ToUpperInvariant()
+        return IsColour(value)
+            ? value.Trim().ToUpperInvariant()
             : throw new ArgumentException(
                 $"'{value}' is not a #RRGGBB or #AARRGGBB colour.",
                 parameterName);

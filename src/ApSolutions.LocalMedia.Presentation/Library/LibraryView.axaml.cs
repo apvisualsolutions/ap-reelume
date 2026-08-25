@@ -31,7 +31,7 @@ public sealed partial class LibraryView : UserControl
         viewModel.Columns = ColumnsThatFit(
             e.NewSize.Width,
             Scalar(this, "PosterCardWidth", 148),
-            Scalar(this, "Space8", 8));
+            Scalar(this, "DensityGutter", 8));
     }
 
     /// <summary>

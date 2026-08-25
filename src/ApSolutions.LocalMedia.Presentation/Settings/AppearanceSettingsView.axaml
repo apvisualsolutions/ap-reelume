@@ -8,12 +8,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme"
     x:DataType="settings:AppearanceSettingsViewModel"
     automation:AutomationProperties.Name="{DynamicResource AppearanceAccessibleName}">
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="AppearanceResourceKey" />
+    <!--
+      The same converter the subtitle preview paints with: a string of six hexadecimal digits is a
+      colour in exactly one way, and a second implementation of that is a second answer waiting to
+      disagree. It falls back rather than throwing, which is what a swatch bound to a value somebody
+      is still moving needs.
+    -->
+    <player:SubtitleColourConverter x:Key="AppearanceColour" />
   </UserControl.Resources>
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space16}">
@@ -114,6 +122,446 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </WrapPanel>
         </StackPanel>
       </Border>
+      <!--
+        The nine rows the prototype offers beside the theme and the language, in its own order. Each
+        one is a setting-row: the name and the sentence that says what it does on the left, the state
+        and the control against the right edge, which is what that class exists for.
+      -->
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceFollowWindowsLabel}" />
+            <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceFollowWindowsDescription}" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding FollowsWindowsTheme}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !FollowsWindowsTheme}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                x:Name="FollowWindowsThemeCheckBox"
+                VerticalAlignment="Center"
+                IsChecked="{Binding FollowsWindowsTheme}"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceFollowWindowsLabel}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!--
+        The accent, as the prototype draws it: six circular swatches and the value beside them in a
+        fixed-width face. Each swatch carries the state glyph as well as its fill — in either high
+        contrast dictionary the six fills resolve to the same colour, so the glyph is the whole
+        signal there, which is the same reason every pill row in this tree carries one.
+
+        The six hexadecimals are written here and in AccentPalette.Presets, and that is not two
+        sources: the swatch has to paint the colour it stands for, and a Background bound through a
+        converter would be a converter whose only job is to turn a string into the string beside it.
+        AppearanceSwatchTests compares the two lists, so they cannot drift apart in silence.
+      -->
+      <Border Classes="setting-row">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceAccentLabel}" />
+          <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentDescription}" />
+          <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+            <Button
+                x:Name="FirstAccentSwatch"
+                Classes="accent-swatch"
+                Classes.selected="{Binding IsFirstAccent}"
+                Background="#1769AA"
+                Command="{Binding ApplyAccentCommand}"
+                CommandParameter="#1769AA"
+                automation:AutomationProperties.Name="#1769AA" />
+            <Button
+                Classes="accent-swatch"
+                Classes.selected="{Binding IsSecondAccent}"
+                Background="#2D6A4F"
+                Command="{Binding ApplyAccentCommand}"
+                CommandParameter="#2D6A4F"
+                automation:AutomationProperties.Name="#2D6A4F" />
+            <Button
+                Classes="accent-swatch"
+                Classes.selected="{Binding IsThirdAccent}"
+                Background="#8E4B2E"
+                Command="{Binding ApplyAccentCommand}"
+                CommandParameter="#8E4B2E"
+                automation:AutomationProperties.Name="#8E4B2E" />
+            <Button
+                Classes="accent-swatch"
+                Classes.selected="{Binding IsFourthAccent}"
+                Background="#6B4E9B"
+                Command="{Binding ApplyAccentCommand}"
+                CommandParameter="#6B4E9B"
+                automation:AutomationProperties.Name="#6B4E9B" />
+            <Button
+                Classes="accent-swatch"
+                Classes.selected="{Binding IsFifthAccent}"
+                Background="#B23A48"
+                Command="{Binding ApplyAccentCommand}"
+                CommandParameter="#B23A48"
+                automation:AutomationProperties.Name="#B23A48" />
+            <Button
+                Classes="accent-swatch"
+                Classes.selected="{Binding IsSixthAccent}"
+                Background="#0E7490"
+                Command="{Binding ApplyAccentCommand}"
+                CommandParameter="#0E7490"
+                automation:AutomationProperties.Name="#0E7490" />
+            <!--
+              The hairline the prototype puts between the presets and the picker: the six on the left
+              are choices, and what is on the right is a way to any colour at all.
+            -->
+            <Border
+                Width="1"
+                Height="22"
+                VerticalAlignment="Center"
+                Background="{DynamicResource ShellHairlineBrush}" />
+            <!--
+              The seventh circle is the picker, and it is the prototype's own «elige cualquier color».
+              Its <input type=color> opens the browser's grid; this opens the same shape built out of
+              controls this application already owns — a grid of hues and lightnesses, three sliders
+              for anything between them, and the value in the fixed-width face the row already
+              carries. It wears the colour in force, so a custom colour is visible on the row itself
+              rather than only inside the flyout.
+            -->
+            <Button
+                x:Name="CustomAccentSwatch"
+                Classes="accent-swatch custom"
+                Classes.selected="{Binding IsCustomAccent}"
+                Background="{Binding AccentHex, Converter={StaticResource AppearanceColour}}"
+                ToolTip.Tip="{DynamicResource AppearanceAccentCustom}"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceAccentCustom}">
+              <Path Classes="icon size-14" Data="{DynamicResource IconChevronDown}" Stroke="{DynamicResource AccentTextBrush}" />
+              <Button.Flyout>
+                <Flyout Placement="Bottom">
+                  <StackPanel Width="304" Spacing="{DynamicResource Space12}">
+                    <TextBlock
+                        Classes="setting-name"
+                        Text="{DynamicResource AppearanceAccentCustom}" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space12}">
+                      <Ellipse
+                          Width="44"
+                          Height="44"
+                          Stroke="{DynamicResource ShellBorderBrush}"
+                          StrokeThickness="1"
+                          Fill="{Binding AccentHex, Converter={StaticResource AppearanceColour}}" />
+                      <TextBlock
+                          Grid.Column="1"
+                          VerticalAlignment="Center"
+                          FontFamily="{DynamicResource FontFamilyMono}"
+                          Foreground="{DynamicResource TextSecondaryBrush}"
+                          Text="{Binding AccentHex}" />
+                    </Grid>
+                    <ItemsControl ItemsSource="{x:Static settings:AppearanceSettingsViewModel.ColourGrid}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <WrapPanel />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                          <Button
+                              x:Name="AccentGridCell"
+                              Classes="colour-cell"
+                              Background="{Binding ., Converter={StaticResource AppearanceColour}}"
+                              Command="{Binding $parent[settings:AppearanceSettingsView].((settings:AppearanceSettingsViewModel)DataContext).ApplyAccentCommand}"
+                              CommandParameter="{Binding .}"
+                              ToolTip.Tip="{Binding .}"
+                              automation:AutomationProperties.Name="{DynamicResource AppearanceColourCell}"
+                              automation:AutomationProperties.HelpText="{Binding .}" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentHue}" />
+                    <Slider
+                        x:Name="AccentHueSlider"
+                        Classes="hue"
+                        Minimum="0"
+                        Maximum="360"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        Value="{Binding AccentHue, Mode=TwoWay}"
+                        automation:AutomationProperties.Name="{DynamicResource AppearanceAccentHue}" />
+                    <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentSaturation}" />
+                    <Slider
+                        x:Name="AccentSaturationSlider"
+                        Minimum="0"
+                        Maximum="100"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        Value="{Binding AccentSaturation, Mode=TwoWay}"
+                        automation:AutomationProperties.Name="{DynamicResource AppearanceAccentSaturation}" />
+                    <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentLightness}" />
+                    <Slider
+                        x:Name="AccentLightnessSlider"
+                        Minimum="0"
+                        Maximum="100"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        Value="{Binding AccentLightness, Mode=TwoWay}"
+                        automation:AutomationProperties.Name="{DynamicResource AppearanceAccentLightness}" />
+                    <TextBlock
+                        Classes="setting-description"
+                        Text="{DynamicResource AppearanceAccentDerivedNote}"
+                        TextWrapping="Wrap" />
+                  </StackPanel>
+                </Flyout>
+              </Button.Flyout>
+            </Button>
+            <TextBlock
+                x:Name="AccentHexReadout"
+                VerticalAlignment="Center"
+                FontFamily="{DynamicResource FontFamilyMono}"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="{Binding AccentHex}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceMicaLabel}" />
+            <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceMicaDescription}" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding Mica}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !Mica}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                x:Name="MicaCheckBox"
+                VerticalAlignment="Center"
+                IsChecked="{Binding Mica}"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceMicaLabel}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Classes="setting-row">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceTintLabel}" />
+          <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceTintDescription}" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+            <Slider
+                x:Name="AccentTintSlider"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Minimum="0"
+                Maximum="100"
+                TickFrequency="5"
+                IsSnapToTickEnabled="True"
+                Value="{Binding TintPercent, Mode=TwoWay}"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceTintLabel}" />
+            <TextBlock
+                Grid.Column="1"
+                Classes="setting-state"
+                VerticalAlignment="Center"
+                Text="{Binding TintPercent, StringFormat={}{0:0} %}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="setting-row">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceDensityLabel}" />
+          <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceDensityDescription}" />
+          <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceDensityCompact}"
+                Command="{Binding ApplyDensityCommand}"
+                CommandParameter="{x:Static theme:InterfaceDensity.Compact}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding CompactCue}" />
+                <TextBlock Text="{DynamicResource AppearanceDensityCompact}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceDensityComfortable}"
+                Command="{Binding ApplyDensityCommand}"
+                CommandParameter="{x:Static theme:InterfaceDensity.Comfortable}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding ComfortableCue}" />
+                <TextBlock Text="{DynamicResource AppearanceDensityComfortable}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceDensityRoomy}"
+                Command="{Binding ApplyDensityCommand}"
+                CommandParameter="{x:Static theme:InterfaceDensity.Roomy}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding RoomyCue}" />
+                <TextBlock Text="{DynamicResource AppearanceDensityRoomy}" />
+              </StackPanel>
+            </Button>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="setting-row">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceCoverSizeLabel}" />
+          <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceCoverSizeDescription}" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+            <Slider
+                x:Name="CoverSizeSlider"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Minimum="{x:Static settings:AppearanceSettingsViewModel.MinimumCoverWidth}"
+                Maximum="{x:Static settings:AppearanceSettingsViewModel.MaximumCoverWidth}"
+                TickFrequency="2"
+                IsSnapToTickEnabled="True"
+                Value="{Binding CoverWidth, Mode=TwoWay}"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceCoverSizeLabel}" />
+            <TextBlock
+                Grid.Column="1"
+                Classes="setting-state"
+                VerticalAlignment="Center"
+                Text="{Binding CoverWidth, StringFormat={}{0:0} px}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="setting-row">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceRoundingLabel}" />
+          <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceRoundingSharp}"
+                Command="{Binding ApplyRoundingCommand}"
+                CommandParameter="{x:Static theme:CornerRounding.Sharp}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding SharpCue}" />
+                <TextBlock Text="{DynamicResource AppearanceRoundingSharp}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceRoundingSoft}"
+                Command="{Binding ApplyRoundingCommand}"
+                CommandParameter="{x:Static theme:CornerRounding.Soft}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding SoftCue}" />
+                <TextBlock Text="{DynamicResource AppearanceRoundingSoft}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="theme-option"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceRoundingVeryRound}"
+                Command="{Binding ApplyRoundingCommand}"
+                CommandParameter="{x:Static theme:CornerRounding.VeryRound}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding VeryRoundCue}" />
+                <TextBlock Text="{DynamicResource AppearanceRoundingVeryRound}" />
+              </StackPanel>
+            </Button>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceCoverTitlesLabel}" />
+            <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceCoverTitlesDescription}" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding CoverTitles}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !CoverTitles}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                x:Name="CoverTitlesCheckBox"
+                VerticalAlignment="Center"
+                IsChecked="{Binding CoverTitles}"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceCoverTitlesLabel}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceAnimationsLabel}" />
+            <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAnimationsDescription}" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding Animations}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !Animations}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                x:Name="AnimationsCheckBox"
+                VerticalAlignment="Center"
+                IsChecked="{Binding Animations}"
+                automation:AutomationProperties.Name="{DynamicResource AppearanceAnimationsLabel}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!--
+        The one row with no control, which the prototype draws the same way: the player's surface is
+        dark in all four themes because a light strip under a picture is a seam, and that is a
+        decision rather than a preference. Written down so nobody looks for the switch.
+      -->
+      <Border Classes="setting-row">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="setting-name" Text="{DynamicResource AppearancePlayerSurfaceLabel}" />
+            <TextBlock Classes="setting-description" Text="{DynamicResource AppearancePlayerSurfaceDescription}" />
+          </StackPanel>
+          <TextBlock
+              Grid.Column="1"
+              Classes="setting-state"
+              VerticalAlignment="Center"
+              IsVisible="{Binding PlayerSurfaceIsFixed}"
+              Text="{DynamicResource AppearancePlayerSurfaceValue}" />
+        </Grid>
+      </Border>
+
       <Border Classes="setting-row">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock

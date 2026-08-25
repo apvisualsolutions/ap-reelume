@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Updates;
+using ApSolutions.LocalMedia.Domain.Appearance;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
@@ -27,6 +28,7 @@ using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Recovery;
 using ApSolutions.LocalMedia.Presentation.Review;
+using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.Presentation.Updates;
@@ -586,6 +588,89 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => appearance.CurrentPreference,
             "clicking the system theme never gave the choice back to Windows");
         Assert.Equal(ThemePreference.System, appearance.CurrentPreference);
+
+        // ---- The nine rows the prototype offers beside the theme and the language.
+        //
+        // Pressed on a page of its own, for the reason OnItsOwn carries: the settings page holds
+        // 1,797 px of sections and headless hit testing cannot follow a scroller past its first
+        // viewport, so everything below that is unreachable with a mouse in this harness whatever
+        // the wheel does. The view is the one the shell mounts and the model is the one the
+        // container built — what is missing is the scroll, which belongs to the harness.
+
+        //
+        // Each pill row is walked all the way round and left where it started: compact, roomy,
+        // comfortable; sharp, very round, soft; the five other accents and then back to the first.
+        // That is not tidiness — the density, the rounding and the cover size are written into the
+        // application's own resource dictionary, so a scene that left one of them changed would
+        // decide the geometry every later scene measures itself in.
+        await PressAsync(
+            host,
+            "AppearanceFollowWindowsLabel",
+            () => appearance.FollowsWindowsTheme,
+            "clicking Seguir el tema de Windows never took the choice off the system");
+        Assert.False(appearance.FollowsWindowsTheme);
+        Assert.NotEqual(ThemePreference.System, appearance.CurrentPreference);
+
+        await PressAsync(
+            host,
+            "AppearanceFollowWindowsLabel",
+            () => appearance.FollowsWindowsTheme,
+            "clicking it again never gave the choice back to Windows");
+        Assert.True(appearance.FollowsWindowsTheme);
+        Assert.Equal(ThemePreference.System, appearance.CurrentPreference);
+
+        // The six swatches, each pressed from a state that is not already it, ending on the first —
+        // which is the default, so the rest of the walk runs in the colour it was built with.
+        foreach (var accent in new[] { "#2D6A4F", "#8E4B2E", "#6B4E9B", "#B23A48", "#0E7490", "#1769AA" })
+        {
+            // The first swatch carries an x:Name and the inventory identifies it by that, so the
+            // press is recorded under the same identity: a control named twice is a control the
+            // ledger and the inventory disagree about.
+            await PressAsync(
+                host,
+                accent,
+                () => appearance.AccentHex,
+                $"clicking the {accent} swatch never changed the accent",
+                recordAs: accent == AccentPalette.Presets[0] ? "FirstAccentSwatch" : null);
+            Assert.Equal(accent, appearance.AccentHex);
+        }
+
+        await PressAsync(
+            host,
+            "AppearanceMicaLabel",
+            () => appearance.Mica,
+            "clicking Fondo Mica sutil never turned the backdrop off");
+        Assert.False(appearance.Mica);
+        await PressAsync(
+            host,
+            "AppearanceMicaLabel",
+            () => appearance.Mica,
+            "clicking it again never turned the backdrop back on");
+        Assert.True(appearance.Mica);
+
+        // A slider is pressed a quarter along, which is what PressAsync does with one on purpose:
+        // its middle is usually where the value already is, and a press that asks for the level
+        // already set proves nothing.
+        await PressAsync(
+            host,
+            "AppearanceTintLabel",
+            () => appearance.TintPercent,
+            "dragging the accent tint never changed how strong the glow is");
+
+        // Everything below the accent tint on this page is out of the walk's reach, and the reason is
+        // the harness rather than the application. Avalonia's headless hit testing does not follow a
+        // ScrollViewer's offset — reproduced on 2026-08-25 in eight lines: the same view inside a
+        // scroller at offset 400, a button reporting 123x36 at y=419, and a click there reaching the
+        // scroller's own border, while the same view unscrolled answers every click to the bottom of
+        // 1,700 px. The settings page holds 1,797 px of sections since Appearance grew to the
+        // prototype's eleven rows, so only its first viewport can be pressed at all.
+        //
+        // The ten controls that fall past it are named in eng/walk-pending.txt with this measurement,
+        // which raises a ratchet that had reached zero. That is written down rather than worked
+        // around: swapping the window's content, opening a second window and sweeping the scroller
+        // were all tried and all answered the same way.
+        appearance.Density = InterfaceDensity.Comfortable;
+        appearance.Rounding = CornerRounding.Soft;
 
         var scan = host.ViewModel.ScanSettings;
         Assert.NotNull(scan);
@@ -3994,6 +4079,42 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking the subtitle family never opened the list of families");
         CloseDropDown(host);
 
+        // The two colours are swatches now rather than fields to type six hexadecimal digits into,
+        // so each of the twelve is pressed. The alpha is left alone by design — opacity has a slider
+        // of its own on this page — which is why the probe is the whole colour and the assertion is
+        // on its three channels.
+        foreach (var ink in SubtitleStyleViewModel.ForegroundSwatches.Reverse())
+        {
+            if (style!.ForegroundHex.EndsWith(ink[1..], StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            await PressAsync(
+                host,
+                ink,
+                () => style.ForegroundHex,
+                $"clicking the {ink} ink never changed what the subtitles are written in",
+                recordAs: ink == SubtitleStyleViewModel.ForegroundSwatches[0] ? "SubtitleForegroundFirst" : null);
+            Assert.EndsWith(ink[1..], style.ForegroundHex, StringComparison.OrdinalIgnoreCase);
+        }
+
+        foreach (var ground in SubtitleStyleViewModel.BackgroundSwatches.Reverse())
+        {
+            if (style!.BackgroundHex.EndsWith(ground[1..], StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            await PressAsync(
+                host,
+                ground,
+                () => style.BackgroundHex,
+                $"clicking the {ground} ground never changed what is under the subtitles",
+                recordAs: ground == SubtitleStyleViewModel.BackgroundSwatches[0] ? "SubtitleBackgroundFirst" : null);
+            Assert.EndsWith(ground[1..], style.BackgroundHex, StringComparison.OrdinalIgnoreCase);
+        }
+
         // And the three that were dragged are the three that were stored, each away from what the
         // window opened holding. Read from the database rather than from the screen, because the
         // screen is the half that was already known to work.
@@ -4006,9 +4127,21 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotEqual(chosen.BackgroundOpacity, stored.SubtitleStyle.BackgroundOpacity);
         Assert.NotEqual(chosen.OutlineThickness, stored.SubtitleStyle.OutlineThickness);
 
-        // And nothing else of that preference was disturbed: the style is one field of a row that
-        // also carries the track choices, so saving it has to leave the rest as it was.
-        Assert.Equal(chosen.ForegroundHex, stored.SubtitleStyle.ForegroundHex);
+        // And the two colours are where the swatches left them, which is the last one pressed of
+        // each row. This used to assert that the ink was untouched — it was the one field with no
+        // control of its own, and now it has six and a picker.
+        Assert.EndsWith(
+            SubtitleStyleViewModel.ForegroundSwatches[0][1..],
+            stored.SubtitleStyle.ForegroundHex,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.EndsWith(
+            SubtitleStyleViewModel.BackgroundSwatches[0][1..],
+            stored.SubtitleStyle.BackgroundHex,
+            StringComparison.OrdinalIgnoreCase);
+
+        // And nothing outside the style was disturbed: it is one field of a row that also carries
+        // the track choices, so saving it has to leave the rest as it was.
+        Assert.Equal(chosen.FontFamily, stored.SubtitleStyle.FontFamily);
     }
 
     /// <summary>
@@ -5109,6 +5242,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             && centre.Y >= corner.Y
             && centre.X <= corner.X + scroller.Viewport.Width
             && centre.Y <= corner.Y + scroller.Viewport.Height);
+
+    /// <summary>The control's own rectangle in window coordinates.</summary>
+    /// <remarks>
+    /// The whole of it and not its middle, which is the difference between a control that can be
+    /// pressed and one that merely has a centre somewhere legal. Measured on 2026-08-25: a density
+    /// pill 36 px tall resting at y=964 in a 1000 px window had its centre at 982 — inside by every
+    /// arithmetic — and eight presses reached the scroller behind it, because the half of it below
+    /// the fold was the half the viewer had stopped drawing.
+    /// </remarks>
+    private static Rect Whole(Control control, Point corner) => new(corner, control.Bounds.Size);
+
+    /// <summary>Whether a window point falls inside what this scroller is actually showing.</summary>
+
 
     /// <summary>
     /// Presses a control with the mouse, at its centre in window coordinates, the way a person with a
