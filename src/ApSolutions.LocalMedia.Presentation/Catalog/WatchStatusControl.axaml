@@ -56,22 +56,43 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource WatchStatusManualOverride}"
         TextWrapping="Wrap" />
 
-    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+    <!--
+      The three decisions, in the shape the column beside them already uses: a full-width row with an
+      icon and the name. They were pills in a WrapPanel, so «Marcar como visto» and «Marcar como no
+      visto» were two short controls of different widths above two full-width rows — a column with
+      two grammars in it. Same names, same commands, same order; only the shape moved.
+    -->
+    <StackPanel Spacing="{DynamicResource Space4}">
       <Button
           x:Name="MarkWatchedButton"
+          Classes="action-row"
           Command="{Binding MarkWatchedCommand}"
-          Content="{DynamicResource WatchStatusMarkWatched}"
-          automation:AutomationProperties.Name="{DynamicResource WatchStatusMarkWatched}" />
+          automation:AutomationProperties.Name="{DynamicResource WatchStatusMarkWatched}">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
+          <Path Classes="icon size-16" Data="{DynamicResource IconCheck}" />
+          <TextBlock Grid.Column="1" Text="{DynamicResource WatchStatusMarkWatched}" />
+        </Grid>
+      </Button>
       <Button
           x:Name="MarkNotStartedButton"
+          Classes="action-row"
           Command="{Binding MarkNotStartedCommand}"
-          Content="{DynamicResource WatchStatusMarkNotStarted}"
-          automation:AutomationProperties.Name="{DynamicResource WatchStatusMarkNotStarted}" />
+          automation:AutomationProperties.Name="{DynamicResource WatchStatusMarkNotStarted}">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
+          <Path Classes="icon size-16" Data="{DynamicResource IconClose}" />
+          <TextBlock Grid.Column="1" Text="{DynamicResource WatchStatusMarkNotStarted}" />
+        </Grid>
+      </Button>
       <Button
           x:Name="ClearOverrideButton"
+          Classes="action-row"
           Command="{Binding ClearOverrideCommand}"
-          Content="{DynamicResource WatchStatusClearOverride}"
-          automation:AutomationProperties.Name="{DynamicResource WatchStatusClearOverride}" />
-    </WrapPanel>
+          automation:AutomationProperties.Name="{DynamicResource WatchStatusClearOverride}">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
+          <Path Classes="icon size-16" Data="{DynamicResource IconReset}" />
+          <TextBlock Grid.Column="1" Text="{DynamicResource WatchStatusClearOverride}" />
+        </Grid>
+      </Button>
+    </StackPanel>
   </StackPanel>
 </UserControl>
