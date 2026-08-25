@@ -1420,6 +1420,21 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Null(host.ViewModel.Player!.Resume);
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
 
+        // And the progress goes back, because playing it is what spends it. The sample is ninety
+        // seconds long and Continue opens it at thirty; a runner busy enough to take three minutes
+        // over the next few presses lets the rest of it play out, the tracker stores the end, and
+        // the film stops being something to continue — so the hero, which is drawn only when there
+        // is, is not on the surface for the press below. CI measured exactly that on 2026-08-25:
+        // this scene passed three runs and failed the fourth on "Home came back without the hero's
+        // Details on it", with nothing between them that touched the walk.
+        //
+        // Seeding it again is the same answer the two «from the start» presses further down already
+        // needed, and for the same reason written the other way round: what the hero offers is a
+        // fact about stored progress, so a scene that spends the progress has to put it back rather
+        // than hope the machine was quick.
+        await SeedProgressAsync();
+        await home.LoadAsync(TestContext.Current.CancellationToken);
+
         // The hero's second action, which the prototype has had all along: the card of the same
         // title, reached the way the grid reaches it. The route is what is probed because that is
         // what changes — the card it opens is the library's, and Home is left behind.
@@ -1474,6 +1489,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "a rail card's Continue opened a session that never reached the playing state");
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // And put it back again, for the reason the hero's own Continue needed it above: this rail
+        // shows what somebody is part way through, so a session that played itself out takes the
+        // card off the rail and the press below has nothing to aim at.
+        await SeedProgressAsync();
+        await home.LoadAsync(TestContext.Current.CancellationToken);
 
         // «Desde el principio», which arrived on both wide surfaces on 2026-08-25. It opens the same
         // session Continue does and differs in one thing only — the minute it starts at — so what is
