@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los iconos son los del prototipo, y ahora lo dice una puerta y no un comentario.**
+  `PrototypeIconTests` lee `design/AP Reelume.dc.html`, saca el mapa de su función `icon(n, s)` y
+  compara **carácter por carácter** las dieciséis formas que están hechas sólo de trazados. Las que
+  llevan un rectángulo o un círculo se convirtieron en los arcos que los dibujan, así que no hay
+  cadena que comparar y están **nombradas** como conversiones en vez de saltadas en silencio — un
+  salto que nadie escribe es como una puerta se vuelve ciega en vez de roja. Y la suma cuadra: toda
+  geometría que el tema declara está o copiada, o convertida, o declarada como propia de esta
+  aplicación con su razón.
+
+- **`HasPlayerPanels` tenía una rama que nada podía tomar.** El término del panel de subtítulos es
+  `Player?.Tracks is not null`, y también lo es la mitad de `HasAudioPanel`, que se evalúa antes: en
+  el momento en que la cadena llegaba al subtítulo, la lista de pistas ya se sabía ausente y el
+  término sólo podía contestar «no». La puerta de cobertura fue lo que lo vio. Se ha borrado —la
+  regla de este árbol para una rama así es hacerla alcanzable o quitarla, nunca escribirle una prueba
+  imposible— y las cuatro alternativas que quedan se piden ahora una a una.
+
 - **Una carpeta de episodios ya es una serie.** Es el defecto característico de este repositorio en
   su forma más grande: `titles`, `seasons`, `episodes` y `episode_media` existen desde la migración
   0004, la ficha de serie está dibujada y enrutada desde que se escribió, y **nada había escrito

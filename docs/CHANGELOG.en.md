@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The icons are the prototype's, and now a gate says so rather than a comment.**
+  `PrototypeIconTests` reads `design/AP Reelume.dc.html`, pulls the map out of its `icon(n, s)`
+  function, and compares **character for character** the sixteen shapes that are made of paths alone.
+  The ones carrying a rectangle or a circle became the arcs that draw them, so there is no string to
+  compare and they are **named** as conversions rather than quietly skipped — a skip nobody writes
+  down is how a gate becomes blind instead of red. And the set adds up: every geometry the theme
+  declares is either copied, converted, or declared as this application's own with its reason.
+
+- **`HasPlayerPanels` carried a branch nothing could take.** The subtitle panel term is
+  `Player?.Tracks is not null`, and so is half of `HasAudioPanel`, which is evaluated first: by the
+  time the chain reached the subtitle term, the track list was already known to be absent and the
+  term could only ever answer no. The coverage gate is what saw it. It has been deleted — this
+  tree's rule for a branch like that is to make it reachable or remove it, never to write it an
+  impossible test — and the four alternatives left are now asked for one at a time.
+
 - **A folder of episodes is a series now.** It is this repository's characteristic defect in its
   largest form: `titles`, `seasons`, `episodes` and `episode_media` have existed since migration
   0004, the series card has been drawn and routed to since it was written, and **nothing had ever

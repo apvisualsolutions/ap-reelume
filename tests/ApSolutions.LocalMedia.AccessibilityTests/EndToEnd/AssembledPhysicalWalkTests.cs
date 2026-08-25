@@ -2603,6 +2603,26 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking it again never brought the picture back into the shell");
         Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
 
+        // And the same button with no shell above it to reach, which is the arm the composition
+        // writes and nothing had ever taken. The bar travels: the mini window mounts the very same
+        // control, and a session outlives more than one call of that handler, so the shell is asked
+        // for at the moment of the press rather than captured. What that buys is exactly this — a
+        // press with no shell does nothing instead of throwing — and the way to measure it is to
+        // take the shell away and press anyway.
+        var shellHost = host.Application.Services.GetRequiredService<CompositionRoot.ShellHost>();
+        var live = shellHost.Shell;
+        shellHost.Shell = null;
+        try
+        {
+            await host.ViewModel.Player!.Player.ModeHandler!(PlaybackMode.Fullscreen);
+        }
+        finally
+        {
+            shellHost.Shell = live;
+        }
+
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
+
         await PressAsync(
             host,
             "PlayerStopAction",
