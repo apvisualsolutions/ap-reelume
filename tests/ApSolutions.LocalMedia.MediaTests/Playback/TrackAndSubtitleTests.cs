@@ -52,6 +52,31 @@ public sealed class TrackAndSubtitleTests
         await engine.StopAsync(TestContext.Current.CancellationToken);
     }
 
+    /// <summary>
+    /// The engine with nothing open answers about its tracks rather than inventing an answer.
+    /// </summary>
+    /// <remarks>
+    /// A snapshot names which audio and which subtitle are <b>in force</b>, and there is a state in
+    /// which neither is: before a media is open. That state is what a session's panel is built in,
+    /// so the answer for it has to be «none» rather than a number nobody can select.
+    /// </remarks>
+    [Fact]
+    public async Task An_engine_with_no_media_reports_no_track_in_force()
+    {
+        await using var factory = LibVlcFactory.CreateHeadless();
+        await using var engine = new LibVlcMediaPlayerEngine(factory);
+
+        var beforeInitialise = await engine.GetSnapshotAsync(TestContext.Current.CancellationToken);
+        Assert.Null(beforeInitialise.ActiveAudioTrackId);
+        Assert.Null(beforeInitialise.ActiveSubtitleTrackId);
+        Assert.Empty(beforeInitialise.Tracks);
+
+        await engine.InitializeAsync(TestContext.Current.CancellationToken);
+        var afterInitialise = await engine.GetSnapshotAsync(TestContext.Current.CancellationToken);
+        Assert.Null(afterInitialise.ActiveAudioTrackId);
+        Assert.Null(afterInitialise.ActiveSubtitleTrackId);
+    }
+
     [Fact]
     public async Task An_internal_subtitle_track_can_be_selected_and_switched_off()
     {

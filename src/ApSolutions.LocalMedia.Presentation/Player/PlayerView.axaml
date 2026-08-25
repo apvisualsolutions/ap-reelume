@@ -177,6 +177,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
       a themed background; this sits beside a frame, and a light-themed strip under a dark picture is
       the seam the whole player surface exists to avoid.
     -->
+    <!--
+      IsVisible and not Opacity, and the difference matters: hiding the chrome while a film plays is
+      a fade, so the bar stays in the focus and automation trees and a keyboard never loses it. This
+      is the other thing — the picture is in the small window, which draws five buttons of its own,
+      and a bar that only went transparent there would still be 120 px of nothing between them and
+      the picture.
+    -->
     <Border
         x:Name="TransportControlsSurface"
         Padding="20,14,20,16"
@@ -185,6 +192,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         TextElement.Foreground="{DynamicResource PlayerTextBrush}"
         BorderBrush="{DynamicResource PlayerHairlineBrush}"
         BorderThickness="0,1,0,0"
+        IsVisible="{Binding HasFullTransport}"
         Opacity="{Binding ControlsOpacity}"
         automation:AutomationProperties.Name="{DynamicResource PlayerTransportName}">
       <StackPanel Spacing="{DynamicResource Space8}">

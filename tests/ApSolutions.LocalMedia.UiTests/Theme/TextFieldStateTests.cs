@@ -91,7 +91,7 @@ public sealed class TextFieldStateTests
         var theme = Resolve(themeName);
         using var scene = new Scene(theme);
 
-        var painted = scene.Read(":focus");
+        var painted = scene.Read(":focus-visible");
 
         // Measured: the template painted #0078D7 in all four themes — including the one whose focus
         // colour is #FFFF00. The application style that sets BorderBrush on a focused TextBox does
@@ -212,7 +212,10 @@ public sealed class TextFieldStateTests
 
         public Painted Read(string? state)
         {
-            foreach (var candidate in new[] { ":pointerover", ":focus", ":disabled" })
+            // :focus-visible, because that is the selector the ring is written with: it answers to
+            // the keyboard and not to a pointer, which is what stopped every clicked control from
+            // wearing a ring nobody asked for.
+            foreach (var candidate in new[] { ":pointerover", ":focus-visible", ":disabled" })
             {
                 ((IPseudoClasses)_field.Classes).Set(candidate, candidate == state);
             }

@@ -136,9 +136,68 @@ public sealed class AccentPaletteTests
     {
         // Picking exactly the light theme's focus ring: it reads against the page, so nothing but
         // the collision would move it.
+        //
+        // What this does NOT assert is that the two are far enough apart to tell apart by eye, and
+        // that is a limitation rather than an oversight: the nudge is one step of the same lightness
+        // walk, so it returns #00599A for a ring of #005A9C — a different colour by the byte and the
+        // same colour to a person. Whether one signal doing two jobs is fixed by moving one step or
+        // by demanding a ratio is a decision about how the interface looks, and it has not been
+        // taken. Measured on 2026-08-25 and written down rather than asserted away.
         var tones = AccentPalette.Derive("#005A9C", "#FBFCFE", "#005A9C");
         Assert.NotEqual("#005A9C", tones.Accent);
         Assert.True(AccentPalette.Contrast(tones.Accent, "#FBFCFE") >= 3.0);
+
+        // And the same on the dark page, where the walk goes the other way.
+        var onDark = AccentPalette.Derive("#7CC4FF", "#08090C", "#7CC4FF");
+        Assert.NotEqual("#7CC4FF", onDark.Accent);
+        Assert.True(AccentPalette.Contrast(onDark.Accent, "#08090C") >= 3.0);
+    }
+
+    /// <summary>
+    /// The ends of the scale, where the walk has nowhere left to go and has to answer anyway.
+    /// </summary>
+    /// <remarks>
+    /// Black on a white page reads, so it is kept; it is also the focus ring here, so the nudge is
+    /// asked to move it — and every step of a walk that starts at black and goes darker is off the
+    /// scale before it begins. The answer is black again: the walk runs out rather than looping, and
+    /// what comes back is the end it was walking towards. That the accent and the ring end up equal
+    /// in this one case is the truth about a page painted in two colours, not a defect this can fix.
+    /// </remarks>
+    [Fact]
+    public void A_walk_with_nowhere_left_to_go_answers_with_the_end_of_the_scale()
+    {
+        var onWhite = AccentPalette.Derive("#000000", "#FFFFFF", "#000000");
+        Assert.Equal("#000000", onWhite.Accent);
+        Assert.True(AccentPalette.Contrast(onWhite.Accent, "#FFFFFF") >= 3.0);
+
+        var onBlack = AccentPalette.Derive("#FFFFFF", "#000000", "#FFFFFF");
+        Assert.Equal("#FFFFFF", onBlack.Accent);
+        Assert.True(AccentPalette.Contrast(onBlack.Accent, "#000000") >= 3.0);
+    }
+
+    /// <summary>
+    /// A pick that already reads is kept byte for byte, which is what makes the nudge above possible.
+    /// </summary>
+    [Fact]
+    public void A_colour_that_already_reads_comes_back_exactly_as_it_was_handed_over()
+    {
+        Assert.Equal("#1769AA", AccentPalette.Derive("#1769AA", "#FBFCFE", "#005A9C").Accent);
+        Assert.Equal("#7CC4FF", AccentPalette.Derive("#7CC4FF", "#08090C", "#005A9C").Accent);
+    }
+
+    [Fact]
+    public void The_text_on_an_accent_is_whichever_of_black_and_white_reads_on_it()
+    {
+        Assert.Equal("#FFFFFF", AccentPalette.Derive("#10243A", "#FBFCFE", "#005A9C").Text);
+        Assert.Equal("#000000", AccentPalette.Derive("#F2E205", "#08090C", "#7CC4FF").Text);
+    }
+
+    [Fact]
+    public void A_contrast_asked_about_something_that_is_not_a_colour_is_refused()
+    {
+        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Contrast("nope", "#FFFFFF"));
+        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Contrast("#FFFFFF", "nope"));
+        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Split("nope"));
     }
 
     private static IEnumerable<string> Wheel()

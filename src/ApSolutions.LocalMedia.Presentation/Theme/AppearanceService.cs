@@ -121,6 +121,18 @@ public sealed class AppearanceService : IAppearanceService
     private readonly IBackdropService _backdropService;
 
     /// <summary>
+    /// The window on screen, which is an ambient fact rather than one this service can derive.
+    /// </summary>
+    /// <remarks>
+    /// A delegate and not a lookup, for a reason a comment cannot argue away: an application's
+    /// lifetime cannot be replaced once it has started, so a host without a desktop lifetime — which
+    /// is every automated one — could never reach the two lines that put the material on a window or
+    /// take it off. What is passed here in the product is exactly the lookup that used to be written
+    /// inline; what is passed in a measurement is a window somebody made.
+    /// </remarks>
+    private readonly Func<Window?> _liveWindow;
+
+    /// <summary>
     /// The tint the theme declares, read once at construction.
     /// </summary>
     /// <remarks>
@@ -134,12 +146,14 @@ public sealed class AppearanceService : IAppearanceService
         Avalonia.Application application,
         ISettingsStore settingsStore,
         IThemeService themeService,
-        IBackdropService backdropService)
+        IBackdropService backdropService,
+        Func<Window?>? liveWindow = null)
     {
         _application = application ?? throw new ArgumentNullException(nameof(application));
         _settingsStore = settingsStore ?? throw new ArgumentNullException(nameof(settingsStore));
         _themeService = themeService ?? throw new ArgumentNullException(nameof(themeService));
         _backdropService = backdropService ?? throw new ArgumentNullException(nameof(backdropService));
+        _liveWindow = liveWindow ?? LiveWindow;
         _declaredTint = Scalar("AccentTintOpacity", 0.156);
         Current = Read();
         Write(Current);
@@ -297,10 +311,7 @@ public sealed class AppearanceService : IAppearanceService
     /// </remarks>
     private void WriteBackdrop(bool mica)
     {
-        if (_application.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime
-            {
-                MainWindow: { } window,
-            })
+        if (_liveWindow() is not { } window)
         {
             return;
         }
@@ -313,6 +324,10 @@ public sealed class AppearanceService : IAppearanceService
 
         window.TransparencyLevelHint = [WindowTransparencyLevel.None];
     }
+
+    /// <summary>The main window of a desktop application, and nothing at all anywhere else.</summary>
+    private Window? LiveWindow() =>
+        (_application.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
 
     private void WriteAccent(string accent)
     {

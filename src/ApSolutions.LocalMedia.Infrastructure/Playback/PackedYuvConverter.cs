@@ -50,7 +50,11 @@ public static class PackedYuvConverter
         int sourceStride,
         int destinationStride)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+        // The width is paired rather than merely positive: the format carries one chroma sample for
+        // every two pixels, so an odd width names a pixel with no partner. Refusing it here is what
+        // lets the loop below be the loop and nothing else — the caller aligns first, and AlignWidth
+        // is the one place that decides how.
+        ArgumentOutOfRangeException.ThrowIfNotEqual(width, AlignWidth(width));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
         ArgumentOutOfRangeException.ThrowIfLessThan(sourceStride, width * SourceBytesPerPixel);
         ArgumentOutOfRangeException.ThrowIfLessThan(destinationStride, width * DestinationBytesPerPixel);
@@ -75,15 +79,6 @@ public static class PackedYuvConverter
                 var secondLuma = read[at + 3] - 16;
                 WritePixel(write[(pair * 8)..], firstLuma, u, v);
                 WritePixel(write[((pair * 8) + 4)..], secondLuma, u, v);
-            }
-
-            // An odd width has a luma with no partner. It cannot happen through AlignWidth, and
-            // repeating the neighbour rather than leaving a black column is what keeps a caller
-            // that bypassed the alignment from drawing a stripe down the edge of the picture.
-            if (width % 2 == 1 && pairs > 0)
-            {
-                var previous = destination.Slice((row * destinationStride) + ((width - 2) * 4), 4);
-                previous.CopyTo(destination.Slice((row * destinationStride) + ((width - 1) * 4), 4));
             }
         }
     }

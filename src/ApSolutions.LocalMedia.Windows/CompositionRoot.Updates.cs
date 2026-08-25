@@ -138,7 +138,7 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<ISettingsStore>()))
             .AddSingleton<IHighContrastService, WindowsHighContrastService>()
             .AddSingleton<IThemeService>(provider => new FluentThemeService(
-                Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized."),
+                RequireApplication(),
                 provider.GetRequiredService<ISettingsStore>(),
                 provider.GetRequiredService<IBackdropService>(),
                 provider.GetRequiredService<IReducedMotionService>(),
@@ -147,12 +147,12 @@ public static partial class CompositionRoot
             // metadata language all read what this service applied, never the machine's culture.
             .AddSingleton<ILanguageService>(provider => new StoredLanguageService(
                 provider.GetRequiredService<ISettingsStore>(),
-                Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized.")))
+                RequireApplication()))
             // Built once and eagerly, because its constructor is what paints the stored preferences
             // onto the application: a service that only existed when Settings was opened would mean
             // a library drawn with the default cover until somebody went looking for the page.
             .AddSingleton<IAppearanceService>(provider => new AppearanceService(
-                Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized."),
+                RequireApplication(),
                 provider.GetRequiredService<ISettingsStore>(),
                 provider.GetRequiredService<IThemeService>(),
                 provider.GetRequiredService<IBackdropService>()))
@@ -161,4 +161,17 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<ILanguageService>(),
                 provider.GetRequiredService<IAppearanceService>()))
             .AddTransient<ScanSettingsViewModel>();
+
+    /// <summary>
+    /// The running application, which three services need and none of them can invent.
+    /// </summary>
+    /// <remarks>
+    /// One sentence in one place rather than the same guard written out at each registration. It was
+    /// three copies, and three copies of a branch nothing in a hosted test can take is three points
+    /// of branch coverage spent saying the same thing — which is what the ratchet noticed when the
+    /// third arrived.
+    /// </remarks>
+    private static Avalonia.Application RequireApplication() =>
+        Avalonia.Application.Current
+        ?? throw new InvalidOperationException("Avalonia application is not initialized.");
 }
