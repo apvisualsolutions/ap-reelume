@@ -78,11 +78,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ComboBox>
     </StackPanel>
 
+    <!--
+      The label wraps, and that is the whole fix: a CheckBox measures its content with infinite width
+      and draws it where it falls, so «Recordar para toda la serie» ran past the right edge of a
+      320 px column — the word and its dotted disabled outline both cut off. A TextBlock that wraps
+      inside the content is what gives the check box a width to work with.
+    -->
     <CheckBox
         x:Name="RememberForSeriesToggle"
         IsEnabled="{Binding CanRememberForSeries}"
         IsChecked="{Binding RememberForSeries, Mode=TwoWay}"
-        automation:AutomationProperties.Name="{DynamicResource TrackSelectorRememberForSeries}"
-        Content="{DynamicResource TrackSelectorRememberForSeries}" />
+        automation:AutomationProperties.Name="{DynamicResource TrackSelectorRememberForSeries}">
+      <TextBlock
+          Text="{DynamicResource TrackSelectorRememberForSeries}"
+          TextWrapping="Wrap" />
+    </CheckBox>
   </StackPanel>
 </UserControl>
