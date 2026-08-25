@@ -54,7 +54,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Height="260"
         IsHitTestVisible="False"
         Opacity="{DynamicResource PosterArtOpacity}">
-      <Border Background="{DynamicResource AccentBrush}" Opacity="0.156">
+      <Border Background="{DynamicResource AccentBrush}" Opacity="{DynamicResource AccentTintOpacity}">
         <Border.OpacityMask>
           <RadialGradientBrush Center="10%,0%" GradientOrigin="10%,0%" RadiusX="120%" RadiusY="100%">
             <GradientStop Offset="0" Color="#FFFFFFFF" />

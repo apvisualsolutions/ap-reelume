@@ -8,6 +8,62 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Fixed
+
+- **Button labels looked low even with their box centred, and this time with the number first.**
+  `ButtonInkTests` centred the box in August and said in writing that it did not measure glyphs; the
+  owner kept seeing it crooked and was right. Measured through the font's own metrics: the run of ink
+  — the top of a capital to the foot of a descender — sat **2.43 px below** the middle of a 44 px
+  button. Five pixels of bottom padding move it up two and a half, the number is derived rather than
+  tuned by eye, and `ButtonOpticalCentreTests` holds it to the pixel. Buttons whose content is a
+  glyph do not carry it: an icon is centred by its own geometry and has no baseline to compensate.
+
+- **The accent changed almost nothing in the application.** Four brushes were written and Fluent's
+  controls read their own, which the token file points at the accent with `<StaticResource>` — a
+  **static** reference, resolved once when the dictionary loads. So neither the sliders, the check
+  boxes, the radios nor list selection followed the chosen colour. All twenty redirections are
+  written now as well as the four tokens, and `AccentTokenTests` reads the same file to insist none
+  is missing: a redirection added next year and forgotten here would be a control keeping whichever
+  accent it was built with, and that cannot be caught by looking, because nineteen of the twenty do
+  change.
+
+- **The colour swatches carried a circle inside them.** It was the ● and ○ every pill row in this
+  tree spends, and on a circle of colour it reads as a radio button somebody dropped there. The
+  prototype says it with the swatch's own edge, and a ring is geometry exactly as the glyph was: both
+  high contrast dictionaries paint a border, so nothing is lost where colour says nothing.
+
+### Added
+
+- **A colour picker on all three rows that choose one**: the accent and the two subtitle colours.
+  The prototype opens the browser's; this opens the same shape out of controls this application
+  already owns — a grid of eight hues by five lightnesses over a row of greys, three sliders for
+  anything between them, a large swatch of what they make, and the value in a fixed-width face. The
+  grid is built in the domain rather than listed: the hues are spaced round the wheel and the
+  lightnesses up it, which is what makes a grid read as a grid.
+
+### Added
+
+- **Settings → Appearance with the prototype's eleven rows**, where it had two. Beside the theme and
+  the language: follow the Windows theme, accent colour with its six swatches and the value in a
+  fixed-width face, subtle Mica backdrop, accent tint on backgrounds, density, cover size, corner
+  rounding, show titles under covers, interface animations, and the row with no control saying the
+  player's surface is fixed. Each one writes into the resource the interface already read — the same
+  route reduced motion has reached the animations by since it was implemented — so none of them is a
+  stored preference that changes nothing.
+
+  **Three of them touched gates, and all three are declared again.** The custom accent against
+  `ContrastTokenTests`: its five obligations were met by hand-picking two colours per theme, which is
+  not something a person choosing their own can do. The family is **derived** now — hue and
+  saturation are theirs, lightness is walked until the ratio against the page it will be drawn on is
+  met — and `AccentPaletteTests` measures it by sweeping the whole wheel against both surfaces, 600
+  colours each. Corner rounding against `ScalarTokenTests`: both radii are written from one choice,
+  and `DensityGutter` is spent on the card rather than left declared with no reader. Density and
+  cover size against `ViewOverflowTests`: the grid already counted its columns by reading the token's
+  width, so moving the token moves the count.
+
+  In high contrast the accent is left alone: there it is a need rather than a taste, and what the
+  service does is remove its own writes instead of adding another on top.
+
 ### Added
 
 - **Playing takes everything but the picture away, and the mouse or a key brings it back.** The

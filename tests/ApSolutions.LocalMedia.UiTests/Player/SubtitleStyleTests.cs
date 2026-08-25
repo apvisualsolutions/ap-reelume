@@ -109,8 +109,8 @@ public sealed class SubtitleStyleTests
                 {
                     "SubtitleSizeSlider",
                     "SubtitleFamilySelector",
-                    "SubtitleForegroundBox",
-                    "SubtitleBackgroundBox",
+                    "SubtitleForegroundFirst",
+                    "SubtitleBackgroundFirst",
                     "SubtitleBackgroundOpacitySlider",
                     "SubtitleOutlineSlider",
                 };

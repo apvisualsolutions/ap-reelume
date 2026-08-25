@@ -103,6 +103,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <sys:TimeSpan x:Key="MotionDuration">00:00:00.160</sys:TimeSpan>
       <x:Double x:Key="PosterCardWidth">148</x:Double>
       <x:Double x:Key="PosterCardHeight">222</x:Double>
+      <!--
+        The four the Appearance page writes over, declared here so a host with no preference stored
+        renders exactly as this tree always drew it. AppearanceService reads the tint once at
+        construction and scales it, which is the same shape the motion duration already has: the
+        number lives here and the service spends a percentage of it, rather than a second 0.156
+        living in C# to disagree with this one.
+
+        DensityGutter and PosterCardPadding are one decision written twice because two readers need
+        two types: the library counts columns with the number and the card's own style needs a
+        Thickness. They are written together, from one value, in Write.
+      -->
+      <x:Double x:Key="AccentTintOpacity">0.156</x:Double>
+      <x:Double x:Key="DensityGutter">8</x:Double>
+      <Thickness x:Key="PosterCardPadding">8</Thickness>
+      <sys:Boolean x:Key="CoverTitlesVisible">True</sys:Boolean>
       <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>
       <!--
         Five sizes for the whole application, mapped from the thirteen literals the views carried:
@@ -1141,9 +1156,37 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="Button, ToggleButton">
     <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
-    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="Padding" Value="16,0,16,5" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <!--
+    And the ink inside that box, which is a second question and was still wrong after the first was
+    fixed. A font's ascent and descent are not symmetric: measured on 2026-08-25 through the font's
+    own metrics, a label centred to the pixel drew its run of ink — the top of a capital to the foot
+    of a descender — 2.43 px below the middle of a 44 px button. The box was centred and the words
+    still looked low, which is what the owner reported twice.
+
+    Five pixels of bottom margin move the line up two and a half, and the number is derived rather
+    than tuned: it is twice the measured offset, because a margin on one side moves a centred box by
+    half of it. ButtonOpticalCentreTests holds the result at a pixel, so a change of type family or
+    size fails there instead of being noticed by eye a month later.
+
+    On the label and not on the button, and by direct-child selector: a button whose content is a
+    glyph, or a row of a glyph and a word, must not have its icon shoved upwards. Only the TextBlock
+    the presenter makes for a plain string is touched.
+  -->
+  <!--
+    And taken back off the buttons whose content is a shape rather than a sentence. A glyph is
+    centred by its own geometry and has no baseline to compensate for, so the same five pixels that
+    put a word right would push an icon two and a half above the middle of its target. The presenter
+    takes its padding from the button by template binding, so this is where it has to be said.
+  -->
+  <Style Selector="Button.player-chrome">
+    <Setter Property="Padding" Value="0" />
+  </Style>
+  <Style Selector="Button.accent-swatch">
+    <Setter Property="Padding" Value="0" />
   </Style>
   <!--
     The ring is drawn twice, in two colours, one inside the other. Borrowing the control's own border
@@ -1300,7 +1343,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Foreground" Value="{DynamicResource PrimaryActionTextBrush}" />
     <!-- btnPri is the wider and heavier of the prototype's two: 0 20 against the secondary's 0 16. -->
     <Setter Property="FontWeight" Value="SemiBold" />
-    <Setter Property="Padding" Value="20,0" />
+    <Setter Property="Padding" Value="20,0,20,5" />
   </Style>
 
   <!--
@@ -1938,7 +1981,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="Padding" Value="8" />
+    <Setter Property="Padding" Value="{DynamicResource PosterCardPadding}" />
     <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
     <!--
@@ -1976,6 +2019,91 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="TextBlock.state-glyph">
     <Setter Property="FontSize" Value="{DynamicResource FontSizeSubtitle}" />
     <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!--
+    One of the six accent swatches: a circle of the colour it stands for, with the state glyph in
+    the middle. 28 is the prototype's own diameter and it has no token — the three scales this
+    repository gates are the type sizes, the five spaces and the two radii — but 44 is the target
+    area every other command control on this page takes, so the circle is 28 inside a 44 button
+    rather than a 28 px thing to aim at.
+
+    The border is what says which one is chosen at a glance, and the glyph is what says it in both
+    high contrasts, where the six fills resolve to one colour and a border alone would be six
+    identical rings.
+  -->
+  <Style Selector="Button.accent-swatch">
+    <Setter Property="MinWidth" Value="44" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="Width" Value="44" />
+    <Setter Property="Height" Value="44" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="22" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!--
+    The chosen swatch, said with the swatch's own edge. It carried the ● and ○ every pill row in this
+    tree spends, and the owner was right that it does not belong on a circle of colour: a small ring
+    drawn inside a large one reads as a radio button somebody dropped there. The prototype rings the
+    chosen swatch in the page's ink instead, and that is geometry in exactly the way the glyph was —
+    both high contrast dictionaries paint a border, so nothing is lost where colour says nothing.
+
+    Three pixels of border rather than one, which is what makes it a ring rather than a slightly
+    darker edge, and the fill stays the colour it stands for.
+  -->
+  <Style Selector="Button.accent-swatch.selected">
+    <Setter Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="BorderThickness" Value="3" />
+  </Style>
+
+  <!--
+    The seventh circle, which is the picker rather than a colour: it wears whatever is in force and
+    carries a chevron to say it opens something. Dashed while nothing custom is chosen, so a row of
+    six solid circles and one outline reads as "and anything else".
+  -->
+  <Style Selector="Button.accent-swatch.custom">
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+
+  <!--
+    One cell of the picker's grid. Square rather than round, and small: forty-eight of these are a
+    palette to sweep an eye across, not forty-eight things to aim at one by one — the six presets
+    above are the ones sized as targets.
+  -->
+  <Style Selector="Button.colour-cell">
+    <Setter Property="Width" Value="34" />
+    <Setter Property="Height" Value="26" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Margin" Value="1" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!--
+    The hue slider paints the wheel it runs along, which is the one thing a colour picker cannot say
+    in words. Six stops and the seventh back at red, because hue is a circle.
+  -->
+  <Style Selector="Slider.hue /template/ Border#TrackBackground">
+    <Setter Property="Background">
+      <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+        <GradientStop Offset="0" Color="#FF0000" />
+        <GradientStop Offset="0.166" Color="#FFFF00" />
+        <GradientStop Offset="0.333" Color="#00FF00" />
+        <GradientStop Offset="0.5" Color="#00FFFF" />
+        <GradientStop Offset="0.666" Color="#0000FF" />
+        <GradientStop Offset="0.833" Color="#FF00FF" />
+        <GradientStop Offset="1" Color="#FF0000" />
+      </LinearGradientBrush>
+    </Setter>
   </Style>
 
   <Style Selector="Button.theme-option">

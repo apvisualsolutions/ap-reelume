@@ -73,36 +73,285 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Grid>
     </Border>
 
+    <!--
+      The two colours, as swatches and a readout rather than as two fields to type six hexadecimal
+      digits into. Typing #RRGGBB is not choosing a colour: nothing on the row said what the value
+      would look like, a typo was a subtitle nobody could read, and the one thing a person actually
+      wants — the colour — was the one thing the control could not show.
+
+      Six inks and six grounds and a picker for anything else, which is the prototype's own accent
+      row applied here. The chosen one is ringed rather than ticked: a glyph inside a circle of
+      colour reads as a radio button dropped on a swatch, and a ring is geometry all the same, so
+      both high contrast dictionaries keep the cue.
+    -->
     <Border Classes="setting-row">
-      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
-        <TextBlock
-            Classes="setting-name"
-            VerticalAlignment="Center"
-            Text="{DynamicResource SubtitleStyleForegroundLabel}" />
-        <TextBox
-            x:Name="SubtitleForegroundBox"
-            Grid.Column="1"
-            Width="140"
-            VerticalAlignment="Center"
-            automation:AutomationProperties.Name="{DynamicResource SubtitleStyleForegroundLabel}"
-            Text="{Binding ForegroundHex, Mode=TwoWay}" />
-      </Grid>
+      <StackPanel Spacing="{DynamicResource Space8}">
+        <TextBlock Classes="setting-name" Text="{DynamicResource SubtitleStyleForegroundLabel}" />
+        <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+          <Button
+              x:Name="SubtitleForegroundFirst"
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsFirstForeground}"
+              Background="#FFFFFF"
+              Command="{Binding ApplyForegroundCommand}"
+              CommandParameter="#FFFFFF"
+              automation:AutomationProperties.Name="#FFFFFF" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsSecondForeground}"
+              Background="#F5F0E1"
+              Command="{Binding ApplyForegroundCommand}"
+              CommandParameter="#F5F0E1"
+              automation:AutomationProperties.Name="#F5F0E1" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsThirdForeground}"
+              Background="#F2E205"
+              Command="{Binding ApplyForegroundCommand}"
+              CommandParameter="#F2E205"
+              automation:AutomationProperties.Name="#F2E205" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsFourthForeground}"
+              Background="#7CE0E8"
+              Command="{Binding ApplyForegroundCommand}"
+              CommandParameter="#7CE0E8"
+              automation:AutomationProperties.Name="#7CE0E8" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsFifthForeground}"
+              Background="#C3CEDB"
+              Command="{Binding ApplyForegroundCommand}"
+              CommandParameter="#C3CEDB"
+              automation:AutomationProperties.Name="#C3CEDB" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsSixthForeground}"
+              Background="#0A0C10"
+              Command="{Binding ApplyForegroundCommand}"
+              CommandParameter="#0A0C10"
+              automation:AutomationProperties.Name="#0A0C10" />
+          <Button
+              x:Name="SubtitleForegroundCustom"
+              Classes="accent-swatch custom"
+              Classes.selected="{Binding IsCustomForeground}"
+              Background="{Binding ForegroundHex, Converter={StaticResource SubtitleColour}}"
+              ToolTip.Tip="{DynamicResource SubtitleStyleForegroundCustom}"
+              automation:AutomationProperties.Name="{DynamicResource SubtitleStyleForegroundCustom}">
+            <Path Classes="icon size-14" Data="{DynamicResource IconChevronDown}" Stroke="{DynamicResource TextPrimaryBrush}" />
+            <Button.Flyout>
+              <Flyout Placement="Bottom">
+                <StackPanel Width="304" Spacing="{DynamicResource Space12}">
+                  <TextBlock Classes="setting-name" Text="{DynamicResource SubtitleStyleForegroundCustom}" />
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space12}">
+                    <Ellipse
+                        Width="44"
+                        Height="44"
+                        Stroke="{DynamicResource ShellBorderBrush}"
+                        StrokeThickness="1"
+                        Fill="{Binding ForegroundHex, Converter={StaticResource SubtitleColour}}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        FontFamily="{DynamicResource FontFamilyMono}"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{Binding ForegroundHex}" />
+                  </Grid>
+                  <ItemsControl ItemsSource="{x:Static player:SubtitleStyleViewModel.ColourGrid}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="x:String">
+                        <Button
+                            x:Name="SubtitleForegroundGridCell"
+                            Classes="colour-cell"
+                            Background="{Binding ., Converter={StaticResource SubtitleColour}}"
+                            Command="{Binding $parent[player:SubtitleStyleView].((player:SubtitleStyleViewModel)DataContext).ApplyForegroundCommand}"
+                            CommandParameter="{Binding .}"
+                            ToolTip.Tip="{Binding .}"
+                            automation:AutomationProperties.Name="{DynamicResource AppearanceColourCell}"
+                            automation:AutomationProperties.HelpText="{Binding .}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentHue}" />
+                  <Slider
+                      x:Name="SubtitleForegroundHueSlider"
+                      Classes="hue"
+                      Minimum="0"
+                      Maximum="360"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                      Value="{Binding ForegroundHue, Mode=TwoWay}"
+                      automation:AutomationProperties.Name="{DynamicResource AppearanceAccentHue}" />
+                  <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentSaturation}" />
+                  <Slider
+                      x:Name="SubtitleForegroundSaturationSlider"
+                      Minimum="0"
+                      Maximum="100"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                      Value="{Binding ForegroundSaturation, Mode=TwoWay}"
+                      automation:AutomationProperties.Name="{DynamicResource AppearanceAccentSaturation}" />
+                  <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentLightness}" />
+                  <Slider
+                      x:Name="SubtitleForegroundLightnessSlider"
+                      Minimum="0"
+                      Maximum="100"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                      Value="{Binding ForegroundLightness, Mode=TwoWay}"
+                      automation:AutomationProperties.Name="{DynamicResource AppearanceAccentLightness}" />
+                </StackPanel>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
+          <TextBlock
+              x:Name="SubtitleForegroundReadout"
+              VerticalAlignment="Center"
+              FontFamily="{DynamicResource FontFamilyMono}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              Text="{Binding ForegroundHex}" />
+        </WrapPanel>
+      </StackPanel>
     </Border>
 
     <Border Classes="setting-row">
-      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
-        <TextBlock
-            Classes="setting-name"
-            VerticalAlignment="Center"
-            Text="{DynamicResource SubtitleStyleBackgroundLabel}" />
-        <TextBox
-            x:Name="SubtitleBackgroundBox"
-            Grid.Column="1"
-            Width="140"
-            VerticalAlignment="Center"
-            automation:AutomationProperties.Name="{DynamicResource SubtitleStyleBackgroundLabel}"
-            Text="{Binding BackgroundHex, Mode=TwoWay}" />
-      </Grid>
+      <StackPanel Spacing="{DynamicResource Space8}">
+        <TextBlock Classes="setting-name" Text="{DynamicResource SubtitleStyleBackgroundLabel}" />
+        <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+          <Button
+              x:Name="SubtitleBackgroundFirst"
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsFirstBackground}"
+              Background="#000000"
+              Command="{Binding ApplyBackgroundCommand}"
+              CommandParameter="#000000"
+              automation:AutomationProperties.Name="#000000" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsSecondBackground}"
+              Background="#0B0D10"
+              Command="{Binding ApplyBackgroundCommand}"
+              CommandParameter="#0B0D10"
+              automation:AutomationProperties.Name="#0B0D10" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsThirdBackground}"
+              Background="#1F2937"
+              Command="{Binding ApplyBackgroundCommand}"
+              CommandParameter="#1F2937"
+              automation:AutomationProperties.Name="#1F2937" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsFourthBackground}"
+              Background="#0B1E2F"
+              Command="{Binding ApplyBackgroundCommand}"
+              CommandParameter="#0B1E2F"
+              automation:AutomationProperties.Name="#0B1E2F" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsFifthBackground}"
+              Background="#2A1D12"
+              Command="{Binding ApplyBackgroundCommand}"
+              CommandParameter="#2A1D12"
+              automation:AutomationProperties.Name="#2A1D12" />
+          <Button
+              Classes="accent-swatch"
+              Classes.selected="{Binding IsSixthBackground}"
+              Background="#E9EEF4"
+              Command="{Binding ApplyBackgroundCommand}"
+              CommandParameter="#E9EEF4"
+              automation:AutomationProperties.Name="#E9EEF4" />
+          <Button
+              x:Name="SubtitleBackgroundCustom"
+              Classes="accent-swatch custom"
+              Classes.selected="{Binding IsCustomBackground}"
+              Background="{Binding BackgroundHex, Converter={StaticResource SubtitleColour}}"
+              ToolTip.Tip="{DynamicResource SubtitleStyleBackgroundCustom}"
+              automation:AutomationProperties.Name="{DynamicResource SubtitleStyleBackgroundCustom}">
+            <Path Classes="icon size-14" Data="{DynamicResource IconChevronDown}" Stroke="{DynamicResource TextPrimaryBrush}" />
+            <Button.Flyout>
+              <Flyout Placement="Bottom">
+                <StackPanel Width="304" Spacing="{DynamicResource Space12}">
+                  <TextBlock Classes="setting-name" Text="{DynamicResource SubtitleStyleBackgroundCustom}" />
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space12}">
+                    <Ellipse
+                        Width="44"
+                        Height="44"
+                        Stroke="{DynamicResource ShellBorderBrush}"
+                        StrokeThickness="1"
+                        Fill="{Binding BackgroundHex, Converter={StaticResource SubtitleColour}}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        FontFamily="{DynamicResource FontFamilyMono}"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{Binding BackgroundHex}" />
+                  </Grid>
+                  <ItemsControl ItemsSource="{x:Static player:SubtitleStyleViewModel.ColourGrid}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="x:String">
+                        <Button
+                            x:Name="SubtitleBackgroundGridCell"
+                            Classes="colour-cell"
+                            Background="{Binding ., Converter={StaticResource SubtitleColour}}"
+                            Command="{Binding $parent[player:SubtitleStyleView].((player:SubtitleStyleViewModel)DataContext).ApplyBackgroundCommand}"
+                            CommandParameter="{Binding .}"
+                            ToolTip.Tip="{Binding .}"
+                            automation:AutomationProperties.Name="{DynamicResource AppearanceColourCell}"
+                            automation:AutomationProperties.HelpText="{Binding .}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentHue}" />
+                  <Slider
+                      x:Name="SubtitleBackgroundHueSlider"
+                      Classes="hue"
+                      Minimum="0"
+                      Maximum="360"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                      Value="{Binding BackgroundHue, Mode=TwoWay}"
+                      automation:AutomationProperties.Name="{DynamicResource AppearanceAccentHue}" />
+                  <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentSaturation}" />
+                  <Slider
+                      x:Name="SubtitleBackgroundSaturationSlider"
+                      Minimum="0"
+                      Maximum="100"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                      Value="{Binding BackgroundSaturation, Mode=TwoWay}"
+                      automation:AutomationProperties.Name="{DynamicResource AppearanceAccentSaturation}" />
+                  <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentLightness}" />
+                  <Slider
+                      x:Name="SubtitleBackgroundLightnessSlider"
+                      Minimum="0"
+                      Maximum="100"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                      Value="{Binding BackgroundLightness, Mode=TwoWay}"
+                      automation:AutomationProperties.Name="{DynamicResource AppearanceAccentLightness}" />
+                </StackPanel>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
+          <TextBlock
+              x:Name="SubtitleBackgroundReadout"
+              VerticalAlignment="Center"
+              FontFamily="{DynamicResource FontFamilyMono}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              Text="{Binding BackgroundHex}" />
+        </WrapPanel>
+      </StackPanel>
     </Border>
 
     <Border Classes="setting-row">

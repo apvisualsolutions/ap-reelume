@@ -55,7 +55,13 @@ and a name here would be a second announcement of the same card.
       <Setter Property="Data" Value="{DynamicResource IconShow}" />
     </Style>
   </UserControl.Styles>
-  <StackPanel Spacing="{DynamicResource Space8}">
+  <!--
+    The gutter and not the fixed step: the Appearance page's density row is what decides how much
+    room a cover and the words under it take, and this is the gap it means. Compact, comfortable and
+    roomy write 4, 8 and 16 into it — 8 is what this card was drawn with, so a profile with nothing
+    stored is unchanged.
+  -->
+  <StackPanel Spacing="{DynamicResource DensityGutter}">
     <!--
     The hairline and not the control border: this rectangle separates a card from the one beside it
     and is not something to press, so it is the 1.8:1 brush the token split was made for.
@@ -166,6 +172,16 @@ and a name here would be a second announcement of the same card.
       </Panel>
     </Border>
     <!--
+    Everything under the cover, in one panel, because the Appearance page can turn all of it off:
+    the prototype's «Mostrar títulos bajo las portadas» leaves a wall of artwork and nothing else.
+    Nothing is lost to a reader when it goes — the button around the card carries the title as its
+    accessible name, which is where the full one has always lived.
+    -->
+    <StackPanel
+        x:Name="CoverCaption"
+        Spacing="{DynamicResource Space8}"
+        IsVisible="{DynamicResource CoverTitlesVisible}">
+    <!--
     One line and no more, ended by an ellipsis: a second line pushed the caption of one card below
     the caption of the card beside it, so a row of cards read as a ragged edge instead of a grid.
     The full title is still announced - the button around the card carries it as its name.
@@ -206,6 +222,7 @@ and a name here would be a second announcement of the same card.
           FontSize="{DynamicResource FontSizeCaption}"
           Foreground="{DynamicResource TextSecondaryBrush}"
           Text="{DynamicResource CatalogEpisodesSuffix}" />
+    </StackPanel>
     </StackPanel>
   </StackPanel>
 </UserControl>

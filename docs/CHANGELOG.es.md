@@ -8,6 +8,65 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Corregido
+
+- **El texto de los botones se veía bajo aunque su caja estuviera centrada, y esta vez con el número
+  delante.** `ButtonInkTests` centró la caja en agosto y dijo por escrito que no medía los glifos; el
+  propietario siguió viéndolo torcido y tenía razón. Medido con las métricas de la propia fuente: el
+  trazo de tinta —del alto de una mayúscula al pie de un descendente— caía **2,43 px por debajo** del
+  centro de un botón de 44. Cinco píxeles de relleno inferior lo suben dos y medio, el número se
+  deriva y no se ajusta a ojo, y `ButtonOpticalCentreTests` lo sostiene al píxel. Los botones cuyo
+  contenido es un glifo no lo llevan: un icono se centra por su geometría y no tiene línea base que
+  compensar.
+
+- **El acento no cambiaba casi nada de la aplicación.** Se escribían cuatro pinceles y los controles
+  de Fluent leen los suyos, que el archivo de tokens redirige al acento con `<StaticResource>` — una
+  referencia **estática**, resuelta una sola vez al cargar el diccionario. Así que ni los deslizadores,
+  ni las casillas, ni los radios, ni la selección de las listas seguían al color elegido. Ahora se
+  escriben las veinte redirecciones además de los cuatro tokens, y `AccentTokenTests` lee el mismo
+  archivo para exigir que no falte ninguna: una redirección añadida el año que viene y olvidada sería
+  un control que se queda con el acento con el que se compiló, y eso no se ve mirando la pantalla
+  porque diecinueve de veinte sí cambian.
+
+- **Las muestras de color llevaban un círculo dentro.** Era el ● y ○ que gasta cada fila de píldoras
+  de este árbol, y sobre un círculo de color se lee como un botón de opción que alguien dejó caer
+  encima. El prototipo lo dice con el borde de la propia muestra, y un anillo es geometría igual que
+  el glifo: los dos contrastes altos pintan un borde, así que no se pierde la señal donde el color no
+  dice nada.
+
+### Añadido
+
+- **Un selector de color en las tres filas que eligen uno**: el acento y los dos de los subtítulos.
+  El prototipo abre el del navegador; este abre la misma forma con controles que esta aplicación ya
+  tiene — una rejilla de ocho tonos por cinco luminosidades sobre una fila de grises, tres
+  deslizadores para cualquier color intermedio, una muestra grande de lo que hacen y el valor en
+  monoespaciada. La rejilla se construye en el dominio y no se lista: los tonos van repartidos por la
+  rueda y las luminosidades por la escala, que es lo que hace que una rejilla se lea como una rejilla.
+
+### Añadido
+
+- **Ajustes → Apariencia con las once filas del prototipo**, donde tenía dos. A las de tema e idioma
+  se suman: seguir el tema de Windows, color de acento con sus seis muestras y el valor en
+  monoespaciada, fondo Mica sutil, tinte de acento en los fondos, densidad, tamaño de las portadas,
+  redondeo de esquinas, mostrar títulos bajo las portadas, animaciones de la interfaz, y la fila sin
+  control que dice que la superficie del reproductor es fija. Cada una escribe en el recurso que la
+  interfaz ya leía —la misma vía por la que el movimiento reducido llega a las animaciones desde que
+  se implementó—, así que ninguna es una preferencia guardada que no cambia nada.
+
+  **Tres tocaban puertas y las tres se declaran de nuevo.** El acento personalizable contra
+  `ContrastTokenTests`: sus cinco obligaciones se cumplían eligiendo dos colores a mano por tema, y
+  eso no es algo que pueda hacer quien elige el suyo. Ahora la familia se **deriva** —tono y
+  saturación son de quien elige, la luminosidad se camina hasta cumplir la razón contra la página en
+  la que se va a dibujar— y lo mide `AccentPaletteTests` barriendo la rueda entera contra las dos
+  superficies, 600 colores por cada una. El redondeo contra `ScalarTokenTests`: los dos radios se
+  escriben desde una sola elección, y `DensityGutter` se gasta en la tarjeta en vez de quedar
+  declarado y sin lector. La densidad y el tamaño de portada contra `ViewOverflowTests`: la
+  cuadrícula ya contaba sus columnas leyendo el ancho del token, así que mover el token mueve la
+  cuenta.
+
+  En alto contraste el acento **no** se toca: allí es una necesidad y no un gusto, y lo que hace el
+  servicio es retirar sus propias escrituras en vez de añadir otra encima.
+
 ### Añadido
 
 - **Al reproducir se va todo menos la imagen, y vuelve al mover el ratón o pulsar una tecla.** La

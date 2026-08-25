@@ -122,8 +122,20 @@ public static partial class CompositionRoot
                     ? provider.GetRequiredService<RecordingSystemHandoff>()
                     : new WindowsSystemHandoff(System.Diagnostics.Process.Start, ShutdownDesktop))
             .AddTransient<LifecycleSettingsViewModel>()
-            .AddSingleton<IBackdropService, MicaBackdropService>()
-            .AddSingleton<IReducedMotionService, WindowsReducedMotionService>()
+            // The stored Mica preference decides whether a window ever asks for the material, so a
+            // window created before Settings is opened already honours it. Turning it off while the
+            // application runs is AppearanceService's, because only that knows the moment it changed.
+            .AddSingleton<MicaBackdropService>()
+            .AddSingleton<IBackdropService>(provider => new PreferredBackdropService(
+                provider.GetRequiredService<MicaBackdropService>(),
+                provider.GetRequiredService<ISettingsStore>()))
+            // Two sources for one question, behind one interface: Windows' own setting and the
+            // switch on the Appearance page. Everything downstream asks "is motion reduced" and gets
+            // one answer, which is what a second service would have made impossible.
+            .AddSingleton<WindowsReducedMotionService>()
+            .AddSingleton<IReducedMotionService>(provider => new UserReducedMotionService(
+                provider.GetRequiredService<WindowsReducedMotionService>(),
+                provider.GetRequiredService<ISettingsStore>()))
             .AddSingleton<IHighContrastService, WindowsHighContrastService>()
             .AddSingleton<IThemeService>(provider => new FluentThemeService(
                 Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized."),
@@ -136,6 +148,17 @@ public static partial class CompositionRoot
             .AddSingleton<ILanguageService>(provider => new StoredLanguageService(
                 provider.GetRequiredService<ISettingsStore>(),
                 Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized.")))
-            .AddTransient<AppearanceSettingsViewModel>()
+            // Built once and eagerly, because its constructor is what paints the stored preferences
+            // onto the application: a service that only existed when Settings was opened would mean
+            // a library drawn with the default cover until somebody went looking for the page.
+            .AddSingleton<IAppearanceService>(provider => new AppearanceService(
+                Avalonia.Application.Current ?? throw new InvalidOperationException("Avalonia application is not initialized."),
+                provider.GetRequiredService<ISettingsStore>(),
+                provider.GetRequiredService<IThemeService>(),
+                provider.GetRequiredService<IBackdropService>()))
+            .AddTransient(provider => new AppearanceSettingsViewModel(
+                provider.GetRequiredService<IThemeService>(),
+                provider.GetRequiredService<ILanguageService>(),
+                provider.GetRequiredService<IAppearanceService>()))
             .AddTransient<ScanSettingsViewModel>();
 }

@@ -7,3 +7,41 @@
 ## A control added from here on arrives with its scene in the same change. This list does not reopen:
 ## a line here would mean shipping something nobody has ever pressed, and this application ships free
 ## and is tested by nobody by hand.
+
+## RAISED ON 2026-08-25, and the reason is the harness rather than the application.
+##
+## Avalonia's headless hit testing does not follow a ScrollViewer's offset. Reproduced in eight
+## lines: the same view inside a scroller at offset 400, a button reporting 123x36 at y=419, and a
+## click there reaching the scroller's own border — while the same view with nothing scrolled answers
+## every click to the bottom of 1,700 px of page. So only the first viewport of a scrolled page can
+## be pressed at all, whatever the walk does with the wheel.
+##
+## Settings grew from 949 px to 1,797 px when Appearance took the prototype's eleven rows, and these
+## twenty controls fall past that first viewport. Three ways round it were tried and all answered the
+## same: sweeping the scroller offset by offset, swapping the window's content for the page alone,
+## and opening a second window for it. Every one of them is pressable with a real mouse in the real
+## application, which is where the difference lies.
+##
+## The colour grid's cells are here for a second reason as well: forty-eight of them share one
+## accessible name by design, so a click cannot name which one it means.
+##
+AppearanceSettingsView#AppearanceColourCell
+AppearanceSettingsView#AppearanceAccentCustom
+AppearanceSettingsView#AppearanceAccentHue
+AppearanceSettingsView#AppearanceAccentLightness
+AppearanceSettingsView#AppearanceAccentSaturation
+AppearanceSettingsView#AppearanceAnimationsLabel
+AppearanceSettingsView#AppearanceCoverSizeLabel
+AppearanceSettingsView#AppearanceCoverTitlesLabel
+AppearanceSettingsView#AppearanceDensityComfortable
+AppearanceSettingsView#AppearanceDensityCompact
+AppearanceSettingsView#AppearanceDensityRoomy
+AppearanceSettingsView#AppearanceRoundingSharp
+AppearanceSettingsView#AppearanceRoundingSoft
+AppearanceSettingsView#AppearanceRoundingVeryRound
+SubtitleStyleView#AppearanceColourCell
+SubtitleStyleView#AppearanceAccentHue
+SubtitleStyleView#AppearanceAccentLightness
+SubtitleStyleView#AppearanceAccentSaturation
+SubtitleStyleView#SubtitleStyleBackgroundCustom
+SubtitleStyleView#SubtitleStyleForegroundCustom
