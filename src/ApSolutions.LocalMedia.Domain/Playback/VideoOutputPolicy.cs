@@ -90,3 +90,54 @@ public static class VideoOutputPolicy
             unsupported);
     }
 }
+
+/// <summary>
+/// Where the picture is drawn inside the space it was given, in device-independent units.
+/// </summary>
+public readonly record struct VideoFrameBox(double X, double Y, double Width, double Height)
+{
+    /// <summary>True when the box leaves bars, which is what proves the shape was preserved.</summary>
+    public bool IsLetterboxed => Y > 0;
+
+    /// <summary>True when the box leaves bars at the sides instead of above and below.</summary>
+    public bool IsPillarboxed => X > 0;
+}
+
+/// <summary>
+/// Places the decoded picture inside the surface that shows it, keeping the shape it was decoded
+/// with. Stretching to the surface is what the player did until 2026-08-25: a 16:9 episode drawn
+/// into a window somebody had made taller came out taller too, and so did the picture-in-picture.
+/// </summary>
+/// <remarks>
+/// The rule is the one every player uses: scale by whichever axis runs out first and centre what is
+/// left, so the bars are shared rather than pushed to one side. Nothing here rounds — the caller
+/// draws in device-independent units and the renderer owns the pixel grid.
+/// </remarks>
+public static class VideoFitPolicy
+{
+    /// <summary>
+    /// The box a picture of <paramref name="frameWidth"/> by <paramref name="frameHeight"/> occupies
+    /// inside a surface of <paramref name="surfaceWidth"/> by <paramref name="surfaceHeight"/>.
+    /// A degenerate input on either side yields an empty box rather than a division by zero.
+    /// </summary>
+    public static VideoFrameBox Fit(
+        double frameWidth,
+        double frameHeight,
+        double surfaceWidth,
+        double surfaceHeight)
+    {
+        if (frameWidth <= 0 || frameHeight <= 0 || surfaceWidth <= 0 || surfaceHeight <= 0)
+        {
+            return default;
+        }
+
+        var scale = Math.Min(surfaceWidth / frameWidth, surfaceHeight / frameHeight);
+        var width = frameWidth * scale;
+        var height = frameHeight * scale;
+        return new VideoFrameBox(
+            (surfaceWidth - width) / 2,
+            (surfaceHeight - height) / 2,
+            width,
+            height);
+    }
+}

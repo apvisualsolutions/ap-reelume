@@ -222,13 +222,17 @@ public sealed record PlaybackSnapshot
         TimeSpan position,
         TimeSpan? duration,
         IReadOnlyList<MediaTrack> tracks,
-        PlaybackFailure? failure)
+        PlaybackFailure? failure,
+        string? activeAudioTrackId,
+        string? activeSubtitleTrackId)
     {
         State = state;
         Position = position;
         Duration = duration;
         Tracks = tracks;
         Failure = failure;
+        ActiveAudioTrackId = activeAudioTrackId;
+        ActiveSubtitleTrackId = activeSubtitleTrackId;
     }
 
     public PlaybackState State { get; }
@@ -241,13 +245,29 @@ public sealed record PlaybackSnapshot
 
     public PlaybackFailure? Failure { get; }
 
+    /// <summary>
+    /// The audio track the engine is actually playing, or null when the kind is off or unknown.
+    /// </summary>
+    /// <remarks>
+    /// What is announced and what is <em>in force</em> are different questions, and until 2026-08-25
+    /// nothing could ask the second one. It matters because the engine chooses on its own when
+    /// nobody has stored a preference — a container names a default track and LibVLC honours it —
+    /// so a surface that assumed «nothing stored means nothing playing» showed the wrong answer.
+    /// </remarks>
+    public string? ActiveAudioTrackId { get; }
+
+    /// <summary>The subtitle track in force, or null when subtitles are off.</summary>
+    public string? ActiveSubtitleTrackId { get; }
+
     /// <summary>Creates a snapshot whose position always stays inside the observed duration.</summary>
     public static PlaybackSnapshot Create(
         PlaybackState state,
         TimeSpan position,
         TimeSpan? duration,
         IReadOnlyList<MediaTrack> tracks,
-        PlaybackFailure? failure = null)
+        PlaybackFailure? failure = null,
+        string? activeAudioTrackId = null,
+        string? activeSubtitleTrackId = null)
     {
         ArgumentNullException.ThrowIfNull(tracks);
         var clamped = position < TimeSpan.Zero ? TimeSpan.Zero : position;
@@ -256,7 +276,14 @@ public sealed record PlaybackSnapshot
             clamped = observed;
         }
 
-        return new PlaybackSnapshot(state, clamped, duration, tracks, failure);
+        return new PlaybackSnapshot(
+            state,
+            clamped,
+            duration,
+            tracks,
+            failure,
+            activeAudioTrackId,
+            activeSubtitleTrackId);
     }
 }
 
@@ -395,4 +422,26 @@ public sealed class VideoFrameEventArgs(ReadOnlyMemory<byte> pixels, int width, 
 public interface IVideoFrameSource
 {
     event EventHandler<VideoFrameEventArgs>? FrameRendered;
+}
+
+/// <summary>
+/// Implemented by engines that choose a track on their own, so a surface can follow the choice
+/// instead of guessing it.
+/// </summary>
+/// <remarks>
+/// <para>
+/// LibVLC honours the flag a container puts on a track, and it makes that choice while the first
+/// frames decode — after the media is open, so a snapshot taken at open time reports nothing in
+/// force. Measured on 2026-08-25 against a real episode: seven tracks announced, the subtitle in
+/// force reported as none before playing and as track 6 three seconds later.
+/// </para>
+/// <para>
+/// The signal deliberately carries <b>nothing</b>. It is raised on the engine's own event thread,
+/// which must never call back into the player, so whoever listens asks
+/// <see cref="IMediaPlayerEngine.GetSnapshotAsync"/> from a thread that may.
+/// </para>
+/// </remarks>
+public interface IActiveTrackSource
+{
+    event EventHandler? ActiveTracksChanged;
 }
