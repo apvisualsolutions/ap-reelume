@@ -222,4 +222,31 @@ public sealed class LifecycleSettingsTests
             return true;
         }
     }
+
+    /// <summary>
+    /// Changing one of these says so to whoever is listening.
+    /// </summary>
+    /// <remarks>
+    /// The announcement's two halves are different code: with nobody attached it is a null check
+    /// that does nothing, and with somebody attached it is the only way a switch on screen learns
+    /// that the stored preference moved. The second half is what a person sees, and it was the one
+    /// nothing measured — every test here reads the properties back instead of listening.
+    /// </remarks>
+    [Fact]
+    public void What_changes_is_announced_to_whoever_is_listening()
+    {
+        var viewModel = new LifecycleSettingsViewModel(
+            new InMemorySettings(LifecyclePreferences.Default),
+            new StubStartupService());
+
+        var announced = new List<string>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+
+        viewModel.TrayEnabled = true;
+
+        Assert.Contains(nameof(viewModel.TrayEnabled), announced);
+        Assert.Contains(nameof(viewModel.TrayIsDisabled), announced);
+        Assert.Contains(nameof(viewModel.CanMinimizeToTray), announced);
+    }
+
 }

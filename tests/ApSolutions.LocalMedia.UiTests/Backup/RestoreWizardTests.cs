@@ -536,6 +536,14 @@ public sealed class RestoreWizardTests
         missing.NewPath = @"S:\shows";
         Assert.Equal("RestoreRootRemappedStatus", missing.StatusKey);
 
+        // And the row says what it now is, to whoever is listening: the wizard's own list redraws
+        // from the announcement, and every other assertion here reads the property back instead.
+        var announced = new List<string>();
+        missing.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+        missing.NewPath = @"S:\otra";
+        Assert.Contains(nameof(missing.NewPath), announced);
+        Assert.Contains(nameof(missing.StatusKey), announced);
+
         var unchanged = new RootRemapRowViewModel(
             new RootRemapDecision(@"R:\media", @"R:\media", RootRemapStatus.Unchanged));
         Assert.False(unchanged.NeedsFolder);
