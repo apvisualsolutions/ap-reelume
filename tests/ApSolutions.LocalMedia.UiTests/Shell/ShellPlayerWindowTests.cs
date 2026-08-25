@@ -153,24 +153,38 @@ public sealed class ShellPlayerWindowTests
         var left = surface.TranslatePoint(default, window)!.Value.X;
         Assert.Equal(64, left);
 
-        // The header, and its three buttons named in the language in force rather than by their
-        // glyphs — the glyph is what the eye lands on and the name is what a reader hears.
+        // The header, and the buttons this session actually draws, named in the language in force
+        // rather than by their glyphs — the glyph is what the eye lands on and the name is what a
+        // reader hears. Effectively visible and not merely declared: the five panel pills are
+        // declared on every session and drawn only by the ones that have those panels, and this
+        // file has none of them, so what is left is the three that are always there.
         var header = view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PlayerHeaderSurface");
         var headed = header.GetVisualDescendants()
             .OfType<Button>()
+            .Where(button => button.IsEffectivelyVisible)
             .Select(button => Avalonia.Automation.AutomationProperties.GetName(button) ?? string.Empty)
             .ToArray();
         Assert.Equal(
             ["Cerrar el reproductor", "Mini reproductor", "Pantalla completa"],
             headed);
         Assert.All(
-            header.GetVisualDescendants().OfType<Button>(),
+            header.GetVisualDescendants().OfType<Button>().Where(button => button.IsEffectivelyVisible),
             button => Assert.Contains("player-chrome", button.Classes));
 
-        // And the column: this session has no panel at all, so it takes no width.
+        // The pills are declared even here, and every one of them is a player-pill: a session that
+        // grew a track list must not find a pill wearing the wrong grammar.
+        Assert.Equal(
+            5,
+            header.GetVisualDescendants()
+                .OfType<Button>()
+                .Count(button => button.Classes.Contains("player-pill")));
+
+        // And the column: this session has no panel at all, so no pill is drawn, nothing has been
+        // opened, and it takes no width.
         Assert.False(viewModel.HasPlayerPanels);
-        // By name and not by type: the column became a TabControl when it stopped stacking its five
-        // panels and started switching between them, and what this measures is its width.
+        Assert.False(viewModel.IsPlayerPanelOpen);
+        // By name and not by type: the column was a TabControl until the pills took over the
+        // switching, and what this measures is its width.
         var column = view.GetVisualDescendants()
             .OfType<Control>()
             .Single(control => control.Name == "PlayerPanelColumn");

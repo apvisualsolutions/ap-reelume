@@ -272,7 +272,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerRecoveryExternalFailed">Windows no tiene ninguna aplicación asociada a este archivo.</x:String>
   <x:String x:Key="TrackSelectorAccessibleName">Pistas de audio y subtítulos</x:String>
   <x:String x:Key="TrackSelectorAudioLabel">Pista de audio</x:String>
-  <x:String x:Key="TrackSelectorSubtitleLabel">Subtítulos</x:String>
+  <x:String x:Key="TrackSelectorSubtitleLabel">Pista de subtítulos</x:String>
   <x:String x:Key="TrackSelectorSubtitlesDisabled">Sin subtítulos</x:String>
   <x:String x:Key="TrackSelectorRememberForSeries">Recordar para toda la serie</x:String>
   <x:String x:Key="SubtitleStyleAccessibleName">Estilo de subtítulos</x:String>
@@ -589,6 +589,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerCloseAction">Cerrar el reproductor</x:String>
   <x:String x:Key="PlayerMiniModeAction">Mini reproductor</x:String>
   <x:String x:Key="PlayerFullscreenAction">Pantalla completa</x:String>
+  <x:String x:Key="PlayerSessionBadge">Sesión {0} · motor único activo</x:String>
+  <x:String x:Key="PlayerPanelAudio">Audio</x:String>
+  <x:String x:Key="PlayerPanelSubtitles">Subtítulos</x:String>
+  <x:String x:Key="PlayerPanelVideo">Vídeo</x:String>
+  <x:String x:Key="PlayerPanelMarkers">Marcadores</x:String>
+  <x:String x:Key="PlayerPanelClose">Cerrar el panel</x:String>
+  <x:String x:Key="PlayerVideoHdrLabel">HDR</x:String>
+  <x:String x:Key="PlayerVideoHardwareBadge">Por hardware</x:String>
+  <x:String x:Key="PlayerVideoSoftwareBadge">Por software</x:String>
+  <x:String x:Key="PlayerVideoHdrBadge">HDR10</x:String>
+  <x:String x:Key="PlayerVideoSdrBadge">SDR</x:String>
+  <x:String x:Key="PlayerVideoScopeNote">Dolby Vision y el passthrough de Dolby y DTS quedan fuera de alcance.</x:String>
   <x:String x:Key="RootAddFailureAccessibleName">No se pudo añadir la carpeta</x:String>
   <x:String x:Key="RootAddDuplicate">Esa carpeta ya está en la biblioteca. No se ha añadido dos veces y no se ha tocado nada.</x:String>
   <x:String x:Key="RootAddNested">Esa carpeta está dentro de otra que ya está en la biblioteca, o la contiene. Elige una que no se solape.</x:String>

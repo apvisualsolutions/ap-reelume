@@ -28,7 +28,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           TextWrapping="Wrap" />
     </StackPanel>
 
-    <StackPanel Spacing="{DynamicResource Space4}">
+    <StackPanel
+        IsVisible="{Binding $parent[player:TrackSelectorView].ShowsAudio}"
+        Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource TrackSelectorAudioLabel}" />
@@ -56,7 +58,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ComboBox>
     </StackPanel>
 
-    <StackPanel Spacing="{DynamicResource Space4}">
+    <StackPanel
+        IsVisible="{Binding $parent[player:TrackSelectorView].ShowsSubtitles}"
+        Spacing="{DynamicResource Space4}">
       <TextBlock
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource TrackSelectorSubtitleLabel}" />
@@ -84,8 +88,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
       320 px column — the word and its dotted disabled outline both cut off. A TextBlock that wraps
       inside the content is what gives the check box a width to work with.
     -->
+    <!--
+      Under the audio half and not under both, because there is one setting and it governs the pair:
+      choosing to remember applies to whichever track was picked, audio or subtitle. Drawn twice it
+      would be two check boxes writing one value, and the second would look like a second decision.
+    -->
     <CheckBox
         x:Name="RememberForSeriesToggle"
+        IsVisible="{Binding $parent[player:TrackSelectorView].ShowsAudio}"
         IsEnabled="{Binding CanRememberForSeries}"
         IsChecked="{Binding RememberForSeries, Mode=TwoWay}"
         automation:AutomationProperties.Name="{DynamicResource TrackSelectorRememberForSeries}">

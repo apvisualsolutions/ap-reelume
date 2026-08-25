@@ -17,6 +17,7 @@ using ApSolutions.LocalMedia.Presentation.Onboarding;
 using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Settings;
+using ApSolutions.LocalMedia.Presentation.Show;
 using ApSolutions.LocalMedia.Presentation.Updates;
 
 namespace ApSolutions.LocalMedia.Presentation.Shell;
@@ -35,6 +36,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly AsyncRelayCommand _toggleFullscreen;
     private readonly AsyncRelayCommand _addMedia;
     private readonly AsyncRelayCommand _cancelAddMedia;
+    private readonly AsyncRelayCommand _closePlayerPanel;
+    private readonly PlayerPanelCommand _togglePlayerPanel;
     private bool _isAddingRoot;
     private int _reviewPendingCount;
     private SettingsSection _settingsSection = SettingsSection.Appearance;
@@ -44,6 +47,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private DuplicateReviewViewModel? _duplicates;
     private PlayerSurfaces? _player;
     private PlaybackMode _playbackMode = PlaybackMode.Embedded;
+    private PlayerPanel _playerPanel = PlayerPanel.None;
+    private int _playerSessionOrdinal;
 
     public ShellViewModel(INavigationService navigationService)
         : this(navigationService, appearanceSettings: null, library: null)
@@ -196,6 +201,14 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 return Task.CompletedTask;
             },
             () => IsAddingRoot);
+        _togglePlayerPanel = new PlayerPanelCommand(TogglePlayerPanel);
+        _closePlayerPanel = new AsyncRelayCommand(
+            () =>
+            {
+                PlayerPanel = PlayerPanel.None;
+                return Task.CompletedTask;
+            },
+            () => _playerPanel is not PlayerPanel.None);
 
         if (Library is { } libraryViewModel)
         {
@@ -245,6 +258,21 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public ICommand ToggleMiniPlayerCommand => _toggleMini;
 
     public ICommand ToggleFullscreenCommand => _toggleFullscreen;
+
+    /// <summary>
+    /// Opens the side panel named by the parameter, or closes it when it is the one already open.
+    /// </summary>
+    /// <remarks>
+    /// One command for the five pills rather than five commands, which is what the library's kind
+    /// filter already does: the parameter is the state, so a pill cannot open a panel and leave a
+    /// second pill claiming to be pressed. And a pill is a toggle rather than a tab — the prototype
+    /// gives the column's 320 px back to the picture when the open pill is pressed again, and a tab
+    /// strip has no way to say "none of them".
+    /// </remarks>
+    public ICommand TogglePlayerPanelCommand => _togglePlayerPanel;
+
+    /// <summary>The «×» in the panel column's own header; the same close the pill performs.</summary>
+    public ICommand ClosePlayerPanelCommand => _closePlayerPanel;
 
     /// <summary>
     /// The one control at the foot of the navigation rail: it opens the surface a folder is added on
@@ -351,6 +379,20 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         {
             if (SetField(ref _player, value))
             {
+                // A new session starts with its column closed and its own ordinal: the panel that
+                // was open belonged to the file that just left, and a badge that kept counting the
+                // previous one would be the only thing on this header still describing it.
+                if (value is not null)
+                {
+                    _playerSessionOrdinal++;
+                }
+
+                PlayerPanel = PlayerPanel.None;
+                OnPropertyChanged(nameof(PlayerSessionBadge));
+                OnPropertyChanged(nameof(HasAudioPanel));
+                OnPropertyChanged(nameof(HasSubtitlePanel));
+                OnPropertyChanged(nameof(HasVideoPanel));
+                OnPropertyChanged(nameof(HasMarkerPanel));
                 OnPropertyChanged(nameof(IsPlayerVisible));
                 OnPropertyChanged(nameof(PlayerTitle));
                 OnPropertyChanged(nameof(PlayerSubtitle));
@@ -542,9 +584,98 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// panel when there is one and gives the width back to the film when there is not.
     /// </remarks>
     public bool HasPlayerPanels =>
-        HasTracks || HasAudioOutput || HasMarkers || HasDetectedReview || HasPlayerVersions;
+        HasAudioPanel || HasSubtitlePanel || HasVideoPanel || HasMarkerPanel || HasPlayerVersions;
 
     public bool HasVideoStatus => Player?.VideoStatus is not null;
+
+    /// <summary>
+    /// The four pills the prototype heads the player with, plus the fifth this application keeps.
+    /// </summary>
+    /// <remarks>
+    /// The grouping is the prototype's and not this application's: audio tracks and the output
+    /// device are one subject to a person choosing what they hear, so they head one pill together
+    /// even though two view models answer for them. A pill with nothing behind it is not drawn —
+    /// a file with a single audio track and no other version has fewer than five.
+    /// </remarks>
+    public bool HasAudioPanel => Player?.Tracks is not null || HasAudioOutput;
+
+    public bool HasSubtitlePanel => Player?.Tracks is not null;
+
+    public bool HasVideoPanel => HasVideoStatus;
+
+    public bool HasMarkerPanel => HasMarkers || HasDetectedReview;
+
+    /// <summary>Which panel the column is showing; <see cref="PlayerPanel.None"/> closes it.</summary>
+    public PlayerPanel PlayerPanel
+    {
+        get => _playerPanel;
+        private set
+        {
+            if (SetField(ref _playerPanel, value))
+            {
+                OnPropertyChanged(nameof(IsAudioPanelOpen));
+                OnPropertyChanged(nameof(IsSubtitlePanelOpen));
+                OnPropertyChanged(nameof(IsVideoPanelOpen));
+                OnPropertyChanged(nameof(IsMarkerPanelOpen));
+                OnPropertyChanged(nameof(IsVersionsPanelOpen));
+                OnPropertyChanged(nameof(IsPlayerPanelOpen));
+                OnPropertyChanged(nameof(AudioPanelStateCue));
+                OnPropertyChanged(nameof(SubtitlePanelStateCue));
+                OnPropertyChanged(nameof(VideoPanelStateCue));
+                OnPropertyChanged(nameof(MarkerPanelStateCue));
+                OnPropertyChanged(nameof(VersionsPanelStateCue));
+                _closePlayerPanel.RaiseCanExecuteChanged();
+            }
+        }
+    }
+
+    public bool IsAudioPanelOpen => _playerPanel is PlayerPanel.Audio;
+
+    public bool IsSubtitlePanelOpen => _playerPanel is PlayerPanel.Subtitles;
+
+    public bool IsVideoPanelOpen => _playerPanel is PlayerPanel.Video;
+
+    public bool IsMarkerPanelOpen => _playerPanel is PlayerPanel.Markers;
+
+    public bool IsVersionsPanelOpen => _playerPanel is PlayerPanel.Versions;
+
+    /// <summary>Whether the column takes its 320 px at all.</summary>
+    public bool IsPlayerPanelOpen => _playerPanel is not PlayerPanel.None;
+
+    /// <summary>
+    /// The glyph each pill carries beside its name, saying whether its panel is the open one.
+    /// </summary>
+    /// <remarks>
+    /// The same pair the library's kind filter and the appearance pills already spend, for the same
+    /// measured reason: in either high contrast dictionary AccentSubtleBrush and the resting fill
+    /// resolve to the same white or the same black, so a pill that said "open" in colour alone would
+    /// say nothing at all there.
+    /// </remarks>
+    public string AudioPanelStateCue => Cue(IsAudioPanelOpen);
+
+    public string SubtitlePanelStateCue => Cue(IsSubtitlePanelOpen);
+
+    public string VideoPanelStateCue => Cue(IsVideoPanelOpen);
+
+    public string MarkerPanelStateCue => Cue(IsMarkerPanelOpen);
+
+    public string VersionsPanelStateCue => Cue(IsVersionsPanelOpen);
+
+    private static string Cue(bool selected) => selected ? "●" : "○";
+
+    /// <summary>
+    /// The badge beside the title: which session this is, and that only one engine is ever running.
+    /// </summary>
+    /// <remarks>
+    /// The prototype writes «Sesión 1 · motor único activo» and this application can say the same
+    /// thing truthfully: LibVLC is built once and one session at a time holds it, so the ordinal is
+    /// how many times a session has been opened in this run rather than a handle to anything. It is
+    /// counted here because the shell is what opens and closes them.
+    /// </remarks>
+    public string PlayerSessionBadge => ShowText.Format(
+        "PlayerSessionBadge",
+        "Session {0} · single active engine",
+        _playerSessionOrdinal.ToString(System.Globalization.CultureInfo.CurrentCulture));
 
     public bool HasLooseFile => Player?.LooseFile is not null;
 
@@ -861,6 +992,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    /// <summary>Opens a panel, or closes the column when the panel asked for is already open.</summary>
+    private void TogglePlayerPanel(PlayerPanel panel) =>
+        PlayerPanel = _playerPanel == panel ? PlayerPanel.None : panel;
+
     private sealed class RouteNavigationCommand(INavigationService navigationService) : ICommand
     {
         public event EventHandler? CanExecuteChanged
@@ -881,7 +1016,30 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// A command that opens one surface and says when it became possible. Without the event a button
-    /// stays as it was built, however many titles are opened afterwards.
+    /// The five pills' one command: it takes the panel it is for and never asks whether it may run.
     /// </summary>
+    /// <remarks>
+    /// No <c>CanExecute</c> that changes, and that is deliberate rather than unfinished: a pill is
+    /// drawn only when the panel behind it has something in it, so a pill that exists can always be
+    /// pressed. Making it also disable itself would be a second answer to the same question, and the
+    /// two would disagree the first time one of them was updated alone.
+    /// </remarks>
+    private sealed class PlayerPanelCommand(Action<PlayerPanel> open) : ICommand
+    {
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public bool CanExecute(object? parameter) => parameter is PlayerPanel;
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is PlayerPanel panel)
+            {
+                open(panel);
+            }
+        }
+    }
 }

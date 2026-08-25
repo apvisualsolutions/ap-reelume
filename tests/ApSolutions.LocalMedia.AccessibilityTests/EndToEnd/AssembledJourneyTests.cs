@@ -336,25 +336,32 @@ public sealed class AssembledJourneyTests : IDisposable
         Dispatcher.UIThread.RunJobs();
         Assert.NotNull(Find<PlayerView>(host));
 
-        // Until 2026-08-22 the three panels were all mounted at once and this asserted all three
-        // views were in the tree. The column switches now, so a panel that is not the open tab is
-        // not in the tree at all - what says the session wired them is that each has a tab to be
-        // reached by, and that the open one is mounted behind it.
-        var tabs = host.Shell.GetVisualDescendants()
-            .OfType<TabItem>()
-            .Where(item => item.IsEffectivelyVisible)
-            .Select(item => item.Header as string)
+        // The three panels were all mounted at once until 2026-08-22 and this asserted all three
+        // views were in the tree; then the column switched between them and this read its tabs.
+        // Now the column starts closed and pills open it, so what says the session wired the panels
+        // is that each subject has a pill on the header to be reached by.
+        var pills = host.Shell.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(button => button.Classes.Contains("player-pill"))
+            .Where(button => button.IsEffectivelyVisible)
+            .Select(button => Avalonia.Automation.AutomationProperties.GetName(button) ?? string.Empty)
             .ToArray();
         foreach (var key in new[]
         {
-            "TrackSelectorAccessibleName",
-            "AudioOutputAccessibleName",
-            "MarkerEditorAccessibleName",
+            "PlayerPanelAudio",
+            "PlayerPanelSubtitles",
+            "PlayerPanelVideo",
+            "PlayerPanelMarkers",
         })
         {
-            Assert.Contains(Resource(key), tabs, StringComparer.Ordinal);
+            Assert.Contains(Resource(key), pills, StringComparer.Ordinal);
         }
 
+        // And that pressing one of them mounts the view behind it, which is the half a pill alone
+        // does not prove: the column was closed a line ago and the track selector was nowhere.
+        Assert.Null(Find<TrackSelectorView>(host));
+        host.ViewModel.TogglePlayerPanelCommand.Execute(PlayerPanel.Audio);
+        Dispatcher.UIThread.RunJobs();
         Assert.NotNull(Find<TrackSelectorView>(host));
 
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);

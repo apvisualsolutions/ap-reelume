@@ -629,38 +629,123 @@ SPDX-License-Identifier: GPL-3.0-or-later
             card that pressed Play called it, carried on the request. Absent rather than empty for a
             file opened from outside the library, which has no card behind it.
           -->
-          <StackPanel
+          <!--
+            The title, its second line and the session badge, which is the order the prototype puts
+            them in. The badge is beside the title rather than under it because it describes the
+            session and not the film: one engine, and this is the nth time it has been handed a file
+            since the application started.
+          -->
+          <WrapPanel
               Grid.Column="1"
               Margin="12,0"
               VerticalAlignment="Center"
-              IsVisible="{Binding HasPlayerTitle}">
-            <TextBlock
-                MaxWidth="420"
-                HorizontalAlignment="Left"
-                FontWeight="SemiBold"
-                Text="{Binding PlayerTitle}"
-                TextTrimming="CharacterEllipsis"
-                TextWrapping="NoWrap" />
-            <TextBlock
-                MaxWidth="420"
-                HorizontalAlignment="Left"
-                FontSize="{DynamicResource FontSizeCaption}"
-                Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-                IsVisible="{Binding HasPlayerSubtitle}"
-                Text="{Binding PlayerSubtitle}"
-                TextTrimming="CharacterEllipsis"
-                TextWrapping="NoWrap" />
-          </StackPanel>
+              ItemSpacing="{DynamicResource Space8}"
+              LineSpacing="{DynamicResource Space4}">
+            <StackPanel VerticalAlignment="Center" IsVisible="{Binding HasPlayerTitle}">
+              <TextBlock
+                  MaxWidth="420"
+                  HorizontalAlignment="Left"
+                  FontWeight="SemiBold"
+                  Text="{Binding PlayerTitle}"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+              <TextBlock
+                  MaxWidth="420"
+                  HorizontalAlignment="Left"
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                  IsVisible="{Binding HasPlayerSubtitle}"
+                  Text="{Binding PlayerSubtitle}"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+            </StackPanel>
+            <Border
+                x:Name="PlayerSessionBadgeSurface"
+                Padding="8,4"
+                VerticalAlignment="Center"
+                Background="{DynamicResource AccentSubtleBrush}"
+                CornerRadius="{DynamicResource CornerRadiusSmall}">
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  FontWeight="SemiBold"
+                  Foreground="{DynamicResource AccentInkBrush}"
+                  Text="{Binding PlayerSessionBadge}" />
+            </Border>
+          </WrapPanel>
           <!--
-            A WrapPanel for two buttons, which is not about these two wrapping: it is the container
-            this tree reaches for whenever a row of controls can grow, and the 44 px target area these
-            take is exactly that kind of growth. The measurement behind the habit is on the column
-            below.
+            The four pills the prototype heads its player with, and the fifth this application keeps
+            because a title with two copies can move the session between them. Each one opens the
+            column, and pressing the open one closes it — which is what the prototype does and what
+            a tab strip could not say.
+
+            A WrapPanel, which is not about wanting these seven on two lines: it is the container
+            this tree reaches for whenever a row of controls can grow. The column below carries the
+            measurement that made it a habit.
           -->
           <WrapPanel
               Grid.Column="2"
               ItemSpacing="{DynamicResource Space8}"
               LineSpacing="{DynamicResource Space8}">
+            <Button
+                Classes="player-pill"
+                Classes.selected="{Binding IsAudioPanelOpen}"
+                IsVisible="{Binding HasAudioPanel}"
+                automation:AutomationProperties.Name="{DynamicResource PlayerPanelAudio}"
+                Command="{Binding TogglePlayerPanelCommand}"
+                CommandParameter="{x:Static shell:PlayerPanel.Audio}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding AudioPanelStateCue}" />
+                <TextBlock Text="{DynamicResource PlayerPanelAudio}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="player-pill"
+                Classes.selected="{Binding IsSubtitlePanelOpen}"
+                IsVisible="{Binding HasSubtitlePanel}"
+                automation:AutomationProperties.Name="{DynamicResource PlayerPanelSubtitles}"
+                Command="{Binding TogglePlayerPanelCommand}"
+                CommandParameter="{x:Static shell:PlayerPanel.Subtitles}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding SubtitlePanelStateCue}" />
+                <TextBlock Text="{DynamicResource PlayerPanelSubtitles}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="player-pill"
+                Classes.selected="{Binding IsVideoPanelOpen}"
+                IsVisible="{Binding HasVideoPanel}"
+                automation:AutomationProperties.Name="{DynamicResource PlayerPanelVideo}"
+                Command="{Binding TogglePlayerPanelCommand}"
+                CommandParameter="{x:Static shell:PlayerPanel.Video}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding VideoPanelStateCue}" />
+                <TextBlock Text="{DynamicResource PlayerPanelVideo}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="player-pill"
+                Classes.selected="{Binding IsMarkerPanelOpen}"
+                IsVisible="{Binding HasMarkerPanel}"
+                automation:AutomationProperties.Name="{DynamicResource PlayerPanelMarkers}"
+                Command="{Binding TogglePlayerPanelCommand}"
+                CommandParameter="{x:Static shell:PlayerPanel.Markers}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding MarkerPanelStateCue}" />
+                <TextBlock Text="{DynamicResource PlayerPanelMarkers}" />
+              </StackPanel>
+            </Button>
+            <Button
+                Classes="player-pill"
+                Classes.selected="{Binding IsVersionsPanelOpen}"
+                IsVisible="{Binding HasPlayerVersions}"
+                automation:AutomationProperties.Name="{DynamicResource PlayerVersionsTitle}"
+                Command="{Binding TogglePlayerPanelCommand}"
+                CommandParameter="{x:Static shell:PlayerPanel.Versions}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding VersionsPanelStateCue}" />
+                <TextBlock Text="{DynamicResource PlayerVersionsTitle}" />
+              </StackPanel>
+            </Button>
             <Button
                 Classes="player-chrome"
                 automation:AutomationProperties.Name="{DynamicResource PlayerMiniModeAction}"
@@ -694,7 +779,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ContentControl>
       <ContentControl Grid.Row="1" x:Name="PlayerHost">
         <Panel x:Name="PlayerStage">
-        <player:PlayerView DataContext="{Binding Player.Player}" />
+        <player:PlayerView
+            DataContext="{Binding Player.Player}"
+            OutputSummary="{Binding $parent[shell:ShellView].((shell:ShellViewModel)DataContext).Player.AudioOutput.SelectedDevice.Display}" />
         <ContentControl IsVisible="{Binding HasVideoStatus}">
           <player:VideoStatusOverlay DataContext="{Binding Player.VideoStatus}" />
         </ContentControl>
@@ -714,70 +801,220 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ContentControl>
       </Grid>
       <!--
-        The panel column: 320 px when it has something in it, and nothing at all when it does not. It
-        used to take those 320 px whether or not one of its five panels existed, so a file with a
-        single audio track, no markers and no other version left an empty rectangle holding a fifth of
-        the picture's width. The grid's column is Auto and the width is the viewer's, which is what
-        makes an invisible column measure zero rather than reserve its place.
+        The panel column: 320 px when a pill has opened it, and nothing at all otherwise. The grid's
+        column is Auto and the width is the viewer's, which is what makes an invisible column measure
+        zero rather than reserve its place — a file with a single audio track and no other version
+        used to leave an empty rectangle holding a fifth of the picture's width.
 
-        The three session buttons that used to head it moved to the header above, which is where the
-        prototype draws them.
+        <b>It starts closed and it is a pill that opens it, which is a change of grammar and not of
+        layout.</b> It was a tab strip, and a tab strip has no way to say "none of them": whatever
+        the session had, some panel was always standing in 320 px of the picture. The prototype heads
+        the player with four pills and gives the width back when the open one is pressed again, and
+        that is what these five do — the four subjects it names, plus the versions this application
+        keeps because a title with two copies can move the session between them.
 
-        And the column is switched now instead of stacked, which is what the prototype does: one panel
-        at a time, chosen at the head of the column. Five tabs and not the prototype's four, because
-        the four are its names for what this application keeps in five panels, and a tab that grouped
-        two of them would need either a word nobody has approved or a sixth boolean on the shell. Each
-        tab carries the name its own panel already declares.
+        The three session buttons that used to head this column moved to that header too, which is
+        where the prototype draws them.
 
-        <b>No view model decides which one opens, and that is measured.</b> Avalonia 12.1.1 skips an
-        invisible TabItem when it auto-selects — checked on 2026-08-22 with the first of three hidden,
-        which opened on the second — so a session with no tracks opens on whatever it does have.
-
-        The measurement that put the header's buttons in a WrapPanel is what the tab strip inherits:
-        this column is 320 px by definition, these five names are a translator's, and a horizontal
-        strip offers its children infinite width — Mini player sat at x=1737 in a 1600 px window on
-        2026-08-16 and Fullscreen was further out still.
+        The four subjects are a person's grouping and not this tree's, and that is why the panels
+        below compose views rather than mount one each: audio tracks and the output device answer one
+        question and arrive from two view models, and detected ranges and kept ones answer another
+        and arrive from two more. Nothing was merged to do it — each view still declares its own
+        name, and a panel draws only the halves the session actually has.
       -->
-      <TabControl
+      <Border
           x:Name="PlayerPanelColumn"
-          Classes="player-panels"
           Grid.Row="1"
           Grid.Column="1"
           Width="320"
           Background="{DynamicResource PlayerPanelBrush}"
-          Foreground="{DynamicResource PlayerTextBrush}"
-          IsVisible="{Binding HasPlayerPanels}">
-        <TabControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <WrapPanel />
-          </ItemsPanelTemplate>
-        </TabControl.ItemsPanel>
-        <TabItem Header="{DynamicResource TrackSelectorAccessibleName}" IsVisible="{Binding HasTracks}">
-          <ScrollViewer Padding="16">
-            <player:TrackSelectorView DataContext="{Binding Player.Tracks}" />
+          BorderBrush="{DynamicResource PlayerHairlineBrush}"
+          BorderThickness="1,0,0,0"
+          TextElement.Foreground="{DynamicResource PlayerTextBrush}"
+          IsVisible="{Binding IsPlayerPanelOpen}">
+        <Grid RowDefinitions="Auto,*">
+          <!--
+            The column's own header, which the prototype draws and the tab strip stood in for: the
+            name of what is open, and the «×» that closes it. Two ways to close one panel is not a
+            duplicate — the pill is where somebody's hand already is when they open it, and this is
+            where their eye is once the panel is under it.
+          -->
+          <Border
+              Grid.Row="0"
+              Padding="14,12"
+              BorderBrush="{DynamicResource PlayerHairlineBrush}"
+              BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock
+                  VerticalAlignment="Center"
+                  FontWeight="SemiBold"
+                  IsVisible="{Binding IsAudioPanelOpen}"
+                  Text="{DynamicResource PlayerPanelAudio}" />
+              <TextBlock
+                  VerticalAlignment="Center"
+                  FontWeight="SemiBold"
+                  IsVisible="{Binding IsSubtitlePanelOpen}"
+                  Text="{DynamicResource PlayerPanelSubtitles}" />
+              <TextBlock
+                  VerticalAlignment="Center"
+                  FontWeight="SemiBold"
+                  IsVisible="{Binding IsVideoPanelOpen}"
+                  Text="{DynamicResource PlayerPanelVideo}" />
+              <TextBlock
+                  VerticalAlignment="Center"
+                  FontWeight="SemiBold"
+                  IsVisible="{Binding IsMarkerPanelOpen}"
+                  Text="{DynamicResource PlayerPanelMarkers}" />
+              <TextBlock
+                  VerticalAlignment="Center"
+                  FontWeight="SemiBold"
+                  IsVisible="{Binding IsVersionsPanelOpen}"
+                  Text="{DynamicResource PlayerVersionsTitle}" />
+              <Button
+                  Grid.Column="1"
+                  Classes="player-chrome"
+                  automation:AutomationProperties.Name="{DynamicResource PlayerPanelClose}"
+                  ToolTip.Tip="{DynamicResource PlayerPanelClose}"
+                  Command="{Binding ClosePlayerPanelCommand}">
+                <Path Classes="icon size-20" Data="{DynamicResource IconClose}" />
+              </Button>
+            </Grid>
+          </Border>
+          <ScrollViewer Grid.Row="1" Padding="16">
+            <!--
+              The prototype's four subjects, which are a person's and not this application's: audio
+              tracks and the output device answer one question — what am I hearing — and they arrive
+              from two view models, so the grouping happens here rather than in either of them.
+            -->
+            <Panel>
+              <StackPanel IsVisible="{Binding IsAudioPanelOpen}" Spacing="{DynamicResource Space16}">
+                <ContentControl IsVisible="{Binding HasTracks}">
+                  <player:TrackSelectorView
+                      DataContext="{Binding Player.Tracks}"
+                      ShowsSubtitles="False" />
+                </ContentControl>
+                <ContentControl IsVisible="{Binding HasAudioOutput}">
+                  <player:AudioOutputView DataContext="{Binding Player.AudioOutput}" />
+                </ContentControl>
+              </StackPanel>
+              <StackPanel IsVisible="{Binding IsSubtitlePanelOpen}" Spacing="{DynamicResource Space16}">
+                <ContentControl IsVisible="{Binding HasTracks}">
+                  <player:TrackSelectorView
+                      DataContext="{Binding Player.Tracks}"
+                      ShowsAudio="False" />
+                </ContentControl>
+              </StackPanel>
+              <!--
+                What the decoder and the display actually agreed on, said as the prototype says it:
+                a row per subject with its state against the right edge, and the sentence underneath
+                only when there is one. The same four facts the badge over the picture carries — this
+                is where somebody goes looking for them rather than waiting for them to appear.
+              -->
+              <ContentControl IsVisible="{Binding IsVideoPanelOpen}">
+              <StackPanel
+                  DataContext="{Binding Player.VideoStatus}"
+                  Spacing="{DynamicResource Space12}">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+                  <TextBlock VerticalAlignment="Center" Text="{DynamicResource PlayerPanelVideo}" />
+                  <Border
+                      Grid.Column="1"
+                      Padding="8,4"
+                      Background="{DynamicResource AccentSubtleBrush}"
+                      CornerRadius="{DynamicResource CornerRadiusSmall}">
+                    <TextBlock
+                        FontSize="{DynamicResource FontSizeCaption}"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource AccentInkBrush}"
+                        Text="{DynamicResource PlayerVideoHardwareBadge}"
+                        IsVisible="{Binding IsHardwareAccelerated}" />
+                  </Border>
+                  <Border
+                      Grid.Column="1"
+                      Padding="8,4"
+                      Background="{DynamicResource ControlFillBrush}"
+                      CornerRadius="{DynamicResource CornerRadiusSmall}"
+                      IsVisible="{Binding !IsHardwareAccelerated}">
+                    <TextBlock
+                        FontSize="{DynamicResource FontSizeCaption}"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource TextPrimaryBrush}"
+                        Text="{DynamicResource PlayerVideoSoftwareBadge}" />
+                  </Border>
+                </Grid>
+                <TextBlock
+                    FontSize="{DynamicResource FontSizeCaption}"
+                    Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                    IsVisible="{Binding FellBackToSoftware}"
+                    Text="{DynamicResource VideoStatusSoftwareFallback}"
+                    TextWrapping="Wrap" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+                  <TextBlock VerticalAlignment="Center" Text="{DynamicResource PlayerVideoHdrLabel}" />
+                  <Border
+                      Grid.Column="1"
+                      Padding="8,4"
+                      Background="{DynamicResource ControlFillBrush}"
+                      CornerRadius="{DynamicResource CornerRadiusSmall}">
+                    <Panel>
+                      <TextBlock
+                          FontSize="{DynamicResource FontSizeCaption}"
+                          FontWeight="SemiBold"
+                          Foreground="{DynamicResource TextPrimaryBrush}"
+                          IsVisible="{Binding IsHdrPassthrough}"
+                          Text="{DynamicResource PlayerVideoHdrBadge}" />
+                      <TextBlock
+                          FontSize="{DynamicResource FontSizeCaption}"
+                          FontWeight="SemiBold"
+                          Foreground="{DynamicResource TextPrimaryBrush}"
+                          IsVisible="{Binding !IsHdrPassthrough}"
+                          Text="{DynamicResource PlayerVideoSdrBadge}" />
+                    </Panel>
+                  </Border>
+                </Grid>
+                <TextBlock
+                    FontSize="{DynamicResource FontSizeCaption}"
+                    Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                    IsVisible="{Binding IsHdrPassthrough}"
+                    Text="{DynamicResource VideoStatusHdrPassthrough}"
+                    TextWrapping="Wrap" />
+                <TextBlock
+                    FontSize="{DynamicResource FontSizeCaption}"
+                    Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                    IsVisible="{Binding IsToneMapped}"
+                    Text="{DynamicResource VideoStatusToneMapped}"
+                    TextWrapping="Wrap" />
+                <TextBlock
+                    FontSize="{DynamicResource FontSizeCaption}"
+                    Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                    IsVisible="{Binding IsUnsupportedFormat}"
+                    Text="{DynamicResource VideoStatusUnsupportedFormat}"
+                    TextWrapping="Wrap" />
+                <Border
+                    BorderBrush="{DynamicResource PlayerHairlineBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="0,10,0,0">
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeCaption}"
+                      Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                      Text="{DynamicResource PlayerVideoScopeNote}"
+                      TextWrapping="Wrap" />
+                </Border>
+              </StackPanel>
+              </ContentControl>
+              <StackPanel IsVisible="{Binding IsMarkerPanelOpen}" Spacing="{DynamicResource Space16}">
+                <ContentControl IsVisible="{Binding HasDetectedReview}">
+                  <player:DetectedMarkerReviewView DataContext="{Binding Player.DetectedReview}" />
+                </ContentControl>
+                <ContentControl IsVisible="{Binding HasMarkers}">
+                  <player:MarkerEditorView DataContext="{Binding Player.Markers}" />
+                </ContentControl>
+              </StackPanel>
+              <ContentControl IsVisible="{Binding IsVersionsPanelOpen}">
+                <player:PlayerVersionsView DataContext="{Binding Player.Versions}" />
+              </ContentControl>
+            </Panel>
           </ScrollViewer>
-        </TabItem>
-        <TabItem Header="{DynamicResource AudioOutputAccessibleName}" IsVisible="{Binding HasAudioOutput}">
-          <ScrollViewer Padding="16">
-            <player:AudioOutputView DataContext="{Binding Player.AudioOutput}" />
-          </ScrollViewer>
-        </TabItem>
-        <TabItem Header="{DynamicResource MarkerEditorAccessibleName}" IsVisible="{Binding HasMarkers}">
-          <ScrollViewer Padding="16">
-            <player:MarkerEditorView DataContext="{Binding Player.Markers}" />
-          </ScrollViewer>
-        </TabItem>
-        <TabItem Header="{DynamicResource DetectedMarkerReviewTitle}" IsVisible="{Binding HasDetectedReview}">
-          <ScrollViewer Padding="16">
-            <player:DetectedMarkerReviewView DataContext="{Binding Player.DetectedReview}" />
-          </ScrollViewer>
-        </TabItem>
-        <TabItem Header="{DynamicResource PlayerVersionsTitle}" IsVisible="{Binding HasPlayerVersions}">
-          <ScrollViewer Padding="16">
-            <player:PlayerVersionsView DataContext="{Binding Player.Versions}" />
-          </ScrollViewer>
-        </TabItem>
-      </TabControl>
+        </Grid>
+      </Border>
     </Grid>
   </Grid>
 </UserControl>

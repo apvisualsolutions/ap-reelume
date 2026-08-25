@@ -272,7 +272,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerRecoveryExternalFailed">Windows has no application associated with this file.</x:String>
   <x:String x:Key="TrackSelectorAccessibleName">Audio and subtitle tracks</x:String>
   <x:String x:Key="TrackSelectorAudioLabel">Audio track</x:String>
-  <x:String x:Key="TrackSelectorSubtitleLabel">Subtitles</x:String>
+  <x:String x:Key="TrackSelectorSubtitleLabel">Subtitle track</x:String>
   <x:String x:Key="TrackSelectorSubtitlesDisabled">No subtitles</x:String>
   <x:String x:Key="TrackSelectorRememberForSeries">Remember for the whole show</x:String>
   <x:String x:Key="SubtitleStyleAccessibleName">Subtitle style</x:String>
@@ -589,6 +589,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerCloseAction">Close the player</x:String>
   <x:String x:Key="PlayerMiniModeAction">Mini player</x:String>
   <x:String x:Key="PlayerFullscreenAction">Fullscreen</x:String>
+  <x:String x:Key="PlayerSessionBadge">Session {0} · single active engine</x:String>
+  <x:String x:Key="PlayerPanelAudio">Audio</x:String>
+  <x:String x:Key="PlayerPanelSubtitles">Subtitles</x:String>
+  <x:String x:Key="PlayerPanelVideo">Video</x:String>
+  <x:String x:Key="PlayerPanelMarkers">Markers</x:String>
+  <x:String x:Key="PlayerPanelClose">Close the panel</x:String>
+  <x:String x:Key="PlayerVideoHdrLabel">HDR</x:String>
+  <x:String x:Key="PlayerVideoHardwareBadge">Hardware</x:String>
+  <x:String x:Key="PlayerVideoSoftwareBadge">Software</x:String>
+  <x:String x:Key="PlayerVideoHdrBadge">HDR10</x:String>
+  <x:String x:Key="PlayerVideoSdrBadge">SDR</x:String>
+  <x:String x:Key="PlayerVideoScopeNote">Dolby Vision and Dolby and DTS passthrough are out of scope.</x:String>
   <x:String x:Key="RootAddFailureAccessibleName">The folder could not be added</x:String>
   <x:String x:Key="RootAddDuplicate">That folder is already in the library. It was not added twice and nothing was changed.</x:String>
   <x:String x:Key="RootAddNested">That folder is inside one the library already has, or contains it. Choose one that does not overlap.</x:String>

@@ -1484,6 +1484,38 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
+    The pills that head the player and decide what the side column shows. They are theme-option's
+    grammar - plain fill unpressed, the subtle accent and the accent border when pressed - on the
+    player's band, which is dark in all four modes: theme-option itself paints TextPrimaryBrush, and
+    that is dark ink in two of them, over a surface that never is.
+
+    44 and not the prototype's 30, which is the same trade player-chrome already made two styles up:
+    these sit in a row with those, a band as tall as the taller of the two, and a 30 px target beside
+    a 44 px one would be the only control on this header somebody has to aim at.
+  -->
+  <Style Selector="Button.player-pill">
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PlayerHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource PlayerTextBrush}" />
+  </Style>
+
+  <!--
+    The open one, said twice: the accent fill and border, and the state glyph its content carries.
+    Both high contrast dictionaries resolve AccentSubtleBrush and Transparent to surfaces a person
+    cannot tell apart, so the glyph is the whole signal there - the same reason theme-option.selected
+    is never alone either.
+  -->
+  <Style Selector="Button.player-pill.selected">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!--
     The two clocks either side of the scrubber. 58 is the prototype's own minimum and it is a minimum
     rather than a width because the same bar has to hold 2:00:00 and 49:06: fixed at the shorter one
     the hour would be clipped, and left to itself the bar would jump sideways every time the position
@@ -2115,32 +2147,5 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
   <Style Selector="ProgressBar.confidence.pending">
     <Setter Property="Foreground" Value="{DynamicResource WarningBorderBrush}" />
-  </Style>
-  <!--
-    The player's panel column, switched instead of stacked. The prototype shows one panel at a time
-    and puts its switch in the header; this puts it at the head of the column, which is the same
-    decision one control closer to what it opens.
-
-    A TabControl and no view model, and that is measured rather than assumed: on 2026-08-22, Avalonia
-    12.1.1 was checked to skip an invisible TabItem when it auto-selects - a column whose first panel
-    does not exist opens on the first one that does, with nothing in the shell having to work it out.
-
-    The headers wrap, because these five names are translated and a horizontal strip offers its
-    children infinite width - the shape this repository has measured nine times, and the column is
-    320 px by definition.
-
-    The ink is the player's, for the reason the whole column now carries: the base ControlTheme paints
-    a tab header with the theme's foreground, which is dark in two of the four modes, over a surface
-    that is dark in all four.
-  -->
-  <Style Selector="TabControl.player-panels TabItem">
-    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
-    <Setter Property="Padding" Value="10,6" />
-    <Setter Property="MinHeight" Value="0" />
-    <Setter Property="Foreground" Value="{DynamicResource PlayerTextSecondaryBrush}" />
-  </Style>
-
-  <Style Selector="TabControl.player-panels TabItem:selected">
-    <Setter Property="Foreground" Value="{DynamicResource PlayerTextBrush}" />
   </Style>
 </Styles>

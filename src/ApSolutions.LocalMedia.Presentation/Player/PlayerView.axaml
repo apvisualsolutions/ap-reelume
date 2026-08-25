@@ -223,6 +223,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
           different moments, so interleaving them means moving commands between them rather than
           moving buttons in a panel.
         -->
+        <!--
+          A Grid so the endpoint can sit against the right edge, which is where the prototype writes
+          it: the state and the key hints take the width they need and this takes what is left. In
+          the prototype it shares the transport's own line, and here it cannot — that line already
+          holds two sliders and two readouts, and at 900 px, the narrowest window this application
+          allows, adding a device name to it is the shape that has drawn a control off the edge
+          nine times.
+        -->
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
         <WrapPanel
             x:Name="SessionActionsSurface"
             ItemSpacing="{DynamicResource Space8}"
@@ -265,6 +274,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Text="{DynamicResource PlayerShortcutHint}"
               automation:AutomationProperties.AccessibilityView="Raw" />
         </WrapPanel>
+        <!--
+          Absent rather than empty while the catalogue has not answered: a pill with nothing in it
+          reads as an endpoint whose name is blank, which is worse than saying nothing about one.
+        -->
+        <Border
+            x:Name="OutputSummarySurface"
+            Grid.Column="1"
+            Padding="8,4"
+            VerticalAlignment="Center"
+            Background="{DynamicResource ControlFillBrush}"
+            CornerRadius="{DynamicResource CornerRadiusSmall}"
+            IsVisible="{Binding $parent[player:PlayerView].OutputSummary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock
+              FontSize="{DynamicResource FontSizeCaption}"
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{Binding $parent[player:PlayerView].OutputSummary}"
+              TextTrimming="CharacterEllipsis"
+              TextWrapping="NoWrap" />
+        </Border>
+        </Grid>
       </StackPanel>
     </Border>
   </Panel>
