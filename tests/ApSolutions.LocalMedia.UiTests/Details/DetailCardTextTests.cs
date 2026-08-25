@@ -576,6 +576,73 @@ public sealed class DetailCardTextTests
         return classes;
     }
 
+    /// <summary>
+    /// Two of the three title tools appear only when they have something to do.
+    /// </summary>
+    /// <remarks>
+    /// «Revisar versiones» opens a comparison, and a film with one copy is never grouped — the
+    /// surface behind it answers with nothing and the route never changes, so the button was a door
+    /// onto a room that does not exist. «Previsualizar renombrado» opens a plan, and a file already
+    /// called what this application would call it produces a plan of no operations. Editing what a
+    /// title says is the third and is always possible, which is why it has no condition.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_two_conditional_title_tools_appear_only_when_they_have_something_to_do()
+    {
+        var lone = new MovieDetailsViewModel();
+        lone.Apply(Film(2016, null, TimeSpan.FromMinutes(116)), watchState: null, versions: null);
+        Assert.False(lone.HasOtherVersions);
+        Assert.False(lone.CanPreviewRename);
+
+        var grouped = new MovieDetailsViewModel();
+        grouped.Apply(
+            Film(2016, null, TimeSpan.FromMinutes(116)),
+            watchState: null,
+            versions: Pair(),
+            renameWouldChangeTheName: true);
+        Assert.True(grouped.HasOtherVersions);
+        Assert.True(grouped.CanPreviewRename);
+
+        // A series is never grouped into versions, whatever the library holds: its episodes are
+        // separate files under separate keys, so that button has nothing to open here at all.
+        var series = new ShowDetailsViewModel();
+        series.Apply(
+            Series(2020, null),
+            [],
+            new Dictionary<ContentKey, WatchState>(),
+            renameWouldChangeTheName: true);
+        Assert.False(ShowDetailsViewModel.HasOtherVersions);
+        Assert.True(series.CanPreviewRename);
+    }
+
+    /// <summary>Two copies of one film, which is the smallest group that exists.</summary>
+    private static MediaVersionGroup Pair() => new(
+        new MediaVersionId(Guid.Parse("e3000000-0000-4000-8000-000000000001")),
+        "title:" + MovieId.Value.ToString("D"),
+        [
+            new MediaVersion(
+                new MediaFileId(Guid.Parse("e4000000-0000-4000-8000-000000000001")),
+                @"D:\Cine\arrival.2160p.mkv",
+                IsAvailable: true,
+                TimeSpan.FromMinutes(116),
+                3840,
+                2160,
+                IsHdr: true,
+                "HEVC",
+                19_000_000_000),
+            new MediaVersion(
+                new MediaFileId(Guid.Parse("e4000000-0000-4000-8000-000000000002")),
+                @"D:\Cine\arrival.1080p.mkv",
+                IsAvailable: true,
+                TimeSpan.FromMinutes(116),
+                1920,
+                1080,
+                IsHdr: false,
+                "H264",
+                4_000_000_000),
+        ],
+        PreferredMediaFileId: null);
+
     private static CatalogItem Film(
         int? year,
         IReadOnlyList<string>? genres,

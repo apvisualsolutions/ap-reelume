@@ -146,16 +146,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Content="{DynamicResource MovieTrailerAction}"
                   IsVisible="{Binding HasTrailer}"
                   automation:AutomationProperties.Name="{DynamicResource MovieTrailerAction}" />
+              <!--
+                The one button here that leaves the application, and it says so twice: with the arrow
+                the prototype draws beside it, and in the name a reader hears. The label itself is
+                short because the row it sits in is full of short labels and «Ver el tráiler en el
+                navegador» was as wide as the three title tools put together.
+              -->
               <Button
                   Command="{Binding OpenTrailerLinkCommand}"
-                  Content="{DynamicResource DetailsTrailerLinkAction}"
                   IsVisible="{Binding HasTrailerLink}"
-                  automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
+                  automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}"
+                  automation:AutomationProperties.HelpText="{DynamicResource DetailsTrailerLinkHelpText}">
+                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                  <TextBlock VerticalAlignment="Center" Text="{DynamicResource DetailsTrailerLinkAction}" />
+                  <Path
+                      Classes="icon size-14"
+                      VerticalAlignment="Center"
+                      Data="{DynamicResource IconExternal}"
+                      automation:AutomationProperties.AccessibilityView="Raw" />
+                </StackPanel>
+              </Button>
               <!--
                 The three title tools, which the prototype puts in this row and this application drew
                 under the library: a row of buttons acting on a card that might not even be open.
               -->
-              <catalog:TitleActionsView />
+              <catalog:TitleActionsView
+                  CanPreviewRename="{Binding CanPreviewRename}"
+                  CanReviewVersions="{Binding HasOtherVersions}" />
             </WrapPanel>
             <!--
               The three consequences the design package wrote for the trailer, each beside the state

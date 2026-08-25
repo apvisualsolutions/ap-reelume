@@ -423,8 +423,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="HomeLibraryUnavailableLabel">out of reach right now</x:String>
   <x:String x:Key="HomeCountSeparator">·</x:String>
   <x:String x:Key="MoviePlayAction">Play from the start</x:String>
-  <x:String x:Key="MovieTrailerAction">Watch the trailer</x:String>
-  <x:String x:Key="DetailsTrailerLinkAction">Watch the trailer in your browser</x:String>
+  <x:String x:Key="MovieTrailerAction">Play trailer</x:String>
+  <x:String x:Key="DetailsTrailerLinkAction">Watch trailer</x:String>
+  <x:String x:Key="DetailsTrailerLinkHelpText">Opens in your browser and leaves the application.</x:String>
   <x:String x:Key="MovieResumeAction">Resume</x:String>
   <x:String x:Key="MovieOtherActionsHeading">Other actions</x:String>
   <x:String x:Key="MovieVersionsHeading">Versions</x:String>
