@@ -43,9 +43,20 @@ jobs:
       # needs a generated sample, and the media gates need the whole matrix. The version is pinned
       # like the action SHAs: this is the only third-party executable that runs on the machine that
       # seals and signs the release, so it moves only by a deliberate edit, never by a floating tag.
+      # The community feed answers 503 often enough to have cost two runs on 2026-08-24 alone, and a
+      # build that never compiled is not a verdict about the code. Three attempts with a widening
+      # wait; the version stays pinned, so what a retry can change is the transport and nothing else.
       - name: Install ffmpeg
         shell: pwsh
-        run: choco install ffmpeg --version 9.0.0 -y --no-progress
+        run: |
+          if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.'; exit 0 }
+          foreach ($attempt in 1..3) {
+            choco install ffmpeg --version 9.0.0 -y --no-progress
+            if ($LASTEXITCODE -eq 0) { exit 0 }
+            "Attempt $attempt failed ($LASTEXITCODE); the community feed is the usual reason."
+            if ($attempt -lt 3) { Start-Sleep -Seconds (20 * $attempt) }
+          }
+          throw 'ffmpeg could not be installed after three attempts.'
 
       - name: Build the x64 package
         shell: pwsh

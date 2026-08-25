@@ -10,6 +10,44 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La ficha de serie es la del prototipo.** Bajo el título va la línea «2020 · Drama · 3 temporadas
+  · 16 episodios», la barra de la serie con «10/16 vistos», y el panel que nombra el episodio que
+  falta —«T02·E05 · Puerto de invierno», «Reanudar en 17:00»— con su botón «▶ Continuar», que es la
+  única acción acentuada de la ficha. Las temporadas dejan de ser un desplegable y pasan a ser
+  **píldoras**, las tres a la vista; y cada episodio pasa de una tira de 56 px con un número a la
+  **tarjeta** del prototipo: el número, la miniatura apaisada con su barra de progreso, el nombre del
+  episodio y «48 min · Visto». El nombre y la duración no estaban en pantalla en absoluto —la
+  proyección de episodios no los leía—, así que una temporada se leía como una columna de números.
+
+- **Las dos fichas se desplazan como una página.** Había dos regiones de desplazamiento en una misma
+  pantalla —el banner fijo y la lista con su propia barra—, así que la rueda contestaba una cosa u
+  otra según dónde estuviera el puntero. Y la vuelta a la biblioteca es un enlace, «Volver ·
+  Biblioteca», como en el prototipo, en lugar de una píldora rellena compitiendo con la acción de la
+  ficha.
+
+- **Las marcas personales salen del banner.** Diez botones de valoración sobre la obra de arte
+  empujaban los episodios fuera de la primera pantalla. Van a la columna «Otras acciones», donde la
+  ficha de película ya las tenía, y con la forma del prototipo: filas de ancho completo con su icono,
+  su nombre y lo que la marca vale ahora mismo.
+
+- **Un tercio del degradado de los banners estaba mal medido.** La última parada se escribió `#30`
+  pensando en «30 %», y `0x30` es el 19 %: la imagen salía la mitad más clara de lo que el prototipo
+  pinta en el borde derecho. Corregido en las dos fichas, y el héroe de Inicio pasa a su propio
+  degradado, que es otro —`rgba(5,6,8,…)` y con las paradas dentro del marco, no en sus bordes—.
+
+- **CI no verificaba nada desde el 2026-08-24.** Los tres últimos runs murieron en «Install ffmpeg»
+  con un 503 del repositorio de Chocolatey, antes de compilar una sola línea. El paso reintenta tres
+  veces con espera creciente; la versión sigue clavada, así que lo que un reintento puede cambiar es
+  el transporte y nada más.
+
+### Añadido
+
+- `AccentInkBrush`, la tinta que se escribe **sobre** el lavado del acento, que es de lo que está
+  hecha una píldora elegida. Sale del `--accent-ink` del prototipo en los cuatro modos y trae su
+  pareja de contraste medida.
+
+### Corregido
+
 - **La referencia con la que se comparaba estaba a media luz.** Las dieciséis capturas del prototipo
   archivadas se tomaron a mitad de su animación de entrada (`apr-in`, de opacidad 0 a 1): medido
   sobre las ocho vistas, todo lo que anima salía entre **1,3 y 1,9 veces más oscuro**, mientras el

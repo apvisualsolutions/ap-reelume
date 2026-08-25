@@ -383,22 +383,38 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ItemsControl>
       </ScrollViewer>
     </Grid>
-    <Grid IsVisible="{Binding IsMovieDetails}" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space12}">
-      <Button
-          HorizontalAlignment="Left"
-          Command="{Binding BackCommand}"
-          Content="{DynamicResource LibraryBackAction}"
-          automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
-      <movie:MovieDetailsView Grid.Row="1" DataContext="{Binding MovieDetails}" />
-    </Grid>
+    <!--
+      A details card scrolls as one page, banner and all, which is what the prototype does and what a
+      card of sixteen episode rows needs. It used to be a fixed banner over a list with a scrollbar of
+      its own: two scrolling regions on one screen, and the wheel's answer depending on where the
+      pointer happened to be.
 
-    <Grid IsVisible="{Binding IsShowDetails}" RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space12}">
-      <Button
-          HorizontalAlignment="Left"
-          Command="{Binding BackCommand}"
-          Content="{DynamicResource LibraryBackAction}"
-          automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
-      <show:ShowDetailsView Grid.Row="1" DataContext="{Binding ShowDetails}" />
-    </Grid>
+      The way back is a link rather than a button, and it scrolls away with the rest: the prototype
+      writes it as text, and a filled pill at the top of a card competes with the one action the card
+      is actually for.
+    -->
+    <ScrollViewer IsVisible="{Binding IsMovieDetails}">
+      <StackPanel Spacing="{DynamicResource Space12}">
+        <Button
+            Classes="link-action"
+            HorizontalAlignment="Left"
+            Command="{Binding BackCommand}"
+            Content="{DynamicResource LibraryBackShortAction}"
+            automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
+        <movie:MovieDetailsView DataContext="{Binding MovieDetails}" />
+      </StackPanel>
+    </ScrollViewer>
+
+    <ScrollViewer IsVisible="{Binding IsShowDetails}">
+      <StackPanel Spacing="{DynamicResource Space12}">
+        <Button
+            Classes="link-action"
+            HorizontalAlignment="Left"
+            Command="{Binding BackCommand}"
+            Content="{DynamicResource LibraryBackShortAction}"
+            automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
+        <show:ShowDetailsView DataContext="{Binding ShowDetails}" />
+      </StackPanel>
+    </ScrollViewer>
   </Grid>
 </UserControl>

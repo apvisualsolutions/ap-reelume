@@ -11,43 +11,119 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="show:EpisodeRowViewModel">
   <!--
-    A fixed 56 px row rather than one that grows with its contents: a season is a column of these, and
-    rows of different heights read as a list that is still loading. The number is monospaced and
-    right-aligned inside a fixed width so that 9 and 10 end on the same pixel — what lines the column
-    up is the width and the alignment; the family only keeps the digits themselves even.
+    The prototype's episode row: a card with the number at the left, a wide still, the episode's name
+    and how long it runs, and the two things you can do to it at the right.
+
+    It used to be a 56 px strip holding a number, three status words with visibility bindings, and a
+    button — which lined up neatly and said almost nothing. What was missing was not decoration: the
+    name of the episode and its running time were not on screen at all, so a season read as a column
+    of numbers.
+
+    The still is 148 px wide at 16:9 like the prototype's, and it carries the same progress bar the
+    library's cards carry, drawn only for an episode somebody has actually started.
   -->
-  <Grid Height="56" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
-    <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="{DynamicResource Space4}">
-      <TextBlock VerticalAlignment="Center" Text="{DynamicResource EpisodePrefix}" />
+  <Border
+      Padding="16,13"
+      Background="{DynamicResource CardSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellHairlineBrush}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource CornerRadiusMedium}">
+    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <!--
+        The number is monospaced and right-aligned inside a fixed width so that 9 and 10 end on the
+        same pixel — what lines the column up is the width and the alignment; the family only keeps
+        the digits themselves even.
+      -->
       <TextBlock
-          Width="32"
+          Width="34"
           VerticalAlignment="Center"
           FontFamily="Consolas, Courier New, monospace"
-          FontWeight="SemiBold"
-          Text="{Binding EpisodeNumberText}"
-          TextAlignment="Right" />
-    </StackPanel>
+          FontSize="{DynamicResource FontSizeCaption}"
+          FontWeight="Bold"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{Binding NumberBadge}"
+          automation:AutomationProperties.AccessibilityView="Raw" />
 
-    <StackPanel
-        Grid.Column="1"
-        VerticalAlignment="Center"
-        Orientation="Horizontal"
-        Spacing="{DynamicResource Space8}">
-      <TextBlock IsVisible="{Binding IsWatched}" Text="{DynamicResource WatchStatusWatched}" />
-      <TextBlock IsVisible="{Binding IsInProgress}" Text="{DynamicResource WatchStatusInProgress}" />
-      <TextBlock IsVisible="{Binding IsNotStarted}" Text="{DynamicResource WatchStatusNotStarted}" />
-      <TextBlock IsVisible="{Binding IsManualOverride}" Text="{DynamicResource WatchStatusManualOverride}" />
-      <library:UnavailableBadge />
-      <TextBlock IsVisible="{Binding !IsPlayable}" Text="{DynamicResource EpisodeNoFile}" />
-    </StackPanel>
+      <Border
+          Grid.Column="1"
+          Width="148"
+          Height="83"
+          ClipToBounds="True"
+          BorderBrush="{DynamicResource ShellHairlineBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusMedium}">
+        <Panel>
+          <library:PosterArtView Classes="wide" Title="{Binding EpisodeTitle}" />
+          <!--
+            Three px at the foot of the still, and the same three setters the library's card needed:
+            the base theme gives a ProgressBar a minimum height of four and a minimum width of 200,
+            so Height alone measures 4 and stretching inside 148 px of picture clips rather than
+            fits.
+          -->
+          <ProgressBar
+              Height="3"
+              MinHeight="3"
+              MinWidth="0"
+              VerticalAlignment="Bottom"
+              Background="{DynamicResource ControlFillBrush}"
+              Foreground="{DynamicResource AccentBrush}"
+              IsVisible="{Binding HasProgress}"
+              Maximum="1"
+              Value="{Binding CompletedFraction}"
+              automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+        </Panel>
+      </Border>
 
-    <Button
-        Grid.Column="2"
-        VerticalAlignment="Center"
-        Click="OnPlayClick"
-        Content="{DynamicResource EpisodePlayAction}"
-        IsEnabled="{Binding IsPlayable}"
-        automation:AutomationProperties.Name="{DynamicResource EpisodePlayAction}"
-        automation:AutomationProperties.HelpText="{Binding SeasonEpisodeLabel}" />
-  </Grid>
+      <StackPanel
+          Grid.Column="2"
+          VerticalAlignment="Center"
+          Spacing="{DynamicResource Space4}">
+        <TextBlock
+            FontWeight="SemiBold"
+            Text="{Binding EpisodeTitle}"
+            TextTrimming="CharacterEllipsis"
+            TextWrapping="NoWrap" />
+        <TextBlock
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{Binding MetaText}"
+            TextTrimming="CharacterEllipsis"
+            TextWrapping="NoWrap" />
+        <WrapPanel ItemSpacing="{DynamicResource Space4}" LineSpacing="{DynamicResource Space4}">
+          <library:UnavailableBadge />
+          <TextBlock
+              VerticalAlignment="Center"
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              IsVisible="{Binding !IsPlayable}"
+              Text="{DynamicResource EpisodeNoFile}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              IsVisible="{Binding IsManualOverride}"
+              Text="{DynamicResource WatchStatusManualOverride}" />
+        </WrapPanel>
+      </StackPanel>
+
+      <!--
+        The word on the button is the short one and the announced name is the long one: ten rows of
+        «Reproducir» are ten identical sentences to a reader user, and the help text is what tells
+        them apart.
+      -->
+      <Button
+          Grid.Column="3"
+          Classes="compact"
+          VerticalAlignment="Center"
+          Click="OnPlayClick"
+          IsEnabled="{Binding IsPlayable}"
+          automation:AutomationProperties.Name="{DynamicResource EpisodePlayAction}"
+          automation:AutomationProperties.HelpText="{Binding SeasonEpisodeLabel}">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+          <Path Classes="icon size-14 filled" Data="{DynamicResource IconPlay}" />
+          <TextBlock Text="{DynamicResource EpisodePlayShortAction}" />
+        </StackPanel>
+      </Button>
+    </Grid>
+  </Border>
 </UserControl>

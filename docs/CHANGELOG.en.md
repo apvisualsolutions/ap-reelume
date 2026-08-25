@@ -10,6 +10,44 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The series card is the prototype's.** Under the title: «2020 · Drama · 3 seasons · 16 episodes»,
+  the series' own bar with «10/16 watched», and the panel that names the episode it is waiting on —
+  «S02·E05 · Puerto de invierno», «Resume at 17:00» — with its «▶ Continue» button, the card's only
+  accented action. The seasons stop being a drop-down and become **pills**, all three on the surface;
+  and every episode goes from a 56 px strip holding a number to the prototype's **card**: the number,
+  the wide still with its progress bar, the episode's name and «48 min · Watched». The name and the
+  running time were not on screen at all — the episode projection did not read them — so a season
+  read as a column of numbers.
+
+- **Both detail cards scroll as one page.** There were two scrolling regions on one screen — a fixed
+  banner over a list with a scrollbar of its own — so the wheel answered one or the other depending
+  on where the pointer happened to be. And the way back is a link, «Back · Library», as in the
+  prototype, rather than a filled pill competing with the card's own action.
+
+- **The personal marks leave the banner.** Ten rating buttons over the artwork pushed the episodes
+  off the first screen. They move to the «Other actions» column, where the film card already kept
+  them, in the prototype's shape: full-width rows with an icon, the name, and what the mark currently
+  is.
+
+- **A third of the banners' gradient was mismeasured.** The last stop was written `#30` meaning
+  «30 %», and `0x30` is 19 %: the picture came through half again as bright as the prototype paints
+  it at the right-hand edge. Corrected on both cards, and Home's hero moves to its own gradient,
+  which is a different one — `rgba(5,6,8,…)`, with its stops inside the frame rather than at its
+  edges.
+
+- **CI had verified nothing since 2026-08-24.** The last three runs died at «Install ffmpeg» with a
+  503 from the Chocolatey feed, before compiling a single line. The step now retries three times with
+  a widening wait; the version stays pinned, so what a retry can change is the transport and nothing
+  else.
+
+### Added
+
+- `AccentInkBrush`, the ink written **on** the accent's wash, which is what a chosen pill is made of.
+  It comes from the prototype's `--accent-ink` in all four modes and arrives with its contrast pair
+  measured.
+
+### Fixed
+
 - **The reference everything was compared against was half-lit.** The sixteen archived prototype
   captures were taken mid fade-in (`apr-in`, opacity 0 to 1): measured across the eight views,
   everything that animates came out **1.3 to 1.9 times darker**, while the page background — which

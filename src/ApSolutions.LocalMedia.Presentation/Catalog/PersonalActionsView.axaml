@@ -11,42 +11,70 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     x:DataType="catalog:PersonalActionsViewModel"
     automation:AutomationProperties.Name="{DynamicResource PersonalActionsAccessibleName}">
-  <StackPanel Spacing="{DynamicResource Space8}">
-    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
-      <ToggleButton
-          Command="{Binding ToggleFavoriteCommand}"
-          Content="{DynamicResource PersonalFavoriteAction}"
-          IsChecked="{Binding IsFavorite, Mode=OneWay}"
-          automation:AutomationProperties.Name="{DynamicResource PersonalFavoriteAction}" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding IsFavorite}"
-          Text="{DynamicResource PersonalFavoriteOn}" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding IsNotFavorite}"
-          Text="{DynamicResource PersonalFavoriteOff}" />
-    </WrapPanel>
+  <!--
+    The prototype's «Otras acciones» list: full-width rows, an icon, the name of the mark, and what
+    it currently is, at the right. It used to be three rows of loose controls with the state written
+    in a label beside them, which is 620 px wide and reads as a form; the column it lives in is 320.
 
-    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
-      <ToggleButton
-          Command="{Binding ToggleWatchLaterCommand}"
-          Content="{DynamicResource PersonalWatchLaterAction}"
-          IsChecked="{Binding IsWatchLater, Mode=OneWay}"
-          automation:AutomationProperties.Name="{DynamicResource PersonalWatchLaterAction}" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding IsWatchLater}"
-          Text="{DynamicResource PersonalWatchLaterOn}" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding IsNotWatchLater}"
-          Text="{DynamicResource PersonalWatchLaterOff}" />
-    </WrapPanel>
+    The state stays in words as well as in the button's own checked state, because a mark that only
+    said "on" by being filled would be saying it in colour alone.
+  -->
+  <StackPanel Spacing="{DynamicResource Space4}">
+    <ToggleButton
+        Classes="action-row"
+        Command="{Binding ToggleFavoriteCommand}"
+        IsChecked="{Binding IsFavorite, Mode=OneWay}"
+        automation:AutomationProperties.Name="{DynamicResource PersonalFavoriteAction}">
+      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space8}">
+        <Path Classes="icon size-16" Data="{DynamicResource IconBookmark}" />
+        <TextBlock Grid.Column="1" Text="{DynamicResource PersonalFavoriteAction}" />
+        <TextBlock
+            Grid.Column="2"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            IsVisible="{Binding IsFavorite}"
+            Text="{DynamicResource PersonalFavoriteOn}" />
+        <TextBlock
+            Grid.Column="2"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            IsVisible="{Binding IsNotFavorite}"
+            Text="{DynamicResource PersonalFavoriteOff}" />
+      </Grid>
+    </ToggleButton>
 
-    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+    <ToggleButton
+        Classes="action-row"
+        Command="{Binding ToggleWatchLaterCommand}"
+        IsChecked="{Binding IsWatchLater, Mode=OneWay}"
+        automation:AutomationProperties.Name="{DynamicResource PersonalWatchLaterAction}">
+      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space8}">
+        <Path Classes="icon size-16" Data="{DynamicResource IconClock}" />
+        <TextBlock Grid.Column="1" Text="{DynamicResource PersonalWatchLaterAction}" />
+        <TextBlock
+            Grid.Column="2"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            IsVisible="{Binding IsWatchLater}"
+            Text="{DynamicResource PersonalWatchLaterOn}" />
+        <TextBlock
+            Grid.Column="2"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            IsVisible="{Binding IsNotWatchLater}"
+            Text="{DynamicResource PersonalWatchLaterOff}" />
+      </Grid>
+    </ToggleButton>
+
+    <!--
+      The rating is the one thing here the prototype never drew, so it is drawn in the prototype's
+      grammar rather than invented: the label, ten square choices that fit the column on one line,
+      and what the answer currently is.
+    -->
+    <StackPanel Margin="0,4,0,0" Spacing="{DynamicResource Space4}">
       <TextBlock
-          VerticalAlignment="Center"
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
           Text="{DynamicResource PersonalRatingLabel}" />
       <ItemsControl ItemsSource="{Binding RatingChoices}">
         <ItemsControl.ItemsPanel>
@@ -57,7 +85,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="sys:Int32">
             <Button
-                MinWidth="36"
+                Width="28"
+                Classes="rating-choice"
                 Click="OnRatingClick"
                 Content="{Binding}"
                 Tag="{Binding}"
@@ -66,18 +95,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding HasRating}"
-          Text="{Binding RatingText}" />
-      <TextBlock
-          VerticalAlignment="Center"
-          IsVisible="{Binding HasNoRating}"
-          Text="{DynamicResource PersonalRatingNone}" />
-      <Button
-          Command="{Binding ClearRatingCommand}"
-          Content="{DynamicResource PersonalRatingClearAction}"
-          automation:AutomationProperties.Name="{DynamicResource PersonalRatingClearAction}" />
-    </WrapPanel>
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+        <TextBlock
+            VerticalAlignment="Center"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            IsVisible="{Binding HasRating}"
+            Text="{Binding RatingText}" />
+        <TextBlock
+            VerticalAlignment="Center"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            IsVisible="{Binding HasNoRating}"
+            Text="{DynamicResource PersonalRatingNone}" />
+        <Button
+            Grid.Column="1"
+            Classes="compact"
+            Command="{Binding ClearRatingCommand}"
+            Content="{DynamicResource PersonalRatingClearAction}"
+            automation:AutomationProperties.Name="{DynamicResource PersonalRatingClearAction}" />
+      </Grid>
+    </StackPanel>
   </StackPanel>
 </UserControl>

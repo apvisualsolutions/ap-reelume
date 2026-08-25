@@ -110,6 +110,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="LibrarySortYear">Year</x:String>
   <x:String x:Key="LibrarySortAdded">Added</x:String>
   <x:String x:Key="LibrarySortLastPlayed">Last played</x:String>
+  <x:String x:Key="LibraryBackShortAction">Back · Library</x:String>
   <x:String x:Key="LibraryBackAction">Back to library</x:String>
   <x:String x:Key="LibraryResultsListName">Library results</x:String>
   <x:String x:Key="LibraryEmptyTitle">Nothing in the library yet</x:String>
@@ -413,6 +414,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MovieVersionEffective">This one will open</x:String>
   <x:String x:Key="MovieVersionPreferred">Chosen by you</x:String>
   <x:String x:Key="ShowDetailsEmpty">This show has no episodes in the catalog yet.</x:String>
+  <x:String x:Key="ShowEpisodesHeading">Episodes</x:String>
+  <x:String x:Key="ShowSeasonsSuffix">seasons</x:String>
+  <x:String x:Key="ShowWatchedOfTotal">{0}/{1} watched</x:String>
+  <x:String x:Key="ShowNextEpisodeHeading">NEXT EPISODE</x:String>
+  <x:String x:Key="ShowNextEpisodeCode">S{0}·E{1}</x:String>
+  <x:String x:Key="ShowFinished">Series finished</x:String>
+  <x:String x:Key="EpisodeResumeAt">Resume at {0}</x:String>
+  <x:String x:Key="EpisodePlayShortAction">Play</x:String>
   <x:String x:Key="SeasonHeading">Season</x:String>
   <x:String x:Key="SeasonPickerLabel">Choose a season</x:String>
   <x:String x:Key="SeasonSpecialsHeading">Specials</x:String>

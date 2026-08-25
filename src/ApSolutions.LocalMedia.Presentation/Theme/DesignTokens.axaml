@@ -238,6 +238,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FBFCFE" />
           <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#E4EFF9" />
+          <SolidColorBrush x:Key="AccentInkBrush" Color="#0B4A78" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#101828" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PrimaryActionBrush" Color="#1769AA" />
@@ -459,6 +460,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#08090C" />
           <SolidColorBrush x:Key="AccentBrush" Color="#62AEE8" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#0B1E2F" />
+          <SolidColorBrush x:Key="AccentInkBrush" Color="#9CC9EC" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#EDF1F6" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#0A0C10" />
           <!--
@@ -692,6 +694,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="AccentInkBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="PrimaryActionBrush" Color="#0000FF" />
@@ -919,6 +922,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#000000" />
           <SolidColorBrush x:Key="AccentBrush" Color="#00FFFF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#000000" />
+          <SolidColorBrush x:Key="AccentInkBrush" Color="#00FFFF" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#000000" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#000000" />
           <SolidColorBrush x:Key="PrimaryActionBrush" Color="#00FFFF" />
@@ -1569,6 +1573,86 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
   <Style Selector="ComboBox.filter-pill:disabled /template/ Path#DropCaret">
     <Setter Property="Stroke" Value="{DynamicResource TextDisabledBrush}" />
+  </Style>
+
+  <!--
+    The prototype's «Otras acciones» row: full width, an icon at the left, the label beside it and
+    what the mark currently is at the right. It is a ToggleButton because that is what it does, and
+    the class is what stops it from looking like a pill in a column of rows.
+  -->
+  <Style Selector="ToggleButton.action-row">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+  </Style>
+
+  <!-- Ten of these fit a 320 px column on one line, which is the whole reason for the width. -->
+  <Style Selector="Button.rating-choice">
+    <Setter Property="MinWidth" Value="28" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+
+  <!--
+    The prototype's small secondary button — btnSecSm — which is what rides inside a row rather than
+    under a heading: 30 px tall against the ordinary 36, and the caption size. A row of full-height
+    buttons makes every list in the application look like a form.
+  -->
+  <Style Selector="Button.compact">
+    <Setter Property="Height" Value="30" />
+    <Setter Property="MinHeight" Value="30" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+  </Style>
+
+  <!--
+    The prototype's segmented pill, which it draws in three places: the seasons of a series, the two
+    tabs of the editor, and the type filter of the library. One style rather than three, because the
+    thing being chosen differs and the grammar does not.
+
+    The chosen one is filled with the accent's own subtle wash and written in the accent's ink; the
+    rest carry the control fill and the secondary ink, and their border is transparent so the row
+    does not read as four boxes. The checked setters go on the presenter for the reason
+    primary-action's do: measured, a Background setter on the ToggleButton itself loses to the base
+    theme, and a pill that lost its fill would be a chooser with no answer showing.
+  -->
+  <Style Selector="ToggleButton.segment">
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="15,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+
+  <Style Selector="ToggleButton.segment:checked">
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="ToggleButton.segment:checked /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentInkBrush}" />
+  </Style>
+
+  <Style Selector="ToggleButton.segment:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ControlFillHoverBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentInkBrush}" />
+  </Style>
+
+  <Style Selector="ToggleButton.segment:checked:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ControlFillPressedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentInkBrush}" />
   </Style>
 
   <Style Selector="TextBlock.transport-clock">

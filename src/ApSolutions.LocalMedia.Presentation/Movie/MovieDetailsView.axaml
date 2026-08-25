@@ -33,8 +33,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <Border.Background>
               <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
                 <GradientStop Offset="0" Color="#F2090C10" />
-                <GradientStop Offset="0.55" Color="#B8090C10" />
-                <GradientStop Offset="1" Color="#30090C10" />
+                <GradientStop Offset="0.54" Color="#BD090C10" />
+                <GradientStop Offset="1" Color="#47090C10" />
               </LinearGradientBrush>
             </Border.Background>
           </Border>

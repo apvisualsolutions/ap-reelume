@@ -61,6 +61,8 @@ public sealed class ContrastTokenTests
         "FocusInnerStrokeBrush",
         "AccentBrush",
         "AccentSubtleBrush",
+        // The ink written ON the subtle wash, which is what a chosen segment is painted with.
+        "AccentInkBrush",
         "AccentTextBrush",
 
         // The leading action's own family, added 2026-08-24 with the prototype's palette: in dark
@@ -165,6 +167,16 @@ public sealed class ContrastTokenTests
             // accent is a pale blue, and white on it reads 2.40:1. The colour follows the accent's
             // luminance, not the theme's name.
             AssertContrastAtLeast(brushes, "AccentTextBrush", "AccentBrush", TextMinimum, $"{theme} text on the accent");
+
+            // And the chosen segment: the accent's ink on the accent's wash. A pill is a word on a
+            // tinted background, so this pair carries a whole chooser — which season is on screen,
+            // which tab of the editor is open, which kind the library is filtered to.
+            AssertContrastAtLeast(
+                brushes,
+                "AccentInkBrush",
+                "AccentSubtleBrush",
+                TextMinimum,
+                $"{theme} accent ink on the accent wash");
 
             // The leading action's ink on each of its three fills: the primary is its own family
             // since 2026-08-24, and a pill whose hover loses its ink is a button that blinks.

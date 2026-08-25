@@ -45,11 +45,33 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         PlayEpisodeCommand = new AsyncRelayCommand(
             parameter => parameter is EpisodeRowViewModel episode ? PlayAsync(episode) : Task.CompletedTask,
             parameter => parameter is EpisodeRowViewModel { IsPlayable: true });
+        // What the banner's own button does: start the one episode this series is waiting on, which
+        // the card already had to work out in order to name it.
+        ContinueCommand = new AsyncRelayCommand(
+            () => NextEpisode is { } next ? PlayAsync(next) : Task.CompletedTask,
+            () => NextEpisode is { IsPlayable: true });
+        SelectSeasonCommand = new AsyncRelayCommand(
+            parameter =>
+            {
+                if (parameter is SeasonViewModel season)
+                {
+                    SelectedSeason = season;
+                }
+
+                return Task.CompletedTask;
+            },
+            parameter => parameter is SeasonViewModel);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand PlayEpisodeCommand { get; }
+
+    /// <summary>Starts the episode the banner names, which is where a series is picked up.</summary>
+    public ICommand ContinueCommand { get; }
+
+    /// <summary>Puts one season on screen. The pills call it; nothing else changes the selection.</summary>
+    public ICommand SelectSeasonCommand { get; }
 
     /// <summary>
     /// Opens the provider's trailer in the browser (LIB-015). A series has no single file to hang a
@@ -89,6 +111,74 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     public bool IsAvailable => _item?.IsAvailable ?? false;
 
+    /// <summary>
+    /// The line under the title: year, genres, how many seasons and how many episodes.
+    /// </summary>
+    /// <remarks>
+    /// The card said a year and nothing else. The season count is left out of a series that has one,
+    /// because a plural over a single season is worse than silence and a one-season series has
+    /// nothing to say about its seasons anyway — the picker above is absent for the same reason.
+    /// </remarks>
+    public string MetaText => string.Join(
+        " · ",
+        new[]
+        {
+            YearText,
+            _item?.Genres is { Count: > 0 } genres ? string.Join(" · ", genres.Take(2)) : string.Empty,
+            Seasons.Count > 1 ? Count(Seasons.Count, "ShowSeasonsSuffix", "seasons") : string.Empty,
+            EpisodeTotal > 0 ? Count(EpisodeTotal, "CatalogEpisodesSuffix", "episodes") : string.Empty,
+        }.Where(piece => piece.Length > 0));
+
+    public bool HasMeta => MetaText.Length > 0;
+
+    /// <summary>Every episode the catalogue knows of this series, specials included.</summary>
+    public int EpisodeTotal => Seasons.Sum(season => season.EpisodeCount);
+
+    /// <summary>And how many of them are finished.</summary>
+    public int WatchedCount => Seasons.Sum(season => season.WatchedCount);
+
+    /// <summary>The sentence under the bar, which counts what is done out of what there is.</summary>
+    public string ProgressText => ShowText.Resource("ShowWatchedOfTotal", "{0}/{1} watched")
+        .Replace("{0}", WatchedCount.ToString(CultureInfo.CurrentCulture), StringComparison.Ordinal)
+        .Replace("{1}", EpisodeTotal.ToString(CultureInfo.CurrentCulture), StringComparison.Ordinal);
+
+    /// <summary>How much of the series is behind you, between nothing and one.</summary>
+    public double WatchedFraction => EpisodeTotal > 0 ? WatchedCount / (double)EpisodeTotal : 0;
+
+    /// <summary>A bar is drawn only for a series that has episodes to count.</summary>
+    public bool HasProgress => EpisodeTotal > 0;
+
+    /// <summary>
+    /// The episode this series is waiting on: the one left half-watched, or the first nobody has
+    /// started. Ordered by the same policy the player chains with, so a series never resumes into a
+    /// special.
+    /// </summary>
+    public EpisodeRowViewModel? NextEpisode
+    {
+        get
+        {
+            var rows = Seasons.SelectMany(season => season.Episodes).ToArray();
+            return Array.Find(rows, row => row.IsInProgress && row.IsPlayable)
+                ?? Array.Find(rows, row => row.IsNotStarted && row.IsPlayable);
+        }
+    }
+
+    public bool HasNextEpisode => NextEpisode is not null;
+
+    /// <summary>The code and the name of that episode, or the sentence for one with nothing left.</summary>
+    public string NextEpisodeLabel => NextEpisode is { } next
+        ? ShowText.Resource("ShowNextEpisodeCode", "S{0}·E{1}")
+            .Replace("{0}", next.SeasonNumber.ToString("D2", CultureInfo.CurrentCulture), StringComparison.Ordinal)
+            .Replace("{1}", next.EpisodeNumber.ToString("D2", CultureInfo.CurrentCulture), StringComparison.Ordinal)
+            + " · "
+            + next.EpisodeTitle
+        : ShowText.Resource("ShowFinished", "Series finished");
+
+    /// <summary>Where it would be picked up, or that nobody has opened it.</summary>
+    public string NextEpisodeSubText => NextEpisode is { IsInProgress: true } next
+        ? next.MetaText
+        : ShowText.Resource("WatchStatusNotStarted", "Not started");
+
     public IReadOnlyList<SeasonViewModel> Seasons
     {
         get => _seasons;
@@ -103,7 +193,20 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     public SeasonViewModel? SelectedSeason
     {
         get => _selectedSeason;
-        set => SetField(ref _selectedSeason, value);
+        set
+        {
+            if (!SetField(ref _selectedSeason, value))
+            {
+                return;
+            }
+
+            // Exactly one pill is lit, and the loop is what guarantees it: setting the new one and
+            // trusting the old one to have been cleared is how a chooser ends up with two answers.
+            foreach (var season in Seasons)
+            {
+                season.IsSelected = ReferenceEquals(season, value);
+            }
+        }
     }
 
     /// <summary>
@@ -160,13 +263,29 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
             nameof(IsEmpty),
             nameof(HasSeasons),
             nameof(HasTrailerLink),
+            nameof(MetaText),
+            nameof(HasMeta),
+            nameof(EpisodeTotal),
+            nameof(WatchedCount),
+            nameof(ProgressText),
+            nameof(WatchedFraction),
+            nameof(HasProgress),
+            nameof(NextEpisode),
+            nameof(HasNextEpisode),
+            nameof(NextEpisodeLabel),
+            nameof(NextEpisodeSubText),
         })
         {
             OnPropertyChanged(name);
         }
 
         (OpenTrailerLinkCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (ContinueCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
+
+    /// <summary>A number and the word that follows it, in whichever language is loaded.</summary>
+    private static string Count(int value, string key, string fallback) =>
+        string.Create(CultureInfo.CurrentCulture, $"{value} {ShowText.Resource(key, fallback)}");
 
     private Task PlayAsync(EpisodeRowViewModel episode) => _onPlay is null || !episode.IsPlayable
         ? Task.CompletedTask
