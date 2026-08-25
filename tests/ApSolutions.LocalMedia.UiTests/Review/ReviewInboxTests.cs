@@ -68,7 +68,7 @@ public sealed class ReviewInboxTests
     }
 
     [AvaloniaFact]
-    public async Task Tab_arrows_Enter_and_Escape_operate_review_without_a_mouse()
+    public async Task Tab_Enter_and_Escape_operate_review_without_a_mouse()
     {
         var repository = new UiReviewRepository([
             Candidate("first", 0.50, ReviewState.Pending, "Identification.Signal.Title"),
@@ -80,20 +80,9 @@ public sealed class ReviewInboxTests
         var window = new Window { Width = 1024, Height = 720, Content = view };
         window.Show();
         Dispatcher.UIThread.RunJobs();
-        var list = view.GetVisualDescendants().OfType<ListBox>().Single();
-        list.SelectedIndex = 0;
-        Dispatcher.UIThread.RunJobs();
-        var firstItem = view.GetVisualDescendants().OfType<ListBoxItem>().First();
-        firstItem.Focus();
-        Assert.True(list.IsKeyboardFocusWithin);
-
-        window.KeyPress(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, null);
-        window.KeyRelease(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, null);
-        Dispatcher.UIThread.RunJobs();
-        Assert.Equal(1, list.SelectedIndex);
-
-        // Accept with the keyboard, on the card the arrows landed on. It used to be Enter on the row
-        // itself; a card holds three decisions now, so the key belongs to the one with focus.
+        // Accept with the keyboard, on the card the person tabbed to. It used to be Enter on a row
+        // that a pair of arrow keys moved between; a card holds three decisions now, so the key
+        // belongs to whichever of them has focus and Tab is what walks between them.
         var second = viewModel.Items[1];
         var acceptButton = view.GetVisualDescendants()
             .OfType<Button>()
@@ -104,9 +93,13 @@ public sealed class ReviewInboxTests
         await WaitForAsync(() => repository.Candidates.Single(candidate => candidate.StableKey == "second").IsDecisionLocked);
         Assert.Equal(ReviewState.Accepted, repository.Candidates.Single(candidate => candidate.StableKey == "second").ReviewState);
 
+        // Escape gives up whichever card the manual search was aimed at, from anywhere on the
+        // surface: the binding is the view's own rather than a list's.
         viewModel.SelectedItem = viewModel.Items.Single();
         Dispatcher.UIThread.RunJobs();
-        view.GetVisualDescendants().OfType<ListBoxItem>().Single().Focus();
+        Assert.NotNull(viewModel.SelectedItem);
+        var box = view.GetVisualDescendants().OfType<TextBox>().Single(text => text.Name == "ManualSearchBox");
+        Assert.True(box.Focus(), "The tray's own search box could not take focus.");
         window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
         window.KeyRelease(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
         Dispatcher.UIThread.RunJobs();
@@ -432,7 +425,7 @@ public sealed class ReviewInboxTests
         Assert.Contains(Resource("ReviewInboxEmptyDescription"), painted, StringComparer.Ordinal);
 
         var list = Assert.Single(
-            view.GetVisualDescendants().OfType<ListBox>(),
+            view.GetVisualDescendants().OfType<ItemsControl>(),
             box => box.Name == "ReviewCandidates");
         Assert.False(list.IsEffectivelyVisible, "an empty list under an empty state says nothing twice.");
 
@@ -462,7 +455,7 @@ public sealed class ReviewInboxTests
         Assert.False(surface.IsEffectivelyVisible, "the tray has something in it and still says there is nothing.");
 
         var list = Assert.Single(
-            view.GetVisualDescendants().OfType<ListBox>(),
+            view.GetVisualDescendants().OfType<ItemsControl>(),
             box => box.Name == "ReviewCandidates");
         Assert.True(list.IsEffectivelyVisible);
 

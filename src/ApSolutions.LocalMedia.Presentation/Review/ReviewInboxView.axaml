@@ -9,7 +9,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
     x:DataType="review:ReviewInboxViewModel"
-    KeyDown="OnReviewKeyDown"
     automation:AutomationProperties.Name="{DynamicResource ReviewInboxAccessibleName}">
   <UserControl.KeyBindings>
     <KeyBinding Gesture="Escape" Command="{Binding ClearSelectionCommand}" />
@@ -165,13 +164,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </StackPanel>
       </Grid>
     </Border>
-    <ListBox
+    <!--
+      A list of cards rather than a list with a selection, since the decisions moved into the cards.
+      What the ListBox bought was "the row Accept acts on", and nothing acts on a row any more —
+      while what it cost was measured on 2026-08-25: its items are command controls, so a full-width
+      card in a stack of them leaves no point beside a button that is not inside another control,
+      and the walk's own proof (click beside, and nothing must change) had nowhere to land. The
+      duplicates destination draws its rows the same way and never had the problem.
+    -->
+    <ItemsControl
         x:Name="ReviewCandidates"
         Grid.Row="3"
         IsVisible="{Binding !IsEmpty}"
         automation:AutomationProperties.Name="{DynamicResource ReviewCandidateListName}"
-        ItemsSource="{Binding Items}"
-        SelectedItem="{Binding SelectedItem}">
+        ItemsSource="{Binding Items}">
       <!--
         Enter used to accept whatever was selected. With the three decisions inside the card that is
         a shortcut nobody can predict: measured on 2026-08-25, pressing Enter on the focused Reject
@@ -179,17 +185,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
         holds three actions, so Enter belongs to whichever of them has focus — which is the ordinary
         keyboard grammar, and one Tab away.
       -->
-      <ListBox.ItemsPanel>
+      <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>
           <VirtualizingStackPanel />
         </ItemsPanelTemplate>
-      </ListBox.ItemsPanel>
-      <ListBox.ItemTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="review:CandidateCardViewModel">
           <review:CandidateCardView />
         </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
     <!--
       What is left under the list once the decisions moved into the cards: the next page, and the
       sentence that says a decision was overtaken by another one. Accept and Reject used to live here

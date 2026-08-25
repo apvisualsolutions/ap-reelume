@@ -2,36 +2,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using Avalonia.Controls;
-using Avalonia.Input;
 
 namespace ApSolutions.LocalMedia.Presentation.Review;
 
+/// <summary>
+/// The review tray. It carried an arrow-key handler that moved a list selection, which went with the
+/// list on 2026-08-25: the three decisions live in the card now, so what a keyboard walks between is
+/// buttons, and Tab already does that.
+/// </summary>
 public sealed partial class ReviewInboxView : UserControl
 {
     public ReviewInboxView()
     {
         InitializeComponent();
-    }
-
-    private void OnReviewKeyDown(object? sender, KeyEventArgs e)
-    {
-        _ = sender;
-        if (!ReviewCandidates.IsKeyboardFocusWithin || ReviewCandidates.ItemCount == 0)
-        {
-            return;
-        }
-
-        if (e.Key == Key.Down)
-        {
-            ReviewCandidates.SelectedIndex = Math.Min(
-                ReviewCandidates.SelectedIndex + 1,
-                ReviewCandidates.ItemCount - 1);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Up)
-        {
-            ReviewCandidates.SelectedIndex = Math.Max(ReviewCandidates.SelectedIndex - 1, 0);
-            e.Handled = true;
-        }
     }
 }
