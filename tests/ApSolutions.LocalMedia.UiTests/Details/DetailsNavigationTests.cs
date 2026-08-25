@@ -283,6 +283,79 @@ public sealed class DetailsNavigationTests
         Assert.Equal(TimeSpan.FromMinutes(expectedStartMinutes), requests[0].StartPosition);
     }
 
+    /// <summary>
+    /// A film with no version group and no file names no file, and the host fills it in.
+    /// </summary>
+    /// <remarks>
+    /// It is the ordinary case rather than an edge one: a film with a single copy is never grouped,
+    /// and a card opened before the repository answered has no row either. The request carries a null
+    /// identifier and the composition substitutes the title's own — a title's id IS its media file's
+    /// id — so what has to hold here is that the card asks rather than refusing.
+    /// </remarks>
+    [Fact]
+    public void A_film_with_no_versions_at_all_still_opens_and_names_no_file()
+    {
+        var requests = new List<PlayDetailsRequest>();
+        var viewModel = new MovieDetailsViewModel(onPlay: request =>
+        {
+            requests.Add(request);
+            return Task.CompletedTask;
+        });
+        viewModel.Apply(
+            Item(MovieId, CatalogTitleKind.Movie, "Arrival", isAvailable: true),
+            watchState: null,
+            versions: null);
+
+        // The stored point of a film nobody has started, which is zero and not a throw: the property
+        // is read by the card whether or not there is anything behind it.
+        Assert.Equal(TimeSpan.Zero, viewModel.ResumePosition);
+        Assert.Empty(viewModel.Versions);
+
+        viewModel.PlayOrResumeCommand.Execute(null);
+
+        Assert.Single(requests);
+        Assert.Null(requests[0].MediaFileId);
+        Assert.Equal(TimeSpan.Zero, requests[0].StartPosition);
+    }
+
+    /// <summary>
+    /// And with a file behind it, the card lists that one copy.
+    /// </summary>
+    /// <remarks>
+    /// «Which copy is this and where does it live» is asked of every film and not only of duplicated
+    /// ones, so a film with no group still shows one row — built from the file the repository
+    /// answered with, which is the arm a card with no file cannot take.
+    /// </remarks>
+    [Fact]
+    public void A_film_with_one_file_and_no_group_lists_that_copy()
+    {
+        var fileId = new MediaFileId(CreateGuid(55));
+        var viewModel = new MovieDetailsViewModel();
+        viewModel.Apply(
+            Item(MovieId, CatalogTitleKind.Movie, "Arrival", isAvailable: true),
+            watchState: null,
+            versions: null,
+            file: new MediaFile(
+                fileId,
+                new LibraryRootId(CreateGuid(56)),
+                @"root\arrival.mkv",
+                4_000_000_000,
+                DateTimeOffset.UnixEpoch,
+                new TechnicalMetadata(TimeSpan.FromMinutes(116), "mkv", ["h264"], ["aac"], 1920, 1080)));
+
+        Assert.Single(viewModel.Versions);
+        Assert.Equal(fileId, viewModel.Versions[0].MediaFileId);
+        Assert.True(viewModel.Versions[0].IsEffective);
+    }
+
+    /// <summary>A version row refuses to be built around nothing.</summary>
+    [Fact]
+    public void A_version_row_refuses_a_version_that_is_not_there()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new MediaVersionRowViewModel(null!, isPreferred: false, isEffective: false));
+    }
+
     [Fact]
     public void A_resume_point_past_an_hour_is_written_with_hours_and_a_position_is_clamped()
     {

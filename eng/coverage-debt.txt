@@ -156,7 +156,7 @@ src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs     
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewViewModel.cs                    95  53
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsViewModel.cs                       100  81
+src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsViewModel.cs                       100  82
 src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs                       83  75
 src/ApSolutions.LocalMedia.Presentation/Onboarding/AddRootDialogView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
