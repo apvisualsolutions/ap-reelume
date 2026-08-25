@@ -112,7 +112,9 @@ public sealed class HdrAccelerationTests
     /// it reaches this engine's buffer, and with D3D11VA the picture at that moment is a graphics
     /// card surface it has no routine to draw onto — measured on 2026-08-25, 67 001 bytes of picture
     /// changing in software and zero in hardware. The engine records the step down when it is built,
-    /// so the request stays the caller's and what is announced as active stays true.
+    /// and reports neither requested nor active — a surface it cannot compose onto is not something
+    /// it asks for, so the «hardware acceleration was not available» warning belongs to a machine
+    /// that could not give it and not to a decision this engine took.
     /// </remarks>
     [Fact]
     public async Task The_embedded_engine_decodes_in_software_and_reports_it_from_the_first_open()
@@ -134,7 +136,12 @@ public sealed class HdrAccelerationTests
         await engine.PlayAsync(TestContext.Current.CancellationToken);
         var advanced = await CodecMatrixTests.WaitForPositionAsync(engine, TimeSpan.FromMilliseconds(150));
 
-        Assert.True(engine.Capabilities!.HardwareAccelerationRequested);
+        // Neither requested nor active, and the pair is the point: the engine does not ask for a
+        // graphics-card surface, because it composes subtitles into the picture it hands out and a
+        // surface cannot be asked to do that. Reporting the caller's wish would light the «hardware
+        // acceleration was not available» warning over every session forever — a complaint about
+        // the machine where the truth is a decision.
+        Assert.False(engine.Capabilities!.HardwareAccelerationRequested);
         Assert.False(engine.Capabilities.HardwareAccelerationActive);
         Assert.True(advanced, "Playback stopped while decoding in software.");
         Assert.True(engine.DecodedFrameCount > 0);

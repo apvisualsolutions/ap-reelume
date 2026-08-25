@@ -1,14 +1,17 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-using ApSolutions.LocalMedia.Domain.Playback;
-
 namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 
 /// <summary>
 /// Tracks the one-time step from hardware decoding to software. Once a media has fallen back it is
 /// not retried in hardware, so a failing decoder cannot make the session flap between the two.
 /// </summary>
+/// <remarks>
+/// It used to build the reported decision as well, and that method went with the engine's decision to
+/// stop asking for a graphics-card surface at all: nothing called it any more, and a method with no
+/// caller outside its own tests is this repository's house defect wearing a small hat.
+/// </remarks>
 public sealed class HardwareAccelerationFallback
 {
     private readonly Lock _sync = new();
@@ -52,13 +55,6 @@ public sealed class HardwareAccelerationFallback
             return true;
         }
     }
-
-    /// <summary>Builds the decision to report for this attempt.</summary>
-    public VideoOutputDecision Decide(
-        VideoSourceCapabilities source,
-        DisplayCapabilities display,
-        bool hardwareRequested) =>
-        VideoOutputPolicy.Decide(source, display, hardwareRequested, ShouldUseHardware(hardwareRequested));
 
     /// <summary>Forgets the fallback, which only happens when a new engine is created.</summary>
     public void Reset()

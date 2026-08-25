@@ -76,11 +76,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
         height, not CSS's 999</b>. So it is one value spent by every button rather than a step for one
         consumer, which is the shape FontSizeMono was refused for.
 
-        Half of ControlHeight, and the two are written apart because a CornerRadius is not a Double
-        and AXAML has no arithmetic. ScalarTokenTests would not catch them disagreeing, so the comment
-        is where the pair is declared: if the control height moves, this moves with it.
+        Larger than any control that carries it, which is what makes one number draw both shapes.
+
+        It was 18 — half of ControlHeight — and that is exactly right for a 36 px control and one
+        pixel short of round for anything taller: the player's 44 px targets came out as squares with
+        their corners taken off, which is what the owner saw on 2026-08-25 and what «nunca cuadrados»
+        refuses. A radius larger than half the shorter side is clamped to half of it when it is drawn,
+        so 999 is a circle on a square target, a pill on a wide one, and needs no second token to say
+        which. It is the prototype's own `border-radius: 999px`, and the reason that idiom exists.
       -->
-      <CornerRadius x:Key="CornerRadiusPill">18</CornerRadius>
+      <CornerRadius x:Key="CornerRadiusPill">999</CornerRadius>
       <!--
         The poster, in exactly 2:3, and here rather than inside PosterCardView because two things read
         it: the card paints it, and the library grid divides its own width by it to decide how many
@@ -1377,6 +1382,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="{DynamicResource PrimaryActionPressedBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource PrimaryActionTextBrush}" />
   </Style>
+  <!--
+    A button whose whole content is a glyph, standing in a row of buttons that carry words.
+
+    It is exactly as tall as they are — ControlHeight, the same one the base style gives every button
+    — and exactly as wide, which with the pill radius makes it a circle. player-chrome would have
+    been the obvious class and is the wrong one here: those are 44 px because they sit on the
+    player's own band beside other 44 px targets, and a 44 px circle in a row of 36 px pills is the
+    one control that does not line up. «Esos botones deberían ser del mismo tamaño menos el de
+    reproducir», said on 2026-08-25, looking at exactly that row.
+
+    Padding zero for the reason player-chrome has it: the five pixels that put a word right would
+    push a shape above the middle of its own target.
+  -->
+  <Style Selector="Button.icon-action">
+    <Setter Property="Width" Value="{DynamicResource ControlHeight}" />
+    <Setter Property="Height" Value="{DynamicResource ControlHeight}" />
+    <Setter Property="MinWidth" Value="{DynamicResource ControlHeight}" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
   <Style Selector="Button.primary-action">
     <Setter Property="Background" Value="{DynamicResource PrimaryActionBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource PrimaryActionBrush}" />
@@ -1766,7 +1793,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="MinHeight" Value="36" />
     <Setter Property="Padding" Value="12,0" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
   </Style>
 
   <Style Selector="ToggleButton.action-row">
@@ -1774,7 +1801,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="MinHeight" Value="36" />
     <Setter Property="Padding" Value="12,0" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
   </Style>
 
   <!-- Ten of these fit a 320 px column on one line, which is the whole reason for the width. -->
@@ -1888,7 +1915,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Padding" Value="0" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
   </Style>
@@ -1910,7 +1937,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
   </Style>
@@ -2124,7 +2151,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Width" Value="44" />
     <Setter Property="Height" Value="44" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="CornerRadius" Value="22" />
+    <!-- The token and not a copy of half the side: one number decides every button's shape. -->
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
@@ -2169,7 +2197,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="Margin" Value="1" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
   </Style>

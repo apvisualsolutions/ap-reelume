@@ -50,7 +50,7 @@ src/ApSolutions.LocalMedia.Application/Identification/ReviewInboxChanged.cs     
 src/ApSolutions.LocalMedia.Application/Lifecycle/CloseApplication.cs                         100  93
 src/ApSolutions.LocalMedia.Application/Metadata/RefreshMetadata.cs                            97  91
 src/ApSolutions.LocalMedia.Application/Metadata/UpdateMetadata.cs                             81  87
-src/ApSolutions.LocalMedia.Application/Playback/ApplyPlaybackPreferences.cs                   89  66
+src/ApSolutions.LocalMedia.Application/Playback/ApplyPlaybackPreferences.cs                  100  95
 src/ApSolutions.LocalMedia.Application/Playback/InputCommandRouter.cs                        100  91
 src/ApSolutions.LocalMedia.Application/Playback/OpenLooseFile.cs                             100  83
 src/ApSolutions.LocalMedia.Application/Playback/PlaybackEvents.cs                             71 100
@@ -153,7 +153,7 @@ src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs         
 src/ApSolutions.LocalMedia.Presentation/Onboarding/AddRootDialogView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        94  73
+src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        98  79
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileViewModel.cs                          97  82
@@ -171,13 +171,13 @@ src/ApSolutions.LocalMedia.Presentation/Player/ShortcutSettingsView.axaml       
 src/ApSolutions.LocalMedia.Presentation/Player/ShortcutSettingsViewModel.cs                   98  95
 src/ApSolutions.LocalMedia.Presentation/Player/SkipMarkerButton.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleView.axaml                       100  50
-src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs                     100  93
+src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs                     100  95
 src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorView.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorViewModel.cs                      96  75
 src/ApSolutions.LocalMedia.Presentation/Player/TransportControlsView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchDialog.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchViewModel.cs                      97  85
-src/ApSolutions.LocalMedia.Presentation/Player/VideoFrameView.cs                              79  70
+src/ApSolutions.LocalMedia.Presentation/Player/VideoFrameView.cs                             100  89
 src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusOverlay.axaml                      100  50
 src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusViewModel.cs                        96  87
 src/ApSolutions.LocalMedia.Presentation/Recovery/DatabaseRecoveryView.axaml                  100  50
@@ -191,7 +191,7 @@ src/ApSolutions.LocalMedia.Presentation/Review/DuplicateReviewViewModel.cs      
 src/ApSolutions.LocalMedia.Presentation/Review/DuplicatesOverviewView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Review/ReviewInboxView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsView.axaml                100  50
-src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsViewModel.cs              100  84
+src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsViewModel.cs              100  87
 src/ApSolutions.LocalMedia.Presentation/Settings/DiagnosticsPreviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsView.axaml                 100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PrivacySettingsView.axaml                   100  50
@@ -204,7 +204,7 @@ src/ApSolutions.LocalMedia.Presentation/Settings/ScanSettingsViewModel.cs       
 src/ApSolutions.LocalMedia.Presentation/Settings/SegmentDetectionSettingsView.axaml          100  50
 src/ApSolutions.LocalMedia.Presentation/Shell/MainWindowPlacement.cs                          97  71
 src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml                                100  50
-src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml.cs                              96  70
+src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml.cs                              97  71
 src/ApSolutions.LocalMedia.Presentation/Shell/ShellViewModel.cs                               99  95
 src/ApSolutions.LocalMedia.Presentation/Shell/StartupView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml                            100  50
@@ -218,7 +218,7 @@ src/ApSolutions.LocalMedia.Presentation/Theme/Icons.axaml                       
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         89  66
-src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  75
+src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  80
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90
 src/ApSolutions.LocalMedia.Windows/Playback/ShellExternalPlaybackLauncher.cs                  40  50

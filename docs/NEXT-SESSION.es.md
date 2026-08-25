@@ -1,5 +1,75 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-25 (madrugada) — nueve de los veinticuatro, y CI casi verde
+
+Nueve commits sobre la rama. **Todo verde en local**: Domain 499, Application 241, Architecture 30,
+Documentation 87, Ui 904, Accessibility 146, Integration 467, Media 149.
+
+**Lo que hay que mirar primero:** CI del HEAD. La puerta de cobertura pasó de **siete** suelos caídos
+a **dos** (`ShellViewModel` y `CompositionRoot.cs`, una rama cada uno tras esta tanda), y siete
+suelos se subieron copiándolos del artefacto de CI. Si siguen rojos, están medidos abajo: la rama que
+falta en el compositor es el lado nulo de `ShellHost.Shell` en el `ModeHandler` de la sesión, y la del
+shell es una de las dieciséis de `HasPlayerPanels`.
+
+### Lo cerrado, con su medición
+
+Además de lo de la primera tanda (subtítulos, Home, proporción del vídeo, los dos botones de modo,
+`:focus-visible`, tooltips, alineación de desplegables, contorno punteado):
+
+1. **La valoración es de cinco estrellas** con migración **0020**, que divide entre dos y redondea
+   hacia arriba. Lo que dice que una estrella está dada es su relleno. La regla vive también en el
+   dominio (`PersonalStatePolicy.ToFiveStars`) porque una migración corre una vez contra un archivo y
+   una copia restaurada es un número que llega después.
+2. **El minuto del botón «Continuar» va dentro del botón**, no al lado.
+3. **«Desde el principio» es el arco de reinicio con la flecha al otro lado**, y su botón mide 36 y
+   es redondo, como los dos que tiene al lado.
+4. **Todos los iconos bajan dos píxeles** con el trazo escalado (ancho ÷ 15).
+5. **Ningún botón es cuadrado.** Ocho clases lo eran. El token de píldora valía 18 —la mitad de un
+   control de 36— y ahora vale **999**, que el dibujo recorta a la mitad del lado corto: un objetivo
+   cuadrado sale círculo y uno ancho sale píldora con un solo número. `ButtonShapeTests` lee los
+   estilos del archivo de tokens **y mira el píxel de la esquina**, porque 999 satisfaría cualquier
+   comparación numérica mientras el dibujo decide otra cosa.
+6. **El aviso de aceleración por hardware ya no sale en cada reproducción.** El motor no pide una
+   superficie de la tarjeta gráfica porque no puede componer subtítulos sobre ella; ni pedida ni
+   activa es lo que pasa de verdad.
+
+### Lo que queda de los veinticuatro
+
+- **El menú de velocidad** sigue siendo un `MenuFlyout` de once filas numéricas. El prototipo lo
+  dibuja con marca, nombre y nota. Cambia la identidad de once controles del inventario del paseo,
+  así que sus pulsados viajan en el mismo commit.
+- **Los glifos del transporte, uno a uno contra el prototipo.** Sin empezar.
+- **El mini como ventana PiP de verdad**: sin marco, siempre encima, arrastrable, conservando la
+  relación de aspecto y recordando dónde se dejó. Sólo está hecha la mitad — ya no duplica la barra.
+- **«Reproducir» cuando no hay progreso.** Hoy una película sin progreso no enseña ningún botón de
+  reproducir, sólo el glifo de empezar de nuevo. Pide un segundo botón o un nombre que se mueva con
+  el estado, y las dos cosas cambian el inventario del paseo.
+- **El póster de fondo en el cabecero de la ficha** (decisión 6). Ojo: `PosterArtView` dibuja **arte
+  generado** a partir del tono del título; el póster de verdad viaja en `PosterPath` de los metadatos,
+  y en una biblioteca sin identificar no hay ninguno.
+- **El editor de metadatos como vista propia.**
+- **«Secciones cortadas por el ancho»**, todavía sin localizar.
+
+### Las trampas que costaron tiempo aquí
+
+- **La puerta de cobertura mide con el informe fusionado** de
+  `artifacts/test-results/verify-win-x64/coverage-gate/Cobertura.xml`, no con los informes sueltos.
+  Un script que tome el máximo por línea entre los sueltos da otros números y **engaña**.
+- **Los suelos se copian del artefacto `coverage-debt` de CI y sólo suben.** Varios archivos miden
+  distinto aquí y allí, así que la lista no se cierra sin una vuelta de CI.
+- **Un archivo nuevo contra `main` tiene que llegar a 96/96**: no puede entrar en la lista de deuda,
+  porque el trinquete baja con cada archivo que sale y no libera hueco. Cuando un archivo de
+  infraestructura no llega, la salida es **sacar la regla a una función pura** —`LibVlcTrackIdentity`
+  lo hizo— porque una rama en el adaptador sólo la toma una máquina con decodificador.
+- **Cambiar la escala de la valoración tocó 63 pruebas de integración por una sola causa**: un
+  fixture siembra un número. Antes de dar por grande un cambio, mírale la causa al primer fallo.
+
+### Un hallazgo que sigue sin decidir
+
+El apartado del acento respecto del anillo de foco **mueve un solo paso**: para un anillo `#005A9C`
+devuelve `#00599A`, otro color por el byte y el mismo a la vista. Está escrito en la prueba en vez de
+afirmado a la baja. Si importa, la decisión es cuánto tiene que separarse.
+
 ## Estado al cierre del 2026-08-25 (noche, segunda sesión) — cinco de los veinticuatro, medidos
 
 Cinco commits sobre la rama. **Todo verde en local**: Domain 498, Application 241, Architecture 30,

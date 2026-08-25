@@ -10,6 +10,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El glifo de «desde el principio» es el arco de reinicio con la flecha al otro lado**, que es el
+  que llevaba antes leído al revés, y su botón mide lo mismo que los dos que tiene al lado: 36 como
+  ellos y redondo, en vez de los 44 del reproductor. Un círculo de 44 en una fila de píldoras de 36
+  es el único control que no alinea.
+
+- **Y ya no queda ninguno cuadrado en ninguna parte.** La puerta lee los estilos de botón del archivo
+  de tokens y rechaza cualquiera que declare un radio que no sea el de píldora: eran seis más de los
+  dos que se veían —las filas de «Otras acciones», los dos del carril, la muestra de acento y las
+  celdas de la rejilla de color—, y la muestra escribía además su propio 22 al lado del token.
+
+- **El aviso de «la aceleración por hardware no estaba disponible» salía en cada reproducción**, y
+  era una queja sobre la máquina donde lo cierto es una decisión: este motor compone los subtítulos
+  dentro de la imagen que entrega, y a una superficie de la tarjeta gráfica no se le puede pedir eso,
+  así que **no la pide**. Ni pedida ni activa, que es lo que pasa de verdad.
+
 - **La valoración es de cinco estrellas** y no diez casillas numeradas. Lo que ya estaba guardado
   viene con ella: la migración 0020 lo divide entre dos y **redondea hacia arriba**, así que un 1
   sobrevive como una estrella en vez de caer a un cero que esta aplicación no sabe tener. Lo que dice
@@ -29,6 +44,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 - **Ningún botón es cuadrado.** Dos clases lo eran: los del reproductor, 44 × 44 con el radio medio,
   que es un cuadrado con las esquinas quitadas, y una llamada `player-pill` que dibujaba un radio
   pequeño. Los de icono son círculos y los que llevan palabra son píldoras, con un solo token.
+
+- **Y redondos de verdad.** El token de píldora valía 18 —la mitad de un control de 36— y eso deja
+  un píxel de recta en cualquier cosa más alta: los objetivos de 44 del reproductor salían como
+  cuadrados con las esquinas quitadas. Vale 999, que el dibujo recorta a la mitad del lado más
+  corto, así que un objetivo cuadrado sale círculo y uno ancho sale píldora con un solo número. Es
+  el `border-radius: 999px` del prototipo, y la razón de que ese modismo exista. La prueba mira el
+  **píxel de la esquina**, no el número: 999 satisfaría cualquier comparación mientras el dibujo
+  decide otra cosa.
 
 - **La ficha de película lleva ahora el mismo triángulo que la de serie**, que era lo que el
   propietario echaba en falta —«el botón de reproducir no es igual al del prototipo»—, y

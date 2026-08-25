@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The "from the start" glyph is the restart arc with its arrow on the other side**, which is the
+  one it carried before read the other way round, and its button is the size of the two beside it:
+  36 like them and round, rather than the player's 44. A 44 px circle in a row of 36 px pills is the
+  one control that does not line up.
+
+- **And there is no square button left anywhere.** The gate reads the button styles out of the token
+  file and refuses any that names a radius other than the pill's: there were six beyond the two that
+  showed — the "other actions" rows, the two on the rail, the accent swatch and the colour grid's
+  cells — and the swatch was writing its own 22 beside the token as well.
+
+- **The "hardware acceleration was not available" warning appeared on every playback**, and it was a
+  complaint about the machine where the truth is a decision: this engine composes subtitles into the
+  picture it hands out, and a graphics-card surface cannot be asked to do that, so it **does not ask
+  for one**. Neither requested nor active, which is what actually happens.
+
 - **The rating is five stars** rather than ten numbered squares. What was already stored comes with
   it: migration 0020 halves it and **rounds up**, so a 1 survives as one star instead of falling to a
   zero this application cannot hold. What says a star is given is its fill and not a mark beside it,
@@ -29,6 +44,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **No button is square.** Two classes were: the player's, 44 by 44 with the medium radius, which is
   a square with its corners taken off, and one called `player-pill` that drew a small radius. The
   icon ones are circles and the ones carrying a word are pills, from one token either way.
+
+- **And round for real.** The pill token was 18 — half of a 36 px control — which leaves a pixel of
+  straight edge on anything taller: the player's 44 px targets came out as squares with their
+  corners taken off. It is 999 now, which the renderer clamps to half the shorter side, so a square
+  target is a circle and a wide one is a pill from one number. It is the prototype's own
+  `border-radius: 999px`, and the reason that idiom exists. The test looks at the **corner pixel**
+  and not at the number: 999 would satisfy any comparison while the renderer decided otherwise.
 
 - **The film card carries the same play triangle the series card has**, which is what the owner
   missed — "el botón de reproducir no es igual al del prototipo" — and **"play from the start" is a

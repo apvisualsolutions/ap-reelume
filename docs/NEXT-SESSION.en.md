@@ -1,5 +1,75 @@
 # Where to pick up
 
+## State at the close of 2026-08-25 (small hours) — nine of the twenty-four, and CI nearly green
+
+Nine commits on the branch. **Everything green locally**: Domain 499, Application 241, Architecture
+30, Documentation 87, Ui 904, Accessibility 146, Integration 467, Media 149.
+
+**What to look at first:** CI on HEAD. The coverage gate went from **seven** fallen floors to **two**
+(`ShellViewModel` and `CompositionRoot.cs`, one branch each after this round), and seven floors were
+raised by copying them from CI's artefact. If they are still red, they are measured below: the branch
+missing in the composition root is the null side of `ShellHost.Shell` in the session's `ModeHandler`,
+and the shell's is one of the sixteen in `HasPlayerPanels`.
+
+### What was closed, with its measurement
+
+Besides the first round (subtitles, Home, the picture's ratio, the two mode buttons,
+`:focus-visible`, tooltips, the drop-downs' alignment, the dotted outline):
+
+1. **The rating is five stars** with migration **0020**, which halves and rounds up. What says a star
+   is given is its fill. The rule lives in the domain as well (`PersonalStatePolicy.ToFiveStars`)
+   because a migration runs once against a file and a restored backup is a number arriving later.
+2. **The minute on "Continue" rides inside the button**, not beside it.
+3. **"From the start" is the restart arc with its arrow on the other side**, and its button is 36 px
+   and round, like the two beside it.
+4. **Every icon is two pixels smaller** with its stroke scaled (width ÷ 15).
+5. **No button is square.** Eight classes were. The pill token was 18 — half of a 36 px control — and
+   is **999** now, which the renderer clamps to half the shorter side: a square target is a circle and
+   a wide one is a pill from one number. `ButtonShapeTests` reads the button styles out of the token
+   file **and looks at the corner pixel**, because 999 would satisfy any numeric comparison while the
+   renderer decided otherwise.
+6. **The hardware-acceleration warning no longer appears on every playback.** The engine does not ask
+   for a graphics-card surface because it cannot compose subtitles onto one; neither requested nor
+   active is what actually happens.
+
+### What is left of the twenty-four
+
+- **The speed menu** is still a `MenuFlyout` of eleven numeric rows. The prototype draws it with a
+  mark, a name and a note. It changes the identity of eleven controls in the walk's inventory, so
+  their presses travel in the same commit.
+- **The transport glyphs, one against one with the prototype.** Not started.
+- **The mini as a real picture-in-picture window**: frameless, always on top, draggable, keeping its
+  ratio and remembering where it was left. Only half done — it no longer duplicates the bar.
+- **"Play" when there is no progress.** Today a film with no progress shows no play button at all,
+  only the start-again glyph. It needs a second button or a name that moves with the state, and both
+  change the walk's inventory.
+- **The poster behind the card's header** (decision 6). Note: `PosterArtView` draws **generated art**
+  from the title's hue; the real poster travels in the metadata's `PosterPath`, and an unidentified
+  library has none.
+- **The metadata editor as a surface of its own.**
+- **"Sections cut off by the width"**, still not located.
+
+### The traps that cost time here
+
+- **The coverage gate measures from the merged report** at
+  `artifacts/test-results/verify-win-x64/coverage-gate/Cobertura.xml`, not from the individual ones.
+  A script that takes the maximum per line across the individual reports gives different numbers and
+  **misleads**.
+- **Floors are copied from CI's `coverage-debt` artefact and only ever move up.** Several files
+  measure differently here and there, so the list cannot be closed without a CI round.
+- **A file new against `main` has to reach 96/96**: it cannot join the debt list, because the ratchet
+  drops with every file that leaves it and frees no slot. When an infrastructure file cannot get
+  there, the way out is to **lift the rule into a pure function** — `LibVlcTrackIdentity` did —
+  because a branch in the adapter is only taken by a machine with a decoder.
+- **Moving the rating scale broke 63 integration tests from one cause**: a fixture seeds a number.
+  Before calling a change large, look at what the first failure actually says.
+
+### One finding still undecided
+
+The nudge that moves the accent off the focus ring **moves one step**: for a ring of `#005A9C` it
+returns `#00599A`, a different colour by the byte and the same one to the eye. It is written into the
+test rather than asserted away. If that matters, the decision is how far apart they have to be.
+
 ## State at the close of 2026-08-25 (evening, second session) — five of the twenty-four, measured
 
 Five commits on the branch. **Everything green locally**: Domain 498, Application 241, Architecture
