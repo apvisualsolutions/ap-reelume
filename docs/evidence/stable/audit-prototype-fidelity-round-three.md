@@ -32,7 +32,7 @@ prototype was designed at.
 
 ## Lo que sigue siendo distinto, y por qué / What is still different, and why
 
-Cinco diferencias, y las cinco son decisiones con su medición detrás. / Five differences, each a
+Seis diferencias, y las seis son decisiones con su medición detrás. / Six differences, each a
 decision with a measurement behind it.
 
 1. **Las iniciales en la portada.** El prototipo dibuja el aro y nada más; aquí van dos letras. Una
@@ -61,6 +61,13 @@ decision with a measurement behind it.
    **título**, no por episodio: `CatalogMetadata` está indexado por `TitleId`. Un botón por fila que
    editase la serie sería un botón que dice una cosa y hace otra. / The editor here opens per
    **title**, not per episode, so a per-row button would say one thing and do another.
+
+6. **La ficha de película lleva dos acciones donde el prototipo lleva una.** El prototipo dibuja un
+   solo botón cuya etiqueta cambia —«Reanudar» o «Reproducir»—; aquí son dos, porque reanudar y
+   empezar de nuevo son dos cosas distintas y la oferta de reanudación existe además. El acento va
+   sobre «Reanudar», así que una película sin empezar deja la ficha sin acción acentuada. / The
+   prototype draws one button whose label changes; here there are two, because resuming and starting
+   again are different things — so a film nobody has started leaves the card with no accented action.
 
 ## Cómo se rehace esta comparación / How to repeat this comparison
 
