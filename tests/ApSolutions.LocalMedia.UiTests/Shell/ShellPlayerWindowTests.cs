@@ -157,16 +157,19 @@ public sealed class ShellPlayerWindowTests
         // rather than by their glyphs — the glyph is what the eye lands on and the name is what a
         // reader hears. Effectively visible and not merely declared: the five panel pills are
         // declared on every session and drawn only by the ones that have those panels, and this
-        // file has none of them, so what is left is the three that are always there.
+        // file has none of them, so what is left is the one that is always there.
+        //
+        // One and not three since 2026-08-25: full screen and the floating window are in the
+        // transport bar now, which is where the owner looked for them, and they are not in both
+        // places. Two buttons answering to «Pantalla completa» on one screen is a name that names
+        // neither, and the walk says so out loud — it refuses a click it cannot aim.
         var header = view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PlayerHeaderSurface");
         var headed = header.GetVisualDescendants()
             .OfType<Button>()
             .Where(button => button.IsEffectivelyVisible)
             .Select(button => Avalonia.Automation.AutomationProperties.GetName(button) ?? string.Empty)
             .ToArray();
-        Assert.Equal(
-            ["Cerrar el reproductor", "Mini reproductor", "Pantalla completa"],
-            headed);
+        Assert.Equal(["Cerrar el reproductor"], headed);
         Assert.All(
             header.GetVisualDescendants().OfType<Button>().Where(button => button.IsEffectivelyVisible),
             button => Assert.Contains("player-chrome", button.Classes));

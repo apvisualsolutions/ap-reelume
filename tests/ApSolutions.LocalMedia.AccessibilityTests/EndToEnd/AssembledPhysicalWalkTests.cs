@@ -2499,29 +2499,41 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         ((Button)Resolve(host, "TransportSpeedLabel")).Flyout!.Hide();
         Dispatcher.UIThread.RunJobs();
 
+        // The bar's own two mode buttons, which is where the owner looked for them on 2026-08-25 and
+        // where they were not. Pressed from the bar and read off the shell's mode, because a button
+        // that only changed its own look would leave the picture exactly where it was. There is one
+        // of each on screen and not two: the pair that used to sit in the header above the picture
+        // went with these arriving, since one name for two buttons is a name that names neither.
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
+        await PressAsync(
+            host,
+            "TransportFullscreenAction",
+            () => host.ViewModel.PlaybackMode,
+            "clicking the transport's full screen never moved the picture onto the whole screen");
+        Assert.Equal(PlaybackMode.Fullscreen, host.ViewModel.PlaybackMode);
+        await PressAsync(
+            host,
+            "TransportFullscreenAction",
+            () => host.ViewModel.PlaybackMode,
+            "clicking it again never brought the picture back into the shell");
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
+
         await PressAsync(
             host,
             "PlayerStopAction",
             () => player.IsStopped,
             "clicking Stop never stopped the session");
 
-        // The shell's own three, which decide where the picture is rather than what it is doing.
-        // Exactly one mode is in force at a time, so each press is read from the shell's mode: a
-        // button that only changed its own label would leave this where it was.
+        // And the floating window, which is pressed last of the three because the bar stands down
+        // inside it: the small window draws five controls of its own rather than carrying this one
+        // with it, so there is no second press of this button to make from there.
         Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
         await PressAsync(
             host,
-            "PlayerMiniModeAction",
+            "TransportPictureInPictureAction",
             () => host.ViewModel.PlaybackMode,
-            "clicking Mini player never moved the session into the mini mode");
+            "clicking the transport's floating window never moved the picture into one");
         Assert.Equal(PlaybackMode.Mini, host.ViewModel.PlaybackMode);
-
-        await PressAsync(
-            host,
-            "PlayerFullscreenAction",
-            () => host.ViewModel.PlaybackMode,
-            "clicking Fullscreen never moved the session out of mini and into fullscreen");
-        Assert.Equal(PlaybackMode.Fullscreen, host.ViewModel.PlaybackMode);
 
         // And closing, which is the one that ends the session rather than moving it: the shell holds
         // no player afterwards, and the mode goes back to where a next session starts.

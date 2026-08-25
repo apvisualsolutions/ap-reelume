@@ -96,6 +96,7 @@ public sealed class PackedYuvConverterTests
 
     [Theory]
     [InlineData(0, 1, 4, 8)]
+    [InlineData(3, 1, 8, 16)]
     [InlineData(2, 0, 4, 8)]
     [InlineData(2, 1, 3, 8)]
     [InlineData(2, 1, 4, 7)]

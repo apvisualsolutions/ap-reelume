@@ -28,6 +28,8 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     private string _mediaPath = string.Empty;
     private bool _externalLaunchFailed;
     private bool _areControlsRevealed = true;
+    private Func<PlaybackMode, Task>? _modeHandler;
+    private bool _isCompact;
 
     /// <param name="alternativesExist">
     /// Whether the content being played has other versions catalogued, asked rather than stored.
@@ -54,6 +56,12 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         RetryCommand = new AsyncRelayCommand(RetryAsync, () => CanRetry);
         OpenExternallyCommand = new AsyncRelayCommand(OpenExternallyAsync, () => CanOpenExternally);
         TogglePlaybackCommand = new AsyncRelayCommand(TogglePlaybackAsync, () => CanPause || CanResume);
+        ToggleFullscreenCommand = new AsyncRelayCommand(
+            () => ChangeModeAsync(PlaybackMode.Fullscreen),
+            () => ModeHandler is not null);
+        TogglePictureInPictureCommand = new AsyncRelayCommand(
+            () => ChangeModeAsync(PlaybackMode.Mini),
+            () => ModeHandler is not null);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -90,6 +98,53 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     /// it while a session exists; the view asks synchronously, so a handled key never also scrolls.
     /// </summary>
     public Func<Avalonia.Input.KeyGesture, bool>? GestureHandler { get; set; }
+
+    /// <summary>
+    /// Changes which window the picture is in. Installed by the composition root, like the gestures.
+    /// </summary>
+    /// <remarks>
+    /// The transport bar needs the two mode buttons the owner asked for — full screen and
+    /// picture-in-picture, «en la barra de controles» — and the bar travels: the same control is
+    /// handed to the mini window, where there is no shell above it to reach up to. So the surface
+    /// carries the commands and the composition fills them, exactly as it fills the gestures.
+    /// </remarks>
+    public Func<PlaybackMode, Task>? ModeHandler
+    {
+        get => _modeHandler;
+        set
+        {
+            _modeHandler = value;
+            (ToggleFullscreenCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+            (TogglePictureInPictureCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        }
+    }
+
+    /// <summary>
+    /// Whether the picture is in the small window, which carries a transport of its own.
+    /// </summary>
+    /// <remarks>
+    /// The stage travels: the very control the shell shows is the one the picture-in-picture window
+    /// is handed, so the full bar went with it and sat under the five buttons that window already
+    /// draws. This is what the bar stands down for, and it comes back the moment the picture does.
+    /// </remarks>
+    public bool IsCompact
+    {
+        get => _isCompact;
+        set
+        {
+            SetField(ref _isCompact, value);
+            OnPropertyChanged(nameof(HasFullTransport));
+        }
+    }
+
+    /// <summary>True while the picture's own transport bar is the one a person uses.</summary>
+    public bool HasFullTransport => !_isCompact;
+
+    /// <summary>Puts the picture on the whole screen, and takes it back off.</summary>
+    public ICommand ToggleFullscreenCommand { get; }
+
+    /// <summary>Sends the picture to the small always-on-top window, and brings it back.</summary>
+    public ICommand TogglePictureInPictureCommand { get; }
 
     /// <summary>
     /// Whether the transport bar is shown. Hiding it only changes its opacity, so the controls stay
@@ -274,6 +329,9 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
             .ConfigureAwait(true);
         OnPropertyChanged(nameof(ExternalLaunchFailed));
     }
+
+    private Task ChangeModeAsync(PlaybackMode mode) =>
+        ModeHandler is { } handler ? handler(mode) : Task.CompletedTask;
 
     private Task TogglePlaybackAsync() =>
         CanPause

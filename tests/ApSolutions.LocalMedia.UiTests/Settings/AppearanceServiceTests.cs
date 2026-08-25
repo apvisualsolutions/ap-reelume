@@ -245,6 +245,88 @@ public sealed class AppearanceServiceTests
         _ = Assert.Throws<ArgumentNullException>(() => backdrop.TryApply(null!));
     }
 
+    /// <summary>
+    /// Turning the material off reaches the window that is on screen, not only the next one.
+    /// </summary>
+    /// <remarks>
+    /// The backdrop is decided when a window is created, long before Settings exists, so a
+    /// preference that waited for the next launch would be a switch that did nothing when pressed.
+    /// Reaching the live window needs a desktop lifetime with a main window in it, and an
+    /// application's lifetime cannot be replaced once it has started — so the service is told which
+    /// window is on screen instead of looking it up, which is what the product does too.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_material_is_written_onto_the_window_that_is_already_open()
+    {
+        var application = Avalonia.Application.Current!;
+        var store = new InMemoryStore();
+        var backdrop = new CountingBackdrop();
+        var window = new Window();
+        try
+        {
+            using var scope = new ResourceScope(application);
+            var service = new AppearanceService(
+                application,
+                store,
+                new RecordingTheme(),
+                backdrop,
+                () => window);
+
+            // Building the service already writes what it read, so the first apply is the second
+            // ask. What matters is that turning it off asks for nothing more and says so on the
+            // window instead.
+            var afterBuild = backdrop.Applied;
+            service.Apply(service.Current with { Mica = true });
+            Assert.Equal(afterBuild + 1, backdrop.Applied);
+
+            service.Apply(service.Current with { Mica = false });
+            Assert.Equal(afterBuild + 1, backdrop.Applied);
+            Assert.Equal([WindowTransparencyLevel.None], window.TransparencyLevelHint);
+
+            // And the theme toggle both ways, because turning Windows off has to name the side
+            // Windows is on right now rather than leaving the screen where it was.
+            application.RequestedThemeVariant = ThemeVariant.Dark;
+            service.Apply(service.Current with { FollowsWindowsTheme = false });
+            service.Apply(service.Current with { FollowsWindowsTheme = true });
+            application.RequestedThemeVariant = ThemeVariant.Light;
+            service.Apply(service.Current with { FollowsWindowsTheme = false });
+        }
+        finally
+        {
+            application.RequestedThemeVariant = ThemeVariant.Default;
+            window.Close();
+        }
+    }
+
+    /// <summary>
+    /// A host with no theme merged into it, which is how several suites mount a single view.
+    /// </summary>
+    /// <remarks>
+    /// The tint and the page colour are read from the dictionary rather than written here, for the
+    /// reason the whole token file exists — and a dictionary that holds neither is not a
+    /// hypothetical: it is what an application object with nothing merged in answers. The fallbacks
+    /// are what keep such a host drawing rather than throwing, and they were the one path in this
+    /// file nothing had ever taken.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_host_with_no_tokens_in_it_falls_back_instead_of_failing()
+    {
+        var bare = new Avalonia.Application();
+        var store = new InMemoryStore();
+
+        var service = new AppearanceService(bare, store, new RecordingTheme(), new NoBackdrop(), () => null);
+
+        // Whatever it could not read, it wrote what it decided anyway: the four accent tones are in
+        // the bare host's own dictionary, derived against the page colour the fallback names.
+        Assert.True(service.Current.Mica);
+        foreach (var key in AppearanceService.AccentResources)
+        {
+            Assert.True(
+                bare.Resources.ContainsKey(key),
+                $"{key} was not written into a host that had nothing to read it from.");
+        }
+    }
+
     [AvaloniaFact]
     public void Nothing_is_built_without_what_it_needs()
     {

@@ -763,20 +763,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 <TextBlock Text="{DynamicResource PlayerVersionsTitle}" />
               </StackPanel>
             </Button>
-            <Button
-                Classes="player-chrome"
-                automation:AutomationProperties.Name="{DynamicResource PlayerMiniModeAction}"
-                ToolTip.Tip="{DynamicResource PlayerMiniModeAction}"
-                Command="{Binding ToggleMiniPlayerCommand}">
-              <Path Classes="icon size-20" Data="{DynamicResource IconExitFullscreen}" />
-            </Button>
-            <Button
-                Classes="player-chrome"
-                automation:AutomationProperties.Name="{DynamicResource PlayerFullscreenAction}"
-                ToolTip.Tip="{DynamicResource PlayerFullscreenAction}"
-                Command="{Binding ToggleFullscreenCommand}">
-              <Path Classes="icon size-20" Data="{DynamicResource IconFullscreen}" />
-            </Button>
+            <!--
+              The two mode buttons that used to sit here are in the transport bar now, which is where
+              the owner looked for them on 2026-08-25 and where every player puts them. They are not
+              in both places: two controls answering to «Pantalla completa» on one screen is one name
+              for two buttons, which a screen reader cannot tell apart and the walk refuses outright
+              — measured, the moment the second one appeared.
+            -->
           </WrapPanel>
         </Grid>
       </Border>

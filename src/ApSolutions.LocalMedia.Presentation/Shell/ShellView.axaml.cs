@@ -92,6 +92,17 @@ public sealed partial class ShellView : UserControl
             return;
         }
 
+        // The small window carries a transport of its own — five buttons and 480 logical pixels —
+        // and the picture it is handed brings the full bar with it, so both were on screen at once:
+        // «se duplica la barra de reproducción», reported on 2026-08-25. Told here rather than from
+        // the mode's setter, and the reason is measured: changing what is visible inside the stage
+        // while the stage is between two windows asks the wrong layout manager to arrange it, which
+        // is an exception six suites caught the moment it was tried.
+        if (_viewModel?.Player is { } session)
+        {
+            session.Player.IsCompact = mode == PlaybackMode.Mini;
+        }
+
         if (mode == PlaybackMode.Mini)
         {
             var window = _miniWindow ??= new MiniPlayerWindow();

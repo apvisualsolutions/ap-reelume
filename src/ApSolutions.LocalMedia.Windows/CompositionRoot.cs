@@ -1077,6 +1077,15 @@ public static partial class CompositionRoot
             return true;
         };
 
+        // The two mode buttons in the transport bar, and the double click on the picture, all reach
+        // the same place a key does. The shell is asked for at the moment of the press rather than
+        // captured: a session outlives more than one of this handler's calls, and the shell is the
+        // thing that owns which window the picture is in.
+        player.ModeHandler = mode =>
+            provider.GetRequiredService<ShellHost>().Shell is { } live
+                ? live.TogglePlaybackModeAsync(mode, CancellationToken.None)
+                : Task.CompletedTask;
+
 
         // The decision has to exist before the media opens: the engine accepts a start position at
         // open and nothing later can recover the moment that was lost by starting at zero. Walking
@@ -1152,6 +1161,7 @@ public static partial class CompositionRoot
             // gesture handler lets go of the router, and the router lets go of its gate.
             mediaKeys.CommandReceived -= OnMediaKey;
             player.GestureHandler = null;
+            player.ModeHandler = null;
             _ = StopMediaKeysQuietlyAsync(mediaKeys);
             router.Dispose();
         });

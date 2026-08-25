@@ -4,6 +4,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -28,6 +29,7 @@ public sealed partial class PlayerView : UserControl
         // The player answers the keyboard itself: without focus, every shortcut of PLY-014 would
         // depend on whichever control happened to hold it.
         Focusable = true;
+        AddHandler(KeyDownEvent, OnKeyDownTunnel, RoutingStrategies.Tunnel);
     }
 
     public string? OutputSummary
@@ -42,15 +44,46 @@ public sealed partial class PlayerView : UserControl
         _ = Focus();
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
+    /// <summary>
+    /// A double click on the picture puts it on the whole screen, and takes it back off.
+    /// </summary>
+    /// <remarks>
+    /// It is the gesture every player has and this one did not: the owner reported «el doble clic no
+    /// pone pantalla completa» on 2026-08-25, and there was nothing listening for it. The transport
+    /// bar sits above the picture and handles its own clicks, so a double click that reaches here is
+    /// one aimed at the picture.
+    /// </remarks>
+    protected override void OnDoubleTapped(TappedEventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(e);
+        base.OnDoubleTapped(e);
+        if (DataContext is PlayerViewModel { ModeHandler: not null } player
+            && player.ToggleFullscreenCommand.CanExecute(null))
+        {
+            player.ToggleFullscreenCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>
+    /// The keyboard reaches the session's own shortcuts before anything else can spend the key.
+    /// </summary>
+    /// <remarks>
+    /// Tunnelling, and that is the whole fix for what the owner reported: «la barra espaciadora pone
+    /// pantalla completa» and «el atajo F no funciona». Neither is about the map — space has always
+    /// been play/pause there and F has always been full screen — it is about who hears the key
+    /// first. A button inside the transport bar takes focus the moment it is clicked, and a focused
+    /// button answers the space bar by activating itself; the last button clicked was whichever mode
+    /// button somebody had just used, so space repeated it. Handling on the way down means the
+    /// session answers first and no focused button ever sees a key that belongs to the player.
+    /// </remarks>
+    private void OnKeyDownTunnel(object? sender, KeyEventArgs e)
+    {
+        _ = sender;
         if (DataContext is PlayerViewModel { GestureHandler: { } handler }
             && handler(new KeyGesture(e.Key, e.KeyModifiers)))
         {
             e.Handled = true;
-            return;
         }
-
-        base.OnKeyDown(e);
     }
 }

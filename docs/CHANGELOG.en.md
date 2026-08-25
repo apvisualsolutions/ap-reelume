@@ -10,6 +10,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The blue ring appeared on a click, not only on arriving with the keyboard.** All ten focus
+  selectors said `:focus`, which a mouse raises too, so every checkbox somebody clicked answered with
+  a two-pixel ring that stayed until they clicked elsewhere. They say `:focus-visible` now. A pointer
+  already says where it is by being there; the ring says where the keyboard is.
+
+- **Full screen and the floating window were not in the transport bar.** Both modes were reachable
+  only from the pill row above the picture and from the keyboard, which is where the owner did not
+  look for them. They are at the end of the bar, they reach the player's own model — the bar travels
+  to the small window, where there is no shell above it to reach up to — and they are **no longer in
+  both places**: two buttons answering to "Full screen" on one screen is a name that names neither,
+  and the walk says so out loud, because it cannot aim the click.
+
+- **A double click on the picture puts it on the whole screen, and takes it back off.** Nothing was
+  listening for it.
+
+- **The space bar put the picture full screen and `F` did nothing.** Neither was about the map: space
+  has always been play/pause and `F` has always been full screen. It was **who hears the key first** —
+  a button in the bar takes focus when it is clicked, and a focused button answers the space bar by
+  activating itself. The player hears them on the way down now, before any focused button can spend
+  them.
+
+- **The mini player's icon was the one for leaving full screen**, four arrows pointing inwards. The
+  picture-in-picture one was already in the dictionary and used by nobody.
+
+- **The transport bar was duplicated inside the floating window.** The picture that window is handed
+  brings the whole bar with it, and the window already draws five controls of its own. The picture's
+  bar stands down while it is there and comes back with it.
+
 - **Subtitles never reached the screen, and there are now three measured reasons why.** The owner
   brought it with the test already done: the same episode shows them in VLC and not here. None of the
   three is visible by reading the code, and all three had to be measured against a real file with a
@@ -77,6 +105,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   high contrast dictionaries paint a border, so nothing is lost where colour says nothing.
 
 ### Added
+
+- **Every button says what it does when the pointer rests on it**, in the same words a screen reader
+  is told. One style rather than an attribute per button: there are more than two hundred of them,
+  and written out one by one that is two hundred chances for the two sentences to drift apart with
+  nobody noticing for a year.
+
 
 - **A colour picker on all three rows that choose one**: the accent and the two subtitle colours.
   The prototype opens the browser's; this opens the same shape out of controls this application

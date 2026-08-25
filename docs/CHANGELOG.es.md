@@ -10,6 +10,33 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El reborde azul salía al hacer clic, y no sólo al llegar con el teclado.** Los diez selectores de
+  foco decían `:focus`, que un ratón también levanta, así que cada casilla pulsada respondía con un
+  anillo de dos píxeles que se quedaba hasta pulsar en otro sitio. Ahora dicen `:focus-visible`. Un
+  puntero ya dice dónde está estando ahí; el anillo dice dónde está el teclado.
+
+- **Pantalla completa y ventana flotante no estaban en la barra de controles.** Los dos modos sólo se
+  alcanzaban desde la fila de píldoras sobre la imagen y desde el teclado, que es donde el propietario
+  no los buscó. Están al final de la barra, alcanzan el modelo del propio reproductor —la barra viaja
+  a la ventana pequeña, donde no hay concha encima a la que subir— y **ya no están en los dos sitios**:
+  dos botones respondiendo a «Pantalla completa» en una pantalla es un nombre que no nombra a ninguno,
+  y el paseo lo dice en voz alta porque no puede apuntar el clic.
+
+- **El doble clic sobre la imagen pone y quita la pantalla completa.** No había nada escuchándolo.
+
+- **La barra espaciadora ponía pantalla completa y `F` no hacía nada.** Ninguna de las dos era el
+  mapa: espacio siempre fue reproducir/pausar y `F` siempre fue pantalla completa. Era **quién oye la
+  tecla primero** — un botón de la barra toma el foco al pulsarlo y un botón enfocado contesta al
+  espacio activándose. El reproductor las oye ahora de bajada, antes de que ningún botón enfocado
+  pueda gastarlas.
+
+- **El icono del mini reproductor era el de salir de pantalla completa**, cuatro flechas hacia
+  dentro. El de imagen sobre imagen ya estaba en el diccionario y no lo usaba nadie.
+
+- **La barra de reproducción se duplicaba en la ventana flotante.** La imagen que esa ventana recibe
+  se lleva la barra entera consigo, y la ventana ya dibuja cinco controles propios. La barra de la
+  imagen se retira mientras está ahí y vuelve con ella.
+
 - **Los subtítulos no llegaban nunca a la pantalla, y ahora hay tres razones medidas de por qué.** El
   propietario lo trajo con su prueba hecha: el mismo episodio los muestra en VLC y no aquí. Ninguna de
   las tres se ve leyendo el código, y las tres tuvieron que medirse contra un archivo real con un
@@ -79,6 +106,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   dice nada.
 
 ### Añadido
+
+- **Todos los botones dicen lo que hacen al posar el puntero**, y lo dicen con las mismas palabras
+  que oye un lector de pantalla. Un estilo y no un atributo por botón: son más de doscientos, y
+  escritos uno a uno serían doscientas ocasiones de que las dos frases se separen sin que nadie lo
+  note en un año.
+
 
 - **Un selector de color en las tres filas que eligen uno**: el acento y los dos de los subtítulos.
   El prototipo abre el del navegador; este abre la misma forma con controles que esta aplicación ya

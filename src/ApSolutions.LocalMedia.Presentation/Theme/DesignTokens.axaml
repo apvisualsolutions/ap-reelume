@@ -5,6 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 <Styles
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:theme="clr-namespace:ApSolutions.LocalMedia.Presentation.Theme">
   <Styles.Resources>
@@ -1262,47 +1263,72 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderBrush" Value="Transparent" />
   </Style>
   <!--
+    Every button says what it does when the pointer rests on it, and it says exactly what a screen
+    reader is told.
+
+    One style rather than an attribute on each button. The owner asked for tooltips «en todos los
+    botones, en especial los que sólo llevan icono», and there are more than two hundred of them:
+    written out one by one, that is two hundred chances for the tip and the accessible name to drift
+    apart, and nothing would notice for a year. Bound to the control's own name they are the same
+    string by construction, and ViewLiteralTests — which refuses a literal in ToolTip.Tip — keeps
+    that string a resource key, so both follow the language in force.
+
+    A button that declares no accessible name gets no tip, which is the honest answer: there is
+    nothing to say about it that has been written down. A button that already carries a tip of its
+    own keeps it, because a local value outranks a style setter.
+  -->
+  <Style Selector="Button">
+    <Setter Property="ToolTip.Tip" Value="{Binding $self.(automation:AutomationProperties.Name)}" />
+  </Style>
+  <!--
     Every control type that can take keyboard focus is styled from the same token, so the focus ring
     the contrast matrix measured is the ring the person actually sees. A type left out here would fall
     back to whatever the base theme draws, which no check covers.
+
+    :focus-visible and not :focus, and the difference is the whole complaint. :focus is raised by a
+    mouse too, so every checkbox somebody clicked answered with a two-pixel ring that stayed until
+    they clicked elsewhere — «al hacer clic en una casilla sale un reborde azul, y pasa en todas»,
+    reported on 2026-08-25 by the owner. The ring says where the keyboard is; a pointer already says
+    where it is by being there. Nothing is lost for a keyboard: Avalonia raises focus-visible for
+    Tab, for the arrow keys, and for a focus moved in code.
   -->
-  <Style Selector="Button:focus">
+  <Style Selector="Button:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="ToggleButton:focus">
+  <Style Selector="ToggleButton:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="TextBox:focus">
+  <Style Selector="TextBox:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="ComboBox:focus">
+  <Style Selector="ComboBox:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="CheckBox:focus">
+  <Style Selector="CheckBox:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="Slider:focus">
+  <Style Selector="Slider:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="NumericUpDown:focus">
+  <Style Selector="NumericUpDown:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="ListBoxItem:focus">
+  <Style Selector="ListBoxItem:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="ToggleSwitch:focus">
+  <Style Selector="ToggleSwitch:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
-  <Style Selector="RadioButton:focus">
+  <Style Selector="RadioButton:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FocusStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>

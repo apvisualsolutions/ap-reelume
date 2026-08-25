@@ -126,8 +126,16 @@ public static class AccentPalette
         var darker = Luminance(ground) > EqualContrastLuminance;
 
         var (hue, saturation, lightness) = ToHsl(picked);
-        var body = Walk(hue, saturation, lightness, darker, candidate =>
-            Contrast(candidate, ground) >= ShapeMinimum);
+
+        // A colour that already reads is kept byte for byte, not walked. Walking it returned the
+        // round trip through hue, saturation and lightness instead — the same colour to the eye and
+        // a byte or two away in the bytes, which is close enough for every ratio here and not close
+        // enough for the comparison below: a pick that <em>is</em> the focus ring came back not
+        // equal to it, so the nudge that exists for exactly that case could never run.
+        var body = Contrast(picked, ground) >= ShapeMinimum
+            ? picked
+            : Walk(hue, saturation, lightness, darker, candidate =>
+                Contrast(candidate, ground) >= ShapeMinimum);
 
         // The ring and the accent apart, by one step of the same walk: they are compared as colours
         // rather than as strings, so a ring written #005A9C and an accent that landed on the same

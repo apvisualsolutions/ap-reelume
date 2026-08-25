@@ -247,6 +247,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </MenuFlyout>
         </Button.Flyout>
       </Button>
+      <!--
+        Picture-in-picture and full screen, at the end of the bar, which is where every player on
+        this machine puts them and where this one did not have them at all: the two modes were
+        reachable from the header pill row above the picture and from the keyboard, and the owner
+        looked for them in the transport — «no hay botón de pantalla completa en la barra de
+        controles», «el icono de PiP debe ir en la barra de controles, junto al de pantalla
+        completa».
+
+        They reach the player's own model rather than the shell's, and that is not a preference: this
+        very control is handed to the mini window, where there is no shell above it to bind up to.
+      -->
+      <Button
+          x:Name="PictureInPictureButton"
+          Classes="player-chrome"
+          automation:AutomationProperties.Name="{DynamicResource TransportPictureInPictureAction}"
+          automation:AutomationProperties.AcceleratorKey="Ctrl+P"
+          Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).TogglePictureInPictureCommand}">
+        <Path Classes="icon size-20" Data="{DynamicResource IconMiniPlayer}" />
+      </Button>
+      <Button
+          x:Name="FullscreenButton"
+          Classes="player-chrome"
+          automation:AutomationProperties.Name="{DynamicResource TransportFullscreenAction}"
+          automation:AutomationProperties.AcceleratorKey="F"
+          Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).ToggleFullscreenCommand}">
+        <Path Classes="icon size-20" Data="{DynamicResource IconFullscreen}" />
+      </Button>
     </WrapPanel>
 
     <Border
