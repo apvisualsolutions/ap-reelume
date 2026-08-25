@@ -108,6 +108,12 @@
       "name": "provider_reference",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0018_provider_reference.sql",
       "sha256": "2718049238EA3399855F4D41BBB57291F4AE49CF9CBD1975CD90673D86F47FE0"
+    },
+    {
+      "version": 19,
+      "name": "match_candidate_title",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0019_match_candidate_title.sql",
+      "sha256": "31E8546CE7653D459A77A1717A8E4742D77ECAE71ED6359912AF277E0B34F712"
     }
   ]
 }

@@ -71,10 +71,11 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
                 INSERT INTO match_candidates (
                     candidate_id, media_file_id, stable_key, content_kind, score,
                     scoring_model_version, review_state, signals_json,
-                    explanation_codes_json, revision, decision_locked)
+                    explanation_codes_json, revision, decision_locked, display_title)
                 VALUES (
                     $candidateId, $mediaFileId, $stableKey, $contentKind, $score,
-                    $modelVersion, $reviewState, $signals, $explanations, $revision, $locked);
+                    $modelVersion, $reviewState, $signals, $explanations, $revision, $locked,
+                    $displayTitle);
                 """;
             insert.Parameters.AddWithValue("$candidateId", candidate.Id.Value.ToString("D"));
             insert.Parameters.AddWithValue("$mediaFileId", mediaFileId.Value.ToString("D"));
@@ -87,6 +88,9 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
             insert.Parameters.AddWithValue("$explanations", JsonSerializer.Serialize(candidate.ExplanationCodes));
             insert.Parameters.AddWithValue("$revision", candidate.Revision);
             insert.Parameters.AddWithValue("$locked", candidate.IsDecisionLocked ? 1 : 0);
+            insert.Parameters.AddWithValue(
+                "$displayTitle",
+                (object?)candidate.DisplayTitle ?? DBNull.Value);
             await insert.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -101,7 +105,8 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         await using var command = connection.CreateCommand();
         command.CommandText = """
             SELECT candidate_id, stable_key, content_kind, score, scoring_model_version,
-                   review_state, signals_json, explanation_codes_json, revision, decision_locked
+                   review_state, signals_json, explanation_codes_json, revision, decision_locked,
+                   display_title
             FROM match_candidates
             WHERE media_file_id = $mediaFileId
             ORDER BY score DESC, stable_key COLLATE BINARY;
@@ -122,7 +127,9 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
                 JsonSerializer.Deserialize<MatchSignal[]>(reader.GetString(6)) ?? [],
                 JsonSerializer.Deserialize<string[]>(reader.GetString(7)) ?? [],
                 reader.GetInt32(8),
-                reader.GetBoolean(9)));
+                reader.GetBoolean(9),
+                MediaFilePath: null,
+                DisplayTitle: reader.IsDBNull(10) ? null : reader.GetString(10)));
         }
 
         return candidates;
@@ -146,7 +153,7 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
             SELECT candidate_id, candidate.media_file_id, stable_key, content_kind, score,
                    scoring_model_version, review_state, signals_json,
                    explanation_codes_json, revision, decision_locked,
-                   media.normalized_path
+                   media.normalized_path, display_title
             FROM match_candidates candidate
             LEFT JOIN media_files media ON media.id = candidate.media_file_id
             WHERE candidate.review_state IN ($pending, $suggested)
@@ -171,7 +178,7 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         var candidates = new List<MatchCandidate>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            candidates.Add(ReadCandidate(reader, mediaFileColumn: 1, pathColumn: 11));
+            candidates.Add(ReadCandidate(reader, mediaFileColumn: 1, pathColumn: 11, titleColumn: 12));
         }
 
         return candidates;
@@ -250,7 +257,7 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         command.CommandText = """
             SELECT candidate_id, media_file_id, stable_key, content_kind, score,
                    scoring_model_version, review_state, signals_json,
-                   explanation_codes_json, revision, decision_locked
+                   explanation_codes_json, revision, decision_locked, display_title
             FROM match_candidates
             WHERE media_file_id = $mediaFileId AND candidate_id = $candidateId;
             """;
@@ -258,7 +265,7 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         command.Parameters.AddWithValue("$candidateId", candidateId.Value.ToString("D"));
         await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
         return await reader.ReadAsync(cancellationToken).ConfigureAwait(false)
-            ? ReadCandidate(reader, mediaFileColumn: 1)
+            ? ReadCandidate(reader, mediaFileColumn: 1, titleColumn: 11)
             : null;
     }
 
@@ -269,7 +276,8 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
     private static MatchCandidate ReadCandidate(
         SqliteDataReader reader,
         int mediaFileColumn,
-        int pathColumn = -1) => new(
+        int pathColumn = -1,
+        int titleColumn = -1) => new(
         new CandidateId(Guid.Parse(reader.GetString(0))),
         new MediaFileId(Guid.Parse(reader.GetString(mediaFileColumn))),
         reader.GetString(2),
@@ -281,5 +289,6 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         JsonSerializer.Deserialize<string[]>(reader.GetString(8)) ?? [],
         reader.GetInt32(9),
         reader.GetBoolean(10),
-        pathColumn >= 0 && !reader.IsDBNull(pathColumn) ? reader.GetString(pathColumn) : null);
+        pathColumn >= 0 && !reader.IsDBNull(pathColumn) ? reader.GetString(pathColumn) : null,
+        titleColumn >= 0 && !reader.IsDBNull(titleColumn) ? reader.GetString(titleColumn) : null);
 }

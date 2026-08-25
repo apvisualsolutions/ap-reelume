@@ -8,6 +8,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Added
+
+- **The review tray says which title it is talking about.** It asked somebody to accept or reject
+  «movie:761053»: the provider already answered with the name and the year, and the whole chain —
+  facts, scoring, stored row, projection — threw them away. It carries them to the card now, which
+  writes «Tormenta de Sal (2016)» and falls back to the key only when no name was stored, which is
+  every row written before this version. The name is also what a screen reader announces on the
+  card's three buttons.
+
+### Fixed
+
+- **The «Next episode» panel limits its column, not its border.** A fixed width does not give way: at
+  200 % text scaling it put «Continue» at pixel 714 of a 683 px viewport, out of the mouse's reach.
+  Measured in CI. A column of «* up to 540» is the `max-width` the prototype uses: as wide as there
+  is room for, never wider, and still against the left edge.
+
+
 ### Fixed
 
 - **Four details the prototype had and this application did not.** The kind chip drops its word in

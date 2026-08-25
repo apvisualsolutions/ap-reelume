@@ -119,8 +119,20 @@ public sealed class MetadataCandidateSource : IIdentificationCandidateSource
             parsed.Season is null ? null : 1.0,
             parsed.Episode is null ? null : 1.0,
             YearMatch(parsed.Year, result.ReleaseYear),
-            DurationMatch: null))
+            DurationMatch: null,
+            DisplayTitle: Name(result)))
     ];
+
+    /// <summary>
+    /// «Puerto Sombra (2021)», or just the name when the provider gives no year.
+    /// </summary>
+    /// <remarks>
+    /// The year is in the name because the tray's whole job is telling two answers apart, and two
+    /// films of the same title a decade apart are the commonest pair it has to separate.
+    /// </remarks>
+    private static string Name(MetadataSearchResult result) => result.ReleaseYear is { } year
+        ? string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{result.Title} ({year})")
+        : result.Title;
 
     /// <summary>
     /// How close two titles are, on the characters that survive normalisation. It never claims more

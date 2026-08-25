@@ -8,6 +8,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Añadido
+
+- **La bandeja de revisión dice de qué título habla.** Pedía aceptar o rechazar «movie:761053»: el
+  proveedor ya devolvía el nombre y el año, y la cadena entera —hechos, puntuación, fila guardada,
+  proyección— los tiraba. Ahora los lleva hasta la tarjeta, que escribe «Tormenta de Sal (2016)» y
+  cae a la clave sólo cuando no hay nombre guardado, que es toda fila anterior a esta versión. El
+  nombre también es lo que anuncia el lector de pantalla en los tres botones de la tarjeta.
+
+### Corregido
+
+- **El panel de «Siguiente episodio» limita su columna, no su borde.** Un ancho fijo no cede: al
+  200 % de escala de texto ponía «Continuar» en el píxel 714 de una ventana de 683, fuera de alcance
+  del ratón. Medido en CI. Una columna «* hasta 540» es el `max-width` que el prototipo usa: todo lo
+  ancha que quepa, nunca más, y pegada a la izquierda igual.
+
+
 ### Corregido
 
 - **Cuatro detalles que el prototipo tenía y esta aplicación no.** La píldora de tipo pierde su

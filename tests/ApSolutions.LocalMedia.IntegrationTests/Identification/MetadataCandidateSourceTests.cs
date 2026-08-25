@@ -50,6 +50,12 @@ public sealed class MetadataCandidateSourceTests
         Assert.Null(only.EpisodeMatch);
         Assert.Null(only.DurationMatch);
         Assert.Equal(1, provider.Searches);
+
+        // The name the tray shows, which is the provider's own plus the year: two films of the same
+        // title a decade apart are the commonest pair a person has to tell apart, and the key cannot
+        // do it.
+        Assert.NotNull(only.DisplayTitle);
+        Assert.Contains("(", only.DisplayTitle, StringComparison.Ordinal);
     }
 
     /// <summary>

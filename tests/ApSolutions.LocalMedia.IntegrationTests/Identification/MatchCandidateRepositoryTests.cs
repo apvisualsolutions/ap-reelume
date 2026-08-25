@@ -115,6 +115,67 @@ public sealed class MatchCandidateRepositoryTests
         Assert.Equal(MatchDecisionWriteOutcome.Conflict, stale.Outcome);
     }
 
+    /// <summary>
+    /// The name the provider gave a candidate survives every reading of it, and its absence too.
+    /// </summary>
+    /// <remarks>
+    /// The tray shows this and nothing else a person can weigh: without it a row says
+    /// «tmdb:movie:761053» and asks somebody to decide about a title they were never told. Three
+    /// readings return a candidate — the file's own, the tray's projection and the single row a
+    /// decision reads — and a column added to one of them and forgotten in the others is a name that
+    /// appears and disappears depending on which screen you are on.
+    ///
+    /// The nameless half is the row written before the column existed, which is every row in a
+    /// library upgraded rather than created.
+    /// </remarks>
+    [Fact]
+    public async Task A_candidates_name_survives_every_reading_of_it()
+    {
+        using var directory = new DatabaseTestDirectory();
+        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        using var runner = new MigrationRunner(factory);
+        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        var mediaFileId = new MediaFileId(Guid.Parse("40000000-0000-0000-0000-000000000001"));
+        await SeedMediaFileAsync(factory, mediaFileId);
+        var repository = new MatchCandidateRepository(factory);
+        var named = Candidate(mediaFileId, "tmdb:movie:1", 0.95, ReviewState.Suggested) with
+        {
+            DisplayTitle = "Puerto Sombra (2021)",
+        };
+        var nameless = Candidate(mediaFileId, "tmdb:movie:2", 0.70, ReviewState.Pending);
+
+        await repository.ReplaceForMediaFileAsync(
+            mediaFileId,
+            [named, nameless],
+            TestContext.Current.CancellationToken);
+
+        var byFile = await repository.GetForMediaFileAsync(
+            mediaFileId,
+            TestContext.Current.CancellationToken);
+        Assert.Equal("Puerto Sombra (2021)", byFile[0].DisplayTitle);
+        Assert.Null(byFile[1].DisplayTitle);
+
+        var tray = await repository.ListForReviewAsync(
+            limit: 10,
+            offset: 0,
+            cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Equal(
+            "Puerto Sombra (2021)",
+            Assert.Single(tray, candidate => candidate.StableKey == "tmdb:movie:1").DisplayTitle);
+        Assert.Null(Assert.Single(tray, candidate => candidate.StableKey == "tmdb:movie:2").DisplayTitle);
+
+        // And the reading a decision makes, which is the one that writes the row back.
+        var decided = await repository.TrySetReviewStateAsync(
+            mediaFileId,
+            named.Id,
+            expectedRevision: 0,
+            ReviewState.Accepted,
+            lockDecision: true,
+            TestContext.Current.CancellationToken);
+        Assert.Equal(MatchDecisionWriteOutcome.Applied, decided.Outcome);
+        Assert.Equal("Puerto Sombra (2021)", decided.Candidate?.DisplayTitle);
+    }
+
     private static MatchCandidate Candidate(
         MediaFileId mediaFileId,
         string stableKey,

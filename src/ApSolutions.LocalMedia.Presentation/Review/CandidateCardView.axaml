@@ -39,7 +39,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       Classes="candidate-card"
       Classes.pending="{Binding IsPending}"
       Classes.suggested="{Binding IsSuggested}"
-      automation:AutomationProperties.Name="{Binding StableKey}"
+      automation:AutomationProperties.Name="{Binding CandidateLabel}"
       automation:AutomationProperties.HelpText="{Binding ExplanationCodes, Converter={StaticResource ExplanationText}}">
     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space16}">
       <Border
@@ -100,7 +100,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <TextBlock
                 FontWeight="SemiBold"
                 Foreground="{DynamicResource TextPrimaryBrush}"
-                Text="{Binding StableKey}"
+                Text="{Binding CandidateLabel}"
                 TextWrapping="Wrap" />
             <TextBlock
                 FontSize="{DynamicResource FontSizeCaption}"
@@ -170,17 +170,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Command="{Binding AcceptCommand}"
               Content="{DynamicResource ReviewAcceptShortAction}"
               automation:AutomationProperties.Name="{DynamicResource ReviewAcceptAction}"
-              automation:AutomationProperties.HelpText="{Binding StableKey}" />
+              automation:AutomationProperties.HelpText="{Binding CandidateLabel}" />
           <Button
               Command="{Binding RejectCommand}"
               Content="{DynamicResource ReviewRejectShortAction}"
               automation:AutomationProperties.Name="{DynamicResource ReviewRejectAction}"
-              automation:AutomationProperties.HelpText="{Binding StableKey}" />
+              automation:AutomationProperties.HelpText="{Binding CandidateLabel}" />
           <Button
               Command="{Binding SearchManuallyCommand}"
               Content="{DynamicResource ReviewManualSearchCardAction}"
               automation:AutomationProperties.Name="{DynamicResource ReviewManualSearchCardAction}"
-              automation:AutomationProperties.HelpText="{Binding StableKey}" />
+              automation:AutomationProperties.HelpText="{Binding CandidateLabel}" />
         </WrapPanel>
       </StackPanel>
     </Grid>
