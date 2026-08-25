@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los rótulos de la tarjeta de revisión iban en dos estilos.** «ARCHIVO PENDIENTE» estaba en
+  versalitas y «Candidato propuesto», «Confianza» y «Por qué» no, dentro de la misma tarjeta. Los
+  cuatro van ahora como los escribe el prototipo, y el tercero pasa a decir lo que dice allí:
+  «SEÑALES CONSIDERADAS», que es lo que la lista de debajo contiene.
+
+
+### Corregido
+
 - **«Otras acciones» tenía dos gramáticas en la misma columna.** Las marcas personales ya eran filas
   de ancho completo con icono, que es como las dibuja el prototipo; las tres decisiones de estado de
   visto seguían siendo píldoras sueltas de anchos distintos encima de ellas. Ahora son cinco filas

@@ -201,11 +201,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ReviewManualSearchCardAction">Buscar manualmente</x:String>
   <x:String x:Key="ReviewLoadMoreAction">Cargar más</x:String>
   <x:String x:Key="ReviewConflictMessage">La coincidencia cambió en otra operación. Se conserva la decisión ya guardada.</x:String>
-  <x:String x:Key="ReviewProposedCandidate">Candidato propuesto</x:String>
-  <x:String x:Key="ReviewConfidence">Confianza</x:String>
+  <x:String x:Key="ReviewProposedCandidate">CANDIDATO PROPUESTO</x:String>
+  <x:String x:Key="ReviewConfidence">CONFIANZA</x:String>
   <x:String x:Key="ReviewStatusPending">Pendiente</x:String>
   <x:String x:Key="ReviewStatusSuggested">Sugerida</x:String>
-  <x:String x:Key="ReviewExplanationHeading">Por qué</x:String>
+  <x:String x:Key="ReviewExplanationHeading">SEÑALES CONSIDERADAS</x:String>
   <x:String x:Key="DuplicateReviewAccessibleName">Revisión de versiones duplicadas</x:String>
   <x:String x:Key="DuplicateReviewTitle">Versiones del mismo contenido</x:String>
   <x:String x:Key="MediaVersionAvailable">Disponible</x:String>

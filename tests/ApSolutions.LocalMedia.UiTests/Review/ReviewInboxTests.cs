@@ -50,7 +50,7 @@ public sealed class ReviewInboxTests
                 .ToArray();
             Assert.Contains(cultureName == "es-ES" ? "Pendiente" : "Pending", visibleText);
             Assert.Contains(cultureName == "es-ES" ? "Sugerida" : "Suggested", visibleText);
-            Assert.Contains(cultureName == "es-ES" ? "Por qué" : "Why", visibleText);
+            Assert.Contains(cultureName == "es-ES" ? "SEÑALES CONSIDERADAS" : "SIGNALS CONSIDERED", visibleText);
             Assert.Contains(visibleText, text => text!.Contains("59", StringComparison.Ordinal));
 
             var frame = window.CaptureRenderedFrame();

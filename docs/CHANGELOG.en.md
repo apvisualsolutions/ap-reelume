@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The review card's labels came in two styles.** «PENDING FILE» was in small capitals and
+  «Proposed candidate», «Confidence» and «Why» were not, inside the same card. All four are now
+  written the way the prototype writes them, and the third says what it says there: «SIGNALS
+  CONSIDERED», which is what the list under it holds.
+
+
+### Fixed
+
 - **«Other actions» held two grammars in one column.** The personal marks were already full-width
   rows with an icon, which is how the prototype draws them; the three watch-state decisions were
   still loose pills of differing widths above them. They are five matching rows now. Same names, same
