@@ -352,6 +352,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             if (SetField(ref _player, value))
             {
                 OnPropertyChanged(nameof(IsPlayerVisible));
+                OnPropertyChanged(nameof(PlayerTitle));
+                OnPropertyChanged(nameof(PlayerSubtitle));
+                OnPropertyChanged(nameof(HasPlayerTitle));
+                OnPropertyChanged(nameof(HasPlayerSubtitle));
                 OnPropertyChanged(nameof(HasTracks));
                 OnPropertyChanged(nameof(HasAudioOutput));
                 OnPropertyChanged(nameof(HasMarkers));
@@ -371,6 +375,22 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             }
         }
     }
+
+    /// <summary>
+    /// What is playing, as the card that started it calls it, and the line under that.
+    /// </summary>
+    /// <remarks>
+    /// The prototype writes both in the middle of the player's header and this application wrote
+    /// nothing there, because the session holds a path and a path is not a heading. They travel with
+    /// the request now, so the header says what a person pressed rather than where the file is.
+    /// </remarks>
+    public string PlayerTitle => Player?.Title ?? string.Empty;
+
+    public string PlayerSubtitle => Player?.Subtitle ?? string.Empty;
+
+    public bool HasPlayerTitle => PlayerTitle.Length > 0;
+
+    public bool HasPlayerSubtitle => PlayerSubtitle.Length > 0;
 
     /// <summary>Where the picture is being shown right now. The view follows this, not the reverse.</summary>
     public PlaybackMode PlaybackMode

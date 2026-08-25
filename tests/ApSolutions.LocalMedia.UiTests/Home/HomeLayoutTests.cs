@@ -449,9 +449,9 @@ public sealed class HomeLayoutTests
         var withProgress = new HomeViewModel(
             new GetHome(new StubHomeReadModel([EpisodeProgress()])),
             new NavigationService(),
-            content =>
+            request =>
             {
-                resumed.Add(content);
+                resumed.Add(request.Content);
                 return Task.CompletedTask;
             });
         await withProgress.LoadAsync(TestContext.Current.CancellationToken);
@@ -463,9 +463,9 @@ public sealed class HomeLayoutTests
         var empty = new HomeViewModel(
             new GetHome(new StubHomeReadModel([])),
             new NavigationService(),
-            content =>
+            request =>
             {
-                resumed.Add(content);
+                resumed.Add(request.Content);
                 return Task.CompletedTask;
             });
         await empty.LoadAsync(TestContext.Current.CancellationToken);

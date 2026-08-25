@@ -329,7 +329,10 @@ public sealed class PlayerViewDesignTests
     [AvaloniaFact]
     public void The_large_transport_wears_the_chrome_the_mini_player_defined()
     {
-        var (window, view) = Show();
+        // With the transport, because the session's three moved into it on 2026-08-25: the prototype
+        // puts back, play and forward together, and a player mounted without a transport model now
+        // has no play button to measure.
+        var (window, view) = Show(withTransport: true);
         var expected = ChromeCorner();
 
         foreach (var key in TransportChrome)
@@ -377,7 +380,7 @@ public sealed class PlayerViewDesignTests
         Assert.True(chrome.Success, "Button.player-chrome is not declared, so this measures nothing.");
         Assert.DoesNotContain("Property=\"Margin\"", chrome.Groups["body"].Value, StringComparison.Ordinal);
 
-        var (window, view) = Show();
+        var (window, view) = Show(withTransport: true);
         foreach (var key in TransportChrome)
         {
             var button = view.GetVisualDescendants()

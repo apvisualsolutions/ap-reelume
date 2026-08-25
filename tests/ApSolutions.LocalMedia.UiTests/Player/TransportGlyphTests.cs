@@ -58,6 +58,12 @@ public sealed class TransportGlyphTests
     ];
 
     /// <summary>The large transport's three, which carry no name and are found by the key behind theirs.</summary>
+    /// <summary>
+    /// The session's own three, which moved into the transport row on 2026-08-25: the prototype puts
+    /// back, play and forward together, and they were on a second line because their commands belong
+    /// to a different model. They are still told apart by their accessible name rather than by an
+    /// x:Name — they are declared inside a template and have none.
+    /// </summary>
     private static readonly (string Key, string Icon)[] LargeTransport =
     [
         ("PlayerPlayAction", "IconPlay"),
@@ -95,7 +101,7 @@ public sealed class TransportGlyphTests
 
         foreach (var (key, icon) in LargeTransport)
         {
-            Check(ByKey(scope.Player, key), key, icon);
+            Check(ByKey(scope.Transport, key), key, icon);
         }
 
         foreach (var (name, key, icon) in MiniChrome)
@@ -150,7 +156,7 @@ public sealed class TransportGlyphTests
         using var scope = Mount();
 
         foreach (var button in TransportOwn.Select(entry => ByName(scope.Transport, entry.Name))
-            .Concat(LargeTransport.Select(entry => ByKey(scope.Player, entry.Key)))
+            .Concat(LargeTransport.Select(entry => ByKey(scope.Transport, entry.Key)))
             .Concat(MiniChrome.Select(entry => ByName(scope.Mini, entry.Name))))
         {
             foreach (var path in button.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>())

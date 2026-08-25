@@ -78,6 +78,28 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Command="{Binding SkipBackwardCommand}">
         <Path Classes="icon size-20" Data="{DynamicResource IconSkipBackward}" />
       </Button>
+      <!--
+        Play, pause and stop, between the skips, which is where the prototype puts them and where
+        this application did not: they lived on a second row because their commands belong to the
+        session coordinator and the skips belong to ControlPlayback, and the two models are built at
+        different moments. That is a fact about the models, not about the row — the buttons reach
+        across to the player's own model through the view they are hosted in, and the transport is
+        one line again.
+      -->
+      <Button
+          Classes="player-chrome"
+          IsVisible="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).CanResume}"
+          automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
+          Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).ResumeCommand}">
+        <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlay}" />
+      </Button>
+      <Button
+          Classes="player-chrome"
+          IsVisible="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).CanPause}"
+          automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
+          Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).PauseCommand}">
+        <Path Classes="icon size-22" Data="{DynamicResource IconPause}" />
+      </Button>
       <Button
           x:Name="SkipForwardButton"
           Classes="player-chrome"
@@ -86,6 +108,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.HelpText="{Binding ForwardSkipLabel}"
           Command="{Binding SkipForwardCommand}">
         <Path Classes="icon size-20" Data="{DynamicResource IconSkipForward}" />
+      </Button>
+      <Button
+          Classes="player-chrome"
+          automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
+          Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).StopCommand}">
+        <Path Classes="icon size-22" Data="{DynamicResource IconStop}" />
       </Button>
       <Button
           x:Name="MuteButton"
@@ -147,8 +175,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Classes="player-chrome"
           VerticalAlignment="Center"
           automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}">
-        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
-          <TextBlock Foreground="{DynamicResource PlayerTextBrush}" Text="{Binding SpeedLabel}" />
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+          <!--
+            The word, which the prototype writes beside the multiplier: «1×» alone is a number
+            nobody can tell from a volume or a version.
+          -->
+          <TextBlock
+              VerticalAlignment="Center"
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+              Text="{DynamicResource TransportSpeedLabel}" />
+          <TextBlock
+              VerticalAlignment="Center"
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource PlayerTextBrush}"
+              Text="{Binding SpeedLabel}" />
+          <Path Classes="icon size-14" Data="{DynamicResource IconChevronUp}" Stroke="{DynamicResource PlayerTextSecondaryBrush}" />
         </StackPanel>
         <Button.Flyout>
           <MenuFlyout Placement="Top">

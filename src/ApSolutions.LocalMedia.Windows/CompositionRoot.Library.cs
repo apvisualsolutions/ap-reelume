@@ -95,7 +95,7 @@ public static partial class CompositionRoot
                 // exactly this — at the position the progress policy allows. The shell is read at
                 // press time rather than captured: this view model is built while the shell is still
                 // being assembled.
-                onResume: async content =>
+                onResume: async request =>
                 {
                     if (provider.GetRequiredService<ShellHost>().Shell is not { } shell)
                     {
@@ -103,7 +103,7 @@ public static partial class CompositionRoot
                     }
 
                     var state = await provider.GetRequiredService<IWatchStateRepository>()
-                        .GetAsync(content, CancellationToken.None)
+                        .GetAsync(request.Content, CancellationToken.None)
                         .ConfigureAwait(true);
                     if (state is null)
                     {
@@ -113,7 +113,9 @@ public static partial class CompositionRoot
                     await shell.OpenPlayerAsync(
                         new PlayDetailsRequest(
                             state.SourceMediaFileId,
-                            ProgressPolicy.ClampPosition(state.Position, state.ObservedDuration)),
+                            ProgressPolicy.ClampPosition(state.Position, state.ObservedDuration),
+                            request.Title,
+                            request.Subtitle),
                         CancellationToken.None).ConfigureAwait(true);
                 },
                 provider.GetRequiredService<RecommendationsViewModel>(),

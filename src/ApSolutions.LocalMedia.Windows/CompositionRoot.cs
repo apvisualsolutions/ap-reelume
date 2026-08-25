@@ -1366,6 +1366,12 @@ public static partial class CompositionRoot
         return new PlayerSurfaces
         {
             Player = player,
+            // What the card that pressed Play called it. An episode chained into by the countdown
+            // has no card behind it, so the entry's own title stands in — and a session started from
+            // a file outside the library has neither, which is why the header's middle is absent
+            // rather than empty.
+            Title = request.Title ?? episodeEntry?.Title,
+            Subtitle = request.Subtitle,
             Tracks = tracks,
             AudioOutput = audioOutput,
             Markers = markers,

@@ -213,8 +213,14 @@ public sealed class DetailsNavigationTests
         viewModel.ResumeCommand.Execute(null);
 
         Assert.Equal(2, requests.Count);
-        Assert.Equal(new PlayDetailsRequest(effective, TimeSpan.Zero), requests[0]);
-        Assert.Equal(new PlayDetailsRequest(effective, TimeSpan.FromMinutes(40)), requests[1]);
+
+        // The request carries what the card calls the film since 2026-08-25 — the player's header
+        // writes it, and the session itself holds only a path. Asserted here as well as the file and
+        // the position, because a header that says the wrong film is a session about the wrong film.
+        Assert.Equal(new PlayDetailsRequest(effective, TimeSpan.Zero, "Arrival", "2016"), requests[0]);
+        Assert.Equal(
+            new PlayDetailsRequest(effective, TimeSpan.FromMinutes(40), "Arrival", "2016"),
+            requests[1]);
         Assert.Equal("40:00", viewModel.ResumePositionText);
     }
 
@@ -251,7 +257,9 @@ public sealed class DetailsNavigationTests
             show.Apply(Item(ShowId, CatalogTitleKind.Show, "Crónicas", true), [], null!));
     }
 
-    [Fact]
+    // On the UI thread since 2026-08-25: starting an episode names it for the player's header, and
+    // naming it reads a string from the application's own dictionaries.
+    [AvaloniaFact]
     public void An_episode_plays_only_when_a_reachable_file_backs_it()
     {
         var requests = new List<PlayDetailsRequest>();
