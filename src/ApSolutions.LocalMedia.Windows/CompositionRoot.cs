@@ -630,10 +630,11 @@ public static partial class CompositionRoot
                 // The copy that would play: the group's first available member when the film has one,
                 // and otherwise the film's own row — which is the ordinary case, because a film with
                 // no duplicate is never grouped.
+                var file = await provider.GetRequiredService<IMediaFileRepository>()
+                    .FindByIdAsync(new MediaFileId(item.Item.Id.Value), CancellationToken.None)
+                    .ConfigureAwait(true);
                 var filmPath = versions?.Versions.FirstOrDefault(version => version.IsAvailable)?.Path
-                    ?? (await provider.GetRequiredService<IMediaFileRepository>()
-                        .FindByIdAsync(new MediaFileId(item.Item.Id.Value), CancellationToken.None)
-                        .ConfigureAwait(true))?.Path;
+                    ?? file?.Path;
                 movieDetails.Apply(
                     item.Item,
                     state,
@@ -641,7 +642,8 @@ public static partial class CompositionRoot
                     personal,
                     overview: overview,
                     trailerPath: FindTrailer(filmPath),
-                    trailerKey: trailerKey);
+                    trailerKey: trailerKey,
+                    file: file);
             }
         };
         return library;
