@@ -126,21 +126,40 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 x:Name="MovieActionsSurface"
                 ItemSpacing="{DynamicResource Space8}"
                 LineSpacing="{DynamicResource Space8}">
+              <!--
+                The glyph the series card has carried since it was drawn, and the film card had not:
+                «el botón de reproducir no es igual al del prototipo», reported on 2026-08-25. One
+                shape for both cards, and the words stay beside it — a play triangle says what will
+                happen and «Continuar» says where from.
+              -->
               <Button
                   Classes="primary-action"
                   Command="{Binding ResumeCommand}"
-                  Content="{DynamicResource MovieResumeAction}"
                   IsVisible="{Binding CanResume}"
-                  automation:AutomationProperties.Name="{DynamicResource MovieResumeAction}" />
+                  automation:AutomationProperties.Name="{DynamicResource MovieResumeAction}">
+                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                  <Path Classes="icon size-14 filled" Data="{DynamicResource IconPlay}" />
+                  <TextBlock Text="{DynamicResource MovieResumeAction}" />
+                </StackPanel>
+              </Button>
               <TextBlock
                   VerticalAlignment="Center"
                   Foreground="{DynamicResource PlayerTextSecondaryBrush}"
                   IsVisible="{Binding CanResume}"
                   Text="{Binding ResumePositionText}" />
+              <!--
+                «Reproducir desde el principio» is a glyph now and not four words: the owner asked
+                for it on 2026-08-25, and the row it sits in already carries three other labels. What
+                it says is unchanged — the name a reader hears and the tip a pointer finds are the
+                same sentence they always were, and the shape is the one every player draws for
+                «start again».
+              -->
               <Button
+                  Classes="player-chrome"
                   Command="{Binding PlayCommand}"
-                  Content="{DynamicResource MoviePlayAction}"
-                  automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}" />
+                  automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}">
+                <Path Classes="icon size-20" Data="{DynamicResource IconReset}" />
+              </Button>
               <Button
                   Command="{Binding PlayTrailerCommand}"
                   Content="{DynamicResource MovieTrailerAction}"

@@ -10,6 +10,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The film card carries the same play triangle the series card has**, which is what the owner
+  missed — "el botón de reproducir no es igual al del prototipo" — and **"play from the start" is a
+  glyph** rather than four words in a row that already carried three other labels. What it says is
+  unchanged: the name a reader hears and the tip a pointer finds are the sentence they always were.
+
 - **The disabled outline was drawn in all four themes, and only two need it.** The reason it exists
   was written down from the start: in light and dark a disabled control reads off its fill, which is
   a third grey, and the two high contrast palettes have no third colour to spend. Drawing it in the

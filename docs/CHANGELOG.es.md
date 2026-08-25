@@ -10,6 +10,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La ficha de película lleva ahora el mismo triángulo que la de serie**, que era lo que el
+  propietario echaba en falta —«el botón de reproducir no es igual al del prototipo»—, y
+  **«Reproducir desde el principio» es un glifo** y no cuatro palabras en una fila que ya llevaba
+  otras tres etiquetas. Lo que dice no cambia: el nombre que oye un lector y la ayuda que encuentra
+  un puntero son la misma frase de siempre.
+
 - **El contorno punteado del deshabilitado salía en los cuatro temas, y sólo hace falta en dos.** La
   razón por la que existe estaba escrita desde el principio: en claro y oscuro un control
   deshabilitado se lee por su relleno, que es un tercer gris, y las dos paletas de contraste alto no
