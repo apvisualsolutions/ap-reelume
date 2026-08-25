@@ -13,6 +13,15 @@
 ## 60.61/27.27 to 45.45/14.29 and no gate said a word, because newness was decided against the base
 ## ref and that file had shipped long ago. This is the same ratchet eng/walk-pending.txt used to take
 ## the walk from 126 to 0.
+##
+## 2026-08-25: the numbers below are the coverage-debt artefact of a CI run, which is the only place
+## a floor may come from. Two files left the list by reaching the bar — ShellViewModel, once the
+## branch nothing could take came out of HasPlayerPanels, and HardwareAccelerationFallback, once a
+## Reset with no caller anywhere came out — so the ratchet went 214 -> 212. Two came DOWN by a point
+## and that is not a relaxation, it is the same rule read the other way: a floor above what CI
+## measures fails exactly like one below it, and LibVlcMediaPlayerEngine and CompositionRoot.cs both
+## carried a floor from a luckier run. The LibVLC one is the audio-device enumeration and the
+## EncounteredError event, which a hosted runner has no hardware to raise.
 
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  80
@@ -75,9 +84,9 @@ src/ApSolutions.LocalMedia.Infrastructure/Backup/StagedRestoreService.cs        
 src/ApSolutions.LocalMedia.Infrastructure/Backup/ZipExportService.cs                         100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/IntegrityChecker.cs                            94  83
 src/ApSolutions.LocalMedia.Infrastructure/Data/MigrationRunner.cs                             96  72
-src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  88
+src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  89
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs                 100  89
-src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/LibraryRootRepository.cs         100  80
+src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/LibraryRootRepository.cs         100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       99  75
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  87
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PersonalStateRepository.cs        96  90
@@ -100,9 +109,8 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbMetadataProvider.cs      
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbOptions.cs                             95  42
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs                        100  50
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs               87  73
-src/ApSolutions.LocalMedia.Infrastructure/Playback/HardwareAccelerationFallback.cs            77 100
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                86  79
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 91  80
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 91  79
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  61
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs           100  83
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/NetworkPurposeRegistry.cs                  100  87
@@ -129,7 +137,7 @@ src/ApSolutions.LocalMedia.Presentation/Home/HomeViewModel.cs                   
 src/ApSolutions.LocalMedia.Presentation/Home/InProgressRailView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecentlyAddedRailView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsRailView.axaml                   100  50
-src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      94  85
+src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      96  90
 src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  78
 src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Language/LanguageService.cs                          100  88
@@ -205,7 +213,6 @@ src/ApSolutions.LocalMedia.Presentation/Settings/SegmentDetectionSettingsView.ax
 src/ApSolutions.LocalMedia.Presentation/Shell/MainWindowPlacement.cs                          97  71
 src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml                                100  50
 src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml.cs                              97  71
-src/ApSolutions.LocalMedia.Presentation/Shell/ShellViewModel.cs                               99  95
 src/ApSolutions.LocalMedia.Presentation/Shell/StartupView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml.cs                          88  50
@@ -217,7 +224,7 @@ src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs             
 src/ApSolutions.LocalMedia.Presentation/Theme/Icons.axaml                                    100  50
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
-src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         89  66
+src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         90  65
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  80
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90

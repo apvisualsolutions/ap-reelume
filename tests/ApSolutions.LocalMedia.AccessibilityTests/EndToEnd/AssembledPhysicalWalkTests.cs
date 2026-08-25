@@ -1533,6 +1533,61 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => host.ViewModel.CurrentRoute,
             "clicking the library entry never took the shell to the library");
         Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
+
+        // ---- And the arms every one of Home's hooks carries for a surface that is not there.
+        //
+        // Each of them reads the shell at the moment of the press rather than capturing it, because
+        // these models are built while the shell is still being assembled. What that buys is that a
+        // press with nothing behind it does nothing instead of throwing — and the only way to
+        // measure it is to take the thing away and press anyway, which is the same shape as the
+        // transport's mode handler above.
+        Navigate(host, AppRoute.Home);
+        await home.LoadAsync(TestContext.Current.CancellationToken);
+        var homeShellHost = host.Application.Services.GetRequiredService<CompositionRoot.ShellHost>();
+        var liveShell = homeShellHost.Shell;
+        homeShellHost.Shell = null;
+        try
+        {
+            home.ResumeCommand.Execute(null);
+            home.OpenItemDetailsCommand.Execute(home.RecentlyAdded[0]);
+            await SettleAsync();
+            Assert.Null(host.ViewModel.Player);
+        }
+        finally
+        {
+            homeShellHost.Shell = liveShell;
+        }
+
+        // A card for something the catalogue no longer holds, which is what a rail drawn before a
+        // removal is holding a moment later. The route must not move: there is no card to open.
+        Navigate(host, AppRoute.Home);
+        home.OpenItemDetailsCommand.Execute(new ApSolutions.LocalMedia.Presentation.Home.RecentlyAddedItemViewModel(
+            new ApSolutions.LocalMedia.Application.Home.RecentlyAddedItem(
+            new TitleId(Guid.NewGuid()),
+            CatalogTitleKind.Movie,
+            "Nada",
+            Year: null,
+            IsAvailable: true,
+            AddedUtc: DateTimeOffset.UnixEpoch)));
+        await SettleAsync();
+        Assert.Equal(AppRoute.Home, host.ViewModel.CurrentRoute);
+
+        // And a card whose stored progress is gone, which is the same moment from the other rail:
+        // Continue has nothing to resume at, so it opens nothing rather than opening at zero.
+        home.ResumeItemCommand.Execute(new ApSolutions.LocalMedia.Presentation.Home.InProgressItemViewModel(
+            new ApSolutions.LocalMedia.Application.Home.InProgressItem(
+            ContentKey.ForTitle(new TitleId(Guid.NewGuid())),
+            new TitleId(Guid.NewGuid()),
+            CatalogTitleKind.Movie,
+            "Nada",
+            SeasonNumber: null,
+            EpisodeNumber: null,
+            EpisodeTitle: null,
+            CompletedFraction: 0.5,
+            IsAvailable: true,
+            UpdatedUtc: DateTimeOffset.UnixEpoch)));
+        await SettleAsync();
+        Assert.Null(host.ViewModel.Player);
     }
 
     /// <summary>
