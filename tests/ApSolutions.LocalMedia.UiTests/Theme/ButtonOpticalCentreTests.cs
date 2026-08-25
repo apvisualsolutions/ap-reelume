@@ -75,4 +75,56 @@ public sealed class ButtonOpticalCentreTests
             window.Close();
         }
     }
+
+    /// <summary>
+    /// And the same for a drop-down, which carries the same words on the same baseline.
+    /// </summary>
+    /// <remarks>
+    /// «Los desplegables tienen el mismo problema de alineación vertical que tenían los botones»,
+    /// reported on 2026-08-25 after the buttons were fixed. It is the same font and the same
+    /// asymmetry, so it is the same five pixels — measured here rather than trusted, because the
+    /// drop-down centres its label inside a template of its own rather than through a padding.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_ink_of_a_drop_downs_label_is_centred_in_it_too()
+    {
+        var picker = new ComboBox
+        {
+            Classes = { "filter-pill" },
+            Height = 44,
+            Width = 260,
+            ItemsSource = new[] { "Guardar el informe" },
+            SelectedIndex = 0,
+        };
+        var window = new Window { Width = 400, Height = 200, Content = picker };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        try
+        {
+            var label = picker.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Single(block => block.Text == "Guardar el informe");
+            var box = ((Visual)label).TranslatePoint(default, picker)!.Value.Y;
+            var metrics = new Typeface(label.FontFamily, label.FontStyle, label.FontWeight)
+                .GlyphTypeface;
+            var scale = label.FontSize / metrics.Metrics.DesignEmHeight;
+            var ascent = -metrics.Metrics.Ascent * scale;
+            var descent = metrics.Metrics.Descent * scale;
+            var capital = metrics.Metrics.IsFixedPitch ? ascent : ascent * 0.72;
+            var baseline = box + ascent;
+            var inkCentre = ((baseline - capital) + (baseline + descent)) / 2;
+            var pickerCentre = picker.Bounds.Height / 2;
+
+            Assert.True(
+                Math.Abs(inkCentre - pickerCentre) <= 1.0,
+                $"the run of ink is centred at {inkCentre:F2} in a {picker.Bounds.Height:F0} px "
+                    + $"drop-down whose middle is {pickerCentre:F2}, so the label sits "
+                    + $"{inkCentre - pickerCentre:F2} px {(inkCentre > pickerCentre ? "low" : "high")}.");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
 }
