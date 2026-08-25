@@ -134,7 +134,6 @@ src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs            
 src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Language/LanguageService.cs                          100  88
 src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                      100  90
-src/ApSolutions.LocalMedia.Presentation/Library/KindShapeConverter.cs                        100  66
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  78
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           97  90

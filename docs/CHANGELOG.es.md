@@ -10,6 +10,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La forma de la ficha de tipo la decide un estilo, no un convertidor.** `KindShapeConverter` tenía
+  que pedir la aplicación y buscar un recurso por nombre, y sus dos ramas de «no encontrado» no las
+  puede tomar nada: las dos claves de icono están declaradas y hay una puerta sobre ese inventario.
+  Se retira entero. La tarjeta pregunta `IsShow` —que la interfaz responde desde la clave que los
+  cuatro modelos ya dan— y dos reglas de estilo ponen la película o la pantalla. El trinquete de
+  cobertura baja de 215 a 214 con él.
+
+
+### Corregido
+
 - **Los rótulos de la tarjeta de revisión iban en dos estilos.** «ARCHIVO PENDIENTE» estaba en
   versalitas y «Candidato propuesto», «Confianza» y «Por qué» no, dentro de la misma tarjeta. Los
   cuatro van ahora como los escribe el prototipo, y el tercero pasa a decir lo que dice allí:

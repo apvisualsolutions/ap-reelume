@@ -10,6 +10,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The kind chip's shape is decided by a style, not by a converter.** `KindShapeConverter` had to
+  ask for the application and look a resource up by name, and neither of its "not found" arms can be
+  taken: both icon keys are declared and there is a gate over that inventory. It is removed. The card
+  asks `IsShow` — which the interface answers from the key the four models already give — and two
+  style rules draw the film or the screen. The coverage ratchet drops from 215 to 214 with it.
+
+
+### Fixed
+
 - **The review card's labels came in two styles.** «PENDING FILE» was in small capitals and
   «Proposed candidate», «Confidence» and «Why» were not, inside the same card. All four are now
   written the way the prototype writes them, and the third says what it says there: «SIGNALS

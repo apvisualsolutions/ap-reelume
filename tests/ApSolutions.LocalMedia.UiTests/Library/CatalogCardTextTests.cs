@@ -109,39 +109,52 @@ public sealed class CatalogCardTextTests
     }
 
     /// <summary>
-    /// The shape a kind is drawn as, and the direction that conversion does not go.
+    /// Which shape the chip draws, asked of the card rather than computed by a converter.
     /// </summary>
     /// <remarks>
-    /// The converter turns a key into one of the theme's own geometries. Asked for a key it does not
-    /// know it answers with nothing rather than with a guess, and asked to run backwards it refuses:
-    /// a shape does not become a kind, and a converter that silently returned one would be inventing
-    /// a catalogue entry out of a drawing.
+    /// The interface answers it from the key the four models already give, so no model says it
+    /// twice, and a style turns the answer into a geometry. It replaced a converter that had to
+    /// reach for <c>Application.Current</c> and for a resource by name — two "not found" arms that
+    /// nothing can take, because both icon keys are declared and there is a gate over that
+    /// inventory. Asserted as mounted, because what decides the shape is a style now.
     /// </remarks>
     [AvaloniaFact]
-    public void The_kind_shape_is_looked_up_and_never_converted_back()
+    public void A_series_card_draws_a_screen_and_everything_else_draws_a_film()
     {
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
 
-        var converter = new KindShapeConverter();
-        var film = converter.Convert("CatalogKindMovie", typeof(Geometry), null, CultureInfo.CurrentCulture);
-        var show = converter.Convert("CatalogKindShow", typeof(Geometry), null, CultureInfo.CurrentCulture);
+        Assert.True(((IPosterCard)Card(CatalogTitleKind.Show)).IsShow);
+        Assert.False(((IPosterCard)Card(CatalogTitleKind.Movie)).IsShow);
 
-        Assert.IsAssignableFrom<Geometry>(film);
-        Assert.IsAssignableFrom<Geometry>(show);
-        Assert.NotSame(film, show);
+        // The third arm: a scanned file the catalogue never identified is a film's frame rather than
+        // a blank where a chip should be.
+        Assert.False(((IPosterCard)Card((CatalogTitleKind)7)).IsShow);
 
-        // Anything that is not the series key is drawn as a film, which is what an unidentified file
-        // gets: a frame of celluloid rather than a blank where a chip should be.
-        Assert.Same(film, converter.Convert(null, typeof(Geometry), null, CultureInfo.CurrentCulture));
-        Assert.Same(
-            film,
-            converter.Convert("NotAKeyAnybodyDeclared", typeof(Geometry), null, CultureInfo.CurrentCulture));
+        var show = KindGlyph(CatalogTitleKind.Show);
+        var film = KindGlyph(CatalogTitleKind.Movie);
+        Assert.NotNull(show);
+        Assert.NotNull(film);
 
-        // And it never runs backwards: a shape does not become a kind, and a converter that
-        // answered would be inventing a catalogue entry out of a drawing.
-        Assert.Throws<NotSupportedException>(() =>
-            converter.ConvertBack(null, typeof(string), null, CultureInfo.CurrentCulture));
+        // Two different resources, not two names for one: the geometries themselves are compared,
+        // because a style that matched neither arm would hand both cards the same default.
+        Assert.NotSame(show, film);
+        Assert.NotEqual(show!.Bounds, film!.Bounds);
+    }
+
+    /// <summary>The geometry the chip's glyph ends up with, read while the card is mounted.</summary>
+    private static Avalonia.Media.Geometry? KindGlyph(CatalogTitleKind kind)
+    {
+        var card = new PosterCardView { DataContext = Card(kind) };
+        var window = new Avalonia.Controls.Window { Width = 400, Height = 600, Content = card };
+        window.Show();
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var glyph = Assert.Single(
+            card.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>(),
+            path => path.Classes.Contains("kind-glyph"));
+        var data = glyph.Data;
+        window.Close();
+        return data;
     }
 
     /// <summary>

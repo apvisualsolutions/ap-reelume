@@ -30,7 +30,6 @@ and a name here would be a second announcement of the same card.
     x:DataType="library:IPosterCard">
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="CardWord" />
-    <library:KindShapeConverter x:Key="KindShape" />
   </UserControl.Resources>
   <UserControl.Styles>
     <!--
@@ -42,6 +41,18 @@ and a name here would be a second announcement of the same card.
     -->
     <Style Selector="library|PosterCardView.glyph-chip TextBlock#KindWord">
       <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <!--
+      The shape in the chip: a strip of film, or a screen for a series. Two setters and a class
+      rather than a converter, because a converter for this has to ask the application for a
+      resource by name and both of its "not found" arms are branches nothing can take.
+    -->
+    <Style Selector="Path.kind-glyph">
+      <Setter Property="Data" Value="{DynamicResource IconFilm}" />
+    </Style>
+    <Style Selector="Path.kind-glyph.show">
+      <Setter Property="Data" Value="{DynamicResource IconShow}" />
     </Style>
   </UserControl.Styles>
   <StackPanel Spacing="{DynamicResource Space8}">
@@ -110,10 +121,10 @@ and a name here would be a second announcement of the same card.
             IsVisible="{Binding HasKind}">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
             <Path
-                Classes="icon size-14"
+                Classes="icon size-14 kind-glyph"
+                Classes.show="{Binding IsShow}"
                 VerticalAlignment="Center"
-                Stroke="{DynamicResource PosterChipInkBrush}"
-                Data="{Binding KindKey, Converter={StaticResource KindShape}}" />
+                Stroke="{DynamicResource PosterChipInkBrush}" />
             <TextBlock
                 x:Name="KindWord"
                 VerticalAlignment="Center"

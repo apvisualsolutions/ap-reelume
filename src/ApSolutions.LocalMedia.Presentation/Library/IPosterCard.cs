@@ -49,6 +49,18 @@ public interface IPosterCard
     /// <summary>Whether there is a chip to draw at all; a rail that cannot say has none.</summary>
     bool HasKind { get; }
 
+    /// <summary>
+    /// Whether the chip's shape is a screen rather than a strip of film.
+    /// </summary>
+    /// <remarks>
+    /// Answered here, from the key the four models already give, so no model has to say it twice —
+    /// and asked by a style rather than by a converter. A converter would have to reach for
+    /// <c>Application.Current</c> and for a resource by name, which is two arms that cannot both be
+    /// taken: both icon keys are declared and there is a gate over that inventory. A class on the
+    /// glyph and two setters say the same thing with nothing to cover.
+    /// </remarks>
+    bool IsShow => string.Equals(KindKey, "CatalogKindShow", StringComparison.Ordinal);
+
     /// <summary>The line under the title: «2024 · 111 min · Suspense», already joined.</summary>
     string MetaText { get; }
 
