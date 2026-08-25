@@ -10,6 +10,26 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La valoración es de cinco estrellas** y no diez casillas numeradas. Lo que ya estaba guardado
+  viene con ella: la migración 0020 lo divide entre dos y **redondea hacia arriba**, así que un 1
+  sobrevive como una estrella en vez de caer a un cero que esta aplicación no sabe tener. Lo que dice
+  que una estrella está dada es su relleno y no una marca al lado, porque «tres de cinco» es lo que
+  significa una valoración. «Quitar valoración» sigue justo al lado.
+
+- **El minuto del botón «Continuar» iba por fuera**, como un pie de la fila en vez de como parte de
+  lo que el botón va a hacer. Va dentro, que es lo que Home lleva haciendo desde que se dibujó.
+
+- **El icono de «desde el principio» es ahora el espejo del de reproducir**, que es lo que dice
+  «atrás» antes que ninguna palabra, y su botón es **redondo**.
+
+- **Todos los iconos bajan dos píxeles**, y el trazo con ellos: las cuatro escalas guardan la
+  proporción con la que se dibujaron —el ancho entre quince—, así que un glifo dos píxeles más
+  estrecho se lee como el mismo dibujo y no como uno más grueso.
+
+- **Ningún botón es cuadrado.** Dos clases lo eran: los del reproductor, 44 × 44 con el radio medio,
+  que es un cuadrado con las esquinas quitadas, y una llamada `player-pill` que dibujaba un radio
+  pequeño. Los de icono son círculos y los que llevan palabra son píldoras, con un solo token.
+
 - **La ficha de película lleva ahora el mismo triángulo que la de serie**, que era lo que el
   propietario echaba en falta —«el botón de reproducir no es igual al del prototipo»—, y
   **«Reproducir desde el principio» es un glifo** y no cuatro palabras en una fila que ya llevaba

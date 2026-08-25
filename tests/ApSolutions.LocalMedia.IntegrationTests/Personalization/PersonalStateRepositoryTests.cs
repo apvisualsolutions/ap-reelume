@@ -30,7 +30,7 @@ public sealed class PersonalStateRepositoryTests
         using var directory = new DatabaseTestDirectory();
         var factory = new SqliteConnectionFactory(directory.DatabasePath);
         await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
-        var state = PersonalState.Empty(Content(1)).WithFavorite(true).WithWatchLater(true).WithRating(9);
+        var state = PersonalState.Empty(Content(1)).WithFavorite(true).WithWatchLater(true).WithRating(5);
 
         await new PersonalStateRepository(factory).SaveAsync(state, Noon, TestContext.Current.CancellationToken);
         var restored = await new PersonalStateRepository(factory).GetAsync(
@@ -54,13 +54,13 @@ public sealed class PersonalStateRepositoryTests
             Noon,
             TestContext.Current.CancellationToken);
         await repository.SaveAsync(
-            PersonalState.Empty(Content(2)).WithRating(3),
+            PersonalState.Empty(Content(2)).WithRating(2),
             Noon,
             TestContext.Current.CancellationToken);
 
         var stored = Assert.Single(await repository.GetAllAsync(TestContext.Current.CancellationToken));
         Assert.False(stored.IsFavorite);
-        Assert.Equal(3, stored.Rating);
+        Assert.Equal(2, stored.Rating);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class PersonalStateRepositoryTests
             Noon,
             TestContext.Current.CancellationToken);
         await repository.SaveAsync(
-            PersonalState.Empty(ContentKey.ForEpisode(show, episode)).WithRating(10),
+            PersonalState.Empty(ContentKey.ForEpisode(show, episode)).WithRating(5),
             Noon,
             TestContext.Current.CancellationToken);
 
@@ -107,7 +107,7 @@ public sealed class PersonalStateRepositoryTests
             TestContext.Current.CancellationToken);
         Assert.NotNull(stored);
         Assert.Equal(episode, stored.Content.EpisodeId);
-        Assert.Equal(10, stored.Rating);
+        Assert.Equal(5, stored.Rating);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public sealed class PersonalStateRepositoryTests
             Noon,
             TestContext.Current.CancellationToken);
         await personal.SaveAsync(
-            PersonalState.Empty(ContentKey.ForTitle(rated)).WithRating(7),
+            PersonalState.Empty(ContentKey.ForTitle(rated)).WithRating(4),
             Noon,
             TestContext.Current.CancellationToken);
 
@@ -210,7 +210,9 @@ public sealed class PersonalStateRepositoryTests
             {
                 0 => current.WithFavorite(random.Next(2) == 1),
                 1 => current.WithWatchLater(random.Next(2) == 1),
-                2 => current.WithRating(random.Next(1, 11)),
+                2 => current.WithRating(random.Next(
+                    PersonalStatePolicy.MinimumRating,
+                    PersonalStatePolicy.MaximumRating + 1)),
                 _ => current.WithRating(null),
             };
 

@@ -492,7 +492,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PersonalWatchLaterAction">Watch later</x:String>
   <x:String x:Key="PersonalWatchLaterOn">Kept for later</x:String>
   <x:String x:Key="PersonalWatchLaterOff">Not kept for later</x:String>
-  <x:String x:Key="PersonalRatingLabel">Your rating, from 1 to 10</x:String>
+  <x:String x:Key="PersonalRatingLabel">Your rating, from 1 to 5</x:String>
   <x:String x:Key="PersonalRatingNone">Not rated</x:String>
   <x:String x:Key="PersonalRatingClearAction">Clear rating</x:String>
   <x:String x:Key="LibraryFilterFavorite">Favorites</x:String>

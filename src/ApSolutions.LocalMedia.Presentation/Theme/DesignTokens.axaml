@@ -1508,40 +1508,48 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="TextElement.Foreground" Value="#EDF1F6" />
   </Style>
 
+  <!--
+    Every glyph two pixels smaller than it was drawn, and the stroke with it.
+    
+    The owner asked for it on 2026-08-25 — «todos los iconos de la aplicación son muy grandes, bájales
+    el tamaño un poco» — and «un poco» is one step of this scale rather than a taste: the four sizes
+    keep the ratio they were built with, width over fifteen, so a glyph two pixels narrower is drawn
+    with a stroke two fifteenths thinner and reads as the same drawing rather than as a bolder one.
+  -->
   <Style Selector="Path.icon">
     <Setter Property="Stroke" Value="{Binding $self.(TextElement.Foreground)}" />
-    <Setter Property="StrokeThickness" Value="1.2" />
+    <Setter Property="StrokeThickness" Value="1.07" />
     <Setter Property="StrokeLineCap" Value="Round" />
     <Setter Property="StrokeJoin" Value="Round" />
     <Setter Property="Stretch" Value="Uniform" />
-    <Setter Property="Width" Value="18" />
-    <Setter Property="Height" Value="18" />
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
     <!-- A picture inside a control is not a second target inside it. -->
     <Setter Property="IsHitTestVisible" Value="False" />
   </Style>
 
   <Style Selector="Path.icon.size-14">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+    <Setter Property="StrokeThickness" Value="0.8" />
+  </Style>
+
+  <Style Selector="Path.icon.size-16">
     <Setter Property="Width" Value="14" />
     <Setter Property="Height" Value="14" />
     <Setter Property="StrokeThickness" Value="0.93" />
   </Style>
 
-  <Style Selector="Path.icon.size-16">
-    <Setter Property="Width" Value="16" />
-    <Setter Property="Height" Value="16" />
-    <Setter Property="StrokeThickness" Value="1.07" />
-  </Style>
-
   <Style Selector="Path.icon.size-20">
-    <Setter Property="Width" Value="20" />
-    <Setter Property="Height" Value="20" />
-    <Setter Property="StrokeThickness" Value="1.33" />
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="StrokeThickness" Value="1.2" />
   </Style>
 
   <Style Selector="Path.icon.size-22">
-    <Setter Property="Width" Value="22" />
-    <Setter Property="Height" Value="22" />
-    <Setter Property="StrokeThickness" Value="1.47" />
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="StrokeThickness" Value="1.33" />
   </Style>
 
   <!--
@@ -1554,10 +1562,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Stroke" Value="{x:Null}" />
   </Style>
 
+  <!--
+    Round, and not a square with softened corners.
+
+    «Todos los botones o son redondos o son píldoras, pero nunca cuadrados», the owner said on
+    2026-08-25, and this was the one class that disagreed: 44 by 44 with the medium radius is a
+    square whose corners have been taken off. A square target of the same width as its height is a
+    circle when the radius is half of it, which is what the pill radius already is — so the icon
+    buttons become circles and the ones carrying a word stay pills, from one token either way.
+  -->
   <Style Selector="Button.player-chrome">
     <Setter Property="MinWidth" Value="44" />
     <Setter Property="MinHeight" Value="44" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <!--
       The player's ink and not the theme's: these icons sit on the chrome band, which is dark in all
       four modes, and the base ControlTheme's foreground is dark in two of them. The icons take it by
@@ -1579,7 +1596,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="Button.player-pill">
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <!-- A class called player-pill drew a small radius, which is the one shape a pill is not. -->
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="{DynamicResource PlayerHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
@@ -1760,6 +1778,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!-- Ten of these fit a 320 px column on one line, which is the whole reason for the width. -->
+  <!--
+    The rating: five stars where there were ten numbered squares. What says a star is given is its
+    fill and not a mark beside it, because «three of five» is what a rating means and a dot on the
+    third would say «this one». The outline is the same shape unfilled, so a row of five reads as
+    five of one thing.
+
+    Padding zero for the reason player-chrome has it: the content is a glyph, and the five pixels
+    that put a word right would push a shape above the middle of its own target.
+  -->
   <Style Selector="Button.rating-choice">
     <Setter Property="MinWidth" Value="28" />
     <Setter Property="Height" Value="28" />
@@ -1767,6 +1794,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Padding" Value="0" />
     <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Button.rating-choice /template/ ContentPresenter Path">
+    <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Fill" Value="Transparent" />
+  </Style>
+  <Style Selector="Button.rating-choice.given /template/ ContentPresenter Path">
+    <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Fill" Value="{DynamicResource AccentBrush}" />
   </Style>
 
   <!--

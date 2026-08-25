@@ -57,7 +57,7 @@ public sealed class DisasterRecoveryTests
 
         Assert.NotNull(personal);
         Assert.True(personal.IsFavorite);
-        Assert.Equal(8, personal.Rating);
+        Assert.Equal(4, personal.Rating);
         Assert.NotNull(progress);
         Assert.Equal(TimeSpan.FromMinutes(21), progress.Position);
         Assert.Single(markers);
@@ -663,7 +663,7 @@ internal sealed class RestoreFixture : IDisposable
     private static async Task SeedAsync(SqliteConnectionFactory factory, string rootPath, string? secondRoot)
     {
         await new PersonalStateRepository(factory).SaveAsync(
-            PersonalState.Empty(ContentKey.ForTitle(Movie)).WithFavorite(true).WithRating(8),
+            PersonalState.Empty(ContentKey.ForTitle(Movie)).WithFavorite(true).WithRating(4),
             Noon,
             TestContext.Current.CancellationToken);
         await new WatchStateRepository(factory).SaveAsync(

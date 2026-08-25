@@ -54,22 +54,22 @@ public sealed class PersonalActionsTests
 
         viewModel.ToggleFavoriteCommand.Execute(null);
         viewModel.ToggleWatchLaterCommand.Execute(null);
-        viewModel.SetRatingCommand.Execute(8);
-        viewModel.Apply(PersonalState.Empty(Content).WithRating(8));
+        viewModel.SetRatingCommand.Execute(4);
+        viewModel.Apply(PersonalState.Empty(Content).WithRating(4));
         viewModel.ClearRatingCommand.Execute(null);
 
         Assert.Equal(
             [
                 new PersonalActionRequest(PersonalActionKind.ToggleFavorite, null),
                 new PersonalActionRequest(PersonalActionKind.ToggleWatchLater, null),
-                new PersonalActionRequest(PersonalActionKind.SetRating, 8),
+                new PersonalActionRequest(PersonalActionKind.SetRating, 4),
                 new PersonalActionRequest(PersonalActionKind.SetRating, null),
             ],
             requests);
     }
 
     [Fact]
-    public void A_rating_outside_one_to_ten_never_reaches_the_host()
+    public void A_rating_outside_one_to_five_never_reaches_the_host()
     {
         var requests = new List<PersonalActionRequest>();
         var viewModel = new PersonalActionsViewModel(request =>
@@ -80,13 +80,14 @@ public sealed class PersonalActionsTests
         viewModel.Apply(PersonalState.Empty(Content));
 
         Assert.False(viewModel.SetRatingCommand.CanExecute(0));
-        Assert.False(viewModel.SetRatingCommand.CanExecute(11));
-        Assert.False(viewModel.SetRatingCommand.CanExecute("eight"));
+        Assert.False(viewModel.SetRatingCommand.CanExecute(6));
+        Assert.False(viewModel.SetRatingCommand.CanExecute(10));
+        Assert.False(viewModel.SetRatingCommand.CanExecute("four"));
         Assert.True(viewModel.SetRatingCommand.CanExecute(1));
-        Assert.True(viewModel.SetRatingCommand.CanExecute(10));
+        Assert.True(viewModel.SetRatingCommand.CanExecute(5));
 
         viewModel.SetRatingCommand.Execute(0);
-        viewModel.SetRatingCommand.Execute(11);
+        viewModel.SetRatingCommand.Execute(6);
         Assert.Empty(requests);
     }
 
@@ -100,13 +101,18 @@ public sealed class PersonalActionsTests
         viewModel.Apply(PersonalState.Empty(Content)
             .WithFavorite(true)
             .WithWatchLater(true)
-            .WithRating(6));
+            .WithRating(3));
 
         Assert.True(viewModel.IsFavorite);
         Assert.True(viewModel.IsWatchLater);
         Assert.True(viewModel.HasRating);
-        Assert.Equal(6, viewModel.Rating);
-        Assert.Equal("6", viewModel.RatingText);
+        Assert.Equal(3, viewModel.Rating);
+        Assert.Equal("3", viewModel.RatingText);
+
+        // Three of five, said by the fill: the row is five stars and the first three carry it.
+        Assert.Equal(5, viewModel.RatingChoices.Count);
+        Assert.Equal([true, true, true, false, false], viewModel.RatingChoices.Select(star => star.IsFilled));
+        Assert.Equal([1, 2, 3, 4, 5], viewModel.RatingChoices.Select(star => star.Value));
         Assert.True(viewModel.ClearRatingCommand.CanExecute(null));
         Assert.Contains(nameof(PersonalActionsViewModel.IsFavorite), changed, StringComparer.Ordinal);
         Assert.Contains(nameof(PersonalActionsViewModel.RatingText), changed, StringComparer.Ordinal);
@@ -124,7 +130,7 @@ public sealed class PersonalActionsTests
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
         var viewModel = new PersonalActionsViewModel();
-        viewModel.Apply(PersonalState.Empty(Content).WithFavorite(true).WithRating(4));
+        viewModel.Apply(PersonalState.Empty(Content).WithFavorite(true).WithRating(2));
         var view = new PersonalActionsView { DataContext = viewModel };
         var window = new Window { Width = 900, Height = 400, Content = view };
         window.Show();

@@ -47,16 +47,16 @@ public sealed class PersonalStateWorkflowTests
 
         await command.SetFavoriteAsync(content, true, TestContext.Current.CancellationToken);
         await command.SetWatchLaterAsync(content, true, TestContext.Current.CancellationToken);
-        var rated = await command.SetRatingAsync(content, 7, TestContext.Current.CancellationToken);
+        var rated = await command.SetRatingAsync(content, 4, TestContext.Current.CancellationToken);
 
         Assert.True(rated.IsFavorite);
         Assert.True(rated.IsWatchLater);
-        Assert.Equal(7, rated.Rating);
+        Assert.Equal(4, rated.Rating);
 
         var unfavorited = await command.SetFavoriteAsync(content, false, TestContext.Current.CancellationToken);
         Assert.False(unfavorited.IsFavorite);
         Assert.True(unfavorited.IsWatchLater);
-        Assert.Equal(7, unfavorited.Rating);
+        Assert.Equal(4, unfavorited.Rating);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public sealed class PersonalStateWorkflowTests
         var command = new SetPersonalState(repository, new FixedClock(Noon));
         await command.SetFavoriteAsync(Content(7), true, TestContext.Current.CancellationToken);
         await command.SetWatchLaterAsync(Content(8), true, TestContext.Current.CancellationToken);
-        await command.SetRatingAsync(Content(9), 9, TestContext.Current.CancellationToken);
+        await command.SetRatingAsync(Content(9), 5, TestContext.Current.CancellationToken);
         var query = new GetPersonalFilters(repository);
 
         var marked = await query.GetMarkedAsync(TestContext.Current.CancellationToken);
@@ -168,7 +168,7 @@ public sealed class PersonalStateWorkflowTests
                     reference[key] = current with { WatchLater = watchLater };
                     break;
                 case 2:
-                    var rating = random.Next(1, 11);
+                    var rating = random.Next(PersonalStatePolicy.MinimumRating, PersonalStatePolicy.MaximumRating + 1);
                     await command.SetRatingAsync(content, rating, TestContext.Current.CancellationToken);
                     reference[key] = current with { Rating = rating };
                     break;

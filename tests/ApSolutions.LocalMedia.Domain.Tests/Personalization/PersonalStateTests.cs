@@ -32,9 +32,9 @@ public sealed class PersonalStateTests
 
     [Theory]
     [InlineData(1)]
+    [InlineData(3)]
     [InlineData(5)]
-    [InlineData(10)]
-    public void A_rating_inside_one_to_ten_is_accepted(int rating)
+    public void A_rating_inside_one_to_five_is_accepted(int rating)
     {
         var state = PersonalState.Empty(Content).WithRating(rating);
 
@@ -46,10 +46,11 @@ public sealed class PersonalStateTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    [InlineData(11)]
+    [InlineData(6)]
+    [InlineData(10)]
     [InlineData(int.MaxValue)]
     [InlineData(int.MinValue)]
-    public void A_rating_outside_one_to_ten_is_rejected_rather_than_clamped(int rating)
+    public void A_rating_outside_one_to_five_is_rejected_rather_than_clamped(int rating)
     {
         var exception = Assert.Throws<ArgumentOutOfRangeException>(
             () => PersonalState.Empty(Content).WithRating(rating));
@@ -64,7 +65,7 @@ public sealed class PersonalStateTests
         var rated = PersonalState.Empty(Content)
             .WithFavorite(true)
             .WithWatchLater(true)
-            .WithRating(8);
+            .WithRating(4);
 
         var cleared = rated.WithRating(null);
 
@@ -109,12 +110,12 @@ public sealed class PersonalStateTests
         Assert.False(state.IsWatchLater);
         Assert.Null(state.Rating);
 
-        state = state.WithRating(3);
+        state = state.WithRating(2);
         Assert.True(state.IsFavorite);
         Assert.False(state.IsWatchLater);
 
         state = state.WithFavorite(false);
-        Assert.Equal(3, state.Rating);
+        Assert.Equal(2, state.Rating);
         Assert.False(state.IsEmpty);
     }
 
@@ -123,7 +124,7 @@ public sealed class PersonalStateTests
     {
         var state = PersonalState.Empty(Content)
             .WithFavorite(true)
-            .WithRating(9)
+            .WithRating(5)
             .WithFavorite(false)
             .WithRating(null);
 
@@ -144,11 +145,31 @@ public sealed class PersonalStateTests
         Assert.Contains("/episode:", episode.Content.Value, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// One to five since 2026-08-25, and what was stored on the old scale comes across with it.
+    /// </summary>
+    /// <remarks>
+    /// The arithmetic is migration 0020's, written here too because a migration runs once against a
+    /// file and this runs against a number: a backup restored from before it, or a value arriving
+    /// from anywhere else, is answered by the same rule rather than by a second one.
+    /// </remarks>
     [Fact]
-    public void The_boundaries_of_the_accepted_range_are_exactly_one_and_ten()
+    public void The_boundaries_of_the_accepted_range_are_exactly_one_and_five()
     {
         Assert.Equal(1, PersonalStatePolicy.MinimumRating);
-        Assert.Equal(10, PersonalStatePolicy.MaximumRating);
+        Assert.Equal(5, PersonalStatePolicy.MaximumRating);
+
+        // Halved and rounded up: a 1 survives as one star rather than falling to a zero this
+        // application cannot hold, and a 10 lands on the fifth.
+        Assert.Equal(1, PersonalStatePolicy.ToFiveStars(1));
+        Assert.Equal(1, PersonalStatePolicy.ToFiveStars(2));
+        Assert.Equal(2, PersonalStatePolicy.ToFiveStars(3));
+        Assert.Equal(5, PersonalStatePolicy.ToFiveStars(9));
+        Assert.Equal(5, PersonalStatePolicy.ToFiveStars(10));
+        Assert.Equal(5, PersonalStatePolicy.ToFiveStars(int.MaxValue));
+        Assert.Null(PersonalStatePolicy.ToFiveStars(null));
+        Assert.Null(PersonalStatePolicy.ToFiveStars(0));
+        Assert.Null(PersonalStatePolicy.ToFiveStars(-3));
         Assert.False(PersonalStatePolicy.IsValidRating(PersonalStatePolicy.MinimumRating - 1));
         Assert.True(PersonalStatePolicy.IsValidRating(PersonalStatePolicy.MinimumRating));
         Assert.True(PersonalStatePolicy.IsValidRating(PersonalStatePolicy.MaximumRating));

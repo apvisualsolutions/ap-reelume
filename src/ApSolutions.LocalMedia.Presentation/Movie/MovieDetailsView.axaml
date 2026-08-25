@@ -132,6 +132,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 shape for both cards, and the words stay beside it — a play triangle says what will
                 happen and «Continuar» says where from.
               -->
+              <!--
+                The minute rides inside the button and not beside it. It was a label of its own next
+                to it — «el botón de continuar tiene el tiempo por fuera», reported on 2026-08-25 —
+                which reads as a caption about the row rather than as part of what the button will
+                do. Home's own continue button has said «Continuar · 13:54» since it was drawn, and
+                this is that, on the card.
+              -->
               <Button
                   Classes="primary-action"
                   Command="{Binding ResumeCommand}"
@@ -140,13 +147,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
                   <Path Classes="icon size-14 filled" Data="{DynamicResource IconPlay}" />
                   <TextBlock Text="{DynamicResource MovieResumeAction}" />
+                  <TextBlock Opacity="0.75" Text="{Binding ResumePositionText}" />
                 </StackPanel>
               </Button>
-              <TextBlock
-                  VerticalAlignment="Center"
-                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-                  IsVisible="{Binding CanResume}"
-                  Text="{Binding ResumePositionText}" />
               <!--
                 «Reproducir desde el principio» is a glyph now and not four words: the owner asked
                 for it on 2026-08-25, and the row it sits in already carries three other labels. What
@@ -158,7 +161,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Classes="player-chrome"
                   Command="{Binding PlayCommand}"
                   automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}">
-                <Path Classes="icon size-20" Data="{DynamicResource IconReset}" />
+                <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlayBack}" />
               </Button>
               <Button
                   Command="{Binding PlayTrailerCommand}"

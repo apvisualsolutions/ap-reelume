@@ -6,14 +6,37 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 namespace ApSolutions.LocalMedia.Domain.Personalization;
 
 /// <summary>
-/// The rules personal marks follow. A rating is an integer from one to ten or nothing at all; there is
-/// no half star and no zero, because zero and "not rated" would be indistinguishable.
+/// The rules personal marks follow. A rating is a whole number of stars from one to five, or nothing
+/// at all; there is no half star and no zero, because zero and "not rated" would be indistinguishable.
 /// </summary>
+/// <remarks>
+/// It was one to ten until 2026-08-25, drawn as ten numbered squares. Five stars is what the owner
+/// asked for — «las típicas de Google» — and what is already stored comes with it: migration 0020
+/// halves every rating and rounds up, so a 1 survives as one star rather than falling to a zero this
+/// application cannot hold.
+/// </remarks>
 public static class PersonalStatePolicy
 {
     public const int MinimumRating = 1;
 
-    public const int MaximumRating = 10;
+    public const int MaximumRating = 5;
+
+    /// <summary>
+    /// What a rating stored on the old ten-point scale becomes, which is migration 0020's arithmetic.
+    /// </summary>
+    /// <remarks>
+    /// Written here as well as in the SQL, and that is deliberate rather than duplicated: the
+    /// migration runs once against a file, and this runs against a number — a backup restored from
+    /// before the migration, or a value that arrives from anywhere else, is answered by the same rule
+    /// instead of by a second one somebody wrote later.
+    /// </remarks>
+    public static int? ToFiveStars(int? tenPointRating) =>
+        tenPointRating is { } rating && rating > 0
+            // Widened before the halving, and not for tidiness: int.MaxValue plus one is a negative
+            // number, and a rating that arrived as the largest integer there is would have come back
+            // as one star through an overflow rather than through this rule.
+            ? (int)Math.Clamp((rating + 1L) / 2, MinimumRating, MaximumRating)
+            : null;
 
     /// <summary>True for a rating inside the accepted range, and for the absence of one.</summary>
     public static bool IsValidRating(int? rating) =>

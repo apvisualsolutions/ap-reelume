@@ -106,7 +106,7 @@ public sealed class ZipExportTests
         Assert.NotNull(personal);
         Assert.True(personal.IsFavorite);
         Assert.True(personal.IsWatchLater);
-        Assert.Equal(9, personal.Rating);
+        Assert.Equal(5, personal.Rating);
         Assert.NotNull(progress);
         Assert.Equal(TimeSpan.FromMinutes(12), progress.Position);
         Assert.Single(markers);
@@ -412,7 +412,7 @@ public sealed class ZipExportTests
                 PersonalState.Empty(ContentKey.ForTitle(Movie))
                     .WithFavorite(true)
                     .WithWatchLater(true)
-                    .WithRating(9),
+                    .WithRating(5),
                 Noon,
                 TestContext.Current.CancellationToken);
             await new WatchStateRepository(factory).SaveAsync(

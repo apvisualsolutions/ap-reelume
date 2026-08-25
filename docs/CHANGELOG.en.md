@@ -10,6 +10,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The rating is five stars** rather than ten numbered squares. What was already stored comes with
+  it: migration 0020 halves it and **rounds up**, so a 1 survives as one star instead of falling to a
+  zero this application cannot hold. What says a star is given is its fill and not a mark beside it,
+  because "three of five" is what a rating means. "Clear rating" stays right beside them.
+
+- **The minute on the "Continue" button was outside it**, reading as a caption about the row rather
+  than as part of what the button will do. It rides inside now, which is what Home has done since it
+  was drawn.
+
+- **The "from the start" glyph is the play triangle mirrored**, which says "back" before any word
+  does, and its button is **round**.
+
+- **Every icon is two pixels smaller**, and the stroke with it: the four scales keep the ratio they
+  were built with — width over fifteen — so a glyph two pixels narrower reads as the same drawing
+  rather than as a bolder one.
+
+- **No button is square.** Two classes were: the player's, 44 by 44 with the medium radius, which is
+  a square with its corners taken off, and one called `player-pill` that drew a small radius. The
+  icon ones are circles and the ones carrying a word are pills, from one token either way.
+
 - **The film card carries the same play triangle the series card has**, which is what the owner
   missed — "el botón de reproducir no es igual al del prototipo" — and **"play from the start" is a
   glyph** rather than four words in a row that already carried three other labels. What it says is
