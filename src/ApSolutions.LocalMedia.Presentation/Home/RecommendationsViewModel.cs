@@ -20,24 +20,43 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
 {
     private readonly GetRecommendations _getRecommendations;
     private readonly IRecommendationSettings _settings;
-    private readonly Func<TitleId, string> _titleLookup;
+    private readonly Func<IReadOnlyList<TitleId>, CancellationToken, Task<IReadOnlyDictionary<TitleId, string>>> _titleLookup;
+    private readonly Func<TitleId, Task>? _onOpenDetails;
     private IReadOnlyList<RecommendationItemViewModel> _items = [];
 
     public RecommendationsViewModel(
         GetRecommendations getRecommendations,
         IRecommendationSettings settings,
-        Func<TitleId, string>? titleLookup = null)
+        Func<IReadOnlyList<TitleId>, CancellationToken, Task<IReadOnlyDictionary<TitleId, string>>>? titleLookup = null,
+        Func<TitleId, Task>? onOpenDetails = null)
     {
         _getRecommendations = getRecommendations ?? throw new ArgumentNullException(nameof(getRecommendations));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _titleLookup = titleLookup ?? (_ => string.Empty);
+        _titleLookup = titleLookup
+            ?? ((_, _) => Task.FromResult<IReadOnlyDictionary<TitleId, string>>(
+                new Dictionary<TitleId, string>()));
+        _onOpenDetails = onOpenDetails;
         ToggleCommand = new AsyncRelayCommand(
             () => SetEnabledAsync(!IsEnabled, CancellationToken.None));
+        OpenItemDetailsCommand = new AsyncRelayCommand(
+            parameter => OpenItemDetailsAsync(parameter as IRailCard),
+            parameter => parameter is IRailCard);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand ToggleCommand { get; }
+
+    /// <summary>
+    /// Opens the card of whichever suggestion is passed to it.
+    /// </summary>
+    /// <remarks>
+    /// This rail drew the prototype's card and never gave it the thing the prototype does with it:
+    /// `&lt;button onClick="r.open"&gt;` around the whole cover. Its own command rather than Home's,
+    /// because the rail is mounted with itself as the data context and a binding that walked out to
+    /// find Home would be a rail that only works in one place.
+    /// </remarks>
+    public ICommand OpenItemDetailsCommand { get; }
 
     public bool IsEnabled => _settings.IsEnabled;
 
@@ -63,7 +82,18 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
         var results = await _getRecommendations
             .ExecuteAsync(new RecommendationOptions(IsEnabled, Limit: 20), cancellationToken)
             .ConfigureAwait(false);
-        Items = [.. results.Select(result => new RecommendationItemViewModel(result, _titleLookup(result.ContentId)))];
+
+        // The words behind the ids, asked for once and for the whole rail. A per-card lookup would
+        // be twenty queries for one row of pictures, and a synchronous one over a connection would
+        // be twenty blocking calls on the thread that draws them.
+        var titles = await _titleLookup([.. results.Select(result => result.ContentId)], cancellationToken)
+            .ConfigureAwait(false);
+        Items =
+        [
+            .. results.Select(result => new RecommendationItemViewModel(
+                result,
+                titles.TryGetValue(result.ContentId, out var title) ? title : string.Empty)),
+        ];
         OnPropertyChanged(nameof(HasRecommendations));
         OnPropertyChanged(nameof(IsEmpty));
     }
@@ -75,6 +105,14 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsEnabled));
         OnPropertyChanged(nameof(IsDisabled));
         await LoadAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task OpenItemDetailsAsync(IRailCard? card)
+    {
+        if (card is not null && _onOpenDetails is { } open)
+        {
+            await open(card.TitleId).ConfigureAwait(true);
+        }
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
@@ -95,14 +133,27 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
 
 /// <summary>One suggestion, with the resource keys that explain it.</summary>
 public sealed class RecommendationItemViewModel(Recommendation recommendation, string title)
-    : IPosterCard
+    : IPosterCard, IRailCard
 {
     private readonly Recommendation _recommendation = recommendation
         ?? throw new ArgumentNullException(nameof(recommendation));
 
     public TitleId ContentId => _recommendation.ContentId;
 
+    /// <summary>
+    /// The same id under the name a rail card is opened by.
+    /// </summary>
+    /// <remarks>
+    /// This rail drew the prototype's card and left out the one thing the prototype does with it:
+    /// press it. A suggestion nobody can open is a picture of a recommendation.
+    /// </remarks>
+    public TitleId TitleId => _recommendation.ContentId;
+
     public string Title { get; } = title ?? string.Empty;
+
+    /// <summary>The same, for this rail: which rail, then the title. See the recently added card.</summary>
+    public string OpenAccessibleName =>
+        HomeViewModel.Word("RecommendationsHeading", "Suggestions") + " · " + Title;
 
     public double Score => _recommendation.Score;
 

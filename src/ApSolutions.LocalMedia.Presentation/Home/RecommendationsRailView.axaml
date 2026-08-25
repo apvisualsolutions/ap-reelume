@@ -74,7 +74,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
           has to say why a title is in front of somebody, and a year would say less.
           -->
           <StackPanel Width="{DynamicResource PosterCardWidth}" Spacing="{DynamicResource Space4}">
-            <library:PosterCardView Classes="glyph-chip" />
+          <!--
+            The card is a button, which is what the prototype makes it: `<button onClick="r.open">`
+            around the cover and the two lines under it. It was a bare card inside a list item, so
+            pressing one selected it and nothing else — «al hacer click en las tarjetas en home no
+            redirige a la vista detalle del vídeo», 2026-08-25.
+
+            The same class the library grid uses, so a card is one shape and one target area in both
+            places, and the same command the Detalles button of the wide card already reaches: there
+            is one way into a card in this application and not two.
+          -->
+            <Button
+                Classes="poster-card"
+                Command="{Binding $parent[ItemsControl].((home:RecommendationsViewModel)DataContext).OpenItemDetailsCommand}"
+                CommandParameter="{Binding}"
+                automation:AutomationProperties.Name="{Binding OpenAccessibleName}">
+              <library:PosterCardView Classes="glyph-chip" />
+            </Button>
             <TextBlock
                 FontSize="{DynamicResource FontSizeCaption}"
                 Foreground="{DynamicResource TextSecondaryBrush}"

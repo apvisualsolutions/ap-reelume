@@ -1338,8 +1338,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromSeconds(90));
 
         // A film somebody is part way through: the entry, and the progress that makes Home offer it.
+        //
+        // Written by a local function because it has to be written more than once. «Desde el
+        // principio» opens the session at zero, and closing it stores zero — which is correct, and
+        // which takes the hero and the rail card off Home, because neither of them is offered for
+        // something nobody is part way through. So the progress is put back between the two presses
+        // rather than the two presses being reordered: there is no order in which both survive.
         await SeedMovieRowAsync(factory, fileId, "Continue");
-        await new WatchStateRepository(factory).SaveAsync(
+        var watchStates = new WatchStateRepository(factory);
+        async Task SeedProgressAsync() => await watchStates.SaveAsync(
             new WatchState
             {
                 Content = ContentKey.ForTitle(new TitleId(fileId)),
@@ -1352,6 +1359,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 UpdatedUtc = DateTimeOffset.UtcNow,
             },
             TestContext.Current.CancellationToken);
+        await SeedProgressAsync();
 
         using var host = ShowShell(height: 1600);
         Navigate(host, AppRoute.Home);
@@ -1366,6 +1374,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // the rail empties instead of hiding a result, and both look the same on screen.
         var recommendations = home.Recommendations;
         Assert.NotNull(recommendations);
+
+        // Its covers first, while the rail still has any: the switch below empties it, and a
+        // suggestion nobody can press is a picture of a recommendation. Same button and same class
+        // as the library's grid, so this is the third place one card shape is pressed.
+        Assert.True(
+            recommendations!.Items.Count > 0,
+            "The suggestions rail ranked nothing, so its cover could not be pressed.");
+        await PressAsync(
+            host,
+            recommendations.Items[0].OpenAccessibleName,
+            () => host.ViewModel.CurrentRoute,
+            "clicking a cover on the suggestions rail never opened that title's card",
+            recordAs: "{Binding OpenAccessibleName}");
+        Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
+        Navigate(host, AppRoute.Home);
+        Dispatcher.UIThread.RunJobs();
         var settings = host.Application.Services.GetRequiredService<IRecommendationSettings>();
         var wasEnabled = settings.IsEnabled;
         await PressAsync(
@@ -1443,6 +1467,56 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "a rail card's Continue opened a session that never reached the playing state");
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // «Desde el principio», which arrived on both wide surfaces on 2026-08-25. It opens the same
+        // session Continue does and differs in one thing only — the minute it starts at — so what is
+        // asserted is that a session opened at all; where it opened is the film card's own question
+        // and is measured there.
+        Navigate(host, AppRoute.Home);
+        await PressAsync(
+            host,
+            card.RestartAccessibleName,
+            () => host.ViewModel.Player is not null,
+            "clicking «from the start» on a rail card never opened a session",
+            recordAs: "{Binding RestartAccessibleName}");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // The hero comes back with the navigation and is arranged one pass later, which is the same
+        // warm-up the Details press above needs and for the same reason: a control that has not been
+        // arranged yet reports itself as not on screen. And the progress goes back first, or there
+        // is no hero to warm up — the press before this one stored zero, on purpose.
+        await SeedProgressAsync();
+        Navigate(host, AppRoute.Home);
+        await home.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        await WaitForAsync(
+            () => Task.FromResult(Reachable(host).Any(control =>
+                control.IsEffectivelyVisible && control.Name == "ResumeHeroRestart")),
+            "Home came back without the hero's «from the start» on it");
+        await PressAsync(
+            host,
+            "HomeRestartAction",
+            () => host.ViewModel.Player is not null,
+            "clicking «from the start» on the hero never opened a session");
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // And the covers themselves, which were cards nobody could press: a poster on either rail is
+        // a button around the whole tile, exactly as it is in the library's grid. «Al hacer click en
+        // las tarjetas en home no redirige a la vista detalle del vídeo», 2026-08-25 — they were
+        // list items, so pressing one selected it and nothing else.
+        Navigate(host, AppRoute.Home);
+        Assert.True(
+            home.RecentlyAdded.Count > 0,
+            "The recently added rail never offered a cover to press.");
+        await PressAsync(
+            host,
+            home.RecentlyAdded[0].OpenAccessibleName,
+            () => host.ViewModel.CurrentRoute,
+            "clicking a cover on the recently added rail never opened that title's card",
+            recordAs: "{Binding OpenAccessibleName}");
+        Assert.Equal(AppRoute.Library, host.ViewModel.CurrentRoute);
 
         // And the way into the library, which is the other thing Home is for.
         Navigate(host, AppRoute.Home);
