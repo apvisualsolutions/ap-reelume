@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Three things declared and never fed, taken out or fed.** The red state chip — what says a file is
+  not there is the shared badge, and a second shape saying the same thing is what
+  `UnavailableBadgeTests` exists to refuse — the folder icon, because this application opens no
+  Explorer window from a card, and the «leaves the application» arrow, which had somewhere to go: the
+  player's recovery button that opens the file with another program.
+
+### Fixed
+
 - **Two commands nothing read any more, and two branches nothing could take.** Moving the decisions
   into the card left `AcceptSelectedCommand` and `RejectSelectedCommand` declared with no consumer —
   this repository's characteristic defect, introduced by the change itself — and they are gone. So

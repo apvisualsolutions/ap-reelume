@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Tres cosas declaradas y sin alimentar, retiradas o alimentadas.** La ficha roja de estado —lo que
+  dice que un archivo no está es la insignia compartida, y una segunda forma diciendo lo mismo es lo
+  que `UnavailableBadgeTests` existe para impedir—, el icono de carpeta —esta aplicación no abre el
+  Explorador desde una ficha— y el de «sale de la aplicación», que sí tiene dónde ir: el botón de
+  recuperación del reproductor que abre el archivo con otro programa.
+
+### Corregido
+
 - **Dos mandos que ya no leía nadie, y dos ramas que nada podía ejecutar.** Al llevar las decisiones
   a la tarjeta, `AcceptSelectedCommand` y `RejectSelectedCommand` quedaron declarados sin consumidor
   —el defecto de la casa, introducido por el propio cambio— y se retiran. Las guardas de nulo dentro
