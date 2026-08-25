@@ -6,6 +6,8 @@ using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Presentation.Player;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace ApSolutions.LocalMedia.Presentation.Shell;
@@ -28,6 +30,36 @@ public sealed partial class ShellView : UserControl
     {
         AvaloniaXamlLoader.Load(this);
         DataContextChanged += OnDataContextChanged;
+
+        // Tunnelling, and that is the whole reason these are added in code rather than declared in
+        // the markup: a key pressed inside the player is handled there — that is what the shortcuts
+        // are — and a bubbling handler would never see it. The chrome has to come back for the
+        // gesture that was handled, not only for the ones nothing wanted.
+        AddHandler(PointerMovedEvent, OnPointerMovedAnywhere, RoutingStrategies.Tunnel);
+        AddHandler(KeyDownEvent, OnKeyDownAnywhere, RoutingStrategies.Tunnel);
+    }
+
+    /// <summary>
+    /// The mouse moving anywhere brings the chrome back, and never takes it away.
+    /// </summary>
+    /// <remarks>
+    /// Nothing is marked handled and nothing is swallowed: this watches the gesture on its way down
+    /// and lets it carry on to whatever it was aimed at. Revealing when the chrome is already there
+    /// costs a comparison — <c>RevealChrome</c> returns on the first line — which matters, because a
+    /// pointer crossing a window raises this a few hundred times a second.
+    /// </remarks>
+    private void OnPointerMovedAnywhere(object? sender, PointerEventArgs args)
+    {
+        _ = sender;
+        _ = args;
+        _viewModel?.RevealChrome();
+    }
+
+    private void OnKeyDownAnywhere(object? sender, KeyEventArgs args)
+    {
+        _ = sender;
+        _ = args;
+        _viewModel?.RevealChrome();
     }
 
     private void OnDataContextChanged(object? sender, EventArgs args)

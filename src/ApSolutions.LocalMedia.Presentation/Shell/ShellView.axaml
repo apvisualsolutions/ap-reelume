@@ -14,6 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     xmlns:metadata="clr-namespace:ApSolutions.LocalMedia.Presentation.Metadata"
     xmlns:onboarding="clr-namespace:ApSolutions.LocalMedia.Presentation.Onboarding"
+    xmlns:presentation="clr-namespace:ApSolutions.LocalMedia.Presentation"
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
     xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
@@ -28,7 +29,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <navigation:RouteStateConverter x:Key="RouteStatus" Kind="Status" />
     <navigation:RouteStateConverter x:Key="RouteIsCurrent" Kind="IsCurrent" />
   </UserControl.Resources>
-  <Grid Background="{DynamicResource ShellSurfaceBrush}" RowDefinitions="44,*" ColumnDefinitions="64,*">
+  <!--
+    The two bands measure their contents instead of being written down, and that is the whole of
+    hiding the chrome: a control hidden inside a fixed 44 px row leaves the 44 px behind it, because
+    the row is what reserves them. Auto gives the band back the moment the surface inside it stops
+    being drawn, so while a film plays the picture has the whole window.
+
+    The two numbers moved into the surfaces they belong to. The title bar's is App.TitleBarHeight,
+    the same constant the window extends its client area by — one number, two places that must agree
+    about it, and the seam between them is what ShellOverflowTests measures.
+  -->
+  <Grid Background="{DynamicResource ShellSurfaceBrush}" RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
     <!--
       The prototype's accent tint: a 260 px halo breathing from the top-left of the content, so the
       ground is never a flat sheet. No new brush pays for it — it is AccentBrush itself at the
@@ -72,6 +83,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
         x:Name="TitleBarSurface"
         Grid.Row="0"
         Grid.ColumnSpan="2"
+        Height="{x:Static presentation:App.TitleBarHeight}"
+        IsVisible="{Binding IsChromeRevealed}"
         Background="{DynamicResource NavigationSurfaceBrush}"
         BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="0,0,0,1" />
@@ -82,8 +95,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
       AutomationProperties.Name and in the tooltip, and the glyph is what the eye lands on.
     -->
     <Border
+        x:Name="NavigationRailSurface"
         Grid.Row="1"
+        Width="64"
         Padding="9,8"
+        IsVisible="{Binding IsChromeRevealed}"
         Background="{DynamicResource NavigationSurfaceBrush}"
         BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="0,0,1,0">
@@ -610,6 +626,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Grid.Row="0"
           Grid.ColumnSpan="2"
           Padding="14,10"
+          IsVisible="{Binding IsChromeRevealed}"
           Background="{DynamicResource PlayerChromeBrush}"
           BorderBrush="{DynamicResource PlayerHairlineBrush}"
           BorderThickness="0,0,0,1"
@@ -831,7 +848,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           BorderBrush="{DynamicResource PlayerHairlineBrush}"
           BorderThickness="1,0,0,0"
           TextElement.Foreground="{DynamicResource PlayerTextBrush}"
-          IsVisible="{Binding IsPlayerPanelOpen}">
+          IsVisible="{Binding IsPlayerColumnVisible}">
         <Grid RowDefinitions="Auto,*">
           <!--
             The column's own header, which the prototype draws and the tab strip stood in for: the
