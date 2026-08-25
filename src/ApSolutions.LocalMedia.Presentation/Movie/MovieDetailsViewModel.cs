@@ -79,6 +79,9 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         PersonalActions = new PersonalActionsViewModel(onPersonalActionChanged);
         PlayCommand = new AsyncRelayCommand(() => PlayAsync(fromStart: true), () => CanPlay);
         ResumeCommand = new AsyncRelayCommand(() => PlayAsync(fromStart: false), () => CanResume);
+        PlayOrResumeCommand = new AsyncRelayCommand(
+            () => PlayAsync(fromStart: !CanResume),
+            () => CanPlay);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -91,6 +94,16 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     public ICommand PlayCommand { get; }
 
     public ICommand ResumeCommand { get; }
+
+    /// <summary>
+    /// What the leading action runs: the stored minute when there is one, and zero when there is not.
+    /// </summary>
+    /// <remarks>
+    /// The two remain separately reachable — the glyph beside this button is <c>PlayCommand</c>, and
+    /// the shortcut a keyboard reaches is <c>ResumeCommand</c> — because they answer different
+    /// questions. This one answers the button's own question, which is «open it».
+    /// </remarks>
+    public ICommand PlayOrResumeCommand { get; }
 
     /// <summary>
     /// Opens the trailer that already exists next to the film. It is a loose session on purpose: a
@@ -208,6 +221,28 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
     public string ResumePositionText => FormatPosition(ResumePosition);
 
+    /// <summary>
+    /// The words on the one button that opens this film, which follow what there is to open.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The prototype writes exactly this — <c>(pos > 0 ? t.resume : t.play) + (pos > 0 ? ' · ' +
+    /// fmt(pos) : '')</c> — and this card had the first half only: the button was hidden outright
+    /// when there was no progress, so a film nobody had started showed the «from the start» glyph
+    /// and nothing else. «En ciertas ocasiones en la vista detalle desaparece el botón de
+    /// reproducir/continuar y solamente queda el icono de ver desde el inicio», 2026-08-25, and the
+    /// occasion is every film nobody has started.
+    /// </para>
+    /// <para>
+    /// A property and not two buttons swapped by visibility, because the two are one control: it is
+    /// the leading action of this view, <c>LeadingActionTests</c> allows exactly one of those per
+    /// view, and a pair that took turns would be two controls the walk has to press to prove one.
+    /// </para>
+    /// </remarks>
+    public string PlayActionText => CanResume
+        ? Resource("MovieResumeAction", "Resume") + " · " + ResumePositionText
+        : Resource("MovieStartAction", "Play");
+
     public IReadOnlyList<MediaVersionRowViewModel> Versions
     {
         get => _versions;
@@ -281,6 +316,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
             nameof(CanResume),
             nameof(ResumePosition),
             nameof(ResumePositionText),
+            nameof(PlayActionText),
             nameof(HasVersions),
             nameof(HasOtherVersions),
             nameof(CanPreviewRename),
@@ -293,6 +329,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
         (PlayCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (ResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (PlayOrResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (PlayTrailerCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (OpenTrailerLinkCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }

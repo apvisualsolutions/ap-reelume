@@ -1411,6 +1411,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "Continue opened a session that never reached the playing state");
+
+        // And it does not ask again what pressing Continue already answered. «Al hacer click en
+        // continuar vuelve a pedir confirmación de continuar o volver a ver desde el inicio en la
+        // vista del reproductor», 2026-08-25: the session opened at the right minute and then
+        // offered to decide the minute, over a picture already playing. The offer belongs to a
+        // session nobody named a position for, which is what opening a file from Explorer is.
+        Assert.Null(host.ViewModel.Player!.Resume);
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
 
         // The hero's second action, which the prototype has had all along: the card of the same
@@ -1907,12 +1914,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.False(watch.IsManualOverride, "A control click reached one of the watch-state buttons.");
 
         // And Play, which is where the card stops being a page and becomes a session: the real engine
-        // opens the real file the walk put on the disk.
+        // opens the real file the walk put on the disk. This card has no progress on it, so the one
+        // button says «Reproducir» and the «from the start» glyph beside it is not drawn at all —
+        // there is nothing for it to be the alternative to.
         await PressAsync(
             host,
-            "MoviePlayAction",
+            host.ViewModel.Library!.MovieDetails.PlayActionText,
             () => host.ViewModel.Player is not null,
-            "clicking Play never opened a session on the film");
+            "clicking Play never opened a session on the film",
+            recordAs: "{Binding PlayActionText}");
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "the session Play opened never reached the playing state on the real engine");
@@ -3439,7 +3449,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // rather than discovered as a red sixty seconds later.
         foreach (var anchor in new[]
         {
-            "MovieResumeAction",
+            card.PlayActionText,
             "MoviePlayAction",
             "MovieTrailerAction",
             "DetailsTrailerLinkAction",
@@ -3453,15 +3463,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                     + "the film card's action row draws outside it.");
         }
 
-        // ---- Resume: back to the second that was stored, not to the beginning.
+        // ---- Resume: back to the second that was stored, not to the beginning. The button says
+        // «Continuar · 40:00» here, which is its accessible name too: one control whose words follow
+        // what there is to open, so the anchor is read off the card rather than from a resource.
         await PressAsync(
             host,
-            "MovieResumeAction",
+            card.PlayActionText,
             () => host.ViewModel.Player?.Player.MediaPath ?? string.Empty,
-            "returning to where you were never opened the film");
+            "returning to where you were never opened the film",
+            recordAs: "{Binding PlayActionText}");
         await WaitForAsync(
             async () => await PlayheadSecondsAsync() >= 35,
             "the film opened, but not at the point the card offered to return to");
+
+        // The same silence the hero's Continue earns: a card that named the minute has answered the
+        // question the offer asks, and asking it again over a picture already playing is the offer
+        // arguing with the button that opened it.
+        Assert.Null(host.ViewModel.Player!.Resume);
 
         // ---- And the finding that came out of the version switch: with progress stored, starting
         // from the beginning has to actually start at the beginning. Until the requested position

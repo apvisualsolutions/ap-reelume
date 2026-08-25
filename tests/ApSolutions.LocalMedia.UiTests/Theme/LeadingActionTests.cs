@@ -84,7 +84,10 @@ public sealed class LeadingActionTests
         ["PosterCardView"] = null,
 
         // Details
-        ["MovieDetailsView"] = "MovieResumeAction",
+        // Renamed on 2026-08-25 when the two buttons became one: it says «Continuar · 49:00» or
+        // «Reproducir» depending on what there is to open, so its accessible name is a binding and
+        // an x:Name is what identifies it here.
+        ["MovieDetailsView"] = "MovieOpenAction",
         // The series card leads with the episode it is waiting on, since 2026-08-25. A card whose
         // point is «where was I» has one answer, and it was a list of seasons until the banner could
         // name that episode and start it.

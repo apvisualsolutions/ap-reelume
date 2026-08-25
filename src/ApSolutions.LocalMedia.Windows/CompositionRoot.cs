@@ -1461,8 +1461,22 @@ public static partial class CompositionRoot
             DetectedReview = detectedReview,
             // The prompt's buttons reach the running session: restart seeks to zero, resume to the
             // stored point. Without the handler either button only hides the prompt.
-            Resume = new ResumePromptViewModel(resume, (_, position) =>
-                provider.GetRequiredService<ControlPlayback>().SeekAsync(position, CancellationToken.None)),
+            //
+            // And there is no prompt at all when the caller named a position, because the caller
+            // already answered the question this asks. «Al hacer click en continuar vuelve a pedir
+            // confirmación de continuar o volver a ver desde el inicio en la vista del reproductor»,
+            // 2026-08-25 — the session opened at the right minute and then offered to decide the
+            // minute, over a picture already playing. The same silence is what «desde el principio»
+            // needs, and for the same reason: an offer to resume over a film somebody just asked to
+            // start again is the opposite of what they pressed.
+            //
+            // startPosition above already reads request.StartPosition first; this is the other half
+            // of that decision, and the two are written next to the value they share on purpose —
+            // one of them was made and the other was not, which is exactly how this defect got in.
+            Resume = request.StartPosition is null
+                ? new ResumePromptViewModel(resume, (_, position) =>
+                    provider.GetRequiredService<ControlPlayback>().SeekAsync(position, CancellationToken.None))
+                : null,
             Skip = skip,
             NextEpisode = nextEpisode,
             VersionSwitch = versionSwitch,

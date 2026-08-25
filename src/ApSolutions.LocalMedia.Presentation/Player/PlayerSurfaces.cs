@@ -39,7 +39,10 @@ public sealed record PlayerSurfaces
     /// <summary>What automatic detection found in this episode, ready to accept, adjust, or remove.</summary>
     public DetectedMarkerReviewViewModel? DetectedReview { get; init; }
 
-    /// <summary>The stored position offer; absent when there is nothing worth returning to.</summary>
+    /// <summary>
+    /// The stored position offer; absent when there is nothing worth returning to, and absent when
+    /// whoever opened the session already said where it starts.
+    /// </summary>
     public ResumePromptViewModel? Resume { get; init; }
 
     /// <summary>The skip offer while the playhead is inside a marked range.</summary>

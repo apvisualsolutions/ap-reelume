@@ -10,6 +10,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Continue asked again what pressing Continue had already answered.** The session opened at the
+  right minute and then offered to decide the minute, over a picture already playing — «al hacer
+  click en continuar vuelve a pedir confirmación de continuar o volver a ver desde el inicio en la
+  vista del reproductor». The position the caller names had won over the policy since the version
+  switch; what was never done then was the other half of that same decision, and the two are written
+  next to each other now: **no offer when the request names a position**. It holds for «from the
+  start» too, where offering to resume was the offer arguing with the button that had just been
+  pressed. The offer still appears where it means something: a session nobody opened with a minute,
+  which is what opening a file from Explorer is.
+
+- **The film card's play button disappeared.** It was hidden outright when there was nothing to
+  resume, so a film nobody had started offered the «from the start» glyph and no way to simply watch
+  it. It is now **one button whose words follow the state** — «Continuar · 49:00» with progress and
+  «Reproducir» without, which is what the prototype writes — and the glyph becomes what it always
+  was, the alternative: drawn only while there is something to be an alternative to.
+
 - **Home's covers led nowhere.** They were cards inside a list item, so pressing one selected it and
   nothing else — «al hacer click en las tarjetas en home no redirige a la vista detalle del vídeo».
   The prototype wraps the whole cover in a button, and that is what both poster rails carry now, with

@@ -10,6 +10,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Continuar volvía a preguntar lo que continuar ya había contestado.** La sesión abría en el minuto
+  correcto y acto seguido ofrecía decidir el minuto, sobre una imagen ya en marcha — «al hacer click
+  en continuar vuelve a pedir confirmación de continuar o volver a ver desde el inicio en la vista
+  del reproductor». La posición pedida por quien abre ya mandaba sobre la política desde el cambio de
+  versión; lo que no se hizo entonces fue la otra mitad de esa misma decisión, y las dos están ahora
+  escritas juntas: **sin aviso cuando la petición nombra una posición**. Vale igual para «desde el
+  principio», donde ofrecer reanudar era discutir con el botón que acababa de pulsarse. El aviso
+  sigue apareciendo donde tiene sentido: una sesión que nadie abrió con un minuto, que es lo que es
+  abrir un archivo desde el Explorador.
+
+- **En la ficha de película desaparecía el botón de reproducir.** Estaba oculto de plano cuando no
+  había nada que reanudar, así que una película sin empezar ofrecía el glifo de «desde el principio»
+  y ninguna forma de simplemente verla. Ahora es **un solo botón cuyas palabras siguen al estado** —
+  «Continuar · 49:00» con progreso y «Reproducir» sin él, que es lo que escribe el prototipo— y el
+  glifo pasa a ser lo que siempre fue, la alternativa: sólo se dibuja mientras hay algo de lo que ser
+  alternativa.
+
 - **Las carátulas de Home no llevaban a ninguna parte.** Eran tarjetas dentro de un elemento de
   lista, así que pulsar una la seleccionaba y nada más — «al hacer click en las tarjetas en home no
   redirige a la vista detalle del vídeo». El prototipo envuelve la carátula entera en un botón, y eso
