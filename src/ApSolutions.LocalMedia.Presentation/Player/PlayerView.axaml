@@ -136,8 +136,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <Button
               IsVisible="{Binding CanOpenExternally}"
               automation:AutomationProperties.Name="{DynamicResource PlayerRecoveryOpenExternally}"
-              Command="{Binding OpenExternallyCommand}"
-              Content="{DynamicResource PlayerRecoveryOpenExternally}" />
+              Command="{Binding OpenExternallyCommand}">
+            <!--
+              The arrow the prototype puts on anything that leaves this process, which is exactly
+              what this does: the file opens in whatever Windows has associated, and this application
+              stops being responsible for it.
+            -->
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <Path Classes="icon size-14" Data="{DynamicResource IconExternal}" />
+              <TextBlock Text="{DynamicResource PlayerRecoveryOpenExternally}" />
+            </StackPanel>
+          </Button>
         </WrapPanel>
       </StackPanel>
     </Border>
