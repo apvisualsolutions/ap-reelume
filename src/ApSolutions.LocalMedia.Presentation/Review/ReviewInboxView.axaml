@@ -15,11 +15,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <KeyBinding Gesture="Escape" Command="{Binding ClearSelectionCommand}" />
   </UserControl.KeyBindings>
   <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space12}">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeDisplay}"
-        FontWeight="SemiBold"
-        Text="{DynamicResource ReviewInboxTitle}"
-        automation:AutomationProperties.HeadingLevel="1" />
+    <StackPanel Spacing="{DynamicResource Space4}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeDisplay}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource ReviewInboxTitle}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <!--
+        What this tray is and what it has not done, which the prototype says before showing a single
+        card: nothing here has been applied to the library. A surface that asks for decisions without
+        saying what a decision costs is asking somebody to guess.
+      -->
+      <TextBlock
+          MaxWidth="760"
+          HorizontalAlignment="Left"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource ReviewInboxIntro}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          IsVisible="{Binding !IsEmpty}"
+          Text="{Binding CountText}" />
+    </StackPanel>
     <StackPanel
         Grid.Row="1"
         Spacing="{DynamicResource Space8}"
@@ -154,9 +172,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.Name="{DynamicResource ReviewCandidateListName}"
         ItemsSource="{Binding Items}"
         SelectedItem="{Binding SelectedItem}">
-      <ListBox.KeyBindings>
-        <KeyBinding Gesture="Enter" Command="{Binding AcceptSelectedCommand}" />
-      </ListBox.KeyBindings>
+      <!--
+        Enter used to accept whatever was selected. With the three decisions inside the card that is
+        a shortcut nobody can predict: measured on 2026-08-25, pressing Enter on the focused Reject
+        button accepted the candidate instead, because the binding on the list answered first. A card
+        holds three actions, so Enter belongs to whichever of them has focus — which is the ordinary
+        keyboard grammar, and one Tab away.
+      -->
       <ListBox.ItemsPanel>
         <ItemsPanelTemplate>
           <VirtualizingStackPanel />
@@ -168,18 +190,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
+    <!--
+      What is left under the list once the decisions moved into the cards: the next page, and the
+      sentence that says a decision was overtaken by another one. Accept and Reject used to live here
+      and act on the selection, which made a tray of five files one decision wide — and put the
+      surface's only accent on a button that could be pressed while nothing was selected.
+    -->
     <WrapPanel Grid.Row="4" ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
-      <Button
-          Classes="primary-action"
-          x:Name="AcceptReviewAction"
-          automation:AutomationProperties.Name="{DynamicResource ReviewAcceptAction}"
-          Command="{Binding AcceptSelectedCommand}"
-          Content="{DynamicResource ReviewAcceptAction}" />
-      <Button
-          x:Name="RejectReviewAction"
-          automation:AutomationProperties.Name="{DynamicResource ReviewRejectAction}"
-          Command="{Binding RejectSelectedCommand}"
-          Content="{DynamicResource ReviewRejectAction}" />
       <Button
           x:Name="LoadMoreReviewAction"
           automation:AutomationProperties.Name="{DynamicResource ReviewLoadMoreAction}"

@@ -13,7 +13,30 @@ namespace ApSolutions.LocalMedia.Application.Catalog;
 public sealed record DuplicateOverviewEntry(
     TitleId TitleId,
     string Title,
-    int VersionCount);
+    int VersionCount,
+    MediaVersionId GroupId = default,
+    IReadOnlyList<DuplicateFileRow>? Files = null);
+
+/// <summary>
+/// One file of a duplicate group, with the facts a person compares copies by.
+/// </summary>
+/// <remarks>
+/// The destination listed titles and a count, and the comparison lived a click away. The prototype
+/// puts the whole table on the page — resolution, codecs, size, running time, where it lives and
+/// whether it is reachable — because that IS the decision: which of these three is the one to play.
+/// A count of three cannot be compared with anything.
+/// </remarks>
+public sealed record DuplicateFileRow(
+    MediaFileId MediaFileId,
+    string Path,
+    int? Width,
+    int? Height,
+    string VideoCodec,
+    string AudioCodec,
+    long SizeBytes,
+    TimeSpan? Duration,
+    bool IsAvailable,
+    bool IsPreferred);
 
 /// <summary>
 /// Reads every group holding two or more versions, newest grammar of the rail's fifth destination.

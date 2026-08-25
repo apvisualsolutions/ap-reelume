@@ -120,8 +120,13 @@ public sealed class LeadingActionTests
         ["DiagnosticsPreviewView"] = null,
 
         // Review
-        ["ReviewInboxView"] = "AcceptReviewAction",
-        ["CandidateCardView"] = null,
+        // The decisions moved into the cards on 2026-08-25, so the tray itself leads with nothing —
+        // what is left under the list is a next page and a warning.
+        ["ReviewInboxView"] = null,
+        // And the card leads with Accept, which is the exception the repeated-row rule allows for:
+        // a review card IS a decision, and five files are five independent ones. The prototype
+        // accents it in every card for the same reason.
+        ["CandidateCardView"] = "ReviewAcceptAction",
         ["DuplicateReviewView"] = null,
         // A list of rows that repeat: a hierarchy repeated N times is not a hierarchy.
         ["DuplicatesOverviewView"] = null,

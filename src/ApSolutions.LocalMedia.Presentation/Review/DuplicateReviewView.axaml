@@ -49,8 +49,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
               BorderThickness="1"
               CornerRadius="{DynamicResource CornerRadiusMedium}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space12}" RowDefinitions="Auto,Auto">
+              <!--
+                The quality rides in the help text since 2026-08-25. The duplicates destination draws
+                the same files above this comparison, so two radios answer to the same path — a
+                reader user heard one sentence for two controls, and anything looking for one of them
+                by name found two.
+              -->
               <RadioButton
                   automation:AutomationProperties.Name="{Binding ShortPath}"
+                  automation:AutomationProperties.HelpText="{Binding Quality}"
                   Command="{Binding $parent[ItemsControl].((review:DuplicateReviewViewModel)DataContext).SetPreferredCommand}"
                   CommandParameter="{Binding}"
                   IsChecked="{Binding IsEffective}" />

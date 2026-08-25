@@ -66,11 +66,69 @@ public sealed class PendingReassignmentViewModel
     public ICommand KeepAsNewCommand { get; }
 }
 
-public sealed class CandidateCardViewModel(MatchCandidate candidate)
+public sealed class CandidateCardViewModel
 {
-    public MatchCandidate Candidate { get; } = candidate ?? throw new ArgumentNullException(nameof(candidate));
+    public CandidateCardViewModel(
+        MatchCandidate candidate,
+        Func<CandidateCardViewModel, Task>? onAccept = null,
+        Func<CandidateCardViewModel, Task>? onReject = null,
+        Action<CandidateCardViewModel>? onSearchManually = null)
+    {
+        Candidate = candidate ?? throw new ArgumentNullException(nameof(candidate));
+        AcceptCommand = new AsyncRelayCommand(
+            () => onAccept is null ? Task.CompletedTask : onAccept(this),
+            () => onAccept is not null);
+        RejectCommand = new AsyncRelayCommand(
+            () => onReject is null ? Task.CompletedTask : onReject(this),
+            () => onReject is not null);
+        SearchManuallyCommand = new AsyncRelayCommand(
+            () =>
+            {
+                onSearchManually?.Invoke(this);
+                return Task.CompletedTask;
+            },
+            () => onSearchManually is not null);
+    }
+
+    public MatchCandidate Candidate { get; }
+
+    /// <summary>
+    /// Accepts, rejects, or starts a manual search for <b>this</b> file.
+    /// </summary>
+    /// <remarks>
+    /// The decisions used to live one row below the list and act on whatever was selected, which is
+    /// one decision per tray rather than one per file — and the prototype puts them in the card
+    /// because that is where the file is. Each of them selects this card first, so the keyboard path
+    /// and the mouse path end in the same place.
+    /// </remarks>
+    public ICommand AcceptCommand { get; }
+
+    public ICommand RejectCommand { get; }
+
+    public ICommand SearchManuallyCommand { get; }
 
     public string StableKey => Candidate.StableKey;
+
+    /// <summary>The file's own name, which is what the tray is asking about.</summary>
+    public string FileName => Candidate.MediaFilePath is { Length: > 0 } path
+        ? System.IO.Path.GetFileName(path)
+        : string.Empty;
+
+    /// <summary>And the folder it sits in, which is what tells two files of the same name apart.</summary>
+    public string FileFolder => Candidate.MediaFilePath is { Length: > 0 } path
+        ? System.IO.Path.GetDirectoryName(path) ?? string.Empty
+        : string.Empty;
+
+    public bool HasFile => FileName.Length > 0;
+
+    /// <summary>
+    /// «Película» or «Serie», as a resource key: what kind of thing is being proposed. An episode
+    /// candidate says «Serie», which is what the prototype writes and what a person is choosing —
+    /// the episode itself is already named by the candidate above it.
+    /// </summary>
+    public string KindKey => Candidate.Kind == CandidateContentKind.Episode
+        ? "CatalogKindShow"
+        : "CatalogKindMovie";
 
     public string ScorePercent => Candidate.Score.ToString("P0", CultureInfo.CurrentCulture);
 
@@ -199,6 +257,27 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
 
     public bool IsEmpty => Items.Count == 0;
 
+    /// <summary>
+    /// «5 archivos esperando tu decisión», which is the line the prototype writes under the intro.
+    /// </summary>
+    /// <remarks>
+    /// A tray with no count is a tray whose length you learn by scrolling to the end of it, and the
+    /// number is the whole reason somebody opens this surface rather than the library.
+    /// </remarks>
+    public string CountText => Resource("ReviewInboxCount", "{0} files waiting for your decision")
+        .Replace("{0}", Items.Count.ToString(CultureInfo.CurrentCulture), StringComparison.Ordinal);
+
+    /// <summary>
+    /// The one string this model assembles rather than picks. The fallback keeps a headless test —
+    /// which mounts this without the dictionaries — printing a sentence rather than a blank.
+    /// </summary>
+    private static string Resource(string key, string fallback) =>
+        Avalonia.Application.Current is { } application
+            && application.TryGetResource(key, application.ActualThemeVariant, out var value)
+            && value is string text
+                ? text
+                : fallback;
+
     public bool HasMore => _nextOffset.HasValue;
 
     /// <summary>The moved-file offers a person decides here, refreshed with every load.</summary>
@@ -230,9 +309,10 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         var page = await _getReviewInbox.ExecuteAsync(
             new GetReviewInboxQuery(PageSize),
             cancellationToken).ConfigureAwait(false);
-        Items = page.Items.Select(candidate => new CandidateCardViewModel(candidate)).ToArray();
+        Items = page.Items.Select(Card).ToArray();
         _nextOffset = page.NextOffset;
         OnPropertyChanged(nameof(HasMore));
+        OnPropertyChanged(nameof(CountText));
         ReloadReassignments();
     }
 
@@ -342,7 +422,7 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         }
         else if (result.Candidate is not null)
         {
-            Items = Items.Select(item => item == selected ? new CandidateCardViewModel(result.Candidate) : item).ToArray();
+            Items = Items.Select(item => item == selected ? Card(result.Candidate) : item).ToArray();
             SelectedItem = Items.FirstOrDefault(item => item.Candidate.Id == result.Candidate.Id);
         }
     }
@@ -387,6 +467,41 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         _manualSearch is not null
         && SelectedItem is not null
         && !string.IsNullOrWhiteSpace(ManualSearch);
+
+    /// <summary>
+    /// One card, wired to the three things a person can do to the file behind it. Selecting first is
+    /// not a detail: everything downstream — the decision, the manual search, the conflict message —
+    /// is written in terms of the selected candidate, and a card that acted without selecting would
+    /// be deciding about one file while the tray still pointed at another.
+    /// </summary>
+    private CandidateCardViewModel Card(MatchCandidate candidate)
+    {
+        CandidateCardViewModel? card = null;
+        card = new CandidateCardViewModel(
+            candidate,
+            async _ =>
+            {
+                SelectedItem = card;
+                await AcceptSelectedAsync(CancellationToken.None).ConfigureAwait(true);
+            },
+            async _ =>
+            {
+                SelectedItem = card;
+                await RejectSelectedAsync(CancellationToken.None).ConfigureAwait(true);
+            },
+            _ =>
+            {
+                SelectedItem = card;
+
+                // The words to search with default to the file's own name, which is what a person
+                // would type first and what the parser already knows how to read.
+                if (string.IsNullOrWhiteSpace(ManualSearch) && card?.FileName is { Length: > 0 } name)
+                {
+                    ManualSearch = System.IO.Path.GetFileNameWithoutExtension(name);
+                }
+            });
+        return card;
+    }
 
     private void RaiseSelectionDependentCommands()
     {

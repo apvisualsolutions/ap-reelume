@@ -717,7 +717,8 @@ public static partial class CompositionRoot
         // The opener is the shell's to wire - its constructor points every row at the same door
         // the film card uses - so the composition only builds the list half.
         return new DuplicatesOverviewViewModel(
-            provider.GetRequiredService<ApSolutions.LocalMedia.Application.Catalog.GetDuplicateOverview>());
+            provider.GetRequiredService<ApSolutions.LocalMedia.Application.Catalog.GetDuplicateOverview>(),
+            provider.GetRequiredService<ApSolutions.LocalMedia.Application.Catalog.SetPreferredVersion>());
     }
 
     /// <summary>

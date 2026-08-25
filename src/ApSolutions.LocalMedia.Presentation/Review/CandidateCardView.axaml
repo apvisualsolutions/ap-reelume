@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
     x:DataType="review:CandidateCardViewModel">
   <!--
@@ -20,19 +21,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <home:ResourceKeyConverter x:Key="ExplanationText" />
   </UserControl.Resources>
   <!--
-    The prototype's candidate card: the tinted border, the badge in the top right corner, and the two
-    columns underneath - what is proposed on the left, why on the right. Three things it draws that
-    this cannot, and they are omissions rather than oversights:
+    The prototype's candidate card, and what it took to draw it. Three things were declared missing
+    here on 2026-08-22 and all three are now on screen:
 
-    - <b>The 2:3 thumbnail.</b> MatchCandidate carries an id, a key, a kind, a score and its signals,
-      and no artwork - so an empty 78x117 rectangle in every row would promise a picture that does not
-      exist. Same declared omission as the recommendation year and the player's title.
-    - <b>The candidate's title and its kind.</b> The key is what the domain holds - "movie:329865" -
-      and the kind would need the words "Película" / "Serie", which the string package does not
-      propose and this tree does not invent. Both were already decided on 2026-08-22.
-    - <b>The four buttons at the card's foot.</b> They exist, one row lower: Accept and Reject act on
-      whatever the list has selected, and moving them into every card would turn one decision per
-      inbox into one decision per row - a change to how the surface works, not to how it is drawn.
+    - <b>The file.</b> Its name and its folder are what the tray is asking about, and the card named
+      only the candidate — «movie:761053» — so it asked somebody to decide about a file it never
+      showed them. The candidate's projection reads the path since 2026-08-25.
+    - <b>The picture and the kind.</b> The cover is the hash-built art every other surface draws,
+      from the file's own name; the kind is the same word the library's cards carry, which the string
+      package has had all along.
+    - <b>The decisions.</b> They lived one row below the list and acted on the selection, which is one
+      decision per tray rather than one per file. Each button selects its own card first, so the
+      keyboard path and the mouse path end in the same place.
   -->
   <Border
       Margin="0,4"
@@ -41,96 +41,148 @@ SPDX-License-Identifier: GPL-3.0-or-later
       Classes.suggested="{Binding IsSuggested}"
       automation:AutomationProperties.Name="{Binding StableKey}"
       automation:AutomationProperties.HelpText="{Binding ExplanationCodes, Converter={StaticResource ExplanationText}}">
-    <Grid
-        RowDefinitions="Auto,Auto"
-        ColumnDefinitions="*,Auto"
-        RowSpacing="{DynamicResource Space12}"
-        ColumnSpacing="{DynamicResource Space12}">
-      <StackPanel Grid.Row="0" Grid.Column="0" Spacing="{DynamicResource Space4}">
-        <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewProposedCandidate}" />
-        <TextBlock
-            FontWeight="SemiBold"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{Binding StableKey}"
-            TextWrapping="Wrap" />
-      </StackPanel>
-      <!--
-        Two badges and not one with two labels inside: a candidate that has been accepted or rejected
-        is neither pending nor suggested, and a single badge would then be an empty tinted rectangle
-        with nothing in it.
-      -->
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space16}">
       <Border
-          Grid.Row="0"
-          Grid.Column="1"
-          Classes="state-chip suggested"
-          IsVisible="{Binding IsSuggested}">
-        <TextBlock Text="{DynamicResource ReviewStatusSuggested}" />
+          Width="78"
+          Height="117"
+          VerticalAlignment="Top"
+          ClipToBounds="True"
+          BorderBrush="{DynamicResource ShellHairlineBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusMedium}"
+          IsVisible="{Binding HasFile}">
+        <library:PosterArtView Title="{Binding FileName}" />
       </Border>
-      <Border
-          Grid.Row="0"
-          Grid.Column="1"
-          Classes="state-chip pending"
-          IsVisible="{Binding IsPending}">
-        <TextBlock Text="{DynamicResource ReviewStatusPending}" />
-      </Border>
-      <Grid
-          Grid.Row="1"
-          Grid.ColumnSpan="2"
-          ColumnDefinitions="*,*"
-          ColumnSpacing="{DynamicResource Space16}">
-        <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
-          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
-            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewConfidence}" />
+
+      <StackPanel Grid.Column="1" Spacing="{DynamicResource Space12}">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewPendingFile}" />
             <TextBlock
-                Grid.Column="1"
-                FontSize="{DynamicResource FontSizeCaption}"
                 FontWeight="SemiBold"
                 Foreground="{DynamicResource TextPrimaryBrush}"
-                Text="{Binding ScorePercent}" />
-          </Grid>
+                IsVisible="{Binding HasFile}"
+                Text="{Binding FileName}"
+                TextWrapping="Wrap" />
+            <TextBlock
+                FontFamily="{DynamicResource FontFamilyMono}"
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                IsVisible="{Binding HasFile}"
+                Text="{Binding FileFolder}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="NoWrap" />
+          </StackPanel>
           <!--
-            The score is the same number the percentage above it is written from, so the bar and the
-            figure cannot disagree: Maximum is 1 because that is the range Score is scored on, and
-            ScorePercent is that same double formatted with P0.
+            Two badges and not one with two labels inside: a candidate that has been accepted or rejected
+            is neither pending nor suggested, and a single badge would then be an empty tinted rectangle
+            with nothing in it.
           -->
-          <ProgressBar
-              Classes="confidence"
-              Classes.pending="{Binding IsPending}"
-              Maximum="1"
-              Value="{Binding Candidate.Score}"
-              automation:AutomationProperties.AccessibilityView="Raw" />
-        </StackPanel>
-        <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
-          <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewExplanationHeading}" />
-          <ItemsControl ItemsSource="{Binding ExplanationCodes}">
-            <ItemsControl.ItemTemplate>
-              <!-- x:DataType, because this control declares one and a template without its own inherits
-                   it: the binding would resolve against the card's model instead of against the code. -->
-              <DataTemplate x:DataType="x:String">
-                <!--
-                  A Grid and not a horizontal StackPanel. The bullet sits beside text that wraps, and a
-                  stack offers its children infinite width, so the sentence would never wrap and would
-                  run off the side - measured nine times in this repository, always this shape.
-                -->
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
-                  <TextBlock
-                      Grid.Column="0"
-                      VerticalAlignment="Top"
-                      Foreground="{DynamicResource TextSecondaryBrush}"
-                      Text="•"
-                      automation:AutomationProperties.AccessibilityView="Raw" />
-                  <TextBlock
-                      Grid.Column="1"
-                      FontSize="{DynamicResource FontSizeCaption}"
-                      Foreground="{DynamicResource TextSecondaryBrush}"
-                      Text="{Binding ., Converter={StaticResource ExplanationText}}"
-                      TextWrapping="Wrap" />
-                </Grid>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </StackPanel>
-      </Grid>
+          <Border
+              Grid.Column="1"
+              VerticalAlignment="Top"
+              Classes="state-chip suggested"
+              IsVisible="{Binding IsSuggested}">
+            <TextBlock Text="{DynamicResource ReviewStatusSuggested}" />
+          </Border>
+          <Border
+              Grid.Column="1"
+              VerticalAlignment="Top"
+              Classes="state-chip pending"
+              IsVisible="{Binding IsPending}">
+            <TextBlock Text="{DynamicResource ReviewStatusPending}" />
+          </Border>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewProposedCandidate}" />
+            <TextBlock
+                FontWeight="SemiBold"
+                Foreground="{DynamicResource TextPrimaryBrush}"
+                Text="{Binding StableKey}"
+                TextWrapping="Wrap" />
+            <TextBlock
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="{Binding KindKey, Converter={StaticResource ExplanationText}}" />
+            <Grid Margin="0,4,0,0" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+              <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewConfidence}" />
+              <TextBlock
+                  Grid.Column="1"
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  FontWeight="SemiBold"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
+                  Text="{Binding ScorePercent}" />
+            </Grid>
+            <!--
+              The score is the same number the percentage above it is written from, so the bar and the
+              figure cannot disagree: Maximum is 1 because that is the range Score is scored on, and
+              ScorePercent is that same double formatted with P0.
+            -->
+            <ProgressBar
+                Classes="confidence"
+                Classes.pending="{Binding IsPending}"
+                Maximum="1"
+                Value="{Binding Candidate.Score}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
+            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewExplanationHeading}" />
+            <ItemsControl ItemsSource="{Binding ExplanationCodes}">
+              <ItemsControl.ItemTemplate>
+                <!-- x:DataType, because this control declares one and a template without its own inherits
+                     it: the binding would resolve against the card's model instead of against the code. -->
+                <DataTemplate x:DataType="x:String">
+                  <!--
+                    A Grid and not a horizontal StackPanel. The bullet sits beside text that wraps, and a
+                    stack offers its children infinite width, so the sentence would never wrap and would
+                    run off the side - measured nine times in this repository, always this shape.
+                  -->
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space8}">
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Top"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="•"
+                        automation:AutomationProperties.AccessibilityView="Raw" />
+                    <TextBlock
+                        Grid.Column="1"
+                        FontSize="{DynamicResource FontSizeCaption}"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{Binding ., Converter={StaticResource ExplanationText}}"
+                        TextWrapping="Wrap" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Grid>
+
+        <!--
+          The three decisions, in the card that holds the file they are about. Named by their words
+          and told apart by the file: a tray of five cards is fifteen buttons, and without the help
+          text a reader user hears "Aceptar" five times with nothing to choose between.
+        -->
+        <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+          <Button
+              Classes="primary-action"
+              Command="{Binding AcceptCommand}"
+              Content="{DynamicResource ReviewAcceptShortAction}"
+              automation:AutomationProperties.Name="{DynamicResource ReviewAcceptAction}"
+              automation:AutomationProperties.HelpText="{Binding StableKey}" />
+          <Button
+              Command="{Binding RejectCommand}"
+              Content="{DynamicResource ReviewRejectShortAction}"
+              automation:AutomationProperties.Name="{DynamicResource ReviewRejectAction}"
+              automation:AutomationProperties.HelpText="{Binding StableKey}" />
+          <Button
+              Command="{Binding SearchManuallyCommand}"
+              Content="{DynamicResource ReviewManualSearchCardAction}"
+              automation:AutomationProperties.Name="{DynamicResource ReviewManualSearchCardAction}"
+              automation:AutomationProperties.HelpText="{Binding StableKey}" />
+        </WrapPanel>
+      </StackPanel>
     </Grid>
   </Border>
 </UserControl>

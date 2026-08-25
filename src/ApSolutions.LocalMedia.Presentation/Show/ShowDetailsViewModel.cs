@@ -116,8 +116,9 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     /// </summary>
     /// <remarks>
     /// The card said a year and nothing else. The season count is left out of a series that has one,
-    /// because a plural over a single season is worse than silence and a one-season series has
-    /// nothing to say about its seasons anyway — the picker above is absent for the same reason.
+    /// because a one-season series has nothing to say about its seasons anyway — the picker above is
+    /// absent for the same reason. The episode count stays and changes word instead: a series with
+    /// one episode is a real thing, and «1 episodios» is not a sentence in either language.
     /// </remarks>
     public string MetaText => string.Join(
         " · ",
@@ -126,7 +127,12 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
             YearText,
             _item?.Genres is { Count: > 0 } genres ? string.Join(" · ", genres.Take(2)) : string.Empty,
             Seasons.Count > 1 ? Count(Seasons.Count, "ShowSeasonsSuffix", "seasons") : string.Empty,
-            EpisodeTotal > 0 ? Count(EpisodeTotal, "CatalogEpisodesSuffix", "episodes") : string.Empty,
+            EpisodeTotal > 0
+                ? Count(
+                    EpisodeTotal,
+                    EpisodeTotal == 1 ? "CatalogEpisodeSuffixOne" : "CatalogEpisodesSuffix",
+                    EpisodeTotal == 1 ? "episode" : "episodes")
+                : string.Empty,
         }.Where(piece => piece.Length > 0));
 
     public bool HasMeta => MetaText.Length > 0;
