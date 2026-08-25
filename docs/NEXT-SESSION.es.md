@@ -1,5 +1,99 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-25 (tarde) — lo que el propietario miró, y lo que falta
+
+**Todo lo de esta tanda está verde en local** (Domain 472, Application 236, Architecture 30,
+Documentation 87, Ui 836, Integration 466, Accessibility 146, paseo con **0 pendientes**) y la rama
+lleva 33 commits por delante de `main`.
+
+### Lo primero que se arregló no estaba en el código
+
+Tres veces se dijo que una captura «salía oscura», y las tres veces el archivo estaba bien: **un PNG
+de 1500 × 1000 se lee oscuro, y la misma imagen a 750 × 500 se lee como es**. Medido sobre la
+biblioteca en tema claro —`#FBFCFE` en el lienzo, `#E9EEF4` en el raíl, 100 % opaco— y confirmado
+reduciéndola. El color se decide midiendo o mirando la mitad; nunca a tamaño completo. Una alarma que
+levantó —«las portadas están más claras abajo»— era un punto de medición mal elegido.
+
+**Y `docs/assets/review.png`, en un repositorio público, imprimía la ruta del perfil de quien tomó la
+captura.** Las cinco están rehechas con la biblioteca en una carpeta neutra, sin canal alfa.
+
+### Lo que se cerró en la aplicación
+
+- **Duplicados**: la copia elegida se marca en toda su fila, el título del grupo deja de ir en azul,
+  y la columna de tamaño baja hasta los bytes.
+- **Enlaces**: del acento a su tinta —9,03:1 frente a 5,62:1 en claro—, con el par medido.
+- **Ficha de serie**: cada episodio con el tono de la serie caminado 7° por episodio; el panel de
+  «Siguiente episodio» limita su columna y no su borde.
+- **Bandeja**: dice de qué título habla (migración 0019, una columna) y sus cuatro rótulos van en el
+  mismo estilo.
+- **Reproductor**: un fallo ya no se borra solo cuando LibVLC informa del *stop* posterior.
+- **Inicio/biblioteca**: ficha de tipo sólo con glifo en los carruseles, «+» en Añadir medios,
+  segunda línea en la cabecera del reproductor, «VELOCIDAD» en vez del rótulo largo.
+- **Otras acciones**: cinco filas iguales en vez de dos píldoras sobre tres filas.
+- **Dos herramientas del título** aparecen sólo cuando tienen algo que hacer, y el tráiler externo
+  dice «Ver tráiler» con su flecha.
+- **El contorno punteado** de un control deshabilitado toma el radio del control.
+- **`KindShapeConverter` retirado**: dos ramas que nada podía tomar, sustituidas por un estilo. El
+  trinquete de cobertura baja de 215 a **214**.
+
+## Lo que el propietario pidió y NO está hecho
+
+**1. El reproductor tiene que ser copia exacta del prototipo, en diseño y en funcionalidad.**
+
+Las referencias ya están tomadas, una por estado, en
+`%TEMP%\claude\…\scratchpad\proto-player\`: `proto-player.png`, `proto-panel-audio.png`,
+`proto-panel-subs.png`, `proto-panel-video.png`, `proto-panel-marks.png`, `proto-mini.png`,
+`proto-fullscreen.png`. **Se miran a la mitad** (`half.ps1`).
+
+Cómo se tomaron, que es lo que permite explorar cualquier estado del prototipo: la copia de trabajo
+`scratchpad/proto/proto.html` acepta **`?press=A|B|C`** y pulsa esos nombres en orden, por
+`aria-label` o por el texto del botón; `scratchpad/shoot-player.ps1` lo automatiza con Chrome sin
+cabeza y `--force-prefers-reduced-motion`.
+
+Lo que falta, medido contra esas capturas:
+
+- Las cuatro píldoras —**Audio, Subtítulos, Vídeo, Marcadores**— van en la **cabecera** del
+  reproductor y abren o cierran la columna. Aquí viven dentro de la columna, que está siempre puesta.
+- La columna del prototipo tiene **cabecera propia con su «×»**.
+- Falta la píldora **«Sesión 1 · motor único activo»** junto al título.
+- Falta **«Altavoces del sistema · 2.0»** a la derecha del pie.
+- Los paneles agrupan distinto: **Audio** = pistas de audio + dispositivo de salida + canales;
+  **Subtítulos** = pistas + «Cargar subtítulo externo…» + su nota; **Vídeo** = decodificación + HDR +
+  nota; **Marcadores** = detectados automáticamente + los de este título.
+- **Los glifos del transporte no son idénticos**; hay que compararlos uno a uno.
+- **Decidido por el propietario**: el botón de **detener** y el panel **«Otras versiones»** se quedan
+  aunque el prototipo no los tenga, y se anotan como añadidos deliberados.
+
+**2. Al reproducir se oculta todo menos el vídeo.** Decidido: vuelve **al mover el ratón o al pulsar
+una tecla**. El prototipo no lo hace —se comprobó su código—, así que es un requisito propio.
+
+**3. Ajustes → Apariencia con las mismas opciones que el prototipo**, y en general **las mismas
+opciones y campos que el prototipo en todas las pantallas**. El prototipo tiene once filas donde esta
+aplicación tiene dos: seguir el tema de Windows, color de acento (seis muestras + selector + el
+hexadecimal), fondo Mica sutil, tinte de acento en los fondos, densidad, tamaño de las portadas,
+redondeo de esquinas, mostrar títulos bajo las portadas, animaciones de la interfaz e idioma. Tres de
+ellas tocan puertas que hay que declarar de nuevo: el acento personalizable contra
+`ContrastTokenTests`, el redondeo contra `ScalarTokenTests`, y densidad y tamaño de portada contra
+`ViewOverflowTests`.
+
+**4. Los dos campos de color de los subtítulos son cajas de texto hexadecimal** y deben ser un
+selector. El patrón del prototipo está a la vista en su fila de acento: seis muestras circulares de
+28 px, un separador y el valor en monoespaciada.
+
+**5. «Secciones cortadas por el ancho del diseño»** — el propietario lo vio «por ejemplo en la
+vista». Falta localizarlo con una medición; `ViewOverflowTests` mide a 900 px sin contexto de datos y
+no lo ha cazado, así que probablemente es una superficie con datos reales.
+
+## Cómo se trabaja aquí
+
+1. Las suites afectadas en local, commit, push a la rama, **CI verde**, y sólo entonces el
+   fast-forward a `main`.
+2. **La suite de accesibilidad entera después de tocar cualquier vista**: `TextScalingTests` cazó en
+   CI un ancho fijo que aquí no se había ejecutado.
+3. `eng/coverage-debt.txt` se copia del artefacto `coverage-debt` de un run de CI, nunca se genera
+   aquí. El trinquete está en **214** y sólo baja.
+4. Un control nuevo llega con su escena de paseo en el mismo commit; la puerta está en 0 y no sube.
+
 ## Estado al cierre del 2026-08-25 (tarde) — el prototipo, mirado a la resolución correcta
 
 **Lo primero que se arregló no estaba en el código.** Tres veces se dijo que una captura «salía

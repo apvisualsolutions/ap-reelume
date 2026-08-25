@@ -102,6 +102,40 @@ decision with a measurement behind it.
    prototype draws one button whose label changes; here there are two, because resuming and starting
    again are different things — so a film nobody has started leaves the card with no accented action.
 
+## Lo que el propietario miró el 2026-08-25 por la tarde / What the owner looked at
+
+Nueve cosas señaladas mirando la aplicación, no el prototipo. Seis cerradas en esa misma tanda —dos
+herramientas del título que aparecían sin tener nada que hacer, el botón del tráiler externo, el
+contorno punteado con el radio equivocado, los rótulos de la tarjeta de revisión en dos estilos, la
+columna de «Otras acciones» con dos gramáticas y el convertidor de forma que se retiró—. Las tres que
+quedan están descritas en [la nota de la próxima sesión](../../NEXT-SESSION.es.md): el reproductor
+como copia exacta, Apariencia con las opciones del prototipo y el selector de color de subtítulos.
+/ Nine things the owner named while looking at the application; six closed the same day, three
+described in the next-session note.
+
+**Dos decisiones tomadas por el propietario**, y por eso dejan de ser diferencias por resolver:
+
+1. **El botón de detener del transporte se queda** aunque el prototipo no lo tenga: detener no es
+   pausar —cierra la sesión y suelta el archivo, que es lo que hace falta para expulsar un disco—.
+   / Stopping is not pausing: it ends the session and releases the file.
+2. **El panel «Otras versiones» del reproductor se queda.** El prototipo tiene cuatro paneles y esta
+   aplicación cinco; el quinto es LIB-008, VERIFIED, y quitarlo sería una regresión registrada.
+   / The fifth panel is a VERIFIED feature; removing it would be a recorded regression.
+
+**Y una decisión de diseño nueva, que el prototipo no tiene:** al reproducir se oculta todo menos el
+vídeo, y vuelve **al mover el ratón o al pulsar una tecla**. Se comprobó el código del prototipo: no
+hay auto-ocultación en él, así que es un requisito propio y no una diferencia. / The prototype has no
+auto-hide; this is a requirement of our own.
+
+### Cómo se explora cualquier estado del prototipo / How to reach any prototype state
+
+La copia de trabajo `scratchpad/proto/proto.html` acepta `?press=A|B|C`: pulsa esos nombres en orden,
+por `aria-label` o por el texto del botón, con medio segundo entre cada uno. Con eso se llega a
+pantallas que no tienen ruta —el reproductor, cada uno de sus cuatro paneles, el minirreproductor y
+la pantalla completa— y se fotografían con Chrome sin cabeza. `shoot-player.ps1` lo hace para las
+siete del reproductor. / The working copy takes `?press=A|B|C`, which is how a screen with no route
+of its own gets photographed.
+
 ## La captura no estaba oscura: la lectura sí / The capture was not dark, the reading was
 
 **2026-08-25.** Tres veces se dijo que una captura «salía oscura» —las del prototipo, la del

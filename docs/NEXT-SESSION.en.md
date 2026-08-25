@@ -1,5 +1,93 @@
 # Where to pick up
 
+## State at the close of 2026-08-25 (afternoon) — what the owner looked at, and what is left
+
+**Everything in this batch is green locally** (Domain 472, Application 236, Architecture 30,
+Documentation 87, Ui 836, Integration 466, Accessibility 146, the walk at **zero pending**) and the
+branch is 33 commits ahead of `main`.
+
+### The first thing fixed was not in the code
+
+A capture was called "dark" three times, and three times the file was right: **a 1500 × 1000 PNG
+reads dark, and the same image at 750 × 500 reads as it is**. Measured over the library in light
+theme — `#FBFCFE` on the canvas, `#E9EEF4` on the rail, 100 % opaque — and confirmed by halving it.
+Colour is decided by measuring, or at half size; never at full size.
+
+**And `docs/assets/review.png`, in a public repository, printed the profile path of whoever took
+it.** All five are retaken with the library in a neutral folder, without an alpha channel.
+
+### What was closed in the application
+
+- **Duplicates**: the chosen copy marked on its whole row, the group heading no longer blue, the size
+  column reaching the bytes.
+- **Links**: from the accent to its ink — 9.03:1 against 5.62:1 in light — with the pair measured.
+- **Series card**: each episode in the show's hue walked 7° per episode; the next-episode panel
+  limits its column rather than its border.
+- **Tray**: it says which title it is talking about (migration 0019, one column) and its four labels
+  share one style.
+- **Player**: a failure no longer erases itself when LibVLC reports the stop that follows it.
+- **Home/library**: glyph-only kind chip in the rails, a plus on Add media, the header's second line,
+  «SPEED» instead of the long label.
+- **Other actions**: five matching rows instead of two pills above three rows.
+- **Two title tools** appear only when they have something to do, and the external trailer says
+  «Watch trailer» with its arrow.
+- **The dotted outline** on a disabled control takes the control's own radius.
+- **`KindShapeConverter` removed**: two branches nothing could take, replaced by a style. The coverage
+  ratchet drops from 215 to **214**.
+
+## What the owner asked for and is NOT done
+
+**1. The player has to be an exact copy of the prototype, in design and in behaviour.**
+
+The references are taken, one per state, in `%TEMP%\claude\…\scratchpad\proto-player\`. **They
+are read at half size** (`half.ps1`).
+
+How they were taken, which is what lets any prototype state be explored: the working copy
+`scratchpad/proto/proto.html` accepts **`?press=A|B|C`** and presses those names in order, by
+`aria-label` or by button text; `scratchpad/shoot-player.ps1` automates it with headless Chrome and
+`--force-prefers-reduced-motion`.
+
+What is missing, measured against those captures:
+
+- The four pills — **Audio, Subtitles, Video, Markers** — belong in the player's **header** and open
+  or close the column. Here they live inside the column, which is always present.
+- The prototype's column has **a heading of its own with an «×»**.
+- The **«Session 1 · single engine active»** pill beside the title is missing.
+- **«System speakers · 2.0»** at the right of the footer is missing.
+- The panels group differently: **Audio** = audio tracks + output device + channels; **Subtitles** =
+  tracks + «Load external subtitle…» + its note; **Video** = decoding + HDR + note; **Markers** =
+  automatically detected + this title's own.
+- **The transport glyphs are not identical**; they have to be compared one by one.
+- **Decided by the owner**: the **stop** button and the **«Other versions»** panel stay even though
+  the prototype has neither, and are recorded as deliberate additions.
+
+**2. Playing hides everything but the video.** Decided: it comes back **on mouse movement or a key
+press**. The prototype does not do this — its code was checked — so it is a requirement of our own.
+
+**3. Settings → Appearance with the prototype's own options**, and in general **the same options and
+fields as the prototype on every screen**. The prototype has eleven rows where this application has
+two. Three of them touch gates that would have to be declared again: a custom accent against
+`ContrastTokenTests`, corner rounding against `ScalarTokenTests`, and density and cover size against
+`ViewOverflowTests`.
+
+**4. The two subtitle colour fields are hexadecimal text boxes** and should be a picker. The
+prototype's pattern is in its accent row: six 28 px swatches, a separator, and the value in monospace.
+
+**5. «Sections cut off by the design's width»** — the owner saw it «for example in the view».
+It still has to be located by measurement; `ViewOverflowTests` measures at 900 px with no data
+context and has not caught it, so it is probably a surface with real data in it.
+
+## How work is done here
+
+1. The affected suites locally, commit, push to the branch, **CI green**, and only then the
+   fast-forward to `main`.
+2. **The whole accessibility suite after touching any view**: `TextScalingTests` caught a fixed width
+   in CI that had not been run here.
+3. `eng/coverage-debt.txt` is copied from a CI run's `coverage-debt` artifact, never generated here.
+   The ratchet is at **214** and only goes down.
+4. A new control arrives with its walk scene in the same commit; that gate is at zero and does not
+   rise.
+
 ## State at the close of 2026-08-25 (afternoon) — the prototype, read at the right size
 
 **The first thing fixed was not in the code.** A capture was called "dark" three times, and three
