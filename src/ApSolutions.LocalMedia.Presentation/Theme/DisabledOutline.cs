@@ -42,11 +42,10 @@ public static class DisabledOutline
     private static readonly double[] DashPattern = [3, 2];
 
     /// <summary>
-    /// The corner radius, which is <c>CornerRadiusSmall</c>'s. A <c>Rectangle</c> takes two doubles
-    /// where a <c>Border</c> takes a <c>CornerRadius</c>, so the value is repeated here rather than
-    /// read; <c>DisabledOutlineTests</c> asserts the two are the same so they cannot drift apart.
+    /// The corner radius to fall back on when the control has none of its own: a plain
+    /// <see cref="Control"/> is not a <see cref="TemplatedControl"/> and carries no radius at all.
     /// </summary>
-    private const double CornerRadius = 4;
+    private const double FallbackCornerRadius = 4;
 
     /// <summary>Whether the dotted outline is drawn over this control.</summary>
     public static readonly AttachedProperty<bool> IsShownProperty =
@@ -56,7 +55,7 @@ public static class DisabledOutline
         IsShownProperty.Changed.AddClassHandler<Control, bool>((control, change) =>
             AdornerLayer.SetAdorner(
                 control,
-                Wanted(control, change.NewValue.GetValueOrDefault()) ? Draw() : null));
+                Wanted(control, change.NewValue.GetValueOrDefault()) ? Draw(control) : null));
 
     /// <summary>
     /// Whether this control is the one to draw around, rather than a piece of another one's template.
@@ -73,15 +72,24 @@ public static class DisabledOutline
     /// </remarks>
     private static bool Wanted(Control control, bool shown) => shown && control.TemplatedParent is null;
 
-    /// <summary>A fresh outline. Each adorner is one visual over one control, so it is never shared.</summary>
-    private static Rectangle Draw()
+    /// <summary>
+    /// A fresh outline. Each adorner is one visual over one control, so it is never shared.
+    /// </summary>
+    /// <remarks>
+    /// The corners are the control's own, and that is the whole difference between an outline and a
+    /// box drawn near one. It was <c>CornerRadiusSmall</c> for every type, so a pill — the rating's
+    /// «Quitar valoración», every leading action, every row of «Otras acciones» — got a nearly square
+    /// dotted rectangle whose corners fell outside its own edge. Measured: the adorner is exactly the
+    /// control's size, so «bigger» was always the corners and never the box.
+    /// </remarks>
+    private static Rectangle Draw(Control control)
     {
         var outline = new Rectangle
         {
             StrokeThickness = 1,
             StrokeDashArray = [.. DashPattern],
-            RadiusX = CornerRadius,
-            RadiusY = CornerRadius,
+            RadiusX = FallbackCornerRadius,
+            RadiusY = FallbackCornerRadius,
             // The control underneath is disabled and takes no input; the adorner must not start
             // taking any on its behalf.
             IsHitTestVisible = false,
@@ -90,6 +98,18 @@ public static class DisabledOutline
         // Dynamic, not static: the adorner outlives a theme change, and in high contrast this stroke
         // is the entire difference between disabled and resting.
         outline[!Shape.StrokeProperty] = new DynamicResourceExtension("ShellBorderBrush");
+
+        // The corners are read when the outline reaches the tree, not when it is built: the setter
+        // that shows it and the setter that gives the control its radius are both style setters, and
+        // reading here caught a 0 that the style had not written yet.
+        outline.AttachedToVisualTree += (_, _) =>
+        {
+            if (control is TemplatedControl templated)
+            {
+                outline.RadiusX = templated.CornerRadius.TopLeft;
+                outline.RadiusY = templated.CornerRadius.TopLeft;
+            }
+        };
         return outline;
     }
 }

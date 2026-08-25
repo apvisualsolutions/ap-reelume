@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El contorno punteado de un control deshabilitado tenía la forma equivocada.** Se dibujaba con un
+  radio fijo de 4 px para los diez tipos, así que en una píldora —«Quitar valoración», cualquier
+  acción principal, cualquier fila de «Otras acciones»— quedaba un rectángulo casi recto cuyas
+  esquinas caían **fuera** del borde del propio botón: se lee como un contorno más grande que lo que
+  contornea. Medido: el adorno siempre tuvo el tamaño exacto del control, así que «más grande» eran
+  las esquinas y nunca la caja. Ahora toma el radio del control, leído cuando llega al árbol —los dos
+  son ajustes de estilo, y leerlo al construir daba el 0 que el estilo aún no había escrito—.
+
+- **Cuatro controles que el paseo pulsaba y el inventario no reconocía.** Los que se llaman por sus
+  propios datos —las dos acciones de una tarjeta del carrusel y las píldoras de temporada— se
+  registran bajo el enlace con el que están declarados; sin eso, el paseo anotaba «Temporada 1» y el
+  inventario buscaba `{Binding SeasonLabel}`. La puerta vuelve a 0 pendientes.
+
+
+### Corregido
+
 - **Dos de las tres herramientas del título aparecían sin tener nada que hacer.** «Revisar versiones»
   abre una comparación, y una película con una sola copia nunca se agrupa: la superficie de detrás
   respondía con nada y la ruta no cambiaba, así que era una puerta a una habitación que no existe —y

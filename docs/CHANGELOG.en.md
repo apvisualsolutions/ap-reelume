@@ -10,6 +10,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The dotted outline on a disabled control had the wrong shape.** It was drawn with a fixed 4 px
+  radius for all ten types, so on a pill — «Clear rating», any leading action, any «Other actions»
+  row — it became a nearly square rectangle whose corners fell **outside** the button's own edge,
+  which reads as an outline bigger than the thing it outlines. Measured: the adorner was always
+  exactly the control's size, so «bigger» was the corners and never the box. It takes the control's
+  radius now, read when it reaches the tree — both are style setters, and reading at construction
+  caught a 0 the style had not written yet.
+
+- **Four controls the walk pressed and the inventory did not recognise.** The ones named by their own
+  data — a rail card's two actions and the season pills — are recorded under the binding they are
+  declared with; without that the walk wrote «Season 1» while the inventory looked for
+  `{Binding SeasonLabel}`. The gate is back at zero pending.
+
+
+### Fixed
+
 - **Two of the three title tools appeared with nothing to do.** «Review versions» opens a comparison,
   and a film with a single copy is never grouped: the surface behind it answered with nothing and the
   route never changed, so it was a door onto a room that does not exist — and on a series it never

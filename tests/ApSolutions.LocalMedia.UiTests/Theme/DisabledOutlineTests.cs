@@ -40,17 +40,22 @@ public sealed class DisabledOutlineTests
         var outline = RequireOutline(button);
 
         Assert.NotEmpty(outline.StrokeDashArray!);
-        // A Rectangle takes two doubles where a Border takes a CornerRadius, so the outline repeats
-        // CornerRadiusSmall's value rather than reading it. Asserted here so the copy cannot drift:
-        // a parallel copy of a token that nothing compared is exactly how ContrastTokenTests came to
-        // measure a colour the application did not paint.
-        Assert.True(
-            Avalonia.Application.Current!.TryGetResource(
-                "CornerRadiusSmall",
-                ThemeVariant.Default,
-                out var radius),
-            "CornerRadiusSmall is gone, so the outline's corners match nothing.");
-        Assert.Equal(Assert.IsType<CornerRadius>(radius).TopLeft, outline.RadiusX);
+
+        // The corners are the control's own. They were a fixed 4 for every type, so a pill got a
+        // nearly square dotted rectangle whose corners sat outside its own edge — which reads as an
+        // outline that is bigger than the thing it outlines, and was the one complaint about it.
+        Assert.Equal(button.CornerRadius.TopLeft, outline.RadiusX);
+        Assert.Equal(button.CornerRadius.TopLeft, outline.RadiusY);
+
+        var pill = new Button { Content = "Ok", Width = 120, Height = 36, IsEnabled = false, CornerRadius = new CornerRadius(18) };
+        var pillWindow = Show(pill);
+        Assert.Equal(18, RequireOutline(pill).RadiusX);
+        pillWindow.Close();
+
+        // What it measures next to what it is drawn over.
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(button.Bounds.Width, outline.Bounds.Width, 1);
+        Assert.Equal(button.Bounds.Height, outline.Bounds.Height, 1);
         window.Close();
     }
 
