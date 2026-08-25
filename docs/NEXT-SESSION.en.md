@@ -1,5 +1,115 @@
 # Where to pick up
 
+## State at the close of 2026-08-25 (evening) — the owner ran the application against his library
+
+This batch is four commits and **everything is green locally**: Domain 480, Application 236,
+Architecture 30, Documentation 87, Ui 856, Accessibility 146, Integration 466, the walk at 198
+pressed with 20 declared.
+
+**What matters about this session is not what was built, it is what the owner found while using it.**
+He ran the application against his own library — `E:\Series`, with Game of Thrones and House of the
+Dragon — and brought back thirty-four things. Ten are done; twenty-four are not, and they are below
+in his own words.
+
+### What was closed
+
+- **The player is headed by the prototype's pills** — Audio, Subtitles, Video, Markers and Other
+  versions — and the column starts closed, with a header of its own and its «×». The panels group by
+  subject rather than by model. «Video» is new: decoding, HDR and the scope. The «Session 1 · single
+  active engine» badge and the output device at the right of the foot.
+- **Playing takes everything but the picture away** and the mouse or a key brings it back. No timer,
+  with the cost written down.
+- **Settings → Appearance with the prototype's eleven rows**, with the accent derived by
+  `AccentPalette` so any chosen colour still meets its five contrast obligations.
+- **The accent now reaches the whole application.** Four brushes were written and Fluent's controls
+  read their own, redirected with `<StaticResource>` — static, resolved once. All twenty redirections
+  are written and `AccentTokenTests` insists none is missing.
+- **Button labels sat 2.43 px low**, measured through the font's metrics and corrected with five
+  derived pixels rather than an eyeballed nudge.
+- **The two subtitle colours** are six swatches and a picker, like the accent.
+
+## What the owner found and is NOT done
+
+These are his words, grouped. **None of it is measured yet except where it says so.**
+
+### The player, which is what he looked at most
+
+1. **Double click does not go fullscreen.**
+2. **The `F` shortcut does nothing**, and **the space bar goes fullscreen** — which is exactly what
+   it must not do: space is play/pause.
+3. **There is no fullscreen button in the transport.**
+4. **The mini player's icon is wrong**, and **the mini window does not land in the right place**.
+5. **The transport is drawn twice** in the mini.
+6. **The mini has to behave like any PiP window.**
+7. **The PiP icon belongs in the transport, next to the fullscreen one.**
+8. **The speed menu belongs at the right of the bar**, and **its open design is not the prototype's**
+   — the prototype draws nine rows with a mark, a name and a note («Normal», «slower», «faster»), not
+   the `MenuFlyout` that is there.
+9. **The video distorts when resized**, both in PiP and in the main player.
+10. **Subtitles do not load.** He checked it in VLC with
+    `E:\Series\Juego de tronos\Temporada 1\Juego de tronos - 1x01 - Se acerca el invierno.mkv`.
+11. **The transport glyphs have not been compared one by one** with the prototype — from the original
+    brief and still open.
+
+### The film and show cards
+
+12. **The play button is not the prototype's**: it has to say «Play» or «Continue» by state.
+13. **«Play from the beginning» has to be an icon**, not a button carrying words.
+14. **The banner should show the poster behind it, or even a frame of the video itself.**
+15. **Editing metadata happens inside the same view**, and in the prototype it is **a page of its own
+    with its own design**.
+
+### Across every screen
+
+16. **Dotted outlines appear where they do not belong**: Privacy and diagnostics, Backups, Updates,
+    Duplicates, Review, Library and both cards. Also "some ellipse".
+17. **Clicking a check box draws a blue ring**, on all of them. **Identified and not fixed**: the ten
+    focus selectors in `DesignTokens.axaml` use `:focus`, which fires for the mouse too; what is
+    wanted is `:focus-visible`, which answers the keyboard alone.
+18. **Drop-downs have the same vertical alignment problem** the buttons had. The button fix is in and
+    the recipe is the same: bottom padding compensates the font's asymmetry, and the number comes
+    from the metrics.
+19. **Every button needs a tooltip**, especially the icon-only ones.
+20. **Rating has to be one to five stars**, filled or empty by state, with «clear rating» beside it.
+    The usual Google ones. Today it is ten numbered buttons.
+
+### Home and the library
+
+21. **Home is completely empty** even with shows catalogued. **Half measured**: `Home.LoadAsync` only
+    runs from `OnNavigated`, and `ReadRecentlyAddedAsync` reads the `titles` table — if the scan
+    leaves files in the review inbox without promoting them to titles, Library shows them and Home
+    does not. It still has to be checked against his database.
+22. **"Sections cut off by the width"**, from the original brief and still not located. The closest
+    thing found: the settings page measures 1,797 px of content.
+
+## What was learned and has to be remembered
+
+- **The autonomous walk cannot press anything below the first viewport of a scrolled page.**
+  Avalonia's headless hit testing does not follow a `ScrollViewer`'s offset: reproduced in eight
+  lines — the same view inside a scroller at offset 400, a button reporting 123x36 at y=419, and a
+  click there reaching the scroller's own border — while unscrolled it answers to the bottom of
+  1,700 px. Three ways round it were tried and all fail the same: sweeping the offset, swapping the
+  window's content, and opening a second window. **The walk ratchet went from 0 to 20** with that
+  measurement written into `eng/check-walk-coverage.ps1`, and it only comes down when the harness can
+  follow a scroll, or when somebody chooses to press through a pointer event directed at the control
+  instead of a window coordinate — which keeps "it was pressed" and gives up "it was reachable".
+- **A `<StaticResource>` resolves once.** Anything redirecting to a token the application writes at
+  runtime has to be written too. True of the accent and true of anything like it.
+- **Centring a label's box is not centring the label.** The ink runs from a capital's top to a
+  descender's foot and the font is not symmetric: 2.43 px in a 44 px button.
+
+## How the work goes here
+
+1. The affected suites locally, commit, push the branch, **CI green**, and only then the fast-forward
+   to `main`.
+2. **The whole accessibility suite after touching any view.**
+3. `eng/coverage-debt.txt` is copied from a CI run's `coverage-debt` artefact, never generated here.
+   The ratchet is at **214** and only comes down.
+4. A new control arrives with its walk scene in the same change — unless the harness cannot reach it,
+   and then it is declared in `eng/walk-pending.txt` with the measurement, never in silence.
+5. To see the application: build **Debug** and run that binary. While the owner has it open, Release
+   stays free for the tests.
+
 ## State at the close of 2026-08-25 (afternoon) — what the owner looked at, and what is left
 
 **Everything in this batch is green locally** (Domain 472, Application 236, Architecture 30,

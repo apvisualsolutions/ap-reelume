@@ -1,5 +1,117 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-25 (noche) — el propietario probó la aplicación con su biblioteca
+
+Esta tanda tiene cuatro commits y **todo está verde en local**: Domain 480, Application 236,
+Architecture 30, Documentation 87, Ui 856, Accessibility 146, Integration 466, paseo con 198
+pulsados y 20 declarados.
+
+**Lo importante de esta sesión no es lo que se hizo, es lo que el propietario encontró probándola.**
+Arrancó la aplicación contra su propia biblioteca —`E:\Series`, con Juego de Tronos y La casa del
+dragón— y trajo treinta y cuatro cosas. Diez están hechas; veinticuatro no, y están abajo con sus
+palabras.
+
+### Lo que se cerró
+
+- **El reproductor se encabeza con las píldoras del prototipo** —Audio, Subtítulos, Vídeo,
+  Marcadores y Otras versiones— y la columna empieza cerrada, con cabecera propia y su «×». Los
+  paneles agrupan por asunto y no por modelo. «Vídeo» es nuevo: decodificación, HDR y el alcance.
+  La píldora «Sesión 1 · motor único activo» y el dispositivo de salida a la derecha del pie.
+- **Al reproducir se va todo menos la imagen** y vuelve al mover el ratón o pulsar una tecla. Sin
+  temporizador, con el coste escrito.
+- **Ajustes → Apariencia con las once filas del prototipo**, con el acento derivado por
+  `AccentPalette` para que cualquier color elegido siga cumpliendo sus cinco razones de contraste.
+- **El acento llega ahora a toda la aplicación.** Escribía cuatro pinceles y los controles de Fluent
+  leen los suyos, redirigidos con `<StaticResource>` —estático, resuelto una vez—. Se escriben las
+  veinte redirecciones y `AccentTokenTests` exige que no falte ninguna.
+- **El texto de los botones estaba 2,43 px bajo**, medido con las métricas de la fuente y corregido
+  con cinco píxeles derivados, no ajustados a ojo.
+- **Los dos colores de subtítulos** son seis muestras y un selector, como el acento.
+
+## Lo que el propietario encontró y NO está hecho
+
+Son sus palabras, agrupadas. **Nada de esto está medido todavía salvo donde se dice.**
+
+### El reproductor, que es lo que más miró
+
+1. **El doble clic no pone pantalla completa.**
+2. **El atajo `F` no funciona**, y **la barra espaciadora sí pone pantalla completa** — que es
+   justamente lo que no debe hacer: espacio es reproducir/pausar.
+3. **No hay botón de pantalla completa en la barra de controles.**
+4. **El icono del mini reproductor no es el correcto**, y **al usarlo el mini no se coloca en el
+   sitio correcto**.
+5. **Se duplica la barra de reproducción** en el mini.
+6. **El mini debe funcionar como cualquier ventana PiP.**
+7. **El icono de PiP debe ir en la barra de controles, junto al de pantalla completa.**
+8. **El desplegable de velocidad debe ir a la derecha de la barra**, y **su diseño abierto no es
+   igual al del prototipo** — el prototipo lo dibuja como un menú de nueve filas con marca, nombre y
+   nota («Normal», «más lenta», «más rápida»), no como el `MenuFlyout` que hay.
+9. **El vídeo se deforma al redimensionar**, tanto en PiP como en el reproductor principal.
+10. **Los subtítulos no cargan.** Comprobado por él en VLC con
+    `E:\Series\Juego de tronos\Temporada 1\Juego de tronos - 1x01 - Se acerca el invierno.mkv`.
+11. **Los glifos del transporte no se han comparado uno a uno** con el prototipo (viene del encargo
+    original y sigue pendiente).
+
+### La ficha de película y de serie
+
+12. **El botón de reproducir no es igual al del prototipo**: debe decir «Reproducir» o «Continuar»
+    según el estado.
+13. **«Reproducir desde el principio» debe ser un icono**, no un botón con palabras.
+14. **El cabecero debe mostrar el póster de fondo, o incluso un fotograma del propio vídeo.**
+15. **Editar metadatos se muestra dentro de la misma vista**, y en el prototipo es **una vista
+    independiente con su propio diseño**.
+
+### Transversal, en todas las pantallas
+
+16. **Los contornos punteados salen donde no van**: Privacidad y diagnósticos, Copias,
+    Actualizaciones, Duplicados, Revisión, Biblioteca y las dos fichas. También «algún elipse».
+17. **Al hacer clic en una casilla sale un reborde azul**, y pasa en todas. **Está identificado sin
+    corregir**: los diez selectores de foco de `DesignTokens.axaml` usan `:focus`, que se activa con
+    el ratón; lo que hace falta es `:focus-visible`, que sólo responde al teclado.
+18. **Los desplegables tienen el mismo problema de alineación vertical** que tenían los botones. La
+    corrección de los botones ya está y es la misma receta: el relleno inferior compensa la
+    asimetría de la fuente, y el número sale de las métricas.
+19. **Todos los botones deben tener tooltip**, en especial los que sólo llevan icono.
+20. **La valoración debe ser de 1 a 5 con estrellas** llenas o vacías según el estado, con «quitar
+    valoración» al lado. Las típicas de Google. Hoy son diez botones numerados.
+
+### Home y la biblioteca
+
+21. **Home queda totalmente vacío** aunque haya series cargadas. **A medio medir**: `Home.LoadAsync`
+    sólo corre en `OnNavigated`, y `ReadRecentlyAddedAsync` lee la tabla `titles` — si el escaneo
+    deja los archivos en la bandeja de revisión sin promoverlos a títulos, Biblioteca los enseña y
+    Home no. Falta comprobarlo contra su base de datos.
+22. **«Secciones cortadas por el ancho»**, del encargo original y todavía sin localizar. Lo más
+    parecido que apareció: la página de Ajustes mide 1.797 px de contenido.
+
+## Lo que se aprendió y hay que recordar
+
+- **El paseo autónomo no puede pulsar lo que hay bajo el primer viewport de una página con scroll.**
+  El hit test de Avalonia en headless no sigue el desplazamiento de un `ScrollViewer`: reproducido en
+  ocho líneas —la misma vista dentro de un scroller con offset 400, un botón que dice medir 123×36 en
+  y=419, y un clic ahí que llega al borde del scroller— mientras que sin desplazar responde hasta el
+  final de 1.700 px. Se probaron tres salidas y las tres fallan igual: barrer el offset, cambiar el
+  contenido de la ventana y abrir una segunda ventana. **El trinquete del paseo subió de 0 a 20** con
+  esa medición escrita en `eng/check-walk-coverage.ps1`, y sólo vuelve a bajar cuando el arnés sepa
+  seguir un scroll, o cuando se decida pulsar con un evento de puntero dirigido al control en vez de
+  con una coordenada de ventana — lo que conserva «se pulsó» y renuncia a «era alcanzable».
+- **Un `<StaticResource>` se resuelve una vez.** Todo lo que redirige a un token que la aplicación
+  escribe en caliente hay que escribirlo también. Vale para el acento y valdría para cualquier otro.
+- **Centrar la caja de un texto no es centrar el texto.** La tinta va del alto de la mayúscula al pie
+  del descendente y la fuente no es simétrica: 2,43 px en un botón de 44.
+
+## Cómo se trabaja aquí
+
+1. Las suites afectadas en local, commit, push a la rama, **CI verde**, y sólo entonces el
+   fast-forward a `main`.
+2. **La suite de accesibilidad entera después de tocar cualquier vista.**
+3. `eng/coverage-debt.txt` se copia del artefacto `coverage-debt` de un run de CI, nunca se genera
+   aquí. El trinquete está en **214** y sólo baja.
+4. Un control nuevo llega con su escena de paseo en el mismo commit, salvo que el arnés no pueda
+   alcanzarlo — y entonces se declara en `eng/walk-pending.txt` con la medición, no en silencio.
+5. Para ver la aplicación: compilar en **Debug** y ejecutar ese binario. Mientras el propietario la
+   tiene abierta, Release queda libre para las pruebas.
+
 ## Estado al cierre del 2026-08-25 (tarde) — lo que el propietario miró, y lo que falta
 
 **Todo lo de esta tanda está verde en local** (Domain 472, Application 236, Architecture 30,

@@ -48,15 +48,33 @@ public sealed class CommandNotificationTests
                     "public bool CanExecute(object? parameter) => parameter is DatabaseRecoveryAction "
                     + "action && SafeActions.Contains(action);",
                 ],
+            // Four now, and the two new ones ask the same kind of question as the two that were
+            // here: is this parameter one of the values this command takes. A colour is a colour or
+            // it is not, and an enum member is defined or it is not — neither answer moves while a
+            // button is on screen, which is what earns a place on this list.
             ["src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsViewModel.cs"] =
                 [
                     "public bool CanExecute(object? parameter) => parameter is \"es\" or \"en\";",
                     "public bool CanExecute(object? parameter) => parameter is ThemePreference;",
+                    "public bool CanExecute(object? parameter) => AccentPalette.IsAccent(parameter as string);",
+                    "public bool CanExecute(object? parameter) => parameter is T value && Enum.IsDefined(value);",
+                ],
+            // The subtitle swatches, whose question is whether the parameter is a colour at all.
+            ["src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs"] =
+                [
+                    "public bool CanExecute(object? parameter) => parameter is string value "
+                    + "&& SubtitleStyle.IsColour(value);",
                 ],
             ["src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsViewModel.cs"] =
                 ["public bool CanExecute(object? parameter) => true;"],
+            // Two: the rail's routes and the player's five panel pills. A pill is drawn only when
+            // its panel has something in it, so a pill that exists can always be pressed — the
+            // command has nothing to change its mind about.
             ["src/ApSolutions.LocalMedia.Presentation/Shell/ShellViewModel.cs"] =
-                ["public bool CanExecute(object? parameter) => parameter is AppRoute;"],
+                [
+                    "public bool CanExecute(object? parameter) => parameter is AppRoute;",
+                    "public bool CanExecute(object? parameter) => parameter is PlayerPanel;",
+                ],
             ["src/ApSolutions.LocalMedia.Windows/Tray/WindowsTrayService.cs"] =
                 ["public bool CanExecute(object? parameter) => true;"],
         };
