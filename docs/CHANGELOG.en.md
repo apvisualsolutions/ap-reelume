@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The review tray stops being a list with a selection.** Its rows were command controls, and with
+  the decisions inside the card that left the walk's own proof with nowhere to click «beside» —
+  measured in CI: no point around «Accept» falls outside another card. The tray is drawn the way the
+  duplicates destination draws its rows, which never had the problem: cards in a list with no
+  selection, and the up/down arrows go with it because what a keyboard walks now is buttons.
+
+### Fixed
+
 - **The player says what it is playing.** The top band had three glyphs and nothing between them,
   with the reason written into the view itself: the session holds a path, and painting somebody's
   file path as a heading is the opposite of what this application is for. The title and its line now

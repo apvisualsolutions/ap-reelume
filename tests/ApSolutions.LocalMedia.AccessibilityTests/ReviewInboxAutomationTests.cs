@@ -29,19 +29,23 @@ public sealed class ReviewInboxAutomationTests
             window.Show();
             Dispatcher.UIThread.RunJobs();
 
+            // Every control a person operates, plus the tray's own list — named because a screen
+            // reader announces the region before its cards. The inner lists are not on this roll:
+            // the explanation codes inside a card are a bulleted paragraph, not a region, and a name
+            // on each of them would be read out before every «why».
             var controls = view.GetVisualDescendants()
                 .OfType<Control>()
-                .Where(control => control is Button or TextBox or ListBox)
+                .Where(control => control is Button or TextBox || control.Name == "ReviewCandidates")
                 .ToArray();
             Assert.NotEmpty(controls);
             Assert.All(controls, control => Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(control))));
             Assert.All(controls.Where(control => control is Button or TextBox), control => Assert.True(control.Focusable));
-            // Enter on the list used to accept the selection. It was removed on 2026-08-25 with the
-            // decisions moving into the card: a card holds three of them, and measured, the list's
+            // Enter on the list used to accept the selection, and the list itself went with it: the
+            // decisions live in the card, a card holds three of them, and measured, the list's
             // binding answered Enter before the focused Reject button did — so the keyboard accepted
-            // what a person was trying to refuse. What is asserted now is that no gesture on the list
-            // decides anything by itself.
-            Assert.Empty(view.GetVisualDescendants().OfType<ListBox>().Single().KeyBindings);
+            // what a person was trying to refuse. What is asserted now is that the tray carries no
+            // gesture of its own except the one that gives up: Escape.
+            Assert.Empty(view.GetVisualDescendants().OfType<ListBox>());
             Assert.Contains(view.KeyBindings, binding => binding.Gesture is KeyGesture { Key: Key.Escape });
 
             var treePath = Path.Combine(

@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La bandeja de revisión deja de ser una lista con selección.** Sus filas eran controles de mando, y
+  con las decisiones dentro de la tarjeta eso dejó a la prueba del paseo sin sitio donde pulsar «al
+  lado» —medido en CI: ningún punto alrededor de «Aceptar» cae fuera de otra tarjeta—. La bandeja se
+  dibuja como la de duplicados, que nunca tuvo el problema: tarjetas en una lista sin selección, y
+  las flechas arriba/abajo se van con ella porque lo que un teclado recorre ahora son botones.
+
+### Corregido
+
 - **El reproductor dice qué está reproduciendo.** La banda superior tenía tres glifos y nada en medio,
   con la razón escrita en la propia vista: la sesión guarda una ruta, y pintar la ruta del archivo de
   alguien como encabezado es lo contrario de para lo que sirve esta aplicación. Ahora el título y su

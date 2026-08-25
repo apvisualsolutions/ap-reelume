@@ -1938,7 +1938,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         // The decision is read from the catalogue, and the card is chosen with the mouse: the list
         // has no other way of knowing which candidate a person means.
-        var accepted = SelectCard(host, inbox);
+        var accepted = VisibleCard(host, inbox);
         await PressAsync(
             host,
             "ReviewAcceptAction",
@@ -1957,7 +1957,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => Task.FromResult(inbox.Items.All(item => item.StableKey != accepted)),
             "the accepted candidate was written to the catalogue and stayed in the inbox anyway");
 
-        var rejected = SelectCard(host, inbox);
+        var rejected = VisibleCard(host, inbox);
         await PressAsync(
             host,
             "ReviewRejectAction",
@@ -1977,7 +1977,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // The card's own way in, which is where the prototype puts it: pressing it starts a manual
         // search for THAT file, and what it puts in the box is the file's own name — which is what a
         // person would type first and what the parser already knows how to read.
-        var searched = SelectCard(host, inbox);
+        var searched = VisibleCard(host, inbox);
         await PressAsync(
             host,
             "ReviewManualSearchCardAction",
@@ -2016,7 +2016,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// below it something to act on.
     /// </para>
     /// </remarks>
-    private static string SelectCard(ShellHost host, ReviewInboxViewModel inbox)
+    private static string VisibleCard(ShellHost host, ReviewInboxViewModel inbox)
     {
         // Back to the top first, and only then look at what is on screen. Pressing a card is itself a
         // Reveal, and revealing recycles the containers a virtualised list had materialised further
@@ -2041,9 +2041,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             key is not null,
             $"None of the {inbox.Items.Count} candidates in the inbox has a card on screen to click.");
 
-        _ = Click(host, Resolve(host, key!));
-        Dispatcher.UIThread.RunJobs();
-        Assert.Equal(key, inbox.SelectedItem?.StableKey);
+        // The card is not clicked any more, because there is nothing to select: each card carries
+        // its own three decisions and every one of them speaks for the file it sits under. What this
+        // answers is which card is REACHABLE, which is what a person clicking one has to be.
         return key!;
     }
 
