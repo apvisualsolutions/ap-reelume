@@ -60,26 +60,32 @@ public static class PosterArt
     /// .NET Core: the same library would be a different set of colours on every launch, and a colour
     /// that changes is a colour nobody can learn.
     /// </remarks>
-    public static int HueOf(string? title)
+    public static int HueOf(string? title, int hueShift = 0)
     {
-        if (string.IsNullOrEmpty(title))
-        {
-            return 0;
-        }
-
         var hash = 0;
-        foreach (var character in title)
+        foreach (var character in title ?? string.Empty)
         {
             hash = unchecked((hash * 31) + character);
         }
 
-        return (((hash % 360) + 360) % 360);
+        // The shift is folded in here rather than by the callers so that a negative one, or one past
+        // a full turn, still lands on the wheel.
+        return ((((hash + hueShift) % 360) + 360) % 360);
     }
 
-    /// <summary>The two-stop gradient the whole card sits on.</summary>
-    public static IBrush BaseOf(string? title)
+    /// <summary>
+    /// The two-stop gradient the whole card sits on, optionally turned <paramref name="hueShift"/>
+    /// degrees around the wheel.
+    /// </summary>
+    /// <remarks>
+    /// The shift is what keeps a series looking like one series. The prototype draws an episode's
+    /// still as <c>art(show.h + episode * 7, 'w')</c> — the show's own hue, walked a few degrees per
+    /// episode — so a season reads as a family of tones. Hashing each episode's own name instead
+    /// gives a wall of unrelated colours, which is what this list used to be.
+    /// </remarks>
+    public static IBrush BaseOf(string? title, int hueShift = 0)
     {
-        var hue = HueOf(title);
+        var hue = HueOf(title, hueShift);
         return new LinearGradientBrush
         {
             // The prototype's 200deg, which in CSS points down and slightly left: from the top right
@@ -97,9 +103,9 @@ public static class PosterArt
     }
 
     /// <summary>The light the prototype puts in the card's top left corner.</summary>
-    public static IBrush GlowOf(string? title)
+    public static IBrush GlowOf(string? title, int hueShift = 0)
     {
-        var hue = HueOf(title);
+        var hue = HueOf(title, hueShift);
         return new RadialGradientBrush
         {
             Center = new RelativePoint(0.18, 0.08, RelativeUnit.Relative),
@@ -149,21 +155,29 @@ public static class PosterArt
 /// four implementations of one arithmetic, which is the shape <see cref="PosterInitials"/> exists to
 /// avoid.
 /// </remarks>
-public sealed class PosterArtConverter : IValueConverter
+public sealed class PosterArtConverter : IMultiValueConverter
 {
     /// <summary>What the second layer is asked for by.</summary>
     private const string Glow = "glow";
 
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    /// <summary>
+    /// The title and the shift, in that order, into one of the two brushes.
+    /// </summary>
+    /// <remarks>
+    /// Two values rather than one because an episode's still is the show's hue walked a few degrees,
+    /// and a binding that carried only the title could not say how far. Both arrive as
+    /// <c>UnsetValue</c> while the tree is still being built, which is not an error: a picture over
+    /// no title is the hue every empty string gets.
+    /// </remarks>
+    public object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {
         _ = targetType;
         _ = culture;
-        var title = value as string;
+        ArgumentNullException.ThrowIfNull(values);
+        var title = values.Count > 0 ? values[0] as string : null;
+        var shift = values.Count > 1 && values[1] is int degrees ? degrees : 0;
         return string.Equals(parameter as string, Glow, StringComparison.Ordinal)
-            ? PosterArt.GlowOf(title)
-            : PosterArt.BaseOf(title);
+            ? PosterArt.GlowOf(title, shift)
+            : PosterArt.BaseOf(title, shift);
     }
-
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        throw new NotSupportedException("A poster's colour is computed from its title in one direction only.");
 }

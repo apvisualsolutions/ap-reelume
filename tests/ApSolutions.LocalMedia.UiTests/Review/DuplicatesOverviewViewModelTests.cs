@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Presentation.Review;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Review;
@@ -111,9 +112,9 @@ public sealed class DuplicatesOverviewViewModelTests
     /// <remarks>
     /// The destination's table is eight columns wide and a real library fills few of them for every
     /// copy: a file whose dimensions were never read has no resolution, one under a gigabyte is
-    /// counted in megabytes, one of no size at all says nothing rather than «0 MB», and one at the
-    /// root of a drive has no folder. Each of those is the arm a screenshot of a tidy pair never
-    /// shows.
+    /// counted in megabytes, one under a megabyte in kilobytes, one of no size at all says nothing
+    /// rather than «0 MB», and one at the root of a drive has no folder. Each of those is the arm a
+    /// screenshot of a tidy pair never shows.
     /// </remarks>
     [Fact]
     public async Task A_row_says_only_what_its_file_can_answer()
@@ -150,6 +151,29 @@ public sealed class DuplicatesOverviewViewModelTests
         // Its command is the destination's own, handed to every row so a radio has something to
         // press without each row carrying a copy of the decision.
         Assert.Same(small.SetPreferredCommand, silent.SetPreferredCommand);
+
+        // A file measured in kilobytes still has a size. Rounding it to «0 MB» would say the copy a
+        // person is choosing between is empty.
+        var tiny = new DuplicateFileRowViewModel(
+            new DuplicateFileRow(
+                new MediaFileId(Guid.NewGuid()),
+                @"D:\Cine\muestra.mkv",
+                Width: null,
+                Height: null,
+                "H264",
+                "AAC",
+                SizeBytes: 96 * 1024,
+                Duration: null,
+                IsAvailable: true,
+                IsPreferred: false),
+            small.SetPreferredCommand);
+        Assert.Equal("96 KB", tiny.Size);
+
+        // And below that, the bytes themselves. Two bytes is not a film, but a row that prints «0»
+        // for it is a row that will print «0» for the copy somebody is about to throw away.
+        Assert.Equal(
+            "2 B",
+            new DuplicateFileRowViewModel(tiny.Row with { SizeBytes = 2 }, small.SetPreferredCommand).Size);
 
         // A path that is a folder and nothing else: no name to shorten and no parent to name.
         var root = new DuplicateFileRowViewModel(
@@ -402,6 +426,46 @@ public sealed class DuplicatesOverviewViewModelTests
 
             return Task.CompletedTask;
         }
+    }
+
+    /// <summary>
+    /// What the chosen copy looks like on the page, which is a whole row and not only its radio.
+    /// </summary>
+    /// <remarks>
+    /// The prototype marks the choice three ways at once — the radio, the accent border and the
+    /// accent's wash behind the row — and the destination had only the first, which is a fifteen
+    /// pixel mark on a row a thousand wide. It is also the one state a screenshot of an unseeded
+    /// library never shows, because nothing is preferred until somebody chooses.
+    ///
+    /// Asserted as exactly one: two lit rows would say the group has two defaults, and a group whose
+    /// choice is not drawn at all is the same page as one where nothing is chosen.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_chosen_copy_is_marked_on_its_whole_row()
+    {
+        var model = NewModel();
+        await model.LoadAsync(TestContext.Current.CancellationToken);
+
+        var view = new DuplicatesOverviewView { DataContext = model };
+        var window = new Avalonia.Controls.Window { Width = 1280, Height = 800, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var rows = view.GetVisualDescendants()
+            .OfType<Avalonia.Controls.Border>()
+            .Where(border => border.Classes.Contains("duplicate-row"))
+            .ToArray();
+        Assert.Equal(2, rows.Length);
+        Assert.Single(rows, row => row.Classes.Contains("chosen"));
+
+        // And the heading over them is a way in that is not painted as one: the prototype writes it
+        // in the page's own ink, and a table of links reads as a list of somewhere else to go.
+        var heading = Assert.Single(
+            view.GetVisualDescendants().OfType<Avalonia.Controls.Button>(),
+            button => button.Classes.Contains("link-action"));
+        Assert.Contains("plain", heading.Classes);
+
+        window.Close();
     }
 
     private static DuplicatesOverviewViewModel NewModel() => new(

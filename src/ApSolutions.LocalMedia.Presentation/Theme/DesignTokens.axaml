@@ -1380,11 +1380,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
     colour with no fill and no border, because it goes somewhere rather than doing something. It
     keeps the 36 px height every other control has, so a row it sits in does not change height.
   -->
+  <!--
+    The prototype's link is drawn in the accent's INK, not in the accent: the difference is 9.03:1
+    against 5.62:1 in light and 11.36:1 against 8.29:1 in dark, and it is the same decision the
+    chosen pill already made. The pair is measured in ContrastTokenTests against the shell, because
+    this is the one place the ink is asked to be readable over the page rather than over its wash.
+  -->
   <Style Selector="Button.link-action">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentInkBrush}" />
     <Setter Property="Padding" Value="8,0" />
+  </Style>
+
+  <!--
+    The chosen copy, which the prototype marks on the whole row and not only in its radio: the wash
+    of the accent behind it and the accent itself around it. Text over that wash measures 15.22:1 in
+    light and 14.92:1 in dark; in either high contrast the wash equals the card, so the border and
+    the radio carry it alone — which is the same decision the library's filter already made.
+  -->
+  <Style Selector="Border.duplicate-row">
+    <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+  </Style>
+
+  <Style Selector="Border.duplicate-row.chosen">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <!--
+    A way in that the prototype does not colour: the duplicates group heading is a title first and a
+    door second, and painting it accent made the page read as a list of links rather than as the
+    comparison it is. The reach stays, the accent goes.
+  -->
+  <Style Selector="Button.link-action.plain">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
   </Style>
 
   <Style Selector="Border.poster-chip">

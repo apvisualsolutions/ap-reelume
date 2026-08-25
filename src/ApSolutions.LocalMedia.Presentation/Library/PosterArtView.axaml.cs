@@ -21,9 +21,27 @@ public sealed partial class PosterArtView : UserControl
     public static readonly StyledProperty<string?> TitleProperty =
         AvaloniaProperty.Register<PosterArtView, string?>(nameof(Title));
 
+    /// <summary>
+    /// How many degrees around the wheel the title's own hue is turned before it is drawn.
+    /// </summary>
+    /// <remarks>
+    /// Zero everywhere but the episode list, where the prototype walks the show's hue a few degrees
+    /// per episode so a season reads as one family of tones instead of as a wall of unrelated
+    /// colours. A property of the view for the same reason <see cref="Title"/> is one: the host says
+    /// what it wants drawn, and this view knows how.
+    /// </remarks>
+    public static readonly StyledProperty<int> HueShiftProperty =
+        AvaloniaProperty.Register<PosterArtView, int>(nameof(HueShift));
+
     public PosterArtView()
     {
         InitializeComponent();
+    }
+
+    public int HueShift
+    {
+        get => GetValue(HueShiftProperty);
+        set => SetValue(HueShiftProperty, value);
     }
 
     public string? Title

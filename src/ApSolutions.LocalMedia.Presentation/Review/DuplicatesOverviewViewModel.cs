@@ -54,21 +54,30 @@ public sealed class DuplicateFileRowViewModel
 
     public string AudioCodec => _row.AudioCodec;
 
-    /// <summary>Gigabytes with one decimal, or megabytes under one.</summary>
+    /// <summary>
+    /// Gigabytes with one decimal, then megabytes, then kilobytes, then the bytes themselves.
+    /// </summary>
+    /// <remarks>
+    /// The ladder goes all the way down because the column has to be true rather than tidy: every
+    /// step exists so that nothing which occupies space prints as «0». A copy shown as empty next to
+    /// one shown in gigabytes is not a comparison, it is an argument for deleting the wrong file.
+    /// Only a size of zero — or none recorded — prints as nothing at all.
+    /// </remarks>
     public string Size
     {
         get
         {
+            const double Kilo = 1024d;
             const double Mega = 1024d * 1024d;
-            if (_row.SizeBytes <= 0)
+            const double Giga = 1024d * 1024d * 1024d;
+            return _row.SizeBytes switch
             {
-                return string.Empty;
-            }
-
-            var megabytes = _row.SizeBytes / Mega;
-            return megabytes >= 1024
-                ? string.Create(CultureInfo.CurrentCulture, $"{megabytes / 1024:0.0} GB")
-                : string.Create(CultureInfo.CurrentCulture, $"{megabytes:0} MB");
+                <= 0 => string.Empty,
+                >= (long)Giga => string.Create(CultureInfo.CurrentCulture, $"{_row.SizeBytes / Giga:0.0} GB"),
+                >= (long)Mega => string.Create(CultureInfo.CurrentCulture, $"{_row.SizeBytes / Mega:0} MB"),
+                >= (long)Kilo => string.Create(CultureInfo.CurrentCulture, $"{_row.SizeBytes / Kilo:0} KB"),
+                _ => string.Create(CultureInfo.CurrentCulture, $"{_row.SizeBytes} B"),
+            };
         }
     }
 

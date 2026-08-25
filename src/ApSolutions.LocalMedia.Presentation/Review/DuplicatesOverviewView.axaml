@@ -87,7 +87,7 @@ positive surface, because "no duplicates" is the healthy answer, not a sad blank
               </Border>
               <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <Button
-                    Classes="link-action"
+                    Classes="link-action plain"
                     Padding="0"
                     HorizontalAlignment="Left"
                     Command="{Binding $parent[ItemsControl].((review:DuplicatesOverviewViewModel)DataContext).OpenGroupCommand}"
@@ -137,9 +137,9 @@ positive surface, because "no duplicates" is the healthy answer, not a sad blank
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="review:DuplicateFileRowViewModel">
                   <Border
+                      Classes="duplicate-row"
+                      Classes.chosen="{Binding IsPreferred}"
                       Padding="12,10"
-                      Background="{DynamicResource CardSurfaceBrush}"
-                      BorderBrush="{DynamicResource ShellHairlineBrush}"
                       BorderThickness="1"
                       CornerRadius="{DynamicResource CornerRadiusMedium}">
                     <Grid

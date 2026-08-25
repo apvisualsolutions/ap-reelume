@@ -47,8 +47,22 @@ in the prototype's own source.
     being allowed to bind a colour to state at all.
   -->
   <Panel x:Name="PosterArtSurface" Opacity="{DynamicResource PosterArtOpacity}">
-    <Border Background="{Binding $parent[library:PosterArtView].Title, Converter={StaticResource Art}}" />
-    <Border Background="{Binding $parent[library:PosterArtView].Title, Converter={StaticResource Art}, ConverterParameter=glow}" />
+    <Border>
+      <Border.Background>
+        <MultiBinding Converter="{StaticResource Art}">
+          <Binding Path="$parent[library:PosterArtView].Title" />
+          <Binding Path="$parent[library:PosterArtView].HueShift" />
+        </MultiBinding>
+      </Border.Background>
+    </Border>
+    <Border>
+      <Border.Background>
+        <MultiBinding Converter="{StaticResource Art}" ConverterParameter="glow">
+          <Binding Path="$parent[library:PosterArtView].Title" />
+          <Binding Path="$parent[library:PosterArtView].HueShift" />
+        </MultiBinding>
+      </Border.Background>
+    </Border>
     <Border Background="{DynamicResource PosterHatchBrush}" />
     <Ellipse
         x:Name="Ring"

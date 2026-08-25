@@ -251,7 +251,8 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
                     [
                         .. group.Select(entry => new EpisodeRowViewModel(
                             entry,
-                            watchStates.GetValueOrDefault(ContentKey.ForEpisode(entry.ShowId, entry.Id))))
+                            watchStates.GetValueOrDefault(ContentKey.ForEpisode(entry.ShowId, entry.Id)),
+                            item.Title))
                     ]))
         ];
         SelectedSeason = Seasons.Count > 0 ? Seasons[0] : null;
