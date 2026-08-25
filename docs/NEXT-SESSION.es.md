@@ -100,6 +100,36 @@ Son sus palabras, agrupadas. **Nada de esto está medido todavía salvo donde se
 - **Centrar la caja de un texto no es centrar el texto.** La tinta va del alto de la mayúscula al pie
   del descendente y la fuente no es simétrica: 2,43 px en un botón de 44.
 
+## Decisiones ya tomadas — no se vuelven a preguntar
+
+Tomadas al cierre del 2026-08-25 para que la sesión siguiente construya en vez de consultar.
+
+1. **Teclas del reproductor.** `Espacio` reproduce y pausa. `F` y el **doble clic** ponen y quitan
+   pantalla completa. `N` el mini. `Esc` cierra. Que hoy el espacio ponga pantalla completa es un
+   defecto, no una alternativa.
+2. **El mini reproductor es una ventana PiP de verdad**: sin marco, siempre encima, arrastrable,
+   redimensionable **conservando la relación de aspecto**, y con un transporte mínimo propio — no la
+   barra entera del reproductor, que es lo que hoy se duplica. Se coloca en la esquina inferior
+   derecha del área de trabajo, con un margen, y recuerda dónde la dejaron.
+3. **La deformación del vídeo se corrige conservando la relación de aspecto** con letterbox, en el
+   reproductor y en el PiP. El vídeo nunca se estira.
+4. **El editor de metadatos pasa a ser una superficie propia**, como en el prototipo, y deja de vivir
+   dentro de la ficha. Se llega desde la ficha y se vuelve con un enlace, igual que las dos fichas.
+5. **La valoración pasa a cinco estrellas.** El dato guardado hoy va de 1 a 10; se migra dividiendo
+   entre dos y redondeando hacia arriba, en una migración con su número. «Quitar valoración» queda a
+   la derecha de la quinta estrella.
+6. **El cabecero de la ficha usa el póster como fondo**, con el degradado que ya usa el prototipo —
+   no un fotograma del vídeo. Extraer un fotograma obliga a decodificar desde el catálogo, que es
+   superficie de ataque nueva y coste por título, y el póster ya existe. Si el título no tiene
+   póster, se queda el arte generado que ya se dibuja.
+7. **El anillo de foco sólo responde al teclado**: los diez selectores pasan de `:focus` a
+   `:focus-visible`. El contorno punteado del deshabilitado se queda como está — es la única señal en
+   los dos contrastes altos — pero hay que comprobar control por control que quien lo lleva está
+   deshabilitado de verdad.
+8. **Los tooltips se ponen en todos los botones**, y en los de sólo icono el tooltip repite el nombre
+   accesible. Una cadena, dos lugares, y `ToolTip.Tip` nunca lleva un literal con letras:
+   `ViewLiteralTests` lo refusa y tiene razón.
+
 ## Cómo se trabaja aquí
 
 1. Las suites afectadas en local, commit, push a la rama, **CI verde**, y sólo entonces el

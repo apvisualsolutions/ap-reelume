@@ -98,6 +98,33 @@ These are his words, grouped. **None of it is measured yet except where it says 
 - **Centring a label's box is not centring the label.** The ink runs from a capital's top to a
   descender's foot and the font is not symmetric: 2.43 px in a 44 px button.
 
+## Decisions already taken — do not ask again
+
+Taken at the close of 2026-08-25 so the next session builds instead of consulting.
+
+1. **Player keys.** `Space` plays and pauses. `F` and **double click** toggle fullscreen. `N` the
+   mini. `Esc` closes. Space going fullscreen today is a defect, not an alternative.
+2. **The mini player is a real PiP window**: frameless, always on top, draggable, resizable **keeping
+   its aspect ratio**, with a minimal transport of its own — not the player's whole bar, which is
+   what is drawn twice today. It lands in the bottom-right of the work area with a margin, and
+   remembers where it was left.
+3. **The video distortion is fixed by keeping the aspect ratio** with letterboxing, in the player and
+   in PiP. The picture is never stretched.
+4. **The metadata editor becomes a surface of its own**, as in the prototype, and stops living inside
+   the card. It is reached from the card and left by a link, like both cards already do.
+5. **Rating becomes five stars.** The stored value runs 1 to 10 today; it migrates by halving and
+   rounding up, in a numbered migration. «Clear rating» sits to the right of the fifth star.
+6. **The card's banner uses the poster behind it**, with the gradient the prototype already draws —
+   not a frame of the video. Pulling a frame means decoding from the catalogue, which is new attack
+   surface and a cost per title, and the poster already exists. A title with no poster keeps the
+   generated art that is drawn today.
+7. **The focus ring answers the keyboard alone**: the ten selectors move from `:focus` to
+   `:focus-visible`. The disabled dotted outline stays — it is the only cue in both high contrasts —
+   but every control carrying it has to be checked for being genuinely disabled.
+8. **Tooltips go on every button**, and on icon-only ones the tooltip repeats the accessible name.
+   One string, two places, and `ToolTip.Tip` never carries a literal with letters in it:
+   `ViewLiteralTests` refuses that and is right.
+
 ## How the work goes here
 
 1. The affected suites locally, commit, push the branch, **CI green**, and only then the fast-forward
