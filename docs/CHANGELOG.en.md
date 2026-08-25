@@ -8,6 +8,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Fixed
+
+- **A playback failure no longer erases itself.** LibVLC refuses a file and then, a moment later,
+  reports the stop of the media it had just torn down; that state replaced the failure, so the
+  recovery actions vanished from the screen while somebody was reading them — including the offer to
+  hand the file to another player. It appeared first as a flake: the physical walk waited a full
+  minute for a failure that had already happened and been overwritten. The three ways out of a
+  failure that this application decides — reopening, failing again for another reason, going idle —
+  all still apply.
+
+- **The card's «Available» state is said in green**, which is how the prototype paints it. The chip
+  beside it stays neutral: «Not started» is a fact, «it is there» and «it is not» are the two answers
+  that card exists to give.
+
+
 ### Added
 
 - **The review tray says which title it is talking about.** It asked somebody to accept or reject

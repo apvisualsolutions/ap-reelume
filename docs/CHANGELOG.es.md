@@ -8,6 +8,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Corregido
+
+- **Un fallo de reproducción ya no se borra solo.** LibVLC rechaza un archivo y, un instante después,
+  informa de que ha detenido el medio que acababa de desmontar; ese estado sustituía al fallo, así
+  que las acciones de recuperación desaparecían de la pantalla mientras alguien las leía —incluida la
+  de abrir el archivo con otro programa—. Apareció primero como intermitencia: el paseo físico
+  esperaba un minuto entero por un fallo que ya había ocurrido y había sido pisado. Salir de un fallo
+  sigue siendo posible por las tres vías que decide la aplicación: reabrir, volver a fallar por otro
+  motivo, o quedar en reposo.
+
+- **El estado «Disponible» de la ficha se dice en verde**, que es como lo pinta el prototipo. La ficha
+  de al lado sigue neutra: «Sin empezar» es un dato, «está» y «no está» son las dos respuestas que
+  esa tarjeta existe para dar.
+
+
 ### Añadido
 
 - **La bandeja de revisión dice de qué título habla.** Pedía aceptar o rechazar «movie:761053»: el

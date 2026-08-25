@@ -219,8 +219,25 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Applied when the coordinator reports a transition for the active session.</summary>
+    /// <remarks>
+    /// A failure is terminal for the attempt that produced it, and <see cref="PlaybackStatePolicy"/>
+    /// already says so: the only move out of <see cref="PlaybackState.Failed"/> is reopening. The
+    /// engine does not know that — LibVLC tears the media down after refusing it and reports the stop
+    /// a moment later — and applying that stop erased the recovery a person was in the middle of
+    /// reading. It showed up as a flake before it showed up as a bug: the physical walk waited a full
+    /// minute for a failure that had already happened and been overwritten.
+    ///
+    /// Only the engine's own end-of-session states are ignored, and only after a failure. Reopening,
+    /// a second failure with another reason, and going idle all still apply: those come from this
+    /// application deciding something, not from LibVLC finishing its clean-up.
+    /// </remarks>
     public void ApplySessionState(PlaybackState state, PlaybackFailure? failure)
     {
+        if (_state == PlaybackState.Failed && state is PlaybackState.Stopped or PlaybackState.Ended)
+        {
+            return;
+        }
+
         Report(failure);
         UpdateState(state);
     }
