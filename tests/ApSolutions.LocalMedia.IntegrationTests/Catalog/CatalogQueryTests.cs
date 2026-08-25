@@ -4,6 +4,7 @@
 using System.Reflection;
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
@@ -290,6 +291,105 @@ public sealed class CatalogQueryTests
         Assert.Contains(
             searchPlan,
             detail => detail.Contains("VIRTUAL TABLE INDEX", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// A row of the grid carries what its card paints: a running time, its genres, how far through
+    /// it is, and — for a series — how many of its episodes are done.
+    /// </summary>
+    /// <remarks>
+    /// The five arrived on 2026-08-24 with the prototype's card, and each of them is a subquery in
+    /// the catalogue's own projection. Asserted against a title that has all five and a title that
+    /// has none, because the shape of the answer when the database is silent is the half that goes
+    /// wrong: a running time of zero and a genre list of nothing are two different absences from a
+    /// card's point of view, and only one of them is allowed to draw a line of separators.
+    /// </remarks>
+    [Fact]
+    public async Task A_catalogue_row_carries_the_running_time_the_genres_and_the_progress()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var fixture = await CreateFixtureAsync(directory.DatabasePath);
+        var rootId = new LibraryRootId(Guid.NewGuid());
+        var film = Title(1, CatalogTitleKind.Movie, "Arrival", 2016) with { Genres = ["Drama", "Ciencia ficción"] };
+        var bare = Title(2, CatalogTitleKind.Movie, "Sin datos", 2001);
+        var show = Title(3, CatalogTitleKind.Show, "Dark", 2017);
+
+        // The film's own media file, whose id IS the title's: that identity is what lets the
+        // projection read the running time without a join through the version groups.
+        await new MediaFileRepository(fixture.Factory).UpsertAsync(
+            new MediaFile(
+                new MediaFileId(film.Id.Value),
+                rootId,
+                @"D:\Cine\Arrival.mkv",
+                4_096,
+                DateTimeOffset.UnixEpoch,
+                new TechnicalMetadata(TimeSpan.FromMinutes(116), "matroska", ["h264"], ["aac"], 1920, 1080)),
+            TestContext.Current.CancellationToken);
+
+        await fixture.Repository.UpsertTitleAsync(film, TestContext.Current.CancellationToken);
+        await fixture.Repository.UpsertTitleAsync(bare, TestContext.Current.CancellationToken);
+        await fixture.Repository.UpsertTitleAsync(show, TestContext.Current.CancellationToken);
+        await fixture.Repository.UpsertSeasonAsync(
+            new CatalogSeason(show.Id, 1, "T1"),
+            TestContext.Current.CancellationToken);
+        var firstEpisode = new EpisodeId(Guid.NewGuid());
+        foreach (var (id, number) in new[] { (firstEpisode, 1), (new EpisodeId(Guid.NewGuid()), 2) })
+        {
+            await fixture.Repository.UpsertEpisodeAsync(
+                new CatalogEpisode(id, show.Id, 1, number, number, $"E{number}", number, IsAvailable: true),
+                TestContext.Current.CancellationToken);
+        }
+
+        var watchStates = new WatchStateRepository(fixture.Factory);
+        await watchStates.SaveAsync(
+            new WatchState
+            {
+                Content = ContentKey.ForTitle(film.Id),
+                Position = TimeSpan.FromMinutes(58),
+                ObservedDuration = TimeSpan.FromMinutes(116),
+                SourceMediaFileId = new MediaFileId(film.Id.Value),
+                Status = ApSolutions.LocalMedia.Domain.Continuity.WatchStatus.InProgress,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UnixEpoch,
+                UpdatedUtc = DateTimeOffset.UnixEpoch,
+            },
+            TestContext.Current.CancellationToken);
+        await watchStates.SaveAsync(
+            new WatchState
+            {
+                Content = ContentKey.ForEpisode(show.Id, firstEpisode),
+                Position = TimeSpan.FromMinutes(48),
+                ObservedDuration = TimeSpan.FromMinutes(48),
+                SourceMediaFileId = new MediaFileId(Guid.NewGuid()),
+                Status = ApSolutions.LocalMedia.Domain.Continuity.WatchStatus.Watched,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UnixEpoch,
+                UpdatedUtc = DateTimeOffset.UnixEpoch,
+            },
+            TestContext.Current.CancellationToken);
+
+        var page = await fixture.Repository.QueryAsync(
+            new CatalogQuery(PageSize: 10),
+            TestContext.Current.CancellationToken);
+
+        var read = page.Items.Single(item => item.Title == "Arrival");
+        Assert.Equal(TimeSpan.FromMinutes(116), read.Runtime);
+        // The order is the table's and not the list's: the repository writes genres as rows and
+        // group_concat returns them as SQLite reads them back, which is what a card then shows.
+        Assert.Equal(["Ciencia ficción", "Drama"], read.Genres!.Order(StringComparer.Ordinal));
+        Assert.Equal(ApSolutions.LocalMedia.Domain.Continuity.WatchStatus.InProgress, read.Status);
+        Assert.Equal(0.5, read.CompletedFraction, 3);
+        Assert.Equal(0, read.EpisodeCount);
+
+        var silent = page.Items.Single(item => item.Title == "Sin datos");
+        Assert.Null(silent.Runtime);
+        Assert.Empty(silent.Genres!);
+        Assert.Equal(ApSolutions.LocalMedia.Domain.Continuity.WatchStatus.NotStarted, silent.Status);
+        Assert.Equal(0, silent.CompletedFraction);
+
+        var series = page.Items.Single(item => item.Title == "Dark");
+        Assert.Equal(2, series.EpisodeCount);
+        Assert.Equal(1, series.EpisodesWatched);
     }
 
     private static async Task<CatalogFixture> CreateFixtureAsync(string databasePath)
