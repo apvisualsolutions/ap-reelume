@@ -78,7 +78,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Data/MigrationRunner.cs               
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  88
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs                 100  89
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/LibraryRootRepository.cs         100  80
-src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       98  72
+src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       99  75
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  87
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PersonalStateRepository.cs        96  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PlaybackPreferenceRepository.cs  100  87
@@ -210,7 +210,7 @@ src/ApSolutions.LocalMedia.Presentation/Shell/ShellViewModel.cs                 
 src/ApSolutions.LocalMedia.Presentation/Shell/StartupView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml.cs                          88  50
-src/ApSolutions.LocalMedia.Presentation/Show/SeasonViewModel.cs                              100  87
+src/ApSolutions.LocalMedia.Presentation/Show/SeasonViewModel.cs                              100  88
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsView.axaml                           100  50
 src/ApSolutions.LocalMedia.Presentation/Show/ShowDetailsViewModel.cs                         100  85
 src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml                             100  50

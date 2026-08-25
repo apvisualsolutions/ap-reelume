@@ -163,6 +163,14 @@ public sealed class CatalogCardTextTests
 
         art.Title = "Otra cosa";
         Assert.Equal("Otra cosa", art.Title);
+
+        // And the shift beside it, which is the episode list's whole reason for this view taking two
+        // values instead of one. Zero until a host asks for otherwise, because four of the five
+        // surfaces want the title's own hue and nothing else.
+        Assert.Equal(0, art.HueShift);
+        art.HueShift = 21;
+        Assert.Equal(21, art.HueShift);
+        Assert.Equal(21, art.GetValue(PosterArtView.HueShiftProperty));
     }
 
     /// <summary>
