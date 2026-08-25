@@ -10,6 +10,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The buttons still did not line up vertically, and the compensation was in the wrong place.** The
+  five pixels lived in the button's bottom padding, which moves **everything**: a glyph and the word
+  beside it travel together, so the two stayed exactly as far apart as before and all that changed
+  was where the whole row sat. Measured in a 44 px button: the glyph's middle at 19.00 and the
+  word's ink at 21.43 — **2.43 px**, the same number as always, untouched by the padding that was
+  meant to fix it; and the glyph a further 3 px above the button's own middle, lifted for a baseline
+  it does not have. The five pixels are now a bottom margin **on the label**, which is the one thing
+  with a baseline to answer for, and the glyph stays centred by its geometry.
+  `ButtonOpticalCentreTests` holds both claims to a pixel, the icon against the word included — which
+  was the half no gate was looking at.
+
 - **The "from the start" glyph is the restart arc with its arrow on the other side**, which is the
   one it carried before read the other way round, and its button is the size of the two beside it:
   36 like them and round, rather than the player's 44. A 44 px circle in a row of 36 px pills is the

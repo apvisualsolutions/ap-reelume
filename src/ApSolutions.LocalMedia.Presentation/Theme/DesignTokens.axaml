@@ -1166,7 +1166,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="Button, ToggleButton">
     <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
-    <Setter Property="Padding" Value="16,0,16,5" />
+    <Setter Property="Padding" Value="16,0" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
@@ -1197,6 +1197,47 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
   <Style Selector="Button.accent-swatch">
     <Setter Property="Padding" Value="0" />
+  </Style>
+  <!--
+    And here is the compensation, on the label and nowhere else.
+
+    <b>Five pixels of bottom margin on the words.</b> A font's ascent and descent are not symmetric:
+    measured through the font's own metrics, a label centred to the pixel draws its run of ink — the
+    top of a capital to the foot of a descender — 2.43 px below the middle of its box. The number is
+    twice that, because a margin on one side moves a centred box by half of it.
+
+    <b>It used to live in the button's padding, and that is why the complaint came back.</b> A bottom
+    padding on the button moves the whole content: a glyph and the word beside it travel together, so
+    the two stay exactly as far apart as they were and only the row changes place. Measured on
+    2026-08-25 in a 44 px button: the glyph's middle at 19.00 and the word's ink at 21.43 — 2.43 px
+    apart, the same number, untouched by the padding that was supposed to be fixing it. The glyph
+    also ended up 3 px above the button's own middle, because it was being lifted for a baseline it
+    does not have.
+
+    So it goes on the one thing with a baseline to answer for. A shape is centred by its geometry and
+    is left alone, which is why <c>Path.icon</c> appears nowhere here.
+
+    <b>Child selectors and not a descendant one.</b> The four containers are the ones the views
+    actually put inside a button — counted: 37 StackPanel, 21 Path, 6 Grid, 6 Panel, one bare
+    TextBlock — and stopping one level down is what keeps this off the captions under a poster card,
+    which sit three levels deep inside <c>PosterCardView</c> and are a stacked block rather than a
+    centred row. A descendant selector would also grow the rail's badge by five pixels.
+
+    <c>:is(TextBlock)</c> and not <c>TextBlock</c>, because the label a presenter makes for a plain
+    string is an <c>AccessText</c> — measured, along with the fact that its logical parent is the
+    button itself and not the presenter, which is what lets the first selector reach it at all.
+  -->
+  <Style Selector="Button &gt; :is(TextBlock),
+                   Button &gt; StackPanel &gt; :is(TextBlock),
+                   Button &gt; WrapPanel &gt; :is(TextBlock),
+                   Button &gt; Grid &gt; :is(TextBlock),
+                   Button &gt; Panel &gt; :is(TextBlock),
+                   ToggleButton &gt; :is(TextBlock),
+                   ToggleButton &gt; StackPanel &gt; :is(TextBlock),
+                   ToggleButton &gt; WrapPanel &gt; :is(TextBlock),
+                   ToggleButton &gt; Grid &gt; :is(TextBlock),
+                   ToggleButton &gt; Panel &gt; :is(TextBlock)">
+    <Setter Property="Margin" Value="0,0,0,5" />
   </Style>
   <!--
     The ring is drawn twice, in two colours, one inside the other. Borrowing the control's own border
@@ -1410,7 +1451,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Foreground" Value="{DynamicResource PrimaryActionTextBrush}" />
     <!-- btnPri is the wider and heavier of the prototype's two: 0 20 against the secondary's 0 16. -->
     <Setter Property="FontWeight" Value="SemiBold" />
-    <Setter Property="Padding" Value="20,0,20,5" />
+    <Setter Property="Padding" Value="20,0" />
   </Style>
 
   <!--

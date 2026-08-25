@@ -58,15 +58,19 @@ public sealed class ButtonInkTests
             var above = offset.Y;
             var below = button.Bounds.Height - offset.Y - label.Bounds.Height;
 
-            // The box is deliberately NOT centred any more, and by a number that is written down:
-            // the button carries five pixels of bottom padding so the run of ink lands in the
-            // middle, which is what an eye compares and what the box alone never delivered. So what
-            // is asserted here is that the box sits exactly that far up — a box centred to the pixel
-            // would mean the compensation had been dropped, and the words would look low again.
+            // The box is deliberately NOT centred, and by a number that is written down: the label
+            // carries five pixels of bottom margin so the run of ink lands in the middle, which is
+            // what an eye compares and what the box alone never delivered. So what is asserted here
+            // is that the box sits exactly that far up — a box centred to the pixel would mean the
+            // compensation had been dropped, and the words would look low again.
             // ButtonOpticalCentreTests is where the five comes from.
-            // Zero for the classes whose content is a glyph: an icon is centred by its own geometry
-            // and has no baseline to compensate for, so those carry no bottom padding at all.
-            var OpticalCompensation = className is "player-chrome" ? 0.0 : 5.0;
+            //
+            // The same five for all three classes, and player-chrome used to be the exception. That
+            // exception was a fact about the PADDING — a glyph must not be lifted for a baseline it
+            // does not have, and the padding moved everything — and the padding is no longer where
+            // the compensation lives. On the label it reaches only what has a baseline, so a class
+            // whose content is a glyph is already left alone by construction and needs no arm here.
+            const double OpticalCompensation = 5.0;
             Assert.True(
                 Math.Abs(below - above - OpticalCompensation) <= 1.5,
                 $"'{className}': the label sits {above:F2} px below the top and {below:F2} px above the "

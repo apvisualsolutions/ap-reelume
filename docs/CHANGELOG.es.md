@@ -10,6 +10,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los botones seguían sin alinearse en vertical, y la compensación estaba en el sitio equivocado.**
+  Los cinco píxeles vivían en el relleno inferior del botón, que mueve **todo** el contenido: un
+  glifo y la palabra a su lado viajan juntos, así que quedaban exactamente igual de separados que
+  antes y lo único que cambiaba era dónde se apoyaba la fila entera. Medido en un botón de 44 px: el
+  centro del glifo en 19,00 y la tinta de la palabra en 21,43 — **2,43 px**, el mismo número de
+  siempre, intacto bajo el relleno que debía corregirlo; y el glifo, además, 3 px por encima del
+  centro del propio botón, levantado por una línea base que no tiene. Ahora los cinco píxeles son un
+  margen inferior **de la etiqueta**, que es lo único con línea base a la que responder, y el glifo
+  se queda centrado por su geometría. `ButtonOpticalCentreTests` sostiene las dos afirmaciones a un
+  píxel, la del icono contra la palabra incluida — que era la mitad que ninguna puerta miraba.
+
 - **El glifo de «desde el principio» es el arco de reinicio con la flecha al otro lado**, que es el
   que llevaba antes leído al revés, y su botón mide lo mismo que los dos que tiene al lado: 36 como
   ellos y redondo, en vez de los 44 del reproductor. Un círculo de 44 en una fila de píldoras de 36
