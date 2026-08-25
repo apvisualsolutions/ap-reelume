@@ -115,11 +115,26 @@ public sealed class EpisodeRowViewModel
     private readonly EpisodeSequenceEntry _entry;
     private readonly WatchState? _watchState;
 
-    public EpisodeRowViewModel(EpisodeSequenceEntry entry, WatchState? watchState)
+    public EpisodeRowViewModel(EpisodeSequenceEntry entry, WatchState? watchState, string? showTitle = null)
     {
         _entry = entry ?? throw new ArgumentNullException(nameof(entry));
         _watchState = watchState;
+        ShowTitle = showTitle ?? string.Empty;
     }
+
+    /// <summary>
+    /// The series this episode belongs to, which is what its still is coloured from.
+    /// </summary>
+    /// <remarks>
+    /// The show's title and not the episode's, because the prototype draws a season as one family of
+    /// tones — <c>art(show.h + episode * 7, 'w')</c> — and hashing each episode's own name turned a
+    /// list of sixteen into sixteen unrelated colours. Empty when a row is built without one, which
+    /// a headless mount does; an empty title has a hue like any other.
+    /// </remarks>
+    public string ShowTitle { get; }
+
+    /// <summary>How far around the wheel this episode's still is turned from the show's own hue.</summary>
+    public int ArtHueShift => EpisodeNumber * 7;
 
     public EpisodeId Id => _entry.Id;
 

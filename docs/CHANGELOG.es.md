@@ -10,6 +10,32 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una temporada vuelve a parecerse a sí misma.** Cada miniatura de episodio se coloreaba con el
+  hash de **su propio nombre**, así que dieciséis episodios de una serie eran dieciséis colores sin
+  relación. El prototipo dibuja `art(serie + episodio × 7)`: el tono de la serie, caminado unos
+  grados por episodio. La carátula acepta ahora ese desplazamiento y la fila lo pide.
+
+- **El panel de «Siguiente episodio» deja de encogerse.** Se ajustaba a su contenido, así que
+  «Continuar» cambiaba de sitio según lo largo que fuese el nombre del episodio. El prototipo le da
+  540 px fijos y deja que el texto se lleve la holgura.
+
+
+### Corregido
+
+- **La copia elegida se marca en toda su fila, y el enlace lleva la tinta del acento.** El prototipo
+  señala la elección tres veces a la vez —el radio, el borde de acento y el lavado del acento detrás
+  de la fila— y la vista sólo tenía la primera: una marca de quince píxeles en una fila de mil. El
+  título del grupo deja de ir en azul, que es como el prototipo lo escribe, y los tres enlaces de la
+  aplicación pasan del acento a su **tinta**: mismo sitio, mismo tamaño, y de 5,62:1 a 9,03:1 en
+  claro y de 8,29:1 a 11,36:1 en oscuro. El par nuevo se mide en `ContrastTokenTests`.
+
+- **La columna de tamaño deja de decir «0».** Bajaba hasta megabytes y redondeaba: un archivo de dos
+  bytes se leía como vacío justo en la pantalla donde alguien decide qué copia conserva. La escala
+  llega ahora hasta los bytes, y sólo un tamaño de cero —o ninguno registrado— se queda en blanco.
+
+
+### Corregido
+
 - **Cuatro ramas que nada podía ejecutar, y las dos que sí y nadie miraba.** El lector de duplicados
   comprobaba si eran nulas tres columnas que el esquema declara `NOT NULL`, y el modelo volvía a
   preguntar por su parámetro después de que `CanExecute` lo hubiera exigido: código inalcanzable, que

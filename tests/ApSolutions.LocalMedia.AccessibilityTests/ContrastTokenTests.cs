@@ -178,6 +178,15 @@ public sealed class ContrastTokenTests
                 TextMinimum,
                 $"{theme} accent ink on the accent wash");
 
+            // And the same ink over the page itself, which is where a link is drawn: the rail's way
+            // into the library, the way back out of a card, and the duplicates group's heading.
+            AssertContrastAtLeast(
+                brushes,
+                "AccentInkBrush",
+                "ShellSurfaceBrush",
+                TextMinimum,
+                $"{theme} accent ink on the shell");
+
             // The leading action's ink on each of its three fills: the primary is its own family
             // since 2026-08-24, and a pill whose hover loses its ink is a button that blinks.
             AssertContrastAtLeast(brushes, "PrimaryActionTextBrush", "PrimaryActionBrush", TextMinimum, $"{theme} text on the primary");

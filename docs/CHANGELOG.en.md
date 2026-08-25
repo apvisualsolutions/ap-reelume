@@ -10,6 +10,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A season looks like one season again.** Every episode still was coloured from the hash of **its
+  own name**, so sixteen episodes of one series were sixteen unrelated colours. The prototype draws
+  `art(show + episode × 7)`: the show's hue, walked a few degrees per episode. The cover now takes
+  that shift and the row asks for it.
+
+- **The «Next episode» panel stops shrink-wrapping.** It fitted its contents, so «Continue» moved
+  every time the episode's name changed length. The prototype gives it a fixed 540 px and lets the
+  text take the slack.
+
+
+### Fixed
+
+- **The chosen copy is marked on its whole row, and the link carries the accent's ink.** The
+  prototype marks the choice three ways at once — the radio, the accent border and the accent's wash
+  behind the row — and the view had only the first: a fifteen pixel mark on a row a thousand wide.
+  The group's heading stops being blue, which is how the prototype writes it, and the application's
+  three links move from the accent to its **ink**: same place, same size, and 9.03:1 instead of
+  5.62:1 in light, 11.36:1 instead of 8.29:1 in dark. The new pair is measured in
+  `ContrastTokenTests`.
+
+- **The size column stops saying «0».** It went down to megabytes and rounded, so a file of two bytes
+  read as empty on the very screen where somebody decides which copy to keep. The ladder now reaches
+  the bytes themselves, and only a size of zero — or none recorded — stays blank.
+
+
+### Fixed
+
 - **Four branches nothing could take, and the two that happen and no one watched.** The duplicates
   reader tested three columns for null that the schema declares `NOT NULL`, and the destination asked
   after its parameter again once `CanExecute` had already demanded it: unreachable code, removed

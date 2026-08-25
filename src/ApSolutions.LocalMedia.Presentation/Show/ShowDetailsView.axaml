@@ -105,9 +105,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
               The one episode this series is waiting on, named and startable in one place. Without it
               the card answered «here are three seasons» to the question «where was I», and the
               answer was somewhere down a list.
+
+              540 wide and not «as wide as its contents»: the prototype gives this panel a fixed
+              max-width and lets the text column inside it take the slack, so «Continuar» sits at the
+              far edge rather than against the episode's name. Shrink-wrapped, the button moved every
+              time the title changed length — which is a button whose position depends on the data.
             -->
             <Border
-                MaxWidth="540"
+                Width="540"
                 Padding="14,12"
                 HorizontalAlignment="Left"
                 Background="{DynamicResource PlayerPanelBrush}"

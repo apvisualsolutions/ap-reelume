@@ -53,7 +53,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
           BorderThickness="1"
           CornerRadius="{DynamicResource CornerRadiusMedium}">
         <Panel>
-          <library:PosterArtView Classes="wide" Title="{Binding EpisodeTitle}" />
+          <library:PosterArtView
+              Classes="wide"
+              HueShift="{Binding ArtHueShift}"
+              Title="{Binding ShowTitle}" />
           <!--
             Three px at the foot of the still, and the same three setters the library's card needed:
             the base theme gives a ProgressBar a minimum height of four and a minimum width of 200,

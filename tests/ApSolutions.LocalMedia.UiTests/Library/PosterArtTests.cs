@@ -146,15 +146,55 @@ public sealed class PosterArtTests
     public void The_converter_answers_with_the_layer_it_is_asked_for()
     {
         var converter = new PosterArtConverter();
-        Assert.IsType<LinearGradientBrush>(
-            converter.Convert("Astillero", typeof(IBrush), null, CultureInfo.InvariantCulture));
-        Assert.IsType<LinearGradientBrush>(
-            converter.Convert("Astillero", typeof(IBrush), "base", CultureInfo.InvariantCulture));
-        Assert.IsType<RadialGradientBrush>(
-            converter.Convert("Astillero", typeof(IBrush), "glow", CultureInfo.InvariantCulture));
-        Assert.IsType<LinearGradientBrush>(
-            converter.Convert(42, typeof(IBrush), null, CultureInfo.InvariantCulture));
+        Assert.IsType<LinearGradientBrush>(Ask(converter, null, "Astillero", 0));
+        Assert.IsType<LinearGradientBrush>(Ask(converter, "base", "Astillero", 0));
+        Assert.IsType<RadialGradientBrush>(Ask(converter, "glow", "Astillero", 0));
+
+        // Anything that is not a title is a title of nothing, which has a hue like any other. Both
+        // halves arrive that way while the tree is being built.
+        Assert.IsType<LinearGradientBrush>(Ask(converter, null, 42, 0));
+        Assert.IsType<LinearGradientBrush>(Ask(converter, null, "Astillero", "seven"));
+        Assert.IsType<LinearGradientBrush>(converter.Convert(
+            [],
+            typeof(IBrush),
+            null,
+            CultureInfo.InvariantCulture));
+        Assert.IsType<LinearGradientBrush>(converter.Convert(
+            ["Astillero"],
+            typeof(IBrush),
+            null,
+            CultureInfo.InvariantCulture));
+        Assert.Throws<ArgumentNullException>(
+            () => converter.Convert(null!, typeof(IBrush), null, CultureInfo.InvariantCulture));
     }
+
+    /// <summary>
+    /// The shift is what makes a season one family of tones: the same title, walked a few degrees.
+    /// </summary>
+    /// <remarks>
+    /// Asserted as «different from its neighbour and different from no shift at all», not as a
+    /// particular colour: what matters is that the walk happens and that a full turn comes home,
+    /// because a shift the view dropped on the floor would still paint sixteen identical stills and
+    /// look deliberate.
+    /// </remarks>
+    [Fact]
+    public void A_shifted_hue_walks_around_the_wheel_and_comes_home()
+    {
+        var plain = PosterArt.HueOf("Puerto Sombra");
+        Assert.NotEqual(plain, PosterArt.HueOf("Puerto Sombra", 7));
+        Assert.NotEqual(PosterArt.HueOf("Puerto Sombra", 7), PosterArt.HueOf("Puerto Sombra", 14));
+        Assert.Equal(plain, PosterArt.HueOf("Puerto Sombra", 360));
+
+        // And off both ends of the wheel, because an episode list walks past a full turn and a
+        // caller may hand back a negative.
+        Assert.InRange(PosterArt.HueOf("Puerto Sombra", -400), 0, 359);
+        Assert.InRange(PosterArt.HueOf("Puerto Sombra", 4_000), 0, 359);
+        Assert.InRange(PosterArt.HueOf(null, 5), 0, 359);
+    }
+
+    /// <summary>One layer of one picture, asked for the way the view asks for it.</summary>
+    private static object Ask(PosterArtConverter converter, string? layer, object? title, object? shift) =>
+        converter.Convert([title, shift], typeof(IBrush), layer, CultureInfo.InvariantCulture);
 
     /// <summary>Every surface that paints a cover paints all of its layers, hatch included.</summary>
     /// <remarks>
@@ -181,7 +221,11 @@ public sealed class PosterArtTests
             SearchOption.AllDirectories))
         {
             var markup = File.ReadAllText(view);
-            var glows = Occurrences(markup, "ConverterParameter=glow");
+            // Both spellings, because the same parameter is written bare inside a binding's braces
+            // and quoted on a MultiBinding element. Counting only one of them would make this pass
+            // by not looking, which is the failure mode a counting test has.
+            var glows = Occurrences(markup, "ConverterParameter=glow")
+                + Occurrences(markup, "ConverterParameter=\"glow\"");
             // The reference and not the name: the dictionary that declares the brush writes it once
             // as a key and paints no cover at all, so counting the bare word would fail on the one
             // file that has to carry it.
@@ -225,14 +269,6 @@ public sealed class PosterArtTests
         }
 
         return count;
-    }
-
-    [Fact]
-    public void The_converter_refuses_to_run_backwards()
-    {
-        var converter = new PosterArtConverter();
-        Assert.Throws<NotSupportedException>(
-            () => converter.ConvertBack(null, typeof(string), null, CultureInfo.InvariantCulture));
     }
 
     /// <summary>Relative luminance, enough to tell one stop from the other.</summary>

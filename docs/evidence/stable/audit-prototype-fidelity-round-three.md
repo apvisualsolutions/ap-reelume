@@ -30,6 +30,21 @@ prototype was designed at.
 | Degradados | última parada al 19 % | al 30 %, que es lo que el prototipo pide |
 | Paleta | sin tinta sobre el lavado del acento | `AccentInkBrush`, medida en los cuatro modos |
 
+## Lo que se cerró después, mirando la tabla de duplicados con datos / Closed afterwards, with data
+
+La primera comparación de esa tabla se hizo sobre una biblioteca sembrada con dos bytes por archivo:
+todas las filas decían lo mismo, y cuatro diferencias se escondieron detrás de esa igualdad. Con
+tamaños y códecs plausibles sembrados, salieron a la vez. / The first comparison of that table was
+made over a library seeded with two bytes per file, which hid four differences behind rows that all
+said the same thing.
+
+| Vista | Lo que faltaba | Ahora |
+| --- | --- | --- |
+| Duplicados | la elección sólo en el radio | borde de acento y lavado del acento en toda la fila |
+| Duplicados | el título del grupo en azul | en la tinta de la página, que es como lo escribe el prototipo |
+| Enlaces | el acento (5,62:1 en claro) | su tinta (9,03:1 en claro, 11,36:1 en oscuro) |
+| Duplicados | «0 MB» para lo que pesa menos | escala hasta los bytes; sólo el cero se queda en blanco |
+
 ## Lo que sigue siendo distinto, y por qué / What is still different, and why
 
 Seis diferencias, y las seis son decisiones con su medición detrás. / Six differences, each a
