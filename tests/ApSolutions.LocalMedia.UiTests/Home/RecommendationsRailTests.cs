@@ -44,7 +44,7 @@ public sealed class RecommendationsRailTests
         var viewModel = new RecommendationsViewModel(
             new GetRecommendations(readModel),
             new StubRecommendationSettings(enabled: true),
-            id => readModel.TitleOf(id));
+            TitlesOf(readModel));
 
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
 
@@ -69,7 +69,7 @@ public sealed class RecommendationsRailTests
         var viewModel = new RecommendationsViewModel(
             new GetRecommendations(readModel),
             settings,
-            id => readModel.TitleOf(id));
+            TitlesOf(readModel));
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
         Assert.True(viewModel.HasRecommendations);
 
@@ -83,7 +83,7 @@ public sealed class RecommendationsRailTests
         var restarted = new RecommendationsViewModel(
             new GetRecommendations(readModel),
             settings,
-            id => readModel.TitleOf(id));
+            TitlesOf(readModel));
         await restarted.LoadAsync(TestContext.Current.CancellationToken);
         Assert.False(restarted.IsEnabled);
         Assert.Empty(restarted.Items);
@@ -99,7 +99,7 @@ public sealed class RecommendationsRailTests
         var viewModel = new RecommendationsViewModel(
             new GetRecommendations(readModel),
             new StubRecommendationSettings(enabled: false),
-            id => readModel.TitleOf(id));
+            TitlesOf(readModel));
 
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
 
@@ -191,11 +191,11 @@ public sealed class RecommendationsRailTests
         Assert.Throws<ArgumentNullException>(() => new RecommendationsViewModel(
             null!,
             new StubRecommendationSettings(true),
-            _ => string.Empty));
+            NoTitles));
         Assert.Throws<ArgumentNullException>(() => new RecommendationsViewModel(
             new GetRecommendations(new StubRecommendationReadModel()),
             null!,
-            _ => string.Empty));
+            NoTitles));
         Assert.Throws<ArgumentNullException>(() => new RecommendationSettingsViewModel(null!));
     }
 
@@ -211,7 +211,7 @@ public sealed class RecommendationsRailTests
         var rail = new RecommendationsViewModel(
             new GetRecommendations(readModel),
             new StubRecommendationSettings(enabled: true),
-            id => readModel.TitleOf(id));
+            TitlesOf(readModel));
         await rail.LoadAsync(TestContext.Current.CancellationToken);
 
         var window = new Window
@@ -337,7 +337,7 @@ public sealed class RecommendationsRailTests
         var rail = new RecommendationsViewModel(
             new GetRecommendations(readModel),
             new StubRecommendationSettings(enabled),
-            id => readModel.TitleOf(id));
+            TitlesOf(readModel));
         await rail.LoadAsync(TestContext.Current.CancellationToken);
 
         var window = new Window
@@ -426,5 +426,28 @@ public sealed class RecommendationsRailTests
             Reads++;
             return Task.FromResult(Candidates);
         }
+    }
+
+    /// <summary>
+    /// The words behind a page of ids, which the rail now asks for once instead of card by card.
+    /// </summary>
+    /// <remarks>
+    /// The lookup went from <c>Func&lt;TitleId, string&gt;</c> to a batch on 2026-08-25, because the
+    /// composition had never fed it: the catalogue is asked over a connection and a per-card
+    /// synchronous lookup can only be answered by blocking the thread that draws the cards. What the
+    /// rail drew until then was twenty covers of initials of nothing.
+    /// </remarks>
+    private static Func<IReadOnlyList<TitleId>, CancellationToken, Task<IReadOnlyDictionary<TitleId, string>>>
+        TitlesOf(StubRecommendationReadModel readModel) =>
+        (ids, _) => Task.FromResult<IReadOnlyDictionary<TitleId, string>>(
+            ids.ToDictionary(id => id, readModel.TitleOf));
+
+    private static Task<IReadOnlyDictionary<TitleId, string>> NoTitles(
+        IReadOnlyList<TitleId> ids,
+        CancellationToken cancellationToken)
+    {
+        _ = ids;
+        _ = cancellationToken;
+        return Task.FromResult<IReadOnlyDictionary<TitleId, string>>(new Dictionary<TitleId, string>());
     }
 }

@@ -77,6 +77,21 @@ prototype puts it on a wide frame: off to the right and high, rather than centre
               <TextBlock VerticalAlignment="Center" Text="{Binding ResumeActionText}" />
             </StackPanel>
           </Button>
+          <!--
+            And the glyph beside it, which the film card has and this one did not: «en la tarjeta
+            ancha del inicio justo después habría que poner el icono de reproducir desde el inicio,
+            como en la vista detalle del vídeo», 2026-08-25. Same arc, same 36 px circle, same
+            sentence in the name a reader hears — one shape for the two places it means the same
+            thing.
+          -->
+          <Button
+              x:Name="ContinueCardRestart"
+              Classes="icon-action"
+              Command="{Binding $parent[ItemsControl].((home:HomeViewModel)DataContext).RestartItemCommand}"
+              CommandParameter="{Binding}"
+              automation:AutomationProperties.Name="{Binding RestartAccessibleName}">
+            <Path Classes="icon size-16" Data="{DynamicResource IconRestart}" />
+          </Button>
           <Button
               Command="{Binding $parent[ItemsControl].((home:HomeViewModel)DataContext).OpenItemDetailsCommand}"
               CommandParameter="{Binding}"

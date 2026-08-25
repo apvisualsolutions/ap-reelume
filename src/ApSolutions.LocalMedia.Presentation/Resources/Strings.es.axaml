@@ -442,6 +442,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="HomeResumeRemaining">quedan {0}</x:String>
   <x:String x:Key="HomeResumeDetailsAction">Detalles</x:String>
   <x:String x:Key="HomeResumeAction">Continuar</x:String>
+  <x:String x:Key="HomeRestartAction">Reproducir desde el principio</x:String>
   <x:String x:Key="HomeResumeProgressLabel">Progreso</x:String>
   <x:String x:Key="HomePercentSuffix">%</x:String>
   <x:String x:Key="HomeInProgressAccessibleName">Elementos en curso</x:String>

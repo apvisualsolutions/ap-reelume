@@ -10,6 +10,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Las carátulas de Home no llevaban a ninguna parte.** Eran tarjetas dentro de un elemento de
+  lista, así que pulsar una la seleccionaba y nada más — «al hacer click en las tarjetas en home no
+  redirige a la vista detalle del vídeo». El prototipo envuelve la carátula entera en un botón, y eso
+  es lo que hay ahora en los dos carriles de póster, con la misma clase `poster-card` que la rejilla
+  de la biblioteca: una tarjeta es una sola forma y un solo objetivo en los tres sitios. El paseo
+  destapó de paso una ambigüedad real al pulsarlas: un mismo título puede estar a la vez en «Añadido
+  recientemente» y en las sugerencias, y dos controles con un nombre es el defecto por el que los
+  botones del carril ya se habían renombrado, así que la carátula anuncia el carril y después el
+  título.
+
+- **Y el carril de sugerencias dibujaba veinte portadas de las iniciales de nada.** Su búsqueda de
+  títulos era un parámetro opcional que la composición nunca pasó, así que resolvía la cadena vacía:
+  registrado y nunca alimentado, en su forma más callada — el carril se dibujaba, las tarjetas tenían
+  la forma correcta y no había error en ninguna parte. Ahora se pide una vez por carga y en lote,
+  porque el catálogo se consulta por una conexión y una búsqueda por tarjeta sólo se puede contestar
+  bloqueando el hilo que las pinta.
+
 - **Los recuadros de selección de los menús ya no son un rectángulo de acento.** Eran dos píxeles del
   acento alrededor de cada fila elegida de toda la aplicación —el índice de ajustes, los menús del
   carril, y también una carátula dentro de un carril, donde se lee como una caja que alguien dejó
@@ -199,6 +216,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   dice nada.
 
 ### Añadido
+
+- **«Desde el principio» está también en las dos superficies anchas de Home**, que es donde faltaba:
+  el mismo arco con la flecha al otro lado, el mismo círculo de 36, junto al botón del que es la
+  alternativa — «en la tarjeta ancha del inicio justo después habría que poner el icono de reproducir
+  desde el inicio, como en la vista detalle del vídeo». Una bandera en la petición y no un segundo
+  enganche: lo que cambia es el minuto en que abre la sesión, y el anfitrión ya es quien lo lee.
 
 - **El catálogo de elementos, leído y escrito**: [docs/design/ELEMENTS.es.md](design/ELEMENTS.es.md)
   pasa `design/Catálogo de elementos - AP Reelume.dc.html` a los tokens de este árbol, elemento por

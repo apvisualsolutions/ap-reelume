@@ -23,7 +23,21 @@ namespace ApSolutions.LocalMedia.Presentation.Home;
 /// title and the line under it since 2026-08-25, and Home is the one surface that knows both without
 /// reading anything — so it says them instead of making the composition look them up again.
 /// </remarks>
-public sealed record HomeResumeRequest(ContentKey Content, string? Title, string? Subtitle);
+/// <summary>
+/// What Home asks the host to open, and from where.
+/// </summary>
+/// <remarks>
+/// <c>FromStart</c> arrived on 2026-08-25 with the glyph beside Continue. The film card has carried
+/// the pair since it was drawn — «en la tarjeta ancha del inicio justo después habría que poner el
+/// icono de reproducir desde el inicio, como en la vista detalle del vídeo» — and the difference is
+/// one flag rather than a second hook: what changes is the position the session opens at, and the
+/// host is already the thing that reads it.
+/// </remarks>
+public sealed record HomeResumeRequest(
+    ContentKey Content,
+    string? Title,
+    string? Subtitle,
+    bool FromStart = false);
 
 /// <summary>
 /// The hybrid Home. Continue is the primary action whenever there is something worth continuing, and
@@ -51,11 +65,15 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         _onResume = onResume;
         _onOpenDetails = onOpenDetails;
         Recommendations = recommendations;
-        ResumeCommand = new AsyncRelayCommand(ResumeAsync, () => HasResume);
+        ResumeCommand = new AsyncRelayCommand(() => ResumeAsync(fromStart: false), () => HasResume);
         OpenResumeDetailsCommand = new AsyncRelayCommand(OpenResumeDetailsAsync, () => HasResume);
         OpenLibraryCommand = new AsyncRelayCommand(OpenLibraryAsync);
+        RestartCommand = new AsyncRelayCommand(() => ResumeAsync(fromStart: true), () => HasResume);
         ResumeItemCommand = new AsyncRelayCommand(
-            parameter => ResumeItemAsync(parameter as InProgressItemViewModel),
+            parameter => ResumeItemAsync(parameter as InProgressItemViewModel, fromStart: false),
+            parameter => parameter is InProgressItemViewModel { IsAvailable: true });
+        RestartItemCommand = new AsyncRelayCommand(
+            parameter => ResumeItemAsync(parameter as InProgressItemViewModel, fromStart: true),
             parameter => parameter is InProgressItemViewModel { IsAvailable: true });
         OpenItemDetailsCommand = new AsyncRelayCommand(
             parameter => OpenItemDetailsAsync(parameter as IRailCard),
@@ -66,6 +84,9 @@ public sealed class HomeViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand ResumeCommand { get; }
+
+    /// <summary>The hero's own «from the start», the pair of ResumeCommand.</summary>
+    public ICommand RestartCommand { get; }
 
     /// <summary>
     /// The hero's second action: the card for what it offers to continue.
@@ -91,6 +112,16 @@ public sealed class HomeViewModel : INotifyPropertyChanged
     /// parameter so one command serves the whole rail.
     /// </remarks>
     public ICommand ResumeItemCommand { get; }
+
+    /// <summary>
+    /// The same card, from zero: the glyph the film card has carried since it was drawn.
+    /// </summary>
+    /// <remarks>
+    /// It sits beside Continue rather than replacing it, because they answer different questions and
+    /// a person who wants one does not want the other. On a rail the two travel as one pair, which
+    /// is why this takes the card as its parameter exactly as its neighbour does.
+    /// </remarks>
+    public ICommand RestartItemCommand { get; }
 
     /// <summary>Opens the card of whichever rail item is passed to it.</summary>
     public ICommand OpenItemDetailsCommand { get; }
@@ -294,15 +325,21 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         }
 
         (ResumeCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (RestartCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (OpenResumeDetailsCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
     }
 
     internal static string FormatPercentage(double fraction) =>
         Math.Round(fraction * 100).ToString("F0", CultureInfo.CurrentCulture);
 
-    private Task ResumeAsync() => _snapshot.Resume is { } resume && _onResume is not null
-        ? _onResume(new HomeResumeRequest(resume.Content, ResumeTitle, ResumePlayerSubtitle))
-        : Task.CompletedTask;
+    private Task ResumeAsync(bool fromStart = false) =>
+        _snapshot.Resume is { } resume && _onResume is not null
+            ? _onResume(new HomeResumeRequest(
+                resume.Content,
+                ResumeTitle,
+                ResumePlayerSubtitle,
+                fromStart))
+            : Task.CompletedTask;
 
     private Task OpenLibraryAsync()
     {
@@ -322,11 +359,11 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         return true;
     }
 
-    private async Task ResumeItemAsync(InProgressItemViewModel? card)
+    private async Task ResumeItemAsync(InProgressItemViewModel? card, bool fromStart)
     {
         if (card is not null && _onResume is { } resume)
         {
-            await resume(new HomeResumeRequest(card.Content, card.Title, card.RailSubtitle))
+            await resume(new HomeResumeRequest(card.Content, card.Title, card.RailSubtitle, fromStart))
                 .ConfigureAwait(true);
         }
     }
@@ -420,6 +457,10 @@ public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard, 
     public string DetailsAccessibleName =>
         HomeViewModel.Word("HomeResumeDetailsAction", "Details") + " · " + Title;
 
+    /// <summary>And for the glyph between them, which is a sentence rather than a shape to a reader.</summary>
+    public string RestartAccessibleName =>
+        HomeViewModel.Word("HomeRestartAction", "Play from the start") + " · " + Title;
+
     public string KindKey => IsShow ? "CatalogKindShow" : "CatalogKindMovie";
 
     public bool HasKind => true;
@@ -443,6 +484,19 @@ public sealed class InProgressItemViewModel(InProgressItem item) : IPosterCard, 
 /// <summary>One card of the recently added rail.</summary>
 public sealed class RecentlyAddedItemViewModel(RecentlyAddedItem item) : IPosterCard, IRailCard
 {
+    /// <summary>
+    /// What a reader hears on the cover, which is the rail and then the title.
+    /// </summary>
+    /// <remarks>
+    /// The title alone is not enough and the walk found it the first time both covers became
+    /// buttons: one title can be on this rail and on the suggestions rail at the same moment, and
+    /// two controls with one name is the very defect the rail's Continue and Detalles were renamed
+    /// to avoid. The rail is what tells them apart, and it is the same thing the eye uses — the
+    /// heading is directly above the cover.
+    /// </remarks>
+    public string OpenAccessibleName =>
+        HomeViewModel.Word("HomeRecentlyAddedHeading", "Recently added") + " · " + Title;
+
     private readonly RecentlyAddedItem _item = item ?? throw new ArgumentNullException(nameof(item));
 
     public TitleId Id => _item.Id;

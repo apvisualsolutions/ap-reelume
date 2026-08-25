@@ -154,6 +154,19 @@ would be inventing two fields. It is a vertical through three layers for a secon
             <TextBlock VerticalAlignment="Center" Text="{Binding ResumeActionText}" />
           </StackPanel>
         </Button>
+        <!--
+          «Desde el principio», as the glyph and not four words, which is the shape the film card
+          already carries: the arc with its arrow the other way round, 36 px and round, next to the
+          button it is the alternative to. The words are not lost — they are the name a reader hears
+          and the tip a pointer finds, which is the same string in both places by construction.
+        -->
+        <Button
+            x:Name="ResumeHeroRestart"
+            Classes="icon-action"
+            Command="{Binding RestartCommand}"
+            automation:AutomationProperties.Name="{DynamicResource HomeRestartAction}">
+          <Path Classes="icon size-16" Data="{DynamicResource IconRestart}" />
+        </Button>
         <Button
             x:Name="ResumeHeroDetails"
             Command="{Binding OpenResumeDetailsCommand}"

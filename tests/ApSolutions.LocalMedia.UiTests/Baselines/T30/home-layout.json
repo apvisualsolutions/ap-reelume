@@ -11,9 +11,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -34,9 +37,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -57,9 +63,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -80,9 +89,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -103,9 +115,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -126,9 +141,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -149,9 +167,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -172,9 +193,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -195,9 +219,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -218,9 +245,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -241,9 +271,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -264,9 +297,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -287,8 +323,10 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -309,8 +347,10 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -331,8 +371,10 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -353,8 +395,10 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -375,8 +419,10 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -397,8 +443,10 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -419,9 +467,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -442,9 +493,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -465,9 +519,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -488,9 +545,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -511,9 +571,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -534,9 +597,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -557,9 +623,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -580,9 +649,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -603,9 +675,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -626,9 +701,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -649,9 +727,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -672,9 +753,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -695,9 +779,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -718,9 +805,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -741,9 +831,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -764,9 +857,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -787,9 +883,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,
@@ -810,9 +909,12 @@
     "FirstFocus": "ResumeHeroAction",
     "FocusOrder": [
       "ResumeHeroAction",
+      "ResumeHeroRestart",
       "ResumeHeroDetails",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "ContinueCardResume",
+      "ContinueCardRestart",
       "LibraryEntryAction"
     ],
     "ResumeHeroVisible": true,

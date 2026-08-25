@@ -442,6 +442,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="HomeResumeRemaining">left {0}</x:String>
   <x:String x:Key="HomeResumeDetailsAction">Details</x:String>
   <x:String x:Key="HomeResumeAction">Continue</x:String>
+  <x:String x:Key="HomeRestartAction">Play from the start</x:String>
   <x:String x:Key="HomeResumeProgressLabel">Progress</x:String>
   <x:String x:Key="HomePercentSuffix">%</x:String>
   <x:String x:Key="HomeInProgressAccessibleName">Items in progress</x:String>

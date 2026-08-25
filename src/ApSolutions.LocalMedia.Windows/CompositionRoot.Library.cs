@@ -6,6 +6,7 @@ using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Home;
 using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Application.Personalization;
+using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
@@ -81,7 +82,19 @@ public static partial class CompositionRoot
             .AddTransient(CreateLibraryViewModel)
             .AddTransient(provider => new RecommendationsViewModel(
                 provider.GetRequiredService<GetRecommendations>(),
-                provider.GetRequiredService<IRecommendationSettings>()))
+                provider.GetRequiredService<IRecommendationSettings>(),
+
+                // The rail's titles, which nothing was feeding: the parameter defaulted to a lookup
+                // that answers the empty string, so every suggestion was drawn as initials of
+                // nothing under a blank caption. Registered and never fed, in its quietest form —
+                // the rail rendered, the cards had the right shape, and there was no error anywhere.
+                //
+                // The catalogue is read once and remembered for the rail's lifetime, which is the
+                // shape a synchronous lookup can have at all: the formula ranks ids and the words
+                // live in the catalogue, and asking it per card would be twenty queries for one row
+                // of pictures.
+                CatalogTitleLookup(provider),
+                onOpenDetails: titleId => OpenTitleCardAsync(provider, titleId)))
             .AddTransient(provider => new HomeViewModel(
                 provider.GetRequiredService<GetHome>(),
                 provider.GetRequiredService<INavigationService>(),
@@ -110,10 +123,15 @@ public static partial class CompositionRoot
                         return;
                     }
 
+                    // Zero when the glyph beside Continue was the one pressed, and the stored
+                    // point otherwise. Both are a position the caller named, which is what stops the
+                    // player asking the same question over again once it is open.
                     await shell.OpenPlayerAsync(
                         new PlayDetailsRequest(
                             state.SourceMediaFileId,
-                            ProgressPolicy.ClampPosition(state.Position, state.ObservedDuration),
+                            request.FromStart
+                                ? TimeSpan.Zero
+                                : ProgressPolicy.ClampPosition(state.Position, state.ObservedDuration),
                             request.Title,
                             request.Subtitle),
                         CancellationToken.None).ConfigureAwait(true);
@@ -126,24 +144,67 @@ public static partial class CompositionRoot
                 // The catalogue is asked for the row rather than the row being carried from Home:
                 // what a card needs is the whole CatalogItem, and the read model behind the hero
                 // answers with a title id.
-                onOpenDetails: async titleId =>
-                {
-                    if (provider.GetRequiredService<ShellHost>().Shell is not { Library: { } library } shell)
-                    {
-                        return;
-                    }
+                onOpenDetails: titleId => OpenTitleCardAsync(provider, titleId)));
 
-                    var page = await provider.GetRequiredService<ICatalogQueryService>()
-                        .QueryAsync(new CatalogQuery(PageSize: 100), CancellationToken.None)
-                        .ConfigureAwait(true);
-                    if (page.Items.FirstOrDefault(item => item.Id == titleId) is not { } row)
-                    {
-                        return;
-                    }
+    /// <summary>
+    /// Opens one title's card from wherever on Home it was pressed.
+    /// </summary>
+    /// <remarks>
+    /// It lands where the library's own grid lands: the shell navigates to the library and the
+    /// library opens that title's card, so there is one way into a card and not two. The catalogue is
+    /// asked for the row rather than the row being carried from Home — what a card needs is the whole
+    /// <c>CatalogItem</c>, and the read models behind the rails answer with a title id.
+    /// <para>
+    /// A method and no longer a lambda, because three surfaces reach it now: the hero's Detalles, the
+    /// wide card's, and the cover of a card on either of the two poster rails.
+    /// </para>
+    /// </remarks>
+    private static async Task OpenTitleCardAsync(IServiceProvider provider, TitleId titleId)
+    {
+        if (provider.GetRequiredService<ShellHost>().Shell is not { Library: { } library } shell)
+        {
+            return;
+        }
 
-                    shell.NavigateCommand.Execute(AppRoute.Library);
-                    await library.OpenDetailsAsync(
-                        new CatalogItemViewModel(row),
-                        CancellationToken.None).ConfigureAwait(true);
-                }));
+        var page = await provider.GetRequiredService<ICatalogQueryService>()
+            .QueryAsync(new CatalogQuery(PageSize: 100), CancellationToken.None)
+            .ConfigureAwait(true);
+        if (page.Items.FirstOrDefault(item => item.Id == titleId) is not { } row)
+        {
+            return;
+        }
+
+        shell.NavigateCommand.Execute(AppRoute.Library);
+        await library.OpenDetailsAsync(
+            new CatalogItemViewModel(row),
+            CancellationToken.None).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// The words behind the ids a formula ranks.
+    /// </summary>
+    /// <remarks>
+    /// One query for the whole rail, and it answers with a map rather than with a string per card:
+    /// the recommendation read model deals in identifiers and the catalogue is where the words are,
+    /// so this is the join, made once per load. A title the catalogue does not hold is left out of
+    /// the map and its card falls back to the empty caption it already draws.
+    /// </remarks>
+    private static Func<IReadOnlyList<TitleId>, CancellationToken, Task<IReadOnlyDictionary<TitleId, string>>>
+        CatalogTitleLookup(IServiceProvider provider) =>
+        async (ids, cancellationToken) =>
+        {
+            if (ids.Count == 0)
+            {
+                return new Dictionary<TitleId, string>();
+            }
+
+            var wanted = ids.ToHashSet();
+            var page = await provider.GetRequiredService<ICatalogQueryService>()
+                .QueryAsync(new CatalogQuery(PageSize: 200), cancellationToken)
+                .ConfigureAwait(false);
+            return page.Items
+                .Where(item => wanted.Contains(item.Id))
+                .GroupBy(item => item.Id)
+                .ToDictionary(group => group.Key, group => group.First().Title);
+        };
 }

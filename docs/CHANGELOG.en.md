@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Home's covers led nowhere.** They were cards inside a list item, so pressing one selected it and
+  nothing else — «al hacer click en las tarjetas en home no redirige a la vista detalle del vídeo».
+  The prototype wraps the whole cover in a button, and that is what both poster rails carry now, with
+  the same `poster-card` class the library grid uses: a card is one shape and one target area in all
+  three places. Pressing them turned up a real ambiguity on the way: one title can be on «Recently
+  added» and on the suggestions rail at the same moment, and two controls with one name is the very
+  defect the rail's buttons were renamed to avoid — so a cover announces its rail and then its title.
+
+- **And the suggestions rail was drawing twenty covers of the initials of nothing.** Its title lookup
+  was an optional parameter the composition never passed, so it resolved the empty string: registered
+  and never fed, in its quietest form — the rail rendered, the cards had the right shape, and there
+  was no error anywhere. It is asked for once per load and in a batch now, because the catalogue is
+  read over a connection and a per-card lookup can only be answered by blocking the thread that draws
+  them.
+
 - **A menu's selection box is no longer an accent rectangle.** It was two pixels of accent around
   every chosen row in the application — the settings index, the rail's menus, and a poster inside a
   rail too, where it reads as a box somebody dropped on a picture. The prototype draws it the other
@@ -196,6 +211,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   high contrast dictionaries paint a border, so nothing is lost where colour says nothing.
 
 ### Added
+
+- **«From the start» is on Home's two wide surfaces as well**, which is where it was missing: the
+  same arc with its arrow the other way, the same 36 px circle, beside the button it is the
+  alternative to — «en la tarjeta ancha del inicio justo después habría que poner el icono de
+  reproducir desde el inicio, como en la vista detalle del vídeo». One flag on the request rather
+  than a second hook: what changes is the minute the session opens at, and the host is already what
+  reads it.
 
 - **The element catalogue, read and written down**:
   [docs/design/ELEMENTS.en.md](design/ELEMENTS.en.md) carries
