@@ -33,9 +33,18 @@ public sealed class DuplicateFileRowViewModel
     /// The tail of the path, which is what tells two copies apart: the folder is a column of its own
     /// and repeating it in every file name would push the facts off the side.
     /// </summary>
-    public string ShortPath => System.IO.Path.GetFileName(_row.Path) is { Length: > 0 } name
-        ? "..." + name
-        : _row.Path;
+    public string ShortPath => Shortened(_row.Path);
+
+    /// <summary>
+    /// The tail of a path. Written as a length rather than as a pattern that also tests for null:
+    /// GetFileName answers with an empty string for a folder, never with nothing, and a test for a
+    /// state the framework cannot produce is a branch nothing can take.
+    /// </summary>
+    private static string Shortened(string path)
+    {
+        var name = System.IO.Path.GetFileName(path);
+        return name.Length > 0 ? "..." + name : path;
+    }
 
     public string Resolution => _row is { Width: { } width, Height: { } height }
         ? string.Create(CultureInfo.CurrentCulture, $"{width} × {height}")
@@ -185,11 +194,9 @@ public sealed class DuplicatesOverviewViewModel : INotifyPropertyChanged
     /// </summary>
     private async Task SetPreferredAsync(object? parameter)
     {
-        if (parameter is not DuplicateFileRowViewModel file)
-        {
-            return;
-        }
-
+        // The parameter is not tested again: the command refuses anything that is not a row before
+        // this runs, so a second check would be a branch nothing can take.
+        var file = (DuplicateFileRowViewModel)parameter!;
         var group = Groups.FirstOrDefault(candidate =>
             candidate.Files.Any(row => row.MediaFileId == file.MediaFileId));
         if (group is null)

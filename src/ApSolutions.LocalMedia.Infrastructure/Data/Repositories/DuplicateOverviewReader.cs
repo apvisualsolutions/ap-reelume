@@ -91,7 +91,9 @@ public sealed class DuplicateOverviewReader : IDuplicateOverviewReader
                 reader.IsDBNull(6) ? null : reader.GetInt32(6),
                 FirstCodec(reader, 7),
                 FirstCodec(reader, 8),
-                reader.IsDBNull(9) ? 0 : reader.GetInt64(9),
+                // Read rather than checked: size_bytes is NOT NULL in the schema, unlike the four
+                // columns around it, so a null test would be a branch nothing can take.
+                reader.GetInt64(9),
                 reader.IsDBNull(10) ? null : TimeSpan.FromTicks(reader.GetInt64(10)),
                 reader.GetInt32(11) == 1,
                 reader.GetInt32(12) == 1));
@@ -107,11 +109,8 @@ public sealed class DuplicateOverviewReader : IDuplicateOverviewReader
     /// </summary>
     private static string FirstCodec(SqliteDataReader reader, int column)
     {
-        if (reader.IsDBNull(column))
-        {
-            return string.Empty;
-        }
-
+        // Read rather than checked for null: both codec columns are NOT NULL in the schema, so a
+        // null test here would be a branch nothing can take.
         var stored = reader.GetString(column);
         try
         {

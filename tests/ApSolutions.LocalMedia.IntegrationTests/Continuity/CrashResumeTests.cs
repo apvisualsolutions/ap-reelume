@@ -160,6 +160,47 @@ public sealed class CrashResumeTests
             TestContext.Current.CancellationToken);
 
         Assert.Null(missing);
+        Assert.Throws<ArgumentNullException>(() => new WatchStateRepository(null!));
+    }
+
+    /// <summary>
+    /// Progress on something whose length the engine never reported is stored and read back as
+    /// exactly that: a position, and no length.
+    /// </summary>
+    /// <remarks>
+    /// It is the ordinary state of the first seconds of a session — the engine answers with a
+    /// duration once it has parsed enough of the file — and it is a different absence from a length
+    /// of zero: everything downstream that draws a bar asks whether there is a length at all, and a
+    /// zero would draw a full one.
+    /// </remarks>
+    [Fact]
+    public async Task Progress_with_no_known_length_round_trips_as_no_length()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+
+        var repository = new WatchStateRepository(factory);
+        var content = ContentKey.ForTitle(new TitleId(Guid.NewGuid()));
+        await repository.SaveAsync(
+            new WatchState
+            {
+                Content = content,
+                Position = TimeSpan.FromSeconds(12),
+                ObservedDuration = null,
+                SourceMediaFileId = new MediaFileId(Guid.NewGuid()),
+                Status = WatchStatus.InProgress,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UnixEpoch,
+                UpdatedUtc = DateTimeOffset.UnixEpoch,
+            },
+            TestContext.Current.CancellationToken);
+
+        var stored = await repository.GetAsync(content, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(stored);
+        Assert.Equal(TimeSpan.FromSeconds(12), stored!.Position);
+        Assert.Null(stored.ObservedDuration);
     }
 
     [Fact]

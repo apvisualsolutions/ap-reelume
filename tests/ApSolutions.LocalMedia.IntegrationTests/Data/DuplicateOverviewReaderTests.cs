@@ -90,6 +90,61 @@ public sealed class DuplicateOverviewReaderTests
         Assert.Equal("H264", other.VideoCodec);
     }
 
+    /// <summary>
+    /// What a row says when the file behind it says less: no dimensions, no running time, no codec
+    /// list at all, and a codec column written before that column held JSON.
+    /// </summary>
+    /// <remarks>
+    /// A library scanned without deep probing is exactly this: rows whose technical metadata is
+    /// empty. The destination's table has a column for each of those facts, so each absence has to
+    /// arrive as an absence rather than as a zero — and the legacy value has to arrive as itself
+    /// rather than as an exception on the way to the screen.
+    /// </remarks>
+    [Fact]
+    public async Task A_row_survives_a_file_that_says_nothing_and_a_codec_written_before_the_json()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        using (var runner = new MigrationRunner(factory))
+        {
+            await runner.MigrateAsync(CancellationToken.None);
+        }
+
+        var title = Guid.NewGuid();
+        var silent = Version("silent", 1920, 1080, "H264", "AAC", 0, isAvailable: true);
+        var legacy = Version("legacy", 1920, 1080, "H264", "AAC", 1_000, isAvailable: true);
+        await SeedFileAsync(factory, silent, bareMetadata: true);
+        await SeedFileAsync(factory, legacy);
+
+        // The row a version older than the JSON column would have written: the codec itself, not an
+        // array holding it.
+        await using (var connection = await factory.OpenAsync(CancellationToken.None))
+        await using (var command = connection.CreateCommand())
+        {
+            command.CommandText =
+                "UPDATE media_files SET video_codecs = 'AV1', audio_codecs = '' WHERE id = $id;";
+            command.Parameters.AddWithValue("$id", legacy.MediaFileId.Value.ToString("D"));
+            await command.ExecuteNonQueryAsync(CancellationToken.None);
+        }
+
+        await new MediaVersionGroupRepository(factory).SaveAsync(
+            Group(title, silent, legacy),
+            TestContext.Current.CancellationToken);
+
+        var entry = Assert.Single(await new DuplicateOverviewReader(factory)
+            .ListAsync(TestContext.Current.CancellationToken));
+
+        var quiet = Assert.Single(entry.Files!, file => file.MediaFileId == silent.MediaFileId);
+        Assert.Null(quiet.Width);
+        Assert.Null(quiet.Height);
+        Assert.Null(quiet.Duration);
+        Assert.Equal(string.Empty, quiet.VideoCodec);
+
+        var old = Assert.Single(entry.Files!, file => file.MediaFileId == legacy.MediaFileId);
+        Assert.Equal("AV1", old.VideoCodec);
+        Assert.Equal(string.Empty, old.AudioCodec);
+    }
+
     [Fact]
     public void A_reader_over_no_store_refuses_to_be_built()
     {
@@ -120,8 +175,14 @@ public sealed class DuplicateOverviewReaderTests
         videoCodec,
         sizeBytes);
 
-    /// <summary>The file behind one member, as the scan would have written it.</summary>
-    private static async Task SeedFileAsync(SqliteConnectionFactory factory, MediaVersion version)
+    /// <summary>
+    /// The file behind one member, as the scan would have written it — or as a scan that never
+    /// probed it would, with <paramref name="bareMetadata"/>.
+    /// </summary>
+    private static async Task SeedFileAsync(
+        SqliteConnectionFactory factory,
+        MediaVersion version,
+        bool bareMetadata = false)
     {
         await new MediaFileRepository(factory).UpsertAsync(
             new MediaFile(
@@ -130,13 +191,15 @@ public sealed class DuplicateOverviewReaderTests
                 version.Path,
                 version.SizeBytes,
                 DateTimeOffset.UnixEpoch,
-                new TechnicalMetadata(
-                    version.Duration,
-                    "matroska",
-                    [version.VideoCodec],
-                    [AudioCodecOf(version)],
-                    version.Width,
-                    version.Height),
+                bareMetadata
+                    ? new TechnicalMetadata(null, "matroska", [], [], null, null)
+                    : new TechnicalMetadata(
+                        version.Duration,
+                        "matroska",
+                        [version.VideoCodec],
+                        [AudioCodecOf(version)],
+                        version.Width,
+                        version.Height),
                 version.IsAvailable),
             CancellationToken.None);
     }
