@@ -339,6 +339,74 @@ public sealed class PlayerPanelColumnTests
         return (window, view, viewModel);
     }
 
+    /// <summary>
+    /// Each of the four panels, alone, is enough to give the column its width — and none of them is
+    /// enough to take it when it is not there.
+    /// </summary>
+    /// <remarks>
+    /// The column is 320 px of the window, so which panel decides it is not a detail: a session with
+    /// one audio track, no markers and no other version used to leave an empty rectangle taking a
+    /// fifth of the picture. Each arm is asked for on its own here because a chain of four alternatives
+    /// tested only at its ends is a chain where the middle two are never the one that answered.
+    /// </remarks>
+    [AvaloniaTheory]
+    [InlineData("audio")]
+    [InlineData("video")]
+    [InlineData("markers")]
+    [InlineData("versions")]
+    [InlineData("none")]
+    public void One_panel_is_enough_for_the_column_and_none_is_not(string only)
+    {
+        var shell = new ShellViewModel(
+            new NavigationService(),
+            new ShellSurfaces
+            {
+                OpenPlayer = (_, _) => Task.FromResult<PlayerSurfaces?>(OnlyPanel(only)),
+                ClosePlayer = _ => Task.CompletedTask,
+            });
+
+        shell.OpenPlayerAsync(new PlayDetailsRequest(new MediaFileId(Guid.NewGuid()), null))
+            .GetAwaiter()
+            .GetResult();
+
+        Assert.Equal(only != "none", shell.HasPlayerPanels);
+    }
+
+    private static PlayerSurfaces OnlyPanel(string only)
+    {
+        var player = new PlayerViewModel(new InertCoordinator());
+        if (only == "versions")
+        {
+            var version = new MediaVersion(
+                new MediaFileId(Guid.NewGuid()),
+                @"rootlternate.mkv",
+                true,
+                TimeSpan.FromMinutes(90),
+                1280,
+                720,
+                IsHdr: false,
+                "H264",
+                1_000_000);
+            var versions = new PlayerVersionsViewModel(
+                [new PlayerVersionRowViewModel(version, new VersionSwitchViewModel(), _ => Task.CompletedTask)]);
+            return new PlayerSurfaces { Player = player, Versions = versions };
+        }
+
+        if (only == "audio")
+        {
+            var output = new AudioOutputViewModel(new StubCatalog());
+            output.LoadAsync().GetAwaiter().GetResult();
+            return new PlayerSurfaces { Player = player, AudioOutput = output };
+        }
+
+        return only switch
+        {
+            "video" => new PlayerSurfaces { Player = player, VideoStatus = new VideoStatusViewModel() },
+            "markers" => new PlayerSurfaces { Player = player, Markers = new MarkerEditorViewModel() },
+            _ => new PlayerSurfaces { Player = player },
+        };
+    }
+
     private static ShellViewModel CreateViewModel() => new(
         new NavigationService(),
         new ShellSurfaces

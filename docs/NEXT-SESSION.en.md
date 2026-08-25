@@ -1,5 +1,112 @@
 # Where to pick up
 
+## State at the close of 2026-08-25 (third session) — the eight of the brief, closed and measured
+
+Six commits on the branch. **Everything green locally**: Domain 519, Application 246, Architecture
+30, Documentation 91, Ui 917, Accessibility 146, Integration 470, and the walk at 202 pressed with
+the ratchet still at 20.
+
+**What to look at first:** the coverage gate in CI. The two floors the previous session left open —
+`ShellViewModel` and `CompositionRoot.cs` — are still the only thing between this branch and a
+fast-forward. `ShellViewModel` is **closed in this session**: the missing branch was the subtitle
+panel term inside `HasPlayerPanels`, which **nothing could take** — it is `Player?.Tracks is not null`
+and so is half of `HasAudioPanel`, which is evaluated first — so it was deleted rather than written an
+impossible test, and the four alternatives left are now asked for one at a time. `CompositionRoot.cs`
+was not touched on the null side of `ShellHost.Shell` in the `ModeHandler`, which is still the branch
+that is missing.
+
+### The brief, point by point
+
+Eight points: two improvements and six defects. All eight are closed, each with its number.
+
+1. **The buttons' vertical alignment, for the third time, and this time with the right number.** The
+   five pixels lived in the **button's padding**, which moves the whole content: a glyph and the word
+   beside it travel together, so they stayed exactly as far apart as before. Measured in a 44 px
+   button: glyph at 19.00, ink at 21.43 — **2.43 px**, the same number as always, untouched by the
+   correction that was meant to fix it. The margin now goes **on the label**, and
+   `ButtonOpticalCentreTests` also holds the icon against the word, which was the half no gate was
+   looking at.
+
+2. **The selection boxes in menus.** They were 2 px of accent around every chosen row in the whole
+   application, rail covers included. The prototype does it the other way round: a neutral wash,
+   `rgba(127,145,170,.16)`, with the accent on the destination's 3 px bar. Two new tokens and a
+   one-pixel border. **The measured concession**: the stroke is not transparent because
+   `ListRowStateTests` asks for 3:1 and a 16 % wash reads 1.1:1 — so it carries the neutral 3.88:1
+   border.
+
+3. **The library's filter pills** carried the control border and the primary ink when unchosen, so
+   three options looked like three chosen ones. And **the drop-down said nothing when it opened**
+   beyond turning its caret over.
+
+4. **Home's covers led nowhere** (they were cards inside a list item). On the way: **the suggestions
+   rail was drawing twenty covers of the initials of nothing**, because its title lookup was an
+   optional parameter the composition never passed.
+
+5. **"From the start" on Home's two wide surfaces**, with a flag on the request rather than a second
+   hook.
+
+6. **Continue asked again** what pressing Continue had already answered: the position the caller names
+   had won over the policy since the version switch, and the other half of that decision — not
+   building the offer — had never been made.
+
+7. **The play button disappeared on the card** when there was no progress. It is now one button whose
+   words follow the state, which is what the prototype writes, and the glyph is the alternative and is
+   drawn only while there is something to be one to.
+
+8. **Series.** See below: it is the largest thing in the session.
+
+### Series, which was this house's defect in its largest form
+
+`titles`, `seasons`, `episodes` and `episode_media` have existed since migration **0004**, the series
+card has been drawn and routed to since it was written, `MediaNameParser` has read `S01E01` since day
+one — and **nothing had ever written a row into any of the four**. LIB-005 stood as `VERIFIED` on
+evidence that measures the parser, and the parser works: what was missing was a caller.
+
+Two pieces, neither in the view: `LocalSeriesPolicy` (domain, pure) says which folder names the
+series — **the folder, never the file** — and `GroupScannedEpisodes` runs after every scan and writes
+the show, its seasons, its episodes and the file behind each one.
+
+Measured end to end over the real tree: **99 files go in and 3 cards come out** — two shows of 72 and
+27 episodes with their eight and three seasons, and the film that was in the same root — with a file
+behind every episode. The evidence is in
+[docs/evidence/stable/audit-lib005-a-folder-of-episodes-is-a-series.md](evidence/stable/audit-lib005-a-folder-of-episodes-is-a-series.md).
+
+### The element catalogue, written down
+
+[docs/design/ELEMENTS.en.md](design/ELEMENTS.en.md) carries the prototype's catalogue over into this
+tree's tokens, element by element and state by state, with a rule of precedence: the prototype wins
+over the document and the document wins over the `.axaml`. The icons were already the prototype's —
+`Theme/Icons.axaml` converted them on 2026-08-24 — and it has been checked that not one Segoe Fluent
+glyph is left in any view.
+
+### The traps that cost time here
+
+- **A new test over a model that reads resources needs `[AvaloniaTheory]`**, not `[Theory]`. It went
+  unnoticed locally because of execution order and CI caught it: "the calling thread cannot access
+  this object".
+- **An XML comment cannot contain two consecutive hyphens**, so the prototype's CSS variables quoted
+  inside an AXAML comment break the markup build, not the code build.
+- **`Guid` keeps its first three fields little-endian**, so the byte a canonical UUID calls the
+  seventh — the version byte — is index **7** of the array and not 6.
+- **Making both covers pressable turned up a real ambiguity**: one title can be on "Recently added"
+  and on the suggestions rail at the same moment, and the walk refused to press a name that matched
+  two controls. It was resolved the way the rail already did it: the accessible name says the rail and
+  then the title.
+- **"From the start" erases the progress when it closes**, so the hero and the rail card disappear.
+  There is no order in which both presses survive: the walk puts the progress back between them.
+
+### What is left
+
+- **The speed menu** is still a `MenuFlyout` of eleven numeric rows.
+- **The transport's glyphs, one by one against the prototype.** Not started.
+- **The mini as a real PiP window.** Half done.
+- **The poster behind the card's header** (decision 6).
+- **The metadata editor as a view of its own.**
+- **"Sections cut off by the width"**, still not located.
+- **The title of an unidentified film is its file name verbatim** — "El Faro de Piedra 2019". It is
+  **asserted** in the series test rather than corrected: now that the parser is used for grouping,
+  cleaning it up for films too is half an hour, but it is somebody's decision.
+
 ## State at the close of 2026-08-25 (small hours) — nine of the twenty-four, and CI nearly green
 
 Nine commits on the branch. **Everything green locally**: Domain 499, Application 241, Architecture

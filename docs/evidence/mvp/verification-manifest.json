@@ -205,7 +205,8 @@
         "ApSolutions.LocalMedia.UiTests"
       ],
       "evidence": [
-        "docs/evidence/mvp/T11-name-parser.md"
+        "docs/evidence/mvp/T11-name-parser.md",
+        "docs/evidence/stable/audit-lib005-a-folder-of-episodes-is-a-series.md"
       ]
     },
     {

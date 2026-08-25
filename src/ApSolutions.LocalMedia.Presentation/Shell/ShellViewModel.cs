@@ -603,8 +603,16 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// empty rectangle taking a fifth of the picture's width. The prototype gives the column to a
     /// panel when there is one and gives the width back to the film when there is not.
     /// </remarks>
+    /// <remarks>
+    /// <b>Four and not five, and the subtitle panel is the one missing on purpose.</b> It is
+    /// <c>Player?.Tracks is not null</c>, and so is half of <c>HasAudioPanel</c>, which is evaluated
+    /// first — so the moment this chain reaches the subtitle term, the track list is already known
+    /// to be absent and the term can only ever answer false. Written out it was a branch nothing
+    /// could take, which the coverage gate is what noticed. The rule this tree follows for one of
+    /// those is to make it reachable or delete it, never to write it an impossible test.
+    /// </remarks>
     public bool HasPlayerPanels =>
-        HasAudioPanel || HasSubtitlePanel || HasVideoPanel || HasMarkerPanel || HasPlayerVersions;
+        HasAudioPanel || HasVideoPanel || HasMarkerPanel || HasPlayerVersions;
 
     public bool HasVideoStatus => Player?.VideoStatus is not null;
 

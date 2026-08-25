@@ -1,5 +1,113 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-25 (tercera sesión) — los ocho del encargo, cerrados y medidos
+
+Seis commits sobre la rama. **Todo verde en local**: Domain 519, Application 246, Architecture 30,
+Documentation 91, Ui 917, Accessibility 146, Integration 470, y el paseo en 202 pulsados con el
+trinquete quieto en 20.
+
+**Lo que hay que mirar primero:** la puerta de cobertura en CI. Los dos suelos que la sesión anterior
+dejó abiertos —`ShellViewModel` y `CompositionRoot.cs`— siguen siendo lo único que separa esta rama
+de un fast-forward. `ShellViewModel` queda **cerrado en esta sesión**: la rama que faltaba era el
+término del panel de subtítulos dentro de `HasPlayerPanels`, que **nada podía tomar** —es
+`Player?.Tracks is not null` y también lo es la mitad de `HasAudioPanel`, que se evalúa antes—, así
+que se ha borrado en vez de escribirle una prueba imposible, y las cuatro alternativas que quedan se
+piden ahora una a una. De `CompositionRoot.cs` no se ha tocado el lado nulo de `ShellHost.Shell` en el
+`ModeHandler`, que sigue siendo la rama que falta.
+
+### El encargo, punto por punto
+
+Ocho puntos: dos mejoras y seis defectos. Los ocho están cerrados, cada uno con su número.
+
+1. **La alineación vertical de los botones, por tercera vez, y esta vez con el número correcto.** Los
+   cinco píxeles estaban en el **relleno del botón**, que mueve todo el contenido: un glifo y la
+   palabra a su lado viajan juntos, así que seguían exactamente igual de separados. Medido en un
+   botón de 44: glifo en 19,00, tinta en 21,43 — **2,43 px**, el mismo número de siempre, intacto bajo
+   la corrección que debía arreglarlo. Ahora el margen va **en la etiqueta**, y
+   `ButtonOpticalCentreTests` sostiene también el icono contra la palabra, que era la mitad que
+   ninguna puerta miraba.
+
+2. **Los recuadros de selección de los menús.** Eran 2 px de acento alrededor de cada fila elegida de
+   toda la aplicación, carátulas de carril incluidas. El prototipo lo hace al revés: lavado neutro
+   `rgba(127,145,170,.16)` y el acento en la barra de 3 px del destino. Dos tokens nuevos y el borde a
+   un píxel. **La cesión medida**: el trazo no es transparente porque `ListRowStateTests` exige 3:1 y
+   un lavado al 16 % da 1,1:1 — así que lleva el borde neutro de 3,88:1.
+
+3. **Las píldoras de filtro de Biblioteca** llevaban borde de control y tinta primaria sin elegir, así
+   que las tres opciones parecían tres elegidas. Y **el desplegable no decía nada al abrirse** salvo
+   dar la vuelta al galón.
+
+4. **Las carátulas de Home no llevaban a ninguna parte** (eran tarjetas dentro de un elemento de
+   lista). De paso: **el carril de sugerencias dibujaba veinte portadas de las iniciales de nada**,
+   porque su búsqueda de títulos era un parámetro opcional que la composición nunca pasó.
+
+5. **«Desde el principio» en las dos superficies anchas de Home**, con una bandera en la petición y no
+   un segundo enganche.
+
+6. **Continuar volvía a preguntar** lo que continuar ya había contestado: la posición pedida mandaba
+   sobre la política desde el cambio de versión, y la otra mitad de esa decisión —no construir el
+   aviso— no se había hecho.
+
+7. **El botón de reproducir desaparecía en la ficha** cuando no había progreso. Ahora es un solo botón
+   cuyas palabras siguen al estado, que es lo que escribe el prototipo, y el glifo es la alternativa y
+   sólo se dibuja mientras hay algo de lo que serlo.
+
+8. **Las series.** Ver abajo: es lo más grande de la sesión.
+
+### Las series, que eran el defecto de la casa en su forma más grande
+
+`titles`, `seasons`, `episodes` y `episode_media` existen desde la migración **0004**, la ficha de
+serie está dibujada y enrutada desde que se escribió, `MediaNameParser` lee `S01E01` desde el primer
+día — y **nada había escrito jamás una fila en ninguna de las cuatro**. LIB-005 figuraba como
+`VERIFIED` con una evidencia que mide el analizador, y el analizador funciona: lo que no había era
+quien lo llamara.
+
+Dos piezas, ninguna en la vista: `LocalSeriesPolicy` (dominio, pura) dice qué carpeta nombra la serie
+—**la carpeta, nunca el archivo**— y `GroupScannedEpisodes` corre después de cada escaneo y escribe la
+serie, sus temporadas, sus episodios y el archivo detrás de cada uno.
+
+Medido de punta a punta sobre el árbol real: **99 archivos entran y 3 tarjetas salen** —dos series de
+72 y 27 episodios con sus ocho y tres temporadas, y la película que había en la misma raíz—, con un
+archivo detrás de cada episodio. La evidencia está en
+[docs/evidence/stable/audit-lib005-a-folder-of-episodes-is-a-series.md](evidence/stable/audit-lib005-a-folder-of-episodes-is-a-series.md).
+
+### El catálogo de elementos, escrito
+
+[docs/design/ELEMENTS.es.md](design/ELEMENTS.es.md) pasa el catálogo del prototipo a los tokens de
+este árbol, elemento por elemento y estado por estado, con una regla de precedencia: el prototipo
+manda sobre el documento y el documento manda sobre el `.axaml`. Los iconos ya eran los del prototipo
+—`Theme/Icons.axaml` los convirtió el 2026-08-24— y se ha comprobado que no queda ni un glifo de Segoe
+Fluent en ninguna vista.
+
+### Las trampas que costaron tiempo aquí
+
+- **Una prueba nueva sobre un modelo que lee recursos necesita `[AvaloniaTheory]`**, no `[Theory]`.
+  Pasó desapercibido en local por el orden de ejecución y CI lo cazó: «the calling thread cannot
+  access this object».
+- **Un comentario XML no puede contener dos guiones seguidos**, así que las variables CSS del
+  prototipo citadas en un comentario de AXAML rompen la compilación del marcado, no la del código.
+- **`Guid` guarda sus tres primeros campos en little-endian**, así que el byte que un UUID canónico
+  llama séptimo —el de la versión— es el índice **7** del array, no el 6.
+- **Hacer pulsables las dos carátulas destapó una ambigüedad real**: un mismo título puede estar a la
+  vez en «Añadido recientemente» y en sugerencias, y el paseo se negó a pulsar un nombre que casaba
+  con dos controles. Se resolvió como ya hacía el carril: el nombre accesible dice el carril y luego
+  el título.
+- **«Desde el principio» borra el progreso al cerrarse**, así que el héroe y la tarjeta del carril
+  desaparecen. No hay orden en que las dos pulsaciones sobrevivan: el paseo repone el progreso entre
+  ellas.
+
+### Lo que queda
+
+- **El menú de velocidad** sigue siendo un `MenuFlyout` de once filas numéricas.
+- **Los glifos del transporte, uno a uno contra el prototipo.** Sin empezar.
+- **El mini como ventana PiP de verdad.** Media hecha.
+- **El póster de fondo en el cabecero de la ficha** (decisión 6).
+- **El editor de metadatos como vista propia.**
+- **«Secciones cortadas por el ancho»**, todavía sin localizar.
+- **El título de una película sin identificar es su nombre de archivo tal cual** —«El Faro de Piedra
+  2019»—. Está **afirmado** en la prueba de series en vez de corregido: ahora que el analizador se usa
+  para agrupar, limpiarlo también para las películas es media hora, pero es una decisión de alguien.
+
 ## Estado al cierre del 2026-08-25 (madrugada) — nueve de los veinticuatro, y CI casi verde
 
 Nueve commits sobre la rama. **Todo verde en local**: Domain 499, Application 241, Architecture 30,
