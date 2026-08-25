@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Las tres herramientas del título están en la ficha, no bajo la biblioteca.** «Editar metadatos»,
+  «Previsualizar renombrado» y «Revisar versiones» eran una fila de botones bajo la cuadrícula, que
+  actuaban sobre «el título abierto» en una pantalla donde puede no haber ninguno abierto. El
+  prototipo las pone en la fila de acciones del banner, y ahí están —una sola vista montada por las
+  dos fichas, para que la identidad que el paseo pulsa siga siendo una.
+
+### Corregido
+
 - **La bandeja de revisión deja de ser una lista con selección.** Sus filas eran controles de mando, y
   con las decisiones dentro de la tarjeta eso dejó a la prueba del paseo sin sitio donde pulsar «al
   lado» —medido en CI: ningún punto alrededor de «Aceptar» cae fuera de otra tarjeta—. La bandeja se

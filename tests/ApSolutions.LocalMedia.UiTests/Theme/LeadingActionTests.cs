@@ -136,6 +136,9 @@ public sealed class LeadingActionTests
         ["RenamePreviewView"] = "RenameExecuteAction",
 
         // Catalog
+        // Three peer tools — edit, rename, compare — and no first among them: a card's leading
+        // action is Play, and these sit beside it.
+        ["TitleActionsView"] = null,
         ["PersonalActionsView"] = null,
         ["WatchStatusControl"] = null,
 

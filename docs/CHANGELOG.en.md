@@ -10,6 +10,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The three title tools are in the card rather than under the library.** «Edit metadata», «Preview
+  rename» and «Review versions» were a row of buttons under the grid, acting on «the open title» on a
+  screen where none need be open. The prototype puts them in the banner's action row, and that is
+  where they are — one view mounted by both cards, so the identity the walk presses stays one.
+
+### Fixed
+
 - **The review tray stops being a list with a selection.** Its rows were command controls, and with
   the decisions inside the card that left the walk's own proof with nowhere to click «beside» —
   measured in CI: no point around «Accept» falls outside another card. The tray is drawn the way the

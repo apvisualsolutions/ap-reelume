@@ -170,21 +170,44 @@ public sealed class AssembledJourneyTests : IDisposable
         Assert.Contains("GPL-3.0", text, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// The three title tools are in the card that opened the title, and only there.
+    /// </summary>
+    /// <remarks>
+    /// They were a row under the library until 2026-08-25: three buttons acting on «the open title»,
+    /// on a screen where no title need be open. Both halves are asserted, because moving a control
+    /// is only finished when the place it left no longer draws it.
+    /// </remarks>
     [AvaloniaFact]
-    public void The_card_actions_reach_the_editor_the_rename_preview_and_the_versions()
+    public void The_card_actions_live_in_the_card_and_not_under_the_library()
     {
         using var host = ShowShell();
         Navigate(host, AppRoute.Library);
 
-        var buttons = host.Shell.GetVisualDescendants()
+        var onTheGrid = host.Shell.GetVisualDescendants()
             .OfType<Button>()
             .Select(button => AutomationProperties.GetName(button))
             .Where(name => !string.IsNullOrWhiteSpace(name))
             .ToArray();
 
-        Assert.Contains(Resource("TitleEditMetadataAction"), buttons);
-        Assert.Contains(Resource("TitlePreviewRenameAction"), buttons);
-        Assert.Contains(Resource("TitleReviewDuplicatesAction"), buttons);
+        Assert.DoesNotContain(Resource("TitleEditMetadataAction"), onTheGrid);
+        Assert.DoesNotContain(Resource("TitlePreviewRenameAction"), onTheGrid);
+        Assert.DoesNotContain(Resource("TitleReviewDuplicatesAction"), onTheGrid);
+
+        var actions = new Presentation.Catalog.TitleActionsView();
+        var window = new Window { Width = 900, Height = 300, Content = actions };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var inTheCard = actions.GetVisualDescendants()
+            .OfType<Button>()
+            .Select(button => AutomationProperties.GetName(button))
+            .ToArray();
+
+        Assert.Contains(Resource("TitleEditMetadataAction"), inTheCard);
+        Assert.Contains(Resource("TitlePreviewRenameAction"), inTheCard);
+        Assert.Contains(Resource("TitleReviewDuplicatesAction"), inTheCard);
+        window.Close();
     }
 
     /// <summary>

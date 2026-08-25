@@ -142,6 +142,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   Content="{DynamicResource DetailsTrailerLinkAction}"
                   IsVisible="{Binding HasTrailerLink}"
                   automation:AutomationProperties.Name="{DynamicResource DetailsTrailerLinkAction}" />
+              <!--
+                The three title tools, which the prototype puts in this row and this application drew
+                under the library: a row of buttons acting on a card that might not even be open.
+              -->
+              <catalog:TitleActionsView />
             </WrapPanel>
             <!--
               The three consequences the design package wrote for the trailer, each beside the state

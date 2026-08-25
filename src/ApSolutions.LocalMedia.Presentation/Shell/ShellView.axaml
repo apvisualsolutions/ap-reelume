@@ -504,28 +504,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ContentControl>
         <library:LibraryView DataContext="{Binding Library}" />
         <!--
-          A WrapPanel and not a horizontal StackPanel: three buttons carrying translated words is the
-          shape that has drawn a control off the side seven times in this repository, and §4 asks for
-          this one by name.
+          The three title tools used to be here, under the library: a row of buttons acting on a card
+          that might not even be open. They moved into the cards themselves on 2026-08-25, which is
+          where the prototype draws them — TitleActionsView, mounted by both.
         -->
-        <WrapPanel
-            x:Name="TitleActionsSurface"
-            ItemSpacing="{DynamicResource Space8}"
-            LineSpacing="{DynamicResource Space8}"
-            automation:AutomationProperties.Name="{DynamicResource TitleActionsAccessibleName}">
-          <Button
-              automation:AutomationProperties.Name="{DynamicResource TitleEditMetadataAction}"
-              Command="{Binding EditMetadataCommand}"
-              Content="{DynamicResource TitleEditMetadataAction}" />
-          <Button
-              automation:AutomationProperties.Name="{DynamicResource TitlePreviewRenameAction}"
-              Command="{Binding PreviewRenameCommand}"
-              Content="{DynamicResource TitlePreviewRenameAction}" />
-          <Button
-              automation:AutomationProperties.Name="{DynamicResource TitleReviewDuplicatesAction}"
-              Command="{Binding ReviewDuplicatesCommand}"
-              Content="{DynamicResource TitleReviewDuplicatesAction}" />
-        </WrapPanel>
         <!--
           The owner's fifth point: the two title tools share one panel behind real tabs, the way the
           player's side column holds its four lists. Each door selects its own tab as it opens; a
