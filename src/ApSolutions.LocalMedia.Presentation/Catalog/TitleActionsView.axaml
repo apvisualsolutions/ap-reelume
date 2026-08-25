@@ -1,0 +1,40 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Catalog.TitleActionsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:shell="clr-namespace:ApSolutions.LocalMedia.Presentation.Shell">
+  <!--
+    The three things a person can do to whichever title is open: edit what it says, see what renaming
+    its file would do, and compare the copies of it. The prototype puts them in the card's banner
+    beside Play, and they lived under the library instead — a row of buttons that acted on a card
+    that might not even be open.
+
+    One view mounted by both cards rather than a copy in each: the walk's inventory is keyed by the
+    view a control is declared in, so two copies would be two identities and one of them would go
+    unpressed. It is also why the commands are reached through the shell rather than handed in —
+    what they act on is the shell's SelectedTitleId, which is what opening either card sets.
+  -->
+  <WrapPanel
+      x:Name="TitleActionsSurface"
+      ItemSpacing="{DynamicResource Space8}"
+      LineSpacing="{DynamicResource Space8}"
+      automation:AutomationProperties.Name="{DynamicResource TitleActionsAccessibleName}">
+    <Button
+        automation:AutomationProperties.Name="{DynamicResource TitleEditMetadataAction}"
+        Command="{Binding $parent[shell:ShellView].((shell:ShellViewModel)DataContext).EditMetadataCommand}"
+        Content="{DynamicResource TitleEditMetadataAction}" />
+    <Button
+        automation:AutomationProperties.Name="{DynamicResource TitlePreviewRenameAction}"
+        Command="{Binding $parent[shell:ShellView].((shell:ShellViewModel)DataContext).PreviewRenameCommand}"
+        Content="{DynamicResource TitlePreviewRenameAction}" />
+    <Button
+        automation:AutomationProperties.Name="{DynamicResource TitleReviewDuplicatesAction}"
+        Command="{Binding $parent[shell:ShellView].((shell:ShellViewModel)DataContext).ReviewDuplicatesCommand}"
+        Content="{DynamicResource TitleReviewDuplicatesAction}" />
+  </WrapPanel>
+</UserControl>

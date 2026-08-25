@@ -30,7 +30,7 @@ public sealed class WrappingSurfaceTests
     /// <summary>The surfaces decided so far, by the view that declares them.</summary>
     private static readonly (string View, string Surface)[] Wrapping =
     [
-        ("Shell/ShellView.axaml", "TitleActionsSurface"),
+        ("Catalog/TitleActionsView.axaml", "TitleActionsSurface"),
         ("Library/LibraryView.axaml", "LibraryFilterSurface"),
         ("Movie/MovieDetailsView.axaml", "MovieActionsSurface"),
         ("Show/ShowDetailsView.axaml", "ShowActionsSurface"),

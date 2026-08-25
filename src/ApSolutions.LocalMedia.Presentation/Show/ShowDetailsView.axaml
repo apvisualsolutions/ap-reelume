@@ -155,6 +155,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 x:Name="ShowActionsSurface"
                 ItemSpacing="{DynamicResource Space8}"
                 LineSpacing="{DynamicResource Space8}">
+              <catalog:TitleActionsView />
               <Button
                   Command="{Binding OpenTrailerLinkCommand}"
                   Content="{DynamicResource DetailsTrailerLinkAction}"
