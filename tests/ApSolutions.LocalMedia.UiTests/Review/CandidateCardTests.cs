@@ -133,6 +133,35 @@ public sealed class CandidateCardTests
         Assert.Equal(1, searched);
     }
 
+    /// <summary>
+    /// What the card calls the candidate: its name, or the key when nobody stored one.
+    /// </summary>
+    /// <remarks>
+    /// The tray asks a person to accept or reject something, and «movie:329865» is not something
+    /// anybody can accept or reject. The fallback is the key rather than a blank, because a row
+    /// written before the provider's name was stored still has to identify itself — and because a
+    /// key is at least something that can be pasted into a search.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_card_calls_the_candidate_by_its_name_and_by_its_key_when_it_has_none()
+    {
+        var named = new CandidateCardViewModel(Candidate(@"D:\Cine.mkv") with
+        {
+            DisplayTitle = "Puerto Sombra (2021)",
+        });
+        Assert.Equal("Puerto Sombra (2021)", named.CandidateLabel);
+
+        var nameless = new CandidateCardViewModel(Candidate(@"D:\Cine.mkv"));
+        Assert.Equal("movie:329865", nameless.CandidateLabel);
+
+        // A name that is there and says nothing is the same absence as no name at all.
+        var blank = new CandidateCardViewModel(Candidate(@"D:\Cine.mkv") with
+        {
+            DisplayTitle = string.Empty,
+        });
+        Assert.Equal("movie:329865", blank.CandidateLabel);
+    }
+
     private static MatchCandidate Candidate(
         string? path,
         CandidateContentKind kind = CandidateContentKind.Movie) => new(

@@ -36,7 +36,8 @@ public sealed class CandidateScorer : ICandidateScorer
                 ScoringModelVersion,
                 ReviewState.Rejected,
                 Signals: [],
-                ExplanationCodes: ["Identification.Error.KindConflict"]);
+                ExplanationCodes: ["Identification.Error.KindConflict"],
+                DisplayTitle: facts.DisplayTitle);
         }
 
         var signals = BuildSignals(parsed, facts);
@@ -69,7 +70,8 @@ public sealed class CandidateScorer : ICandidateScorer
             ScoringModelVersion,
             ConfidencePolicy.Classify(score),
             signals.AsReadOnly(),
-            explanations.AsReadOnly());
+            explanations.AsReadOnly(),
+            DisplayTitle: facts.DisplayTitle);
     }
 
     private static List<MatchSignal> BuildSignals(ParsedMediaName parsed, CandidateFacts facts)

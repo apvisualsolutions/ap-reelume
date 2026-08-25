@@ -108,6 +108,20 @@ public sealed class CandidateCardViewModel
 
     public string StableKey => Candidate.StableKey;
 
+    /// <summary>
+    /// What this candidate is called, falling back to the key that identifies it.
+    /// </summary>
+    /// <remarks>
+    /// The tray exists to have somebody decide, and «movie:761053» is not something anybody can
+    /// decide about: the prototype writes «Puerto Sombra · T02E05 · «Puerto de invierno»» here. The
+    /// key stays as the fallback rather than a blank, because a row written before the provider's
+    /// name was stored still has to say which candidate it is — and because the key is at least
+    /// something a person can paste into a search.
+    /// </remarks>
+    public string CandidateLabel => Candidate.DisplayTitle is { Length: > 0 } title
+        ? title
+        : Candidate.StableKey;
+
     /// <summary>The file's own name, which is what the tray is asking about.</summary>
     public string FileName => Candidate.MediaFilePath is { Length: > 0 } path
         ? System.IO.Path.GetFileName(path)

@@ -89,7 +89,11 @@ public sealed record CandidateFacts(
     double? SeasonMatch,
     double? EpisodeMatch,
     double? YearMatch,
-    double? DurationMatch);
+    double? DurationMatch,
+    // What the provider calls this, which is the only part of a candidate a person can weigh. Scoring
+    // never reads it — it is carried, not used — and it is nullable because a source that answers with
+    // keys and no names is a source this still has to work with.
+    string? DisplayTitle = null);
 
 public sealed record MatchSignal(
     string Code,
@@ -113,7 +117,10 @@ public sealed record MatchCandidate(
     // about a file it never shows them, which is the one thing this surface exists to do. Nullable
     // because most readings of a candidate do not need it, and a file can be gone by the time one is
     // reviewed.
-    string? MediaFilePath = null);
+    string? MediaFilePath = null,
+    // And what the candidate is called. Same reason as the path above and the same nullability: rows
+    // written before the column existed have no name, and the tray falls back to the key.
+    string? DisplayTitle = null);
 
 public enum MatchDecisionWriteOutcome
 {
