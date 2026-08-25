@@ -86,8 +86,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <Button
               Classes="primary-action"
               automation:AutomationProperties.Name="{DynamicResource LibraryAddMediaAction}"
-              Command="{Binding AddMediaCommand}"
-              Content="{DynamicResource LibraryAddMediaAction}" />
+              Command="{Binding AddMediaCommand}">
+            <!--
+              The plus before the words, which is how the prototype draws this button and the only
+              thing it had missing. Raw, because the button is already named by its label: a reader
+              that heard the glyph would hear «plus, add media…».
+            -->
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <Path
+                  Classes="icon size-14"
+                  VerticalAlignment="Center"
+                  Data="{DynamicResource IconAdd}"
+                  automation:AutomationProperties.AccessibilityView="Raw" />
+              <TextBlock VerticalAlignment="Center" Text="{DynamicResource LibraryAddMediaAction}" />
+            </StackPanel>
+          </Button>
         </WrapPanel>
       </Grid>
       <!--

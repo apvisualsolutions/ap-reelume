@@ -32,6 +32,18 @@ and a name here would be a second announcement of the same card.
     <home:ResourceKeyConverter x:Key="CardWord" />
     <library:KindShapeConverter x:Key="KindShape" />
   </UserControl.Resources>
+  <UserControl.Styles>
+    <!--
+      The same card, in a rail: the chip keeps its glyph and drops its word. The prototype writes the
+      word only in the library grid, where a card has the width for it, and gives the rail's smaller
+      covers the icon alone — a chip that says «Película» across a third of a thumbnail is a label
+      competing with the picture under it. Nothing is lost to a reader: the word is announced Raw,
+      and the button around the card already says which kind it is.
+    -->
+    <Style Selector="library|PosterCardView.glyph-chip TextBlock#KindWord">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </UserControl.Styles>
   <StackPanel Spacing="{DynamicResource Space8}">
     <!--
     The hairline and not the control border: this rectangle separates a card from the one beside it
@@ -103,6 +115,7 @@ and a name here would be a second announcement of the same card.
                 Stroke="{DynamicResource PosterChipInkBrush}"
                 Data="{Binding KindKey, Converter={StaticResource KindShape}}" />
             <TextBlock
+                x:Name="KindWord"
                 VerticalAlignment="Center"
                 FontSize="{DynamicResource FontSizeCaption}"
                 Text="{Binding KindKey, Converter={StaticResource CardWord}}"

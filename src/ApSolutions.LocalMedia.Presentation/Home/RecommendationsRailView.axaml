@@ -74,7 +74,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           has to say why a title is in front of somebody, and a year would say less.
           -->
           <StackPanel Width="{DynamicResource PosterCardWidth}" Spacing="{DynamicResource Space4}">
-            <library:PosterCardView />
+            <library:PosterCardView Classes="glyph-chip" />
             <TextBlock
                 FontSize="{DynamicResource FontSizeCaption}"
                 Foreground="{DynamicResource TextSecondaryBrush}"
