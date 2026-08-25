@@ -65,6 +65,13 @@ public sealed class DetailsNavigationTests
             versions: null);
         Assert.False(unavailable.CanResume);
         Assert.False(unavailable.CanPlay);
+
+        // And the one button that opens the film cannot be pressed either. It is a separate
+        // assertion because it is a separate predicate: the button stays on the card whatever the
+        // progress is — that is what stops a film nobody started from offering no way to watch it —
+        // so what has to answer for an unreachable file is whether it can be pressed, not whether it
+        // is drawn.
+        Assert.False(unavailable.PlayOrResumeCommand.CanExecute(null));
     }
 
     [Fact]

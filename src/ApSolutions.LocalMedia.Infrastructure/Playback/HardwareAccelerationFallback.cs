@@ -8,9 +8,17 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// not retried in hardware, so a failing decoder cannot make the session flap between the two.
 /// </summary>
 /// <remarks>
+/// <para>
 /// It used to build the reported decision as well, and that method went with the engine's decision to
 /// stop asking for a graphics-card surface at all: nothing called it any more, and a method with no
 /// caller outside its own tests is this repository's house defect wearing a small hat.
+/// </para>
+/// <para>
+/// A <c>Reset</c> went the same way on 2026-08-25, and it is the same story again: it said it was
+/// for "when a new engine is created", and a new engine builds a new one of these, so nothing in
+/// <c>src/</c> or in any test had ever called it. The coverage gate is what noticed — one line of a
+/// small file is a whole percentage point.
+/// </para>
 /// </remarks>
 public sealed class HardwareAccelerationFallback
 {
@@ -53,15 +61,6 @@ public sealed class HardwareAccelerationFallback
 
             _hardwareDisabled = true;
             return true;
-        }
-    }
-
-    /// <summary>Forgets the fallback, which only happens when a new engine is created.</summary>
-    public void Reset()
-    {
-        lock (_sync)
-        {
-            _hardwareDisabled = false;
         }
     }
 }
