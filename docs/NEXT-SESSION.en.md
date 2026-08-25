@@ -75,6 +75,12 @@ artefact said so from before this session. With the three batches above:
   no hardware to raise them with.
 - The ratchet goes from **214 to 212**.
 
+And a note for the next time a floor has to move: **the report CI measures merges more suites than a
+local run of one of them.** `MovieDetailsViewModel` read 82.54 % measuring `UiTests` alone here and
+83 there, because the accessibility suite walks that file too. Measuring locally is worth it for the
+**direction** and for not spending a CI round blind; the number written into the file is CI's.
+
+
 And one that **is not on the list and should be**: `CompositionRoot.Library.cs` fell from the bar to
 97/50 with the hooks this batch added. The walk already presses its five arms — with no shell, with a
 card for a title the catalogue no longer holds, and with a card whose progress is gone — so CI's next

@@ -74,6 +74,13 @@ La nota anterior decía que quedaban **dos** suelos abiertos. Eran **cuatro**, y
   hospedado no tiene hardware con el que levantarlas.
 - El trinquete baja de **214 a 212**.
 
+Y una nota para la próxima vez que haya que mover un suelo: **el informe que mide CI fusiona más
+suites que una ejecución local de una sola.** `MovieDetailsViewModel` dio 82,54 % midiendo sólo
+`UiTests` aquí y 83 allí, porque la suite de accesibilidad también recorre ese archivo. Medir en
+local sirve para saber la **dirección** y para no gastar una vuelta de CI a ciegas; el número que se
+escribe en el archivo es el de CI.
+
+
 Y una que **no está en la lista y debería**: `CompositionRoot.Library.cs` cayó de estar en el listón
 a 97/50 con los enganches que añadió esta tanda. El paseo ya presiona sus cinco arcos —sin shell, con
 una tarjeta de un título que el catálogo ya no tiene, y con una tarjeta cuyo progreso desapareció—,
