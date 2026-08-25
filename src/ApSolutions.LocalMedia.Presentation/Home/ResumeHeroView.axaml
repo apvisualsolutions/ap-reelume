@@ -55,6 +55,21 @@ would be inventing two fields. It is a vertical through three layers for a secon
             </LinearGradientBrush>
           </Border.Background>
         </Border>
+        <!--
+          And the second veil the prototype draws over this one: the page's own colour rising from
+          the bottom edge, so the hero ends in the page instead of ending at a line across it. It is
+          painted as the surface brush behind an opacity mask rather than as a gradient of colours,
+          because the colour has to be the theme's — four dictionaries, and a hex written here would
+          be right in one of them.
+        -->
+        <Border Background="{DynamicResource ShellSurfaceBrush}">
+          <Border.OpacityMask>
+            <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+              <GradientStop Offset="0.01" Color="#FF000000" />
+              <GradientStop Offset="0.38" Color="#00000000" />
+            </LinearGradientBrush>
+          </Border.OpacityMask>
+        </Border>
       </Panel>
       <StackPanel
           Margin="40,44"
