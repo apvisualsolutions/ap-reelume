@@ -186,6 +186,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       -->
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
+          <sys:Boolean x:Key="DisabledOutlineShown">False</sys:Boolean>
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FBFCFE" />
           <!--
             The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
@@ -444,6 +445,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="TextControlPlaceholderForegroundDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
+          <sys:Boolean x:Key="DisabledOutlineShown">False</sys:Boolean>
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#08090C" />
           <!--
             The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
@@ -678,6 +680,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           amber from red, and in these themes it also has no colour left to say it with.
         -->
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastLight}">
+          <sys:Boolean x:Key="DisabledOutlineShown">True</sys:Boolean>
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFFFFF" />
           <!--
             The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
@@ -901,6 +904,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="TextControlPlaceholderForegroundDisabled" ResourceKey="TextDisabledBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="{x:Static theme:AppThemeVariants.HighContrastDark}">
+          <sys:Boolean x:Key="DisabledOutlineShown">True</sys:Boolean>
           <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#000000" />
           <!--
             The veil under the add-root dialog: the prototype's rgba(9,12,16,.62) over either
@@ -1333,14 +1337,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderThickness" Value="{DynamicResource FocusStrokeThickness}" />
   </Style>
   <!--
-    Disabled is drawn, not tinted. In light and dark the fill says it; in the two high contrast themes
-    it cannot — measured, the disabled fill, the resting fill and the surface are one colour, the
-    border is the theme's single border in all four states, and the disabled text is the primary text.
-    A dotted outline is geometry, and geometry still reads in a palette of two colours. It is an
-    adorner for the same reason the focus ring is one: ten types from one implementation.
+    Disabled is drawn, not tinted — in the two high contrast themes, and only there.
+
+    That last clause is the whole of what changed on 2026-08-25. The reason this outline exists has
+    always been written down: in light and dark a disabled control reads off its fill, which is a
+    third grey, while the two high contrast palettes have no third colour to spend — measured, the
+    disabled fill, the resting fill and the surface are one colour, the border is the theme's single
+    border in all four states, and the disabled text is the primary text. Geometry is what is left.
+
+    Drawing it in all four themes made every command with nothing to act on wear a dotted rectangle
+    in the ordinary ones too, on top of a grey that already said the same thing. The owner counted
+    them on seven screens; the instrument counted 299 across the tree with no data loaded. So the
+    cue is spent where it is the only one, and the fill carries it where the fill can.
+
+    A DynamicResource and not a code test of the theme: the adorner outlives a theme change, and a
+    resource is what re-resolves when one happens. It is the same mechanism the whole file rests on.
   -->
   <Style Selector="Button:disabled, ToggleButton:disabled, ToggleSwitch:disabled, RadioButton:disabled, TextBox:disabled, ComboBox:disabled, CheckBox:disabled, Slider:disabled, NumericUpDown:disabled, ListBoxItem:disabled">
-    <Setter Property="theme:DisabledOutline.IsShown" Value="True" />
+    <Setter Property="theme:DisabledOutline.IsShown" Value="{DynamicResource DisabledOutlineShown}" />
   </Style>
   <!--
     The one button that is the point of its screen. It was a class on ResumeHeroView's button that no

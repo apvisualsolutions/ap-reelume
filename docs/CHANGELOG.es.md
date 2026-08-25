@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El contorno punteado del deshabilitado salía en los cuatro temas, y sólo hace falta en dos.** La
+  razón por la que existe estaba escrita desde el principio: en claro y oscuro un control
+  deshabilitado se lee por su relleno, que es un tercer gris, y las dos paletas de contraste alto no
+  tienen un tercer color que gastar. Dibujarlo también en los temas ordinarios ponía un rectángulo de
+  puntos encima de un gris que ya lo decía — el propietario los contó en siete pantallas y el
+  instrumento contó **299 en todo el árbol** sin datos cargados, todos ellos órdenes sin nada sobre lo
+  que actuar. La señal se gasta donde es la única, y el relleno la lleva donde puede llevarla.
+
 - **Los desplegables llevaban su texto 2,43 px bajo**, exactamente el mismo número que los botones y
   por la misma razón: la tinta de una fuente no es simétrica alrededor de la caja que la contiene. La
   receta es la de los botones —cinco píxeles de margen inferior, derivados de las métricas y no

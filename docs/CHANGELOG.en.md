@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The disabled outline was drawn in all four themes, and only two need it.** The reason it exists
+  was written down from the start: in light and dark a disabled control reads off its fill, which is
+  a third grey, and the two high contrast palettes have no third colour to spend. Drawing it in the
+  ordinary themes too put a dotted rectangle on top of a grey that already said so — the owner
+  counted them on seven screens and the instrument counted **299 across the tree** with no data
+  loaded, every one of them a command with nothing to act on. The cue is spent where it is the only
+  one, and the fill carries it where the fill can.
+
 - **The drop-downs drew their text 2.43 px low**, the same number the buttons had and for the same
   reason: a font's ink is not symmetric about the box that holds it. The recipe is the buttons' own —
   five pixels of bottom margin, derived from the metrics rather than tuned — put on the words and not
