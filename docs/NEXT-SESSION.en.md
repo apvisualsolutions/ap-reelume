@@ -114,6 +114,14 @@ glyph is left in any view.
 
 ### The traps that cost time here
 
+- **A walk scene that spends the progress has to put it back rather than trust the machine.** The
+  hero and the rail card are drawn only while there is something to continue; the sample is ninety
+  seconds long and Continue opens it at thirty, so a busy runner lets the rest play out, the tracker
+  stores the end, and both surfaces disappear. CI measured it on 2026-08-25: the same scene passed
+  three runs and failed the fourth on "Home came back without the hero's Details on it", with
+  nothing between them that touched the walk. The progress is seeded again after every session that
+  spends it, which is the same answer the two «from the start» presses already needed.
+
 - **A new test over a model that reads resources needs `[AvaloniaTheory]`**, not `[Theory]`. It went
   unnoticed locally because of execution order and CI caught it: "the calling thread cannot access
   this object".

@@ -115,6 +115,15 @@ Fluent en ninguna vista.
 
 ### Las trampas que costaron tiempo aquí
 
+- **Una escena del paseo que gasta el progreso tiene que reponerlo, no confiar en la máquina.** El
+  héroe y la tarjeta del carril se dibujan sólo cuando hay algo que continuar; la muestra dura noventa
+  segundos y «Continuar» la abre en el treinta, así que un runner ocupado deja que el resto se
+  reproduzca, el rastreador guarda el final y las dos superficies desaparecen. CI lo midió el
+  2026-08-25: la misma escena pasó tres ejecuciones y falló la cuarta con «Home came back without the
+  hero's Details on it», sin que nada entre ellas tocara el paseo. Se repone el progreso después de
+  cada sesión que lo gasta, que es la misma respuesta que ya necesitaban las dos pulsaciones de
+  «desde el principio».
+
 - **Una prueba nueva sobre un modelo que lee recursos necesita `[AvaloniaTheory]`**, no `[Theory]`.
   Pasó desapercibido en local por el orden de ejecución y CI lo cazó: «the calling thread cannot
   access this object».
