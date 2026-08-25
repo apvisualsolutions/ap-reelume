@@ -37,6 +37,29 @@ public sealed class BilingualHeadingTests
         "docs/CHANGELOG",
     ];
 
+    /// <summary>
+    /// The design documents, which are not published with a release and are bilingual all the same.
+    /// </summary>
+    /// <remarks>
+    /// They are the reference an agent reads before touching a view, and a reference that says more
+    /// in one language than in the other is a reference that decides which language gets the rule.
+    /// </remarks>
+    public static TheoryData<string> DesignDocuments() =>
+    [
+        "docs/design/SURFACES",
+        "docs/design/ELEMENTS",
+    ];
+
+    [Theory]
+    [MemberData(nameof(DesignDocuments))]
+    public void The_design_document_exists_in_both_languages(string stem) =>
+        The_document_exists_in_both_languages(stem);
+
+    [Theory]
+    [MemberData(nameof(DesignDocuments))]
+    public void The_design_documents_two_languages_carry_the_same_structure(string stem) =>
+        The_two_languages_carry_the_same_structure(stem);
+
     [Theory]
     [MemberData(nameof(PublicDocuments))]
     public void The_document_exists_in_both_languages(string stem)

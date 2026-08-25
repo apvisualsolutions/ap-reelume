@@ -167,6 +167,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The element catalogue, read and written down**:
+  [docs/design/ELEMENTS.en.md](design/ELEMENTS.en.md) carries
+  `design/Catálogo de elementos - AP Reelume.dc.html` over into this tree's tokens, element by
+  element and state by state. It says three things that had been drawn wrong — an unchosen pill
+  carries no border, a menu is not painted like a drop-down, and the optical compensation goes on the
+  label and not in the button's padding — and one rule of precedence: the prototype wins over the
+  document, and the document wins over the `.axaml`. `BilingualHeadingTests` holds it in both
+  languages along with `SURFACES`, which until now had no gate at all.
+
 - **Every button says what it does when the pointer rests on it**, in the same words a screen reader
   is told. One style rather than an attribute per button: there are more than two hundred of them,
   and written out one by one that is two hundred chances for the two sentences to drift apart with

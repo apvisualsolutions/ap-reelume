@@ -170,6 +170,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El catálogo de elementos, leído y escrito**: [docs/design/ELEMENTS.es.md](design/ELEMENTS.es.md)
+  pasa `design/Catálogo de elementos - AP Reelume.dc.html` a los tokens de este árbol, elemento por
+  elemento y estado por estado. Dice tres cosas que se venían dibujando mal —la píldora sin elegir no
+  lleva borde, un menú no se pinta como un desplegable, y la compensación óptica va en la etiqueta y
+  no en el relleno del botón— y una regla de precedencia: el prototipo manda sobre el documento, y el
+  documento manda sobre el `.axaml`. `BilingualHeadingTests` lo sostiene en los dos idiomas junto con
+  `SURFACES`, que hasta ahora no tenía puerta ninguna.
+
 - **Todos los botones dicen lo que hacen al posar el puntero**, y lo dicen con las mismas palabras
   que oye un lector de pantalla. Un estilo y no un atributo por botón: son más de doscientos, y
   escritos uno a uno serían doscientas ocasiones de que las dos frases se separen sin que nadie lo
