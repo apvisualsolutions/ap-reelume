@@ -66,6 +66,17 @@ public sealed class EpisodeSequenceRepositoryTests
         Assert.Null(offline.Runtime);
     }
 
+    /// <summary>
+    /// Every one of these repositories refuses to exist without a store, which is the guard that
+    /// turns a composition mistake into a failure at start-up rather than into a query at midnight.
+    /// </summary>
+    [Fact]
+    public void A_repository_over_no_store_refuses_to_be_built()
+    {
+        Assert.Throws<ArgumentNullException>(() => new EpisodeSequenceRepository(null!));
+        Assert.Throws<ArgumentNullException>(() => new IntroMarkerRepository(null!));
+    }
+
     [Fact]
     public async Task One_series_never_returns_the_episodes_of_another()
     {

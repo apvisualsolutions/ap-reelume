@@ -10,6 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Four branches nothing could take, and the two that happen and no one watched.** The duplicates
+  reader tested three columns for null that the schema declares `NOT NULL`, and the destination asked
+  after its parameter again once `CanExecute` had already demanded it: unreachable code, removed
+  rather than measured around. The ones that do occur had no test and now have one — progress stored
+  before the engine knows the length, which is the ordinary state of the first seconds, and a codec
+  written before that column held JSON.
+
+
+### Fixed
+
 - **Three things declared and never fed, taken out or fed.** The red state chip — what says a file is
   not there is the shared badge, and a second shape saying the same thing is what
   `UnavailableBadgeTests` exists to refuse — the folder icon, because this application opens no

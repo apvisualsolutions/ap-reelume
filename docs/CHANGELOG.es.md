@@ -10,6 +10,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Cuatro ramas que nada podía ejecutar, y las dos que sí y nadie miraba.** El lector de duplicados
+  comprobaba si eran nulas tres columnas que el esquema declara `NOT NULL`, y el modelo volvía a
+  preguntar por su parámetro después de que `CanExecute` lo hubiera exigido: código inalcanzable, que
+  se retira en vez de medirse. Las que sí ocurren llevaban sin prueba y ya la tienen: progreso
+  guardado antes de que el motor sepa la duración —el estado normal de los primeros segundos— y un
+  códec escrito antes de que esa columna guardara JSON.
+
+
+### Corregido
+
 - **Tres cosas declaradas y sin alimentar, retiradas o alimentadas.** La ficha roja de estado —lo que
   dice que un archivo no está es la insignia compartida, y una segunda forma diciendo lo mismo es lo
   que `UnavailableBadgeTests` existe para impedir—, el icono de carpeta —esta aplicación no abre el
