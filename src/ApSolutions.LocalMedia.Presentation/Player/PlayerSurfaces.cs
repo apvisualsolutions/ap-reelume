@@ -15,6 +15,18 @@ public sealed record PlayerSurfaces
 {
     public required PlayerViewModel Player { get; init; }
 
+    /// <summary>
+    /// What is playing, as the surface that started it calls it, and the line under it.
+    /// </summary>
+    /// <remarks>
+    /// The header's middle was empty until 2026-08-25 with the reason written into the view: the
+    /// session holds a path and nothing else, and a file path is not a heading. It is not looked up
+    /// here either — it travels with the request, from the card that pressed Play.
+    /// </remarks>
+    public string? Title { get; init; }
+
+    public string? Subtitle { get; init; }
+
     /// <summary>Audio and subtitle tracks of the media being played.</summary>
     public TrackSelectorViewModel? Tracks { get; init; }
 

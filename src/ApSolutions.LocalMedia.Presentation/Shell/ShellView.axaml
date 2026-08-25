@@ -642,6 +642,34 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <Path Classes="icon size-20" Data="{DynamicResource IconClose}" />
           </Button>
           <!--
+            What is playing, which the prototype puts here and this band had nothing to write in
+            until 2026-08-25. It is not read from the session — that holds a path — it is what the
+            card that pressed Play called it, carried on the request. Absent rather than empty for a
+            file opened from outside the library, which has no card behind it.
+          -->
+          <StackPanel
+              Grid.Column="1"
+              Margin="12,0"
+              VerticalAlignment="Center"
+              IsVisible="{Binding HasPlayerTitle}">
+            <TextBlock
+                MaxWidth="420"
+                HorizontalAlignment="Left"
+                FontWeight="SemiBold"
+                Text="{Binding PlayerTitle}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="NoWrap" />
+            <TextBlock
+                MaxWidth="420"
+                HorizontalAlignment="Left"
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                IsVisible="{Binding HasPlayerSubtitle}"
+                Text="{Binding PlayerSubtitle}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="NoWrap" />
+          </StackPanel>
+          <!--
             A WrapPanel for two buttons, which is not about these two wrapping: it is the container
             this tree reaches for whenever a row of controls can grow, and the 44 px target area these
             take is exactly that kind of growth. The measurement behind the habit is on the column

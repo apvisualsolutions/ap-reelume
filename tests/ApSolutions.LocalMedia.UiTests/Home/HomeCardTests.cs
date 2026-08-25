@@ -119,9 +119,9 @@ public sealed class HomeCardTests
         var viewModel = new HomeViewModel(
             new GetHome(new StubHome([EpisodeProgress(), FilmProgress(2019, null, TimeSpan.FromMinutes(113))])),
             new NavigationService(),
-            content =>
+            request =>
             {
-                resumed.Add(content);
+                resumed.Add(request.Content);
                 return Task.CompletedTask;
             },
             recommendations: null,

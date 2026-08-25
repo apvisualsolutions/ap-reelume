@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
@@ -98,7 +99,14 @@ public sealed class PlayerOverlayTests
     {
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
-        var viewModel = new PlayerViewModel(new InertPlaybackSessionCoordinator());
+        // With a transport model, because the session's own three buttons moved into that row on
+        // 2026-08-25 — the prototype puts back, play and forward together. A player mounted without
+        // one has no buttons in the bar at all, which is a fixture with nothing in it rather than a
+        // bar that lost its controls.
+        var viewModel = new PlayerViewModel(new InertPlaybackSessionCoordinator())
+        {
+            Transport = new TransportControlsViewModel(new ControlPlayback(new SilentEngine())),
+        };
         var view = new PlayerView { DataContext = viewModel };
         var window = new Window { Width = WindowWidth, Height = WindowHeight, Content = view };
         window.Show();
@@ -107,7 +115,12 @@ public sealed class PlayerOverlayTests
         var transport = view.GetVisualDescendants()
             .OfType<Border>()
             .Single(border => border.Name == "TransportControlsSurface");
-        var buttons = transport.GetVisualDescendants().OfType<Button>().ToArray();
+        // The bar's own buttons, not the pieces a slider is made of: a Slider's template carries two
+        // RepeatButtons that are not focusable by design and never were part of what this measures.
+        var buttons = transport.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(button => button is not RepeatButton)
+            .ToArray();
         Assert.NotEmpty(buttons);
         Assert.True(viewModel.AreControlsRevealed);
         Assert.Equal(0.92, viewModel.ControlsOpacity);
@@ -121,7 +134,9 @@ public sealed class PlayerOverlayTests
         Assert.All(buttons, button => Assert.True(button.Focusable, "A hidden control lost keyboard focus."));
         Assert.All(
             buttons,
-            button => Assert.Contains(button, transport.GetVisualDescendants().OfType<Button>()));
+            button => Assert.Contains(
+                button,
+                transport.GetVisualDescendants().OfType<Button>().Where(candidate => candidate is not RepeatButton)));
 
         viewModel.RevealControls();
         Assert.True(viewModel.AreControlsRevealed);
@@ -162,6 +177,68 @@ public sealed class PlayerOverlayTests
     }
 
     /// <summary>A coordinator that answers the view model without touching a real engine.</summary>
+    /// <summary>An engine that answers everything and does nothing, so a transport can be mounted.</summary>
+    private sealed class SilentEngine : IMediaPlayerEngine
+    {
+        public PlaybackState State => PlaybackState.Idle;
+
+        public event EventHandler<PlaybackStateChangedEventArgs>? StateChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public event EventHandler<PlaybackPositionChangedEventArgs>? PositionChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public event EventHandler<PlaybackFailureEventArgs>? Failure
+        {
+            add { }
+            remove { }
+        }
+
+        public Task InitializeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task OpenAsync(PlaybackRequest request, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task PlayAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task PauseAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task SeekAsync(TimeSpan position, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task<PlaybackSnapshot> GetSnapshotAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(PlaybackSnapshot.Create(PlaybackState.Idle, TimeSpan.Zero, null, []));
+
+        public Task SelectTrackAsync(
+            MediaTrackKind kind,
+            string? trackId,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task<MediaTrack> AddExternalSubtitleAsync(
+            string path,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new MediaTrack(path, MediaTrackKind.Subtitle));
+
+        public Task SetSpeedAsync(double multiplier, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task SetAudioOutputDeviceAsync(string deviceId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task ApplyVolumeAsync(VolumeDecision decision, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
+
     private sealed class InertPlaybackSessionCoordinator : IPlaybackSessionCoordinator
     {
         public PlaybackSession? ActiveSession => null;

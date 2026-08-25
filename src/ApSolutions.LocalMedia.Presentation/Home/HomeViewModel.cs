@@ -16,6 +16,16 @@ using ApSolutions.LocalMedia.Presentation.Player;
 namespace ApSolutions.LocalMedia.Presentation.Home;
 
 /// <summary>
+/// What Home is asking to continue: which content, and what it is called.
+/// </summary>
+/// <remarks>
+/// The key alone was enough while the player's header had nothing to write in it. It writes the
+/// title and the line under it since 2026-08-25, and Home is the one surface that knows both without
+/// reading anything — so it says them instead of making the composition look them up again.
+/// </remarks>
+public sealed record HomeResumeRequest(ContentKey Content, string? Title, string? Subtitle);
+
+/// <summary>
 /// The hybrid Home. Continue is the primary action whenever there is something worth continuing, and
 /// the library stays one keystroke away either way, so the shortcut never becomes a detour.
 /// </summary>
@@ -23,7 +33,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
 {
     private readonly GetHome _getHome;
     private readonly INavigationService? _navigation;
-    private readonly Func<ContentKey, Task>? _onResume;
+    private readonly Func<HomeResumeRequest, Task>? _onResume;
     private readonly Func<TitleId, Task>? _onOpenDetails;
     private HomeSnapshot _snapshot = new(null, [], [], new LibrarySummary(0, 0, 0));
     private IReadOnlyList<InProgressItemViewModel> _inProgress = [];
@@ -32,7 +42,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
     public HomeViewModel(
         GetHome getHome,
         INavigationService? navigation = null,
-        Func<ContentKey, Task>? onResume = null,
+        Func<HomeResumeRequest, Task>? onResume = null,
         RecommendationsViewModel? recommendations = null,
         Func<TitleId, Task>? onOpenDetails = null)
     {
@@ -268,7 +278,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         Math.Round(fraction * 100).ToString("F0", CultureInfo.CurrentCulture);
 
     private Task ResumeAsync() => _snapshot.Resume is { } resume && _onResume is not null
-        ? _onResume(resume.Content)
+        ? _onResume(new HomeResumeRequest(resume.Content, ResumeTitle, ResumeSubtitle))
         : Task.CompletedTask;
 
     private Task OpenLibraryAsync()
@@ -293,7 +303,8 @@ public sealed class HomeViewModel : INotifyPropertyChanged
     {
         if (card is not null && _onResume is { } resume)
         {
-            await resume(card.Content).ConfigureAwait(true);
+            await resume(new HomeResumeRequest(card.Content, card.Title, card.RailSubtitle))
+                .ConfigureAwait(true);
         }
     }
 

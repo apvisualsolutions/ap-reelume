@@ -10,6 +10,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The player says what it is playing.** The top band had three glyphs and nothing between them,
+  with the reason written into the view itself: the session holds a path, and painting somebody's
+  file path as a heading is the opposite of what this application is for. The title and its line now
+  **travel with the request**, from the card that pressed Play — the one that knows — and the header
+  writes «El Faro de Piedra / 2019 · Drama · Misterio · 96 min».
+
+- **The transport is one row again.** Play, pause and stop lived on a second line because their
+  commands belong to the session coordinator while the skips belong to `ControlPlayback`. That is a
+  fact about the models rather than about the row: the buttons reach across to the player's own model
+  through the view that hosts them, and the order is the prototype's — back, play, forward — with the
+  speed carrying its word and not only its number.
+
+- **The player's shortcuts are written where they are used.** Space, the arrows, F, N and Escape were
+  all bound and announced one control at a time; a person who never opens a screen reader learned them
+  here or not at all. The prototype writes that line under the transport, and now so does this.
+
+### Fixed
+
 - **The review tray shows the file it is asking about.** It asked for a decision on «movie:761053»
   and never showed which file that was: the candidate projection now carries the path as well as the
   identifier. Every card holds the cover, «PENDING FILE» with the name and the folder, the candidate

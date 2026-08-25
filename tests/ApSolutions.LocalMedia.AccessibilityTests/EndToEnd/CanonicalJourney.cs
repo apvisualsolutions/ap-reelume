@@ -258,7 +258,13 @@ public static class CanonicalJourney
     /// </summary>
     private static PlayerView BuildPlayer()
     {
-        var viewModel = new PlayerViewModel(new StubCoordinator());
+        // With its transport, because that is what a session always has: both routes into a player
+        // build one, and since 2026-08-25 the session's own three buttons live in that row — so a
+        // player mounted without it is a bar with nothing in it rather than the step this audits.
+        var viewModel = new PlayerViewModel(new StubCoordinator())
+        {
+            Transport = new TransportControlsViewModel(new ControlPlayback(new StubEngine())),
+        };
         viewModel.ApplySessionState(PlaybackState.Playing, failure: null);
         return new PlayerView { DataContext = viewModel };
     }

@@ -218,26 +218,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
             x:Name="SessionActionsSurface"
             ItemSpacing="{DynamicResource Space8}"
             LineSpacing="{DynamicResource Space8}">
-          <Button
-              Classes="player-chrome"
-              IsVisible="{Binding CanResume}"
-              automation:AutomationProperties.Name="{DynamicResource PlayerPlayAction}"
-              Command="{Binding ResumeCommand}">
-            <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlay}" />
-          </Button>
-          <Button
-              Classes="player-chrome"
-              IsVisible="{Binding CanPause}"
-              automation:AutomationProperties.Name="{DynamicResource PlayerPauseAction}"
-              Command="{Binding PauseCommand}">
-            <Path Classes="icon size-22" Data="{DynamicResource IconPause}" />
-          </Button>
-          <Button
-              Classes="player-chrome"
-              automation:AutomationProperties.Name="{DynamicResource PlayerStopAction}"
-              Command="{Binding StopCommand}">
-            <Path Classes="icon size-22" Data="{DynamicResource IconStop}" />
-          </Button>
           <TextBlock
               VerticalAlignment="Center"
               IsVisible="{Binding IsIdle}"
@@ -263,6 +243,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
               IsVisible="{Binding IsStopped}"
               Foreground="{DynamicResource PlayerTextBrush}"
               Text="{DynamicResource PlayerStateStopped}" />
+          <!--
+            The keyboard, said out loud. The prototype writes this line under its transport and this
+            application has every one of these bound — Space, the arrows, F, N and Escape — with the
+            gestures announced one control at a time and nowhere on screen. A person who never opens
+            a screen reader learns them here or not at all.
+          -->
+          <TextBlock
+              VerticalAlignment="Center"
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+              Text="{DynamicResource PlayerShortcutHint}"
+              automation:AutomationProperties.AccessibilityView="Raw" />
         </WrapPanel>
       </StackPanel>
     </Border>

@@ -583,6 +583,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="TitlePreviewRenameAction">Previsualizar renombrado</x:String>
   <x:String x:Key="TitleReviewDuplicatesAction">Revisar versiones</x:String>
   <x:String x:Key="PlayerSessionAccessibleName">Sesión de reproducción</x:String>
+  <x:String x:Key="PlayerShortcutHint">Espacio reproduce · ← → salta · ↑ ↓ volumen · F pantalla completa · N mini · Esc cierra</x:String>
   <x:String x:Key="PlayerCloseAction">Cerrar el reproductor</x:String>
   <x:String x:Key="PlayerMiniModeAction">Mini reproductor</x:String>
   <x:String x:Key="PlayerFullscreenAction">Pantalla completa</x:String>

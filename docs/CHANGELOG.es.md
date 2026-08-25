@@ -10,6 +10,24 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El reproductor dice qué está reproduciendo.** La banda superior tenía tres glifos y nada en medio,
+  con la razón escrita en la propia vista: la sesión guarda una ruta, y pintar la ruta del archivo de
+  alguien como encabezado es lo contrario de para lo que sirve esta aplicación. Ahora el título y su
+  línea **viajan con la petición**, desde la tarjeta que pulsó Reproducir — que es la que lo sabe—, y
+  la cabecera escribe «El Faro de Piedra / 2019 · Drama · Misterio · 96 min».
+
+- **El transporte vuelve a ser una fila.** Reproducir, pausar y parar vivían en una segunda línea
+  porque sus mandos son del coordinador de sesión y los saltos son de `ControlPlayback`. Eso es un
+  hecho sobre los modelos, no sobre la fila: los botones cruzan hasta el modelo del reproductor a
+  través de la vista que los hospeda, y el orden es el del prototipo —atrás, reproducir, adelante—
+  con la velocidad llevando su palabra y no sólo su número.
+
+- **Los atajos del reproductor están escritos donde se usan.** Espacio, las flechas, F, N y Escape
+  estaban todos enlazados y anunciados de uno en uno; quien no abre un lector de pantalla los
+  aprendía aquí o no los aprendía. El prototipo escribe esa línea bajo el transporte y ahora está.
+
+### Corregido
+
 - **La bandeja de revisión enseña el archivo del que habla.** Pedía una decisión sobre
   «movie:761053» y no mostraba de qué archivo hablaba: la proyección de candidatos ya no sólo trae el
   identificador, trae la ruta. Cada tarjeta lleva ahora la carátula, «ARCHIVO PENDIENTE» con el

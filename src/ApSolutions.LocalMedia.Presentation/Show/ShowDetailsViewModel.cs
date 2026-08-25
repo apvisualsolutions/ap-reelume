@@ -297,7 +297,19 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         ? Task.CompletedTask
         // No position of its own: an episode left half-watched is resumed, and that is the resume
         // policy's decision to make rather than this row's.
-        : _onPlay(new PlayDetailsRequest(episode.MediaFileId, StartPosition: null));
+        : _onPlay(new PlayDetailsRequest(
+            episode.MediaFileId,
+            StartPosition: null,
+            Title,
+            EpisodeLine(episode)));
+
+    /// <summary>«T01·E02 · La marea baja», which is what the player's header writes under the series.</summary>
+    private static string EpisodeLine(EpisodeRowViewModel episode) =>
+        ShowText.Resource("ShowNextEpisodeCode", "S{0}·E{1}")
+            .Replace("{0}", episode.SeasonNumber.ToString("D2", CultureInfo.CurrentCulture), StringComparison.Ordinal)
+            .Replace("{1}", episode.EpisodeNumber.ToString("D2", CultureInfo.CurrentCulture), StringComparison.Ordinal)
+        + " · "
+        + episode.EpisodeTitle;
 
     private Task OpenTrailerLinkAsync() =>
         _onOpenTrailerLink is null || _trailerLink is not { Length: > 0 } link

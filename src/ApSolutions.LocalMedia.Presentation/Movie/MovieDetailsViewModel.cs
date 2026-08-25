@@ -28,7 +28,21 @@ namespace ApSolutions.LocalMedia.Presentation.Movie;
 /// then wrote that zero over the position it had just transferred. Measured on the walk: the
 /// playhead read 0, 0, 0, 0, 1, 1, 1, 2 while the switch had stored 00:02:01.
 /// </remarks>
-public sealed record PlayDetailsRequest(MediaFileId? MediaFileId, TimeSpan? StartPosition);
+/// <summary>
+/// What to play, from where, and what it is called.
+/// </summary>
+/// <remarks>
+/// The last two arrived on 2026-08-25. The player's header had nothing to write in the middle of it
+/// — the session holds a path, and painting somebody's file path as a heading is the opposite of
+/// what this application is for — while every surface that starts a session already knows the title
+/// and the line under it. So they travel with the request rather than being looked up again: the
+/// card that pressed Play is the one that knows.
+/// </remarks>
+public sealed record PlayDetailsRequest(
+    MediaFileId? MediaFileId,
+    TimeSpan? StartPosition,
+    string? Title = null,
+    string? Subtitle = null);
 
 /// <summary>
 /// The complete film details: what it is, whether it can be played right now, how far through it the
@@ -325,7 +339,9 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         var version = Versions.FirstOrDefault(row => row.IsEffective);
         return _onPlay(new PlayDetailsRequest(
             version?.MediaFileId,
-            fromStart ? TimeSpan.Zero : ResumePosition));
+            fromStart ? TimeSpan.Zero : ResumePosition,
+            Title,
+            MetaText));
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
