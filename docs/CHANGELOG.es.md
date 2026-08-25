@@ -10,6 +10,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **`HardwareAccelerationFallback.Reset` no lo llamaba nadie.** Decía ser «para cuando se crea un
+  motor nuevo», y un motor nuevo construye uno de éstos nuevo, así que ni `src/` ni ninguna prueba
+  lo habían invocado jamás: el defecto de la casa con sombrero pequeño, otra vez. La puerta de
+  cobertura fue lo que lo vio —una línea de un archivo pequeño es un punto porcentual entero— y se
+  ha borrado.
+
 - **Los iconos son los del prototipo, y ahora lo dice una puerta y no un comentario.**
   `PrototypeIconTests` lee `design/AP Reelume.dc.html`, saca el mapa de su función `icon(n, s)` y
   compara **carácter por carácter** las dieciséis formas que están hechas sólo de trazados. Las que

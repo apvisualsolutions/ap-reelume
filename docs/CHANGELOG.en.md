@@ -10,6 +10,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **`HardwareAccelerationFallback.Reset` had no caller.** It claimed to be "for when a new engine is
+  created", and a new engine builds a new one of these, so neither `src/` nor any test had ever
+  invoked it: this house's defect wearing a small hat, again. The coverage gate is what saw it — one
+  line of a small file is a whole percentage point — and it has been deleted.
+
 - **The icons are the prototype's, and now a gate says so rather than a comment.**
   `PrototypeIconTests` reads `design/AP Reelume.dc.html`, pulls the map out of its `icon(n, s)`
   function, and compares **character for character** the sixteen shapes that are made of paths alone.
