@@ -45,6 +45,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     private CatalogItem? _item;
     private string? _overview;
     private WatchState? _watchState;
+    private MediaFile? _file;
     private IReadOnlyList<MediaVersionRowViewModel> _versions = [];
 
     public MovieDetailsViewModel(
@@ -127,6 +128,52 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
     public bool HasYear => Year is not null;
 
+    /// <summary>
+    /// «2019 · Drama · 118 min», which is the line the prototype writes under the title.
+    /// </summary>
+    /// <remarks>
+    /// The card had a year and nothing else, because a year was all the read model carried. It
+    /// carries the running time and the genres since 2026-08-24, so the line the prototype has
+    /// always written can finally be written — the same one the library's own card gained, in the
+    /// order the banner uses: what year, what kind of story, how long.
+    /// </remarks>
+    public string MetaText => string.Join(
+        " · ",
+        new[]
+        {
+            YearText,
+            _item?.Genres is { Count: > 0 } genres ? string.Join(" · ", genres.Take(2)) : string.Empty,
+            _item?.Runtime is { } runtime && runtime > TimeSpan.Zero
+                ? RuntimeText(runtime)
+                : string.Empty,
+        }.Where(piece => piece.Length > 0));
+
+    public bool HasMeta => MetaText.Length > 0;
+
+    /// <summary>The chip that says whether the file is there, as a resource key.</summary>
+    public string AvailabilityKey => IsAvailable ? "MediaAvailable" : "MediaUnavailable";
+
+    /// <summary>And the one that says how far through it is.</summary>
+    public string WatchStatusKey => (_watchState?.Status ?? Domain.Continuity.WatchStatus.NotStarted) switch
+    {
+        Domain.Continuity.WatchStatus.InProgress => "WatchStatusInProgress",
+        Domain.Continuity.WatchStatus.Watched => "WatchStatusWatched",
+        _ => "WatchStatusNotStarted",
+    };
+
+    private static string RuntimeText(TimeSpan runtime) =>
+        Resource("CatalogRuntimeMinutes", "{0} min").Replace(
+            "{0}",
+            ((int)Math.Round(runtime.TotalMinutes)).ToString(CultureInfo.CurrentCulture),
+            StringComparison.Ordinal);
+
+    private static string Resource(string key, string fallback) =>
+        Avalonia.Application.Current is { } application
+            && application.TryGetResource(key, application.ActualThemeVariant, out var value)
+            && value is string text
+                ? text
+                : fallback;
+
     public bool IsAvailable => _item?.IsAvailable ?? false;
 
     /// <summary>Nothing can be opened while the file is out of reach, so the action is disabled.</summary>
@@ -162,14 +209,16 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         PersonalState? personalState = null,
         string? overview = null,
         string? trailerPath = null,
-        string? trailerKey = null)
+        string? trailerKey = null,
+        MediaFile? file = null)
     {
         _item = item ?? throw new ArgumentNullException(nameof(item));
+        _file = file;
         _overview = overview;
         _trailerPath = trailerPath;
         _trailerLink = TrailerLinkPolicy.TryBuildWatchLink(trailerKey);
         _watchState = watchState;
-        Versions = BuildVersions(versions);
+        Versions = versions is null ? BuildLoneVersion() : BuildVersions(versions);
         PersonalActions.Apply(
             personalState ?? PersonalState.Empty(ContentKey.ForTitle(item.Id)));
         WatchStatus.Apply(
@@ -184,6 +233,10 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
             nameof(Year),
             nameof(YearText),
             nameof(HasYear),
+            nameof(MetaText),
+            nameof(HasMeta),
+            nameof(AvailabilityKey),
+            nameof(WatchStatusKey),
             nameof(IsAvailable),
             nameof(CanPlay),
             nameof(CanResume),
@@ -205,6 +258,33 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
 
     internal static string FormatPosition(TimeSpan position) =>
         position.ToString(position >= TimeSpan.FromHours(1) ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.CurrentCulture);
+
+    /// <summary>
+    /// The single row a film with no duplicates still has.
+    /// </summary>
+    /// <remarks>
+    /// A film is only grouped when there are two of it — <c>GroupMediaVersions</c> refuses fewer
+    /// than two — so the ordinary film had no group and this section was simply absent, leaving the
+    /// card with an empty half. The prototype lists what there is either way, because the question
+    /// "which copy is this and where does it live" is asked of every film and not only of duplicated
+    /// ones.
+    /// </remarks>
+    private IReadOnlyList<MediaVersionRowViewModel> BuildLoneVersion() =>
+        _file is { } file
+            ? [new MediaVersionRowViewModel(
+                new MediaVersion(
+                    file.Id,
+                    file.Path,
+                    file.IsAvailable,
+                    file.TechnicalMetadata.Duration,
+                    file.TechnicalMetadata.Width,
+                    file.TechnicalMetadata.Height,
+                    IsHdr: false,
+                    file.TechnicalMetadata.VideoCodecs.Count > 0 ? file.TechnicalMetadata.VideoCodecs[0] : string.Empty,
+                    file.SizeBytes),
+                isPreferred: false,
+                isEffective: true)]
+            : [];
 
     private static IReadOnlyList<MediaVersionRowViewModel> BuildVersions(MediaVersionGroup? group)
     {
@@ -292,4 +372,38 @@ public sealed class MediaVersionRowViewModel(MediaVersion version, bool isPrefer
             string.IsNullOrWhiteSpace(_version.VideoCodec) ? null : _version.VideoCodec,
             _version.IsHdr ? "HDR" : null,
         }.Where(part => !string.IsNullOrWhiteSpace(part)));
+
+    /// <summary>
+    /// The second line of a version row: how long it runs and what it weighs.
+    /// </summary>
+    /// <remarks>
+    /// The prototype writes «H.264 · AAC 2.0 · 3,4 GB · 1:51:00» under the quality, and the row here
+    /// said the quality and stopped. What this can answer is the length and the size — the audio
+    /// track is not in <c>MediaVersion</c>, and inventing a codec name for a row is worse than
+    /// leaving the question to the version picker, which reads the file.
+    /// </remarks>
+    public string TechnicalText => string.Join(
+        " · ",
+        new[]
+        {
+            _version.Duration is { } duration && duration > TimeSpan.Zero
+                ? Player.PlaybackClock.Format(duration)
+                : null,
+            _version.SizeBytes > 0 ? SizeText(_version.SizeBytes) : null,
+        }.Where(part => !string.IsNullOrWhiteSpace(part)));
+
+    public bool HasTechnical => TechnicalText.Length > 0;
+
+    /// <summary>Where the file is, which is the line the prototype ends a version row with.</summary>
+    public string PathText => _version.Path;
+
+    /// <summary>Gigabytes with one decimal, or megabytes under one.</summary>
+    private static string SizeText(long bytes)
+    {
+        const double Mega = 1024d * 1024d;
+        var megabytes = bytes / Mega;
+        return megabytes >= 1024
+            ? string.Create(CultureInfo.CurrentCulture, $"{megabytes / 1024:0.0} GB")
+            : string.Create(CultureInfo.CurrentCulture, $"{megabytes:0} MB");
+    }
 }

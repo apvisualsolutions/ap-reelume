@@ -8,11 +8,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:catalog="clr-namespace:ApSolutions.LocalMedia.Presentation.Catalog"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
     xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     xmlns:movie="clr-namespace:ApSolutions.LocalMedia.Presentation.Movie"
     x:DataType="movie:MovieDetailsViewModel"
     automation:AutomationProperties.Name="{DynamicResource MovieDetailsAccessibleName}">
   <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="DetailWord" />
   </UserControl.Resources>
   <Grid RowDefinitions="Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
     <!--
@@ -73,13 +75,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 Text="{Binding Title}"
                 TextTrimming="CharacterEllipsis"
                 automation:AutomationProperties.HeadingLevel="1" />
+            <!--
+              What this is, in one line, and then two chips saying where it stands: whether the file
+              is reachable and how far through it is. The prototype writes exactly this pair under
+              the title, and the card used to answer with a bare year and a warning badge.
+            -->
+            <TextBlock
+                Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                IsVisible="{Binding HasMeta}"
+                Text="{Binding MetaText}"
+                TextTrimming="CharacterEllipsis" />
             <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
-              <TextBlock
-                  VerticalAlignment="Center"
-                  Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-                  IsVisible="{Binding HasYear}"
-                  Text="{Binding YearText}" />
-              <library:UnavailableBadge />
+              <Border Classes="state-chip" Classes.pending="{Binding !IsAvailable}">
+                <TextBlock Text="{Binding AvailabilityKey, Converter={StaticResource DetailWord}}" />
+              </Border>
+              <Border Classes="state-chip">
+                <TextBlock Text="{Binding WatchStatusKey, Converter={StaticResource DetailWord}}" />
+              </Border>
             </WrapPanel>
             <!--
               The synopsis is a paragraph, so it wraps and is capped: a banner that grows without
@@ -162,30 +174,92 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Panel>
     </Border>
 
-    <StackPanel Grid.Row="1" Spacing="{DynamicResource Space8}">
-      <catalog:WatchStatusControl DataContext="{Binding WatchStatus}" />
-      <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
-    </StackPanel>
+    <!--
+      Two columns under the banner, which is the prototype's own division of this card: what there is
+      of this film on the left, and what you can do about it on the right. They were a stack of loose
+      rows — status, then personal actions, then versions — which read as a list of controls rather
+      than as two answers.
 
-    <StackPanel Grid.Row="2" IsVisible="{Binding HasVersions}" Spacing="{DynamicResource Space8}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeSubtitle}"
-          FontWeight="SemiBold"
-          Text="{DynamicResource MovieVersionsHeading}" />
+      The columns collapse to one at the narrowest window the application allows, because 900 px
+      cannot hold 620 of versions beside 320 of actions; the grid's second column is Auto and the
+      panel wraps.
+    -->
+    <Grid
+        Grid.Row="1"
+        ColumnDefinitions="*,Auto"
+        ColumnSpacing="{DynamicResource Space24}"
+        RowDefinitions="Auto">
+      <StackPanel Grid.Column="1" Width="320" Spacing="{DynamicResource Space8}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Text="{DynamicResource MovieOtherActionsHeading}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <catalog:WatchStatusControl DataContext="{Binding WatchStatus}" />
+        <catalog:PersonalActionsView DataContext="{Binding PersonalActions}" />
+      </StackPanel>
+      <StackPanel IsVisible="{Binding HasVersions}" Spacing="{DynamicResource Space8}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Text="{DynamicResource MovieVersionsHeading}"
+            automation:AutomationProperties.HeadingLevel="2" />
       <ItemsControl ItemsSource="{Binding Versions}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="movie:MediaVersionRowViewModel">
-            <Grid Margin="0,2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
-              <TextBlock Text="{Binding QualityLabel}" />
-              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock IsVisible="{Binding IsEffective}" Text="{DynamicResource MovieVersionEffective}" />
-                <TextBlock IsVisible="{Binding IsPreferred}" Text="{DynamicResource MovieVersionPreferred}" />
-                <TextBlock IsVisible="{Binding !IsAvailable}" Text="{DynamicResource MediaUnavailable}" />
-              </StackPanel>
-            </Grid>
+            <!--
+              The prototype's version row: a card with the quality in bold, what it weighs and how
+              long it runs under it, the path in the mono face, and the state at the right. It was
+              one line of text with three words beside it, which said the same things and looked
+              like a log entry.
+            -->
+            <Border
+                Margin="0,3"
+                Padding="12"
+                Background="{DynamicResource CardSurfaceBrush}"
+                BorderBrush="{DynamicResource ShellHairlineBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource CornerRadiusMedium}">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+                <StackPanel Spacing="{DynamicResource Space4}">
+                  <TextBlock FontWeight="SemiBold" Text="{Binding QualityLabel}" />
+                  <TextBlock
+                      FontSize="{DynamicResource FontSizeCaption}"
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      IsVisible="{Binding HasTechnical}"
+                      Text="{Binding TechnicalText}" />
+                  <TextBlock
+                      FontFamily="{DynamicResource FontFamilyMono}"
+                      FontSize="{DynamicResource FontSizeCaption}"
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      Text="{Binding PathText}"
+                      TextTrimming="CharacterEllipsis"
+                      TextWrapping="NoWrap" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="{DynamicResource Space8}">
+                  <Border Classes="state-chip" IsVisible="{Binding IsEffective}">
+                    <TextBlock Text="{DynamicResource MovieVersionEffective}" />
+                  </Border>
+                  <Border Classes="state-chip" IsVisible="{Binding IsPreferred}">
+                    <TextBlock Text="{DynamicResource MovieVersionPreferred}" />
+                  </Border>
+                  <!--
+                    The badge itself and not a copy of it: whether a file is reachable is said in one
+                    place in this application, and a row that drew its own would be the fourth copy
+                    UnavailableBadgeTests exists to prevent.
+                  -->
+                  <library:UnavailableBadge />
+                </StackPanel>
+              </Grid>
+            </Border>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
-    </StackPanel>
+      </StackPanel>
+    </Grid>
   </Grid>
 </UserControl>
