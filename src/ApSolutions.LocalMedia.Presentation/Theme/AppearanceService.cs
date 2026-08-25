@@ -105,7 +105,6 @@ public sealed class AppearanceService : IAppearanceService
         ("SliderTrackValueFill", Body),
         ("SliderTrackValueFillPointerOver", Body),
         ("SliderTrackValueFillPressed", Body),
-        ("SystemControlHighlightListAccentLowBrush", Wash),
         ("ToggleButtonBackgroundChecked", Body),
         ("ToggleButtonForegroundChecked", OnBody),
     ];

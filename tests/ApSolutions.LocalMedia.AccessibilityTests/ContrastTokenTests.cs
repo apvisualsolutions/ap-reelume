@@ -65,6 +65,12 @@ public sealed class ContrastTokenTests
         "AccentInkBrush",
         "AccentTextBrush",
 
+        // The neutral wash a menu paints its current row with, added 2026-08-25 when the accent
+        // rectangle came off. It is deliberately NOT an accent token: what it says is "you are
+        // here", and in the two high contrasts it resolves to the surface and the border says it
+        // instead — which is why no contrast pair names it.
+        "SelectionFillBrush",
+
         // The leading action's own family, added 2026-08-24 with the prototype's palette: in dark
         // it is a light pill, so it cannot share the accent's tokens or its measured pairs.
         "PrimaryActionBrush",
