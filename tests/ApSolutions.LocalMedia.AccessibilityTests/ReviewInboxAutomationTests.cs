@@ -36,9 +36,12 @@ public sealed class ReviewInboxAutomationTests
             Assert.NotEmpty(controls);
             Assert.All(controls, control => Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(control))));
             Assert.All(controls.Where(control => control is Button or TextBox), control => Assert.True(control.Focusable));
-            Assert.Contains(
-                view.GetVisualDescendants().OfType<ListBox>().Single().KeyBindings,
-                binding => binding.Gesture is KeyGesture { Key: Key.Enter });
+            // Enter on the list used to accept the selection. It was removed on 2026-08-25 with the
+            // decisions moving into the card: a card holds three of them, and measured, the list's
+            // binding answered Enter before the focused Reject button did — so the keyboard accepted
+            // what a person was trying to refuse. What is asserted now is that no gesture on the list
+            // decides anything by itself.
+            Assert.Empty(view.GetVisualDescendants().OfType<ListBox>().Single().KeyBindings);
             Assert.Contains(view.KeyBindings, binding => binding.Gesture is KeyGesture { Key: Key.Escape });
 
             var treePath = Path.Combine(

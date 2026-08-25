@@ -10,6 +10,36 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La bandeja de revisión enseña el archivo del que habla.** Pedía una decisión sobre
+  «movie:761053» y no mostraba de qué archivo hablaba: la proyección de candidatos ya no sólo trae el
+  identificador, trae la ruta. Cada tarjeta lleva ahora la carátula, «ARCHIVO PENDIENTE» con el
+  nombre y la carpeta, el candidato con su tipo, la confianza y las señales — y **las tres decisiones
+  dentro de la tarjeta**, que es donde el prototipo las pone. Estaban una fila más abajo actuando
+  sobre «lo seleccionado», que es una decisión por bandeja en vez de una por archivo.
+
+- **Enter sobre «Rechazar» aceptaba.** Medido: el atajo de la lista contestaba antes que el botón con
+  el foco, así que el teclado aceptaba justo lo que se intentaba rechazar. El atajo se retira; una
+  tarjeta con tres acciones no puede tener una tecla que elija una de ellas en secreto.
+
+- **La página de duplicados es la tabla del prototipo.** Listaba títulos y un número, con la
+  comparación a un clic. Ahora cada grupo trae su tabla —archivo, resolución, códec, audio, tamaño,
+  duración, ubicación y disponibilidad— con el radio que fija qué copia se reproduce por defecto, sin
+  abrir nada. El lector hace el trabajo en una sola consulta, y el título sigue siendo la puerta a la
+  comparación de siempre.
+
+- **«1 episodios» dejó de escribirse.** El recuento de la ficha de serie cambia de palabra en el
+  singular, en los dos idiomas.
+
+### Añadido
+
+- Cobertura de lo que llegó con el rediseño y CI midió a la baja: la igualdad de una fila del
+  catálogo con sus seis miembros nuevos, las dos ausencias del título y la duración de un episodio,
+  el año y los géneros que Inicio lee —presentes y ausentes—, las líneas de las dos fichas con cada
+  pieza que puede faltar, los dos botones de cada tarjeta del riel, y la tabla de duplicados leída
+  del almacén real.
+
+### Corregido
+
 - **La ficha de serie es la del prototipo.** Bajo el título va la línea «2020 · Drama · 3 temporadas
   · 16 episodios», la barra de la serie con «10/16 vistos», y el panel que nombra el episodio que
   falta —«T02·E05 · Puerto de invierno», «Reanudar en 17:00»— con su botón «▶ Continuar», que es la

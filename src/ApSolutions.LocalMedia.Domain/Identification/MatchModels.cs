@@ -107,7 +107,13 @@ public sealed record MatchCandidate(
     IReadOnlyList<MatchSignal> Signals,
     IReadOnlyList<string> ExplanationCodes,
     int Revision = 0,
-    bool IsDecisionLocked = false);
+    bool IsDecisionLocked = false,
+    // The file this candidate is about, when the reading that produced it was asked for the review
+    // tray. A tray that names only the candidate — «movie:761053» — is asking somebody to decide
+    // about a file it never shows them, which is the one thing this surface exists to do. Nullable
+    // because most readings of a candidate do not need it, and a file can be gone by the time one is
+    // reviewed.
+    string? MediaFilePath = null);
 
 public enum MatchDecisionWriteOutcome
 {

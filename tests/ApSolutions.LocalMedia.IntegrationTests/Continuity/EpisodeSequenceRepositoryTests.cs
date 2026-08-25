@@ -54,6 +54,16 @@ public sealed class EpisodeSequenceRepositoryTests
         var withoutFile = episodes.Single(entry => entry is { SeasonNumber: 1, EpisodeNumber: 3 });
         Assert.Null(withoutFile.MediaFileId);
         Assert.False(withoutFile.IsPlayable);
+
+        // The name and the length, which the series card writes under the number. They joined the
+        // projection on 2026-08-25 and both halves are here: the episode with a file carries the
+        // file's running time, and the one with none carries no running time at all — which is a
+        // different absence from a running time of zero, and the card draws them differently.
+        Assert.Equal("Crónicas S01E01", linked.Title);
+        Assert.Equal(TimeSpan.FromMinutes(48), linked.Runtime);
+        Assert.Equal("Crónicas S01E03", withoutFile.Title);
+        Assert.Null(withoutFile.Runtime);
+        Assert.Null(offline.Runtime);
     }
 
     [Fact]
@@ -120,6 +130,13 @@ public sealed class EpisodeSequenceRepositoryTests
         Assert.Equal(CatalogTitleKind.Movie, progress[1].Kind);
         Assert.Null(progress[1].SeasonNumber);
 
+        // What the hero's line is written from, and both absences: the series has genres and no
+        // year, the film has a year and no genres.
+        Assert.Null(first.Year);
+        Assert.Equal(["Drama", "Intriga"], first.Genres);
+        Assert.Equal(2016, progress[1].Year);
+        Assert.Empty(progress[1].Genres ?? []);
+
         var recent = await readModel.ReadRecentlyAddedAsync(2, TestContext.Current.CancellationToken);
         Assert.Equal(2, recent.Count);
         Assert.True(recent[0].AddedUtc >= recent[1].AddedUtc);
@@ -163,7 +180,16 @@ public sealed class EpisodeSequenceRepositoryTests
     private static async Task SeedAsync(SqliteConnectionFactory factory)
     {
         var catalog = new CatalogRepository(factory);
-        await catalog.UpsertTitleAsync(Title(Show, CatalogTitleKind.Show, "Crónicas", Noon.AddDays(-1)));
+        // The series carries genres and no year; the film carries a year and no genres. Both halves
+        // of both absences, in one seed, because Home's projection reads them as two nullable
+        // columns and a fixture that filled them in would only ever measure one side of each.
+        await catalog.UpsertTitleAsync(Title(
+            Show,
+            CatalogTitleKind.Show,
+            "Crónicas",
+            Noon.AddDays(-1),
+            year: null,
+            genres: ["Drama", "Intriga"]));
         await catalog.UpsertTitleAsync(Title(OtherShow, CatalogTitleKind.Show, "Otra serie", Noon.AddDays(-2)));
         await catalog.UpsertTitleAsync(Title(Movie, CatalogTitleKind.Movie, "Arrival", Noon));
         await catalog.UpsertSeasonAsync(new CatalogSeason(Show, 0, "Especiales"));
@@ -188,8 +214,10 @@ public sealed class EpisodeSequenceRepositoryTests
             """,
             ("$root", Root.Value.ToString("D")));
 
-        // Season one episodes one and two have a file; episode three deliberately has none.
-        await LinkAsync(connection, Show, 1, 1, isAvailable: true);
+        // Season one episodes one and two have a file; episode three deliberately has none. Only the
+        // first carries a running time, because a file whose duration was never read is the ordinary
+        // state of a library that has not been scanned deeply — and the card has to survive it.
+        await LinkAsync(connection, Show, 1, 1, isAvailable: true, duration: TimeSpan.FromMinutes(48));
         await LinkAsync(connection, Show, 1, 2, isAvailable: false);
         await LinkAsync(connection, Show, 2, 1, isAvailable: true);
         await LinkAsync(connection, Show, 0, 1, isAvailable: true);
@@ -201,7 +229,8 @@ public sealed class EpisodeSequenceRepositoryTests
         TitleId show,
         int season,
         int number,
-        bool isAvailable)
+        bool isAvailable,
+        TimeSpan? duration = null)
     {
         var mediaFileId = MediaGuid(show, season, number);
         await ExecuteAsync(
@@ -212,13 +241,14 @@ public sealed class EpisodeSequenceRepositoryTests
                 duration_ticks, container, video_codecs, audio_codecs, width, height, is_available)
             VALUES (
                 $id, $root, $path, 1000, $written,
-                NULL, 'matroska', '["h264"]', '["aac"]', 1920, 1080, $available);
+                $duration, 'matroska', '["h264"]', '["aac"]', 1920, 1080, $available);
             """,
             ("$id", mediaFileId.ToString("D")),
             ("$root", Root.Value.ToString("D")),
             ("$path", $@"root\{show.Value:N}-s{season:D2}e{number:D2}.mkv"),
             ("$written", Noon.ToString("O", CultureInfo.InvariantCulture)),
-            ("$available", isAvailable ? 1 : 0));
+            ("$available", isAvailable ? 1 : 0),
+            ("$duration", duration is { } span ? span.Ticks : DBNull.Value));
         await ExecuteAsync(
             connection,
             """
@@ -244,19 +274,28 @@ public sealed class EpisodeSequenceRepositoryTests
         await command.ExecuteNonQueryAsync();
     }
 
+    /// <summary>
+    /// A title as the catalogue stores it. The year and the genres are arguments because Home's
+    /// projection reads both since 2026-08-24 and both can be absent: a title nobody identified has
+    /// no year, and one identified from a file name has no genres. The hero writes «2019 · Drama ·
+    /// quedan 44:00» out of them, so each absence is a line that comes out shorter rather than a
+    /// line that comes out wrong.
+    /// </summary>
     private static CatalogTitle Title(
         TitleId id,
         CatalogTitleKind kind,
         string title,
-        DateTimeOffset addedUtc) => new(
+        DateTimeOffset addedUtc,
+        int? year = 2016,
+        IReadOnlyList<string>? genres = null) => new(
         id,
         kind,
         title,
         title,
-        2016,
+        year,
         [],
         [],
-        [],
+        genres ?? [],
         addedUtc,
         null,
         HasProgress: false,

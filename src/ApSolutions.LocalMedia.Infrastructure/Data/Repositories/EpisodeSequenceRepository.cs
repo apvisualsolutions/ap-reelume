@@ -96,6 +96,8 @@ public sealed class EpisodeSequenceRepository : IEpisodeSequenceRepository
         reader.IsDBNull(4) ? null : new MediaFileId(Guid.Parse(reader.GetString(4))),
         reader.IsDBNull(5) ? null : reader.GetString(5),
         reader.GetInt32(6) == 1,
-        reader.IsDBNull(7) ? null : reader.GetString(7),
+        // The title is NOT NULL in the schema, so it is read rather than checked; the running time
+        // comes from the file, and an episode the catalogue knows with no file behind it has none.
+        reader.GetString(7),
         reader.IsDBNull(8) ? null : TimeSpan.FromTicks(reader.GetInt64(8)));
 }

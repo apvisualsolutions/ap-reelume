@@ -2028,6 +2028,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="BorderBrush" Value="{DynamicResource WarningBorderBrush}" />
   </Style>
 
+  <!--
+    The prototype's other two chips: green for a file that is there, red for one that is not. It drew
+    availability that way from the start and this theme had only the neutral and the amber, so
+    «Disponible» and «No disponible» were told apart by their words alone — which is correct and is
+    not the whole of it, because a table of eight columns is scanned rather than read.
+  -->
+  <Style Selector="Border.state-chip.ok">
+    <Setter Property="Background" Value="{DynamicResource PositiveSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PositiveBorderBrush}" />
+  </Style>
+
+  <Style Selector="Border.state-chip.danger">
+    <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
+  </Style>
+
   <Style Selector="Border.state-chip TextBlock">
     <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
     <Setter Property="FontWeight" Value="SemiBold" />

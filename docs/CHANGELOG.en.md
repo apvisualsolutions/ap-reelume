@@ -10,6 +10,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The review tray shows the file it is asking about.** It asked for a decision on «movie:761053»
+  and never showed which file that was: the candidate projection now carries the path as well as the
+  identifier. Every card holds the cover, «PENDING FILE» with the name and the folder, the candidate
+  with its kind, the confidence and the signals — and **the three decisions inside the card**, which
+  is where the prototype puts them. They lived one row below, acting on «the selection», which is one
+  decision per tray rather than one per file.
+
+- **Enter on «Reject» accepted.** Measured: the list's shortcut answered before the focused button
+  did, so the keyboard accepted exactly what somebody was trying to refuse. The shortcut is gone; a
+  card holding three actions cannot have a key that silently picks one of them.
+
+- **The duplicates page is the prototype's table.** It listed titles and a count with the comparison
+  a click away. Every group now brings its table — file, resolution, codec, audio, size, duration,
+  location and availability — with the radio that decides which copy plays by default, without
+  opening anything. The reader does it in one query, and the title is still the way into the
+  comparison it always was.
+
+- **«1 episodes» is not written any more.** The series card's count changes word in the singular, in
+  both languages.
+
+### Added
+
+- Coverage for what the redesign brought and CI measured downwards: the equality of a catalogue row
+  with its six new members, both absences of an episode's title and running time, the year and the
+  genres Home reads — present and absent — the two cards' lines with every piece that can be missing,
+  the two buttons on each rail card, and the duplicates table read from the real store.
+
+### Fixed
+
 - **The series card is the prototype's.** Under the title: «2020 · Drama · 3 seasons · 16 episodes»,
   the series' own bar with «10/16 watched», and the panel that names the episode it is waiting on —
   «S02·E05 · Puerto de invierno», «Resume at 17:00» — with its «▶ Continue» button, the card's only

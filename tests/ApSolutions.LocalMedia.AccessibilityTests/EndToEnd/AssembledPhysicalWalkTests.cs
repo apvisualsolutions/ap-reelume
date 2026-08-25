@@ -183,6 +183,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             chosen.ShortPath,
             () => PreferredVersionAsync(factory),
             "clicking a version radio never stored the preference for the group",
+            helpText: chosen.Quality,
             recordAs: "{Binding ShortPath}");
         Assert.Equal(chosen.Version.MediaFileId.Value, await PreferredVersionAsync(factory));
 
@@ -199,6 +200,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Dispatcher.UIThread.RunJobs();
 
         var row = host.ViewModel.DuplicatesOverview!.Groups.Single();
+
+        // The destination's own table, which is where the prototype puts the decision: the same
+        // choice, made without opening anything. Pressed on the copy that is NOT stored, so the
+        // press has something to change — and the probe is the stored preference for the same reason
+        // it is above, since the policy answers with a version either way.
+        var stored = await PreferredVersionAsync(factory);
+        var other = row.Files.Single(file => file.MediaFileId.Value != stored);
+        await PressAsync(
+            host,
+            other.ShortPath,
+            () => PreferredVersionAsync(factory),
+            "clicking a radio in the duplicates table never stored the preference",
+            helpText: other.Location,
+            recordAs: "{Binding ShortPath}");
+        Assert.Equal(other.MediaFileId.Value, await PreferredVersionAsync(factory));
+
         await PressAsync(
             host,
             row.Title,
@@ -1926,7 +1943,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host,
             "ReviewAcceptAction",
             () => CountDecidedAsync(factory, fileId, ReviewState.Accepted),
-            "clicking Accept never stored the decision on the candidate");
+            "clicking Accept never stored the decision on the candidate",
+            helpText: accepted);
         Assert.Equal(1, await CountDecidedAsync(factory, fileId, ReviewState.Accepted));
 
         // The one that was clicked, and not merely one of them: the control click used to land on a
@@ -1944,7 +1962,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host,
             "ReviewRejectAction",
             () => CountDecidedAsync(factory, fileId, ReviewState.Rejected),
-            "clicking Reject never stored the refusal on the candidate");
+            "clicking Reject never stored the refusal on the candidate",
+            helpText: rejected);
         Assert.Equal(1, await CountDecidedAsync(factory, fileId, ReviewState.Rejected));
         Assert.Equal(rejected, await DecidedKeyAsync(factory, fileId, ReviewState.Rejected));
         await WaitForAsync(
@@ -1955,7 +1974,20 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // provider's own cache, so the real provider, parser and scorer all take part — and because
         // what the words find leaves no doubt, the identification is finished rather than queued: the
         // probe is the catalogue row, which is what a person came here to change.
-        SelectCard(host, inbox);
+        // The card's own way in, which is where the prototype puts it: pressing it starts a manual
+        // search for THAT file, and what it puts in the box is the file's own name — which is what a
+        // person would type first and what the parser already knows how to read.
+        var searched = SelectCard(host, inbox);
+        await PressAsync(
+            host,
+            "ReviewManualSearchCardAction",
+            () => inbox.ManualSearch ?? string.Empty,
+            "clicking Search manually on a card never started a search for that file",
+            helpText: searched);
+        Assert.False(
+            string.IsNullOrWhiteSpace(inbox.ManualSearch),
+            "Search manually left the box empty, so it asked for nothing.");
+
         inbox.ManualSearch = "La llegada 2016";
         Dispatcher.UIThread.RunJobs();
         await PressAsync(

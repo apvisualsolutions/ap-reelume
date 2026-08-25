@@ -92,6 +92,13 @@ public sealed class ReviewInboxTests
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(1, list.SelectedIndex);
 
+        // Accept with the keyboard, on the card the arrows landed on. It used to be Enter on the row
+        // itself; a card holds three decisions now, so the key belongs to the one with focus.
+        var second = viewModel.Items[1];
+        var acceptButton = view.GetVisualDescendants()
+            .OfType<Button>()
+            .Single(button => ReferenceEquals(button.Command, second.AcceptCommand));
+        acceptButton.Focus();
         window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
         window.KeyRelease(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
         await WaitForAsync(() => repository.Candidates.Single(candidate => candidate.StableKey == "second").IsDecisionLocked);
@@ -113,10 +120,14 @@ public sealed class ReviewInboxTests
         Dispatcher.UIThread.RunJobs();
         Assert.Contains(focusable, control => control.IsKeyboardFocusWithin && control != focusable[0]);
 
-        viewModel.SelectedItem = viewModel.Items.Single();
+        // The decisions live in the card since 2026-08-25, so the button is found by the command it
+        // carries rather than by a name on the surface: one card, one Reject, and it is that card's.
+        var remaining = viewModel.Items.Single();
+        viewModel.SelectedItem = remaining;
+        Dispatcher.UIThread.RunJobs();
         var rejectButton = view.GetVisualDescendants()
             .OfType<Button>()
-            .Single(button => button.Name == "RejectReviewAction");
+            .Single(button => ReferenceEquals(button.Command, remaining.RejectCommand));
         rejectButton.Focus();
         window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
         window.KeyRelease(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);

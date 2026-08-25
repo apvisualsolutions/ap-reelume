@@ -143,10 +143,12 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
         await using var command = connection.CreateCommand();
         command.CommandText = """
-            SELECT candidate_id, media_file_id, stable_key, content_kind, score,
+            SELECT candidate_id, candidate.media_file_id, stable_key, content_kind, score,
                    scoring_model_version, review_state, signals_json,
-                   explanation_codes_json, revision, decision_locked
+                   explanation_codes_json, revision, decision_locked,
+                   media.normalized_path
             FROM match_candidates candidate
+            LEFT JOIN media_files media ON media.id = candidate.media_file_id
             WHERE candidate.review_state IN ($pending, $suggested)
               AND NOT EXISTS (
                   SELECT 1
@@ -169,7 +171,7 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         var candidates = new List<MatchCandidate>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            candidates.Add(ReadCandidate(reader, mediaFileColumn: 1));
+            candidates.Add(ReadCandidate(reader, mediaFileColumn: 1, pathColumn: 11));
         }
 
         return candidates;
@@ -260,7 +262,14 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
             : null;
     }
 
-    private static MatchCandidate ReadCandidate(SqliteDataReader reader, int mediaFileColumn) => new(
+    /// <summary>
+    /// One row as a candidate. The path is read only where the projection selected it — the review
+    /// tray's, which is the one place a candidate is shown to a person rather than scored.
+    /// </summary>
+    private static MatchCandidate ReadCandidate(
+        SqliteDataReader reader,
+        int mediaFileColumn,
+        int pathColumn = -1) => new(
         new CandidateId(Guid.Parse(reader.GetString(0))),
         new MediaFileId(Guid.Parse(reader.GetString(mediaFileColumn))),
         reader.GetString(2),
@@ -271,5 +280,6 @@ public sealed class MatchCandidateRepository : IMatchCandidateRepository
         JsonSerializer.Deserialize<MatchSignal[]>(reader.GetString(7)) ?? [],
         JsonSerializer.Deserialize<string[]>(reader.GetString(8)) ?? [],
         reader.GetInt32(9),
-        reader.GetBoolean(10));
+        reader.GetBoolean(10),
+        pathColumn >= 0 && !reader.IsDBNull(pathColumn) ? reader.GetString(pathColumn) : null);
 }
