@@ -224,6 +224,58 @@ public sealed class DetailsNavigationTests
         Assert.Equal("40:00", viewModel.ResumePositionText);
     }
 
+    /// <summary>
+    /// The one button that opens a film says what it will do, and it is there either way.
+    /// </summary>
+    /// <remarks>
+    /// It was hidden outright when there was nothing to resume, so a film nobody had started offered
+    /// the «from the start» glyph and no way to simply play it — «en ciertas ocasiones en la vista
+    /// detalle desaparece el botón de reproducir/continuar y solamente queda el icono de ver desde el
+    /// inicio», 2026-08-25. The occasion was every film nobody had started.
+    /// <para>
+    /// What is asserted is both arms and the command behind them: with progress the button resumes at
+    /// the stored minute, and without it the same button starts at zero. A test that only read the
+    /// words would pass over a button that says «Reproducir» and resumes.
+    /// </para>
+    /// </remarks>
+    [Theory]
+    [InlineData(0, "Play", 0)]
+    [InlineData(40, "Resume · 40:00", 40)]
+    public void The_card_always_offers_a_way_to_open_the_film(
+        int storedMinutes,
+        string expectedWords,
+        int expectedStartMinutes)
+    {
+        var requests = new List<PlayDetailsRequest>();
+        var effective = new MediaFileId(CreateGuid(53));
+        var viewModel = new MovieDetailsViewModel(onPlay: request =>
+        {
+            requests.Add(request);
+            return Task.CompletedTask;
+        });
+        viewModel.Apply(
+            Item(MovieId, CatalogTitleKind.Movie, "Arrival", isAvailable: true),
+            storedMinutes == 0
+                ? null
+                : State(
+                    ContentKey.ForTitle(MovieId),
+                    TimeSpan.FromMinutes(storedMinutes),
+                    TimeSpan.FromMinutes(116)),
+            new MediaVersionGroup(
+                new MediaVersionId(CreateGuid(54)),
+                ContentKey.ForTitle(MovieId).Value,
+                [new MediaVersion(effective, @"root.mkv", true, TimeSpan.FromMinutes(116), 1920, 1080, false, "H264", 40)],
+                null));
+
+        Assert.Equal(expectedWords, viewModel.PlayActionText);
+        Assert.True(viewModel.PlayOrResumeCommand.CanExecute(null));
+
+        viewModel.PlayOrResumeCommand.Execute(null);
+
+        Assert.Single(requests);
+        Assert.Equal(TimeSpan.FromMinutes(expectedStartMinutes), requests[0].StartPosition);
+    }
+
     [Fact]
     public void A_resume_point_past_an_hour_is_written_with_hours_and_a_position_is_clamped()
     {

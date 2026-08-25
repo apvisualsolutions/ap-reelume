@@ -139,15 +139,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 do. Home's own continue button has said «Continuar · 13:54» since it was drawn, and
                 this is that, on the card.
               -->
+              <!--
+                One button, always here, whose words follow what there is to open: «Continuar ·
+                49:00» for a film with progress and «Reproducir» for one without. It used to be
+                hidden outright when there was nothing to resume, so a film nobody had started
+                offered the «from the start» glyph and no way to simply play it — «en ciertas
+                ocasiones en la vista detalle desaparece el botón de reproducir/continuar y solamente
+                queda el icono de ver desde el inicio», 2026-08-25, and the occasion was every film
+                nobody had started.
+
+                The words are one binding rather than two TextBlocks, because with no progress the
+                second one would be an empty run of ink holding open a gap the prototype does not
+                draw.
+              -->
               <Button
+                  x:Name="MovieOpenAction"
                   Classes="primary-action"
-                  Command="{Binding ResumeCommand}"
-                  IsVisible="{Binding CanResume}"
-                  automation:AutomationProperties.Name="{DynamicResource MovieResumeAction}">
+                  Command="{Binding PlayOrResumeCommand}"
+                  automation:AutomationProperties.Name="{Binding PlayActionText}">
                 <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
                   <Path Classes="icon size-14 filled" Data="{DynamicResource IconPlay}" />
-                  <TextBlock Text="{DynamicResource MovieResumeAction}" />
-                  <TextBlock Opacity="0.75" Text="{Binding ResumePositionText}" />
+                  <TextBlock Text="{Binding PlayActionText}" />
                 </StackPanel>
               </Button>
               <!--
@@ -157,9 +169,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 same sentence they always were, and the shape is the one every player draws for
                 «start again».
               -->
+              <!--
+                And the glyph is the ALTERNATIVE to that button, so it is here only while there is
+                something to be an alternative to. With no progress the button beside it already
+                starts at zero, and two controls that do the same thing is one of them saying
+                nothing.
+              -->
               <Button
                   Classes="icon-action"
                   Command="{Binding PlayCommand}"
+                  IsVisible="{Binding CanResume}"
                   automation:AutomationProperties.Name="{DynamicResource MoviePlayAction}">
                 <Path Classes="icon size-16" Data="{DynamicResource IconRestart}" />
               </Button>

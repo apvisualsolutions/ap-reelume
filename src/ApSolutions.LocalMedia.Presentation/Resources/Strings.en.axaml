@@ -464,6 +464,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="DetailsTrailerLinkAction">Watch trailer</x:String>
   <x:String x:Key="DetailsTrailerLinkHelpText">Opens in your browser and leaves the application.</x:String>
   <x:String x:Key="MovieResumeAction">Resume</x:String>
+  <x:String x:Key="MovieStartAction">Play</x:String>
   <x:String x:Key="MovieOtherActionsHeading">Other actions</x:String>
   <x:String x:Key="MovieVersionsHeading">Versions</x:String>
   <x:String x:Key="MovieVersionEffective">This one will open</x:String>
