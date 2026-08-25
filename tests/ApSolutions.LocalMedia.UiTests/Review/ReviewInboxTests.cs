@@ -180,6 +180,12 @@ public sealed class ReviewInboxTests
         withPath.SearchManuallyCommand.Execute(null);
         Assert.Equal("La.Llegada.2016.1080p", aimed.ManualSearch);
 
+        // A box holding only spaces is a box nobody typed in: the card fills it rather than treating
+        // the whitespace as words to search for.
+        aimed.ManualSearch = "   ";
+        withPath.SearchManuallyCommand.Execute(null);
+        Assert.Equal("La.Llegada.2016.1080p", aimed.ManualSearch);
+
         // Words already typed are left alone.
         viewModel.ManualSearch = "La llegada 2016";
         viewModel.Items[1].SearchManuallyCommand.Execute(null);

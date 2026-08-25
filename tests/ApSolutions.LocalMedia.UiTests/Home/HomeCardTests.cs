@@ -200,6 +200,56 @@ public sealed class HomeCardTests
     public void A_card_built_over_nothing_refuses_to_be_built()
     {
         Assert.Throws<ArgumentNullException>(() => new InProgressItemViewModel(null!));
+        Assert.Throws<ArgumentNullException>(() => new RecentlyAddedItemViewModel(null!));
+    }
+
+    /// <summary>
+    /// A recently added card says which title it is, twice: once as its own id and once as the id
+    /// whatever opens a card asks for.
+    /// </summary>
+    /// <remarks>
+    /// Two names for one value is not duplication here — <c>Id</c> is the card's own and
+    /// <c>TitleId</c> is what <c>IRailCard</c> promises — and nothing read either of them, which is
+    /// how a rail ends up opening the card of the title beside the one that was clicked.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task A_recently_added_card_carries_the_title_it_would_open()
+    {
+        var titleId = new TitleId(Guid.Parse("d1000000-0000-4000-8000-000000000003"));
+        var viewModel = new HomeViewModel(
+            new GetHome(new StubHome([])
+            {
+                RecentlyAdded =
+                [
+                    new RecentlyAddedItem(titleId, CatalogTitleKind.Movie, "Arrival", 2016, true, Noon),
+                ],
+            }),
+            new NavigationService());
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+
+        var card = Assert.Single(viewModel.RecentlyAdded);
+        Assert.Equal(titleId, card.Id);
+        Assert.Equal(titleId, card.TitleId);
+        Assert.Equal("Arrival", card.Title);
+    }
+
+    /// <summary>
+    /// Setting a list to what it already is announces nothing, which is the half of every setter
+    /// that only runs when a reload finds the library unchanged.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task Loading_the_same_thing_twice_announces_nothing_the_second_time()
+    {
+        var viewModel = await LoadAsync(EpisodeProgress());
+
+        var announced = new List<string>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName ?? string.Empty);
+
+        var same = typeof(HomeViewModel).GetProperty(nameof(viewModel.InProgress));
+        Assert.NotNull(same);
+        same!.SetValue(viewModel, viewModel.InProgress);
+
+        Assert.Empty(announced);
     }
 
     private static async Task<HomeViewModel> LoadAsync(params HomeProgressEntry[] entries)
@@ -245,6 +295,8 @@ public sealed class HomeCardTests
 
     private sealed class StubHome(IReadOnlyList<HomeProgressEntry> entries) : IHomeReadModel
     {
+        public IReadOnlyList<RecentlyAddedItem> RecentlyAdded { get; init; } = [];
+
         public Task<IReadOnlyList<HomeProgressEntry>> ReadProgressAsync(
             int limit,
             CancellationToken cancellationToken = default) =>
@@ -253,7 +305,7 @@ public sealed class HomeCardTests
         public Task<IReadOnlyList<RecentlyAddedItem>> ReadRecentlyAddedAsync(
             int limit,
             CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<RecentlyAddedItem>>([]);
+            Task.FromResult<IReadOnlyList<RecentlyAddedItem>>([.. RecentlyAdded.Take(limit)]);
 
         public Task<LibrarySummary> ReadLibrarySummaryAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(new LibrarySummary(0, 0, 0));

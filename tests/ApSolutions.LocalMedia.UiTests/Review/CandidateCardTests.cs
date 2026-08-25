@@ -52,6 +52,19 @@ public sealed class CandidateCardTests
         Assert.False(blank.HasFile);
         Assert.Equal(string.Empty, blank.FileName);
         Assert.Equal(string.Empty, blank.FileFolder);
+
+        // A path with no folder in it at all — a file the scan met at the root of a drive, or a name
+        // stored bare — has a name and no folder, and the card says exactly that.
+        var rootless = new CandidateCardViewModel(Candidate("arrival.mkv"));
+        Assert.True(rootless.HasFile);
+        Assert.Equal("arrival.mkv", rootless.FileName);
+        Assert.Equal(string.Empty, rootless.FileFolder);
+
+        // And a path that IS a folder and nothing else, which is the one shape Windows answers with
+        // no parent at all: the card says nothing rather than propagating the null.
+        var root = new CandidateCardViewModel(Candidate(@"C:\"));
+        Assert.False(root.HasFile);
+        Assert.Equal(string.Empty, root.FileFolder);
     }
 
     /// <summary>

@@ -477,9 +477,12 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
 
                 // The words to search with default to the file's own name, which is what a person
                 // would type first and what the parser already knows how to read.
-                if (string.IsNullOrWhiteSpace(ManualSearch) && card?.FileName is { Length: > 0 } name)
+                // FileName answers with an empty string rather than with nothing, so what is asked is
+                // its length: a pattern that also tested for null would be testing for a state this
+                // model cannot be in.
+                if (string.IsNullOrWhiteSpace(ManualSearch) && card!.FileName.Length > 0)
                 {
-                    ManualSearch = System.IO.Path.GetFileNameWithoutExtension(name);
+                    ManualSearch = System.IO.Path.GetFileNameWithoutExtension(card.FileName);
                 }
             });
         return card;
