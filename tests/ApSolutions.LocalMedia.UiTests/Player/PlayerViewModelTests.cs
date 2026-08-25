@@ -150,6 +150,51 @@ public sealed class PlayerViewModelTests
         Assert.False(viewModel.FileWasNotFound);
     }
 
+    /// <summary>
+    /// The engine's clean-up does not erase the failure a person is reading.
+    /// </summary>
+    /// <remarks>
+    /// LibVLC refuses a file and then, a moment later, reports the stop of the media it tore down.
+    /// Applied, that stop replaced the failure with an ordinary end of session: the recovery actions
+    /// vanished from the screen on their own, and the offer to hand the file to another player went
+    /// with them. It appeared first as a flake — the physical walk waited a full minute for a failure
+    /// that had already happened and been overwritten — which is the shape a race takes before
+    /// anybody calls it a defect.
+    ///
+    /// The other three moves out of failure still apply: reopening, failing again for another reason,
+    /// and going idle are this application deciding something rather than the engine finishing.
+    /// </remarks>
+    [Fact]
+    public async Task A_stop_after_a_failure_does_not_replace_it()
+    {
+        var viewModel = new PlayerViewModel(new RecordingCoordinator());
+        viewModel.ApplySessionState(
+            PlaybackState.Failed,
+            new PlaybackFailure(PlaybackFailureCode.OpenFailed, "codec"));
+
+        viewModel.ApplySessionState(PlaybackState.Stopped, failure: null);
+        Assert.True(viewModel.HasFailed);
+        Assert.True(viewModel.OpenFailed);
+        Assert.False(viewModel.IsStopped);
+
+        // And the end of the media, which the engine also reports after tearing it down.
+        viewModel.ApplySessionState(PlaybackState.Ended, failure: null);
+        Assert.True(viewModel.HasFailed);
+        Assert.True(viewModel.OpenFailed);
+
+        // Reopening is the way out, and it clears the reason on its own.
+        await viewModel.OpenAsync(
+            new MediaFileId(Guid.NewGuid()),
+            SamplePath,
+            cancellationToken: TestContext.Current.CancellationToken);
+        Assert.False(viewModel.HasFailed);
+        Assert.False(viewModel.OpenFailed);
+
+        // And once it is playing, a stop is an ordinary stop again.
+        viewModel.ApplySessionState(PlaybackState.Stopped, failure: null);
+        Assert.True(viewModel.IsStopped);
+    }
+
     [Fact]
     public async Task An_unsupported_codec_offers_another_version_and_external_playback_but_no_retry()
     {

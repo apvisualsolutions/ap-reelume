@@ -86,7 +86,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 Text="{Binding MetaText}"
                 TextTrimming="CharacterEllipsis" />
             <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
-              <Border Classes="state-chip" Classes.pending="{Binding !IsAvailable}">
+              <!--
+                Green when the file is there, which is how the prototype writes this one: the chip
+                beside it is neutral because «Sin empezar» is a fact and not a verdict, but «está» and
+                «no está» are the two answers this card exists to give. The warning wash is the other
+                arm and was already here.
+              -->
+              <Border
+                  Classes="state-chip"
+                  Classes.ok="{Binding IsAvailable}"
+                  Classes.pending="{Binding !IsAvailable}">
                 <TextBlock Text="{Binding AvailabilityKey, Converter={StaticResource DetailWord}}" />
               </Border>
               <Border Classes="state-chip">

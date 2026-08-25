@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Show;
 using Avalonia.Headless.XUnit;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Details;
@@ -532,6 +533,47 @@ public sealed class DetailCardTextTests
         Assert.Equal("Puerto Sombra", request.Title);
         Assert.Contains("Cuaderno", request.Subtitle!, StringComparison.Ordinal);
         Assert.Null(request.StartPosition);
+    }
+
+    /// <summary>
+    /// The availability chip is green when the file is there and washed amber when it is not.
+    /// </summary>
+    /// <remarks>
+    /// Colour on this one and not on the chip beside it: «Sin empezar» is a fact, «está» and «no
+    /// está» are the two answers the card exists to give, and the prototype paints only this one.
+    /// Both arms are asserted because a class bound to a negation is the shape that goes on saying
+    /// the same thing whatever the data does.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_availability_chip_is_green_when_the_file_is_there_and_washed_when_it_is_not()
+    {
+        Assert.Contains("ok", ChipClasses(isAvailable: true));
+        Assert.DoesNotContain("pending", ChipClasses(isAvailable: true));
+        Assert.Contains("pending", ChipClasses(isAvailable: false));
+        Assert.DoesNotContain("ok", ChipClasses(isAvailable: false));
+    }
+
+    /// <summary>The classes on the first state chip of a mounted film card.</summary>
+    /// <remarks>
+    /// Read while the window is open: closing it detaches the control and a bound class goes with it.
+    /// </remarks>
+    private static string[] ChipClasses(bool isAvailable)
+    {
+        var model = new MovieDetailsViewModel();
+        model.Apply(
+            Film(2016, null, TimeSpan.FromMinutes(116), isAvailable),
+            watchState: null,
+            versions: null);
+        var view = new MovieDetailsView { DataContext = model };
+        var window = new Avalonia.Controls.Window { Width = 1024, Height = 720, Content = view };
+        window.Show();
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var chip = view.GetVisualDescendants()
+            .OfType<Avalonia.Controls.Border>()
+            .First(border => border.Classes.Contains("state-chip"));
+        var classes = chip.Classes.ToArray();
+        window.Close();
+        return classes;
     }
 
     private static CatalogItem Film(
