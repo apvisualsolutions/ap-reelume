@@ -54,9 +54,17 @@ public sealed class ShellOverflowTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
+        // Measured on the band rather than read off its definition: the row became Auto when the
+        // chrome learned to go away, because a hidden control inside a fixed 44 px row leaves the
+        // 44 px standing. What has to be 44 is what the row actually takes with the bar in it, and
+        // that is the number the window extends its client area by.
         var root = shell.GetVisualDescendants().OfType<Grid>().First(grid => grid.RowDefinitions.Count > 0);
-        Assert.Equal(App.TitleBarHeight, root.RowDefinitions[0].Height.Value);
-        Assert.True(root.RowDefinitions[0].Height.IsAbsolute);
+        var titleBar = shell.GetVisualDescendants()
+            .OfType<Border>()
+            .Single(border => border.Name == "TitleBarSurface");
+        Assert.True(titleBar.IsVisible);
+        Assert.Equal(App.TitleBarHeight, titleBar.Bounds.Height);
+        Assert.Equal(App.TitleBarHeight, root.RowDefinitions[0].ActualHeight);
 
         // And the chrome the window is given actually carries that number.
         App.ApplyDesignedChrome(window);

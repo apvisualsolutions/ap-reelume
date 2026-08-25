@@ -49,6 +49,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private PlaybackMode _playbackMode = PlaybackMode.Embedded;
     private PlayerPanel _playerPanel = PlayerPanel.None;
     private int _playerSessionOrdinal;
+    private bool _isChromeRevealed = true;
 
     public ShellViewModel(INavigationService navigationService)
         : this(navigationService, appearanceSettings: null, library: null)
@@ -377,8 +378,27 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         get => _player;
         private set
         {
+            // The session that is leaving stops being listened to before the next one arrives:
+            // a handler left on a discarded player is how a closed session goes on deciding what
+            // is on screen, which is the defect this repository has a name for.
+            if (_player is { } leaving)
+            {
+                leaving.Player.PropertyChanged -= OnPlayerChanged;
+            }
+
             if (SetField(ref _player, value))
             {
+                if (value is { } arriving)
+                {
+                    arriving.Player.PropertyChanged += OnPlayerChanged;
+                }
+
+                // The chrome answers the state the session is in, not only the next change of it:
+                // the surfaces are built and the file is opened before the shell is handed them, so
+                // a session that is already playing when it arrives has no transition left to watch
+                // — measured on the real engine, where the picture was running and the rail, the
+                // title bar and the header were all still standing.
+                ApplyChromeFor(value?.Player.IsPlaying == true);
                 // A new session starts with its column closed and its own ordinal: the panel that
                 // was open belonged to the file that just left, and a badge that kept counting the
                 // previous one would be the only thing on this header still describing it.
@@ -619,6 +639,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsMarkerPanelOpen));
                 OnPropertyChanged(nameof(IsVersionsPanelOpen));
                 OnPropertyChanged(nameof(IsPlayerPanelOpen));
+                OnPropertyChanged(nameof(IsPlayerColumnVisible));
                 OnPropertyChanged(nameof(AudioPanelStateCue));
                 OnPropertyChanged(nameof(SubtitlePanelStateCue));
                 OnPropertyChanged(nameof(VideoPanelStateCue));
@@ -672,6 +693,68 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// how many times a session has been opened in this run rather than a handle to anything. It is
     /// counted here because the shell is what opens and closes them.
     /// </remarks>
+    /// <summary>
+    /// Whether everything that is not the picture is on screen.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The prototype does not do this — its player keeps its header and its transport standing the
+    /// whole time, and that was checked in its source before any of this was written. It is a
+    /// requirement of this application's own: a film is what the window is for while it is playing,
+    /// and a title bar, a navigation rail, a session header and a side column around it are four
+    /// surfaces about the application rather than about the film.
+    /// </para>
+    /// <para>
+    /// <b>It comes back on a movement of the mouse or a key, and on nothing else — no timer puts it
+    /// away again.</b> That is a decision with a cost written into it: a person who moves the mouse
+    /// once keeps the chrome until they pause and play again. The alternative is a clock, and a clock
+    /// here would be a second thing deciding what is on screen — one that no test can ask a question
+    /// of without waiting for it, and that the autonomous walk would race against on every scene
+    /// where it presses something during a real session.
+    /// </para>
+    /// </remarks>
+    public bool IsChromeRevealed
+    {
+        get => _isChromeRevealed;
+        private set
+        {
+            if (SetField(ref _isChromeRevealed, value))
+            {
+                OnPropertyChanged(nameof(IsPlayerColumnVisible));
+            }
+        }
+    }
+
+    /// <summary>The column is a panel somebody opened <b>and</b> chrome, so it answers to both.</summary>
+    public bool IsPlayerColumnVisible => IsPlayerPanelOpen && _isChromeRevealed;
+
+    /// <summary>Brings everything back, and does nothing at all when it is already there.</summary>
+    public void RevealChrome()
+    {
+        if (_isChromeRevealed)
+        {
+            return;
+        }
+
+        IsChromeRevealed = true;
+        _player?.Player.RevealControls();
+    }
+
+    /// <summary>
+    /// Takes everything but the picture away. The transport goes with it, through the pair the
+    /// player has always declared and nothing ever called.
+    /// </summary>
+    public void HideChrome()
+    {
+        if (!_isChromeRevealed)
+        {
+            return;
+        }
+
+        IsChromeRevealed = false;
+        _player?.Player.HideControls();
+    }
+
     public string PlayerSessionBadge => ShowText.Format(
         "PlayerSessionBadge",
         "Session {0} · single active engine",
@@ -995,6 +1078,36 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// <summary>Opens a panel, or closes the column when the panel asked for is already open.</summary>
     private void TogglePlayerPanel(PlayerPanel panel) =>
         PlayerPanel = _playerPanel == panel ? PlayerPanel.None : panel;
+
+    /// <summary>
+    /// The picture starting is what takes the chrome away; anything else brings it back.
+    /// </summary>
+    /// <remarks>
+    /// Paused, stopped and failed all reveal, and that is not three cases of one rule: a paused film
+    /// is somebody who has stopped watching for a moment and wants the controls they paused with,
+    /// and a failed one has a recovery surface that is the only thing left worth reading.
+    /// </remarks>
+    private void OnPlayerChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not nameof(PlayerViewModel.IsPlaying) || sender is not PlayerViewModel player)
+        {
+            return;
+        }
+
+        ApplyChromeFor(player.IsPlaying);
+    }
+
+    private void ApplyChromeFor(bool isPlaying)
+    {
+        if (isPlaying)
+        {
+            HideChrome();
+        }
+        else
+        {
+            RevealChrome();
+        }
+    }
 
     private sealed class RouteNavigationCommand(INavigationService navigationService) : ICommand
     {

@@ -8,6 +8,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Añadido
+
+- **Al reproducir se va todo menos la imagen, y vuelve al mover el ratón o pulsar una tecla.** La
+  barra de título, el raíl de navegación, la cabecera de la sesión, la columna de paneles y el
+  transporte: mientras la película corre, la ventana es la película. El prototipo no lo hace —se
+  comprobó en su código— así que es un requisito propio. Las dos bandas del shell miden ahora su
+  contenido en vez de llevar el número escrito, porque un control oculto dentro de una fila de 44 px
+  deja los 44 px: lo que reserva el espacio es la fila. Y el par `RevealControls`/`HideControls` que
+  el reproductor declaraba desde siempre y **nadie llamaba** por fin tiene quien lo llame.
+
+  Vuelve con el gesto y con nada más: no hay temporizador que lo esconda otra vez. Es una decisión
+  con su coste escrito —quien mueve el ratón una vez conserva el cromo hasta que pause y reanude— y
+  la alternativa sería un reloj decidiendo qué hay en pantalla, al que ninguna prueba puede
+  preguntar sin esperarlo y con el que el paseo autónomo competiría en cada escena.
+
 ### Cambiado
 
 - **El reproductor se encabeza con las píldoras del prototipo y su columna empieza cerrada.** Audio,

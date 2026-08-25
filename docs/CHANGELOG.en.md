@@ -8,6 +8,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Added
+
+- **Playing takes everything but the picture away, and the mouse or a key brings it back.** The
+  title bar, the navigation rail, the session header, the panel column and the transport: while the
+  film runs, the window is the film. The prototype does not do this — its own source was checked —
+  so it is a requirement of this application's own. The shell's two bands now measure their contents
+  instead of carrying the number, because a control hidden inside a fixed 44 px row leaves the 44 px
+  behind: the row is what reserves them. And the `RevealControls`/`HideControls` pair the player has
+  always declared and **nothing ever called** finally has a caller.
+
+  It comes back on the gesture and on nothing else: no timer puts it away again. That is a decision
+  with its cost written down — a person who moves the mouse once keeps the chrome until they pause
+  and play again — and the alternative is a clock deciding what is on screen, one no test can ask a
+  question of without waiting for it and that the autonomous walk would race on every scene.
+
 ### Changed
 
 - **The player is headed by the prototype's pills and its column starts closed.** Audio, Subtitles,

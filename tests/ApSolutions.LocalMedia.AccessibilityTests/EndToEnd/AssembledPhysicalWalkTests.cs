@@ -4054,6 +4054,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
+        // On the real engine, and this is the only place it can be measured: the picture started, so
+        // everything that is not the picture went away. The header, the rail and the title bar are
+        // gone and so is the transport, which is what the requirement asks for and what the
+        // prototype does not do.
+        Assert.False(host.ViewModel.IsChromeRevealed);
+        Assert.False(host.ViewModel.Player!.Player.AreControlsRevealed);
+
+        // And a movement of the mouse brings it back, which is how a person gets the controls again
+        // and how every scene from here on reaches a control at all.
+        await RevealChromeAsync(host);
+        Assert.True(host.ViewModel.Player!.Player.AreControlsRevealed);
+
         var tracks = host.ViewModel.Player!.Tracks;
         Assert.NotNull(tracks);
 
@@ -4872,12 +4884,43 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// what closes it, and a press that undid the scene's own setup would prove nothing.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// Brings the chrome back the way a person does, and says so when it does not come.
+    /// </summary>
+    /// <remarks>
+    /// The application takes everything but the picture away the moment a file starts playing, and
+    /// gives it back on a movement of the mouse or a key. Every scene that presses something on the
+    /// header of a running session goes through here, so the reveal is a measured gesture rather
+    /// than a state somebody set from the outside.
+    /// </remarks>
+    private static async Task RevealChromeAsync(ShellHost host)
+    {
+        if (host.ViewModel.IsChromeRevealed)
+        {
+            return;
+        }
+
+        host.Window.MouseMove(
+            new Point(host.Window.Bounds.Width / 2, host.Window.Bounds.Height / 2),
+            RawInputModifiers.None);
+        await SettleAsync();
+        Assert.True(
+            host.ViewModel.IsChromeRevealed,
+            "moving the mouse never brought the chrome back, so nothing on the header is reachable.");
+    }
+
     private static async Task OpenPlayerPanelAsync(ShellHost host, PlayerPanel panel)
     {
         if (host.ViewModel.PlayerPanel == panel)
         {
             return;
         }
+
+        // A pill cannot be pressed while the chrome is away, and that is not an obstacle to work
+        // around — it is the requirement: a session that is playing shows the picture and nothing
+        // else until somebody moves the mouse. So the mouse is moved, exactly as a person moves it,
+        // and the reveal is asserted rather than assumed.
+        await RevealChromeAsync(host);
 
         var pill = panel switch
         {

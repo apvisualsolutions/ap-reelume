@@ -12,9 +12,12 @@ using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -205,8 +208,92 @@ public sealed class PlayerPanelColumnTests
         window.Close();
     }
 
+    [AvaloniaFact]
+    public async Task Playing_takes_everything_but_the_picture_away_and_a_key_or_the_mouse_brings_it_back()
+    {
+        var (window, view, viewModel) = await ShowSessionAsync();
+        var player = viewModel.Player!.Player;
+
+        // Everything is there while the file opens: what is on screen at that moment is a header
+        // saying which one.
+        Assert.True(viewModel.IsChromeRevealed);
+        Assert.True(TitleBar(view).IsVisible);
+        Assert.True(Rail(view).IsVisible);
+        var withChrome = Stage(view).Bounds;
+
+        player.ApplySessionState(PlaybackState.Playing, failure: null);
+        Dispatcher.UIThread.RunJobs();
+        window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // The prototype does not do this — its player keeps its header standing the whole time. It
+        // is a requirement of this application's own, and what it means is measured on the picture:
+        // the stage ends up being the window. The transport goes too, and it goes by opacity rather
+        // than by visibility, so the controls stay in the focus and automation trees — it floats
+        // over the picture and takes none of its height either way.
+        Assert.False(viewModel.IsChromeRevealed);
+        Assert.False(TitleBar(view).IsVisible);
+        Assert.False(Rail(view).IsVisible);
+        Assert.False(Header(view).IsVisible);
+        Assert.False(player.AreControlsRevealed);
+        Assert.Equal(0d, player.ControlsOpacity);
+        Assert.Equal(withChrome.Width + 64, Stage(view).Bounds.Width);
+        Assert.Equal(window.Bounds.Width, Stage(view).Bounds.Width);
+        Assert.Equal(window.Bounds.Height, Stage(view).Bounds.Height);
+        Assert.True(Stage(view).Bounds.Height > withChrome.Height);
+
+        // A key anywhere brings it back — tunnelling, so a gesture the player handles counts too.
+        window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(viewModel.IsChromeRevealed);
+        Assert.True(player.AreControlsRevealed);
+
+        // And so does the mouse, from the state the key just left.
+        viewModel.HideChrome();
+        Assert.False(viewModel.IsChromeRevealed);
+        window.MouseMove(new Point(400, 300), RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(viewModel.IsChromeRevealed);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task Pausing_brings_the_chrome_back_and_the_open_panel_goes_with_the_picture()
+    {
+        var (window, view, viewModel) = await ShowSessionAsync();
+        var player = viewModel.Player!.Player;
+        viewModel.TogglePlayerPanelCommand.Execute(PlayerPanel.Audio);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(Column(view).IsVisible);
+
+        player.ApplySessionState(PlaybackState.Playing, failure: null);
+        Dispatcher.UIThread.RunJobs();
+
+        // The column is a panel somebody opened and it is chrome, so it answers to both: it is not
+        // closed — the pill it was opened with is still pressed — it is simply not drawn.
+        Assert.True(viewModel.IsAudioPanelOpen);
+        Assert.False(Column(view).IsVisible);
+
+        // Paused is somebody who has stopped watching for a moment and wants the controls they
+        // paused with, so everything comes back, the panel included.
+        player.ApplySessionState(PlaybackState.Paused, failure: null);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(viewModel.IsChromeRevealed);
+        Assert.True(Column(view).IsVisible);
+        window.Close();
+    }
+
     private static Panel Stage(ShellView view) =>
         view.GetVisualDescendants().OfType<Panel>().Single(panel => panel.Name == "PlayerStage");
+
+    private static Border TitleBar(ShellView view) =>
+        view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "TitleBarSurface");
+
+    private static Border Rail(ShellView view) =>
+        view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "NavigationRailSurface");
+
+    private static Border Header(ShellView view) =>
+        view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PlayerHeaderSurface");
 
     private static Border Column(ShellView view) =>
         view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PlayerPanelColumn");
