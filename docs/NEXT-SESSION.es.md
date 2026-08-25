@@ -1,5 +1,52 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-25 — la aplicación se parece al prototipo, vista a vista
+
+**La comparación se hizo con las dieciséis capturas verificadas, no de memoria**
+([evidencia](evidence/stable/audit-prototype-fidelity-round-three.md)). Diecisiete diferencias
+cerradas y **cinco que se quedan, cada una con su medición escrita**.
+
+Lo que cambió, por superficie:
+
+- **Ficha de serie.** Línea de datos, barra de la serie con «10/16 vistos», panel de siguiente
+  episodio con su botón —la única acción acentuada de la ficha—, temporadas en píldoras en vez de
+  desplegable, y cada episodio como tarjeta con miniatura, nombre y «48 min · Visto». El nombre y la
+  duración **no estaban en pantalla**: la proyección de episodios no los leía.
+- **Las dos fichas.** Se desplazan como una página, la vuelta es un enlace, las marcas personales
+  salen del banner a «Otras acciones», y las tres herramientas del título entran en la fila de
+  acciones del banner (`TitleActionsView`, una vista montada por las dos).
+- **Bandeja de revisión.** Cada tarjeta dice **de qué archivo habla** —la proyección de candidatos
+  trae la ruta desde ahora—, con carátula, tipo, confianza y señales, y lleva **sus tres decisiones
+  dentro**. Deja de ser una lista con selección: sus filas eran controles de mando y el paseo se
+  quedaba sin sitio donde pulsar «al lado».
+- **Duplicados.** La tabla de ocho columnas del prototipo, con el radio que fija qué copia se
+  reproduce, leída en una sola consulta.
+- **Reproductor.** La cabecera dice qué se reproduce —el título viaja con la petición, desde la
+  tarjeta que pulsó—, el transporte vuelve a ser una fila con el orden del prototipo, y los atajos
+  están escritos bajo ella.
+- **Paleta.** `AccentInkBrush` en los cuatro modos, y la última parada de los degradados corregida:
+  estaba escrita `#30` pensando en «30 %», que es el 19 %.
+
+**Lo que se quedó distinto, y por qué** (las cinco están en la evidencia): las iniciales de la
+portada, el punto de radio de los filtros —en los dos contrastes altos el relleno no distingue nada y
+el glifo es toda la señal—, la columna de paneles del reproductor siempre abierta —cerrarla dejaría
+fuera de alcance controles que el paseo pulsa, y esa cobertura está en cero pendientes—, el cuarto
+botón de la bandeja y el editor por episodio, que esta aplicación no tiene porque sus metadatos van
+por título.
+
+**Lo que hay que mirar primero en la próxima sesión:**
+
+1. **`eng/coverage-debt.txt` está por refrescar desde un artefacto de CI.** Varios archivos mejoraron
+   (`CatalogQueries` llegó a la barra, `GetHome`, `HomeReadModel` y `EpisodeSequenceRepository`
+   subieron) y **cuatro vistas nuevas entran en la lista con el 100/50 que mide todo archivo de
+   vista**. El trinquete está en 215 y sólo baja: dos archivos ya salieron de la lista en esta tanda
+   —`LifecycleSettingsViewModel` y `RootRemapRowViewModel`, ambos a 100/100— y hay que ver, con el
+   artefacto delante, cuántos más hay que pagar.
+2. **CI verifica lo que esta máquina no.** Dos carreras las encontró allí y aquí no: el raspador se
+   pulsaba con la sesión en marcha —y desde que el transporte observa la posición del motor, eso
+   mueve la propia sonda del paseo— y la ficha del héroe se buscaba sin una pasada de medida.
+3. **Las capturas del README están rehechas** contra la aplicación de hoy, en inglés y a 1600 × 1000.
+
 ## Estado al cierre del 2026-08-24 (madrugada del 25) — el propietario miró y tenía razón
 
 **Tres diferencias con el prototipo, las tres medidas y corregidas**

@@ -1,5 +1,51 @@
 # Where to resume
 
+## State at the close of 2026-08-25 — the application looks like the prototype, view by view
+
+**The comparison was made against the sixteen verified captures rather than from memory**
+([evidence](evidence/stable/audit-prototype-fidelity-round-three.md)). Seventeen differences closed
+and **five that stay, each with its measurement written down**.
+
+What changed, by surface:
+
+- **Series card.** The data line, the series' own bar with «10/16 watched», the next-episode panel
+  with its button — the card's only accented action — seasons as pills rather than a drop-down, and
+  every episode as a card with a still, a name and «48 min · Watched». The name and the running time
+  **were not on screen at all**: the episode projection did not read them.
+- **Both cards.** They scroll as one page, the way back is a link, the personal marks leave the
+  banner for «Other actions», and the three title tools move into the banner's action row
+  (`TitleActionsView`, one view mounted by both).
+- **Review tray.** Every card says **which file it is about** — the candidate projection carries the
+  path now — with a cover, the kind, the confidence and the signals, and it holds **its three
+  decisions**. It stops being a list with a selection: its rows were command controls and the walk
+  had nowhere to click «beside».
+- **Duplicates.** The prototype's eight-column table, with the radio that decides which copy plays,
+  read in one query.
+- **Player.** The header says what is playing — the title travels with the request, from the card
+  that pressed — the transport is one row again in the prototype's order, and the shortcuts are
+  written under it.
+- **Palette.** `AccentInkBrush` in all four modes, and the gradients' last stop corrected: it was
+  written `#30` meaning «30 %», which is 19 %.
+
+**What stayed different, and why** (all five are in the evidence): the poster initials, the filter
+radio dot — in both high contrasts the fill distinguishes nothing and the glyph is the whole signal —
+the player's panel column always open — closing it would put controls the walk presses out of reach,
+and that coverage is at zero pending — the tray's fourth button, and the per-episode editor this
+application does not have because its metadata is keyed by title.
+
+**What to look at first next session:**
+
+1. **`eng/coverage-debt.txt` is waiting to be refreshed from a CI artefact.** Several files improved
+   (`CatalogQueries` reached the bar; `GetHome`, `HomeReadModel` and `EpisodeSequenceRepository` rose)
+   and **four new views enter the list at the 100/50 every view file measures**. The ratchet is 215
+   and only goes down: two files already left the list in this batch — `LifecycleSettingsViewModel`
+   and `RootRemapRowViewModel`, both at 100/100 — and how many more have to be paid is a question for
+   the artefact.
+2. **CI verifies what this machine does not.** Two races were found there and not here: the scrubber
+   was pressed with the session playing — and since the transport observes the engine's position,
+   that moves the walk's own probe — and the hero's Details was looked for without a layout pass.
+3. **The README captures are re-taken** against today's application, in English, at 1600 × 1000.
+
 ## State at close (2026-08-24) — F11 closed: the parity plan is complete
 
 **All eleven phases of the master plan are done.** PRD-006 moves to `VERIFIED` with its
