@@ -1,5 +1,80 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-25 (noche, segunda sesión) — cinco de los veinticuatro, medidos
+
+Cinco commits sobre la rama. **Todo verde en local**: Domain 498, Application 241, Architecture 30,
+Documentation 87, Ui 897, Accessibility 146, Integration 467, Media 143.
+
+**CI seguía en rojo al empezar, y no por lo que decía el encargo.** El run de `897dfda` no falló por
+una puerta ya corregida: falló por la **puerta de cobertura**, con siete archivos por debajo de su
+suelo y uno mejorado sin subirlo. Eso es lo que llevaba bloqueando el fast-forward a `main`, y buena
+parte de esta sesión se ha ido en devolverlos.
+
+### Lo que se cerró, con su medición
+
+1. **Los subtítulos no llegaban a la pantalla, por tres causas y ninguna visible leyendo el código.**
+   - La sesión los apagaba al abrir: sin preferencia guardada el valor resuelto es «apagados» y se
+     aplicaba igual, mandándole `-1` al motor sobre la pista que el contenedor marca por omisión.
+   - **El croma decidía si VLC componía el subtítulo.** Con `RV32`, `RGBA`, `ARGB`, `RV24`, `YUY2`,
+     `VYUY` y `YVYU` no cambiaba **ni un byte** del fotograma al encenderlo; con `UYVY` cambiaban
+     61 687. El motor pide `UYVY` y convierte a BGRA él mismo (`PackedYuvConverter`).
+   - **Con D3D11VA la composición falla y VLC lo dice una vez por fotograma**: «no matching alpha
+     blending routine (chroma: YUVA -> DX11)». 67 001 bytes cambian por software y ninguno por
+     hardware. El motor decodifica por software y lo declara.
+   - Verificado de punta a punta contra el episodio del propietario: el fotograma publicado lleva el
+     subtítulo dentro, en las bandas 15 y 16 de 16.
+2. **Home salía vacía con la biblioteca llena.** Medido contra su base de datos: 102 filas en
+   `scanned_titles`, **cero** en `titles` y cuatro en `watch_state` que sólo casan con archivos
+   escaneados. Las tres proyecciones leen la misma unión que lista Biblioteca. Y la ruta con la que
+   abre la aplicación se anuncia como cualquier otra, porque Home sólo se leía al *llegar* a ella.
+3. **El vídeo se deformaba al redimensionar.** `VideoFitPolicy` conserva la proporción y reparte las
+   bandas; lo que se afirma es la **proporción**, no el tamaño.
+4. **El reproductor**: pantalla completa y ventana flotante en la barra de controles (y **ya no en
+   los dos sitios**, que el paseo rechaza), doble clic, las teclas oídas de bajada —que es por qué el
+   espacio ponía pantalla completa—, el icono de PiP correcto y la barra que deja de duplicarse en la
+   ventana pequeña.
+5. **Transversal**: los diez selectores a `:focus-visible`, tooltip en todos los botones desde un
+   estilo, la alineación vertical de los desplegables (2,43 px, el mismo número que los botones, y la
+   prueba falla sin la corrección), y el contorno punteado gastado sólo en los dos contrastes altos —
+   eran **299** rectángulos de puntos en todo el árbol sin datos cargados.
+
+### Lo que queda de los veinticuatro
+
+- **El menú de velocidad** sigue siendo un `MenuFlyout` de once filas numéricas. El prototipo lo
+  dibuja con marca, nombre y nota. Es la pieza que más cuesta: cambia la identidad de once controles
+  del inventario del paseo, así que hay que llevar sus pulsados en el mismo commit.
+- **Los glifos del transporte, uno a uno contra el prototipo.** Sin empezar.
+- **El mini como ventana PiP de verdad** (sin marco, siempre encima, arrastrable, con relación de
+  aspecto y posición recordada). Sólo está hecha la mitad: ya no duplica la barra.
+- **«Reproducir» cuando no hay progreso.** Hoy una película sin progreso no enseña ningún botón de
+  reproducir, sólo el glifo de empezar de nuevo. Decir la palabra que toca pide un segundo botón o un
+  nombre que se mueva con el estado, y las dos cosas cambian lo que el inventario del paseo guarda.
+- **El póster de fondo en el cabecero de la ficha** (decisión 6: el póster, no un fotograma).
+- **El editor de metadatos como vista propia.**
+- **La valoración a cinco estrellas** con su migración numerada dividiendo entre dos.
+- **«Secciones cortadas por el ancho»**, todavía sin localizar.
+
+### Lo que hay que saber antes de tocar la cobertura
+
+- **La puerta mide con el informe fusionado** de `artifacts/test-results/verify-win-x64/coverage-gate/`,
+  no con los informes sueltos. Un script que tome el máximo por línea entre los informes sueltos da
+  otros números y **engaña**.
+- **Los suelos se copian del artefacto `coverage-debt` de CI y sólo se mueven hacia arriba.** Varios
+  archivos miden distinto aquí y allí —`LibVlcMediaPlayerEngine` dio 91/81 en local y 91/78 en CI—,
+  así que la lista no se puede cerrar sin una vuelta de CI.
+- **Un archivo nuevo contra `main` tiene que llegar a 96/96**; no puede entrar en la lista de deuda,
+  porque el trinquete baja con cada archivo que sale de ella y no libera hueco.
+- Tres archivos no se podían medir y ahora sí: el servicio de apariencia recibe **qué ventana está en
+  pantalla** en vez de buscarla (el ciclo de vida de una aplicación no se puede sustituir una vez
+  arrancada), y un color que ya lee vuelve **byte a byte** para que el apartado del anillo de foco
+  pueda ocurrir siquiera.
+
+### Un hallazgo que no se ha decidido
+
+El apartado del acento respecto del anillo de foco **mueve un solo paso**: para un anillo `#005A9C`
+devuelve `#00599A`, que es otro color por el byte y el mismo a la vista. Está escrito en la prueba en
+vez de afirmado a la baja. Si eso importa, la decisión es cuánto tiene que separarse.
+
 ## Estado al cierre del 2026-08-25 (noche) — el propietario probó la aplicación con su biblioteca
 
 Esta tanda tiene cuatro commits y **todo está verde en local**: Domain 480, Application 236,

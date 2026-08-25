@@ -1,5 +1,81 @@
 # Where to pick up
 
+## State at the close of 2026-08-25 (evening, second session) — five of the twenty-four, measured
+
+Five commits on the branch. **Everything green locally**: Domain 498, Application 241, Architecture
+30, Documentation 87, Ui 897, Accessibility 146, Integration 467, Media 143.
+
+**CI was still red when this started, and not for the reason the brief gave.** The run for `897dfda`
+did not fail on a gate already corrected: it failed on the **coverage gate**, with seven files below
+their floor and one improved without its floor being raised. That is what had been blocking the
+fast-forward to `main`, and a good part of this session went into giving them back.
+
+### What was closed, with its measurement
+
+1. **Subtitles never reached the screen, for three causes and none of them visible by reading.**
+   - The session switched them off on the way in: with nothing stored the resolved value is "off" and
+     it was applied anyway, handing the engine `-1` over the track the container marks as default.
+   - **The chroma decided whether VLC composed the subtitle at all.** With `RV32`, `RGBA`, `ARGB`,
+     `RV24`, `YUY2`, `VYUY` and `YVYU`, **not one byte** of the frame changed when it was switched
+     on; with `UYVY`, 61 687 did. The engine asks for `UYVY` and converts to BGRA itself
+     (`PackedYuvConverter`).
+   - **With D3D11VA the compositing fails and VLC says so once per frame**: "no matching alpha
+     blending routine (chroma: YUVA -> DX11)". 67 001 bytes change in software and none in hardware.
+     The engine decodes in software and says that it does.
+   - Verified end to end against the owner's own episode: the published frame carries the subtitle
+     inside it, in bands 15 and 16 of 16.
+2. **Home was empty on a full library.** Measured against his database: 102 rows in `scanned_titles`,
+   **zero** in `titles`, and four in `watch_state` that match scanned files and nothing else. All
+   three projections read the same union the library lists. And the route the application opens on is
+   announced like any other, because Home was only ever read on *arriving* at it.
+3. **The video was stretched when the window was resized.** `VideoFitPolicy` keeps the ratio and
+   shares the bars; what is asserted is the **ratio**, not the size.
+4. **The player**: full screen and the floating window in the transport bar (and **no longer in both
+   places**, which the walk refuses), the double click, the keys heard on the way down — which is why
+   space put the picture full screen — the right picture-in-picture glyph, and the bar that stops
+   being duplicated inside the small window.
+5. **Across the tree**: the ten selectors moved to `:focus-visible`, a tooltip on every button from
+   one style, the drop-downs' vertical alignment (2.43 px, the buttons' own number, and the test
+   fails without the fix), and the dotted outline spent only in the two high contrasts — it was
+   **299** dotted rectangles across the tree with no data loaded.
+
+### What is left of the twenty-four
+
+- **The speed menu** is still a `MenuFlyout` of eleven numeric rows. The prototype draws it with a
+  mark, a name and a note. It is the costliest piece: it changes the identity of eleven controls in
+  the walk's inventory, so their presses have to travel in the same commit.
+- **The transport glyphs, one against one with the prototype.** Not started.
+- **The mini as a real picture-in-picture window** (frameless, always on top, draggable, keeping its
+  ratio and remembering where it was left). Only half is done: it no longer duplicates the bar.
+- **"Play" when there is no progress.** Today a film with no progress shows no play button at all,
+  only the start-again glyph. Saying the right word for the state needs a second button or a name
+  that moves with it, and both change what the walk's inventory holds.
+- **The poster behind the card's header** (decision 6: the poster, not a frame of the video).
+- **The metadata editor as a surface of its own.**
+- **The five-star rating**, with its numbered migration halving what is stored.
+- **"Sections cut off by the width"**, still not located.
+
+### What to know before touching coverage
+
+- **The gate measures from the merged report** in `artifacts/test-results/verify-win-x64/coverage-gate/`,
+  not from the individual ones. A script that takes the maximum per line across the individual reports
+  gives different numbers and **misleads**.
+- **Floors are copied from CI's `coverage-debt` artefact and only ever move up.** Several files
+  measure differently here and there — `LibVlcMediaPlayerEngine` gave 91/81 locally and 91/78 on CI —
+  so the list cannot be closed without a CI round.
+- **A file new against `main` has to reach 96/96**; it cannot join the debt list, because the ratchet
+  drops with every file that leaves it and frees no slot.
+- Three files could not be measured and now can: the appearance service is told **which window is on
+  screen** instead of looking it up (an application's lifetime cannot be replaced once it has
+  started), and a colour that already reads comes back **byte for byte**, so the nudge off the focus
+  ring can happen at all.
+
+### One finding nobody has decided
+
+The nudge that moves the accent off the focus ring **moves one step**: for a ring of `#005A9C` it
+returns `#00599A`, a different colour by the byte and the same one to the eye. It is written into the
+test rather than asserted away. If that matters, the decision is how far apart they have to be.
+
 ## State at the close of 2026-08-25 (evening) — the owner ran the application against his library
 
 This batch is four commits and **everything is green locally**: Domain 480, Application 236,
