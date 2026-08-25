@@ -102,6 +102,25 @@ decision with a measurement behind it.
    prototype draws one button whose label changes; here there are two, because resuming and starting
    again are different things — so a film nobody has started leaves the card with no accented action.
 
+## La captura no estaba oscura: la lectura sí / The capture was not dark, the reading was
+
+**2026-08-25.** Tres veces se dijo que una captura «salía oscura» —las del prototipo, la del
+reproductor, y la de la biblioteca en tema claro— y las tres veces el archivo estaba bien. Medido
+sobre la biblioteca en claro: `GetPixel` da `#FBFCFE` en el lienzo y `#E9EEF4` en el raíl, que son
+exactamente los dos valores del diccionario claro; el PNG es 100 % opaco; y la **misma imagen
+reducida a 750×500 se ve clara**. Lo que oscurece es mirar un PNG de 1500×1000, no tomarlo. / The
+same image at half size reads correctly; the file was never dark.
+
+Por eso el color se decide midiendo —`GetPixel`, o el contraste calculado— y nunca mirando una
+captura a tamaño completo. La comparación de arriba se rehízo entera a 750×500 después de saberlo, y
+una alarma que había levantado —«las portadas de la aplicación están más claras abajo»— resultó ser
+un punto de medición mal elegido: a la misma altura relativa, el prototipo da S=39 % L=16 % y la
+aplicación S=41 % L=17 %. / Colour is decided by measurement, never by looking at a full-size shot.
+
+`shoot.ps1` guarda desde entonces sin canal alfa. No era la causa —el 99 % de sus píxeles ya era
+opaco— pero un PNG con alfa lo compone quien lo muestra, y las capturas del repositorio acaban en
+una página cuyo fondo no elegimos nosotros. / Not the cause, but a page we do not own composites it.
+
 ## Cómo se rehace esta comparación / How to repeat this comparison
 
 ```powershell

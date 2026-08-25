@@ -10,6 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The repository's five screenshots showed one machine's own path.** The review tray writes the
+  folder under every file name, and the library behind those captures lived under the profile of
+  whoever took them: `C:\Users\<name>\.claude\projects\…` was printed
+  into `docs/assets/review.png`, in a public repository. They are retaken with the library in a neutral folder — and with the application as it
+  stands now: the kind chip without its word in the rail, the plus on «Add media», the candidate's
+  name, and the player's second line.
+
+
+### Fixed
+
 - **A playback failure no longer erases itself.** LibVLC refuses a file and then, a moment later,
   reports the stop of the media it had just torn down; that state replaced the failure, so the
   recovery actions vanished from the screen while somebody was reading them — including the offer to

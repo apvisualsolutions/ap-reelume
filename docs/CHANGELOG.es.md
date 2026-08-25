@@ -10,6 +10,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Las cinco capturas del repositorio enseñaban la ruta de una máquina concreta.** La bandeja de
+  revisión escribe la carpeta bajo cada nombre de archivo, y la biblioteca de las capturas vivía bajo
+  el perfil de quien las tomó: `C:\Users\<nombre>\.claude\projects\…` quedó impreso
+  en `docs/assets/review.png`, en un repositorio público. Se vuelven a tomar con la biblioteca en una carpeta neutra, y de paso con la
+  aplicación al día: la ficha de tipo sin palabra en el carrusel, el signo más de «Añadir medios», el
+  nombre del candidato y la segunda línea del reproductor.
+
+
+### Corregido
+
 - **Un fallo de reproducción ya no se borra solo.** LibVLC rechaza un archivo y, un instante después,
   informa de que ha detenido el medio que acababa de desmontar; ese estado sustituía al fallo, así
   que las acciones de recuperación desaparecían de la pantalla mientras alguien las leía —incluida la
