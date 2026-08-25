@@ -13,8 +13,39 @@ namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 /// The three projections Home needs, answered by SQLite. Each one is bounded and indexed, so drawing
 /// Home costs the same on a library of ten titles and one of ten thousand.
 /// </summary>
+/// <remarks>
+/// All three read the <b>same catalogue the library lists</b>, which is not the <c>titles</c> table
+/// on its own. Nothing in the application writes that table — <c>ApplyIdentification</c> says so in
+/// its own words, and its only writer has no caller outside integration tests — so a real library is
+/// a set of scanned files whose title id is the media file's id. Reading <c>titles</c> alone is why
+/// Home came up empty on a machine with 102 scanned files and four things half watched: measured on
+/// 2026-08-25 against the owner's own database, which held 102 rows in <c>scanned_titles</c>, zero in
+/// <c>titles</c>, and four in <c>watch_state</c> that all joined to a scanned file and to nothing else.
+/// </remarks>
 public sealed class HomeReadModel : IHomeReadModel
 {
+    /// <summary>
+    /// The union the library already uses: identified titles, plus every scanned file that no
+    /// identified title has claimed. Kept as one string so the two readers cannot drift apart.
+    /// </summary>
+    private const string CatalogItems = """
+        WITH catalog_items AS (
+            SELECT t.id AS id, t.kind AS kind, t.primary_title AS primary_title,
+                   t.release_year AS release_year, t.is_available AS is_available,
+                   t.added_utc AS added_utc,
+                   (SELECT group_concat(g.genre, '|') FROM title_genres g WHERE g.title_id = t.id)
+                       AS genres
+            FROM titles t
+            UNION ALL
+            SELECT scanned.media_file_id, 2, scanned.display_title, NULL,
+                   media.is_available, scanned.added_utc, NULL
+            FROM scanned_titles scanned
+            INNER JOIN media_files media ON media.id = scanned.media_file_id
+            WHERE NOT EXISTS (
+                SELECT 1 FROM titles identified WHERE identified.id = scanned.media_file_id)
+        )
+        """;
+
     private readonly SqliteConnectionFactory _connectionFactory;
 
     public HomeReadModel(SqliteConnectionFactory connectionFactory) =>
@@ -27,22 +58,21 @@ public sealed class HomeReadModel : IHomeReadModel
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(limit);
         await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
         await using var command = connection.CreateCommand();
-        command.CommandText = """
-            SELECT state.content_key, state.title_id, state.episode_id, titles.kind, titles.primary_title,
+        command.CommandText = CatalogItems + """
+
+            SELECT state.content_key, state.title_id, state.episode_id, item.kind, item.primary_title,
                    episodes.season_number, episodes.episode_number, episodes.title,
                    state.position_ticks, state.observed_duration_ticks, state.status,
-                   titles.release_year,
-                   (SELECT group_concat(g.genre, '|') FROM title_genres g WHERE g.title_id = titles.id)
-                       AS genres,
+                   item.release_year, item.genres,
                    CASE
-                       WHEN state.episode_id IS NULL THEN titles.is_available
+                       WHEN state.episode_id IS NULL THEN item.is_available
                        ELSE CASE WHEN COALESCE(episodes.is_available, 0) = 1
                                   AND COALESCE(media.is_available, 0) = 1
                                  THEN 1 ELSE 0 END
                    END AS effective_availability,
                    state.updated_utc
             FROM watch_state state
-            INNER JOIN titles ON titles.id = state.title_id
+            INNER JOIN catalog_items item ON item.id = state.title_id
             LEFT JOIN episodes ON episodes.id = state.episode_id
             LEFT JOIN episode_media link ON link.episode_id = episodes.id
             LEFT JOIN media_files media ON media.id = link.media_file_id
@@ -87,9 +117,10 @@ public sealed class HomeReadModel : IHomeReadModel
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(limit);
         await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
         await using var command = connection.CreateCommand();
-        command.CommandText = """
+        command.CommandText = CatalogItems + """
+
             SELECT id, kind, primary_title, release_year, is_available, added_utc
-            FROM titles
+            FROM catalog_items
             ORDER BY added_utc DESC, id
             LIMIT $limit;
             """;
@@ -114,12 +145,16 @@ public sealed class HomeReadModel : IHomeReadModel
     {
         await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
         await using var command = connection.CreateCommand();
-        command.CommandText = """
+        // Films and series are counted by the kind the catalogue actually knows; a scanned file
+        // nobody has identified is neither, and inventing one for it would be a number the
+        // catalogue made up. What it does join is availability, which is true of every item.
+        command.CommandText = CatalogItems + """
+
             SELECT
                 COALESCE(SUM(CASE WHEN kind = 0 THEN 1 ELSE 0 END), 0),
                 COALESCE(SUM(CASE WHEN kind = 1 THEN 1 ELSE 0 END), 0),
                 COALESCE(SUM(CASE WHEN is_available = 0 THEN 1 ELSE 0 END), 0)
-            FROM titles;
+            FROM catalog_items;
             """;
         await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
         return await reader.ReadAsync(cancellationToken).ConfigureAwait(false)

@@ -103,8 +103,19 @@ public sealed class HdrAccelerationTests
         await engine.StopAsync(TestContext.Current.CancellationToken);
     }
 
+    /// <summary>
+    /// The embedded engine decodes in software, and says so rather than claiming otherwise.
+    /// </summary>
+    /// <remarks>
+    /// This used to assert that a fresh engine decoded in hardware and stepped down only when asked
+    /// to. It does not any more, and the reason is subtitles: VLC draws them into the picture before
+    /// it reaches this engine's buffer, and with D3D11VA the picture at that moment is a graphics
+    /// card surface it has no routine to draw onto — measured on 2026-08-25, 67 001 bytes of picture
+    /// changing in software and zero in hardware. The engine records the step down when it is built,
+    /// so the request stays the caller's and what is announced as active stays true.
+    /// </remarks>
     [Fact]
-    public async Task Losing_hardware_decoding_falls_back_to_software_once_and_keeps_playing()
+    public async Task The_embedded_engine_decodes_in_software_and_reports_it_from_the_first_open()
     {
         var sample = MediaManifest.Require("mkv-hevc-sdr");
         var path = await CodecMatrixTests.RequireSampleAsync(sample);
@@ -112,14 +123,9 @@ public sealed class HdrAccelerationTests
         await using var engine = new LibVlcMediaPlayerEngine(factory);
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
 
-        await engine.OpenAsync(
-            new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path),
-            TestContext.Current.CancellationToken);
-        Assert.True(engine.Capabilities!.HardwareAccelerationRequested);
-        Assert.True(engine.Capabilities.HardwareAccelerationActive);
-        await engine.StopAsync(TestContext.Current.CancellationToken);
-
-        Assert.True(engine.TryFallBackToSoftware());
+        // Already stepped down, so asking again changes nothing: the step is taken once, when the
+        // engine is built, and it is the same one a failing decoder would have taken.
+        Assert.True(engine.HasFallenBackToSoftware);
         Assert.False(engine.TryFallBackToSoftware());
 
         await engine.OpenAsync(
@@ -128,10 +134,9 @@ public sealed class HdrAccelerationTests
         await engine.PlayAsync(TestContext.Current.CancellationToken);
         var advanced = await CodecMatrixTests.WaitForPositionAsync(engine, TimeSpan.FromMilliseconds(150));
 
-        Assert.True(engine.HasFallenBackToSoftware);
-        Assert.False(engine.Capabilities!.HardwareAccelerationActive);
-        Assert.True(engine.Capabilities.HardwareAccelerationRequested);
-        Assert.True(advanced, "Playback stopped after falling back to software.");
+        Assert.True(engine.Capabilities!.HardwareAccelerationRequested);
+        Assert.False(engine.Capabilities.HardwareAccelerationActive);
+        Assert.True(advanced, "Playback stopped while decoding in software.");
         Assert.True(engine.DecodedFrameCount > 0);
         await engine.StopAsync(TestContext.Current.CancellationToken);
     }

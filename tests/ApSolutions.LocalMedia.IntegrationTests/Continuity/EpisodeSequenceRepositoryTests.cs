@@ -176,6 +176,101 @@ public sealed class EpisodeSequenceRepositoryTests
         Assert.Single(await readModel.ReadRecentlyAddedAsync(1, TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// The shape a real library actually has. Nothing in the application writes the <c>titles</c>
+    /// table — <c>ApplyIdentification</c> says so, and its only writer has no caller outside these
+    /// tests — so a scanned library is rows in <c>scanned_titles</c> whose title id is the media
+    /// file's own. Reading <c>titles</c> alone is what left Home blank on the owner's machine on
+    /// 2026-08-25: 102 scanned files, zero identified titles, four things half watched, and a Home
+    /// that showed none of them while the library listed all of them.
+    /// </summary>
+    [Fact]
+    public async Task Home_sees_a_library_that_was_scanned_and_never_identified()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        await SeedScannedOnlyAsync(factory);
+        await new WatchStateRepository(factory).SaveAsync(
+            Progress(ContentKey.ForTitle(new TitleId(ScannedFile)), Noon),
+            TestContext.Current.CancellationToken);
+        var readModel = new HomeReadModel(factory);
+
+        var recent = await readModel.ReadRecentlyAddedAsync(10, TestContext.Current.CancellationToken);
+        Assert.Equal(2, recent.Count);
+        Assert.Contains(recent, item => item.Title == "Episodio sin identificar");
+        Assert.All(recent, item => Assert.Equal(CatalogTitleKind.Unidentified, item.Kind));
+
+        var progress = await readModel.ReadProgressAsync(10, TestContext.Current.CancellationToken);
+        var underway = Assert.Single(progress);
+        Assert.Equal("Episodio sin identificar", underway.Title);
+        Assert.Equal(CatalogTitleKind.Unidentified, underway.Kind);
+        Assert.True(underway.IsAvailable);
+        Assert.Null(underway.Year);
+
+        // Neither a film nor a series, because the catalogue does not know which — and inventing one
+        // would be a number it made up. What it does know is that one of the two is out of reach.
+        var summary = await readModel.ReadLibrarySummaryAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(new LibrarySummary(0, 0, 1), summary);
+    }
+
+    private static readonly Guid ScannedFile = Guid.Parse("c1000000-0000-4000-8000-000000000001");
+    private static readonly Guid MissingScannedFile = Guid.Parse("c1000000-0000-4000-8000-000000000002");
+
+    /// <summary>Two scanned files and no identified title, which is a library after a first scan.</summary>
+    private static async Task SeedScannedOnlyAsync(SqliteConnectionFactory factory)
+    {
+        await using var connection = await factory.OpenAsync();
+        await ExecuteAsync(
+            connection,
+            """
+            INSERT INTO library_roots (id, normalized_path, kind, availability, scan_policy)
+            VALUES ($root, 'root', 0, 0, 7);
+            """,
+            ("$root", Root.Value.ToString("D")));
+        await InsertScannedAsync(connection, ScannedFile, "Episodio sin identificar", isAvailable: true, Noon);
+        await InsertScannedAsync(
+            connection,
+            MissingScannedFile,
+            "Otro archivo suelto",
+            isAvailable: false,
+            Noon.AddHours(-1));
+    }
+
+    private static async Task InsertScannedAsync(
+        SqliteConnection connection,
+        Guid mediaFileId,
+        string displayTitle,
+        bool isAvailable,
+        DateTimeOffset addedUtc)
+    {
+        await ExecuteAsync(
+            connection,
+            """
+            INSERT INTO media_files (
+                id, library_root_id, normalized_path, size_bytes, last_write_utc,
+                duration_ticks, container, video_codecs, audio_codecs, width, height, is_available)
+            VALUES (
+                $id, $root, $path, 1000, $written,
+                $duration, 'matroska', '["h264"]', '["aac"]', 1920, 1080, $available);
+            """,
+            ("$id", mediaFileId.ToString("D")),
+            ("$root", Root.Value.ToString("D")),
+            ("$path", $@"root\{mediaFileId:N}.mkv"),
+            ("$written", Noon.ToString("O", CultureInfo.InvariantCulture)),
+            ("$available", isAvailable ? 1 : 0),
+            ("$duration", TimeSpan.FromMinutes(50).Ticks));
+        await ExecuteAsync(
+            connection,
+            """
+            INSERT INTO scanned_titles (media_file_id, display_title, sort_title, added_utc)
+            VALUES ($id, $title, $title, $added);
+            """,
+            ("$id", mediaFileId.ToString("D")),
+            ("$title", displayTitle),
+            ("$added", addedUtc.ToString("O", CultureInfo.InvariantCulture)));
+    }
+
     private static WatchState Progress(ContentKey content, DateTimeOffset updatedUtc) => new()
     {
         Content = content,

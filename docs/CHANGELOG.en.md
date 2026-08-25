@@ -10,6 +10,50 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Subtitles never reached the screen, and there are now three measured reasons why.** The owner
+  brought it with the test already done: the same episode shows them in VLC and not here. None of the
+  three is visible by reading the code, and all three had to be measured against a real file with a
+  control `.srt` covering the whole film.
+  1. **The session switched them off on the way in.** `ApplyPlaybackPreferences` applied the resolved
+     value whether or not a preference had been stored, and with none stored that value is "off":
+     every first playback handed the engine `-1` and disabled the track the container marks as its
+     default. A scope that does not answer is silence, and silence is not "no". Only a decision
+     somebody took is applied now, and whatever the engine chose on its own is read and shown.
+  2. **The memory sink's chroma decided whether the subtitle was composed at all.** With `RV32`,
+     `RGBA`, `ARGB`, `RV24`, `YUY2`, `VYUY` and `YVYU`, **not one byte** of the frame changed when a
+     subtitle was switched on; with `UYVY`, 61 687 did. The engine asks for `UYVY` and converts to
+     BGRA itself.
+  3. **With hardware decoding the subtitle is lost to an error nobody was reading.** VLC says it once
+     per frame — "no matching alpha blending routine (chroma: YUVA -> DX11)" — and publishes the frame
+     without it: it draws the subtitle onto the picture before it reaches this buffer, and with
+     D3D11VA that picture is still a graphics card surface. 67 001 bytes change in software and none
+     in hardware. The engine decodes in software and **says so**: the request stays the caller's, and
+     what is announced as active is what is running.
+
+- **Subtitles sitting beside the media were never loaded.** `ExternalSubtitleDiscovery` was written,
+  confined to its root and tested in both encodings — and called by nobody: the session handed an
+  empty list on every open. The house defect, again.
+
+- **The video was stretched when the window was resized.** It was drawn across the whole width and
+  height available, so a 16:9 episode in a dragged window came out dragged too, in the player and in
+  the picture-in-picture. `VideoFitPolicy` keeps the shape and shares the bars; what is asserted is
+  the **ratio**, not the size.
+
+- **Home was empty on a full library.** It read the `titles` table, which **nothing in the application
+  writes** — `ApplyIdentification` already said so in its own words — while the library lists the union
+  of identified titles with scanned files. Measured against the owner's own database: 102 rows in
+  `scanned_titles`, zero in `titles`, and four in `watch_state` that matched scanned files and nothing
+  else. All three Home projections now read that same union.
+
+- **Home did not load at startup either.** The navigation service starts on Home and announces
+  nothing, so the only place that reads Home — arriving at a route — never ran until somebody left and
+  came back. The route the application opens on is announced like any other.
+
+- **The track panel said "no subtitles" over subtitles somebody was reading.** The engine chooses
+  while the first frames decode, which is after the panel was built: measured, none in force at open
+  and track 6 three seconds later. The panel follows the engine now.
+
+
 - **Button labels looked low even with their box centred, and this time with the number first.**
   `ButtonInkTests` centred the box in August and said in writing that it did not measure glyphs; the
   owner kept seeing it crooked and was right. Measured through the font's own metrics: the run of ink

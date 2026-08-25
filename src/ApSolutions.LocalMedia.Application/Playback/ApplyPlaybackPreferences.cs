@@ -68,28 +68,50 @@ public sealed class ApplyPlaybackPreferences
         }
 
         var snapshot = await engine.GetSnapshotAsync(cancellationToken).ConfigureAwait(false);
-        var audio = PreferenceResolutionPolicy.SelectTrack(
-            snapshot.Tracks,
-            resolved.Audio,
-            MediaTrackKind.Audio);
-        if (audio is not null)
-        {
-            await engine.SelectTrackAsync(MediaTrackKind.Audio, audio.Id, cancellationToken).ConfigureAwait(false);
-        }
 
-        MediaTrack? subtitle = null;
-        if (resolved.SubtitlesEnabled)
-        {
-            subtitle = PreferenceResolutionPolicy.SelectTrack(
-                snapshot.Tracks,
-                resolved.Subtitle,
-                MediaTrackKind.Subtitle);
-        }
-
-        await engine
-            .SelectTrackAsync(MediaTrackKind.Subtitle, subtitle?.Id, cancellationToken)
-            .ConfigureAwait(false);
+        // A scope that answered is a decision somebody took; a scope that did not is silence, and
+        // silence is not «off». Applying the resolved value either way is what made a first
+        // playback disable subtitles the container had marked as its default — the engine had
+        // already selected the Spanish track, and this handed it -1 on the way in. Reported by the
+        // owner on 2026-08-25: the same episode showed subtitles in VLC and none here.
+        var audio = resolved.AudioSource is null
+            ? Find(snapshot.Tracks, snapshot.ActiveAudioTrackId)
+            : await SelectAsync(MediaTrackKind.Audio, resolved.Audio).ConfigureAwait(false);
+        var subtitle = resolved.SubtitlesEnabledSource is null && resolved.SubtitleSource is null
+            ? Find(snapshot.Tracks, snapshot.ActiveSubtitleTrackId)
+            : await SelectSubtitleAsync().ConfigureAwait(false);
 
         return new AppliedPlaybackPreference(resolved, audio, subtitle, snapshot.Tracks);
+
+        async Task<MediaTrack?> SelectAsync(MediaTrackKind kind, TrackSelection selection)
+        {
+            var track = PreferenceResolutionPolicy.SelectTrack(snapshot.Tracks, selection, kind);
+            if (track is not null)
+            {
+                await engine.SelectTrackAsync(kind, track.Id, cancellationToken).ConfigureAwait(false);
+            }
+
+            return track;
+        }
+
+        async Task<MediaTrack?> SelectSubtitleAsync()
+        {
+            var track = resolved.SubtitlesEnabled
+                ? PreferenceResolutionPolicy.SelectTrack(
+                    snapshot.Tracks,
+                    resolved.Subtitle,
+                    MediaTrackKind.Subtitle)
+                : null;
+            await engine
+                .SelectTrackAsync(MediaTrackKind.Subtitle, track?.Id, cancellationToken)
+                .ConfigureAwait(false);
+            return track;
+        }
     }
+
+    /// <summary>The announced track carrying an identifier, or null when nothing carries it.</summary>
+    private static MediaTrack? Find(IReadOnlyList<MediaTrack> tracks, string? trackId) =>
+        trackId is null
+            ? null
+            : tracks.FirstOrDefault(track => string.Equals(track.Id, trackId, StringComparison.Ordinal));
 }

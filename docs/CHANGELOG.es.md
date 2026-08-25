@@ -10,6 +10,50 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los subtítulos no llegaban nunca a la pantalla, y ahora hay tres razones medidas de por qué.** El
+  propietario lo trajo con su prueba hecha: el mismo episodio los muestra en VLC y no aquí. Ninguna de
+  las tres se ve leyendo el código, y las tres tuvieron que medirse contra un archivo real con un
+  `.srt` de control que cubre la película entera.
+  1. **La sesión los apagaba al abrir.** `ApplyPlaybackPreferences` aplicaba el valor resuelto
+     hubiera o no una preferencia guardada, y sin ninguna ese valor es «apagados»: cada primera
+     reproducción le mandaba `-1` al motor y desactivaba la pista que el contenedor marca por
+     omisión. Un ámbito que no contesta es silencio, y el silencio no es «no». Ahora sólo se aplica
+     lo que alguien decidió, y lo que el motor eligió por su cuenta se lee y se enseña.
+  2. **El croma del sumidero de memoria decidía si el subtítulo se componía.** Con `RV32`, `RGBA`,
+     `ARGB`, `RV24`, `YUY2`, `VYUY` y `YVYU` **no cambiaba ni un byte** del fotograma al encender un
+     subtítulo; con `UYVY` cambiaban 61 687. El motor pide `UYVY` y convierte a BGRA él mismo.
+  3. **Con decodificación por hardware el subtítulo se pierde con un error que nadie leía.** VLC lo
+     dice una vez por fotograma —«no matching alpha blending routine (chroma: YUVA -> DX11)»— y
+     publica el fotograma sin él: dibuja el subtítulo sobre la imagen antes de que llegue a este
+     búfer, y con D3D11VA esa imagen todavía es una superficie de la tarjeta gráfica. 67 001 bytes
+     cambian por software y ninguno por hardware. El motor decodifica por software y **lo declara**:
+     lo pedido sigue siendo lo pedido y lo que se anuncia como activo es lo que corre.
+
+- **Los subtítulos que viven junto al archivo no se cargaban nunca.** `ExternalSubtitleDiscovery`
+  estaba escrito, confinado a su raíz y probado en los dos codificados — y sin nadie que lo llamara:
+  la sesión entregaba una lista vacía en cada apertura. El defecto de la casa, otra vez.
+
+- **El vídeo se deformaba al redimensionar.** Se dibujaba sobre todo el alto y el ancho disponibles,
+  así que un episodio 16:9 en una ventana estirada salía estirado, en el reproductor y en el mini.
+  `VideoFitPolicy` conserva la forma y reparte las bandas; lo que se afirma es la **proporción**, no
+  el tamaño.
+
+- **Home salía vacía con la biblioteca llena.** Leía la tabla `titles`, que **nada de la aplicación
+  escribe** —`ApplyIdentification` ya lo decía con sus palabras—, mientras que Biblioteca lista la
+  unión de los títulos identificados con los archivos escaneados. Medido contra la base de datos del
+  propietario: 102 filas en `scanned_titles`, cero en `titles` y cuatro en `watch_state` que sólo
+  casaban con archivos escaneados. Las tres proyecciones de Home leen ahora esa misma unión.
+
+- **Home tampoco se cargaba al arrancar.** El servicio de navegación empieza en Home y no anuncia
+  nada, así que el único sitio que lee Home —la llegada a una ruta— no corría hasta que alguien se
+  iba y volvía. La ruta con la que abre la aplicación se anuncia como cualquier otra.
+
+- **El panel de pistas decía «sin subtítulos» sobre subtítulos que se estaban leyendo.** El motor
+  elige mientras se decodifican los primeros fotogramas, que es después de construirse el panel:
+  medido, ninguna en vigor al abrir y la pista 6 tres segundos más tarde. Ahora el panel sigue al
+  motor.
+
+
 - **El texto de los botones se veía bajo aunque su caja estuviera centrada, y esta vez con el número
   delante.** `ButtonInkTests` centró la caja en agosto y dijo por escrito que no medía los glifos; el
   propietario siguió viéndolo torcido y tenía razón. Medido con las métricas de la propia fuente: el

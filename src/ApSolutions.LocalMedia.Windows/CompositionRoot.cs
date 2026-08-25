@@ -331,6 +331,14 @@ public static partial class CompositionRoot
                     : CreateRecoveryView(services, paths.DatabasePath, migrationRunner.LastBackupPath, refusal);
                 if (refusal is null)
                 {
+                    // The destination the application opens on arrives the same way every other one
+                    // does. NavigationService starts on Home and raises nothing, so the shell's
+                    // arrival handler — the only thing that reads Home — never ran until somebody
+                    // left Home and came back: the owner opened the application on a library of 102
+                    // scanned files and found it blank. Announcing the route that is already current
+                    // makes the first destination an arrival rather than an initial value.
+                    var navigation = services.GetRequiredService<INavigationService>();
+                    navigation.Navigate(navigation.CurrentRoute);
                     await StartReviewBadgeAsync(services).ConfigureAwait(true);
                 }
             },
@@ -1101,6 +1109,22 @@ public static partial class CompositionRoot
         engine.PositionChanged += OnPositionChanged;
         engine.StateChanged += OnStateChanged;
 
+        // The engine chooses a track on its own whenever nobody has stored a preference: a container
+        // names its default and LibVLC honours it while the first frames decode — which is after the
+        // panel below was built. Measured on 2026-08-25 against a real episode: the subtitle in force
+        // was none at open and track 6 three seconds later, so a panel fed only at open time said
+        // «no subtitles» over subtitles somebody could read. The surface it feeds is assigned once
+        // it exists, so a choice arriving before then simply has nowhere to land yet.
+        TrackSelectorViewModel? sessionTracks = null;
+        var activeTracks = engine as IActiveTrackSource;
+        void OnActiveTracksChanged(object? sender, EventArgs args) =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                _ = RunQuietlyAsync(() => FollowActiveTracksAsync(engine, sessionTracks)));
+        if (activeTracks is not null)
+        {
+            activeTracks.ActiveTracksChanged += OnActiveTracksChanged;
+        }
+
         // The hardware keys listen only while a session exists, which is the source's own rule —
         // and they start after the previous session's teardown, which stops them. CommandReceived
         // is raised on the STA pump thread, so it is marshalled before touching anything bound.
@@ -1119,6 +1143,10 @@ public static partial class CompositionRoot
         {
             engine.PositionChanged -= OnPositionChanged;
             engine.StateChanged -= OnStateChanged;
+            if (activeTracks is not null)
+            {
+                activeTracks.ActiveTracksChanged -= OnActiveTracksChanged;
+            }
 
             // The input chain dies with its session: the keys release their registrations, the
             // gesture handler lets go of the router, and the router lets go of its gate.
@@ -1150,7 +1178,8 @@ public static partial class CompositionRoot
                     new PlaybackPreferenceContext(
                         fileScopeKey,
                         seriesScopeKey,
-                        ExternalSubtitlePaths: []),
+                        await DiscoverExternalSubtitlesAsync(provider, file.Path, cancellationToken)
+                            .ConfigureAwait(true)),
                     cancellationToken)
                 .ConfigureAwait(true);
         }
@@ -1216,6 +1245,7 @@ public static partial class CompositionRoot
             seriesScopeKey,
             ReadResource("TrackSelectorSubtitlesDisabled"));
         tracks.Load(snapshot.Tracks, applied?.Audio, applied?.Subtitle);
+        sessionTracks = tracks;
 
         // The output choice reaches the engine (AUD-A01): the stored global device is applied to
         // the session that just opened, and a person's pick goes through the adapter that pauses,
@@ -1860,6 +1890,68 @@ public static partial class CompositionRoot
             default:
                 break;
         }
+    }
+
+    /// <summary>
+    /// Shows in the panel whichever tracks the engine now has in force.
+    /// </summary>
+    /// <remarks>
+    /// Loading never stores a preference — the view model says so itself — so following the engine
+    /// can never be mistaken for somebody's choice, which is the one thing that would make this
+    /// worse than the stale panel it replaces.
+    /// </remarks>
+    private static async Task FollowActiveTracksAsync(
+        IMediaPlayerEngine engine,
+        TrackSelectorViewModel? tracks)
+    {
+        if (tracks is null)
+        {
+            return;
+        }
+
+        var snapshot = await engine.GetSnapshotAsync(CancellationToken.None).ConfigureAwait(true);
+        tracks.Load(
+            snapshot.Tracks,
+            Announced(snapshot, snapshot.ActiveAudioTrackId),
+            Announced(snapshot, snapshot.ActiveSubtitleTrackId));
+
+        static MediaTrack? Announced(PlaybackSnapshot snapshot, string? trackId) =>
+            trackId is null
+                ? null
+                : snapshot.Tracks.FirstOrDefault(track =>
+                    string.Equals(track.Id, trackId, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// The subtitle files sitting beside one media file, confined to the root that holds it.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="ExternalSubtitleDiscovery"/> was written, confined to its root, tested in both
+    /// encodings — and called by nobody: the session handed
+    /// <see cref="PlaybackPreferenceContext.ExternalSubtitlePaths"/> an empty list on every open, so
+    /// a <c>.srt</c> beside an episode was never loaded. The house defect, found again on 2026-08-25
+    /// while chasing subtitles that VLC showed and this did not.
+    /// <para>
+    /// The root is the one that contains the file; a file under none of the roots gets no
+    /// candidates at all, which keeps the confinement the discovery already enforces rather than
+    /// trusting the media's own directory.
+    /// </para>
+    /// </remarks>
+    private static async Task<IReadOnlyList<string>> DiscoverExternalSubtitlesAsync(
+        IServiceProvider provider,
+        string mediaPath,
+        CancellationToken cancellationToken)
+    {
+        var roots = await provider.GetRequiredService<ILibraryRootRepository>()
+            .ListAsync(cancellationToken)
+            .ConfigureAwait(true);
+        return
+        [
+            .. roots
+                .SelectMany(root => ExternalSubtitleDiscovery.Discover(mediaPath, root.Path))
+                .Select(subtitle => subtitle.Path)
+                .Distinct(StringComparer.OrdinalIgnoreCase),
+        ];
     }
 
     /// <summary>

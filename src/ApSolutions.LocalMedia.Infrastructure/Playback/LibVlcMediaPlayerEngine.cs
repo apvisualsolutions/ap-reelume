@@ -22,7 +22,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// to flush on request, because teardown here must release the media before the player that
 /// referenced them.
 /// </remarks>
-public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSource
+public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSource, IActiveTrackSource
 {
     private const int ParseTimeoutMilliseconds = 10_000;
     private const int DisabledTrack = -1;
@@ -57,21 +57,42 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     private TimeSpan? _duration;
     private PlaybackState _state = PlaybackState.Idle;
     private nint _frameBuffer;
+    private byte[]? _packedFrame;
     private byte[]? _managedFrame;
     private int _frameWidth;
     private int _frameHeight;
+    private int _visibleWidth;
+    private int _visibleHeight;
+    private int _packedStride;
     private int _frameStride;
     private object? _formatCallback;
     private object? _cleanupCallback;
     private object? _lockCallback;
     private object? _displayCallback;
     private int _decodedFrameCount;
+    private int _sourceWidth;
+    private int _sourceHeight;
     private bool _isDisposed;
 
     public LibVlcMediaPlayerEngine(LibVlcFactory factory, IDisplayCapabilityProvider? displays = null)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         _displays = displays ?? new SdrOnlyDisplayProvider();
+
+        // Hardware decoding is not available to this engine, and the reason is subtitles.
+        //
+        // The picture is decoded into process memory so the shell can compose accessible controls
+        // above it. VLC draws the subtitle into the picture on its way out, and with D3D11VA the
+        // picture at that moment is still a graphics-card surface: VLC says so itself, once per
+        // frame — «no matching alpha blending routine (chroma: YUVA -> DX11)», «blending YUVA to
+        // DX11 failed» — and then publishes the frame without it. Measured on 2026-08-25 against a
+        // real episode with a subtitle covering the whole film: 67 001 bytes of the picture change
+        // when it is switched on with software decoding, and not one byte with D3D11VA.
+        //
+        // Recording it as the fallback rather than editing the options is what keeps the report
+        // honest without a second rule: the request is still what the caller asked for, and what is
+        // announced as active is what is actually running.
+        _ = _acceleration.TryFallBack();
     }
 
     public event EventHandler<PlaybackStateChangedEventArgs>? StateChanged;
@@ -81,6 +102,8 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     public event EventHandler<PlaybackFailureEventArgs>? Failure;
 
     public event EventHandler<VideoFrameEventArgs>? FrameRendered;
+
+    public event EventHandler? ActiveTracksChanged;
 
     public PlaybackState State => _state;
 
@@ -172,6 +195,13 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
 
                 _tracks = observed;
                 var source = LibVlcVideoCapabilities.Describe(media) with { Hdr = request.SourceHdr };
+
+                // What the picture really measures, which is not what the video callback is handed:
+                // LibVLC asks for the decoder's aligned buffer — 1088 or 1090 rows for a picture of
+                // 1080 — and never writes the rows it does not use. Publishing them showed a bar of
+                // whatever the packed format makes of untouched bytes.
+                _sourceWidth = source.Width;
+                _sourceHeight = source.Height;
                 Capabilities = _acceleration
                     .Decide(source, _displays.GetCurrentDisplay(), request.UseHardwareAcceleration)
                     .ToCapabilities();
@@ -370,7 +400,14 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            return PlaybackSnapshot.Create(_state, ReadPosition(), ReadDuration(), _tracks);
+            return PlaybackSnapshot.Create(
+                _state,
+                ReadPosition(),
+                ReadDuration(),
+                _tracks,
+                failure: null,
+                ReadActiveTrack(player => player.AudioTrack),
+                ReadActiveTrack(player => player.Spu));
         }
         finally
         {
@@ -409,6 +446,7 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
             player.TimeChanged -= OnTimeChanged;
             player.EncounteredError -= OnEncounteredError;
             player.EndReached -= OnEndReached;
+            player.ESSelected -= OnElementaryStreamSelected;
             _factory.ReleaseMediaPlayer(player);
         }
 
@@ -431,6 +469,7 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
         player.TimeChanged += OnTimeChanged;
         player.EncounteredError += OnEncounteredError;
         player.EndReached += OnEndReached;
+        player.ESSelected += OnElementaryStreamSelected;
         InstallVideoSink(player);
         _mediaPlayer = player;
     }
@@ -457,8 +496,22 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
                 return;
             }
 
-            Marshal.Copy(_frameBuffer, managed, 0, managed.Length);
-            handler(this, new VideoFrameEventArgs(managed, _frameWidth, _frameHeight, _frameStride));
+            if (_packedFrame is not { } packed)
+            {
+                return;
+            }
+
+            // The picture arrives packed and leaves as BGRA, which is the price of asking LibVLC for
+            // the one format that hands this callback a frame with the subtitles already in it.
+            Marshal.Copy(_frameBuffer, packed, 0, packed.Length);
+            PackedYuvConverter.UyvyToBgra(
+                packed,
+                managed,
+                _visibleWidth,
+                _visibleHeight,
+                _packedStride,
+                _frameStride);
+            handler(this, new VideoFrameEventArgs(managed, _visibleWidth, _visibleHeight, _frameStride));
         });
 
         _formatCallback = formatCallback;
@@ -478,18 +531,35 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
         ref uint pitches,
         ref uint lines)
     {
-        width = Math.Clamp(width, 1, MaximumFrameWidth);
+        // UYVY, not RV32, and the whole reason is subtitles: PackedYuvConverter carries that
+        // measurement. The width is paired, because the format carries one chroma sample for every
+        // two pixels.
+        //
+        // What is deliberately NOT done here is asking for the size the catalogue read from the
+        // media. LibVLC offers the decoder's aligned buffer — 1088 or 1090 rows for a picture of
+        // 1080 — and accepting it is load-bearing: measured on 2026-08-25, requesting the exact
+        // source size took the subtitle back out of the frame, from 76 439 differing bytes to zero.
+        // The core composes the subpicture into the picture only when the geometry it is asked for
+        // differs from the source's, and hands it to the display module otherwise — where a managed
+        // display callback has no parameter to receive it. The padding is dropped on the way out
+        // instead, which costs nothing and changes no decision of VLC's.
+        width = (uint)PackedYuvConverter.AlignWidth((int)Math.Clamp(width, 1, MaximumFrameWidth));
         height = Math.Clamp(height, 1, MaximumFrameHeight);
-        Marshal.Copy("RV32"u8.ToArray(), 0, chroma, 4);
-        pitches = width * 4;
+        Marshal.Copy("UYVY"u8.ToArray(), 0, chroma, 4);
+        pitches = width * PackedYuvConverter.SourceBytesPerPixel;
         lines = height;
 
         ReleaseFrameBuffer();
         _frameWidth = (int)width;
         _frameHeight = (int)height;
-        _frameStride = (int)pitches;
-        _frameBuffer = Marshal.AllocHGlobal(_frameStride * _frameHeight);
-        _managedFrame = new byte[_frameStride * _frameHeight];
+        _visibleWidth = PackedYuvConverter.AlignWidth(
+            _sourceWidth > 0 ? Math.Min(_sourceWidth, _frameWidth) : _frameWidth);
+        _visibleHeight = _sourceHeight > 0 ? Math.Min(_sourceHeight, _frameHeight) : _frameHeight;
+        _packedStride = (int)pitches;
+        _frameStride = _visibleWidth * PackedYuvConverter.DestinationBytesPerPixel;
+        _frameBuffer = Marshal.AllocHGlobal(_packedStride * _frameHeight);
+        _packedFrame = new byte[_packedStride * _frameHeight];
+        _managedFrame = new byte[_frameStride * _visibleHeight];
         return 1;
     }
 
@@ -504,9 +574,13 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
 
         Marshal.FreeHGlobal(_frameBuffer);
         _frameBuffer = nint.Zero;
+        _packedFrame = null;
         _managedFrame = null;
         _frameWidth = 0;
         _frameHeight = 0;
+        _visibleWidth = 0;
+        _visibleHeight = 0;
+        _packedStride = 0;
         _frameStride = 0;
     }
 
@@ -583,6 +657,22 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
         return TimeSpan.FromMilliseconds(Math.Max(0, player.Time));
     }
 
+    /// <summary>
+    /// The identifier LibVLC reports for one kind, or null when it reports the disabled sentinel.
+    /// </summary>
+    private string? ReadActiveTrack(Func<MediaPlayer, int> read)
+    {
+        if (_mediaPlayer is not { } player || _media is null)
+        {
+            return null;
+        }
+
+        var identifier = read(player);
+        return identifier == DisabledTrack
+            ? null
+            : identifier.ToString(CultureInfo.InvariantCulture);
+    }
+
     private TimeSpan? ReadDuration()
     {
         if (_mediaPlayer is { Length: > 0 } player && _media is not null)
@@ -617,6 +707,14 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     /// only flips the state and raises the managed event, and whoever listens posts elsewhere.
     /// </summary>
     private void OnEndReached(object? sender, EventArgs args) => Transition(PlaybackState.Ended);
+
+    /// <summary>
+    /// LibVLC has activated a stream, which is how the engine's own choice becomes observable.
+    /// Nothing is read here: this runs on LibVLC's event thread, and the listener asks the engine
+    /// from a thread that is allowed to.
+    /// </summary>
+    private void OnElementaryStreamSelected(object? sender, MediaPlayerESSelectedEventArgs args) =>
+        ActiveTracksChanged?.Invoke(this, EventArgs.Empty);
 
     private void OnEncounteredError(object? sender, EventArgs args) =>
         Failure?.Invoke(

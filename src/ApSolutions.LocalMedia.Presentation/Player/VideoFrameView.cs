@@ -55,7 +55,20 @@ public sealed class VideoFrameView : Control, IDisposable
                 return;
             }
 
-            context.DrawImage(_bitmap, new Rect(Bounds.Size));
+            // The picture keeps the shape it was decoded with: drawing into the whole bounds is
+            // what stretched a 16:9 episode into whatever the window had been dragged to, here and
+            // in the picture-in-picture. The bars are the surface showing through.
+            var box = VideoFitPolicy.Fit(
+                _bitmap.PixelSize.Width,
+                _bitmap.PixelSize.Height,
+                Bounds.Width,
+                Bounds.Height);
+            if (box.Width <= 0 || box.Height <= 0)
+            {
+                return;
+            }
+
+            context.DrawImage(_bitmap, new Rect(box.X, box.Y, box.Width, box.Height));
         }
     }
 
