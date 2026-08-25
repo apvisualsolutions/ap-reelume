@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **«Otras acciones» tenía dos gramáticas en la misma columna.** Las marcas personales ya eran filas
+  de ancho completo con icono, que es como las dibuja el prototipo; las tres decisiones de estado de
+  visto seguían siendo píldoras sueltas de anchos distintos encima de ellas. Ahora son cinco filas
+  iguales. Mismos nombres, mismos mandos, mismo orden: sólo cambió la forma.
+
+
+### Corregido
+
 - **Las cinco capturas del repositorio enseñaban la ruta de una máquina concreta.** La bandeja de
   revisión escribe la carpeta bajo cada nombre de archivo, y la biblioteca de las capturas vivía bajo
   el perfil de quien las tomó: `C:\Users\<nombre>\.claude\projects\…` quedó impreso

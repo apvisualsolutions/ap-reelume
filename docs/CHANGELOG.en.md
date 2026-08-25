@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **«Other actions» held two grammars in one column.** The personal marks were already full-width
+  rows with an icon, which is how the prototype draws them; the three watch-state decisions were
+  still loose pills of differing widths above them. They are five matching rows now. Same names, same
+  commands, same order — only the shape moved.
+
+
+### Fixed
+
 - **The repository's five screenshots showed one machine's own path.** The review tray writes the
   folder under every file name, and the library behind those captures lived under the profile of
   whoever took them: `C:\Users\<name>\.claude\projects\…` was printed

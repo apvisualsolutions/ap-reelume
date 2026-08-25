@@ -1611,6 +1611,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
     what the mark currently is at the right. It is a ToggleButton because that is what it does, and
     the class is what stops it from looking like a pill in a column of rows.
   -->
+  <!--
+    The «Otras acciones» row, in both of the shapes that column holds: a mark you turn on and off
+    is a ToggleButton, a decision you make once is a Button, and the prototype draws them the
+    same — full width, icon, name, and whatever the current answer is at the right edge. Three of
+    them were loose pills in a WrapPanel, which is a form dropped into a 320 px column.
+  -->
+  <Style Selector="Button.action-row">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+  </Style>
+
   <Style Selector="ToggleButton.action-row">
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

@@ -60,4 +60,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <StreamGeometry x:Key="IconClock">M3.5,12 A8.5,8.5 0 1 0 20.5,12 A8.5,8.5 0 1 0 3.5,12 Z M12 7.6V12l3 1.9</StreamGeometry>
   <StreamGeometry x:Key="IconExternal">M14 4h6v6 M20 4l-8.5 8.5 M18 14.5V20H4V6h5.5</StreamGeometry>
   <StreamGeometry x:Key="IconCheck">M5.5 12.4 10 16.9 18.6 7.6</StreamGeometry>
+  <!--
+    The turn back to automatic: an arc most of the way round with a head on it. It is the third
+    row of «Otras acciones» and the only one of the three with nothing in the prototype to copy —
+    the prototype has no manual override to undo.
+  -->
+  <StreamGeometry x:Key="IconReset">M19 12a7 7 0 1 1-2.05-4.95 M19 4.5V8h-3.5</StreamGeometry>
 </ResourceDictionary>
