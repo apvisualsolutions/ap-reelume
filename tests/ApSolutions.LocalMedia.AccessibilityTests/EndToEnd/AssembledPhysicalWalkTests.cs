@@ -2865,7 +2865,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.False(dialog!.IsVisible, "The question was on screen before anything had been switched.");
 
         // ---- Confirm: the question is raised by the switch, and answered by keeping the position.
-        await OpenPlayerPanelAsync(host, "PlayerVersionsTitle");
+        await OpenPlayerPanelAsync(host, PlayerPanel.Versions);
         await PressAsync(
             host,
             "PlayerVersionsSwitchAction",
@@ -2892,6 +2892,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(afterConfirm);
         Assert.NotSame(dialog, afterConfirm);
         Assert.Single(host.ViewModel.Player!.Versions!.Alternatives);
+
+        // And the column is closed again, which is the same fact said about the panels: a new
+        // session starts with the picture at full width, because the panel that was open belonged
+        // to the file that just left. So it is opened again, the way a person would.
+        Assert.Equal(PlayerPanel.None, host.ViewModel.PlayerPanel);
+        await OpenPlayerPanelAsync(host, PlayerPanel.Versions);
 
         // The next switch flushes the playhead before it decides, so the session has to have reached
         // the point it was opened at first: the engine answers 0 until the demuxer applies the start
@@ -3742,7 +3748,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         Assert.Equal(string.Empty, await ManualRangesAsync());
 
-        await OpenPlayerPanelAsync(host, "MarkerEditorAccessibleName");
+        await OpenPlayerPanelAsync(host, PlayerPanel.Markers);
         await PressAsync(
             host,
             "MarkerEditorKindLabel",
@@ -3817,7 +3823,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // surface that changed its own copy and stored nothing looks identical on screen.
         review.Selected = review.Detections.Single(row => row.Id == proposals[0].Id);
         Dispatcher.UIThread.RunJobs();
-        await OpenPlayerPanelAsync(host, "DetectedMarkerReviewTitle");
+        await OpenPlayerPanelAsync(host, PlayerPanel.Markers);
         await PressAsync(
             host,
             "DetectedMarkerReviewAccept",
@@ -4056,6 +4062,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(2, tracks!.AudioTracks.Count);
         Assert.Equal(2, tracks.SubtitleTracks.Count);
 
+        // The two lists live under two pills now, which is the prototype's grouping: what somebody
+        // is hearing is one subject and what they are reading is another. So each one is reached the
+        // way a person reaches it — by opening the panel that holds it first.
+        await OpenPlayerPanelAsync(host, PlayerPanel.Audio);
         await PressAsync(
             host,
             "TrackSelectorAudioLabel",
@@ -4063,21 +4073,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking the audio track never opened the list of audio tracks");
         CloseDropDown(host);
 
-        await PressAsync(
-            host,
-            "TrackSelectorSubtitleLabel",
-            () => Resolve(host, "TrackSelectorSubtitleLabel") is ComboBox { IsDropDownOpen: true },
-            "clicking the subtitle track never opened the list of subtitle tracks");
-        CloseDropDown(host);
-
-        // The one that is not a drop-down, and the one this batch found a defect in: it decides
-        // whether the choice is stored for this file or for the whole show.
+        // The one that is not a drop-down, and the one an earlier batch found a defect in: it
+        // decides whether the choice is stored for this file or for the whole show. It is drawn
+        // under the audio half and only there — one setting governing the pair.
         await PressAsync(
             host,
             "TrackSelectorRememberForSeries",
             () => tracks.RememberForSeries,
             "clicking Remember for this series never asked for the choice to apply to the series");
         Assert.True(tracks.RememberForSeries);
+
+        await OpenPlayerPanelAsync(host, PlayerPanel.Subtitles);
+        await PressAsync(
+            host,
+            "TrackSelectorSubtitleLabel",
+            () => Resolve(host, "TrackSelectorSubtitleLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the subtitle track never opened the list of subtitle tracks");
+        CloseDropDown(host);
 
         // And what the box means, not only that it ticks. With it on the next choice is stored under
         // the show rather than under this episode's file, and the key it is stored under is the same
@@ -4098,7 +4110,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var audio = host.ViewModel.Player!.AudioOutput;
         Assert.NotNull(audio);
 
-        await OpenPlayerPanelAsync(host, "AudioOutputAccessibleName");
+        await OpenPlayerPanelAsync(host, PlayerPanel.Audio);
         await PressAsync(
             host,
             "AudioOutputDeviceLabel",
@@ -4116,6 +4128,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // The layouts are the application's own list rather than the machine's, so this one is the
         // same everywhere and can be asserted on.
         Assert.NotEmpty(AudioOutputViewModel.Layouts);
+
+        // The fourth pill, which has no controls of its own: what the decoder and the display agreed
+        // on is read, not chosen. It is pressed anyway because the pill itself is a control, and a
+        // panel nobody in this suite ever opens is a panel nobody has ever seen drawn.
+        Assert.True(host.ViewModel.HasVideoPanel);
+        await OpenPlayerPanelAsync(host, PlayerPanel.Video);
+
+        // And the column's own «×», which is the second way to close a panel. Asserted on the column
+        // going away rather than on the button: what it is for is the 320 px, not the click.
+        await PressAsync(
+            host,
+            "PlayerPanelClose",
+            () => Task.FromResult(host.ViewModel.IsPlayerPanelOpen),
+            "pressing the panel's close never gave the column's width back to the picture");
+        Assert.False(host.ViewModel.IsPlayerPanelOpen);
+        Assert.Equal(PlayerPanel.None, host.ViewModel.PlayerPanel);
 
         // Closed the way every scene with a session closes one, and the way a person does before
         // leaving. It is not tidying up: a shutdown that still holds a session takes the coordinator
@@ -4827,45 +4855,45 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// </para>
     /// </remarks>
     /// <summary>
-    /// Opens one of the player column's panels by clicking its tab, the way a person would.
+    /// Opens one of the player column's panels by pressing the pill that heads it, as a person does.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The column switched from five panels stacked to one at a time on 2026-08-22, and the walk is
-    /// what measured the cost: four scenes went red at once, each of them saying a control "matched 0
-    /// controls on screen". They were right - a panel that is not the open tab is not in the tree, so
-    /// the click had nowhere to land. That is the whole point of pressing with a mouse.
+    /// The column was a tab strip until the pills took over the switching, and the walk is what
+    /// measured the cost of each move: when the five panels stopped being stacked, four scenes went
+    /// red at once saying a control "matched 0 controls on screen" — a panel that is not open is not
+    /// in the tree, so a click has nowhere to land. That is the whole point of pressing with a mouse,
+    /// and it is the same reason this exists now that the column also starts closed.
     /// </para>
     /// <para>
-    /// A tab is not a command control - the inventory counts Button, CheckBox, ComboBox, Slider,
-    /// ToggleButton, RadioButton and ToggleSwitch - so this does not record anything in the ledger.
-    /// What it does is put the panel on screen, and assert that the click did it, which is the same
-    /// contract PressAsync holds for everything else.
+    /// A pill <b>is</b> a command control, unlike the tab it replaced, so this records one in the
+    /// ledger rather than quietly putting a panel on screen — which is what keeps the five of them
+    /// out of eng/walk-pending.txt. A panel already open is left alone: pressing its pill again is
+    /// what closes it, and a press that undid the scene's own setup would prove nothing.
     /// </para>
     /// </remarks>
-    private static async Task OpenPlayerPanelAsync(ShellHost host, string headerKey)
+    private static async Task OpenPlayerPanelAsync(ShellHost host, PlayerPanel panel)
     {
-        var header = Avalonia.Application.Current!.TryFindResource(headerKey, out var resolved)
-            && resolved is string text
-                ? text
-                : headerKey;
-        var tabs = Reachable(host)
-            .OfType<TabItem>()
-            .Where(item => item.IsEffectivelyVisible)
-            .Where(item => (item.Header as string) == header)
-            .ToArray();
-        Assert.True(
-            tabs.Length == 1,
-            $"{headerKey} matched {tabs.Length} tabs in the player column; a click needs exactly one.");
-
-        var tab = tabs[0];
-        if (!tab.IsSelected)
+        if (host.ViewModel.PlayerPanel == panel)
         {
-            Click(host, tab);
-            await SettleAsync();
+            return;
         }
 
-        Assert.True(tab.IsSelected, $"clicking the {header} tab did not open the panel behind it.");
+        var pill = panel switch
+        {
+            PlayerPanel.Audio => "PlayerPanelAudio",
+            PlayerPanel.Subtitles => "PlayerPanelSubtitles",
+            PlayerPanel.Video => "PlayerPanelVideo",
+            PlayerPanel.Markers => "PlayerPanelMarkers",
+            _ => "PlayerVersionsTitle",
+        };
+
+        await PressAsync(
+            host,
+            pill,
+            () => Task.FromResult(host.ViewModel.PlayerPanel),
+            $"pressing the {pill} pill never opened the panel behind it");
+        Assert.Equal(panel, host.ViewModel.PlayerPanel);
     }
 
     private static Control Resolve(ShellHost host, string anchor, string? helpText = null)

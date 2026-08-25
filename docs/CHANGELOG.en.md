@@ -8,6 +8,43 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Changed
+
+- **The player is headed by the prototype's pills and its column starts closed.** Audio, Subtitles,
+  Video and Markers — plus «Other versions», which this player keeps — sit on the header and open the
+  column; pressing the open one gives its 320 px back to the picture. It was a tab strip before, and
+  a tab strip has no way to say "none of them": some panel was always holding a fifth of the film's
+  width, whether or not it had anything to say. The column now carries a header of its own with the
+  name of what is open and its «×», which is the second way to close it.
+
+- **The four panels group by subject rather than by model.** «Audio» gathers the audio tracks, the
+  output device and its channels; «Subtitles», the subtitle tracks; «Markers», the detected ranges
+  and the ones this title keeps. Each half comes from a different model and none was merged: the
+  grouping belongs to the person looking, and a panel draws only the halves the session has.
+
+- **The subtitle picker's label reads «Subtitle track».** It read «Subtitles», which is exactly the
+  name of the pill that now opens its panel: two controls under one name is a real ambiguity, and the
+  walk found it before anybody else did.
+
+### Added
+
+- **«Video», the panel that was missing.** It says whether decoding is on the hardware or in
+  software and whether the output is HDR10 or SDR, with the sentence that explains it under each row
+  and the scope written at the foot: Dolby Vision and Dolby and DTS passthrough are out. They are the
+  same facts the badge over the picture already carried; this is where somebody goes looking for them
+  instead of waiting for them to appear.
+
+- **The session badge, «Session 1 · single active engine».** It is true and measured: LibVLC is built
+  once and one session at a time holds it, so the number is how many have been opened in this run. A
+  new session raises it and closes the column, because the panel standing open belonged to the file
+  that just left.
+
+- **At the right of the foot, where the sound is going.** The chosen device and what it can carry —
+  «System speakers · 2.0» — which is the pill the prototype draws at the end of its transport. Here
+  it sits on the row below rather than the transport's own: that one already holds two sliders and
+  two readouts, and at 900 px — the narrowest window this application allows — adding a device name
+  to it is the shape that has drawn a control off the edge nine times.
+
 ### Fixed
 
 - **The «Remember for the whole series» check box measured with infinite width.** A `CheckBox`

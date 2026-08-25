@@ -8,6 +8,43 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Cambiado
+
+- **El reproductor se encabeza con las píldoras del prototipo y su columna empieza cerrada.** Audio,
+  Subtítulos, Vídeo y Marcadores —más «Otras versiones», que este reproductor conserva— van en la
+  cabecera y abren la columna; pulsar la que está abierta devuelve sus 320 px a la imagen. Antes era
+  una tira de pestañas, y una tira de pestañas no sabe decir «ninguna»: siempre había un panel
+  ocupando un quinto del ancho de la película, tuviera o no algo que decir. La columna lleva ahora
+  cabecera propia con el nombre de lo que está abierto y su «×», que es la segunda forma de
+  cerrarla.
+
+- **Los cuatro paneles agrupan por asunto y no por modelo.** «Audio» reúne las pistas de audio, el
+  dispositivo de salida y sus canales; «Subtítulos», las pistas de subtítulos; «Marcadores», los
+  detectados y los de este título. Cada mitad viene de un modelo distinto y ninguna se fusionó: la
+  agrupación es de quien mira, y un panel dibuja sólo las mitades que la sesión tiene.
+
+- **La etiqueta del selector de subtítulos dice «Pista de subtítulos».** Decía «Subtítulos», que es
+  exactamente el nombre de la píldora que ahora abre su panel: dos controles con un nombre es una
+  ambigüedad real, y el paseo la encontró antes que nadie.
+
+### Añadido
+
+- **«Vídeo», el panel que faltaba.** Dice si la decodificación va por hardware o por software y si la
+  salida es HDR10 o SDR, con la frase que lo explica debajo de cada fila y el alcance escrito al pie:
+  Dolby Vision y el passthrough de Dolby y DTS quedan fuera. Son los mismos hechos que la insignia
+  sobre la imagen ya llevaba; esto es donde alguien va a buscarlos en vez de esperar a que aparezcan.
+
+- **La píldora de sesión, «Sesión 1 · motor único activo».** Es cierta y medida: LibVLC se construye
+  una vez y una sesión cada vez lo sostiene, así que el número es cuántas veces se ha abierto una en
+  esta ejecución. Una sesión nueva la sube y cierra la columna, porque el panel que estaba abierto
+  era del archivo que acaba de irse.
+
+- **A la derecha del pie, adónde va el sonido.** El dispositivo elegido y lo que puede llevar —
+  «Altavoces del sistema · 2.0»—, que es la píldora que el prototipo dibuja al final de su
+  transporte. Aquí va en la fila de abajo y no en la del transporte: esa ya lleva dos deslizadores y
+  dos lecturas, y a 900 px —la ventana más estrecha que esta aplicación permite— añadirle un nombre
+  de dispositivo es la forma que ha dibujado un control fuera del borde nueve veces.
+
 ### Corregido
 
 - **La casilla «Recordar para toda la serie» medía con ancho infinito.** Una `CheckBox` mide su
