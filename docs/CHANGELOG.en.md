@@ -10,6 +10,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The drop-downs drew their text 2.43 px low**, the same number the buttons had and for the same
+  reason: a font's ink is not symmetric about the box that holds it. The recipe is the buttons' own —
+  five pixels of bottom margin, derived from the metrics rather than tuned — put on the words and not
+  on the chevron, which is geometry and centres itself. Measured before and after: 24.43 against a
+  middle of 22.00, and inside a pixel once corrected.
+
 - **The blue ring appeared on a click, not only on arriving with the keyboard.** All ten focus
   selectors said `:focus`, which a mouse raises too, so every checkbox somebody clicked answered with
   a two-pixel ring that stayed until they clicked elsewhere. They say `:focus-visible` now. A pointer

@@ -10,6 +10,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los desplegables llevaban su texto 2,43 px bajo**, exactamente el mismo número que los botones y
+  por la misma razón: la tinta de una fuente no es simétrica alrededor de la caja que la contiene. La
+  receta es la de los botones —cinco píxeles de margen inferior, derivados de las métricas y no
+  ajustados a ojo— puestos sobre las palabras y no sobre el galón, que es geometría y se centra solo.
+  Medido antes y después: 24,43 sobre un centro de 22,00, y dentro del píxel al corregirlo.
+
 - **El reborde azul salía al hacer clic, y no sólo al llegar con el teclado.** Los diez selectores de
   foco decían `:focus`, que un ratón también levanta, así que cada casilla pulsada respondía con un
   anillo de dos píxeles que se quedaba hasta pulsar en otro sitio. Ahora dicen `:focus-visible`. Un

@@ -1644,8 +1644,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
               BorderThickness="{TemplateBinding BorderThickness}"
               CornerRadius="{TemplateBinding CornerRadius}">
             <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="Auto,*,Auto">
+              <!--
+                Five pixels of bottom margin on the words and none on the caret, which is the recipe
+                the buttons already carry and the reason it is written twice. A font's ascent and
+                descent are not symmetric, so a label centred to the pixel draws its ink below the
+                middle; the owner reported the same list on 2026-08-25 — «los desplegables tienen el
+                mismo problema de alineación vertical que tenían los botones». The number is the
+                buttons' own, derived from the font's metrics rather than tuned, and the chevron is
+                left alone because a glyph is centred by its geometry and has no baseline to answer
+                for.
+              -->
               <TextBlock
-                  Margin="0,0,8,0"
+                  Margin="0,0,8,5"
                   VerticalAlignment="Center"
                   FontSize="{DynamicResource FontSizeCaption}"
                   Foreground="{DynamicResource TextSecondaryBrush}"
@@ -1659,6 +1669,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <ContentControl
                   x:Name="ContentPresenter"
                   Grid.Column="1"
+                  Margin="0,0,0,5"
                   VerticalAlignment="Center"
                   Content="{TemplateBinding SelectionBoxItem}"
                   ContentTemplate="{TemplateBinding ItemTemplate}"
