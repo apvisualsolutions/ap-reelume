@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The «Remember for the whole series» check box measured with infinite width.** A `CheckBox`
+  measures its content without a limit and draws it where it falls, so its label depended on Spanish
+  happening to fit a 320 px column. It wraps now. It is the same shape this repository has caught
+  nine times, and the last one left in the player's column.
+
+
+### Fixed
+
 - **The dotted outline on a disabled control had the wrong shape.** It was drawn with a fixed 4 px
   radius for all ten types, so on a pill — «Clear rating», any leading action, any «Other actions»
   row — it became a nearly square rectangle whose corners fell **outside** the button's own edge,

@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La casilla «Recordar para toda la serie» medía con ancho infinito.** Una `CheckBox` mide su
+  contenido sin límite y lo dibuja donde caiga, así que su etiqueta dependía de que el español
+  cupiera por casualidad en una columna de 320 px. Ahora envuelve. Es la misma forma que este
+  repositorio lleva cazadas nueve veces, y la única de la columna del reproductor que quedaba.
+
+
+### Corregido
+
 - **El contorno punteado de un control deshabilitado tenía la forma equivocada.** Se dibujaba con un
   radio fijo de 4 px para los diez tipos, así que en una píldora —«Quitar valoración», cualquier
   acción principal, cualquier fila de «Otras acciones»— quedaba un rectángulo casi recto cuyas
