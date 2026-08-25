@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una carpeta de episodios ya es una serie.** Es el defecto característico de este repositorio en
+  su forma más grande: `titles`, `seasons`, `episodes` y `episode_media` existen desde la migración
+  0004, la ficha de serie está dibujada y enrutada desde que se escribió, y **nada había escrito
+  jamás una fila en ninguna de las cuatro**. `MediaNameParser` lee `S01E01`, `1x04`, «Temporada 1
+  Episodio 2» y `Cap.803` desde que se escribió, y nadie le preguntó nunca dónde iba el episodio: así
+  que dos series con once temporadas entre las dos llegaron como noventa y nueve tarjetas sueltas.
+  Ahora hay una política pura (`LocalSeriesPolicy`) que dice qué carpeta nombra la serie —la carpeta,
+  nunca el archivo— y un caso de uso (`GroupScannedEpisodes`) que corre después de cada escaneo, igual
+  que la agrupación de versiones, y escribe la serie, sus temporadas, sus episodios y el archivo
+  detrás de cada uno. Medido de punta a punta contra la disposición real: noventa y nueve archivos
+  entran, **tres tarjetas salen** —las dos series y la película que había en la misma raíz—, con 72 y
+  27 episodios contados, sus ocho y tres temporadas, y cada episodio con su archivo detrás.
+  Los identificadores se derivan de la clave de la serie y de los números, así que un segundo
+  escaneo actualiza en vez de duplicar; la clave lleva la raíz, así que un respaldo no se funde con
+  el original; y una película sigue siendo una película.
+
 - **Continuar volvía a preguntar lo que continuar ya había contestado.** La sesión abría en el minuto
   correcto y acto seguido ofrecía decidir el minuto, sobre una imagen ya en marcha — «al hacer click
   en continuar vuelve a pedir confirmación de continuar o volver a ver desde el inicio en la vista

@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A folder of episodes is a series now.** It is this repository's characteristic defect in its
+  largest form: `titles`, `seasons`, `episodes` and `episode_media` have existed since migration
+  0004, the series card has been drawn and routed to since it was written, and **nothing had ever
+  written a row into any of the four**. `MediaNameParser` has read `S01E01`, `1x04`, «Temporada 1
+  Episodio 2» and `Cap.803` since it was written, and nobody ever asked it where the episode
+  belonged — so two shows with eleven seasons between them arrived as ninety-nine loose cards. There
+  is now a pure policy (`LocalSeriesPolicy`) that says which folder names the series — the folder,
+  never the file — and a use case (`GroupScannedEpisodes`) that runs after every scan, exactly as
+  version grouping does, and writes the show, its seasons, its episodes and the file behind each
+  one. Measured end to end against the real layout: ninety-nine files go in and **three cards come
+  out** — the two shows and the film that was in the same root — with 72 and 27 episodes counted,
+  their eight and three seasons, and a file behind every episode. The identifiers are derived from
+  the series key and the numbers, so a second scan updates instead of duplicating; the key carries
+  the root, so a backup does not fold into the original; and a film is still a film.
+
 - **Continue asked again what pressing Continue had already answered.** The session opened at the
   right minute and then offered to decide the minute, over a picture already playing — «al hacer
   click en continuar vuelve a pedir confirmación de continuar o volver a ver desde el inicio en la

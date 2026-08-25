@@ -119,7 +119,13 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(episode);
-        ArgumentException.ThrowIfNullOrWhiteSpace(episode.Title);
+
+        // Null is refused and empty is not, and the difference is a real state: an episode nobody
+        // has identified has a number and no name, which is every episode of a series this
+        // application assembled from a folder. The row for one carries the empty string and
+        // SeasonViewModel writes «Episodio 3» over it in whichever language is in force — a
+        // placeholder stored in the database would be a language stored in the database.
+        ArgumentNullException.ThrowIfNull(episode.Title);
         ArgumentOutOfRangeException.ThrowIfNegative(episode.SeasonNumber);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(episode.EpisodeNumber);
         await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
@@ -148,6 +154,27 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
         command.Parameters.AddWithValue("$title", episode.Title);
         command.Parameters.AddWithValue("$sortOrder", episode.SortOrder);
         command.Parameters.AddWithValue("$isAvailable", episode.IsAvailable ? 1 : 0);
+        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task LinkEpisodeMediaAsync(
+        EpisodeId episodeId,
+        MediaFileId mediaFileId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
+        await using var command = connection.CreateCommand();
+
+        // One file per episode, replaced rather than added to: a second copy of T01E01 is a
+        // duplicate, which is the version grouping's question, and answering it here would make
+        // the episode row depend on which order a scan happened to walk the folder in.
+        command.CommandText = """
+            INSERT INTO episode_media (episode_id, media_file_id)
+            VALUES ($episodeId, $mediaFileId)
+            ON CONFLICT(episode_id) DO UPDATE SET media_file_id = excluded.media_file_id;
+            """;
+        command.Parameters.AddWithValue("$episodeId", episodeId.Value.ToString("D"));
+        command.Parameters.AddWithValue("$mediaFileId", mediaFileId.Value.ToString("D"));
         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -245,6 +272,12 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                 INNER JOIN media_files media ON media.id = scanned.media_file_id
                 WHERE NOT EXISTS (
                     SELECT 1 FROM titles identified WHERE identified.id = scanned.media_file_id)
+                  -- And not once more as itself when it is already an episode of something. The
+                  -- scanned row is rewritten by every scan, so deleting it would bring it back on
+                  -- the next one; what settles it is that the file is linked to an episode, which
+                  -- is a fact about the catalogue rather than a row somebody remembered to remove.
+                  AND NOT EXISTS (
+                    SELECT 1 FROM episode_media link WHERE link.media_file_id = scanned.media_file_id)
             )
             SELECT t.id, t.kind, t.primary_title, t.release_year, t.is_available,
                    t.has_progress, t.is_personal, t.added_utc, t.last_played_utc,

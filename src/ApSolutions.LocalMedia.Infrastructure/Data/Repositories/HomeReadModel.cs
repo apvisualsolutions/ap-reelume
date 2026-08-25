@@ -43,6 +43,12 @@ public sealed class HomeReadModel : IHomeReadModel
             INNER JOIN media_files media ON media.id = scanned.media_file_id
             WHERE NOT EXISTS (
                 SELECT 1 FROM titles identified WHERE identified.id = scanned.media_file_id)
+              -- The library's own union carries the same second clause and for the same
+              -- reason: a file already linked to an episode is that episode, not a loose
+              -- card of its own. The two are one string in each reader and the pair has to
+              -- agree, or Home and the grid would count a season differently.
+              AND NOT EXISTS (
+                SELECT 1 FROM episode_media link WHERE link.media_file_id = scanned.media_file_id)
         )
         """;
 

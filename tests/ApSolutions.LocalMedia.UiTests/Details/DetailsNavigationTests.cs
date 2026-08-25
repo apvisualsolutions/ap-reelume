@@ -238,7 +238,7 @@ public sealed class DetailsNavigationTests
     /// words would pass over a button that says «Reproducir» and resumes.
     /// </para>
     /// </remarks>
-    [Theory]
+    [AvaloniaTheory]
     [InlineData(0, "Play", 0)]
     [InlineData(40, "Resume · 40:00", 40)]
     public void The_card_always_offers_a_way_to_open_the_film(

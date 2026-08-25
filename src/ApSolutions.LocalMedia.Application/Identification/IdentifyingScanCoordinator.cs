@@ -19,17 +19,20 @@ public sealed class IdentifyingScanCoordinator : IScanCoordinator
     private readonly Func<ReconcileScannedFiles> _reconciliation;
     private readonly Func<IdentifyScannedFiles> _identification;
     private readonly Func<GroupScannedVersions> _grouping;
+    private readonly Func<GroupScannedEpisodes> _series;
 
     public IdentifyingScanCoordinator(
         IScanCoordinator inner,
         Func<ReconcileScannedFiles> reconciliation,
         Func<IdentifyScannedFiles> identification,
-        Func<GroupScannedVersions> grouping)
+        Func<GroupScannedVersions> grouping,
+        Func<GroupScannedEpisodes> series)
     {
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
         _reconciliation = reconciliation ?? throw new ArgumentNullException(nameof(reconciliation));
         _identification = identification ?? throw new ArgumentNullException(nameof(identification));
         _grouping = grouping ?? throw new ArgumentNullException(nameof(grouping));
+        _series = series ?? throw new ArgumentNullException(nameof(series));
     }
 
     public async Task<ScanSummary> StartAsync(
@@ -45,6 +48,12 @@ public sealed class IdentifyingScanCoordinator : IScanCoordinator
         _ = await _reconciliation().ExecuteAsync(summary, cancellationToken).ConfigureAwait(false);
         _ = await _identification().ExecuteAsync(summary, cancellationToken).ConfigureAwait(false);
         _ = await _grouping().ExecuteAsync(summary, cancellationToken).ConfigureAwait(false);
+
+        // And last, the folders that are series. It runs after identification so a show a
+        // person identified keeps what they said: this one skips every file an identified
+        // title already claims, and writes under an identifier derived from the folder,
+        // which can never collide with the one identification uses.
+        _ = await _series().ExecuteAsync(summary, cancellationToken).ConfigureAwait(false);
         return summary;
     }
 }
