@@ -138,6 +138,33 @@ public sealed class HomeViewModel : INotifyPropertyChanged
     {
         get
         {
+            if (_snapshot.Resume is not { ObservedDuration: { } duration } resume
+                || duration <= resume.Position)
+            {
+                return ResumePlayerSubtitle;
+            }
+
+            var remaining = Remaining(duration - resume.Position);
+            return ResumePlayerSubtitle is { Length: > 0 } known
+                ? string.Join(" · ", known, remaining)
+                : remaining;
+        }
+    }
+
+    /// <summary>
+    /// What this is, without how much of it is left: «T2 · E5 · Puerto de invierno», or «2024 ·
+    /// Suspense» for something with no episode to name.
+    /// </summary>
+    /// <remarks>
+    /// The player's header writes this under the title, which is what the prototype puts there, and
+    /// the hero's own line is this plus what is left. Written once and used twice rather than
+    /// composed twice: two copies of a rule about dropping empty pieces drift apart on the piece
+    /// nobody tested.
+    /// </remarks>
+    public string ResumePlayerSubtitle
+    {
+        get
+        {
             if (_snapshot.Resume is not { } resume)
             {
                 return string.Empty;
@@ -156,11 +183,6 @@ public sealed class HomeViewModel : INotifyPropertyChanged
             if (resume.Genres is { Count: > 0 } genres)
             {
                 pieces.AddRange(genres.Take(2));
-            }
-
-            if (resume.ObservedDuration is { } duration && duration > resume.Position)
-            {
-                pieces.Add(Remaining(duration - resume.Position));
             }
 
             return string.Join(" · ", pieces);
@@ -256,6 +278,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
             nameof(ResumeCompletedFraction),
             nameof(ResumeCompletedText),
             nameof(ResumeMetaText),
+            nameof(ResumePlayerSubtitle),
             nameof(HasResumeMeta),
             nameof(ResumeActionText),
             nameof(HasInProgress),
@@ -278,7 +301,7 @@ public sealed class HomeViewModel : INotifyPropertyChanged
         Math.Round(fraction * 100).ToString("F0", CultureInfo.CurrentCulture);
 
     private Task ResumeAsync() => _snapshot.Resume is { } resume && _onResume is not null
-        ? _onResume(new HomeResumeRequest(resume.Content, ResumeTitle, ResumeSubtitle))
+        ? _onResume(new HomeResumeRequest(resume.Content, ResumeTitle, ResumePlayerSubtitle))
         : Task.CompletedTask;
 
     private Task OpenLibraryAsync()

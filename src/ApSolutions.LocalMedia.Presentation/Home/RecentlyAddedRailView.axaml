@@ -65,7 +65,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           something this rail knows and the suggestions rail does not, so the card never claims it.
           -->
           <StackPanel Spacing="{DynamicResource Space8}">
-            <library:PosterCardView />
+            <library:PosterCardView Classes="glyph-chip" />
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>

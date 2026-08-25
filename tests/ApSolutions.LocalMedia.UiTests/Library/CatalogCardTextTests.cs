@@ -9,6 +9,7 @@ using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Library;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Library;
@@ -162,6 +163,53 @@ public sealed class CatalogCardTextTests
 
         art.Title = "Otra cosa";
         Assert.Equal("Otra cosa", art.Title);
+    }
+
+    /// <summary>
+    /// The kind chip keeps its word in the grid and drops it in a rail.
+    /// </summary>
+    /// <remarks>
+    /// The prototype writes «Película» only where a card has the width for it. In the rails it draws
+    /// the glyph alone, and the same card class serves both — so what decides is a class on the host,
+    /// which is exactly the kind of thing that gets copied onto a third rail and forgotten. Mounted
+    /// rather than grepped: a style that stopped matching would leave the markup saying the right
+    /// thing and the screen saying the other one.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_kind_chip_keeps_its_word_in_the_grid_and_drops_it_in_a_rail()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        Assert.True(WordIsVisible(inRail: false));
+        Assert.False(WordIsVisible(inRail: true));
+    }
+
+    /// <summary>
+    /// Whether the chip's word is drawn, on a card mounted the way a grid or a rail mounts it.
+    /// </summary>
+    /// <remarks>
+    /// Read before the window closes, and that is not a detail: closing it detaches the control, the
+    /// style stops applying, and <c>IsVisible</c> answers with the local value — which is true for
+    /// both, so a test that returned the control would pass whatever the style did.
+    /// </remarks>
+    private static bool WordIsVisible(bool inRail)
+    {
+        var card = new PosterCardView { DataContext = Card(CatalogTitleKind.Movie) };
+        if (inRail)
+        {
+            card.Classes.Add("glyph-chip");
+        }
+
+        var window = new Avalonia.Controls.Window { Width = 400, Height = 600, Content = card };
+        window.Show();
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var word = Assert.Single(
+            card.GetVisualDescendants().OfType<Avalonia.Controls.TextBlock>(),
+            block => block.Name == "KindWord");
+        var visible = word.IsVisible;
+        window.Close();
+        return visible;
     }
 
     private static CatalogItemViewModel Card(

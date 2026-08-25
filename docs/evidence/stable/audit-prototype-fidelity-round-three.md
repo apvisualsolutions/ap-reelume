@@ -44,6 +44,24 @@ said the same thing.
 | Duplicados | el título del grupo en azul | en la tinta de la página, que es como lo escribe el prototipo |
 | Enlaces | el acento (5,62:1 en claro) | su tinta (9,03:1 en claro, 11,36:1 en oscuro) |
 | Duplicados | «0 MB» para lo que pesa menos | escala hasta los bytes; sólo el cero se queda en blanco |
+| Ficha de serie | cada episodio con el color de su nombre | el tono de la serie, caminado 7° por episodio |
+| Ficha de serie | «Siguiente episodio» encogido a su texto | 540 px, con «Continuar» en el borde |
+| Inicio | ficha de tipo con palabra en el carrusel | sólo el glifo, como el prototipo; la palabra sigue en la cuadrícula |
+| Biblioteca | «Añadir medios…» sin su signo más | con él |
+| Reproductor | cabecera sin segunda línea para una película | «2019 · Drama · Misterio» |
+| Reproductor | «Velocidad de reproducción 1×» | «VELOCIDAD 1×»; el rótulo largo sigue siendo el nombre accesible |
+
+Y dos diferencias más que se quedan, con su razón: / And two more that stay, with their reason:
+
+7. **La insignia de «no disponible» es ámbar en los siete sitios.** El prototipo tiene dos formas
+   —una píldora casi negra sobre la carátula y un chip rojo en la tabla—; aquí hay una sola, y la
+   puerta que impide la segunda (`UnavailableBadgeTests`) es anterior a esta comparación. / The
+   prototype has two shapes; here there is one, and the gate that forbids a second predates this
+   comparison.
+
+8. **El transporte lleva un botón de detener que el prototipo no tiene.** Detener no es pausar: cierra
+   la sesión y suelta el archivo, que es lo que hace falta para expulsar un disco. / Stopping is not
+   pausing: it ends the session and releases the file.
 
 ## Lo que sigue siendo distinto, y por qué / What is still different, and why
 

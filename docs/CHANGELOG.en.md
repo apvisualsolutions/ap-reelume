@@ -10,6 +10,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Four details the prototype had and this application did not.** The kind chip drops its word in
+  the rails and keeps it in the grid, which is where the prototype writes it — a chip saying «Film»
+  across a third of a thumbnail competes with the picture. «Add media…» gets its plus back. The
+  player's header gets its second line back: what it was handed only ever had a value for an episode,
+  so a film arrived with a title and nothing under it. And the speed pill is written «SPEED», which
+  is what fits: the long label made it wider than the four transport buttons together, and it stays
+  the control's accessible name.
+
+
+### Fixed
+
 - **A season looks like one season again.** Every episode still was coloured from the hash of **its
   own name**, so sixteen episodes of one series were sixteen unrelated colours. The prototype draws
   `art(show + episode × 7)`: the show's hue, walked a few degrees per episode. The cover now takes

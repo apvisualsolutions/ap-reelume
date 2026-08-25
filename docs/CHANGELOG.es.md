@@ -10,6 +10,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Cuatro detalles que el prototipo tenía y esta aplicación no.** La píldora de tipo pierde su
+  palabra en los carruseles y la conserva en la cuadrícula, que es donde el prototipo la escribe —una
+  ficha que dice «Película» sobre un tercio de la miniatura compite con la imagen—. «Añadir medios…»
+  recupera su signo más. La cabecera del reproductor recupera su segunda línea: lo que se le pasaba
+  sólo tenía valor para un episodio, así que una película llegaba con el título y nada debajo. Y la
+  píldora de velocidad se escribe «VELOCIDAD», que es lo que cabe: el rótulo largo la hacía más ancha
+  que los cuatro botones del transporte juntos, y sigue siendo el nombre accesible del control.
+
+
+### Corregido
+
 - **Una temporada vuelve a parecerse a sí misma.** Cada miniatura de episodio se coloreaba con el
   hash de **su propio nombre**, así que dieciséis episodios de una serie eran dieciséis colores sin
   relación. El prototipo dibuja `art(serie + episodio × 7)`: el tono de la serie, caminado unos

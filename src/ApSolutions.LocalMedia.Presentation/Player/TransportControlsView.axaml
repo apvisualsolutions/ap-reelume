@@ -179,12 +179,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <!--
             The word, which the prototype writes beside the multiplier: «1×» alone is a number
             nobody can tell from a volume or a version.
+
+            Drawn short and spaced, which is the prototype's own «VELOCIDAD»: the full label is four
+            syllables longer and made this pill wider than the four transport buttons put together.
+            The long one stays as the button's accessible name, where length costs nothing and
+            «Velocidad» alone would be a control a reader cannot place.
           -->
           <TextBlock
+              Classes="hero-overline"
               VerticalAlignment="Center"
-              FontSize="{DynamicResource FontSizeCaption}"
               Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-              Text="{DynamicResource TransportSpeedLabel}" />
+              Text="{DynamicResource TransportSpeedShortLabel}" />
           <TextBlock
               VerticalAlignment="Center"
               FontWeight="SemiBold"

@@ -59,6 +59,27 @@ public sealed class HomeCardTests
         // And a series puts its season and episode where a film puts its year.
         var series = await LoadAsync(EpisodeProgress());
         Assert.StartsWith("T1 · E2 · Ned", series.ResumeMetaText, StringComparison.Ordinal);
+
+        // And the same line without what is left, which is what the player's header writes under the
+        // title: the prototype puts «2024 · Suspense» there, and a film opened from the hero used to
+        // reach the player with a title and nothing under it — the subtitle it was handed only ever
+        // had a value for an episode.
+        Assert.Equal("2019 · Drama · Misterio", rich.ResumePlayerSubtitle);
+        Assert.StartsWith(rich.ResumePlayerSubtitle, rich.ResumeMetaText, StringComparison.Ordinal);
+        Assert.NotEqual(rich.ResumePlayerSubtitle, rich.ResumeMetaText);
+        Assert.Equal("T1 · E2 · Ned", series.ResumePlayerSubtitle);
+        Assert.Equal(string.Empty, bare.ResumePlayerSubtitle);
+
+        // The one that says nothing about itself but does know how far in it is: the hero's line is
+        // what is left and no more, and the player's header stays empty rather than printing it.
+        Assert.Equal(string.Empty, overrun.ResumePlayerSubtitle);
+        var timed = await LoadAsync(FilmProgress(
+            year: null,
+            genres: null,
+            duration: TimeSpan.FromMinutes(90),
+            position: TimeSpan.FromMinutes(30)));
+        Assert.Equal(string.Empty, timed.ResumePlayerSubtitle);
+        Assert.NotEqual(string.Empty, timed.ResumeMetaText);
     }
 
     /// <summary>
