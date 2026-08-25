@@ -44,20 +44,20 @@ rehacerlas en el commit que cambia una vista.
 
 ![La biblioteca: títulos identificados con su año, archivos aún por identificar con su nombre de archivo, y uno marcado como no disponible](docs/assets/library.png)
 
-La ficha de una serie: el selector de temporada, los episodios debajo y las acciones personales que
-son de la serie entera.
+La ficha de una serie: cuántos episodios van vistos, el que falta nombrado y listo para empezar, las
+temporadas a la vista y cada episodio con su duración y su estado.
 
-![La ficha de una serie, con su selector de temporada, sus dos episodios y las acciones personales](docs/assets/show.png)
+![La ficha de una serie: el episodio que falta con su botón, las temporadas en píldoras y los episodios como tarjetas](docs/assets/show.png)
 
 La reproducción, con la columna de pistas abierta. La barra dice dónde va la sesión; al cerrar la
 ventana y volver a abrirla se reanuda dentro de cinco segundos de ahí.
 
 ![El reproductor: el vídeo, la banda de transporte con su barra y sus relojes, y la columna de audio y subtítulos](docs/assets/player.png)
 
-Lo que la identificación no pudo resolver espera aquí en vez de decidirse solo, y cada propuesta dice
-por qué se propone.
+Lo que la identificación no pudo resolver espera aquí en vez de decidirse solo. Cada tarjeta dice de
+qué archivo habla, qué propone, con cuánta confianza y por qué — y lleva encima sus tres decisiones.
 
-![La bandeja de revisión: tres candidatos propuestos, cada uno con su confianza y sus motivos](docs/assets/review.png)
+![La bandeja de revisión: cada archivo pendiente con su candidato, su confianza, sus señales y sus tres decisiones](docs/assets/review.png)
 
 ## Qué no es
 
