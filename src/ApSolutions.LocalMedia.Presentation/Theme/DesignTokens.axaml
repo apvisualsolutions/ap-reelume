@@ -260,6 +260,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FBFCFE" />
           <SolidColorBrush x:Key="AccentBrush" Color="#1769AA" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#E4EFF9" />
+          <!--
+            What says «you are here» in a menu, and it is not the accent.
+
+            The prototype paints the rail's current destination and every row of its fly-out menus
+            with one literal — `rgba(127,145,170,.16)`, the same in light and in dark — and spends the
+            accent on a 3 px bar beside the destination instead. «No quiero un borde coloreado con el
+            acento», said on 2026-08-25 about exactly the box this replaces: a 2 px accent rectangle
+            around every selected row in the application, rails of posters included.
+
+            The stroke is ShellBorderBrush and not transparent, and that is a deviation from the
+            prototype with a measured reason: ListRowStateTests asks a selected row to stand out from
+            its neighbours by 3:1, counting its fill or its border, and a 16 % wash reads about 1.1:1
+            over either surface. A neutral border at 3.88:1 answers the gate without answering it in
+            accent — which is the whole of what was asked for.
+          -->
+          <SolidColorBrush x:Key="SelectionFillBrush" Color="#297F91AA" />
+          <StaticResource x:Key="SelectionStrokeBrush" ResourceKey="ShellBorderBrush" />
           <SolidColorBrush x:Key="AccentInkBrush" Color="#0B4A78" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#101828" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
@@ -320,7 +337,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
-          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionFillBrush" />
           <!--
             The drop-down, in three families of its own: the closed frame, the panel that opens, and
             the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
@@ -483,6 +500,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#08090C" />
           <SolidColorBrush x:Key="AccentBrush" Color="#62AEE8" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#0B1E2F" />
+          <!-- The same pair, in this dictionary's own colours. -->
+          <SolidColorBrush x:Key="SelectionFillBrush" Color="#297F91AA" />
+          <StaticResource x:Key="SelectionStrokeBrush" ResourceKey="ShellBorderBrush" />
           <SolidColorBrush x:Key="AccentInkBrush" Color="#9CC9EC" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#EDF1F6" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#0A0C10" />
@@ -549,7 +569,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
-          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionFillBrush" />
           <!--
             The drop-down, in three families of its own: the closed frame, the panel that opens, and
             the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
@@ -718,6 +738,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#FFFFFF" />
+          <!-- The same pair, in this dictionary's own colours. -->
+          <SolidColorBrush x:Key="SelectionFillBrush" Color="#FFFFFF" />
+          <StaticResource x:Key="SelectionStrokeBrush" ResourceKey="ShellBorderBrush" />
           <SolidColorBrush x:Key="AccentInkBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
@@ -779,7 +802,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
-          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionFillBrush" />
           <!--
             The drop-down, in three families of its own: the closed frame, the panel that opens, and
             the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
@@ -947,6 +970,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="FocusInnerStrokeBrush" Color="#000000" />
           <SolidColorBrush x:Key="AccentBrush" Color="#00FFFF" />
           <SolidColorBrush x:Key="AccentSubtleBrush" Color="#000000" />
+          <!-- The same pair, in this dictionary's own colours. -->
+          <SolidColorBrush x:Key="SelectionFillBrush" Color="#000000" />
+          <StaticResource x:Key="SelectionStrokeBrush" ResourceKey="ShellBorderBrush" />
           <SolidColorBrush x:Key="AccentInkBrush" Color="#00FFFF" />
           <SolidColorBrush x:Key="ControlTextActiveBrush" Color="#000000" />
           <SolidColorBrush x:Key="AccentTextBrush" Color="#000000" />
@@ -1007,7 +1033,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StaticResource x:Key="CheckBoxForegroundCheckedDisabled" ResourceKey="TextDisabledBrush" />
           <StaticResource x:Key="SystemControlHighlightListLowBrush" ResourceKey="ControlFillHoverBrush" />
           <StaticResource x:Key="SystemControlHighlightListMediumBrush" ResourceKey="ControlFillPressedBrush" />
-          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="AccentSubtleBrush" />
+          <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionFillBrush" />
           <!--
             The drop-down, in three families of its own: the closed frame, the panel that opens, and
             the rows inside it. Measured: 59 keys, and it inherits nothing from the text field
@@ -1286,12 +1312,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
     Declared before the focus selectors on purpose: between styles that both match, the last one
     declared wins, and focus has to win over selection.
   -->
+  <!--
+    One pixel and not two, and the neutral pair rather than the accent. The two-pixel accent
+    rectangle is what the owner was looking at on 2026-08-25 — «quiero cambiar los recuadros de
+    selección de los menús en general, no quiero un borde coloreado con el acento» — and it was
+    drawn around every selected row this application has, including a poster in a rail, where it
+    reads as a box somebody dropped on a picture.
+
+    What replaces it is what the prototype draws for a menu: a neutral wash, and the accent spent
+    somewhere else. The border stays because ListRowStateTests measures one — see SelectionStrokeBrush
+    for why it is ShellBorderBrush and not nothing — and it is a hairline in every state so selecting
+    a row still never shoves its text sideways.
+  -->
   <Style Selector="ListBoxItem">
-    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderThickness" Value="1" />
     <Setter Property="BorderBrush" Value="Transparent" />
   </Style>
   <Style Selector="ListBoxItem:selected">
-    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource SelectionStrokeBrush}" />
   </Style>
   <!--
     A drop-down row is the same idea as a list row and is read the same way: the fill is a tint, and
@@ -1309,8 +1347,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
     so the selected border is a redirect above and not a setter here.
   -->
   <Style Selector="ComboBoxItem">
-    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderThickness" Value="1" />
     <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <!--
+    The same five pixels the buttons carry, for the same reason and on the same thing: the label a
+    presenter makes for a plain string is an AccessText whose logical parent is the row itself. A
+    drop-down row is a centred line of words beside a mark, so its ink answers to a baseline exactly
+    as a button's does — and the closed frame above has carried this since 2026-08-25 while the rows
+    the panel opens never did.
+  -->
+  <Style Selector="ComboBoxItem &gt; :is(TextBlock),
+                   ComboBoxItem &gt; StackPanel &gt; :is(TextBlock),
+                   ComboBoxItem &gt; Grid &gt; :is(TextBlock)">
+    <Setter Property="Margin" Value="0,0,0,5" />
   </Style>
   <!--
     Every button says what it does when the pointer rests on it, and it says exactly what a screen
@@ -1814,6 +1865,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Data" Value="{DynamicResource IconChevronUp}" />
   </Style>
 
+  <!--
+    And the frame under that caret, which said nothing at all while its panel was open. The prototype
+    writes both halves — `border: 1px solid var(accent); background: var(accent-sub)` when open
+    against `var(border-strong)` over `var(fill)` when closed — and only the caret had been
+    carried across. «Lo mismo ocurre con los desplegables», 2026-08-25.
+
+    On the named part of the template and not on the control: the frame is Border#Background, and a
+    setter on the ComboBox itself loses to the control theme exactly as it does on a Button.
+  -->
+  <Style Selector="ComboBox.filter-pill:dropdownopen /template/ Border#Background">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
   <Style Selector="ComboBox.filter-pill:disabled /template/ Path#DropCaret">
     <Setter Property="Stroke" Value="{DynamicResource TextDisabledBrush}" />
   </Style>
@@ -2261,11 +2326,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </Setter>
   </Style>
 
+  <!--
+    The prototype's seg(false), and the two setters that were wrong are the two that make a group of
+    pills read as a group: <b>no border and the quiet ink.</b>
+
+    It carried ShellBorderBrush and TextPrimaryBrush, so the two options nobody had chosen were drawn
+    with a full outline and full-strength text — three pills that all look chosen, with one of them a
+    little bluer. «Los botones de filtro de Biblioteca no son iguales a los del prototipo. Cuando
+    están seleccionados tienen un estado y cuando no otro», said on 2026-08-25. seg(false) is
+    `border: 1px solid transparent; background: var(fill); color: var(text2)`, and that is what
+    is here now: the thickness stays so choosing one never shifts the row, and only the colour moves.
+
+    The states go on the presenter, because the presenter is what paints — the same measurement the
+    five base states rest on.
+  -->
   <Style Selector="Button.theme-option">
     <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource ShellBorderBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+
+  <Style Selector="Button.theme-option /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource TextSecondaryBrush}" />
   </Style>
 
   <!--
@@ -2281,7 +2366,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="Button.theme-option.selected">
     <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentInkBrush}" />
     <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Button.theme-option.selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentInkBrush}" />
   </Style>
 
   <!--

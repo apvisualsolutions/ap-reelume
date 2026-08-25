@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A menu's selection box is no longer an accent rectangle.** It was two pixels of accent around
+  every chosen row in the application — the settings index, the rail's menus, and a poster inside a
+  rail too, where it reads as a box somebody dropped on a picture. The prototype draws it the other
+  way round: a neutral wash, `rgba(127,145,170,.16)`, with the accent spent on the 3 px bar of the
+  current destination. That is what is there now, with two new tokens (`SelectionFillBrush` and
+  `SelectionStrokeBrush`) and a one-pixel border. The stroke is not transparent and that is the one
+  concession, measured: `ListRowStateTests` asks a chosen row to stand out from its neighbours by
+  3:1, and a 16 % wash reads 1.1:1 — so it carries the neutral 3.88:1 border, which answers the gate
+  without answering it in accent. Selection also stops following the accent chosen in Appearance,
+  because it is no longer accent.
+
+- **The library's filter pills were not the prototype's.** The unchosen one carries
+  `border: 1px solid transparent` over the plain fill with the quiet ink; this carried the control
+  border and the primary ink, so three options were drawn as three chosen ones with one a little
+  bluer. And **the drop-down said nothing when it opened** beyond turning its caret over: it was
+  missing the other half the prototype writes, the subtle accent as fill and the accent as border.
+  `SelectionSurfaceTests` measures both on realised controls, which is a different question from
+  reading them out of the markup.
+
 - **The buttons still did not line up vertically, and the compensation was in the wrong place.** The
   five pixels lived in the button's bottom padding, which moves **everything**: a glyph and the word
   beside it travel together, so the two stayed exactly as far apart as before and all that changed

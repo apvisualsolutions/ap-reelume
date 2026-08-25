@@ -10,6 +10,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los recuadros de selección de los menús ya no son un rectángulo de acento.** Eran dos píxeles del
+  acento alrededor de cada fila elegida de toda la aplicación —el índice de ajustes, los menús del
+  carril, y también una carátula dentro de un carril, donde se lee como una caja que alguien dejó
+  caer sobre una foto—. El prototipo lo dibuja al revés: un lavado neutro, `rgba(127,145,170,.16)`,
+  y el acento gastado en la barra de 3 px del destino actual. Eso es lo que hay ahora, con dos
+  tokens nuevos (`SelectionFillBrush` y `SelectionStrokeBrush`) y el borde a un solo píxel. El trazo
+  no es transparente y ésa es la única cesión, medida: `ListRowStateTests` exige que una fila elegida
+  se distinga de sus vecinas por 3:1, y un lavado al 16 % da 1,1:1 — así que lleva el borde neutro de
+  3,88:1, que responde a la puerta sin responder en acento. La selección deja además de seguir al
+  acento elegido en Apariencia, porque ya no es acento.
+
+- **Las píldoras de filtro de la Biblioteca no eran las del prototipo.** La que no está elegida lleva
+  `border: 1px solid transparent` sobre el relleno llano y la tinta secundaria; ésta llevaba el borde
+  de control y la tinta primaria, así que las tres opciones se dibujaban como tres elegidas con una
+  un poco más azul. Y **el desplegable no decía nada al abrirse** salvo dar la vuelta al galón: le
+  faltaba la otra mitad que el prototipo escribe, el acento sutil de relleno y el acento de borde.
+  `SelectionSurfaceTests` mide las dos cosas sobre controles realizados, que es distinto de leerlas
+  del marcado.
+
 - **Los botones seguían sin alinearse en vertical, y la compensación estaba en el sitio equivocado.**
   Los cinco píxeles vivían en el relleno inferior del botón, que mueve **todo** el contenido: un
   glifo y la palabra a su lado viajan juntos, así que quedaban exactamente igual de separados que

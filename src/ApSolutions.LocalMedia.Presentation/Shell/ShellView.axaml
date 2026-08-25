@@ -142,9 +142,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <!--
                 Two signals for the open destination, and one of them is not colour: the fill, and a
                 3 px bar that is present or absent rather than tinted. Absent is not dimmed.
+
+                The fill is the neutral wash and not the accent's, which is the prototype's own
+                division of labour on this rail: `rgba(127,145,170,.16)` behind the current
+                destination, and the accent spent on the bar. Two accents on one 46 px target is a
+                box of accent with a line of accent inside it.
               -->
               <Border
-                  Background="{DynamicResource AccentSubtleBrush}"
+                  Background="{DynamicResource SelectionFillBrush}"
                   CornerRadius="{DynamicResource CornerRadiusMedium}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Home}}" />
               <Border
@@ -169,9 +174,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <!--
                 Two signals for the open destination, and one of them is not colour: the fill, and a
                 3 px bar that is present or absent rather than tinted. Absent is not dimmed.
+
+                The fill is the neutral wash and not the accent's, which is the prototype's own
+                division of labour on this rail: `rgba(127,145,170,.16)` behind the current
+                destination, and the accent spent on the bar. Two accents on one 46 px target is a
+                box of accent with a line of accent inside it.
               -->
               <Border
-                  Background="{DynamicResource AccentSubtleBrush}"
+                  Background="{DynamicResource SelectionFillBrush}"
                   CornerRadius="{DynamicResource CornerRadiusMedium}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
               <Border
@@ -196,9 +206,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <!--
                 Two signals for the open destination, and one of them is not colour: the fill, and a
                 3 px bar that is present or absent rather than tinted. Absent is not dimmed.
+
+                The fill is the neutral wash and not the accent's, which is the prototype's own
+                division of labour on this rail: `rgba(127,145,170,.16)` behind the current
+                destination, and the accent spent on the bar. Two accents on one 46 px target is a
+                box of accent with a line of accent inside it.
               -->
               <Border
-                  Background="{DynamicResource AccentSubtleBrush}"
+                  Background="{DynamicResource SelectionFillBrush}"
                   CornerRadius="{DynamicResource CornerRadiusMedium}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Review}}" />
               <Border
@@ -243,9 +258,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <!--
                 Two signals for the open destination, and one of them is not colour: the fill, and a
                 3 px bar that is present or absent rather than tinted. Absent is not dimmed.
+
+                The fill is the neutral wash and not the accent's, which is the prototype's own
+                division of labour on this rail: `rgba(127,145,170,.16)` behind the current
+                destination, and the accent spent on the bar. Two accents on one 46 px target is a
+                box of accent with a line of accent inside it.
               -->
               <Border
-                  Background="{DynamicResource AccentSubtleBrush}"
+                  Background="{DynamicResource SelectionFillBrush}"
                   CornerRadius="{DynamicResource CornerRadiusMedium}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Duplicates}}" />
               <Border
@@ -270,9 +290,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <!--
                 Two signals for the open destination, and one of them is not colour: the fill, and a
                 3 px bar that is present or absent rather than tinted. Absent is not dimmed.
+
+                The fill is the neutral wash and not the accent's, which is the prototype's own
+                division of labour on this rail: `rgba(127,145,170,.16)` behind the current
+                destination, and the accent spent on the bar. Two accents on one 46 px target is a
+                box of accent with a line of accent inside it.
               -->
               <Border
-                  Background="{DynamicResource AccentSubtleBrush}"
+                  Background="{DynamicResource SelectionFillBrush}"
                   CornerRadius="{DynamicResource CornerRadiusMedium}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Settings}}" />
               <Border
