@@ -47,4 +47,19 @@ public interface ICatalogRepository
     Task UpsertSeasonAsync(CatalogSeason season, CancellationToken cancellationToken = default);
 
     Task UpsertEpisodeAsync(CatalogEpisode episode, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Says which file is behind an episode.
+    /// </summary>
+    /// <remarks>
+    /// The table has existed since migration 0014 and nothing had ever written a row into it, so
+    /// every episode in the catalogue was an episode with no file: the sequence reader returns it
+    /// marked as not playable, the card draws it greyed, and the next-episode countdown has nothing
+    /// to chain to. It is a port of its own rather than a field on the episode because a file can
+    /// arrive after the episode it backs — a season catalogued from a provider, then the copies.
+    /// </remarks>
+    Task LinkEpisodeMediaAsync(
+        EpisodeId episodeId,
+        MediaFileId mediaFileId,
+        CancellationToken cancellationToken = default);
 }

@@ -138,5 +138,6 @@ public static partial class CompositionRoot
             .AddSingleton<DuplicateGroupingPolicy>()
             .AddTransient<GroupMediaVersions>()
             .AddTransient<GroupScannedVersions>()
+            .AddTransient<GroupScannedEpisodes>()
             .AddTransient<SetPreferredVersion>();
 }

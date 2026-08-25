@@ -52,9 +52,12 @@ public static partial class CompositionRoot
             .AddSingleton<ILibraryRootRepository, LibraryRootRepository>()
             .AddSingleton<IMediaFileRepository, MediaFileRepository>()
             .AddSingleton<CatalogRepository>()
-            // ICatalogRepository was a dead registration (LIB-002/003 follow-up): the application
-            // projects titles through the scan's own writes, and nothing ever resolved the
-            // interface. Removed rather than left silent, the ARQ-A01 rule.
+            // ICatalogRepository was removed as a dead registration once (LIB-002/003 follow-up):
+            // nothing in the application resolved it, so it went rather than being left silent —
+            // the ARQ-A01 rule. It is back on 2026-08-25 with the consumer it was missing:
+            // GroupScannedEpisodes writes a show, its seasons and its episodes through it, which is
+            // how a folder of episodes becomes one card. Registered and fed, this time.
+            .AddSingleton<ICatalogRepository>(provider => provider.GetRequiredService<CatalogRepository>())
             .AddSingleton<ICatalogQueryService>(provider => provider.GetRequiredService<CatalogRepository>())
             .AddSingleton<IPathNormalizer, WindowsPathNormalizer>()
             .AddSingleton<IMediaFileEnumerator, MediaFileEnumerator>()

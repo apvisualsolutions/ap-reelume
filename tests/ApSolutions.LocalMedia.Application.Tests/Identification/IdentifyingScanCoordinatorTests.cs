@@ -37,6 +37,11 @@ public sealed class IdentifyingScanCoordinatorTests
             new MediaNameParser(),
             new DuplicateGroupingPolicy(),
             new GroupMediaVersions(new EmptyGroups()));
+        var series = new GroupScannedEpisodes(
+            roots,
+            new UntouchedMediaFiles(),
+            new UnwrittenCatalog(),
+            new MediaNameParser());
         var reconciliation = new ReconcileScannedFiles(
             new UntouchedMediaFiles(),
             new ReconcileScanResults(new UntouchedMediaFiles(), new FileReconciliationPolicy()),
@@ -47,7 +52,8 @@ public sealed class IdentifyingScanCoordinatorTests
             new FixedScanCoordinator(summary),
             () => reconciliation,
             () => identification,
-            () => grouping);
+            () => grouping,
+            () => series);
 
         var returned = await coordinator.StartAsync(
             new StartScanCommand(rootId, ScanTrigger.Watcher),
@@ -55,9 +61,10 @@ public sealed class IdentifyingScanCoordinatorTests
 
         Assert.Same(summary, returned);
 
-        // Identification and grouping each asked the repository for this scan's root, which is the
-        // first thing either does with a summary: both hand-offs happened.
-        Assert.Equal([rootId, rootId], roots.Asked);
+        // Identification, version grouping and series grouping each asked the repository for this
+        // scan's root, which is the first thing all three do with a summary: every hand-off
+        // happened. Three and not two since 2026-08-25, when a folder of episodes became a series.
+        Assert.Equal([rootId, rootId, rootId], roots.Asked);
     }
 
     private sealed class UnreadIdentity : IFileIdentityProvider
@@ -226,5 +233,28 @@ public sealed class IdentifyingScanCoordinatorTests
         public Task ClearScanCheckpointAsync(
             LibraryRootId rootId,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
+    }
+
+    /// <summary>A catalogue that accepts everything and keeps none of it.</summary>
+    /// <remarks>
+    /// This scene is about the hand-offs and not about what any of them writes: the summary it feeds
+    /// them holds no results at all, so nothing here is ever called. What matters is that the third
+    /// use case was constructed and reached.
+    /// </remarks>
+    private sealed class UnwrittenCatalog : ICatalogRepository
+    {
+        public Task UpsertTitleAsync(CatalogTitle title, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task UpsertSeasonAsync(CatalogSeason season, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task UpsertEpisodeAsync(CatalogEpisode episode, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task LinkEpisodeMediaAsync(
+            EpisodeId episodeId,
+            MediaFileId mediaFileId,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }

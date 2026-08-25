@@ -42,7 +42,8 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<ScanCoordinator>(),
                 () => provider.GetRequiredService<ReconcileScannedFiles>(),
                 () => provider.GetRequiredService<IdentifyScannedFiles>(),
-                () => provider.GetRequiredService<GroupScannedVersions>()))
+                () => provider.GetRequiredService<GroupScannedVersions>(),
+                () => provider.GetRequiredService<GroupScannedEpisodes>()))
             .AddSingleton<RootWatchCoordinator>()
             .AddSingleton<RootWatchBackground>()
             .AddSingleton<FileReconciliationPolicy>()
