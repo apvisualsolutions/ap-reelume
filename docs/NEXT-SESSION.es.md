@@ -54,6 +54,33 @@ Ocho puntos: dos mejoras y seis defectos. Los ocho están cerrados, cada uno con
 
 8. **Las series.** Ver abajo: es lo más grande de la sesión.
 
+### La puerta de cobertura, con los números de CI delante
+
+La nota anterior decía que quedaban **dos** suelos abiertos. Eran **cuatro**, y el artefacto
+`coverage-debt` de CI lo dice desde antes de esta sesión. Con las tres tandas de arriba:
+
+- `ShellViewModel` **llega al listón** y sale de la lista: la rama que faltaba era la del panel de
+  subtítulos, que nada podía tomar.
+- `HardwareAccelerationFallback` sale también: su `Reset` no lo llamaba nadie —ni `src/` ni ninguna
+  prueba— y con él fuera el archivo queda al 100 %. **Ojo:** esa salida es aritmética y no una
+  medición de CI (13 de 17 líneas eran el 76 % que medía, y las cuatro que faltaban eran las de
+  `Reset`). Si CI la desmiente, la línea vuelve a la lista.
+- `CatalogRepository` (98/89), `LibraryRootRepository` (100/90) y `RecommendationsViewModel` (96/90)
+  **suben**, medidos.
+- `LibVlcMediaPlayerEngine` (91/79) y `CompositionRoot.cs` (90/65) **bajan un punto**, y eso no es
+  aflojar: la regla dice que un suelo por encima de lo medido falla igual que uno por debajo, y esos
+  dos llevaban un número de una ejecución con más suerte. Las ramas que a CI le faltan en el motor
+  son la enumeración de dispositivos de audio de LibVLC y el evento `EncounteredError`: un runner
+  hospedado no tiene hardware con el que levantarlas.
+- El trinquete baja de **214 a 212**.
+
+Y una que **no está en la lista y debería**: `CompositionRoot.Library.cs` cayó de estar en el listón
+a 97/50 con los enganches que añadió esta tanda. El paseo ya presiona sus cinco arcos —sin shell, con
+una tarjeta de un título que el catálogo ya no tiene, y con una tarjeta cuyo progreso desapareció—,
+así que la próxima medición de CI será más alta que 97/50 y es esa la que hay que meter. Es la misma
+grieta por la que ya se cuelan otros cuatro archivos —`PlayerView.axaml.cs` a 65/41 entre ellos—: la
+lista sólo vigila lo que ya está en ella.
+
 ### Las series, que eran el defecto de la casa en su forma más grande
 
 `titles`, `seasons`, `episodes` y `episode_media` existen desde la migración **0004**, la ficha de

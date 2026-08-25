@@ -55,6 +55,33 @@ Eight points: two improvements and six defects. All eight are closed, each with 
 
 8. **Series.** See below: it is the largest thing in the session.
 
+### The coverage gate, with CI's numbers in front of it
+
+The previous note said **two** floors were open. There were **four**, and CI's `coverage-debt`
+artefact said so from before this session. With the three batches above:
+
+- `ShellViewModel` **reaches the bar** and leaves the list: the missing branch was the subtitle
+  panel's, which nothing could take.
+- `HardwareAccelerationFallback` leaves too: its `Reset` had no caller — not in `src/`, not in any
+  test — and with it gone the file is at 100 %. **Careful:** that removal is arithmetic and not a CI
+  measurement (13 of 17 lines were the 76 % it measured, and the four missing ones were `Reset`'s).
+  If CI says otherwise, the line goes back on the list.
+- `CatalogRepository` (98/89), `LibraryRootRepository` (100/90) and `RecommendationsViewModel`
+  (96/90) **go up**, measured.
+- `LibVlcMediaPlayerEngine` (91/79) and `CompositionRoot.cs` (90/65) **come down by a point**, and
+  that is not a relaxation: the rule says a floor above what was measured fails exactly like one
+  below it, and those two carried a number from a luckier run. The branches CI cannot take in the
+  engine are LibVLC's audio-device enumeration and the `EncounteredError` event: a hosted runner has
+  no hardware to raise them with.
+- The ratchet goes from **214 to 212**.
+
+And one that **is not on the list and should be**: `CompositionRoot.Library.cs` fell from the bar to
+97/50 with the hooks this batch added. The walk already presses its five arms — with no shell, with a
+card for a title the catalogue no longer holds, and with a card whose progress is gone — so CI's next
+measurement will be higher than 97/50 and that is the one to write in. It is the same crack four
+other files already fall through — `PlayerView.axaml.cs` at 65/41 among them: the list only watches
+what is already on it.
+
 ### Series, which was this house's defect in its largest form
 
 `titles`, `seasons`, `episodes` and `episode_media` have existed since migration **0004**, the series
