@@ -1,4 +1,52 @@
-# Where to resume
+# Where to pick up
+
+## State at the close of 2026-08-25 (afternoon) — the prototype, read at the right size
+
+**The first thing fixed was not in the code.** A capture was called "dark" three times, and three
+times the file was right: a 1500 × 1000 PNG *reads* dark, and the same image at 750 × 500 reads as it
+is. Measured over the library in light theme — `#FBFCFE` on the canvas, `#E9EEF4` on the rail, 100 %
+opaque — and confirmed by halving it. Colour is decided by measuring, or by looking at half size;
+never at full size. It is in
+[the evidence](evidence/stable/audit-prototype-fidelity-round-three.md), and an alarm it raised —
+"the covers are lighter at the bottom" — turned out to be a badly chosen measuring point.
+
+**Nor was the second:** `docs/assets/review.png`, in a public repository, printed the profile path of
+whoever took it. The tray writes the folder under every file. All five are retaken with the library
+in a neutral folder, without an alpha channel, against the application as it stands.
+
+What changed in the application, by surface:
+
+- **Duplicates.** The chosen copy is marked on its whole row — radio, accent border and wash — the
+  group's heading stops being blue, and the size column reaches the bytes: it rounded to "0 MB" on
+  the very screen where somebody decides which copy to keep.
+- **Links** move from the accent to its ink, which is what the prototype uses: 9.03:1 instead of
+  5.62:1 in light and 11.36:1 instead of 8.29:1 in dark, with the new pair measured in
+  `ContrastTokenTests`.
+- **Series card.** Every episode still was coloured from the hash of its own name; it is the show's
+  hue walked 7° per episode now, which is `art(show + episode × 7)`. And the next-episode panel
+  limits its column rather than its border: with a fixed width, at 200 % text scaling, "Continue"
+  fell outside the window.
+- **Review tray.** It says **which title it is talking about**. The provider already answered with
+  the name and the year and the whole chain threw them away; it carries them to the card now
+  (migration 0019, one column).
+- **Player.** A failure no longer erases itself: LibVLC reported the stop of the media it had just
+  torn down, and that state replaced the failure, so the recovery vanished from the screen while
+  somebody was reading it. It appeared as a flake before it appeared as a defect.
+- **Home and library.** The kind chip drops its word in the rails and keeps it in the grid, "Add
+  media" gets its plus back, and the player's header gets its second line back for a film.
+
+**What is still different, and why:** besides the six from the previous round, the unavailable badge
+is amber in all seven places it is mounted — the prototype has two shapes and the gate that forbids a
+second predates this — the transport carries a stop button the prototype does not have, the metadata
+editor lives inside the card rather than on a page of its own, and Settings does not offer the
+prototype's nine appearance preferences: the palette is canonical and its pairs are measured.
+
+**What to look at first next session:**
+
+1. **`eng/coverage-debt.txt` is refreshed from the artifact of the last green run.** The ratchet
+   stays at 215 and only goes down.
+2. **The whole accessibility suite after touching any view.** `TextScalingTests` caught the fixed
+   width of the next-episode panel in CI, and it had not been run here after the change.
 
 ## State at the close of 2026-08-25 — the application looks like the prototype, view by view
 

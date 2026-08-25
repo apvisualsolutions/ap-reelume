@@ -1,5 +1,53 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-25 (tarde) — el prototipo, mirado a la resolución correcta
+
+**Lo primero que se arregló no estaba en el código.** Tres veces se dijo que una captura «salía
+oscura», y las tres veces el archivo estaba bien: un PNG de 1500 × 1000 **se lee** oscuro, y la misma
+imagen a 750 × 500 se lee como es. Medido sobre la biblioteca en tema claro —`#FBFCFE` en el lienzo,
+`#E9EEF4` en el raíl, 100 % opaco— y confirmado reduciéndola. Desde ahora el color se decide midiendo
+o mirando la mitad; nunca a tamaño completo. Está en
+[la evidencia](evidence/stable/audit-prototype-fidelity-round-three.md), y una alarma que levantó
+—«las portadas están más claras abajo»— resultó ser un punto de medición mal elegido.
+
+**Y lo segundo tampoco:** `docs/assets/review.png`, en un repositorio público, imprimía la ruta del
+perfil de quien tomó la captura. La bandeja escribe la carpeta bajo cada archivo. Las cinco están
+rehechas con la biblioteca en una carpeta neutra, sin canal alfa, y contra la aplicación de hoy.
+
+Lo que cambió en la aplicación, por superficie:
+
+- **Duplicados.** La copia elegida se marca en toda su fila —radio, borde de acento y lavado—, el
+  título del grupo deja de ir en azul, y la columna de tamaño baja hasta los bytes: redondeaba a
+  «0 MB» justo donde alguien decide qué copia conserva.
+- **Los enlaces** pasan del acento a su tinta, que es lo que usa el prototipo: de 5,62:1 a 9,03:1 en
+  claro y de 8,29:1 a 11,36:1 en oscuro, con el par nuevo medido en `ContrastTokenTests`.
+- **Ficha de serie.** Cada miniatura de episodio se coloreaba con el hash de su propio nombre;
+  ahora es el tono de la serie caminado 7° por episodio, que es `art(serie + episodio × 7)`. Y el
+  panel de «Siguiente episodio» limita su columna en vez de su borde: con ancho fijo, al 200 % de
+  escala de texto, «Continuar» caía fuera de la ventana.
+- **Bandeja de revisión.** Dice **de qué título habla**. El proveedor ya devolvía el nombre y el año
+  y la cadena entera los tiraba; ahora los lleva hasta la tarjeta (migración 0019, una columna).
+- **Reproductor.** Un fallo ya no se borra solo: LibVLC informaba del *stop* del medio que acababa de
+  desmontar y ese estado sustituía al fallo, así que la recuperación desaparecía de la pantalla
+  mientras alguien la leía. Apareció como intermitencia antes que como defecto.
+- **Inicio y biblioteca.** La ficha de tipo pierde su palabra en los carruseles y la conserva en la
+  cuadrícula, «Añadir medios» recupera su signo más, y la cabecera del reproductor recupera su
+  segunda línea para una película.
+
+**Lo que sigue distinto, y por qué:** además de las seis de la vuelta anterior, la insignia de «no
+disponible» es ámbar en los siete sitios donde se monta —el prototipo tiene dos formas y la puerta
+que impide la segunda es anterior—, el transporte lleva un botón de detener que el prototipo no
+tiene, el editor de metadatos vive dentro de la ficha en vez de en una página propia, y Ajustes no
+ofrece las nueve preferencias de apariencia del prototipo: la paleta es canónica y sus pares están
+medidos.
+
+**Lo que hay que mirar primero en la próxima sesión:**
+
+1. **`eng/coverage-debt.txt` se refresca desde el artefacto del último run verde.** El trinquete
+   sigue en 215 y sólo baja.
+2. **La suite de accesibilidad entera después de tocar cualquier vista.** `TextScalingTests` cazó en
+   CI el ancho fijo del panel de siguiente episodio, y aquí no se había ejecutado tras el cambio.
+
 ## Estado al cierre del 2026-08-25 — la aplicación se parece al prototipo, vista a vista
 
 **La comparación se hizo con las dieciséis capturas verificadas, no de memoria**
