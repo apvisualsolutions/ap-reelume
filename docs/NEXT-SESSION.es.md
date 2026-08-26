@@ -119,6 +119,13 @@ Fluent en ninguna vista.
 
 ### Las trampas que costaron tiempo aquí
 
+- **Un suelo que sube en una sola ejecución puede ser un baile, no una mejora.**
+  `MarkerEditorViewModel` midió 79, 79, 79, **81**, 79 en cinco ejecuciones seguidas de CI. Lo subí a
+  81 en la cuarta y la quinta falló por ello. La puerta dice «now reaches X; raise its floor» en
+  cuanto **una** ejecución mide más, y un suelo lo tienen que cumplir **todas**: el artefacto de un
+  run es una medición, no una tendencia. Antes de subir un suelo hay que mirar los artefactos de
+  varios runs — se descargan con `gh run download <id> -n coverage-debt`.
+
 - **Una escena del paseo que gasta el progreso tiene que reponerlo, no confiar en la máquina.** El
   héroe y la tarjeta del carril se dibujan sólo cuando hay algo que continuar; la muestra dura noventa
   segundos y «Continuar» la abre en el treinta, así que un runner ocupado deja que el resto se

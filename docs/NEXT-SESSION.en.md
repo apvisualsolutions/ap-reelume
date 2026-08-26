@@ -118,6 +118,13 @@ glyph is left in any view.
 
 ### The traps that cost time here
 
+- **A floor that goes up in a single run can be a dance, not an improvement.**
+  `MarkerEditorViewModel` measured 79, 79, 79, **81**, 79 over five consecutive CI runs. I raised it
+  to 81 on the fourth and the fifth failed on it. The gate says "now reaches X; raise its floor" as
+  soon as **one** run measures higher, and a floor has to be met by **every** run: one run's artefact
+  is a measurement, not a trend. Before raising a floor, look at several runs' artefacts — they come
+  down with `gh run download <id> -n coverage-debt`.
+
 - **A walk scene that spends the progress has to put it back rather than trust the machine.** The
   hero and the rail card are drawn only while there is something to continue; the sample is ninety
   seconds long and Continue opens it at thirty, so a busy runner lets the rest play out, the tracker
