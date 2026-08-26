@@ -6,7 +6,17 @@ Six commits on the branch. **Everything green locally**: Domain 519, Application
 30, Documentation 91, Ui 917, Accessibility 146, Integration 470, and the walk at 202 pressed with
 the ratchet still at 20.
 
-**What to look at first:** the coverage gate in CI. The two floors the previous session left open —
+**CI is GREEN on `7c1decb`**, for the first time in several sessions. `main` is at `eb91cd2` and the
+fast-forward is clean, but it **carries 64 commits**, not this batch's twelve: the branch has not
+advanced since the coverage gate went red. That is why it was not advanced here — that is no longer
+the cycle's routine step 4, it is publishing several sessions at once, and it is the owner's call.
+The command, when they want it:
+
+```
+git checkout main && git merge --ff-only codex/ap-reelume-mvp-x64 && git push origin main
+```
+
+**What had to be looked at first:** the coverage gate in CI. The two floors the previous session left open —
 `ShellViewModel` and `CompositionRoot.cs` — are still the only thing between this branch and a
 fast-forward. `ShellViewModel` is **closed in this session**: the missing branch was the subtitle
 panel term inside `HasPlayerPanels`, which **nothing could take** — it is `Player?.Tracks is not null`
