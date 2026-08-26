@@ -81,12 +81,16 @@ local run of one of them.** `MovieDetailsViewModel` read 82.54 % measuring `UiTe
 **direction** and for not spending a CI round blind; the number written into the file is CI's.
 
 
-And one that **is not on the list and should be**: `CompositionRoot.Library.cs` fell from the bar to
-97/50 with the hooks this batch added. The walk already presses its five arms — with no shell, with a
-card for a title the catalogue no longer holds, and with a card whose progress is gone — so CI's next
-measurement will be higher than 97/50 and that is the one to write in. It is the same crack four
-other files already fall through — `PlayerView.axaml.cs` at 65/41 among them: the list only watches
-what is already on it.
+`CompositionRoot.Library.cs` fell from the bar to 97/50 with the hooks this batch added, and **came
+back to the bar** as soon as the walk pressed its five arms: with no shell, with a card for a title
+the catalogue no longer holds, and with a card whose progress is gone. It does not need to go on the
+list.
+
+What is still open is the crack it was falling through unnoticed: **the list only watches what is
+already on it**, so a file that was at the bar and degrades is seen by nobody. CI measures four like
+that right now — `PlayerView.axaml.cs` at 65/41, `PlayerViewModel.cs` at 98/91,
+`PlaybackPreference.cs` at 98/92 and `DisabledOutline.cs` at 100/87 — and they predate this session.
+Adding them raises the ratchet, which only comes down; closing them means taking them to 96/96.
 
 ### Series, which was this house's defect in its largest form
 

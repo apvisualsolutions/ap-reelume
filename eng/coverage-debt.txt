@@ -166,7 +166,7 @@ src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml   
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileViewModel.cs                          97  82
 src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorView.axaml                        100  50
-src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorViewModel.cs                       95  79
+src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorViewModel.cs                       95  81
 src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerChromeView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerWindow.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/NextEpisodeOverlay.axaml                      100  50

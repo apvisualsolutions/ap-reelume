@@ -81,12 +81,16 @@ local sirve para saber la **dirección** y para no gastar una vuelta de CI a cie
 escribe en el archivo es el de CI.
 
 
-Y una que **no está en la lista y debería**: `CompositionRoot.Library.cs` cayó de estar en el listón
-a 97/50 con los enganches que añadió esta tanda. El paseo ya presiona sus cinco arcos —sin shell, con
-una tarjeta de un título que el catálogo ya no tiene, y con una tarjeta cuyo progreso desapareció—,
-así que la próxima medición de CI será más alta que 97/50 y es esa la que hay que meter. Es la misma
-grieta por la que ya se cuelan otros cuatro archivos —`PlayerView.axaml.cs` a 65/41 entre ellos—: la
-lista sólo vigila lo que ya está en ella.
+`CompositionRoot.Library.cs` cayó de estar en el listón a 97/50 con los enganches que añadió esta
+tanda, y **volvió al listón** en cuanto el paseo presionó sus cinco arcos: sin shell, con una tarjeta
+de un título que el catálogo ya no tiene, y con una tarjeta cuyo progreso desapareció. No hace falta
+meterlo en la lista.
+
+Lo que sigue abierto es la grieta por la que ese archivo estuvo cayendo sin que nadie se enterara:
+**la lista sólo vigila lo que ya está en ella**, así que un archivo que estaba en el listón y se
+degrada no lo ve nadie. CI mide cuatro así ahora mismo —`PlayerView.axaml.cs` a 65/41,
+`PlayerViewModel.cs` a 98/91, `PlaybackPreference.cs` a 98/92 y `DisabledOutline.cs` a 100/87—, y son
+de antes de esta sesión. Meterlos sube el trinquete, que sólo baja; cerrarlos es subirlos al 96/96.
 
 ### Las series, que eran el defecto de la casa en su forma más grande
 
