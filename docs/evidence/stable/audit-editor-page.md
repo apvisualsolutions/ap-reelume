@@ -86,10 +86,29 @@ silencio. **No hay puerta que lo cace**, y eso queda anotado. / Two style classe
 class that does not exist does not fail — it leaves the control with its default styling, silently.
 **No gate catches this**, and that is written down.
 
+## Un tercer defecto propio, encontrado releyendo el diff / A third defect of my own
+
+`OnLibraryChanged` refresca `CanExecuteChanged` de los tres comandos de la ficha cuando cambia la
+selección, y **los tres de la página nueva descansan exactamente sobre la misma
+`SelectedTitleId`** — y quedaron fuera. Una píldora que abre una herramienta «para el título abierto»
+no puede ser la última en enterarse de que hay otro abierto. / The page's three commands rest on the
+same selection as the card's three, and were left out of the handler that refreshes them.
+
+**Y la prueba que lo ata se escribió dos veces.** La primera afirmaba sobre `CanExecute(null)`, que
+**evalúa su predicado en cada llamada** y por tanto habría dicho `true` con arreglo y sin él: una
+prueba que no prueba. Lo que un botón en pantalla escucha es `CanExecuteChanged`, así que es sobre el
+**evento** sobre lo que se afirma. Comprobado quitando el arreglo: falla con «the metadata pill was
+never told the selection changed». / The first version asserted on `CanExecute`, which evaluates its
+predicate on every call and would have read true either way. Verified by removing the fix.
+
+Y se afirma **al menos una vez por comando** y no un total: abrir una ficha mueve `SelectedItem` y
+`Surface`, así que el manejador corre dos veces, y un número exacto estaría afirmando cuántas
+propiedades cambia la biblioteca. / At least once each rather than an exact total.
+
 ## Verde / Green
 
 ```
-UiTests            1.010 superadas, 0 con error (tres ejecuciones seguidas)
+UiTests            1.015 superadas, 0 con error (tres ejecuciones seguidas)
 AccessibilityTests   146 superadas, 0 con error
 IntegrationTests     485 superadas, 0 con error, 1 omitida
 check-walk-coverage  206 pulsados, 20 pendientes, trinquete quieto
