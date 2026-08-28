@@ -55,7 +55,8 @@ public sealed class ApplyIdentification(
     IMetadataProvider provider,
     MetadataMergePolicy mergePolicy,
     MetadataLanguage language,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    CacheTitleArtwork artwork)
 {
     public async Task<ApplyIdentificationResult> ExecuteAsync(
         ApplyIdentificationCommand command,
@@ -93,6 +94,15 @@ public sealed class ApplyIdentification(
                 timeProvider.GetUtcNow()),
             expectedRevision,
             cancellationToken).ConfigureAwait(false);
+
+        // The poster comes down here and nowhere else, which is what keeps the film card from ever
+        // opening a connection: this is the one moment somebody has already consented to talk to the
+        // provider, and the card only ever reads the disk afterwards. The answer is thrown away on
+        // purpose - a title identified with no poster fetched is a title identified, and the path is
+        // rebuilt from the same address when a surface asks for it.
+        _ = await artwork
+            .ExecuteAsync(titleId, merged.PosterPath, merged.Title, cancellationToken)
+            .ConfigureAwait(false);
 
         return new ApplyIdentificationResult(
             write.Outcome == MetadataWriteOutcome.Applied

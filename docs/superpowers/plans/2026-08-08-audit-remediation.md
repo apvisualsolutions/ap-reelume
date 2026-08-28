@@ -134,6 +134,14 @@ El mayor salto funcional restante. Empezar por la puerta y cablear por orden de 
         cuando se decida cerrarlo. Con esta cara `PendingWiring` queda **vacío**. De paso arrancó
         ARQ-006 (ver WP-6). Evidencia en
         [audit-wp2-assembly.md](../../evidence/stable/audit-wp2-assembly.md).
+
+        **El hueco se cerró el 2026-08-28, por decisión del propietario, en el orden que esta misma
+        entrada había escrito**: la descarga monta en `ApplyIdentification` —el único momento en que
+        alguien ya ha consentido hablar con el proveedor— dentro del propósito de red declarado y
+        del techo de 10 MB que ya tenía, y la superficie que lo muestra es el cabecero de la ficha,
+        con el arte generado debajo. El registro volvió al contenedor y la aserción que afirmaba su
+        ausencia dice ahora lo contrario. Evidencia en
+        [audit-poster-on-the-card.md](../../evidence/stable/audit-poster-on-the-card.md).
   - [x] **PLY-A01** — `ApplyPlaybackPreferences` sin invocar. **Hecho 2026-08-09**: `OpenPlayerAsync`
         aplica las preferencias resueltas (archivo sobre serie sobre global, con repliegue por
         idioma) en cuanto el medio abre, y el selector de pistas recibe las pistas efectivamente

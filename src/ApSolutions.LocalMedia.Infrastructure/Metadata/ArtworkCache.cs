@@ -3,6 +3,7 @@
 
 using System.Security.Cryptography;
 using System.Text;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Privacy;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Infrastructure.Privacy;
@@ -21,7 +22,7 @@ public sealed record ArtworkReference(
     string AlternativeText,
     bool IsExportable);
 
-public sealed class ArtworkCache
+public sealed class ArtworkCache : IArtworkStore
 {
     /// <summary>
     /// Ten megabytes is the ceiling on one poster (SEC-005): a legitimate TMDB image is a fraction
@@ -136,6 +137,52 @@ public sealed class ArtworkCache
 
                 buffered.Write(buffer, 0, read);
             }
+        }
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// The name of a cached file is the hash of the address plus whatever extension the media type
+    /// implied, so the extension cannot be worked out from the address alone — which is why this
+    /// looks the directory up rather than composing a path and asking whether it exists.
+    /// </remarks>
+    public string? Find(TitleId titleId, Uri source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        var directory = Path.Combine(_remoteRoot, titleId.Value.ToString("N"));
+        return Directory.Exists(directory)
+            ? Directory.EnumerateFiles(directory, $"{Hash(source.AbsoluteUri)}.*")
+                .Order(StringComparer.Ordinal)
+                .FirstOrDefault()
+            : null;
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// The refusals <see cref="CacheRemoteAsync"/> makes are all of them worth having and none of
+    /// them worth stopping an identification for, so they are turned into "no artwork" here: an
+    /// undeclared host, a body over the ceiling, a provider that answered with an error. What the
+    /// caller wanted was a picture, and there is none.
+    /// </remarks>
+    public async Task<string?> FetchAsync(
+        TitleId titleId,
+        Uri source,
+        string alternativeText,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var reference = await CacheRemoteAsync(
+                titleId,
+                source,
+                alternativeText,
+                previous: null,
+                cancellationToken).ConfigureAwait(false);
+            return reference.Path;
+        }
+        catch (HttpRequestException)
+        {
+            return null;
         }
     }
 

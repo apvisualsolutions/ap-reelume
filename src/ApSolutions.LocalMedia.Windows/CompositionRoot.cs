@@ -666,11 +666,26 @@ public static partial class CompositionRoot
                     trailerPath: FindTrailer(filmPath),
                     trailerKey: trailerKey,
                     file: file,
-                    renameWouldChangeTheName: movieRename);
+                    renameWouldChangeTheName: movieRename,
+                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath));
             }
         };
         return library;
     }
+
+    /// <summary>
+    /// The poster this title already has on the disk, or nothing.
+    /// </summary>
+    /// <remarks>
+    /// Opening a card must not open a connection, so this asks the store where the file is and never
+    /// asks it to fetch one. What fetches is <c>ApplyIdentification</c>, at the moment somebody has
+    /// consented to talk to the provider — which means a library identified before 2026-08-28 gets
+    /// its posters at its next identification or refresh, the same way a scanned title got its name.
+    /// </remarks>
+    private static string? FindCachedPoster(IServiceProvider provider, TitleId titleId, string? posterPath) =>
+        PosterAddressPolicy.TryBuildPosterAddress(posterPath) is { } address
+            ? provider.GetRequiredService<IArtworkStore>().Find(titleId, new Uri(address, UriKind.Absolute))
+            : null;
 
     /// <summary>
     /// Everything the shell is handed. The long-lived surfaces arrive built; the ones that describe
@@ -1494,6 +1509,17 @@ public static partial class CompositionRoot
     private static HttpClient CreateProviderClient() => new()
     {
         BaseAddress = new Uri("https://api.themoviedb.org/"),
+        Timeout = TimeSpan.FromSeconds(20),
+    };
+
+    /// <summary>
+    /// The client artwork comes down over. Its own, and not the metadata provider's, because the two
+    /// reach different declared hosts and a base address that names one of them must not be able to
+    /// carry a request to the other.
+    /// </summary>
+    private static HttpClient CreateArtworkClient() => new()
+    {
+        BaseAddress = new Uri($"https://{PosterAddressPolicy.Host}/"),
         Timeout = TimeSpan.FromSeconds(20),
     };
 

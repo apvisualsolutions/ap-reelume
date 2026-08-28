@@ -8,6 +8,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Added
+
+- **The film card's header draws the real poster, with the generated art beneath it.** `PosterPath`
+  was produced, merged and persisted from the beginning and **no surface read it**: a value with no
+  reader, which is this repository's characteristic defect seen from the far end. It closes
+  **ART-A01** (2026-08-09), which had retired `ArtworkCache`'s registration rather than leave it
+  silent, and it closes it in the order that same entry wrote down.
+
+  **A card never opens a connection.** The port has two members and they are asymmetric on purpose:
+  finding only ever looks at the disk, and everything that reaches the network is behind fetching,
+  which is called once and from the identification — the one moment somebody has already consented to
+  talk to the provider. Measured: finding before anything is fetched answers nothing at **0
+  requests**, after it answers the file at **1**, and a different address for the same title still
+  answers nothing at **1**.
+
+  **A TMDB path is untrusted input**, so `PosterAddressPolicy` checks **before** it composes, for the
+  reason the trailer's policy does: composing first leaves a malformed address in existence and from
+  then on every reader has to remember to distrust it. It refuses a second slash — which would climb
+  out of the size segment — a `..`, a whole address of somebody else's, a scheme, a query, a fragment
+  and percent encoding.
+
+  One size and not two — `w780`, and the cession is written down — one download, and **one decode**
+  for both surfaces. And an unidentified library does not change: the generated art is what it
+  already showed, it stays underneath, and the initials leave only when there is a picture to answer
+  for them.
+
 ### Changed
 
 - **The mini player is a real floating window: no frame, dragged by the picture, kept in shape, and

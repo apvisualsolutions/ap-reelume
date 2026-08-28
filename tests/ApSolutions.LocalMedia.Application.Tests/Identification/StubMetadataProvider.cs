@@ -126,8 +126,33 @@ internal static class TestIdentification
         ICatalogMetadataRepository repository,
         IMetadataProvider provider,
         TimeProvider? timeProvider = null) =>
-        new(repository, provider, new MetadataMergePolicy(), Language, timeProvider ?? TimeProvider.System);
+        new(
+            repository,
+            provider,
+            new MetadataMergePolicy(),
+            Language,
+            timeProvider ?? TimeProvider.System,
+            new CacheTitleArtwork(new NoArtwork()));
 
     public static ApplyIdentification Silent() =>
         Apply(new MemoryCatalogMetadataRepository(), new StubMetadataProvider());
+
+    /// <summary>
+    /// A store with no disk and no network behind it.
+    /// </summary>
+    /// <remarks>
+    /// Answering nothing to both members is what an unidentified library and an artifact with no
+    /// provider token both look like from here, so these suites go on measuring what they are about
+    /// — the metadata row — without artwork appearing in any of them.
+    /// </remarks>
+    private sealed class NoArtwork : IArtworkStore
+    {
+        public string? Find(TitleId titleId, Uri source) => null;
+
+        public Task<string?> FetchAsync(
+            TitleId titleId,
+            Uri source,
+            string alternativeText,
+            CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
+    }
 }

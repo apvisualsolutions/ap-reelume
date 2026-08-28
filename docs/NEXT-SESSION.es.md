@@ -46,15 +46,49 @@ manejador enganchado a una sola ventana, y el segundo `Screens.Primary?.Bounds ?
 del primero). **La corrección es el número del artefacto `coverage-debt` de ese mismo run**, nunca uno
 medido aquí. `MiniPlayerWindow.axaml.cs` no está en la lista, su listón es 96/96 y mide 98,73/97,61.
 
-### La cola, con el punto 1 tachado
+### El punto 2, y la decisión de alcance que hizo falta preguntar
+
+**El póster estaba a dos extremos de existir, y lo que faltaba no era código sino una decisión.**
+Medido antes de tocar nada:
+
+- `PosterPath` guarda el `poster_path` de TMDB tal cual —`/wXsQ….jpg`, una ruta **remota**—, no un
+  archivo local.
+- `ArtworkCache` existe **completa y probada**, con su techo de 10 MB (SEC-005), y `image.tmdb.org`
+  lleva declarado en `NetworkPurposeRegistry` desde siempre.
+- Pero estaba **fuera del contenedor** por ART-A01 (2026-08-09), y `CompositionDescriptorTests`
+  **afirmaba su ausencia**. Más la decisión del 2026-08-21 de dejar las portadas fuera de 0.2.0.
+
+Con dos decisiones registradas en contra y una prueba que ataba una de ellas, **la pregunta se hizo**
+y el propietario respondió: revertir ART-A01 y hacerlo entero. Está hecho, en el orden que la propia
+entrada de ART-A01 había escrito.
+
+**Una ficha no abre nunca una conexión.** El puerto es asimétrico a propósito: `Find` sólo mira el
+disco y `FetchAsync` es lo único que sale a la red, llamado una vez desde `ApplyIdentification` —el
+único momento en que alguien ya ha consentido hablar con el proveedor—. Consecuencia que hay que
+saber: **una biblioteca identificada antes de hoy recibe sus pósteres en su siguiente identificación
+o refresco**, igual que un título escaneado recibió su nombre.
+
+`PosterAddressPolicy` comprueba **antes** de componer, como la política del tráiler, y su prueba
+afirma además una propiedad: lo que se construye siempre es `https`, sobre el host declarado, bajo el
+segmento del tamaño, sin consulta ni fragmento.
+
+### Lo que hay que mirar en el CI de esta tanda
+
+Dos archivos **suben por encima de su suelo**, y eso es rojo de la puerta igual que bajar:
+`ArtworkCache.cs` (95/64 declarado, mide 100/100 aquí) y `MovieDetailsViewModel.cs` (100/83, mide
+100/100). Si CI confirma 100/100, `ArtworkCache.cs` **sale de la lista** y el trinquete baja de 212 a
+211. El número sale del artefacto `coverage-debt` del run, nunca de una medición local.
+
+### La cola, con los puntos 1 y 2 tachados
 
 1. ~~El mini como ventana PiP de verdad.~~ **Hecho.** Lo único que queda de su cromo es la
    composición del prototipo —título, tiempo y una barra de progreso de tres píxeles sobre los cinco
    botones—, que es otra pieza y no un remate de ésta.
-2. **El póster de fondo del cabecero de la ficha** (decisión 6). Sin tocar, y sigue midiendo lo
-   mismo: `PosterPath` existe en los metadatos y `MovieDetailsViewModel` no lo lee, así que son dos
-   trabajos —llevarlo hasta la ficha y dibujarlo— y el arte generado hace falta detrás de todos modos,
-   porque una biblioteca sin identificar no tiene ningún póster.
+2. ~~El póster de fondo del cabecero de la ficha.~~ **Hecho para la película.** Queda **la ficha de
+   serie**, que en el prototipo dibuja su póster a 136×204 y aquí todavía no; es la misma cadena y una
+   vista más. Y las portadas de la cuadrícula y de las tres filas de Inicio **siguen fuera**, con la
+   razón medida del 2026-08-21 intacta: arrastran la cuadrícula, que cuesta 7× el tiempo y 455× los
+   controles vivos por perder la virtualización.
 3. **El editor de metadatos como vista propia.**
 4. **«Secciones cortadas por el ancho»**, con el eje del ancho ya descartado y medido — las cuatro
    hipótesis vivas siguen abajo, en la sección de la cuarta sesión.

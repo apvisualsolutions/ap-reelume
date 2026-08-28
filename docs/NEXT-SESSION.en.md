@@ -45,15 +45,50 @@ attached to exactly one window, and the second `Screens.Primary?.Bounds ?? …` 
 first). **The fix is the number from that run's `coverage-debt` artefact**, never one measured here.
 `MiniPlayerWindow.axaml.cs` is not in the list, its bar is 96/96, and it measures 98.73/97.61.
 
-### The queue, with point 1 struck out
+### Point 2, and the scope decision that had to be asked for
+
+**The poster was two ends away from existing, and what was missing was not code but a decision.**
+Measured before touching anything:
+
+- `PosterPath` holds TMDB's `poster_path` exactly as it comes — `/wXsQ….jpg`, a **remote** path — not
+  a local file.
+- `ArtworkCache` exists **complete and tested**, with its 10 MB ceiling (SEC-005), and
+  `image.tmdb.org` has been declared in `NetworkPurposeRegistry` all along.
+- But it was **out of the container** by ART-A01 (2026-08-09), and `CompositionDescriptorTests`
+  **asserted its absence**. Plus the 2026-08-21 decision leaving covers out of 0.2.0.
+
+With two recorded decisions against it and a test tying one of them down, **the question was asked**
+and the owner answered: reverse ART-A01 and do the whole thing. It is done, in the order ART-A01's own
+entry had written.
+
+**A card never opens a connection.** The port is asymmetric on purpose: `Find` only looks at the disk
+and `FetchAsync` is the only thing that reaches the network, called once from `ApplyIdentification` —
+the one moment somebody has already consented to talk to the provider. The consequence worth knowing:
+**a library identified before today gets its posters at its next identification or refresh**, the same
+way a scanned title got its name.
+
+`PosterAddressPolicy` checks **before** it composes, as the trailer's policy does, and its test also
+asserts a property: whatever is built is always `https`, on the declared host, under the size segment,
+with no query and no fragment.
+
+### What to watch in this batch's CI
+
+Two files **rise above their floors**, and that is a gate red exactly as falling is:
+`ArtworkCache.cs` (declared 95/64, measures 100/100 here) and `MovieDetailsViewModel.cs` (100/83,
+measures 100/100). If CI confirms 100/100, `ArtworkCache.cs` **leaves the list** and the ratchet drops
+from 212 to 211. The number comes from that run's `coverage-debt` artefact, never from a local
+reading.
+
+### The queue, with points 1 and 2 struck out
 
 1. ~~The mini as a real PiP window.~~ **Done.** All that is left of its chrome is the prototype's
    composition — the title, the time, and a three-pixel progress bar above the five buttons — which is
    another piece and not a finishing touch on this one.
-2. **The poster behind the film card's header** (decision 6). Untouched, and it still measures the
-   same: `PosterPath` exists in the metadata and `MovieDetailsViewModel` does not read it, so it is
-   two jobs — carrying it to the card and drawing it — and the generated art is needed behind it
-   either way, because an unidentified library has no poster at all.
+2. ~~The poster behind the film card's header.~~ **Done for the film.** What is left is **the show
+   card**, which the prototype draws at 136×204 and this does not yet; it is the same chain and one
+   more view. And the library grid's covers and Home's three rows **are still out**, with the measured
+   reason of 2026-08-21 intact: they drag the grid along, which costs 7× the time and 455× the live
+   controls for losing virtualisation.
 3. **The metadata editor as a surface of its own.**
 4. **"Sections cut off by the width"**, with the width axis already ruled out and measured — the four
    live hypotheses are still below, in the fourth session's section.

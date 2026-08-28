@@ -8,6 +8,30 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Añadido
+
+- **El cabecero de la ficha dibuja el póster de verdad, con el arte generado debajo.** `PosterPath`
+  se producía, se fusionaba y se persistía desde el principio, y **ninguna vista lo leía**: un valor
+  sin lector, que es el defecto característico de este repositorio visto desde el otro extremo. Cierra
+  **ART-A01** (2026-08-09), que había retirado el registro de `ArtworkCache` en vez de dejarlo mudo, y
+  lo cierra en el orden que aquella misma entrada dejó escrito.
+
+  **Una ficha no abre nunca una conexión.** El puerto tiene dos miembros y son asimétricos a
+  propósito: buscar sólo mira el disco, y todo lo que sale a la red está detrás de traer, que se llama
+  una vez y desde la identificación — el único momento en que alguien ya ha consentido hablar con el
+  proveedor. Medido: buscar antes de traer responde nada con **0 peticiones**, después responde el
+  archivo con **1**, y otra dirección del mismo título responde nada todavía con **1**.
+
+  **Una ruta de TMDB es una entrada no confiable**, así que `PosterAddressPolicy` comprueba **antes**
+  de componer, por la misma razón que la política del tráiler: componer primero deja una dirección
+  malformada en existencia y a partir de ahí todo lector tiene que acordarse de desconfiar. Rechaza
+  una segunda barra —que sacaría la ruta del segmento del tamaño—, un `..`, una dirección entera de
+  otro, un esquema, una consulta, un fragmento y codificación por porcentaje.
+
+  Un tamaño y no dos —`w780`, y la cesión está escrita—, una descarga y **un solo descodificado** para
+  las dos superficies. Y una biblioteca sin identificar no cambia: el arte generado es lo que ya
+  enseñaba, sigue debajo, y las iniciales sólo se van cuando hay una imagen que responda por ellas.
+
 ### Cambiado
 
 - **El minirreproductor es una ventana flotante de verdad: sin marco, arrastrable, con la forma de la
