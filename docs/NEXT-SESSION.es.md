@@ -98,6 +98,14 @@ y no bloquea, igual que los suelos.
    byte era teatro y se ha ido, con el parámetro que lo alimentaba. Lo que sigue vigilado es lo que ve
    todo el mundo: los cuatro diccionarios, en `ContrastTokenTests`.
 
+   **Y aquí la puerta nueva se ganó el sueldo en su primera vuelta, sobre un cambio de esta misma
+   tanda.** Quitar el apartado adelgazó `AccentPalette.cs` lo justo para que su agujero de siempre
+   pesara: CI lo midió en **99/93** y lo nombró por no estar en ninguna lista. El agujero era un
+   `return` de reserva del recorrido de luminosidad que **ningún predicado del archivo podía
+   alcanzar** —`EqualContrastLuminance` está donde negro y blanco contrastan igual, y ese contraste es
+   4,58:1, por encima del 4,5 más estricto, así que un extremo siempre acepta—. Metido el extremo
+   dentro del recorrido, el archivo queda en **100/100**. Sin la puerta, nadie lo habría visto.
+
 2. **«Home queda totalmente vacío» ya estaba resuelto** —`HomeReadModel` hace `UNION ALL` con
    `scanned_titles` desde el 2026-08-25— **pero se destapó lo de al lado**: el año de la migración
    0021 se puso en la unión de Biblioteca y no en la de Inicio. Son la misma consulta escrita dos

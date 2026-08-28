@@ -27,6 +27,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Y el paso que sobraba se ha ido: la lista del prototipo tiene nueve y ésta tenía un `1,75×` que
   nadie dibujó nunca.
 
+- **El recorrido de luminosidad de `AccentPalette` termina en el extremo de la escala en vez de
+  detrás de él**, y con eso el archivo pasa de 99/93 a **100/100**. Tenía un `return` de reserva —«si
+  el bucle se agota, negro o blanco»— que **ningún predicado de este archivo podía alcanzar**, junto
+  con las dos ramas de la comprobación de límites que lo precedía. Y no es suerte que no se alcance:
+  `EqualContrastLuminance` es la luminancia donde negro y blanco contrastan igual, y ese contraste es
+  **4,58:1**, por encima del 4,5 que pide el predicado más estricto — así que uno de los dos extremos
+  siempre acepta, vaya el recorrido hacia donde vaya.
+
+  **Lo destapó la puerta de cobertura nueva, sobre un cambio de esta misma tanda**: quitar el apartado
+  del anillo de foco adelgazó el archivo lo justo para que el agujero de siempre pesara por encima del
+  listón, y como el archivo no estaba en ninguna lista, **antes de hoy nadie lo habría visto**.
+
 - **Un acento elegido que cae justo sobre el anillo de foco se respeta tal cual.** Se apartaba un paso
   de la escala de luminosidad, y eso devolvía `#00599A` para un anillo `#005A9C`: otro color por el
   byte y el mismo a la vista. La pregunta abierta era si bastaba un paso o hacía falta un ratio, y la

@@ -27,6 +27,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   And the step that did not belong is gone: the prototype's list holds nine, and this one carried a
   `1.75×` nothing ever drew.
 
+- **`AccentPalette`'s lightness walk ends at the end of the scale rather than behind it**, taking the
+  file from 99/93 to **100/100**. It had a fallback `return` — "if the loop runs out, black or white" —
+  that **no predicate in this file could reach**, along with the two arms of the bounds check in front
+  of it. And it is not luck that it cannot be reached: `EqualContrastLuminance` is the luminance where
+  black and white contrast equally, and that contrast is **4.58:1**, above the 4.5 the strictest
+  predicate wants — so one of the two ends always accepts, whichever way the walk goes.
+
+  **The new coverage gate surfaced it, on a change from this very batch**: removing the focus-ring
+  nudge thinned the file just enough for its long-standing hole to weigh above the bar, and since the
+  file was on no list, **before today nobody would have seen it**.
+
 - **A picked accent that lands exactly on the focus ring is now kept as picked.** It used to be nudged
   one step of the lightness walk, which returned `#00599A` for a ring of `#005A9C`: a different colour
   by the byte and the same colour to a person. The open question was whether one step was enough or a

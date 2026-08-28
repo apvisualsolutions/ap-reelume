@@ -97,6 +97,14 @@ reports and does not block, exactly like the floors.
    and it is gone, along with the parameter that fed it. What is still watched is what everybody sees:
    the four dictionaries, in `ContrastTokenTests`.
 
+   **And here the new gate earned its keep on its first run, over a change from this very batch.**
+   Removing the nudge thinned `AccentPalette.cs` just enough for its long-standing hole to weigh: CI
+   measured it at **99/93** and named it for being on no list. The hole was a fallback `return` in the
+   lightness walk that **no predicate in the file could reach** — `EqualContrastLuminance` is where
+   black and white contrast equally, and that contrast is 4.58:1, above the strictest 4.5, so one end
+   always accepts. With the end moved inside the walk, the file sits at **100/100**. Without the gate,
+   nobody would have seen it.
+
 2. **"Home comes up empty" was already fixed** — `HomeReadModel` has done `UNION ALL` over
    `scanned_titles` since 2026-08-25 — **but the thing beside it surfaced**: migration 0021's year was
    put into the library's union and not into Home's. They are one query written twice, and there is
