@@ -94,6 +94,21 @@ public sealed class ScanSeriesGroupingTests
         Assert.Equal("El Faro de Piedra", film.Title);
         Assert.Equal(2019, film.Year);
 
+        // And Home says the same thing, which is a separate query over the same projection: the two
+        // unions are one statement written twice — each carries its own copy of "hide a file an
+        // episode already claims" — so a change to one that misses the other is a film that has its
+        // year on the grid and loses it on the rail. That is exactly what the year did on the day it
+        // arrived, and this is the assertion that would have caught it.
+        var recent = await new HomeReadModel(new SqliteConnectionFactory(directory.DatabasePath))
+            .ReadRecentlyAddedAsync(20, TestContext.Current.CancellationToken);
+        var onHome = Assert.Single(recent, item => item.Kind == CatalogTitleKind.Unidentified);
+        Assert.Equal(film.Title, onHome.Title);
+        Assert.Equal(film.Year, onHome.Year);
+
+        // Three cards on Home too, and not ninety-nine: the second clause of that union is what
+        // keeps an episode from being a loose card, and it has to be in both.
+        Assert.Equal(3, recent.Count);
+
         // And the count each card writes under its cover.
         var thrones = shows.Single(show => show.Title == "Juego de Tronos");
         Assert.Equal(8 * 9, thrones.EpisodeCount);
