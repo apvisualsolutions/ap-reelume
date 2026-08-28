@@ -10,7 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
-- **The film card's header draws the real poster, with the generated art beneath it.** `PosterPath`
+- **Both cards' headers draw the real poster, with the generated art beneath them.** `PosterPath`
   was produced, merged and persisted from the beginning and **no surface read it**: a value with no
   reader, which is this repository's characteristic defect seen from the far end. It closes
   **ART-A01** (2026-08-09), which had retired `ArtworkCache`'s registration rather than leave it
@@ -30,7 +30,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   and percent encoding.
 
   One size and not two — `w780`, and the cession is written down — one download, and **one decode**
-  for both surfaces. And an unidentified library does not change: the generated art is what it
+  across all four surfaces: the prototype raises the show's poster at 136×204 against the same bled
+  wall the film uses, so it is one chain and two views. And the picture cache is **bounded**: a
+  decoded poster is about 3.5 MB in memory whatever the file weighs, so an unbounded dictionary
+  would put a third of a gigabyte on somebody browsing a hundred films. And an unidentified library does not change: the generated art is what it
   already showed, it stays underneath, and the initials leave only when there is a picture to answer
   for them.
 

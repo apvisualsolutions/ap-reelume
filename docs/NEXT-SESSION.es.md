@@ -79,17 +79,50 @@ Dos archivos **suben por encima de su suelo**, y eso es rojo de la puerta igual 
 100/100). Si CI confirma 100/100, `ArtworkCache.cs` **sale de la lista** y el trinquete baja de 212 a
 211. El número sale del artefacto `coverage-debt` del run, nunca de una medición local.
 
+### Una trampa local nueva: `PackagingTests` está roja aquí y verde en CI
+
+Tres pruebas de empaquetado fallan **en esta máquina** —`Arm64PackageTests`, `ReproducibleBuildTests`
+y dos de `MsixLifecycleTests`— y la primera dice `BackgroundColor="#08090C"` esperado contra
+`#111827` medido. **No es de esta tanda**: se midió con `git stash`, y los mismos tres fallan sin
+ninguno de los cambios. Y CI las pasa —191 superadas y 3 omitidas en el run de `d91b9d6`—, porque el
+flujo genera los artefactos del paquete y esta máquina los tiene caducados desde hace días.
+
+Así que **`PackagingTests` no es una suite afectada por trabajo de vistas o de casos de uso**, y su
+rojo aquí no significa nada hasta que se corra el ciclo del sandbox entero.
+
 ### La cola, con los puntos 1 y 2 tachados
 
 1. ~~El mini como ventana PiP de verdad.~~ **Hecho.** Lo único que queda de su cromo es la
    composición del prototipo —título, tiempo y una barra de progreso de tres píxeles sobre los cinco
    botones—, que es otra pieza y no un remate de ésta.
-2. ~~El póster de fondo del cabecero de la ficha.~~ **Hecho para la película.** Queda **la ficha de
-   serie**, que en el prototipo dibuja su póster a 136×204 y aquí todavía no; es la misma cadena y una
-   vista más. Y las portadas de la cuadrícula y de las tres filas de Inicio **siguen fuera**, con la
-   razón medida del 2026-08-21 intacta: arrastran la cuadrícula, que cuesta 7× el tiempo y 455× los
-   controles vivos por perder la virtualización.
-3. **El editor de metadatos como vista propia.**
+2. ~~El póster de fondo del cabecero de la ficha.~~ **Hecho, en las dos fichas** — la de película y
+   la de serie, que el prototipo levanta a 136×204 contra el mismo muro sangrado. Las portadas de la
+   cuadrícula y de las tres filas de Inicio **siguen fuera**, con la razón medida del 2026-08-21
+   intacta: arrastran la cuadrícula, que cuesta 7× el tiempo y 455× los controles vivos por perder la
+   virtualización.
+3. **El editor de metadatos como vista propia** (decisión 15). **Dimensionado y medido en esta
+   sesión, sin abrir**: es una pieza entera, y abrirla a medias habría sido peor que dejarla escrita.
+   Lo que hay que saber antes de tocarlo:
+
+   - **Hoy vive en un `TabControl` dentro del scroll de Biblioteca** (`ShellView.axaml`, bajo
+     `HasEditorPanel`), con `MetadataEditorView` y `RenamePreviewView` como sus dos pestañas.
+   - **El prototipo lo dibuja como una página del área principal** (`isEditor`), con «Volver ·
+     Biblioteca» arriba, un cabecero de dos líneas —tipo pequeño y título a 28 px—, **dos píldoras
+     con `aria-pressed`** en lugar de un `TabControl`, y el cuerpo de metadatos en rejilla de dos
+     columnas: los campos a `2fr` y el arte a `1fr`.
+   - **⚠ NO es una `AppRoute`, y esto está medido**:
+     `ShellAssemblyTests.The_shell_lists_the_five_approved_destinations_and_nothing_else` afirma
+     exactamente `Home, Library, Review, Duplicates, Settings`, y el paseo ensamblado recorre
+     `shell.Routes` esperando llegar a cada uno **por su botón del carril** — que se declaran a mano,
+     cinco, en el marcado. Un sexto valor del enum rompería la primera y dejaría al paseo navegando a
+     un sitio sin puerta.
+   - **El patrón correcto ya existe en el árbol**: `IsPlayerVisible => Player is not null`, una
+     superficie que **cubre la ruta que haya debajo** sin ser una. El editor va así:
+     `IsEditorVisible`, y «Volver» lo cierra.
+   - **Las dos píldoras son controles nuevos**, así que traen su escena de paseo en el mismo commit y
+     el trinquete sigue en 20. Un `ToggleButton` o un `RadioButton` sí se pulsan; lo que no se puede
+     es meterlas en un `Flyout`.
+
 4. **«Secciones cortadas por el ancho»**, con el eje del ancho ya descartado y medido — las cuatro
    hipótesis vivas siguen abajo, en la sección de la cuarta sesión.
 

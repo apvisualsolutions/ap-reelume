@@ -27,6 +27,7 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     private readonly Func<string, Task>? _onOpenTrailerLink;
     private CatalogItem? _item;
     private string? _overview;
+    private string? _posterFile;
     private string? _trailerLink;
     private bool _renameWouldChangeTheName;
     private IReadOnlyList<SeasonViewModel> _seasons = [];
@@ -100,6 +101,19 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
 
     /// <summary>True only for a synopsis with something in it; blank is absent.</summary>
     public bool HasOverview => !string.IsNullOrWhiteSpace(_overview);
+
+    /// <summary>
+    /// The file the poster was cached to, or nothing when this show has no artwork on this disk.
+    /// </summary>
+    /// <remarks>
+    /// Handed in like everything else here, and read off the disk by whoever hands it: this view
+    /// model queries nothing and opens no connection. The prototype draws the show's poster at
+    /// 136x204, which is the raised card below the header's own art wall.
+    /// </remarks>
+    public string? PosterFile => _posterFile;
+
+    /// <summary>True only when there is a poster to draw; the generated art stays underneath.</summary>
+    public bool HasPoster => !string.IsNullOrWhiteSpace(_posterFile);
 
     /// <summary>True only when the stored key was well formed; anything else offers nothing.</summary>
     public bool HasTrailerLink => _trailerLink is not null;
@@ -251,11 +265,13 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
         PersonalState? personalState = null,
         string? overview = null,
         string? trailerKey = null,
-        bool renameWouldChangeTheName = false)
+        bool renameWouldChangeTheName = false,
+        string? posterFile = null)
     {
         _renameWouldChangeTheName = renameWouldChangeTheName;
         _item = item ?? throw new ArgumentNullException(nameof(item));
         _overview = overview;
+        _posterFile = posterFile;
         _trailerLink = TrailerLinkPolicy.TryBuildWatchLink(trailerKey);
         ArgumentNullException.ThrowIfNull(episodes);
         ArgumentNullException.ThrowIfNull(watchStates);
@@ -282,6 +298,8 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
             nameof(Title),
             nameof(Initials),
             nameof(Overview),
+            nameof(PosterFile),
+            nameof(HasPoster),
             nameof(HasOverview),
             nameof(Year),
             nameof(YearText),

@@ -632,7 +632,8 @@ public static partial class CompositionRoot
                     showPersonal,
                     overview: overview,
                     trailerKey: trailerKey,
-                    renameWouldChangeTheName: showRename);
+                    renameWouldChangeTheName: showRename,
+                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath));
             }
             else
             {

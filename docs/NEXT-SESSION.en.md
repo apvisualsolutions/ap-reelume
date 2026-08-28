@@ -79,17 +79,49 @@ measures 100/100). If CI confirms 100/100, `ArtworkCache.cs` **leaves the list**
 from 212 to 211. The number comes from that run's `coverage-debt` artefact, never from a local
 reading.
 
+### A new local trap: `PackagingTests` is red here and green on CI
+
+Three packaging tests fail **on this machine** — `Arm64PackageTests`, `ReproducibleBuildTests` and
+two of `MsixLifecycleTests` — and the first says `BackgroundColor="#08090C"` expected against
+`#111827` measured. **It is not from this batch**: measured with `git stash`, and the same three fail
+with none of the changes in place. And CI passes them — 191 passed and 3 skipped on `d91b9d6`'s run —
+because the workflow generates the package artefacts and this machine's have been stale for days.
+
+So **`PackagingTests` is not a suite affected by view or use-case work**, and its red here means
+nothing until the whole sandbox cycle has been run.
+
 ### The queue, with points 1 and 2 struck out
 
 1. ~~The mini as a real PiP window.~~ **Done.** All that is left of its chrome is the prototype's
    composition — the title, the time, and a three-pixel progress bar above the five buttons — which is
    another piece and not a finishing touch on this one.
-2. ~~The poster behind the film card's header.~~ **Done for the film.** What is left is **the show
-   card**, which the prototype draws at 136×204 and this does not yet; it is the same chain and one
-   more view. And the library grid's covers and Home's three rows **are still out**, with the measured
-   reason of 2026-08-21 intact: they drag the grid along, which costs 7× the time and 455× the live
-   controls for losing virtualisation.
-3. **The metadata editor as a surface of its own.**
+2. ~~The poster behind the film card's header.~~ **Done, on both cards** — the film's and the show's,
+   which the prototype raises at 136×204 against the same bled wall. The library grid's covers and
+   Home's three rows **are still out**, with the measured reason of 2026-08-21 intact: they drag the
+   grid along, which costs 7× the time and 455× the live controls for losing virtualisation.
+3. **The metadata editor as a surface of its own** (decision 15). **Sized and measured this session,
+   not opened**: it is a whole piece, and opening it halfway would have been worse than writing it
+   down. What to know before touching it:
+
+   - **Today it lives in a `TabControl` inside the library's scroll** (`ShellView.axaml`, under
+     `HasEditorPanel`), with `MetadataEditorView` and `RenamePreviewView` as its two tabs.
+   - **The prototype draws it as a page of the main area** (`isEditor`), with "Back · Library" on
+     top, a two-line header — small kind, then a 28 px title — **two pills carrying `aria-pressed`**
+     instead of a `TabControl`, and the metadata body in a two-column grid: fields at `2fr`, artwork
+     at `1fr`.
+   - **⚠ It is NOT an `AppRoute`, and that is measured**:
+     `ShellAssemblyTests.The_shell_lists_the_five_approved_destinations_and_nothing_else` asserts
+     exactly `Home, Library, Review, Duplicates, Settings`, and the assembled walk iterates
+     `shell.Routes` expecting to reach each one **by its rail button** — and those are declared by
+     hand, five of them, in the markup. A sixth enum value would break the first and leave the walk
+     navigating to a place with no door.
+   - **The right pattern is already in the tree**: `IsPlayerVisible => Player is not null`, a surface
+     that **covers whatever route is underneath it** without being one. The editor goes the same way:
+     `IsEditorVisible`, and "Back" closes it.
+   - **The two pills are new controls**, so they arrive with their walk scene in the same commit and
+     the ratchet stays at 20. A `ToggleButton` or a `RadioButton` can be pressed; what cannot happen
+     is putting them inside a `Flyout`.
+
 4. **"Sections cut off by the width"**, with the width axis already ruled out and measured — the four
    live hypotheses are still below, in the fourth session's section.
 

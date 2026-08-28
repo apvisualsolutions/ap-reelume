@@ -10,7 +10,7 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
-- **El cabecero de la ficha dibuja el póster de verdad, con el arte generado debajo.** `PosterPath`
+- **El cabecero de las dos fichas dibuja el póster de verdad, con el arte generado debajo.** `PosterPath`
   se producía, se fusionaba y se persistía desde el principio, y **ninguna vista lo leía**: un valor
   sin lector, que es el defecto característico de este repositorio visto desde el otro extremo. Cierra
   **ART-A01** (2026-08-09), que había retirado el registro de `ArtworkCache` en vez de dejarlo mudo, y
@@ -29,7 +29,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
   otro, un esquema, una consulta, un fragmento y codificación por porcentaje.
 
   Un tamaño y no dos —`w780`, y la cesión está escrita—, una descarga y **un solo descodificado** para
-  las dos superficies. Y una biblioteca sin identificar no cambia: el arte generado es lo que ya
+  las cuatro superficies: el prototipo levanta el póster de la serie a 136×204 contra el mismo muro
+  sangrado que usa la película, así que es una cadena y dos vistas. Y la caché de imágenes **tiene
+  tope**: un póster descodificado son unos 3,5 MB en memoria pese el archivo lo que pese, así que un
+  diccionario sin límite pondría un tercio de gigabyte encima de quien pasee por cien películas. Y una biblioteca sin identificar no cambia: el arte generado es lo que ya
   enseñaba, sigue debajo, y las iniciales sólo se van cuando hay una imagen que responda por ellas.
 
 ### Cambiado

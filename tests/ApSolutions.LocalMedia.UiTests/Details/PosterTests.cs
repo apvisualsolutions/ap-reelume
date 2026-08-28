@@ -4,8 +4,10 @@
 using System.Globalization;
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
+using ApSolutions.LocalMedia.Presentation.Show;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
@@ -15,7 +17,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Details;
 
 /// <summary>
-/// The poster reaches the film card, and the generated art stays underneath it.
+/// The poster reaches both cards, and the generated art stays underneath it.
 /// </summary>
 /// <remarks>
 /// <c>PosterPath</c> was produced, merged and persisted from the beginning and no surface read it —
@@ -36,6 +38,61 @@ public sealed class PosterTests
 
         Assert.Equal(@"C:\cache\artwork\poster.jpg", viewModel.PosterFile);
         Assert.True(viewModel.HasPoster);
+    }
+
+    [Fact]
+    public void A_show_card_states_the_poster_it_was_given()
+    {
+        var viewModel = new ShowDetailsViewModel();
+
+        viewModel.Apply(
+            Item(CatalogTitleKind.Show),
+            [],
+            new Dictionary<ContentKey, WatchState>(),
+            posterFile: @"C:\cache\artwork\poster.jpg");
+
+        Assert.Equal(@"C:\cache\artwork\poster.jpg", viewModel.PosterFile);
+        Assert.True(viewModel.HasPoster);
+    }
+
+    /// <summary>
+    /// The show card draws it in both places too, and the same file decodes once for both cards.
+    /// </summary>
+    /// <remarks>
+    /// The prototype raises the show's poster at 136×204 against the same bled art wall the film
+    /// card uses, so this is one chain and two views rather than two chains. The shared decode is
+    /// asserted across the two <em>cards</em> here — the converter caches by path for the process,
+    /// not per view.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_show_card_draws_the_same_poster_in_both_of_its_places()
+    {
+        var poster = WriteOnePixelPng();
+        var viewModel = new ShowDetailsViewModel();
+        viewModel.Apply(
+            Item(CatalogTitleKind.Show),
+            [],
+            new Dictionary<ContentKey, WatchState>(),
+            posterFile: poster);
+        var view = new ShowDetailsView { DataContext = viewModel };
+        var window = new Window { Width = 1180, Height = 900, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var drawn = view.GetVisualDescendants()
+            .OfType<Image>()
+            .Where(image => image.IsEffectivelyVisible)
+            .ToArray();
+
+        Assert.Equal(2, drawn.Length);
+        Assert.All(drawn, image => Assert.NotNull(image.Source));
+        Assert.Same(drawn[0].Source, drawn[1].Source);
+        Assert.Equal(2, view.GetVisualDescendants().OfType<PosterArtView>().Count());
+        Assert.DoesNotContain(
+            view.GetVisualDescendants().OfType<TextBlock>(),
+            text => text.IsEffectivelyVisible && text.Text == "A");
+        window.Close();
+        File.Delete(poster);
     }
 
     /// <summary>
@@ -149,6 +206,48 @@ public sealed class PosterTests
         File.Delete(notAnImage);
     }
 
+    /// <summary>
+    /// The cache is bounded, and the same path answers the same picture until it is dropped.
+    /// </summary>
+    /// <remarks>
+    /// A decoded `w780` poster is about 3.5 MB in memory whatever the file weighs, so an unbounded
+    /// dictionary keyed by path would have somebody browsing a hundred films carrying a third of a
+    /// gigabyte of pictures nothing draws. What is asserted is the bound doing its job: the oldest
+    /// entry stops being answered from memory once <c>Capacity</c> newer ones exist, and the newest
+    /// still is.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_decoded_posters_are_bounded_and_the_oldest_is_the_one_that_goes()
+    {
+        var converter = new CachedPosterConverter();
+        var posters = Enumerable.Range(0, CachedPosterConverter.Capacity + 1)
+            .Select(_ => WriteOnePixelPng())
+            .ToArray();
+
+        var first = Convert(converter, posters[0]);
+        Assert.NotNull(first);
+        Assert.Same(first, Convert(converter, posters[0]));
+
+        foreach (var poster in posters.Skip(1))
+        {
+            Assert.NotNull(Convert(converter, poster));
+        }
+
+        // The first was pushed out by the newer ones, so it is decoded again rather than answered:
+        // a different instance for the same path is exactly what eviction looks like from here.
+        Assert.NotSame(first, Convert(converter, posters[0]));
+
+        // And the newest is still remembered, which is what makes the bound a cache rather than a
+        // counter that clears everything.
+        var newest = Convert(converter, posters[^1]);
+        Assert.Same(newest, Convert(converter, posters[^1]));
+
+        foreach (var poster in posters)
+        {
+            File.Delete(poster);
+        }
+    }
+
     private static object? Convert(CachedPosterConverter converter, object? value) =>
         converter.Convert(value, typeof(object), null, CultureInfo.InvariantCulture);
 
@@ -170,9 +269,9 @@ public sealed class PosterTests
         return path;
     }
 
-    private static CatalogItem Item() => new(
+    private static CatalogItem Item(CatalogTitleKind kind = CatalogTitleKind.Movie) => new(
         MovieId,
-        CatalogTitleKind.Movie,
+        kind,
         "Arrival",
         2016,
         IsAvailable: true,
