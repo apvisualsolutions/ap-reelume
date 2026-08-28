@@ -7,6 +7,48 @@ Este archivo es para un agente que llega al repositorio sin contexto. Está en e
 proyecto se piensa en español y se publica en dos idiomas; el código, los commits y los nombres de
 prueba van en inglés.
 
+## Regla 0, inquebrantable: el MCP de Avalonia antes que nada
+
+**Antes de escribir una línea de AXAML, de tocar un estilo o de afirmar cómo se comporta un control,
+se consulta el MCP de Avalonia.** No es una sugerencia ni un último recurso: es el primer paso,
+delante incluso de la lista de lectura de abajo.
+
+Las tres herramientas, y cuándo va cada una:
+
+- `mcp__avalonia-docs__get_avalonia_expert_rules` — **al empezar cualquier sesión que toque la
+  presentación.** Trae de una vez la sintaxis AXAML, el sistema de propiedades, los selectores y los
+  errores habituales.
+- `mcp__avalonia-docs__lookup_avalonia_api` — **antes de usar un tipo o una propiedad**: `TextBlock`,
+  `Shape`, `Stretch`, `DockPanel`. Si devuelve «no results», eso también es un dato: significa que
+  hay que buscar por la otra vía antes de suponer.
+- `mcp__avalonia-docs__search_avalonia_docs` — **antes de afirmar por qué algo se ve como se ve.**
+
+### Por qué está escrita, con la factura del día que se aprendió
+
+El 2026-08-28, midiendo por qué los botones se veían desalineados, se supuso el comportamiento del
+framework en lugar de consultarlo. Lo que costó:
+
+- **Una hipótesis falsa perseguida hasta el final**: que el render ajustaba la línea base a la
+  rejilla de píxeles. Cuando por fin se consultó, la página de `TextOptions` contestó en **una sola
+  llamada** que `BaselinePixelAlignment` y `TextHintingMode` existen, qué hacen y cuáles son sus
+  valores por defecto — y la medición confirmó que **ninguno de los cuatro modos cambia un solo
+  píxel** aquí. La consulta habría descartado la hipótesis antes de escribir el arnés.
+- **Seis vueltas de compilación** adivinando la superficie de la API: `IGlyphTypeface` no es público,
+  `FontMetrics` no expone `CapHeight`, `GlyphTypeface` no lleva `GetGlyphMetrics`, `Shape` no expone
+  `TranslatePoint` sin castear a `Visual`. Cada una fue un error de compilación que una consulta
+  contesta antes.
+
+**Y la regla no termina en la consulta: lo que el MCP diga se mide.** El día que se escribió esto, la
+documentación era correcta y la hipótesis que la motivó era falsa de todos modos. La consulta evita
+inventarse la API; sólo la medición dice qué pasa en esta aplicación.
+
+**El corolario que ese día dejó**, y que vale para cualquier vista: **medir el layout no es medir lo
+que se ve.** `Bounds`, `TranslatePoint` y las métricas de una fuente describen el modelo; el defecto
+puede vivir sólo en el píxel. Cuando lo que se investiga es algo que alguien **ve**, se rasteriza —
+`window.CaptureRenderedFrame()`, que aquí funciona porque `TestAppBuilder` levanta Skia de verdad con
+`UseHeadlessDrawing = false`— y se cuentan píxeles. Dos puertas de este repositorio estaban verdes
+sobre dos píxeles de desalineación visible por medir el modelo en vez de la tinta.
+
 ## Antes de tocar nada, lee esto en este orden
 
 1. [docs/FEATURES.md](docs/FEATURES.md) — el registro **canónico** del alcance: qué existe, en qué

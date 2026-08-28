@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
+  clock.** The band was five buttons and nothing else, so a floating window said neither **what** was
+  playing nor **how far in** it was — which is most of what a picture-in-picture is for. It now
+  carries the prototype's three pixel bar across its width, the title on the left with
+  `position / duration · speed` under it, and the five on the right in the order the prototype draws:
+  back, play, forward, expand, close.
+
+  **The bar's track never leaves and only the fill arrives.** The window answers a drag by putting
+  16:9 back on the picture and adding the chrome's height on top, and that handler only runs on a
+  drag: a bar that appeared when the duration arrived would move the picture under a window nobody
+  touched. The fill does wait, for the reason `DurationSeconds` carries — it answers 1 until the
+  length is known, so fifty-two minutes against that maximum is clamped and paints a **full** bar
+  over a film that has barely started.
+
+  The clock is **one** string from the model rather than three bindings in a row: the separators are
+  punctuation no dictionary holds, and a row of three with an empty middle leaves the punctuation
+  stranded, `0:12 /  · 1×`. Evidence:
+  [the mini player's chrome](evidence/stable/audit-mini-player-band.md).
+
 - **Both cards' headers draw the real poster, with the generated art beneath them.** `PosterPath`
   was produced, merged and persisted from the beginning and **no surface read it**: a value with no
   reader, which is this repository's characteristic defect seen from the far end. It closes
@@ -38,6 +57,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   for them.
 
 ### Changed
+
+- **The test asserting the mini's five fit on one line stops supposing the other language.** It
+  pinned `es-ES`, and those five already folded into three rows inside 480×270 over one translated
+  word; the language is a parameter now, as in both width gates since 2026-08-26. A second one joins
+  it, asserting that **nothing on the band is drawn past the 320** the window allows —
+  `ViewOverflowTests` measures at 900, which is the main window's minimum and the one width at which
+  this view cannot fail. Measured at 320 in both languages: the row of five takes 252×44 in **one**
+  row and the title and clock get 36 px.
 
 - **The metadata editor and safe renaming are a surface of their own, not a panel under the library.**
   They were a `TabControl` at the bottom of the library's own scroll, so opening either tool put a
@@ -117,6 +144,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   by hand, and `ContrastTokenTests` refuses a theme that paints them alike.
 
 ### Fixed
+
+- **In both light themes the mini player's chrome was invisible.** The band painted
+  `ShellSurfaceBrush` and its buttons take `PlayerTextBrush` from the `player-chrome` class, and
+  those two are the same colour: measured on the mounted view, **1.02:1** in light (`#F8FAFC` on
+  `#FBFCFE`) and **1.00:1** in high contrast light, white on white. Five buttons with nothing visible
+  on them.
+
+  **No gate could see it, and the reason matters**: every contrast gate reads the four dictionaries,
+  and a dictionary is consistent with itself — `ShellSurfaceBrush` is right as the shell's ground and
+  `PlayerTextBrush` is right as the player's ink. What was wrong was the **pairing**, and a pairing
+  exists only in a view. The correction is the prototype's, which paints the whole mini on `#0B0D10`,
+  and `MiniPlayerBandTests` measures the pairing in all four themes: 3:1 for the glyphs and 4.5:1 for
+  the two lines of text.
 
 - **Home did not scroll, and on the smallest window 83 px of it were lost off the bottom.** It was the
   one destination mounted in a bare `ContentControl` while Library, Review, Duplicates and Settings

@@ -182,6 +182,12 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
     /// </remarks>
     public bool HasDuration => _state.Duration is { } duration && duration > TimeSpan.Zero;
 
+    /// <summary>
+    /// The position, the length and the speed on one line, which is what the mini player has room
+    /// for and what the large transport spreads across its own width.
+    /// </summary>
+    public string Readout => PlaybackClock.Readout(_state.Position, _state.Duration, SpeedLabel);
+
     /// <summary>The position in seconds, for the scrubber, which works in numbers rather than spans.</summary>
     public double PositionSeconds => _state.Position.TotalSeconds;
 
@@ -285,6 +291,10 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
             nameof(PositionLabel),
             nameof(SpeedMultiplier),
             nameof(SpeedLabel),
+            // After the three it is made of, and that is the same ordering argument the scale above
+            // makes: a composed line announced first would be read while its parts still hold the
+            // previous state.
+            nameof(Readout),
             nameof(IsAwayFromNormalSpeed),
             nameof(VolumePercent),
             nameof(VolumeLabel),

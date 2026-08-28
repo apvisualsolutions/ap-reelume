@@ -1,11 +1,96 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-28 (sexta sesión) — el cromo del mini, y dos puertas ciegas
+
+**El cromo del minirreproductor es la composición del prototipo**: barra de progreso de tres píxeles
+cruzando el ancho, el título a la izquierda con `posición / duración · velocidad` debajo, y los cinco
+a la derecha en el orden que el prototipo dibuja — atrás, reproducir, adelante, ampliar, cerrar. Era
+el punto 1 de los tres candidatos y el único acotado.
+
+### Lo que se encontró de camino, y no estaba en el encargo
+
+**En los dos temas claros el cromo del mini era invisible.** La franja pintaba `ShellSurfaceBrush` y
+sus botones toman `PlayerTextBrush` de `player-chrome`: en claro son el mismo color. Medido sobre la
+vista montada, **antes** de tocar nada:
+
+```
+Light              glifos 1,02:1   tinta #F8FAFC   franja #FBFCFE
+HighContrastLight  glifos 1,00:1   tinta White     franja White
+```
+
+**Ninguna puerta lo veía, y la razón vale para la próxima**: todas las de contraste leen **los cuatro
+diccionarios**, y un diccionario es coherente consigo mismo — `ShellSurfaceBrush` es correcto como
+fondo del shell y `PlayerTextBrush` como tinta del reproductor. Lo que estaba mal era el
+**emparejamiento**, y un emparejamiento sólo existe en una vista. `MiniPlayerBandTests` lo mide ahora
+en los cuatro temas: 3:1 los glifos, 4,5:1 las palabras.
+
+### La regla 0, que el propietario pidió inquebrantable
+
+**Se consulta el MCP de Avalonia antes de escribir AXAML o de afirmar cómo se comporta un control.**
+Está en `CLAUDE.md` por delante de la lista de lectura, con la factura del día: una hipótesis falsa
+perseguida hasta el final —que el render ajustaba la línea base a la rejilla— y **seis vueltas de
+compilación** adivinando la API (`IGlyphTypeface` no es público, `FontMetrics` no expone `CapHeight`,
+`GlyphTypeface` no lleva `GetGlyphMetrics`, `Shape` necesita castearse a `Visual`).
+
+**Y su corolario, que es el hallazgo de la sesión: medir el layout no es medir lo que se ve.**
+
+## Lo que queda, y es la pieza siguiente: los botones están 2 px desalineados
+
+**Medido en píxeles, rasterizando un botón real** con `window.CaptureRenderedFrame()` —funciona
+porque `TestAppBuilder` levanta Skia con `UseHeadlessDrawing = false`—, icono de 12 px y la palabra
+«Guardar»:
+
+```
+con el margen de 5 px    icono 39,5   palabra 37,5   delta +2,0
+sin el margen de 5 px    icono 40,5   palabra 40,5   delta  0,0
+```
+
+**La causa es la compensación de 5 px** que el tema pone a la etiqueta de todo botón, y que la sube
+2,5. Se puso el 2026-08-25 porque el texto se veía bajo, calibrada sobre una asimetría de fuente de
+**2,43 px calculada con métricas**; en píxeles reales esa asimetría es **1 px**. Sobrecorrige, y al
+subir la palabra la separa del icono — que está en el centro exacto del botón.
+
+**Lo que hay que llevarse de aquí: `ButtonInkTests` y `ButtonOpticalCentreTests` están las dos verdes
+sobre esos 2 px.** Miden cajas y métricas de fuente, y el defecto vive sólo en el píxel. Son dos
+puertas ciegas exactamente en el punto que dicen vigilar, y es la forma nueva del defecto de la casa:
+no un servicio sin consumidor, sino **una puerta que mide el modelo de lo que promete mirar**.
+
+### Tres hipótesis medidas y descartadas, para no repetirlas
+
+1. **`TextOptions` no tiene nada que ver.** Los cuatro modos —por defecto, `BaselinePixelAlignment
+   Unaligned`, `TextHintingMode None`, y ambos— dan **exactamente el mismo píxel**. La hipótesis era
+   que el render ajustaba la línea base a la rejilla y el icono vectorial no; es falsa.
+2. **Los iconos no son el problema y una fuente de iconos lo empeoraría.** El icono está en `+0,00`
+   contra el centro del botón. Es geometría y está libre de la asimetría ascendente/descendente; como
+   fuente la heredaría, y `PrototypeIconTests` ata cada icono al prototipo desde el 2026-08-24.
+3. **«Centrar la tinta» no es una regla, es una regla distinta por palabra.** El centro de la tinta
+   respecto a la caja de línea, en Inter a 14 px: `Guardar` +0,70, `Reproducir` +2,23, `ppp` +3,82,
+   `Save` +0,90. Un rango de **3,2 px** que depende de si hay descendente — y que cambia al traducir.
+   Lo estable es la métrica de la fuente, no la palabra.
+
+### Lo que sí queda medido y sin hacer: `Path.icon` ancla en vez de centrar
+
+`Stretch="Uniform"` con caja cuadrada escala la geometría y **la ancla arriba-izquierda**: el eje que
+sobra queda todo a un lado. De 29 botones de sólo icono, **17 tienen la tinta descentrada** — seis
+swatches de color a `dy=-3,00`, el play a `dx=-1,67`, `PictureInPictureButton` a `dy=-1,06`.
+
+Probado: cambiar `Width`/`Height` por `MaxWidth`/`MaxHeight` en `Path.icon` baja de 17 a 11 y deja los
+verticales en cero. **Rompe una puerta**: `Every_picture_the_transport_paints_is_a_drawing_and_is_
+stroked_for_its_size` lee `path.Width` para comprobar el grosor de trazo contra el 1,6 en 24 del
+prototipo, y con `MaxWidth` responde `NaN`. Revertido para no dejar el árbol a medias; es parte de la
+pieza del centrado.
+
 ## Estado al cierre del 2026-08-28 (quinta sesión) — la cola de cuatro puntos, cerrada entera
 
-**`main`, la rama y el HEAD son el mismo commit: `935fcb0`, verde comprobado con
-`gh run view --json conclusion`.** No queda nada sin publicar ni sin verificar. `main` avanzó **seis
-veces** en la sesión —`8aa2304`, `a16a523`, `d7b5804`, `f0a94ac`, `7e86525`, `935fcb0`—, cada una con
-la conclusión de su run leída **antes** de mover la referencia.
+**`main`, la rama y el HEAD son el mismo commit: `ae4b9b1`, verde comprobado con
+`gh run view --json conclusion`.** No queda nada sin publicar ni sin verificar. `main` avanzó **ocho
+veces** en la sesión —`8aa2304`, `a16a523`, `d7b5804`, `f0a94ac`, `7e86525`, `935fcb0`, `aadb3ea`,
+`ae4b9b1`—, cada una con la conclusión de su run leída **antes** de mover la referencia.
+
+> Esta cabecera nombró `935fcb0` hasta el 2026-08-28, y estaba mal por una razón que se repetirá: **un
+> documento no puede nombrar su propio SHA**, así que el commit que lo escribe y los que vengan
+> después quedan siempre fuera. Los dos que faltaban eran `aadb3ea` y `ae4b9b1`. Lo que se hace ahora
+> al abrir sesión es leer `git rev-parse HEAD` y corregir esta línea antes de tocar código.
 
 **Dos rojos por el camino, los dos reales y los dos corregidos**: un suelo de cobertura que había que
 subir con el número de CI (`ArtworkCache.cs`, 96/70), y el clic «al lado» del paseo aterrizando en el

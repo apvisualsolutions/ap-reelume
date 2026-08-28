@@ -1,5 +1,85 @@
 # Where to pick up
 
+## State at the close of 2026-08-28 (sixth session) — the mini's chrome, and two blind gates
+
+**The mini player's chrome is the prototype's composition**: a three pixel bar of progress across the
+width, the title on the left with `position / duration · speed` under it, and the five on the right
+in the order the prototype draws — back, play, forward, expand, close. It was point 1 of the three
+candidates and the only bounded one.
+
+### What was found on the way, and was not in the brief
+
+**In both light themes the mini's chrome was invisible.** The band painted `ShellSurfaceBrush` while
+its buttons take `PlayerTextBrush` from `player-chrome`: in light they are the same colour. Measured
+on the mounted view, **before** any change:
+
+```
+Light              glyphs 1.02:1   ink #F8FAFC   band #FBFCFE
+HighContrastLight  glyphs 1.00:1   ink White     band White
+```
+
+**No gate could see it, and the reason is worth keeping**: every contrast gate reads **the four
+dictionaries**, and a dictionary is consistent with itself — `ShellSurfaceBrush` is right as the
+shell's ground and `PlayerTextBrush` as the player's ink. What was wrong was the **pairing**, and a
+pairing exists only in a view. `MiniPlayerBandTests` measures it now in all four themes: 3:1 for the
+glyphs, 4.5:1 for the words.
+
+### Rule 0, which the owner asked to be unbreakable
+
+**The Avalonia MCP is consulted before writing AXAML or asserting how a control behaves.** It is in
+`CLAUDE.md` ahead of the reading list, with the day's bill: one false hypothesis chased to the end —
+that the renderer was snapping the baseline to the pixel grid — and **six compile rounds** guessing
+at the API (`IGlyphTypeface` is not public, `FontMetrics` exposes no `CapHeight`, `GlyphTypeface` has
+no `GetGlyphMetrics`, `Shape` must be cast to `Visual`).
+
+**And its corollary, which is the session's finding: measuring layout is not measuring what is seen.**
+
+## What is left, and it is the next piece: the buttons are 2 px out
+
+**Measured in pixels, rasterising a real button** with `window.CaptureRenderedFrame()` — which works
+because `TestAppBuilder` brings up Skia with `UseHeadlessDrawing = false` — a 12 px icon and the word
+«Guardar»:
+
+```
+with the 5 px margin    icon 39.5   word 37.5   delta +2.0
+without it              icon 40.5   word 40.5   delta  0.0
+```
+
+**The cause is the 5 px compensation** the theme puts on every button's label, which lifts it by 2.5.
+It was added on 2026-08-25 because the text read low, calibrated against a font asymmetry of **2.43
+px computed from metrics**; in real pixels that asymmetry is **1 px**. It overcorrects, and lifting
+the word separates it from the icon — which sits at the button's exact centre.
+
+**What to take from this: `ButtonInkTests` and `ButtonOpticalCentreTests` are both green over those
+2 px.** They measure boxes and font metrics, and the defect lives only in the pixel. Two gates blind
+at exactly the point they claim to watch — the house defect in a new form: not a service with no
+consumer, but **a gate measuring the model of what it promises to look at**.
+
+### Three hypotheses measured and dismissed, so they are not repeated
+
+1. **`TextOptions` has nothing to do with it.** All four modes — default, `BaselinePixelAlignment
+   Unaligned`, `TextHintingMode None`, and both — give **exactly the same pixel**. The hypothesis was
+   that the renderer snapped the baseline while the vector icon did not; it is false.
+2. **The icons are not the problem and an icon font would make it worse.** The icon measures `+0.00`
+   against the button's centre. It is geometry and free of the ascent/descent asymmetry; as a font it
+   would inherit it, and `PrototypeIconTests` has tied every icon to the prototype since 2026-08-24.
+3. **"Centre the ink" is not one rule, it is a different rule per word.** The middle of the ink
+   against the line box, in Inter at 14 px: `Guardar` +0.70, `Reproducir` +2.23, `ppp` +3.82, `Save`
+   +0.90. A **3.2 px** range that depends on whether there is a descender — and that moves with
+   translation. What is stable is the font's metric, not the word.
+
+### Measured and still undone: `Path.icon` anchors instead of centring
+
+`Stretch="Uniform"` in a square box scales the geometry and **anchors it top-left**: the spare axis
+goes entirely to one side. Of 29 icon-only buttons, **17 have their ink off centre** — six colour
+swatches at `dy=-3.00`, play at `dx=-1.67`, `PictureInPictureButton` at `dy=-1.06`.
+
+Tried: swapping `Width`/`Height` for `MaxWidth`/`MaxHeight` in `Path.icon` takes 17 down to 11 and
+zeroes the vertical ones. **It breaks a gate**: `Every_picture_the_transport_paints_is_a_drawing_and_
+is_stroked_for_its_size` reads `path.Width` to check the stroke against the prototype's 1.6 in 24, and
+with `MaxWidth` that answers `NaN`. Reverted rather than left half done; it belongs to the centring
+piece.
+
 ## State at the close of 2026-08-28 (fifth session) — the queue of four points, closed entire
 
 **`main`, the branch and HEAD are the same commit: `935fcb0`, green checked with

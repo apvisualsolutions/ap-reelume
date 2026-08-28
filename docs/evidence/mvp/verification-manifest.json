@@ -508,7 +508,8 @@
       "evidence": [
         "docs/evidence/mvp/T18-libvlc-spike.md",
         "docs/evidence/mvp/T24-windows-input.md",
-        "docs/evidence/stable/audit-mini-player-window.md"
+        "docs/evidence/stable/audit-mini-player-window.md",
+        "docs/evidence/stable/audit-mini-player-band.md"
       ]
     },
     {

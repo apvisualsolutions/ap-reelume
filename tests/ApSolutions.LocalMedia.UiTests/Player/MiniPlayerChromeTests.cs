@@ -200,6 +200,161 @@ public sealed class MiniPlayerChromeTests
         window.Close();
     }
 
+    /// <summary>
+    /// The prototype's composition, in the order it draws it: the bar of progress above the row, and
+    /// the row carrying the readout beside the five.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Written as geometry rather than as a list of names on purpose. "The bar is declared" is what
+    /// a grep answers, and the defect it would miss is the one this repository keeps finding: a
+    /// control that exists, is bound, and is drawn where nobody looks. What is asserted is that the
+    /// bar's foot is at or above the row's head - which is the only reading of "over the five
+    /// buttons" a person watching the window would agree with.
+    /// </para>
+    /// <para>
+    /// Three pixels is the prototype's number and it is asserted, because a <c>ProgressBar</c> in
+    /// this theme has a minimum height of four: the three setters that get past it are exactly the
+    /// kind of thing a later tidy-up removes, and the bar would silently grow by a third.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_bar_of_progress_is_three_pixels_and_sits_over_the_five()
+    {
+        var (window, view, viewModel) = await ShowPlayingAsync();
+        var mini = MiniWindow(view);
+
+        // A length first, because the fill is absent without one and an absent control measures
+        // nothing: asserting three pixels against a bar that is not on screen reads zero and passes
+        // for the wrong reason the moment the number stops being three.
+        viewModel.Player!.Player.Transport!.Observe(
+            TimeSpan.FromMinutes(52),
+            TimeSpan.FromMinutes(96));
+        Dispatcher.UIThread.RunJobs();
+
+        var bar = mini.GetVisualDescendants()
+            .OfType<ProgressBar>()
+            .Single(control => control.Name == "MiniPlayerProgress");
+        var row = mini.GetVisualDescendants()
+            .OfType<WrapPanel>()
+            .Single(panel => panel.Name == "MiniPlayerChromeSurface");
+
+        Assert.Equal(3, bar.Bounds.Height);
+
+        var barFoot = bar.TranslatePoint(new Point(0, bar.Bounds.Height), mini);
+        var rowHead = row.TranslatePoint(new Point(0, 0), mini);
+        Assert.NotNull(barFoot);
+        Assert.NotNull(rowHead);
+        Assert.True(
+            barFoot!.Value.Y <= rowHead!.Value.Y,
+            $"the bar of progress ends at y={barFoot.Value.Y:0.0} and the five start at "
+                + $"y={rowHead.Value.Y:0.0}, so it is not over them.");
+
+        window.Close();
+    }
+
+    /// <summary>
+    /// The band says what is playing and where it is, which the window did not say at all.
+    /// </summary>
+    /// <remarks>
+    /// The text is read off the screen and compared against the model rather than against a string
+    /// written here: a test carrying its own copy of the composed line agrees with itself while the
+    /// binding points at nothing, which is the state this view was in for the title until today.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_band_carries_the_title_and_the_clock_of_what_is_playing()
+    {
+        var (window, view, viewModel) = await ShowPlayingAsync();
+        var mini = MiniWindow(view);
+
+        viewModel.Player!.Player.Transport!.Observe(
+            TimeSpan.FromMinutes(52),
+            TimeSpan.FromMinutes(96));
+        Dispatcher.UIThread.RunJobs();
+
+        var title = Text(mini, "MiniPlayerTitleText");
+        var clock = Text(mini, "MiniPlayerClockText");
+
+        Assert.Equal(viewModel.PlayerTitle, title.Text);
+        Assert.False(
+            string.IsNullOrWhiteSpace(title.Text),
+            "the mini player's title is empty, so the binding reaches nothing.");
+        Assert.Equal(viewModel.Player.Player.Transport.Readout, clock.Text);
+        Assert.Contains("52:00", clock.Text ?? string.Empty, StringComparison.Ordinal);
+        Assert.Contains("1:36:00", clock.Text ?? string.Empty, StringComparison.Ordinal);
+
+        window.Close();
+    }
+
+    /// <summary>
+    /// The bar follows the playhead, and stays away until there is a length for it to be a fraction
+    /// of.
+    /// </summary>
+    /// <remarks>
+    /// The absence is half the assertion and the more expensive half to get wrong:
+    /// <c>DurationSeconds</c> answers 1 until the engine says otherwise, so a position of fifty-two
+    /// minutes against that maximum is clamped and paints a <b>full</b> bar over a film that has
+    /// barely started.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_bar_is_away_until_there_is_a_length_and_then_follows_the_playhead()
+    {
+        var (window, view, viewModel) = await ShowPlayingAsync();
+        var mini = MiniWindow(view);
+        var transport = viewModel.Player!.Player.Transport!;
+
+        var bar = mini.GetVisualDescendants()
+            .OfType<ProgressBar>()
+            .Single(control => control.Name == "MiniPlayerProgress");
+
+        transport.Observe(TimeSpan.FromMinutes(52), duration: null);
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(bar.IsVisible, "the bar is on screen before the engine has said how long the file is.");
+
+        transport.Observe(TimeSpan.FromMinutes(52), TimeSpan.FromMinutes(96));
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(bar.IsVisible);
+        Assert.Equal(5760, bar.Maximum);
+        Assert.Equal(3120, bar.Value);
+
+        window.Close();
+    }
+
+    /// <summary>
+    /// The band keeps its height when the length arrives, because a window sized to 16:9 plus the
+    /// chrome would stop being either.
+    /// </summary>
+    /// <remarks>
+    /// This is why the track is a panel of its own that is always there and only the fill comes and
+    /// goes. Hiding the whole three pixels would move the picture under a window nobody touched: the
+    /// resize handler puts 16:9 back on the video and adds the chrome's height on top, and it only
+    /// runs on a drag.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_band_is_exactly_as_tall_before_and_after_the_length_arrives()
+    {
+        var (window, view, viewModel) = await ShowPlayingAsync();
+        var mini = MiniWindow(view);
+        var chrome = mini.GetVisualDescendants().OfType<MiniPlayerChromeView>().Single();
+        var transport = viewModel.Player!.Player.Transport!;
+
+        transport.Observe(TimeSpan.FromSeconds(1), duration: null);
+        Dispatcher.UIThread.RunJobs();
+        var before = chrome.Bounds.Height;
+
+        transport.Observe(TimeSpan.FromMinutes(52), TimeSpan.FromMinutes(96));
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(before > 0, "the chrome measured nothing, so this compares two zeroes.");
+        Assert.Equal(before, chrome.Bounds.Height);
+
+        window.Close();
+    }
+
+    private static TextBlock Text(Window mini, string name) =>
+        mini.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == name);
+
     private static Window MiniWindow(ShellView view)
     {
         var stage = view.FindControl<Panel>("PlayerStage")
@@ -234,7 +389,14 @@ public sealed class MiniPlayerChromeTests
         {
             OpenPlayer = (_, _) => Task.FromResult<PlayerSurfaces?>(new PlayerSurfaces
             {
-                Player = new PlayerViewModel(new InertCoordinator()),
+                // A title and a transport, because the band draws both and a session without them
+                // would let the two new bindings point at nothing and still pass.
+                Title = "El Faro de Piedra",
+                Player = new PlayerViewModel(new InertCoordinator())
+                {
+                    Transport = new TransportControlsViewModel(
+                        new ControlPlayback(new SpeedMenuTests.RecordingEngine())),
+                },
             }),
             ClosePlayer = _ => Task.CompletedTask,
             ChangePlaybackMode = (mode, _) => Task.FromResult(mode),

@@ -10,6 +10,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
+  reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se
+  estaba viendo ni **por dónde iba** — que es la mayor parte de para qué existe una imagen sobre
+  imagen. Ahora lleva la barra de tres píxeles del prototipo cruzando el ancho, el título a la
+  izquierda y debajo `posición / duración · velocidad`, con los cinco a la derecha en el orden que el
+  prototipo dibuja: atrás, reproducir, adelante, ampliar, cerrar.
+
+  **La pista de la barra no se va nunca y sólo el relleno aparece.** La ventana responde a un
+  arrastre poniendo 16:9 sobre la imagen y sumando la altura del cromo encima, y ese manejador sólo
+  corre en un arrastre: una barra que apareciera al llegar la duración movería la imagen debajo de
+  una ventana que nadie ha tocado. El relleno sí espera, por la razón que `DurationSeconds` lleva
+  escrita — responde 1 mientras no se sabe, así que cincuenta y dos minutos contra ese máximo se
+  recortan y pintan una barra **llena** sobre una película que acaba de empezar.
+
+  El reloj es **una** cadena del modelo y no tres enlaces seguidos: los separadores son puntuación
+  que ningún diccionario guarda, y una fila de tres con el del medio vacío deja la puntuación
+  colgando, `0:12 /  · 1×`. Evidencia:
+  [el cromo del minirreproductor](evidence/stable/audit-mini-player-band.md).
+
 - **El cabecero de las dos fichas dibuja el póster de verdad, con el arte generado debajo.** `PosterPath`
   se producía, se fusionaba y se persistía desde el principio, y **ninguna vista lo leía**: un valor
   sin lector, que es el defecto característico de este repositorio visto desde el otro extremo. Cierra
@@ -36,6 +55,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   enseñaba, sigue debajo, y las iniciales sólo se van cuando hay una imagen que responda por ellas.
 
 ### Cambiado
+
+- **La prueba que afirma que los cinco del mini caben en una línea deja de suponer el otro idioma.**
+  Fijaba `es-ES`, y esos cinco ya plegaron en tres filas dentro de 480×270 por una palabra
+  traducida; ahora el idioma es parámetro, como en las dos puertas de ancho desde el 2026-08-26. Se
+  le suma una segunda que afirma que **nada de la franja se dibuja fuera de los 320** que la ventana
+  permite — `ViewOverflowTests` mide a 900, que es el mínimo de la ventana principal y la única
+  anchura a la que esta vista no puede fallar. Medido a 320 en los dos idiomas: la fila de los cinco
+  ocupa 252×44 en **una** fila y al título y al reloj les quedan 36 px.
 
 - **El editor de metadatos y el renombrado seguro son una vista propia, no un panel bajo la
   biblioteca.** Eran un `TabControl` al final del propio desplazamiento de Biblioteca, así que abrir
@@ -116,6 +143,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   `ContrastTokenTests` rechaza un tema que los pinte iguales.
 
 ### Corregido
+
+- **En los dos temas claros, el cromo del minirreproductor era invisible.** La franja pintaba
+  `ShellSurfaceBrush` y sus botones toman `PlayerTextBrush` de la clase `player-chrome`, y esos dos
+  son el mismo color: medido sobre la vista montada, **1,02:1** en claro (`#F8FAFC` sobre `#FBFCFE`)
+  y **1,00:1** en alto contraste claro, blanco sobre blanco. Cinco botones sin nada visible encima.
+
+  **Ninguna puerta lo veía, y la razón importa**: todas las de contraste leen los cuatro
+  diccionarios, y un diccionario es coherente consigo mismo — `ShellSurfaceBrush` es correcto como
+  fondo del shell y `PlayerTextBrush` como tinta del reproductor. Lo que estaba mal era el
+  **emparejamiento**, y un emparejamiento sólo existe en una vista. La corrección es la del
+  prototipo, que pinta el mini entero sobre `#0B0D10`, y `MiniPlayerBandTests` mide el
+  emparejamiento en los cuatro temas: 3:1 para los glifos y 4,5:1 para las dos líneas de texto.
 
 - **Inicio no se desplazaba, y en la ventana más pequeña se perdían 83 px por abajo.** Era el único
   destino montado en un `ContentControl` pelado mientras Biblioteca, Revisión, Duplicados y Ajustes
