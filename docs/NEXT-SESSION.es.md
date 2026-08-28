@@ -17,8 +17,21 @@ Las tres cifras de ese verde, que son las que cierran la sesión:
   `NameScannedTitles.cs` llegan al 96/96 que un archivo nuevo tiene que traer.
 
 Los cuatro puntos del encargo están cerrados. El quinto —el mini como ventana PiP de verdad y el
-póster de fondo del cabecero— **no se ha tocado**, y sigue siendo lo que queda junto con el editor de
-metadatos y «secciones cortadas por el ancho».
+póster de fondo del cabecero— **no se ha tocado**: cada uno es una pieza entera y no un remate, y
+abrir una a medias habría sido peor que dejarla nombrada.
+
+**La cola, ordenada, es ésta:**
+
+1. **El mini como ventana PiP de verdad.** Media hecha: ya no duplica la barra, ya es `Topmost` y ya
+   tiene geometría por modo. Falta: sin marco (`SystemDecorations="None"`), arrastrable
+   (`BeginMoveDrag`), conservando la relación de aspecto al redimensionar, y **recordando dónde se
+   dejó entre sesiones** — hoy `PlayerWindowCoordinator.DefaultMiniGeometry` es una constante.
+2. **El póster de fondo del cabecero de la ficha** (decisión 6). **Ojo, y está medido**: `PosterPath`
+   existe en los metadatos y **no llega a ninguna vista** —`MovieDetailsViewModel` no lo lee—, así que
+   son dos trabajos: llevarlo hasta la ficha y dibujarlo. Y en una biblioteca sin identificar no hay
+   ningún póster, así que hace falta el arte generado detrás de todos modos.
+3. **El editor de metadatos como vista propia.**
+4. **«Secciones cortadas por el ancho»**, con el eje del ancho ya descartado — ver abajo.
 
 ### 1. El menú de velocidad es el desplegable del prototipo
 

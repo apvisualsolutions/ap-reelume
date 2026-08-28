@@ -17,8 +17,21 @@ The three numbers from that green, which are what close the session:
   `NameScannedTitles.cs` reach the 96/96 a new file has to arrive with.
 
 All four points of the brief are closed. The fifth — the mini as a real PiP window and the poster
-behind the details header — **was not touched**, and is what remains alongside the metadata editor and
-«sections cut off by the width».
+behind the details header — **was not touched**: each is a whole piece rather than a finishing touch,
+and opening one halfway would have been worse than leaving it named.
+
+**The queue, in order:**
+
+1. **The mini as a real PiP window.** Half done: it no longer duplicates the bar, it is already
+   `Topmost`, and it already has per-mode geometry. Missing: undecorated (`SystemDecorations="None"`),
+   draggable (`BeginMoveDrag`), aspect ratio kept while resizing, and **remembering where it was left
+   between sessions** — today `PlayerWindowCoordinator.DefaultMiniGeometry` is a constant.
+2. **The poster behind the details header** (decision 6). **Note, and it is measured**: `PosterPath`
+   exists in the metadata and **reaches no view** — `MovieDetailsViewModel` does not read it — so it
+   is two jobs: carrying it to the card and drawing it. And an unidentified library holds no poster at
+   all, so the generated art has to stay behind it regardless.
+3. **The metadata editor as a view of its own.**
+4. **«Sections cut off by the width»**, with the width axis now ruled out — see below.
 
 ### 1. The speed menu is the prototype's drop-down
 
