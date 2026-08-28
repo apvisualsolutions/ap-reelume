@@ -2719,7 +2719,21 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // spends something — except that here the repayment IS the effect being measured.
         await transport.SetSpeedAsync(1.5, TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
+
+        // The bar is laid out again before anything is aimed at it, and that is not belt and braces.
+        // «Volver a 1×» appears when the speed leaves 1×, so this line changes the composition of the
+        // row: everything to its side moves. PressAsync picks the point it clicks "beside" a control
+        // from the geometry on screen, and CI answered `Expected: Embedded, Actual: Fullscreen` on
+        // 2026-08-28 — the beside-click had landed on the mode button next door, before the layout
+        // that made room for the reset had settled. It does not reproduce here: the case alone three
+        // times and the whole suite twice, all green. A race is removed rather than hunted.
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
         Assert.True(transport.IsAwayFromNormalSpeed, "the session never left 1×, so the reset has nothing to do.");
+
+        // And the mode is read here as well as after the press, so that a beside-click that moves it
+        // is caught where it happened rather than three assertions later.
+        Assert.Equal(PlaybackMode.Embedded, host.ViewModel.PlaybackMode);
         await PressAsync(
             host,
             "TransportSpeedResetAction",
