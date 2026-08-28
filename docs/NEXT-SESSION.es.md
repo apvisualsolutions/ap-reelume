@@ -2,12 +2,13 @@
 
 ## Estado al cierre del 2026-08-28 (cuarta sesión) — la grieta de la deuda, cerrada y con puerta
 
-Cuatro commits sobre la rama, **CI en verde en `e49a5e6`**, y **`main` avanzado por fast-forward hasta
-ese mismo SHA**: la rama, `main` y el HEAD son el mismo commit verificado. Antes, a media sesión,
-`main` había avanzado a `8ce6ef8` —el commit de sólo documentación que la nota anterior dejó esperando
-su run— con su verde comprobado primero.
+Ocho commits sobre la rama, **CI en verde en `c85b6cb`**, y **`main` avanzado por fast-forward hasta
+ese mismo SHA**: la rama, `main` y el HEAD son el mismo commit verificado, y **no queda nada sin
+publicar ni sin verificar**. `main` pasó por tres saltos en el día —`8ce6ef8`, `e49a5e6` y
+`c85b6cb`—, cada uno con su verde comprobado con `gh run view --json conclusion` **antes** de mover la
+referencia.
 
-Las tres cifras de ese verde, que son las que cierran la sesión:
+Las tres cifras del verde final, que son las que cierran la sesión:
 
 - `Coverage gate: 212 file(s) still short of 96/96, ratchet 212, **212 measured under the bar**` — la
   lista y lo medido son el mismo número. Eran 212 y 216.

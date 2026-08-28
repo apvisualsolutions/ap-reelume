@@ -2,12 +2,12 @@
 
 ## State at the close of 2026-08-28 (fourth session) — the debt list's crack, closed and gated
 
-Four commits on the branch, **CI green on `e49a5e6`**, and **`main` fast-forwarded to that same SHA**:
-the branch, `main` and HEAD are one verified commit. Earlier in the session `main` had moved to
-`8ce6ef8` — the documentation-only commit the previous note left waiting for its run — with its green
-checked first.
+Eight commits on the branch, **CI green on `c85b6cb`**, and **`main` fast-forwarded to that same
+SHA**: the branch, `main` and HEAD are one verified commit, and **nothing is left unpublished or
+unverified**. `main` moved three times in the day — `8ce6ef8`, `e49a5e6` and `c85b6cb` — each with its
+green checked through `gh run view --json conclusion` **before** the reference moved.
 
-The three numbers from that green, which are what close the session:
+The three numbers from the final green, which are what close the session:
 
 - `Coverage gate: 212 file(s) still short of 96/96, ratchet 212, **212 measured under the bar**` — the
   list and the measurement are the same number. They were 212 and 216.
