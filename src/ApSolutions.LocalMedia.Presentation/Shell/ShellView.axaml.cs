@@ -22,9 +22,9 @@ namespace ApSolutions.LocalMedia.Presentation.Shell;
 /// </summary>
 public sealed partial class ShellView : UserControl
 {
-    private readonly PlayerWindowCoordinator _windowCoordinator = new();
     private MiniPlayerWindow? _miniWindow;
     private ShellViewModel? _viewModel;
+    private PlayerWindowCoordinator _windowCoordinator = new();
 
     public ShellView()
     {
@@ -73,6 +73,11 @@ public sealed partial class ShellView : UserControl
         if (_viewModel is not null)
         {
             _viewModel.PropertyChanged += OnViewModelChanged;
+
+            // Rebuilt rather than told, because the store is the one thing a coordinator takes at
+            // construction and the data context arrives after this view does. A shell handed no
+            // store gets the same coordinator it had before 2026-08-28.
+            _windowCoordinator = new PlayerWindowCoordinator(_viewModel.MiniPlayerPlacement);
         }
     }
 
@@ -109,15 +114,26 @@ public sealed partial class ShellView : UserControl
 
         if (mode == PlaybackMode.Mini)
         {
-            var window = _miniWindow ??= new MiniPlayerWindow();
+            // Built rather than reused, and the `??=` that was here first is gone on purpose: every
+            // path out of this mode below closes the window and drops the field, and the view model
+            // does not raise a change for a mode already in force. So the branch that reused one
+            // could not be taken — a guard that guards nothing, which is this repository's
+            // characteristic defect at one line long.
+            var window = new MiniPlayerWindow();
+            _miniWindow = window;
+
+            // Where it was left is written when it closes, and not while it moves. A move drag
+            // raises PositionChanged on every frame, and the placement goes to a file: saving per
+            // frame would put a few hundred writes behind one gesture, for an answer that only ever
+            // gets read at the next launch.
+            window.Closing += OnMiniPlayerClosing;
 
             // The mini window's chrome is bound to the shell's own view model - the session, the
             // mode and the close all already live there, so a view model of its own would be a
             // second answer to questions that have one.
             window.DataContext = _viewModel;
-            var screen = window.Screens.Primary?.Bounds ?? new PixelRect(0, 0, 1920, 1080);
             window.Host(stage);
-            _windowCoordinator.Apply(window, PlaybackMode.Mini, screen, window.RenderScaling);
+            _windowCoordinator.Apply(window, PlaybackMode.Mini, ScreenOf(window), window.RenderScaling);
             window.Show();
             return;
         }
@@ -127,10 +143,41 @@ public sealed partial class ShellView : UserControl
         if (_miniWindow is { } mini)
         {
             mini.Release();
+
+            // Closing raises the handler below, which is where the placement is written: doing it
+            // there rather than here covers the other way this window ends, which is the application
+            // shutting down with the mini player still on screen.
             mini.Close();
+            mini.Closing -= OnMiniPlayerClosing;
             _miniWindow = null;
         }
 
         host.Content = stage;
     }
+
+    private void OnMiniPlayerClosing(object? sender, WindowClosingEventArgs args)
+    {
+        _ = args;
+
+        // Cast rather than tested: this handler is attached to exactly one window and detached from
+        // it above, so a sender of any other type is not a case to fall through, it is a bug that
+        // should say so.
+        var mini = (MiniPlayerWindow)sender!;
+        _windowCoordinator.Remember(
+            PlaybackMode.Mini,
+            mini.CurrentGeometry(),
+            ScreenOf(mini),
+            mini.RenderScaling);
+    }
+
+    /// <summary>
+    /// The screen a window is on, or a plausible one when the platform names none.
+    /// </summary>
+    /// <remarks>
+    /// One place for it, rather than the same fallback written at both call sites: the fallback is
+    /// never taken on any platform this ships to, so writing it twice is two branches nothing can
+    /// cover for one decision that has no second opinion.
+    /// </remarks>
+    private static PixelRect ScreenOf(Window window) =>
+        window.Screens.Primary?.Bounds ?? new PixelRect(0, 0, 1920, 1080);
 }

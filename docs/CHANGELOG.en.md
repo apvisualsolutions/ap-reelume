@@ -10,6 +10,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The mini player is a real floating window: no frame, dragged by the picture, kept in shape, and
+  it remembers.** It was an ordinary Windows window with its title bar sitting above the video. It
+  now opens without decorations (`WindowDecorations.None`), moves when the picture is dragged,
+  resizes from **any of its eight edges**, and every resize brings it back to the prototype's
+  **16:9** — which belongs to the picture, with the chrome's height added on top, not to the window.
+  With no frame left, a one-pixel border is what says where it ends.
+
+  **And it now remembers where it was left, between sessions.** `PlayerWindowCoordinator.Remember`
+  had existed since 2026-08-19 and **nothing called it**: it wrote to a dictionary that only its own
+  tests ever read, which is this repository's characteristic defect wearing the shape of a
+  coordinator. The placement is written when the window closes — not while it moves: a drag raises an
+  event per frame and this goes to a file — and read at the next launch. A placement that no longer
+  lands on any screen is dropped when it would be used rather than when it was stored: with no title
+  bar, a window at the coordinates of an unplugged monitor could not be brought back.
+
+  **What decided how it drags was a measurement and not an argument.** The first draft let a gesture
+  through that another control had already handled, on the assumption that a button marks its own
+  press: **it does not** — Avalonia marks the *release*, which is where its click is — so that guard
+  protected nothing and all five chrome controls would have dragged the window instead of working.
+  What decides is **where** the press lands: the picture drags, and the strip the chrome sits in
+  does not.
+
 - **The speed menu is the prototype's drop-down and no longer eleven bare numbers.** It was a
   `MenuFlyout` of ten numbers with an eleventh row that reset: a thing that is not a speed, inside a
   list of speeds, hidden behind the click that opens that list. It is now the pill the prototype

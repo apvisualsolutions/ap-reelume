@@ -697,6 +697,7 @@ public static partial class CompositionRoot
             ScanSettings = provider.GetRequiredService<ScanSettingsViewModel>(),
             Shortcuts = provider.GetRequiredService<ShortcutSettingsViewModel>(),
             SubtitleStyle = provider.GetRequiredService<SubtitleStyleViewModel>(),
+            MiniPlayerPlacement = provider.GetRequiredService<IMiniPlayerPlacementStore>(),
             SegmentDetection = new SegmentDetectionSettingsViewModel(
             () => provider.GetRequiredService<DetectSeriesSegments>().IsEnabled,
             enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)),

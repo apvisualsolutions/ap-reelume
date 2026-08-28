@@ -17,6 +17,7 @@ using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.Media;
 using ApSolutions.LocalMedia.Infrastructure.Playback;
+using ApSolutions.LocalMedia.Infrastructure.Settings;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Onboarding;
 using ApSolutions.LocalMedia.Presentation.Player;
@@ -57,6 +58,7 @@ public static partial class CompositionRoot
             .AddSingleton<PlaybackSessionCoordinator>()
             .AddSingleton<IPlaybackSessionCoordinator>(provider =>
                 provider.GetRequiredService<PlaybackSessionCoordinator>())
+            .AddSingleton<IMiniPlayerPlacementStore, StoredMiniPlayerPlacement>()
             .AddSingleton<IPlaybackPreferenceRepository, PlaybackPreferenceRepository>()
             .AddSingleton<IWatchStateRepository, WatchStateRepository>()
             .AddSingleton(provider => new PlaybackProgressTracker(

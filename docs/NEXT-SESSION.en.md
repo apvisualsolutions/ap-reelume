@@ -1,5 +1,63 @@
 # Where to pick up
 
+## State at the close of 2026-08-28 (fifth session) — the mini is a real PiP window now
+
+**`main` is at `c85b6cb`, green checked with `gh run view --json conclusion`.** Above it were
+`8aa2304` (the note only) and now this batch's commit; `main`'s fast-forward waits for both runs to
+close green, in that order, with each conclusion read **before** the reference moves.
+
+**Point 1 of the queue is closed.** The mini player opens with no frame, is dragged by the picture,
+resizes from its eight edges at the prototype's **16:9** — which belongs to the picture, with the
+chrome's height added on top — and **remembers where it was left between sessions**.
+
+### What decided the design was two measurements, not two arguments
+
+1. **An Avalonia button does NOT mark its press as handled.** The first draft of the drag skipped
+   what another control had already handled, and it was measured with a harness `MouseDown` on
+   `MiniPlayerPlayPause`, with a handler registered `handledEventsToo: true`: `seen=1 handled=0`.
+   Avalonia marks the **release**, which is where the click is. That guard protected nothing, and
+   **all five chrome controls would have dragged the window instead of working**. What decides now is
+   where the press lands: the picture drags, the strip the chrome sits in does not.
+2. **A headless backend never raises a user resize**: every one arrives as `reason=Layout`. A filter
+   `e.Reason == User` buried in the override would have left the whole correction behind a branch no
+   test can take, so the decision lives in `HandleResize(WindowResizeReason)`, public, and the test
+   calls it.
+
+### The house defect again, and closed
+
+`PlayerWindowCoordinator.Remember` and `Recall` had existed since 2026-08-19 and **the product code
+never called them**: `0` calls in `src/`, `3` in `tests/`. Registered and never fed. `ShellView` now
+calls them, and the coordinator writes the half that outlives the process through
+`IMiniPlayerPlacementStore` → `StoredMiniPlayerPlacement` over the same old `ISettingsStore`.
+
+The placement is written **when the window closes and not while it moves**: a drag raises an event
+per frame and this goes to a file. And a placement that no longer lands on any screen is dropped
+**when it would be used**, not when it was stored: with no title bar, a window at the coordinates of
+an unplugged monitor could not be brought back.
+
+### What to watch in this batch's CI
+
+**`ShellView.axaml.cs` rises above its floor, and that is a coverage-gate red**, which refuses a file
+above its floor exactly as it refuses one below. Measured on this machine with the same suite:
+`97.50/67.85` before → `98.03/69.23` after, once three guards that guarded nothing came out (the
+`??=` reusing a window the shell had already closed, the `sender is not MiniPlayerWindow` of a handler
+attached to exactly one window, and the second `Screens.Primary?.Bounds ?? …` written beside the
+first). **The fix is the number from that run's `coverage-debt` artefact**, never one measured here.
+`MiniPlayerWindow.axaml.cs` is not in the list, its bar is 96/96, and it measures 98.73/97.61.
+
+### The queue, with point 1 struck out
+
+1. ~~The mini as a real PiP window.~~ **Done.** All that is left of its chrome is the prototype's
+   composition — the title, the time, and a three-pixel progress bar above the five buttons — which is
+   another piece and not a finishing touch on this one.
+2. **The poster behind the film card's header** (decision 6). Untouched, and it still measures the
+   same: `PosterPath` exists in the metadata and `MovieDetailsViewModel` does not read it, so it is
+   two jobs — carrying it to the card and drawing it — and the generated art is needed behind it
+   either way, because an unidentified library has no poster at all.
+3. **The metadata editor as a surface of its own.**
+4. **"Sections cut off by the width"**, with the width axis already ruled out and measured — the four
+   live hypotheses are still below, in the fourth session's section.
+
 ## State at the close of 2026-08-28 (fourth session) — the debt list's crack, closed and gated
 
 Eight commits on the branch, **CI green on `c85b6cb`**, and **`main` fast-forwarded to that same

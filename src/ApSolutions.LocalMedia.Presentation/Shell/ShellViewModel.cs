@@ -320,6 +320,9 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public SegmentDetectionSettingsViewModel? SegmentDetection => _surfaces.SegmentDetection;
 
+    /// <summary>Where the mini player was left last time, for the view that owns its window.</summary>
+    public IMiniPlayerPlacementStore? MiniPlayerPlacement => _surfaces.MiniPlayerPlacement;
+
     public MetadataEditorViewModel? MetadataEditor
     {
         get => _metadataEditor;

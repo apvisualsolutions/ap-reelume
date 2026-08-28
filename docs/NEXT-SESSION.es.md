@@ -1,5 +1,64 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-28 (quinta sesión) — el mini ya es una ventana PiP de verdad
+
+**`main` está en `c85b6cb`, verde comprobado con `gh run view --json conclusion`.** Por encima
+quedaban `8aa2304` (sólo la nota) y ahora el commit de esta tanda; el fast-forward de `main` espera a
+que sus dos runs cierren en verde, en ese orden y comprobando la conclusión de cada uno **antes** de
+mover la referencia.
+
+**El punto 1 de la cola está cerrado.** El minirreproductor abre sin marco, se arrastra por la
+imagen, se redimensiona desde sus ocho bordes conservando el **16:9 del prototipo** —que es el de la
+imagen, con la altura del cromo sumada encima— y **recuerda dónde se dejó entre sesiones**.
+
+### Lo que decidió el diseño fueron dos mediciones, no dos razonamientos
+
+1. **Un botón de Avalonia NO marca su pulsación como atendida.** El primer arrastre dejaba pasar lo
+   que otro control ya hubiera atendido, y se midió con un `MouseDown` del arnés sobre
+   `MiniPlayerPlayPause`, con un manejador registrado `handledEventsToo: true`: `seen=1 handled=0`.
+   Avalonia marca el **soltar**, que es donde está el clic. Esa guarda no guardaba nada, y **los cinco
+   controles del cromo habrían arrastrado la ventana en vez de funcionar**. Lo que decide ahora es
+   dónde cae la pulsación: la imagen arrastra, la franja del cromo no.
+2. **Un backend headless nunca levanta un redimensionado de usuario**: todos llegan con
+   `reason=Layout`. Un filtro `e.Reason == User` enterrado en el `override` habría dejado toda la
+   corrección detrás de una rama que ninguna prueba puede tomar, así que la decisión vive en
+   `HandleResize(WindowResizeReason)`, público, y la prueba la llama.
+
+### El defecto de la casa otra vez, y cerrado
+
+`PlayerWindowCoordinator.Remember` y `Recall` existían desde el 2026-08-19 y **el código de producto
+no los llamaba nunca**: `0` llamadas en `src/`, `3` en `tests/`. Registrado y nunca alimentado. Ahora
+`ShellView` los llama, y el coordinador escribe la mitad que sobrevive al proceso a través de
+`IMiniPlayerPlacementStore` → `StoredMiniPlayerPlacement` sobre el `ISettingsStore` de siempre.
+
+La colocación se escribe **al cerrar la ventana y no al moverla**: un arrastre levanta un evento por
+fotograma y esto va a un archivo. Y una colocación que ya no cae en ninguna pantalla se descarta **al
+usarla**, no al guardarla: sin barra de título, una ventana en las coordenadas de un monitor
+desconectado no habría forma de recuperarla.
+
+### Lo que hay que mirar en el CI de esta tanda
+
+**`ShellView.axaml.cs` sube por encima de su suelo, y eso es un rojo de la puerta de cobertura**, que
+rechaza igual un archivo por debajo que uno por encima. Medido en esta máquina con la misma suite:
+`97,50/67,85` antes → `98,03/69,23` después, tras quitar tres guardas que no guardaban nada (el `??=`
+que reutilizaba una ventana que el shell ya había cerrado, el `sender is not MiniPlayerWindow` de un
+manejador enganchado a una sola ventana, y el segundo `Screens.Primary?.Bounds ?? …` escrito al lado
+del primero). **La corrección es el número del artefacto `coverage-debt` de ese mismo run**, nunca uno
+medido aquí. `MiniPlayerWindow.axaml.cs` no está en la lista, su listón es 96/96 y mide 98,73/97,61.
+
+### La cola, con el punto 1 tachado
+
+1. ~~El mini como ventana PiP de verdad.~~ **Hecho.** Lo único que queda de su cromo es la
+   composición del prototipo —título, tiempo y una barra de progreso de tres píxeles sobre los cinco
+   botones—, que es otra pieza y no un remate de ésta.
+2. **El póster de fondo del cabecero de la ficha** (decisión 6). Sin tocar, y sigue midiendo lo
+   mismo: `PosterPath` existe en los metadatos y `MovieDetailsViewModel` no lo lee, así que son dos
+   trabajos —llevarlo hasta la ficha y dibujarlo— y el arte generado hace falta detrás de todos modos,
+   porque una biblioteca sin identificar no tiene ningún póster.
+3. **El editor de metadatos como vista propia.**
+4. **«Secciones cortadas por el ancho»**, con el eje del ancho ya descartado y medido — las cuatro
+   hipótesis vivas siguen abajo, en la sección de la cuarta sesión.
+
 ## Estado al cierre del 2026-08-28 (cuarta sesión) — la grieta de la deuda, cerrada y con puerta
 
 Ocho commits sobre la rama, **CI en verde en `c85b6cb`**, y **`main` avanzado por fast-forward hasta

@@ -12,8 +12,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
     Height="270"
     MinWidth="320"
     MinHeight="180"
+    Background="{DynamicResource PlayerSurfaceBrush}"
     ShowInTaskbar="False"
     Topmost="True"
+    WindowDecorations="None"
     Title="{DynamicResource MiniPlayerTitle}"
     automation:AutomationProperties.Name="{DynamicResource MiniPlayerTitle}">
   <!--
@@ -22,8 +24,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
     threw this whole tree away the moment a session moved in: whatever the window declared for itself
     was gone in the one mode it exists for.
   -->
-  <DockPanel LastChildFill="True">
-    <player:MiniPlayerChromeView x:Name="MiniPlayerChrome" DockPanel.Dock="Bottom" />
-    <Panel x:Name="MiniPlayerSurface" Background="{DynamicResource PlayerSurfaceBrush}" />
-  </DockPanel>
+  <!--
+    The border is what a window without decorations has instead of a frame: the prototype draws the
+    mini player with a hairline of its own against the desktop, and with WindowDecorations="None"
+    nothing else would say where the window ends. It is the player's hairline and not the shell's,
+    because what it sits against is the picture.
+  -->
+  <Border
+      x:Name="MiniPlayerFrame"
+      BorderBrush="{DynamicResource PlayerHairlineBrush}"
+      BorderThickness="1">
+    <DockPanel LastChildFill="True">
+      <player:MiniPlayerChromeView x:Name="MiniPlayerChrome" DockPanel.Dock="Bottom" />
+      <Panel x:Name="MiniPlayerSurface" Background="{DynamicResource PlayerSurfaceBrush}" />
+    </DockPanel>
+  </Border>
 </Window>

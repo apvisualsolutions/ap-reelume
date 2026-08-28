@@ -10,6 +10,27 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El minirreproductor es una ventana flotante de verdad: sin marco, arrastrable, con la forma de la
+  imagen y con memoria.** Era una ventana normal de Windows con su barra de título encima del vídeo.
+  Ahora abre sin decoraciones (`WindowDecorations.None`), se mueve arrastrando la imagen, se
+  redimensiona desde **cualquiera de sus ocho bordes**, y cada cambio de tamaño la devuelve a la
+  relación **16:9 del prototipo** —que es la de la imagen, con la altura del cromo sumada encima, no
+  la de la ventana—. Como ya no tiene marco, un borde de un píxel dice dónde acaba.
+
+  **Y ahora recuerda dónde se dejó, entre sesiones.** `PlayerWindowCoordinator.Remember` existía desde
+  el 2026-08-19 y **no lo llamaba nadie**: se guardaba en un diccionario que sólo leían sus propias
+  pruebas, que es el defecto característico de este repositorio con forma de coordinador. La
+  colocación se escribe al cerrar la ventana —y no al moverla: un arrastre levanta un evento por
+  fotograma y esto va a un archivo— y se lee en el arranque siguiente. Una colocación que ya no cae en
+  ninguna pantalla se descarta al usarla, no al guardarla: sin barra de título, una ventana en las
+  coordenadas de un monitor desconectado no habría forma de recuperarla.
+
+  **Lo que decidió cómo se arrastra fue una medición y no un razonamiento.** El primer intento dejaba
+  pasar el gesto que otro control ya hubiera atendido, dando por hecho que un botón marca su propia
+  pulsación: **no lo hace** —Avalonia marca el *soltar*, que es donde está su clic—, así que esa
+  guarda no guardaba nada y los cinco controles del cromo habrían arrastrado la ventana en vez de
+  funcionar. Lo que decide es **dónde** cae la pulsación: la imagen arrastra y la franja del cromo no.
+
 - **El menú de velocidad es el desplegable del prototipo y ya no once filas numéricas.** Era un
   `MenuFlyout` con diez números y una undécima fila que reiniciaba: una cosa que no es una velocidad,
   dentro de una lista de velocidades, escondida detrás del clic que abre esa lista. Ahora es la
