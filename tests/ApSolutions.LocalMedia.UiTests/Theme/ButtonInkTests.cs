@@ -58,19 +58,23 @@ public sealed class ButtonInkTests
             var above = offset.Y;
             var below = button.Bounds.Height - offset.Y - label.Bounds.Height;
 
-            // The box is deliberately NOT centred, and by a number that is written down: the label
-            // carries five pixels of bottom margin so the run of ink lands in the middle, which is
-            // what an eye compares and what the box alone never delivered. So what is asserted here
-            // is that the box sits exactly that far up — a box centred to the pixel would mean the
-            // compensation had been dropped, and the words would look low again.
-            // ButtonOpticalCentreTests is where the five comes from.
+            // The box is deliberately NOT centred, and by a number that is written down: the
+            // button's content carries one pixel of bottom margin so the run of ink lands in the
+            // middle, which is what an eye compares and what the box alone never delivered. So what
+            // is asserted here is that the box sits exactly that far up — a box centred to the pixel
+            // would mean the compensation had been dropped, and the words would look low again.
             //
-            // The same five for all three classes, and player-chrome used to be the exception. That
+            // It was five until 2026-08-28, derived from the font's metrics. ButtonPixelCentreTests
+            // is where the one comes from now, and it rasterises: on screen the error is 1 px and
+            // five moved the word by three, from one low to two high. What a margin corrects is half
+            // of itself, so the margin is twice the error — and the error was never 2.43.
+            //
+            // The same one for all three classes, and player-chrome used to be the exception. That
             // exception was a fact about the PADDING — a glyph must not be lifted for a baseline it
             // does not have, and the padding moved everything — and the padding is no longer where
-            // the compensation lives. On the label it reaches only what has a baseline, so a class
-            // whose content is a glyph is already left alone by construction and needs no arm here.
-            const double OpticalCompensation = 5.0;
+            // the compensation lives. A button whose whole content is a glyph is still left alone,
+            // because Path is not in the selector.
+            const double OpticalCompensation = 1.0;
             Assert.True(
                 Math.Abs(below - above - OpticalCompensation) <= 1.5,
                 $"'{className}': the label sits {above:F2} px below the top and {below:F2} px above the "
