@@ -565,6 +565,16 @@ public sealed class ShellAssemblyTests
         Assert.Equal(AppRoute.Home, shell.CurrentRoute);
     }
 
+    /// <summary>
+    /// The same surfaces, for the suite that measures the editor page.
+    /// </summary>
+    /// <remarks>
+    /// Shared rather than copied, because what the page is about is the two tools arriving the way
+    /// the application hands them over — a second builder would drift from this one and then measure
+    /// its own drift.
+    /// </remarks>
+    internal static ShellSurfaces EditorSurfaces() => FullSurfaces();
+
     private static ShellSurfaces FullSurfaces() => new()
     {
         Library = BuildLibrary(),

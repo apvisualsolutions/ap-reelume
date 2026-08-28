@@ -37,6 +37,9 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly AsyncRelayCommand _addMedia;
     private readonly AsyncRelayCommand _cancelAddMedia;
     private readonly AsyncRelayCommand _closePlayerPanel;
+    private readonly AsyncRelayCommand _closeEditor;
+    private readonly AsyncRelayCommand _showMetadataTab;
+    private readonly AsyncRelayCommand _showRenameTab;
     private readonly PlayerPanelCommand _togglePlayerPanel;
     private bool _isAddingRoot;
     private int _reviewPendingCount;
@@ -211,6 +214,44 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             },
             () => _playerPanel is not PlayerPanel.None);
 
+        // Closing drops both surfaces and not just the one in front. They are two pills over one
+        // page, so leaving the other behind would take somebody back to the library and then put
+        // them in the editor again the moment they opened the other tool.
+        _closeEditor = new AsyncRelayCommand(
+            () =>
+            {
+                MetadataEditor = null;
+                Rename = null;
+                return Task.CompletedTask;
+            },
+            () => HasEditorPanel);
+        // The pills open as well as select, which is the prototype's own behaviour and what keeps
+        // this page from being a dead end. Measured by the walk on 2026-08-28: with the page
+        // covering the card, «Previsualizar renombrado» was no longer on screen, so a person who
+        // opened the metadata editor had no way left to reach the other tool at all.
+        _showMetadataTab = new AsyncRelayCommand(
+            async () =>
+            {
+                if (!HasMetadataEditor)
+                {
+                    await OpenMetadataEditorAsync(CancellationToken.None).ConfigureAwait(true);
+                }
+
+                EditorTab = 0;
+            },
+            () => _surfaces.OpenMetadataEditor is not null && SelectedTitleId is not null);
+        _showRenameTab = new AsyncRelayCommand(
+            async () =>
+            {
+                if (!HasRename)
+                {
+                    await OpenRenamePreviewAsync(CancellationToken.None).ConfigureAwait(true);
+                }
+
+                EditorTab = 1;
+            },
+            () => _surfaces.OpenRename is not null && SelectedTitleId is not null);
+
         if (Library is { } libraryViewModel)
         {
             // A button bound to a command asks once and then waits to be told. Choosing a title is
@@ -275,6 +316,15 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// <summary>The «×» in the panel column's own header; the same close the pill performs.</summary>
     public ICommand ClosePlayerPanelCommand => _closePlayerPanel;
 
+    /// <summary>Leaves the editor page and puts the library back, which is what «Volver» means here.</summary>
+    public ICommand CloseEditorCommand => _closeEditor;
+
+    /// <summary>The two pills over the editor page. One-way, so a second press cannot unselect.</summary>
+    public ICommand ShowMetadataTabCommand => _showMetadataTab;
+
+    /// <inheritdoc cref="ShowMetadataTabCommand" />
+    public ICommand ShowRenameTabCommand => _showRenameTab;
+
     /// <summary>
     /// The one control at the foot of the navigation rail: it opens the surface a folder is added on
     /// and clears the form before it gets there.
@@ -332,6 +382,12 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             {
                 OnPropertyChanged(nameof(HasMetadataEditor));
                 OnPropertyChanged(nameof(HasEditorPanel));
+                OnPropertyChanged(nameof(IsLibraryListVisible));
+                OnPropertyChanged(nameof(IsEditorVisible));
+                OnPropertyChanged(nameof(IsMetadataTabOpen));
+                OnPropertyChanged(nameof(IsRenameTabOpen));
+                OnPropertyChanged(nameof(EditorTitle));
+                RaiseEditorCanExecuteChanged();
             }
         }
     }
@@ -344,11 +400,68 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public int EditorTab
     {
         get => _editorTab;
-        set => SetField(ref _editorTab, value);
+        set
+        {
+            if (SetField(ref _editorTab, value))
+            {
+                OnPropertyChanged(nameof(IsMetadataTab));
+                OnPropertyChanged(nameof(IsRenameTab));
+                OnPropertyChanged(nameof(IsMetadataTabOpen));
+                OnPropertyChanged(nameof(IsRenameTabOpen));
+            }
+        }
     }
 
-    /// <summary>One panel for the two title tools; the tabs decide, the way the player's panel does.</summary>
+    /// <summary>One page for the two title tools; the pills decide, the way the player's panel does.</summary>
     public bool HasEditorPanel => HasMetadataEditor || HasRename;
+
+    /// <summary>
+    /// The library's list of cards, which the editor page covers while it is open.
+    /// </summary>
+    /// <remarks>
+    /// Both halves are here rather than only the editor's, and that is measured: binding the list to
+    /// <c>!HasEditorPanel</c> alone drew the whole library on top of Settings and every other
+    /// destination, because nothing was left saying which route this is.
+    /// <c>ThemeTests</c> caught it by counting sixteen appearance buttons where thirteen exist.
+    /// </remarks>
+    public bool IsLibraryListVisible => IsLibraryVisible && !HasEditorPanel;
+
+    /// <summary>The editor page, on the library's own slot and over its list.</summary>
+    public bool IsEditorVisible => IsLibraryVisible && HasEditorPanel;
+
+    /// <summary>The metadata editor is the tool in front, and it exists.</summary>
+    /// <remarks>
+    /// Both halves, because a pill opens its tool as well as selecting it: between the press and the
+    /// surface arriving there is a moment where the tab has moved and the tool has not, and a
+    /// container bound to the tab alone would draw an empty page in it.
+    /// </remarks>
+    public bool IsMetadataTabOpen => IsMetadataTab && HasMetadataEditor;
+
+    /// <inheritdoc cref="IsMetadataTabOpen" />
+    public bool IsRenameTabOpen => IsRenameTab && HasRename;
+
+    /// <summary>Which of the two pills is pressed. One-way, because the command decides.</summary>
+    /// <remarks>
+    /// A toggle bound two ways would let a second click unpress the pill that is showing, leaving a
+    /// page whose two pills both say "not this one" over a surface that is plainly on screen. That is
+    /// the same reason the season picker checks one way — the command owns which one is in force.
+    /// </remarks>
+    public bool IsMetadataTab => EditorTab == 0;
+
+    /// <inheritdoc cref="IsMetadataTab" />
+    public bool IsRenameTab => EditorTab == 1;
+
+    /// <summary>
+    /// The title the editor page writes at display size, under the small line that says what this
+    /// page is.
+    /// </summary>
+    /// <remarks>
+    /// The card that is open, and not the editor's own title field: that field is what somebody is
+    /// in the middle of typing into, so a header bound to it would rewrite itself letter by letter
+    /// while they worked. The rename preview has no title of its own at all, and this page serves
+    /// both pills.
+    /// </remarks>
+    public string EditorTitle => Library?.SelectedItem?.Item.Title ?? string.Empty;
 
     public RenamePreviewViewModel? Rename
     {
@@ -359,6 +472,12 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             {
                 OnPropertyChanged(nameof(HasRename));
                 OnPropertyChanged(nameof(HasEditorPanel));
+                OnPropertyChanged(nameof(IsLibraryListVisible));
+                OnPropertyChanged(nameof(IsEditorVisible));
+                OnPropertyChanged(nameof(IsMetadataTabOpen));
+                OnPropertyChanged(nameof(IsRenameTabOpen));
+                OnPropertyChanged(nameof(EditorTitle));
+                RaiseEditorCanExecuteChanged();
             }
         }
     }
@@ -965,6 +1084,21 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     private TitleId? SelectedTitleId => Library?.SelectedItem?.Item.Id;
 
+    /// <summary>
+    /// The three commands of the editor page, whose answers all move with the two surfaces.
+    /// </summary>
+    /// <remarks>
+    /// Both setters call this, and the reason is the pill that has no surface: a page opened by
+    /// «Previsualizar renombrado» has one pill and not two, and a pill offering a tab that does not
+    /// exist is a control this repository has shipped before under another name.
+    /// </remarks>
+    private void RaiseEditorCanExecuteChanged()
+    {
+        _closeEditor.RaiseCanExecuteChanged();
+        _showMetadataTab.RaiseCanExecuteChanged();
+        _showRenameTab.RaiseCanExecuteChanged();
+    }
+
     private void OnLibraryChanged(object? sender, PropertyChangedEventArgs args)
     {
         if (args.PropertyName is nameof(LibraryViewModel.SelectedItem) or nameof(LibraryViewModel.Surface))
@@ -1037,6 +1171,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(CurrentRoute));
         OnPropertyChanged(nameof(IsSettingsVisible));
         OnPropertyChanged(nameof(IsLibraryVisible));
+        OnPropertyChanged(nameof(IsLibraryListVisible));
+        OnPropertyChanged(nameof(IsEditorVisible));
         OnPropertyChanged(nameof(IsHomeVisible));
         OnPropertyChanged(nameof(IsDuplicatesVisible));
         OnPropertyChanged(nameof(IsReviewVisible));
