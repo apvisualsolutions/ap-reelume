@@ -100,6 +100,21 @@ convertidor cachea por ruta para el proceso, no por vista. / The prototype raise
 136×204 against the same bled wall, so it is one chain and two views: the same port, the same
 converter, the same file.
 
+## La cadena entera, atada de una vez / The whole chain, tied at once
+
+Cada eslabón tenía su prueba el día en que se escribió —la política de dirección, el caso de uso, la
+caché, el modelo de la ficha, las dos vistas— y **ninguna corría junta**. Ésa es exactamente la forma
+del defecto de esta casa: una cadena donde cada eslabón devuelve éxito y el final no hace nada.
+`IdentifiedArtworkTests` la recorre entera: catálogo SQLite real, `ArtworkCache` real sobre un
+directorio real, y **la dirección compuesta por la política en los dos lados** —si el segmento del
+tamaño cambiara, el archivo que la caché escribe y el que la ficha busca se separarían, y sólo lo nota
+una prueba que deje calcular a ambos—. / Every link had a test of its own and none ran together.
+
+Tres casos, y los tres son promesas del producto: identificar **escribe el póster donde la ficha lo
+busca** y no lo trae dos veces; un póster que no se puede traer **no cuesta la identificación**; y un
+título sin `poster_path` **no llega a la red en absoluto** — cero peticiones, que es lo que pasa en una
+biblioteca identificada antes de que el arte existiera. / Three cases, and all three are promises.
+
 ## Verde / Green
 
 ```

@@ -123,6 +123,33 @@ flujo genera los artefactos del paquete y esta máquina los tiene caducados desd
 Así que **`PackagingTests` no es una suite afectada por trabajo de vistas o de casos de uso**, y su
 rojo aquí no significa nada hasta que se corra el ciclo del sandbox entero.
 
+### Tres decisiones que quedaban y se toman aquí
+
+1. **La hipótesis (a) de «secciones cortadas» —con las listas llenas— NO recibe puerta propia.** Lo
+   que una puerta así tendría que hacer es construir un contexto de datos para las 17 vistas que
+   llevan un `ItemsControl`, y lo que mediría ya está cubierto por dos lados: **las filas y tarjetas
+   que esas listas repiten son vistas por derecho propio y se miden solas** —`LibraryEntryView`,
+   `EpisodeRowView`, `CandidateCardView`, `PosterCardView`— y **el paseo recorre la aplicación con
+   datos sembrados y rechaza un clic que no aterriza**. El coste de la puerta es alto, su superficie
+   nueva es pequeña, y una puerta frágil que hay que mantener es peor que una ausencia declarada.
+   **Criterio si aparece un hallazgo real**: se ataca la vista concreta con su contexto, no las 17.
+
+2. **El cromo del minirreproductor con la composición del prototipo —título, tiempo y barra de
+   progreso de tres píxeles sobre los cinco botones— es una pieza propia y va a la cola, no a un
+   remate.** Es composición de una vista, del tamaño de un tramo de la §4. **Y trae una medición
+   hecha**: a 480×270 esos cinco botones ya plegaron en tres filas una vez por una palabra traducida,
+   así que quien lo haga mide el ancho **en los dos idiomas** — que es justo lo que las dos puertas de
+   ancho hacen desde hoy.
+
+3. **`ArtworkCache.cs` NO se sube al listón ahora, y hay un techo que lo explica.** Su suelo quedó en
+   `96 70` con el número de CI. Lo que le falta está medido, y casi todo es barato: las dos respuestas
+   `image/png` e `image/webp` de `MediaExtension`, el lado nulo del `??` del `HttpClient` y el de
+   `allowedHosts`, y los dos `Directory.Exists` en su rama contraria. **Lo que pone techo es
+   `EnsureRemoteRootIsConfined`**: su `throw` es una guarda de invariante de seguridad que ningún
+   llamador legítimo puede alcanzar, y **ésa no se borra** — no es una guarda redundante como las del
+   2026-08-28, es la que mantiene la caché dentro de la raíz de datos. Subirlo exigiría reescribirla
+   para que sea alcanzable, y eso cambia una promesa de seguridad por un punto de cobertura.
+
 ### La cola, con los puntos 1 y 2 tachados
 
 1. ~~El mini como ventana PiP de verdad.~~ **Hecho.** Lo único que queda de su cromo es la

@@ -123,6 +123,33 @@ because the workflow generates the package artefacts and this machine's have bee
 So **`PackagingTests` is not a suite affected by view or use-case work**, and its red here means
 nothing until the whole sandbox cycle has been run.
 
+### Three decisions that were open, taken here
+
+1. **Hypothesis (a) of "sections cut off" — with full lists — gets NO gate of its own.** Such a gate
+   would have to build a data context for the 17 views that hold an `ItemsControl`, and what it would
+   measure is already covered from two sides: **the rows and cards those lists repeat are views in
+   their own right and are measured alone** — `LibraryEntryView`, `EpisodeRowView`,
+   `CandidateCardView`, `PosterCardView` — and **the walk covers the application with seeded data and
+   refuses a click that does not land**. The gate costs a lot, its new surface is small, and a fragile
+   gate somebody has to maintain is worse than a stated absence. **Criterion if a real finding
+   appears**: attack the one view with its context, not all 17.
+
+2. **The mini player's chrome in the prototype's composition — title, time and a three-pixel progress
+   bar above the five buttons — is a piece of its own and goes on the queue, not in as a finishing
+   touch.** It is one view's composition, the size of a §4 tranche. **And it comes with a measurement
+   already made**: at 480×270 those five buttons folded into three rows once because of a translated
+   word, so whoever does it measures the width **in both languages** — which is exactly what both
+   width gates do as of today.
+
+3. **`ArtworkCache.cs` is NOT raised to the bar now, and there is a ceiling that explains it.** Its
+   floor is `96 70` from CI's own number. What it lacks is measured, and most of it is cheap: the
+   `image/png` and `image/webp` answers of `MediaExtension`, the null side of the `??` on the
+   `HttpClient` and on `allowedHosts`, and both `Directory.Exists` in their opposite branch. **What
+   sets the ceiling is `EnsureRemoteRootIsConfined`**: its `throw` is a security invariant no
+   legitimate caller can reach, and **that one is not deleted** — it is not a redundant guard like the
+   ones removed on 2026-08-28, it is what keeps the cache inside the data root. Raising it would mean
+   rewriting that guard to be reachable, trading a security promise for a coverage point.
+
 ### The queue, with points 1 and 2 struck out
 
 1. ~~The mini as a real PiP window.~~ **Done.** All that is left of its chrome is the prototype's
