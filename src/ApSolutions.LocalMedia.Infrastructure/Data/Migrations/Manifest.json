@@ -120,6 +120,12 @@
       "name": "five_star_rating",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0020_five_star_rating.sql",
       "sha256": "25AD4997F089911E4435BB0C500F314742F02A3390AAE4534E44AB7319F30F51"
+    },
+    {
+      "version": 21,
+      "name": "scanned_title_year",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0021_scanned_title_year.sql",
+      "sha256": "822FE57D10249125670DC69A9805FDEE0667B9C7C1B67719F6E9BBB72BAB365E"
     }
   ]
 }

@@ -139,5 +139,6 @@ public static partial class CompositionRoot
             .AddTransient<GroupMediaVersions>()
             .AddTransient<GroupScannedVersions>()
             .AddTransient<GroupScannedEpisodes>()
+            .AddTransient<NameScannedTitles>()
             .AddTransient<SetPreferredVersion>();
 }

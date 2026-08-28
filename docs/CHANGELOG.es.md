@@ -29,6 +29,29 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una película sin identificar se llamaba por su nombre de archivo, tal cual.** «El Faro de Piedra
+  2019» en la tarjeta, con el año dentro del título y la columna del año vacía a su lado — y antes de
+  eso, «Neon.Sobre.el.Rio.2022.2160p». Mientras tanto `MediaNameParser` lleva desde la primera semana
+  descomponiendo ese mismo nombre, y **tres** casos de uso ya lo llaman: la bandeja de revisión lo
+  compara con el proveedor, la agrupación de versiones compara copias con él, y desde el 2026-08-25 la
+  de series decide episodios con él. Dos lecturas del mismo nombre, y la que salía en pantalla era la
+  cruda.
+
+  Ahora hay una política pura (`ScannedTitlePolicy`) que dice cómo se llama la tarjeta —el título
+  limpio, y el nombre de archivo cuando limpiarlo no deja nada, porque «2019.mkv» es un año sin
+  título y una tarjeta en blanco es peor que una sucia— y un caso de uso hermano de los otros dos
+  (`NameScannedTitles`) que corre después de cada escaneo. La migración **0021** añade la columna del
+  año a la proyección: limpiar el título sin sitio donde poner el año habría quitado el año de la
+  pantalla, así que las dos cosas viajan juntas.
+
+  **Una biblioteca ya catalogada se renombra sola en el siguiente escaneo**, y sin volver a sondear un
+  solo archivo: el paso recorre todo el resumen del escaneo, `Unchanged` incluidos, que es justo lo
+  que un archivo cuyo tamaño y fecha no se han movido nunca vuelve a ser. Ese es el estado en el que
+  está todo lo ya catalogado el día que esto llega.
+
+  La aserción de `ScanSeriesGroupingTests` que decía «El Faro de Piedra 2019» estaba escrita a
+  propósito, para que cambiarla fuera una decisión y no una sorpresa. Ésta es esa decisión.
+
 - **`PlaybackControlPolicy.SpeedSteps` no lo leía nadie.** El defecto de la casa, número dieciséis:
   el menú escribía sus diez números en su propio marcado y una prueba **leía ese archivo como texto**
   para comparar los dos, así que la política no decidía nada mientras el comentario que tiene encima

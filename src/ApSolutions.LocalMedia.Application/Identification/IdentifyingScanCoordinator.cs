@@ -20,19 +20,22 @@ public sealed class IdentifyingScanCoordinator : IScanCoordinator
     private readonly Func<IdentifyScannedFiles> _identification;
     private readonly Func<GroupScannedVersions> _grouping;
     private readonly Func<GroupScannedEpisodes> _series;
+    private readonly Func<NameScannedTitles> _naming;
 
     public IdentifyingScanCoordinator(
         IScanCoordinator inner,
         Func<ReconcileScannedFiles> reconciliation,
         Func<IdentifyScannedFiles> identification,
         Func<GroupScannedVersions> grouping,
-        Func<GroupScannedEpisodes> series)
+        Func<GroupScannedEpisodes> series,
+        Func<NameScannedTitles> naming)
     {
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
         _reconciliation = reconciliation ?? throw new ArgumentNullException(nameof(reconciliation));
         _identification = identification ?? throw new ArgumentNullException(nameof(identification));
         _grouping = grouping ?? throw new ArgumentNullException(nameof(grouping));
         _series = series ?? throw new ArgumentNullException(nameof(series));
+        _naming = naming ?? throw new ArgumentNullException(nameof(naming));
     }
 
     public async Task<ScanSummary> StartAsync(
@@ -54,6 +57,12 @@ public sealed class IdentifyingScanCoordinator : IScanCoordinator
         // title already claims, and writes under an identifier derived from the folder,
         // which can never collide with the one identification uses.
         _ = await _series().ExecuteAsync(summary, cancellationToken).ConfigureAwait(false);
+
+        // Then what is left over gets its name read rather than copied. After the series pass on
+        // purpose: this one skips episodes, and a file only becomes an episode once that pass has
+        // said so. Everything else — the films, and whatever the parser cannot place — keeps a card,
+        // and until 2026-08-28 that card said the file name with the year still inside it.
+        _ = await _naming().ExecuteAsync(summary, cancellationToken).ConfigureAwait(false);
         return summary;
     }
 }

@@ -29,6 +29,29 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **An unidentified film was called by its file name, verbatim.** «El Faro de Piedra 2019» on the
+  card, with the year inside the title and the year column empty beside it — and before that,
+  «Neon.Sobre.el.Rio.2022.2160p». Meanwhile `MediaNameParser` has been taking that same name apart
+  since the first week, and **three** use cases already call it: the review inbox matches its output
+  against a provider, version grouping compares copies with it, and since 2026-08-25 the series
+  grouping decides episodes with it. Two readings of one file name, and the one on the screen was the
+  raw one.
+
+  There is now a pure policy (`ScannedTitlePolicy`) that says what the card is called — the clean
+  title, and the file name when cleaning leaves nothing, because «2019.mkv» is a year with no title
+  and a blank card is worse than a messy one — and a use case that is a sibling of the other two
+  (`NameScannedTitles`), run after every scan. Migration **0021** adds the year column to the
+  projection: cleaning the title with nowhere to put the year would have taken the year off the
+  screen, so the two travel together.
+
+  **An already-catalogued library renames itself on the next scan**, without re-probing a single file:
+  the pass walks the whole scan summary, `Unchanged` included, which is exactly what a file whose size
+  and date have not moved always is. That is the state everything already catalogued is in on the day
+  this ships.
+
+  The assertion in `ScanSeriesGroupingTests` that read «El Faro de Piedra 2019» was written on purpose
+  so that changing it would be a decision rather than a surprise. This is that decision.
+
 - **`PlaybackControlPolicy.SpeedSteps` was read by nobody.** The defect of the house, number sixteen:
   the menu wrote its own ten numbers into its own markup and a test **read that file as text** to
   compare the two, so the policy decided nothing while the comment above it claimed the keyboard

@@ -361,6 +361,11 @@ public sealed class IdentifyScannedFilesTests
         public Task ClearScanCheckpointAsync(
             LibraryRootId rootId,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task SetScannedTitleAsync(
+            MediaFileId mediaFileId,
+            ScannedTitle title,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 
     private sealed class InMemoryCandidateRepository : IMatchCandidateRepository

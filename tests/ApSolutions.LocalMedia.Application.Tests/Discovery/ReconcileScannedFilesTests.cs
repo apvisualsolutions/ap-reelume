@@ -376,6 +376,11 @@ public sealed class ReconcileScannedFilesTests
             LibraryRootId rootId,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
+        public Task SetScannedTitleAsync(
+            MediaFileId mediaFileId,
+            ScannedTitle title,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
         private IEnumerable<IdentifiedMediaFile> Identified() => _byPath.Values
             .Where(file => _identities.ContainsKey(file.Id))
             .Select(file => new IdentifiedMediaFile(file, _identities[file.Id]));

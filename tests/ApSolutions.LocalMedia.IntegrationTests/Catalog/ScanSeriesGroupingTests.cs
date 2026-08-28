@@ -59,8 +59,17 @@ public sealed class ScanSeriesGroupingTests
 
         var result = await grouping.ExecuteAsync(summary, TestContext.Current.CancellationToken);
 
+        // And the naming pass that follows it in the real chain, which is what gives the film its
+        // name. Run here rather than assumed, because what this test is about is what comes out of a
+        // scan of a real folder — and in the assembled application these two run one after the other.
+        var naming = new NameScannedTitles(roots, mediaFiles, new MediaNameParser());
+        var named = await naming.ExecuteAsync(summary, TestContext.Current.CancellationToken);
+
         Assert.Equal(2, result.SeriesCount);
         Assert.Equal((8 * 9) + (3 * 9), result.EpisodeCount);
+
+        // One file of the ninety-nine is not an episode, and it is the only one this pass renames.
+        Assert.Equal(new NameScannedTitlesResult(1, 1), named);
 
         // The grid's own query, which is what the report was about.
         var page = await catalog.QueryAsync(
@@ -74,12 +83,16 @@ public sealed class ScanSeriesGroupingTests
 
         // Three cards in total: the two shows and the film. Not ninety-nine.
         //
-        // The film still carries its file name verbatim — «El Faro de Piedra 2019» — because a
-        // scanned title is the file name and always was. That is a separate defect from this one and
-        // it is asserted here rather than corrected, so a later change to it is a change somebody
-        // decided rather than a surprise.
+        // The film is called «El Faro de Piedra» and its year is 2019, which is the correction this
+        // assertion was written to wait for. It used to read `item.Title == "El Faro de Piedra 2019"`
+        // — the file name verbatim, year and all, with the year column empty beside it — asserted on
+        // purpose so that changing it would be a decision rather than a surprise. This is that
+        // decision, taken on 2026-08-28: the parser that already reads these names for the review
+        // inbox, for version grouping and for the series above now reads them for the card too.
         Assert.Equal(3, page.Items.Count);
-        Assert.Contains(page.Items, item => item.Title == "El Faro de Piedra 2019");
+        var film = Assert.Single(page.Items, item => item.Kind == CatalogTitleKind.Unidentified);
+        Assert.Equal("El Faro de Piedra", film.Title);
+        Assert.Equal(2019, film.Year);
 
         // And the count each card writes under its cover.
         var thrones = shows.Single(show => show.Title == "Juego de Tronos");
