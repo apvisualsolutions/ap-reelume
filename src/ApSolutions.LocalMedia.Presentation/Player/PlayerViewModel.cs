@@ -30,6 +30,7 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     private bool _areControlsRevealed = true;
     private Func<PlaybackMode, Task>? _modeHandler;
     private bool _isCompact;
+    private bool _isFullscreen;
 
     /// <param name="alternativesExist">
     /// Whether the content being played has other versions catalogued, asked rather than stored.
@@ -139,6 +140,28 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
 
     /// <summary>True while the picture's own transport bar is the one a person uses.</summary>
     public bool HasFullTransport => !_isCompact;
+
+    /// <summary>
+    /// Whether the picture has the whole screen, which is what the transport's mode button draws.
+    /// </summary>
+    /// <remarks>
+    /// The prototype swaps that button's picture the instant the mode changes —
+    /// <c>icon(mode === 'fullscreen' ? 'exitfull' : 'full')</c> — and this application drew the
+    /// entering arrows in both states: a control saying the same thing whatever it had done, which is
+    /// the exact defect the mute button was found with on 2026-08-25 and fixed for. <c>exitfull</c>
+    /// was already in the dictionary and was drawn by the mini window alone.
+    ///
+    /// <para>
+    /// Pushed in from <c>ShellView</c> beside <see cref="IsCompact"/> rather than read out of the
+    /// shell, and for the same two reasons that one is: the bar travels to a window with no shell
+    /// above it, and the mode is applied while the stage is between two windows.
+    /// </para>
+    /// </remarks>
+    public bool IsFullscreen
+    {
+        get => _isFullscreen;
+        set => SetField(ref _isFullscreen, value);
+    }
 
     /// <summary>Puts the picture on the whole screen, and takes it back off.</summary>
     public ICommand ToggleFullscreenCommand { get; }

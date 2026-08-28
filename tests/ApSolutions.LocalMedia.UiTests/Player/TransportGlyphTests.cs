@@ -49,12 +49,47 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </remarks>
 public sealed class TransportGlyphTests
 {
-    /// <summary>The three the transport owns: seek back, seek forward, silence.</summary>
+    /// <summary>
+    /// The five the transport owns: seek back, seek forward, silence, and the two modes.
+    /// </summary>
+    /// <remarks>
+    /// The two mode buttons were <b>not on this table</b> until 2026-08-28, and they had been on the
+    /// bar since 2026-08-25. That is the shape of the gap this batch was for: the icons had a gate
+    /// over their <em>shapes</em> — <c>PrototypeIconTests</c> compares all thirty-five against the
+    /// prototype's own path data — and a gate over which glyph each button carried that listed
+    /// eleven buttons of thirteen. A picture on a button nothing names is a picture nothing checks,
+    /// and the one that was wrong was one of the two missing ones.
+    /// </remarks>
     private static readonly (string Name, string Key, string Icon)[] TransportOwn =
     [
         ("SkipBackwardButton", "TransportSkipBackward", "IconSkipBackward"),
         ("SkipForwardButton", "TransportSkipForward", "IconSkipForward"),
         ("MuteButton", "TransportToggleMute", "IconVolume"),
+        ("PictureInPictureButton", "TransportPictureInPictureAction", "IconMiniPlayer"),
+        ("FullscreenButton", "TransportFullscreenAction", "IconFullscreen"),
+    ];
+
+    /// <summary>
+    /// The three buttons that carry two pictures, and which one each state is for.
+    /// </summary>
+    /// <remarks>
+    /// A button whose picture never changes is a button saying the same thing whatever it has done,
+    /// and this tree has now found two of them: the mute drew the crossed speaker in both states
+    /// until 2026-08-25, and the full screen drew the entering arrows in both until 2026-08-28. The
+    /// prototype swaps both. (The speed pill's caret is the same fault in a third place and is not
+    /// on this table, because it is a template part rather than a button's content — the style
+    /// <c>ComboBox.filter-pill:dropdownopen</c> turns it over and <c>SpeedMenuTests</c> measures it.)
+    ///
+    /// <para>
+    /// Both pictures are asserted to be <b>in</b> the button, because that is what the swap is made
+    /// of: a state that resolved to no geometry at all would leave the button empty in exactly one
+    /// of its two states, and nothing that only looked at the resting state would see it.
+    /// </para>
+    /// </remarks>
+    private static readonly (string Name, string Resting, string Acted)[] TwoFaced =
+    [
+        ("MuteButton", "IconVolume", "IconMute"),
+        ("FullscreenButton", "IconFullscreen", "IconExitFullscreen"),
     ];
 
     /// <summary>The large transport's three, which carry no name and are found by the key behind theirs.</summary>
@@ -133,6 +168,43 @@ public sealed class TransportGlyphTests
         }
     }
 
+    /// <summary>
+    /// The buttons with two states carry two pictures, and the second is not the first.
+    /// </summary>
+    /// <remarks>
+    /// Asserted from the dictionary rather than from the state, because the states are driven by a
+    /// data context this scope deliberately does not give — which is what puts both pictures in the
+    /// visual tree at once and makes the pair visible to a check at all.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_buttons_that_do_two_things_carry_two_pictures()
+    {
+        using var scope = Mount();
+
+        foreach (var (name, resting, acted) in TwoFaced)
+        {
+            var button = ByName(scope.Transport, name);
+            var drawn = button.GetVisualDescendants()
+                .OfType<Avalonia.Controls.Shapes.Path>()
+                .Select(path => path.Data)
+                .ToArray();
+
+            foreach (var key in new[] { resting, acted })
+            {
+                Assert.True(button.TryFindResource(key, out var geometry), $"{key} does not resolve.");
+                Assert.Contains(geometry, drawn);
+            }
+
+            Assert.NotEqual(Resolve(button, resting), Resolve(button, acted));
+        }
+
+        static object? Resolve(Button button, string key)
+        {
+            button.TryFindResource(key, out var value);
+            return value;
+        }
+    }
+
     /// <summary>Every picture the transport paints is a drawing with something in it.</summary>
     /// <remarks>
     /// <para>
@@ -176,17 +248,18 @@ public sealed class TransportGlyphTests
     }
 
     /// <summary>
-    /// The transport's own three take the target area §4 asked for on their own row.
+    /// The transport's own five take the target area §4 asked for on their own row.
     /// </summary>
     /// <remarks>
-    /// Measured on 2026-08-21: these three sat at <c>MinWidth 0</c> and <c>MinHeight 36</c> and wore
-    /// no class at all. The 36 to 44 rise of 2026-08-21 landed on <c>player-chrome</c>, and this is
-    /// the one view §4 names by name that <b>was not wearing it</b> — so the change was recorded as
-    /// done while the three buttons somebody presses to skip and to silence stayed at 36. A glyph
-    /// needs a square target more than a word does, which is why the two arrive together.
+    /// Measured on 2026-08-21: three of these sat at <c>MinWidth 0</c> and <c>MinHeight 36</c> and
+    /// wore no class at all. The 36 to 44 rise of 2026-08-21 landed on <c>player-chrome</c>, and this
+    /// is the one view §4 names by name that <b>was not wearing it</b> — so the change was recorded
+    /// as done while the buttons somebody presses to skip and to silence stayed at 36. A glyph needs
+    /// a square target more than a word does, which is why the two arrive together. The two mode
+    /// buttons joined the table on 2026-08-28 and were already wearing it.
     /// </remarks>
     [AvaloniaFact]
-    public void The_transports_own_three_wear_the_chrome_and_measure_the_target_area()
+    public void The_transports_own_five_wear_the_chrome_and_measure_the_target_area()
     {
         using var scope = Mount();
 

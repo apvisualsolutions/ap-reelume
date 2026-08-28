@@ -326,6 +326,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="TransportFullscreenAction">Pantalla completa</x:String>
   <x:String x:Key="TransportPictureInPictureAction">Ventana flotante</x:String>
   <x:String x:Key="TransportSpeedShortLabel">VELOCIDAD</x:String>
+  <x:String x:Key="TransportSpeedNormal">Normal</x:String>
+  <x:String x:Key="TransportSpeedSlower">más lenta</x:String>
+  <x:String x:Key="TransportSpeedFaster">más rápida</x:String>
   <x:String x:Key="TransportPositionLabel">Posición de reproducción</x:String>
   <x:String x:Key="TransportVolumeLabel">Volumen (porcentaje)</x:String>
   <x:String x:Key="TransportBoostWarningTitle">Volumen amplificado</x:String>

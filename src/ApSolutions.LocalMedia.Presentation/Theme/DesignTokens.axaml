@@ -1844,7 +1844,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
               MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
               PlacementTarget="Background"
               WindowManagerAddShadowHint="False">
+            <!--
+              Named because the speed pill opens upward and has to move these four pixels of air to
+              the other side of the panel. A part a style has to reach needs a name, which is the
+              same reason Border#Background and Path#DropCaret carry theirs.
+            -->
             <Border
+                x:Name="DropDownSurface"
                 Margin="0,4,0,0"
                 Padding="4"
                 Background="{DynamicResource CardSurfaceBrush}"
@@ -1881,6 +1887,60 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
   <Style Selector="ComboBox.filter-pill:disabled /template/ Path#DropCaret">
     <Setter Property="Stroke" Value="{DynamicResource TextDisabledBrush}" />
+  </Style>
+
+  <!--
+    The transport's speed pill, which is the one drop-down in this application that opens upward.
+    It has to: the transport is the bottom edge of the player, and a panel dropping from it would
+    open off the screen. The prototype writes exactly that — `position:absolute; bottom:38px` — and
+    turns its caret the other way round, which the caret style above already does from the same
+    pseudo-class.
+
+    Three overrides and no second template. Placement is one of them because the pill's own template
+    does not bind PlacementMode: five drop-downs share that template and four of them open downward,
+    so the Popup takes its default and this one asks by class instead. The margin comes with it —
+    four pixels of air belong on the side the panel is actually on.
+  -->
+  <Style Selector="ComboBox.speed-pill /template/ Popup#PART_Popup">
+    <Setter Property="Placement" Value="Top" />
+  </Style>
+
+  <Style Selector="ComboBox.speed-pill /template/ Border#DropDownSurface">
+    <Setter Property="Margin" Value="0,0,0,4" />
+  </Style>
+
+  <!--
+    And the closed face, which says the multiplier where the open row says the word for it: the
+    prototype's pill reads «VELOCIDAD 1× ▲» and its row reads «● Normal · 1×». Both are drawn from
+    the same step, so one of the two has to be told to draw it differently.
+
+    Null rather than a second DataTemplate, and that is what SpeedOption.ToString is for: a presenter
+    with no template asks the object what it is, and this object answers with the multiplier. Written
+    down because painting a record's own ToString is normally the defect MarkerRowLabelConverter
+    exists to fix — the difference is that this one is written, tested, and is the shorter of the two
+    faces rather than a type name nobody meant to show.
+  -->
+  <Style Selector="ComboBox.speed-pill /template/ ContentControl#ContentPresenter">
+    <Setter Property="ContentTemplate" Value="{x:Null}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!--
+    The mark on the step in force. It is the prototype's «●» and it is the third signal on that row,
+    beside the wash and the border — and on the two high contrasts it is the only one, because both
+    of those dictionaries resolve ComboBoxItemBackgroundSelected and the resting fill to the same
+    colour. Same reasoning as the state glyph on the appearance pills and the bar on the rail.
+
+    Hidden by a style and shown by a more specific one, never by a local IsVisible in the template: a
+    local value outranks every setter in Avalonia, so a mark written as hidden in the markup would
+    stay hidden on the selected row too. Measured the hard way elsewhere in this file.
+  -->
+  <Style Selector="TextBlock.speed-mark">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="ComboBoxItem:selected TextBlock.speed-mark">
+    <Setter Property="IsVisible" Value="True" />
   </Style>
 
   <!--

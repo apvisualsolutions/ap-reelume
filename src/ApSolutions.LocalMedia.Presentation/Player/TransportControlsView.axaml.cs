@@ -93,4 +93,35 @@ public sealed partial class TransportControlsView : UserControl
 
         GuardedEvent.Run(() => viewModel.SeekAsync(TimeSpan.FromSeconds(requested)));
     }
+
+    /// <summary>
+    /// Carries a step chosen in the speed menu to the session that is playing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The third of the same shape, and it is here for the same reason the other two are: what comes
+    /// back from the engine is the speed it actually took, clamped by
+    /// <see cref="ApSolutions.LocalMedia.Domain.Playback.PlaybackControlPolicy"/>, and a two-way
+    /// binding would write the asked-for value into a property that has no setter.
+    /// </para>
+    /// <para>
+    /// The equality check is what keeps this from looping and from firing on its own. Applying the
+    /// answer raises <c>SpeedMultiplier</c>, the one-way <c>SelectedValue</c> puts the row back, and
+    /// that raises this event again with the value the model already holds — which is the case that
+    /// returns. It is also every selection the control makes for itself: a list handed an
+    /// <c>ItemsSource</c> selects the matching row while the view is still being built.
+    /// </para>
+    /// </remarks>
+    private void OnSpeedChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        _ = e;
+        if (DataContext is not TransportControlsViewModel viewModel
+            || SpeedReadout.SelectedValue is not double requested
+            || Math.Abs(requested - viewModel.SpeedMultiplier) < 0.001)
+        {
+            return;
+        }
+
+        GuardedEvent.Run(() => viewModel.SetSpeedAsync(requested));
+    }
 }

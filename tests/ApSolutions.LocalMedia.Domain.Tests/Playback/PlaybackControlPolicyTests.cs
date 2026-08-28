@@ -22,11 +22,20 @@ public sealed class PlaybackControlPolicyTests
     public void Speed_stays_between_a_quarter_and_four_times(double requested, double expected) =>
         Assert.Equal(expected, PlaybackControlPolicy.ClampSpeed(requested));
 
+    /// <summary>
+    /// The nine the prototype draws, in its order, and every one of them a speed this policy accepts
+    /// unchanged.
+    /// </summary>
+    /// <remarks>
+    /// It was ten until 2026-08-28. The extra one was <c>1.75</c>, which nothing in the prototype
+    /// offers — and this list is what the transport builds its menu from now, so a step here is a row
+    /// somebody sees rather than a number in a file nobody read.
+    /// </remarks>
     [Fact]
     public void The_approved_speed_steps_are_offered_in_ascending_order()
     {
         Assert.Equal(
-            [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 4.0],
+            [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0, 4.0],
             PlaybackControlPolicy.SpeedSteps);
         Assert.All(PlaybackControlPolicy.SpeedSteps, step => Assert.Equal(step, PlaybackControlPolicy.ClampSpeed(step)));
     }

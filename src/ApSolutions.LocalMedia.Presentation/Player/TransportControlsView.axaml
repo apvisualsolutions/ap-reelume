@@ -165,88 +165,72 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{Binding VolumeLabel}" />
       <!--
-        The prototype's speed menu: one button wearing the current multiplier, nine steps as radio
-        items behind it, and "back to 1x" only while away from 1x. It replaces what was a readout a
-        mouse could not act on — the keyboard changed speed and the pointer could only watch. Same
-        key as the readout carried, so the walk's identity is unchanged while the type is new.
+        The prototype's speed menu, which this drew as eleven bare numbers in a MenuFlyout: the
+        pill wears SPEED and the current multiplier, the nine steps behind it carry a mark, a name
+        and a note, and «Volver a 1×» is a button of its own beside the pill rather than an
+        eleventh row — a row that resets is not a speed, and it was sitting in a list of speeds.
+
+        A ComboBox and not a button with a flyout, and that is the walk rather than taste. Nothing
+        inside a Flyout can be pressed by the harness — a flyout's content lands in a popup root of
+        its own, which is why all twenty entries of eng/walk-pending.txt are flyout children and why
+        that ratchet cannot take two more. A ComboBox is pressed and asserted on IsDropDownOpen, the
+        way the library's two filters already are, and its rows are ComboBoxItems, which the
+        inventory does not count as separate command controls. So the menu gains a shape and the
+        ledger gains exactly one identity: the reset beside it.
+
+        filter-pill is the prototype's drop-down and already draws all of this — the label in small
+        type, the value in semi-bold, the caret that turns over when the panel opens, and the accent
+        frame while it is open. speed-pill adds the two things only this one wants: it opens upward,
+        and its closed face says the multiplier where the row says «Normal».
+      -->
+      <ComboBox
+          x:Name="SpeedReadout"
+          Classes="filter-pill speed-pill"
+          VerticalAlignment="Center"
+          Tag="{DynamicResource TransportSpeedShortLabel}"
+          automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}"
+          ItemsSource="{Binding SpeedOptions}"
+          SelectedValue="{Binding SpeedMultiplier, Mode=OneWay}"
+          SelectedValueBinding="{Binding Multiplier}"
+          SelectionChanged="OnSpeedChanged">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="player:SpeedOption">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space8}">
+              <!--
+                The mark, which is the prototype's own «●» and the third signal this row carries.
+                It is not decoration beside the wash and the border: both high contrast dictionaries
+                resolve the selected fill and the resting fill to one colour, so on those two themes
+                the mark is the only thing left that says which speed is in force — the same reason
+                the appearance pills carry a state glyph and the navigation rail carries a bar.
+
+                Hidden here and shown by ComboBoxItem:selected, so the row that has it is the row the
+                control itself calls selected. A bound IsCurrent would be a second opinion about the
+                same fact, and the two would disagree the first time one of them was not refreshed.
+              -->
+              <TextBlock
+                  Classes="speed-mark"
+                  Width="14"
+                  TextAlignment="Center"
+                  Text="●" />
+              <TextBlock Grid.Column="1" Text="{Binding Label}" />
+              <TextBlock Grid.Column="2" Classes="setting-state" Text="{Binding Note}" />
+            </Grid>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <!--
+        Present only while there is something to come back from, which is the same grammar the
+        library's «Limpiar filtros» follows and the prototype's own rateNotNormal. A reset
+        permanently on offer is a control whose job would be nothing.
       -->
       <Button
-          x:Name="SpeedReadout"
-          Classes="player-chrome"
+          x:Name="SpeedResetButton"
           VerticalAlignment="Center"
-          automation:AutomationProperties.Name="{DynamicResource TransportSpeedLabel}">
-        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-          <!--
-            The word, which the prototype writes beside the multiplier: «1×» alone is a number
-            nobody can tell from a volume or a version.
-
-            Drawn short and spaced, which is the prototype's own «VELOCIDAD»: the full label is four
-            syllables longer and made this pill wider than the four transport buttons put together.
-            The long one stays as the button's accessible name, where length costs nothing and
-            «Velocidad» alone would be a control a reader cannot place.
-          -->
-          <TextBlock
-              Classes="hero-overline"
-              VerticalAlignment="Center"
-              Foreground="{DynamicResource PlayerTextSecondaryBrush}"
-              Text="{DynamicResource TransportSpeedShortLabel}" />
-          <TextBlock
-              VerticalAlignment="Center"
-              FontWeight="SemiBold"
-              Foreground="{DynamicResource PlayerTextBrush}"
-              Text="{Binding SpeedLabel}" />
-          <Path Classes="icon size-14" Data="{DynamicResource IconChevronUp}" Stroke="{DynamicResource PlayerTextSecondaryBrush}" />
-        </StackPanel>
-        <Button.Flyout>
-          <MenuFlyout Placement="Top">
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="0.25"
-                Header="0,25×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="0.5"
-                Header="0,5×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="0.75"
-                Header="0,75×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="1"
-                Header="1×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="1.25"
-                Header="1,25×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="1.5"
-                Header="1,5×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="1.75"
-                Header="1,75×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="2"
-                Header="2×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="3"
-                Header="3×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="4"
-                Header="4×" />
-            <MenuItem
-                Command="{Binding SetSpeedCommand}"
-                CommandParameter="1"
-                Header="{DynamicResource TransportSpeedResetAction}"
-                IsVisible="{Binding IsAwayFromNormalSpeed}" />
-          </MenuFlyout>
-        </Button.Flyout>
-      </Button>
+          IsVisible="{Binding IsAwayFromNormalSpeed}"
+          automation:AutomationProperties.Name="{DynamicResource TransportSpeedResetAction}"
+          Command="{Binding SetSpeedCommand}"
+          CommandParameter="1"
+          Content="{DynamicResource TransportSpeedResetAction}" />
       <!--
         Picture-in-picture and full screen, at the end of the bar, which is where every player on
         this machine puts them and where this one did not have them at all: the two modes were
@@ -272,7 +256,23 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.Name="{DynamicResource TransportFullscreenAction}"
           automation:AutomationProperties.AcceleratorKey="F"
           Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).ToggleFullscreenCommand}">
-        <Path Classes="icon size-20" Data="{DynamicResource IconFullscreen}" />
+        <!--
+          Two shapes and not one, which is the same correction the mute button took on 2026-08-25 and
+          for the same reason: the prototype writes
+          `icon(mode === 'fullscreen' ? 'exitfull' : 'full')` and this drew the entering arrows in
+          both states — a control that says the same thing whatever it has done. `IconExitFullscreen`
+          was in the dictionary the whole time and only the mini window's restore ever asked for it.
+        -->
+        <Panel>
+          <Path
+              Classes="icon size-20"
+              Data="{DynamicResource IconFullscreen}"
+              IsVisible="{Binding !$parent[player:PlayerView].((player:PlayerViewModel)DataContext).IsFullscreen}" />
+          <Path
+              Classes="icon size-20"
+              Data="{DynamicResource IconExitFullscreen}"
+              IsVisible="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).IsFullscreen}" />
+        </Panel>
       </Button>
     </WrapPanel>
 
