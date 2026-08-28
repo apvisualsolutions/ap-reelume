@@ -643,7 +643,8 @@
         "docs/evidence/mvp/T30-home-details.md",
         "docs/evidence/mvp/T39B-assembly.md",
         "docs/evidence/mvp/T7-catalog-search.md",
-        "docs/evidence/stable/audit-initial-route-never-navigates.md"
+        "docs/evidence/stable/audit-initial-route-never-navigates.md",
+        "docs/evidence/stable/audit-sections-cut-off.md"
       ]
     },
     {

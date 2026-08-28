@@ -117,8 +117,19 @@ nothing until the whole sandbox cycle has been run.
    `TitlePreviewRenameAction matched 0 controls` — because the page covers the card it was opened
    from. So both pills **open** as well as select, which is what the prototype does.
 
-4. **"Sections cut off by the width"**, with the width axis already ruled out and measured — the four
-   live hypotheses are still below, in the fourth session's section.
+4. ~~"Sections cut off by the width"~~ **Found, and it was not the width.** `HomeView` asks for
+   **683 px** and was the one destination mounted in a bare `ContentControl` with no `ScrollViewer`:
+   with `MinHeight` at 600, **83 px of Home could not be reached**. That is hypothesis (c), the
+   vertical one.
+
+   Two new gates close it: the language became a **parameter** of both width suites — they pinned
+   `es-ES`, so the other language was a guess, hypothesis (b) — and a third asserts that **a view
+   taller than the window is inside something that scrolls**, reading the shell's own tree rather than
+   a list.
+
+   **(a) and (d) are still open**: with full lists — partly covered by the walk, which refuses a click
+   that does not land — and with a **wide window**, which nothing looks at yet; there what fails is
+   not something overflowing but something that does not grow.
 
 ## State at the close of 2026-08-28 (fourth session) — the debt list's crack, closed and gated
 

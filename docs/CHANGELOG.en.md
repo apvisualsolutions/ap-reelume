@@ -118,6 +118,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Home did not scroll, and on the smallest window 83 px of it were lost off the bottom.** It was the
+  one destination mounted in a bare `ContentControl` while Library, Review, Duplicates and Settings
+  each had a `ScrollViewer` of their own. With `MinHeight` at 600 and `HomeView` asking for **683**,
+  the end of Home was content nobody could reach.
+
+  **This is the "sections cut off by the width" finding, and it was not the width.** The horizontal
+  axis had been ruled out and measured — none of the 48 views exceeds the 836 px the shell gives them
+  — leaving four hypotheses; this was the third. There is a gate on it now: **a view taller than the
+  window has to be inside something that scrolls**, read off the shell's own tree rather than off a
+  list written by hand.
+
+  Both width gates now measure **in both languages** as well. They pinned `es-ES` as a constant, so
+  the other language was a guess — and the mini player's chrome had already folded into three rows
+  once because an English word was longer.
+
 - **A scanned film's year reached the library and not Home.** Both surfaces read the same projection
   with **the same query written twice** — each carries its own copy of "hide a file that is already an
   episode" — and the year column, which arrived with migration 0021, was put into one and not the

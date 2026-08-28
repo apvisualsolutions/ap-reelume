@@ -60,11 +60,23 @@ public sealed class ViewOverflowTests
     /// </summary>
     private static readonly Dictionary<string, string> NotMountedAlone = new(StringComparer.Ordinal);
 
-    [AvaloniaFact]
-    public void No_view_is_wider_than_the_narrowest_window_the_application_allows()
+    /// <summary>
+    /// Measured in both languages since 2026-08-28, and that closes one of the four hypotheses left
+    /// standing over «secciones cortadas por el ancho».
+    /// </summary>
+    /// <remarks>
+    /// It ran in <c>es-ES</c> only until then, which made the other language a guess rather than a
+    /// measurement — and the mini player's chrome had already folded into three rows once because an
+    /// English word was longer than the Spanish one it replaced. Longer strings are the ordinary way
+    /// a layout that fits stops fitting, so the language is a parameter here rather than a constant.
+    /// </remarks>
+    [AvaloniaTheory]
+    [InlineData("es-ES")]
+    [InlineData("en-US")]
+    public void No_view_is_wider_than_the_narrowest_window_the_application_allows(string language)
     {
         Assert.NotNull(Avalonia.Application.Current);
-        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo(language));
 
         var views = typeof(ShellView).Assembly
             .GetTypes()
@@ -130,7 +142,7 @@ public sealed class ViewOverflowTests
                 {
                     offside.Add(
                         $"{type.Name}: {Describe(control)} ends at x={edge.X:F0} in a "
-                            + $"{MinimumWindowWidth:F0}-wide window");
+                            + $"{MinimumWindowWidth:F0}-wide window, in {language}");
                     break;
                 }
             }

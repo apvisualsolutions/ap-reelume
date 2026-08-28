@@ -117,6 +117,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Inicio no se desplazaba, y en la ventana más pequeña se perdían 83 px por abajo.** Era el único
+  destino montado en un `ContentControl` pelado mientras Biblioteca, Revisión, Duplicados y Ajustes
+  tenían cada uno su `ScrollViewer`. Con `MinHeight` en 600 y `HomeView` pidiendo **683**, el final de
+  Inicio era contenido que nadie podía alcanzar.
+
+  **Es el hallazgo «secciones cortadas por el ancho», y no era el ancho.** El eje horizontal estaba
+  descartado y medido —ninguna de las 48 vistas se pasa de los 836 px que da el shell—, así que
+  quedaban cuatro hipótesis; ésta era la tercera. Ahora hay una puerta que la vigila: **una vista más
+  alta que la ventana tiene que estar dentro de algo que se desplace**, leído del árbol del shell y no
+  de una lista escrita a mano.
+
+  De paso, las dos puertas de ancho **miden ahora en los dos idiomas**. Fijaban `es-ES` como
+  constante, así que el otro idioma era una suposición — y el cromo del mini ya plegó en tres filas
+  una vez por una palabra inglesa más larga.
+
 - **El año de una película escaneada llegaba a Biblioteca y no a Inicio.** Las dos superficies leen la
   misma proyección con **la misma consulta escrita dos veces** —cada una lleva su propia copia de
   «oculta el archivo que ya es un episodio»— y la columna del año, que llegó con la migración 0021, se

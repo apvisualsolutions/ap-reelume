@@ -119,8 +119,18 @@ rojo aquí no significa nada hasta que se corra el ciclo del sandbox entero.
    `TitlePreviewRenameAction matched 0 controls` — porque la página tapa la ficha de la que se abrió.
    Por eso las dos píldoras **abren** además de seleccionar, que es lo que hace el prototipo.
 
-4. **«Secciones cortadas por el ancho»**, con el eje del ancho ya descartado y medido — las cuatro
-   hipótesis vivas siguen abajo, en la sección de la cuarta sesión.
+4. ~~«Secciones cortadas por el ancho»~~ **Encontrado, y no era el ancho.** `HomeView` pide **683 px**
+   y era el único destino montado en un `ContentControl` pelado, sin `ScrollViewer`: con `MinHeight`
+   en 600, **83 px de Inicio no se podían alcanzar**. Es la hipótesis (c), la vertical.
+
+   Lo cierran dos puertas nuevas: el idioma pasó a ser **parámetro** de las dos suites de ancho —
+   fijaban `es-ES`, así que el otro idioma era una suposición, hipótesis (b) — y hay una tercera que
+   afirma que **una vista más alta que la ventana está dentro de algo que se desplaza**, leyendo el
+   árbol del shell y no una lista.
+
+   **Siguen abiertas (a) y (d)**: con las listas llenas —la cubre en parte el paseo, que rechaza un
+   clic que no aterriza— y con la **ventana ancha**, que no la mira nada todavía; allí lo que falla no
+   es que algo se salga, sino que algo **no crezca**.
 
 ## Estado al cierre del 2026-08-28 (cuarta sesión) — la grieta de la deuda, cerrada y con puerta
 
