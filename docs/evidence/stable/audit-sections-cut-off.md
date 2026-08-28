@@ -69,13 +69,33 @@ It asserts that a tall one is inside something that scrolls, read off the shell'
 son el marcado de todos los destinos a la vez sin contexto de datos que oculte ninguno. / `ShellView`
 is excluded because it holds the scrollers rather than being held by one.
 
+## (d) medida y descartada / (d) measured and ruled out
+
+Lo que fallaría en una ventana ancha no es que algo se salga, sino que algo **no crezca**, y eso no lo
+miraba ninguna puerta. Medido: cada vista sola en una ventana de **1920**, buscando cuáles se quedan
+por debajo. Sólo dos: / What would fail on a wide window is not something overflowing but something
+that does not grow. Measured at 1920, only two views stay short:
+
+```
+ContinueCardView 332 px      PosterCardView 148 px
+```
+
+**Las dos son tarjetas, y una tarjeta tiene su ancho.** Son las piezas que las listas repiten, no
+páginas: crecer con la ventana es exactamente lo que no deben hacer. **Ninguna página se queda corta**,
+así que la hipótesis muere aquí — y sin puerta, porque lo que habría que afirmar es «una página crece»
+y las dos únicas excepciones son legítimas y permanentes. / Both are cards, and a card has its own
+width. No page stays short, so the hypothesis dies here — and without a gate, because the only two
+exceptions are legitimate and permanent.
+
+Con las mismas dos limitaciones de siempre: sin contexto de datos, y por tanto sin listas llenas. /
+With the same two limitations: no data context, and therefore no full lists.
+
 ## Lo que sigue abierto / What is still open
 
-**(a) con las listas llenas** y **(d) con la ventana ancha**. La primera la cubre en parte el paseo,
-que recorre la aplicación con datos sembrados y rechaza un clic que no aterriza; la segunda no está
-medida por nada todavía — lo que fallaría allí no es que algo se salga, sino que algo **no crezca**, y
-eso ninguna de las tres puertas lo mira. / (a) is partly covered by the walk; (d) is measured by
-nothing yet — what fails there is something that does not grow, which no gate looks at.
+**Sólo (a), con las listas llenas.** La cubre en parte el paseo, que recorre la aplicación con datos
+sembrados y rechaza un clic que no aterriza — pero «rechaza un clic» no es lo mismo que «mide cada
+control», y esa diferencia es lo que queda sin puerta. / **Only (a), with full lists.** The walk covers
+part of it, but refusing a click is not the same as measuring every control.
 
 ## Verde / Green
 

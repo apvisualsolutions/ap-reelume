@@ -127,9 +127,13 @@ nothing until the whole sandbox cycle has been run.
    taller than the window is inside something that scrolls**, reading the shell's own tree rather than
    a list.
 
-   **(a) and (d) are still open**: with full lists — partly covered by the walk, which refuses a click
-   that does not land — and with a **wide window**, which nothing looks at yet; there what fails is
-   not something overflowing but something that does not grow.
+   **(d) is measured and ruled out too**: at 1920 px only two views stay short, `ContinueCardView`
+   (332) and `PosterCardView` (148), **and both are cards** — growing with the window is exactly what
+   they must not do. No page stays short, and it carries no gate because the two exceptions are
+   legitimate and permanent.
+
+   **Only (a) is left**, with full lists: the walk covers part of it by refusing a click that does not
+   land, but refusing a click is not measuring every control, and that difference is what has no gate.
 
 ## State at the close of 2026-08-28 (fourth session) — the debt list's crack, closed and gated
 

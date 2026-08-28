@@ -128,9 +128,14 @@ rojo aquí no significa nada hasta que se corra el ciclo del sandbox entero.
    afirma que **una vista más alta que la ventana está dentro de algo que se desplaza**, leyendo el
    árbol del shell y no una lista.
 
-   **Siguen abiertas (a) y (d)**: con las listas llenas —la cubre en parte el paseo, que rechaza un
-   clic que no aterriza— y con la **ventana ancha**, que no la mira nada todavía; allí lo que falla no
-   es que algo se salga, sino que algo **no crezca**.
+   **(d) también está medida y descartada**: a 1920 px sólo dos vistas se quedan cortas,
+   `ContinueCardView` (332) y `PosterCardView` (148), **y las dos son tarjetas** — crecer con la
+   ventana es justo lo que no deben hacer. Ninguna página se queda corta, y no lleva puerta porque las
+   dos excepciones son legítimas y permanentes.
+
+   **Queda sólo (a)**, con las listas llenas: la cubre en parte el paseo, que rechaza un clic que no
+   aterriza, pero «rechazar un clic» no es «medir cada control», y esa diferencia es lo que sigue sin
+   puerta.
 
 ## Estado al cierre del 2026-08-28 (cuarta sesión) — la grieta de la deuda, cerrada y con puerta
 
