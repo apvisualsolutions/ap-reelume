@@ -34,9 +34,30 @@ no `GetGlyphMetrics`, `Shape` must be cast to `Visual`).
 
 **And its corollary, which is the session's finding: measuring layout is not measuring what is seen.**
 
-## What is left, and it is the next piece: the buttons are 2 px out
+## The buttons were 2 px out, and are not any more — with a pixel gate
 
-**Measured in pixels, rasterising a real button** with `window.CaptureRenderedFrame()` — which works
+**Closed in the same session.** The optical compensation was **5 px on the label** and the error on
+screen was **1**, so it moved the word by three — from 1 px low to 2 px high — and shifted the icon on
+the way, because a margin on the label grows the panel it sits in. It is now **1 px on the button's
+content**: it moves everything the button draws by the same amount.
+
+```
+                 icon    word    button    icon<->word   word<->button
+margin 5         39.5    37.5     39.5        +2.0           -2.0
+no margin        40.5    40.5     39.5         0.0           +1.0
+margin 2         38.5    38.5     39.5         0.0           -1.0
+margin 1         39.5    39.5     39.5         0.0            0.0
+```
+
+**`ButtonOpticalCentreTests` is retired, and that is not loosening a gate.** Its method had a
+demonstrable flaw: it computed the foot of the ink assuming a descender **always**, and over «Guardar
+el informe» — which has none — it answered 2.43 px where rasterising measures 0.0. All three of its
+assertions live in `ButtonPixelCentreTests` now, in pixels and with the word as a parameter.
+Evidence: [the pixel against the box](evidence/stable/audit-button-pixel-centre.md).
+
+### How it was measured, which is the technique that was missing
+
+**In pixels, rasterising a real button** with `window.CaptureRenderedFrame()` — which works
 because `TestAppBuilder` brings up Skia with `UseHeadlessDrawing = false` — a 12 px icon and the word
 «Guardar»:
 
@@ -68,7 +89,7 @@ consumer, but **a gate measuring the model of what it promises to look at**.
    +0.90. A **3.2 px** range that depends on whether there is a descender — and that moves with
    translation. What is stable is the font's metric, not the word.
 
-### Measured and still undone: `Path.icon` anchors instead of centring
+## The one thing left of this, measured and undone: `Path.icon` anchors instead of centring
 
 `Stretch="Uniform"` in a square box scales the geometry and **anchors it top-left**: the spare axis
 goes entirely to one side. Of 29 icon-only buttons, **17 have their ink off centre** — six colour

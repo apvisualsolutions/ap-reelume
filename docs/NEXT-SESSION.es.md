@@ -34,9 +34,30 @@ compilación** adivinando la API (`IGlyphTypeface` no es público, `FontMetrics`
 
 **Y su corolario, que es el hallazgo de la sesión: medir el layout no es medir lo que se ve.**
 
-## Lo que queda, y es la pieza siguiente: los botones están 2 px desalineados
+## Los botones estaban 2 px desalineados, y ya no — con puerta de píxeles
 
-**Medido en píxeles, rasterizando un botón real** con `window.CaptureRenderedFrame()` —funciona
+**Cerrado en esta misma sesión.** La compensación óptica valía **5 px sobre la etiqueta** y el error
+en pantalla era **1**, así que movía la palabra tres — de 1 px baja a 2 px alta — y de paso desplazaba
+el icono, porque un margen sobre la etiqueta hace crecer el panel donde vive. Ahora es **1 px sobre el
+contenido del botón**: mueve por igual todo lo que el botón dibuja.
+
+```
+                 icono   palabra   botón    icono↔palabra   palabra↔botón
+margen 5          39,5     37,5     39,5        +2,0            -2,0
+sin margen        40,5     40,5     39,5         0,0            +1,0
+margen 2          38,5     38,5     39,5         0,0            -1,0
+margen 1          39,5     39,5     39,5         0,0             0,0
+```
+
+**`ButtonOpticalCentreTests` se retira, y no es aflojar una puerta.** Su método tenía un fallo
+demostrable: calculaba el pie de la tinta asumiendo **siempre** un descendente, y sobre «Guardar el
+informe» —que no tiene ninguno— contestaba 2,43 px donde el rasterizado mide 0,0. Sus tres
+afirmaciones están las tres en `ButtonPixelCentreTests`, ahora en píxeles y con la palabra como
+parámetro. Evidencia: [el píxel contra la caja](evidence/stable/audit-button-pixel-centre.md).
+
+### Cómo se midió, que es la técnica que faltaba
+
+**En píxeles, rasterizando un botón real** con `window.CaptureRenderedFrame()` —funciona
 porque `TestAppBuilder` levanta Skia con `UseHeadlessDrawing = false`—, icono de 12 px y la palabra
 «Guardar»:
 
@@ -68,7 +89,7 @@ no un servicio sin consumidor, sino **una puerta que mide el modelo de lo que pr
    `Save` +0,90. Un rango de **3,2 px** que depende de si hay descendente — y que cambia al traducir.
    Lo estable es la métrica de la fuente, no la palabra.
 
-### Lo que sí queda medido y sin hacer: `Path.icon` ancla en vez de centrar
+## Lo único que queda de esto, medido y sin hacer: `Path.icon` ancla en vez de centrar
 
 `Stretch="Uniform"` con caja cuadrada escala la geometría y **la ancla arriba-izquierda**: el eje que
 sobra queda todo a un lado. De 29 botones de sólo icono, **17 tienen la tinta descentrada** — seis

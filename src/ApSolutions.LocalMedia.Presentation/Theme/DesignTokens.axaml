@@ -1253,17 +1253,45 @@ SPDX-License-Identifier: GPL-3.0-or-later
     string is an <c>AccessText</c> — measured, along with the fact that its logical parent is the
     button itself and not the presenter, which is what lets the first selector reach it at all.
   -->
+  <!--
+    <b>One pixel on the button's content, and it used to be five on the label.</b> Rewritten on
+    2026-08-28 against the first measurement of this that read pixels rather than boxes.
+
+    The five were derived from the font's metrics — a 2.43 px asymmetry between ascent and descent,
+    doubled because a margin on one side moves a centred box by half of it. Rasterising a real button
+    with <c>CaptureRenderedFrame</c> says the error on screen is <b>1 px</b>, not 2.43, and that the
+    five moved the word by three: from 1 px low to 2 px high. It overcorrected past the middle.
+
+    <b>And it moved the wrong thing.</b> A margin on the label grows the panel the label sits in, so
+    a button carrying an icon beside its word had the icon shifted too — measured at <b>2 px between
+    the icon and the word</b> across all 53 buttons of that shape. The icon is geometry and was
+    already centred to the pixel; the compensation pushed it off and then pushed the word twice as
+    far the other way.
+
+    So it goes on the button's own content — the label when that is all there is, the panel when
+    there is an icon beside it — where it moves everything the button draws by the same amount and
+    cannot separate two things that belong together. Measured after the change, at 14 px in Inter,
+    the icon, the word and the button's middle all land on the same pixel for «Guardar»,
+    «Reproducir», «Añadir medios…» and «Save the report» — with a descender and without, in both
+    languages.
+
+    <b>Two is not the answer and was measured too</b>: 2 px of margin moves the pair 1 px past the
+    middle, the same overshoot in miniature. What a margin corrects is half of itself.
+
+    <c>Path</c> appears nowhere here, and that is unchanged: a shape is centred by its geometry and a
+    button whose whole content is an icon needs no compensation at all.
+  -->
   <Style Selector="Button &gt; :is(TextBlock),
-                   Button &gt; StackPanel &gt; :is(TextBlock),
-                   Button &gt; WrapPanel &gt; :is(TextBlock),
-                   Button &gt; Grid &gt; :is(TextBlock),
-                   Button &gt; Panel &gt; :is(TextBlock),
+                   Button &gt; StackPanel,
+                   Button &gt; WrapPanel,
+                   Button &gt; Grid,
+                   Button &gt; Panel,
                    ToggleButton &gt; :is(TextBlock),
-                   ToggleButton &gt; StackPanel &gt; :is(TextBlock),
-                   ToggleButton &gt; WrapPanel &gt; :is(TextBlock),
-                   ToggleButton &gt; Grid &gt; :is(TextBlock),
-                   ToggleButton &gt; Panel &gt; :is(TextBlock)">
-    <Setter Property="Margin" Value="0,0,0,5" />
+                   ToggleButton &gt; StackPanel,
+                   ToggleButton &gt; WrapPanel,
+                   ToggleButton &gt; Grid,
+                   ToggleButton &gt; Panel">
+    <Setter Property="Margin" Value="0,0,0,1" />
   </Style>
   <!--
     The ring is drawn twice, in two colours, one inside the other. Borrowing the control's own border

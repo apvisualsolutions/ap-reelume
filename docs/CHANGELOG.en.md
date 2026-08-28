@@ -58,6 +58,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **`ButtonOpticalCentreTests` is retired and `ButtonPixelCentreTests` replaces it, rasterising.**
+  This is not loosening a gate: its method had a demonstrable flaw — it computed the foot of the ink
+  assuming a descender **always**, and over «Guardar el informe», which has none, it answered 2.43 px
+  of separation where rasterising measures 0.0. All three of its assertions — the word centred in the
+  button, the icon centred in the button, and the two on one middle — are in the new gate, now in
+  pixels and with the word as a **parameter**: the middle of the ink is a property of the string and
+  not of the font, ranging from +0.62 («Guardar el informe») to +3.82 («ppp») with the descender.
+
+- **`CLAUDE.md` gains an unbreakable rule 0: the Avalonia MCP before anything.** It is consulted
+  before writing AXAML or asserting how a control behaves, with its bill written down: one false
+  hypothesis chased to the end — that the renderer snapped the baseline to the pixel grid, which the
+  measurement refutes — and six compile rounds guessing at the API. And its corollary, the day's
+  finding: **measuring layout is not measuring what is seen**.
+
 - **The test asserting the mini's five fit on one line stops supposing the other language.** It
   pinned `es-ES`, and those five already folded into three rows inside 480×270 over one translated
   word; the language is a parameter now, as in both width gates since 2026-08-26. A second one joins
@@ -144,6 +158,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   by hand, and `ContrastTokenTests` refuses a theme that paints them alike.
 
 ### Fixed
+
+- **The buttons drew their icon and their word 2 px apart, with two gates green over it.** Measured
+  by rasterising a real button with `CaptureRenderedFrame()`: the label's optical compensation was
+  **5 px** and the error on screen was **1**, so it moved the word by three — from 1 px low to 2 px
+  high. And it moved the wrong thing: a margin on the label grows the panel it sits in, so across the
+  **53 buttons** carrying an icon beside a word the icon moved too, and the icon is geometry and was
+  already centred to the pixel.
+
+  The five came from the font's metrics — a 2.43 px asymmetry between ascent and descent — and that
+  number **is not the screen's**. The compensation is now **1 px on the button's content** rather
+  than on the label: it moves everything the button draws by the same amount and cannot separate two
+  things that belong together. Measured after: the icon, the word and the button's middle land on the
+  **same pixel row** for «Guardar», «Reproducir», «Añadir medios…» and «Save the report» — with a
+  descender and without, in both languages. Evidence:
+  [the pixel against the box](evidence/stable/audit-button-pixel-centre.md).
 
 - **In both light themes the mini player's chrome was invisible.** The band painted
   `ShellSurfaceBrush` and its buttons take `PlayerTextBrush` from the `player-chrome` class, and

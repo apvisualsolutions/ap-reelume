@@ -56,6 +56,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **`ButtonOpticalCentreTests` se retira y la sustituye `ButtonPixelCentreTests`, que rasteriza.**
+  No es aflojar una puerta: su método tenía un fallo demostrable — calculaba el pie de la tinta
+  asumiendo **siempre** un descendente, y sobre «Guardar el informe», que no tiene ninguno,
+  contestaba 2,43 px de separación donde el rasterizado mide 0,0. Sus tres afirmaciones —la palabra
+  centrada en el botón, el icono centrado en el botón, y los dos en el mismo medio— están las tres en
+  la puerta nueva, y ahora en píxeles y con la palabra como **parámetro**: el centro de la tinta no
+  es propiedad de la fuente sino de la cadena, y va de +0,62 («Guardar el informe») a +3,82 («ppp»)
+  según lleve descendente.
+
+- **`CLAUDE.md` gana una regla 0 inquebrantable: el MCP de Avalonia antes que nada.** Se consulta
+  antes de escribir AXAML o de afirmar cómo se comporta un control. Con su factura escrita: una
+  hipótesis falsa perseguida hasta el final —que el render ajustaba la línea base a la rejilla, que
+  la medición desmiente— y seis vueltas de compilación adivinando la API. Y su corolario, que es el
+  hallazgo del día: **medir el layout no es medir lo que se ve**.
+
 - **La prueba que afirma que los cinco del mini caben en una línea deja de suponer el otro idioma.**
   Fijaba `es-ES`, y esos cinco ya plegaron en tres filas dentro de 480×270 por una palabra
   traducida; ahora el idioma es parámetro, como en las dos puertas de ancho desde el 2026-08-26. Se
@@ -143,6 +158,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
   `ContrastTokenTests` rechaza un tema que los pinte iguales.
 
 ### Corregido
+
+- **Los botones dibujaban su icono y su palabra 2 px separados, con dos puertas verdes encima.**
+  Medido rasterizando un botón real con `CaptureRenderedFrame()`: la compensación óptica de la
+  etiqueta valía **5 px** y el error en pantalla era **1**, así que movía la palabra tres — de 1 px
+  baja a 2 px alta. Y movía lo que no era: un margen sobre la etiqueta hace crecer el panel donde
+  vive, así que en los **53 botones** con icono al lado el icono se desplazaba también, y el icono es
+  geometría y ya estaba centrado al píxel.
+
+  Los cinco venían de las métricas de la fuente —2,43 px de asimetría entre ascendente y
+  descendente—, y ese número **no es el de la pantalla**. Ahora la compensación es de **1 px y va
+  sobre el contenido del botón**, no sobre la etiqueta: mueve por igual todo lo que el botón dibuja y
+  no puede separar dos cosas que van juntas. Medido después: el icono, la palabra y el centro del
+  botón caen en la **misma fila de píxeles** con «Guardar», «Reproducir», «Añadir medios…» y «Save
+  the report» — con descendente y sin, en los dos idiomas. Evidencia:
+  [el píxel contra la caja](evidence/stable/audit-button-pixel-centre.md).
 
 - **En los dos temas claros, el cromo del minirreproductor era invisible.** La franja pintaba
   `ShellSurfaceBrush` y sus botones toman `PlayerTextBrush` de la clase `player-chrome`, y esos dos
