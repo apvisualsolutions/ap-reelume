@@ -136,6 +136,18 @@ reports and does not block, exactly like the floors.
   it as `ENDOFLINE` on every line of the whole file.
 - **The schema version has three assertions**: the count, the maximum and the list of names in
   `SqliteBootstrapTests`. A new migration moves all three.
+- **A `Test Case Cleanup Failure` reading "the calling thread cannot access this object" is NOT the
+  code: it is the harness recycling itself.** CI failed that way on 2026-08-28 in
+  `TransportGlyphTests`, and the whole stack was Avalonia's —
+  `HeadlessUnitTestSession.EnsureIsolatedApplication` → `Compositor..ctor` →
+  `Dispatcher.VerifyAccess` — without one line of ours. **And the test xUnit named was not the
+  culprit**: it lasted 1 ms and never ran; what failed was preparing the application *for* it. The
+  cause was the new test beside it, opening a fourth window by hand in a class whose scope already
+  opens three per test, and not closing it when an assertion failed. **It does not reproduce
+  locally** — two passes of 958 green — so the way out is the usual one: a race is removed, not
+  hunted. The test moved to the mounting pattern that had just gone green on CI, with its window
+  closed in a `finally`.
+
 - **`App.ApplyLanguage` replaces the dictionaries and does NOT touch `CultureInfo.CurrentCulture`.** A
   test asserting «0,25×» after applying the language passes on a machine in es-ES and **fails on the
   runner**, which is in en-US and writes «0.25×». CI caught it and the tree did not. The fix was not to

@@ -137,6 +137,17 @@ y no bloquea, igual que los suelos.
   `dotnet format` lo caza como `ENDOFLINE` en cada línea del archivo entero.
 - **La versión del esquema tiene tres afirmaciones**: el conteo, el máximo y la lista de nombres de
   `SqliteBootstrapTests`. Una migración nueva mueve las tres.
+- **Un `Test Case Cleanup Failure` con «the calling thread cannot access this object» NO es del
+  código: es el arnés reciclándose.** CI falló así el 2026-08-28 en `TransportGlyphTests`, y la traza
+  entera era de Avalonia —`HeadlessUnitTestSession.EnsureIsolatedApplication` → `Compositor..ctor` →
+  `Dispatcher.VerifyAccess`— sin una sola línea nuestra. **Y la prueba que xUnit nombró no era la
+  culpable**: duró 1 ms, ni llegó a correr; lo que falló fue preparar la aplicación **para** ella. La
+  causa era la prueba nueva de al lado, que abría una cuarta ventana a mano en una clase cuyo scope ya
+  abre tres por prueba, y que además no la cerraba si una aserción fallaba. **No se reproduce en
+  local** —dos pasadas de 958 en verde—, así que la salida es la de siempre: la carrera se quita, no
+  se busca. La prueba se mudó al archivo cuyo patrón de montaje acababa de pasar CI, con la ventana
+  cerrada en un `finally`.
+
 - **`App.ApplyLanguage` cambia los diccionarios y NO toca `CultureInfo.CurrentCulture`.** Una prueba
   que afirma «0,25×» tras aplicar el idioma pasa en una máquina en es-ES y **falla en el runner**, que
   está en en-US y escribe «0.25×». Lo cazó CI y no el árbol. La corrección no fue quitar la aserción
