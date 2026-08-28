@@ -354,12 +354,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </StackPanel>
       </Border>
     </Grid>
-    <ContentControl
+    <!--
+      Home scrolls, and it did not until 2026-08-28. It was the one destination mounted in a bare
+      ContentControl while Library, Review, Duplicates and Settings each had a scroller: measured at
+      683 px against a window whose minimum height is 600, which is 83 px of Home that nobody could
+      reach on the smallest window this application allows. That is «secciones cortadas», on the axis
+      the width gates had already ruled out.
+
+      The bottom margin is the same 24 the library carries and for the same measured reason: a stack
+      whose last child ends flush with the viewport edge leaves that child half-pressable.
+    -->
+    <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
         IsVisible="{Binding IsHomeVisible}">
-      <home:HomeView DataContext="{Binding Home}" />
-    </ContentControl>
+      <home:HomeView DataContext="{Binding Home}" Margin="0,0,0,24" />
+    </ScrollViewer>
     <!--
       Settings, as the prototype's page: the heading, a fixed side index, and one section at a time
       on the right. §7's construction to the letter — no sticky, a Grid whose ScrollViewer lives

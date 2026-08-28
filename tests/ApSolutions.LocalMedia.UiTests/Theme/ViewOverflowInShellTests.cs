@@ -72,10 +72,13 @@ public sealed class ViewOverflowInShellTests
     /// at once — and it still carries that suite's second limitation: an empty <c>ItemsControl</c> is
     /// not a filled one. <b>Silence here is not a certificate either.</b>
     /// </remarks>
-    [AvaloniaFact]
-    public void No_view_is_wider_than_the_room_the_shell_gives_it()
+    /// <summary>Both languages since 2026-08-28, for the reason <c>ViewOverflowTests</c> gives.</summary>
+    [AvaloniaTheory]
+    [InlineData("es-ES")]
+    [InlineData("en-US")]
+    public void No_view_is_wider_than_the_room_the_shell_gives_it(string language)
     {
-        var room = ContentRoom(out var shellWindow);
+        var room = ContentRoom(out var shellWindow, language);
         shellWindow.Close();
 
         var views = typeof(ShellView).Assembly
@@ -151,10 +154,10 @@ public sealed class ViewOverflowInShellTests
     /// <summary>
     /// The width the shell's content area really has, measured rather than assumed.
     /// </summary>
-    private static double ContentRoom(out Window window)
+    private static double ContentRoom(out Window window, string language = "es-ES")
     {
         Assert.NotNull(Avalonia.Application.Current);
-        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo(language));
 
         var shell = new ShellView();
         window = new Window { Width = MinimumWindowWidth, Height = 700, Content = shell };
