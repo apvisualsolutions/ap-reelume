@@ -1,11 +1,19 @@
 # Dónde retomar
 
-## Estado al cierre del 2026-08-28 (quinta sesión) — el mini ya es una ventana PiP de verdad
+## Estado al cierre del 2026-08-28 (quinta sesión) — la cola de cuatro puntos, cerrada entera
 
-**`main` está en `c85b6cb`, verde comprobado con `gh run view --json conclusion`.** Por encima
-quedaban `8aa2304` (sólo la nota) y ahora el commit de esta tanda; el fast-forward de `main` espera a
-que sus dos runs cierren en verde, en ese orden y comprobando la conclusión de cada uno **antes** de
-mover la referencia.
+**`main`, la rama y el HEAD son el mismo commit: `935fcb0`, verde comprobado con
+`gh run view --json conclusion`.** No queda nada sin publicar ni sin verificar. `main` avanzó **seis
+veces** en la sesión —`8aa2304`, `a16a523`, `d7b5804`, `f0a94ac`, `7e86525`, `935fcb0`—, cada una con
+la conclusión de su run leída **antes** de mover la referencia.
+
+**Dos rojos por el camino, los dos reales y los dos corregidos**: un suelo de cobertura que había que
+subir con el número de CI (`ArtworkCache.cs`, 96/70), y el clic «al lado» del paseo aterrizando en el
+botón vecino porque la fila del transporte se recompone. Ninguno se reprodujo en local.
+
+**Y una lección de ritmo**: empujar cuatro commits seguidos puso **tres runs solapados**, y el paso
+`Verify` de uno pasó de 31 a **48 minutos** compitiendo con los otros. Salía más barato agrupar los
+remates.
 
 **El punto 1 de la cola está cerrado.** El minirreproductor abre sin marco, se arrastra por la
 imagen, se redimensiona desde sus ocho bordes conservando el **16:9 del prototipo** —que es el de la

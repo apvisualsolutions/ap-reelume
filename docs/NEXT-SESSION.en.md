@@ -1,10 +1,19 @@
 # Where to pick up
 
-## State at the close of 2026-08-28 (fifth session) — the mini is a real PiP window now
+## State at the close of 2026-08-28 (fifth session) — the queue of four points, closed entire
 
-**`main` is at `c85b6cb`, green checked with `gh run view --json conclusion`.** Above it were
-`8aa2304` (the note only) and now this batch's commit; `main`'s fast-forward waits for both runs to
-close green, in that order, with each conclusion read **before** the reference moves.
+**`main`, the branch and HEAD are the same commit: `935fcb0`, green checked with
+`gh run view --json conclusion`.** Nothing is left unpublished or unverified. `main` moved **six
+times** in the session — `8aa2304`, `a16a523`, `d7b5804`, `f0a94ac`, `7e86525`, `935fcb0` — each with
+its run's conclusion read **before** the reference moved.
+
+**Two reds along the way, both real and both fixed**: a coverage floor that had to rise with CI's own
+number (`ArtworkCache.cs`, 96/70), and the walk's beside-click landing on the neighbouring button
+because the transport row recomposes. Neither reproduced locally.
+
+**And a lesson about pace**: pushing four commits in a row put **three runs in flight at once**, and
+one run's `Verify` step went from 31 to **48 minutes** competing with the others. Grouping the
+finishing touches would have been cheaper.
 
 **Point 1 of the queue is closed.** The mini player opens with no frame, is dragged by the picture,
 resizes from its eight edges at the prototype's **16:9** — which belongs to the picture, with the
