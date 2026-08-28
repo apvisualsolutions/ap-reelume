@@ -209,25 +209,31 @@ public static class AccentPalette
         bool darker,
         Func<(byte R, byte G, byte B), bool> accepts)
     {
-        var current = FromHsl(hue, saturation, lightness);
-        if (accepts(current))
+        // The end of the scale is the walk's last step rather than a fallback behind it, and that is
+        // what lets this have no "nothing answered" arm at all. Black going down and white going up
+        // satisfy every ratio this file asks for against the surface they are walking away from, and
+        // that is not luck: EqualContrastLuminance is the luminance where black and white contrast
+        // equally, and that contrast is 4.58:1 — above the 4.5 the strictest predicate here wants.
+        // So one of the two ends always accepts, whichever way the walk goes, and the loop ends by
+        // accepting.
+        //
+        // It had a fallback `return darker ? black : white` until 2026-08-28, and it was a line no
+        // predicate in this file could reach — along with the two arms of the bounds check in front
+        // of it. It surfaced when the focus-ring nudge came out and left the file thin enough for the
+        // coverage gate to notice: 99/93 against a bar of 96/96.
+        //
+        // The step count stays as the loop's other bound, and it is a guard against a future
+        // predicate that refuses both ends rather than a case anything takes today. Hanging is worse
+        // than answering the closest colour the walk reached.
+        var steps = (int)Math.Ceiling(1.0 / LightnessStep) + 1;
+        var candidate = FromHsl(hue, saturation, lightness);
+        for (var index = 0; !accepts(candidate) && index < steps; index++)
         {
-            return current;
+            var step = lightness + ((darker ? -LightnessStep : LightnessStep) * (index + 1));
+            candidate = FromHsl(hue, saturation, Math.Clamp(step, 0, 1));
         }
 
-        // Bounded by the ends of the scale rather than by a count: the walk stops at black going
-        // down and at white going up, and both of those satisfy every ratio this asks for against
-        // the surface they are walking away from.
-        for (var step = lightness; step >= 0 && step <= 1; step += darker ? -LightnessStep : LightnessStep)
-        {
-            var candidate = FromHsl(hue, saturation, step);
-            if (accepts(candidate))
-            {
-                return candidate;
-            }
-        }
-
-        return darker ? ((byte)0, (byte)0, (byte)0) : ((byte)255, (byte)255, (byte)255);
+        return candidate;
     }
 
     private static (byte R, byte G, byte B) Blend((byte R, byte G, byte B) colour, (byte R, byte G, byte B) towards, double amount) =>
