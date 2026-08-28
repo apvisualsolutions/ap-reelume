@@ -10,6 +10,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Player;
@@ -169,6 +170,69 @@ public sealed class PlayerViewInputTests
         window.Close();
     }
 
+    /// <summary>
+    /// The full-screen button draws the arrows that match the mode the picture is actually in.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>TransportGlyphTests</c> says both pictures are in the button; this says the right one is on
+    /// screen, which is the half a data context decides and the half that was wrong — the entering
+    /// arrows were drawn while already full screen. It lives here rather than beside its sibling
+    /// because the two glyphs alternate on a binding that reaches up to a <c>PlayerView</c>, and this
+    /// is the file that mounts one with a session behind it.
+    /// </para>
+    /// <para>
+    /// <b>And because of where it does not live.</b> Written into <c>TransportGlyphTests</c> it made
+    /// CI fail on 2026-08-28 with a <c>Test Case Cleanup Failure</c> in a <em>different</em> test of
+    /// that class — Avalonia's own harness re-entering <c>EnsureIsolatedApplication</c> off the UI
+    /// thread, with nothing of ours in the stack — and it never reproduced locally. That class already
+    /// opens three windows per test through its scope; this one opened a fourth by hand. The rule this
+    /// tree keeps relearning is that a race is removed rather than hunted, so the test moved to the
+    /// mounting pattern that had just gone green.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_full_screen_button_draws_the_arrows_for_the_mode_the_picture_is_in()
+    {
+        var (window, view, player) = Mount(withTransport: true);
+        try
+        {
+            var button = Assert.Single(
+                view.GetVisualDescendants().OfType<Button>(),
+                each => each.Name == "FullscreenButton");
+
+            Assert.Equal([Geometry(button, "IconFullscreen")], Drawn(button));
+
+            player.IsFullscreen = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal([Geometry(button, "IconExitFullscreen")], Drawn(button));
+
+            player.IsFullscreen = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal([Geometry(button, "IconFullscreen")], Drawn(button));
+        }
+        finally
+        {
+            // Closed even when an assertion fails, which the version this replaced did not do: a
+            // window left open outlives the test and belongs to whatever runs next.
+            window.Close();
+        }
+
+        static object? Geometry(Button button, string key)
+        {
+            button.TryFindResource(key, out var value);
+            return value;
+        }
+
+        static object?[] Drawn(Button button) =>
+        [
+            .. button.GetVisualDescendants()
+                .OfType<Avalonia.Controls.Shapes.Path>()
+                .Where(path => path.IsVisible)
+                .Select(path => (object?)path.Data),
+        ];
+    }
+
     /// <summary>The player takes the keyboard the moment it is on screen.</summary>
     /// <remarks>
     /// Without it every shortcut would depend on whichever control happened to hold focus when the
@@ -220,14 +284,90 @@ public sealed class PlayerViewInputTests
                 new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased),
                 KeyModifiers.None));
 
-    private static (Window Window, PlayerView View, PlayerViewModel Model) Mount()
+    /// <summary>
+    /// A player on screen with a session that never starts, and optionally its transport bar.
+    /// </summary>
+    /// <remarks>
+    /// The bar is given to the model rather than pushed into the host control, and that is measured
+    /// rather than style: the host's own <c>IsVisible</c> is bound to the model's <c>Transport</c>, so
+    /// a bar handed straight to the presenter sits in a hidden container with no children to find —
+    /// the tree came back holding three buttons and none of them the transport's.
+    /// </remarks>
+    private static (Window Window, PlayerView View, PlayerViewModel Model) Mount(bool withTransport = false)
     {
-        var model = new PlayerViewModel(new IdleCoordinator());
+        var model = withTransport
+            ? new PlayerViewModel(new IdleCoordinator())
+            {
+                Transport = new TransportControlsViewModel(new ControlPlayback(new SilentEngine())),
+            }
+            : new PlayerViewModel(new IdleCoordinator());
         var view = new PlayerView { DataContext = model };
-        var window = new Window { Width = 900, Height = 600, Content = view };
+        var window = new Window { Width = 1200, Height = 700, Content = view };
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return (window, view, model);
+    }
+
+    /// <summary>An engine that plays nothing; the transport only has to exist to be drawn.</summary>
+    private sealed class SilentEngine : IMediaPlayerEngine
+    {
+        public event EventHandler<PlaybackStateChangedEventArgs>? StateChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public event EventHandler<PlaybackPositionChangedEventArgs>? PositionChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public event EventHandler<PlaybackFailureEventArgs>? Failure
+        {
+            add { }
+            remove { }
+        }
+
+        public PlaybackState State => PlaybackState.Idle;
+
+        public Task InitializeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task OpenAsync(PlaybackRequest request, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task PlayAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task PauseAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task SeekAsync(TimeSpan position, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task<PlaybackSnapshot> GetSnapshotAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(PlaybackSnapshot.Create(PlaybackState.Idle, TimeSpan.Zero, null, []));
+
+        public Task SelectTrackAsync(
+            MediaTrackKind kind,
+            string? trackId,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task<MediaTrack> AddExternalSubtitleAsync(
+            string path,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new MediaTrack(path, MediaTrackKind.Subtitle));
+
+        public Task SetSpeedAsync(double multiplier, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task SetAudioOutputDeviceAsync(string deviceId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task ApplyVolumeAsync(VolumeDecision decision, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 
     /// <summary>A session that never starts: nothing here asks the player to play anything.</summary>
