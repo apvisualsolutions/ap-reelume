@@ -370,6 +370,11 @@ public sealed class ScanCoordinatorTests
             return Task.CompletedTask;
         }
 
+        public Task SetScannedTitleAsync(
+            MediaFileId mediaFileId,
+            ScannedTitle title,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
         private static string Key(LibraryRootId rootId, string path) => $"{rootId.Value:D}|{path}";
     }
 

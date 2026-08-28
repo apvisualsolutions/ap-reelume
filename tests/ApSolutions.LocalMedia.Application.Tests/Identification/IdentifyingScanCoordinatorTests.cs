@@ -42,6 +42,7 @@ public sealed class IdentifyingScanCoordinatorTests
             new UntouchedMediaFiles(),
             new UnwrittenCatalog(),
             new MediaNameParser());
+        var naming = new NameScannedTitles(roots, new UntouchedMediaFiles(), new MediaNameParser());
         var reconciliation = new ReconcileScannedFiles(
             new UntouchedMediaFiles(),
             new ReconcileScanResults(new UntouchedMediaFiles(), new FileReconciliationPolicy()),
@@ -53,7 +54,8 @@ public sealed class IdentifyingScanCoordinatorTests
             () => reconciliation,
             () => identification,
             () => grouping,
-            () => series);
+            () => series,
+            () => naming);
 
         var returned = await coordinator.StartAsync(
             new StartScanCommand(rootId, ScanTrigger.Watcher),
@@ -61,10 +63,11 @@ public sealed class IdentifyingScanCoordinatorTests
 
         Assert.Same(summary, returned);
 
-        // Identification, version grouping and series grouping each asked the repository for this
-        // scan's root, which is the first thing all three do with a summary: every hand-off
-        // happened. Three and not two since 2026-08-25, when a folder of episodes became a series.
-        Assert.Equal([rootId, rootId, rootId], roots.Asked);
+        // Identification, version grouping, series grouping and naming each asked the repository for
+        // this scan's root, which is the first thing all four do with a summary: every hand-off
+        // happened. Three since 2026-08-25, when a folder of episodes became a series, and four since
+        // 2026-08-28, when a film stopped being called by its raw file name.
+        Assert.Equal([rootId, rootId, rootId, rootId], roots.Asked);
     }
 
     private sealed class UnreadIdentity : IFileIdentityProvider
@@ -232,6 +235,11 @@ public sealed class IdentifyingScanCoordinatorTests
 
         public Task ClearScanCheckpointAsync(
             LibraryRootId rootId,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task SetScannedTitleAsync(
+            MediaFileId mediaFileId,
+            ScannedTitle title,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 

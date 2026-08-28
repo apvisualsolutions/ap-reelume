@@ -1,0 +1,13 @@
+-- The year a scanned file's name carries, so it can leave the title instead of staying inside it.
+--
+-- The projection wrote the file name verbatim and this column did not exist, so «El Faro de Piedra
+-- 2019» was the whole of what a card said: the title held the year and the release_year the query
+-- projects was NULL. Cleaning the title without somewhere to put the year would have taken the year
+-- off the screen, which is why the two arrive together.
+--
+-- It is left NULL for every row already stored, and that is not a gap being ignored. The projection
+-- is derived from the path and is rewritten after every scan by NameScannedTitles, which walks the
+-- whole summary — Unchanged files included — so an already-catalogued library is renamed by the next
+-- scan without re-probing a single file. A backfill here would have to run MediaNameParser, and SQL
+-- cannot.
+ALTER TABLE scanned_titles ADD COLUMN release_year INTEGER;

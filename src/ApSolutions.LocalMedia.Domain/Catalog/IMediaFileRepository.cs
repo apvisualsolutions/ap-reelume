@@ -80,6 +80,21 @@ public interface IMediaFileRepository
     Task ClearScanCheckpointAsync(
         LibraryRootId rootId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Writes what one unidentified file is called on a card: the name and, when its own name
+    /// carried one, the year.
+    /// </summary>
+    /// <remarks>
+    /// Separate from <see cref="UpsertBatchAsync"/>, which writes the raw file name as the floor
+    /// every file has from the instant it is stored. Reading a name properly needs the parser, the
+    /// parser is a port of its own, and a repository that took one would be an adapter deciding what
+    /// things are called. So the scan writes the floor and <c>NameScannedTitles</c> writes the name.
+    /// </remarks>
+    Task SetScannedTitleAsync(
+        MediaFileId mediaFileId,
+        ScannedTitle title,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed record IdentifiedMediaFile(MediaFile MediaFile, FileIdentity Identity);

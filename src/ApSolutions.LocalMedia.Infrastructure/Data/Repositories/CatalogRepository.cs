@@ -265,7 +265,11 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                         WHERE e.show_id = t.id AND w.status = 2) AS episodes_watched
                 FROM titles t
                 UNION ALL
-                SELECT scanned.media_file_id, 2, scanned.display_title, scanned.sort_title, NULL,
+                -- The year comes out of the projection now rather than being a literal NULL. It was
+                -- one because the column did not exist and the year lived inside the title, which is
+                -- what the card showed: «El Faro de Piedra 2019», with nothing in the year beside it.
+                SELECT scanned.media_file_id, 2, scanned.display_title, scanned.sort_title,
+                       scanned.release_year,
                        media.is_available, 0, 0, scanned.added_utc, NULL,
                        media.duration_ticks, NULL, NULL, NULL, NULL, 0, 0
                 FROM scanned_titles scanned

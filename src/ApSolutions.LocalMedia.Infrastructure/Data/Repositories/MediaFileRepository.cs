@@ -438,10 +438,46 @@ public sealed class MediaFileRepository : IMediaFileRepository
         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// The name every scanned file has from the instant it is stored, before anything reads it
+    /// properly.
+    /// </summary>
+    /// <remarks>
+    /// This used to be the <b>only</b> name a card ever showed, which is why the grid said «El Faro
+    /// de Piedra 2019» with an empty year beside it. It is the floor now: <c>NameScannedTitles</c>
+    /// runs after every scan and writes the parsed name over it. The floor stays because this row is
+    /// <c>NOT NULL</c> and a file has to be findable between being stored and being named.
+    /// </remarks>
     private static string CreateDisplayTitle(string path)
     {
         var title = Path.GetFileNameWithoutExtension(path);
         return string.IsNullOrWhiteSpace(title) ? Path.GetFileName(path) : title;
+    }
+
+    /// <inheritdoc />
+    public async Task SetScannedTitleAsync(
+        MediaFileId mediaFileId,
+        ScannedTitle title,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(title);
+        await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
+        await using var command = connection.CreateCommand();
+
+        // Only where there is a row to name. A file stored without a projection is not a state this
+        // repository can produce — the two are written in one transaction — and an INSERT here would
+        // be a second place that decides what scanned_titles holds.
+        command.CommandText = """
+            UPDATE scanned_titles
+            SET display_title = $displayTitle,
+                sort_title = $displayTitle,
+                release_year = $releaseYear
+            WHERE media_file_id = $mediaFileId;
+            """;
+        command.Parameters.AddWithValue("$mediaFileId", mediaFileId.Value.ToString("D"));
+        command.Parameters.AddWithValue("$displayTitle", title.DisplayTitle);
+        command.Parameters.AddWithValue("$releaseYear", (object?)title.Year ?? DBNull.Value);
+        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static IdentifiedMediaFile ReadIdentifiedMediaFile(SqliteDataReader reader) => new(
