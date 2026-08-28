@@ -2,9 +2,19 @@
 
 ## State at the close of 2026-08-28 (fourth session) — the debt list's crack, closed and gated
 
-Four commits on the branch. **`main` fast-forwarded to `8ce6ef8` on 2026-08-28**, with its CI checked
-green before the reference moved: it was the documentation-only commit the previous note left waiting
-for its run.
+Four commits on the branch, **CI green on `e49a5e6`**, and **`main` fast-forwarded to that same SHA**:
+the branch, `main` and HEAD are one verified commit. Earlier in the session `main` had moved to
+`8ce6ef8` — the documentation-only commit the previous note left waiting for its run — with its green
+checked first.
+
+The three numbers from that green, which are what close the session:
+
+- `Coverage gate: 212 file(s) still short of 96/96, ratchet 212, **212 measured under the bar**` — the
+  list and the measurement are the same number. They were 212 and 216.
+- `The walk: 228 declared command controls in 223 identities; 203 pressed, 20 pending` — the ratchet
+  still, with one identity more.
+- `2 new file(s) against origin/main ... are where they have to be` — `ScannedTitlePolicy.cs` and
+  `NameScannedTitles.cs` reach the 96/96 a new file has to arrive with.
 
 All four points of the brief are closed. The fifth — the mini as a real PiP window and the poster
 behind the details header — **was not touched**, and is what remains alongside the metadata editor and

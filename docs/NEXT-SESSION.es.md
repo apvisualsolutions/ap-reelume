@@ -2,9 +2,19 @@
 
 ## Estado al cierre del 2026-08-28 (cuarta sesión) — la grieta de la deuda, cerrada y con puerta
 
-Cuatro commits sobre la rama. **`main` avanzado por fast-forward a `8ce6ef8` el 2026-08-28**, con su
-CI en verde comprobado antes de mover la referencia: era el commit de sólo documentación que la nota
-anterior dejó esperando su run.
+Cuatro commits sobre la rama, **CI en verde en `e49a5e6`**, y **`main` avanzado por fast-forward hasta
+ese mismo SHA**: la rama, `main` y el HEAD son el mismo commit verificado. Antes, a media sesión,
+`main` había avanzado a `8ce6ef8` —el commit de sólo documentación que la nota anterior dejó esperando
+su run— con su verde comprobado primero.
+
+Las tres cifras de ese verde, que son las que cierran la sesión:
+
+- `Coverage gate: 212 file(s) still short of 96/96, ratchet 212, **212 measured under the bar**` — la
+  lista y lo medido son el mismo número. Eran 212 y 216.
+- `The walk: 228 declared command controls in 223 identities; 203 pressed, 20 pending` — el trinquete
+  quieto con una identidad más.
+- `2 new file(s) against origin/main ... are where they have to be` — `ScannedTitlePolicy.cs` y
+  `NameScannedTitles.cs` llegan al 96/96 que un archivo nuevo tiene que traer.
 
 Los cuatro puntos del encargo están cerrados. El quinto —el mini como ventana PiP de verdad y el
 póster de fondo del cabecero— **no se ha tocado**, y sigue siendo lo que queda junto con el editor de
