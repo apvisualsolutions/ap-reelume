@@ -74,10 +74,18 @@ segmento del tamaño, sin consulta ni fragmento.
 
 ### Lo que hay que mirar en el CI de esta tanda
 
-Dos archivos **suben por encima de su suelo**, y eso es rojo de la puerta igual que bajar:
-`ArtworkCache.cs` (95/64 declarado, mide 100/100 aquí) y `MovieDetailsViewModel.cs` (100/83, mide
-100/100). Si CI confirma 100/100, `ArtworkCache.cs` **sale de la lista** y el trinquete baja de 212 a
-211. El número sale del artefacto `coverage-debt` del run, nunca de una medición local.
+**Y aquí la trampa del informe fusionado se cobró su décima alarma falsa, sobre esta misma tanda.**
+El pronóstico escrito antes de que CI midiera decía que `ArtworkCache.cs` y `MovieDetailsViewModel.cs`
+subían a 100/100 y que el primero saldría de la lista. **Los dos datos eran falsos**: CI midió
+`ArtworkCache.cs` en **96/70** y no nombró a `MovieDetailsViewModel.cs` en absoluto.
+
+La causa es exactamente la que la nota del 2026-08-25 ya avisaba: **la puerta mide con el informe
+fusionado**, y la lectura local se hizo **tomando el mejor informe por suite**. Un archivo que una
+suite no ejercita aparece en su informe con ceros, y la fusión los suma en vez de quedarse con el
+mejor. Un script que toma el máximo **engaña**, y engañó.
+
+El suelo queda en `96 70`, con el número del artefacto de ese run, y `ArtworkCache.cs` **sigue en la
+lista**: 96 de línea llega al listón y 70 de rama no. El trinquete sigue en 212.
 
 ### Una trampa local nueva: `PackagingTests` está roja aquí y verde en CI
 

@@ -73,11 +73,18 @@ with no query and no fragment.
 
 ### What to watch in this batch's CI
 
-Two files **rise above their floors**, and that is a gate red exactly as falling is:
-`ArtworkCache.cs` (declared 95/64, measures 100/100 here) and `MovieDetailsViewModel.cs` (100/83,
-measures 100/100). If CI confirms 100/100, `ArtworkCache.cs` **leaves the list** and the ratchet drops
-from 212 to 211. The number comes from that run's `coverage-debt` artefact, never from a local
-reading.
+**And here the merged-report trap took its tenth false alarm, on this very batch.** The forecast
+written before CI measured said `ArtworkCache.cs` and `MovieDetailsViewModel.cs` both rose to 100/100
+and that the first would leave the list. **Both were false**: CI measured `ArtworkCache.cs` at
+**96/70** and did not name `MovieDetailsViewModel.cs` at all.
+
+The cause is exactly the one the 2026-08-25 note warned about: **the gate measures from the merged
+report**, and the local reading was taken by **best report per suite**. A file a suite does not
+exercise appears in its report as zeros, and the merge adds those in rather than keeping the best. A
+script that takes the maximum **misleads**, and it did.
+
+The floor is `96 70`, from that run's artefact, and `ArtworkCache.cs` **stays on the list**: 96 lines
+meets the bar, 70 branches does not. The ratchet stays at 212.
 
 ### A new local trap: `PackagingTests` is red here and green on CI
 

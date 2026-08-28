@@ -136,7 +136,7 @@ src/ApSolutions.LocalMedia.Infrastructure/FileSystem/SafeFileRenamer.cs         
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/WindowsPathNormalizer.cs                 75  41
 src/ApSolutions.LocalMedia.Infrastructure/Media/LibVlcMediaProbe.cs                           96  64
 src/ApSolutions.LocalMedia.Infrastructure/Media/LocalSegmentFeatureExtractor.cs               91  97
-src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            95  64
+src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            96  70
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/MetadataCandidateSource.cs                 98  91
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/SqliteMetadataCache.cs                     78  66
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbMetadataProvider.cs                    97  73

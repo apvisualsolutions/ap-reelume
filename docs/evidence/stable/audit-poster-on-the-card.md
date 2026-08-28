@@ -119,17 +119,30 @@ and what was touched, over the four suites that exercise it:
 | `PosterAddressPolicy.cs` | 100 | 100 |
 | `CacheTitleArtwork.cs` | 100 | 100 |
 | `CachedPosterConverter.cs` | 100 | 100 |
-| `ArtworkCache.cs` | 100 | 100 |
+| `ArtworkCache.cs` | **96 en CI, no 100** — ver abajo / **96 on CI, not 100** — see below | **70** |
 | `ApplyIdentification.cs` | 100 | 100 |
 | `MovieDetailsViewModel.cs` | 100 | sube sobre su suelo / rises above its floor |
 | `ShowDetailsViewModel.cs` | 100 | 85, **igual que su suelo** / same as its floor |
 
 `IArtworkStore.cs` no aparece en ningún informe: es un contrato sin líneas instrumentables, que es
-como la puerta lo espera. **`ArtworkCache.cs` y `MovieDetailsViewModel.cs` suben por encima de sus
-suelos declarados** (95/64 y 100/83), y eso es un rojo de la puerta de cobertura cuya corrección es el
-número del artefacto `coverage-debt` del run que lo mida. `ShowDetailsViewModel.cs` mide exactamente
-su suelo, 100/85, y por eso no se toca. / Two files rise above their declared
-floors, which is a coverage-gate red whose fix is CI's own artefact.
+como la puerta lo espera. `ShowDetailsViewModel.cs` mide exactamente su suelo, 100/85, y por eso no se
+toca. / `IArtworkStore.cs` appears in no report — a contract with no instrumentable lines, which is
+how the gate expects it. `ShowDetailsViewModel.cs` measures exactly its floor.
+
+### La lectura local de `ArtworkCache.cs` era engañosa, y CI lo dijo / The local reading was misleading
+
+La tabla de arriba se leyó **tomando el mejor informe por suite**, y para `ArtworkCache.cs` eso dio
+100/100. **CI midió 96/70** sobre el informe **fusionado**, que es con el que la puerta trabaja: un
+archivo que una suite no ejercita aparece en su informe con ceros, y la fusión los suma en vez de
+quedarse con el mejor. Esa trampa ya estaba escrita en la nota desde el 2026-08-25 —«la puerta mide
+con el informe fusionado, y un script que tome el máximo engaña»— y ésta es la décima alarma falsa que
+se cobra por no seguirla. / The table above was read by taking the best report per suite, which gave
+100/100. **CI measured 96/70** from the merged report, which is what the gate works with.
+
+El suelo de `ArtworkCache.cs` sube de **95/64 a 96/70** con el número del artefacto `coverage-debt` de
+ese run, y el archivo **sigue en la lista**: 96 de línea llega al listón, pero 70 de rama no.
+`MovieDetailsViewModel.cs` no lo nombró CI, así que sigue cumpliendo su 100/83. / The floor rises with
+CI's own number, and the file stays on the list: 96 lines meets the bar, 70 branches does not.
 
 ## Una puerta que se creía un comentario / A gate that believed a comment
 
