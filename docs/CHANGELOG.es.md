@@ -37,6 +37,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El editor de metadatos y el renombrado seguro son una vista propia, no un panel bajo la
+  biblioteca.** Eran un `TabControl` al final del propio desplazamiento de Biblioteca, así que abrir
+  una de las dos herramientas ponía un panel **debajo de una rejilla entera de fichas** — hasta el
+  punto de que el paseo necesitaba una ventana de 2.000 px para alcanzarlo. Ahora es la página que el
+  prototipo dibuja: «Volver · Biblioteca» arriba, un cabecero de dos líneas con el título de la ficha
+  a tamaño de display, **dos píldoras** y la herramienta debajo.
+
+  **No es un sexto destino del carril, y eso está medido**: los cinco aprobados se afirman por nombre
+  y el paseo llega a cada uno **por su botón del carril**, así que un sexto valor del enum habría roto
+  la primera aserción y dejado al paseo navegando a un sitio sin puerta. La página **cubre** el hueco
+  de Biblioteca, igual que una sesión cubre la ruta que haya debajo.
+
+  **Y el paseo encontró un callejón el mismo día.** Con la página cubriendo la ficha,
+  «Previsualizar renombrado» dejó de estar en pantalla: quien abría el editor de metadatos ya no
+  tenía forma de llegar a la otra herramienta. Por eso las dos píldoras **abren** además de
+  seleccionar, que es lo que hace el prototipo — y se dibujan siempre las dos.
+
 - **El minirreproductor es una ventana flotante de verdad: sin marco, arrastrable, con la forma de la
   imagen y con memoria.** Era una ventana normal de Windows con su barra de título encima del vídeo.
   Ahora abre sin decoraciones (`WindowDecorations.None`), se mueve arrastrando la imagen, se

@@ -39,6 +39,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The metadata editor and safe renaming are a surface of their own, not a panel under the library.**
+  They were a `TabControl` at the bottom of the library's own scroll, so opening either tool put a
+  panel **under a whole grid of cards** — far enough down that the walk needed a 2,000 px window to
+  reach it at all. It is now the page the prototype draws: "Back · Library" on top, a two-line header
+  with the card's title at display size, **two pills**, and the tool below.
+
+  **It is not a sixth rail destination, and that is measured**: the five approved ones are asserted by
+  name and the walk reaches each of them **by its rail button**, so a sixth enum value would have
+  broken the first assertion and left the walk navigating to a place with no door. The page **covers**
+  the library's slot, the way a session covers whatever route is underneath it.
+
+  **And the walk found a dead end the same day.** With the page covering the card, "Preview rename"
+  was no longer on screen: whoever opened the metadata editor had no way left to reach the other tool.
+  So both pills **open** as well as select, which is what the prototype does — and both are always
+  drawn.
+
 - **The mini player is a real floating window: no frame, dragged by the picture, kept in shape, and
   it remembers.** It was an ordinary Windows window with its title bar sitting above the video. It
   now opens without decorations (`WindowDecorations.None`), moves when the picture is dragged,

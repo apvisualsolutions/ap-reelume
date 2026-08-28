@@ -82,10 +82,18 @@ the shell had already closed and dropped, the `sender is not MiniPlayerWindow` o
 to exactly one window, and the second `Screens.Primary?.Bounds ?? …` written beside the first.
 
 **`MiniPlayerWindow.axaml.cs` no está en `eng/coverage-debt.txt`**, así que su listón es 96/96 y lo
-cumple. `ShellView.axaml.cs` sube por encima de su suelo declarado, que es un rojo de CI cuya
-corrección es el número del artefacto `coverage-debt` de ese mismo run. / **`MiniPlayerWindow.axaml.cs`
-is not in the debt list**, so its bar is 96/96 and it meets it. `ShellView.axaml.cs` rises above its
-declared floor, which is a CI red whose fix is the number from that run's `coverage-debt` artefact.
+cumple: CI no lo nombró. `ShellView.axaml.cs` subió por encima de su suelo, y CI lo midió en **98/73**
+—no en el 98,03/69,23 de la tabla—, que es el número con el que se movió el suelo. / **The mini
+window is not in the debt list**, so its bar is 96/96 and CI did not name it. `ShellView.axaml.cs`
+rose above its floor and CI measured it at **98/73**, which is the number the floor moved with.
+
+**Las tres columnas de arriba son lecturas locales por suite, y sirven para comparar entre sí y para
+nada más.** La puerta mide con el informe **fusionado**, y sobre esta misma tanda esa diferencia
+convirtió un 100/100 local en un 96/70 de CI para otro archivo. Lo que vale de la tabla es la forma
+—las guardas muertas bajan un archivo y quitarlas lo suben—, no los decimales. / **The three columns
+above are local per-suite readings, good for comparing with each other and nothing else.** The gate
+measures from the merged report, and on this same batch that difference turned a local 100/100 into
+CI's 96/70 for another file.
 
 ## Verde / Green
 

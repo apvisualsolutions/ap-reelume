@@ -523,11 +523,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ScrollViewer>
       </Grid>
     </Grid>
+    <!--
+      The library destination holds two pages and shows one: the list, and the editor that covers it.
+      Until 2026-08-28 the two title tools were a TabControl at the bottom of the library's own
+      scroll, so opening one put a panel under a whole grid of cards - which is why the walk needs a
+      2,000 px window to reach it. The prototype draws it as a page of its own with «Volver ·
+      Biblioteca» at the top, and this is that page. It is not a sixth AppRoute: the five approved
+      destinations are asserted by name, and the walk reaches each of them by its rail button.
+    -->
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
         Margin="48"
-        IsVisible="{Binding IsLibraryVisible}">
+        IsVisible="{Binding IsLibraryListVisible}">
       <!--
         The bottom margin is a control's right to be pressed. Measured on 2026-08-22 in the walk's
         1600x1000 window: the scrolled content ran to 927 px inside a 904 px viewport, and Review
@@ -549,24 +557,64 @@ SPDX-License-Identifier: GPL-3.0-or-later
           that might not even be open. They moved into the cards themselves on 2026-08-25, which is
           where the prototype draws them — TitleActionsView, mounted by both.
         -->
+      </StackPanel>
+    </ScrollViewer>
+    <!--
+      The editor page. Its own scroll rather than a section of the library's, so what a person
+      scrolls is the tool they opened and not a grid of cards they have left behind.
+    -->
+    <ScrollViewer
+        Grid.Row="1"
+        Grid.Column="1"
+        Margin="48"
+        IsVisible="{Binding IsEditorVisible}">
+      <StackPanel Margin="0,0,0,24" MaxWidth="1080" HorizontalAlignment="Left" Spacing="{DynamicResource Space16}">
+        <Button
+            x:Name="EditorBackAction"
+            Classes="link-action"
+            Command="{Binding CloseEditorCommand}"
+            Content="{DynamicResource LibraryBackShortAction}"
+            automation:AutomationProperties.Name="{DynamicResource LibraryBackAction}" />
+        <StackPanel>
+          <TextBlock
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              Text="{DynamicResource MetadataEditorTitle}" />
+          <TextBlock
+              FontSize="{DynamicResource FontSizeDisplay}"
+              FontWeight="SemiBold"
+              Text="{Binding EditorTitle}"
+              TextWrapping="Wrap"
+              automation:AutomationProperties.HeadingLevel="1" />
+        </StackPanel>
         <!--
-          The owner's fifth point: the two title tools share one panel behind real tabs, the way the
-          player's side column holds its four lists. Each door selects its own tab as it opens; a
-          tab whose surface is not open hides its header rather than offering a blank page.
+          Two pills and not a TabControl, which is what the prototype draws and what the walk can
+          reach: a ToggleButton is pressed and read back through IsChecked, and it is checked one
+          way only because the command owns which tool is in force. Both are always drawn, and each
+          one opens its tool as well as selecting it - the page covers the card it was opened from,
+          so a pill that only selected would leave whoever opened one tool unable to reach the other.
         -->
-        <ContentControl IsVisible="{Binding HasEditorPanel}">
-          <TabControl SelectedIndex="{Binding EditorTab}">
-            <TabItem
-                Header="{DynamicResource MetadataEditorTabLabel}"
-                IsVisible="{Binding HasMetadataEditor}">
-              <metadata:MetadataEditorView DataContext="{Binding MetadataEditor}" Margin="0,12,0,0" />
-            </TabItem>
-            <TabItem
-                Header="{DynamicResource RenamePreviewTabLabel}"
-                IsVisible="{Binding HasRename}">
-              <metadata:RenamePreviewView DataContext="{Binding Rename}" Margin="0,12,0,0" />
-            </TabItem>
-          </TabControl>
+        <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+          <ToggleButton
+              x:Name="EditorMetadataTab"
+              Classes="segment"
+              Command="{Binding ShowMetadataTabCommand}"
+              Content="{DynamicResource MetadataEditorTabLabel}"
+              IsChecked="{Binding IsMetadataTab, Mode=OneWay}"
+              automation:AutomationProperties.Name="{DynamicResource MetadataEditorTabLabel}" />
+          <ToggleButton
+              x:Name="EditorRenameTab"
+              Classes="segment"
+              Command="{Binding ShowRenameTabCommand}"
+              Content="{DynamicResource RenamePreviewTabLabel}"
+              IsChecked="{Binding IsRenameTab, Mode=OneWay}"
+              automation:AutomationProperties.Name="{DynamicResource RenamePreviewTabLabel}" />
+        </WrapPanel>
+        <ContentControl IsVisible="{Binding IsMetadataTabOpen}">
+          <metadata:MetadataEditorView DataContext="{Binding MetadataEditor}" />
+        </ContentControl>
+        <ContentControl IsVisible="{Binding IsRenameTabOpen}">
+          <metadata:RenamePreviewView DataContext="{Binding Rename}" />
         </ContentControl>
       </StackPanel>
     </ScrollViewer>

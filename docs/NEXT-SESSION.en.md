@@ -106,28 +106,16 @@ nothing until the whole sandbox cycle has been run.
    which the prototype raises at 136×204 against the same bled wall. The library grid's covers and
    Home's three rows **are still out**, with the measured reason of 2026-08-21 intact: they drag the
    grid along, which costs 7× the time and 455× the live controls for losing virtualisation.
-3. **The metadata editor as a surface of its own** (decision 15). **Sized and measured this session,
-   not opened**: it is a whole piece, and opening it halfway would have been worse than writing it
-   down. What to know before touching it:
+3. ~~The metadata editor as a surface of its own~~ (decision 15). **Done.** It is the prototype's
+   page: "Back · Library", a two-line header, two `segment` pills, and the tool below. It is not an
+   `AppRoute` — the five destinations are asserted by name and the walk reaches each by its rail
+   button — but a page that **covers** the library's slot, the way a session does.
 
-   - **Today it lives in a `TabControl` inside the library's scroll** (`ShellView.axaml`, under
-     `HasEditorPanel`), with `MetadataEditorView` and `RenamePreviewView` as its two tabs.
-   - **The prototype draws it as a page of the main area** (`isEditor`), with "Back · Library" on
-     top, a two-line header — small kind, then a 28 px title — **two pills carrying `aria-pressed`**
-     instead of a `TabControl`, and the metadata body in a two-column grid: fields at `2fr`, artwork
-     at `1fr`.
-   - **⚠ It is NOT an `AppRoute`, and that is measured**:
-     `ShellAssemblyTests.The_shell_lists_the_five_approved_destinations_and_nothing_else` asserts
-     exactly `Home, Library, Review, Duplicates, Settings`, and the assembled walk iterates
-     `shell.Routes` expecting to reach each one **by its rail button** — and those are declared by
-     hand, five of them, in the markup. A sixth enum value would break the first and leave the walk
-     navigating to a place with no door.
-   - **The right pattern is already in the tree**: `IsPlayerVisible => Player is not null`, a surface
-     that **covers whatever route is underneath it** without being one. The editor goes the same way:
-     `IsEditorVisible`, and "Back" closes it.
-   - **The two pills are new controls**, so they arrive with their walk scene in the same commit and
-     the ratchet stays at 20. A `ToggleButton` or a `RadioButton` can be pressed; what cannot happen
-     is putting them inside a `Flyout`.
+   **Two things that only showed up when measured**, and they hold for the next view that moves:
+   binding the list to `!HasEditorPanel` alone drew the library **over Settings** (`ThemeTests` caught
+   it by counting 16 buttons where 13 exist), and **the walk found a dead end** —
+   `TitlePreviewRenameAction matched 0 controls` — because the page covers the card it was opened
+   from. So both pills **open** as well as select, which is what the prototype does.
 
 4. **"Sections cut off by the width"**, with the width axis already ruled out and measured — the four
    live hypotheses are still below, in the fourth session's section.

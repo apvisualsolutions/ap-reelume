@@ -471,6 +471,42 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => editor.Title,
             "clicking Restore never brought the provider's title back over the edited one");
         Assert.Equal("La llegada", editor.Title);
+
+        // The page's own three controls, which arrived with it on 2026-08-28. The rename preview is
+        // opened first because a pill is only drawn when its surface exists: with one tool open
+        // there is one pill, pressing it would change nothing, and PressAsync refuses a press whose
+        // effect never arrives — which is the whole reason it can be trusted.
+        await host.ViewModel.OpenRenamePreviewAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(1, host.ViewModel.EditorTab);
+
+        await PressAsync(
+            host,
+            "MetadataEditorTabLabel",
+            () => host.ViewModel.IsMetadataTab,
+            "clicking the metadata pill never brought the metadata editor back in front");
+        Assert.True(host.ViewModel.IsMetadataTab);
+
+        await PressAsync(
+            host,
+            "RenamePreviewTabLabel",
+            () => host.ViewModel.IsRenameTab,
+            "clicking the renaming pill never brought the rename preview in front");
+        Assert.True(host.ViewModel.IsRenameTab);
+
+        // And «Volver · Biblioteca», which is what makes this a page rather than a panel: it drops
+        // both surfaces, so coming back does not land in the editor again.
+        await PressAsync(
+            host,
+            "LibraryBackAction",
+            () => host.ViewModel.HasEditorPanel,
+            "clicking Back never left the editor page");
+        Assert.False(host.ViewModel.HasEditorPanel);
+        Assert.False(host.ViewModel.HasMetadataEditor);
+        Assert.False(host.ViewModel.HasRename);
+        Assert.True(host.ViewModel.IsLibraryListVisible);
     }
 
     /// <summary>
@@ -1305,6 +1341,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "TitleEditMetadataAction",
             () => host.ViewModel.HasMetadataEditor,
             "clicking Edit details never opened the editor for the open title");
+
+        // Back to the card between the two, and that is the change of 2026-08-28 rather than a
+        // detour: the editor is a page of its own now and it covers the card it was opened from, so
+        // the second of the card's tools is not on screen while the first one is open. The walk
+        // found that the moment the page landed — «Previsualizar renombrado» matched zero controls —
+        // which is the same thing a person would have found.
+        await PressAsync(
+            host,
+            "LibraryBackAction",
+            () => host.ViewModel.HasEditorPanel,
+            "clicking Back never left the editor page and put the card back");
+        Assert.False(host.ViewModel.HasEditorPanel);
 
         await PressAsync(
             host,

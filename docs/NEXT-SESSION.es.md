@@ -108,28 +108,16 @@ rojo aquí no significa nada hasta que se corra el ciclo del sandbox entero.
    cuadrícula y de las tres filas de Inicio **siguen fuera**, con la razón medida del 2026-08-21
    intacta: arrastran la cuadrícula, que cuesta 7× el tiempo y 455× los controles vivos por perder la
    virtualización.
-3. **El editor de metadatos como vista propia** (decisión 15). **Dimensionado y medido en esta
-   sesión, sin abrir**: es una pieza entera, y abrirla a medias habría sido peor que dejarla escrita.
-   Lo que hay que saber antes de tocarlo:
+3. ~~El editor de metadatos como vista propia~~ (decisión 15). **Hecho.** Es la página del prototipo:
+   «Volver · Biblioteca», cabecero de dos líneas, dos píldoras `segment` y la herramienta debajo. No
+   es una `AppRoute` —los cinco destinos están afirmados por nombre y el paseo llega a cada uno por su
+   botón del carril—, sino una página que **cubre** el hueco de Biblioteca, como hace una sesión.
 
-   - **Hoy vive en un `TabControl` dentro del scroll de Biblioteca** (`ShellView.axaml`, bajo
-     `HasEditorPanel`), con `MetadataEditorView` y `RenamePreviewView` como sus dos pestañas.
-   - **El prototipo lo dibuja como una página del área principal** (`isEditor`), con «Volver ·
-     Biblioteca» arriba, un cabecero de dos líneas —tipo pequeño y título a 28 px—, **dos píldoras
-     con `aria-pressed`** en lugar de un `TabControl`, y el cuerpo de metadatos en rejilla de dos
-     columnas: los campos a `2fr` y el arte a `1fr`.
-   - **⚠ NO es una `AppRoute`, y esto está medido**:
-     `ShellAssemblyTests.The_shell_lists_the_five_approved_destinations_and_nothing_else` afirma
-     exactamente `Home, Library, Review, Duplicates, Settings`, y el paseo ensamblado recorre
-     `shell.Routes` esperando llegar a cada uno **por su botón del carril** — que se declaran a mano,
-     cinco, en el marcado. Un sexto valor del enum rompería la primera y dejaría al paseo navegando a
-     un sitio sin puerta.
-   - **El patrón correcto ya existe en el árbol**: `IsPlayerVisible => Player is not null`, una
-     superficie que **cubre la ruta que haya debajo** sin ser una. El editor va así:
-     `IsEditorVisible`, y «Volver» lo cierra.
-   - **Las dos píldoras son controles nuevos**, así que traen su escena de paseo en el mismo commit y
-     el trinquete sigue en 20. Un `ToggleButton` o un `RadioButton` sí se pulsan; lo que no se puede
-     es meterlas en un `Flyout`.
+   **Dos cosas que sólo aparecieron al medir**, y que valen para la próxima vista que se mueva:
+   atar la lista a `!HasEditorPanel` a secas dibujó la biblioteca **sobre Ajustes** (lo cazó
+   `ThemeTests` contando 16 botones donde hay 13), y **el paseo encontró un callejón** —
+   `TitlePreviewRenameAction matched 0 controls` — porque la página tapa la ficha de la que se abrió.
+   Por eso las dos píldoras **abren** además de seleccionar, que es lo que hace el prototipo.
 
 4. **«Secciones cortadas por el ancho»**, con el eje del ancho ya descartado y medido — las cuatro
    hipótesis vivas siguen abajo, en la sección de la cuarta sesión.
