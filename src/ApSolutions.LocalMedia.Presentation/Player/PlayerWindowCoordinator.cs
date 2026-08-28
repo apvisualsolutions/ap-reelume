@@ -39,7 +39,33 @@ public sealed record PlayerWindowGeometry(double X, double Y, double Width, doub
 /// </remarks>
 public sealed class PlayerWindowCoordinator
 {
+    /// <summary>The shape of the picture, which is the shape the prototype's mini player keeps.</summary>
+    /// <remarks>
+    /// The prototype draws the mini player as a fixed panel whose picture carries
+    /// <c>aspect-ratio:16/9</c> and whose controls sit under it. So the ratio belongs to the video and
+    /// not to the window: the chrome's height is added on top of it, which is what
+    /// <see cref="ConstrainToVideoAspect"/> takes as its last argument.
+    /// </remarks>
+    public const double MiniVideoAspect = 16.0 / 9.0;
+
     private readonly Dictionary<PlaybackMode, PlayerWindowGeometry> _geometry = [];
+    private readonly IMiniPlayerPlacementStore? _placements;
+
+    public PlayerWindowCoordinator()
+        : this(placements: null)
+    {
+    }
+
+    /// <summary>
+    /// Builds a coordinator that also remembers the mini player between sessions.
+    /// </summary>
+    /// <remarks>
+    /// Optional, and every other constructor in this file went without it until 2026-08-28, because
+    /// the tests and the recovery shell both build a coordinator with nothing behind it. What the
+    /// store adds is only the half that outlives the process: within one run the dictionary above
+    /// still answers first, so a mini player moved twice does not go to disk to learn where it is.
+    /// </remarks>
+    public PlayerWindowCoordinator(IMiniPlayerPlacementStore? placements) => _placements = placements;
 
     /// <summary>The mode the surface is presented in right now.</summary>
     public PlaybackMode Current { get; private set; } = PlaybackMode.Embedded;
@@ -70,7 +96,47 @@ public sealed class PlayerWindowCoordinator
         };
     }
 
+    /// <summary>
+    /// Keeps a resize on the shape of the picture, deriving whichever side moved less.
+    /// </summary>
+    /// <remarks>
+    /// Which side gives way is decided by which one the pointer moved further, because a mini player
+    /// that always derived its height would never answer a drag on its bottom edge — the window would
+    /// snap back on every frame and read as broken rather than as constrained. Both sides are
+    /// clamped to the minimum before the ratio is applied, so a window squeezed against its own floor
+    /// still comes out of here in shape.
+    /// </remarks>
+    public static PlayerWindowGeometry ConstrainToVideoAspect(
+        PlayerWindowGeometry requested,
+        PlayerWindowGeometry previous,
+        double aspect,
+        double chromeHeight,
+        double minimumWidth)
+    {
+        ArgumentNullException.ThrowIfNull(requested);
+        ArgumentNullException.ThrowIfNull(previous);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(aspect, 0);
+        ArgumentOutOfRangeException.ThrowIfNegative(chromeHeight);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(minimumWidth, 0);
+
+        var widthMoved = Math.Abs(requested.Width - previous.Width);
+        var heightMoved = Math.Abs(requested.Height - previous.Height);
+        var width = widthMoved >= heightMoved
+            ? requested.Width
+            : (requested.Height - chromeHeight) * aspect;
+        width = Math.Max(minimumWidth, width);
+
+        return requested with { Width = width, Height = (width / aspect) + chromeHeight };
+    }
+
     /// <summary>Remembers the geometry of a mode, but only while it is actually on screen.</summary>
+    /// <remarks>
+    /// The mini player's is also written through to the placement store, when there is one: that is
+    /// the only path by which a window moved in one session opens where it was left in the next.
+    /// Until 2026-08-28 nothing at all called this method — it was remembered and recalled by its own
+    /// tests and by nobody else, which is this repository's characteristic defect wearing the shape
+    /// of a coordinator.
+    /// </remarks>
     public void Remember(
         PlaybackMode mode,
         PlayerWindowGeometry geometry,
@@ -78,15 +144,41 @@ public sealed class PlayerWindowCoordinator
         double scaling)
     {
         ArgumentNullException.ThrowIfNull(geometry);
-        if (geometry.IsVisibleOn(screenBounds, scaling))
+        if (!geometry.IsVisibleOn(screenBounds, scaling))
         {
-            _geometry[mode] = geometry;
+            return;
+        }
+
+        _geometry[mode] = geometry;
+        if (mode == PlaybackMode.Mini)
+        {
+            _placements?.Save(new MiniPlayerPlacement(
+                geometry.X,
+                geometry.Y,
+                geometry.Width,
+                geometry.Height));
         }
     }
 
     /// <summary>The stored geometry for a mode, or null when none is visible.</summary>
-    public PlayerWindowGeometry? Recall(PlaybackMode mode) =>
-        _geometry.TryGetValue(mode, out var geometry) ? geometry : null;
+    /// <remarks>
+    /// This session's answer wins over the stored one. They only differ on the first switch after a
+    /// launch, and on that one the stored answer is the whole point.
+    /// </remarks>
+    public PlayerWindowGeometry? Recall(PlaybackMode mode)
+    {
+        if (_geometry.TryGetValue(mode, out var geometry))
+        {
+            return geometry;
+        }
+
+        if (mode != PlaybackMode.Mini || _placements?.Read() is not { } stored)
+        {
+            return null;
+        }
+
+        return new PlayerWindowGeometry(stored.X, stored.Y, stored.Width, stored.Height);
+    }
 
     /// <summary>
     /// Applies a mode to a window: where it sits, how big it is, whether it stays on top, and
@@ -101,11 +193,23 @@ public sealed class PlayerWindowCoordinator
     public void Apply(Window window, PlaybackMode mode, PixelRect screenBounds, double scaling)
     {
         ArgumentNullException.ThrowIfNull(window);
-        var geometry = Recall(mode) ?? GeometryFor(mode, screenBounds, scaling);
 
-        window.WindowDecorations = mode == PlaybackMode.Fullscreen
-            ? WindowDecorations.None
-            : WindowDecorations.Full;
+        // Recalled and then checked against this screen, and the two are not the same test. What
+        // Remember refused was a placement off the screen it was written on; a placement written on
+        // a second monitor is perfectly valid there and lands on nothing here, so the window would
+        // open where nobody could reach it — with no title bar to drag it back by.
+        var recalled = Recall(mode);
+        var geometry = recalled is not null && recalled.IsVisibleOn(screenBounds, scaling)
+            ? recalled
+            : GeometryFor(mode, screenBounds, scaling);
+
+        // The mini player loses its frame too, and it is the only mode where that costs something:
+        // fullscreen keeps the shortcuts and the transport, and this one keeps neither a title bar to
+        // drag by nor a system close. Both are given back by MiniPlayerWindow — the move on a press
+        // anywhere the chrome is not, and the close as one of its own five buttons.
+        window.WindowDecorations = mode == PlaybackMode.Embedded
+            ? WindowDecorations.Full
+            : WindowDecorations.None;
         window.Topmost = mode == PlaybackMode.Mini;
         window.Position = new PixelPoint(
             (int)Math.Round(geometry.X * scaling),

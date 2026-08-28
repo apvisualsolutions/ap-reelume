@@ -85,6 +85,59 @@ public sealed class ShellPlayerWindowTests
     }
 
     /// <summary>
+    /// Where the mini player was left is written down when it closes, and read back when it opens.
+    /// </summary>
+    /// <remarks>
+    /// This is the path that stopped <c>PlayerWindowCoordinator.Remember</c> being registered and
+    /// never fed. It is written on the close and not on the move for a measured reason: a move drag
+    /// raises <c>PositionChanged</c> on every frame and the placement goes to a file, so saving per
+    /// frame would put a few hundred writes behind one gesture for an answer read once a launch.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Where_the_mini_player_was_left_is_written_down_when_it_closes()
+    {
+        var placements = new RecordingPlacements();
+        var viewModel = CreateViewModel(placements);
+        var view = new ShellView { DataContext = viewModel };
+        var window = new Window { Width = 1280, Height = 800, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        await viewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(MediaFile, TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+
+        await viewModel.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        var mini = Assert.IsType<MiniPlayerWindow>(
+            Stage(view).GetVisualAncestors().OfType<Window>().FirstOrDefault());
+        Assert.Null(placements.Saved);
+
+        mini.Position = new PixelPoint(360, 240);
+        mini.Width = 560;
+        Dispatcher.UIThread.RunJobs();
+
+        await viewModel.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.NotNull(placements.Saved);
+        Assert.Equal(560, placements.Saved!.Width);
+        Assert.Equal(360 / mini.RenderScaling, placements.Saved.X);
+        Assert.Equal(240 / mini.RenderScaling, placements.Saved.Y);
+
+        // And the second visit opens on what the first one wrote, through a window built afresh:
+        // the shell closes the mini window on the way back rather than hiding it.
+        await viewModel.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        var second = Assert.IsType<MiniPlayerWindow>(
+            Stage(view).GetVisualAncestors().OfType<Window>().FirstOrDefault());
+
+        Assert.Equal(560, second.Width);
+        await viewModel.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        window.Close();
+    }
+
+    /// <summary>
     /// A shell whose data context is replaced stops listening to the old one. Without that, two view
     /// models would both drive the same window and the second mode change would fight the first.
     /// </summary>
@@ -214,7 +267,7 @@ public sealed class ShellPlayerWindowTests
         return (window, view, viewModel);
     }
 
-    private static ShellViewModel CreateViewModel() => new(
+    private static ShellViewModel CreateViewModel(IMiniPlayerPlacementStore? placements = null) => new(
         new NavigationService(),
         new ShellSurfaces
         {
@@ -224,7 +277,17 @@ public sealed class ShellPlayerWindowTests
             }),
             ClosePlayer = _ => Task.CompletedTask,
             ChangePlaybackMode = (mode, _) => Task.FromResult(mode),
+            MiniPlayerPlacement = placements,
         });
+
+    private sealed class RecordingPlacements : IMiniPlayerPlacementStore
+    {
+        public MiniPlayerPlacement? Saved { get; set; }
+
+        public MiniPlayerPlacement? Read() => Saved;
+
+        public void Save(MiniPlayerPlacement placement) => Saved = placement;
+    }
 
     private sealed class InertCoordinator : IPlaybackSessionCoordinator
     {

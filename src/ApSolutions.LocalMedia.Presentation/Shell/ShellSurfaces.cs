@@ -104,4 +104,14 @@ public sealed record ShellSurfaces
     /// that ended up in force. The engine is never reopened, so nothing about the media changes.
     /// </summary>
     public Func<PlaybackMode, CancellationToken, Task<PlaybackMode>>? ChangePlaybackMode { get; init; }
+
+    /// <summary>
+    /// Where the mini player was left last time this application ran.
+    /// </summary>
+    /// <remarks>
+    /// It arrives here rather than being built by the shell because the shell has no idea where the
+    /// settings file lives, and must not: the mini player's window is a view, and a view that opens
+    /// its own file is a view that cannot be tested without one.
+    /// </remarks>
+    public IMiniPlayerPlacementStore? MiniPlayerPlacement { get; init; }
 }

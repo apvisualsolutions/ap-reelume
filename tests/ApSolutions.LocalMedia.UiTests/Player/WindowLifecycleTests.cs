@@ -276,6 +276,213 @@ public sealed class WindowLifecycleTests
             PlayerWindowCoordinator.GeometryFor(PlaybackMode.Fullscreen, Screen2560X1440, -1.5));
     }
 
+    /// <summary>
+    /// The mini player loses its frame too, and that is not the same statement as fullscreen's.
+    /// </summary>
+    /// <remarks>
+    /// Fullscreen without decorations gives up a title bar nobody could reach anyway. The mini
+    /// player gives up the only way the system offered to move it and to close it, so both are asked
+    /// for here: the mode has no frame, and it is still on top of everything.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_mini_player_has_no_frame_either_and_is_still_on_top()
+    {
+        var coordinator = new PlayerWindowCoordinator();
+        var window = new Window { Width = 800, Height = 600 };
+        window.Show();
+
+        coordinator.Apply(window, PlaybackMode.Mini, Screen2560X1440, 1.5);
+
+        Assert.Equal(WindowDecorations.None, window.WindowDecorations);
+        Assert.True(window.Topmost);
+
+        coordinator.Apply(window, PlaybackMode.Embedded, Screen2560X1440, 1.5);
+        Assert.Equal(WindowDecorations.Full, window.WindowDecorations);
+        Assert.False(window.Topmost);
+        window.Close();
+    }
+
+    /// <summary>
+    /// Where the mini player was left survives the application closing, and comes back on the switch.
+    /// </summary>
+    /// <remarks>
+    /// Until 2026-08-28 nothing in the product called <c>Remember</c> at all: it and <c>Recall</c>
+    /// were written, kept in a dictionary, and read by their own tests and by nobody else — this
+    /// repository's characteristic defect, wearing the shape of a coordinator. What this asserts is
+    /// the path that closes it: a placement written through the store on one run is what
+    /// <c>Apply</c> puts on screen on the next, with no dictionary in between.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_mini_player_left_somewhere_opens_there_in_the_next_session()
+    {
+        var placements = new RecordingPlacements();
+        var firstRun = new PlayerWindowCoordinator(placements);
+        var moved = new PlayerWindowGeometry(700, 400, 640, 400);
+
+        firstRun.Remember(PlaybackMode.Mini, moved, Screen2560X1440, 1.5);
+        Assert.Equal(new MiniPlayerPlacement(700, 400, 640, 400), placements.Saved);
+
+        // A coordinator of its own, with an empty dictionary, which is what the next launch has.
+        var nextRun = new PlayerWindowCoordinator(placements);
+        var window = new Window { Width = 800, Height = 600 };
+        window.Show();
+        nextRun.Apply(window, PlaybackMode.Mini, Screen2560X1440, 1.5);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(moved, nextRun.Recall(PlaybackMode.Mini));
+        Assert.Equal(640, window.Width);
+        Assert.Equal(400, window.Height);
+        window.Close();
+    }
+
+    /// <summary>Only the mini player is written to disk, and only what is on a screen.</summary>
+    [AvaloniaFact]
+    public void Nothing_but_the_mini_player_is_written_down_and_nothing_off_screen_is()
+    {
+        var placements = new RecordingPlacements();
+        var coordinator = new PlayerWindowCoordinator(placements);
+
+        coordinator.Remember(
+            PlaybackMode.Fullscreen,
+            new PlayerWindowGeometry(0, 0, 1706, 960),
+            Screen2560X1440,
+            1.5);
+        Assert.Null(placements.Saved);
+
+        coordinator.Remember(
+            PlaybackMode.Mini,
+            new PlayerWindowGeometry(-9000, -9000, 480, 270),
+            Screen2560X1440,
+            1.5);
+        Assert.Null(placements.Saved);
+    }
+
+    /// <summary>
+    /// A placement written on another screen is not applied on this one.
+    /// </summary>
+    /// <remarks>
+    /// <c>Remember</c> refuses what is off the screen it was written on; a second monitor is on a
+    /// screen, and its coordinates land on nothing once it is unplugged. Since 2026-08-28 the window
+    /// has no title bar to drag it back by, so a placement that cannot be seen has to be dropped at
+    /// the moment it would be used rather than at the moment it was stored.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_placement_from_a_screen_that_is_gone_falls_back_to_the_default()
+    {
+        var placements = new RecordingPlacements
+        {
+            Saved = new MiniPlayerPlacement(-3000, 100, 640, 400),
+        };
+        var coordinator = new PlayerWindowCoordinator(placements);
+        var window = new Window { Width = 800, Height = 600 };
+        window.Show();
+
+        coordinator.Apply(window, PlaybackMode.Mini, Screen2560X1440, 1.5);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(PlayerWindowCoordinator.DefaultMiniGeometry.Width, window.Width);
+        Assert.Equal(PlayerWindowCoordinator.DefaultMiniGeometry.Height, window.Height);
+        window.Close();
+    }
+
+    /// <summary>A coordinator with no store behind it works exactly as it did before there was one.</summary>
+    [AvaloniaFact]
+    public void Without_a_store_the_coordinator_remembers_only_for_as_long_as_it_runs()
+    {
+        var coordinator = new PlayerWindowCoordinator(placements: null);
+        var moved = new PlayerWindowGeometry(300, 200, 640, 400);
+
+        coordinator.Remember(PlaybackMode.Mini, moved, Screen2560X1440, 1.5);
+
+        Assert.Equal(moved, coordinator.Recall(PlaybackMode.Mini));
+        Assert.Null(new PlayerWindowCoordinator(placements: null).Recall(PlaybackMode.Mini));
+    }
+
+    /// <summary>
+    /// A resize keeps the picture at 16:9, and the side that gives way is the one that moved less.
+    /// </summary>
+    /// <remarks>
+    /// The second half is the whole reason this takes a previous geometry. A constraint that always
+    /// derived the height would snap back on every frame of a drag on the bottom edge, which reads
+    /// as a window that refuses to be resized rather than as one that keeps its shape.
+    /// </remarks>
+    [AvaloniaTheory]
+    // Dragged wider: the height follows the width.
+    [InlineData(480, 270, 640, 270, 640, 400)]
+    // Dragged taller: the width follows the height.
+    [InlineData(480, 310, 480, 400, 640, 400)]
+    // Dragged by a corner, the width further: the width leads.
+    [InlineData(480, 310, 700, 330, 700, 433.75)]
+    public void A_resize_keeps_the_picture_at_sixteen_by_nine(
+        double fromWidth,
+        double fromHeight,
+        double toWidth,
+        double toHeight,
+        double expectedWidth,
+        double expectedHeight)
+    {
+        const double chromeHeight = 40;
+
+        var constrained = PlayerWindowCoordinator.ConstrainToVideoAspect(
+            new PlayerWindowGeometry(10, 20, toWidth, toHeight),
+            new PlayerWindowGeometry(10, 20, fromWidth, fromHeight),
+            PlayerWindowCoordinator.MiniVideoAspect,
+            chromeHeight,
+            minimumWidth: 320);
+
+        Assert.Equal(expectedWidth, constrained.Width, precision: 6);
+        Assert.Equal(expectedHeight, constrained.Height, precision: 6);
+        Assert.Equal(
+            PlayerWindowCoordinator.MiniVideoAspect,
+            constrained.Width / (constrained.Height - chromeHeight),
+            precision: 6);
+
+        // The position is carried through untouched: a resize from a north or a west edge moves the
+        // window as well, and this is the half that must not undo that.
+        Assert.Equal(10, constrained.X);
+        Assert.Equal(20, constrained.Y);
+    }
+
+    [AvaloniaFact]
+    public void A_window_squeezed_under_its_own_minimum_comes_back_in_shape()
+    {
+        var constrained = PlayerWindowCoordinator.ConstrainToVideoAspect(
+            new PlayerWindowGeometry(0, 0, 120, 90),
+            new PlayerWindowGeometry(0, 0, 480, 270),
+            PlayerWindowCoordinator.MiniVideoAspect,
+            chromeHeight: 40,
+            minimumWidth: 320);
+
+        Assert.Equal(320, constrained.Width);
+        Assert.Equal((320 / PlayerWindowCoordinator.MiniVideoAspect) + 40, constrained.Height, precision: 6);
+    }
+
+    [AvaloniaFact]
+    public void An_aspect_or_a_minimum_that_no_window_could_have_is_refused()
+    {
+        var geometry = new PlayerWindowGeometry(0, 0, 480, 270);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            PlayerWindowCoordinator.ConstrainToVideoAspect(geometry, geometry, 0, 40, 320));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            PlayerWindowCoordinator.ConstrainToVideoAspect(geometry, geometry, 16.0 / 9.0, -1, 320));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            PlayerWindowCoordinator.ConstrainToVideoAspect(geometry, geometry, 16.0 / 9.0, 40, 0));
+        Assert.Throws<ArgumentNullException>(() =>
+            PlayerWindowCoordinator.ConstrainToVideoAspect(null!, geometry, 16.0 / 9.0, 40, 320));
+        Assert.Throws<ArgumentNullException>(() =>
+            PlayerWindowCoordinator.ConstrainToVideoAspect(geometry, null!, 16.0 / 9.0, 40, 320));
+    }
+
+    private sealed class RecordingPlacements : IMiniPlayerPlacementStore
+    {
+        public MiniPlayerPlacement? Saved { get; set; }
+
+        public MiniPlayerPlacement? Read() => Saved;
+
+        public void Save(MiniPlayerPlacement placement) => Saved = placement;
+    }
+
     private sealed class InertCoordinator : IPlaybackSessionCoordinator
     {
         public PlaybackSession? ActiveSession => null;
