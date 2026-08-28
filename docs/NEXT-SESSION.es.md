@@ -81,6 +81,12 @@ y no bloquea, igual que los suelos.
   `dotnet format` lo caza como `ENDOFLINE` en cada línea del archivo entero.
 - **La versión del esquema tiene tres afirmaciones**: el conteo, el máximo y la lista de nombres de
   `SqliteBootstrapTests`. Una migración nueva mueve las tres.
+- **`App.ApplyLanguage` cambia los diccionarios y NO toca `CultureInfo.CurrentCulture`.** Una prueba
+  que afirma «0,25×» tras aplicar el idioma pasa en una máquina en es-ES y **falla en el runner**, que
+  está en en-US y escribe «0.25×». Lo cazó CI y no el árbol. La corrección no fue quitar la aserción
+  sino **fijar las dos cosas por separado**, con lo que la prueba dice algo más fuerte que antes: el
+  número sigue a la máquina y las palabras al idioma elegido, que es lo que ve alguien con Windows en
+  inglés y la aplicación en español.
 - **`MediaTests` se cuelga en esta máquina cuando corre dentro de la solución con
   `--collect:'XPlat Code Coverage'`**, y sola pasa en 1 m 37 s. Dos consecuencias, y las dos engañan:
   deja un `testhost` bloqueando los `.dll` —así que la siguiente compilación falla con `MSB3026` y

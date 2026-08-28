@@ -67,7 +67,7 @@ public sealed class SpeedMenuTests
     [AvaloniaFact]
     public void Every_row_says_its_multiplier_its_name_and_which_way_it_goes()
     {
-        using var scope = Mount();
+        using var scope = Mount(CultureInfo.GetCultureInfo("es-ES"));
         var options = scope.Menu.Items.Cast<SpeedOption>().ToArray();
 
         var normal = Assert.Single(options, option => option.Multiplier == 1.0);
@@ -87,11 +87,41 @@ public sealed class SpeedMenuTests
             options.Where(option => option.Multiplier > 1.0),
             option => Assert.Equal("más rápida", option.Note));
 
-        // The multipliers themselves follow the culture in force, which is the whole reason they are
-        // formatted rather than written into the markup: a literal «0,25×» would say «0,25×» in
-        // English too.
         Assert.Equal("0,25×", options[0].Value);
         Assert.Equal("4×", options[^1].Value);
+    }
+
+    /// <summary>
+    /// The multiplier follows the machine's numbers and the words follow the chosen language.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// They are two different settings and this row spends both. <c>App.ApplyLanguage</c> replaces the
+    /// string dictionaries and <b>does not touch <see cref="CultureInfo.CurrentCulture"/></b>, which
+    /// is what formats the number — so somebody running Windows in English with this application in
+    /// Spanish reads «0.25× · más lenta», with the separator their machine uses and the words they
+    /// asked for. That is the whole reason the multiplier is formatted rather than written into the
+    /// markup, and it is the same decision every other number in this tree already takes.
+    /// </para>
+    /// <para>
+    /// Measured on CI, which is what this test is for: the row above asserted «0,25×» while setting
+    /// only the language, and it passed on a development machine in es-ES and failed on a hosted
+    /// runner in en-US. A comma is not a fact about the language.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_number_follows_the_machine_and_the_words_follow_the_language()
+    {
+        using var scope = Mount(CultureInfo.GetCultureInfo("en-US"));
+        var options = scope.Menu.Items.Cast<SpeedOption>().ToArray();
+
+        Assert.Equal("0.25×", options[0].Value);
+        Assert.Equal("1.25×", options[4].Value);
+
+        // And the words are still the language's, which is the half that would be lost by formatting
+        // everything with one culture.
+        Assert.Equal("Normal", Assert.Single(options, option => option.Multiplier == 1.0).Label);
+        Assert.Equal("más rápida", options[^1].Note);
     }
 
     /// <summary>
@@ -263,11 +293,20 @@ public sealed class SpeedMenuTests
         Assert.True(condition(), complaint);
     }
 
-    private static Scope Mount()
+    /// <summary>
+    /// The transport in a window, with the language and the machine's numbers both settled.
+    /// </summary>
+    /// <remarks>
+    /// The numbers are set as well as the words, and only a test that says which of the two it means
+    /// can assert a formatted multiplier at all: <c>ApplyLanguage</c> replaces the dictionaries and
+    /// leaves <see cref="CultureInfo.CurrentCulture"/> as the machine has it. Restored by the scope,
+    /// because a culture left behind is a culture the next test inherits.
+    /// </remarks>
+    private static Scope Mount(CultureInfo? numbers = null)
     {
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
-        return new Scope();
+        return new Scope(numbers);
     }
 
     /// <summary>
@@ -280,9 +319,16 @@ public sealed class SpeedMenuTests
     private sealed class Scope : IDisposable
     {
         private readonly Window _window;
+        private readonly CultureInfo _restore;
 
-        internal Scope()
+        internal Scope(CultureInfo? numbers)
         {
+            _restore = CultureInfo.CurrentCulture;
+            if (numbers is not null)
+            {
+                CultureInfo.CurrentCulture = numbers;
+            }
+
             Engine = new RecordingEngine();
             Model = new TransportControlsViewModel(new ControlPlayback(Engine));
             Transport = new TransportControlsView { DataContext = Model };
@@ -306,7 +352,11 @@ public sealed class SpeedMenuTests
             Dispatcher.UIThread.RunJobs();
         }
 
-        public void Dispose() => _window.Close();
+        public void Dispose()
+        {
+            _window.Close();
+            CultureInfo.CurrentCulture = _restore;
+        }
     }
 
     /// <summary>An engine that plays nothing and remembers the last speed it was asked for.</summary>

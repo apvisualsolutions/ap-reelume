@@ -80,6 +80,12 @@ reports and does not block, exactly like the floors.
   it as `ENDOFLINE` on every line of the whole file.
 - **The schema version has three assertions**: the count, the maximum and the list of names in
   `SqliteBootstrapTests`. A new migration moves all three.
+- **`App.ApplyLanguage` replaces the dictionaries and does NOT touch `CultureInfo.CurrentCulture`.** A
+  test asserting «0,25×» after applying the language passes on a machine in es-ES and **fails on the
+  runner**, which is in en-US and writes «0.25×». CI caught it and the tree did not. The fix was not to
+  drop the assertion but to **set the two separately**, which makes the test say something stronger
+  than before: the number follows the machine and the words follow the chosen language, which is what
+  somebody running Windows in English with the application in Spanish actually sees.
 - **`MediaTests` hangs on this machine when it runs inside the solution with
   `--collect:'XPlat Code Coverage'`**, and passes in 1 m 37 s on its own. Two consequences, both
   misleading: it leaves a `testhost` holding the `.dll`s — so the next build fails with `MSB3026` and
