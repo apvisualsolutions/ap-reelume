@@ -42,14 +42,20 @@
 ## count on both sides is the same number. check-coverage.ps1 now names anything under the bar that is
 ## not on this list, which is the only way a degradation announces itself.
 ##
-## One floor moves with them, and it is the exception to "floors come from CI": MediaFileRepository
-## 87 -> 88, because the branches that moved it are a port this batch added and a test that takes both
-## of its arms. It is raised on a local reading, which the rule above forbids, and the reason it is
-## allowed here is measured rather than argued: on the four files this batch was about, this machine
-## and the CI artefact agreed to the digit — 65/41, 98/91, 98/92 and 100/87 in both — and the suites
-## that cover this file, Integration and Accessibility, are the two that ran. What this machine cannot
-## measure is LibVLC and packaging, and none of that reaches here. If CI disagrees, it will say the
-## number and the number is what goes in.
+## Three floors move with them, all three read off the coverage-debt artefact of run 33157677813 and
+## compared against the three runs before it, which is what the dance rule asks for:
+##
+##   MediaFileRepository   87, 87, 87 -> 88. The branches are a port this batch added and a test that
+##                         takes both of its arms. Not a dance: a cause that is written down.
+##   MatchModels           60, 60, 60 -> 80. Twenty points, and the cause is the same batch:
+##                         ScannedTitlePolicyTests and NameScannedTitlesTests build ParsedMediaName
+##                         and FileNameContext, which nothing else did.
+##   LibVlcMediaPlayerEngine  91, 91, 91 -> 92, ONE line, on the file whose branches depend on codecs
+##                         a runner may or may not have. **This is the shape of a dance** and it is
+##                         raised anyway, because the gate fails either way — a floor under what was
+##                         measured fails exactly like one over it — and one reading is what there is.
+##                         If the next run reads 91, it comes back down with that written beside it,
+##                         the way MarkerEditorViewModel's 81 did.
 
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  80
@@ -99,7 +105,7 @@ src/ApSolutions.LocalMedia.Application/Privacy/CreateDiagnostics.cs             
 src/ApSolutions.LocalMedia.Domain/Backup/RootRemapPolicy.cs                                  100  90
 src/ApSolutions.LocalMedia.Domain/Continuity/SegmentDetectionPolicy.cs                       100  92
 src/ApSolutions.LocalMedia.Domain/Discovery/RenameOperation.cs                                95  50
-src/ApSolutions.LocalMedia.Domain/Identification/MatchModels.cs                              100  60
+src/ApSolutions.LocalMedia.Domain/Identification/MatchModels.cs                              100  80
 src/ApSolutions.LocalMedia.Domain/Identification/MediaNameParser.cs                          100  91
 src/ApSolutions.LocalMedia.Domain/Metadata/IMetadataProvider.cs                               93 100
 src/ApSolutions.LocalMedia.Domain/Metadata/MetadataMergePolicy.cs                            100  92
@@ -138,7 +144,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbOptions.cs               
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs                        100  50
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs               87  73
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                86  79
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 91  79
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 92  79
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  61
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs           100  83
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/NetworkPurposeRegistry.cs                  100  87
