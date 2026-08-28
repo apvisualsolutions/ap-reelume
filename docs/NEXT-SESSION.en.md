@@ -1,5 +1,92 @@
 # Where to pick up
 
+## State at the close of 2026-08-28 (fourth session) — the debt list's crack, closed and gated
+
+Four commits on the branch. **`main` fast-forwarded to `8ce6ef8` on 2026-08-28**, with its CI checked
+green before the reference moved: it was the documentation-only commit the previous note left waiting
+for its run.
+
+All four points of the brief are closed. The fifth — the mini as a real PiP window and the poster
+behind the details header — **was not touched**, and is what remains alongside the metadata editor and
+«sections cut off by the width».
+
+### 1. The speed menu is the prototype's drop-down
+
+It was a `MenuFlyout` of ten numbers with an eleventh row that reset. It is now the pill the prototype
+draws, with **nine** rows of three columns — mark, name and note — opening **upward**, and «Back to
+1×» as a button beside it.
+
+**What decided the shape was the walk and not taste.** Nothing inside a `Flyout` can be reached by the
+harness: all twenty entries of `eng/walk-pending.txt` are exactly that, flyout children, and that
+ratchet does not go up. A `ComboBox` is pressed and asserted on `IsDropDownOpen`, the way the
+library's two filters already are, and its rows are `ComboBoxItem`s, which the inventory does not
+count. So the ledger gains **one** identity — the reset — and the walk went from 202 to **203
+pressed**, with the ratchet still at 20.
+
+Along the way: `PlaybackControlPolicy.SpeedSteps` **was read by nobody**. The menu wrote its own ten
+numbers into its own markup and a test read that `.axaml` back **as text** to compare. The menu is
+built from the policy now and the test asks the model. The `1.75×` the prototype does not offer went
+with it.
+
+### 2. The transport's glyphs
+
+Only one was wrong, and the rest already matched the prototype character for character — that has
+been pinned by `PrototypeIconTests` since 2026-08-24. **The full-screen button drew the entering
+arrows while already full screen**, and `IconExitFullscreen` had been in the dictionary the whole
+time: the same defect the mute button had in August.
+
+What hid it: **the table pinning which glyph each button carries listed eleven of thirteen.** The two
+mode buttons had been on the bar for three days without being on it, and the one that was wrong was
+one of the two that were missing.
+
+### 3. An unidentified film's title
+
+«El Faro de Piedra 2019» was the file name verbatim, with the year inside the title and the year
+column empty beside it. `ScannedTitlePolicy` (domain, pure) says what the card is called, and
+`NameScannedTitles` — a sibling of the other two post-scan use cases — writes it. Migration **0021**
+for the year.
+
+**An already-catalogued library renames itself on the next scan with nothing re-probed**, because the
+pass walks the whole summary, `Unchanged` included — a file whose size and date have not moved is
+never re-stored, so a projection written once would have kept the raw name forever.
+
+### 4. The debt list's crack, closed and gated
+
+**Measured**: three consecutive CI runs measured **216** files below the bar while the list named
+**212**, and the four missing ones measure the same in all three — they do not dance. And no file on
+the `$watched` list falls below the bar on CI, so the difference is exactly those four.
+
+All four were **closed** rather than written down, so the ratchet stays at **212**:
+
+- `PlayerView.axaml.cs` **65/41**, the lowest pair in the tree. Two views mounted it and neither gave
+  it a context, so **neither of its two handlers had ever run**.
+- `PlayerViewModel.cs` **98/91**, by removing three guards nothing could take.
+- `PlaybackPreference.cs` **98/92** and `DisabledOutline.cs` **100/87**, with the arm nobody took.
+
+And `check-coverage.ps1` now asks the list to be **complete** and not merely accurate. Off CI it
+reports and does not block, exactly like the floors.
+
+### The traps that cost time here
+
+- **A model that resolves a resource in its constructor makes every one of its callers a UI-thread
+  caller.** `SpeedOptions` was built there and two `[Fact]`s that only asked about a playhead failed
+  with "the calling thread cannot access this object". It is built on first read.
+- **`Gestures` is internal in Avalonia 12.1.1**; the public event is `InputElement.DoubleTappedEvent`.
+  It is the same class of premise that already failed over `ItemsRepeater`: checked, not assumed.
+- **A `ContentControl` whose `IsVisible` is bound to a model property is not filled by setting its
+  `Content` by hand.** The transport has to be given to the `PlayerViewModel`, or it sits in a hidden
+  container with no children to find.
+- **A PowerShell script that rewrites a file can change its line endings**, and `dotnet format` catches
+  it as `ENDOFLINE` on every line of the whole file.
+- **The schema version has three assertions**: the count, the maximum and the list of names in
+  `SqliteBootstrapTests`. A new migration moves all three.
+- **`MediaTests` hangs on this machine when it runs inside the solution with
+  `--collect:'XPlat Code Coverage'`**, and passes in 1 m 37 s on its own. Two consequences, both
+  misleading: it leaves a `testhost` holding the `.dll`s — so the next build fails with `MSB3026` and
+  looks like a code error — and it **leaves no report**, so five LibVLC files show up in the coverage
+  gate as "fell to 3/2" when all that happened is that nobody measured them. Measure suite by suite.
+  The floors are still CI's, which is exactly why that rule exists.
+
 ## State at the close of 2026-08-25 (third session) — the eight of the brief, closed and measured
 
 Six commits on the branch. **Everything green locally**: Domain 519, Application 246, Architecture

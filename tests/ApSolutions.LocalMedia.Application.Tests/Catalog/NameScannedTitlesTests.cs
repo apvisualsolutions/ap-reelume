@@ -34,9 +34,12 @@ public sealed class NameScannedTitlesTests
     /// is called.
     /// </summary>
     /// <remarks>
-    /// The grid does not draw an episode's scanned row at all — the projection's query hides a file
-    /// an <c>episode_media</c> link claims — so renaming one would be writing a name nothing shows
-    /// while overwriting the floor the series pass may still need.
+    /// Two reasons, and the second is the one that decides it. The grid does not draw an episode's
+    /// scanned row at all — the projection's query hides a file an <c>episode_media</c> link claims.
+    /// And where that link is missing, because the episodes were loose in a root and the series
+    /// policy refused to group them, cleaning the name would take away the only thing that tells one
+    /// from another: «Puerto Sombra S01E01» and «…S01E02» both clean to «Puerto Sombra», and a column
+    /// of identically named cards is worse than a column of ugly ones.
     /// </remarks>
     [Fact]
     public async Task Films_are_renamed_and_episodes_are_left_to_the_series_pass()

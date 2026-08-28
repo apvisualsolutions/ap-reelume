@@ -196,10 +196,27 @@ public sealed class SpeedMenuTests
 
         Assert.Equal(2.0, scope.Model.SpeedMultiplier);
 
-        // And the step the session already plays at changes nothing: the one-way binding writes the
-        // engine's answer back into the list, which raises the same event again.
+        // A list with nothing chosen sends no speed. It is the state the pill is in while its items
+        // are being replaced, and a null there would be asked to be a multiplier.
         scope.Engine.LastSpeed = null;
+        scope.Menu.SelectedValue = null;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Null(scope.Engine.LastSpeed);
+
+        // And choosing again the step the session is already playing at reaches nothing. This is the
+        // arm that keeps the handler from looping: applying the engine's answer raises
+        // SpeedMultiplier, the one-way binding puts the row back, and that raises this same event
+        // with the value the model already holds. Reached from null rather than from 2× itself,
+        // because setting a list to what it already holds raises no event at all.
         scope.Menu.SelectedValue = 2.0;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Null(scope.Engine.LastSpeed);
+
+        // And a bar with no session behind it yet, which is the state between the view being built
+        // and the composition filling it. A selection there reaches nothing rather than throwing.
+        scope.Transport.DataContext = null;
+        Dispatcher.UIThread.RunJobs();
+        scope.Menu.SelectedValue = 0.5;
         Dispatcher.UIThread.RunJobs();
         Assert.Null(scope.Engine.LastSpeed);
     }

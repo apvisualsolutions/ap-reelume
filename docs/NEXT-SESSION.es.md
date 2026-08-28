@@ -1,5 +1,93 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-28 (cuarta sesión) — la grieta de la deuda, cerrada y con puerta
+
+Cuatro commits sobre la rama. **`main` avanzado por fast-forward a `8ce6ef8` el 2026-08-28**, con su
+CI en verde comprobado antes de mover la referencia: era el commit de sólo documentación que la nota
+anterior dejó esperando su run.
+
+Los cuatro puntos del encargo están cerrados. El quinto —el mini como ventana PiP de verdad y el
+póster de fondo del cabecero— **no se ha tocado**, y sigue siendo lo que queda junto con el editor de
+metadatos y «secciones cortadas por el ancho».
+
+### 1. El menú de velocidad es el desplegable del prototipo
+
+Era un `MenuFlyout` de diez números y una undécima fila que reiniciaba. Ahora es la píldora que el
+prototipo dibuja, con **nueve** filas de tres columnas —marca, nombre y nota—, abriendo **hacia
+arriba**, y «Volver a 1×» como botón al lado.
+
+**Lo que decidió la forma fue el paseo y no el gusto.** Nada dentro de un `Flyout` es alcanzable por
+el arnés: las veinte entradas de `eng/walk-pending.txt` son exactamente eso, hijos de un flyout, y ese
+trinquete no sube. Un `ComboBox` sí se pulsa y se afirma sobre `IsDropDownOpen`, como ya hacen los dos
+filtros de Biblioteca, y sus filas son `ComboBoxItem`, que el inventario no cuenta. Así el inventario
+gana **una** identidad —la del reinicio— y el paseo pasó de 202 a **203 pulsados**, con el trinquete
+quieto en 20.
+
+De paso: `PlaybackControlPolicy.SpeedSteps` **no lo leía nadie**. El menú escribía sus diez números en
+su propio marcado y una prueba leía ese `.axaml` **como texto** para comparar. Ahora el menú se
+construye de la política y la prueba pregunta al modelo. El `1,75×` que el prototipo no ofrece se fue
+con ello.
+
+### 2. Los glifos del transporte
+
+Sólo uno estaba mal, y el resto ya coincidían con el prototipo carácter por carácter (eso lo ata
+`PrototypeIconTests` desde el 2026-08-24). **El botón de pantalla completa dibujaba las flechas de
+entrar también estando ya dentro**, y `IconExitFullscreen` llevaba en el diccionario desde el
+principio: mismo defecto que el silencio tuvo en agosto.
+
+Lo que lo tapaba: **la tabla que ata qué glifo lleva cada botón listaba once de trece.** Los dos
+botones de modo llevaban tres días en la barra sin estar en ella, y el que estaba mal era uno de los
+dos que faltaban.
+
+### 3. El título de una película sin identificar
+
+«El Faro de Piedra 2019» era el nombre del archivo tal cual, con el año dentro del título y la columna
+del año vacía al lado. `ScannedTitlePolicy` (dominio, pura) dice cómo se llama la tarjeta, y
+`NameScannedTitles` —hermano de los otros dos casos de uso post-escaneo— la escribe. Migración
+**0021** para el año.
+
+**Una biblioteca ya catalogada se renombra sola en el siguiente escaneo y sin re-sondear nada**,
+porque el paso recorre todo el resumen, `Unchanged` incluidos — un archivo cuyo tamaño y fecha no se
+han movido nunca vuelve a guardarse, así que una proyección escrita una vez se habría quedado con el
+nombre crudo para siempre.
+
+### 4. La grieta de la lista de deuda, cerrada y con puerta
+
+**Medido**: tres ejecuciones seguidas de CI midieron **216** archivos bajo el listón mientras la lista
+nombraba **212**, y los cuatro que faltaban miden lo mismo en las tres — no bailan. Y ningún archivo
+de la lista `$watched` cae bajo el listón en CI, así que la diferencia son exactamente esos cuatro.
+
+Los cuatro **se cerraron** en vez de escribirse, así que el trinquete sigue en **212**:
+
+- `PlayerView.axaml.cs` **65/41**, la pareja más baja del árbol. Dos vistas lo montaban y ninguna le
+  daba contexto, así que **ninguno de sus dos manejadores se había ejecutado jamás**.
+- `PlayerViewModel.cs` **98/91**, quitando tres guardas que nada podía tomar.
+- `PlaybackPreference.cs` **98/92** y `DisabledOutline.cs` **100/87**, con la rama que nadie tomaba.
+
+Y `check-coverage.ps1` pide ahora que la lista sea **completa** y no sólo exacta. Fuera de CI informa
+y no bloquea, igual que los suelos.
+
+### Las trampas que costaron tiempo aquí
+
+- **Un modelo que resuelve un recurso en su constructor convierte a todos sus llamadores en llamadores
+  del hilo de UI.** `SpeedOptions` se construía ahí y dos `[Fact]` que sólo preguntaban por un playhead
+  fallaron con «the calling thread cannot access this object». Se construye en la primera lectura.
+- **`Gestures` es internal en Avalonia 12.1.1**; el evento público es `InputElement.DoubleTappedEvent`.
+  Es la misma clase de premisa que ya falló con `ItemsRepeater`: se comprueba, no se supone.
+- **Un `ContentControl` cuyo `IsVisible` se enlaza a una propiedad del modelo no se llena poniéndole
+  `Content` a mano.** El transporte hay que dárselo al `PlayerViewModel`, o queda en un contenedor
+  oculto sin hijos que encontrar.
+- **Un script de PowerShell que reescribe un archivo puede cambiarle los finales de línea**, y
+  `dotnet format` lo caza como `ENDOFLINE` en cada línea del archivo entero.
+- **La versión del esquema tiene tres afirmaciones**: el conteo, el máximo y la lista de nombres de
+  `SqliteBootstrapTests`. Una migración nueva mueve las tres.
+- **`MediaTests` se cuelga en esta máquina cuando corre dentro de la solución con
+  `--collect:'XPlat Code Coverage'`**, y sola pasa en 1 m 37 s. Dos consecuencias, y las dos engañan:
+  deja un `testhost` bloqueando los `.dll` —así que la siguiente compilación falla con `MSB3026` y
+  parece un error del código— y **no deja informe**, así que cinco archivos de LibVLC aparecen en la
+  puerta de cobertura como «fell to 3/2» cuando lo único que pasa es que nadie los midió. Se mide
+  suite a suite. Los suelos siguen siendo los de CI, que es exactamente por lo que esa regla existe.
+
 ## Estado al cierre del 2026-08-25 (tercera sesión) — los ocho del encargo, cerrados y medidos
 
 Seis commits sobre la rama. **Todo verde en local**: Domain 519, Application 246, Architecture 30,

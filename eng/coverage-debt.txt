@@ -28,6 +28,28 @@
 ## which is the whole lesson this gate can teach about itself: "improved" is what one run said, and a
 ## floor is what every run has to meet. Its floor is the 79 it holds, and it is not to be raised
 ## again on a single reading — the artefact of one run is a measurement, not a trend.
+##
+## 2026-08-28: this list is now checked for being COMPLETE, not only for being accurate.
+##
+## Until that day the gate iterated over the names written here and over nothing else, so a file that
+## reached 96/96 and then got worse was watched by nobody — the new-file gate cannot see it, because
+## newness is decided against the base ref and the file shipped long ago. That is measured rather than
+## feared: three consecutive CI runs measured 216 files under the bar while this list named 212, and
+## the four it did not name had been degraded for days. The worst of them, PlayerView.axaml.cs at
+## 65/41, is the lowest pair in the tree.
+##
+## All four were brought back to the bar rather than written down, so the ratchet stays at 212 and the
+## count on both sides is the same number. check-coverage.ps1 now names anything under the bar that is
+## not on this list, which is the only way a degradation announces itself.
+##
+## One floor moves with them, and it is the exception to "floors come from CI": MediaFileRepository
+## 87 -> 88, because the branches that moved it are a port this batch added and a test that takes both
+## of its arms. It is raised on a local reading, which the rule above forbids, and the reason it is
+## allowed here is measured rather than argued: on the four files this batch was about, this machine
+## and the CI artefact agreed to the digit — 65/41, 98/91, 98/92 and 100/87 in both — and the suites
+## that cover this file, Integration and Accessibility, are the two that ran. What this machine cannot
+## measure is LibVLC and packaging, and none of that reaches here. If CI disagrees, it will say the
+## number and the number is what goes in.
 
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  80
@@ -94,7 +116,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs                 100  89
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/LibraryRootRepository.cs         100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       99  75
-src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  87
+src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  88
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PersonalStateRepository.cs        96  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PlaybackPreferenceRepository.cs  100  87
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/RecommendationReadModel.cs       100  90

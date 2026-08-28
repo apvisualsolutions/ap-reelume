@@ -53,12 +53,20 @@ public sealed partial class PlayerView : UserControl
     /// bar sits above the picture and handles its own clicks, so a double click that reaches here is
     /// one aimed at the picture.
     /// </remarks>
+    /// <remarks>
+    /// <para>
+    /// The command is asked and the handler behind it is not, which is one test rather than two:
+    /// <c>ToggleFullscreenCommand</c>'s own <c>CanExecute</c> <em>is</em> «ModeHandler is not null»,
+    /// so a <c>{ ModeHandler: not null }</c> pattern beside it was the same question asked twice —
+    /// and the second answer can never differ from the first, which the coverage gate reads as a
+    /// branch nothing can take.
+    /// </para>
+    /// </remarks>
     protected override void OnDoubleTapped(TappedEventArgs e)
     {
         ArgumentNullException.ThrowIfNull(e);
         base.OnDoubleTapped(e);
-        if (DataContext is PlayerViewModel { ModeHandler: not null } player
-            && player.ToggleFullscreenCommand.CanExecute(null))
+        if (DataContext is PlayerViewModel player && player.ToggleFullscreenCommand.CanExecute(null))
         {
             player.ToggleFullscreenCommand.Execute(null);
             e.Handled = true;

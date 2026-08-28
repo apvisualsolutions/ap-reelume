@@ -368,22 +368,25 @@ try {
     $debtRatchet = 212
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
-    if ($WriteDebt) {
-        $emitted = @()
-        foreach ($key in ($coverageByFile.Keys | Sort-Object)) {
-            $relative = $key -replace '^.*?/(src/)', '$1'
-            if (-not $relative.StartsWith('src/')) { continue }
-            # The first key wins, exactly as Measure-File picks it, so what is written is what will
-            # be read back.
-            if ($emitted.File -contains $relative) { continue }
-            $m = Measure-File -Coverage $coverageByFile -Path $relative
-            if (-not $m) { continue }
-            $lineFloor = [math]::Floor($m.LinePct)
-            $branchFloor = [math]::Floor($m.BranchPct)
-            if ($lineFloor -ge 96 -and $branchFloor -ge 96) { continue }
-            $emitted += [pscustomobject]@{ File = $relative; Lines = $lineFloor; Branches = $branchFloor }
-        }
+    # Every file in src/ that this run measures below the bar, with the floor it would be given.
+    # -WriteDebt prints these; the check below compares them against the list.
+    $belowTheBar = @()
+    foreach ($key in ($coverageByFile.Keys | Sort-Object)) {
+        $relative = $key -replace '^.*?/(src/)', '$1'
+        if (-not $relative.StartsWith('src/')) { continue }
+        # The first key wins, exactly as Measure-File picks it, so what is written is what will
+        # be read back.
+        if ($belowTheBar.File -contains $relative) { continue }
+        $m = Measure-File -Coverage $coverageByFile -Path $relative
+        if (-not $m) { continue }
+        $lineFloor = [math]::Floor($m.LinePct)
+        $branchFloor = [math]::Floor($m.BranchPct)
+        if ($lineFloor -ge 96 -and $branchFloor -ge 96) { continue }
+        $belowTheBar += [pscustomobject]@{ File = $relative; Lines = $lineFloor; Branches = $branchFloor }
+    }
 
+    if ($WriteDebt) {
+        $emitted = $belowTheBar
         $width = ($emitted.File | Measure-Object -Property Length -Maximum).Maximum + 2
         $lines = foreach ($e in $emitted) {
             '{0}{1,3} {2,3}' -f $e.File.PadRight($width), $e.Lines, $e.Branches
@@ -405,6 +408,39 @@ try {
     if ($debt.Count -gt $debtRatchet) {
         $debtFailures += ("eng/coverage-debt.txt holds $($debt.Count) files and the ratchet is " +
             "$debtRatchet. The list only shrinks; lower the ratchet with it, never the other way.")
+    }
+
+    <#
+        The crack this gate had until 2026-08-28, and it is the same one the watched list above was
+        invented for — one level up.
+
+        The loop below holds every file that IS on the list. A file that reached the bar and then got
+        worse is on neither list and is watched by nobody: the new-file gate cannot see it, because
+        newness is decided against the base ref and the file shipped long ago, and the debt loop
+        cannot see it, because it only iterates over names already written down. Measured, not
+        feared: CI measured 216 files below the bar while eng/coverage-debt.txt named 212, and the
+        four it did not name had been degraded for days — PlayerView.axaml.cs at 65/41, which is the
+        worst number in the whole tree.
+
+        So the list is now asked to be COMPLETE rather than merely accurate. Anything under the bar
+        that is not on it is named here, which is the only way a degradation announces itself.
+
+        Off CI this reports and does not block, exactly like the floors above and for the same
+        reason: seven files read differently on a hosted runner than they do on a development
+        machine, so a file that is above the bar here can be under it there. The list belongs to what
+        CI measures.
+    #>
+    # The watched list counts as a list. Those files are held to an exact floor by the loop above —
+    # a run that measures one of them below its floor already fails, by name — so asking for them
+    # here as well would be asking for the same file to be written down twice. Verified against the
+    # coverage-debt artefact of three CI runs: not one watched file measures under the bar there.
+    $listed = @($debt.File) + @($watched.File)
+    $unlisted = @($belowTheBar | Where-Object { $listed -notcontains $_.File })
+    foreach ($entry in $unlisted) {
+        $debtFailures += ("$($entry.File) measures $($entry.Lines)/$($entry.Branches), under the " +
+            "96/96 bar, and is on no list. It reached the bar once and got worse, which nothing " +
+            "watches. Bring it back to the bar, or add it to eng/coverage-debt.txt with the reason " +
+            "and raise the ratchet in the same change.")
     }
 
     $improved = 0
@@ -430,8 +466,11 @@ try {
         }
     }
 
-    Write-Output ("Coverage gate: {0} file(s) still short of 96/96, ratchet {1}{2}." -f
-        $debt.Count, $debtRatchet, $(if ($improved) { ", $improved improved" } else { '' }))
+    Write-Output ("Coverage gate: {0} file(s) still short of 96/96, ratchet {1}, {2} measured under the bar{3}." -f
+        $debt.Count,
+        $debtRatchet,
+        $belowTheBar.Count,
+        $(if ($improved) { ", $improved improved" } else { '' }))
     if ($debtFailures) {
         $debtVerdict = $debtFailures -join [Environment]::NewLine
         if ($isContinuousIntegration) { throw $debtVerdict }

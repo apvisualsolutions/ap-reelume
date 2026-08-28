@@ -29,6 +29,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The coverage debt list only watched what was already on it.** A file that reached 96/96 and then
+  got worse was watched by nobody: the new-file gate cannot see it — newness is decided against the
+  base ref and the file shipped months ago — and the debt loop only walks names already written down.
+  **Measured, not feared**: three consecutive CI runs measured **216** files below the bar while
+  `eng/coverage-debt.txt` named **212**, and the four it did not name had been degraded for days. The
+  worst, `PlayerView.axaml.cs` at **65/41**, is the lowest pair in the tree.
+
+  The list is now checked for being **complete** and not merely accurate: anything under the bar that
+  is not on it is named by the gate, which is the only way a degradation announces itself. Off CI it
+  reports and does not block, exactly like the floors and for the same reason: seven files measure
+  differently on a hosted runner.
+
+  **All four were closed rather than written down**, so the ratchet stays at 212 and the two counts
+  are the same number:
+
+  - `PlayerView.axaml.cs` **65/41 → the bar**. Two views mounted it and neither gave it a data
+    context, so **neither of its two handlers had ever run** — not the tunnelling key handler (the
+    whole fix for «la barra espaciadora pone pantalla completa») nor the double click. Both shipped on
+    the strength of a manual look.
+  - `PlayerViewModel.cs` **98/91 → the bar**, by removing three guards nothing could take: two
+    `as AsyncRelayCommand` casts over properties assigned in exactly one place, and two null checks
+    repeating what their command's `CanExecute` already requires — and `AsyncRelayCommand.Execute`
+    asks before it runs anything, which is a promise written into that class.
+  - `PlaybackPreference.cs` **98/92 → the bar**. `SubtitleStyle.IsColour` is public because the
+    swatches ask before they offer, and its "there is nothing here" arm had been taken by nobody.
+  - `DisabledOutline.cs` **100/87 → the bar**. The fallback corner radius exists for a `Control` that
+    is not a `TemplatedControl`, and all ten types the style names are templated: written,
+    documented, and measured by nobody.
+
 - **An unidentified film was called by its file name, verbatim.** «El Faro de Piedra 2019» on the
   card, with the year inside the title and the year column empty beside it — and before that,
   «Neon.Sobre.el.Rio.2022.2160p». Meanwhile `MediaNameParser` has been taking that same name apart

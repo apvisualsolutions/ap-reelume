@@ -29,6 +29,36 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La lista de deuda de cobertura sólo vigilaba lo que ya estaba en ella.** Un archivo que llegaba al
+  96/96 y luego se degradaba no lo miraba nadie: la puerta de archivos nuevos no puede verlo —la
+  novedad se decide contra la referencia base y el archivo se publicó hace meses— y el bucle de la
+  deuda sólo recorre nombres ya escritos. **Medido, no temido**: tres ejecuciones seguidas de CI
+  midieron **216** archivos por debajo del listón mientras `eng/coverage-debt.txt` nombraba **212**, y
+  los cuatro que faltaban llevaban días degradados. El peor, `PlayerView.axaml.cs` a **65/41**, es la
+  pareja más baja del árbol.
+
+  Ahora la lista se comprueba **completa** y no sólo exacta: cualquier archivo bajo el listón que no
+  esté en ella se nombra en la puerta, que es la única forma en que una degradación se anuncia. Fuera
+  de CI informa y no bloquea, igual que los suelos y por la misma razón: siete archivos miden distinto
+  en un runner hospedado.
+
+  **Los cuatro se han cerrado en vez de escribirse**, así que el trinquete sigue en 212 y las dos
+  cuentas son el mismo número:
+
+  - `PlayerView.axaml.cs` **65/41 → el listón**. Dos vistas lo montaban y ninguna le daba contexto de
+    datos, así que **ninguno de sus dos manejadores se había ejecutado jamás** — ni el del teclado que
+    túnela (el arreglo entero de «la barra espaciadora pone pantalla completa») ni el del doble clic.
+    Los dos se publicaron con una mirada a mano por toda evidencia.
+  - `PlayerViewModel.cs` **98/91 → el listón**, quitando tres guardas que nada podía tomar: dos `as
+    AsyncRelayCommand` sobre dos propiedades que sólo se asignan en un sitio, y dos comprobaciones de
+    nulo que repiten lo que el `CanExecute` de su comando ya exige —y `AsyncRelayCommand.Execute`
+    pregunta antes de correr nada, que es una promesa escrita en esa clase—.
+  - `PlaybackPreference.cs` **98/92 → el listón**. `SubtitleStyle.IsColour` es público porque las
+    muestras preguntan antes de ofrecer, y su rama de «aquí no hay nada» no la tomaba nadie.
+  - `DisabledOutline.cs` **100/87 → el listón**. El radio de reserva existe para un `Control` que no
+    es `TemplatedControl`, y los diez tipos que el estilo nombra son todos plantillados: escrito,
+    documentado y medido por nadie.
+
 - **Una película sin identificar se llamaba por su nombre de archivo, tal cual.** «El Faro de Piedra
   2019» en la tarjeta, con el año dentro del título y la columna del año vacía a su lado — y antes de
   eso, «Neon.Sobre.el.Rio.2022.2160p». Mientras tanto `MediaNameParser` lleva desde la primera semana

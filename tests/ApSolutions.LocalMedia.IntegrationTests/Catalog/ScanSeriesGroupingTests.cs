@@ -148,6 +148,50 @@ public sealed class ScanSeriesGroupingTests
     }
 
     /// <summary>
+    /// The projection refuses a title that is not there, at the door rather than in the SQL.
+    /// </summary>
+    /// <remarks>
+    /// The port takes a <see cref="ScannedTitle"/> and the column it writes is <c>NOT NULL</c>, so
+    /// the refusal is the repository's and not SQLite's — a null reaching the command would come back
+    /// as a constraint violation naming a column, from inside a transaction, which says nothing about
+    /// who passed it.
+    /// </remarks>
+    [Fact]
+    public async Task Naming_a_card_nothing_is_refused()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var mediaRoot = Path.Combine(directory.Path, "media");
+        Directory.CreateDirectory(mediaRoot);
+        await File.WriteAllBytesAsync(
+            Path.Combine(mediaRoot, "Vidrio Templado 2024.mkv"),
+            [0x41],
+            TestContext.Current.CancellationToken);
+
+        var (_, _, mediaFiles, _, summary) = await ScanAsync(directory, mediaRoot);
+        var file = Assert.Single(summary.Results);
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => mediaFiles.SetScannedTitleAsync(
+            new MediaFileId(Guid.NewGuid()),
+            null!,
+            TestContext.Current.CancellationToken));
+
+        // And naming a card that is not there changes nothing rather than failing: the UPDATE only
+        // ever touches a row that exists, which is what keeps this out of the business of creating
+        // projections. Written twice, with a year and without one, because the year is the one
+        // parameter that can be absent — a name the parser found no year in leaves it null, and that
+        // column has to take the null rather than the word "null".
+        await mediaFiles.SetScannedTitleAsync(
+            new MediaFileId(Guid.NewGuid()),
+            new ScannedTitle("Nadie", 1999),
+            TestContext.Current.CancellationToken);
+        await mediaFiles.SetScannedTitleAsync(
+            new MediaFileId(Guid.NewGuid()),
+            new ScannedTitle("Nadie tampoco", Year: null),
+            TestContext.Current.CancellationToken);
+        _ = file;
+    }
+
+    /// <summary>
     /// A cancelled scan writes nothing, which is the arm every one of these use cases carries.
     /// </summary>
     [Fact]

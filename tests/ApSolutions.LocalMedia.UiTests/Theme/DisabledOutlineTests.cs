@@ -142,6 +142,36 @@ public sealed class DisabledOutlineTests
     }
 
     /// <summary>
+    /// A control with no corner radius of its own is outlined with the fallback one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The corners are read off <c>TemplatedControl.CornerRadius</c>, and a plain <c>Control</c> is
+    /// not one and carries no radius at all — which is what <c>FallbackCornerRadius</c> is for. That
+    /// arm had never been taken: every one of the ten types the style names is templated, so the
+    /// fallback was written, documented, and measured by nobody.
+    /// </para>
+    /// <para>
+    /// Shown by writing the attached property rather than by disabling something, because the point
+    /// is the shape of the control and not how it got here. It is the same door the style uses.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_control_with_no_radius_of_its_own_takes_the_fallback_corners()
+    {
+        var plain = new Canvas { Width = 120, Height = 36 };
+        var window = Show(plain);
+
+        plain.SetValue(Presentation.Theme.DisabledOutline.IsShownProperty, true);
+        Dispatcher.UIThread.RunJobs();
+
+        var outline = RequireOutline(plain);
+        Assert.Equal(4, outline.RadiusX);
+        Assert.Equal(4, outline.RadiusY);
+        window.Close();
+    }
+
+    /// <summary>
     /// Mounts in high contrast, which is the only place this cue is spent since 2026-08-25.
     /// </summary>
     /// <remarks>

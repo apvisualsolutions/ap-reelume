@@ -36,10 +36,16 @@ public sealed record NameScannedTitlesResult(int RenamedCount, int DatedCount);
 /// bytes.
 /// </para>
 /// <para>
-/// Two kinds of file are left alone. An episode is skipped because the series grouping owns what it
-/// is called and the grid does not draw its scanned row at all — the projection's own query hides a
-/// file that an <c>episode_media</c> link claims. And a name the parser can make nothing of keeps
-/// the file name, which is what <see cref="ScannedTitlePolicy"/> decides rather than this.
+/// Two kinds of file are left alone. An episode is skipped, and the reason is stronger than "the
+/// series grouping owns its name": <b>cleaning an episode's name removes the only thing that tells it
+/// from its siblings.</b> «Puerto Sombra S01E01» and «Puerto Sombra S01E02» both clean to «Puerto
+/// Sombra», so a folder the series pass could not group — episodes loose in a root, which is what
+/// <see cref="Domain.Identification.LocalSeriesPolicy"/> refuses on purpose — would become a column of
+/// cards with one name. The raw name is worse to read and better at saying which file it is.
+/// </para>
+/// <para>
+/// And a name the parser can make nothing of keeps the file name, which is what
+/// <see cref="ScannedTitlePolicy"/> decides rather than this.
 /// </para>
 /// </remarks>
 public sealed class NameScannedTitles
