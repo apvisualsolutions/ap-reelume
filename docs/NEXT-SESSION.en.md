@@ -76,6 +76,31 @@ All four were **closed** rather than written down, so the ratchet stays at **212
 And `check-coverage.ps1` now asks the list to be **complete** and not merely accurate. Off CI it
 reports and does not block, exactly like the floors.
 
+### Three decisions that were open and are not any more
+
+1. **An accent landing on the focus ring is kept as picked.** The question was "one step or a ratio?"
+   and the answer is neither: the focus adorner is **two concentric rings** at 3:1 against each other,
+   so the keyboard's signal is **geometry** and survives any accent. The one-byte nudge was theatre
+   and it is gone, along with the parameter that fed it. What is still watched is what everybody sees:
+   the four dictionaries, in `ContrastTokenTests`.
+
+2. **"Home comes up empty" was already fixed** — `HomeReadModel` has done `UNION ALL` over
+   `scanned_titles` since 2026-08-25 — **but the thing beside it surfaced**: migration 0021's year was
+   put into the library's union and not into Home's. They are one query written twice, and there is
+   now an assertion tying them.
+
+3. **«Secciones cortadas por el ancho»: measured, and NOT on the width axis.** It was the first
+   limitation `ViewOverflowTests` declares about itself — each view measured alone at 900, while
+   inside the shell the rail takes 64 — so `ViewOverflowInShellTests` measures them against the real
+   room, **836 px taken off the shell**, the player included because the prototype leaves the rail on
+   screen for an embedded session. **Not one of the 48 exceeds it.** The absence is proved.
+
+   **What stays alive as a hypothesis**, so the work is not repeated: (a) with the lists **filled**,
+   which is the second limitation both gates still declare; (b) with the **other language's** strings,
+   which already folded the mini chrome into three rows once; (c) that "cut off" is **vertical** and
+   not horizontal — Settings measures 1,797 px tall, and that fits the word; (d) at a **wide** window,
+   where the failure is not something spilling out but something not growing.
+
 ### The traps that cost time here
 
 - **A model that resolves a resource in its constructor makes every one of its callers a UI-thread

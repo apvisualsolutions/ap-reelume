@@ -17,10 +17,17 @@ public readonly record struct AccentTones(string Accent, string Subtle, string I
 /// <remarks>
 /// <para>
 /// The prototype's Appearance page offers six presets <b>and a picker</b>, and a picker is the whole
-/// difficulty: <c>ContrastTokenTests</c> holds five obligations on the accent — it must be visible
-/// against the shell at 3:1, whatever sits on it must read at 4.5:1, its ink must read on its wash
-/// and on the shell at 4.5:1, and it must not be the focus ring's colour. Four of those were met by
-/// hand-picking two colours per theme, which is not a thing a person choosing #7A00FF can do.
+/// difficulty: <c>ContrastTokenTests</c> holds four obligations on the accent a derivation can meet —
+/// it must be visible against the shell at 3:1, whatever sits on it must read at 4.5:1, and its ink
+/// must read on its wash and on the shell at 4.5:1. All four were met by hand-picking two colours per
+/// theme, which is not a thing a person choosing #7A00FF can do.
+///
+/// <para>
+/// The fifth obligation that test holds — that a theme must not paint the accent and the focus ring
+/// the same colour — is <b>not</b> one of these, and that is a decision taken on 2026-08-28 rather
+/// than an omission. It belongs to the four hand-picked dictionaries, which is where it is measured;
+/// see <see cref="Derive"/> for why a picked colour that lands on the ring is kept as picked.
+/// </para>
 /// </para>
 /// <para>
 /// So the family is derived rather than chosen. Hue and saturation are the person's; lightness is
@@ -109,15 +116,34 @@ public static class AccentPalette
     /// </summary>
     /// <param name="accent">What the person picked, as <c>#RRGGBB</c>.</param>
     /// <param name="surface">The page the accent is drawn on, as <c>#RRGGBB</c>.</param>
-    /// <param name="focus">
-    /// The focus ring's colour. The accent is nudged off it when the two land together, because a
-    /// mark and the keyboard's position in one colour are one signal doing two jobs.
-    /// </param>
-    public static AccentTones Derive(string accent, string surface, string focus)
+    /// <remarks>
+    /// <para>
+    /// <b>The focus ring is not an input, and that was decided on 2026-08-28 after being left open
+    /// for three days.</b> This used to take it and nudge the accent one step of the lightness walk
+    /// when a pick landed on it — «a mark and the keyboard's position in one colour are one signal
+    /// doing two jobs». Measured, that nudge returned <c>#00599A</c> for a ring of <c>#005A9C</c>: a
+    /// different colour by the byte and the same colour to a person. It protected nothing.
+    /// </para>
+    /// <para>
+    /// The question left open was whether to nudge one step or to demand a ratio, and the answer is
+    /// <b>neither</b>, because the thing it was protecting is already protected by geometry rather
+    /// than by colour: the focus adorner is <b>two concentric rings in two colours</b>, held at 3:1
+    /// against each other by <c>ContrastTokenTests</c> — "two rings the same colour are one ring". An
+    /// accent that lands exactly on the outer ring leaves the inner one drawing the shape, so focus
+    /// still reads. Demanding a ratio would have been worse than useless: it turns «I chose this
+    /// blue» into «here is a different blue», and buys nothing the geometry does not already give.
+    /// </para>
+    /// <para>
+    /// What is still held is the case that matters, and it is held where it belongs: the four
+    /// dictionaries pick their accent and their ring by hand, and <c>ContrastTokenTests</c> refuses a
+    /// theme that paints them the same colour. That is what everybody sees; this is one person's
+    /// picker.
+    /// </para>
+    /// </remarks>
+    public static AccentTones Derive(string accent, string surface)
     {
         var picked = Parse(accent);
         var ground = Parse(surface);
-        var ring = Parse(focus);
         // Which way the walk goes is a fact about the page, not about the pick: on a light page
         // every readable accent is darker than it, and on a dark page every one is lighter. Deciding
         // it by comparing the two was measured wrong — #000033 is darker than the dark theme's own
@@ -136,15 +162,6 @@ public static class AccentPalette
             ? picked
             : Walk(hue, saturation, lightness, darker, candidate =>
                 Contrast(candidate, ground) >= ShapeMinimum);
-
-        // The ring and the accent apart, by one step of the same walk: they are compared as colours
-        // rather than as strings, so a ring written #005A9C and an accent that landed on the same
-        // three bytes is caught however either was spelled.
-        if (body == ring)
-        {
-            body = Walk(hue, saturation, ToHsl(body).L, darker, candidate =>
-                Contrast(candidate, ground) >= ShapeMinimum && candidate != ring);
-        }
 
         var wash = Blend(body, ground, WashTowardsSurface);
         var ink = Walk(hue, saturation, ToHsl(body).L, darker, candidate =>

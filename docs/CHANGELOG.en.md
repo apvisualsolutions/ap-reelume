@@ -27,7 +27,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   And the step that did not belong is gone: the prototype's list holds nine, and this one carried a
   `1.75×` nothing ever drew.
 
+- **A picked accent that lands exactly on the focus ring is now kept as picked.** It used to be nudged
+  one step of the lightness walk, which returned `#00599A` for a ring of `#005A9C`: a different colour
+  by the byte and the same colour to a person. The open question was whether one step was enough or a
+  ratio was needed, and the answer is **neither**, because what it was protecting is already protected
+  by geometry: the focus adorner is **two concentric rings in two colours** held at 3:1 against each
+  other — "two rings the same colour are one ring" — so an accent landing on the outer ring leaves the
+  inner one drawing the shape. Demanding a ratio would have been worse than useless: it turns "I chose
+  this blue" into "here is a different blue" and buys nothing the geometry does not already give. What
+  is still watched is the case everybody sees: the four dictionaries pick their accent and their ring
+  by hand, and `ContrastTokenTests` refuses a theme that paints them alike.
+
 ### Fixed
+
+- **A scanned film's year reached the library and not Home.** Both surfaces read the same projection
+  with **the same query written twice** — each carries its own copy of "hide a file that is already an
+  episode" — and the year column, which arrived with migration 0021, was put into one and not the
+  other. There is now an assertion tying the two: the same title and the same year on both, over one
+  scan.
+
+- **The overflow gate measured each view alone at 900 px**, which is wider than any of them ever gets:
+  inside the shell the rail takes 64. That was **the first of the two limitations that gate declares
+  about itself**, and it is the exact shape of «secciones cortadas por el ancho» from the original
+  brief. They are now measured against the real room as well — **836 px, taken off the shell rather
+  than written down** — the player included, because the prototype leaves the rail on screen for an
+  embedded session.
+
+  **And the result is that the defect is not on this axis**: not one of the 48 views exceeds it. The
+  absence is measured rather than assumed, which is what was missing before it could be looked for
+  somewhere else.
 
 - **The coverage debt list only watched what was already on it.** A file that reached 96/96 and then
   got worse was watched by nobody: the new-file gate cannot see it — newness is decided against the

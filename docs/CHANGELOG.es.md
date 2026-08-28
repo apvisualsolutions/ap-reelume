@@ -27,7 +27,35 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Y el paso que sobraba se ha ido: la lista del prototipo tiene nueve y ésta tenía un `1,75×` que
   nadie dibujó nunca.
 
+- **Un acento elegido que cae justo sobre el anillo de foco se respeta tal cual.** Se apartaba un paso
+  de la escala de luminosidad, y eso devolvía `#00599A` para un anillo `#005A9C`: otro color por el
+  byte y el mismo a la vista. La pregunta abierta era si bastaba un paso o hacía falta un ratio, y la
+  respuesta es **ninguna de las dos**, porque lo que se protegía ya lo protege la geometría: el adorno
+  de foco son **dos anillos concéntricos en dos colores**, sostenidos a 3:1 entre sí —«dos anillos del
+  mismo color son un anillo»—, así que un acento que aterriza sobre el exterior deja al interior
+  dibujando la forma. Exigir un ratio habría sido peor que inútil: convierte «elegí este azul» en
+  «aquí tienes otro azul» y no compra nada que la geometría no dé ya. Lo que sí sigue vigilado es el
+  caso que ve todo el mundo: los cuatro diccionarios eligen su acento y su anillo a mano, y
+  `ContrastTokenTests` rechaza un tema que los pinte iguales.
+
 ### Corregido
+
+- **El año de una película escaneada llegaba a Biblioteca y no a Inicio.** Las dos superficies leen la
+  misma proyección con **la misma consulta escrita dos veces** —cada una lleva su propia copia de
+  «oculta el archivo que ya es un episodio»— y la columna del año, que llegó con la migración 0021, se
+  puso en una y no en la otra. Ahora hay una aserción que las ata: el mismo título y el mismo año en
+  las dos, sobre el mismo escaneo.
+
+- **La puerta de desbordamiento medía cada vista sola a 900 px**, que es más ancho del que ninguna
+  recibe: dentro del shell el carril se lleva 64. Era **la primera de las dos limitaciones que esa
+  puerta declara de sí misma**, y es la forma exacta de «secciones cortadas por el ancho» del encargo
+  original. Ahora se miden también contra el hueco real —**836 px, tomados del shell y no escritos a
+  mano**—, el reproductor incluido, porque el prototipo deja el carril a la vista en una sesión
+  embebida.
+
+  **Y el resultado es que el defecto no está en este eje**: ninguna de las 48 vistas se pasa. La
+  ausencia queda medida en vez de supuesta, que era justo lo que faltaba para poder buscarlo en otro
+  sitio.
 
 - **La lista de deuda de cobertura sólo vigilaba lo que ya estaba en ella.** Un archivo que llegaba al
   96/96 y luego se degradaba no lo miraba nadie: la puerta de archivos nuevos no puede verlo —la

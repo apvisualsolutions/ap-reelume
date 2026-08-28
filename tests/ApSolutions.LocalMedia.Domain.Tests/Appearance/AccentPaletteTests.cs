@@ -19,26 +19,25 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Appearance;
 /// </remarks>
 public sealed class AccentPaletteTests
 {
-    /// <summary>The light theme's page and its focus ring, and the dark theme's.</summary>
-    public static TheoryData<string, string> Surfaces =>
-        new()
-        {
-            { "#FBFCFE", "#005A9C" },
-            { "#08090C", "#7CC4FF" },
-        };
+    /// <summary>The light theme's page and the dark theme's.</summary>
+    /// <remarks>
+    /// It carried each page's focus ring beside it until 2026-08-28, when the ring stopped being an
+    /// input to the derivation — see
+    /// <see cref="A_pick_that_lands_on_the_focus_ring_is_kept_because_the_ring_is_a_double_one"/>. A
+    /// column no test reads is a column that will disagree with the theme it claims to describe.
+    /// </remarks>
+    public static TheoryData<string> Surfaces => ["#FBFCFE", "#08090C"];
 
     [Theory]
     [MemberData(nameof(Surfaces))]
-    public void Every_colour_on_the_wheel_derives_a_family_that_meets_all_five_obligations(
-        string surface,
-        string focus)
+    public void Every_colour_on_the_wheel_derives_a_family_that_meets_all_four_obligations(string surface)
     {
         // 24 hues by 5 saturations by 5 lightnesses: 600 colours per surface, which covers the wheel
         // densely enough that a hue where the walk fails cannot hide between two samples, and is
         // still a test that answers in under a second.
         foreach (var colour in Wheel())
         {
-            var tones = AccentPalette.Derive(colour, surface, focus);
+            var tones = AccentPalette.Derive(colour, surface);
 
             Assert.True(
                 AccentPalette.Contrast(tones.Accent, surface) >= 3.0,
@@ -56,22 +55,18 @@ public sealed class AccentPaletteTests
                 AccentPalette.Contrast(tones.Ink, surface) >= 4.5,
                 $"{colour} on {surface}: the ink on the page reads "
                     + $"{AccentPalette.Contrast(tones.Ink, surface):F2}:1 and needs 4.5:1.");
-            Assert.False(
-                string.Equals(tones.Accent, focus, StringComparison.OrdinalIgnoreCase),
-                $"{colour} on {surface}: the accent landed on the focus ring's own colour, so the "
-                    + "mark and the keyboard's position became one signal.");
         }
     }
 
     [Theory]
     [MemberData(nameof(Surfaces))]
-    public void The_six_the_prototype_offers_are_derived_by_the_same_policy(string surface, string focus)
+    public void The_six_the_prototype_offers_are_derived_by_the_same_policy(string surface)
     {
         Assert.Equal(6, AccentPalette.Presets.Count);
         foreach (var preset in AccentPalette.Presets)
         {
             Assert.True(AccentPalette.IsAccent(preset));
-            var tones = AccentPalette.Derive(preset, surface, focus);
+            var tones = AccentPalette.Derive(preset, surface);
             Assert.True(AccentPalette.Contrast(tones.Accent, surface) >= 3.0);
             Assert.True(AccentPalette.Contrast(tones.Ink, surface) >= 4.5);
         }
@@ -82,16 +77,16 @@ public sealed class AccentPaletteTests
     {
         // The default is the prototype's own #1769AA on the light page, and it meets 3:1 as it
         // stands: the walk has to return the colour untouched rather than move it for tidiness.
-        var tones = AccentPalette.Derive("#1769AA", "#FBFCFE", "#005A9C");
+        var tones = AccentPalette.Derive("#1769AA", "#FBFCFE");
         Assert.Equal("#1769AA", tones.Accent);
 
         // The same colour reads on the dark page too — 3.44:1 — so it is left alone there as well.
         // What does not survive the move is a darker pick: #0B4A78 is the light theme's own ink, and
         // on the dark page it has to be lightened, which is the point of deriving rather than
         // storing four hand-picked values.
-        Assert.Equal("#1769AA", AccentPalette.Derive("#1769AA", "#08090C", "#7CC4FF").Accent);
+        Assert.Equal("#1769AA", AccentPalette.Derive("#1769AA", "#08090C").Accent);
 
-        var dark = AccentPalette.Derive("#0B4A78", "#08090C", "#7CC4FF");
+        var dark = AccentPalette.Derive("#0B4A78", "#08090C");
         Assert.NotEqual("#0B4A78", dark.Accent);
         Assert.True(AccentPalette.Contrast(dark.Accent, "#08090C") >= 3.0);
         Assert.True(AccentPalette.Contrast("#0B4A78", "#08090C") < 3.0);
@@ -104,9 +99,9 @@ public sealed class AccentPaletteTests
         // of room. All three are things a picker hands over.
         foreach (var colour in new[] { "#808080", "#000000", "#FFFFFF" })
         {
-            foreach (var (surface, focus) in new[] { ("#FBFCFE", "#005A9C"), ("#08090C", "#7CC4FF") })
+            foreach (var surface in new[] { "#FBFCFE", "#08090C" })
             {
-                var tones = AccentPalette.Derive(colour, surface, focus);
+                var tones = AccentPalette.Derive(colour, surface);
                 Assert.True(AccentPalette.Contrast(tones.Accent, surface) >= 3.0);
                 Assert.True(AccentPalette.Contrast(tones.Text, tones.Accent) >= 4.5);
                 Assert.True(AccentPalette.Contrast(tones.Ink, tones.Subtle) >= 4.5);
@@ -126,31 +121,52 @@ public sealed class AccentPaletteTests
         Assert.False(AccentPalette.IsAccent("#ZZZZZZ"));
         Assert.True(AccentPalette.IsAccent("#1769AA"));
         Assert.True(AccentPalette.IsAccent("#1769aa"));
-        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Derive("nope", "#FBFCFE", "#005A9C"));
-        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Derive("#1769AA", "nope", "#005A9C"));
-        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Derive("#1769AA", "#FBFCFE", "nope"));
+        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Derive("nope", "#FBFCFE"));
+        _ = Assert.Throws<ArgumentException>(() => AccentPalette.Derive("#1769AA", "nope"));
     }
 
+    /// <summary>
+    /// A pick that lands exactly on the focus ring is kept, because the ring is a double one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This asserted the opposite until 2026-08-28, and the decision behind the change was left open
+    /// for three days with the reason written into the test that could not settle it: the derivation
+    /// nudged the accent one step of the lightness walk, which returned <c>#00599A</c> for a ring of
+    /// <c>#005A9C</c> — <b>a different colour by the byte and the same colour to a person</b>. The
+    /// question was whether to keep the one step or to demand a ratio.
+    /// </para>
+    /// <para>
+    /// The answer is neither, and it is a fact about the tree rather than a taste: the focus adorner
+    /// is <b>two concentric rings in two colours</b>, held at 3:1 against each other by
+    /// <c>ContrastTokenTests</c> — «two rings the same colour are one ring». An accent that lands on
+    /// the outer ring leaves the inner one drawing the shape, so the keyboard's position still reads.
+    /// Demanding a ratio would have turned «I chose this blue» into «here is a different blue» and
+    /// bought nothing the geometry does not already give, and one step bought nothing at all.
+    /// </para>
+    /// <para>
+    /// What still holds is the case everybody sees: the four dictionaries pick their accent and their
+    /// ring by hand, and <c>ContrastTokenTests</c> refuses a theme that paints them alike.
+    /// </para>
+    /// </remarks>
     [Fact]
-    public void The_accent_is_moved_off_the_focus_ring_when_a_pick_lands_on_it()
+    public void A_pick_that_lands_on_the_focus_ring_is_kept_because_the_ring_is_a_double_one()
     {
-        // Picking exactly the light theme's focus ring: it reads against the page, so nothing but
-        // the collision would move it.
-        //
-        // What this does NOT assert is that the two are far enough apart to tell apart by eye, and
-        // that is a limitation rather than an oversight: the nudge is one step of the same lightness
-        // walk, so it returns #00599A for a ring of #005A9C — a different colour by the byte and the
-        // same colour to a person. Whether one signal doing two jobs is fixed by moving one step or
-        // by demanding a ratio is a decision about how the interface looks, and it has not been
-        // taken. Measured on 2026-08-25 and written down rather than asserted away.
-        var tones = AccentPalette.Derive("#005A9C", "#FBFCFE", "#005A9C");
-        Assert.NotEqual("#005A9C", tones.Accent);
+        // The light theme's own ring, picked as the accent: it reads against the page, so nothing
+        // moves it and nothing should.
+        var tones = AccentPalette.Derive("#005A9C", "#FBFCFE");
+        Assert.Equal("#005A9C", tones.Accent);
         Assert.True(AccentPalette.Contrast(tones.Accent, "#FBFCFE") >= 3.0);
 
-        // And the same on the dark page, where the walk goes the other way.
-        var onDark = AccentPalette.Derive("#7CC4FF", "#08090C", "#7CC4FF");
-        Assert.NotEqual("#7CC4FF", onDark.Accent);
+        // And the dark theme's, where the walk would have gone the other way.
+        var onDark = AccentPalette.Derive("#7CC4FF", "#08090C");
+        Assert.Equal("#7CC4FF", onDark.Accent);
         Assert.True(AccentPalette.Contrast(onDark.Accent, "#08090C") >= 3.0);
+
+        // The rest of the family is still derived around it, which is the half that would be lost by
+        // reading "kept" as "left alone".
+        Assert.True(AccentPalette.Contrast(tones.Text, tones.Accent) >= 4.5);
+        Assert.True(AccentPalette.Contrast(tones.Ink, tones.Subtle) >= 4.5);
     }
 
     /// <summary>
@@ -166,11 +182,11 @@ public sealed class AccentPaletteTests
     [Fact]
     public void A_walk_with_nowhere_left_to_go_answers_with_the_end_of_the_scale()
     {
-        var onWhite = AccentPalette.Derive("#000000", "#FFFFFF", "#000000");
+        var onWhite = AccentPalette.Derive("#000000", "#FFFFFF");
         Assert.Equal("#000000", onWhite.Accent);
         Assert.True(AccentPalette.Contrast(onWhite.Accent, "#FFFFFF") >= 3.0);
 
-        var onBlack = AccentPalette.Derive("#FFFFFF", "#000000", "#FFFFFF");
+        var onBlack = AccentPalette.Derive("#FFFFFF", "#000000");
         Assert.Equal("#FFFFFF", onBlack.Accent);
         Assert.True(AccentPalette.Contrast(onBlack.Accent, "#000000") >= 3.0);
     }
@@ -181,15 +197,15 @@ public sealed class AccentPaletteTests
     [Fact]
     public void A_colour_that_already_reads_comes_back_exactly_as_it_was_handed_over()
     {
-        Assert.Equal("#1769AA", AccentPalette.Derive("#1769AA", "#FBFCFE", "#005A9C").Accent);
-        Assert.Equal("#7CC4FF", AccentPalette.Derive("#7CC4FF", "#08090C", "#005A9C").Accent);
+        Assert.Equal("#1769AA", AccentPalette.Derive("#1769AA", "#FBFCFE").Accent);
+        Assert.Equal("#7CC4FF", AccentPalette.Derive("#7CC4FF", "#08090C").Accent);
     }
 
     [Fact]
     public void The_text_on_an_accent_is_whichever_of_black_and_white_reads_on_it()
     {
-        Assert.Equal("#FFFFFF", AccentPalette.Derive("#10243A", "#FBFCFE", "#005A9C").Text);
-        Assert.Equal("#000000", AccentPalette.Derive("#F2E205", "#08090C", "#7CC4FF").Text);
+        Assert.Equal("#FFFFFF", AccentPalette.Derive("#10243A", "#FBFCFE").Text);
+        Assert.Equal("#000000", AccentPalette.Derive("#F2E205", "#08090C").Text);
     }
 
     [Fact]

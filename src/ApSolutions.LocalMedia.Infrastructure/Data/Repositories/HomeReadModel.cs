@@ -37,7 +37,11 @@ public sealed class HomeReadModel : IHomeReadModel
                        AS genres
             FROM titles t
             UNION ALL
-            SELECT scanned.media_file_id, 2, scanned.display_title, NULL,
+            -- The year comes out of the projection, exactly as the library's own union takes it:
+            -- these two readers are one query written twice and the pair has to agree, or a film
+            -- would carry its year on the grid and lose it on the home rail. It was a literal NULL
+            -- here until 2026-08-28, when the column arrived with migration 0021.
+            SELECT scanned.media_file_id, 2, scanned.display_title, scanned.release_year,
                    media.is_available, scanned.added_utc, NULL
             FROM scanned_titles scanned
             INNER JOIN media_files media ON media.id = scanned.media_file_id

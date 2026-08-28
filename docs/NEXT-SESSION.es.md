@@ -77,6 +77,31 @@ Los cuatro **se cerraron** en vez de escribirse, así que el trinquete sigue en 
 Y `check-coverage.ps1` pide ahora que la lista sea **completa** y no sólo exacta. Fuera de CI informa
 y no bloquea, igual que los suelos.
 
+### Tres decisiones que estaban abiertas y ya no lo están
+
+1. **El acento que cae sobre el anillo de foco se respeta tal cual.** La pregunta era «¿un paso o un
+   ratio?» y la respuesta es ninguna: el adorno de foco son **dos anillos concéntricos** a 3:1 entre
+   sí, así que la señal del teclado es **geometría** y sobrevive a cualquier acento. El paso de un
+   byte era teatro y se ha ido, con el parámetro que lo alimentaba. Lo que sigue vigilado es lo que ve
+   todo el mundo: los cuatro diccionarios, en `ContrastTokenTests`.
+
+2. **«Home queda totalmente vacío» ya estaba resuelto** —`HomeReadModel` hace `UNION ALL` con
+   `scanned_titles` desde el 2026-08-25— **pero se destapó lo de al lado**: el año de la migración
+   0021 se puso en la unión de Biblioteca y no en la de Inicio. Son la misma consulta escrita dos
+   veces y ahora hay una aserción que las ata.
+
+3. **«Secciones cortadas por el ancho»: medido y NO está en el ancho.** Era la primera limitación
+   declarada de `ViewOverflowTests` —mide cada vista sola a 900, y dentro del shell el carril se lleva
+   64—, así que `ViewOverflowInShellTests` las mide contra el hueco real, **836 px tomados del shell**,
+   con el reproductor incluido porque el prototipo deja el carril a la vista en una sesión embebida.
+   **Ninguna de las 48 se pasa.** La ausencia está probada.
+
+   **Lo que queda vivo como hipótesis**, para no repetir el trabajo: (a) con las listas **llenas**, que
+   es la segunda limitación que las dos puertas siguen declarando; (b) con las cadenas del **otro
+   idioma**, que ya plegó el cromo del mini en tres filas una vez; (c) que «cortadas» sea **vertical**
+   y no horizontal — Ajustes mide 1.797 px de alto, y eso encaja con la palabra; (d) con la ventana
+   **ancha**, donde lo que falla no es que algo se salga sino que algo no crezca.
+
 ### Las trampas que costaron tiempo aquí
 
 - **Un modelo que resuelve un recurso en su constructor convierte a todos sus llamadores en llamadores
