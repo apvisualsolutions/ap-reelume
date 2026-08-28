@@ -145,6 +145,54 @@ public sealed class EditorPageTests
         Assert.Equal(expected, shell.EditorTitle);
     }
 
+    /// <summary>
+    /// The page's three commands answer to the selection, the way the card's three tools do.
+    /// </summary>
+    /// <remarks>
+    /// They were left out of the library's own change handler when the page landed, which is the
+    /// quiet half of this shape: the three older commands were refreshed there and the three new ones
+    /// rest on exactly the same <c>SelectedTitleId</c>. A pill that opens a tool for "the open title"
+    /// cannot be the last to hear that a different title is open.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_pages_commands_answer_to_the_selection_like_the_cards_do()
+    {
+        var shell = Shell();
+        var library = shell.Library!;
+
+        Assert.Null(library.SelectedItem);
+        Assert.False(shell.ShowMetadataTabCommand.CanExecute(null));
+        Assert.False(shell.ShowRenameTabCommand.CanExecute(null));
+        Assert.Equal(string.Empty, shell.EditorTitle);
+
+        var raised = new List<string>();
+        shell.PropertyChanged += (_, args) => raised.Add(args.PropertyName ?? string.Empty);
+
+        // The event and not only the answer, and that distinction is the whole test: CanExecute
+        // evaluates its predicate on every call, so it would read true after the selection with or
+        // without the fix. What a button on screen listens to is CanExecuteChanged, and nothing was
+        // raising it for these three.
+        var metadataTold = 0;
+        var renameTold = 0;
+        var closeTold = 0;
+        shell.ShowMetadataTabCommand.CanExecuteChanged += (_, _) => metadataTold++;
+        shell.ShowRenameTabCommand.CanExecuteChanged += (_, _) => renameTold++;
+        shell.CloseEditorCommand.CanExecuteChanged += (_, _) => closeTold++;
+
+        await library.OpenDetailsAsync(library.Items[0], TestContext.Current.CancellationToken);
+
+        // At least once each rather than an exact total: opening a card moves both SelectedItem and
+        // Surface, so the handler runs twice, and a count would be asserting how many properties the
+        // library happens to change. Without the fix all three are zero.
+        Assert.True(metadataTold >= 1, "the metadata pill was never told the selection changed.");
+        Assert.True(renameTold >= 1, "the renaming pill was never told the selection changed.");
+        Assert.True(closeTold >= 1, "Back was never told the selection changed.");
+        Assert.True(shell.ShowMetadataTabCommand.CanExecute(null));
+        Assert.True(shell.ShowRenameTabCommand.CanExecute(null));
+        Assert.Contains(nameof(ShellViewModel.EditorTitle), raised);
+        Assert.Equal(library.Items[0].Item.Title, shell.EditorTitle);
+    }
+
     /// <summary>Both pills are on screen, and the one in force is the one that reads as pressed.</summary>
     [AvaloniaFact]
     public async Task The_page_draws_its_way_back_and_both_of_its_pills()

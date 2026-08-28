@@ -1106,6 +1106,13 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             _editMetadata.RaiseCanExecuteChanged();
             _previewRename.RaiseCanExecuteChanged();
             _reviewDuplicates.RaiseCanExecuteChanged();
+
+            // The editor page's three, whose answers rest on the same selection the three above do.
+            // They were left out when the page landed on 2026-08-28: two pills that open a tool for
+            // «the open title» cannot be told a different title is open by the surface that closes
+            // over the one they were built for.
+            RaiseEditorCanExecuteChanged();
+            OnPropertyChanged(nameof(EditorTitle));
         }
     }
 
