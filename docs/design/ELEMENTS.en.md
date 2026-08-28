@@ -129,6 +129,17 @@ Its rows, and here there **is** accent, which is what the prototype draws:
 
 Where: the five settings and filter drop-downs, plus the speed one, which opens upwards.
 
+**The speed one has three things of its own**, all of them the prototype's. Its rows are three
+columns — a mark, a name and a note: `● Normal · 1×`, `2× · faster` — because the number alone does
+not say which way it goes: `0.75×` and `1.25×` are the same distance from normal and read alike. Its
+panel comes out **upward**, which is the only sensible direction on the player's bottom edge. And its
+closed face says the multiplier where the row says the word for it: the pill reads `SPEED 1× ▲` and
+the row reads `● Normal · 1×`.
+
+The mark is not decoration beside the wash and the border: on both high contrasts the selected row's
+fill and the resting fill are the same colour, so the mark is the only thing left saying which one is
+in force — the same reason the appearance pills carry a state glyph and the rail carries a bar.
+
 ### Menu row
 
 **This is not a drop-down and is not painted like one.** A menu says where you are, not which one you

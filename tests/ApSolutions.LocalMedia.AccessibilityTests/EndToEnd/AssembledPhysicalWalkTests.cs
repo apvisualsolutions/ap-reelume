@@ -2647,18 +2647,37 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => transport.Position,
             "clicking the scrubber never moved the session to the chosen minute");
 
-        // The speed menu that replaced the readout: a drop-down's effect is that it opens — what is
-        // chosen inside lands in a popup root of its own — and the command behind every item is
-        // measured in TransportControlsAutomationTests against the engine's own speed. Closed by the
-        // flyout's own door rather than Escape to the window: the popup is a top level of its own,
-        // and the window's Escape is not its business.
+        // The speed menu, which took the prototype's shape on 2026-08-28 and is a ComboBox now: a
+        // drop-down's effect is that it opens, and what is chosen inside lands in a popup root of its
+        // own that this harness cannot reach — the rows are measured in SpeedMenuTests against the
+        // engine's own speed. Closed by the control's own property rather than Escape to the window,
+        // because the popup is a top level of its own and the window's Escape is not its business.
         await PressAsync(
             host,
             "TransportSpeedLabel",
-            () => Resolve(host, "TransportSpeedLabel") is Button { Flyout.IsOpen: true },
-            "clicking the speed readout never opened the menu of speeds");
-        ((Button)Resolve(host, "TransportSpeedLabel")).Flyout!.Hide();
+            () => Resolve(host, "TransportSpeedLabel") is ComboBox { IsDropDownOpen: true },
+            "clicking the speed pill never opened the menu of speeds");
+        ((ComboBox)Resolve(host, "TransportSpeedLabel")).IsDropDownOpen = false;
         Dispatcher.UIThread.RunJobs();
+
+        // And «Volver a 1×», which the prototype puts beside the pill and this application had as
+        // the menu's eleventh row — a thing that is not a speed, in a list of speeds, behind the
+        // click that opens that list.
+        //
+        // The session is sent away from 1× first, and that is the scene rather than the test: the
+        // button is absent while there is nothing to come back from, so a walk that pressed it
+        // straight away would be pressing something that is not on the screen. The speed is spent
+        // here and the press is what puts it back, which is this suite's own rule about a scene that
+        // spends something — except that here the repayment IS the effect being measured.
+        await transport.SetSpeedAsync(1.5, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(transport.IsAwayFromNormalSpeed, "the session never left 1×, so the reset has nothing to do.");
+        await PressAsync(
+            host,
+            "TransportSpeedResetAction",
+            () => transport.SpeedMultiplier,
+            "clicking «back to 1×» never brought the session back to normal speed");
+        Assert.Equal(1.0, transport.SpeedMultiplier);
 
         // The bar's own two mode buttons, which is where the owner looked for them on 2026-08-25 and
         // where they were not. Pressed from the bar and read off the shell's mode, because a button

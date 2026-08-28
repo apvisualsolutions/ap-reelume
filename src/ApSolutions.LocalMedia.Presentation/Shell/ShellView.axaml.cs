@@ -98,9 +98,13 @@ public sealed partial class ShellView : UserControl
         // the mode's setter, and the reason is measured: changing what is visible inside the stage
         // while the stage is between two windows asks the wrong layout manager to arrange it, which
         // is an exception six suites caught the moment it was tried.
+        // The full-screen half is told here for the same two reasons, and it decides which of the two
+        // arrow glyphs the transport's mode button draws: the prototype swaps `full` for `exitfull`
+        // the moment the picture takes the screen, and this drew the entering arrows in both states.
         if (_viewModel?.Player is { } session)
         {
             session.Player.IsCompact = mode == PlaybackMode.Mini;
+            session.Player.IsFullscreen = mode == PlaybackMode.Fullscreen;
         }
 
         if (mode == PlaybackMode.Mini)

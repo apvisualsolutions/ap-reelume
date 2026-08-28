@@ -301,24 +301,38 @@ public sealed class TransportControlsAutomationTests
     }
 
     /// <summary>
-    /// The menu writes its steps as literals - a MenuFlyout with a conditional last row does not
-    /// bind an ItemsSource well - so this is the seam that keeps them being the policy's steps.
-    /// The keyboard walks <see cref="PlaybackControlPolicy.SpeedSteps"/>; a menu that drifted from
-    /// it would offer the mouse speeds the keyboard cannot reach.
+    /// The steps the model offers are the policy's steps, and every one of them is a speed the
+    /// policy would accept unchanged.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This asked the same question of the <b>markup</b> until 2026-08-28: it read
+    /// <c>TransportControlsView.axaml</c> as text and matched <c>CommandParameter="([0-9.]+)"</c>.
+    /// A check written that way does not fail when the file changes shape — it matches nothing,
+    /// compares an empty list, and passes. Three suites in this repository have gone blind exactly
+    /// like that, and this one would have on the very change that removed those attributes.
+    /// </para>
+    /// <para>
+    /// What made it possible to ask the model instead is that the menu is now built from the policy
+    /// rather than repeating it. Until then <see cref="PlaybackControlPolicy.SpeedSteps"/> was read
+    /// by nothing at all in <c>src/</c> — the characteristic defect of this repository, with the
+    /// comment above it claiming the keyboard walked it.
+    /// </para>
+    /// </remarks>
     [AvaloniaFact]
-    public void The_menus_literal_steps_are_the_policys_steps()
+    public void The_menus_steps_are_the_policys_steps()
     {
-        var markup = File.ReadAllText(TestSupport.RepositoryLayout.PathFromRoot(
-            "src", "ApSolutions.LocalMedia.Presentation", "Player", "TransportControlsView.axaml"));
-        var offered = System.Text.RegularExpressions.Regex
-            .Matches(markup, "CommandParameter=\"([0-9.]+)\"")
-            .Select(match => double.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture))
-            .Distinct()
-            .OrderBy(step => step)
-            .ToArray();
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(new StubEngine()));
 
-        Assert.Equal(PlaybackControlPolicy.SpeedSteps.OrderBy(step => step), offered);
+        Assert.Equal(
+            PlaybackControlPolicy.SpeedSteps,
+            viewModel.SpeedOptions.Select(option => option.Multiplier));
+        Assert.All(
+            viewModel.SpeedOptions,
+            option => Assert.Equal(option.Multiplier, PlaybackControlPolicy.ClampSpeed(option.Multiplier)));
+
+        // The anti-blindness floor: an empty menu compared against an empty policy would pass.
+        Assert.Equal(9, viewModel.SpeedOptions.Count);
     }
 
 

@@ -8,7 +8,45 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Changed
+
+- **The speed menu is the prototype's drop-down and no longer eleven bare numbers.** It was a
+  `MenuFlyout` of ten numbers with an eleventh row that reset: a thing that is not a speed, inside a
+  list of speeds, hidden behind the click that opens that list. It is now the pill the prototype
+  draws — the word in small type, the multiplier in semi-bold, and the caret that turns over when the
+  panel opens — its **nine** steps carry a mark, a name and a note (`● Normal · 1×`, `2× · faster`),
+  it opens **upward** because the transport is the player's bottom edge, and «Back to 1×» is a button
+  beside it that exists only while there is something to come back from.
+
+  It is a `ComboBox` and not a button with a flyout, and that is the walk rather than taste: **nothing
+  inside a `Flyout` can be reached by the harness** — all twenty entries of `eng/walk-pending.txt` are
+  exactly that, flyout children, and that ratchet does not go up — while a `ComboBox` is pressed and
+  asserted on `IsDropDownOpen` the way the library's two filters already are. So the menu gains a
+  shape and the ledger gains **one** identity, the reset, pressed in the same commit.
+
+  And the step that did not belong is gone: the prototype's list holds nine, and this one carried a
+  `1.75×` nothing ever drew.
+
 ### Fixed
+
+- **`PlaybackControlPolicy.SpeedSteps` was read by nobody.** The defect of the house, number sixteen:
+  the menu wrote its own ten numbers into its own markup and a test **read that file as text** to
+  compare the two, so the policy decided nothing while the comment above it claimed the keyboard
+  walked it. Nothing walked it. The menu is built from it now, and the test asks the model instead of
+  a `Regex` over an `.axaml` — which is how three suites in this tree have already gone blind: a file
+  that stops matching the pattern returns an empty list, and an empty list compared against another
+  empty one passes.
+
+- **The full-screen button drew the entering arrows while already full screen.** The prototype writes
+  `icon(mode === 'fullscreen' ? 'exitfull' : 'full')`, and `IconExitFullscreen` had been in the
+  dictionary the whole time, drawn only by the mini window's restore. It is the same defect the mute
+  button was found with in August and fixed for: a control that says the same thing whatever it has
+  done.
+
+  Along the way, the table that pins which glyph each button carries listed **eleven of thirteen**:
+  the two mode buttons had been on the bar for three days and were not on it, and the one that was
+  wrong was one of the two that were missing. A picture on a button nothing names is a picture nothing
+  checks.
 
 - **`HardwareAccelerationFallback.Reset` had no caller.** It claimed to be "for when a new engine is
   created", and a new engine builds a new one of these, so neither `src/` nor any test had ever

@@ -8,7 +8,44 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Cambiado
+
+- **El menú de velocidad es el desplegable del prototipo y ya no once filas numéricas.** Era un
+  `MenuFlyout` con diez números y una undécima fila que reiniciaba: una cosa que no es una velocidad,
+  dentro de una lista de velocidades, escondida detrás del clic que abre esa lista. Ahora es la
+  píldora que el prototipo dibuja —la palabra en pequeño, el multiplicador en semi-negrita y el galón
+  que se da la vuelta al abrirse—, sus **nueve** pasos llevan marca, nombre y nota (`● Normal · 1×`,
+  `2× · más rápida`), abre **hacia arriba** porque el transporte es el borde inferior del reproductor,
+  y «Volver a 1×» es un botón al lado que sólo existe mientras hay algo de lo que volver.
+
+  Es un `ComboBox` y no un botón con desplegable, y eso lo decide el paseo y no el gusto: **nada
+  dentro de un `Flyout` es alcanzable por el arnés** —las veinte entradas de `eng/walk-pending.txt`
+  son exactamente eso, hijos de un flyout, y ese trinquete no sube—, mientras que un `ComboBox` se
+  pulsa y se afirma sobre `IsDropDownOpen` como ya hacen los dos filtros de Biblioteca. Así el menú
+  gana forma y el inventario gana **una** identidad, la del reinicio, pulsada en el mismo commit.
+
+  Y el paso que sobraba se ha ido: la lista del prototipo tiene nueve y ésta tenía un `1,75×` que
+  nadie dibujó nunca.
+
 ### Corregido
+
+- **`PlaybackControlPolicy.SpeedSteps` no lo leía nadie.** El defecto de la casa, número dieciséis:
+  el menú escribía sus diez números en su propio marcado y una prueba **leía ese archivo como texto**
+  para comparar los dos, así que la política no decidía nada mientras el comentario que tiene encima
+  afirmaba que el teclado la recorría. Nada la recorría. Ahora el menú se construye de ella, y la
+  prueba pregunta al modelo en vez de a un `Regex` sobre un `.axaml` — que es la forma en que tres
+  suites de este árbol ya se quedaron ciegas: un archivo que deja de casar con el patrón devuelve una
+  lista vacía, y una lista vacía comparada con otra vacía pasa.
+
+- **El botón de pantalla completa dibujaba las flechas de entrar también estando ya dentro.** El
+  prototipo escribe `icon(mode === 'fullscreen' ? 'exitfull' : 'full')` y `IconExitFullscreen` estaba
+  en el diccionario desde el principio, dibujado sólo por el restaurar de la ventana pequeña. Es el
+  mismo defecto que el botón de silencio tenía en agosto y por el que se corrigió: un control que dice
+  lo mismo hiciera lo que hiciera.
+
+  De paso, la tabla que ata qué glifo lleva cada botón listaba **once de trece**: los dos botones de
+  modo llevaban tres días en la barra y no estaban en ella, y el que estaba mal era uno de los dos que
+  faltaban. Una imagen sobre un botón que nadie nombra es una imagen que nadie comprueba.
 
 - **`HardwareAccelerationFallback.Reset` no lo llamaba nadie.** Decía ser «para cuando se crea un
   motor nuevo», y un motor nuevo construye uno de éstos nuevo, así que ni `src/` ni ninguna prueba

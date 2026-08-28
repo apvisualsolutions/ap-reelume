@@ -128,6 +128,18 @@ Sus filas, y aquí **sí** hay acento, que es lo que el prototipo dibuja:
 
 Dónde: los cinco desplegables de ajustes y filtros, más el de velocidad, que abre hacia arriba.
 
+**El de velocidad tiene tres cosas propias** y todas vienen del prototipo. Sus filas son de tres
+columnas —marca, nombre y nota: `● Normal · 1×`, `2× · más rápida`—, porque el número solo no dice
+hacia dónde va: `0,75×` y `1,25×` están a la misma distancia de lo normal y se leen igual. Su panel
+sale **por arriba**, que es lo único razonable en el borde inferior del reproductor. Y su cara
+cerrada dice el multiplicador donde la fila dice la palabra: la píldora es `VELOCIDAD 1× ▲` y la fila
+es `● Normal · 1×`.
+
+La marca no es adorno junto al lavado y el borde: en los dos contrastes altos el relleno de la fila
+elegida y el de reposo son el mismo color, así que la marca es lo único que queda diciendo cuál está
+en vigor — la misma razón por la que las píldoras de apariencia llevan glifo de estado y el rail
+lleva barra.
+
 ### Fila de menú
 
 **Esto no es un desplegable y no se pinta como uno.** Un menú dice dónde estás, no qué has escogido
