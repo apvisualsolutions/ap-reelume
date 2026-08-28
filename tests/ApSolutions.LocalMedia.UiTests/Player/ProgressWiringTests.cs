@@ -100,6 +100,65 @@ public sealed class ProgressWiringTests
         Assert.Equal(9, viewModel.PositionSeconds);
     }
 
+    /// <summary>
+    /// The one line the mini player has room for, with the length and without it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The half worth having is the second one. The large transport answers an unknown length by
+    /// leaving <c>DurationLabel</c> empty and letting <c>HasDuration</c> take the whole row off the
+    /// screen; a composed line has no such switch, so the absence has to be answered inside the
+    /// composition or it comes out as punctuation with a hole in it.
+    /// </para>
+    /// <para>
+    /// The separators are asserted as characters and not as a shape, because they are the part the
+    /// prototype draws and the part no dictionary holds: a slash between the two clocks and a middle
+    /// dot before the speed.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_composed_readout_carries_the_clock_the_length_and_the_speed()
+    {
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(new StubEngine()));
+
+        viewModel.Observe(TimeSpan.FromMinutes(52), TimeSpan.FromMinutes(96));
+
+        Assert.Equal($"52:00 / 1:36:00 · {viewModel.SpeedLabel}", viewModel.Readout);
+    }
+
+    [Fact]
+    public void The_composed_readout_leaves_the_length_out_until_there_is_one()
+    {
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(new StubEngine()));
+
+        viewModel.Observe(TimeSpan.FromSeconds(9), duration: null);
+
+        Assert.Equal($"0:09 · {viewModel.SpeedLabel}", viewModel.Readout);
+        Assert.DoesNotContain('/', viewModel.Readout);
+    }
+
+    /// <summary>
+    /// And it is announced, which is the difference between a line that is right and a line that is
+    /// right once.
+    /// </summary>
+    /// <remarks>
+    /// It is a computed property with no backing field, so nothing about it changes on its own: a
+    /// name missing from the list in <c>Apply</c> leaves the mini player showing the first position
+    /// the engine ever reported, forever, and every assertion that reads the property directly still
+    /// passes.
+    /// </remarks>
+    [Fact]
+    public void The_composed_readout_is_announced_when_the_playhead_moves()
+    {
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(new StubEngine()));
+        var announced = new List<string?>();
+        viewModel.PropertyChanged += (_, e) => announced.Add(e.PropertyName);
+
+        viewModel.Observe(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(90));
+
+        Assert.Contains(nameof(TransportControlsViewModel.Readout), announced);
+    }
+
     /// <summary>The rail's badge is fed, and it is the event bus's first listener.</summary>
     /// <remarks>
     /// <c>ReviewInboxChanged</c> was published by two use cases and subscribed to by nobody, and

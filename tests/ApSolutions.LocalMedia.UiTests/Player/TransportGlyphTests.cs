@@ -5,6 +5,7 @@ using System.Globalization;
 
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Player;
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -274,19 +275,30 @@ public sealed class TransportGlyphTests
     }
 
     /// <summary>
-    /// The five fit on one line at the narrowest width the mini player is allowed to be.
+    /// The five fit on one line at the narrowest width the mini player is allowed to be, in both
+    /// languages.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// This is the defect the glyphs were for, asserted rather than described. With translated words
     /// the chrome folded into <b>three rows inside 480x270</b> on 2026-08-19; the window's own minimum
     /// is 320, which is narrower still, so measuring there says the words could never have fitted and
     /// the glyphs always will. The panel keeps wrapping — this asserts that it does not need to.
+    /// </para>
+    /// <para>
+    /// The language is a parameter since 2026-08-28, which is the same correction the two width gates
+    /// took two days earlier: it pinned <c>es-ES</c>, so the other language was a supposition rather
+    /// than a measurement. It mattered more the moment the band stopped being five glyphs — a title
+    /// and a clock share the line now, and either can be longer in one language than the other.
+    /// </para>
     /// </remarks>
-    [AvaloniaFact]
-    public void The_five_of_the_chrome_share_one_line_at_the_windows_own_minimum()
+    [AvaloniaTheory]
+    [InlineData("es-ES")]
+    [InlineData("en-US")]
+    public void The_five_of_the_chrome_share_one_line_at_the_windows_own_minimum(string language)
     {
         Assert.NotNull(Avalonia.Application.Current);
-        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo(language));
 
         var chrome = new MiniPlayerChromeView();
         var window = new Window { Width = 320, Height = 270, Content = chrome };
@@ -299,7 +311,58 @@ public sealed class TransportGlyphTests
             .Distinct()
             .ToArray();
 
-        Assert.Single(rows);
+        Assert.True(
+            rows.Length == 1,
+            $"{language} folds the mini player's five into {rows.Length} rows at 320 px, at "
+                + $"y={string.Join(", ", rows)}.");
+        window.Close();
+    }
+
+    /// <summary>
+    /// And nothing on the band is drawn outside the narrowest window the mini player allows, in
+    /// either language.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The row above says the five share a line; it does not say the line fits. Those are different
+    /// claims and the band stopped being only buttons on 2026-08-28: a title and a clock sit beside
+    /// them now, and a <c>DockPanel</c> gives its filled child whatever is left over — including a
+    /// negative amount, which it draws rather than complains about.
+    /// </para>
+    /// <para>
+    /// <c>ViewOverflowTests</c> measures every view at 900, which is the main window's minimum. The
+    /// mini player is not the main window: its own minimum is 320, so 900 is the one width at which
+    /// this view cannot fail.
+    /// </para>
+    /// </remarks>
+    [AvaloniaTheory]
+    [InlineData("es-ES")]
+    [InlineData("en-US")]
+    public void Nothing_on_the_mini_band_is_drawn_outside_the_windows_own_minimum(string language)
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo(language));
+
+        var chrome = new MiniPlayerChromeView();
+        var window = new Window { Width = 320, Height = 270, Content = chrome };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var outside = chrome.GetVisualDescendants()
+            .OfType<Control>()
+            .Where(control => control.IsVisible && control.Bounds.Width > 0)
+            .Select(control => (
+                Control: control,
+                Right: control.TranslatePoint(new Point(control.Bounds.Width, 0), chrome)?.X ?? 0))
+            .Where(entry => entry.Right > 320.5)
+            .Select(entry => $"{entry.Control.Name ?? entry.Control.GetType().Name} ends at "
+                + $"{entry.Right:0.0}")
+            .ToArray();
+
+        Assert.True(
+            outside.Length == 0,
+            $"{language} draws the mini player's band past its own 320 px minimum:\n  "
+                + string.Join("\n  ", outside));
         window.Close();
     }
 

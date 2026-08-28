@@ -33,4 +33,32 @@ public static class PlaybackClock
         value.TotalHours >= 1
             ? value.ToString(@"h\:mm\:ss", CultureInfo.InvariantCulture)
             : value.ToString(@"m\:ss", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// The one line the mini player has room for: where the session is, how long it runs, and how
+    /// fast it is going.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It is composed here rather than by three bindings side by side, and the reason is the shape
+    /// and not the tidiness. The separators the prototype draws — a slash and a middle dot — are
+    /// punctuation and not words, so no dictionary holds them; written into the markup they would be
+    /// three <c>TextBlock</c>s with two more between them, and the middle one is empty until the
+    /// engine reports a duration. That row does not collapse when a member of it goes blank: it
+    /// leaves the punctuation stranded, reading <c>0:12 /  · 1×</c>.
+    /// </para>
+    /// <para>
+    /// So the absence is answered here, once, by leaving the length out until there is one. The
+    /// speed stays either way: it is the person's own setting and true from the first frame.
+    /// </para>
+    /// </remarks>
+    /// <param name="speed">
+    /// The multiplier as the transport already writes it, passed in rather than formatted here. It
+    /// follows the current culture — <c>1,5×</c> in Spanish — and the clock beside it deliberately
+    /// does not, so the two formats stay where their reasons are.
+    /// </param>
+    public static string Readout(TimeSpan position, TimeSpan? duration, string speed) =>
+        duration is { } length && length > TimeSpan.Zero
+            ? $"{Format(position)} / {Format(length)} · {speed}"
+            : $"{Format(position)} · {speed}";
 }

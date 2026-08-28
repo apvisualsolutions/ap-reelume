@@ -11,61 +11,153 @@ SPDX-License-Identifier: GPL-3.0-or-later
     x:DataType="shell:ShellViewModel"
     automation:AutomationProperties.Name="{DynamicResource MiniPlayerChromeAccessibleName}">
   <!--
-    A WrapPanel and not a row: the window's own minimum is 320, and the five carried translated words
-    until 2026-08-21 - measured folding into three rows inside 480x270, which is what the glyphs of §4
-    were for. The wrapping stays, because a glyph shrinks the row without proving it can never wrap:
-    this is the shape that has put a control outside the window six times in this repository.
+    The prototype's composition, which until 2026-08-28 was five buttons and nothing else: a three
+    pixel bar of progress across the top, then the title and the clock on the left with the five on
+    the right. What it fixes is not decoration - a mini player showed neither what was playing nor
+    how far in it was, which is most of what a picture-in-picture window is for.
   -->
   <!--
-    Only Content changed here. AutomationProperties.Name still points at the resource key, so the five
-    answer to the same names the walk presses and a screen reader still reads a word rather than a
-    private-use codepoint. The font list lives in the player-chrome class, in one place for all eleven.
+    The band paints the player's surface and not the shell's, and that is a correction rather than a
+    style. The five wear player-chrome, which sets PlayerTextBrush (#F8FAFC), and this panel used to
+    paint ShellSurfaceBrush - #FBFCFE in the light theme. Measured before the change: 1.02:1, five
+    buttons with nothing visible on them. No contrast gate saw it because every one of them reads the
+    four dictionaries, and a dictionary is consistent with itself; what was wrong was the pairing,
+    which exists only in this view. MiniPlayerBandTests measures the pairing.
   -->
-  <!--
-    The spacing is the panel's and not the buttons'. It lived in the player-chrome class as a Margin
-    until the large transport adopted that class and would have inherited a separation it did not
-    want.
-  -->
-  <WrapPanel
-      x:Name="MiniPlayerChromeSurface"
-      HorizontalAlignment="Center"
-      Background="{DynamicResource ShellSurfaceBrush}"
-      ItemSpacing="{DynamicResource Space8}"
-      LineSpacing="{DynamicResource Space8}">
-    <Button
-        x:Name="MiniPlayerPlayPause"
-        Classes="player-chrome"
-        Command="{Binding Player.Player.TogglePlaybackCommand}"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerPlayPause}">
-      <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlay}" />
-    </Button>
-    <Button
-        x:Name="MiniPlayerSkipBack"
-        Classes="player-chrome"
-        Command="{Binding Player.Player.Transport.SkipBackwardCommand}"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipBack}">
-      <Path Classes="icon size-20" Data="{DynamicResource IconSkipBackward}" />
-    </Button>
-    <Button
-        x:Name="MiniPlayerSkipForward"
-        Classes="player-chrome"
-        Command="{Binding Player.Player.Transport.SkipForwardCommand}"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipForward}">
-      <Path Classes="icon size-20" Data="{DynamicResource IconSkipForward}" />
-    </Button>
-    <Button
-        x:Name="MiniPlayerRestore"
-        Classes="player-chrome"
-        Command="{Binding ToggleMiniPlayerCommand}"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerRestore}">
-      <Path Classes="icon size-20" Data="{DynamicResource IconExitFullscreen}" />
-    </Button>
-    <Button
-        x:Name="MiniPlayerClose"
-        Classes="player-chrome"
-        Command="{Binding ClosePlayerCommand}"
-        automation:AutomationProperties.Name="{DynamicResource MiniPlayerClose}">
-      <Path Classes="icon size-20" Data="{DynamicResource IconClose}" />
-    </Button>
-  </WrapPanel>
+  <DockPanel
+      x:Name="MiniPlayerChromeBand"
+      Background="{DynamicResource PlayerSurfaceBrush}">
+    <!--
+      The track stays and only the fill comes and goes, which keeps the band exactly as tall from
+      the first frame to the last. The window answers a drag by putting 16:9 back on the picture and
+      adding this band's height on top - a bar that appeared the moment the engine reported a
+      duration would change that height under a window nobody was resizing.
+
+      Three setters and not one: the base theme gives a ProgressBar a minimum height of four and a
+      minimum width of 200, measured in the library card and again in the episode row, so Height
+      alone draws four and stretching inside 320 px of window clips rather than fits.
+    -->
+    <Panel
+        DockPanel.Dock="Top"
+        Height="3"
+        Background="{DynamicResource PlayerHairlineBrush}">
+      <!--
+        Absent while the length is unknown, for the reason DurationSeconds is written the way it is:
+        it answers 1 until the engine says otherwise, so a position of two minutes would be clamped
+        to the maximum and paint a full bar over a film that has just started.
+      -->
+      <ProgressBar
+          x:Name="MiniPlayerProgress"
+          Height="3"
+          MinHeight="3"
+          MinWidth="0"
+          Background="Transparent"
+          Foreground="{DynamicResource AccentBrush}"
+          IsVisible="{Binding Player.Player.Transport.HasDuration}"
+          Minimum="0"
+          Maximum="{Binding Player.Player.Transport.DurationSeconds}"
+          Value="{Binding Player.Player.Transport.PositionSeconds}"
+          automation:AutomationProperties.Name="{DynamicResource TransportPositionLabel}" />
+    </Panel>
+    <DockPanel Margin="12,10">
+      <!--
+        A WrapPanel and not a row: the window's own minimum is 320, and the five carried translated
+        words until 2026-08-21 - measured folding into three rows inside 480x270, which is what the
+        glyphs of §4 were for. The wrapping stays, because a glyph shrinks the row without proving it
+        can never wrap: this is the shape that has put a control outside the window six times in this
+        repository.
+
+        Docked right rather than centred since the readout arrived beside it: the two share one line,
+        and a centred panel would take the middle of what is left and leave the title against the
+        edge.
+      -->
+      <!--
+        Only Content changed here. AutomationProperties.Name still points at the resource key, so the
+        five answer to the same names the walk presses and a screen reader still reads a word rather
+        than a private-use codepoint. The font list lives in the player-chrome class, in one place
+        for all eleven.
+      -->
+      <!--
+        The spacing is the panel's and not the buttons'. It lived in the player-chrome class as a
+        Margin until the large transport adopted that class and would have inherited a separation it
+        did not want.
+      -->
+      <WrapPanel
+          x:Name="MiniPlayerChromeSurface"
+          DockPanel.Dock="Right"
+          VerticalAlignment="Center"
+          ItemSpacing="{DynamicResource Space8}"
+          LineSpacing="{DynamicResource Space8}">
+        <!--
+          Back, play, forward, expand, close - the prototype's order, and taken here where the large
+          transport could not take it. There the three of the session and the two of the skips come
+          from models built at different moments, so interleaving them means moving commands between
+          them; these five sit in one panel and read one view model, so the order is the markup's.
+        -->
+        <Button
+            x:Name="MiniPlayerSkipBack"
+            Classes="player-chrome"
+            Command="{Binding Player.Player.Transport.SkipBackwardCommand}"
+            automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipBack}">
+          <Path Classes="icon size-20" Data="{DynamicResource IconSkipBackward}" />
+        </Button>
+        <Button
+            x:Name="MiniPlayerPlayPause"
+            Classes="player-chrome"
+            Command="{Binding Player.Player.TogglePlaybackCommand}"
+            automation:AutomationProperties.Name="{DynamicResource MiniPlayerPlayPause}">
+          <Path Classes="icon size-22 filled" Data="{DynamicResource IconPlay}" />
+        </Button>
+        <Button
+            x:Name="MiniPlayerSkipForward"
+            Classes="player-chrome"
+            Command="{Binding Player.Player.Transport.SkipForwardCommand}"
+            automation:AutomationProperties.Name="{DynamicResource MiniPlayerSkipForward}">
+          <Path Classes="icon size-20" Data="{DynamicResource IconSkipForward}" />
+        </Button>
+        <Button
+            x:Name="MiniPlayerRestore"
+            Classes="player-chrome"
+            Command="{Binding ToggleMiniPlayerCommand}"
+            automation:AutomationProperties.Name="{DynamicResource MiniPlayerRestore}">
+          <Path Classes="icon size-20" Data="{DynamicResource IconExitFullscreen}" />
+        </Button>
+        <Button
+            x:Name="MiniPlayerClose"
+            Classes="player-chrome"
+            Command="{Binding ClosePlayerCommand}"
+            automation:AutomationProperties.Name="{DynamicResource MiniPlayerClose}">
+          <Path Classes="icon size-20" Data="{DynamicResource IconClose}" />
+        </Button>
+      </WrapPanel>
+      <!--
+        What is playing and where it is, which the window did not say at all. Both lines are one line
+        each and trimmed rather than wrapped: at 320 px the five buttons take 252 of the 296 the band
+        has, so whatever is left is a strip, and a strip is for an ellipsis and not for a second row
+        of a title.
+
+        The clock is one string from the model rather than three bound side by side, because the
+        separators between them are punctuation the prototype draws and not words a dictionary holds
+        - and three TextBlocks in a row is the shape that folds when the middle one is empty.
+      -->
+      <StackPanel x:Name="MiniPlayerReadout" Margin="0,0,8,0" VerticalAlignment="Center">
+        <TextBlock
+            x:Name="MiniPlayerTitleText"
+            FontSize="{DynamicResource FontSizeCaption}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource PlayerTextBrush}"
+            IsVisible="{Binding HasPlayerTitle}"
+            Text="{Binding PlayerTitle}"
+            TextTrimming="CharacterEllipsis"
+            TextWrapping="NoWrap" />
+        <TextBlock
+            x:Name="MiniPlayerClockText"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+            Text="{Binding Player.Player.Transport.Readout}"
+            TextTrimming="CharacterEllipsis"
+            TextWrapping="NoWrap" />
+      </StackPanel>
+    </DockPanel>
+  </DockPanel>
 </UserControl>
