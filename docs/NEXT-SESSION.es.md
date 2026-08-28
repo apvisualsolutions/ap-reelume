@@ -87,6 +87,23 @@ mejor. Un script que toma el máximo **engaña**, y engañó.
 El suelo queda en `96 70`, con el número del artefacto de ese run, y `ArtworkCache.cs` **sigue en la
 lista**: 96 de línea llega al listón y 70 de rama no. El trinquete sigue en 212.
 
+### Un rojo de CI que no se reproduce aquí, y su causa
+
+`The_players_transport_is_operated_with_the_mouse` respondió en CI `Expected: Embedded, Actual:
+Fullscreen`, en una aserción que se lee **antes** de pulsar nada de modo. **No se reproduce en local**:
+el caso solo tres veces y la suite entera dos, todas verdes.
+
+La causa está en la escena y no en el producto: manda la sesión a **1,5×** justo antes, y «Volver a
+1×» **aparece** cuando la velocidad deja de ser 1×, así que la fila del transporte se recompone y todo
+lo que está a su lado se mueve. `PressAsync` elige el punto que pulsa «al lado» de la **geometría en
+pantalla**, y lo eligió antes de que el hueco del reset estuviera medido: aterrizó en el botón de
+pantalla completa.
+
+Corregido asentando el layout —`InvalidateMeasure()` + `RunJobs()`— entre el cambio que recompone la
+fila y el `PressAsync` que apunta a ella, y leyendo el modo en ese punto para que un aterrizaje en el
+vecino se cace donde ocurre. **Regla: si una línea de la escena cambia qué controles hay en una fila,
+asienta el layout antes de apuntar a esa fila.**
+
 ### Una trampa local nueva: `PackagingTests` está roja aquí y verde en CI
 
 Tres pruebas de empaquetado fallan **en esta máquina** —`Arm64PackageTests`, `ReproducibleBuildTests`

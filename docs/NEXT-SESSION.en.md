@@ -86,6 +86,23 @@ script that takes the maximum **misleads**, and it did.
 The floor is `96 70`, from that run's artefact, and `ArtworkCache.cs` **stays on the list**: 96 lines
 meets the bar, 70 branches does not. The ratchet stays at 212.
 
+### A CI red that does not reproduce here, and its cause
+
+`The_players_transport_is_operated_with_the_mouse` answered `Expected: Embedded, Actual: Fullscreen`
+on CI, in an assertion read **before** any mode button is pressed. **It does not reproduce locally**:
+the case alone three times and the whole suite twice, all green.
+
+The cause is in the scene and not in the product: it sends the session to **1.5×** just before, and
+"Back to 1×" **appears** when the speed leaves 1×, so the transport row recomposes and everything
+beside it moves. `PressAsync` picks the point it clicks "beside" a control from the **geometry on
+screen**, and it picked before the room made for the reset had been measured: it landed on the
+fullscreen button next door.
+
+Fixed by settling the layout — `InvalidateMeasure()` + `RunJobs()` — between the line that recomposes
+the row and the `PressAsync` that aims at it, and by reading the mode at that point so a
+beside-click that moves it is caught where it happens. **Rule: if a line of the scene changes which
+controls are in a row, settle the layout before aiming at that row.**
+
 ### A new local trap: `PackagingTests` is red here and green on CI
 
 Three packaging tests fail **on this machine** — `Arm64PackageTests`, `ReproducibleBuildTests` and
