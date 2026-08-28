@@ -138,6 +138,38 @@ public sealed class ProgressWiringTests
     }
 
     /// <summary>
+    /// A duration of zero is a duration the engine reported, and it leaves the length out too.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The composed line asks two questions — is there a duration, and is it worth anything — and
+    /// only the first had a test. CI caught it: <c>PlaybackClock.cs</c> measured <b>100/83</b>,
+    /// under the 96/96 bar and on no list, for exactly this branch.
+    /// </para>
+    /// <para>
+    /// The guard is kept and covered rather than removed, because the state it answers is reachable:
+    /// <c>Observe</c> stores whatever duration it is handed, and <c>HasDuration</c> asks the same two
+    /// questions of it. An engine that reports zero before it knows better would otherwise be
+    /// described as a film whose whole length has already played.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_length_of_zero_is_left_out_of_the_readout_like_no_length_at_all()
+    {
+        Assert.Equal(
+            "0:09 · 2×",
+            PlaybackClock.Readout(TimeSpan.FromSeconds(9), TimeSpan.Zero, "2×"));
+
+        // And through the view model, because that is the path the mini player's band actually
+        // takes: asserting the static alone would leave Observe free to invent a duration.
+        var viewModel = new TransportControlsViewModel(new ControlPlayback(new StubEngine()));
+        viewModel.Observe(TimeSpan.FromSeconds(9), TimeSpan.Zero);
+
+        Assert.False(viewModel.HasDuration);
+        Assert.DoesNotContain('/', viewModel.Readout);
+    }
+
+    /// <summary>
     /// And it is announced, which is the difference between a line that is right and a line that is
     /// right once.
     /// </summary>
