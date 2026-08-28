@@ -6,15 +6,10 @@ Six commits on the branch. **Everything green locally**: Domain 519, Application
 30, Documentation 91, Ui 917, Accessibility 146, Integration 470, and the walk at 202 pressed with
 the ratchet still at 20.
 
-**CI is GREEN on `7c1decb`**, for the first time in several sessions. `main` is at `eb91cd2` and the
-fast-forward is clean, but it **carries 64 commits**, not this batch's twelve: the branch has not
-advanced since the coverage gate went red. That is why it was not advanced here — that is no longer
-the cycle's routine step 4, it is publishing several sessions at once, and it is the owner's call.
-The command, when they want it:
-
-```
-git checkout main && git merge --ff-only codex/ap-reelume-mvp-x64 && git push origin main
-```
+**CI GREEN twice in a row** (`7c1decb` and `10dedc9`) and **`main` fast-forwarded to `10dedc9` on
+2026-08-26**, under the owner's instruction to close the pending decisions: 65 commits from several
+sessions published at once. The branch, `main` and HEAD are the same verified SHA — nothing is left
+unpublished or unverified, and the next session starts from a green.
 
 **What had to be looked at first:** the coverage gate in CI. The two floors the previous session left open —
 `ShellViewModel` and `CompositionRoot.cs` — are still the only thing between this branch and a

@@ -6,15 +6,10 @@ Seis commits sobre la rama. **Todo verde en local**: Domain 519, Application 246
 Documentation 91, Ui 917, Accessibility 146, Integration 470, y el paseo en 202 pulsados con el
 trinquete quieto en 20.
 
-**CI está en VERDE sobre `7c1decb`**, y es la primera vez en varias sesiones. `main` está en
-`eb91cd2` y el fast-forward es limpio, pero **arrastra 64 commits**, no los doce de esta tanda: la
-rama lleva sin avanzar desde que la puerta de cobertura se puso roja. Por eso no se ha avanzado aquí
-— eso ya no es el paso 4 rutinario del ciclo, es publicar varias sesiones de golpe, y es una decisión
-del propietario. El comando, cuando quiera:
-
-```
-git checkout main && git merge --ff-only codex/ap-reelume-mvp-x64 && git push origin main
-```
+**CI en VERDE dos veces seguidas** (`7c1decb` y `10dedc9`) y **`main` avanzado por fast-forward a
+`10dedc9` el 2026-08-26**, con la orden del propietario de cerrar las decisiones pendientes: 65
+commits de varias sesiones publicados de una vez. La rama, `main` y el HEAD son el mismo SHA
+verificado — no queda nada sin publicar ni sin verificar, y la próxima sesión arranca desde un verde.
 
 **Lo que hubo que mirar primero:** la puerta de cobertura en CI. Los dos suelos que la sesión anterior
 dejó abiertos —`ShellViewModel` y `CompositionRoot.cs`— siguen siendo lo único que separa esta rama
