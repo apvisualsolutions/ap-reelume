@@ -170,6 +170,29 @@ public sealed class PreferenceResolutionTests
         Assert.Throws<ArgumentException>(() => SubtitleStyle.Create(100, "Segoe UI", "red", "#000000", 1, 1));
     }
 
+    /// <summary>
+    /// What counts as a colour, asked of the check itself rather than through what throws on it.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="SubtitleStyle.IsColour"/> is public because the swatches ask before they offer: a
+    /// control that hands over a value <c>Create</c> would throw on is a control that crashes the
+    /// page it is on. Its "there is nothing here" arm had never been taken by anything — every caller
+    /// in this repository asks about a value it already has — so the file sat at 92 % branches with
+    /// nobody watching, which is the crack the coverage gate closed on 2026-08-28.
+    /// </remarks>
+    [Theory]
+    [InlineData("#FFFFFF", true)]
+    [InlineData("#CC000000", true)]
+    [InlineData("  #ffffff  ", true)]
+    [InlineData("#GGGGGG", false)]
+    [InlineData("#FFF", false)]
+    [InlineData("FFFFFF", false)]
+    [InlineData("", false)]
+    [InlineData("   ", false)]
+    [InlineData(null, false)]
+    public void A_colour_is_six_or_eight_hex_digits_behind_a_hash(string? value, bool expected) =>
+        Assert.Equal(expected, SubtitleStyle.IsColour(value));
+
     [Fact]
     public void Matching_tolerates_tracks_that_declare_neither_language_nor_channels()
     {

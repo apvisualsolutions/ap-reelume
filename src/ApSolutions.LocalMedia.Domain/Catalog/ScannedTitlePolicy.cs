@@ -44,7 +44,10 @@ public static class ScannedTitlePolicy
         ArgumentNullException.ThrowIfNull(parsed);
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
 
-        var cleaned = parsed.CleanTitle?.Trim() ?? string.Empty;
+        // Trimmed and not null-checked: CleanTitle is a non-nullable member of the parser's own
+        // record, so `?. ?? ""` would be two branches nothing in this repository can take — the
+        // defect of the house wearing the face of caution, which the coverage gate reads as a hole.
+        var cleaned = parsed.CleanTitle.Trim();
         return cleaned.Length == 0
             ? new ScannedTitle(Fallback(fileName), Year: null)
             : new ScannedTitle(cleaned, parsed.Year);

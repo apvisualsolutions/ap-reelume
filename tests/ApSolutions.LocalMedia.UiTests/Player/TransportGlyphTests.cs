@@ -205,6 +205,67 @@ public sealed class TransportGlyphTests
         }
     }
 
+    /// <summary>
+    /// The full-screen button draws the arrows that match the mode the picture is actually in.
+    /// </summary>
+    /// <remarks>
+    /// The pair above says both pictures are in the button; this says the right one is on screen,
+    /// which is the half a data context decides and the half that was wrong. Mounted inside a
+    /// <c>PlayerView</c> with a session behind it, because the two glyphs alternate on a binding that
+    /// reaches up to that view — with no player above it, both are visible, which is exactly the state
+    /// the scope above measures in.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_full_screen_button_draws_the_arrows_for_the_mode_the_picture_is_in()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+
+        // The bar is given to the model rather than pushed into the host control, and that is a
+        // measurement rather than style: the host's own IsVisible is bound to the model's Transport,
+        // so a bar handed straight to the presenter sits in a hidden container with no children to
+        // find. Measured, the tree held three buttons and none of them the transport's.
+        var player = new PlayerViewModel(new IdlePlayback())
+        {
+            Transport = new TransportControlsViewModel(
+                new ApSolutions.LocalMedia.Application.Playback.ControlPlayback(
+                    new SpeedMenuTests.RecordingEngine())),
+        };
+        var view = new PlayerView { DataContext = player };
+        var window = new Window { Width = 1200, Height = 700, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var button = Assert.Single(
+            view.GetVisualDescendants().OfType<Button>(),
+            each => each.Name == "FullscreenButton");
+
+        Assert.Equal([Geometry(button, "IconFullscreen")], Drawn(button));
+
+        player.IsFullscreen = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal([Geometry(button, "IconExitFullscreen")], Drawn(button));
+
+        player.IsFullscreen = false;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal([Geometry(button, "IconFullscreen")], Drawn(button));
+        window.Close();
+
+        static object? Geometry(Button button, string key)
+        {
+            button.TryFindResource(key, out var value);
+            return value;
+        }
+
+        static object?[] Drawn(Button button) =>
+        [
+            .. button.GetVisualDescendants()
+                .OfType<Avalonia.Controls.Shapes.Path>()
+                .Where(path => path.IsVisible)
+                .Select(path => (object?)path.Data),
+        ];
+    }
+
     /// <summary>Every picture the transport paints is a drawing with something in it.</summary>
     /// <remarks>
     /// <para>
@@ -301,6 +362,22 @@ public sealed class TransportGlyphTests
 
         Assert.Single(rows);
         window.Close();
+    }
+
+    /// <summary>A session that never starts: nothing here asks the player to play anything.</summary>
+    private sealed class IdlePlayback : ApSolutions.LocalMedia.Application.Playback.IPlaybackSessionCoordinator
+    {
+        public ApSolutions.LocalMedia.Application.Playback.PlaybackSession? ActiveSession => null;
+
+        public Task<ApSolutions.LocalMedia.Application.Playback.PlaybackSession> StartAsync(
+            ApSolutions.LocalMedia.Domain.Playback.PlaybackRequest request,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task PauseAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task ResumeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
     private static int GlyphIndex(string family, uint codepoint)
