@@ -4,6 +4,7 @@
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Events;
 using ApSolutions.LocalMedia.Application.Identification;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
@@ -78,7 +79,8 @@ public sealed class ScanIdentificationTests
                 new TitleKeyedProvider(),
                 new MetadataMergePolicy(),
                 Spanish,
-                TimeProvider.System));
+                TimeProvider.System,
+                new CacheTitleArtwork(new NoArtwork())));
         var coordinator = new ScanCoordinator(
             rootRepository,
             mediaFiles,
@@ -139,6 +141,21 @@ public sealed class ScanIdentificationTests
         // has to survive every later scan.
         var again = await useCase.ExecuteAsync(summary, TestContext.Current.CancellationToken);
         Assert.Equal(new IdentifyScannedFilesResult(0, 0, 0), again);
+    }
+
+    /// <summary>
+    /// Artwork with no disk and no network behind it. What this suite measures is the scan reaching
+    /// the metadata row, and a poster fetched in the middle of it would be a second subject.
+    /// </summary>
+    private sealed class NoArtwork : IArtworkStore
+    {
+        public string? Find(TitleId titleId, Uri source) => null;
+
+        public Task<string?> FetchAsync(
+            TitleId titleId,
+            Uri source,
+            string alternativeText,
+            CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
     }
 
     private sealed class TitleKeyedProvider : IMetadataProvider

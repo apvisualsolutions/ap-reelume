@@ -45,12 +45,17 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<TmdbOptions>(),
                 provider.GetRequiredService<TmdbRateLimiter>(),
                 TimeProvider.System))
-            // ArtworkCache left the container with ART-A01 (2026-08-09): nothing fetched art and
-            // no surface showed it, and wiring the whole chain — poster plumbing through the
-            // candidate store, two image surfaces, network tests — is out of proportion for an
-            // MVP whose remote identification ships disabled. The gap is documented in the plan
-            // and in FEATURES; the class stays for personal artwork and for the day the gap
-            // closes. Removed rather than left silent, the ARQ-A01 rule.
+            // ArtworkCache came back into the container on 2026-08-28, and ART-A01 (2026-08-09) is
+            // what it reverses: it left because nothing fetched art and no surface showed it, and
+            // wiring the whole chain was out of proportion for an MVP whose remote identification
+            // ships disabled. Both halves are here now — ApplyIdentification fetches at the one
+            // moment somebody has consented to talk to the provider, and the film card draws what is
+            // on the disk without ever opening a connection. The gap the plan documented is closed.
+            .AddSingleton<IArtworkStore>(provider => new ArtworkCache(
+                provider.GetRequiredService<IAppDataPaths>().DataRoot,
+                CreateArtworkClient()))
+            .AddTransient(provider => new CacheTitleArtwork(
+                provider.GetRequiredService<IArtworkStore>()))
             .AddSingleton<IIdentificationCandidateSource>(provider => new MetadataCandidateSource(
                 provider.GetRequiredService<IMetadataProvider>(),
                 provider.GetRequiredService<IMetadataCache>(),
@@ -71,7 +76,8 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<IMetadataProvider>(),
                 provider.GetRequiredService<MetadataMergePolicy>(),
                 CurrentMetadataLanguage(),
-                TimeProvider.System))
+                TimeProvider.System,
+                provider.GetRequiredService<CacheTitleArtwork>()))
             .AddTransient<GetReviewInbox>()
             .AddTransient<ResolveMatch>()
             .AddTransient<RejectMatch>()

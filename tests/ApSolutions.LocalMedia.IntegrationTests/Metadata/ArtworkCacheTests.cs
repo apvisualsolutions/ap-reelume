@@ -159,6 +159,91 @@ public sealed class ArtworkCacheTests
         Assert.Equal(previous, kept);
     }
 
+    /// <summary>
+    /// The two members the film card and the identification use: look on the disk, and fetch.
+    /// </summary>
+    /// <remarks>
+    /// <c>Find</c> is what makes it possible for a card to draw a poster without opening a
+    /// connection, so what is asserted is that it answers before anything has been fetched (nothing),
+    /// after (the file), and that fetching a second time is not a second request — the card is opened
+    /// far more often than a title is identified.
+    /// </remarks>
+    [Fact]
+    public async Task What_is_on_the_disk_is_found_without_a_request_and_fetched_only_once()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var handler = new ArtworkHandler([Response(HttpStatusCode.OK, "remote-image")]);
+        using var client = new HttpClient(handler);
+        var cache = new ArtworkCache(directory.Path, client);
+        var titleId = new TitleId(Guid.Parse("60000000-0000-0000-0000-000000000009"));
+        var source = new Uri("https://image.tmdb.org/t/p/w780/wXsQ.jpg");
+
+        Assert.Null(cache.Find(titleId, source));
+        Assert.Equal(0, handler.Requests);
+
+        var fetched = await cache.FetchAsync(
+            titleId,
+            source,
+            "Póster de La llegada",
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(fetched);
+        Assert.True(File.Exists(fetched));
+        Assert.Equal(fetched, cache.Find(titleId, source));
+        Assert.Equal(1, handler.Requests);
+
+        // A different address for the same title is a different file, which is what lets a poster
+        // change without the old one being served from under it.
+        Assert.Null(cache.Find(titleId, new Uri("https://image.tmdb.org/t/p/w780/other.jpg")));
+        Assert.Equal(1, handler.Requests);
+    }
+
+    /// <summary>
+    /// Everything <c>CacheRemoteAsync</c> refuses becomes "no artwork" rather than an exception.
+    /// </summary>
+    /// <remarks>
+    /// Both refusals are worth having and neither is worth stopping an identification for: a title
+    /// whose poster could not be had is a title identified. The host refusal is the policy one — it
+    /// never reaches the network at all, which is why the request count is asserted beside it.
+    /// </remarks>
+    [Fact]
+    public async Task A_refusal_answers_no_artwork_rather_than_throwing()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var handler = new ArtworkHandler([Response(HttpStatusCode.ServiceUnavailable, "offline")]);
+        using var client = new HttpClient(handler);
+        var cache = new ArtworkCache(directory.Path, client);
+        var titleId = new TitleId(Guid.Parse("60000000-0000-0000-0000-000000000010"));
+
+        var undeclared = await cache.FetchAsync(
+            titleId,
+            new Uri("https://evil.example/t/p/w780/wXsQ.jpg"),
+            "Póster",
+            TestContext.Current.CancellationToken);
+
+        Assert.Null(undeclared);
+        Assert.Equal(0, handler.Requests);
+
+        var refused = await cache.FetchAsync(
+            titleId,
+            new Uri("https://image.tmdb.org/t/p/w780/wXsQ.jpg"),
+            "Póster",
+            TestContext.Current.CancellationToken);
+
+        Assert.Null(refused);
+        Assert.Equal(1, handler.Requests);
+    }
+
+    [Fact]
+    public void Looking_for_artwork_needs_an_address_to_look_for()
+    {
+        using var directory = new DatabaseTestDirectory();
+        using var client = new HttpClient(new ArtworkHandler([]));
+        var cache = new ArtworkCache(directory.Path, client);
+
+        Assert.Throws<ArgumentNullException>(() => cache.Find(new TitleId(Guid.Empty), null!));
+    }
+
     private static HttpResponseMessage Response(HttpStatusCode status, string body) => new(status)
     {
         Content = new StringContent(body, Encoding.UTF8, "image/jpeg"),

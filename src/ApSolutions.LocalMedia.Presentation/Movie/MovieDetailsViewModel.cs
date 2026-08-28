@@ -58,6 +58,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     private string? _trailerLink;
     private CatalogItem? _item;
     private string? _overview;
+    private string? _posterFile;
     private WatchState? _watchState;
     private bool _renameWouldChangeTheName;
     private MediaFile? _file;
@@ -149,6 +150,23 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     /// pretending to show what it does not have.
     /// </summary>
     public bool HasOverview => !string.IsNullOrWhiteSpace(_overview);
+
+    /// <summary>
+    /// The file the poster was cached to, or nothing when this title has no artwork on this disk.
+    /// </summary>
+    /// <remarks>
+    /// A path and not an image, and handed in like everything else here: this view model queries
+    /// nothing, and it certainly does not fetch. Until 2026-08-28 <c>PosterPath</c> was produced,
+    /// merged and persisted and no surface read it — a value with no reader, which is the
+    /// characteristic defect of this repository seen from the far end.
+    /// </remarks>
+    public string? PosterFile => _posterFile;
+
+    /// <summary>
+    /// True only when there is a poster to draw. The generated art stays underneath either way: an
+    /// unidentified library has no posters at all, and it is the ordinary state rather than a gap.
+    /// </summary>
+    public bool HasPoster => !string.IsNullOrWhiteSpace(_posterFile);
 
     public int? Year => _item?.Year;
 
@@ -283,12 +301,14 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
         string? trailerPath = null,
         string? trailerKey = null,
         MediaFile? file = null,
-        bool renameWouldChangeTheName = false)
+        bool renameWouldChangeTheName = false,
+        string? posterFile = null)
     {
         _renameWouldChangeTheName = renameWouldChangeTheName;
         _item = item ?? throw new ArgumentNullException(nameof(item));
         _file = file;
         _overview = overview;
+        _posterFile = posterFile;
         _trailerPath = trailerPath;
         _trailerLink = TrailerLinkPolicy.TryBuildWatchLink(trailerKey);
         _watchState = watchState;
@@ -304,6 +324,8 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
             nameof(Initials),
             nameof(Overview),
             nameof(HasOverview),
+            nameof(PosterFile),
+            nameof(HasPoster),
             nameof(Year),
             nameof(YearText),
             nameof(HasYear),

@@ -15,6 +15,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource MovieDetailsAccessibleName}">
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="DetailWord" />
+    <library:CachedPosterConverter x:Key="CachedPoster" />
   </UserControl.Resources>
   <Grid RowDefinitions="Auto,Auto,*" RowSpacing="{DynamicResource Space12}">
     <!--
@@ -29,6 +30,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <Panel Background="{DynamicResource PlayerSurfaceBrush}">
         <Panel>
           <library:PosterArtView Classes="wide" Title="{Binding Title}" />
+          <!--
+            The real poster over the generated art, bled across the header the way the prototype
+            bleeds it - and over and not instead, because a library nobody has identified has no
+            poster at all and the art underneath is what it shows. One picture serves both places:
+            the converter decodes the file once and hands the same bitmap to the raised card below.
+          -->
+          <Image
+              IsVisible="{Binding HasPoster}"
+              Source="{Binding PosterFile, Converter={StaticResource CachedPoster}}"
+              Stretch="UniformToFill"
+              automation:AutomationProperties.AccessibilityView="Raw" />
           <Border>
             <Border.Background>
               <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
@@ -57,13 +69,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
               CornerRadius="{DynamicResource CornerRadiusMedium}">
             <Panel>
               <library:PosterArtView Title="{Binding Title}" />
+              <!--
+                The initials go when the poster arrives. Two letters exist to say which title this is
+                before any colour has taught anybody anything; over the actual poster they are a
+                second answer to a question the picture has already answered.
+              -->
               <TextBlock
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   FontSize="{DynamicResource FontSizeDisplay}"
                   FontWeight="SemiBold"
                   Foreground="{DynamicResource PosterInitialsBrush}"
+                  IsVisible="{Binding !HasPoster}"
                   Text="{Binding Initials}"
+                  automation:AutomationProperties.AccessibilityView="Raw" />
+              <Image
+                  IsVisible="{Binding HasPoster}"
+                  Source="{Binding PosterFile, Converter={StaticResource CachedPoster}}"
+                  Stretch="UniformToFill"
                   automation:AutomationProperties.AccessibilityView="Raw" />
             </Panel>
           </Border>

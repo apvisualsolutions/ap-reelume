@@ -3,6 +3,7 @@
 
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.Application.Identification;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Updates;
 using ApSolutions.LocalMedia.Domain.Metadata;
@@ -25,8 +26,19 @@ namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 /// </summary>
 public sealed class CompositionDescriptorTests
 {
+    /// <summary>
+    /// Identification has its provider, its candidate source, and — since 2026-08-28 — its artwork.
+    /// </summary>
+    /// <remarks>
+    /// This assertion was the opposite one until that date, and ART-A01 (2026-08-09) is what it
+    /// recorded: nothing fetched remote artwork and no surface showed it, so the registration left
+    /// rather than promise a behaviour that did not exist. Both halves exist now, and both are asked
+    /// for here — the store the identification fetches through, and the use case that decides
+    /// whether there is anything to fetch. A store registered with nothing resolving it would be the
+    /// same defect wearing the opposite sign.
+    /// </remarks>
     [Fact]
-    public void Identification_has_its_provider_and_candidate_source_and_no_dead_artwork_registration()
+    public void Identification_has_its_provider_its_candidate_source_and_its_artwork()
     {
         var services = Compose();
 
@@ -34,12 +46,15 @@ public sealed class CompositionDescriptorTests
         Assert.Contains(
             services,
             descriptor => descriptor.ServiceType == typeof(IIdentificationCandidateSource));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IArtworkStore));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(CacheTitleArtwork));
 
-        // ART-A01's honest outcome: nothing fetches remote artwork and no surface shows it, so
-        // the registration left instead of promising a behaviour that does not exist. The class
-        // stays for personal artwork and for the day the gap closes; the gap itself is documented
-        // in the remediation plan.
-        Assert.DoesNotContain(services, descriptor => descriptor.ServiceType == typeof(ArtworkCache));
+        // Resolved and not merely registered, which is the whole of this repository's characteristic
+        // defect: the use case is built from the store, so resolving it proves the store is
+        // reachable rather than only declared. ApplyIdentification is deliberately not resolved
+        // here — it would open the database, and what this suite is about is the collection.
+        using var provider = services.BuildServiceProvider();
+        Assert.NotNull(provider.GetRequiredService<CacheTitleArtwork>());
     }
 
     /// <summary>

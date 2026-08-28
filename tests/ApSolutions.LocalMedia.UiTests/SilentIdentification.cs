@@ -20,7 +20,20 @@ internal static class SilentIdentification
         new SilentProvider(),
         new MetadataMergePolicy(),
         new MetadataLanguage("es-ES", "en-US"),
-        TimeProvider.System);
+        TimeProvider.System,
+        new CacheTitleArtwork(new NoArtwork()));
+
+    /// <summary>Artwork with no disk and no network behind it, which is what silence looks like.</summary>
+    private sealed class NoArtwork : IArtworkStore
+    {
+        public string? Find(TitleId titleId, Uri source) => null;
+
+        public Task<string?> FetchAsync(
+            TitleId titleId,
+            Uri source,
+            string alternativeText,
+            CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
+    }
 
     /// <summary>The refresh wired as the composition root wires it, over a provider with no answers.</summary>
     public static RefreshMetadata Refresh(ICatalogMetadataRepository repository) => new(

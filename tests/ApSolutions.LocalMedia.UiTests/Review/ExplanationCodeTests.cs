@@ -44,7 +44,17 @@ namespace ApSolutions.LocalMedia.UiTests.Review;
 public sealed class ExplanationCodeTests
 {
     /// <summary>Every dotted identification code any source file writes.</summary>
-    private static readonly Regex CodeLiteral = new("\"(Identification\\.[A-Za-z.]+)\"", RegexOptions.Compiled);
+    /// <remarks>
+    /// The <c>(?&lt;!cref=)</c> is not decoration and it loosens nothing. A cross-reference in
+    /// documentation is a quoted string that starts with the same word, and on 2026-08-28 one of
+    /// them made this fail asking for a dictionary entry for a class name. That is the shape ARQ-013
+    /// fixed seen from the other side: a gate reading source as text and believing a comment. What
+    /// it still catches is what it is for — a code literal written into the domain with no words
+    /// behind it.
+    /// </remarks>
+    private static readonly Regex CodeLiteral = new(
+        "(?<!cref=)\"(Identification\\.[A-Za-z.]+)\"",
+        RegexOptions.Compiled);
 
     /// <summary>
     /// Every code the source declares has words in both languages, and the two differ.
