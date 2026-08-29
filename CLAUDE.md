@@ -85,6 +85,20 @@ pwsh -NoProfile -File eng/verify-docs.ps1
 
 `eng/verify.ps1` las corre todas más el empaquetado y la puerta de cobertura.
 
+**Y para mirar CI se usa `eng/watch-ci.ps1`, nunca un bucle escrito a mano.**
+
+```powershell
+pwsh -NoProfile -File eng/watch-ci.ps1 -Sha <sha>
+```
+
+Emite una línea por desenlace y **los cinco están cubiertos**: la conclusión literal —incluida una
+vacía—, que el push no disparara el flujo, que `gh` falle, un latido cada 30 minutos mientras corre,
+y un techo a los 120 que avisa y sale. El motivo de que sea un guion y no un bucle en el momento:
+el filtro obvio pregunta por `status == "completed"` y **calla en todo lo demás**, y un vigía callado
+es indistinguible de un run que sigue. Peor aún, `2>/dev/null` sobre la consulta **entierra** el error
+de `gh` y `|| true` lo convierte en una cadena vacía que se lee como «aún no ha terminado». Un run de
+este repositorio tarda **55-80 minutos**, así que hay hueco de sobra para no enterarse.
+
 **Los suelos de cobertura los mide CI, no esta máquina.** `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
