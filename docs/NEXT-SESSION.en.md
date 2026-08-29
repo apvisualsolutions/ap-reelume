@@ -2,8 +2,10 @@
 
 ## State at the close of 2026-08-29 (seventh session) — the icons' canvas, restored
 
-**`main`, the branch and HEAD are the same commit: `34b0fe9`**, with the conclusion read by
-`eng/watch-ci.ps1` before the reference moved. The three figures of the green, **identical to the
+**Five commits pushed and verified one at a time**, each conclusion read by `eng/watch-ci.ps1`
+before the reference moved: `6ef1a5f`, `4a77dcf`, `34b0fe9`, `5aa040f` and `943f51a`. This line
+cannot name the last one — a document does not name its own SHA — so the first thing on opening is
+`git log --oneline -1` and `gh run list --limit 1`. The three figures of the green, **identical to the
 sixth session's** because no new production code landed — markup and tests only:
 
 ```
@@ -96,6 +98,34 @@ prototype draws 15: raising it moved the library entry **44 px** down in 6 of th
 `HomeLayoutTests` — 1366 x 768 at 150 scale in Spanish, the tightest the application supports —
 because it wraps a line. The gain was **0.55 px** of ink. Eighty to one against. It is written into
 `ELEMENTS` with its number, so next time it is a decision and not a discovery.
+
+
+### What the second pass added, and the two gates that came out of it
+
+**A gate born of my own slip.** Aligning the play moved its class in **three** views; with the cost
+measured it went back in **two**, and `MovieDetailsView` was left behind — the same «Reproducir»
+button at 15 on a film's page and at 14 on the other four. **Worse than either size**, because a
+reader moving between screens compares the button against itself. A `grep` while reviewing the diff
+caught it, not a gate; there is a gate now, with the five views in a closed table.
+
+**The rule it leaves is about the work rather than the code: a change reverted halfway leaves neither
+the old state nor the new, but a third one nobody chose.** When undoing part of a sweep, the check is
+not that the diff shrinks but that **what remains is coherent**.
+
+**And the SPDX hook moved to `PreToolUse`.** A `deny` reaches the agent as a tool error; a
+`systemMessage` reaches the person and **never enters the context of whoever is writing the file**. In
+`PreToolUse` the content already exists in `tool_input.content`, so it is checked before anything is
+written. **Piping seven cases through it before writing it found two defects** no reading would have,
+and both were **among the cases that should pass**: it denied when `content` was absent — refusing on
+the lack of a datum rather than on one — and its pattern missed a path that **begins** with `src/`
+rather than containing it.
+
+### An intermittent red I could not identify
+
+In one of five `UiTests` passes **1 of 1045 failed** and I did not capture the name; the four
+after it were green. **Said rather than left out**: I do not know which one. CI runs the suites with
+**two passes**, which is exactly where races a local run cannot see turn up, so if it is real it will
+say so there. If the next session sees an odd red in `UiTests`, this is the antecedent.
 
 ## Next: there is no decided code piece, and that is the real state
 

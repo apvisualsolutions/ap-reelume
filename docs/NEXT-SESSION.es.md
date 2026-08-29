@@ -2,8 +2,10 @@
 
 ## Estado al cierre del 2026-08-29 (séptima sesión) — el lienzo de los iconos, restituido
 
-**`main`, la rama y el HEAD son el mismo commit: `34b0fe9`**, con la conclusión leída por
-`eng/watch-ci.ps1` antes de mover la referencia. Las tres cifras del verde, **idénticas a las de la
+**Cinco commits publicados y verificados de uno en uno**, con la conclusión de cada uno leída por
+`eng/watch-ci.ps1` antes de mover la referencia: `6ef1a5f`, `4a77dcf`, `34b0fe9`, `5aa040f` y
+`943f51a`. Esta línea no puede nombrar el último —un documento no nombra su propio SHA—, así que lo
+primero al abrir es `git log --oneline -1` y `gh run list --limit 1`. Las tres cifras del verde, **idénticas a las de la
 sexta sesión** porque no entró código de producción nuevo —sólo marcado y pruebas—:
 
 ```
@@ -100,6 +102,34 @@ combinaciones de `HomeLayoutTests` —1366 × 768 a escala 150 en español, la m
 aplicación admite— porque hace envolver una línea. La ganancia eran **0,55 px** de tinta. Ochenta a
 uno en contra. Está escrito en `ELEMENTS` con su número, para que la próxima vez sea una decisión y
 no un descubrimiento.
+
+
+### Lo que la segunda ronda añadió, y las dos puertas que salieron de ella
+
+**Una puerta que nació de mi propio descuido.** Alinear el play movió su clase en **tres** vistas;
+medido el coste se puso atrás en **dos**, y `MovieDetailsView` se quedó descolgada — el mismo botón
+«Reproducir» a 15 en la ficha de una película y a 14 en las otras cuatro. **Peor que cualquiera de los
+dos tamaños**, porque quien navega entre pantallas compara el botón consigo mismo. Lo cazó un `grep`
+al revisar el diff, no una puerta; ahora hay puerta, con las cinco vistas en tabla cerrada.
+
+**La regla que deja, y no es del código sino del trabajo: una reversión a medias no deja el estado
+anterior ni el nuevo, deja un tercero que nadie eligió.** Al deshacer parte de un barrido, lo que hay
+que comprobar no es que el diff encoja sino que **lo que queda sea coherente**.
+
+**Y el hook del SPDX pasó a `PreToolUse`.** Un `deny` llega al agente como error de herramienta; un
+`systemMessage` llega a la persona y **no entra en el contexto de quien escribe el archivo**. En
+`PreToolUse` el contenido ya existe en `tool_input.content`, así que se comprueba antes de escribir
+nada. **Probarlo por tubería con siete casos encontró dos defectos** que ninguna lectura habría visto,
+y los dos estaban **entre los casos que debían pasar**: denegaba cuando `content` no venía —rechazando
+por la ausencia de un dato en vez de por un dato— y su patrón perdía una ruta que **empieza** por
+`src/` en vez de contenerlo.
+
+### Un rojo intermitente que no pude identificar
+
+En una de cinco pasadas de `UiTests` apareció **1 fallo de 1045** y no capturé el nombre; las cuatro
+siguientes fueron verdes. **Queda dicho en vez de callado**: no sé cuál fue. CI corre las suites con
+**dos pasadas**, que es justo donde aparecen las carreras que una ejecución local no ve, así que si es
+real lo dirá allí. Si la próxima sesión ve un rojo raro en `UiTests`, éste es el antecedente.
 
 ## Lo siguiente: no hay pieza de código decidida, y eso es el estado real
 
