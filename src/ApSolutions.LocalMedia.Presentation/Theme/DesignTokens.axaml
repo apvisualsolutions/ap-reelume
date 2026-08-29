@@ -1198,19 +1198,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
   <!--
     And the ink inside that box, which is a second question and was still wrong after the first was
-    fixed. A font's ascent and descent are not symmetric: measured on 2026-08-25 through the font's
-    own metrics, a label centred to the pixel drew its run of ink — the top of a capital to the foot
-    of a descender — 2.43 px below the middle of a 44 px button. The box was centred and the words
-    still looked low, which is what the owner reported twice.
+    fixed: the box was centred and the words still looked low, which is what the owner reported
+    twice. The answer lives in the style below, and what it is worth is one pixel on the button's
+    content — measured by rasterising, not derived from the font's metrics.
 
-    Five pixels of bottom margin move the line up two and a half, and the number is derived rather
-    than tuned: it is twice the measured offset, because a margin on one side moves a centred box by
-    half of it. ButtonOpticalCentreTests holds the result at a pixel, so a change of type family or
-    size fails there instead of being noticed by eye a month later.
-
-    On the label and not on the button, and by direct-child selector: a button whose content is a
-    glyph, or a row of a glyph and a word, must not have its icon shoved upwards. Only the TextBlock
-    the presenter makes for a plain string is touched.
+    This block used to argue for five pixels on the label, from a 2.43 px asymmetry the metrics
+    reported, and cited ButtonOpticalCentreTests. All of that is gone: the screen says the error is
+    1 px, five moved the word by three, a margin on the label grows the panel and takes the icon
+    with it, and that test is retired for computing the ink instead of looking at it.
+    ButtonPixelCentreTests holds the result now. See docs/design/ELEMENTS.es.md, which carries the
+    whole story and takes precedence over this file.
   -->
   <!--
     And taken back off the buttons whose content is a shape rather than a sentence. A glyph is
@@ -1225,29 +1222,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Padding" Value="0" />
   </Style>
   <!--
-    And here is the compensation, on the label and nowhere else.
-
-    <b>Five pixels of bottom margin on the words.</b> A font's ascent and descent are not symmetric:
-    measured through the font's own metrics, a label centred to the pixel draws its run of ink — the
-    top of a capital to the foot of a descender — 2.43 px below the middle of its box. The number is
-    twice that, because a margin on one side moves a centred box by half of it.
-
-    <b>It used to live in the button's padding, and that is why the complaint came back.</b> A bottom
-    padding on the button moves the whole content: a glyph and the word beside it travel together, so
-    the two stay exactly as far apart as they were and only the row changes place. Measured on
-    2026-08-25 in a 44 px button: the glyph's middle at 19.00 and the word's ink at 21.43 — 2.43 px
-    apart, the same number, untouched by the padding that was supposed to be fixing it. The glyph
-    also ended up 3 px above the button's own middle, because it was being lifted for a baseline it
-    does not have.
-
-    So it goes on the one thing with a baseline to answer for. A shape is centred by its geometry and
-    is left alone, which is why <c>Path.icon</c> appears nowhere here.
-
-    <b>Child selectors and not a descendant one.</b> The four containers are the ones the views
-    actually put inside a button — counted: 37 StackPanel, 21 Path, 6 Grid, 6 Panel, one bare
-    TextBlock — and stopping one level down is what keeps this off the captions under a poster card,
-    which sit three levels deep inside <c>PosterCardView</c> and are a stacked block rather than a
-    centred row. A descendant selector would also grow the rail's badge by five pixels.
+    <b>Child selectors and not a descendant one</b>, which is the half of the old argument that
+    survived. Stopping one level down is what keeps this off the captions under a poster card, which
+    sit three levels deep inside <c>PosterCardView</c> and are a stacked block rather than a centred
+    row. A descendant selector would also grow the rail's badge.
 
     <c>:is(TextBlock)</c> and not <c>TextBlock</c>, because the label a presenter makes for a plain
     string is an <c>AccessText</c> — measured, along with the fact that its logical parent is the
@@ -1281,16 +1259,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <c>Path</c> appears nowhere here, and that is unchanged: a shape is centred by its geometry and a
     button whose whole content is an icon needs no compensation at all.
   -->
+  <!--
+    <b><c>Panel</c> is deliberately absent, and it was measured.</b> The three buttons in this tree
+    whose content is a bare <c>Panel</c> carry no word at all — <c>MuteButton</c> and
+    <c>FullscreenButton</c> stack two icons that alternate by state — and a button whose content is
+    only a picture needs no compensation, which is the rule three paragraphs up.
+
+    It was in the old selector as <c>Button &gt; Panel &gt; :is(TextBlock)</c> and <b>never reached
+    anything</b>: no <c>Panel</c> inside a button holds a <c>TextBlock</c>. Moving the setter onto
+    the container is what would have woken it up to do the wrong thing. Every <c>Grid</c> inside a
+    button does carry a word — measured across all 48 views — so the other four stay.
+  -->
   <Style Selector="Button &gt; :is(TextBlock),
                    Button &gt; StackPanel,
                    Button &gt; WrapPanel,
                    Button &gt; Grid,
-                   Button &gt; Panel,
                    ToggleButton &gt; :is(TextBlock),
                    ToggleButton &gt; StackPanel,
                    ToggleButton &gt; WrapPanel,
-                   ToggleButton &gt; Grid,
-                   ToggleButton &gt; Panel">
+                   ToggleButton &gt; Grid">
     <Setter Property="Margin" Value="0,0,0,1" />
   </Style>
   <!--
@@ -1824,17 +1811,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
               CornerRadius="{TemplateBinding CornerRadius}">
             <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="Auto,*,Auto">
               <!--
-                Five pixels of bottom margin on the words and none on the caret, which is the recipe
+                One pixel of bottom margin on the words and none on the caret, which is the recipe
                 the buttons already carry and the reason it is written twice. A font's ascent and
                 descent are not symmetric, so a label centred to the pixel draws its ink below the
                 middle; the owner reported the same list on 2026-08-25 — «los desplegables tienen el
-                mismo problema de alineación vertical que tenían los botones». The number is the
-                buttons' own, derived from the font's metrics rather than tuned, and the chevron is
-                left alone because a glyph is centred by its geometry and has no baseline to answer
-                for.
+                mismo problema de alineación vertical que tenían los botones». The chevron is left
+                alone because a glyph is centred by its geometry and has no baseline to answer for.
+
+                It was five until 2026-08-29 and that is the point of writing the number down: the
+                buttons moved to one and these two copies did not, which left every dropdown's label
+                and value 2 px above the middle — the overcorrection that had just been taken off
+                the buttons, reintroduced by half. The number is the buttons' own and it now comes
+                from a rasterised measurement rather than from the font's metrics; when it moves
+                again, these two move with it.
               -->
               <TextBlock
-                  Margin="0,0,8,5"
+                  Margin="0,0,8,1"
                   VerticalAlignment="Center"
                   FontSize="{DynamicResource FontSizeCaption}"
                   Foreground="{DynamicResource TextSecondaryBrush}"
@@ -1848,7 +1840,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               <ContentControl
                   x:Name="ContentPresenter"
                   Grid.Column="1"
-                  Margin="0,0,0,5"
+                  Margin="0,0,0,1"
                   VerticalAlignment="Center"
                   Content="{TemplateBinding SelectionBoxItem}"
                   ContentTemplate="{TemplateBinding ItemTemplate}"

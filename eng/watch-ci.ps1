@@ -72,6 +72,7 @@ if (-not $Branch) {
 $short = $Sha.Substring(0, [Math]::Min(7, $Sha.Length))
 $minutes = 0
 $queryFailures = 0
+$unreadable = 0
 $missing = 0
 
 while ($true) {
@@ -99,6 +100,11 @@ while ($true) {
             exit 1
         }
 
+        if ($minutes -ge $TimeoutMinutes) {
+            Write-Output "CI ${short}: gh has been failing for $minutes min — check it by hand"
+            exit 1
+        }
+
         Start-Sleep -Seconds $PollSeconds
         continue
     }
@@ -112,10 +118,21 @@ while ($true) {
             Select-Object -First 1
     }
     catch {
-        # Malformed output is a query failure by another name.
-        $queryFailures++
-        if ($queryFailures -ge $QueryFailureLimit) {
-            Write-Output "CI ${short}: UNREADABLE RESPONSE from gh after $queryFailures tries"
+        # Its own counter, and not $queryFailures: that one is reset to zero on the line above every
+        # time gh exits 0, so an unreadable body would have incremented 0 to 1 for ever and never
+        # reached the limit. Measured as a real hole on 2026-08-29 — the state that reaches it is gh
+        # exiting 0 with a banner or an update notice on stdout, and the watcher would have gone
+        # silent permanently, which is the one thing this script exists to prevent.
+        $unreadable++
+        if ($unreadable -ge $QueryFailureLimit) {
+            Write-Output "CI ${short}: UNREADABLE RESPONSE from gh after $unreadable tries"
+            exit 1
+        }
+
+        # The ceiling is checked before the sleep on this path too. Every `continue` used to jump
+        # over it, so a failure that repeats below its own limit outlived the timeout as well.
+        if ($minutes -ge $TimeoutMinutes) {
+            Write-Output "CI ${short}: gh has been unreadable for $minutes min — check it by hand"
             exit 1
         }
 
@@ -123,10 +140,17 @@ while ($true) {
         continue
     }
 
+    $unreadable = 0
+
     if (-not $run) {
         $missing++
         if ($missing -ge $MissingLimit) {
             Write-Output "CI ${short}: NO RUN EXISTS after $missing min — the push did not trigger the workflow"
+            exit 1
+        }
+
+        if ($minutes -ge $TimeoutMinutes) {
+            Write-Output "CI ${short}: no run for $Sha after $minutes min — check it by hand"
             exit 1
         }
 

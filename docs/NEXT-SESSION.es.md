@@ -153,6 +153,35 @@ puerta lo comprueba con `1,6 · Width / 24`, que asume que el icono **llena** su
 ocupa 11 de 24, así que su trazo efectivo no es el que la fórmula cree. **Restituir el lienzo también
 arregla eso**, y hoy los iconos se dibujan con grosores distintos entre sí sin que nada lo diga.
 
+### Y el tamaño de los iconos, que es el mismo defecto y se ve
+
+El propietario lo señaló al cerrar: los iconos del carril «parecen estar bastante bien aunque los
+haría un poco más pequeños». Medido, es exacto y además general:
+
+```
+icono              bounds(24)   prototipo@20   app size-20(18)   exceso
+IconHome           18,0x16,0       15,0 px         18,0 px       1,20x
+IconLibrary        17,0x17,0       14,2 px         18,0 px       1,27x
+IconSettings       13,2x14,4       12,0 px         18,0 px       1,50x
+IconPlay           11,0x13,2       11,0 px         18,0 px       1,64x
+IconClose          11,6x11,6        9,7 px         18,0 px       1,86x
+```
+
+**Es el lienzo perdido otra vez, y ahora se ve entero.** El prototipo dibuja `viewBox="0 0 24 24"` a
+20 px, así que el trazo ocupa la fracción del lienzo que el diseñador quiso. Sin lienzo,
+`Stretch="Uniform"` estira cada trazo hasta **llenar** la caja — y como cada geometría ocupa una
+fracción distinta del suyo, cada icono se agranda por un factor distinto. **Los iconos ni siquiera
+guardan entre sí las proporciones del prototipo**: `Close` sale 1,86× y `Home` 1,20×, cuando en el
+prototipo el primero es deliberadamente el más pequeño.
+
+**Y explica el `-2` sistemático de la escala de clases** —`size-20`→18, `size-16`→14, `size-22`→20—:
+alguien vio los iconos grandes y encogió la caja a ojo. No podía funcionar, porque el exceso va de
+1,20 a 1,86 y una resta fija no corrige factores distintos.
+
+**Restituido el lienzo, el nombre de la clase pasa a ser el tamaño real**: `size-20` → `Width="20"`,
+que es literalmente `icon(n, 20)` del prototipo. El `-2` se retira porque deja de haber nada que
+compensar. **Ése es el quinto paso de la pieza**, y es el que el propietario verá.
+
 ### La decisión, tomada: el prefijo del lienzo, no `MaxWidth`
 
 **Verificado**: `Geometry.Parse("M0 0 M24 24 M8 5 L19 12 L8 19 Z")` mide `0,00 0,00 24,00x24,00`. Dos

@@ -75,8 +75,14 @@ public sealed class ButtonInkTests
             // the compensation lives. A button whose whole content is a glyph is still left alone,
             // because Path is not in the selector.
             const double OpticalCompensation = 1.0;
+
+            // Half a pixel of tolerance and not one and a half. With the compensation at five, a
+            // band of 1.5 still refused a centred box; at one it admitted it — [-0.5, 2.5] contains
+            // zero, so deleting the setter outright left this green. A tolerance wider than the
+            // value it guards is a gate that has gone blind, which in this repository looks exactly
+            // like one that is satisfied.
             Assert.True(
-                Math.Abs(below - above - OpticalCompensation) <= 1.5,
+                Math.Abs(below - above - OpticalCompensation) <= 0.5,
                 $"'{className}': the label sits {above:F2} px below the top and {below:F2} px above the "
                     + $"bottom of its button, a difference of {below - above:F2} where the optical "
                     + $"compensation is {OpticalCompensation:F0}.");

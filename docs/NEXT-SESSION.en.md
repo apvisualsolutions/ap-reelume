@@ -154,6 +154,35 @@ with `1.6 · Width / 24`, which assumes the icon **fills** its canvas. `IconPlay
 its effective stroke is not what the formula believes. **Restoring the canvas fixes that too**, and
 today the icons are drawn at weights that differ from each other with nothing saying so.
 
+### And the icons' size, which is the same defect and is visible
+
+The owner raised it at closing: the rail's icons "look about right but I would make them a little
+smaller". Measured, he is exactly right and it is general:
+
+```
+icon               bounds(24)   prototype@20   app size-20(18)   excess
+IconHome           18.0x16.0       15.0 px         18.0 px       1.20x
+IconLibrary        17.0x17.0       14.2 px         18.0 px       1.27x
+IconSettings       13.2x14.4       12.0 px         18.0 px       1.50x
+IconPlay           11.0x13.2       11.0 px         18.0 px       1.64x
+IconClose          11.6x11.6        9.7 px         18.0 px       1.86x
+```
+
+**It is the lost canvas again, and now the whole of it shows.** The prototype draws
+`viewBox="0 0 24 24"` at 20 px, so the stroke occupies the fraction of the canvas the designer chose.
+With no canvas, `Stretch="Uniform"` stretches each stroke to **fill** the box — and since each
+geometry occupies a different fraction of its own, each icon grows by a different factor. **The icons
+do not even keep the prototype's proportions between them**: `Close` comes out 1.86× and `Home`
+1.20×, when in the prototype the first is deliberately the smallest.
+
+**And it explains the systematic `-2` in the class scale** — `size-20`→18, `size-16`→14,
+`size-22`→20: someone saw the icons were big and shrank the box by eye. It could not work, because
+the excess runs from 1.20 to 1.86 and a fixed subtraction cannot correct differing factors.
+
+**With the canvas restored, the class name becomes the real size**: `size-20` → `Width="20"`, which
+is literally the prototype's `icon(n, 20)`. The `-2` comes off because there is nothing left to
+compensate. **That is the piece's fifth step**, and the one the owner will see.
+
 ### The decision, made: the canvas prefix, not `MaxWidth`
 
 **Verified**: `Geometry.Parse("M0 0 M24 24 M8 5 L19 12 L8 19 Z")` measures `0.00 0.00 24.00x24.00`.

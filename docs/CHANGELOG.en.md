@@ -159,6 +159,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Fixing the buttons introduced four defects of its own, and a review found them.** All four are
+  closed:
+
+  1. **The new selector reached seven icon-only buttons.** `Button > Panel` moved the two transport
+     buttons that stack alternating icons by 1 px, and **the rail's five destinations** — worse
+     there, because `navigation-destination` sets `VerticalContentAlignment="Stretch"`: the margin
+     does not shift them, it **shrinks** them. The selection wash stopped filling its button and the
+     accent bar went from 26 to 25 px. Measured: **no `Panel` inside a button carries text and every
+     `Grid` does**, so the fix is dropping `Panel` from the selector. It had been there as
+     `Button > Panel > :is(TextBlock)`, where it **never reached anything**; moving the setter onto
+     the container is what woke it up to do harm.
+  2. **`ButtonInkTests` had gone blind.** Its tolerance is 1.5 and the constant dropped to 1.0, so
+     the band `[-0.5, 2.5]` **admitted zero**: deleting the setter outright left it green. At five,
+     1.5 still refused a centred box. The tolerance is 0.5 now.
+  3. **`eng/watch-ci.ps1` could go silent for ever**, the one thing that script exists to prevent.
+     Its unreadable-response counter was reset on every successful `gh` round, so it went from 0 to 1
+     for ever without reaching the limit, and the `continue`s jumped over the timeout ceiling. It is
+     reached by a `gh` that exits 0 and prints an update notice on stdout. Verified with a fake
+     `gh`: it now exits with `UNREADABLE RESPONSE`.
+  4. **The five was still alive in the dropdown.** `ComboBox.filter-pill` writes its margin by hand
+     in two places, under a comment saying "the number is the buttons' own" — and the buttons had
+     moved to one. It left every dropdown's label and value 2 px high: the overcorrection just taken
+     off the buttons, reintroduced by half.
+
 - **`docs/design/ELEMENTS.en.md` said three false things about vertical alignment, and the section
   was rewritten entire.** It said the compensation was **5 px**, derived from a **2.43 px** asymmetry
   computed from the font's metrics, and that a margin on the `TextBlock` moved "only the word".

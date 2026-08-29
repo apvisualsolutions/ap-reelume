@@ -159,6 +159,30 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La corrección de los botones dejó cuatro defectos propios, y los encontró una revisión.** Los
+  cuatro están cerrados:
+
+  1. **El selector nuevo alcanzaba siete botones de sólo icono.** `Button > Panel` movía 1 px los
+     dos del transporte que apilan iconos alternantes y **los cinco destinos del carril** — y ahí es
+     peor, porque `navigation-destination` fija `VerticalContentAlignment="Stretch"`: el margen no
+     los desplaza, **los encoge**. El lavado de selección dejaba de llenar su botón y la barra de
+     acento pasaba de 26 a 25 px. Medido: **ningún `Panel` dentro de un botón lleva texto y todos
+     los `Grid` sí**, así que la corrección es quitar `Panel` del selector. Estaba ahí desde antes
+     como `Button > Panel > :is(TextBlock)`, donde **nunca alcanzó nada**; moverlo al contenedor es
+     lo que lo despertó para hacer daño.
+  2. **`ButtonInkTests` se había vuelto ciega.** Su tolerancia es de 1,5 y la constante bajó a 1,0,
+     así que la banda `[-0,5 ; 2,5]` **admitía el cero**: borrar el setter entero la dejaba en verde.
+     Con el cinco, el 1,5 aún rechazaba una caja centrada. Ahora la tolerancia es 0,5.
+  3. **`eng/watch-ci.ps1` podía quedarse mudo para siempre**, que es la única cosa que ese guion
+     existe para impedir. Su contador de respuestas ilegibles se reseteaba en cada vuelta con éxito
+     de `gh`, así que iba de 0 a 1 eternamente sin alcanzar el límite, y los `continue` saltaban por
+     encima del techo de tiempo. Lo alcanza un `gh` que sale con código 0 e imprime un aviso de
+     actualización en stdout. Verificado con un `gh` falso: ahora sale con `UNREADABLE RESPONSE`.
+  4. **El cinco seguía vivo en el desplegable.** `ComboBox.filter-pill` escribe su margen a mano en
+     dos sitios, con un comentario que dice «el número es el de los botones» — y los botones habían
+     pasado a uno. Dejaba la etiqueta y el valor de cada desplegable 2 px altos: la sobrecorrección
+     recién retirada de los botones, reintroducida por la mitad.
+
 - **`docs/design/ELEMENTS.es.md` decía tres cosas falsas sobre la alineación vertical, y la sección
   se reescribió entera.** Decía que la compensación era de **5 px**, derivada de una asimetría de
   **2,43 px** calculada con las métricas de la fuente, y que un margen en el `TextBlock` movía «sólo
