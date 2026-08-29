@@ -99,11 +99,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   los dos idiomas tocados, el comando literal del `settings.json` calla por tubería — con el caso que
   sí debe sonar al lado, que es lo único que hace valer al que calla.
 
-  **Y lo que el aviso no hace, medido el mismo día: no llega a la pantalla.** Con el propietario
+  **Y lo que el aviso no hacía, medido el mismo día: no llegaba a la pantalla.** Con el propietario
   delante del PC, los dos avisos provocados a propósito pasaron sin que viera nada, y un
-  `systemMessage` tampoco entra en el contexto del agente que escribe. Los dos que quedan se emiten
-  para nadie — así que **el aviso sigue siendo un adelanto y la puerta sigue siendo la puerta**. El
-  canal está sin medir.
+  `systemMessage` tampoco entra en el contexto del agente que escribe. Se emitían para nadie: corrían,
+  acertaban, y su salida moría en el registro de la sesión.
+
+  **Así que se cambió el canal.** Los dos avisos del `PostToolUse` escriben ahora a stderr y salen con
+  código 2, que sí llega al agente que escribe el archivo — medido con el caso conocido al lado del
+  desconocido, y después por tubería con **siete casos, cuatro de ellos de los que debe dejar pasar**.
+  El precio también está medido: **2.712 caracteres de contexto por aviso**, porque el harness imprime
+  el comando entero dos veces antes del texto. Y como llega etiquetado de «error» tras una escritura
+  que sí funcionó, los tres mensajes **empiezan diciendo que la escritura no falló** — sin eso, el
+  aviso se lee como un fallo y se reintenta la misma escritura.
 
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
   reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se

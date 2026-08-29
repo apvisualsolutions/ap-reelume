@@ -24,14 +24,23 @@ prueba van en inglés.
   quien está escribiendo el archivo**. Por eso la comprobación del SPDX pasó a `PreToolUse`, donde
   `tool_input.content` ya existe y se puede leer antes de escribir nada.
 
-  **Y avisar, hoy, es emitir para nadie.** El mismo día se midió lo que faltaba: un `systemMessage`
-  **tampoco llega a la pantalla de quien programa**. Dos avisos provocados a propósito —uno por
-  `Write`, otro por `Edit`—, con el propietario delante y en la sesión, pasaron sin que viera nada;
-  el registro los tiene los dos. Así que los dos avisos que quedan corren, aciertan y su salida muere
-  en el `.jsonl`: es la forma que ya tiene el defecto de esta casa, registrado y nunca alimentado.
-  **La palanca es el canal y está sin medir**: se dice que un `PostToolUse` que escribe a stderr y
-  sale con código 2 sí alimenta al agente. Hasta que se mida, ningún hook de este árbol es un aviso —
-  son las puertas las que avisan.
+  **Y avisar era emitir para nadie, hasta que se cambió el canal.** El mismo día se midió lo que
+  faltaba: un `systemMessage` **no llega a la pantalla de quien programa** —dos avisos provocados a
+  propósito, uno por `Write` y otro por `Edit`, con el propietario delante y dentro de la sesión,
+  pasaron sin que viera nada— y tampoco entra en el contexto del agente. Corrían, acertaban, y su
+  salida moría en el `.jsonl`: registrado y nunca alimentado, el defecto de la casa en sus propias
+  herramientas.
+
+  **Los dos avisos del `PostToolUse` escriben ahora a stderr y salen con código 2**, que sí llega al
+  agente que está escribiendo el archivo. Medido con la sonda al lado del caso conocido —el
+  `systemMessage` dejó su rastro y no llegó; el stderr llegó— y luego por tubería con **siete casos,
+  cuatro de ellos de los que debe dejar pasar**. El registro los anota como `hook_blocking_error`.
+
+  **Su precio está medido: 2.712 caracteres de contexto por aviso**, porque el harness imprime el
+  comando entero **dos veces** antes del texto útil. Baja extrayendo el comando a un script, que este
+  árbol todavía no hace. Y como llega etiquetado de «error» después de una escritura que sí funcionó,
+  los tres mensajes **empiezan diciendo que la escritura no falló**: sin eso, el aviso se lee como un
+  fallo y se reintenta la misma escritura.
 
   **Ninguno dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así que siguen siendo un
   adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y

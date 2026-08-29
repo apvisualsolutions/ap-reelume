@@ -98,10 +98,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   output**. With both languages touched, the literal command from `settings.json` stays quiet through
   a pipe — with the case that must fire beside it, which is the only reason the quiet one counts.
 
-  **And what the warning does not do, measured the same day: it does not reach the screen.** With the
+  **And what the warning did not do, measured the same day: it did not reach the screen.** With the
   owner in front of the PC, both warnings provoked on purpose went by unseen, and a `systemMessage`
-  does not enter the writing agent's context either. The two that remain are emitted for nobody — so
-  **the warning stays a preview and the gate stays the gate**. The channel is unmeasured.
+  does not enter the writing agent's context either. They were emitted for nobody: they ran, they
+  were right, and their output died in the session log.
+
+  **So the channel changed.** Both `PostToolUse` warnings now write to stderr and exit 2, which does
+  reach the agent writing the file — measured with the known case beside the unknown one, then
+  through a pipe with **seven cases, four of them among those it must let through**. The price is
+  measured too: **2,712 characters of context per warning**, because the harness prints the whole
+  command twice before the text. And since it arrives labelled an error after a write that did
+  succeed, all three messages **open by saying the write did not fail** — without that, the warning
+  reads as a failure and the same write gets retried.
 
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
   clock.** The band was five buttons and nothing else, so a floating window said neither **what** was

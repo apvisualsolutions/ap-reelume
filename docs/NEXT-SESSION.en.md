@@ -1,6 +1,6 @@
 # Where to pick up
 
-## State at the close of 2026-08-29 (ninth session) — the warning nobody receives
+## State at the close of 2026-08-29 (ninth session) — the warning nobody was receiving
 
 **The owner opened with no piece decided** — still the real state — and chose the cheap check the
 eighth session left open: whether the bilingualism hook's warning reaches the person. **The answer is
@@ -41,10 +41,20 @@ same day. So both remaining warnings are emitted for nobody: they run, they are 
 output dies in the log. Registered and never consumed — the shape this repository's defect already
 has, now in its own tooling.
 
-**It is not fixed here, and the call is the owner's.** The lever is the channel, and it is
-**unmeasured**: a `PostToolUse` that writes to stderr and exits 2 is said to feed the agent, where
-`systemMessage` feeds no one. Until that is measured, no hook in this tree is a warning — the gates
-are what warn.
+**The channel was the lever, and it was measured before being believed.** A temporary hook emitted
+`systemMessage` for one file and stderr-with-exit-2 for another: the known case left its
+`hook_system_message` in the log and reached nobody, which is what proved the probe had loaded; the
+unknown one arrived in the writing agent's context as a tool error. Both `PostToolUse` warnings now
+take the second channel, verified through a pipe with **seven cases, four of them among those it
+must let through**, and then in the real tool.
+
+**Two prices, both measured.** It costs **2,712 characters of context per warning**, because the
+harness prints the whole command twice before the text — extracting the command into a script would
+cut that, and this tree does not do it yet. And it arrives labelled an error after a write that
+succeeded, so all three messages **open by saying the write did not fail**; without that the warning
+reads as a failure and the same write gets retried.
+
+**What it does not do is reach the owner.** No hook here warns a person — the gates do that.
 
 ### A silence cannot be told apart from not having run
 
@@ -56,6 +66,11 @@ happened look identical from inside. The record that was there belonged to a plu
 So the case that must stay quiet is measured by running **the literal command from `settings.json`**
 through a pipe, with a case that must fire beside it. It is written into `CLAUDE.md`, because it is
 the shape this repository's defect already has: a test goes blind rather than false.
+
+**And the eighth session's `2>&1` rule inverts for a monitor.** A probe **separates** stderr, because
+merging it turns an instrument's own error into a finding. A monitor **merges** it, because a `pwsh`
+that dies writing to stderr emits nothing and silence reads as "still running" — the failure this
+repository already knows. Probe separates, monitor merges.
 
 ## State at the close of 2026-08-29 (eighth session) — a warning that always fired
 

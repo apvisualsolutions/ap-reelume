@@ -1,6 +1,6 @@
 # Dónde retomar
 
-## Estado al cierre del 2026-08-29 (novena sesión) — el aviso que no recibe nadie
+## Estado al cierre del 2026-08-29 (novena sesión) — el aviso que no recibía nadie
 
 **El propietario abrió sin pieza decidida** —que sigue siendo el estado real— y eligió la
 comprobación barata que la octava dejó abierta: si el aviso del hook del bilingüismo llega a la
@@ -41,10 +41,21 @@ el mismo día. Así que los dos avisos que quedan se emiten para nadie: corren, 
 muere en el registro. Registrado y nunca alimentado — la forma que ya tiene el defecto de esta casa,
 ahora en sus propias herramientas.
 
-**No se arregla aquí, y la decisión es del propietario.** La palanca es el canal, y está **sin
-medir**: se dice que un `PostToolUse` que escribe a stderr y sale con código 2 sí alimenta al agente,
-donde `systemMessage` no alimenta a nadie. Hasta que se mida, ningún hook de este árbol es un aviso —
-las que avisan son las puertas.
+**El canal era la palanca, y se midió antes de creerlo.** Un hook temporal emitía `systemMessage`
+para un archivo y stderr-con-código-2 para otro: el caso conocido dejó su `hook_system_message` en el
+registro y no llegó a nadie —que es lo que demostró que la sonda había cargado—, y el desconocido
+llegó al contexto del agente que escribe, como error de herramienta. Los dos avisos del `PostToolUse`
+usan ahora el segundo canal, verificado por tubería con **siete casos, cuatro de ellos de los que
+debe dejar pasar**, y después en la herramienta real.
+
+**Dos precios, los dos medidos.** Cuesta **2.712 caracteres de contexto por aviso**, porque el
+harness imprime el comando entero dos veces antes del texto — extraerlo a un script lo bajaría, y
+este árbol todavía no lo hace. Y llega etiquetado de «error» tras una escritura que sí funcionó, así
+que los tres mensajes **empiezan diciendo que la escritura no falló**; sin eso el aviso se lee como
+un fallo y se reintenta la misma escritura.
+
+**Lo que no hace es llegar al propietario.** Aquí ningún hook avisa a una persona — eso lo hacen las
+puertas.
 
 ### Un silencio no se distingue de no haber corrido
 
@@ -56,6 +67,11 @@ plugin, que corre en cada llamada.
 Así que el caso que debe callar se mide ejecutando **el comando literal del `settings.json`** por
 tubería, con un caso que sí debe sonar al lado. Queda escrito en `CLAUDE.md`, porque es la forma que
 ya tiene el defecto de esta casa: una prueba se vuelve ciega en vez de falsa.
+
+**Y la regla del `2>&1` de la octava se invierte en un monitor.** Una sonda **separa** stderr, porque
+fusionarlo convierte el error del propio instrumento en un hallazgo. Un monitor lo **fusiona**, porque
+un `pwsh` que muera escribiendo a stderr no emite nada y el silencio se lee como «sigue corriendo» —
+el fallo que este repositorio ya conoce. Sonda separa, monitor fusiona.
 
 ## Estado al cierre del 2026-08-29 (octava sesión) — un aviso que sonaba siempre
 
