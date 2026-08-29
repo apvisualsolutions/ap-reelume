@@ -1,5 +1,101 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-29 (séptima sesión) — el lienzo de los iconos, restituido
+
+**`main`, la rama y el HEAD son el mismo commit: `34b0fe9`**, con la conclusión leída por
+`eng/watch-ci.ps1` antes de mover la referencia. Las tres cifras del verde, **idénticas a las de la
+sexta sesión** porque no entró código de producción nuevo —sólo marcado y pruebas—:
+
+```
+Coverage gate: 212 file(s) still short of 96/96, ratchet 212, 212 measured under the bar
+Coverage gate: 0 new file(s) against origin/main and 14 watched file(s) are where they have to be
+The walk: 231 declared command controls in 226 identities; 206 pressed, 20 pending
+```
+
+**Los tres commits pendientes al abrir se resolvieron en orden y de uno en uno**, que es lo que la
+sexta sesión aprendió a costa de una hora: `main` a `6ef1a5f` con su verde leído, `4a77dcf` publicado
+y esperado hasta su verde, y sólo entonces el trabajo nuevo. Ningún run se solapó y ninguno pasó de
+los 55 minutos.
+
+**El encargo está cerrado y es lo que el propietario ve.** Los iconos se dibujaban entre **1,12× y
+1,74×** más grandes que el prototipo —**cada uno por un factor distinto**— y hasta **4,5 px**
+descentrados, porque la portación del 2026-08-24 copió el trazo y **no el `viewBox` de 24×24**. El
+prefijo `M0 0 M24 24` delante de las 31 geometrías lo devuelve, y con el lienzo puesto el `-2` de las
+clases de tamaño se retira: `size-20` es `Width="20"`, que es literalmente `icon(n, 20)`.
+
+Medido rasterizando, antes y después: el exceso pasa de **1,12-1,74×** (dispersión 0,62) a
+**0,90-1,06×** (dispersión 0,16), y 23 de 31 quedan en `+0,00` de descentrado. **Antes casi todos
+medían 16,8 px en pantalla** fuera cual fuera el tamaño que el prototipo quiso para cada uno: sin
+lienzo, `Stretch="Uniform"` estira cada trazo hasta llenar la caja. Evidencia:
+[el lienzo que la portación no copió](evidence/stable/audit-icon-canvas.md).
+
+### Lo que hubo que medir y la decisión escrita no contemplaba
+
+1. **Los `moveto` sueltos no pintan**, ni bajo `StrokeLineCap="Round"` — un remate redondo sobre un
+   subtrazo de longitud cero es justo como aparece un punto donde no se dibujó nada, y las esquinas
+   del lienzo son 0,0 y 24,24. Rasterizado: con prefijo la tinta arranca en (42,32) de un `Path` de
+   96 px. **Había que comprobarlo antes de escribirlo 31 veces.**
+2. **Son 31 geometrías, no 35.** El 35 es la cuenta del prototipo; el diccionario declara 31.
+3. **Un cero que no era una medida.** `IconAdd` dio 0,8 px de tinta en la columna «antes»: es la única
+   geometría hecha sólo de una recta vertical y una horizontal, y a trazo 1,2 el suavizado la reparte
+   entre dos columnas sin que ninguna baje del umbral. Queda escrito en la evidencia, porque un cero
+   leído como medida es exactamente la trampa que ese arnés tiende.
+
+### Una puerta cuyo verde DEPENDÍA del defecto — la forma 23
+
+`CatalogCardTextTests` distinguía la tarjeta de serie de la de película con
+`Assert.NotEqual(show.Bounds, film.Bounds)`, y eso **sólo funcionaba porque los iconos estaban mal**:
+sus límites diferían por el lienzo ausente. Con las 31 en `0,0 24×24` comparaba **dos cuadrados
+idénticos** y se puso roja.
+
+**Lo peligroso es el reflejo**, porque ese rojo aparece mientras corriges otra cosa y parece daño
+colateral. Aflojarla habría borrado la afirmación entera. Ahora dice lo que quería decir —
+`Assert.Same(Resource("IconShow"), show)` — y de paso caza los recursos **cruzados**, que la
+comparación de cajas nunca vio.
+
+**La señal, para la próxima:** una aserción de *desigualdad* entre dos cosas que deberían
+identificarse por *nombre*. `NotEqual`, `NotSame` y «son distintos» son proxies, y un proxy puede
+apoyarse en un defecto sin que nada lo diga.
+
+### La configuración del repositorio carga dos de tres
+
+Primera sesión que arranca con `.claude/` y `.mcp.json` ya versionados. Medido, no leído:
+
+- **Hooks — sí.** El `deny` **bloqueó** un `Write` a un archivo terminado en `coverage-debt.txt`,
+  probado sobre una ruta del scratchpad para que un fallo no ensuciara nada.
+- **Skills — sí.** `/medir-pixeles` trajo el arnés con sus cinco trampas.
+- **Agentes — NO.** `gate-auditor` no está en el registro de subagentes de la sesión. La auditoría se
+  hizo leyendo su `.md` y aplicando su método a mano, incluida la parte que **exige medir la
+  mutación**: quitar el prefijo a un icono pone rojas las dos puertas nuevas, y `Stretch: Uniform →
+  Fill` sobrevive a las 1043 pruebas **pero es inerte** con lienzo y caja cuadrados, así que no es
+  hallazgo.
+
+**Y una trampa de diseño, no de carga:** el hook del SPDX emite `systemMessage`, que va a la interfaz
+de la persona y **no al contexto del agente que escribe el archivo**. Se escribió un `.cs` sin
+cabecera y no llegó nada. Además los dos hooks sólo disparan sobre `Write|Edit|MultiEdit`: **trabajar
+con Bash los esquiva por completo**, que en modo auto es la vía por defecto.
+
+### Y una discrepancia anotada sin tocar
+
+Contadas las llamadas a `icon(n, s)` del prototipo, los tamaños que gasta son **13, 14, 15, 16, 18,
+20 y 26** —el más frecuente es **15**, con diez usos— y **22 no aparece nunca**. `ELEMENTS` decía «los
+únicos que hay: 14, 16, 18, 20, 22». Corregido en los dos idiomas para que no siga afirmando algo
+falso, y la clase `size-22` **se queda**: es una decisión de diseño del propietario, no un defecto de
+esta pieza.
+
+## Lo siguiente: no hay pieza de código decidida, y eso es el estado real
+
+**Lo único que bloquea el corte de 0.2.0 es el paseo físico del propietario** (paso 7 de los diez; el
+corte es el 8). El punto 1 de los tres candidatos —el cromo del mini— se cerró en la sexta sesión, el
+punto 2 —los pósteres— está hecho entero, y el lienzo de los iconos se cierra aquí. Las portadas de la
+cuadrícula siguen fuera de 0.2.0 por la decisión del 2026-08-21, cuya razón medida sigue en pie.
+
+**Lo que sí puede pedir el propietario al ver los iconos nuevos**: el play es el que más cambia
+—16,8 → 10,7 px de tinta, porque su trazo ocupaba la menor fracción del lienzo perdido— y 10,7 es
+exactamente lo que el prototipo dibuja. Si le parece pequeño de más, la palanca ya no es el `-2`
+—que no podía funcionar, porque el exceso era un factor distinto por icono— sino **subir de clase ese
+icono concreto**, y eso es decisión suya.
+
 ## Estado al cierre del 2026-08-29 (sexta sesión) — el cromo del mini, y dos puertas ciegas
 
 **Los tres commits que esa sesión dejó son `36bdf6f`, `6ef1a5f` y `4a77dcf`**, y esta línea nombró
@@ -132,6 +228,12 @@ no un servicio sin consumidor, sino **una puerta que mide el modelo de lo que pr
    Lo estable es la métrica de la fuente, no la palabra.
 
 ## La pieza siguiente, con la decisión ya tomada: restituir el lienzo de los iconos
+
+> **HECHO el 2026-08-29 en `34b0fe9`.** Lo de abajo es el plan tal como se escribió, y se conserva
+> porque su medición sigue siendo la del defecto. Tres cosas salieron distintas al ejecutarlo: son
+> **31** geometrías y no 35, hubo que **comprobar rasterizando** que los `moveto` sueltos no pintan
+> bajo un remate redondo, y apareció una puerta cuyo verde dependía del defecto. Todo eso está en la
+> sección de esta sesión, arriba.
 
 **El problema.** De 29 botones de sólo icono, **17 tienen la tinta descentrada** — seis swatches de
 color a `dy=-3,00`, el play a `dx=-1,67`, `PictureInPictureButton` a `dy=-1,06`.

@@ -1,5 +1,100 @@
 # Where to pick up
 
+## State at the close of 2026-08-29 (seventh session) — the icons' canvas, restored
+
+**`main`, the branch and HEAD are the same commit: `34b0fe9`**, with the conclusion read by
+`eng/watch-ci.ps1` before the reference moved. The three figures of the green, **identical to the
+sixth session's** because no new production code landed — markup and tests only:
+
+```
+Coverage gate: 212 file(s) still short of 96/96, ratchet 212, 212 measured under the bar
+Coverage gate: 0 new file(s) against origin/main and 14 watched file(s) are where they have to be
+The walk: 231 declared command controls in 226 identities; 206 pressed, 20 pending
+```
+
+**The three pending commits were resolved in order and one at a time**, which is what the sixth
+session learned at the cost of an hour: `main` to `6ef1a5f` with its green read, `4a77dcf` pushed and
+waited out to its green, and only then the new work. No run overlapped and none went past 55 minutes.
+
+**The commission is closed and it is what the owner sees.** The icons were drawn between **1.12x and
+1.74x** larger than the prototype — **each by a different factor** — and up to **4.5 px** off centre,
+because the 2026-08-24 port copied the stroke and **not the 24 by 24 `viewBox`**. The `M0 0 M24 24`
+prefix in front of the 31 geometries gives it back, and with the canvas in place the size classes'
+`-2` goes: `size-20` is `Width="20"`, which is literally `icon(n, 20)`.
+
+Measured by rasterising, before and after: the excess goes from **1.12-1.74x** (spread 0.62) to
+**0.90-1.06x** (spread 0.16), and 23 of 31 land at `+0.00` off centre. **Nearly all of them measured
+16.8 px on screen before** whatever size the prototype intended for each: without a canvas,
+`Stretch="Uniform"` stretches every stroke until the box is full. Evidence:
+[the canvas the port did not copy](evidence/stable/audit-icon-canvas.md).
+
+### What had to be measured and the written decision did not cover
+
+1. **The bare movetos paint nothing**, not even under `StrokeLineCap="Round"` — a round cap on a zero
+   length subpath is exactly how a dot appears where nothing was drawn, and the canvas corners are
+   0,0 and 24,24. Rasterised: with the prefix the ink starts at (42,32) inside a 96 px `Path`. **That
+   was worth checking before writing it 31 times.**
+2. **There are 31 geometries, not 35.** The 35 is the prototype's count; the dictionary declares 31.
+3. **A zero that was not a measurement.** `IconAdd` read 0.8 px of ink in the «before» column: it is
+   the only geometry made of nothing but one vertical and one horizontal line, and at a 1.2 stroke
+   the antialiasing splits it across two columns with neither falling under the threshold. Written
+   into the evidence, because a zero read as a measurement is exactly the trap that harness sets.
+
+### A gate whose green DEPENDED on the defect — form 23
+
+`CatalogCardTextTests` told a series card from a film card with
+`Assert.NotEqual(show.Bounds, film.Bounds)`, and that **only worked because the icons were wrong**:
+their bounds differed through the missing canvas. With all 31 at `0,0 24x24` it compared **two
+identical squares** and went red.
+
+**The reflex is the dangerous part**, because that red appears while you are fixing something else and
+looks like collateral damage. Loosening it would have dropped the claim entirely. It now says what it
+meant — `Assert.Same(Resource("IconShow"), show)` — and catches the two being **crossed**, which the
+bounds comparison never saw.
+
+**The signal, for next time:** an assertion of *inequality* between two things that should be
+identified by *name*. `NotEqual`, `NotSame` and «they differ» are proxies, and a proxy can lean on a
+defect without anything saying so.
+
+### The repository's configuration loads two of three
+
+First session to start with `.claude/` and `.mcp.json` already in the tree. Measured, not read:
+
+- **Hooks — yes.** The `deny` **blocked** a `Write` to a file ending in `coverage-debt.txt`, tried on
+  a scratchpad path so a miss would not dirty anything.
+- **Skills — yes.** `/medir-pixeles` brought the harness and its five traps.
+- **Agents — NO.** `gate-auditor` is not in the session's subagent registry. The audit was done by
+  reading its `.md` and applying its method by hand, including the part that **requires measuring the
+  mutation**: stripping the prefix from one icon turns both new gates red, and `Stretch: Uniform →
+  Fill` survives all 1043 tests **but is inert** with a square canvas in a square box, so it is not a
+  finding.
+
+**And a design trap, not a loading one:** the SPDX hook emits `systemMessage`, which goes to the
+person's interface and **not to the context of the agent writing the file**. A `.cs` was written
+without a header and nothing reached it. Both hooks also fire only on `Write|Edit|MultiEdit`:
+**working through Bash bypasses them entirely**, which in auto mode is the default route.
+
+### And a discrepancy noted without touching it
+
+Counting the prototype's `icon(n, s)` calls, the sizes it spends are **13, 14, 15, 16, 18, 20 and
+26** — the most frequent is **15**, with ten uses — and **22 never appears**. `ELEMENTS` said «the
+only ones there are: 14, 16, 18, 20, 22». Corrected in both languages so it stops asserting something
+false, and the `size-22` class **stays**: that is the owner's design decision, not this piece's
+defect.
+
+## Next: there is no decided code piece, and that is the real state
+
+**The only thing blocking the 0.2.0 cut is the owner's physical walk** (step 7 of the ten; the cut is
+step 8). Point 1 of the three candidates — the mini's chrome — closed in the sixth session, point 2 —
+the posters — is done entire, and the icons' canvas closes here. The grid's cover art stays out of
+0.2.0 by the 2026-08-21 decision, whose measured reason still stands.
+
+**What the owner may ask on seeing the new icons**: the play changes most — 16.8 to 10.7 px of ink,
+because its stroke spanned the smallest fraction of the lost canvas — and 10.7 is exactly what the
+prototype draws. If it reads too small, the lever is no longer the `-2` — which could not work,
+because the excess was a different factor per icon — but **moving that one icon up a class**, and
+that is his call.
+
 ## State at the close of 2026-08-29 (sixth session) — the mini's chrome, and two blind gates
 
 **The three commits that session left are `36bdf6f`, `6ef1a5f` and `4a77dcf`**, and this line named
@@ -133,6 +228,12 @@ consumer, but **a gate measuring the model of what it promises to look at**.
    translation. What is stable is the font's metric, not the word.
 
 ## The next piece, with the decision already made: restore the icons' canvas
+
+> **DONE on 2026-08-29 in `34b0fe9`.** What follows is the plan as it was written, kept because its
+> measurement is still the defect's. Three things came out differently on execution: there are **31**
+> geometries and not 35, the bare movetos had to be **checked by rasterising** for a dot under a round
+> cap, and a gate turned up whose green depended on the defect. All of it is in this session's section
+> above.
 
 **The problem.** Of 29 icon-only buttons, **17 have their ink off centre** — six colour swatches at
 `dy=-3.00`, play at `dx=-1.67`, `PictureInPictureButton` at `dy=-1.06`.
