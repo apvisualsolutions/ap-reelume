@@ -86,6 +86,19 @@ evidencia, es [FEATURES.md](FEATURES.md).
   hecho. Ahora pregunta a git —el `.es.md` difiere de `HEAD` y el `.en.md` no—, probado con **diez
   casos** de los que cuatro son de los que debe dejar pasar.
 
+  **Y sólo avisaba cuando el archivo se reescribía entero.** Su matcher era `Write` a secas, así que
+  toda edición quedaba muda — y `Edit` es justo la herramienta con la que se toca un `.es.md` que ya
+  existe, porque `Write` reescribe el archivo completo. La guarda cubría el camino menos transitado.
+  Medido con el mismo `Edit` antes y después de ampliar el matcher a `Edit|Write|MultiEdit`: mudo
+  primero, avisando después, y **en caliente**, sin recargar la sesión. El del SPDX se queda en
+  `Write`, y ahí no es un descuido: lee `tool_input.content`, que un `Edit` no trae entero.
+  `MultiEdit` queda declarado en el matcher pero **sin medir**.
+
+  **El silencio hubo que medirlo por otra vía, porque dentro de la aplicación no se distingue de no
+  haber corrido**: un hook deja rastro en el registro de la sesión **sólo cuando produce salida**. Con
+  los dos idiomas tocados, el comando literal del `settings.json` calla por tubería — con el caso que
+  sí debe sonar al lado, que es lo único que hace valer al que calla.
+
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
   reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se
   estaba viendo ni **por dónde iba** — que es la mayor parte de para qué existe una imagen sobre

@@ -1,5 +1,50 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-29 (novena sesión) — la guarda cubría el camino menos transitado
+
+**Un commit, el que escribe esta nota.** El propietario abrió sin pieza decidida —que sigue siendo el
+estado real— y eligió la comprobación barata que la octava dejó abierta: si el aviso del hook del
+bilingüismo llega a la persona. Sacó un defecto, y el defecto es este commit. **`0.2.0` sigue
+bloqueado sólo por su paseo físico**, el paso 7 de los diez.
+
+**El hook sólo avisaba cuando el archivo se reescribía entero.** Su matcher era `Write` a secas, así
+que toda edición quedaba muda — y `Edit` es la herramienta con la que se toca un `.es.md` que ya
+existe, porque `Write` reescribe el archivo completo. Ahora es `Edit|Write|MultiEdit`. El del SPDX se
+queda en `Write`, y ahí no es un descuido: lee `tool_input.content`, que un `Edit` no trae entero.
+**`MultiEdit` queda declarado y sin medir** — la herramienta no estaba disponible en esta sesión.
+
+Medido con el mismo `Edit` antes y después, en la herramienta real y no leyendo el matcher:
+
+| caso | herramienta | antes | después |
+| --- | --- | --- | --- |
+| sólo el `.es.md` | `Write` | avisa | avisa |
+| sólo el `.es.md` | `Edit` | **mudo** | avisa |
+| los dos idiomas tocados | `Edit` | — | calla |
+
+Y surtió efecto **en caliente**, sin recargar la sesión — que merece quedar escrito, porque
+`CLAUDE.md` dice que un cambio de hook exige abrir `/hooks` una vez.
+
+### Lo que el aviso sí hace, y la pregunta que sigue abierta
+
+**Se emite, y lo demuestra el registro en vez de una captura.** El `.jsonl` de la sesión, bajo
+`~/.claude/projects/`, lleva un `hook_system_message` por aviso, con el `toolUseID` de la llamada que
+lo provocó y el `hookName`. Dos en toda la sesión, los dos provocados a propósito; el resto de los
+hooks corrió y no produjo nada.
+
+**Si llega a la pantalla del propietario sigue sin confirmarse**, justo donde lo dejaron la séptima y
+la octava. La comprobación cuesta un segundo y necesita a la persona delante del PC.
+
+### Un silencio no se distingue de no haber corrido
+
+El primer intento del caso que debe callar leyó un `hook_success` y lo dio por prueba. No lo era: **un
+hook deja rastro en el registro sólo cuando produce salida**, así que una ejecución callada y una que
+nunca ocurrió se ven idénticas desde dentro. El registro que había era el `posttooluse.py` de un
+plugin, que corre en cada llamada.
+
+Así que el caso que debe callar se mide ejecutando **el comando literal del `settings.json`** por
+tubería, con un caso que sí debe sonar al lado. Queda escrito en `CLAUDE.md`, porque es la forma que
+ya tiene el defecto de esta casa: una prueba se vuelve ciega en vez de falsa.
+
 ## Estado al cierre del 2026-08-29 (octava sesión) — un aviso que sonaba siempre
 
 **El único commit de esta sesión es el que escribe esta nota, y por eso no lo nombra**; lo demás fue

@@ -1,5 +1,50 @@
 # Where to pick up
 
+## State at the close of 2026-08-29 (ninth session) — the guard covered the least travelled path
+
+**One commit, the one that writes this note.** The owner opened with no piece decided — still the
+real state — and chose the cheap check the eighth session left open: whether the bilingualism hook's
+warning reaches the person. It turned up a defect, and the defect became this commit. **`0.2.0` is
+still blocked only by the owner's physical walk**, step 7 of the ten.
+
+**The hook only warned when the file was rewritten whole.** Its matcher was `Write` alone, so every
+`Edit` stayed silent — and `Edit` is the tool used to touch an `.es.md` that already exists, because
+`Write` rewrites the file entire. It is now `Edit|Write|MultiEdit`. The SPDX one stays on `Write`,
+and there it is no oversight: it reads `tool_input.content`, which an `Edit` does not carry whole.
+**`MultiEdit` is declared but not measured** — the tool was not available this session.
+
+Measured with the same `Edit` before and after, in the real tool and not by reading the matcher:
+
+| case | tool | before | after |
+| --- | --- | --- | --- |
+| `.es.md` alone | `Write` | fires | fires |
+| `.es.md` alone | `Edit` | **silent** | fires |
+| both languages touched | `Edit` | — | quiet |
+
+And it took effect **live**, with no session reload — which is worth writing down, because
+`CLAUDE.md` says a hook change needs `/hooks` opened once.
+
+### What the warning does do, and the question still open
+
+**It is emitted, and the log proves it rather than a screenshot.** The session's `.jsonl` under
+`~/.claude/projects/` carries one `hook_system_message` per warning, with the `toolUseID` of the call
+that caused it and the `hookName`. Two in the whole session, both provoked on purpose; every other
+hook ran and produced nothing.
+
+**Whether it reaches the owner's screen is still unconfirmed**, exactly where the seventh and eighth
+sessions left it. The check costs a second and needs the person in front of the PC.
+
+### A silence cannot be told apart from not having run
+
+The first attempt at the quiet case read a `hook_success` and called it proof. It was not: **a hook
+leaves a trace in the log only when it produces output**, so a quiet run and a run that never
+happened look identical from inside. The record that was there belonged to a plugin's
+`posttooluse.py`, which runs on every tool call.
+
+So the case that must stay quiet is measured by running **the literal command from `settings.json`**
+through a pipe, with a case that must fire beside it. It is written into `CLAUDE.md`, because it is
+the shape this repository's defect already has: a test goes blind rather than false.
+
 ## State at the close of 2026-08-29 (eighth session) — a warning that always fired
 
 **The only commit of this session is the one writing this note, which is why it is not named**; the

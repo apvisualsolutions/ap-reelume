@@ -24,9 +24,21 @@ prueba van en inglés.
   **no entra en el contexto de quien está escribiendo el archivo**. Por eso la comprobación del SPDX
   pasó a `PreToolUse`, donde `tool_input.content` ya existe y se puede leer antes de escribir nada.
 
-  **Los tres sólo disparan sobre `Write`, `Edit` y `MultiEdit`.** Escribiendo por Bash —`cat >`,
-  `sed -i`, un heredoc— **no disparan**, así que siguen siendo un adelanto de aviso y no la puerta:
-  la puerta es `dotnet format` con `IDE0073`, y `eng/verify-docs.ps1`.
+  **Ninguno dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así que siguen siendo un
+  adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y
+  `eng/verify-docs.ps1`.
+
+  **Dos cubren `Write`, `Edit` y `MultiEdit`; el del SPDX es sólo `Write`**, y ahí no es un descuido:
+  lee `tool_input.content`, que un `Edit` no trae entero. En el del bilingüismo sí lo era, y se
+  corrigió el 2026-08-29 midiendo el mismo `Edit` antes y después: no lee contenido —sólo pregunta a
+  git— y aun así se perdía **toda** edición, que es justo la herramienta con la que se toca un
+  `.es.md` que ya existe, porque `Write` reescribe el archivo entero. La guarda cubría el camino
+  menos transitado. `MultiEdit` queda declarado en el matcher pero **sin medir**.
+
+  **Y un hook que calla no deja rastro en el registro de la sesión**: sólo se anota cuando produce
+  salida. Un silencio observado en la aplicación no prueba que la guarda corriera —puede que ni
+  siquiera la enrutaran—, así que el caso que **debe** callar se mide ejecutando el comando literal
+  del `settings.json` por tubería, con un caso que sí debe sonar al lado.
 - **`/cerrar-tanda`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso.
 - **`/medir-pixeles`** trae el arnés de rasterización con sus cinco trampas medidas.
 - **`gate-auditor`** busca puertas que pasan sin medir nada; **`prototype-fidelity`** compara la

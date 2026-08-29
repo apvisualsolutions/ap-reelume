@@ -85,6 +85,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   work. It now asks git — the `.es.md` differs from `HEAD` and the `.en.md` does not — tested with
   **ten cases**, four of them among those it must let through.
 
+  **And it only warned when the file was rewritten whole.** Its matcher was `Write` alone, so every
+  edit stayed silent — and `Edit` is exactly the tool used to touch an `.es.md` that already exists,
+  because `Write` rewrites the entire file. The guard covered the least travelled path. Measured with
+  the same `Edit` before and after widening the matcher to `Edit|Write|MultiEdit`: silent first,
+  warning afterwards, and **live**, with no session reload. The SPDX one stays on `Write`, and there
+  it is no oversight: it reads `tool_input.content`, which an `Edit` does not carry whole.
+  `MultiEdit` is declared in the matcher but **not measured**.
+
+  **The silence had to be measured another way, because inside the application it cannot be told
+  apart from not running at all**: a hook leaves a trace in the session log **only when it produces
+  output**. With both languages touched, the literal command from `settings.json` stays quiet through
+  a pipe — with the case that must fire beside it, which is the only reason the quiet one counts.
+
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
   clock.** The band was five buttons and nothing else, so a floating window said neither **what** was
   playing nor **how far in** it was — which is most of what a picture-in-picture is for. It now
