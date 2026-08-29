@@ -1,6 +1,26 @@
 # Dónde retomar
 
-## Estado al cierre del 2026-08-28 (sexta sesión) — el cromo del mini, y dos puertas ciegas
+## Estado al cierre del 2026-08-29 (sexta sesión) — el cromo del mini, y dos puertas ciegas
+
+**`main`, la rama y el HEAD son el mismo commit: `9ff87b2`**, con la conclusión leída por
+`gh run view --json conclusion` antes de mover la referencia. Las tres cifras del verde:
+
+```
+Coverage gate: 212 short of 96/96, ratchet 212, 212 measured under the bar
+Coverage gate: 0 new file(s) and 14 watched file(s) are where they have to be
+The walk: 231 declared in 226 identities; 206 pressed, 20 pending
+```
+
+**Y la factura del ritmo, otra vez y por mi culpa**: dos commits empujados seguidos pusieron dos runs
+solapados, **los dos rojos por la misma causa única** —`PlaybackClock.cs` en 100/83, la rama de una
+duración presente pero de cero—. El tercer run, ya solo, pasó el paso `Verify` en **55 minutos**
+contra los ~33 de uno limpio, porque arrancó mientras el anterior aún corría. Un solo commit habría
+dado la misma información una hora antes.
+
+**La lección concreta**: una guarda añadida en el mismo commit que sus pruebas **no queda cubierta
+por ellas automáticamente**. `Readout` pregunta dos cosas y las tres pruebas que escribí contestaban
+la primera de tres maneras. La cobertura de rama es lo que separa «probé el método» de «probé sus
+caminos», y sólo la mide CI.
 
 **El cromo del minirreproductor es la composición del prototipo**: barra de progreso de tres píxeles
 cruzando el ancho, el título a la izquierda con `posición / duración · velocidad` debajo, y los cinco

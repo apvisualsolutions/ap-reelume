@@ -1,6 +1,26 @@
 # Where to pick up
 
-## State at the close of 2026-08-28 (sixth session) — the mini's chrome, and two blind gates
+## State at the close of 2026-08-29 (sixth session) — the mini's chrome, and two blind gates
+
+**`main`, the branch and HEAD are the same commit: `9ff87b2`**, with the conclusion read by
+`gh run view --json conclusion` before the reference moved. The three figures of the green:
+
+```
+Coverage gate: 212 short of 96/96, ratchet 212, 212 measured under the bar
+Coverage gate: 0 new file(s) and 14 watched file(s) are where they have to be
+The walk: 231 declared in 226 identities; 206 pressed, 20 pending
+```
+
+**And the pace's bill again, this time my own**: two commits pushed back to back put two runs in
+parallel, **both red for the same single cause** — `PlaybackClock.cs` at 100/83, the branch where a
+duration is present and worth nothing. The third run, alone, took **55 minutes** on the `Verify` step
+against ~33 for a clean one, because it started while the previous was still going. One commit would
+have given the same information an hour earlier.
+
+**The concrete lesson**: a guard added in the same commit as its tests is **not covered by them
+automatically**. `Readout` asks two questions and the three tests I wrote answered the first one
+three different ways. Branch coverage is what separates "I tested the method" from "I tested its
+paths", and only CI measures it.
 
 **The mini player's chrome is the prototype's composition**: a three pixel bar of progress across the
 width, the title on the left with `position / duration · speed` under it, and the five on the right
