@@ -154,12 +154,126 @@ entirely.
 
 ## Y una discrepancia que no se toca aquí / And a discrepancy not touched here
 
-`docs/design/ELEMENTS.es.md` nombra cinco tamaños —14, 16, 18, 20 y 22— y las clases del tema
-declaran cuatro: `size-14`, `size-16`, `size-20` y `size-22`. Contadas las llamadas a `icon(n, s)` en
-el prototipo, los tamaños que gasta son **13, 14, 15, 16, 18, 20 y 26**, y el más frecuente con
-diferencia es **15**, con diez usos. **No usa 22 en ningún sitio.** Queda anotado y sin cambiar: es
-una decisión de diseño y no un defecto de esta pieza. / `docs/design/ELEMENTS.es.md` names five sizes
-— 14, 16, 18, 20 and 22 — and the theme declares four classes. Counting the `icon(n, s)` calls in the
-prototype, the sizes it spends are **13, 14, 15, 16, 18, 20 and 26**, and the most frequent by a wide
-margin is **15**, with ten uses. **It never uses 22.** Noted and left alone: that is a design
-decision and not a defect of this piece.
+> **Corrección del 2026-08-29, y el error importa más que el dato.** Esta sección afirmó que el
+> prototipo **no usa 22 en ningún sitio**. Es **falso**, y lo era por la razón que este repositorio
+> ya tiene escrita: **una ausencia inferida de un `grep` en vez de medida**. El patrón usado exigía
+> una cadena literal como primer argumento —`icon\('[a-z]+',\s*[0-9]+\)`— y **diez llamadas del
+> prototipo pasan una expresión**, entre ellas la que decide el conmutador de reproducción:
+> `icon(p.playing && !err ? 'pause' : 'play', 22)`. / **Correction of 2026-08-29, and the error
+> matters more than the datum.** This section claimed the prototype **never uses 22**. That is
+> **false**, for the reason this repository already has written down: **an absence inferred from a
+> `grep` rather than measured.** The pattern required a string literal as the first argument, and
+> **ten of the prototype's calls pass an expression**, among them the one deciding the play toggle.
+
+Contado con `icon\([^)]*,\s*[0-9]+\)`, que sí captura las expresiones, el prototipo gasta **nueve**
+tamaños: / Counted with `icon\([^)]*,\s*[0-9]+\)`, which does capture the expressions, the prototype
+spends **nine** sizes:
+
+```
+ 12 → 2 usos     14 → 8     16 → 5     20 → 3     26 → 1
+ 13 → 2          15 → 10    18 → 5     22 → 1
+```
+
+**`size-22` está donde el prototipo la pone**: `TransportControlsView` y `MiniPlayerChromeView` la
+gastan en play, pausa y parada, que es exactamente `icon(…, 22)`. `ELEMENTS` tenía razón al nombrarla.
+/ **`size-22` is where the prototype puts it**: the transport and the mini spend it on play, pause and
+stop, which is exactly `icon(…, 22)`. `ELEMENTS` was right to name it.
+
+## Y la escala, alineada con el prototipo contexto a contexto / And the scale, aligned context by context
+
+Con el lienzo restituido **la clase pasa a ser el tamaño real**, así que por primera vez se puede
+comparar cada contexto de la aplicación con lo que el prototipo dibuja ahí. Medido el 2026-08-29: /
+With the canvas restored **the class becomes the real size**, so for the first time each context can
+be compared against what the prototype draws there. Measured on 2026-08-29:
+
+```
+contexto / context                                     antes/before  prototipo  ahora/now
+play, pausa y parada del transporte y del mini            22             22        22
+atrás y adelante, destinos del rail                       20             20        20
+cromo del reproductor: mini, pantalla completa, cerrar     20             18        18
+volumen y silencio                                        16             18        18
+búsqueda, fila de menú                                    16             16        16
+acciones personales                                       16             15        15
+galón, aviso                                              14             14        14
+el glifo de tipo sobre una portada                        14             12        12
+el play de una tarjeta                                    14             15        14  ←
+```
+
+Seis contextos ya casaban. Cuatro no, y **tres se corrigieron**: el cromo bajó de 20 a 18, el volumen
+subió de 16 a 18 —iba **más pequeño** que el prototipo, al contrario que todos los demás— y el glifo
+de tipo bajó de 14 a 12. / Six already matched. Four did not, and **three were corrected**: the chrome
+went 20 to 18, the volume went 16 to 18 — it ran **smaller** than the prototype, unlike every other —
+and the kind glyph went 14 to 12.
+
+### El cuarto no se corrigió, y el porqué está medido / The fourth was not, and the why is measured
+
+**El play de una tarjeta se queda en 14 donde el prototipo dibuja 15.** Subirlo se probó y **movió la
+entrada de biblioteca 44 px hacia abajo en 6 de las 36 combinaciones** de `HomeLayoutTests` — las de
+1366 × 768 a escala 150 en español, la más apretada que la aplicación admite —, porque un píxel de más
+en ese botón hace envolver una línea. / **A card's play stays at 14 where the prototype draws 15.**
+Raising it was tried and **moved the library entry 44 px down in 6 of the 36 combinations** in
+`HomeLayoutTests` — 1366 x 768 at 150 scale in Spanish, the tightest the application supports —
+because one pixel more in that button wraps a line.
+
+```
+ganancia / gain      0,55 px de tinta   (7,70 → 8,25)
+coste / cost           44 px de desplazamiento en 6 de 36
+```
+
+**Ochenta a uno en contra.** La fidelidad al prototipo es el encargo permanente de este proyecto, y
+por eso la desviación se escribe con su precio en vez de callarse: si esa fila deja de ir justa, el
+cambio son dos caracteres. / **Eighty to one against.** Fidelity to the prototype is this project's
+standing commission, which is why the deviation is written down with its price rather than left
+silent: if that row stops running tight, the change is two characters.
+
+## Una ausencia que se afirmó sin medirla / An absence asserted without measuring it
+
+Esta evidencia dijo, en su primera versión, que **el prototipo no usa el tamaño 22 en ningún sitio**.
+Era falso, y el error es más instructivo que el dato: el patrón usado —`icon\('[a-z]+',\s*[0-9]+\)`—
+exigía **una cadena literal** como primer argumento, y **diez llamadas del prototipo pasan una
+expresión**. Entre ellas, precisamente, la que decide el conmutador de reproducción:
+`icon(p.playing && !err ? 'pause' : 'play', 22)`. / This evidence said, in its first version, that the
+prototype **never uses size 22**. That was false, and the error teaches more than the datum: the
+pattern required **a string literal** as the first argument, and **ten of the prototype's calls pass
+an expression** — among them the very one deciding the play toggle.
+
+**Y la afirmación viajó**: llegó a `ELEMENTS` en los dos idiomas, a la nota de la sesión siguiente y
+al mensaje de un commit, todo con la seguridad que da un número. Una ausencia se prueba; un patrón
+que no casó nada no es una prueba de nada. / **And the claim travelled**: it reached `ELEMENTS` in
+both languages, the next session's note and a commit message, all with the confidence a number gives.
+An absence is proven; a pattern that matched nothing proves nothing.
+
+**Lo que lo vigila ahora**: `Every_size_class_is_its_own_number_and_one_the_prototype_spends` lee los
+tamaños **del prototipo** con un patrón que acepta expresiones, y exige dos cosas de cada clase — que
+su nombre sea su `Width`, y que ese número sea uno que el prototipo gaste. Probada contra sus dos
+mutaciones: `size-15` con `Width="13"` y una `size-17` inventada. / **What watches it now**:
+`Every_size_class_is_its_own_number_and_one_the_prototype_spends` reads the sizes **from the
+prototype** with a pattern that accepts expressions, and demands two things of every class — that its
+name is its `Width`, and that the number is one the prototype spends. Proved against both its
+mutations.
+
+## Y el descuido que dejó el mismo botón a dos tamaños / And the slip that left one button at two sizes
+
+Alinear el play movió su clase en **tres** vistas. Medido el coste, se puso atrás en **dos**, y
+`MovieDetailsView` se quedó descolgada: el mismo botón «Reproducir» a 15 en la ficha de una película y
+a 14 en las otras cuatro pantallas que lo dibujan. **Peor que cualquiera de los dos tamaños**, porque
+quien navega entre ellas compara el botón consigo mismo. / Aligning the play moved its class in
+**three** views. With the cost measured it went back in **two**, and `MovieDetailsView` was left
+behind: the same «Reproducir» button at 15 on a film's page and at 14 on the four other screens that
+draw it. **Worse than either size**, because a reader moving between them compares the button against
+itself.
+
+Lo cazó un `grep` al revisar el diff, no una puerta — así que ahora hay puerta:
+`The_play_of_a_catalogue_action_is_one_size_in_every_view_that_draws_it`, con las cinco vistas en
+**tabla cerrada**, de modo que una sexta que dibuje ese play falla hasta que alguien diga qué tamaño
+toma. Probada reintroduciendo el descuido: nombra la vista culpable. / A `grep` while reviewing the
+diff caught it, not a gate — so there is a gate now, with the five views in a **closed table**, so a
+sixth drawing that play fails until somebody says what size it takes. Proved by reintroducing the
+slip: it names the offending view.
+
+**La lección, y es de las que se repiten**: un cambio revertido «a medias» no deja el estado anterior
+ni el nuevo, deja un tercero que nadie eligió. Al deshacer parte de un barrido, la comprobación no es
+que el diff encoja sino que **lo que queda sea coherente**. / **The lesson, and it is one that
+recurs**: a change reverted «halfway» leaves neither the old state nor the new, but a third one
+nobody chose. When undoing part of a sweep, the check is not that the diff shrinks but that **what
+remains is coherent**.

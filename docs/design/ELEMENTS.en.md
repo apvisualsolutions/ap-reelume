@@ -290,11 +290,37 @@ The size classes are worth what their name says: `size-20` is `Width="20"`, whic
 the icons looked large and the box was shrunk by eye; it could not work, because the excess was a
 different factor for every icon and lived in the geometry, not in the class.
 
-The sizes the classes declare: 14 for a chevron, 16 for a menu row, 20 for a rail destination, 22 for
-the play toggle. **Counting the prototype's `icon(n, s)` calls, the sizes it spends are 13, 14, 15,
-16, 18, 20 and 26 — the most frequent is 15, with ten uses — and 22 never appears.** This line used
-to say «the only ones there are» and named an 18 that no class declares; it stands as it is pending a
-decision, and is not to be inferred from this document.
+**The prototype spends nine sizes**, counted on 2026-08-29 with `icon\([^)]*,\s*[0-9]+\)` — the
+pattern has to accept an **expression** as the first argument, or ten calls are lost, among them the
+play toggle:
+
+```
+ 12 → 2 uses     14 → 8     16 → 5     20 → 3     26 → 1
+ 13 → 2          15 → 10    18 → 5     22 → 1
+```
+
+And this is how they map onto what the application declares, measured context by context:
+
+| context | class | prototype |
+|---|---|---|
+| play, pause and stop in the transport and the mini | `size-22` | 22 |
+| back and forward in the transport, rail destinations | `size-20` | 20 |
+| player chrome: mini, fullscreen, close, volume | `size-18` | 18 |
+| search, menu row | `size-16` | 16 |
+| personal actions | `size-15` | 15 |
+| chevron, warning, **a card's play** | `size-14` | 14 · **the play, 15** |
+| the kind glyph over a poster | `size-12` | 12 |
+
+The prototype's 13 and 26 have no class because **this application draws nothing in those two
+places**: they are a `check` in an options list and the large folder of an empty state that is
+resolved differently here.
+
+**A card's play is the one deliberate deviation, and its price is measured.** The prototype draws it
+at 15 and here it goes at 14, one pixel less. Raising it to 15 was tried on 2026-08-29 and **moved
+the library entry 44 px down in 6 of the 36 combinations** in `HomeLayoutTests` — the 1366 x 768 at
+150 scale in Spanish, the tightest the application supports — because something wraps one line more.
+The gain was **0.55 px of ink**; the cost, 44 of displacement. Eighty to one against, so it stays at
+14. If that row ever stops running tight, the change is two characters.
 
 Two shapes are this application's own and say so: `IconStop`, because its transport has a stop where
 the prototype has a single toggle, and `IconChevronUp`, which is `IconChevronDown` upside down.

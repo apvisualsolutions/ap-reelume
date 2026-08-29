@@ -10,6 +10,33 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La escala de los iconos, alineada con el prototipo contexto a contexto.** Restituido el lienzo, la
+  clase pasa a ser el tamaño real, así que por primera vez se puede comparar cada sitio con lo que el
+  prototipo dibuja ahí. Seis de nueve ya casaban; tres se corrigen: el cromo del reproductor baja de
+  20 a **18**, el volumen y el silencio **suben** de 16 a 18 —iban más pequeños que el prototipo, al
+  revés que todos los demás— y el glifo de tipo sobre una portada baja de 14 a **12**. Tres clases
+  nuevas, `size-12`, `size-15` y `size-18`, cada una con su grosor `1,6 × N ÷ 24`.
+
+  **El cuarto desvío no se corrige, y su precio está medido**: el play de una tarjeta se queda en 14
+  donde el prototipo dibuja 15, porque subirlo movió la entrada de biblioteca **44 px** hacia abajo en
+  6 de las 36 combinaciones de `HomeLayoutTests` —1366 × 768 a escala 150 en español, la más apretada
+  que la aplicación admite— al hacer envolver una línea. La ganancia eran **0,55 px** de tinta.
+
+  **Y una puerta que nació de un descuido de ese mismo barrido**: al revertir el play en dos vistas,
+  `MovieDetailsView` se quedó en el tamaño nuevo, dejando el mismo botón «Reproducir» a 15 en la ficha
+  de una película y a 14 en las otras cuatro.
+  `The_play_of_a_catalogue_action_is_one_size_in_every_view_that_draws_it` lleva las cinco en tabla
+  cerrada y nombra a la descolgada.
+
+  **Y una afirmación falsa, corregida donde había viajado.** Se dijo que el prototipo no usa el tamaño
+  22 en ningún sitio; lo usa, en el conmutador de reproducción. El error fue **inferir una ausencia de
+  un patrón**: exigía una cadena literal como primer argumento de `icon(n, s)` y **diez llamadas pasan
+  una expresión**, entre ellas `icon(p.playing && !err ? 'pause' : 'play', 22)`. Corregido en
+  `ELEMENTS`, en la evidencia y en la nota. La puerta nueva
+  —`Every_size_class_is_its_own_number_and_one_the_prototype_spends`— lee los tamaños del prototipo
+  con el patrón que sí acepta expresiones y exige que **el nombre de cada clase sea su `Width`** y que
+  ese número sea uno que el prototipo gaste.
+
 - **Los iconos vuelven a su lienzo de 24 × 24, y con eso se van tres defectos a la vez.** Al portarlos
   del prototipo el 2026-08-24 se copió el trazo y **no el `viewBox`**, así que los límites de cada
   geometría pasaron a ser los de su propia tinta. `Stretch="Uniform"` escala por esos límites hasta

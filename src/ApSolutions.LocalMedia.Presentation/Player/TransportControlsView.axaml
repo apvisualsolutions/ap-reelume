@@ -127,8 +127,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
           control that says the same thing whatever it has done.
         -->
         <Panel>
-          <Path Classes="icon" Data="{DynamicResource IconVolume}" IsVisible="{Binding !IsMuted}" />
-          <Path Classes="icon" Data="{DynamicResource IconMute}" IsVisible="{Binding IsMuted}" />
+          <Path Classes="icon size-18" Data="{DynamicResource IconVolume}" IsVisible="{Binding !IsMuted}" />
+          <Path Classes="icon size-18" Data="{DynamicResource IconMute}" IsVisible="{Binding IsMuted}" />
         </Panel>
       </Button>
       <!--
@@ -248,7 +248,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.Name="{DynamicResource TransportPictureInPictureAction}"
           automation:AutomationProperties.AcceleratorKey="Ctrl+P"
           Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).TogglePictureInPictureCommand}">
-        <Path Classes="icon size-20" Data="{DynamicResource IconMiniPlayer}" />
+        <Path Classes="icon size-18" Data="{DynamicResource IconMiniPlayer}" />
       </Button>
       <Button
           x:Name="FullscreenButton"
@@ -265,11 +265,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
         -->
         <Panel>
           <Path
-              Classes="icon size-20"
+              Classes="icon size-18"
               Data="{DynamicResource IconFullscreen}"
               IsVisible="{Binding !$parent[player:PlayerView].((player:PlayerViewModel)DataContext).IsFullscreen}" />
           <Path
-              Classes="icon size-20"
+              Classes="icon size-18"
               Data="{DynamicResource IconExitFullscreen}"
               IsVisible="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).IsFullscreen}" />
         </Panel>

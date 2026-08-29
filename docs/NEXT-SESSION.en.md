@@ -74,13 +74,28 @@ person's interface and **not to the context of the agent writing the file**. A `
 without a header and nothing reached it. Both hooks also fire only on `Write|Edit|MultiEdit`:
 **working through Bash bypasses them entirely**, which in auto mode is the default route.
 
-### And a discrepancy noted without touching it
+### The scale, aligned — and an absence asserted without measuring it
 
-Counting the prototype's `icon(n, s)` calls, the sizes it spends are **13, 14, 15, 16, 18, 20 and
-26** — the most frequent is **15**, with ten uses — and **22 never appears**. `ELEMENTS` said «the
-only ones there are: 14, 16, 18, 20, 22». Corrected in both languages so it stops asserting something
-false, and the `size-22` class **stays**: that is the owner's design decision, not this piece's
-defect.
+**The error first, because it teaches more than the datum.** This section said the prototype **never
+uses 22**. False: it uses it in the play toggle. The count used `icon\('[a-z]+',\s*[0-9]+\)`, which
+requires **a string literal** as the first argument, and **ten of the prototype's calls pass an
+expression** — among them `icon(p.playing && !err ? 'pause' : 'play', 22)`. **An absence is proven; a
+pattern that matched nothing proves nothing**, and the claim had already travelled to `ELEMENTS`, to
+the evidence and to a commit message. All corrected.
+
+Counted properly, the prototype spends **nine** sizes: 12→2 uses, 13→2, 14→8, 15→10, 16→5, 18→5,
+20→3, 22→1, 26→1.
+
+**And with the canvas restored the class is the real size, so contexts could finally be compared.**
+Six of nine already matched. Three were corrected: the player chrome from 20 to **18**, volume and
+mute **from 16 to 18** — they ran smaller than the prototype, unlike every other — and the kind glyph
+over a poster from 14 to **12**. Three new classes: `size-12`, `size-15` and `size-18`.
+
+**The fourth deviation was left, with its price measured.** A card's play stays at 14 where the
+prototype draws 15: raising it moved the library entry **44 px** down in 6 of the 36 combinations in
+`HomeLayoutTests` — 1366 x 768 at 150 scale in Spanish, the tightest the application supports —
+because it wraps a line. The gain was **0.55 px** of ink. Eighty to one against. It is written into
+`ELEMENTS` with its number, so next time it is a decision and not a discovery.
 
 ## Next: there is no decided code piece, and that is the real state
 

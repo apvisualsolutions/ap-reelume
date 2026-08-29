@@ -1667,16 +1667,34 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="IsHitTestVisible" Value="False" />
   </Style>
 
+  <Style Selector="Path.icon.size-12">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+    <Setter Property="StrokeThickness" Value="0.8" />
+  </Style>
+
   <Style Selector="Path.icon.size-14">
     <Setter Property="Width" Value="14" />
     <Setter Property="Height" Value="14" />
     <Setter Property="StrokeThickness" Value="0.93" />
   </Style>
 
+  <Style Selector="Path.icon.size-15">
+    <Setter Property="Width" Value="15" />
+    <Setter Property="Height" Value="15" />
+    <Setter Property="StrokeThickness" Value="1" />
+  </Style>
+
   <Style Selector="Path.icon.size-16">
     <Setter Property="Width" Value="16" />
     <Setter Property="Height" Value="16" />
     <Setter Property="StrokeThickness" Value="1.07" />
+  </Style>
+
+  <Style Selector="Path.icon.size-18">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="StrokeThickness" Value="1.2" />
   </Style>
 
   <Style Selector="Path.icon.size-20">

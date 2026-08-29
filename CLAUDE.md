@@ -13,9 +13,19 @@ prueba van en inglés.
 
 - **`.mcp.json`** declara el MCP de Avalonia. La regla 0 de abajo lo exige, y por eso viene en el
   árbol en vez de en la máquina de cada uno.
-- **Dos hooks** que hacen cumplir lo que antes eran frases: rechazan escribir
-  `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y avisan al escribir si falta la cabecera SPDX o
-  si un `.es.md` se adelantó a su pareja.
+- **Tres hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
+  `eng/coverage-debt.txt` y `eng/walk-pending.txt`, que los produce CI, y un `.cs` o `.axaml` de
+  `src/` o `tests/` **cuyo contenido no lleve la cabecera SPDX**. El tercero **avisa después** si un
+  `.es.md` se adelantó a su pareja.
+
+  **Rechazar y avisar no son lo mismo, y la diferencia se midió el 2026-08-29**: un `deny` llega al
+  agente como error de la herramienta, mientras que un `systemMessage` se muestra a la persona y
+  **no entra en el contexto de quien está escribiendo el archivo**. Por eso la comprobación del SPDX
+  pasó a `PreToolUse`, donde `tool_input.content` ya existe y se puede leer antes de escribir nada.
+
+  **Los tres sólo disparan sobre `Write`, `Edit` y `MultiEdit`.** Escribiendo por Bash —`cat >`,
+  `sed -i`, un heredoc— **no disparan**, así que siguen siendo un adelanto de aviso y no la puerta:
+  la puerta es `dotnet format` con `IDE0073`, y `eng/verify-docs.ps1`.
 - **`/cerrar-tanda`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso.
 - **`/medir-pixeles`** trae el arnés de rasterización con sus cinco trampas medidas.
 - **`gate-auditor`** busca puertas que pasan sin medir nada; **`prototype-fidelity`** compara la

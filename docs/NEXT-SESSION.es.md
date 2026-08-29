@@ -75,13 +75,31 @@ de la persona y **no al contexto del agente que escribe el archivo**. Se escribi
 cabecera y no llegó nada. Además los dos hooks sólo disparan sobre `Write|Edit|MultiEdit`: **trabajar
 con Bash los esquiva por completo**, que en modo auto es la vía por defecto.
 
-### Y una discrepancia anotada sin tocar
+### La escala, alineada — y una ausencia que se afirmó sin medirla
 
-Contadas las llamadas a `icon(n, s)` del prototipo, los tamaños que gasta son **13, 14, 15, 16, 18,
-20 y 26** —el más frecuente es **15**, con diez usos— y **22 no aparece nunca**. `ELEMENTS` decía «los
-únicos que hay: 14, 16, 18, 20, 22». Corregido en los dos idiomas para que no siga afirmando algo
-falso, y la clase `size-22` **se queda**: es una decisión de diseño del propietario, no un defecto de
-esta pieza.
+**Primero el error, porque enseña más que el dato.** Esta sección dijo que el prototipo **no usa 22 en
+ningún sitio**. Es falso: lo usa en el conmutador de reproducción. El patrón contaba
+`icon\('[a-z]+',\s*[0-9]+\)`, que exige **una cadena literal** como primer argumento, y **diez
+llamadas del prototipo pasan una expresión** —entre ellas
+`icon(p.playing && !err ? 'pause' : 'play', 22)`—. **Una ausencia se prueba; un patrón que no casó
+nada no prueba nada**, y la afirmación había viajado ya a `ELEMENTS`, a la evidencia y a un mensaje de
+commit. Todo corregido.
+
+Contados bien, el prototipo gasta **nueve** tamaños: 12→2 usos, 13→2, 14→8, 15→10, 16→5, 18→5, 20→3,
+22→1, 26→1.
+
+**Y con el lienzo restituido la clase es el tamaño real, así que por fin se pudo comparar contexto a
+contexto.** Seis de nueve ya casaban. Tres se corrigieron: el cromo del reproductor de 20 a **18**, el
+volumen y el silencio **de 16 a 18** —iban más pequeños que el prototipo, al revés que todos los
+demás— y el glifo de tipo sobre una portada de 14 a **12**. Tres clases nuevas: `size-12`, `size-15`
+y `size-18`.
+
+**El cuarto desvío se dejó, con su precio medido.** El play de una tarjeta se queda en 14 donde el
+prototipo dibuja 15: subirlo movió la entrada de biblioteca **44 px** hacia abajo en 6 de las 36
+combinaciones de `HomeLayoutTests` —1366 × 768 a escala 150 en español, la más apretada que la
+aplicación admite— porque hace envolver una línea. La ganancia eran **0,55 px** de tinta. Ochenta a
+uno en contra. Está escrito en `ELEMENTS` con su número, para que la próxima vez sea una decisión y
+no un descubrimiento.
 
 ## Lo siguiente: no hay pieza de código decidida, y eso es el estado real
 

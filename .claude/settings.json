@@ -13,6 +13,18 @@
             "statusMessage": "Comprobando los archivos que produce CI"
           }
         ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '[.tool_input.file_path // \"\", (if (.tool_input.content|type) != \"string\" then \"absent\" elif (.tool_input.content|test(\"SPDX-License-Identifier: GPL-3.0-or-later\")) then \"has\" else \"none\" end)] | @tsv' | tr -d '\\r' | { IFS=$'\\t' read -r f spdx; case \"$f\" in src/*.cs|src/*.axaml|tests/*.cs|tests/*.axaml|*/src/*.cs|*/src/*.axaml|*/tests/*.cs|*/tests/*.axaml|*\\\\src\\\\*.cs|*\\\\src\\\\*.axaml|*\\\\tests\\\\*.cs|*\\\\tests\\\\*.axaml) [ \"$spdx\" = \"none\" ] && printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Regla 1: todo fuente lleva SPDX-License-Identifier: GPL-3.0-or-later (CLAUDE.md, IDE0073). Anadela a la cabecera y vuelve a escribir; asi no se descubre veinte minutos mas tarde en dotnet format.\"}}';; esac; exit 0; }",
+            "shell": "bash",
+            "timeout": 10,
+            "statusMessage": "Comprobando la cabecera SPDX antes de escribir"
+          }
+        ]
       }
     ],
     "PostToolUse": [

@@ -10,6 +10,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The icon scale, aligned with the prototype context by context.** With the canvas restored the
+  class becomes the real size, so for the first time each place can be compared against what the
+  prototype draws there. Six of nine already matched; three are corrected: the player chrome drops
+  from 20 to **18**, volume and mute **rise** from 16 to 18 — they ran smaller than the prototype,
+  unlike every other — and the kind glyph over a poster drops from 14 to **12**. Three new classes,
+  `size-12`, `size-15` and `size-18`, each with its `1.6 × N ÷ 24` stroke.
+
+  **The fourth deviation is not corrected, and its price is measured**: a card's play stays at 14
+  where the prototype draws 15, because raising it moved the library entry **44 px** down in 6 of the
+  36 combinations in `HomeLayoutTests` — 1366 x 768 at 150 scale in Spanish, the tightest the
+  application supports — by wrapping a line. The gain was **0.55 px** of ink.
+
+  **And a gate born of a slip in that same sweep**: reverting the play in two views left
+  `MovieDetailsView` at the new size, so the same «Reproducir» button read 15 on a film's page and 14
+  on the four others. `The_play_of_a_catalogue_action_is_one_size_in_every_view_that_draws_it` keeps
+  the five in a closed table and names the one left behind.
+
+  **And a false claim, corrected everywhere it had travelled.** It was said the prototype never uses
+  size 22; it does, in the play toggle. The error was **inferring an absence from a pattern**: it
+  required a string literal as `icon(n, s)`'s first argument, and **ten calls pass an expression**,
+  among them `icon(p.playing && !err ? 'pause' : 'play', 22)`. Corrected in `ELEMENTS`, in the
+  evidence and in the note. The new gate —
+  `Every_size_class_is_its_own_number_and_one_the_prototype_spends` — reads the prototype's sizes with
+  the pattern that does accept expressions, and requires that **each class name is its `Width`** and
+  that the number is one the prototype spends.
+
 - **The icons get their 24 by 24 canvas back, and three defects go with it.** Porting them from the
   prototype on 2026-08-24 copied the stroke and **not the `viewBox`**, so each geometry's bounds
   became its own ink. `Stretch="Uniform"` scales by those bounds until the box is full and pins the

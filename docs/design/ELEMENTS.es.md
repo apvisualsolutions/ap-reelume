@@ -291,11 +291,38 @@ Las clases de tamaño valen lo que dice su nombre: `size-20` es `Width="20"`, qu
 iconos se veían grandes y se encogió la caja a ojo; no podía funcionar, porque el exceso era un
 factor distinto para cada icono y estaba en la geometría, no en la clase.
 
-Los tamaños que las clases declaran: 14 para un galón, 16 para una fila de menú, 20 para un destino
-del rail, 22 para el conmutador de reproducción. **Contadas las llamadas a `icon(n, s)` del
-prototipo, los tamaños que gasta son 13, 14, 15, 16, 18, 20 y 26 —el más frecuente es 15, con diez
-usos— y 22 no aparece.** Esta línea decía «los únicos que hay» y nombraba un 18 que ninguna clase
-declara; queda como está a la espera de una decisión, y no se deduce de este documento.
+**Los tamaños que el prototipo gasta son nueve**, contados el 2026-08-29 con
+`icon\([^)]*,\s*[0-9]+\)` —el patrón tiene que aceptar una **expresión** como primer argumento, o se
+pierden diez llamadas, entre ellas el conmutador de reproducción—:
+
+```
+ 12 → 2 usos     14 → 8     16 → 5     20 → 3     26 → 1
+ 13 → 2          15 → 10    18 → 5     22 → 1
+```
+
+Y así se reparten contra lo que la aplicación declara, medido contexto a contexto:
+
+| contexto | clase | prototipo |
+|---|---|---|
+| play, pausa y parada del transporte y del mini | `size-22` | 22 |
+| atrás y adelante del transporte, destinos del rail | `size-20` | 20 |
+| cromo del reproductor: mini, pantalla completa, cerrar, volumen | `size-18` | 18 |
+| búsqueda, fila de menú | `size-16` | 16 |
+| acciones personales | `size-15` | 15 |
+| galón, aviso, **el play de una tarjeta** | `size-14` | 14 · **el play, 15** |
+| el glifo de tipo sobre una portada | `size-12` | 12 |
+
+Los 13 y el 26 del prototipo no tienen clase porque **esta aplicación no dibuja nada en esos dos
+sitios**: son un `check` de una lista de opciones y la carpeta grande de un estado vacío que aquí se
+resuelve de otra manera.
+
+**El play de una tarjeta es la única desviación deliberada, y su precio está medido.** El prototipo lo
+dibuja a 15 y aquí va a 14, un píxel menos. Subirlo a 15 se probó el 2026-08-29 y **movió la entrada
+de biblioteca 44 px hacia abajo en 6 de las 36 combinaciones** de `HomeLayoutTests` —las de
+1366 × 768 a escala 150 en español, que es la más apretada que la aplicación admite—, porque algo
+envuelve una línea más. La ganancia era **0,55 px de tinta**; el coste, 44 de desplazamiento. Ochenta
+a uno en contra, así que se queda en 14. Si algún día esa fila deja de ir justa, el cambio son dos
+caracteres.
 
 Dos formas son de esta aplicación y lo dicen: `IconStop`, porque su transporte tiene una parada donde
 el prototipo tiene un solo conmutador, y `IconChevronUp`, que es `IconChevronDown` del revés.
