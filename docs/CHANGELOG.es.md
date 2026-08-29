@@ -62,6 +62,30 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La capa `Domain` llega al listón de cobertura, y dos archivos no pueden: su techo está medido.**
+  Los nueve que estaban por debajo de 96/96 tenían entre todos **15 ramas y 4 líneas** sin cubrir. Se
+  cierran 12 ramas y las 4 líneas, y siete archivos alcanzan el listón —`RenameOperation`,
+  `RootRemapPolicy`, `MetadataMergePolicy`, `RecommendationPolicy`, `RecommendationModels`,
+  `IMetadataProvider` y `MediaNameParser`—. 24 pruebas nuevas, todas sobre guardas que existían y a
+  las que nadie llamaba por su lado falso: que un renombrado cuyo destino es su propio origen **no**
+  es la excepción que deja sobrescribir un archivo existente, que un plan sin operaciones no se
+  ejecuta aunque no tenga conflictos, que un conflicto entre dos raíces deja en paz a la tercera, que
+  el remoto sin año no borra el año guardado, y que dos gustos del mismo tamaño con claves distintas
+  no son el mismo gusto.
+
+  **Las tres ramas que quedan no las puede tomar ninguna entrada, y eso se leyó en vez de suponerse.**
+  La de `SegmentDetectionPolicy` es un `dup; brtrue.s` en el offset 139 del IL —el caché del delegado
+  del `GroupBy`, alojado en la clase de cierre que el método crea **una por llamada**, así que el
+  campo nace nulo y el salto no se toma jamás—. La de `MatchModels` exigiría que `GetRelativePath`
+  devolviera una cadena vacía, y ese camino **lanza** antes. La de `MediaNameParser` exigiría una
+  temporada negativa, y los tres patrones capturan `\d{1,3}`. Las tres quedan escritas en la prueba
+  donde se buscarán la próxima vez, no sólo en la evidencia.
+
+  Los suelos nuevos los mide CI: este árbol no toca `eng/coverage-debt.txt`. Evidencia en
+  [audit-domain-coverage.md](evidence/stable/audit-domain-coverage.md), con los suelos de partida
+  reproducidos **exactos** desde el artefacto de un run verde, que es lo que dice que el instrumento
+  mide lo mismo que la puerta.
+
 - **El repositorio gana su propia configuracion de Claude Code, y con ella la regla 0 deja de
   depender de una maquina.** `.mcp.json` declara el MCP de Avalonia —`https://docs-mcp.avaloniaui.net/mcp`,
   sin credenciales ni rutas locales—, que hasta hoy estaba en la configuracion personal de quien

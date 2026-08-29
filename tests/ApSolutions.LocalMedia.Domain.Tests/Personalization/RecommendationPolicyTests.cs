@@ -244,6 +244,71 @@ public sealed class RecommendationPolicyTests
         Assert.True(RecommendationTaste.Empty.IsEmpty);
     }
 
+    /// <summary>
+    /// Two tastes of the same size whose keys differ are not the same taste. The comparison walks the
+    /// first dictionary and looks each key up in the second, and the test above only ever varies a
+    /// value or the count — so the lookup had never come back empty. Someone who likes only Drama and
+    /// someone who likes only Terror, both by exactly the same amount, would otherwise be told they
+    /// have identical taste and be shown each other's rail.
+    /// </summary>
+    [Fact]
+    public void Two_tastes_of_the_same_size_with_different_keys_are_not_equal()
+    {
+        var drama = new RecommendationTaste(
+            new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase) { ["Drama"] = 0.5 },
+            new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase) { ["Ada"] = 0.25 },
+            AverageRating: 7,
+            PreferredYear: 2016);
+        var terror = new RecommendationTaste(
+            new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase) { ["Terror"] = 0.5 },
+            drama.Cast,
+            drama.AverageRating,
+            drama.PreferredYear);
+        var otherPerson = new RecommendationTaste(
+            drama.Genres,
+            new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase) { ["Bob"] = 0.25 },
+            drama.AverageRating,
+            drama.PreferredYear);
+
+        Assert.NotEqual(drama, terror);
+        Assert.NotEqual(drama, otherPerson);
+    }
+
+    /// <summary>
+    /// A history that carries neither ratings nor years still says something: the genres and the cast
+    /// are there. Averaging an empty set gives no answer at all rather than a zero, because a
+    /// preferred year of 0 would put every candidate two millennia away from taste and a rating
+    /// average of 0 would read as actively disliking everything watched so far.
+    /// </summary>
+    [Fact]
+    public void A_history_with_no_ratings_and_no_years_still_summarises_what_it_has()
+    {
+        var taste = RecommendationPolicy.Summarize(
+            [
+                new WatchedTitle(Title(1), ["Drama"], ["Ada"], Year: null, Rating: null),
+                new WatchedTitle(Title(2), ["Drama"], ["Bob"], Year: null, Rating: null),
+            ]);
+
+        Assert.Null(taste.AverageRating);
+        Assert.Null(taste.PreferredYear);
+        Assert.Contains("Drama", taste.Genres);
+        Assert.Contains("Ada", taste.Cast);
+        Assert.False(taste.IsEmpty);
+    }
+
+    /// <summary>
+    /// The history identifies the titles it is made of. Summarize reads only the genres, cast, rating
+    /// and year, so nothing in this layer reads the identifier back — it is what lets a caller build
+    /// the history from a catalogue and know which rows it summarised.
+    /// </summary>
+    [Fact]
+    public void A_watched_title_carries_the_identifier_of_what_was_watched()
+    {
+        var watched = new WatchedTitle(Title(4), ["Drama"], ["Ada"], 2016, 8);
+
+        Assert.Equal(Title(4), watched.Id);
+    }
+
     [Fact]
     public void The_policy_refuses_missing_input_rather_than_inventing_a_result()
     {

@@ -61,6 +61,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The `Domain` layer reaches the coverage bar, and two files cannot: their ceiling is measured.**
+  The nine that sat below 96/96 held **15 branches and 4 lines** between them. Twelve branches and all
+  four lines close, and seven files reach the bar — `RenameOperation`, `RootRemapPolicy`,
+  `MetadataMergePolicy`, `RecommendationPolicy`, `RecommendationModels`, `IMetadataProvider` and
+  `MediaNameParser`. 24 new tests, every one of them on a guard that existed and that nobody had ever
+  called on its false side: that a rename whose destination equals its own source is **not** the
+  exception allowed to overwrite an existing file, that a plan with no operations does not execute
+  however few conflicts it has, that a conflict between two roots leaves a third one alone, that a
+  remote answer without a year does not erase the year already stored, and that two tastes of the
+  same size with different keys are not the same taste.
+
+  **The three branches left cannot be taken by any input, and that was read rather than assumed.**
+  `SegmentDetectionPolicy`'s is a `dup; brtrue.s` at IL offset 139 — the `GroupBy` lambda's delegate
+  cache, held on the closure class the method allocates **once per call**, so the field is born null
+  and the jump is never taken. `MatchModels`'s would need `GetRelativePath` to return an empty string,
+  and that path **throws** first. `MediaNameParser`'s would need a negative season, and all three
+  patterns capture `\d{1,3}`. All three are written into the test someone will look at next time, not
+  only into the evidence.
+
+  CI measures the new floors: this tree does not touch `eng/coverage-debt.txt`. Evidence in
+  [audit-domain-coverage.md](evidence/stable/audit-domain-coverage.md), with the starting floors
+  reproduced **exactly** from a green run's artefact, which is what says the instrument measures what
+  the gate measures.
+
 - **The repository gets its own Claude Code configuration, and with it rule 0 stops depending on one
   machine.** `.mcp.json` declares the Avalonia MCP — `https://docs-mcp.avaloniaui.net/mcp`, no
   credentials or local paths — which until today lived in the personal config of whoever was working:

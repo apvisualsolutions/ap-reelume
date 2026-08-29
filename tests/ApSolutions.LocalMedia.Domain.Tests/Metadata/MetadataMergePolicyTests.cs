@@ -67,6 +67,41 @@ public sealed class MetadataMergePolicyTests
         Assert.Equal("/backdrop.jpg", merged.BackdropPath);
     }
 
+    /// <summary>
+    /// The release year is the one optional value that does not go through SelectText — it is merged
+    /// with a null-coalescing operator instead — so the test above, which drops the overview, the
+    /// poster and the backdrop, leaves it alone. A provider that knows the film but not its release
+    /// date is ordinary, and the year already on the card must survive that answer rather than be
+    /// blanked by it.
+    /// </summary>
+    [Fact]
+    public void A_remote_answer_without_a_year_keeps_the_year_already_stored()
+    {
+        var current = new EditableMetadata(
+            "Arrival",
+            "Arrival",
+            "Local overview",
+            2016,
+            ["Drama"],
+            "/poster.jpg",
+            "/backdrop.jpg",
+            null,
+            new HashSet<MetadataField>());
+        var remote = Details(
+            title: "La llegada",
+            overview: "Remote overview",
+            genres: ["Ciencia ficción"],
+            poster: "/remote.jpg",
+            backdrop: "/remote-backdrop.jpg") with
+        { ReleaseYear = null };
+
+        var merged = new MetadataMergePolicy().Merge(current, remote);
+
+        Assert.Equal(2016, merged.ReleaseYear);
+        Assert.Equal("La llegada", merged.Title);
+        Assert.Equal(["Ciencia ficción"], merged.Genres);
+    }
+
     [Fact]
     public void Locking_all_fields_makes_remote_refresh_non_destructive()
     {
