@@ -7,6 +7,23 @@ Este archivo es para un agente que llega al repositorio sin contexto. Está en e
 proyecto se piensa en español y se publica en dos idiomas; el código, los commits y los nombres de
 prueba van en inglés.
 
+## Lo que el repositorio automatiza por ti
+
+`.claude/` y `.mcp.json` están versionados, así que esto llega con el clon:
+
+- **`.mcp.json`** declara el MCP de Avalonia. La regla 0 de abajo lo exige, y por eso viene en el
+  árbol en vez de en la máquina de cada uno.
+- **Dos hooks** que hacen cumplir lo que antes eran frases: rechazan escribir
+  `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y avisan al escribir si falta la cabecera SPDX o
+  si un `.es.md` se adelantó a su pareja.
+- **`/cerrar-tanda`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso.
+- **`/medir-pixeles`** trae el arnés de rasterización con sus cinco trampas medidas.
+- **`gate-auditor`** busca puertas que pasan sin medir nada; **`prototype-fidelity`** compara la
+  aplicación con `design/`.
+
+Si los hooks no disparan, es que la sesión arrancó sin `.claude/settings.json`: se recarga abriendo
+`/hooks` una vez.
+
 ## Regla 0, inquebrantable: el MCP de Avalonia antes que nada
 
 **Antes de escribir una línea de AXAML, de tocar un estilo o de afirmar cómo se comporta un control,

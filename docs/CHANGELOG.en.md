@@ -10,6 +10,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The repository gets its own Claude Code configuration, and with it rule 0 stops depending on one
+  machine.** `.mcp.json` declares the Avalonia MCP — `https://docs-mcp.avaloniaui.net/mcp`, no
+  credentials or local paths — which until today lived in the personal config of whoever was working:
+  the newest rule in `CLAUDE.md` required consulting it and the server was not in the tree.
+
+  With it, two **process gates** that were sentences until now: a hook refuses to write
+  `eng/coverage-debt.txt` and `eng/walk-pending.txt` — which `CLAUDE.md` declares CI-produced and
+  which nothing prevented editing — and another warns at write time when the SPDX header is missing
+  or an `.es.md` has moved ahead of its pair. Two skills, `/cerrar-tanda` and `/medir-pixeles`, and
+  two agents, `gate-auditor` — which hunts for gates that pass without measuring anything — and
+  `prototype-fidelity`.
+
+  **All six hook cases were tested one by one before being written**, and the pipe-test caught a
+  defect no amount of reading would have found: `jq` on Windows emits **CRLF**, so the path arrived
+  ending in ``, no pattern matched, and the hook would have been silent for ever — which is the
+  shape this repository's defect already has.
+
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
   clock.** The band was five buttons and nothing else, so a floating window said neither **what** was
   playing nor **how far in** it was — which is most of what a picture-in-picture is for. It now

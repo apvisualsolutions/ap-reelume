@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | tr -d '\\r' | { read -r f; case \"$f\" in *coverage-debt.txt|*walk-pending.txt) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"eng/coverage-debt.txt y eng/walk-pending.txt los produce CI: se copian del artefacto coverage-debt de un run, y nunca se editan a mano ni se generan con una ejecucion local (CLAUDE.md). Editarlos a mano relaja en silencio la cobertura de todo el arbol o el trinquete del paseo.\"}}';; esac; }",
+            "shell": "bash",
+            "timeout": 10,
+            "statusMessage": "Comprobando los archivos que produce CI"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | tr -d '\\r' | { read -r f; [ -z \"$f\" ] && exit 0; case \"$f\" in *.cs|*.axaml) grep -q 'SPDX-License-Identifier: GPL-3.0-or-later' \"$f\" 2>/dev/null || printf '%s' '{\"systemMessage\":\"Regla 1: falta la cabecera SPDX-License-Identifier: GPL-3.0-or-later. Lo exige IDE0073 y lo caza dotnet format, pero minutos mas tarde.\"}';; *docs*.es.md) en=\"${f%.es.md}.en.md\"; if [ ! -f \"$en\" ]; then printf '%s' '{\"systemMessage\":\"Regla 4: este documento no tiene pareja .en.md y verify-docs.ps1 la exige.\"}'; elif [ \"$f\" -nt \"$en\" ]; then printf '%s' '{\"systemMessage\":\"Regla 4: el .en.md quedo mas atras que el .es.md. Los dos idiomas van juntos.\"}'; fi;; esac; exit 0; }",
+            "shell": "bash",
+            "timeout": 10,
+            "statusMessage": "Comprobando licencia y bilinguismo"
+          }
+        ]
+      }
+    ]
+  }
+}

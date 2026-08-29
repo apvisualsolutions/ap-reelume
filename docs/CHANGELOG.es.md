@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El repositorio gana su propia configuracion de Claude Code, y con ella la regla 0 deja de
+  depender de una maquina.** `.mcp.json` declara el MCP de Avalonia —`https://docs-mcp.avaloniaui.net/mcp`,
+  sin credenciales ni rutas locales—, que hasta hoy estaba en la configuracion personal de quien
+  programaba: la regla mas nueva de `CLAUDE.md` exigia consultarlo y el servidor no venia en el arbol.
+
+  Con el, dos **puertas de proceso** que hasta ahora eran frases: un hook rechaza escribir
+  `eng/coverage-debt.txt` y `eng/walk-pending.txt` —que `CLAUDE.md` declara producidos por CI y que
+  nada impedia editar—, y otro avisa en el momento de escribir si falta la cabecera SPDX o si un
+  `.es.md` se ha adelantado a su pareja. Dos skills, `/cerrar-tanda` y `/medir-pixeles`, y dos
+  agentes, `gate-auditor` —que busca puertas que pasan sin medir nada— y `prototype-fidelity`.
+
+  **Los seis casos de los hooks se probaron uno a uno antes de escribirlos**, y el pipe-test cazo un
+  defecto que ninguna lectura habria visto: `jq` en Windows emite **CRLF**, asi que la ruta llegaba
+  terminada en ``, ningun patron casaba y el hook habria callado siempre — que es la forma que ya
+  tiene el defecto de esta casa.
+
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
   reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se
   estaba viendo ni **por dónde iba** — que es la mayor parte de para qué existe una imagen sobre
