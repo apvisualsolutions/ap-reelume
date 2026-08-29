@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Globalization;
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Headless.XUnit;
@@ -176,6 +177,147 @@ public sealed class PrototypeIconTests
                     + "it is given up to the control and pins the remainder top left, so this glyph is "
                     + "drawn larger than the prototype draws it and off centre inside its own button.");
         }
+    }
+
+    /// <summary>
+    /// Every size class is the size it is named for, and every one of them is a size the prototype
+    /// actually spends.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Two halves, and each one caught a real defect. <b>The name is the number</b>: from 2026-08-25
+    /// to 2026-08-29 <c>size-20</c> set <c>Width="18"</c>, a two pixel subtraction applied by eye
+    /// against an excess that was a different factor for every icon. With the canvas restored there
+    /// is nothing left to compensate, and a class whose name lies about its size is how that comes
+    /// back.
+    /// </para>
+    /// <para>
+    /// <b>And the number is the prototype's</b>, read from <c>design/</c> rather than listed here, so
+    /// a class invented for this application fails instead of quietly becoming the house style. The
+    /// pattern has to accept an <b>expression</b> as the first argument: on 2026-08-29 a count that
+    /// required a string literal missed ten calls — among them
+    /// <c>icon(p.playing &amp;&amp; !err ? 'pause' : 'play', 22)</c> — and produced the confident,
+    /// false claim that the prototype never used 22. An absence is measured, never inferred from a
+    /// pattern that happened to match nothing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Every_size_class_is_its_own_number_and_one_the_prototype_spends()
+    {
+        var classes = SizeClasses();
+        var spent = PrototypeSizes();
+
+        // Both sides can go silently empty: a renamed selector, a markup change, a pattern that
+        // stopped matching. Two empty sets agree with each other perfectly.
+        Assert.True(classes.Count >= 4, $"only {classes.Count} size classes were read from the theme.");
+        Assert.True(spent.Count >= 5, $"only {spent.Count} icon sizes were read from the prototype.");
+
+        foreach (var (name, width) in classes)
+        {
+            Assert.True(
+                name == width,
+                $"Path.icon.size-{name} sets Width=\"{width}\". The class name is the size the "
+                    + "prototype draws that glyph at, and with the 24 unit canvas restored there is "
+                    + "nothing left for a difference between the two to compensate.");
+
+            Assert.True(
+                spent.Contains(width),
+                $"Path.icon.size-{name} is not a size the prototype spends; it draws at "
+                    + $"{string.Join(", ", spent.Order())}.");
+        }
+    }
+
+    /// <summary>Each <c>Path.icon.size-N</c> the theme declares, as its name and the width it sets.</summary>
+    private static List<(int Name, int Width)> SizeClasses()
+    {
+        var markup = File.ReadAllText(RepositoryLayout.PathFromRoot(
+            "src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml"));
+
+        return
+        [
+            .. Regex.Matches(
+                markup,
+                """<Style Selector="Path\.icon\.size-(?<name>\d+)">\s*<Setter Property="Width" Value="(?<width>\d+)" />""",
+                RegexOptions.None,
+                TimeSpan.FromSeconds(2))
+                .Cast<Match>()
+                .Select(match => (
+                    int.Parse(match.Groups["name"].Value, CultureInfo.InvariantCulture),
+                    int.Parse(match.Groups["width"].Value, CultureInfo.InvariantCulture))),
+        ];
+    }
+
+    /// <summary>Every size the prototype passes to <c>icon(n, s)</c>, expressions included.</summary>
+    private static HashSet<int> PrototypeSizes()
+    {
+        var markup = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
+
+        return
+        [
+            .. Regex.Matches(
+                markup,
+                @"\bicon\([^)]*,\s*(?<size>\d+)\)",
+                RegexOptions.None,
+                TimeSpan.FromSeconds(2))
+                .Cast<Match>()
+                .Select(match => int.Parse(match.Groups["size"].Value, CultureInfo.InvariantCulture)),
+        ];
+    }
+
+    /// <summary>
+    /// One glyph in one role is one size, across every view that draws it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>IconPlay</c> is drawn in seven places and plays two roles: the transport's toggle, which
+    /// the prototype draws at 22, and the play on a catalogue action — «Continuar», «Reproducir» —
+    /// which it draws in five views that a reader moves between. <b>Those five have to agree</b>, and
+    /// on 2026-08-29 they did not: an alignment pass moved the size in three of them, two were put
+    /// back after measuring the cost, and <c>MovieDetailsView</c> was missed. The same button, one
+    /// pixel different depending on which screen you reached it from — worse than either size.
+    /// </para>
+    /// <para>
+    /// The list is closed on purpose, the way <c>LeadingActionTests</c> keeps its table of views: a
+    /// sixth view drawing a catalogue play fails here until somebody adds it and says which size it
+    /// takes. A count that only asked «are they all equal?» would pass the day the last of them is
+    /// deleted.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_play_of_a_catalogue_action_is_one_size_in_every_view_that_draws_it()
+    {
+        string[] views =
+        [
+            "Home/ContinueCardView.axaml",
+            "Home/ResumeHeroView.axaml",
+            "Movie/MovieDetailsView.axaml",
+            "Show/EpisodeRowView.axaml",
+            "Show/ShowDetailsView.axaml",
+        ];
+
+        var sizes = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var view in views)
+        {
+            var markup = File.ReadAllText(RepositoryLayout.PathFromRoot(
+                "src/ApSolutions.LocalMedia.Presentation/" + view));
+
+            var match = Regex.Match(
+                markup,
+                @"Classes=""icon (?<size>size-\d+) filled""[^>]*Data=""\{DynamicResource IconPlay\}""",
+                RegexOptions.None,
+                TimeSpan.FromSeconds(2));
+
+            Assert.True(match.Success, $"{view} no longer draws a filled IconPlay; the table is stale.");
+            sizes[view] = match.Groups["size"].Value;
+        }
+
+        var distinct = sizes.Values.Distinct(StringComparer.Ordinal).ToArray();
+        Assert.True(
+            distinct.Length == 1,
+            "the play of a catalogue action is drawn at more than one size: "
+                + string.Join(", ", sizes.Select(pair => $"{pair.Key} {pair.Value}"))
+                + ". A reader moves between these five views and compares the same button against "
+                + "itself.");
     }
 
     /// <summary>

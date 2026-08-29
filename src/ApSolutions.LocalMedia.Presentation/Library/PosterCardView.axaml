@@ -127,7 +127,7 @@ and a name here would be a second announcement of the same card.
             IsVisible="{Binding HasKind}">
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
             <Path
-                Classes="icon size-14 kind-glyph"
+                Classes="icon size-12 kind-glyph"
                 Classes.show="{Binding IsShow}"
                 VerticalAlignment="Center"
                 Stroke="{DynamicResource PosterChipInkBrush}" />

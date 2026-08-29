@@ -120,14 +120,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Classes="player-chrome"
             Command="{Binding ToggleMiniPlayerCommand}"
             automation:AutomationProperties.Name="{DynamicResource MiniPlayerRestore}">
-          <Path Classes="icon size-20" Data="{DynamicResource IconExitFullscreen}" />
+          <Path Classes="icon size-18" Data="{DynamicResource IconExitFullscreen}" />
         </Button>
         <Button
             x:Name="MiniPlayerClose"
             Classes="player-chrome"
             Command="{Binding ClosePlayerCommand}"
             automation:AutomationProperties.Name="{DynamicResource MiniPlayerClose}">
-          <Path Classes="icon size-20" Data="{DynamicResource IconClose}" />
+          <Path Classes="icon size-18" Data="{DynamicResource IconClose}" />
         </Button>
       </WrapPanel>
       <!--

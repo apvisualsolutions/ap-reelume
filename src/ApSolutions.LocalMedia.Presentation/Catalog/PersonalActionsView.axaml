@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsChecked="{Binding IsFavorite, Mode=OneWay}"
         automation:AutomationProperties.Name="{DynamicResource PersonalFavoriteAction}">
       <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space8}">
-        <Path Classes="icon size-16" Data="{DynamicResource IconBookmark}" />
+        <Path Classes="icon size-15" Data="{DynamicResource IconBookmark}" />
         <TextBlock Grid.Column="1" Text="{DynamicResource PersonalFavoriteAction}" />
         <TextBlock
             Grid.Column="2"
@@ -49,7 +49,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         IsChecked="{Binding IsWatchLater, Mode=OneWay}"
         automation:AutomationProperties.Name="{DynamicResource PersonalWatchLaterAction}">
       <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space8}">
-        <Path Classes="icon size-16" Data="{DynamicResource IconClock}" />
+        <Path Classes="icon size-15" Data="{DynamicResource IconClock}" />
         <TextBlock Grid.Column="1" Text="{DynamicResource PersonalWatchLaterAction}" />
         <TextBlock
             Grid.Column="2"
