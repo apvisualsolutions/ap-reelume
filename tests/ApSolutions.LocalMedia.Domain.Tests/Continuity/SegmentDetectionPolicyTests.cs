@@ -10,6 +10,14 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Continuity;
 /// <summary>
 /// What becomes of a detection: only valid, confident results are stored, a person's corrections
 /// survive every later run, and the player never sees a detection where a manual marker exists.
+/// <para>
+/// MergeDetections stops at 13 of 14 branches and the fourteenth is unreachable, read off the IL on
+/// 2026-08-30 rather than assumed. At offset 139 the method holds <c>dup; brtrue.s</c> — the delegate
+/// cache for the GroupBy lambda — but that cache field lives on the closure class the method builds
+/// to capture <c>durations</c>, and a fresh closure is allocated on every call, so the field is
+/// always null and the jump is never taken. No input reaches it: the file's floor of 92 is also its
+/// ceiling, and it stays in eng/coverage-debt.txt for that reason rather than for a missing test.
+/// </para>
 /// </summary>
 public sealed class SegmentDetectionPolicyTests
 {
@@ -65,6 +73,30 @@ public sealed class SegmentDetectionPolicyTests
 
         // FileA's episode ends at 150 s, so its detection is refused; FileB's duration is unknown
         // and the old judgement stands.
+        Assert.Equal(FileB, Assert.Single(merged).FileId);
+    }
+
+    /// <summary>
+    /// A duration table the caller only partly filled must not fail closed. Every existing test either
+    /// passes no table at all or one that holds every file it detects on, so a file missing from the
+    /// table had never been judged. GetValueOrDefault answers null for an absent key and null means
+    /// "length unknown, let it through" — had it answered TimeSpan.Zero instead, every detection on a
+    /// file whose duration the caller had not looked up would end past its episode and vanish, with
+    /// no error to say so.
+    /// </summary>
+    [Fact]
+    public void A_file_missing_from_the_duration_table_is_unknown_rather_than_zero_length()
+    {
+        var detection = Detection(
+            Segment(FileA, MarkerKind.Credits, 100, 200, 0.9),
+            Segment(FileB, MarkerKind.Credits, 100, 200, 0.9));
+        var partial = new Dictionary<MediaFileId, TimeSpan?>
+        {
+            [FileA] = TimeSpan.FromSeconds(150),
+        };
+
+        var merged = SegmentDetectionPolicy.MergeDetections(detection, existing: [], partial);
+
         Assert.Equal(FileB, Assert.Single(merged).FileId);
     }
 

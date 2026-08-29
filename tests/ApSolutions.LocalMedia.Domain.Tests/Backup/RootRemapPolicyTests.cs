@@ -148,6 +148,62 @@ public sealed class RootRemapPolicyTests
         Assert.Equal("F:\\a\\film.mkv", RootRemapPolicy.Rewrite("D:\\media\\film.mkv", decisions));
     }
 
+    /// <summary>
+    /// The conflict is marked per root, not per batch. Two_roots_pointed_at_one_folder proves both
+    /// contested roots are stopped, but every root in that restore was contested, so the arm that
+    /// hands an uncontested decision back untouched had never run. A restore that blocked roots
+    /// nobody aimed at the same place would be refusing work it could do, and the person would have
+    /// no way to tell which pair actually collided.
+    /// </summary>
+    [Fact]
+    public void A_conflict_between_two_roots_leaves_a_third_one_alone()
+    {
+        var decisions = RootRemapPolicy.Resolve(
+            ["D:\\media", "E:\\archive", "H:\\extra"],
+            [
+                new RootRemap("D:\\media", "F:\\library"),
+                new RootRemap("E:\\archive", "F:\\library"),
+                new RootRemap("H:\\extra", "F:\\other"),
+            ],
+            _ => true);
+
+        Assert.Equal(3, decisions.Count);
+        Assert.Equal(2, decisions.Count(decision => decision.Status == RootRemapStatus.Conflict));
+        var untouched = Assert.Single(decisions, decision => decision.OldPath == "H:\\extra");
+        Assert.Equal(RootRemapStatus.Remapped, untouched.Status);
+        Assert.False(untouched.IsBlocking);
+    }
+
+    /// <summary>
+    /// The length test in Normalize is what keeps a drive root a drive root. Every other path loses a
+    /// trailing separator so one folder cannot become two, but "D:\" without its separator is "D:",
+    /// which on Windows names the current directory of that drive rather than its root.
+    /// <para>
+    /// This test stops at Normalize and at the decision, because Rewrite does not carry a drive root
+    /// through: IsUnder asks whether the path starts with root + '\', and for "D:\" that is "D:\\",
+    /// which no real path begins with. So a library stored at the top of a disk is resolved as
+    /// Remapped and then rewritten to nothing at all. That is a defect in the restore path rather
+    /// than a gap in this suite, and it is left for its own change with its own evidence — asserting
+    /// today's answer here would write the bug down as the contract.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public void A_drive_root_keeps_the_separator_that_makes_it_a_root()
+    {
+        Assert.Equal("D:\\", RootRemapPolicy.Normalize("D:/"));
+        Assert.Equal("D:\\", RootRemapPolicy.Normalize("  D:\\  "));
+        Assert.Equal("D:\\media", RootRemapPolicy.Normalize("D:\\media\\"));
+
+        var decisions = RootRemapPolicy.Resolve(
+            ["D:\\"],
+            [new RootRemap("D:/", "F:\\library")],
+            _ => true);
+
+        var decision = Assert.Single(decisions);
+        Assert.Equal("D:\\", decision.OldPath);
+        Assert.Equal("F:\\library", decision.NewPath);
+    }
+
     [Fact]
     public void Blank_input_is_refused_rather_than_treated_as_a_root()
     {
