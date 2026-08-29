@@ -1,12 +1,86 @@
 # Where to pick up
 
+## State at the close of 2026-08-29 (eighth session) — a warning that always fired
+
+**The only commit of this session is the one writing this note, which is why it is not named**; the
+rest was closing what the seventh left open. There was no code piece: the owner confirmed it on
+opening, and it is still the real state. **`0.2.0` is blocked only by the owner's physical walk**,
+step 7 of the ten.
+
+**The two pending commits, closed in order and one at a time.** `943f51a` was in CI on opening —
+**green at 48 minutes**, read by `eng/watch-ci.ps1` — and `main` moved to it by fast-forward; then
+`f234180` went up on its own. No run overlapped, and the push to `main` **triggered no workflow**,
+which is what the 2026-08-18 order promises and what the run list confirmed here. The three figures
+are unchanged, because no production code landed either:
+
+```
+Coverage gate: 212 file(s) still short of 96/96, ratchet 212, 212 measured under the bar
+Coverage gate: 0 new file(s) against origin/main and 14 watched file(s) are where they have to be
+The walk: 231 declared command controls in 226 identities; 206 pressed, 20 pending
+```
+
+### The bilingualism hook fired on well-done work too
+
+The seventh session left open whether its `systemMessage` reached the person. **It is still open**:
+the owner was on the app rather than at the PC, so nobody has seen one yet. But the question that
+matters turned out to be a different one, and that one could be measured without him: **if it
+arrives, it always arrives.** It compared `mtime`, and since
+each write is a separate call, the `.es.md` ends up newer than its pair **in both possible orders** —
+whether English or Spanish goes first. It only stayed quiet when you were not updating the pair,
+which is exactly when there is nothing to warn about. A warning that always fires distinguishes
+nothing.
+
+Measured on both conditions, against the real tree:
+
+| scenario | `mtime` | asking git |
+| --- | --- | --- |
+| I touch the `.es.md` and not the `.en.md` | fires | fires |
+| I touch both (well-done work) | **fires** | quiet |
+
+The new condition asks git rather than the clock: it fires if the `.es.md` differs from `HEAD` and the
+`.en.md` does not. Piped through **ten cases**, and **four are among those it must let through** —both
+languages touched, a `Write` that changed nothing, two new untracked files, and a `.md` outside
+`docs`— because that is where the seventh found the SPDX hook's two defects. **An untracked file is
+invisible to `git diff HEAD`**, so `git ls-files --error-unmatch` is needed to avoid staying quiet
+about a freshly created document.
+
+**It still does not fire through Bash**, like the other two, and it is still an early warning: the
+gate is `eng/verify-docs.ps1`.
+
+### Three probes of my own lied, and all three were cheap
+
+**No measurement failed this session; three instruments did**, and all three of the kind written in
+ten seconds without thinking:
+
+1. **The hand-written JSON.** It claimed Windows paths broke the hook. False: it passed
+   `"D:\Proyectos\…"`, which is not valid JSON, and its `2>&1` read `jq`'s error as if it were the
+   hook's warning. With the JSON built by `jq`, Git Bash resolves backslashes without trouble and
+   Windows paths were never a defect.
+2. **The too-wide `grep`.** Looking for who reads `.claude/settings.json` it matched plain
+   `settings.json` and returned thirteen files that read **the application's settings**. Nothing in
+   the code or the gates reads the Claude Code configuration.
+3. **`grep -c $'\r'`.** It said the file had no CRLF and that git's warning was a false alarm. **Git
+   was right**: `jq` had written it with **45 CRLFs** where `HEAD` had zero. `grep` treats the CR as
+   a line ending, so it never counts one; **bytes** have to be counted.
+
+**What caught all three was the same thing**: placing a known result next to the unknown one — a case
+the probe had to make fire, or leave quiet, or count. It is the lesson the seventh session paid for
+with its narrow `grep`, one day later and **moved from the measured thing to the instrument**; this
+time three times in one afternoon, which says the cheap instrument is where to look.
+
+The rule, written down for next time: **a probe is validated against something you already know
+before it is believed about something you do not**, and a `2>&1` in a probe turns any error into a
+finding.
+
 ## State at the close of 2026-08-29 (seventh session) — the icons' canvas, restored
 
-**Five commits pushed and verified one at a time**, each conclusion read by `eng/watch-ci.ps1`
-before the reference moved: `6ef1a5f`, `4a77dcf`, `34b0fe9`, `5aa040f` and `943f51a`. This line
-cannot name the last one — a document does not name its own SHA — so the first thing on opening is
-`git log --oneline -1` and `gh run list --limit 1`. The three figures of the green, **identical to the
-sixth session's** because no new production code landed — markup and tests only:
+**Six commits, from `6ef1a5f` to `f234180`.** This session verified the first four, each conclusion
+read by `eng/watch-ci.ps1` before the reference moved; the last two were still open at the close —
+`943f51a` with CI running and `f234180` unpushed — and the eighth session closed them. The earlier
+version of this line said five and named them one by one, and came up short for the usual reason:
+**a list of SHAs never contains the commit that writes it**. A range does, because a session fixes
+its end rather than the document. The three figures of the green, **identical to the sixth
+session's** because no new production code landed — markup and tests only:
 
 ```
 Coverage gate: 212 file(s) still short of 96/96, ratchet 212, 212 measured under the bar

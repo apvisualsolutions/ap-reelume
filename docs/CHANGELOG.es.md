@@ -67,17 +67,24 @@ evidencia, es [FEATURES.md](FEATURES.md).
   sin credenciales ni rutas locales—, que hasta hoy estaba en la configuracion personal de quien
   programaba: la regla mas nueva de `CLAUDE.md` exigia consultarlo y el servidor no venia en el arbol.
 
-  Con el, dos **puertas de proceso** que hasta ahora eran frases: un hook rechaza escribir
+  Con el, tres **puertas de proceso** que hasta ahora eran frases: un hook rechaza escribir
   `eng/coverage-debt.txt` y `eng/walk-pending.txt` —que `CLAUDE.md` declara producidos por CI y que
-  nada impedia editar—, y otro avisa en el momento de escribir si falta la cabecera SPDX o si un
-  `.es.md` se ha adelantado a su pareja. Dos skills, `/cerrar-tanda` y `/medir-pixeles`, y dos
-  agentes, `gate-auditor` —que busca puertas que pasan sin medir nada— y `prototype-fidelity`.
+  nada impedia editar—, otro rechaza un fuente sin la cabecera SPDX **antes** de escribirlo, y el
+  tercero avisa si se toca un `.es.md` y su pareja `.en.md` se queda como está en `HEAD`. Dos skills,
+  `/cerrar-tanda` y `/medir-pixeles`, y dos agentes, `gate-auditor` —que busca puertas que pasan sin
+  medir nada— y `prototype-fidelity`.
 
   **Los seis casos de los hooks se probaron uno a uno antes de escribirlos**, y el pipe-test cazo un
   defecto que ninguna lectura habria visto: `jq` en Windows emite **CRLF**, asi que la ruta llegaba
   terminada en `
 `, ningun patron casaba y el hook habria callado siempre — que es la forma que ya
   tiene el defecto de esta casa.
+
+  **Y el tercero se midió antes de creerlo, que es como se descubrió que sonaba siempre.** Comparaba
+  `mtime`, y como cada escritura es una llamada aparte el `.es.md` queda siempre más nuevo que su
+  pareja: avisaba **también cuando los dos idiomas se habían tocado**, que es justo el trabajo bien
+  hecho. Ahora pregunta a git —el `.es.md` difiere de `HEAD` y el `.en.md` no—, probado con **diez
+  casos** de los que cuatro son de los que debe dejar pasar.
 
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
   reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se

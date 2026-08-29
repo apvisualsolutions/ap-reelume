@@ -15,8 +15,9 @@ prueba van en inglés.
   árbol en vez de en la máquina de cada uno.
 - **Tres hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
   `eng/coverage-debt.txt` y `eng/walk-pending.txt`, que los produce CI, y un `.cs` o `.axaml` de
-  `src/` o `tests/` **cuyo contenido no lleve la cabecera SPDX**. El tercero **avisa después** si un
-  `.es.md` se adelantó a su pareja.
+  `src/` o `tests/` **cuyo contenido no lleve la cabecera SPDX**. El tercero **avisa después** si se
+  toca un `.es.md` y su pareja `.en.md` se queda como está en `HEAD` — pregunta a git y no al reloj,
+  porque comparar `mtime` hacía que sonara también con los dos idiomas al día.
 
   **Rechazar y avisar no son lo mismo, y la diferencia se midió el 2026-08-29**: un `deny` llega al
   agente como error de la herramienta, mientras que un `systemMessage` se muestra a la persona y

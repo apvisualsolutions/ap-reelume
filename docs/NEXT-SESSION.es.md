@@ -1,11 +1,82 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-29 (octava sesión) — un aviso que sonaba siempre
+
+**El único commit de esta sesión es el que escribe esta nota, y por eso no lo nombra**; lo demás fue
+cerrar lo que la séptima dejó abierto. No hubo pieza de código: el propietario lo confirmó al abrir,
+y sigue siendo el estado real. **`0.2.0` sigue bloqueado sólo por su paseo físico**, que es el paso 7
+de los diez.
+
+**Los dos commits pendientes, cerrados en orden y de uno en uno.** `943f51a` estaba en CI al abrir
+—**verde a los 48 minutos**, leído por `eng/watch-ci.ps1`— y con él `main` avanzó por fast-forward;
+después `f234180` se publicó solo. Ningún run se solapó, y el push a `main` **no disparó flujo**, que
+es lo que el orden del 2026-08-18 promete y aquí quedó comprobado en la lista de runs. Las tres
+cifras siguen siendo las mismas, porque tampoco entró código de producción:
+
+```
+Coverage gate: 212 file(s) still short of 96/96, ratchet 212, 212 measured under the bar
+Coverage gate: 0 new file(s) against origin/main and 14 watched file(s) are where they have to be
+The walk: 231 declared command controls in 226 identities; 206 pressed, 20 pending
+```
+
+### El hook del bilingüismo avisaba también cuando el trabajo estaba bien hecho
+
+La séptima sesión dejó abierto si su `systemMessage` llegaba a la persona. **Sigue abierto**: el
+propietario estaba en la aplicación y no delante del PC, así que nadie lo ha visto todavía. Pero la
+pregunta importante resultó ser otra, y ésa sí se pudo medir sin él: **si llega, llega siempre.** Comparaba `mtime`, y como cada escritura es una llamada
+aparte, el `.es.md` queda más nuevo que su pareja **en los dos órdenes posibles** — se escriba antes
+el inglés o antes el español. Sólo callaba si no estabas actualizando la pareja, que es justo cuando
+no hay nada que avisar. Un aviso que suena siempre no distingue nada.
+
+Medido sobre las dos condiciones, con el árbol real:
+
+| escenario | `mtime` | preguntando a git |
+| --- | --- | --- |
+| toco el `.es.md` y no el `.en.md` | avisa | avisa |
+| toco los dos (trabajo bien hecho) | **avisa** | calla |
+
+La condición nueva pregunta a git en vez de al reloj: avisa si el `.es.md` difiere de `HEAD` y el
+`.en.md` no. Probada por tubería con **diez casos**, y **cuatro son de los que debe dejar pasar** —los
+dos idiomas tocados, un `Write` que no cambió nada, dos archivos nuevos sin seguir y un `.md` fuera de
+`docs`— porque ahí es donde la séptima encontró los dos defectos del hook del SPDX. **Un archivo sin
+seguir es invisible para `git diff HEAD`**, así que hace falta `git ls-files --error-unmatch` para no
+callar sobre un documento recién creado.
+
+**Sigue sin disparar por Bash**, como los otros dos, y sigue siendo un adelanto de aviso: la puerta es
+`eng/verify-docs.ps1`.
+
+### Tres sondas mías mintieron, y las tres eran baratas
+
+**Ninguna medición de esta sesión falló; fallaron tres instrumentos**, y los tres del tipo que se
+escribe en diez segundos sin pensarlo:
+
+1. **El JSON escrito a mano.** Afirmó que las rutas de Windows rompían el hook. Era falso: pasaba
+   `"D:\Proyectos\…"`, que no es JSON válido, y su `2>&1` leía el error de `jq` como si fuera el
+   aviso del hook. Con el JSON construido por `jq`, Git Bash resuelve las barras invertidas sin
+   problema y las rutas de Windows nunca fueron un defecto.
+2. **El `grep` demasiado ancho.** Buscando quién lee `.claude/settings.json` casó `settings.json` a
+   secas y devolvió trece archivos que leen **los ajustes de la aplicación**. Nadie del código ni de
+   las puertas lee la configuración de Claude Code.
+3. **`grep -c $'\r'`.** Dijo que el archivo no tenía CRLF y que el aviso de git era una falsa alarma.
+   **Git tenía razón**: `jq` lo había escrito con **45 CRLF** donde `HEAD` tenía cero. `grep` trata el
+   CR como fin de línea, así que jamás cuenta uno; hay que contar **bytes**.
+
+**Lo que las cazó a las tres fue lo mismo**: poner un resultado conocido al lado del desconocido —un
+caso que la sonda debía hacer sonar, o dejar en silencio, o contar—. Es la lección que la séptima
+sesión pagó con su `grep` estrecho, un día después y **movida de lo medido al instrumento**; esta vez
+tres veces en una tarde, lo que dice que el instrumento barato es el sitio donde hay que mirar.
+
+La regla, escrita para la próxima: **una sonda se valida contra algo que ya sabes antes de creerle
+algo que no sabes**, y un `2>&1` en una sonda convierte cualquier error en un hallazgo.
+
 ## Estado al cierre del 2026-08-29 (séptima sesión) — el lienzo de los iconos, restituido
 
-**Cinco commits publicados y verificados de uno en uno**, con la conclusión de cada uno leída por
-`eng/watch-ci.ps1` antes de mover la referencia: `6ef1a5f`, `4a77dcf`, `34b0fe9`, `5aa040f` y
-`943f51a`. Esta línea no puede nombrar el último —un documento no nombra su propio SHA—, así que lo
-primero al abrir es `git log --oneline -1` y `gh run list --limit 1`. Las tres cifras del verde, **idénticas a las de la
+**Seis commits, de `6ef1a5f` a `f234180`.** Los cuatro primeros los verificó esta sesión, con la
+conclusión de cada uno leída por `eng/watch-ci.ps1` antes de mover la referencia; los dos últimos
+quedaron abiertos al cerrar —`943f51a` con CI corriendo y `f234180` sin publicar— y los cerró la
+octava. La versión anterior de esta línea decía cinco y los nombraba uno a uno, y se quedó coja por
+lo de siempre: **una lista de SHA nunca contiene el commit que la escribe**. Un rango sí, porque su
+extremo lo fija la sesión y no el documento. Las tres cifras del verde, **idénticas a las de la
 sexta sesión** porque no entró código de producción nuevo —sólo marcado y pruebas—:
 
 ```
