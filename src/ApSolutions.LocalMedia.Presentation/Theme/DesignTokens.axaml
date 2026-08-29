@@ -1643,12 +1643,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
-    Every glyph two pixels smaller than it was drawn, and the stroke with it.
-    
-    The owner asked for it on 2026-08-25 — «todos los iconos de la aplicación son muy grandes, bájales
-    el tamaño un poco» — and «un poco» is one step of this scale rather than a taste: the four sizes
-    keep the ratio they were built with, width over fifteen, so a glyph two pixels narrower is drawn
-    with a stroke two fifteenths thinner and reads as the same drawing rather than as a bolder one.
+    Each class is the size the prototype draws that glyph at: `size-20` is `icon(n, 20)`, and the
+    stroke under it is the prototype's 1.6 in a box of 24 scaled to the same width.
+
+    This carried a two pixel subtraction from 2026-08-25 to 2026-08-29, and the complaint behind it
+    was real — «todos los iconos de la aplicación son muy grandes, bájales el tamaño un poco». The
+    instrument was not. The icons were oversized because the conversion had dropped the prototype's
+    24 unit viewBox, so `Stretch` `Uniform` stretched each stroke until it filled the box: measured,
+    that made `IconHome` 1.20x too large and `IconClose` 1.86x, a different factor for every glyph.
+    A fixed subtraction of two cannot correct a set of different factors, and it was also being read
+    the wrong way round — the excess was in the geometry, not in the class. Icons.axaml restores the
+    viewBox, so the class name is the size again and there is nothing left to compensate.
   -->
   <Style Selector="Path.icon">
     <Setter Property="Stroke" Value="{Binding $self.(TextElement.Foreground)}" />
@@ -1663,27 +1668,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <Style Selector="Path.icon.size-14">
-    <Setter Property="Width" Value="12" />
-    <Setter Property="Height" Value="12" />
-    <Setter Property="StrokeThickness" Value="0.8" />
-  </Style>
-
-  <Style Selector="Path.icon.size-16">
     <Setter Property="Width" Value="14" />
     <Setter Property="Height" Value="14" />
     <Setter Property="StrokeThickness" Value="0.93" />
   </Style>
 
-  <Style Selector="Path.icon.size-20">
-    <Setter Property="Width" Value="18" />
-    <Setter Property="Height" Value="18" />
-    <Setter Property="StrokeThickness" Value="1.2" />
+  <Style Selector="Path.icon.size-16">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="StrokeThickness" Value="1.07" />
   </Style>
 
-  <Style Selector="Path.icon.size-22">
+  <Style Selector="Path.icon.size-20">
     <Setter Property="Width" Value="20" />
     <Setter Property="Height" Value="20" />
     <Setter Property="StrokeThickness" Value="1.33" />
+  </Style>
+
+  <Style Selector="Path.icon.size-22">
+    <Setter Property="Width" Value="22" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="StrokeThickness" Value="1.47" />
   </Style>
 
   <!--

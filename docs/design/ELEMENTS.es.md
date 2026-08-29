@@ -278,8 +278,24 @@ los `rect` y `circle` del prototipo se convirtieron en los arcos que los dibujan
 número único —Avalonia escala la geometría a los límites del control y luego la traza—, así que cada
 tamaño lleva el suyo: `1,6 × tamaño ÷ 24`.
 
-Los tamaños que el prototipo gasta, y los únicos que hay: 14 para un galón, 16 para una fila de menú,
-18 para un aviso, 20 para un destino del rail, 22 para el conmutador de reproducción.
+**Y cada geometría empieza por `M0 0 M24 24`, que es el lienzo y no dibujo.** Sin él, los límites de
+una geometría son los de su propia tinta, y `Stretch="Uniform"` estira cada trazo por un factor
+distinto hasta llenar la caja: medido el 2026-08-29, eso dejaba los iconos entre **1,12× y 1,74×** más
+grandes que el prototipo y hasta **4,5 px descentrados**, y volvía falsa la premisa de la fórmula del
+grosor —que la tinta llena el lienzo—. Dos `moveto` que no dibujan nada devuelven la caja a `0,0
+24×24`, y una puerta lo parsea para las treinta y una. La medición está en
+[el lienzo que la portación no copió](../evidence/stable/audit-icon-canvas.md).
+
+Las clases de tamaño valen lo que dice su nombre: `size-20` es `Width="20"`, que es literalmente
+`icon(n, 20)`. **Llevaron un `-2` del 2026-08-25 al 2026-08-29** —`size-20` daba 18— porque los
+iconos se veían grandes y se encogió la caja a ojo; no podía funcionar, porque el exceso era un
+factor distinto para cada icono y estaba en la geometría, no en la clase.
+
+Los tamaños que las clases declaran: 14 para un galón, 16 para una fila de menú, 20 para un destino
+del rail, 22 para el conmutador de reproducción. **Contadas las llamadas a `icon(n, s)` del
+prototipo, los tamaños que gasta son 13, 14, 15, 16, 18, 20 y 26 —el más frecuente es 15, con diez
+usos— y 22 no aparece.** Esta línea decía «los únicos que hay» y nombraba un 18 que ninguna clase
+declara; queda como está a la espera de una decisión, y no se deduce de este documento.
 
 Dos formas son de esta aplicación y lo dicen: `IconStop`, porque su transporte tiene una parada donde
 el prototipo tiene un solo conmutador, y `IconChevronUp`, que es `IconChevronDown` del revés.

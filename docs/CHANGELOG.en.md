@@ -8,6 +8,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Fixed
+
+- **The icons get their 24 by 24 canvas back, and three defects go with it.** Porting them from the
+  prototype on 2026-08-24 copied the stroke and **not the `viewBox`**, so each geometry's bounds
+  became its own ink. `Stretch="Uniform"` scales by those bounds until the box is full and pins the
+  remainder top left, so every icon grew **by a different factor** and drifted off centre by whatever
+  was left over.
+
+  Measured by rasterising: the icons came out between **1.12x and 1.74x** larger than the prototype —
+  a spread of 0.62 — and up to **4.5 px** off centre, and **nearly all of them measured the same on
+  screen** (16.8 px) whatever size the prototype intended for each. The excess now runs **0.90 to
+  1.06** and twenty-three of the thirty-one sit at **+0.00**.
+
+  The fix is the `M0 0 M24 24` prefix in front of all 31 strokes: two movetos that **draw nothing** —
+  checked by rasterising, because a round cap on a zero length subpath is exactly how a dot appears
+  where nothing was drawn — restoring the box to `0,0 24x24`. With the canvas back, the size classes'
+  `-2` goes: `size-20` is `Width="20"`, which is literally the prototype's `icon(n, 20)`. That `-2`
+  was the excess corrected by eye with a fixed subtraction against factors running 1.12 to 1.74, so
+  it could not work.
+
+  **And it fixes a gate whose premise was quietly false**: `TransportGlyphTests` checked the stroke
+  with `1.6 · Width / 24`, which **assumes the ink fills the canvas**. It did for none of the 31, and
+  the gate passed anyway. Evidence:
+  [the canvas the port did not copy](evidence/stable/audit-icon-canvas.md).
+
 ### Added
 
 - **The repository gets its own Claude Code configuration, and with it rule 0 stops depending on one
@@ -24,7 +49,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
   **All six hook cases were tested one by one before being written**, and the pipe-test caught a
   defect no amount of reading would have found: `jq` on Windows emits **CRLF**, so the path arrived
-  ending in ``, no pattern matched, and the hook would have been silent for ever — which is the
+  ending in `
+`, no pattern matched, and the hook would have been silent for ever — which is the
   shape this repository's defect already has.
 
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a

@@ -277,8 +277,24 @@ verbatim and the prototype's `rect` and `circle` became the arcs that draw them.
 one number — Avalonia scales the geometry to the control's bounds and then strokes it — so each size
 carries its own: `1.6 × size ÷ 24`.
 
-The sizes the prototype spends, and the only ones there are: 14 for a chevron, 16 for a menu row, 18
-for a banner, 20 for a rail destination, 22 for the play toggle.
+**And every geometry starts with `M0 0 M24 24`, which is the canvas and not drawing.** Without it a
+geometry's bounds are its own ink, and `Stretch="Uniform"` stretches each stroke by a different
+factor to fill the box: measured on 2026-08-29, that left the icons between **1.12x and 1.74x**
+larger than the prototype and up to **4.5 px off centre**, and made the stroke formula's premise —
+that the ink fills the canvas — false. Two movetos that draw nothing restore the box to `0,0 24x24`,
+and a gate parses all thirty-one for it. The measurement is in
+[the canvas the port did not copy](../evidence/stable/audit-icon-canvas.md).
+
+The size classes are worth what their name says: `size-20` is `Width="20"`, which is literally
+`icon(n, 20)`. **They carried a `-2` from 2026-08-25 to 2026-08-29** — `size-20` gave 18 — because
+the icons looked large and the box was shrunk by eye; it could not work, because the excess was a
+different factor for every icon and lived in the geometry, not in the class.
+
+The sizes the classes declare: 14 for a chevron, 16 for a menu row, 20 for a rail destination, 22 for
+the play toggle. **Counting the prototype's `icon(n, s)` calls, the sizes it spends are 13, 14, 15,
+16, 18, 20 and 26 — the most frequent is 15, with ten uses — and 22 never appears.** This line used
+to say «the only ones there are» and named an 18 that no class declares; it stands as it is pending a
+decision, and is not to be inferred from this document.
 
 Two shapes are this application's own and say so: `IconStop`, because its transport has a stop where
 the prototype has a single toggle, and `IconChevronUp`, which is `IconChevronDown` upside down.

@@ -2,8 +2,11 @@
 
 ## Estado al cierre del 2026-08-29 (sexta sesión) — el cromo del mini, y dos puertas ciegas
 
-**`main`, la rama y el HEAD son el mismo commit: `9ff87b2`**, con la conclusión leída por
-`gh run view --json conclusion` antes de mover la referencia. Las tres cifras del verde:
+**Los tres commits que esa sesión dejó son `36bdf6f`, `6ef1a5f` y `4a77dcf`**, y esta línea nombró
+`9ff87b2` porque **un documento no puede nombrar su propio SHA**: el commit que lo escribe y todos los
+que vienen detrás quedan siempre fuera. La corrección es del 2026-08-29 por la mañana, con `main` ya
+en `6ef1a5f` —verde leído con `gh run view --json conclusion` antes de mover la referencia— y
+`4a77dcf` publicado y en CI. Las tres cifras del verde de `9ff87b2`:
 
 ```
 Coverage gate: 212 short of 96/96, ratchet 212, 212 measured under the bar

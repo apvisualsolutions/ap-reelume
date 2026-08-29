@@ -8,6 +8,31 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Corregido
+
+- **Los iconos vuelven a su lienzo de 24 × 24, y con eso se van tres defectos a la vez.** Al portarlos
+  del prototipo el 2026-08-24 se copió el trazo y **no el `viewBox`**, así que los límites de cada
+  geometría pasaron a ser los de su propia tinta. `Stretch="Uniform"` escala por esos límites hasta
+  llenar la caja y ancla lo que sobra arriba-izquierda, de modo que cada icono se agrandaba **por un
+  factor distinto** y se descentraba lo que le sobrase.
+
+  Medido rasterizando: los iconos salían entre **1,12× y 1,74×** más grandes que el prototipo —una
+  dispersión de 0,62— y hasta **4,5 px** descentrados, y **casi todos medían lo mismo en pantalla**
+  (16,8 px) fuera cual fuera el tamaño que el prototipo quiso para cada uno. Ahora el exceso va de
+  **0,90 a 1,06** y veintitrés de los treinta y uno están a **+0,00**.
+
+  La corrección es el prefijo `M0 0 M24 24` delante de los 31 trazos: dos `moveto` que **no dibujan
+  nada** —comprobado rasterizando, porque un remate redondo sobre un subtrazo de longitud cero es
+  justo como aparece un punto donde no se dibujó— y que devuelven la caja a `0,0 24×24`. Con el
+  lienzo puesto, el `-2` de las clases de tamaño se retira: `size-20` es `Width="20"`, que es
+  literalmente `icon(n, 20)` del prototipo. Ese `-2` era el exceso corregido a ojo con una resta fija
+  contra factores que iban de 1,12 a 1,74, así que no podía funcionar.
+
+  **Y arregla una puerta cuya premisa era falsa sin decirlo**: `TransportGlyphTests` comprobaba el
+  grosor con `1,6 · Width / 24`, que **asume que la tinta llena el lienzo**. Lo era para ninguna de
+  las 31, y la puerta pasaba igual. Evidencia:
+  [el lienzo que la portación no copió](evidence/stable/audit-icon-canvas.md).
+
 ### Añadido
 
 - **El repositorio gana su propia configuracion de Claude Code, y con ella la regla 0 deja de
@@ -23,7 +48,8 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
   **Los seis casos de los hooks se probaron uno a uno antes de escribirlos**, y el pipe-test cazo un
   defecto que ninguna lectura habria visto: `jq` en Windows emite **CRLF**, asi que la ruta llegaba
-  terminada en ``, ningun patron casaba y el hook habria callado siempre — que es la forma que ya
+  terminada en `
+`, ningun patron casaba y el hook habria callado siempre — que es la forma que ya
   tiene el defecto de esta casa.
 
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y

@@ -3,6 +3,8 @@
 
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.TestSupport;
+using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Theme;
@@ -29,6 +31,19 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </remarks>
 public sealed class PrototypeIconTests
 {
+    /// <summary>
+    /// The prototype's <c>viewBox</c>, which every geometry carries in front of its stroke.
+    /// </summary>
+    /// <remarks>
+    /// Two movetos that draw nothing. The conversion of 2026-08-24 copied the strokes and left the
+    /// box behind, and the comparison below never noticed because a stroke is all it ever read: the
+    /// prototype declares its box in the <c>svg</c> element and this file was reading the <c>path</c>
+    /// elements inside it. So it is stripped before comparing rather than compared — the string on
+    /// the right is still the prototype's own, character for character — and what the box itself is
+    /// worth is asserted separately, below, where it can be measured instead of spelled.
+    /// </remarks>
+    private const string Canvas = "M0 0 M24 24 ";
+
     /// <summary>
     /// The geometries whose whole shape is <c>path</c> elements, by the name each carries in the two
     /// files. These are the ones a string can hold.
@@ -80,9 +95,13 @@ public sealed class PrototypeIconTests
     public void A_shape_made_of_paths_is_the_prototypes_own_string(string prototypeName, string tokenKey)
     {
         var expected = string.Join(' ', PrototypePaths()[prototypeName]);
-        var actual = Geometries()[tokenKey];
+        var declared = Geometries()[tokenKey];
 
-        Assert.Equal(expected, actual);
+        Assert.True(
+            declared.StartsWith(Canvas, StringComparison.Ordinal),
+            $"{tokenKey} does not carry the prototype's 24 unit box in front of its stroke.");
+
+        Assert.Equal(expected, declared[Canvas.Length..]);
     }
 
     public static TheoryData<string, string> VerbatimShapes()
@@ -115,6 +134,48 @@ public sealed class PrototypeIconTests
             .ToArray();
 
         Assert.Equal(accounted, declared);
+    }
+
+    /// <summary>
+    /// Every geometry occupies the prototype's whole 24 unit box, measured rather than spelled.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is what makes the defect impossible for icon number thirty-two. The check above reads
+    /// the prefix as a string, and a string is exactly what was there for five days while the icons
+    /// drew wrong: the box has to be <b>parsed</b> for the bounds to mean anything, because a
+    /// typo, a shape that reaches past 24, or a future geometry pasted in without the prefix all
+    /// leave a stroke that still looks fine to a comparison of characters.
+    /// </para>
+    /// <para>
+    /// <c>Stretch</c> <c>Uniform</c> fits the geometry's own bounds into the control and anchors what
+    /// is left over at the top left, so a geometry whose bounds are not the full box is drawn both
+    /// larger and off centre — by a different amount for every shape, which is why nothing that
+    /// compared icons against each other caught it either. Measured on 2026-08-29, before the prefix:
+    /// <c>IconClose</c> spanned 11.6 of 24 and came out 1.86x too large, <c>IconHome</c> 18 of 24 and
+    /// 1.20x.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void Every_geometry_measures_the_prototypes_own_canvas()
+    {
+        var geometries = Geometries();
+
+        // A gate whose subject went missing agrees with itself perfectly: an empty dictionary would
+        // walk this loop zero times and pass.
+        Assert.True(geometries.Count >= 30, $"only {geometries.Count} geometries were read.");
+
+        foreach (var (key, data) in geometries)
+        {
+            var bounds = Geometry.Parse(data).Bounds;
+
+            Assert.True(
+                bounds.X == 0 && bounds.Y == 0 && bounds.Width == 24 && bounds.Height == 24,
+                $"{key} measures {bounds.X:0.00},{bounds.Y:0.00} {bounds.Width:0.00}x{bounds.Height:0.00} "
+                    + "where the prototype's box is 0,0 24x24. Stretch Uniform scales whatever bounds "
+                    + "it is given up to the control and pins the remainder top left, so this glyph is "
+                    + "drawn larger than the prototype draws it and off centre inside its own button.");
+        }
     }
 
     /// <summary>

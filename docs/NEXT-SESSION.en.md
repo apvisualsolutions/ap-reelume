@@ -2,8 +2,11 @@
 
 ## State at the close of 2026-08-29 (sixth session) — the mini's chrome, and two blind gates
 
-**`main`, the branch and HEAD are the same commit: `9ff87b2`**, with the conclusion read by
-`gh run view --json conclusion` before the reference moved. The three figures of the green:
+**The three commits that session left are `36bdf6f`, `6ef1a5f` and `4a77dcf`**, and this line named
+`9ff87b2` because **a document cannot name its own SHA**: the commit that writes it and every one
+after it always fall outside. Corrected on the morning of 2026-08-29, with `main` already at
+`6ef1a5f` — green read with `gh run view --json conclusion` before the reference moved — and
+`4a77dcf` pushed and in CI. The three figures of the green at `9ff87b2`:
 
 ```
 Coverage gate: 212 short of 96/96, ratchet 212, 212 measured under the bar
