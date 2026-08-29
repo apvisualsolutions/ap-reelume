@@ -123,6 +123,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   from the local `.mcp.json`. The gate applies at startup, so it is verified with `/context` in the
   next session rather than the one that writes it.
 
+  **And three claims this tree made about its own tooling were false.** `CLAUDE.md` said the walk
+  ratchet stood at **0 and would not rise**; it stands at **20** and rose on 2026-08-25, for the
+  harness rather than the application. `eng/walk-pending.txt` opened by saying it was **empty** while
+  listing twenty entries further down — an old paragraph left in place beside the new one. And the
+  hook that refuses to write it gave the reason **"CI produces it"**: `ci.yml` publishes
+  `eng/coverage-debt.txt` and nothing else, so the refusal sent anyone with a legitimate change
+  waiting for an artefact that never arrives. The two refusals now carry separate reasons, and the
+  walk one says what raising the ratchet actually costs. Measured in passing: a `deny` arrives with
+  its reason **alone**, without the command — unlike a `PostToolUse` warning, which is why those two
+  stay inline.
+
+  **And the two local servers that failed on every start are denied for this project.** `gbrain`
+  (`REQUEST_TIMEOUT`) and `MCP_DOCKER` (`CONNECTION_CLOSED`) go into `deniedMcpServers` rather than
+  being deleted from the machine: they belong to whoever is programming and are used outside this
+  repository. This one was measurable on the spot, unlike the connector key — `claude mcp list`
+  showed three servers before and shows only `avalonia-docs` after.
+
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
   clock.** The band was five buttons and nothing else, so a floating window said neither **what** was
   playing nor **how far in** it was — which is most of what a picture-in-picture is for. It now

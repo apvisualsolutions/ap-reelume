@@ -2,10 +2,16 @@
 
 ## State at the close of 2026-08-29 (ninth session) — the warning nobody was receiving
 
-**The owner opened with no piece decided** — still the real state — and chose the cheap check the
-eighth session left open: whether the bilingualism hook's warning reaches the person. **The answer is
-no**, and on the way there a second defect turned up. **`0.2.0` is still blocked only by the owner's
-physical walk**, step 7 of the ten.
+**Five commits, from `d4f65ae` to the one writing this note** — a range, because a list of SHAs never
+contains the commit that writes it. **The owner opened with no piece decided** — still the real state
+— and chose the cheap check the eighth session left open: whether the bilingualism hook's warning
+reaches the person. **The answer is no**, and everything else came out of that one question.
+**`0.2.0` is still blocked only by the owner's physical walk**, step 7 of the ten.
+
+**This last commit closes with CI running, and that is the one thing to pick up first.** The four
+before it were read green by `eng/watch-ci.ps1` before `main` moved; this one cannot be, because it
+is the note itself. `main` stands at `40fa3b3`, verified. Read the run for the note's own SHA before
+anything else, then fast-forward.
 
 **The hook only warned when the file was rewritten whole.** Its matcher was `Write` alone, so every
 `Edit` stayed silent — and `Edit` is the tool used to touch an `.es.md` that already exists, because
@@ -59,6 +65,32 @@ reads as a failure and the same write gets retried.
 
 **What it does not do is reach the owner.** No hook here warns a person — the gates do that.
 
+### Three claims this tree made about its own tooling were false
+
+Asked to exhaust what an agent can do here, the inventory turned up three, all of them measurable in
+seconds and all of the same shape — a statement that stopped being true and was never retracted:
+
+| where | said | measures |
+| --- | --- | --- |
+| `CLAUDE.md`, rule 9 | ratchet at **0**, never rises | **20**, raised 2026-08-25 |
+| header of `eng/walk-pending.txt` | «It is empty, and that is the point» | twenty entries below it, in the same file |
+| the hook refusing to write it | «CI produces it» | `ci.yml` publishes `coverage-debt.txt` and nothing else |
+
+**The third is the one that cost something.** The refusal is right — the walk ratchet must not be
+relaxed quietly — but its reason sent anyone with a legitimate change waiting for an artefact that
+never arrives, and the only way through was to bypass the guard with Bash. The two refusals now
+carry separate reasons: `coverage-debt.txt` is CI's and is copied from its artefact;
+`walk-pending.txt` is this tree's, only shrinks, and raising it costs a measured reason written into
+its header.
+
+The second is the repository's own defect in its documentation: the 2026-08-25 explanation was added
+**beside** the paragraph it contradicted rather than replacing it, leaving a third state nobody
+chose.
+
+Measured in passing, because rule 9's rewrite asserted it: a `deny` reaches the agent with its
+**reason alone**, no command attached — unlike a `PostToolUse` warning, which is exactly why the two
+refusals can stay inline while the warning had to move to a file.
+
 ### A third of the context was connectors, and the project could opt out
 
 A `/context` mid-session showed **298.8k tokens in deferred MCP tools, 29.9% of the window**, and
@@ -91,6 +123,32 @@ the shape this repository's defect already has: a test goes blind rather than fa
 merging it turns an instrument's own error into a finding. A monitor **merges** it, because a `pwsh`
 that dies writing to stderr emits nothing and silence reads as "still running" — the failure this
 repository already knows. Probe separates, monitor merges.
+
+### Where the tenth session starts, with the analysis already done
+
+**The coverage debt is the only large task left, and it is entirely the agent's**: 212 files below
+96/96, ratchet at 212, and a ratchet that only comes down. Split as Presentation 105, Application 45,
+Infrastructure 41, Windows 12, and **Domain 9**.
+
+Start at `Domain`: the smallest layer, and the one where this project concentrates its security
+decisions. Eight of its nine files graze the floor — one or two branches missing — and **one is far
+from it**:
+
+| file | line | branch |
+| --- | --- | --- |
+| `Discovery/RenameOperation.cs` | 95 | **50** |
+| `Identification/MatchModels.cs` | 100 | 80 |
+| `Backup/RootRemapPolicy.cs` | 100 | 90 |
+| `Identification/MediaNameParser.cs` | 100 | 91 |
+| the other five | 93-100 | 92-100 |
+
+`RenameOperation.cs` has **half its branches uncovered**, and `RenamePolicy` is one of this tree's
+security decisions, so it goes first. **CI measures the floors**, not this machine:
+`eng/coverage-debt.txt` is copied from its artefact and never edited by hand.
+
+**What is not the agent's, so it is not expected of it**: `PRD-003` (ARM64) and `PLY-004` (5.1/7.1)
+are `BLOCKED` on hardware; `REL-001` (Store) and `REL-004` (name and domain) are the owner's
+decisions; and the walk's twenty pending are not work but the harness's measured ceiling.
 
 ## State at the close of 2026-08-29 (eighth session) — a warning that always fired
 

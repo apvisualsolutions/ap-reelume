@@ -125,6 +125,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
   del `.mcp.json` local. La puerta actúa al arrancar, así que se verifica con `/context` en la sesión
   siguiente y no en la que lo escribe.
 
+  **Y tres afirmaciones que este árbol hacía sobre sus propias herramientas eran falsas.** `CLAUDE.md`
+  decía que el trinquete del paseo estaba en **0 y no volvía a subir**; está en **20** y subió el
+  2026-08-25, por el arnés y no por la aplicación. `eng/walk-pending.txt` abría diciendo que estaba
+  **vacío** mientras enumeraba veinte entradas más abajo — un párrafo viejo que se quedó al lado del
+  nuevo. Y el hook que rechaza escribirlo daba como motivo **«lo produce CI»**: `ci.yml` publica
+  `eng/coverage-debt.txt` y nada más, así que el rechazo mandaba a quien tuviera un cambio legítimo a
+  esperar un artefacto que no llega nunca. Los dos rechazos llevan ahora motivos separados, y el del
+  paseo dice lo que cuesta de verdad subir el trinquete. Medido de paso: un `deny` llega **sólo con
+  su motivo**, sin el comando —al revés que un aviso de `PostToolUse`—, que es la razón de que esos
+  dos se queden en línea.
+
+  **Y los dos servidores locales que fallaban en cada arranque quedan denegados para este proyecto.**
+  `gbrain` (`REQUEST_TIMEOUT`) y `MCP_DOCKER` (`CONNECTION_CLOSED`) van a `deniedMcpServers` en vez de
+  borrarse de la máquina: son de quien programa y se usan fuera de este repositorio. Ésta sí se pudo
+  medir en el acto, al revés que la clave de los conectores — `claude mcp list` enseñaba tres
+  servidores antes y enseña sólo `avalonia-docs` después.
+
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
   reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se
   estaba viendo ni **por dónde iba** — que es la mayor parte de para qué existe una imagen sobre

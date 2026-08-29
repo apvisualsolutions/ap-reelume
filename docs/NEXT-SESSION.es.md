@@ -2,10 +2,16 @@
 
 ## Estado al cierre del 2026-08-29 (novena sesión) — el aviso que no recibía nadie
 
-**El propietario abrió sin pieza decidida** —que sigue siendo el estado real— y eligió la
-comprobación barata que la octava dejó abierta: si el aviso del hook del bilingüismo llega a la
-persona. **La respuesta es que no**, y por el camino salió un segundo defecto. **`0.2.0` sigue
-bloqueado sólo por su paseo físico**, el paso 7 de los diez.
+**Cinco commits, de `d4f65ae` al que escribe esta nota** —un rango, porque una lista de SHA nunca
+contiene el commit que la escribe—. **El propietario abrió sin pieza decidida** —que sigue siendo el
+estado real— y eligió la comprobación barata que la octava dejó abierta: si el aviso del hook del
+bilingüismo llega a la persona. **La respuesta es que no**, y de esa única pregunta salió todo lo
+demás. **`0.2.0` sigue bloqueado sólo por su paseo físico**, el paso 7 de los diez.
+
+**Este último commit cierra con CI corriendo, y es lo primero que hay que retomar.** Los cuatro
+anteriores los leyó verdes `eng/watch-ci.ps1` antes de mover `main`; éste no puede, porque es la
+propia nota. `main` se queda en `40fa3b3`, verificado. Lee el run del SHA de esta nota antes que nada
+y después avanza la referencia.
 
 **El hook sólo avisaba cuando el archivo se reescribía entero.** Su matcher era `Write` a secas, así
 que toda edición quedaba muda — y `Edit` es la herramienta con la que se toca un `.es.md` que ya
@@ -61,6 +67,31 @@ escritura.
 **Lo que no hace es llegar al propietario.** Aquí ningún hook avisa a una persona — eso lo hacen las
 puertas.
 
+### Tres afirmaciones de este árbol sobre sus propias herramientas eran falsas
+
+Con el encargo de agotar lo que un agente puede hacer aquí, el inventario sacó tres, todas medibles
+en segundos y todas de la misma forma — una frase que dejó de ser cierta y que nadie retiró:
+
+| dónde | decía | mide |
+| --- | --- | --- |
+| `CLAUDE.md`, regla 9 | trinquete en **0**, no vuelve a subir | **20**, subido el 2026-08-25 |
+| cabecera de `eng/walk-pending.txt` | «It is empty, and that is the point» | veinte entradas debajo, en el mismo archivo |
+| el hook que rechaza escribirlo | «lo produce CI» | `ci.yml` publica `coverage-debt.txt` y nada más |
+
+**La tercera es la que costaba algo.** El rechazo es correcto —el trinquete del paseo no se relaja en
+silencio—, pero su motivo mandaba a quien tuviera un cambio legítimo a esperar un artefacto que no
+llega nunca, y la única salida era esquivar la guarda por Bash. Los dos rechazos llevan ahora motivos
+separados: `coverage-debt.txt` es de CI y se copia de su artefacto; `walk-pending.txt` es de este
+árbol, sólo encoge, y subirlo cuesta una razón medida escrita en su cabecera.
+
+La segunda es el defecto de la casa en su propia documentación: la explicación del 2026-08-25 se
+añadió **al lado** del párrafo al que contradecía en vez de sustituirlo, dejando un tercer estado que
+nadie eligió.
+
+Medido de paso, porque la reescritura de la regla 9 lo afirmaba: un `deny` llega al agente **sólo con
+su motivo**, sin comando detrás — al revés que un aviso de `PostToolUse`, que es justo la razón de
+que los dos rechazos puedan quedarse en línea mientras el aviso tuvo que irse a un archivo.
+
 ### Un tercio del contexto eran conectores, y el proyecto podía salirse
 
 Un `/context` a media sesión enseñó **298,8k fichas en herramientas MCP diferidas, el 29,9 % de la
@@ -93,6 +124,31 @@ ya tiene el defecto de esta casa: una prueba se vuelve ciega en vez de falsa.
 fusionarlo convierte el error del propio instrumento en un hallazgo. Un monitor lo **fusiona**, porque
 un `pwsh` que muera escribiendo a stderr no emite nada y el silencio se lee como «sigue corriendo» —
 el fallo que este repositorio ya conoce. Sonda separa, monitor fusiona.
+
+### Por dónde entra la décima, con el análisis ya hecho
+
+**La deuda de cobertura es la única tarea grande que queda, y es enteramente del agente**: 212
+archivos por debajo de 96/96, trinquete en 212, y un trinquete que sólo baja. Repartidos en
+Presentation 105, Application 45, Infrastructure 41, Windows 12 y **Domain 9**.
+
+Se entra por `Domain`: la capa más pequeña, y aquella donde este proyecto concentra sus decisiones de
+seguridad. Ocho de sus nueve archivos rozan el suelo —les falta una rama o dos— y **uno está lejos**:
+
+| archivo | línea | rama |
+| --- | --- | --- |
+| `Discovery/RenameOperation.cs` | 95 | **50** |
+| `Identification/MatchModels.cs` | 100 | 80 |
+| `Backup/RootRemapPolicy.cs` | 100 | 90 |
+| `Identification/MediaNameParser.cs` | 100 | 91 |
+| los otros cinco | 93-100 | 92-100 |
+
+`RenameOperation.cs` tiene **la mitad de sus ramas sin cubrir**, y `RenamePolicy` es una de las
+decisiones de seguridad de este árbol, así que va primero. **Los suelos los mide CI**, no esta
+máquina: `eng/coverage-debt.txt` se copia de su artefacto y nunca se edita a mano.
+
+**Lo que no es del agente, para que no se espere de él**: `PRD-003` (ARM64) y `PLY-004` (5.1/7.1)
+están `BLOCKED` por hardware; `REL-001` (Store) y `REL-004` (nombre y dominio) son decisiones del
+propietario; y los veinte pendientes del paseo no son trabajo, sino el techo medido del arnés.
 
 ## Estado al cierre del 2026-08-29 (octava sesión) — un aviso que sonaba siempre
 

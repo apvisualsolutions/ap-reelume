@@ -20,9 +20,18 @@ prueba van en inglés.
   personal de nadie**. `avalonia-docs` no se ve afectado: viene de `.mcp.json`, que es local. **El
   efecto es de arranque**, así que se comprueba con `/context` en la sesión siguiente y no en la que
   lo escribe.
+- **`deniedMcpServers`** deniega aquí `gbrain` y `MCP_DOCKER`, los dos servidores locales que fallaban
+  al conectar en cada arranque —`REQUEST_TIMEOUT` y `CONNECTION_CLOSED`, leídos de `claude mcp list`—.
+  Se deniegan **en el proyecto y no se borran de la máquina**, porque son de quien programa y se usan
+  fuera de aquí. A diferencia de la clave de arriba, **ésta sí se midió en el acto**: `claude mcp
+  list` enseñaba tres servidores antes y enseña sólo `avalonia-docs` después.
 - **Tres hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
-  `eng/coverage-debt.txt` y `eng/walk-pending.txt`, que los produce CI, y un `.cs` o `.axaml` de
-  `src/` o `tests/` **cuyo contenido no lleve la cabecera SPDX**. El tercero **avisa después** si se
+  `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y un `.cs` o `.axaml` de `src/` o `tests/`
+  **cuyo contenido no lleve la cabecera SPDX**. **Los dos primeros se rechazan por motivos
+  distintos, y confundirlos costó una corrección el 2026-08-29**: `coverage-debt.txt` **lo produce
+  CI** y se copia de su artefacto, mientras que `walk-pending.txt` **no lo produce nadie más que
+  este árbol** —`ci.yml` no lo emite— y es un trinquete que sólo puede encoger. Decirle a alguien
+  que espere un artefacto de CI para un archivo que CI nunca publica es peor que no decirle nada. El tercero **avisa después** si se
   toca un `.es.md` y su pareja `.en.md` se queda como está en `HEAD` — pregunta a git y no al reloj,
   porque comparar `mtime` hacía que sonara también con los dos idiomas al día.
 
@@ -245,8 +254,13 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 48, sin contexto de datos —lo
    que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
    silencio suyo no es un certificado.
-9. **Un control nuevo llega con su escena de paseo en el mismo commit.** `eng/check-walk-coverage.ps1`
-   está en **0 pendientes** y no vuelve a subir.
+9. **Un control nuevo llega con su escena de paseo en el mismo commit.** El trinquete de
+   `eng/check-walk-coverage.ps1` **sólo puede encoger**. Estuvo en 0 y **subió a 20 el 2026-08-25**,
+   por el arnés y no por la aplicación: el hit test headless de Avalonia no sigue el desplazamiento
+   de un `ScrollViewer`, y Ajustes creció de 949 a 1.797 px, así que veinte controles de
+   `AppearanceSettingsView` caen fuera del primer viewport. Se probaron tres vías y las tres
+   contestaron lo mismo; **los veinte se pulsan con un ratón real**. Subirlo otra vez exige medir el
+   porqué y escribirlo en la cabecera de `eng/walk-pending.txt`, como aquel día.
 
 ## El defecto característico de este proyecto
 
