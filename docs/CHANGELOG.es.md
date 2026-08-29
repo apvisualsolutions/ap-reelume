@@ -117,6 +117,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   leídos del registro y no calculados — la cuenta a mano decía 528. Los otros dos hooks se quedan en
   línea porque son cortos y **deniegan**, así que su texto nunca se imprime dos veces.
 
+  **Y el mismo archivo apaga ahora los conectores de nube de claude.ai en este repositorio.** Medidos
+  desde el contexto de una sesión: costaban **298,8k fichas, el 30 % de la ventana, y 212,9k eran de
+  un solo conector** — 102 herramientas de anuncios que este proyecto no llama nunca.
+  `disableClaudeAiConnectors` la gana cualquier fuente que la ponga en `true`, así que el proyecto se
+  sale sin tocar la configuración personal de nadie; `avalonia-docs` no se ve afectado porque viene
+  del `.mcp.json` local. La puerta actúa al arrancar, así que se verifica con `/context` en la sesión
+  siguiente y no en la que lo escribe.
+
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
   reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se
   estaba viendo ni **por dónde iba** — que es la mayor parte de para qué existe una imagen sobre

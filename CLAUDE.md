@@ -13,6 +13,13 @@ prueba van en inglés.
 
 - **`.mcp.json`** declara el MCP de Avalonia. La regla 0 de abajo lo exige, y por eso viene en el
   árbol en vez de en la máquina de cada uno.
+- **`disableClaudeAiConnectors`** apaga aquí los conectores de nube de claude.ai, y no es higiene:
+  medidos el 2026-08-29, pesaban **298,8k fichas de contexto —el 30 % de la ventana—, y 212,9k eran
+  de uno solo**: 102 herramientas de anuncios que este repositorio no usa. La clave la gana cualquier
+  fuente que la ponga en `true`, así que **el proyecto puede salirse sin tocar la configuración
+  personal de nadie**. `avalonia-docs` no se ve afectado: viene de `.mcp.json`, que es local. **El
+  efecto es de arranque**, así que se comprueba con `/context` en la sesión siguiente y no en la que
+  lo escribe.
 - **Tres hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
   `eng/coverage-debt.txt` y `eng/walk-pending.txt`, que los produce CI, y un `.cs` o `.axaml` de
   `src/` o `tests/` **cuyo contenido no lleve la cabecera SPDX**. El tercero **avisa después** si se

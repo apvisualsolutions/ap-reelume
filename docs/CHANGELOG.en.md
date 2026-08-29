@@ -115,6 +115,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   off the log rather than calculated — the arithmetic said 528. The other two hooks stay inline
   because they are short and they **deny**, so their text is never printed twice.
 
+  **And the same file now turns this repository's claude.ai cloud connectors off.** Measured from a
+  session's own context: they cost **298.8k tokens, 30% of the window, and 212.9k of that was a
+  single connector** — 102 advertising tools this project never calls.
+  `disableClaudeAiConnectors` is won by any source that sets it true, so the project opts out
+  without touching anyone's personal configuration; `avalonia-docs` is unaffected because it comes
+  from the local `.mcp.json`. The gate applies at startup, so it is verified with `/context` in the
+  next session rather than the one that writes it.
+
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
   clock.** The band was five buttons and nothing else, so a floating window said neither **what** was
   playing nor **how far in** it was — which is most of what a picture-in-picture is for. It now

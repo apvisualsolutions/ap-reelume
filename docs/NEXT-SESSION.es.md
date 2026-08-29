@@ -61,6 +61,23 @@ escritura.
 **Lo que no hace es llegar al propietario.** Aquí ningún hook avisa a una persona — eso lo hacen las
 puertas.
 
+### Un tercio del contexto eran conectores, y el proyecto podía salirse
+
+Un `/context` a media sesión enseñó **298,8k fichas en herramientas MCP diferidas, el 29,9 % de la
+ventana**, y sumar esa tabla por servidor puso **212,9k en un solo conector**: 102 herramientas de
+anuncios de Meta que este repositorio no llama nunca. El primer diagnóstico dijo que sólo se apagaba
+desde los conectores de claude.ai, porque `claude mcp list` ve únicamente los tres servidores locales
+—`avalonia-docs`, que conecta, y `gbrain` y `MCP_DOCKER`, que fallan los dos—. **Era falso**, y el
+esquema de ajustes lo decía en una línea: `disableClaudeAiConnectors` la respeta cualquier fuente que
+la ponga en `true`, así que un proyecto puede salirse sin tocar la configuración personal de nadie.
+`.claude/settings.json` ya la lleva, y `avalonia-docs` queda intacto porque viene del `.mcp.json`
+local.
+
+Dos cosas que merece la pena guardar. La puerta actúa **al arrancar**: la herramienta que debería
+haber retirado seguía resolviéndose en la sesión que escribió la clave, así que el ahorro se verifica
+con `/context` la próxima vez y no ahora. Y lo que lo zanjó fue **leer el esquema** en vez de fiarse
+del diagnóstico anterior — la descripción de la propia clave enuncia la regla de precedencia.
+
 ### Un silencio no se distingue de no haber corrido
 
 El primer intento del caso que debe callar leyó un `hook_success` y lo dio por prueba. No lo era: **un

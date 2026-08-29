@@ -59,6 +59,23 @@ reads as a failure and the same write gets retried.
 
 **What it does not do is reach the owner.** No hook here warns a person — the gates do that.
 
+### A third of the context was connectors, and the project could opt out
+
+A `/context` mid-session showed **298.8k tokens in deferred MCP tools, 29.9% of the window**, and
+summing that table by server put **212.9k of it in one connector**: 102 Meta advertising tools this
+repository never calls. The first diagnosis said it could only be switched off from the claude.ai
+connector settings, because `claude mcp list` sees only the three local servers — `avalonia-docs`,
+which connects, and `gbrain` and `MCP_DOCKER`, which both fail. **That was wrong**, and the settings
+schema said so in one line: `disableClaudeAiConnectors` is honoured from any source that sets it
+true, so a project may opt out without touching anyone's personal configuration.
+`.claude/settings.json` now carries it, and `avalonia-docs` is untouched because it comes from the
+local `.mcp.json`.
+
+Two things worth keeping. The gate applies **at startup**: the very tool it should remove still
+resolved in the session that wrote the key, so the saving is verified with `/context` next time, not
+now. And what settled it was **reading the schema** rather than trusting the earlier diagnosis — the
+key's own description states the precedence rule.
+
 ### A silence cannot be told apart from not having run
 
 The first attempt at the quiet case read a `hook_success` and called it proof. It was not: **a hook
