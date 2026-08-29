@@ -1,10 +1,10 @@
 # Dónde retomar
 
-## Estado al cierre del 2026-08-29 (novena sesión) — la guarda cubría el camino menos transitado
+## Estado al cierre del 2026-08-29 (novena sesión) — el aviso que no recibe nadie
 
-**Un commit, el que escribe esta nota.** El propietario abrió sin pieza decidida —que sigue siendo el
-estado real— y eligió la comprobación barata que la octava dejó abierta: si el aviso del hook del
-bilingüismo llega a la persona. Sacó un defecto, y el defecto es este commit. **`0.2.0` sigue
+**El propietario abrió sin pieza decidida** —que sigue siendo el estado real— y eligió la
+comprobación barata que la octava dejó abierta: si el aviso del hook del bilingüismo llega a la
+persona. **La respuesta es que no**, y por el camino salió un segundo defecto. **`0.2.0` sigue
 bloqueado sólo por su paseo físico**, el paso 7 de los diez.
 
 **El hook sólo avisaba cuando el archivo se reescribía entero.** Su matcher era `Write` a secas, así
@@ -24,15 +24,27 @@ Medido con el mismo `Edit` antes y después, en la herramienta real y no leyendo
 Y surtió efecto **en caliente**, sin recargar la sesión — que merece quedar escrito, porque
 `CLAUDE.md` dice que un cambio de hook exige abrir `/hooks` una vez.
 
-### Lo que el aviso sí hace, y la pregunta que sigue abierta
+### El aviso se emite, y no lo recibe nadie
 
 **Se emite, y lo demuestra el registro en vez de una captura.** El `.jsonl` de la sesión, bajo
 `~/.claude/projects/`, lleva un `hook_system_message` por aviso, con el `toolUseID` de la llamada que
 lo provocó y el `hookName`. Dos en toda la sesión, los dos provocados a propósito; el resto de los
 hooks corrió y no produjo nada.
 
-**Si llega a la pantalla del propietario sigue sin confirmarse**, justo donde lo dejaron la séptima y
-la octava. La comprobación cuesta un segundo y necesita a la persona delante del PC.
+**Y no llega a la pantalla.** La pregunta que la séptima dejó abierta y la octava no pudo medir tiene
+respuesta: con el propietario delante del PC y dentro de la sesión, los dos avisos —el del `Write` y
+el del `Edit`— pasaron sin que viera nada.
+
+Ése es el defecto grande, y pesa más que el que corrige este commit. Un `systemMessage` **tampoco
+entra en el contexto del agente que escribe**, que es la razón por la que el SPDX pasó a `PreToolUse`
+el mismo día. Así que los dos avisos que quedan se emiten para nadie: corren, aciertan y su salida
+muere en el registro. Registrado y nunca alimentado — la forma que ya tiene el defecto de esta casa,
+ahora en sus propias herramientas.
+
+**No se arregla aquí, y la decisión es del propietario.** La palanca es el canal, y está **sin
+medir**: se dice que un `PostToolUse` que escribe a stderr y sale con código 2 sí alimenta al agente,
+donde `systemMessage` no alimenta a nadie. Hasta que se mida, ningún hook de este árbol es un aviso —
+las que avisan son las puertas.
 
 ### Un silencio no se distingue de no haber corrido
 

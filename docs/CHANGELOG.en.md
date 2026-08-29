@@ -98,6 +98,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   output**. With both languages touched, the literal command from `settings.json` stays quiet through
   a pipe — with the case that must fire beside it, which is the only reason the quiet one counts.
 
+  **And what the warning does not do, measured the same day: it does not reach the screen.** With the
+  owner in front of the PC, both warnings provoked on purpose went by unseen, and a `systemMessage`
+  does not enter the writing agent's context either. The two that remain are emitted for nobody — so
+  **the warning stays a preview and the gate stays the gate**. The channel is unmeasured.
+
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
   clock.** The band was five buttons and nothing else, so a floating window said neither **what** was
   playing nor **how far in** it was — which is most of what a picture-in-picture is for. It now

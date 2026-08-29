@@ -20,9 +20,18 @@ prueba van en inglés.
   porque comparar `mtime` hacía que sonara también con los dos idiomas al día.
 
   **Rechazar y avisar no son lo mismo, y la diferencia se midió el 2026-08-29**: un `deny` llega al
-  agente como error de la herramienta, mientras que un `systemMessage` se muestra a la persona y
-  **no entra en el contexto de quien está escribiendo el archivo**. Por eso la comprobación del SPDX
-  pasó a `PreToolUse`, donde `tool_input.content` ya existe y se puede leer antes de escribir nada.
+  agente como error de la herramienta, mientras que un `systemMessage` **no entra en el contexto de
+  quien está escribiendo el archivo**. Por eso la comprobación del SPDX pasó a `PreToolUse`, donde
+  `tool_input.content` ya existe y se puede leer antes de escribir nada.
+
+  **Y avisar, hoy, es emitir para nadie.** El mismo día se midió lo que faltaba: un `systemMessage`
+  **tampoco llega a la pantalla de quien programa**. Dos avisos provocados a propósito —uno por
+  `Write`, otro por `Edit`—, con el propietario delante y en la sesión, pasaron sin que viera nada;
+  el registro los tiene los dos. Así que los dos avisos que quedan corren, aciertan y su salida muere
+  en el `.jsonl`: es la forma que ya tiene el defecto de esta casa, registrado y nunca alimentado.
+  **La palanca es el canal y está sin medir**: se dice que un `PostToolUse` que escribe a stderr y
+  sale con código 2 sí alimenta al agente. Hasta que se mida, ningún hook de este árbol es un aviso —
+  son las puertas las que avisan.
 
   **Ninguno dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así que siguen siendo un
   adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y

@@ -1,11 +1,11 @@
 # Where to pick up
 
-## State at the close of 2026-08-29 (ninth session) — the guard covered the least travelled path
+## State at the close of 2026-08-29 (ninth session) — the warning nobody receives
 
-**One commit, the one that writes this note.** The owner opened with no piece decided — still the
-real state — and chose the cheap check the eighth session left open: whether the bilingualism hook's
-warning reaches the person. It turned up a defect, and the defect became this commit. **`0.2.0` is
-still blocked only by the owner's physical walk**, step 7 of the ten.
+**The owner opened with no piece decided** — still the real state — and chose the cheap check the
+eighth session left open: whether the bilingualism hook's warning reaches the person. **The answer is
+no**, and on the way there a second defect turned up. **`0.2.0` is still blocked only by the owner's
+physical walk**, step 7 of the ten.
 
 **The hook only warned when the file was rewritten whole.** Its matcher was `Write` alone, so every
 `Edit` stayed silent — and `Edit` is the tool used to touch an `.es.md` that already exists, because
@@ -24,15 +24,27 @@ Measured with the same `Edit` before and after, in the real tool and not by read
 And it took effect **live**, with no session reload — which is worth writing down, because
 `CLAUDE.md` says a hook change needs `/hooks` opened once.
 
-### What the warning does do, and the question still open
+### The warning is emitted, and nobody receives it
 
 **It is emitted, and the log proves it rather than a screenshot.** The session's `.jsonl` under
 `~/.claude/projects/` carries one `hook_system_message` per warning, with the `toolUseID` of the call
 that caused it and the `hookName`. Two in the whole session, both provoked on purpose; every other
 hook ran and produced nothing.
 
-**Whether it reaches the owner's screen is still unconfirmed**, exactly where the seventh and eighth
-sessions left it. The check costs a second and needs the person in front of the PC.
+**And it does not reach the screen.** The question the seventh session left open and the eighth could
+not measure has an answer: with the owner in front of the PC and inside the session, both warnings —
+the `Write` one and the `Edit` one — went by without anything being seen.
+
+That is the larger defect, and it outranks the one this commit fixes. A `systemMessage` **does not
+enter the writing agent's context either**, which is why the SPDX check moved to `PreToolUse` the
+same day. So both remaining warnings are emitted for nobody: they run, they are right, and their
+output dies in the log. Registered and never consumed — the shape this repository's defect already
+has, now in its own tooling.
+
+**It is not fixed here, and the call is the owner's.** The lever is the channel, and it is
+**unmeasured**: a `PostToolUse` that writes to stderr and exits 2 is said to feed the agent, where
+`systemMessage` feeds no one. Until that is measured, no hook in this tree is a warning — the gates
+are what warn.
 
 ### A silence cannot be told apart from not having run
 
