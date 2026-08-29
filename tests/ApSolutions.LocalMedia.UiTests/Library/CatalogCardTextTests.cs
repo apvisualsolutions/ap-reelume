@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Library;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -112,11 +113,21 @@ public sealed class CatalogCardTextTests
     /// Which shape the chip draws, asked of the card rather than computed by a converter.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The interface answers it from the key the four models already give, so no model says it
     /// twice, and a style turns the answer into a geometry. It replaced a converter that had to
     /// reach for <c>Application.Current</c> and for a resource by name — two "not found" arms that
     /// nothing can take, because both icon keys are declared and there is a gate over that
     /// inventory. Asserted as mounted, because what decides the shape is a style now.
+    /// </para>
+    /// <para>
+    /// This compared the two geometries' <c>Bounds</c> until 2026-08-29, and that only ever worked
+    /// by accident: the bounds of an icon differed from its neighbour's because the conversion had
+    /// dropped the prototype's 24 unit box, which is the defect restoring that box fixed. Every
+    /// geometry measures 0,0 24x24 now, so the old assertion compared two identical squares. What it
+    /// was reaching for is asserted directly instead — each card holds the resource named for it —
+    /// and that is the stronger claim, because two different geometries could both be wrong.
+    /// </para>
     /// </remarks>
     [AvaloniaFact]
     public void A_series_card_draws_a_screen_and_everything_else_draws_a_film()
@@ -136,10 +147,24 @@ public sealed class CatalogCardTextTests
         Assert.NotNull(show);
         Assert.NotNull(film);
 
-        // Two different resources, not two names for one: the geometries themselves are compared,
-        // because a style that matched neither arm would hand both cards the same default.
+        // Two different resources, not two names for one, and each of them the right one: a style
+        // that matched neither arm would hand both cards the same default.
         Assert.NotSame(show, film);
-        Assert.NotEqual(show!.Bounds, film!.Bounds);
+        Assert.Same(Resource("IconShow"), show);
+        Assert.Same(Resource("IconFilm"), film);
+    }
+
+    /// <summary>A geometry the theme declares, by the key it is declared under.</summary>
+    private static Avalonia.Media.Geometry Resource(string key)
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        // TryFindResource and not Resources[key]: the geometries live in a dictionary merged into the
+        // theme's styles, and the indexer reads the application's own dictionary only.
+        Assert.True(
+            Avalonia.Application.Current!.TryFindResource(key, out var value),
+            $"the theme declares no geometry called {key}.");
+
+        return Assert.IsAssignableFrom<Avalonia.Media.Geometry>(value);
     }
 
     /// <summary>The geometry the chip's glyph ends up with, read while the card is mounted.</summary>
