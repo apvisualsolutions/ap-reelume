@@ -105,11 +105,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
   **So the channel changed.** Both `PostToolUse` warnings now write to stderr and exit 2, which does
   reach the agent writing the file — measured with the known case beside the unknown one, then
-  through a pipe with **seven cases, four of them among those it must let through**. The price is
-  measured too: **2,712 characters of context per warning**, because the harness prints the whole
-  command twice before the text. And since it arrives labelled an error after a write that did
-  succeed, all three messages **open by saying the write did not fail** — without that, the warning
-  reads as a failure and the same write gets retried.
+  through a pipe with **seven cases, four of them among those it must let through**. And since it
+  arrives labelled an error after a write that did succeed, all three messages **open by saying the
+  write did not fail** — without that, the warning reads as a failure and the same write gets retried.
+
+  **Its price was measured and then paid down.** The harness prints the whole command twice ahead of
+  the text, so inline it cost **2,712 characters of context per warning**. The command now lives in
+  `.claude/hooks/post-write.sh` and `settings.json` only calls it: **488 characters**, 82% less, read
+  off the log rather than calculated — the arithmetic said 528. The other two hooks stay inline
+  because they are short and they **deny**, so their text is never printed twice.
 
 - **The mini player's chrome is the prototype's composition: a bar of progress, a title, and a
   clock.** The band was five buttons and nothing else, so a floating window said neither **what** was

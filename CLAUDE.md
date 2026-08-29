@@ -36,11 +36,16 @@ prueba van en inglés.
   `systemMessage` dejó su rastro y no llegó; el stderr llegó— y luego por tubería con **siete casos,
   cuatro de ellos de los que debe dejar pasar**. El registro los anota como `hook_blocking_error`.
 
-  **Su precio está medido: 2.712 caracteres de contexto por aviso**, porque el harness imprime el
-  comando entero **dos veces** antes del texto útil. Baja extrayendo el comando a un script, que este
-  árbol todavía no hace. Y como llega etiquetado de «error» después de una escritura que sí funcionó,
-  los tres mensajes **empiezan diciendo que la escritura no falló**: sin eso, el aviso se lee como un
-  fallo y se reintenta la misma escritura.
+  **Su precio se midió y se bajó, y por eso el comando vive en un archivo.** El harness imprime el
+  comando entero **dos veces** delante del texto útil, así que en línea costaba **2.712 caracteres**
+  de contexto por aviso. Ahora está en `.claude/hooks/post-write.sh` y el `settings.json` sólo lo
+  llama: **488 caracteres**, un 82 % menos, leído del registro y no calculado — la cuenta a mano daba
+  528. Los otros dos hooks siguen en línea porque son cortos y **deniegan**, así que su texto nunca
+  se imprime dos veces.
+
+  Y como el aviso llega etiquetado de «error» después de una escritura que sí funcionó, los tres
+  mensajes **empiezan diciendo que la escritura no falló**: sin eso se lee como un fallo y se
+  reintenta la misma escritura.
 
   **Ninguno dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así que siguen siendo un
   adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y

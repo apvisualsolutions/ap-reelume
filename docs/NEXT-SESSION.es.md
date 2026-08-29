@@ -48,11 +48,15 @@ llegó al contexto del agente que escribe, como error de herramienta. Los dos av
 usan ahora el segundo canal, verificado por tubería con **siete casos, cuatro de ellos de los que
 debe dejar pasar**, y después en la herramienta real.
 
-**Dos precios, los dos medidos.** Cuesta **2.712 caracteres de contexto por aviso**, porque el
-harness imprime el comando entero dos veces antes del texto — extraerlo a un script lo bajaría, y
-este árbol todavía no lo hace. Y llega etiquetado de «error» tras una escritura que sí funcionó, así
-que los tres mensajes **empiezan diciendo que la escritura no falló**; sin eso el aviso se lee como
-un fallo y se reintenta la misma escritura.
+**Dos precios, los dos medidos, y uno de ellos ya pagado.** El harness imprime el comando entero dos
+veces delante del texto, así que en línea el aviso costaba **2.712 caracteres de contexto** cada vez
+que sonaba. El comando vive ahora en `.claude/hooks/post-write.sh` y el `settings.json` sólo lo
+llama: **488 caracteres, un 82 % menos** — leídos del registro y no calculados, que merece decirse
+porque la cuenta a mano predijo 528. Los otros dos hooks se quedan en línea: son cortos y
+**deniegan**, así que su texto nunca se imprime dos veces. El segundo precio sigue ahí — llega
+etiquetado de «error» tras una escritura que sí funcionó, así que los tres mensajes **empiezan
+diciendo que la escritura no falló**; sin eso el aviso se lee como un fallo y se reintenta la misma
+escritura.
 
 **Lo que no hace es llegar al propietario.** Aquí ningún hook avisa a una persona — eso lo hacen las
 puertas.

@@ -107,10 +107,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   **Así que se cambió el canal.** Los dos avisos del `PostToolUse` escriben ahora a stderr y salen con
   código 2, que sí llega al agente que escribe el archivo — medido con el caso conocido al lado del
   desconocido, y después por tubería con **siete casos, cuatro de ellos de los que debe dejar pasar**.
-  El precio también está medido: **2.712 caracteres de contexto por aviso**, porque el harness imprime
-  el comando entero dos veces antes del texto. Y como llega etiquetado de «error» tras una escritura
-  que sí funcionó, los tres mensajes **empiezan diciendo que la escritura no falló** — sin eso, el
-  aviso se lee como un fallo y se reintenta la misma escritura.
+  Y como llega etiquetado de «error» tras una escritura que sí funcionó, los tres mensajes **empiezan
+  diciendo que la escritura no falló** — sin eso, el aviso se lee como un fallo y se reintenta la
+  misma escritura.
+
+  **Su precio se midió y después se bajó.** El harness imprime el comando entero dos veces delante del
+  texto, así que en línea costaba **2.712 caracteres de contexto por aviso**. El comando vive ahora en
+  `.claude/hooks/post-write.sh` y el `settings.json` sólo lo llama: **488 caracteres**, un 82 % menos,
+  leídos del registro y no calculados — la cuenta a mano decía 528. Los otros dos hooks se quedan en
+  línea porque son cortos y **deniegan**, así que su texto nunca se imprime dos veces.
 
 - **El cromo del minirreproductor es la composición del prototipo: barra de progreso, título y
   reloj.** La franja eran cinco botones y nada más, así que una ventana flotante no decía **qué** se

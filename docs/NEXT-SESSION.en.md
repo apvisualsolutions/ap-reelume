@@ -48,9 +48,12 @@ unknown one arrived in the writing agent's context as a tool error. Both `PostTo
 take the second channel, verified through a pipe with **seven cases, four of them among those it
 must let through**, and then in the real tool.
 
-**Two prices, both measured.** It costs **2,712 characters of context per warning**, because the
-harness prints the whole command twice before the text — extracting the command into a script would
-cut that, and this tree does not do it yet. And it arrives labelled an error after a write that
+**Two prices, both measured, and one of them paid down.** The harness prints the whole command twice
+ahead of the text, so inline the warning cost **2,712 characters of context** every time it fired.
+The command now lives in `.claude/hooks/post-write.sh` and `settings.json` only calls it: **488
+characters, 82% less** — read off the log, not calculated, and worth saying because the arithmetic
+predicted 528. The other two hooks stay inline: they are short and they **deny**, so their text is
+never printed twice. The second price stays — it arrives labelled an error after a write that
 succeeded, so all three messages **open by saying the write did not fail**; without that the warning
 reads as a failure and the same write gets retried.
 

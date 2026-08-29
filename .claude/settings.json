@@ -33,7 +33,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // empty' | tr -d '\\r' | { read -r f; [ -z \"$f\" ] && exit 0; ch () { git ls-files --error-unmatch \"$1\" >/dev/null 2>&1 || return 0; git diff --quiet HEAD -- \"$1\" >/dev/null 2>&1 && return 1 || return 0; }; case \"$f\" in *.cs|*.axaml) grep -q 'SPDX-License-Identifier: GPL-3.0-or-later' \"$f\" 2>/dev/null || { printf 'Regla 1: LA ESCRITURA NO FALLO, el archivo esta en disco. Le falta la cabecera SPDX-License-Identifier: GPL-3.0-or-later, que exige IDE0073 (CLAUDE.md). No reintentes la misma escritura: anade la cabecera y escribelo otra vez.\n' >&2; exit 2; };; *docs*.es.md) en=\"${f%.es.md}.en.md\"; if [ ! -f \"$en\" ]; then printf 'Regla 4: LA ESCRITURA NO FALLO, el archivo esta en disco. No tiene pareja .en.md y eng/verify-docs.ps1 la exige. No reintentes la misma escritura: crea la pareja en ingles.\n' >&2; exit 2; elif git rev-parse --verify HEAD >/dev/null 2>&1 && ch \"$f\" && ! ch \"$en\"; then printf 'Regla 4: LA ESCRITURA NO FALLO, el archivo esta en disco. Su pareja .en.md sigue como en HEAD, y los dos idiomas van juntos. No reintentes la misma escritura: actualiza el .en.md.\n' >&2; exit 2; fi;; esac; exit 0; }",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/post-write.sh\"",
             "shell": "bash",
             "timeout": 10,
             "statusMessage": "Comprobando licencia y bilinguismo"
