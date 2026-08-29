@@ -285,24 +285,43 @@ the prototype has a single toggle, and `IconChevronUp`, which is `IconChevronDow
 
 ## Vertical alignment
 
-The problem that keeps coming back, and why it comes back.
+The problem that keeps coming back, and why it comes back. **This section was rewritten on
+2026-08-29**, against the first measurement here that read pixels rather than boxes; what it used to
+say is at the end, because the error matters more than the correction.
 
-A typeface has no symmetric ascent and descent: a label centred to the pixel draws its ink — from the
-top of a capital to the foot of a descender — **2.43 px below** the middle of its box. Measured
-through the font's metrics, not from a screenshot.
+A typeface has no symmetric ascent and descent, so a label centred to its box draws its ink below the
+middle. **On screen that error is 1 px**, measured by rasterising a real button with
+`CaptureRenderedFrame()`.
 
-The compensation is **5 px**, which is twice the measurement because a margin on one side moves a
-centred box by half of it. And it goes **on the label**, never in the button's padding:
+The compensation is **1 px and it goes on the button's content** — the label when that is all there
+is, the panel when there is an icon beside it — never on the label alone when it shares a row with an
+icon:
 
-- A bottom padding on the button moves **everything** — the icon too — so an icon and the word beside
-  it stay misaligned by exactly as much as before. It changes where the whole row sits, not how its
-  two pieces relate.
-- A bottom margin on the `TextBlock` moves **only the word**, which is the one thing with a baseline
-  to answer for. The icon stays centred by its geometry, and the two meet.
+- A margin on the label **grows the panel the label sits in**, and that panel is centred as a whole.
+  So it moves the icon too, by half as much and the other way: on screen it left the icon at the
+  button's centre and the word **2 px above** it.
+- A margin on the content moves everything the button draws by the same amount, and so cannot
+  separate two pieces that belong together. It is the only shape that keeps them aligned to each
+  other **and** centred in the button.
 
-That is why `Path.icon` carries no compensation and a `TextBlock` inside a button does.
-`ButtonOpticalCentreTests` holds both claims to a pixel: the ink centred in its button, and the ink
-centred against the icon beside it.
+`Path.icon` still carries no compensation: a shape is centred by its geometry, and a button whose
+whole content is an icon needs none.
+
+**What this section said until 2026-08-29, and why it was false.** It said the compensation was
+**5 px**, derived from a **2.43 px** asymmetry computed from the font's metrics, and that a margin on
+the `TextBlock` moved "only the word". All three were wrong:
+
+- **2.43 px is the model's number, not the screen's.** Rasterising says 1.
+- **5 px moved the word by 3**, from 1 px low to 2 px high: it overcorrected past the middle.
+- **A margin on the label does not move only the word.** It moves the panel, and the icon with it.
+  That premise is what left **53 buttons** with their icon and word 2 px apart.
+
+And why nobody saw it: `ButtonInkTests` measured the box and `ButtonOpticalCentreTests` measured ink
+**computed** from metrics. Neither rendered anything. The second is retired — its method assumed a
+descender **always**, and over «Guardar el informe», which has none, it answered 2.43 px where
+rasterising measures 0.0 — and `ButtonPixelCentreTests` replaces it, rasterising and carrying the
+word as a **parameter**: the middle of the ink is a property of the string and not of the font,
+ranging from +0.62 («Guardar el informe») to +3.82 («ppp») with the descender.
 
 ## The concessions, with their reason
 

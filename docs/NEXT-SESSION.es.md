@@ -54,6 +54,25 @@ compilación** adivinando la API (`IGlyphTypeface` no es público, `FontMetrics`
 
 **Y su corolario, que es el hallazgo de la sesión: medir el layout no es medir lo que se ve.**
 
+### Y una discrepancia que sólo aparece al cerrar
+
+`docs/design/ELEMENTS.es.md` **decía tres cosas falsas** sobre la alineación vertical —los 5 px, los
+2,43 px, y que un margen en la etiqueta mueve sólo la palabra— y es **el documento con precedencia**
+sobre el `.axaml`. Una discrepancia ahí no es una errata: es una instrucción equivocada para quien
+venga. La sección está reescrita y conserva al final lo que decía y por qué era falso.
+
+**La regla que deja**: cuando un cambio contradice una premisa escrita, hay que ir a buscar dónde
+está escrita esa premisa. No basta con corregir el código.
+
+### Lo que se miró y no había que tocar
+
+- **`eng/coverage-debt.txt`**: 212 líneas y CI midió 212 en verde, así que los suelos siguen válidos
+  y no hay que copiarlo del artefacto.
+- **`ELEMENTS` y el cromo del mini**: no se documenta ahí, y es una decisión. El mini no introduce
+  ningún elemento nuevo —reutiliza `player-chrome`, `FontSizeCaption`, `AccentBrush` y la barra de
+  3 px que la fila de episodio y la tarjeta de la biblioteca ya tenían—, y ese catálogo es de
+  elementos, no de composiciones.
+
 ## Los botones estaban 2 px desalineados, y ya no — con puerta de píxeles
 
 **Cerrado en esta misma sesión.** La compensación óptica valía **5 px sobre la etiqueta** y el error
@@ -109,17 +128,57 @@ no un servicio sin consumidor, sino **una puerta que mide el modelo de lo que pr
    `Save` +0,90. Un rango de **3,2 px** que depende de si hay descendente — y que cambia al traducir.
    Lo estable es la métrica de la fuente, no la palabra.
 
-## Lo único que queda de esto, medido y sin hacer: `Path.icon` ancla en vez de centrar
+## La pieza siguiente, con la decisión ya tomada: restituir el lienzo de los iconos
 
-`Stretch="Uniform"` con caja cuadrada escala la geometría y **la ancla arriba-izquierda**: el eje que
-sobra queda todo a un lado. De 29 botones de sólo icono, **17 tienen la tinta descentrada** — seis
-swatches de color a `dy=-3,00`, el play a `dx=-1,67`, `PictureInPictureButton` a `dy=-1,06`.
+**El problema.** De 29 botones de sólo icono, **17 tienen la tinta descentrada** — seis swatches de
+color a `dy=-3,00`, el play a `dx=-1,67`, `PictureInPictureButton` a `dy=-1,06`.
 
-Probado: cambiar `Width`/`Height` por `MaxWidth`/`MaxHeight` en `Path.icon` baja de 17 a 11 y deja los
-verticales en cero. **Rompe una puerta**: `Every_picture_the_transport_paints_is_a_drawing_and_is_
-stroked_for_its_size` lee `path.Width` para comprobar el grosor de trazo contra el 1,6 en 24 del
-prototipo, y con `MaxWidth` responde `NaN`. Revertido para no dejar el árbol a medias; es parte de la
-pieza del centrado.
+**La causa raíz, medida el 2026-08-29, y no es `Stretch`.** Al portar los iconos del prototipo **se
+perdió su lienzo de 24×24**: cada geometría conserva sólo su trazo, así que su caja envolvente es
+distinta de las demás.
+
+```
+IconPlay             bounds= 8,00 5,40   11,00x13,20   ← ni cuadrada ni centrada
+IconSkipForward      bounds= 4,00 4,05   16,00x16,00
+IconClose            bounds= 6,20 6,20   11,60x11,60
+IconExitFullscreen   bounds= 4,00 4,00   16,00x16,00
+```
+
+`Stretch="Uniform"` escala cada una por un factor distinto y **ancla el resultado arriba-izquierda**,
+así que el eje que sobra queda todo a un lado. Hace exactamente lo que se le pide; lo que está mal es
+lo que se le da.
+
+**Y hay un segundo defecto que sale del mismo sitio, y que nadie ha mirado**: el grosor de trazo. La
+puerta lo comprueba con `1,6 · Width / 24`, que asume que el icono **llena** su lienzo. `IconPlay`
+ocupa 11 de 24, así que su trazo efectivo no es el que la fórmula cree. **Restituir el lienzo también
+arregla eso**, y hoy los iconos se dibujan con grosores distintos entre sí sin que nada lo diga.
+
+### La decisión, tomada: el prefijo del lienzo, no `MaxWidth`
+
+**Verificado**: `Geometry.Parse("M0 0 M24 24 M8 5 L19 12 L8 19 Z")` mide `0,00 0,00 24,00x24,00`. Dos
+`moveto` que no dibujan nada amplían la caja envolvente y restituyen el `viewBox` que el prototipo
+declara en su `<svg>` y que la portación no copió.
+
+**`MaxWidth`/`MaxHeight` queda descartado**, y no por la puerta que rompe sino por lo que hace: deja
+a `IconPlay` con caja 15×18 y a `IconClose` con 18×18. Iconos de anchos distintos **desalineados
+horizontalmente entre sí** en cualquier columna que los apile — cambia un defecto por otro peor,
+porque el segundo se ve en una lista entera y no en un botón suelto.
+
+El prefijo, en cambio: no toca el árbol visual —`Assert.IsType<Path>(control.Content)` sigue en
+pie—, mantiene `path.Width` —la puerta del grosor no se rompe—, y deja la caja cuadrada, así que
+ningún layout se mueve.
+
+### Lo que hay que tocar, y el orden
+
+1. **Las 35 geometrías de `IconDictionary`**, con el prefijo `M0 0 M24 24` delante del trazo.
+2. **`PrototypeIconTests`**, que compara el `Data` **carácter por carácter** contra el prototipo: debe
+   comparar el trazo **tras retirar el prefijo**. Es legítimo y no es aflojar la puerta — el prefijo
+   no es dibujo, es el `viewBox` que el prototipo sí declara y que la comparación de trazos nunca
+   contempló.
+3. **Una puerta nueva**: toda geometría del diccionario mide `0,0 24×24`. Es lo que hace imposible el
+   defecto para el icono número treinta y seis.
+4. **Medir después con `ButtonPixelCentreTests`** extendido a botones de sólo icono, que es donde se
+   ve el resultado.
 
 ## Estado al cierre del 2026-08-28 (quinta sesión) — la cola de cuatro puntos, cerrada entera
 

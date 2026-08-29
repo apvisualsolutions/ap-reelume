@@ -286,24 +286,42 @@ el prototipo tiene un solo conmutador, y `IconChevronUp`, que es `IconChevronDow
 
 ## La alineación vertical
 
-El problema que vuelve, y por qué vuelve.
+El problema que vuelve, y por qué vuelve. **Esta sección se reescribió entera el 2026-08-29**, con
+la primera medición que leyó píxeles en vez de cajas; lo que decía antes está al final, porque el
+error importa más que la corrección.
 
-Una tipografía no tiene ascendente y descendente simétricos: una etiqueta centrada al píxel dibuja su
-tinta —de la cima de una mayúscula al pie de un descendente— **2,43 px por debajo** del centro de su
-caja. Medido con las métricas de la fuente, no con una captura.
+Una tipografía no tiene ascendente y descendente simétricos, así que una etiqueta centrada a la caja
+dibuja su tinta por debajo del medio. **En pantalla ese error es 1 px**, medido rasterizando un botón
+real con `CaptureRenderedFrame()`.
 
-La compensación son **5 px**, que es el doble de la medida porque un margen a un lado mueve una caja
-centrada la mitad de él. Y va **en la etiqueta**, nunca en el relleno del botón:
+La compensación es **1 px y va en el contenido del botón** —la etiqueta cuando es lo único que hay,
+el panel cuando hay un icono al lado—, nunca en la etiqueta suelta cuando comparte fila con un icono:
 
-- Un relleno inferior en el botón mueve **todo** el contenido —el icono también—, así que un icono y
-  la palabra a su lado siguen desalineados exactamente lo mismo que antes. Cambia dónde está la fila
-  entera, no cómo se relacionan sus dos piezas.
-- Un margen inferior en el `TextBlock` mueve **sólo la palabra**, que es lo único que tiene línea base
-  que responder. El icono se queda centrado por su geometría, y los dos coinciden.
+- Un margen sobre la etiqueta **hace crecer el panel donde la etiqueta vive**, y ese panel se centra
+  como un todo. Así que mueve también el icono, sólo que la mitad y en la otra dirección: en pantalla
+  dejaba el icono en el centro del botón y la palabra **2 px por encima**.
+- Un margen sobre el contenido mueve por igual todo lo que el botón dibuja, y por eso no puede
+  separar dos piezas que van juntas. Es la única forma que las mantiene alineadas entre sí **y**
+  centradas en el botón.
 
-Por eso `Path.icon` no lleva compensación y `TextBlock` dentro de un botón sí. `ButtonOpticalCentreTests`
-sostiene las dos afirmaciones a un píxel: la tinta centrada en su botón, y la tinta centrada respecto
-del icono que tiene al lado.
+`Path.icon` sigue sin llevar compensación: una forma se centra por su geometría y un botón cuyo
+contenido entero es un icono no necesita ninguna.
+
+**Lo que decía esta sección hasta el 2026-08-29, y por qué era falso.** Decía que la compensación era
+de **5 px**, derivada de una asimetría de **2,43 px** calculada con las métricas de la fuente, y que
+un margen en el `TextBlock` movía «sólo la palabra». Las tres afirmaciones eran incorrectas:
+
+- **2,43 px es el número del modelo, no el de la pantalla.** El rasterizado dice 1.
+- **5 px movía la palabra 3**, de 1 px baja a 2 px alta: sobrecorregía pasándose del centro.
+- **Un margen en la etiqueta no mueve sólo la palabra.** Mueve el panel, y con él el icono. Esa
+  premisa es la que dejó **53 botones** con su icono y su palabra 2 px separados.
+
+Y el motivo de que nadie lo viera: `ButtonInkTests` medía la caja y `ButtonOpticalCentreTests` la
+tinta **calculada** desde las métricas. Ninguna dibujaba nada. La segunda está retirada —su método
+asumía **siempre** un descendente, y sobre «Guardar el informe», que no tiene ninguno, contestaba
+2,43 px donde el rasterizado mide 0,0— y la sustituye `ButtonPixelCentreTests`, que rasteriza y lleva
+la palabra como **parámetro**: el centro de la tinta no es propiedad de la fuente sino de la cadena,
+y va de +0,62 («Guardar el informe») a +3,82 («ppp») según lleve descendente.
 
 ## Las cesiones, con su razón
 

@@ -159,6 +159,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **`docs/design/ELEMENTS.es.md` decía tres cosas falsas sobre la alineación vertical, y la sección
+  se reescribió entera.** Decía que la compensación era de **5 px**, derivada de una asimetría de
+  **2,43 px** calculada con las métricas de la fuente, y que un margen en el `TextBlock` movía «sólo
+  la palabra». El rasterizado desmiente las tres: el error en pantalla es **1 px**, los cinco movían
+  la palabra **tres**, y un margen en la etiqueta **hace crecer el panel donde vive** y arrastra
+  también al icono — que es la premisa que dejó 53 botones con sus dos piezas 2 px separadas.
+
+  Importa más de lo que parece: `ELEMENTS` es **el documento con precedencia** sobre el `.axaml`, así
+  que una discrepancia ahí no es una errata sino una instrucción equivocada para quien venga. La
+  sección conserva al final lo que decía y por qué era falso, porque el error enseña más que la
+  corrección.
+
 - **Los botones dibujaban su icono y su palabra 2 px separados, con dos puertas verdes encima.**
   Medido rasterizando un botón real con `CaptureRenderedFrame()`: la compensación óptica de la
   etiqueta valía **5 px** y el error en pantalla era **1**, así que movía la palabra tres — de 1 px

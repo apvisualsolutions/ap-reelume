@@ -54,6 +54,26 @@ no `GetGlyphMetrics`, `Shape` must be cast to `Visual`).
 
 **And its corollary, which is the session's finding: measuring layout is not measuring what is seen.**
 
+### And a discrepancy that only shows up at closing time
+
+`docs/design/ELEMENTS.en.md` **said three false things** about vertical alignment — the 5 px, the
+2.43 px, and that a margin on the label moves only the word — and it is **the document that takes
+precedence** over the `.axaml`. A discrepancy there is not a typo: it is a wrong instruction for
+whoever comes next. The section is rewritten and keeps what it used to say, and why it was false, at
+the end.
+
+**The rule it leaves**: when a change contradicts a written premise, go and find where that premise
+is written. Correcting the code is not enough.
+
+### What was looked at and did not need touching
+
+- **`eng/coverage-debt.txt`**: 212 lines and CI measured 212 green, so the floors still hold and it
+  does not need copying from the artifact.
+- **`ELEMENTS` and the mini's chrome**: it is not documented there, and that is a decision. The mini
+  introduces no new element — it reuses `player-chrome`, `FontSizeCaption`, `AccentBrush` and the
+  3 px bar the episode row and the library card already had — and that catalogue is of elements, not
+  of compositions.
+
 ## The buttons were 2 px out, and are not any more — with a pixel gate
 
 **Closed in the same session.** The optical compensation was **5 px on the label** and the error on
@@ -109,17 +129,56 @@ consumer, but **a gate measuring the model of what it promises to look at**.
    +0.90. A **3.2 px** range that depends on whether there is a descender — and that moves with
    translation. What is stable is the font's metric, not the word.
 
-## The one thing left of this, measured and undone: `Path.icon` anchors instead of centring
+## The next piece, with the decision already made: restore the icons' canvas
 
-`Stretch="Uniform"` in a square box scales the geometry and **anchors it top-left**: the spare axis
-goes entirely to one side. Of 29 icon-only buttons, **17 have their ink off centre** — six colour
-swatches at `dy=-3.00`, play at `dx=-1.67`, `PictureInPictureButton` at `dy=-1.06`.
+**The problem.** Of 29 icon-only buttons, **17 have their ink off centre** — six colour swatches at
+`dy=-3.00`, play at `dx=-1.67`, `PictureInPictureButton` at `dy=-1.06`.
 
-Tried: swapping `Width`/`Height` for `MaxWidth`/`MaxHeight` in `Path.icon` takes 17 down to 11 and
-zeroes the vertical ones. **It breaks a gate**: `Every_picture_the_transport_paints_is_a_drawing_and_
-is_stroked_for_its_size` reads `path.Width` to check the stroke against the prototype's 1.6 in 24, and
-with `MaxWidth` that answers `NaN`. Reverted rather than left half done; it belongs to the centring
-piece.
+**The root cause, measured on 2026-08-29, and it is not `Stretch`.** Porting the prototype's icons
+**lost their 24×24 canvas**: each geometry keeps only its stroke, so its bounding box differs from
+every other's.
+
+```
+IconPlay             bounds= 8.00 5.40   11.00x13.20   ← neither square nor centred
+IconSkipForward      bounds= 4.00 4.05   16.00x16.00
+IconClose            bounds= 6.20 6.20   11.60x11.60
+IconExitFullscreen   bounds= 4.00 4.00   16.00x16.00
+```
+
+`Stretch="Uniform"` scales each by a different factor and **anchors the result top-left**, so the
+spare axis goes entirely to one side. It does exactly what it is asked; what is wrong is what it is
+given.
+
+**And a second defect comes from the same place, unexamined**: the stroke weight. The gate checks it
+with `1.6 · Width / 24`, which assumes the icon **fills** its canvas. `IconPlay` occupies 11 of 24, so
+its effective stroke is not what the formula believes. **Restoring the canvas fixes that too**, and
+today the icons are drawn at weights that differ from each other with nothing saying so.
+
+### The decision, made: the canvas prefix, not `MaxWidth`
+
+**Verified**: `Geometry.Parse("M0 0 M24 24 M8 5 L19 12 L8 19 Z")` measures `0.00 0.00 24.00x24.00`.
+Two `moveto`s that draw nothing widen the bounding box and restore the `viewBox` the prototype
+declares in its `<svg>` and the port never copied.
+
+**`MaxWidth`/`MaxHeight` is dismissed**, and not for the gate it breaks but for what it does: it
+leaves `IconPlay` with a 15×18 box and `IconClose` with 18×18. Icons of differing widths **misaligned
+horizontally with each other** in any column that stacks them — one defect traded for a worse one,
+because the second shows across a whole list rather than in a single button.
+
+The prefix instead: it does not touch the visual tree — `Assert.IsType<Path>(control.Content)` still
+holds — keeps `path.Width` so the stroke gate survives, and leaves the box square, so no layout moves.
+
+### What to touch, and in what order
+
+1. **The 35 geometries in `IconDictionary`**, with `M0 0 M24 24` before the stroke.
+2. **`PrototypeIconTests`**, which compares the `Data` **character for character** against the
+   prototype: it must compare the stroke **with the prefix stripped**. That is legitimate and is not
+   loosening the gate — the prefix is not drawing, it is the `viewBox` the prototype does declare and
+   that a stroke-only comparison never covered.
+3. **A new gate**: every geometry in the dictionary measures `0,0 24×24`. That is what makes the
+   defect impossible for icon number thirty-six.
+4. **Measure afterwards with `ButtonPixelCentreTests`** extended to icon-only buttons, which is where
+   the result shows.
 
 ## State at the close of 2026-08-28 (fifth session) — the queue of four points, closed entire
 

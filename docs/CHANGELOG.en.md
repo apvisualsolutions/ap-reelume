@@ -159,6 +159,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **`docs/design/ELEMENTS.en.md` said three false things about vertical alignment, and the section
+  was rewritten entire.** It said the compensation was **5 px**, derived from a **2.43 px** asymmetry
+  computed from the font's metrics, and that a margin on the `TextBlock` moved "only the word".
+  Rasterising refutes all three: the error on screen is **1 px**, the five moved the word by
+  **three**, and a margin on the label **grows the panel it sits in** and drags the icon with it —
+  the premise that left 53 buttons with their two pieces 2 px apart.
+
+  It matters more than it looks: `ELEMENTS` is **the document that takes precedence** over the
+  `.axaml`, so a discrepancy there is not a typo but a wrong instruction for whoever comes next. The
+  section keeps what it used to say, and why it was false, at the end — the error teaches more than
+  the correction.
+
 - **The buttons drew their icon and their word 2 px apart, with two gates green over it.** Measured
   by rasterising a real button with `CaptureRenderedFrame()`: the label's optical compensation was
   **5 px** and the error on screen was **1**, so it moved the word by three — from 1 px low to 2 px
