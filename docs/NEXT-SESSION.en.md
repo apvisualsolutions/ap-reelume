@@ -11,6 +11,52 @@ to the other session, because its `git add` reached the file first.
 `main` stays at `f10e53e` — the eleventh's green close — until this branch's run is read. That run
 is the thirteenth's first move.
 
+## The other half of this batch: Courses (CRS) lands, and lands halfway
+
+**Nine commits**, from `6af82d4` to `6191ee7`. The note above says eight because the ninth arrived
+after it was written. `ADR-0006` moves to `ACCEPTED` and `CRS-001`…`005` enter `FEATURES.md`.
+
+**Scope:** `CRS-002`, `CRS-003` and `CRS-005` are `IMPLEMENTED` with
+[their evidence](evidence/stable/CRS-courses.md); `CRS-001` is `IN_PROGRESS` because marking a folder
+still has no door; `CRS-004` has not started.
+
+### What is left, in the order `design/PROMPT.md` sets
+
+1. **The player's «Lessons» panel (CRS-004).** 320 px, **absent** rather than disabled outside a
+   lesson session, and «Next lesson» when one ends, reusing PLY-011's countdown. Four written keys
+   wait for it.
+2. **The «Course (folder of lessons)» option in the add-media dialog.** It is what **returns
+   `MarkCoursesInRoot` and `ICourseRootDeclarationStore` to the container**: they are out today
+   because `ServiceConsumptionTests` refused them for having nobody to resolve them, and that refusal
+   was right. It is also where the **depth** question lives, which the ADR requires declared and
+   forbids guessing. Seven keys wait for it.
+3. **The captures matrix** beside the prototype, and a test that a lesson's progress **survives the
+   file being moved**. Those are the two things between `IMPLEMENTED` and `VERIFIED`.
+
+### Four defects the tests found and reading did not
+
+- **`IsCoursesVisible` was not among the properties the shell announces on navigation**: the
+  destination existed, the route changed and **the screen never drew**. No ViewModel test would have
+  seen it — the boolean was right and nothing listened — and **the walk found it by not finding the
+  button**.
+- **The policy normalises paths to `/`** while the use case keyed its dictionary with the
+  enumerator's separators: built with one set of keys and read with another.
+- **SQLite puts NULLs first in `ORDER BY`**, so a lesson with no leading number would have opened
+  every course.
+- And one of the harness's: in the table list, **`lessons` sorts before `library_roots`**, because
+  the collation is binary and `e` precedes `i`. Alphabetised by eye, red at index 13.
+
+### Three things reading the tree does not tell you
+
+- **Nothing writes a `CatalogTitleKind.Course` yet.** Courses live in tables of their own, so the
+  default arms of `CatalogItemViewModel.KindKey` and `LibraryViewModel`'s routing are
+  **unreachable**. Adding a branch there would be code no test can take.
+- **`CourseLastOpenedFormat` stays declared and unpainted.** Its `{0}` wants time units — "3 days" —
+  and there is **not one relative-time string** among the tree's 711, measured. Writing them would be
+  inventing copy, which is the owner's.
+- **The Claude Design MCP caps a read at 256 KiB** and also served two files from an earlier revision
+  while reporting `truncated: false`. To implement against the package, export by hand and compare
+  sizes.
 ### The eight primary constructors, and the two lists that empty themselves
 
 The eight the guard sweep left outside the rule become explicit constructors with their guard:

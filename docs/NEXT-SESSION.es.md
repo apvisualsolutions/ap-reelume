@@ -11,6 +11,65 @@ sesión, porque su `git add` la alcanzó antes de que ésta la comprometiera.
 `main` se queda en `f10e53e` —el cierre verde de la undécima— hasta leer el run de esta rama. Lo
 primero de la decimotercera es ese run.
 
+## La otra mitad de esta tanda: Cursos (CRS) entra, y entra a medias
+
+**Nueve commits**, de `6af82d4` a `6191ee7`. La nota de arriba dice ocho porque el noveno llegó
+después de escribirla. `ADR-0006` pasa a `ACCEPTED` y `CRS-001…005` entran en `FEATURES.md`.
+
+| commit | qué |
+| --- | --- |
+| `6af82d4` | El paquete de diseño importado: `design/vistas/` con 57 archivos |
+| `b50c3d0` | El ADR aceptado, las cinco filas, y el no-objetivo acotado en los dos idiomas |
+| `dfc4d0a` | 42 cadenas en los dos archivos; `ScopeBoundaryTests` acotada |
+| `fbbeda9` | `CatalogTitleKind.Course` y las dos políticas puras |
+| `4a572b5` | El prototipo completo, exportado a mano |
+| `ef84eca` | Migración `0022`, repositorio y `MarkCoursesInRoot` |
+| `e8a53df` | `CourseProgressKey`, `CourseThreadPolicy` y el modelo de lectura |
+| `5ab2aa6` | El destino: `CoursesView`, `CourseDetailsView`, `LessonRowView`, riel |
+| `6191ee7` | El aviso de la marca, los estados de alcance y la evidencia |
+
+**Estado del alcance:** `CRS-002`, `CRS-003` y `CRS-005` en `IMPLEMENTED` con
+[su evidencia](evidence/stable/CRS-courses.md); `CRS-001` en `IN_PROGRESS` porque marcar una carpeta
+aún no tiene puerta; `CRS-004` sin empezar.
+
+### Lo que falta, en el orden que manda `design/PROMPT.md`
+
+1. **Panel «Lecciones» del reproductor (CRS-004).** 320 px, **ausente** —no deshabilitado— fuera de
+   una sesión de lección; y «Siguiente lección» al terminar, reutilizando la cuenta atrás de PLY-011.
+   Cuatro claves escritas y sin consumir esperándolo.
+2. **La opción «Curso (carpeta de lecciones)» del diálogo de añadir.** Es la que **devuelve
+   `MarkCoursesInRoot` e `ICourseRootDeclarationStore` al contenedor**: hoy están fuera porque
+   `ServiceConsumptionTests` los rechazó por no tener quien los resuelva, y ese rechazo era correcto.
+   Ahí vive además la pregunta de la **profundidad**, que el ADR exige declarar y prohíbe adivinar.
+   Siete claves esperándolo.
+3. **La matriz de capturas** junto al prototipo, y una prueba de que el progreso de una lección
+   **sobrevive a mover el archivo**. Son las dos cosas entre `IMPLEMENTED` y `VERIFIED`.
+
+### Cuatro defectos que encontraron las pruebas y no la lectura
+
+- **`IsCoursesVisible` no estaba entre lo que el shell anuncia al navegar**: el destino existía, la
+  ruta cambiaba y **la pantalla no se dibujaba**. Ninguna prueba de ViewModel lo habría visto —el
+  booleano era correcto y nadie escuchaba su cambio—; lo encontró **el paseo, al no hallar el botón**.
+- **La política normaliza las rutas a `/`** y el caso de uso indexaba con las barras del enumerador:
+  el mapa se construía con unas claves y se leía con otras.
+- **SQLite pone los NULL primero en `ORDER BY`**, así que una lección sin número de cabecera habría
+  abierto todos los cursos.
+- Y una del arnés: en la lista de tablas, **`lessons` va antes que `library_roots`** porque la
+  colación es binaria y ahí `e` va antes que `i`. Ordenado «de leer», rojo en el índice 13.
+
+### Tres cosas que no se deducen leyendo el árbol
+
+- **`CatalogTitleKind.Course` no lo escribe nadie todavía.** Los cursos viven en sus propias tablas,
+  así que las ramas por defecto de `CatalogItemViewModel.KindKey` y del encaminamiento de
+  `LibraryViewModel` son **inalcanzables**. Añadirles un brazo sería código que ninguna prueba puede
+  tomar.
+- **`CourseLastOpenedFormat` se queda declarada y sin pintar.** Su `{0}` pide unidades de tiempo
+  —«3 días»— y **no hay una sola cadena de tiempo relativo** entre las 711 del árbol, medido.
+  Escribirlas sería inventar copia, que es del dueño. Novena discrepancia §4↔árbol.
+- **El MCP de Claude Design corta en 256 KiB** y además sirvió dos archivos de una revisión anterior
+  diciendo `truncated: false`. Para implementar contra el paquete, exportación a mano y contraste de
+  tamaños.
+
 ### Los ocho constructores primarios, y las dos listas que se vacían solas
 
 Los ocho que el barrido de guardas dejó fuera de la regla pasan a constructor explícito con su
