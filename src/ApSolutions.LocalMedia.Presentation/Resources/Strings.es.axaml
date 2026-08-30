@@ -690,4 +690,50 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerVersionsEmptyDescription">No hay nada entre lo que elegir para este título.</x:String>
   <x:String x:Key="ShortcutsEmptyTitle">Sin atajos asignados</x:String>
   <x:String x:Key="ShortcutsEmptyDescription">Las teclas multimedia del sistema siguen funcionando.</x:String>
+  <!-- Courses (CRS-001..CRS-005). Forty-two keys, and the design package's own header says
+       forty-one: its "course card and its thread" group is labelled 15 and enumerates 16, because
+       two of its rows pack a pair of keys into one cell and one pair was counted once. Counted
+       from the document rather than read off its heading. -->
+  <x:String x:Key="CoursesNavLabel">Cursos</x:String>
+  <x:String x:Key="CoursesIntro">Vídeos que se estudian, no que se ven una vez: tutoriales, videocursos, carpetas de lecciones numeradas. Cada curso guarda su propio hilo — última lección, minuto exacto — para que perderlo no dependa de ti.</x:String>
+  <x:String x:Key="CoursesEmptyTitle">Ninguna carpeta marcada como curso todavía</x:String>
+  <x:String x:Key="CoursesEmptyDescription">Marca una carpeta de vídeos numerados y se convierte en curso: lecciones en el orden del nombre de archivo, subcarpetas como módulos, progreso por lección. Los archivos se quedan exactamente donde están.</x:String>
+  <x:String x:Key="CoursesMarkFolderAction">Marcar una carpeta como curso…</x:String>
+  <x:String x:Key="CoursesDetectionNote">Un curso se detecta de tu carpeta, nunca de un proveedor: no hay nada que identificar y nada se consulta. El orden sale de los nombres de archivo; los módulos, de las subcarpetas.</x:String>
+  <x:String x:Key="CoursesMenuAll">Todos los cursos</x:String>
+  <x:String x:Key="CoursesMenuThreadPending">Con hilo pendiente</x:String>
+  <x:String x:Key="CoursesMenuFinished">Terminados</x:String>
+  <x:String x:Key="CourseLessonsFormat">{0}/{1} lecciones</x:String>
+  <x:String x:Key="CourseRemainingFormat">{0} restantes</x:String>
+  <x:String x:Key="CourseLastOpenedFormat">Última vez hace {0}</x:String>
+  <x:String x:Key="CourseContinueFormat">Continuar · {0}</x:String>
+  <x:String x:Key="CoursePickUpFormat">Retomar · {0}</x:String>
+  <x:String x:Key="CourseFinishedOpenAction">Terminado · abrir</x:String>
+  <x:String x:Key="CourseJustMarkedStatus">Recién marcada · ordenando lecciones por nombre de archivo</x:String>
+  <x:String x:Key="CourseOpensWhenScanned">Se abrirá al escanear</x:String>
+  <x:String x:Key="CourseKicker">Curso</x:String>
+  <x:String x:Key="CourseMetaFormat">{0} módulos · {1} lecciones · {2}</x:String>
+  <x:String x:Key="CourseWatchedFormat">{0}/{1} vistas</x:String>
+  <x:String x:Key="CourseFinishedChip">Curso terminado</x:String>
+  <x:String x:Key="CourseModuleFormat">Módulo {0} · {1}</x:String>
+  <x:String x:Key="CourseNextInThreadChip">Siguiente en el hilo</x:String>
+  <x:String x:Key="CourseThreadTitle">Dónde lo dejaste</x:String>
+  <x:String x:Key="CourseThreadCta">Retomar el hilo</x:String>
+  <x:String x:Key="CourseThreadRestartCta">Volver a empezar</x:String>
+  <x:String x:Key="CourseResumeAtFormat">Reanudar en {0} / {1}</x:String>
+  <x:String x:Key="CourseRecapTitle">Lo último que viste</x:String>
+  <x:String x:Key="CourseThreadNote">El hilo se guarda solo: última lección, minuto exacto y fecha. No hay que apuntar nada para volver.</x:String>
+  <x:String x:Key="CourseMarkWatchedAction">Marcar como vista</x:String>
+  <x:String x:Key="CourseUnmarkAction">Quitar la marca</x:String>
+  <x:String x:Key="CourseMarkedNotice">Lección marcada como vista. El hilo pasa a la siguiente.</x:String>
+  <x:String x:Key="CourseUnmarkedNotice">Marca quitada. El hilo vuelve a apuntar aquí.</x:String>
+  <x:String x:Key="PlayerLessonsPanelTitle">Lecciones</x:String>
+  <x:String x:Key="PlayerNextLessonLabel">Siguiente lección</x:String>
+  <x:String x:Key="PlayerCourseFinishedNotice">Curso terminado</x:String>
+  <x:String x:Key="PlayerLessonsThreadNote">El hilo se guarda solo: la posición se escribe cada 5 segundos, por lección.</x:String>
+  <x:String x:Key="AddAsCourseOption">Curso (carpeta de lecciones)</x:String>
+  <x:String x:Key="AddCourseTitle">Marcar una carpeta como curso</x:String>
+  <x:String x:Key="AddCourseHelp">Un curso es una carpeta de vídeos numerados que se estudian en orden. Las lecciones siguen el orden del nombre de archivo, las subcarpetas son módulos y el progreso se guarda por lección. Nada se copia, mueve ni renombra — y NO es una raíz de escaneo.</x:String>
+  <x:String x:Key="AddCourseConfirmAction">Marcar como curso</x:String>
+  <x:String x:Key="AddCourseDoneNotice">Carpeta marcada como curso. Las lecciones siguen el orden del nombre de archivo y el progreso se guarda por lección. No se ha copiado nada.</x:String>
 </ResourceDictionary>

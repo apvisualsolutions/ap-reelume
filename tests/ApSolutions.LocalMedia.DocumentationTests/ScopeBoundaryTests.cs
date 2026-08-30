@@ -26,7 +26,14 @@ public sealed class ScopeBoundaryTests
         { "cuentas y sesión remota / accounts and remote sessions", ["IniciarSesion", "SignIn", "CrearCuenta", "CreateAccount", "Contrasena", "Password"] },
         { "sincronización entre equipos / cross-device sync", ["Sincronizar", "Sync", "Nube", "Cloud"] },
         { "reproducción simultánea de varios vídeos / simultaneous multi-video playback", ["SegundaSesion", "SecondSession", "MultiReproductor", "MultiPlayer"] },
-        { "cursos y formación / courses and training", ["Curso", "Course", "Leccion", "Lesson"] },
+        // Narrowed on 2026-08-30 by ADR-0006, and narrowed rather than dropped. Until then this
+        // row banned the words "Curso", "Course", "Leccion" and "Lesson" outright, which also
+        // banned cataloguing a folder of numbered videos that is already on the disk — the thing
+        // this application exists to do. What the roadmap sentence actually protects is the
+        // platform: the markers are now the words the product would have to use if it enrolled
+        // anybody, certified anything, or kept a study record. "Badge" is deliberately not among
+        // them: ten existing keys carry it, starting with UnavailableBadge.
+        { "formación como plataforma / training as a platform", ["Matricula", "Enrolment", "Enrollment", "Certificado", "Certificate", "Diploma", "Cuestionario", "Quiz", "Racha", "Streak", "ProgresoFormacion", "TrainingProgress", "PorcentajeFormacion", "CompletionPercent", "EstadisticasEstudio", "StudyStatistics"] },
         { "gestión de vídeos ajena a la biblioteca / video management beyond the library", ["Convertir", "Transcode", "Recortar", "Trim", "Exportar vídeo", "Export video"] },
         // "Note" is deliberately not a marker on its own: it matches RestoreFindingNotEnoughSpace and
         // every Notice in the licence strings, which are not this capability.
@@ -113,7 +120,11 @@ public sealed class ScopeBoundaryTests
         foreach (var file in Directory.EnumerateFiles(migrations, "*.sql"))
         {
             var text = File.ReadAllText(file);
-            foreach (var table in new[] { "accounts", "sessions", "sync_", "playlists", "custom_lists", "notes", "courses" })
+            // "courses" left this list on 2026-08-30 with ADR-0006, which made a course a third
+            // kind of title; "lessons" never joined it. What replaces them is the schema a course
+            // platform would need and this one must never grow: an enrolment, a certificate, a
+            // quiz, a streak. A table that shipped cannot be changed back.
+            foreach (var table in new[] { "accounts", "sessions", "sync_", "playlists", "custom_lists", "notes", "enrolments", "enrollments", "certificates", "quizzes", "streaks" })
             {
                 if (text.Contains($"CREATE TABLE {table}", StringComparison.OrdinalIgnoreCase))
                 {
