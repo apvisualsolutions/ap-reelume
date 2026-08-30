@@ -176,7 +176,6 @@ public sealed class ScanIdentificationTests
                     [
                         new MetadataSearchResult(
                             new MetadataReference("tmdb", "movie:dune", MetadataContentKind.Movie),
-                            "es-ES",
                             "Dune",
                             "Dune",
                             2021),
@@ -185,7 +184,6 @@ public sealed class ScanIdentificationTests
                     [
                         new MetadataSearchResult(
                             new MetadataReference("tmdb", "movie:unrelated", MetadataContentKind.Movie),
-                            "es-ES",
                             "Zzz Otra Cosa",
                             null,
                             2016),
@@ -202,7 +200,6 @@ public sealed class ScanIdentificationTests
             return Task.FromResult(reference.Key == "movie:dune"
                 ? new MetadataDetails(
                     reference,
-                    "es-ES",
                     "Dune",
                     "Dune",
                     "Paul Atreides llega a Arrakis.",

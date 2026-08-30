@@ -54,7 +54,6 @@ public sealed class RecommendationReadModel : IRecommendationReadModel
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
             history.Add(new WatchedTitle(
-                new TitleId(Guid.Parse(reader.GetString(0))),
                 Split(reader.GetString(2)),
                 Split(reader.GetString(3)),
                 reader.IsDBNull(1) ? null : reader.GetInt32(1),

@@ -152,7 +152,6 @@ public sealed class MetadataEditingTests
 
     private static MetadataDetails RemoteDetails(TitleId titleId, string title, string poster) => new(
         new MetadataReference("tmdb", ProviderKey, MetadataContentKind.Movie),
-        "es-ES",
         title,
         "Arrival",
         "Nuevo resumen remoto",

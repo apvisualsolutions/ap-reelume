@@ -189,7 +189,6 @@ public sealed class MetadataCandidateSourceTests
                 key.StartsWith("tv:", StringComparison.Ordinal)
                     ? MetadataContentKind.Show
                     : MetadataContentKind.Movie),
-            "es-ES",
             title,
             originalTitle,
             year);

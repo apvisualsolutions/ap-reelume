@@ -181,7 +181,6 @@ public sealed class IdentifiedArtworkTests
             CancellationToken cancellationToken = default) =>
             Task.FromResult<MetadataDetails?>(new MetadataDetails(
                 reference,
-                language.Primary,
                 "La llegada",
                 "Arrival",
                 "Una lingüista traduce a los visitantes.",
