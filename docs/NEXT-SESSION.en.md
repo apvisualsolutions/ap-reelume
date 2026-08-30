@@ -14,12 +14,15 @@
 >
 > | file | branches missing |
 > | --- | --- |
-> | `CourseLessonReader.cs` | **2**, on one line: one of its six `IsDBNull` arms is never taken |
 > | `CoursesViewModel.cs` | **15** |
 > | `CourseDetailsViewModel.cs` | **39** |
 >
-> The two view models **have no unit tests of their own**: the autonomous walk covers them through
-> the assembled shell, which measures behaviour rather than branches. That is the bulk of it.
+> `CourseThreadPolicy` and `CourseLessonReader` **are at the bar** and off the list; the ratchet came
+> down 193 → 191 with them.
+>
+> **The two view models have NO tests at all: a `grep` over `tests/` does not mention them.** They
+> are 627 lines between them, covered only by the autonomous walk through the assembled shell, which
+> measures behaviour rather than branches. **This is a batch of its own**, not the tail of another.
 >
 > **The three `.axaml` are not part of that and are already settled**: the new-file gate filters
 > `*.cs`, so they never reach it, and their `100/50` is the branch Avalonia's compiler emits —

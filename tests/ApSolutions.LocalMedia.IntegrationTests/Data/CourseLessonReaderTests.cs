@@ -108,6 +108,28 @@ public sealed class CourseLessonReaderTests
         Assert.Empty(await world.Reader.ReadAsync(empty, TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// A flat course — lessons with no section at all — is the only shape where the reader's two
+    /// module columns arrive null, and it is not a corner case: five of the twelve real courses
+    /// measured on 2026-08-30 are flat. Without this the loose arm of both `IsDBNull` reads was
+    /// never taken, which is exactly the two branches that held the file at 88.
+    /// </summary>
+    [Fact]
+    public async Task A_course_with_no_sections_reads_its_lessons_as_loose()
+    {
+        using var world = await World.OpenAsync();
+        var flat = await world.AddLooseCourseAsync("Plano", ["Una", "Dos"]);
+
+        var lessons = await world.Reader.ReadAsync(flat, TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, lessons.Count);
+        Assert.All(lessons, lesson => Assert.Null(lesson.Module));
+        // 0 is the reader's own LooseModuleNumber: a lesson with no section still needs a module
+        // number to sort by, and zero puts it before every real section rather than after.
+        Assert.All(lessons, lesson => Assert.Equal(0, lesson.ModuleNumber));
+        Assert.Equal([1, 2], lessons.Select(lesson => lesson.Number));
+    }
+
     [Fact]
     public void A_reader_needs_a_connection_factory()
     {
@@ -204,6 +226,32 @@ public sealed class CourseLessonReaderTests
                     $"{index + 1} - {lessonTitle}",
                     lessonTitle,
                     $"{title}/{module}/{index + 1} - {lessonTitle}.mp4"));
+            }
+
+            await Courses.SaveAsync(
+                new Course(id, RootId, title, title, DateTimeOffset.UnixEpoch, null),
+                rows,
+                TestContext.Current.CancellationToken);
+            return id;
+        }
+
+        /// <summary>A course whose lessons hang straight off it, with no section folder.</summary>
+        public async Task<CourseId> AddLooseCourseAsync(string title, string[] lessons)
+        {
+            var id = new CourseId(Guid.NewGuid());
+            var rows = new List<Lesson>();
+            for (var index = 0; index < lessons.Length; index++)
+            {
+                rows.Add(new Lesson(
+                    new LessonId(Guid.NewGuid()),
+                    CourseId: default,
+                    MediaFileId: null,
+                    Module: null,
+                    ModuleOrdinal: null,
+                    new LessonOrdinal(index + 1, null),
+                    $"{index + 1} - {lessons[index]}",
+                    lessons[index],
+                    $"{title}/{index + 1} - {lessons[index]}.mp4"));
             }
 
             await Courses.SaveAsync(

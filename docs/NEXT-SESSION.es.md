@@ -14,12 +14,16 @@
 >
 > | archivo | ramas que faltan |
 > | --- | --- |
-> | `CourseLessonReader.cs` | **2**, en una sola línea: uno de sus seis `IsDBNull` no se toma nunca |
 > | `CoursesViewModel.cs` | **15** |
 > | `CourseDetailsViewModel.cs` | **39** |
 >
-> Los dos ViewModels **no tienen pruebas unitarias propias**: los cubre el paseo autónomo a través
-> del shell ensamblado, que mide comportamiento y no ramas. Ahí está el grueso.
+> `CourseThreadPolicy` y `CourseLessonReader` **ya están en el listón** y fuera de la lista; el
+> trinquete bajó 193 → 191 con ellos.
+>
+> **Los dos ViewModels no tienen NINGUNA prueba: un `grep` sobre `tests/` no los menciona.** Son 627
+> líneas entre los dos y los cubre sólo el paseo autónomo a través del shell ensamblado, que mide
+> comportamiento y no ramas. **Es una tanda propia**, no el remate de otra: hay que montarlos con sus
+> dependencias y recorrer 54 ramas.
 >
 > **Los tres `.axaml` NO son parte de eso y ya están resueltos**: la puerta de nuevos filtra `*.cs`,
 > así que no pasan por ella, y su `100/50` es la rama que el compilador de Avalonia genera —medida
