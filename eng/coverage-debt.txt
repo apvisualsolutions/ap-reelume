@@ -92,6 +92,20 @@
 ## fails on a floor that is short exactly as it fails on one that is long, so the run that improves
 ## coverage is always the run that asks for the list to move. Raising coverage costs two CI runs,
 ## and only the second one can be green.
+##
+## 2026-08-30, segunda tanda del mismo dia: la lista NO se mueve y tres suelos SUBEN. Los ocho
+## constructores primarios pasaron a explicitos con su guarda, asi que RefreshMetadata,
+## UpdateMetadata e IntegrityChecker ganan ramas y suben; ninguno llega al listón, de modo que el
+## trinquete se queda en 186. Filas del artefacto del run 33320119462, verbatim.
+##
+## Y una trampa que costo una vuelta entera, escrita aqui porque volvera: promover esos ocho
+## TIRO tres archivos por debajo del listón en vez de subirlos -- PreviewRename a 100/50,
+## UndoRename a 100/75, ExecuteRename a 100/83. Un archivo SIN ramas mide 100 % por definicion, y
+## su primer par de ramas es tambien su primera ocasion de quedar a medias. Y quedo a medias por el
+## instrumento: el barrido le pasa el null en Application.Tests y RenameTransactionTests le pasa una
+## dependencia real en IntegrationTests, y el Cobertura fusionado se queda con el MEJOR informe de
+## una linea en vez de la union, asi que el par lee 1/2 para siempre. Es lo mismo que le paso a
+## ReviewInboxViewModel. La correccion fue cubrir los dos lados en UNA sola suite.
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  94
 src/ApSolutions.LocalMedia.Application/Backup/PreviewRestore.cs                               98  94
@@ -115,8 +129,8 @@ src/ApSolutions.LocalMedia.Application/Identification/GetReviewInbox.cs         
 src/ApSolutions.LocalMedia.Application/Identification/ResolveMatch.cs                         98  94
 src/ApSolutions.LocalMedia.Application/Identification/ReviewInboxChanged.cs                   60 100
 src/ApSolutions.LocalMedia.Application/Lifecycle/CloseApplication.cs                         100  93
-src/ApSolutions.LocalMedia.Application/Metadata/RefreshMetadata.cs                            97  91
-src/ApSolutions.LocalMedia.Application/Metadata/UpdateMetadata.cs                             81  87
+src/ApSolutions.LocalMedia.Application/Metadata/RefreshMetadata.cs                            97  95
+src/ApSolutions.LocalMedia.Application/Metadata/UpdateMetadata.cs                             81  88
 src/ApSolutions.LocalMedia.Application/Playback/InputCommandRouter.cs                        100  91
 src/ApSolutions.LocalMedia.Application/Playback/OpenLooseFile.cs                             100  83
 src/ApSolutions.LocalMedia.Application/Playback/PlaybackEvents.cs                             71 100
@@ -130,7 +144,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Backup/RotatingBackupStore.cs         
 src/ApSolutions.LocalMedia.Infrastructure/Backup/SqliteBackupService.cs                       96  80
 src/ApSolutions.LocalMedia.Infrastructure/Backup/StagedRestoreService.cs                      97  85
 src/ApSolutions.LocalMedia.Infrastructure/Backup/ZipExportService.cs                         100  90
-src/ApSolutions.LocalMedia.Infrastructure/Data/IntegrityChecker.cs                            94  83
+src/ApSolutions.LocalMedia.Infrastructure/Data/IntegrityChecker.cs                            94  87
 src/ApSolutions.LocalMedia.Infrastructure/Data/MigrationRunner.cs                             96  75
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs                 100  92
