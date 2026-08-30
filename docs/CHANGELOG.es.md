@@ -135,6 +135,39 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El hilo de un curso, y el progreso que ya existía.** `CourseProgressKey` no inventa un almacén:
+  guarda la posición de una lección bajo la clave que PLY-008 ya usa, con el curso donde va un título
+  y la lección donde va un episodio. Así reanudar, el umbral de visto de PLY-009, la marca manual que
+  gana sobre él y la cuenta atrás de PLY-011 siguen funcionando **sin saber que existen los cursos**.
+  Inventar una tabla `lesson_progress` habría sido una segunda respuesta a «¿por dónde iba?», y dos
+  respuestas a una pregunta es como empiezan a contradecirse.
+
+  `CourseThreadPolicy` decide dónde apunta el hilo, y la regla es la que usaría una persona: **la
+  primera lección en orden que no está vista**. No la última reproducida —eso devolvería a alguien a
+  una lección que ya terminó— ni la más avanzada, que tras un salto hacia adelante abandonaría en
+  silencio todo lo de en medio. De ahí salen también el restante —que cuenta entera cada lección sin
+  ver y **sólo lo que queda** de la que está a medias— y «Lo último que viste», que son las dos
+  últimas vistas **antes** del hilo y no las dos últimas del curso.
+
+- **Un curso vacío no está terminado**, y se pregunta aparte por eso: una carpeta recién marcada cuyo
+  recorrido no ha corrido todavía se dibujaría como completa, felicitando a alguien por un curso que
+  nadie ha leído.
+
+- **La duración de una lección se une, no se copia.** El paquete de diseño la pedía como columna de
+  `lessons`; sale del archivo que el catálogo ya sondeó, porque una copia es algo que se queda
+  desfasado. `CourseLessonReader` responde la tarjeta con **un solo `SELECT`** sobre las tres tablas
+  que la contestan —la lección, el archivo que le da longitud y el estado de visto—, con los dos
+  `JOIN` a la izquierda: una lección sin archivo sondeado no tiene longitud todavía y una que nadie
+  ha abierto no tiene estado, que es exactamente lo que significa «sin empezar».
+
+  **Y lo que había que medir era la clave**, porque se compone en dos sitios: en SQL por
+  concatenación y en C# desde `ContentKey`. Hay una prueba de integración que **escribe por uno y lee
+  por el otro** contra una base real.
+
+- **El número de una lección cuenta a lo largo del curso y no del módulo.** El prototipo escribe
+  «L06» junto a una lección del módulo 2, y una numeración que reiniciara por módulo llamaría igual a
+  dos lecciones distintas.
+
 - **La migración `0022` y lo que la escribe, en el mismo cambio.** `courses` y `lessons`, más una
   sola columna nueva en `library_roots`: `course_depth`. Esa columna es **las dos decisiones del ADR
   a la vez** — una raíz tiene cursos exactamente cuando tiene profundidad, y su valor es a qué nivel

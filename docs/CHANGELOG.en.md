@@ -133,6 +133,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A course's thread, and the progress that already existed.** `CourseProgressKey` invents no
+  store: it keeps a lesson's position under the key PLY-008 already uses, with the course where a
+  title goes and the lesson where an episode goes. Resume, PLY-009's watched threshold, the manual
+  mark that wins over it, and PLY-011's countdown all keep working **without knowing courses exist**.
+  Inventing a `lesson_progress` table would have been a second answer to "how far in was I", and two
+  answers to one question is how they start disagreeing.
+
+  `CourseThreadPolicy` decides where the thread points, and the rule is the one a person would use:
+  **the first lesson in order that is not watched**. Not the last one played — that would send
+  somebody back to a lesson they finished — and not the furthest reached, which after a jump ahead
+  would quietly abandon everything in between. The same policy gives what remains — counting an
+  unwatched lesson whole and **only the rest** of one in progress — and "what you watched last",
+  which is the last two watched **before** the thread rather than the last two in the course.
+
+- **An empty course is not a finished one**, and it is asked separately for that reason: a folder
+  just marked whose walk has not run would draw as complete, congratulating somebody for a course
+  nobody has read.
+
+- **A lesson's length is joined, not copied.** The design package asked for it as a column on
+  `lessons`; it comes from the file the catalogue already probed, because a copy is a thing that goes
+  stale. `CourseLessonReader` answers a card with **one `SELECT`** over the three tables that answer
+  it — the lesson, the file that gives it a length, and the watch state — with both `JOIN`s on the
+  left: a lesson whose file was never probed has no length yet, and one nobody opened has no state,
+  which is exactly what "not started" means.
+
+  **What had to be measured was the key**, because it is composed in two places: in SQL by
+  concatenation and in C# from `ContentKey`. An integration test **writes through one and reads
+  through the other** against a real database.
+
+- **A lesson's number counts through the course and not through the module.** The prototype writes
+  "L06" beside a lesson in module 2, and a per-module number would call two different lessons the
+  same thing.
+
 - **Migration `0022` and what writes it, in one change.** `courses` and `lessons`, plus a single new
   column on `library_roots`: `course_depth`. That column is **both of the ADR's decisions at once** —
   a root holds courses exactly when it has a depth, and the value is the level they sit at. Two
