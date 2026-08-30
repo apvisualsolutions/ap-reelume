@@ -43,10 +43,10 @@ public sealed class SqliteBootstrapTests
         Assert.Equal(1L, await ScalarInt64Async(connection, "PRAGMA foreign_keys;"));
         Assert.True(await ScalarInt64Async(connection, "PRAGMA busy_timeout;") >= 5000L);
         Assert.Equal("ok", await ScalarTextAsync(connection, "PRAGMA integrity_check;"));
-        Assert.Equal(21L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
-        Assert.Equal(21L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
+        Assert.Equal(22L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(22L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
         Assert.Equal(
-            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers,trailer_key,provider_reference,match_candidate_title,five_star_rating,scanned_title_year",
+            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers,trailer_key,provider_reference,match_candidate_title,five_star_rating,scanned_title_year,courses",
             await ScalarTextAsync(connection, "SELECT group_concat(name, ',') FROM schema_history ORDER BY version;"));
 
         var tables = await ReadStringsAsync(
@@ -62,10 +62,12 @@ public sealed class SqliteBootstrapTests
                 "catalog_fts_docsize",
                 "catalog_fts_idx",
                 "catalog_metadata",
+                "courses",
                 "detected_markers",
                 "episode_media",
                 "episodes",
                 "intro_markers",
+                "lessons",
                 "library_roots",
                 "match_candidates",
                 "media_file_identities",
@@ -164,14 +166,14 @@ public sealed class SqliteBootstrapTests
         var backupPath = Assert.IsType<string>(runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.True(File.Exists(backupPath));
         var backups = Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray();
-        Assert.Equal(21, backups.Length);
+        Assert.Equal(22, backups.Length);
 
         await DatabaseTestHarness.MigrateAsync(runner);
         Assert.Equal(backupPath, runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.Equal(backups, Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray());
 
         await using var active = await DatabaseTestHarness.OpenAsync(factory);
-        Assert.Equal(21L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(22L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
         Assert.Equal("ok", await ScalarTextAsync(active, "PRAGMA integrity_check;"));
 
         foreach (var path in backups)

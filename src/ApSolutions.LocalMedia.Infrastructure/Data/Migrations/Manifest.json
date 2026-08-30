@@ -126,6 +126,12 @@
       "name": "scanned_title_year",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0021_scanned_title_year.sql",
       "sha256": "822FE57D10249125670DC69A9805FDEE0667B9C7C1B67719F6E9BBB72BAB365E"
+    },
+    {
+      "version": 22,
+      "name": "courses",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0022_courses.sql",
+      "sha256": "FDE85749AA088CD373CCB5DBE81A20F5683CDFC2EA6D63B1601FC36A1C3FF6FC"
     }
   ]
 }
