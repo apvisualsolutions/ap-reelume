@@ -14,8 +14,18 @@
 >
 > | file | branches missing |
 > | --- | --- |
-> | `CoursesViewModel.cs` | **6 lines** left: 80, 131, 141, 196, 201, 240 — the card is tested |
+> | `CoursesViewModel.cs` | **6 lines** left, each asking for something different (below) |
 > | `CourseDetailsViewModel.cs` | **39**, all of it |
+>
+> **The six in `CoursesViewModel`, with what each one wants** — measured, not guessed:
+>
+> | line | what is missing |
+> | --- | --- |
+> | 131 | the **taken** side of its null guard: the sweep hands the null and **nobody builds the view model with a real `GetCourses`**. The `*Rename` pattern again |
+> | 141 | `CanExecute` with something that is **not** a card, and with a card whose `CanAct` is false |
+> | 196 and 201 | the **no-subscriber** path: `handler?.Invoke` and `PropertyChanged?.Invoke` with nobody listening |
+> | 240 | `Application.Current is { }` on the **no application** side |
+> | 80 | `IsCourseFinished` inside `ActionText`; the card tests take both states and the branch is still half, so **read coverlet's JSON before writing anything** |
 >
 > **And an environment trap that cost two reds, measured**: `CourseText.Resource` reads
 > `Application.ActualThemeVariant`, which **verifies the UI thread**. A `[Fact]` over it passes under

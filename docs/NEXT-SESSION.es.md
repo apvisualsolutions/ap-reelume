@@ -14,8 +14,18 @@
 >
 > | archivo | ramas que faltan |
 > | --- | --- |
-> | `CoursesViewModel.cs` | quedan **6 líneas**: 80, 131, 141, 196, 201, 240 — la tarjeta ya está probada |
+> | `CoursesViewModel.cs` | quedan **6 líneas**, y cada una pide una cosa distinta (abajo) |
 > | `CourseDetailsViewModel.cs` | **39**, entero |
+>
+> **Las seis de `CoursesViewModel`, con lo que pide cada una** —medido, no supuesto—:
+>
+> | línea | qué falta |
+> | --- | --- |
+> | 131 | el lado **bueno** de su guarda de null: el barrido pasa el null y **nadie construye el ViewModel con un `GetCourses` real**. Es el patrón de los tres `*Rename`, otra vez |
+> | 141 | `CanExecute` con algo que **no** es una tarjeta, y con una tarjeta cuyo `CanAct` es falso |
+> | 196 y 201 | el camino **sin suscriptores**: `handler?.Invoke` y `PropertyChanged?.Invoke` con nadie escuchando |
+> | 240 | `Application.Current is { }` por el lado **sin aplicación** |
+> | 80 | `IsCourseFinished` dentro de `ActionText`; las pruebas de la tarjeta tocan los dos estados y la rama sigue a medias, así que **hay que mirarlo con el JSON de coverlet antes de escribir nada** |
 >
 > **Y una trampa del entorno que costó dos rojos, medida**: `CourseText.Resource` lee
 > `Application.ActualThemeVariant`, que **verifica el hilo de UI**. Una prueba suya en `[Fact]` pasa
