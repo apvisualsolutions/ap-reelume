@@ -1,5 +1,62 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-08-30, close of the twelfth session
+>
+> **Pushed through `6e5a02c`. There are commits ahead of that locally, deliberately**, waiting for
+> work that can go green. `main` stays at `f10e53e`.
+>
+> **Note: this is the coverage half.** The other half — what the Courses feature still lacks: the
+> player's «Lessons» panel, the "Course (folder of lessons)" option in the add dialog (which is what
+> **returns `MarkCoursesInRoot` and `ICourseRootDeclarationStore` to the container**) and the capture
+> matrix — is further down. **Without that dialog option a course root cannot be declared at all**,
+> which is decision 2 of the ADR.
+>
+> ### The only thing blocking `main`
+>
+> The gate for files **NEW** against `main`, which demands **96/96** of every new `.cs` and **admits
+> no measured ceilings** — unlike the debt list, which does. Two files remain:
+>
+> | file | state in CI's merge |
+> | --- | --- |
+> | `CoursesViewModel.cs` | 42/72 before the card tests; **6 lines** left, detailed below |
+> | `CourseDetailsViewModel.cs` | 110/188 = 58.5 % — **71 branches**, untouched |
+>
+> **Neither had a single test**: a `grep` over `tests/` did not mention them. Only the autonomous
+> walk reached them through the assembled shell, which measures behaviour rather than branches.
+>
+> ### The six in `CoursesViewModel`, with what each one wants
+>
+> | line | what is missing |
+> | --- | --- |
+> | 131 | the **taken** side of its null guard: nobody builds it with a real `GetCourses`. **The `*Rename` pattern, for the third time** |
+> | 141 | `CanExecute` with something that is **not** a card, and with a card whose `CanAct` is false |
+> | 196 and 201 | the **no-subscriber** path: `handler?.Invoke` and `PropertyChanged?.Invoke` with nobody listening |
+> | 240 | `Application.Current is { }` on the **no application** side |
+> | 80 | both states are taken and the branch is still half: **read coverlet's JSON before writing anything** |
+>
+> ### Three measured traps that save runs
+>
+> 1. **`CourseText.Resource` verifies the UI thread** (it reads `Application.ActualThemeVariant`). A
+>    `[Fact]` over `Meta` or `ActionText` passes under `--filter` — no application, English literal —
+>    and **throws with the whole suite**. It belongs in an `[AvaloniaFact]`, and **no assertion may
+>    pin a literal**.
+> 2. **Removing an unreachable branch only wins if what replaces it is reachable.** Swapping a
+>    `TakeWhile` for an equivalent loop removed the delegate cache **and left the file worse**
+>    (93 → 94), because the loop brought eight branches of its own. What worked was **simplifying**.
+> 3. **CI's merge can be reproduced here in twenty seconds**: `gh run download <id> -n test-results`
+>    plus `reportgenerator` with the gate's own arguments. **No push is needed to learn whether
+>    something reaches the bar**, and pushing a known red costs 45 minutes for nothing.
+>
+> ### A decision taken and NOT executed, with its measured cost: `.flv`
+>
+> Across the owner's two course roots, **`.flv` is the only video extension the application does not
+> recognise** — 10 files, one whole course invisible. The eight approved cover 98.3 % of their video.
+> **It goes in, but not alone**: `PackagingTests` requires the MSIX manifest to declare **exactly**
+> `MediaFileExtensions.All`, so the change touches both lists, the authored fragment and the packaged
+> manifest — and **touching the manifest expires two sandbox measurements**, which must be redone.
+> `PackagingTests` also reports 30 reds off CI. **It ships with the next packaging change**, which
+> already pays that cycle.
+
 > ## HANDOVER — 2026-08-30, state after picking up the Courses batch
 >
 > **The block below is already handled**: its run was read, and everything here came out of it. It is

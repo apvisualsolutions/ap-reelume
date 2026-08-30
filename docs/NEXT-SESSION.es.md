@@ -1,5 +1,62 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-08-30, cierre de la duodécima sesión
+>
+> **Empujado hasta `6e5a02c`. En local hay commits por delante, a propósito**, esperando trabajo que
+> pueda salir verde. `main` sigue en `f10e53e`.
+>
+> **Ojo: esto es la mitad de cobertura.** La otra mitad —lo que le falta a la funcionalidad de
+> Cursos: el panel «Lecciones» del reproductor, la opción «Curso (carpeta de lecciones)» del diálogo
+> de añadir (que es la que **devuelve `MarkCoursesInRoot` e `ICourseRootDeclarationStore` al
+> contenedor**) y la matriz de capturas— está más abajo, en «La otra mitad de esta tanda». **Sin esa
+> opción del diálogo no se puede declarar una raíz de cursos**, que es la decisión 2 del ADR.
+>
+> ### Lo único que bloquea `main`
+>
+> La puerta de archivos **NUEVOS** contra `main`, que exige **96/96** a todo `.cs` nuevo y **no
+> admite techos medidos** — a diferencia de la lista de deuda, que sí. Quedan dos archivos:
+>
+> | archivo | estado en la fusión de CI |
+> | --- | --- |
+> | `CoursesViewModel.cs` | 42/72 antes de las pruebas de la tarjeta; quedan **6 líneas**, detalladas abajo |
+> | `CourseDetailsViewModel.cs` | 110/188 = 58,5 % — **71 ramas**, sin tocar |
+>
+> **Ninguno de los dos tenía una sola prueba**: un `grep` sobre `tests/` no los mencionaba. Sólo los
+> recorría el paseo autónomo a través del shell ensamblado, que mide comportamiento y no ramas.
+>
+> ### Las seis de `CoursesViewModel`, con lo que pide cada una
+>
+> | línea | qué falta |
+> | --- | --- |
+> | 131 | el lado **bueno** de su guarda de null: nadie lo construye con un `GetCourses` real. **El patrón de los `*Rename`, por tercera vez** |
+> | 141 | `CanExecute` con algo que **no** es tarjeta, y con una tarjeta cuyo `CanAct` es falso |
+> | 196 y 201 | el camino **sin suscriptores**: `handler?.Invoke` y `PropertyChanged?.Invoke` con nadie escuchando |
+> | 240 | `Application.Current is { }` por el lado **sin aplicación** |
+> | 80 | los dos estados se tocan y la rama sigue a medias: **leer el JSON de coverlet antes de escribir nada** |
+>
+> ### Tres trampas medidas que ahorran vueltas
+>
+> 1. **`CourseText.Resource` verifica el hilo de UI** (lee `Application.ActualThemeVariant`). Un
+>    `[Fact]` sobre `Meta` o `ActionText` pasa con `--filter` —sin aplicación, literal inglés— y
+>    **revienta con la suite entera**. Va en `[AvaloniaFact]`, y **ninguna aserción debe fijar un
+>    literal**.
+> 2. **Quitar una rama inalcanzable sólo gana si lo que la sustituye es alcanzable.** Cambiar un
+>    `TakeWhile` por un bucle equivalente quitó el caché de delegado **y dejó el archivo peor**
+>    (93 → 94), porque el bucle traía ocho ramas propias. Lo que funcionó fue **simplificar**.
+> 3. **La fusión de CI se reproduce aquí en veinte segundos**: `gh run download <id> -n test-results`
+>    y `reportgenerator` con los mismos argumentos que la puerta. **No hace falta empujar para saber
+>    si algo llega al listón**, y empujar un rojo conocido cuesta 45 minutos por nada.
+>
+> ### Decisión tomada y NO ejecutada, con su coste medido: `.flv`
+>
+> De las dos raíces de cursos del propietario, **`.flv` es la única extensión de vídeo que la
+> aplicación no reconoce** — 10 archivos, un curso entero invisible. Las ocho aprobadas cubren el
+> 98,3 % de su vídeo. **Se añade, pero no sola**: `PackagingTests` exige que el manifiesto MSIX
+> declare **exactamente** `MediaFileExtensions.All`, así que el cambio toca las dos listas, el
+> fragmento autorizado y el manifiesto empaquetado — y **tocar el manifiesto caduca dos mediciones
+> del sandbox**, que hay que rehacer. `PackagingTests` da además 30 rojos fuera de CI. **Va agrupado
+> con el próximo cambio de empaquetado**, que ya paga ese ciclo.
+
 > ## RELEVO — 2026-08-30, estado tras recoger la tanda de Cursos
 >
 > **El bloque de abajo ya está atendido**: su run se leyó, y de él salió todo lo que sigue. Se deja
