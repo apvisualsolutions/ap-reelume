@@ -38,6 +38,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   for a measured reason: `RefreshMetadata` carries a sentence where `provider` is an English word,
   and a blind sweep would have written `_provider's` inside it.
 
+  **And what it actually cost was not the conversion: it was three files that FELL.**
+  `PreviewRename` went from 100/100 to **100/50**, `UndoRename` to 100/75 and `ExecuteRename` to
+  100/83, all three under the bar and on no list. The first explanation was false — "they have no
+  tests"; they do — so the CI merge was reproduced here, downloading the run's artefact and merging
+  its twenty reports with the same `reportgenerator` the gate uses: the constructor line reads `1/2`
+  in **every** report and `1/2` merged.
+
+  Two chained causes, **neither in the code**. A file with **no** branches measures 100 % branch
+  coverage by definition, so its first `?? throw` is also its first chance to be half covered: with
+  two branches, one uncovered is 50 %. And it stayed half covered because **the two sides of the pair
+  are taken in different suites** — the sweep hands the null in `Application.Tests` and the rename
+  tests hand the real dependency in `IntegrationTests` — and merged Cobertura **keeps the better
+  report for a line rather than their union**. `ReviewInboxViewModel` hit the same wall on
+  2026-08-28.
+
+  The fix is not another assertion but the same one in a single place: `Application.Tests` now both
+  refuses the null **and** builds all three with something real. The line goes from `1/2` to
+  **`2/2`**, and the second run confirmed it with **186 listed and 186 measured under the bar, which
+  agree**. Three floors rise — `RefreshMetadata` to 97/95, `UpdateMetadata` to 81/88,
+  `IntegrityChecker` to 94/87 — and the ratchet stays at **186**, because a floor that rises takes
+  nobody off the list.
+
 - **A library at the top of a disk moves again when it is told it has moved.** `RootRemapPolicy`
   returned the decision as `Remapped` and then `Rewrite` rewrote nothing. `IsUnder` asked whether the
   path starts with the root followed by `\`, and for `D:\` — which keeps its separator on purpose,
@@ -110,6 +132,74 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   [the canvas the port did not copy](evidence/stable/audit-icon-canvas.md).
 
 ### Added
+
+- **Migration `0022` and what writes it, in one change.** `courses` and `lessons`, plus a single new
+  column on `library_roots`: `course_depth`. That column is **both of the ADR's decisions at once** —
+  a root holds courses exactly when it has a depth, and the value is the level they sit at. Two
+  columns, a flag and a depth, could contradict each other; and a root that said "I hold courses"
+  without saying where would be precisely the one that forces a guess.
+
+  `lessons` carries no progress and will not: progress is PLY-008's store and the watched threshold
+  is PLY-009's, and a second store would be a second answer to one question. What it does carry is
+  `media_file_id`, LIB-009's identity — which is why moving or renaming the file keeps the progress —
+  **nullable and `ON DELETE SET NULL`** rather than cascading: a lesson whose file has gone is a
+  lesson that is missing, and a surface has to be able to say so; dropping the row would make it a
+  lesson that never existed.
+
+  `MarkCoursesInRoot` reuses `IMediaFileEnumerator` instead of opening a second way to walk a folder:
+  one enumerator is one set of error codes and one place where the disk is touched at all. It reaches
+  no network — there is nothing to identify — and copies, moves and renames nothing.
+
+- **Four assertions in `SqliteBootstrapTests` move from 21 to 22**, and with them the name list and
+  the table list. The ADR said three and there are four: the count, the maximum, the pre-migration
+  backups, and the count after the second pass.
+
+  **The table list also taught something reading cannot**: `lessons` sorts **before** `library_roots`,
+  because the query orders under SQLite's binary collation and there `e` precedes `i`. Put in
+  read-it-aloud alphabetical order, the test goes red at index 13.
+
+- **Three defects were found by the tests before anybody else**, and none was visible by reading:
+
+  1. `CourseStructurePolicy` normalises paths to `/` and the use case keyed its dictionary with the
+     separators exactly as the enumerator handed them over. The map was built with one set of keys
+     and read with another, so the first lesson threw `KeyNotFoundException`.
+  2. A lesson's module stored the **folder name** (`01 - Módulo uno`) where the card wants the
+     **title** (`Módulo uno`), because the number already travels apart in `module_sort_major` and
+     "Módulo {0} · {1}" wants them separated.
+  3. In `ORDER BY`, **SQLite puts NULLs first**, so a lesson with no leading number would have opened
+     every course. The query orders on `sort_major IS NULL` before `sort_major`, and a test pins it.
+
+- **`CatalogTitleKind.Course`, and the two pure policies that decide what a course is and the order
+  it is watched in.** `CourseStructurePolicy` reads the courses of a root **at the depth the root
+  declares**, and guesses nothing: at that depth the folder is the course, a subfolder holding video
+  is a section, anything beneath flattens against it, and a video shallower than that depth belongs
+  to no course at all. That a resource folder with no video is not a section comes free from feeding
+  it video paths rather than a directory listing, and it is not a detail: of 1955 files measured in a
+  real collection only 595 were video.
+
+  `CourseLessonOrderPolicy` orders by the leading number of `NN -`, `NN-`, `NN.` and `NN_`, which
+  cover 80.8 % of 595 measured lessons, and **keeps `N.N` as an ordered pair** instead of destroying
+  it — today the film name cleaner turns `1.3 Title` into `1 3 Title`, which destroys the order and
+  the title in one move. The remaining 19.2 % is left alone: it sorts last, alphabetically and
+  stably, which is exactly what puts the zero-padded encoded schemes right. And **a number is read up
+  to three digits**, because four are a year: that limit is what keeps this from reproducing the
+  false positive the film parser makes over the same collection.
+
+  Both land at **100 % of lines and of branches**, measured off the suite's own Cobertura, which is
+  representative here because nothing else exercises them yet.
+
+- **The third kind of title is appended to the END of the enum, and that is not taste.**
+  `CatalogTitleKind` is written to SQLite as its ordinal — `(CatalogTitleKind)reader.GetInt32(1)` —
+  so putting `Course` where it reads best, beside `Movie` and `Show`, would have renumbered
+  `Unidentified` from 2 to 3 and **every unidentified title in any existing database would have come
+  back a course**, silently and on the first read. The reason is written into the enum itself, which
+  is where somebody will go to reorder it.
+
+  **Two consumers still take the new value on their default arm, and are named here so they are not
+  lost**: `CatalogItemViewModel.KindKey` would resolve it to `CatalogKindFile` and `LibraryViewModel`
+  would route it to the film card. Neither is reachable yet, because nothing constructs a course
+  title, and both close in the tranche that brings the views. A `switch` with a `default` is exactly
+  where a new kind goes missing quietly, which is what the ADR warned about.
 
 - **The Courses strings land in both files, and there are 42 of them rather than the 41 the package
   announces.** `Strings.es.axaml` and `Strings.en.axaml` go from **668 to 710 keys each**, in the same

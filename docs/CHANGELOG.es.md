@@ -40,6 +40,27 @@ evidencia, es [FEATURES.md](FEATURES.md).
   por un motivo medido: `RefreshMetadata` lleva una frase donde `provider` es una palabra inglesa, y
   un barrido ciego habría escrito `_provider's` dentro de ella.
 
+  **Y lo que costó de verdad no fue la conversión: fueron tres archivos que CAYERON.**
+  `PreviewRename` pasó de 100/100 a **100/50**, `UndoRename` a 100/75 y `ExecuteRename` a 100/83, los
+  tres por debajo del listón y en ninguna lista. La primera explicación era falsa —«no tienen
+  pruebas»; sí las tienen— así que se reprodujo la fusión de CI aquí, bajando el artefacto del run y
+  fusionando sus veinte informes con el mismo `reportgenerator` que usa la puerta: la línea del
+  constructor lee `1/2` en **todos** los informes y `1/2` fusionada.
+
+  Son **dos causas encadenadas y ninguna del código**. Un archivo **sin ninguna rama** mide 100 % de
+  ramas por definición, así que su primer `?? throw` es también su primera ocasión de quedar a
+  medias: con dos ramas, una sin cubrir es el 50 %. Y quedó a medias porque **los dos lados del par
+  se toman en suites distintas** —el barrido pasa el null en `Application.Tests` y las pruebas de
+  renombrado pasan la dependencia real en `IntegrationTests`—, y el Cobertura fusionado **se queda
+  con el mejor informe de una línea en vez de la unión**. `ReviewInboxViewModel` chocó con la misma
+  pared el 2026-08-28.
+
+  La corrección no es otra aserción sino la misma en un solo sitio: `Application.Tests` ahora rechaza
+  el null **y** construye los tres con algo real. La línea pasa de `1/2` a **`2/2`**, y la segunda
+  vuelta lo confirmó con **186 en la lista y 186 medidos bajo el listón, que cuadran**. Tres suelos
+  suben —`RefreshMetadata` a 97/95, `UpdateMetadata` a 81/88, `IntegrityChecker` a 94/87— y el
+  trinquete se queda en **186**, porque un suelo que sube no saca a nadie de la lista.
+
 - **Una biblioteca en la raíz de un disco vuelve a moverse cuando se le dice que se ha movido.**
   `RootRemapPolicy` devolvía la decisión como `Remapped` y después `Rewrite` no reescribía ni una
   ruta. `IsUnder` preguntaba si la ruta empieza por la raíz seguida de `\`, y para `D:\` —que
@@ -113,6 +134,75 @@ evidencia, es [FEATURES.md](FEATURES.md).
   [el lienzo que la portación no copió](evidence/stable/audit-icon-canvas.md).
 
 ### Añadido
+
+- **La migración `0022` y lo que la escribe, en el mismo cambio.** `courses` y `lessons`, más una
+  sola columna nueva en `library_roots`: `course_depth`. Esa columna es **las dos decisiones del ADR
+  a la vez** — una raíz tiene cursos exactamente cuando tiene profundidad, y su valor es a qué nivel
+  están—. Dos columnas, una bandera y una profundidad, podrían contradecirse; y una raíz que dijera
+  «tengo cursos» sin decir dónde sería justo la que obliga a adivinar.
+
+  `lessons` no lleva progreso y no lo llevará: el progreso es el almacén de PLY-008 y el umbral de
+  visto es el de PLY-009, y un segundo almacén sería una segunda respuesta a la misma pregunta. Lo
+  que sí lleva es `media_file_id`, que es la identidad de LIB-009 — por eso mover o renombrar el
+  archivo conserva el progreso—, **anulable y con `ON DELETE SET NULL`** en vez de en cascada: una
+  lección cuyo archivo desapareció es una lección que falta, y eso una vista tiene que poder decirlo;
+  borrar la fila la convertiría en una lección que nunca existió.
+
+  `MarkCoursesInRoot` reutiliza `IMediaFileEnumerator` en lugar de abrir una segunda forma de recorrer
+  una carpeta: un solo enumerador es un solo juego de códigos de error y un solo sitio donde se toca
+  el disco. No sale a la red —no hay nada que identificar—, no copia, no mueve y no renombra.
+
+- **Cuatro afirmaciones de `SqliteBootstrapTests` pasan de 21 a 22**, y con ellas la lista de nombres
+  y la de tablas. El ADR decía tres y son cuatro: el conteo, el máximo, las copias previas y el
+  conteo tras la segunda pasada.
+
+  **Y la lista de tablas enseñó algo que no se deduce leyendo**: `lessons` va **antes** que
+  `library_roots`, porque la consulta ordena con la colación binaria de SQLite y ahí `e` va antes que
+  `i`. Puesto en orden alfabético «de leer», la prueba se pone roja en el índice 13.
+
+- **Tres defectos los encontraron las pruebas antes que nadie**, y ninguno se veía leyendo:
+
+  1. `CourseStructurePolicy` normaliza las rutas a `/` y el caso de uso indexaba el diccionario con
+     las barras tal y como venían del enumerador. El mapa se construía con unas claves y se leía con
+     otras, así que la primera lección lanzaba `KeyNotFoundException`.
+  2. El módulo de una lección guardaba el **nombre de la carpeta** (`01 - Módulo uno`) donde la ficha
+     pide el **título** (`Módulo uno`), porque el número ya viaja aparte en `module_sort_major` y
+     «Módulo {0} · {1}» los quiere separados.
+  3. En `ORDER BY`, **SQLite pone los NULL primero**, así que una lección sin número de cabecera
+     habría abierto todos los cursos. La consulta ordena por `sort_major IS NULL` antes que por
+     `sort_major`, y hay una prueba que lo fija.
+
+- **`CatalogTitleKind.Course` y las dos políticas puras que deciden qué es un curso y en qué orden se
+  ve.** `CourseStructurePolicy` lee los cursos de una raíz **a la profundidad que la raíz declara**, y
+  no adivina: a esa profundidad la carpeta es el curso, una subcarpeta con vídeo es una sección, lo
+  que cuelgue por debajo se aplana contra ella, y un vídeo más arriba de esa profundidad no pertenece
+  a ningún curso. Que una carpeta de recursos sin un solo vídeo no sea sección sale gratis por
+  alimentarla con rutas de vídeo en vez de con un listado de directorio, y no es un detalle: de 1955
+  archivos medidos en una colección real sólo 595 eran vídeo.
+
+  `CourseLessonOrderPolicy` ordena por el número de cabecera de `NN -`, `NN-`, `NN.` y `NN_`, que
+  cubren el 80,8 % de 595 lecciones medidas, y **conserva `N.N` como par ordenado** en vez de
+  destruirlo — hoy el limpiador de nombres de cine convierte `1.3 Título` en `1 3 Título`, que
+  destruye el orden y el título de una vez—. El 19,2 % restante no se toca: va al final en orden
+  alfabético estable, que es exactamente lo que ordena bien los esquemas codificados con relleno de
+  ceros. Y **el número se lee hasta tres dígitos**, porque cuatro son un año: ése es el límite que
+  evita reproducir el falso positivo que el parser de películas comete sobre la misma colección.
+
+  Las dos entran a **100 % de líneas y de ramas**, medido sobre el Cobertura de la propia suite, que
+  aquí es representativo porque nadie más las ejecuta todavía.
+
+- **El tercer tipo de título se añade al FINAL del enum, y eso no es estética.** `CatalogTitleKind` se
+  escribe en SQLite como su ordinal —`(CatalogTitleKind)reader.GetInt32(1)`—, así que poner `Course`
+  donde mejor se lee, junto a `Movie` y `Show`, habría renumerado `Unidentified` de 2 a 3 y **cada
+  título sin identificar de cualquier base ya existente habría vuelto convertido en curso**, en
+  silencio y en la primera lectura. El porqué queda escrito en el propio enum, que es donde alguien
+  irá a reordenarlo.
+
+  **Dos consumidores siguen tratando el valor nuevo por su rama por defecto, y se dicen aquí para que
+  no se pierdan**: `CatalogItemViewModel.KindKey` lo resolvería como `CatalogKindFile` y
+  `LibraryViewModel` lo llevaría a la ficha de película. Ninguno es alcanzable todavía porque nada
+  construye un título de tipo curso, y los dos se cierran en el tramo que trae las vistas. Un `switch`
+  con `default` es justo donde un tipo nuevo se pierde sin ruido, que es lo que el ADR ya avisaba.
 
 - **Las cadenas de Cursos entran en los dos archivos, y son 42, no las 41 que el paquete anuncia.**
   `Strings.es.axaml` y `Strings.en.axaml` pasan de **668 a 710 claves cada uno**, en el mismo orden y
