@@ -84,6 +84,34 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Un barrido que le da un null a cada constructor, y con él 303 guardas que nunca se habían
+  tomado.** Noventa de los doscientos cinco archivos por debajo del listón de cobertura lo estaban
+  por una sola forma repetida: un `?? throw new ArgumentNullException` que ninguna prueba había
+  ejercido nunca. Un `throw` que nadie toma es media pareja de ramas, y por eso ocho archivos de
+  Application medían exactamente 100 de líneas y 50 de ramas. `ConstructorGuardSweep` construye cada
+  tipo con un sustituto en todas las posiciones menos una y un null en ésa, y exige un
+  `ArgumentNullException` que **nombre ese parámetro**: **127** parámetros en Application, **112** en
+  Presentation y **64** en Infrastructure.
+
+  Tres exclusiones, todas estructurales en lugar de una lista, porque una lista es algo que
+  mantener: los records, que son los portadores de datos de este repositorio y legítimamente no
+  validan —190 de los 319 parámetros de referencia que midió el primer sondeo—; las excepciones,
+  cuyo mensaje es anulable por convención de .NET; y lo que escribió el compilador, como el
+  `JsonSerializerContext` del generador. Cada suite lleva además un suelo de parámetros alcanzados,
+  porque la reflexión **se queda muda en vez de roja** cuando deja de casar, y ése es el fallo que
+  más veces se ha medido aquí.
+
+  **Ocho constructores siguen aceptando un null y están escritos con su motivo**: los ocho declaran
+  sus dependencias como constructor primario, que no tiene dónde poner la guarda sin un campo, así
+  que se tragan el null y fallan más tarde en el primer uso —una `NullReferenceException` desde
+  dentro de un método en lugar de una `ArgumentNullException` desde la composición que la causó—. Van
+  en una lista cerrada como la `PendingWiring` de `ServiceConsumptionTests` —una deuda con nombre, no
+  una exención—, y una segunda prueba fuerza la salida de cada entrada en cuanto su guarda llega.
+
+  **Y una firma que mentía, corregida de camino**: `RecommendationItemViewModel` declaraba su título
+  como `string` no anulable y lo trataba con `title ?? string.Empty`. Ahora la firma dice lo que el
+  cuerpo hace.
+
 - **Un cuarto hook: armar el vigía de CI deja de ser una frase.** «Para mirar CI se usa
   `eng/watch-ci.ps1`, nunca un bucle a mano» estaba escrito en `CLAUDE.md` desde hacía tandas, y el
   2026-08-30 el propietario tuvo que pedirlo igualmente. `post-push.sh` corre en `PostToolUse` sobre

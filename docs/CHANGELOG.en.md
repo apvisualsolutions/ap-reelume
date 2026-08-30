@@ -83,6 +83,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A sweep that hands every constructor a null, and with it 303 guards nothing had ever taken.**
+  Ninety of the two hundred and five files short of the coverage bar were short of it for one
+  repeated reason: a `?? throw new ArgumentNullException` no test had ever exercised. An untaken
+  `throw` is half a branch pair, which is why eight Application files measured exactly 100 lines and
+  50 branches. `ConstructorGuardSweep` builds each type with a stand-in in every position but one and
+  a null in that one, and requires an `ArgumentNullException` **naming that parameter**: **127**
+  parameters in Application, **112** in Presentation and **64** in Infrastructure.
+
+  Three exclusions, all structural rather than a list, because a list is a thing to maintain:
+  records, this repository's data carriers, which legitimately validate nothing — 190 of the 319
+  reference parameters the first probe measured; exceptions, whose message is nullable by .NET
+  convention; and what the compiler wrote, such as the generator's `JsonSerializerContext`. Each
+  suite also carries a floor of parameters reached, because reflection **goes quiet rather than red**
+  when it stops matching, and that is the failure this repository has measured more often than any
+  other.
+
+  **Eight constructors still accept a null and are written down with the reason**: all eight declare
+  their dependencies as a primary constructor, which has nowhere to put a guard without a field, so
+  they take the null and fail later at first use — a `NullReferenceException` from inside a method
+  instead of an `ArgumentNullException` from the composition that caused it. They sit in a closed
+  list like `PendingWiring` in `ServiceConsumptionTests` — a debt with a name on it, not an exemption
+  — and a second test forces an entry out the moment its guard lands.
+
+  **And one signature that lied, fixed on the way**: `RecommendationItemViewModel` declared its title
+  as a non-nullable `string` and treated it as `title ?? string.Empty`. The signature now says what
+  the body does.
+
 - **A fourth hook: arming the CI watcher stops being a sentence.** "CI is watched with
   `eng/watch-ci.ps1`, never a hand-written loop" had been in `CLAUDE.md` for batches, and on
   2026-08-30 the owner had to ask for it anyway. `post-push.sh` runs on `PostToolUse` over

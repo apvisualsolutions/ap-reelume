@@ -132,7 +132,7 @@ public sealed class RecommendationsViewModel : INotifyPropertyChanged
 }
 
 /// <summary>One suggestion, with the resource keys that explain it.</summary>
-public sealed class RecommendationItemViewModel(Recommendation recommendation, string title)
+public sealed class RecommendationItemViewModel(Recommendation recommendation, string? title)
     : IPosterCard, IRailCard
 {
     private readonly Recommendation _recommendation = recommendation
