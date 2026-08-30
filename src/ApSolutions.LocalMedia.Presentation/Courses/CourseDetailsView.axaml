@@ -160,6 +160,21 @@ never disagree.
               automation:AutomationProperties.Name="{Binding ThreadActionText}"
               Command="{Binding ResumeThreadCommand}" />
         </WrapPanel>
+        <!--
+          What the last mark did, in ONE live region and announced politely: a mark is not an
+          interruption, and splitting it in two would split the announcement.
+        -->
+        <Border
+            Padding="12"
+            Background="{DynamicResource AccentSubtleBrush}"
+            CornerRadius="{DynamicResource CornerRadiusSmall}"
+            IsVisible="{Binding HasMarkNotice}"
+            automation:AutomationProperties.LiveSetting="Polite">
+          <TextBlock
+              FontSize="{DynamicResource FontSizeCaption}"
+              Text="{Binding MarkNotice}"
+              TextWrapping="Wrap" />
+        </Border>
         <StackPanel Spacing="{DynamicResource Space4}" IsVisible="{Binding HasRecap}">
           <TextBlock
               FontSize="{DynamicResource FontSizeCaption}"
