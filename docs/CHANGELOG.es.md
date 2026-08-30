@@ -10,6 +10,36 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Ocho constructores aceptaban un null y fallaban más tarde; ahora lo rechazan donde se causa.**
+  Los ocho declaraban sus dependencias como constructor primario, que no tiene dónde poner la guarda
+  sin declarar un campo, así que se tragaban el null y reventaban en el primer uso del campo
+  capturado: una `NullReferenceException` desde dentro de un método, sin nombre de parámetro y sin
+  relación visible con la composición que la causó. La guarda no es defensa contra nadie, es el sitio
+  donde un error de cableado se dice a sí mismo con su propio nombre. Promovidos a constructor
+  explícito: `ExecuteRename`, `PreviewRename`, `UndoRename`, `UpdateMetadata` e `IntegrityChecker`
+  con un parámetro cada uno, y `RefreshMetadata`, `ApplyIdentification` y `RefreshStaleMetadata` con
+  cinco o seis.
+
+  **Veintidós parámetros, y el barrido los cuenta**: Application pasa de 127 a **148** guardas
+  ejercidas e Infrastructure de 64 a **65** —325 en total con las 112 de Presentation, que no tenía
+  ninguno—. La suma cuadra exactamente con los veintidós, que es lo que dice que no se ha añadido una
+  guarda que nadie toma ni perdido una que ya estaba.
+
+  **Y con ellos se van las dos listas cerradas que el barrido había dejado, que no se borran: se
+  vacían solas.** La segunda prueba de cada suite —la que existe para que la lista sólo pueda
+  encoger— falló nombrando los ocho en cuanto la guarda llegó, antes de tocar una línea de las
+  pruebas. Eso es lo que separa una lista de deuda de una de exenciones: **una exención calla cuando
+  deja de hacer falta y una deuda protesta**. La regla vuelve a ser estructural, sin nada que
+  mantener a mano.
+
+  **Lo que había que vigilar no era la conversión sino quién lee esos constructores.**
+  `ServiceConsumptionTests` los analiza **como texto** para decidir qué servicio alimenta a cuál, así
+  que cambiarles la forma cambia justo lo que ese analizador mira — y el riesgo no era que fallara,
+  que se ve, sino que **dejara de ver** y aprobara por silencio. Sus 30 pruebas quedaron verdes, con
+  la suya propia contra la ceguera incluida. El renombrado de los usos saltó las líneas de comentario
+  por un motivo medido: `RefreshMetadata` lleva una frase donde `provider` es una palabra inglesa, y
+  un barrido ciego habría escrito `_provider's` dentro de ella.
+
 - **Una biblioteca en la raíz de un disco vuelve a moverse cuando se le dice que se ha movido.**
   `RootRemapPolicy` devolvía la decisión como `Remapped` y después `Rewrite` no reescribía ni una
   ruta. `IsUnder` preguntaba si la ruta empieza por la raíz seguida de `\`, y para `D:\` —que
@@ -108,7 +138,8 @@ evidencia, es [FEATURES.md](FEATURES.md).
   porque la reflexión **se queda muda en vez de roja** cuando deja de casar, y ése es el fallo que
   más veces se ha medido aquí.
 
-  **Ocho constructores siguen aceptando un null y están escritos con su motivo**: los ocho declaran
+  **Ocho constructores siguen aceptando un null y están escritos con su motivo** —y dejan de estarlo
+  en el cambio de más arriba, que los promueve—: los ocho declaran
   sus dependencias como constructor primario, que no tiene dónde poner la guarda sin un campo, así
   que se tragan el null y fallan más tarde en el primer uso —una `NullReferenceException` desde
   dentro de un método en lugar de una `ArgumentNullException` desde la composición que la causó—. Van

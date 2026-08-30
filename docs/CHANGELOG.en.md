@@ -10,6 +10,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Eight constructors accepted a null and failed later; they now refuse it where it is caused.** All
+  eight declared their dependencies as a primary constructor, which has nowhere to put a guard
+  without declaring a field, so they took the null and broke at first use of the captured parameter:
+  a `NullReferenceException` from inside a method, with no parameter name and no visible connection
+  to the composition that caused it. The guard defends against nobody — it is the place where a
+  wiring mistake says itself by its own name. Promoted to explicit constructors: `ExecuteRename`,
+  `PreviewRename`, `UndoRename`, `UpdateMetadata` and `IntegrityChecker` with one parameter each, and
+  `RefreshMetadata`, `ApplyIdentification` and `RefreshStaleMetadata` with five or six.
+
+  **Twenty-two parameters, and the sweep counts them**: Application goes from 127 to **148** guards
+  exercised and Infrastructure from 64 to **65** — 325 in total with Presentation's 112, which had
+  none. The sum matches the twenty-two exactly, which is what says no guard nothing takes was added
+  and none that already existed was lost.
+
+  **And the two closed lists the sweep had left go with them — not deleted, but emptied.** The second
+  test in each suite, the one that exists so the list can only shrink, failed naming all eight the
+  moment the guards landed, before a line of the tests was touched. That is what separates a debt
+  list from an exemption list: **an exemption goes quiet when it stops being needed, and a debt
+  complains**. The rule is structural again, with nothing to keep true by hand.
+
+  **What had to be watched was not the conversion but who reads those constructors.**
+  `ServiceConsumptionTests` analyses them **as text** to decide which service feeds which, so
+  changing a constructor's shape changes exactly what that analyser looks at — and the risk was not
+  that it would fail, which shows, but that it would **stop seeing** and pass by silence. All 30 of
+  its tests stayed green, its own floor against blindness included. The rename skipped comment lines
+  for a measured reason: `RefreshMetadata` carries a sentence where `provider` is an English word,
+  and a blind sweep would have written `_provider's` inside it.
+
 - **A library at the top of a disk moves again when it is told it has moved.** `RootRemapPolicy`
   returned the decision as `Remapped` and then `Rewrite` rewrote nothing. `IsUnder` asked whether the
   path starts with the root followed by `\`, and for `D:\` — which keeps its separator on purpose,
@@ -105,7 +133,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   when it stops matching, and that is the failure this repository has measured more often than any
   other.
 
-  **Eight constructors still accept a null and are written down with the reason**: all eight declare
+  **Eight constructors still accept a null and are written down with the reason** — and stop being so
+  in the change above, which promotes them: all eight declare
   their dependencies as a primary constructor, which has nowhere to put a guard without a field, so
   they take the null and fail later at first use — a `NullReferenceException` from inside a method
   instead of an `ArgumentNullException` from the composition that caused it. They sit in a closed

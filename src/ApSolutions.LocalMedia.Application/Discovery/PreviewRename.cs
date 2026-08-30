@@ -9,11 +9,16 @@ public sealed record PreviewRenameCommand(
     string RootPath,
     IReadOnlyList<RenameRequest> Requests);
 
-public sealed class PreviewRename(RenamePolicy policy)
+public sealed class PreviewRename
 {
+    private readonly RenamePolicy _policy;
+
+    public PreviewRename(RenamePolicy policy) =>
+        _policy = policy ?? throw new ArgumentNullException(nameof(policy));
+
     public RenamePlan Execute(PreviewRenameCommand command)
     {
         ArgumentNullException.ThrowIfNull(command);
-        return policy.CreatePlan(command.RootPath, command.Requests);
+        return _policy.CreatePlan(command.RootPath, command.Requests);
     }
 }

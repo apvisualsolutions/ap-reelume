@@ -50,14 +50,31 @@ public sealed record ApplyIdentificationCommand(
 /// repository rather than through <c>UpdateMetadata</c> — that one refuses a title with no row yet.
 /// </para>
 /// </remarks>
-public sealed class ApplyIdentification(
-    ICatalogMetadataRepository repository,
-    IMetadataProvider provider,
-    MetadataMergePolicy mergePolicy,
-    MetadataLanguage language,
-    TimeProvider timeProvider,
-    CacheTitleArtwork artwork)
+public sealed class ApplyIdentification
 {
+    private readonly ICatalogMetadataRepository _repository;
+    private readonly IMetadataProvider _provider;
+    private readonly MetadataMergePolicy _mergePolicy;
+    private readonly MetadataLanguage _language;
+    private readonly TimeProvider _timeProvider;
+    private readonly CacheTitleArtwork _artwork;
+
+    public ApplyIdentification(
+        ICatalogMetadataRepository repository,
+        IMetadataProvider provider,
+        MetadataMergePolicy mergePolicy,
+        MetadataLanguage language,
+        TimeProvider timeProvider,
+        CacheTitleArtwork artwork)
+    {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+        _mergePolicy = mergePolicy ?? throw new ArgumentNullException(nameof(mergePolicy));
+        _language = language ?? throw new ArgumentNullException(nameof(language));
+        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _artwork = artwork ?? throw new ArgumentNullException(nameof(artwork));
+    }
+
     public async Task<ApplyIdentificationResult> ExecuteAsync(
         ApplyIdentificationCommand command,
         CancellationToken cancellationToken = default)
@@ -71,27 +88,27 @@ public sealed class ApplyIdentification(
         // CompositionRoot already crosses this bridge in both directions, for renaming and for
         // playback resume.
         var titleId = new TitleId(command.MediaFileId.Value);
-        var reference = new MetadataReference(provider.Name, command.ProviderKey, command.Kind);
-        var details = await provider
-            .GetDetailsAsync(reference, language, cancellationToken)
+        var reference = new MetadataReference(_provider.Name, command.ProviderKey, command.Kind);
+        var details = await _provider
+            .GetDetailsAsync(reference, _language, cancellationToken)
             .ConfigureAwait(false);
         if (details is null)
         {
             return new ApplyIdentificationResult(ApplyIdentificationOutcome.Unavailable, null);
         }
 
-        var current = await repository.GetAsync(titleId, cancellationToken).ConfigureAwait(false);
+        var current = await _repository.GetAsync(titleId, cancellationToken).ConfigureAwait(false);
         var expectedRevision = current?.Revision ?? 0;
         var baseMetadata = current?.Metadata ?? Empty(details.Title);
-        var merged = mergePolicy.Merge(baseMetadata, details);
-        var write = await repository.TrySaveAsync(
+        var merged = _mergePolicy.Merge(baseMetadata, details);
+        var write = await _repository.TrySaveAsync(
             new CatalogMetadata(
                 titleId,
                 merged,
                 expectedRevision,
                 details.Reference.Provider,
                 details.Reference.Key,
-                timeProvider.GetUtcNow()),
+                _timeProvider.GetUtcNow()),
             expectedRevision,
             cancellationToken).ConfigureAwait(false);
 
@@ -100,7 +117,7 @@ public sealed class ApplyIdentification(
         // provider, and the card only ever reads the disk afterwards. The answer is thrown away on
         // purpose - a title identified with no poster fetched is a title identified, and the path is
         // rebuilt from the same address when a surface asks for it.
-        _ = await artwork
+        _ = await _artwork
             .ExecuteAsync(titleId, merged.PosterPath, merged.Title, cancellationToken)
             .ConfigureAwait(false);
 
