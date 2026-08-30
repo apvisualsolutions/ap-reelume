@@ -7,8 +7,13 @@ namespace ApSolutions.LocalMedia.Application.Discovery;
 
 public sealed record UndoRenameCommand(RenamePlan Plan, bool Confirmed);
 
-public sealed class UndoRename(ISafeFileRenamer safeFileRenamer)
+public sealed class UndoRename
 {
+    private readonly ISafeFileRenamer _safeFileRenamer;
+
+    public UndoRename(ISafeFileRenamer safeFileRenamer) =>
+        _safeFileRenamer = safeFileRenamer ?? throw new ArgumentNullException(nameof(safeFileRenamer));
+
     public Task<RenameExecutionResult> ExecuteAsync(
         UndoRenameCommand command,
         CancellationToken cancellationToken = default)
@@ -19,6 +24,6 @@ public sealed class UndoRename(ISafeFileRenamer safeFileRenamer)
             return Task.FromResult(new RenameExecutionResult(RenameExecutionOutcome.NotConfirmed, command.Plan));
         }
 
-        return safeFileRenamer.UndoAsync(command.Plan, cancellationToken);
+        return _safeFileRenamer.UndoAsync(command.Plan, cancellationToken);
     }
 }

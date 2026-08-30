@@ -12,51 +12,35 @@ namespace ApSolutions.LocalMedia.Application.Tests;
 /// Every use case in this assembly refuses a null dependency, and this is where that is measured.
 /// The guard is written in thirty-six of the forty-five Application files that were short of the
 /// coverage bar, and until this sweep existed not one of them had ever been handed a null: the
-/// throw was a branch nothing took, which is why <c>StartPlayback</c>, <c>StopPlayback</c> and six
+/// throw was a branch nothing took, which is why <c>StartPlayback</c>, <c>StopPlayback</c> and four
 /// others sat at exactly 100 lines and 50 branches.
 /// </summary>
+/// <remarks>
+/// There is no list of exceptions here, and there was one for a day. Seven constructors declared
+/// their dependencies as a primary constructor, which has nowhere to put a guard without a field,
+/// so they took the null and failed later at first use. They are explicit constructors now and the
+/// list is gone — which is what a debt list is for. The rule is structural again: every constructor,
+/// no exemptions, nothing to keep true by hand.
+/// </remarks>
 public sealed class ConstructorGuardTests
 {
     /// <summary>
     /// One sweep, shared by every test below. It is pure reflection over an assembly and builds
     /// nothing that survives the call, so running it three times measured the same answer three
-    /// times -- and this suite runs beside a headless Avalonia session, where less concurrent work
-    /// is worth having for its own sake.
+    /// times.
     /// </summary>
     private static readonly Lazy<ConstructorGuardSweep.Sweep> Swept =
         new(() => ConstructorGuardSweep.Run(typeof(StopPlayback).Assembly));
 
     /// <summary>
-    /// The constructors that still accept a null, each with the reason. All seven declare their
-    /// dependencies as a primary constructor, which has nowhere to put a guard without a field, so
-    /// they take the null and fail later at the first use — a NullReferenceException from inside a
-    /// method instead of an ArgumentNullException from the composition that caused it.
-    /// </summary>
-    /// <remarks>
-    /// This works like <c>PendingWiring</c> in <c>ServiceConsumptionTests</c>: an entry is a debt
-    /// with a name on it, not an exemption. <see cref="The_list_names_only_constructors_that_still_accept_a_null"/>
-    /// forces an entry out the moment its guard lands, so the list can only shrink truthfully.
-    /// </remarks>
-    private static readonly IReadOnlyDictionary<string, string> AcceptsNull =
-        new Dictionary<string, string>(StringComparer.Ordinal)
-        {
-            ["ApSolutions.LocalMedia.Application.Discovery.ExecuteRename"] = "primary constructor",
-            ["ApSolutions.LocalMedia.Application.Discovery.PreviewRename"] = "primary constructor",
-            ["ApSolutions.LocalMedia.Application.Discovery.UndoRename"] = "primary constructor",
-            ["ApSolutions.LocalMedia.Application.Identification.ApplyIdentification"] = "primary constructor",
-            ["ApSolutions.LocalMedia.Application.Metadata.RefreshMetadata"] = "primary constructor",
-            ["ApSolutions.LocalMedia.Application.Metadata.RefreshStaleMetadata"] = "primary constructor",
-            ["ApSolutions.LocalMedia.Application.Metadata.UpdateMetadata"] = "primary constructor",
-        };
-
-    /// <summary>
     /// The floor that keeps this suite from passing by seeing nothing. A sweep is reflection over an
     /// assembly, so a rename or a filter that stops matching turns it green in silence rather than
     /// red — the failure mode this repository has measured more than any other. It reached 127
-    /// parameters on 2026-08-30; the floor sits below that so retiring a use case is not a red, and
-    /// far enough above zero that going blind is.
+    /// parameters on 2026-08-30 and 148 once the seven primary constructors were promoted; the floor
+    /// sits below that so retiring a use case is not a red, and far enough above zero that going
+    /// blind is.
     /// </summary>
-    private const int LeastParametersTheSweepMustReach = 120;
+    private const int LeastParametersTheSweepMustReach = 140;
 
     [Fact]
     public void Every_constructor_refuses_a_null_dependency()
@@ -64,29 +48,10 @@ public sealed class ConstructorGuardTests
         var sweep = Swept.Value;
 
         Assert.Empty(sweep.Unbuildable);
-
-        var unexpected = sweep.Unguarded.Where(type => !AcceptsNull.ContainsKey(type)).ToArray();
         Assert.True(
-            unexpected.Length == 0,
-            "These constructors accept a null dependency and are on no list, so whatever they are "
-            + "given they will fail at first use instead of at construction: "
-            + string.Join(", ", unexpected));
-    }
-
-    [Fact]
-    public void The_list_names_only_constructors_that_still_accept_a_null()
-    {
-        var sweep = Swept.Value;
-
-        var stale = AcceptsNull.Keys
-            .Where(type => !sweep.Unguarded.Contains(type))
-            .Order(StringComparer.Ordinal)
-            .ToArray();
-
-        Assert.True(
-            stale.Length == 0,
-            "These constructors now refuse a null; take them out of the list so the debt stays "
-            + "true: " + string.Join(", ", stale));
+            sweep.Unguarded.Count == 0,
+            "These constructors accept a null dependency, so whatever they are given they will fail "
+            + "at first use instead of at construction: " + string.Join(", ", sweep.Unguarded));
     }
 
     [Fact]

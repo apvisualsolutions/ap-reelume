@@ -6,13 +6,18 @@ using Microsoft.Data.Sqlite;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Data;
 
-public sealed class IntegrityChecker(SqliteConnectionFactory connectionFactory) : IDatabaseIntegrityChecker
+public sealed class IntegrityChecker : IDatabaseIntegrityChecker
 {
+    private readonly SqliteConnectionFactory _connectionFactory;
+
+    public IntegrityChecker(SqliteConnectionFactory connectionFactory) =>
+        _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+
     public async Task<DatabaseIntegrityResult> CheckAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            await using var connection = await connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
+            await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
             await using var command = connection.CreateCommand();
             command.CommandText = "PRAGMA integrity_check;";
             await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);

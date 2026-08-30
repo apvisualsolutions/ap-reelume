@@ -43,24 +43,41 @@ public sealed record RefreshStaleMetadataResult(int Attempted, int Applied)
 /// started in.
 /// </para>
 /// </remarks>
-public sealed class RefreshStaleMetadata(
-    ICatalogMetadataRepository repository,
-    RefreshMetadata refresh,
-    IAutoRefreshSettings settings,
-    IPlaybackActivity playback,
-    IScanActivity scans,
-    TimeProvider timeProvider)
+public sealed class RefreshStaleMetadata
 {
+    private readonly ICatalogMetadataRepository _repository;
+    private readonly RefreshMetadata _refresh;
+    private readonly IAutoRefreshSettings _settings;
+    private readonly IPlaybackActivity _playback;
+    private readonly IScanActivity _scans;
+    private readonly TimeProvider _timeProvider;
+
+    public RefreshStaleMetadata(
+        ICatalogMetadataRepository repository,
+        RefreshMetadata refresh,
+        IAutoRefreshSettings settings,
+        IPlaybackActivity playback,
+        IScanActivity scans,
+        TimeProvider timeProvider)
+    {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _refresh = refresh ?? throw new ArgumentNullException(nameof(refresh));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _playback = playback ?? throw new ArgumentNullException(nameof(playback));
+        _scans = scans ?? throw new ArgumentNullException(nameof(scans));
+        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+    }
+
     public async Task<RefreshStaleMetadataResult> ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
-        if (!settings.AutomaticRefreshEnabled || IsBusy)
+        if (!_settings.AutomaticRefreshEnabled || IsBusy)
         {
             return RefreshStaleMetadataResult.None;
         }
 
-        var stale = await repository.ListStaleAsync(
-            MetadataRefreshPolicy.StaleBefore(timeProvider.GetUtcNow()),
+        var stale = await _repository.ListStaleAsync(
+            MetadataRefreshPolicy.StaleBefore(_timeProvider.GetUtcNow()),
             MetadataRefreshPolicy.MaximumPerPass,
             cancellationToken).ConfigureAwait(false);
 
@@ -75,7 +92,7 @@ public sealed class RefreshStaleMetadata(
             }
 
             attempted++;
-            var result = await refresh.ExecuteAsync(
+            var result = await _refresh.ExecuteAsync(
                 new RefreshMetadataCommand(entry.TitleId, entry.Revision, RestoreProviderFields: false),
                 cancellationToken).ConfigureAwait(false);
             if (result.Outcome == MetadataWriteOutcome.Applied)
@@ -87,5 +104,5 @@ public sealed class RefreshStaleMetadata(
         return new RefreshStaleMetadataResult(attempted, applied);
     }
 
-    private bool IsBusy => playback.IsPlaybackActive || scans.IsScanActive;
+    private bool IsBusy => _playback.IsPlaybackActive || _scans.IsScanActive;
 }

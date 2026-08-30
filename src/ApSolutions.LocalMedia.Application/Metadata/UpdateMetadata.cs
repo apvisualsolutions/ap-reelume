@@ -85,7 +85,7 @@ public sealed record UpdateMetadataCommand(
     IReadOnlySet<MetadataField> LockedFields,
     int ExpectedRevision);
 
-public sealed class UpdateMetadata(ICatalogMetadataRepository repository)
+public sealed class UpdateMetadata
 {
     private static readonly EditableMetadata Empty = new(
         string.Empty,
@@ -98,6 +98,10 @@ public sealed class UpdateMetadata(ICatalogMetadataRepository repository)
         TrailerKey: null,
         LockedFields: new HashSet<MetadataField>());
 
+    private readonly ICatalogMetadataRepository _repository;
+
+    public UpdateMetadata(ICatalogMetadataRepository repository) =>
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public async Task<MetadataWriteResult> ExecuteAsync(
         UpdateMetadataCommand command,
@@ -109,7 +113,7 @@ public sealed class UpdateMetadata(ICatalogMetadataRepository repository)
         // what CompositionRoot's own comment always claimed happened. It did not: this returned
         // NotFound, the editor turned that into neither a conflict nor a change, and Save on a fresh
         // title was a button that did nothing.
-        var current = await repository.GetAsync(command.TitleId, cancellationToken).ConfigureAwait(false)
+        var current = await _repository.GetAsync(command.TitleId, cancellationToken).ConfigureAwait(false)
             ?? new CatalogMetadata(command.TitleId, Empty, Revision: 0);
 
         var changes = command.FieldChanges;
@@ -125,7 +129,7 @@ public sealed class UpdateMetadata(ICatalogMetadataRepository repository)
             LockedFields = command.LockedFields.ToHashSet(),
         };
 
-        return await repository.TrySaveAsync(
+        return await _repository.TrySaveAsync(
             current with { Metadata = updated },
             command.ExpectedRevision,
             cancellationToken).ConfigureAwait(false);

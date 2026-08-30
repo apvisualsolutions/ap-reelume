@@ -26,19 +26,34 @@ public sealed record RefreshMetadataCommand(
 /// is the difference between a button that explains itself and one that does nothing.
 /// </para>
 /// </remarks>
-public sealed class RefreshMetadata(
-    ICatalogMetadataRepository repository,
-    IMetadataProvider provider,
-    MetadataMergePolicy mergePolicy,
-    MetadataLanguage language,
-    TimeProvider timeProvider)
+public sealed class RefreshMetadata
 {
+    private readonly ICatalogMetadataRepository _repository;
+    private readonly IMetadataProvider _provider;
+    private readonly MetadataMergePolicy _mergePolicy;
+    private readonly MetadataLanguage _language;
+    private readonly TimeProvider _timeProvider;
+
+    public RefreshMetadata(
+        ICatalogMetadataRepository repository,
+        IMetadataProvider provider,
+        MetadataMergePolicy mergePolicy,
+        MetadataLanguage language,
+        TimeProvider timeProvider)
+    {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+        _mergePolicy = mergePolicy ?? throw new ArgumentNullException(nameof(mergePolicy));
+        _language = language ?? throw new ArgumentNullException(nameof(language));
+        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+    }
+
     public async Task<MetadataWriteResult> ExecuteAsync(
         RefreshMetadataCommand command,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        var current = await repository.GetAsync(command.TitleId, cancellationToken).ConfigureAwait(false);
+        var current = await _repository.GetAsync(command.TitleId, cancellationToken).ConfigureAwait(false);
         if (current is null)
         {
             return new MetadataWriteResult(MetadataWriteOutcome.NotFound, null);
@@ -47,14 +62,14 @@ public sealed class RefreshMetadata(
         // A key stored under another provider's name is not this provider's to read, so it counts as
         // unidentified here rather than being guessed at.
         if (current.ProviderKey is not { } key
-            || !string.Equals(current.Provider, provider.Name, StringComparison.Ordinal)
-            || provider.TryCreateReference(key) is not { } reference)
+            || !string.Equals(current.Provider, _provider.Name, StringComparison.Ordinal)
+            || _provider.TryCreateReference(key) is not { } reference)
         {
             return new MetadataWriteResult(MetadataWriteOutcome.NotIdentified, current);
         }
 
-        var details = await provider
-            .GetDetailsAsync(reference, language, cancellationToken)
+        var details = await _provider
+            .GetDetailsAsync(reference, _language, cancellationToken)
             .ConfigureAwait(false);
         if (details is null)
         {
@@ -64,15 +79,15 @@ public sealed class RefreshMetadata(
         var baseMetadata = command.RestoreProviderFields
             ? current.Metadata with { LockedFields = new HashSet<MetadataField>() }
             : current.Metadata;
-        var merged = mergePolicy.Merge(baseMetadata, details);
+        var merged = _mergePolicy.Merge(baseMetadata, details);
 
-        return await repository.TrySaveAsync(
+        return await _repository.TrySaveAsync(
             current with
             {
                 Metadata = merged,
                 Provider = details.Reference.Provider,
                 ProviderKey = details.Reference.Key,
-                RefreshedUtc = timeProvider.GetUtcNow(),
+                RefreshedUtc = _timeProvider.GetUtcNow(),
             },
             command.ExpectedRevision,
             cancellationToken).ConfigureAwait(false);
