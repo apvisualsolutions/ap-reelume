@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 
 namespace ApSolutions.LocalMedia.Domain.Courses;
@@ -14,6 +15,13 @@ namespace ApSolutions.LocalMedia.Domain.Courses;
 /// </remarks>
 public sealed record CourseLessonProgress(
     LessonId Id,
+
+    /// <summary>
+    /// LIB-009's identity, and <see langword="null"/> when the catalogue has not seen the file.
+    /// Without it a lesson can neither be played nor marked, so the row refuses both rather than
+    /// failing when pressed.
+    /// </summary>
+    MediaFileId? MediaFileId,
     int ModuleNumber,
     string? Module,
     int Number,

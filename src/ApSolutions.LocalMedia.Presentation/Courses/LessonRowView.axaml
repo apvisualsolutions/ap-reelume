@@ -1,0 +1,113 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+One lesson (CRS-005), the mirror of an episode row: the same three states, the same glyphs, the same
+partial bar underneath, and a mark a person's hand wins with.
+
+The state is a shape before it is a colour — ○ ◐ ● — so somebody who cannot tell the accent from the
+secondary text still reads all three. The glyph is hidden from the automation tree because the row's
+own name already says the state in words; announced twice it is read twice.
+
+No leading action here on purpose: this is a row that repeats, and a hierarchy repeated N times is
+not a hierarchy. The card above it is where the one accent goes.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Courses.LessonRowView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:courses="clr-namespace:ApSolutions.LocalMedia.Presentation.Courses"
+    x:DataType="courses:LessonRowViewModel">
+  <Border
+      Padding="12"
+      Background="{DynamicResource CardSurfaceBrush}"
+      BorderBrush="{DynamicResource ShellHairlineBrush}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource CornerRadiusMedium}"
+      automation:AutomationProperties.Name="{Binding AccessibleName}">
+    <StackPanel Spacing="{DynamicResource Space8}">
+      <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock
+            Grid.Column="0"
+            Width="16"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Text="{Binding Glyph}"
+            automation:AutomationProperties.AccessibilityView="Raw" />
+        <TextBlock
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            FontFamily="{DynamicResource FontFamilyMono}"
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{Binding Number}" />
+        <StackPanel Grid.Column="2" Spacing="{DynamicResource Space4}">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+            <TextBlock
+                VerticalAlignment="Center"
+                FontWeight="SemiBold"
+                Text="{Binding Title}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="NoWrap" />
+            <!--
+              «Siguiente en el hilo», present or absent rather than tinted: it is the one row of the
+              card a person is looking for, and absence is not a dimmer version of it.
+            -->
+            <Border
+                VerticalAlignment="Center"
+                Padding="8,2"
+                Background="{DynamicResource AccentSubtleBrush}"
+                CornerRadius="{DynamicResource CornerRadiusPill}"
+                IsVisible="{Binding IsNextInThread}">
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource AccentTextBrush}"
+                  Text="{DynamicResource CourseNextInThreadChip}" />
+            </Border>
+          </StackPanel>
+          <TextBlock
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              Text="{Binding Meta}" />
+        </StackPanel>
+      </Grid>
+      <!--
+        The base theme gives a ProgressBar a minimum height of four and a minimum width of 200, so
+        the three setters are the ones the episode row already needed.
+      -->
+      <ProgressBar
+          Height="3"
+          MinHeight="3"
+          MinWidth="0"
+          Background="{DynamicResource ControlFillBrush}"
+          Foreground="{DynamicResource AccentBrush}"
+          IsVisible="{Binding HasBar}"
+          Maximum="1"
+          Value="{Binding Progress}"
+          automation:AutomationProperties.AccessibilityView="Raw" />
+      <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+        <Button
+            x:Name="LessonPlayAction"
+            IsEnabled="{Binding CanPlay}"
+            automation:AutomationProperties.Name="{Binding AccessibleName}"
+            Command="{Binding PlayCommand}"
+            CommandParameter="{Binding}">
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+            <Path Classes="icon size-14 filled" VerticalAlignment="Center" Data="{DynamicResource IconPlay}" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding Title}" />
+          </StackPanel>
+        </Button>
+        <Button
+            x:Name="LessonMarkAction"
+            Content="{Binding MarkActionText}"
+            IsEnabled="{Binding CanPlay}"
+            automation:AutomationProperties.Name="{Binding MarkAccessibleName}"
+            Command="{Binding ToggleWatchedCommand}"
+            CommandParameter="{Binding}" />
+      </WrapPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

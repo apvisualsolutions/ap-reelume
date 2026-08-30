@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Courses;
+using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Courses;
 using Microsoft.Data.Sqlite;
@@ -33,7 +34,7 @@ public sealed class CourseLessonReader : ICourseLessonReader
 
     private const string Columns = """
         SELECT l.course_id, l.id, l.module, l.module_sort_major, l.title,
-               f.duration_ticks, w.position_ticks, w.status
+               f.duration_ticks, w.position_ticks, w.status, l.media_file_id
         FROM lessons AS l
         LEFT JOIN media_files AS f ON f.id = l.media_file_id
         LEFT JOIN watch_state AS w
@@ -112,6 +113,7 @@ public sealed class CourseLessonReader : ICourseLessonReader
 
             add(courseId, new CourseLessonProgress(
                 new LessonId(Guid.Parse(reader.GetString(1))),
+                reader.IsDBNull(8) ? null : new MediaFileId(Guid.Parse(reader.GetString(8))),
                 reader.IsDBNull(3) ? LooseModuleNumber : reader.GetInt32(3),
                 reader.IsDBNull(2) ? null : reader.GetString(2),
                 number,

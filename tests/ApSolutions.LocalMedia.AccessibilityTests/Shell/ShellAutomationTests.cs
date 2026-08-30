@@ -20,8 +20,14 @@ public sealed class ShellAutomationTests
 {
     private const string PresentationAssemblyName = "ApSolutions.LocalMedia.Presentation";
 
+    /// <summary>
+    /// Six since 2026-08-30, when Courses joined the rail (CRS-003). Every one of them is walked
+    /// here rather than counted: the assertion inside the loop is that pressing Enter on the
+    /// button actually moves the route, so a seventh entry that looked right and navigated
+    /// nowhere would still fail.
+    /// </summary>
     [AvaloniaFact]
-    public void Five_destinations_have_names_roles_states_and_complete_keyboard_navigation()
+    public void Six_destinations_have_names_roles_states_and_complete_keyboard_navigation()
     {
         var assembly = Assembly.Load(PresentationAssemblyName);
         ApplySpanishResources(assembly);
@@ -39,7 +45,7 @@ public sealed class ShellAutomationTests
             .OfType<Button>()
             .Where(button => button.Classes.Contains("navigation-destination"))
             .ToArray();
-        Assert.Equal(5, navigationButtons.Length);
+        Assert.Equal(6, navigationButtons.Length);
 
         foreach (var button in navigationButtons)
         {

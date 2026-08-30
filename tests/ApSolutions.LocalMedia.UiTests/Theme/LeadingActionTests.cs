@@ -74,6 +74,22 @@ public sealed class LeadingActionTests
         ["RecentlyAddedRailView"] = null,
         ["RecommendationsRailView"] = null,
 
+        // Courses
+        // Marking a folder is what this destination offers somebody who has none, and it stays the
+        // leading action once there are some: an offer that disappeared the moment it started
+        // working would be an offer somebody has to go looking for. The cards' own buttons are not
+        // accented — a grid where every card shouts has no leading action at all.
+        ["CoursesView"] = "CoursesMarkFolderAction",
+
+        // The card leads with the thread, which is what the whole card is for. The label swaps to
+        // «Volver a empezar» once nothing is left, and both come off one flag, so the button and the
+        // finished chip can never disagree about whether there is anything to carry on with.
+        ["CourseDetailsView"] = "CourseThreadAction",
+
+        // A row that repeats: a hierarchy repeated N times is not a hierarchy, and the card above it
+        // is where the one accent goes. The same reason `EpisodeRowView` leads with nothing.
+        ["LessonRowView"] = null,
+
         // Library
         // The header's add: opening the dialog is what the screen offers someone whose next step
         // is growing the library — the prototype leads with it too.

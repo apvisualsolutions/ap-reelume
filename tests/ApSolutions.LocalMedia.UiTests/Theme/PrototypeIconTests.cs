@@ -77,6 +77,10 @@ public sealed class PrototypeIconTests
     [
         "IconLibrary", "IconReview", "IconDuplicates", "IconSettings", "IconSearch", "IconPause",
         "IconMiniPlayer", "IconFilm", "IconShow", "IconClock",
+
+        // Courses, converted on 2026-08-30: the prototype draws it as two rounded rectangles
+        // and a play triangle, so both rects became the arcs that draw them.
+        "IconCourses",
     ];
 
     private static readonly string[] Ours =

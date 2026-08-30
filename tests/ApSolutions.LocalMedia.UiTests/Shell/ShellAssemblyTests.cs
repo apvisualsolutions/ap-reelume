@@ -542,13 +542,25 @@ public sealed class ShellAssemblyTests
         Assert.False(shell.IsPlayerVisible);
     }
 
+    /// <summary>
+    /// Six since 2026-08-30, when Courses became a destination of its own (CRS-003). The list is
+    /// asserted in order rather than by count: the rail is written by hand in the AXAML, and a route
+    /// that entered the enum somewhere the rail does not draw it would still pass a count.
+    /// </summary>
     [Fact]
-    public void The_shell_lists_the_five_approved_destinations_and_nothing_else()
+    public void The_shell_lists_the_six_approved_destinations_and_nothing_else()
     {
         var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
 
         Assert.Equal(
-            [AppRoute.Home, AppRoute.Library, AppRoute.Review, AppRoute.Duplicates, AppRoute.Settings],
+            [
+                AppRoute.Home,
+                AppRoute.Library,
+                AppRoute.Courses,
+                AppRoute.Review,
+                AppRoute.Duplicates,
+                AppRoute.Settings,
+            ],
             shell.Routes);
         Assert.False(shell.NavigateCommand.CanExecute("Library"));
         Assert.True(shell.NavigateCommand.CanExecute(AppRoute.Library));

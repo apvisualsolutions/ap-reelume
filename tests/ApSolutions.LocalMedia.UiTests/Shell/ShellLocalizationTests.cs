@@ -38,14 +38,18 @@ public sealed class ShellLocalizationTests
                 || reference.Name?.Equals("System.Net.Http", StringComparison.OrdinalIgnoreCase) is true);
     }
 
+    /// <summary>
+    /// Six since 2026-08-30 (CRS-003). Names and order, not a count: the enum is not persisted
+    /// anywhere - checked before adding to it - so its order is free to say where the rail puts it.
+    /// </summary>
     [Fact]
-    public void Navigation_contract_exposes_exactly_the_five_approved_destinations()
+    public void Navigation_contract_exposes_exactly_the_six_approved_destinations()
     {
         var assembly = LoadPresentationAssembly();
         var routeType = RequireType(assembly, "ApSolutions.LocalMedia.Presentation.Navigation.AppRoute");
 
         Assert.Equal(
-            ["Home", "Library", "Review", "Duplicates", "Settings"],
+            ["Home", "Library", "Courses", "Review", "Duplicates", "Settings"],
             Enum.GetNames(routeType));
 
         var navigationContract = RequireType(

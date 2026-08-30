@@ -43,6 +43,17 @@ public sealed record ShellSurfaces
     /// <summary>The duplicates destination's list; the per-title review stays on its own surface.</summary>
     public DuplicatesOverviewViewModel? DuplicatesOverview { get; init; }
 
+    /// <summary>The courses destination's grid (CRS-003).</summary>
+    public Courses.CoursesViewModel? Courses { get; init; }
+
+    /// <summary>
+    /// One course opened, under the grid (CRS-002). It is a surface of its own rather than a mode of
+    /// the grid because it holds a different question — where you left off — and because the grid has
+    /// to stay on screen: coming back from a course is scrolling up, not a button somebody has to
+    /// find.
+    /// </summary>
+    public Courses.CourseDetailsViewModel? CourseDetails { get; init; }
+
     public RestoreWizardViewModel? Restore { get; init; }
 
     public PrivacySettingsViewModel? PrivacySettings { get; init; }

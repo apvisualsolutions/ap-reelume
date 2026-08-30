@@ -264,6 +264,25 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             onboarding.PropertyChanged += OnOnboardingChanged;
         }
 
+        if (Courses is { } courses)
+        {
+            // The one door, not a copy of it: marking a folder is what the add-media dialog is for,
+            // and the courses grid asks the shell to open it rather than opening one of its own.
+            courses.MarkFolderCommand = AddMediaCommand;
+
+            // Both of the card's buttons open the course. They differ in what happens next - one
+            // carries straight on with the thread - and the difference lives in the card rather than
+            // in two doors, because a course that opened one way from one button and another way
+            // from the other would be two courses.
+            courses.Opened += (_, id) => _ = OpenCourseAsync(id, resume: false);
+            courses.Resumed += (_, id) => _ = OpenCourseAsync(id, resume: true);
+        }
+
+        if (CourseDetails is { } courseDetails)
+        {
+            courseDetails.PlayRequested = request => OpenPlayerAsync(request, CancellationToken.None);
+        }
+
         if (DuplicatesOverview is { } duplicatesOverview)
         {
             // A row on the overview opens the same comparison the film card's action opens, through
@@ -351,6 +370,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public BackupViewModel? Backups => _surfaces.Backups;
 
     public DuplicatesOverviewViewModel? DuplicatesOverview => _surfaces.DuplicatesOverview;
+
+    public Courses.CoursesViewModel? Courses => _surfaces.Courses;
+
+    public Courses.CourseDetailsViewModel? CourseDetails => _surfaces.CourseDetails;
 
     public RestoreWizardViewModel? Restore => _surfaces.Restore;
 
@@ -900,6 +923,16 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public bool IsDuplicatesVisible => CurrentRoute == AppRoute.Duplicates;
 
+    /// <summary>
+    /// The courses destination, and it asks for the grid as well as the route: a rail entry that
+    /// opened an empty frame because nothing was composed would look like a broken destination
+    /// rather than an uncomposed one.
+    /// </summary>
+    public bool IsCoursesVisible => CurrentRoute == AppRoute.Courses && Courses is not null;
+
+    /// <summary>Whether a course is open under the grid.</summary>
+    public bool HasCourseDetails => CourseDetails is { HasCourse: true };
+
     /// <summary>Copias lives in Settings now; its stack shows on its own index entry.</summary>
     public bool IsBackupsSection => CurrentSettingsSection == SettingsSection.Backups;
 
@@ -961,6 +994,29 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// <summary>Takes a fresh count, from whoever counted it.</summary>
     public void ApplyReviewPendingCount(int pending) =>
         ReviewPendingCount = Math.Max(0, pending);
+
+    /// <summary>
+    /// Opens one course under the grid, and carries straight on with its thread when that is what was
+    /// asked for.
+    /// </summary>
+    /// <remarks>
+    /// Both of the card's buttons land here. They differ only in <paramref name="resume"/>, because a
+    /// course opened one way from one button and another way from the other would be two courses.
+    /// </remarks>
+    private async Task OpenCourseAsync(Domain.Courses.CourseId courseId, bool resume)
+    {
+        if (CourseDetails is not { } details)
+        {
+            return;
+        }
+
+        await details.LoadAsync(courseId, CancellationToken.None).ConfigureAwait(true);
+        OnPropertyChanged(nameof(HasCourseDetails));
+        if (resume && details.ResumeThreadCommand.CanExecute(null))
+        {
+            details.ResumeThreadCommand.Execute(null);
+        }
+    }
 
     public async Task OpenPlayerAsync(PlayDetailsRequest request, CancellationToken cancellationToken = default)
     {
@@ -1182,8 +1238,16 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsEditorVisible));
         OnPropertyChanged(nameof(IsHomeVisible));
         OnPropertyChanged(nameof(IsDuplicatesVisible));
+        OnPropertyChanged(nameof(IsCoursesVisible));
         OnPropertyChanged(nameof(IsReviewVisible));
         OnPropertyChanged(nameof(IsPrimaryContentVisible));
+        // The grid is read on every visit for the same reason the duplicates list is: a folder
+        // marked from the add-media dialog would otherwise keep its absence until a restart.
+        if (route == AppRoute.Courses && Courses is { } courses)
+        {
+            await courses.LoadAsync(CancellationToken.None).ConfigureAwait(true);
+        }
+
         if (route == AppRoute.Duplicates && DuplicatesOverview is { } duplicates)
         {
             // The list is read on every visit: a group confirmed away in the review would otherwise

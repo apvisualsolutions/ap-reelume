@@ -16,6 +16,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:onboarding="clr-namespace:ApSolutions.LocalMedia.Presentation.Onboarding"
     xmlns:presentation="clr-namespace:ApSolutions.LocalMedia.Presentation"
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    xmlns:courses="clr-namespace:ApSolutions.LocalMedia.Presentation.Courses"
     xmlns:review="clr-namespace:ApSolutions.LocalMedia.Presentation.Review"
     xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     xmlns:shell="clr-namespace:ApSolutions.LocalMedia.Presentation.Shell"
@@ -193,6 +194,35 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   CornerRadius="{DynamicResource CornerRadiusSmall}"
                   IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Library}}" />
               <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconLibrary}" />
+            </Panel>
+          </Button>
+          <!--
+            Courses, the rail's third slot, which is where the prototype puts it. The same two
+            signals as every other destination for the open one — the fill and the 3 px bar,
+            present or absent rather than dimmed — because a new entry that announced itself
+            differently would be an exception somebody has to learn.
+          -->
+          <Button
+              Classes="navigation-destination"
+              ToolTip.Tip="{DynamicResource NavigationCourses}"
+              automation:AutomationProperties.Name="{DynamicResource NavigationCourses}"
+              automation:AutomationProperties.ItemStatus="{Binding CurrentRoute, Converter={StaticResource RouteStatus}, ConverterParameter={x:Static navigation:AppRoute.Courses}}"
+              Command="{Binding NavigateCommand}"
+              CommandParameter="{x:Static navigation:AppRoute.Courses}">
+            <Panel>
+              <Border
+                  Background="{DynamicResource SelectionFillBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusMedium}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Courses}}" />
+              <Border
+                  Classes="navigation-current-bar"
+                  Width="3"
+                  Margin="0,7"
+                  HorizontalAlignment="Left"
+                  Background="{DynamicResource AccentBrush}"
+                  CornerRadius="{DynamicResource CornerRadiusSmall}"
+                  IsVisible="{Binding CurrentRoute, Converter={StaticResource RouteIsCurrent}, ConverterParameter={x:Static navigation:AppRoute.Courses}}" />
+              <Path Classes="icon size-20 navigation-glyph" Data="{DynamicResource IconCourses}" />
             </Panel>
           </Button>
           <Button
@@ -651,6 +681,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <review:DuplicatesOverviewView DataContext="{Binding DuplicatesOverview}" />
         <ContentControl IsVisible="{Binding HasDuplicates}">
           <review:DuplicateReviewView DataContext="{Binding Duplicates}" />
+        </ContentControl>
+      </StackPanel>
+    </ScrollViewer>
+
+    <!--
+      The courses destination: the grid, and under it the course somebody opened — the library's
+      pattern and the duplicates destination's, list above and detail below. Coming back from a
+      course is scrolling up rather than a button somebody has to find, and the card's own title is
+      a level-2 heading so the destination keeps exactly one level 1.
+    -->
+    <ScrollViewer
+        Grid.Row="1"
+        Grid.Column="1"
+        Margin="48"
+        IsVisible="{Binding IsCoursesVisible}">
+      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
+        <courses:CoursesView DataContext="{Binding Courses}" />
+        <ContentControl IsVisible="{Binding HasCourseDetails}">
+          <courses:CourseDetailsView DataContext="{Binding CourseDetails}" />
         </ContentControl>
       </StackPanel>
     </ScrollViewer>

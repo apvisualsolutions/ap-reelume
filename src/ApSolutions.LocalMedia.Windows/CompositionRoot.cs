@@ -708,6 +708,8 @@ public static partial class CompositionRoot
             Updates = provider.GetRequiredService<UpdateViewModel>(),
             Onboarding = provider.GetRequiredService<RootOnboardingViewModel>(),
             DuplicatesOverview = CreateDuplicatesOverview(provider),
+            Courses = provider.GetRequiredService<Presentation.Courses.CoursesViewModel>(),
+            CourseDetails = provider.GetRequiredService<Presentation.Courses.CourseDetailsViewModel>(),
             StartScan = (rootId, cancellationToken) => ScanRootAsync(provider, rootId, cancellationToken),
             ReviewInbox = provider.GetRequiredService<ReviewInboxViewModel>(),
             ScanSettings = provider.GetRequiredService<ScanSettingsViewModel>(),
