@@ -1,5 +1,37 @@
 # Dónde retomar
 
+> ## RELEVO EN CALIENTE — 2026-08-30, sesión de Cursos → sesión principal
+>
+> **`fbc25a3` está EMPUJADO y su run de CI está corriendo. Nadie lo ha leído.** El vigía que lo
+> miraba se paró al cerrar esa sesión, así que **hay que rearmarlo**:
+>
+> ```powershell
+> pwsh -NoProfile -File eng/watch-ci.ps1 -Sha fbc25a3
+> ```
+>
+> `main` sigue en `f10e53e`. **Lo primero es ese run**, y no se mueve la referencia sin leer su
+> conclusión con `gh run view <id> --json conclusion`.
+>
+> **Las tres cifras que tiene que dar el verde**, y qué se espera de cada una en esta tanda:
+>
+> | cifra | esperado |
+> | --- | --- |
+> | `Coverage gate: N short of 96/96, ratchet N` | los dos números **iguales**; la lista está en **186** |
+> | `0 new file(s) ... are where they have to be` | **es la que puede fallar**: hay once archivos nuevos |
+> | `The walk: ...; N pressed, 20 pending` | el trinquete **no sube de 20** |
+>
+> **La segunda es la que hay que mirar de verdad.** Esta tanda añade once archivos nuevos —cuatro de
+> Domain, dos de Application, dos de Infrastructure y tres de Presentation— y **los de Presentation
+> no tienen pruebas unitarias propias**: los cubre el paseo autónomo a través del shell ensamblado.
+> Local no puede medirlo, porque la puerta se calcula sobre la **fusión de las veinte suites** de CI.
+> Si alguno se queda corto, la corrección es una prueba de ViewModel en `UiTests`, no una línea en
+> `eng/coverage-debt.txt`: **un archivo nuevo no puede entrar en la lista de deuda**.
+>
+> Y si el run sale rojo, su corrección va **en el mismo push siguiente**: dos pushes seguidos
+> solapan dos runs y el paso `Verify` pasa de 33 a 55 minutos.
+>
+> Todo lo demás de esta tanda está descrito abajo, en «La otra mitad de esta tanda».
+
 ## Estado al cierre del 2026-08-30 (duodécima sesión) — la guarda que hundió tres archivos
 
 **Tres commits míos —`5aa8300`, `7729001` y el que escribe esta nota— y ocho de OTRA SESIÓN que

@@ -1,5 +1,37 @@
 # Where to pick up
 
+> ## HOT HANDOFF — 2026-08-30, Courses session → main session
+>
+> **`fbc25a3` is PUSHED and its CI run is in flight. Nobody has read it.** The watcher that was
+> looking at it stopped when that session closed, so **it has to be re-armed**:
+>
+> ```powershell
+> pwsh -NoProfile -File eng/watch-ci.ps1 -Sha fbc25a3
+> ```
+>
+> `main` is still at `f10e53e`. **That run comes first**, and the reference does not move until its
+> conclusion is read with `gh run view <id> --json conclusion`.
+>
+> **The three numbers a green has to give**, and what to expect from each this time:
+>
+> | number | expected |
+> | --- | --- |
+> | `Coverage gate: N short of 96/96, ratchet N` | the two **equal**; the list stands at **186** |
+> | `0 new file(s) ... are where they have to be` | **this is the one that can fail**: eleven new files |
+> | `The walk: ...; N pressed, 20 pending` | the ratchet **does not rise above 20** |
+>
+> **The second is the one to actually watch.** This batch adds eleven new files — four in Domain, two
+> in Application, two in Infrastructure and three in Presentation — and **the Presentation ones have
+> no unit tests of their own**: the autonomous walk covers them through the assembled shell. Local
+> cannot measure it, because the gate is computed over CI's **merge of all twenty suites**. If one
+> falls short, the fix is a ViewModel test in `UiTests`, not a line in `eng/coverage-debt.txt`: **a
+> new file may not enter the debt list**.
+>
+> And if the run comes back red, its fix goes **in the same next push**: two pushes in a row overlap
+> two runs and turn the `Verify` step from 33 minutes into 55.
+>
+> Everything else about this batch is below, under "The other half of this batch".
+
 ## State at the close of 2026-08-30 (twelfth session) — the guard that sank three files
 
 **Three commits of mine — `5aa8300`, `7729001` and the one writing this note — and eight from
