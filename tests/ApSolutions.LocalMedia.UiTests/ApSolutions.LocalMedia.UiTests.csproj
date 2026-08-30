@@ -6,6 +6,9 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\ConstructorGuardSweep.cs" Link="ConstructorGuardSweep.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Infrastructure\ApSolutions.LocalMedia.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Presentation\ApSolutions.LocalMedia.Presentation.csproj" />
   </ItemGroup>
@@ -16,5 +19,6 @@
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
     <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+    <PackageReference Include="NSubstitute" />
   </ItemGroup>
 </Project>

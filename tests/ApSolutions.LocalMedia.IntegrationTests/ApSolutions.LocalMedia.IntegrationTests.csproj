@@ -22,6 +22,7 @@
       One fake update server, shared with the packaging suite. Two copies of a TLS listener would be
       two places for the interruption behaviour to drift apart, and the drift would be invisible.
     -->
+    <Compile Include="..\Shared\ConstructorGuardSweep.cs" Link="ConstructorGuardSweep.cs" />
     <Compile Include="..\Shared\FakeReleaseServer.cs" Link="Updates\FakeReleaseServer.cs" />
     <Compile Include="..\Shared\TestReleaseSigning.cs" Link="Updates\TestReleaseSigning.cs" />
   </ItemGroup>
