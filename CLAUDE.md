@@ -25,7 +25,7 @@ prueba van en inglés.
   Se deniegan **en el proyecto y no se borran de la máquina**, porque son de quien programa y se usan
   fuera de aquí. A diferencia de la clave de arriba, **ésta sí se midió en el acto**: `claude mcp
   list` enseñaba tres servidores antes y enseña sólo `avalonia-docs` después.
-- **Tres hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
+- **Cuatro hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
   `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y un `.cs` o `.axaml` de `src/` o `tests/`
   **cuyo contenido no lleve la cabecera SPDX**. **Los dos primeros se rechazan por motivos
   distintos, y confundirlos costó una corrección el 2026-08-29**: `coverage-debt.txt` **lo produce
@@ -63,8 +63,17 @@ prueba van en inglés.
   mensajes **empiezan diciendo que la escritura no falló**: sin eso se lee como un fallo y se
   reintenta la misma escritura.
 
-  **Ninguno dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así que siguen siendo un
-  adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y
+  **El cuarto vigila el ciclo, no un archivo.** `post-push.sh` corre en `PostToolUse` sobre
+  `Bash|PowerShell` y, tras cualquier `git push`, escribe por stderr y sale con 2 el comando del
+  monitor **con el SHA ya resuelto**. Existe porque «para mirar CI se usa `eng/watch-ci.ps1`» era una
+  frase, y **una frase no dispara**: el 2026-08-30 el propietario tuvo que pedirlo. Y tenía razón
+  aunque el monitor estuviera armado — `TaskOutput` decía `running` con **0 KB**, porque el guion late
+  cada 30 minutos: **corriendo y callado se ve igual que no existir**. Suena también en el
+  fast-forward a `main`, que no dispara el flujo, y eso es deliberado: distinguirlo pedía adivinar la
+  rama de destino, y una guarda que se equivoca **callando** es indistinguible de una que no corrió.
+
+  **Ninguno de los tres primeros dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así
+  que siguen siendo un adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y
   `eng/verify-docs.ps1`.
 
   **Dos cubren `Write`, `Edit` y `MultiEdit`; el del SPDX es sólo `Write`**, y ahí no es un descuido:

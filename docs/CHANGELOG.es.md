@@ -62,6 +62,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Un cuarto hook: armar el vigía de CI deja de ser una frase.** «Para mirar CI se usa
+  `eng/watch-ci.ps1`, nunca un bucle a mano» estaba escrito en `CLAUDE.md` desde hacía tandas, y el
+  2026-08-30 el propietario tuvo que pedirlo igualmente. `post-push.sh` corre en `PostToolUse` sobre
+  `Bash|PowerShell` y, tras cualquier `git push`, escribe por stderr y sale con código 2 el comando
+  del monitor **con el SHA ya resuelto**, listo para copiar.
+
+  **Y la queja era correcta aunque el monitor estuviera vivo**, que es lo que hacía falta medir antes
+  de responder: `TaskOutput` lo daba como `running` con **0 KB de salida**, porque el guion late cada
+  30 minutos y el push llevaba menos. **Corriendo y callado se ve exactamente igual que no existir** —
+  la misma trampa que este repositorio persigue en sus puertas, esta vez vista desde fuera. Medido por
+  tubería con tres casos, uno que debe sonar y dos que deben callar, y luego disparado de verdad.
+
 - **La capa `Domain` llega al listón de cobertura, y dos archivos no pueden: su techo está medido.**
   Los nueve que estaban por debajo de 96/96 tenían entre todos **15 ramas y 4 líneas** sin cubrir. Se
   cierran 12 ramas y las 4 líneas, y siete archivos alcanzan el listón —`RenameOperation`,

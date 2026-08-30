@@ -61,6 +61,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A fourth hook: arming the CI watcher stops being a sentence.** "CI is watched with
+  `eng/watch-ci.ps1`, never a hand-written loop" had been in `CLAUDE.md` for batches, and on
+  2026-08-30 the owner had to ask for it anyway. `post-push.sh` runs on `PostToolUse` over
+  `Bash|PowerShell` and, after any `git push`, writes the monitor command to stderr and exits 2 —
+  **with the SHA already resolved**, ready to copy.
+
+  **And the complaint was right even though the monitor was alive**, which is what had to be measured
+  before answering: `TaskOutput` reported it `running` with **0 KB of output**, because the script
+  beats every 30 minutes and the push was younger than that. **Running and silent looks exactly like
+  not existing** — the same trap this repository hunts in its own gates, seen from outside this time.
+  Measured by pipe with three cases, one that must sound and two that must stay quiet, then fired for
+  real.
+
 - **The `Domain` layer reaches the coverage bar, and two files cannot: their ceiling is measured.**
   The nine that sat below 96/96 held **15 branches and 4 lines** between them. Twelve branches and all
   four lines close, and seven files reach the bar — `RenameOperation`, `RootRemapPolicy`,

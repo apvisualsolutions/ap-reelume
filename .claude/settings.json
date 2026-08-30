@@ -48,6 +48,18 @@
             "statusMessage": "Comprobando licencia y bilinguismo"
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/post-push.sh\"",
+            "shell": "bash",
+            "timeout": 10,
+            "statusMessage": "Comprobando si el push dejo CI sin vigia"
+          }
+        ]
       }
     ]
   }
