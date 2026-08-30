@@ -10,6 +10,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A library at the top of a disk moves again when it is told it has moved.** `RootRemapPolicy`
+  returned the decision as `Remapped` and then `Rewrite` rewrote nothing. `IsUnder` asked whether the
+  path starts with the root followed by `\`, and for `D:\` — which keeps its separator on purpose,
+  because `D:` on Windows names that drive's current directory rather than its root — that is `D:\\`,
+  which no real path begins with. The restore ended by reporting success with every file still
+  pointing at the disk the person had just said they no longer use, **and nothing announced it**. The
+  same seam from the other side doubled the separator when the destination was a root: `F:\` followed
+  by `\shows\episode.mkv` gave `F:\\shows\episode.mkv`. Both sides now join on exactly one separator,
+  and both arrive with their test: the measured red read `D:\shows\episode.mkv` where it had to read
+  `F:\library\shows\episode.mkv`.
+
 - **Three fields written on every read and read by nothing** — the house defect, this time in the
   data. `Language` on `MetadataSearchResult` and `MetadataDetails` did not hold the language the
   answer came back in but **the one that was asked for**: TMDB serves a title in whatever it has when

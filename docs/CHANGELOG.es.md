@@ -10,6 +10,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una biblioteca en la raíz de un disco vuelve a moverse cuando se le dice que se ha movido.**
+  `RootRemapPolicy` devolvía la decisión como `Remapped` y después `Rewrite` no reescribía ni una
+  ruta. `IsUnder` preguntaba si la ruta empieza por la raíz seguida de `\`, y para `D:\` —que
+  conserva su separador a propósito, porque `D:` en Windows nombra el directorio actual de esa unidad
+  y no su raíz— eso es `D:\\`, con lo que no empieza ninguna ruta real. La restauración terminaba
+  diciendo que había ido bien con cada archivo apuntando al disco que la persona acababa de decir que
+  ya no usa, **y nada lo anunciaba**. La misma costura por el otro lado duplicaba el separador cuando
+  el destino era una raíz: `F:\` seguido de `\shows\episodio.mkv` daba `F:\\shows\episodio.mkv`. Las
+  dos caras se unen ahora por un separador exacto, y las dos llegan con su prueba: el rojo medido
+  decía `D:\shows\episode.mkv` donde tenía que decir `F:\library\shows\episode.mkv`.
+
 - **Tres campos que se rellenaban en cada lectura y que no leía nadie** — el defecto de la casa, esta
   vez en los datos. El `Language` de `MetadataSearchResult` y `MetadataDetails` no guardaba el idioma
   en el que vino la respuesta sino **el que se pidió**: TMDB sirve el título con lo que tenga cuando
