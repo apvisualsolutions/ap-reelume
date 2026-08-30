@@ -10,6 +10,32 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La lista de deuda sube por primera vez, de 186 a 193, y el motivo es que siete archivos NACEN
+  por debajo del listón.** La regla de que sólo encoge se escribió contra la degradación —un archivo
+  que estaba arriba y empeora— y un archivo nuevo no es eso: no hay nada que recuperar. La propia
+  puerta lo permite en su mensaje de error, y hasta hoy nadie lo había ejercido, porque las 48 vistas
+  del árbol entraron el día que la lista se creó. Lo que la regla sigue impidiendo queda intacto: un
+  archivo de la lista que empeore falla igual. Las dos frases del guion que decían «la lista sólo
+  encoge» se corrigen en el mismo cambio.
+
+  **Dos de los siete tienen techo medido, y por eso entran en vez de perseguirse.** El primero
+  explica un número que llevaba meses en el árbol: los tres `.axaml` miden `100/50`, y ese par **no
+  es deuda suya sino lo que mide toda vista**. Sobre las 48 del árbol, **todas tienen exactamente una
+  línea con ramas —la del elemento raíz— y siempre a `1/2`**; `App.axaml` está a `0/2`. Es la rama
+  que el compilador de Avalonia genera al convertir el `.axaml`, y **ninguna prueba la ha tomado
+  jamás**. De ahí que **63 de los 69 archivos del árbol con ese par exacto sean vistas**.
+
+  El segundo es la cuarta rama inalcanzable que `Domain` encuentra de la misma forma:
+  `CourseThreadPolicy` se queda en 100/93 por el **caché de delegado** de un `TakeWhile` cuya lambda
+  captura una variable, así que la clausura se reconstruye en cada llamada y el campo nace nulo. **Se
+  midió haciendo**: reescrito con un bucle, la rama desaparece del informe — y el cambio se revirtió,
+  porque el bucle aporta ocho ramas propias y deja el archivo en 94, peor negocio que el techo.
+
+  **Y la corrección de fondo queda nombrada y no hecha**: si la puerta ignorase la cobertura de
+  **ramas** de un `.axaml` —no el archivo, cuyas líneas sí miden algo— saldrían 63 archivos de la
+  lista y el trinquete caería a unos 123. Cambiar la puerta central para que deje de mirar algo es lo
+  que aquí se llama aflojar una puerta: merece su tanda, no ir de rondón en una que desbloquea `main`.
+
 - **Ocho constructores aceptaban un null y fallaban más tarde; ahora lo rechazan donde se causa.**
   Los ocho declaraban sus dependencias como constructor primario, que no tiene dónde poner la guarda
   sin declarar un campo, así que se tragaban el null y reventaban en el primer uso del campo

@@ -106,6 +106,35 @@
 ## dependencia real en IntegrationTests, y el Cobertura fusionado se queda con el MEJOR informe de
 ## una linea en vez de la union, asi que el par lee 1/2 para siempre. Es lo mismo que le paso a
 ## ReviewInboxViewModel. La correccion fue cubrir los dos lados en UNA sola suite.
+##
+## 2026-08-30: LA LISTA SUBE POR PRIMERA VEZ, de 186 a 193, y el motivo importa mas que el numero.
+## Los siete que entran son ARCHIVOS NUEVOS -- la tanda de Cursos -- y no siete degradaciones. La
+## regla de que la lista solo encoge se escribio contra lo segundo: un archivo que estaba en el
+## liston y empeora. Un archivo que nace por debajo es otra cosa, y la propia puerta lo dice en su
+## mensaje de error: "Bring it back to the bar, or add it to eng/coverage-debt.txt with the reason
+## and raise the ratchet in the same change".
+##
+## Dos de los siete tienen TECHO MEDIDO, y por eso entran en vez de perseguirse:
+##
+## - Los tres .axaml miden 100/50 y ese par NO es deuda: es la unica rama que el compilador de
+##   Avalonia genera para un .axaml, en la linea del elemento raiz. Medido sobre las 48 vistas del
+##   arbol: TODAS tienen exactamente una rama, siempre a 1/2, y App.axaml esta a 0/2. Ninguna
+##   prueba la ha tomado jamas. Explica ademas por que 63 de los 69 archivos del arbol con ese par
+##   exacto son vistas.
+## - CourseThreadPolicy.cs esta a 100/93 por el cache de delegado de un TakeWhile cuya lambda
+##   captura una variable local: la clausura se reconstruye en cada llamada, el campo nace nulo y
+##   el `dup; brtrue.s` no salta nunca. Es la cuarta rama inalcanzable de este tipo que Domain
+##   encuentra, tras las tres del 2026-08-30. MEDIDO quitando la lambda: la rama desaparece del
+##   informe. El cambio se revirtio porque el bucle que la sustituye anade ocho ramas propias y
+##   deja el archivo en 94, peor negocio que el techo.
+##
+## Los otros cuatro SI son deuda perseguible y quedan nombrados aqui: CourseLessonReader 100/88,
+## CoursesViewModel 96/58, CourseDetailsViewModel 93/58. Sus ViewModels no tienen pruebas unitarias
+## propias -- los cubre el paseo autonomo a traves del shell ensamblado.
+##
+## Y la correccion de fondo queda nombrada, no hecha: si la puerta ignorase la cobertura de RAMAS
+## de un .axaml -- no el archivo, cuyas lineas si miden algo -- saldrian 63 archivos de esta lista
+## y el trinquete caeria de 193 a unos 123. Es una tanda propia, con su evidencia y su vuelta.
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  94
 src/ApSolutions.LocalMedia.Application/Backup/PreviewRestore.cs                               98  94
@@ -138,6 +167,7 @@ src/ApSolutions.LocalMedia.Application/Playback/PlaybackSessionCoordinator.cs   
 src/ApSolutions.LocalMedia.Application/Playback/SelectTrack.cs                                96  85
 src/ApSolutions.LocalMedia.Application/Privacy/CreateDiagnostics.cs                          100  91
 src/ApSolutions.LocalMedia.Domain/Continuity/SegmentDetectionPolicy.cs                       100  92
+src/ApSolutions.LocalMedia.Domain/Courses/CourseThreadPolicy.cs                              100  93
 src/ApSolutions.LocalMedia.Domain/Identification/MatchModels.cs                              100  90
 src/ApSolutions.LocalMedia.Infrastructure/Backup/BackupValidator.cs                           96  90
 src/ApSolutions.LocalMedia.Infrastructure/Backup/RotatingBackupStore.cs                      100  91
@@ -147,6 +177,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Backup/ZipExportService.cs            
 src/ApSolutions.LocalMedia.Infrastructure/Data/IntegrityChecker.cs                            94  87
 src/ApSolutions.LocalMedia.Infrastructure/Data/MigrationRunner.cs                             96  75
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  90
+src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CourseLessonReader.cs            100  88
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs                 100  92
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       99  76
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  89
@@ -191,6 +222,11 @@ src/ApSolutions.LocalMedia.Presentation/Catalog/PersonalActionsViewModel.cs     
 src/ApSolutions.LocalMedia.Presentation/Catalog/TitleActionsView.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Catalog/WatchStatusControl.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Catalog/WatchStatusViewModel.cs                      100  70
+src/ApSolutions.LocalMedia.Presentation/Courses/CourseDetailsView.axaml                      100  50
+src/ApSolutions.LocalMedia.Presentation/Courses/CourseDetailsViewModel.cs                     93  58
+src/ApSolutions.LocalMedia.Presentation/Courses/CoursesView.axaml                            100  50
+src/ApSolutions.LocalMedia.Presentation/Courses/CoursesViewModel.cs                           96  58
+src/ApSolutions.LocalMedia.Presentation/Courses/LessonRowView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Home/ContinueCardView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Home/HomeView.axaml                                  100  50
 src/ApSolutions.LocalMedia.Presentation/Home/HomeViewModel.cs                                100  87

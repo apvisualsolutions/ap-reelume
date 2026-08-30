@@ -10,6 +10,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The debt list rises for the first time, 186 to 193, because seven files are BORN below the bar.**
+  The rule that it only shrinks was written against degradation — a file that was up and got worse —
+  and a new file is not that: there is nothing to bring back. The gate's own error message allows it,
+  and nobody had used that path until today, because the tree's 48 views entered the day the list was
+  created. What the rule still forbids is untouched: a listed file that degrades fails as before. The
+  two sentences in the script saying "the list only shrinks" are corrected in the same change.
+
+  **Two of the seven have a measured ceiling, which is why they enter rather than being chased.** The
+  first explains a number that had been in the tree for months: the three `.axaml` measure `100/50`,
+  and that pair **is not their debt but what every view measures**. Across the tree's 48, **all have
+  exactly one line with branches — the root element's — and always at `1/2`**; `App.axaml` sits at
+  `0/2`. It is the branch Avalonia's compiler emits for an `.axaml`, and **no test has ever taken
+  it**. Hence **63 of the 69 files measuring exactly that pair are views**.
+
+  The second is the fourth unreachable branch `Domain` has found of the same shape:
+  `CourseThreadPolicy` stays at 100/93 because of the **delegate cache** of a `TakeWhile` whose
+  lambda captures a variable, so the closure is rebuilt on every call and the cached field is null
+  every time. **Measured by doing**: rewritten with a loop, the branch vanishes from the report — and
+  the change was reverted, because the loop brings eight branches of its own and leaves the file at
+  94, a worse deal than the ceiling.
+
+  **And the deep fix is named rather than taken**: if the gate ignored the **branch** coverage of an
+  `.axaml` — not the file, whose lines do measure something — 63 files would leave the list and the
+  ratchet would fall to about 123. Changing the central gate so it stops looking at something is what
+  this repository calls loosening a gate: it deserves its own batch, not a ride in one that exists to
+  unblock `main`.
+
 - **Eight constructors accepted a null and failed later; they now refuse it where it is caused.** All
   eight declared their dependencies as a primary constructor, which has nowhere to put a guard
   without declaring a field, so they took the null and broke at first use of the captured parameter:
