@@ -7,100 +7,10 @@ Este archivo es para un agente que llega al repositorio sin contexto. Está en e
 proyecto se piensa en español y se publica en dos idiomas; el código, los commits y los nombres de
 prueba van en inglés.
 
-## Lo que el repositorio automatiza por ti
-
-`.claude/` y `.mcp.json` están versionados, así que esto llega con el clon:
-
-- **`.mcp.json`** declara el MCP de Avalonia. La regla 0 de abajo lo exige, y por eso viene en el
-  árbol en vez de en la máquina de cada uno.
-- **`disableClaudeAiConnectors`** apaga aquí los conectores de nube de claude.ai, y no es higiene:
-  medidos el 2026-08-29, pesaban **298,8k fichas de contexto —el 30 % de la ventana—, y 212,9k eran
-  de uno solo**: 102 herramientas de anuncios que este repositorio no usa. La clave la gana cualquier
-  fuente que la ponga en `true`, así que **el proyecto puede salirse sin tocar la configuración
-  personal de nadie**. `avalonia-docs` no se ve afectado: viene de `.mcp.json`, que es local. **El
-  efecto es de arranque**, así que se comprueba con `/context` en la sesión siguiente y no en la que
-  lo escribe.
-- **`deniedMcpServers`** deniega aquí `gbrain` y `MCP_DOCKER`, los dos servidores locales que fallaban
-  al conectar en cada arranque —`REQUEST_TIMEOUT` y `CONNECTION_CLOSED`, leídos de `claude mcp list`—.
-  Se deniegan **en el proyecto y no se borran de la máquina**, porque son de quien programa y se usan
-  fuera de aquí. A diferencia de la clave de arriba, **ésta sí se midió en el acto**: `claude mcp
-  list` enseñaba tres servidores antes y enseña sólo `avalonia-docs` después.
-- **Cuatro hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
-  `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y un `.cs` o `.axaml` de `src/` o `tests/`
-  **cuyo contenido no lleve la cabecera SPDX**. **Los dos primeros se rechazan por motivos
-  distintos, y confundirlos costó una corrección el 2026-08-29**: `coverage-debt.txt` **lo produce
-  CI** y se copia de su artefacto, mientras que `walk-pending.txt` **no lo produce nadie más que
-  este árbol** —`ci.yml` no lo emite— y es un trinquete que sólo puede encoger. Decirle a alguien
-  que espere un artefacto de CI para un archivo que CI nunca publica es peor que no decirle nada. El tercero **avisa después** si se
-  toca un `.es.md` y su pareja `.en.md` se queda como está en `HEAD` — pregunta a git y no al reloj,
-  porque comparar `mtime` hacía que sonara también con los dos idiomas al día.
-
-  **Rechazar y avisar no son lo mismo, y la diferencia se midió el 2026-08-29**: un `deny` llega al
-  agente como error de la herramienta, mientras que un `systemMessage` **no entra en el contexto de
-  quien está escribiendo el archivo**. Por eso la comprobación del SPDX pasó a `PreToolUse`, donde
-  `tool_input.content` ya existe y se puede leer antes de escribir nada.
-
-  **Y avisar era emitir para nadie, hasta que se cambió el canal.** El mismo día se midió lo que
-  faltaba: un `systemMessage` **no llega a la pantalla de quien programa** —dos avisos provocados a
-  propósito, uno por `Write` y otro por `Edit`, con el propietario delante y dentro de la sesión,
-  pasaron sin que viera nada— y tampoco entra en el contexto del agente. Corrían, acertaban, y su
-  salida moría en el `.jsonl`: registrado y nunca alimentado, el defecto de la casa en sus propias
-  herramientas.
-
-  **Los dos avisos del `PostToolUse` escriben ahora a stderr y salen con código 2**, que sí llega al
-  agente que está escribiendo el archivo. Medido con la sonda al lado del caso conocido —el
-  `systemMessage` dejó su rastro y no llegó; el stderr llegó— y luego por tubería con **siete casos,
-  cuatro de ellos de los que debe dejar pasar**. El registro los anota como `hook_blocking_error`.
-
-  **Su precio se midió y se bajó, y por eso el comando vive en un archivo.** El harness imprime el
-  comando entero **dos veces** delante del texto útil, así que en línea costaba **2.712 caracteres**
-  de contexto por aviso. Ahora está en `.claude/hooks/post-write.sh` y el `settings.json` sólo lo
-  llama: **488 caracteres**, un 82 % menos, leído del registro y no calculado — la cuenta a mano daba
-  528. Los otros dos hooks siguen en línea porque son cortos y **deniegan**, así que su texto nunca
-  se imprime dos veces.
-
-  Y como el aviso llega etiquetado de «error» después de una escritura que sí funcionó, los tres
-  mensajes **empiezan diciendo que la escritura no falló**: sin eso se lee como un fallo y se
-  reintenta la misma escritura.
-
-  **El cuarto vigila el ciclo, no un archivo.** `post-push.sh` corre en `PostToolUse` sobre
-  `Bash|PowerShell` y, tras cualquier `git push`, escribe por stderr y sale con 2 el comando del
-  monitor **con el SHA ya resuelto**. Existe porque «para mirar CI se usa `eng/watch-ci.ps1`» era una
-  frase, y **una frase no dispara**: el 2026-08-30 el propietario tuvo que pedirlo. Y tenía razón
-  aunque el monitor estuviera armado — `TaskOutput` decía `running` con **0 KB**, porque el guion late
-  cada 30 minutos: **corriendo y callado se ve igual que no existir**. Suena también en el
-  fast-forward a `main`, que no dispara el flujo, y eso es deliberado: distinguirlo pedía adivinar la
-  rama de destino, y una guarda que se equivoca **callando** es indistinguible de una que no corrió.
-
-  **Y sonó en su propio commit, que es el defecto que enseñó a escribirlo bien**: buscaba la cadena
-  suelta, y el mensaje del commit —escrito con un heredoc— hablaba de «after any git push». Ahora
-  **tira los heredocs primero** y exige que `git push` esté en **posición de comando** —inicio de
-  línea, o tras `;`, `&`, `|`, `(` o `&&`—. Diez casos por tubería: cuatro que suenan, seis que callan,
-  incluidos ese heredoc y `git pushd`. Un aviso que suena cuando no toca enseña a ignorarlo, que es
-  peor que no avisar.
-
-  **Ninguno de los tres primeros dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así
-  que siguen siendo un adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y
-  `eng/verify-docs.ps1`.
-
-  **Dos cubren `Write`, `Edit` y `MultiEdit`; el del SPDX es sólo `Write`**, y ahí no es un descuido:
-  lee `tool_input.content`, que un `Edit` no trae entero. En el del bilingüismo sí lo era, y se
-  corrigió el 2026-08-29 midiendo el mismo `Edit` antes y después: no lee contenido —sólo pregunta a
-  git— y aun así se perdía **toda** edición, que es justo la herramienta con la que se toca un
-  `.es.md` que ya existe, porque `Write` reescribe el archivo entero. La guarda cubría el camino
-  menos transitado. `MultiEdit` queda declarado en el matcher pero **sin medir**.
-
-  **Y un hook que calla no deja rastro en el registro de la sesión**: sólo se anota cuando produce
-  salida. Un silencio observado en la aplicación no prueba que la guarda corriera —puede que ni
-  siquiera la enrutaran—, así que el caso que **debe** callar se mide ejecutando el comando literal
-  del `settings.json` por tubería, con un caso que sí debe sonar al lado.
-- **`/cerrar-tanda`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso.
-- **`/medir-pixeles`** trae el arnés de rasterización con sus cinco trampas medidas.
-- **`gate-auditor`** busca puertas que pasan sin medir nada; **`prototype-fidelity`** compara la
-  aplicación con `design/`.
-
-Si los hooks no disparan, es que la sesión arrancó sin `.claude/settings.json`: se recarga abriendo
-`/hooks` una vez.
+El orden es deliberado: **primero lo que hace falta para tocar el código**, y al final
+[lo que el repositorio automatiza por ti](#lo-que-el-repositorio-automatiza-por-ti) — hooks, MCP,
+skills y agentes—, que corre solo y se consulta cuando algo salta. Estuvo arriba hasta el 2026-08-30
+y eran noventa y cinco líneas de herramientas antes de la primera sobre la aplicación.
 
 ## Regla 0, inquebrantable: el MCP de Avalonia antes que nada
 
@@ -164,6 +74,17 @@ dotnet --version   # la versión que fija global.json
 Toda ejecución de pruebas sobre la solución lleva `-m:1 --settings eng/test.runsettings`. Sin eso,
 las suites que tocan SQLite y LibVLC compiten entre sí y producen rojos que no son del código.
 
+**Y para verla correr**, que es lo que este archivo no decía y `CONTRIBUTING.md` tampoco:
+
+```powershell
+dotnet run --project src/ApSolutions.LocalMedia.Windows -c Debug
+```
+
+Es `WinExe` sobre `net10.0-windows10.0.22621.0`: **abre una ventana y no vuelve**, así que no se
+lanza desde una sesión que no pueda cerrarla. Y arrancarla **no es medir**: para algo que alguien
+**ve** se rasteriza y se cuentan píxeles (regla 0), porque `Bounds` describe el modelo y el defecto
+puede vivir sólo en el píxel.
+
 ## El ciclo, en corto
 
 **Rojo archivado → corrección mínima → verde con las puertas → evidencia → changelog en dos idiomas
@@ -179,6 +100,17 @@ pwsh -NoProfile -File eng/verify-docs.ps1
 ```
 
 `eng/verify.ps1` las corre todas más el empaquetado y la puerta de cobertura.
+
+**Empaquetar y publicar** no es parte del ciclo por commit, y por eso se olvida que existe:
+
+```powershell
+pwsh -NoProfile -File eng/package-x64.ps1      # el MSIX y el ZIP independiente
+pwsh -NoProfile -File eng/verify-package.ps1   # su ciclo de vida, y que dos builds de un commit coincidan
+pwsh -NoProfile -File eng/prepare-release.ps1  # contesta si este árbol podría publicarse, y produce la release
+```
+
+`package-arm64.ps1` existe y **no se usa**: PRD-003 está BLOCKED por hardware. Tocar el manifiesto
+caduca dos mediciones del sandbox, así que después toca rehacer su ciclo.
 
 **Una sola prueba**, que es lo que se quiere mientras se persigue un rojo — segundos en vez de
 minutos:
@@ -229,7 +161,8 @@ porque el margen los cubre igual, pero un número que nadie vuelve a medir es el
 la decisión equivocada.
 
 **Y armar el vigía ya no depende de acordarse**: `.claude/hooks/post-push.sh` lo exige tras cada
-`git push` (ver arriba). El comando llega con el SHA ya resuelto.
+`git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA ya
+resuelto.
 
 **Los suelos de cobertura los mide CI, no esta máquina.** `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
@@ -364,3 +297,99 @@ de su propio registro. Si añades un registro, añade también quien lo consume,
 Servidor, cuentas, streaming, telemetría, sincronización en la nube. La
 [hoja de ruta](docs/roadmap/README.es.md) lo dice con nombres. Una propuesta en esa dirección se
 rechaza aunque esté bien implementada.
+
+## Lo que el repositorio automatiza por ti
+
+`.claude/` y `.mcp.json` están versionados, así que esto llega con el clon:
+
+- **`.mcp.json`** declara el MCP de Avalonia. La regla 0 de abajo lo exige, y por eso viene en el
+  árbol en vez de en la máquina de cada uno.
+- **`disableClaudeAiConnectors`** apaga aquí los conectores de nube de claude.ai, y no es higiene:
+  medidos el 2026-08-29, pesaban **298,8k fichas de contexto —el 30 % de la ventana—, y 212,9k eran
+  de uno solo**: 102 herramientas de anuncios que este repositorio no usa. La clave la gana cualquier
+  fuente que la ponga en `true`, así que **el proyecto puede salirse sin tocar la configuración
+  personal de nadie**. `avalonia-docs` no se ve afectado: viene de `.mcp.json`, que es local. **El
+  efecto es de arranque**, así que se comprueba con `/context` en la sesión siguiente y no en la que
+  lo escribe.
+- **`deniedMcpServers`** deniega aquí `gbrain` y `MCP_DOCKER`, los dos servidores locales que fallaban
+  al conectar en cada arranque —`REQUEST_TIMEOUT` y `CONNECTION_CLOSED`, leídos de `claude mcp list`—.
+  Se deniegan **en el proyecto y no se borran de la máquina**, porque son de quien programa y se usan
+  fuera de aquí. A diferencia de la clave de arriba, **ésta sí se midió en el acto**: `claude mcp
+  list` enseñaba tres servidores antes y enseña sólo `avalonia-docs` después.
+- **Cuatro hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
+  `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y un `.cs` o `.axaml` de `src/` o `tests/`
+  **cuyo contenido no lleve la cabecera SPDX**. **Los dos primeros se rechazan por motivos
+  distintos, y confundirlos costó una corrección el 2026-08-29**: `coverage-debt.txt` **lo produce
+  CI** y se copia de su artefacto, mientras que `walk-pending.txt` **no lo produce nadie más que
+  este árbol** —`ci.yml` no lo emite— y es un trinquete que sólo puede encoger. Decirle a alguien
+  que espere un artefacto de CI para un archivo que CI nunca publica es peor que no decirle nada. El tercero **avisa después** si se
+  toca un `.es.md` y su pareja `.en.md` se queda como está en `HEAD` — pregunta a git y no al reloj,
+  porque comparar `mtime` hacía que sonara también con los dos idiomas al día.
+
+  **Rechazar y avisar no son lo mismo, y la diferencia se midió el 2026-08-29**: un `deny` llega al
+  agente como error de la herramienta, mientras que un `systemMessage` **no entra en el contexto de
+  quien está escribiendo el archivo**. Por eso la comprobación del SPDX pasó a `PreToolUse`, donde
+  `tool_input.content` ya existe y se puede leer antes de escribir nada.
+
+  **Y avisar era emitir para nadie, hasta que se cambió el canal.** El mismo día se midió lo que
+  faltaba: un `systemMessage` **no llega a la pantalla de quien programa** —dos avisos provocados a
+  propósito, uno por `Write` y otro por `Edit`, con el propietario delante y dentro de la sesión,
+  pasaron sin que viera nada— y tampoco entra en el contexto del agente. Corrían, acertaban, y su
+  salida moría en el `.jsonl`: registrado y nunca alimentado, el defecto de la casa en sus propias
+  herramientas.
+
+  **Los dos avisos del `PostToolUse` escriben ahora a stderr y salen con código 2**, que sí llega al
+  agente que está escribiendo el archivo. Medido con la sonda al lado del caso conocido —el
+  `systemMessage` dejó su rastro y no llegó; el stderr llegó— y luego por tubería con **siete casos,
+  cuatro de ellos de los que debe dejar pasar**. El registro los anota como `hook_blocking_error`.
+
+  **Su precio se midió y se bajó, y por eso el comando vive en un archivo.** El harness imprime el
+  comando entero **dos veces** delante del texto útil, así que en línea costaba **2.712 caracteres**
+  de contexto por aviso. Ahora está en `.claude/hooks/post-write.sh` y el `settings.json` sólo lo
+  llama: **488 caracteres**, un 82 % menos, leído del registro y no calculado — la cuenta a mano daba
+  528. Los otros dos hooks siguen en línea porque son cortos y **deniegan**, así que su texto nunca
+  se imprime dos veces.
+
+  Y como el aviso llega etiquetado de «error» después de una escritura que sí funcionó, los tres
+  mensajes **empiezan diciendo que la escritura no falló**: sin eso se lee como un fallo y se
+  reintenta la misma escritura.
+
+  **El cuarto vigila el ciclo, no un archivo.** `post-push.sh` corre en `PostToolUse` sobre
+  `Bash|PowerShell` y, tras cualquier `git push`, escribe por stderr y sale con 2 el comando del
+  monitor **con el SHA ya resuelto**. Existe porque «para mirar CI se usa `eng/watch-ci.ps1`» era una
+  frase, y **una frase no dispara**: el 2026-08-30 el propietario tuvo que pedirlo. Y tenía razón
+  aunque el monitor estuviera armado — `TaskOutput` decía `running` con **0 KB**, porque el guion late
+  cada 30 minutos: **corriendo y callado se ve igual que no existir**. Suena también en el
+  fast-forward a `main`, que no dispara el flujo, y eso es deliberado: distinguirlo pedía adivinar la
+  rama de destino, y una guarda que se equivoca **callando** es indistinguible de una que no corrió.
+
+  **Y sonó en su propio commit, que es el defecto que enseñó a escribirlo bien**: buscaba la cadena
+  suelta, y el mensaje del commit —escrito con un heredoc— hablaba de «after any git push». Ahora
+  **tira los heredocs primero** y exige que `git push` esté en **posición de comando** —inicio de
+  línea, o tras `;`, `&`, `|`, `(` o `&&`—. Diez casos por tubería: cuatro que suenan, seis que callan,
+  incluidos ese heredoc y `git pushd`. Un aviso que suena cuando no toca enseña a ignorarlo, que es
+  peor que no avisar.
+
+  **Ninguno de los tres primeros dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así
+  que siguen siendo un adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y
+  `eng/verify-docs.ps1`.
+
+  **Dos cubren `Write`, `Edit` y `MultiEdit`; el del SPDX es sólo `Write`**, y ahí no es un descuido:
+  lee `tool_input.content`, que un `Edit` no trae entero. En el del bilingüismo sí lo era, y se
+  corrigió el 2026-08-29 midiendo el mismo `Edit` antes y después: no lee contenido —sólo pregunta a
+  git— y aun así se perdía **toda** edición, que es justo la herramienta con la que se toca un
+  `.es.md` que ya existe, porque `Write` reescribe el archivo entero. La guarda cubría el camino
+  menos transitado. `MultiEdit` queda declarado en el matcher pero **sin medir**.
+
+  **Y un hook que calla no deja rastro en el registro de la sesión**: sólo se anota cuando produce
+  salida. Un silencio observado en la aplicación no prueba que la guarda corriera —puede que ni
+  siquiera la enrutaran—, así que el caso que **debe** callar se mide ejecutando el comando literal
+  del `settings.json` por tubería, con un caso que sí debe sonar al lado.
+- **`/cerrar-tanda`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso.
+- **`/medir-pixeles`** trae el arnés de rasterización con sus cinco trampas medidas.
+- **`gate-auditor`** busca puertas que pasan sin medir nada; **`prototype-fidelity`** compara la
+  aplicación con `design/`.
+
+Si los hooks no disparan, es que la sesión arrancó sin `.claude/settings.json`: se recarga abriendo
+`/hooks` una vez.
+
