@@ -142,6 +142,12 @@
 ## simplificando: el hilo ES la primera leccion no vista, luego todo lo anterior esta visto por
 ## definicion y localizarlo sobraba. Sin lambda que capture no hay cache de delegado. 100/100 con
 ## las 638 pruebas de Domain intactas y sin anadir ninguna.
+##
+## Y CourseLessonReader sale detras, 192 -> 191. Le faltaban dos ramas en una sola linea: de sus
+## seis ternarios IsDBNull, los dos del modulo -- numero y nombre -- no se tomaban nunca por el
+## lado nulo. El caso que falta es el CURSO PLANO, sin secciones, y no es un rincon: de los doce
+## cursos reales medidos el 2026-08-30, CINCO son planos. El JSON de coverlet nombro las dos ramas
+## por offset y la prueba las cierra; 36/36 medido.
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  94
 src/ApSolutions.LocalMedia.Application/Backup/PreviewRestore.cs                               98  94
@@ -183,7 +189,6 @@ src/ApSolutions.LocalMedia.Infrastructure/Backup/ZipExportService.cs            
 src/ApSolutions.LocalMedia.Infrastructure/Data/IntegrityChecker.cs                            94  87
 src/ApSolutions.LocalMedia.Infrastructure/Data/MigrationRunner.cs                             96  75
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  90
-src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CourseLessonReader.cs            100  88
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs                 100  92
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       99  76
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  89
