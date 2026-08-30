@@ -1,5 +1,77 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-30 (duodécima sesión) — la guarda que hundió tres archivos
+
+**Tres commits míos —`5aa8300`, `7729001` y el que escribe esta nota— y ocho de OTRA SESIÓN que
+trabajaba en el mismo árbol al mismo tiempo**, y que implementó el ADR de cursos entero. Las dos
+cosas conviven en esta rama y conviene saberlo al leer el historial: los commits no van en el orden
+de un solo hilo. La entrada de changelog de esta tanda viajó dentro de `ef84eca`, que es de la otra
+sesión, porque su `git add` la alcanzó antes de que ésta la comprometiera.
+
+`main` se queda en `f10e53e` —el cierre verde de la undécima— hasta leer el run de esta rama. Lo
+primero de la decimotercera es ese run.
+
+### Los ocho constructores primarios, y las dos listas que se vacían solas
+
+Los ocho que el barrido de guardas dejó fuera de la regla pasan a constructor explícito con su
+guarda: `ExecuteRename`, `PreviewRename`, `UndoRename`, `UpdateMetadata` e `IntegrityChecker` con un
+parámetro, y `RefreshMetadata`, `ApplyIdentification` y `RefreshStaleMetadata` con cinco o seis.
+**Veintidós parámetros**, y el barrido los cuenta: `Application` de 127 a **148** y `Infrastructure`
+de 64 a **65**, 325 en total. La suma cuadra con los veintidós, que es lo que dice que no se añadió
+una guarda que nadie toma ni se perdió una que ya estaba.
+
+**Las dos listas cerradas no se borran: se vacían solas.** Antes de tocar una línea de las pruebas,
+la segunda prueba de cada suite falló nombrando los ocho y pidiendo sacarlos. Eso es lo que separa
+una lista de deuda de una de exenciones — **una exención calla cuando deja de hacer falta y una deuda
+protesta**.
+
+### Y lo que costó de verdad: tres archivos que CAYERON
+
+La primera vuelta no dijo lo esperado. `PreviewRename` pasó de 100/100 a **100/50**, `UndoRename` a
+100/75 y `ExecuteRename` a 100/83, los tres bajo el listón y **en ninguna lista**.
+
+**La primera explicación fue falsa y por eso queda escrita**: «no tienen pruebas». Sí las tienen.
+Así que se reprodujo la fusión de CI aquí —artefacto `test-results` del run, sus veinte informes
+fusionados con el mismo `reportgenerator`— y la línea del constructor lee `1/2` en **todos** los
+informes y `1/2` fusionada.
+
+Son **dos causas encadenadas, ninguna del código**:
+
+1. **Un archivo sin ninguna rama mide 100 % por definición** —la puerta hace
+   `if BranchesTotal > 0 ... else 100`—, así que su primer par de ramas es también su primera ocasión
+   de quedar a medias: con dos ramas, una sin cubrir es el 50 %. Es el **espejo** de «borrar código
+   cubierto baja un archivo».
+2. **Los dos lados del par se toman en suites distintas** —el barrido pasa el null en
+   `Application.Tests`, `RenameTransactionTests` pasa la dependencia real en `IntegrationTests`— y el
+   Cobertura fusionado **se queda con el mejor informe de una línea, no con la unión**.
+   `ReviewInboxViewModel` chocó con esa misma pared el 2026-08-28.
+
+**La corrección no es otra aserción, es la misma en un solo sitio**: `RenameUseCaseTests` hace que
+`Application.Tests` a la vez rechace el null y construya los tres con algo real. La línea pasa de
+`1/2` a `2/2`, y la segunda vuelta lo confirmó: **186 en la lista y 186 medidos bajo el listón, que
+cuadran**.
+
+**Y el riesgo restante se acotó sin gastar otra vuelta, porque la causa lo predice**: de los ocho
+promovidos sólo caen los que no tienen prueba en la misma suite que el barrido.
+`ApplyIdentification` y `RefreshStaleMetadata` la tienen y no cayeron; los tres `*Rename` no la
+tenían. La teoría cuadra con los seis casos.
+
+### La lista no se mueve y tres suelos suben
+
+`RefreshMetadata` 97/91 → **97/95**, `UpdateMetadata` 81/87 → **81/88**, `IntegrityChecker`
+94/83 → **94/87**. El trinquete se queda en **186**: un suelo que sube no saca a nadie de la lista.
+
+### Por dónde entra la decimotercera
+
+1. **Leer el run de esta rama y avanzar `main` sólo con él en verde.**
+2. **Lo que queda de los 186.** La forma repetida ya no es la guarda de null: 105 de los 186 son de
+   `Presentation` y la mayoría son `.axaml`, que miden 100/50 por su propia forma y no por una guarda
+   sin probar. **Antes de elegir trabajo hay que volver a medir dónde se concentra**, porque el
+   patrón que sirvió para la undécima ya está agotado.
+3. **Cuidado con el efecto medido aquí**: añadir una guarda a un archivo pequeño puede hundirlo si su
+   par de ramas queda repartido entre dos suites. Se comprueba antes preguntando si la suite que pasa
+   el null es también la que construye el tipo con algo real.
+
 ## Estado al cierre del 2026-08-30 (undécima sesión) — noventa archivos, una sola guarda
 
 **Tres commits, de `56bbc19` a `291bbc2`**, y esta nota encima. **`main` se queda en `8296679`**,

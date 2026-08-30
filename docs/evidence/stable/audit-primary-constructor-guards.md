@@ -86,6 +86,71 @@ suelos. Tres de los ocho estaban en la lista de deuda —`RefreshMetadata` 97/91
 de más no los baja. / Another **two CI runs**: twenty-two new guards are twenty-two new branches, all
 covered, so the files rise and the gate asks for their floors to move.
 
+## Lo que costó de verdad: tres archivos que CAYERON / What it actually cost: three files that FELL
+
+La primera vuelta de CI no dijo lo que se esperaba. Tres archivos subieron —`RefreshMetadata`,
+`UpdateMetadata`, `IntegrityChecker`— y otros tres **cayeron por debajo del listón y quedaron en
+ninguna lista**, que es el fallo que la puerta nombra desde el 2026-08-28:
+
+| archivo | antes | después de promover |
+|---|---|---|
+| `PreviewRename.cs` | 100/100 | **100/50** |
+| `UndoRename.cs` | 100/100 | **100/75** |
+| `ExecuteRename.cs` | 100/100 | **100/83** |
+
+**La primera explicación era falsa y merece quedar escrita**: «no tienen pruebas». Sí las tienen —
+`RenameTransactionTests` construye los tres con dependencias reales—. Así que en lugar de seguir
+adivinando se **reprodujo la fusión de CI aquí**: se descargó el artefacto `test-results` del run y
+se fusionaron sus 20 informes con el mismo `reportgenerator` que usa la puerta. La línea del
+constructor lee `1/2` en **todos** los informes y `1/2` fusionada. / The first explanation was false:
+"they have no tests". They do. So the merge was reproduced here instead of guessed at, and the
+constructor line reads `1/2` in every report and `1/2` merged.
+
+**Son dos causas encadenadas, y ninguna es del código:**
+
+1. **Un archivo sin ninguna rama mide 100 % por definición.** La puerta calcula
+   `if BranchesTotal > 0 ... else 100`, así que estos tres, que no tenían rama en el constructor,
+   medían 100 de ramas sin que nadie hubiera cubierto nada. Su primer par de ramas es también su
+   primera ocasión de quedar a medias: con dos ramas totales, una sin cubrir es el 50 %. **Es el
+   espejo exacto de «borrar código cubierto baja un archivo»**, que la puerta ya tenía anotado.
+2. **Los dos lados del par se toman en suites distintas.** El barrido pasa el null en
+   `Application.Tests` y `RenameTransactionTests` pasa la dependencia real en `IntegrationTests`. El
+   Cobertura fusionado **se queda con el mejor informe de una línea, no con la unión de ellos**, así
+   que el par lee medio cubierto para siempre. `ReviewInboxViewModel` chocó con esta misma pared el
+   2026-08-28 y su comentario de suelo lo dice.
+
+/ Two chained causes, neither in the code: a file with **no** branches measures 100 % by definition,
+so its first branch pair is also its first chance to be half covered; and the two sides of that pair
+are taken in **different suites**, where merged Cobertura keeps the better report for a line rather
+than their union.
+
+**La corrección no es otra aserción, es la misma en un solo sitio.** `RenameUseCaseTests` hace que
+`Application.Tests` a la vez rechace el null —por el barrido— y construya los tres con algo real.
+Medido sobre esa suite sola, la línea del constructor pasa de `1/2` a **`2/2`** en los tres, y las
+mitades que quedaban en las líneas 22 y 27 ya estaban enteras en la fusión. La segunda vuelta lo
+confirmó: **186 en la lista y 186 medidos bajo el listón, que cuadran**, y ningún archivo fuera de
+lista. / The fix is the same assertion in one place, and the second run confirmed it: 186 listed and
+186 measured under the bar, with nothing off-list.
+
+**Y el riesgo restante quedó acotado sin gastar otra vuelta**, porque la causa lo predice: de los
+ocho promovidos sólo caen los que **no tienen prueba en la misma suite que el barrido**.
+`ApplyIdentification` y `RefreshStaleMetadata` la tienen y siguieron en el listón; los tres
+`*Rename` no la tenían y cayeron. La teoría cuadra con los seis casos.
+
+## El resultado en la lista / The result on the list
+
+La lista **no se mueve** —186 antes y 186 después— y **tres suelos suben**, porque los tres archivos
+ganan ramas y ninguno llega todavía al listón:
+
+| archivo | suelo |
+|---|---|
+| `RefreshMetadata.cs` | 97/91 → **97/95** |
+| `UpdateMetadata.cs` | 81/87 → **81/88** |
+| `IntegrityChecker.cs` | 94/83 → **94/87** |
+
+El trinquete se queda en **186**: un suelo que sube no saca a nadie de la lista. / The list does not
+move and three floors rise; the ratchet stays at 186.
+
 ## Cómo se verificó / How it was verified
 
 `dotnet build -c Release -warnaserror` sin una advertencia y `dotnet format --verify-no-changes

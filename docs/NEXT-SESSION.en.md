@@ -1,5 +1,77 @@
 # Where to pick up
 
+## State at the close of 2026-08-30 (twelfth session) — the guard that sank three files
+
+**Three commits of mine — `5aa8300`, `7729001` and the one writing this note — and eight from
+ANOTHER SESSION working in the same tree at the same time**, which implemented the whole course
+ADR. Both live on this branch, and it is worth knowing when reading the history: the commits do not
+run in one thread's order. This batch's changelog entry travelled inside `ef84eca`, which belongs
+to the other session, because its `git add` reached the file first.
+
+`main` stays at `f10e53e` — the eleventh's green close — until this branch's run is read. That run
+is the thirteenth's first move.
+
+### The eight primary constructors, and the two lists that empty themselves
+
+The eight the guard sweep left outside the rule become explicit constructors with their guard:
+`ExecuteRename`, `PreviewRename`, `UndoRename`, `UpdateMetadata` and `IntegrityChecker` with one
+parameter, and `RefreshMetadata`, `ApplyIdentification` and `RefreshStaleMetadata` with five or six.
+**Twenty-two parameters**, and the sweep counts them: `Application` from 127 to **148** and
+`Infrastructure` from 64 to **65**, 325 in total. The sum matches the twenty-two, which is what says
+no guard nothing takes was added and none that already existed was lost.
+
+**The two closed lists are not deleted, they empty themselves.** Before a line of the tests was
+touched, the second test in each suite failed naming all eight and asking for them out. That is what
+separates a debt list from an exemption list — **an exemption goes quiet when it stops being needed,
+and a debt complains**.
+
+### And what it actually cost: three files that FELL
+
+The first run did not say what was expected. `PreviewRename` went from 100/100 to **100/50**,
+`UndoRename` to 100/75 and `ExecuteRename` to 100/83, all three under the bar and **on no list**.
+
+**The first explanation was false and is written down for that reason**: "they have no tests". They
+do. So the CI merge was reproduced here — the run's `test-results` artefact, its twenty reports
+merged with the same `reportgenerator` — and the constructor line reads `1/2` in **every** report and
+`1/2` merged.
+
+Two chained causes, **neither in the code**:
+
+1. **A file with no branches measures 100 % by definition** — the gate does
+   `if BranchesTotal > 0 ... else 100` — so its first branch pair is also its first chance to be half
+   covered: with two branches, one uncovered is 50 %. It is the **mirror** of "deleting covered code
+   lowers a file".
+2. **The two sides of the pair are taken in different suites** — the sweep hands the null in
+   `Application.Tests`, `RenameTransactionTests` hands the real dependency in `IntegrationTests` —
+   and merged Cobertura **keeps the better report for a line, not their union**.
+   `ReviewInboxViewModel` hit that same wall on 2026-08-28.
+
+**The fix is not another assertion, it is the same one in a single place**: `RenameUseCaseTests`
+makes `Application.Tests` both refuse the null and build all three with something real. The line goes
+from `1/2` to `2/2`, and the second run confirmed it: **186 listed and 186 measured under the bar,
+which agree**.
+
+**And the remaining risk was bounded without spending another run, because the cause predicts it**:
+of the eight promoted, only those with no test in the same suite as the sweep can fall.
+`ApplyIdentification` and `RefreshStaleMetadata` have one and did not fall; the three `*Rename` did
+not. The theory matches all six cases.
+
+### The list does not move and three floors rise
+
+`RefreshMetadata` 97/91 → **97/95**, `UpdateMetadata` 81/87 → **81/88**, `IntegrityChecker`
+94/83 → **94/87**. The ratchet stays at **186**: a floor that rises takes nobody off the list.
+
+### Where the thirteenth session starts
+
+1. **Read this branch's run and advance `main` only on its green.**
+2. **Whatever is left of the 186.** The repeated shape is no longer the null guard: 105 of the 186
+   are `Presentation` and most are `.axaml`, which measure 100/50 by their own shape rather than by
+   an untested guard. **Where it concentrates has to be measured again before choosing work**,
+   because the pattern that served the eleventh is spent.
+3. **Mind the effect measured here**: adding a guard to a small file can sink it if its branch pair
+   ends up split across two suites. Check first by asking whether the suite that hands the null is
+   also the one that builds the type with something real.
+
 ## State at the close of 2026-08-30 (eleventh session) — ninety files, one guard
 
 **Three commits, from `56bbc19` to `291bbc2`**, plus this note. **`main` stays at `8296679`**, where
