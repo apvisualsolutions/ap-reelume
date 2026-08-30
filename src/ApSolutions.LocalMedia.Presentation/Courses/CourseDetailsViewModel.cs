@@ -264,8 +264,23 @@ public sealed class CourseDetailsViewModel : INotifyPropertyChanged
     /// <summary>The row the thread points at, which is what the panel's own button plays.</summary>
     public LessonRowViewModel? ThreadLessonRow { get; private set; }
 
+    /// <summary>
+    /// What the last mark did, announced rather than only drawn (CRS-005).
+    /// </summary>
+    /// <remarks>
+    /// Marking a lesson moves the thread, and the thread is the whole point of the card. Somebody
+    /// reading with their eyes sees the chip jump to the next row; somebody reading with a screen
+    /// reader would get nothing at all, because a glyph that changed somewhere else on the page is
+    /// not an announcement. So it is said in words, in one live region, and cleared on every load so
+    /// that reopening a course never re-announces a mark from last time.
+    /// </remarks>
+    public string MarkNotice { get; private set; } = string.Empty;
+
+    public bool HasMarkNotice => MarkNotice.Length > 0;
+
     public async Task LoadAsync(CourseId courseId, CancellationToken cancellationToken = default)
     {
+        MarkNotice = string.Empty;
         _detail = await _getCourses.GetAsync(courseId, cancellationToken).ConfigureAwait(true);
         Rebuild();
     }
@@ -313,7 +328,7 @@ public sealed class CourseDetailsViewModel : INotifyPropertyChanged
             nameof(HasCourse), nameof(Title), nameof(RelativePath), nameof(Meta), nameof(ProgressText),
             nameof(Progress), nameof(IsFinished), nameof(ThreadLesson), nameof(ThreadMinute),
             nameof(HasThreadMinute), nameof(ThreadActionText), nameof(Recap), nameof(HasRecap),
-            nameof(Modules), nameof(ThreadLessonRow),
+            nameof(Modules), nameof(ThreadLessonRow), nameof(MarkNotice), nameof(HasMarkNotice),
         })
         {
             OnPropertyChanged(name);
@@ -344,12 +359,22 @@ public sealed class CourseDetailsViewModel : INotifyPropertyChanged
             return;
         }
 
+        var marking = !lesson.IsWatched;
+        var courseId = _detail.Id;
         await _setWatchStatus.MarkAsync(
-            CourseProgressKey.For(_detail.Id, lesson.Id),
+            CourseProgressKey.For(courseId, lesson.Id),
             file,
-            lesson.IsWatched ? WatchStatus.NotStarted : WatchStatus.Watched,
+            marking ? WatchStatus.Watched : WatchStatus.NotStarted,
             CancellationToken.None).ConfigureAwait(true);
-        await LoadAsync(_detail.Id, CancellationToken.None).ConfigureAwait(true);
+        await LoadAsync(courseId, CancellationToken.None).ConfigureAwait(true);
+
+        // Said after the reload, not before: the sentence claims the thread moved, and it has only
+        // moved once the card has been read again.
+        MarkNotice = marking
+            ? CourseText.Resource("CourseMarkedNotice", "Lesson marked as watched.")
+            : CourseText.Resource("CourseUnmarkedNotice", "Mark removed.");
+        OnPropertyChanged(nameof(MarkNotice));
+        OnPropertyChanged(nameof(HasMarkNotice));
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

@@ -133,6 +133,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Marking a lesson says so out loud, in one live region.** Marking moves the thread, and the
+  thread is the point of the card: somebody reading with their eyes sees the chip jump to the next
+  row, and somebody reading with a screen reader would get **nothing**, because a glyph that changed
+  elsewhere on the page is not an announcement. It goes in as a sentence, in **one** `Border` with
+  `LiveSetting="Polite"`, and it is said **after** the card is re-read: the sentence claims the
+  thread moved, and it has only moved once the card has been read again. It clears on every load, so
+  reopening a course never re-announces last time's mark.
+
+- **Scope statuses moved to what is measured**: `CRS-002`, `CRS-003` and `CRS-005` go to
+  `IMPLEMENTED` with their evidence linked; `CRS-001` to `IN_PROGRESS`, because marking a folder has
+  no door yet; `CRS-004` stays `DESIGN_APPROVED`. Before the three reach `VERIFIED` they need the
+  captures matrix beside the prototype and a test that a lesson's progress **survives the file being
+  moved** — today that is guaranteed by construction and not demonstrated.
+
+- **A ninth §4-versus-tree discrepancy, and this one is vocabulary.** `CourseLastOpenedFormat` is
+  "Last opened {0} ago", and that `{0}` wants units — "3 days", "2 weeks" — that **the package does
+  not carry and the tree does not have**: measured, there is not one relative-time string among the
+  711. Writing them would be inventing copy, which is the owner's. The key stays declared and
+  unpainted, and the card says progress and what is left, which is what a decision needs. **Twelve
+  more keys are unconsumed**, and all twelve belong to the two remaining tranches: four for the
+  marking dialog, three for the rail menu, and four for the player panel.
+
+- **And a correction to what this log said earlier.** It said the two consumers that take
+  `CatalogTitleKind.Course` on their default arm — `CatalogItemViewModel.KindKey` and
+  `LibraryViewModel`'s routing — "close in the tranche that brings the views". **They did not, and
+  now the reason is known**: courses live in tables of their own and **nothing writes a course
+  title**, so both arms are today **unreachable**. Adding a branch to them would be adding code no
+  test can take, which is exactly what this tree avoids. They close the day a course appears in the
+  library, and not before.
+
 - **The course card and its lesson row, with the thread inside.** `CourseDetailsView` stacks under
   the grid — the pattern the library and Duplicates already use, list above and detail below — so
   coming back from a course is scrolling up rather than a button somebody has to find. Its title is a

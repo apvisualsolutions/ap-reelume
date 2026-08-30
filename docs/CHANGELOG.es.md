@@ -135,6 +135,36 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Marcar una lección lo dice en voz alta, en una sola zona viva.** Marcar mueve el hilo, y el hilo
+  es el sentido de la ficha: quien lee con los ojos ve el distintivo saltar a la fila siguiente, y
+  quien lee con un lector de pantalla no recibiría **nada**, porque un glifo que cambió en otro sitio
+  de la página no es un anuncio. Va como frase, en **un solo** `Border` con `LiveSetting="Polite"`, y
+  se dice **después** de releer la ficha: la frase afirma que el hilo se movió, y sólo se ha movido
+  cuando la ficha se ha vuelto a leer. Se limpia en cada carga, para que reabrir un curso no vuelva a
+  anunciar una marca de la vez anterior.
+
+- **Estados de alcance movidos con lo que hay medido**: `CRS-002`, `CRS-003` y `CRS-005` pasan a
+  `IMPLEMENTED` con su evidencia enlazada; `CRS-001` a `IN_PROGRESS`, porque marcar una carpeta aún
+  no tiene puerta; `CRS-004` sigue en `DESIGN_APPROVED`. Para que las tres lleguen a `VERIFIED` falta
+  la matriz de capturas junto al prototipo y una prueba de que el progreso de una lección **sobrevive
+  a mover el archivo** — hoy eso está garantizado por construcción y no demostrado.
+
+- **Novena discrepancia §4↔árbol, y ésta es de vocabulario.** `CourseLastOpenedFormat` es «Última vez
+  hace {0}», y ese `{0}` pide unidades —«3 días», «2 semanas»— que **el paquete no trae y el árbol no
+  tiene**: medido, no hay una sola cadena de tiempo relativo en las 711. Escribirlas sería inventar
+  copia, que es del dueño. La clave se queda declarada y sin pintar, y la tarjeta dice el progreso y
+  el restante, que es lo que hace falta para decidir. **Quedan 12 claves más sin consumir**, y las 12
+  son de los dos tramos que faltan: cuatro del diálogo de marcado, tres del menú del riel y cuatro
+  del panel del reproductor.
+
+- **Y una corrección de lo dicho antes en este mismo registro.** Se escribió que los dos consumidores
+  que tratan `CatalogTitleKind.Course` por su rama por defecto —`CatalogItemViewModel.KindKey` y el
+  encaminamiento de `LibraryViewModel`— «se cierran en el tramo que trae las vistas». **No se
+  cerraron, y ahora se sabe por qué**: los cursos viven en sus propias tablas y **nada escribe un
+  título de tipo curso**, así que esas dos ramas son hoy **inalcanzables**. Añadirles un brazo sería
+  añadir código que ninguna prueba puede tomar, que es justo lo que este árbol evita. Se cierran el
+  día que un curso aparezca en la biblioteca, y no antes.
+
 - **La ficha del curso y su fila de lección, con el hilo dentro.** `CourseDetailsView` se apila bajo
   la cuadrícula —el patrón que la biblioteca y Duplicados ya usan: lista arriba, detalle abajo—, así
   que volver de un curso es subir con la rueda y no un botón que alguien tiene que encontrar. Su
