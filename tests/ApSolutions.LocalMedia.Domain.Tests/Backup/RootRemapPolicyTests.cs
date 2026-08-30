@@ -179,12 +179,8 @@ public sealed class RootRemapPolicyTests
     /// trailing separator so one folder cannot become two, but "D:\" without its separator is "D:",
     /// which on Windows names the current directory of that drive rather than its root.
     /// <para>
-    /// This test stops at Normalize and at the decision, because Rewrite does not carry a drive root
-    /// through: IsUnder asks whether the path starts with root + '\', and for "D:\" that is "D:\\",
-    /// which no real path begins with. So a library stored at the top of a disk is resolved as
-    /// Remapped and then rewritten to nothing at all. That is a defect in the restore path rather
-    /// than a gap in this suite, and it is left for its own change with its own evidence — asserting
-    /// today's answer here would write the bug down as the contract.
+    /// This test stops at Normalize and at the decision. Rewrite is where the separator that makes
+    /// a root a root used to be dropped, and the two tests below carry it the rest of the way.
     /// </para>
     /// </summary>
     [Fact]
@@ -202,6 +198,44 @@ public sealed class RootRemapPolicyTests
         var decision = Assert.Single(decisions);
         Assert.Equal("D:\\", decision.OldPath);
         Assert.Equal("F:\\library", decision.NewPath);
+    }
+
+    /// <summary>
+    /// The defect the test above named and left standing: a library stored at the top of a disk was
+    /// resolved as Remapped and then rewritten to nothing at all, with no error to say so. A restore
+    /// that reports success and leaves every path pointing at a drive the person just told it to
+    /// stop using is worse than one that refuses, because nothing announces it.
+    /// </summary>
+    [Fact]
+    public void A_library_at_the_top_of_a_disk_is_rewritten_like_any_other()
+    {
+        var decisions = RootRemapPolicy.Resolve(
+            ["D:\\"],
+            [new RootRemap("D:/", "F:\\library")],
+            _ => true);
+
+        Assert.Equal(RootRemapStatus.Remapped, Assert.Single(decisions).Status);
+        Assert.Equal(
+            "F:\\library\\shows\\episode.mkv",
+            RootRemapPolicy.Rewrite("D:\\shows\\episode.mkv", decisions));
+    }
+
+    /// <summary>
+    /// The same seam from the other side. A drive root as the destination would have concatenated
+    /// its separator with the one the suffix already carries, so every restored path would have held
+    /// a doubled separator that no later step removes.
+    /// </summary>
+    [Fact]
+    public void A_library_moved_to_the_top_of_a_disk_keeps_one_separator()
+    {
+        var decisions = RootRemapPolicy.Resolve(
+            ["D:\\media"],
+            [new RootRemap("D:\\media", "F:/")],
+            _ => true);
+
+        Assert.Equal(
+            "F:\\shows\\episode.mkv",
+            RootRemapPolicy.Rewrite("D:\\media\\shows\\episode.mkv", decisions));
     }
 
     [Fact]

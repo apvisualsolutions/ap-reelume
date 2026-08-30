@@ -46,6 +46,8 @@ public sealed record RootRemapDecision(string OldPath, string NewPath, RootRemap
 /// </summary>
 public static class RootRemapPolicy
 {
+    private const char Separator = '\\';
+
     public static IReadOnlyList<RootRemapDecision> Resolve(
         IEnumerable<string> storedRoots,
         IEnumerable<RootRemap> remaps,
@@ -104,7 +106,13 @@ public static class RootRemapPolicy
             return storedPath;
         }
 
-        return owner.NewPath + normalized[owner.OldPath.Length..];
+        // Join on exactly one separator. A drive root keeps the one that makes it a root, so it is
+        // the only path whose suffix does not start with a separator and the only destination that
+        // already ends with one -- and both sides of that asymmetry used to produce a wrong answer
+        // in silence: a library at the top of a disk matched no root and came back unchanged, and a
+        // library moved to the top of one came back with a doubled separator.
+        var suffix = normalized[owner.OldPath.Length..];
+        return owner.NewPath.TrimEnd(Separator) + Separator + suffix.TrimStart(Separator);
     }
 
     /// <summary>Comparable form: one kind of separator, no trailing one, and nothing blank.</summary>
@@ -133,5 +141,5 @@ public static class RootRemapPolicy
     }
 
     private static bool IsUnder(string path, string root) =>
-        path.StartsWith(root + '\\', StringComparison.OrdinalIgnoreCase);
+        path.StartsWith(root.EndsWith(Separator) ? root : root + Separator, StringComparison.OrdinalIgnoreCase);
 }
