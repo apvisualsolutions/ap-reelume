@@ -135,6 +135,13 @@
 ## Y la correccion de fondo queda nombrada, no hecha: si la puerta ignorase la cobertura de RAMAS
 ## de un .axaml -- no el archivo, cuyas lineas si miden algo -- saldrian 63 archivos de esta lista
 ## y el trinquete caeria de 193 a unos 123. Es una tanda propia, con su evidencia y su vuelta.
+##
+## Y CourseThreadPolicy sale el mismo dia que entro, 193 -> 192. Su techo era real y no valia: un
+## archivo NUEVO contra main tiene que llegar a 96/96 y esa puerta no admite techos medidos, a
+## diferencia de esta lista. La rama inalcanzable se quito en vez de documentarse, y se quito
+## simplificando: el hilo ES la primera leccion no vista, luego todo lo anterior esta visto por
+## definicion y localizarlo sobraba. Sin lambda que capture no hay cache de delegado. 100/100 con
+## las 638 pruebas de Domain intactas y sin anadir ninguna.
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  94
 src/ApSolutions.LocalMedia.Application/Backup/PreviewRestore.cs                               98  94
@@ -167,7 +174,6 @@ src/ApSolutions.LocalMedia.Application/Playback/PlaybackSessionCoordinator.cs   
 src/ApSolutions.LocalMedia.Application/Playback/SelectTrack.cs                                96  85
 src/ApSolutions.LocalMedia.Application/Privacy/CreateDiagnostics.cs                          100  91
 src/ApSolutions.LocalMedia.Domain/Continuity/SegmentDetectionPolicy.cs                       100  92
-src/ApSolutions.LocalMedia.Domain/Courses/CourseThreadPolicy.cs                              100  93
 src/ApSolutions.LocalMedia.Domain/Identification/MatchModels.cs                              100  90
 src/ApSolutions.LocalMedia.Infrastructure/Backup/BackupValidator.cs                           96  90
 src/ApSolutions.LocalMedia.Infrastructure/Backup/RotatingBackupStore.cs                      100  91
