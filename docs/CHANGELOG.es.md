@@ -10,6 +10,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Tres campos que se rellenaban en cada lectura y que no leía nadie** — el defecto de la casa, esta
+  vez en los datos. El `Language` de `MetadataSearchResult` y `MetadataDetails` no guardaba el idioma
+  en el que vino la respuesta sino **el que se pidió**: TMDB sirve el título con lo que tenga cuando
+  no hay traducción, así que quien lo leyera habría recibido lo contrario de lo que su nombre
+  promete. `WatchedTitle.Id` es el tercero: `Summarize` promedia géneros, reparto, nota y año, y la
+  señal de «esto ya se ha visto» llega al marcador por el otro lado, como
+  `RecommendationCandidate.IsWatched`. Ninguna lectura de los tres existía en `src/`. Con ellos se
+  van dos pruebas que afirmaban que el valor **existía**, no que fuera cierto, que es la forma exacta
+  de una puerta que pasa por no mirar nada — y una de ellas llevaba escrita en su propio comentario
+  la asimetría que la invalidaba.
+
 - **La escala de los iconos, alineada con el prototipo contexto a contexto.** Restituido el lienzo, la
   clase pasa a ser el tamaño real, así que por primera vez se puede comparar cada sitio con lo que el
   prototipo dibuja ahí. Seis de nueve ya casaban; tres se corrigen: el cromo del reproductor baja de

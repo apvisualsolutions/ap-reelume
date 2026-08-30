@@ -233,7 +233,6 @@ public sealed class ApplyIdentificationTests
 
     private static MetadataDetails Details(string key) => new(
         new MetadataReference("tmdb", key, MetadataContentKind.Movie),
-        "es-ES",
         "La llegada",
         "Arrival",
         "Una lingüista traduce a los visitantes.",

@@ -157,7 +157,6 @@ public sealed class IdentifyScannedFilesTests
 
     private static MetadataDetails Details(string key) => new(
         new MetadataReference("tmdb", key, MetadataContentKind.Movie),
-        "es-ES",
         "Dune",
         OriginalTitle: null,
         Overview: null,

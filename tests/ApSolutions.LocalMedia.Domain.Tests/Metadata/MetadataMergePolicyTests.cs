@@ -210,7 +210,6 @@ public sealed class MetadataMergePolicyTests
         string? backdrop,
         string? trailerKey = null) => new(
             new MetadataReference("tmdb", "movie:329865", MetadataContentKind.Movie),
-            "es-ES",
             title,
             "Arrival",
             overview,

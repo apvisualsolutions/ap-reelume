@@ -121,7 +121,6 @@ public sealed class RefreshStaleMetadataTests
             Provider = new RecordingProvider(stale
                 .Select(entry => new MetadataDetails(
                     new MetadataReference("tmdb", entry.ProviderKey!, MetadataContentKind.Movie),
-                    "es-ES",
                     "Refreshed title",
                     OriginalTitle: null,
                     Overview: "Refreshed overview",

@@ -91,7 +91,7 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
                 continue;
             }
 
-            var results = ParseSearchResults(payload, query.Kind, requestedLanguage);
+            var results = ParseSearchResults(payload, query.Kind);
             if (results.Count > 0)
             {
                 return results;
@@ -275,10 +275,7 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
             + "&append_to_response=videos";
     }
 
-    private static List<MetadataSearchResult> ParseSearchResults(
-        string payload,
-        MetadataContentKind kind,
-        string language)
+    private static List<MetadataSearchResult> ParseSearchResults(string payload, MetadataContentKind kind)
     {
         using var document = JsonDocument.Parse(payload);
         if (!document.RootElement.TryGetProperty("results", out var resultsElement))
@@ -302,7 +299,6 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
 
             results.Add(new MetadataSearchResult(
                 new MetadataReference(ProviderName, $"{keyPrefix}{idElement.GetInt64()}", kind),
-                language,
                 titleElement.GetString()!,
                 ReadOptionalString(item, originalTitleProperty),
                 ReadYear(item, dateProperty)));
@@ -328,7 +324,6 @@ public sealed class TmdbMetadataProvider : IMetadataProvider
             : [];
         return new MetadataDetails(
             reference,
-            language,
             root.GetProperty(titleProperty).GetString() ?? string.Empty,
             ReadOptionalString(root, originalTitleProperty),
             ReadOptionalString(root, "overview"),

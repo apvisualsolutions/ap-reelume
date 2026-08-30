@@ -34,9 +34,15 @@ public sealed record MetadataReference(
     string Key,
     MetadataContentKind Kind);
 
+/// <remarks>
+/// There is no language on an answer, and its absence is a measurement. The field that used to sit
+/// here held the language that was *asked for*, not the one the answer came back in — TMDB serves a
+/// title in whatever it has when the requested language has no translation — so a reader would have
+/// been told the opposite of what the name promised. Nothing in src/ ever read it. It goes rather
+/// than stays as a claim the provider cannot make.
+/// </remarks>
 public sealed record MetadataSearchResult(
     MetadataReference Reference,
-    string Language,
     string Title,
     string? OriginalTitle,
     int? ReleaseYear);
@@ -48,7 +54,6 @@ public sealed record MetadataSearchResult(
 /// </param>
 public sealed record MetadataDetails(
     MetadataReference Reference,
-    string Language,
     string Title,
     string? OriginalTitle,
     string? Overview,

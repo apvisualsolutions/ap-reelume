@@ -34,8 +34,14 @@ public sealed record RecommendationCandidate(
 /// <summary>
 /// One title the person has already watched, which is the whole of the history the formula reads.
 /// </summary>
+/// <remarks>
+/// No identifier, and that is deliberate. History feeds <see cref="RecommendationPolicy.Summarize"/>,
+/// which averages genres, cast, rating and year and has no use for which title each came from; the
+/// "already seen this" signal reaches the score from the other side, as
+/// <see cref="RecommendationCandidate.IsWatched"/>. An id here was written on every read and never
+/// read back.
+/// </remarks>
 public sealed record WatchedTitle(
-    TitleId Id,
     IReadOnlyList<string> Genres,
     IReadOnlyList<string> Cast,
     int? Year,

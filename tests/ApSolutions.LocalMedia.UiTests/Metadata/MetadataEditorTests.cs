@@ -242,7 +242,6 @@ public sealed class MetadataEditorTests
 
     private static MetadataDetails ProviderMetadata() => new(
         new MetadataReference("tmdb", ProviderKey, MetadataContentKind.Movie),
-        "es-ES",
         "Arrival restored",
         "Arrival",
         "Provider overview",

@@ -45,18 +45,17 @@ public sealed class MetadataAnswerTests
     }
 
     /// <summary>
-    /// Both answers record the language they came back in. Nothing in src/ reads it back today — the
-    /// cache keys on the language that was requested, not on the one that answered — so this is the
-    /// contract as the provider fills it, and the asymmetry is worth knowing about: a lookup that
-    /// fell through to its fallback is stored under the language nobody got.
+    /// Both answers carry the reference that produced them, and neither carries a language. The
+    /// field that used to sit there held the language that was <em>asked for</em> rather than the one
+    /// the answer came back in, and nothing in src/ read it: this test asserted that a value existed,
+    /// not that it was true, which is the shape of a gate that passes by looking at nothing.
     /// </summary>
     [Fact]
-    public void Both_answers_say_which_language_they_came_back_in()
+    public void Both_answers_carry_the_reference_that_produced_them()
     {
-        var result = new MetadataSearchResult(Reference, "en-US", "Arrival", "Arrival", 2016);
+        var result = new MetadataSearchResult(Reference, "Arrival", "Arrival", 2016);
         var details = new MetadataDetails(
             Reference,
-            "en-US",
             "Arrival",
             "Arrival",
             "Overview",
@@ -66,9 +65,8 @@ public sealed class MetadataAnswerTests
             "/backdrop.jpg",
             "abc");
 
-        Assert.Equal("en-US", result.Language);
-        Assert.Equal("en-US", details.Language);
         Assert.Equal(Reference, result.Reference);
+        Assert.Equal(Reference, details.Reference);
         Assert.Equal(MetadataContentKind.Movie, details.Reference.Kind);
     }
 }

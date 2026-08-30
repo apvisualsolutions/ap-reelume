@@ -412,7 +412,6 @@ public sealed class NetworkPrivacyTests
             return response.IsSuccessStatusCode
                 ? new MetadataDetails(
                     reference,
-                    language.Primary,
                     "Refreshed",
                     OriginalTitle: null,
                     Overview: null,

@@ -183,9 +183,9 @@ public sealed class RecommendationPolicyTests
     {
         var taste = RecommendationPolicy.Summarize(
             [
-                new WatchedTitle(Title(1), ["Drama", "Terror"], ["Ada"], 2010, 10),
-                new WatchedTitle(Title(2), ["Terror"], ["Bob"], 2020, 1),
-                new WatchedTitle(Title(3), ["Drama"], ["Ada"], 2012, null),
+                new WatchedTitle(["Drama", "Terror"], ["Ada"], 2010, 10),
+                new WatchedTitle(["Terror"], ["Bob"], 2020, 1),
+                new WatchedTitle(["Drama"], ["Ada"], 2012, null),
             ]);
 
         Assert.InRange(taste.Genres["Drama"], 0.0, 1.0);
@@ -285,8 +285,8 @@ public sealed class RecommendationPolicyTests
     {
         var taste = RecommendationPolicy.Summarize(
             [
-                new WatchedTitle(Title(1), ["Drama"], ["Ada"], Year: null, Rating: null),
-                new WatchedTitle(Title(2), ["Drama"], ["Bob"], Year: null, Rating: null),
+                new WatchedTitle(["Drama"], ["Ada"], Year: null, Rating: null),
+                new WatchedTitle(["Drama"], ["Bob"], Year: null, Rating: null),
             ]);
 
         Assert.Null(taste.AverageRating);
@@ -294,19 +294,6 @@ public sealed class RecommendationPolicyTests
         Assert.Contains("Drama", taste.Genres);
         Assert.Contains("Ada", taste.Cast);
         Assert.False(taste.IsEmpty);
-    }
-
-    /// <summary>
-    /// The history identifies the titles it is made of. Summarize reads only the genres, cast, rating
-    /// and year, so nothing in this layer reads the identifier back — it is what lets a caller build
-    /// the history from a catalogue and know which rows it summarised.
-    /// </summary>
-    [Fact]
-    public void A_watched_title_carries_the_identifier_of_what_was_watched()
-    {
-        var watched = new WatchedTitle(Title(4), ["Drama"], ["Ada"], 2016, 8);
-
-        Assert.Equal(Title(4), watched.Id);
     }
 
     [Fact]

@@ -10,6 +10,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Three fields written on every read and read by nothing** — the house defect, this time in the
+  data. `Language` on `MetadataSearchResult` and `MetadataDetails` did not hold the language the
+  answer came back in but **the one that was asked for**: TMDB serves a title in whatever it has when
+  there is no translation, so a reader would have been told the opposite of what the name promises.
+  `WatchedTitle.Id` is the third: `Summarize` averages genres, cast, rating and year, and the "this
+  has been seen" signal reaches the score from the other side, as
+  `RecommendationCandidate.IsWatched`. No read of any of the three existed in `src/`. Two tests go
+  with them — tests that asserted a value **existed** rather than that it was true, which is the
+  exact shape of a gate that passes by looking at nothing, and one of them carried the asymmetry that
+  invalidated it in its own comment.
+
 - **The icon scale, aligned with the prototype context by context.** With the canvas restored the
   class becomes the real size, so for the first time each place can be compared against what the
   prototype draws there. Six of nine already matched; three are corrected: the player chrome drops
