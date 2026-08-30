@@ -10,6 +10,46 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The two Courses ViewModels arrived without a single test, and they were all that stood between
+  `main` and being unblocked.** `CoursesViewModel` measured 96.15 % of lines and **58.33 % of
+  branches**, `CourseDetailsViewModel` 93.91 % and **58.51 %**; the **new-file** gate asks for 96/96
+  and, unlike the debt list, **admits no measured ceilings**. A `grep` over `tests/` mentioned
+  neither of them: 627 lines covered only by the autonomous walk through the assembled shell, which
+  measures **behaviour and not branches**. They now read **100 / 97.22** and **100 / 96.81**.
+
+  **The starting figures were not taken from anybody's report: they were reproduced.** The CI run's
+  `test-results` artefact, merged here with the same `reportgenerator`, gave the **four exact
+  numbers** CI had written into its own log. What does **not** work is running the whole of
+  `eng/check-coverage.ps1` against that downloaded artefact: its 430 filenames arrive as
+  `ApSolutions.LocalMedia.Presentation/…` without the leading `src/`, the gate looks them up with
+  `EndsWith('src/…')`, and **not one matches** — so it declares "PASS (no instrumentable lines)" over
+  the whole tree. That is a textbook false green — a gate going blind rather than wrong — and the
+  reproduction is done by **reading the merged Cobertura**, not by running the script.
+
+  **Everything new is covered inside `UiTests`, and that is arithmetic rather than taste.** The merged
+  report keeps **the best single report for a line and not the union** of them, so a pair whose two
+  arms are taken in different suites reads half covered for ever — which is what sank the three
+  `*Rename` files on 2026-08-30. The constructor sweep hands every Presentation constructor a null and
+  takes the throwing arm; these tests build the models over a **real** `GetCourses` and a **real**
+  `SetWatchStatus`, in that same suite, and close the pair.
+
+  **Four branches remain and all four are unreachable. They are measured and written into the test
+  somebody will read again**, not only into the evidence: the property patterns in `Progress` and
+  `ThreadMinute` emit a null check for every member they walk through, and `Summary` and `Thread` are
+  **non-nullable** positional members of a `record`; `ResumeThreadAsync`'s guard is refuted by its own
+  `CanExecute`; and `Application.Current is { }` has no false arm while an application is alive.
+  **That last one was not assumed**: a plain `Fact` reached `Application.get_ActualThemeVariant` and
+  threw, which is proof that `Current` was not null.
+
+  **And the UI-thread trap charged a new variant: it is not the test that decides whether the UI
+  thread is touched, it is the DATA handed to it.** A `CourseModuleViewModel` built from a module
+  **with a title** assembles its label through `CourseText.Resource` — which reads
+  `ActualThemeVariant`, which verifies the thread — and throws with the whole suite; with the title
+  null it never calls it and passes. Same call, same `Fact`, and the only thing that changes is the
+  data. Five of `Resource`'s six branches are reachable and taken by writing into
+  `Application.Current.Resources`: without the key, with it, and with something that is not a string
+  under it.
+
 - **The debt list rises for the first time, 186 to 193, because seven files are BORN below the bar.**
   The rule that it only shrinks was written against degradation — a file that was up and got worse —
   and a new file is not that: there is nothing to bring back. The gate's own error message allows it,

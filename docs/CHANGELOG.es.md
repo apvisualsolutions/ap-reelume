@@ -10,6 +10,45 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los dos ViewModels de Cursos entraron sin una sola prueba, y son lo único que le quedaba a `main`
+  para desbloquearse.** `CoursesViewModel` medía 96,15 % de líneas y **58,33 % de ramas**, y
+  `CourseDetailsViewModel` 93,91 % y **58,51 %**; la puerta de archivos **nuevos** exige 96/96 y, a
+  diferencia de la lista de deuda, **no admite techos medidos**. Un `grep` sobre `tests/` no
+  mencionaba ninguno de los dos: 627 líneas cubiertas sólo por el paseo autónomo a través del shell
+  ensamblado, que mide **comportamiento y no ramas**. Ahora leen **100 / 97,22** y **100 / 96,81**.
+
+  **Las cifras de partida no se dedujeron del informe de nadie: se reprodujeron.** El artefacto
+  `test-results` del run de CI, fusionado aquí con el mismo `reportgenerator`, dio los **cuatro
+  números exactos** que CI había escrito en su registro. Lo que **no** funciona es correr
+  `eng/check-coverage.ps1` entero contra ese artefacto descargado: sus 430 nombres de archivo llegan
+  como `ApSolutions.LocalMedia.Presentation/…` sin el `src/` inicial, la puerta los busca con
+  `EndsWith('src/…')` y **ninguno casa**, así que declara «PASS (no instrumentable lines)» sobre todo
+  el árbol. Es un falso verde de manual —una puerta que se vuelve ciega en vez de falsa—, y la
+  reproducción se hace **leyendo el Cobertura fusionado**, no ejecutando el guion.
+
+  **Todo lo nuevo se cubre dentro de `UiTests` y eso es aritmética, no gusto.** El informe fusionado
+  se queda con **el mejor informe de una línea y no con la unión** de ellos, así que un par cuyos dos
+  lados se toman en suites distintas lee la mitad para siempre — que es lo que hundió a los tres
+  `*Rename` el 2026-08-30. El barrido de constructores pasa un null a cada constructor de
+  Presentation y se lleva el brazo que lanza; estas pruebas construyen los modelos con un `GetCourses`
+  y un `SetWatchStatus` **reales**, en esa misma suite, y cierran el par.
+
+  **Quedan cuatro ramas y las cuatro son inalcanzables. Están medidas y escritas en la prueba que
+  alguien volverá a mirar**, no sólo en la evidencia: los patrones de propiedad de `Progress` y
+  `ThreadMinute` emiten una comprobación de null por cada miembro que atraviesan, y `Summary` y
+  `Thread` son miembros posicionales **no anulables** de un `record`; la guarda de `ResumeThreadAsync`
+  la refuta su propio `CanExecute`; y `Application.Current is { }` no tiene lado falso mientras haya
+  aplicación viva. **Esa última no se supuso**: un `[Fact]` llano llegó hasta
+  `Application.get_ActualThemeVariant` y reventó, que es la prueba de que `Current` no era null.
+
+  **Y la trampa del hilo se cobró una variante nueva: no es la prueba quien decide si toca el hilo de
+  UI, es el DATO que se le pasa.** `CourseModuleViewModel` construido con un módulo **con título**
+  arma su etiqueta a través de `CourseText.Resource` —que lee `ActualThemeVariant`, que verifica el
+  hilo— y revienta con la suite entera; con el título nulo no lo llama siquiera y pasa. La misma
+  llamada, el mismo `[Fact]`, y lo único que cambia es el dato. Las cinco de las seis ramas
+  alcanzables de `Resource` se toman escribiendo en `Application.Current.Resources`: sin la clave, con
+  la clave, y con algo que no es una cadena bajo ella.
+
 - **La lista de deuda sube por primera vez, de 186 a 193, y el motivo es que siete archivos NACEN
   por debajo del listón.** La regla de que sólo encoge se escribió contra la degradación —un archivo
   que estaba arriba y empeora— y un archivo nuevo no es eso: no hay nada que recuperar. La propia

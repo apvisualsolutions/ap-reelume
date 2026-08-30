@@ -68,10 +68,35 @@ Y una cuarta del arnés: en la lista de tablas de `SqliteBootstrapTests`, `lesso
 `library_roots`, porque la colación es binaria y ahí `e` va antes que `i`. Ordenado «de leer», la
 prueba se pone roja en el índice 13. / Under SQLite's binary collation `e` precedes `i`.
 
+## Los dos ViewModels, medidos rama a rama / The two ViewModels, measured branch by branch
+
+Entraron **sin una sola prueba**: un `grep` sobre `tests/` no los mencionaba, y los cubría sólo el
+paseo, que mide comportamiento y no ramas. La puerta de archivos **nuevos** —96/96, y sin admitir
+techos— los tenía parados. / They arrived with no test at all, and only the walk covered them.
+
+| archivo / file | antes / before | ahora / now |
+| --- | --- | --- |
+| `CoursesViewModel.cs` | 96,15 / **58,33** | **100 / 97,22** (35 de 36 ramas / of 36 branches) |
+| `CourseDetailsViewModel.cs` | 93,91 / **58,51** | **100 / 96,81** (91 de 94 ramas / of 94 branches) |
+
+Las cifras de partida se **reprodujeron** aquí desde el artefacto `test-results` del run de CI y
+dieron los cuatro números exactos. Las de ahora se miden sobre `UiTests` **sola**, a propósito: el
+Cobertura fusionado se queda con **el mejor informe de una línea y no con la unión**, así que un par
+cuyos dos lados se toman en suites distintas lee la mitad para siempre. / The starting figures were
+reproduced from the CI artefact and matched exactly; the new ones are measured on `UiTests` alone,
+because the merged report keeps the best single report for a line rather than the union.
+
+**Las cuatro ramas restantes son inalcanzables, y están medidas**: los patrones de propiedad de
+`Progress` y `ThreadMinute` emiten un chequeo de null por cada miembro que atraviesan y `Summary` y
+`Thread` no son anulables; la guarda de `ResumeThreadAsync` la refuta su propio `CanExecute`; y
+`Application.Current is { }` no tiene lado falso mientras haya aplicación — lo cual **no se supuso**:
+un `[Fact]` llano llegó a `ActualThemeVariant` y reventó. / Four branches remain, all unreachable,
+and all measured rather than assumed.
+
 ## Suites en verde / Suites green
 
 `Domain.Tests` 638 · `Application.Tests` 281 · `ArchitectureTests` 30 · `DocumentationTests` 91 ·
-`UiTests` 1047 · `IntegrationTests` 508 · `AccessibilityTests` 147 · `dotnet format` · la puerta de
+`UiTests` 1073 · `IntegrationTests` 508 · `AccessibilityTests` 147 · `dotnet format` · la puerta de
 documentación con 65 identificadores.
 
 ## Lo que falta para que estas tres pasen a VERIFIED / What is left before these reach VERIFIED

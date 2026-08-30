@@ -1,5 +1,46 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-08-31, decimotercera sesión: la puerta de nuevos ya no bloquea
+>
+> **Los dos ViewModels de Cursos pasan la puerta de archivos NUEVOS.** Medidos en `UiTests` **sola**:
+>
+> | archivo | antes (fusión de CI) | ahora (`UiTests` sola) |
+> | --- | --- | --- |
+> | `CoursesViewModel.cs` | 96,15 / **58,33** | **100 / 97,22** (35 de 36 ramas) |
+> | `CourseDetailsViewModel.cs` | 93,91 / **58,51** | **100 / 96,81** (91 de 94 ramas) |
+>
+> Dos archivos de prueba nuevos, 21 pruebas, y `UiTests` entera en verde (1.073).
+>
+> **Lo que queda es la OTRA mitad, y sigue siendo lo que hace usable Cursos**: el panel «Lecciones»
+> del reproductor (CRS-004) y la opción «Curso (carpeta de lecciones)» del diálogo de añadir — que es
+> la que **devuelve `MarkCoursesInRoot` e `ICourseRootDeclarationStore` al contenedor**, y sin la cual
+> **no se puede declarar una raíz de cursos**. Está descrita abajo, sin cambios.
+>
+> ### Cuatro cosas medidas esta tanda, y las cuatro cuestan si se olvidan
+>
+> 1. **Reproducir la fusión de CI sí funciona; correr `check-coverage.ps1` contra ella NO.** Los
+>    cuatro números de partida salieron **exactos** fusionando el artefacto `test-results` con
+>    `reportgenerator`. Pero el guion entero declara **«PASS (no instrumentable lines)» sobre los 430
+>    archivos**: los nombres del fusionado llegan sin el `src/` inicial y la puerta los busca con
+>    `EndsWith('src/…')`. **Un falso verde, no un rojo**: se lee el Cobertura fusionado a mano.
+> 2. **Todo lo nuevo se cubre dentro de UNA suite.** El fusionado se queda con **el mejor informe de
+>    una línea, no con la unión**, así que un par repartido entre dos suites lee la mitad para
+>    siempre. El barrido de constructores pasa el null desde `UiTests`; el lado bueno tiene que
+>    tomarse **ahí también**, construyendo con un `GetCourses` y un `SetWatchStatus` reales.
+> 3. **No es la prueba quien decide si toca el hilo de UI: es el DATO.** `CourseModuleViewModel` con
+>    un módulo **con título** arma su etiqueta por `CourseText.Resource` y **revienta** en un `[Fact]`
+>    con la suite entera; **con el título nulo pasa**. Misma prueba, mismo tipo, distinto dato.
+> 4. **`Application.Current.Resources[clave]` toma cinco de las seis ramas de `Resource`** — sin
+>    clave, con clave, y con algo que no es cadena debajo. La sexta —`Current is { }` por el lado sin
+>    aplicación— **es inalcanzable y está medida**: un `[Fact]` llano llegó a `ActualThemeVariant` y
+>    reventó, que prueba que `Current` no era null.
+>
+> **Las cuatro ramas que quedan sin cubrir son inalcanzables y están escritas en las dos clases de
+> prueba**, con su porqué, porque un techo medido va donde alguien vuelve a mirarlo.
+>
+> Sigue pendiente y decidido, **no ejecutado**: `.flv` en `MediaFileExtensions`, agrupado con el
+> próximo cambio de empaquetado.
+
 > ## RELEVO — 2026-08-30, cierre de la duodécima sesión
 >
 > **Empujado hasta `6e5a02c`. En local hay commits por delante, a propósito**, esperando trabajo que

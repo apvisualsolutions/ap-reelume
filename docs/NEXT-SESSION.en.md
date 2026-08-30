@@ -1,5 +1,47 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-08-31, thirteenth session: the new-file gate no longer blocks
+>
+> **Both Courses ViewModels clear the NEW-file gate.** Measured on `UiTests` **alone**:
+>
+> | file | before (CI merge) | now (`UiTests` alone) |
+> | --- | --- | --- |
+> | `CoursesViewModel.cs` | 96.15 / **58.33** | **100 / 97.22** (35 of 36 branches) |
+> | `CourseDetailsViewModel.cs` | 93.91 / **58.51** | **100 / 96.81** (91 of 94 branches) |
+>
+> Two new test files, 21 tests, and the whole of `UiTests` green (1,073).
+>
+> **What is left is the OTHER half, and it is still what makes Courses usable**: the player's
+> «Lessons» panel (CRS-004) and the "Course (folder of lessons)" option in the add dialog — which is
+> what **returns `MarkCoursesInRoot` and `ICourseRootDeclarationStore` to the container**, and without
+> which **a course root cannot be declared at all**. It is described below, unchanged.
+>
+> ### Four things measured this batch, and all four cost something if forgotten
+>
+> 1. **Reproducing the CI merge works; running `check-coverage.ps1` against it does NOT.** The four
+>    starting figures came out **exact** by merging the `test-results` artefact with
+>    `reportgenerator`. But the whole script declares **"PASS (no instrumentable lines)" over all 430
+>    files**: the merged report's filenames arrive without the leading `src/` and the gate looks them
+>    up with `EndsWith('src/…')`. **A false green, not a red**: read the merged Cobertura by hand.
+> 2. **Everything new is covered inside ONE suite.** The merged report keeps **the best single report
+>    for a line, not the union**, so a pair split across two suites reads half covered for ever. The
+>    constructor sweep passes the null from `UiTests`; the other arm has to be taken **there too**, by
+>    building over a real `GetCourses` and a real `SetWatchStatus`.
+> 3. **It is not the test that decides whether the UI thread is touched: it is the DATA.** A
+>    `CourseModuleViewModel` built from a module **with a title** assembles its label through
+>    `CourseText.Resource` and **throws** in a `[Fact]` with the whole suite; **with a null title it
+>    passes**. Same test, same type, different data.
+> 4. **`Application.Current.Resources[key]` takes five of `Resource`'s six branches** — without the
+>    key, with it, and with a non-string under it. The sixth — `Current is { }` by the no-application
+>    arm — **is unreachable and measured**: a plain `[Fact]` reached `ActualThemeVariant` and threw,
+>    which proves `Current` was not null.
+>
+> **The four branches left uncovered are unreachable and are written into both test classes**, with
+> their reasons, because a measured ceiling belongs where somebody will look again.
+>
+> Still pending and decided, **not executed**: `.flv` in `MediaFileExtensions`, grouped with the next
+> packaging change.
+
 > ## HANDOVER — 2026-08-30, close of the twelfth session
 >
 > **Pushed through `6e5a02c`. There are commits ahead of that locally, deliberately**, waiting for
