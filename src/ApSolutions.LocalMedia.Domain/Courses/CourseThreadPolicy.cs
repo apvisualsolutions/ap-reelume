@@ -141,16 +141,27 @@ public static class CourseThreadPolicy
     {
         ArgumentNullException.ThrowIfNull(lessons);
 
-        var thread = Resolve(lessons);
-        var upTo = thread.Lesson is null
-            ? lessons.Count
-            : lessons.TakeWhile(lesson => lesson.Id != thread.Lesson).Count();
+        // The thread is the first lesson that is not watched, so everything before it is watched by
+        // definition -- which makes the recap simply the tail of the opening run, newest first, and
+        // removes the need to locate the thread at all.
+        //
+        // It is written as a loop rather than TakeWhile on purpose. A lambda capturing the thread
+        // gets a delegate cache whose `dup; brtrue.s` can never be taken: the closure is rebuilt on
+        // every call, so the cached field is null every time. That single unreachable branch held
+        // the file at 93.75 and, unlike a file already on the debt list, a file that is new against
+        // main has to reach 96/96 -- a measured ceiling does not excuse it.
+        var opening = new List<CourseLessonProgress>();
+        foreach (var lesson in lessons)
+        {
+            if (lesson.Status != WatchStatus.Watched)
+            {
+                break;
+            }
 
-        return lessons
-            .Take(upTo)
-            .Where(lesson => lesson.Status == WatchStatus.Watched)
-            .Reverse()
-            .Take(2)
-            .ToArray();
+            opening.Add(lesson);
+        }
+
+        opening.Reverse();
+        return opening.Count <= 2 ? opening : opening.GetRange(0, 2);
     }
 }
