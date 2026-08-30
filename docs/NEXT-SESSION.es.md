@@ -14,8 +14,15 @@
 >
 > | archivo | ramas que faltan |
 > | --- | --- |
-> | `CoursesViewModel.cs` | **15** |
-> | `CourseDetailsViewModel.cs` | **39** |
+> | `CoursesViewModel.cs` | quedan **6 líneas**: 80, 131, 141, 196, 201, 240 — la tarjeta ya está probada |
+> | `CourseDetailsViewModel.cs` | **39**, entero |
+>
+> **Y una trampa del entorno que costó dos rojos, medida**: `CourseText.Resource` lee
+> `Application.ActualThemeVariant`, que **verifica el hilo de UI**. Una prueba suya en `[Fact]` pasa
+> con `--filter` —donde no hay aplicación y sale el literal de reserva— y **revienta con la suite
+> entera**, donde sí la hay. Lo que lea `Meta` o `ActionText` va en `[AvaloniaFact]`, y **ninguna
+> aserción debe fijar un literal**: sin aplicación sale el inglés de reserva y con ella el idioma
+> cargado.
 >
 > `CourseThreadPolicy` y `CourseLessonReader` **ya están en el listón** y fuera de la lista; el
 > trinquete bajó 193 → 191 con ellos.

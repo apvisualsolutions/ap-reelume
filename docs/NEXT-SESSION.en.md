@@ -14,8 +14,14 @@
 >
 > | file | branches missing |
 > | --- | --- |
-> | `CoursesViewModel.cs` | **15** |
-> | `CourseDetailsViewModel.cs` | **39** |
+> | `CoursesViewModel.cs` | **6 lines** left: 80, 131, 141, 196, 201, 240 — the card is tested |
+> | `CourseDetailsViewModel.cs` | **39**, all of it |
+>
+> **And an environment trap that cost two reds, measured**: `CourseText.Resource` reads
+> `Application.ActualThemeVariant`, which **verifies the UI thread**. A `[Fact]` over it passes under
+> `--filter` — no application, English fallback — and **throws with the whole suite**, where there is
+> one. Anything reading `Meta` or `ActionText` belongs in an `[AvaloniaFact]`, and **no assertion may
+> pin a literal**.
 >
 > `CourseThreadPolicy` and `CourseLessonReader` **are at the bar** and off the list; the ratchet came
 > down 193 → 191 with them.
