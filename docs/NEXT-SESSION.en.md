@@ -1,5 +1,105 @@
 # Where to pick up
 
+## State at the close of 2026-08-30 (eleventh session) — ninety files, one guard
+
+**Three commits, from `56bbc19` to `291bbc2`**, plus this note. **`main` stays at `8296679`**, where
+the tenth left it and whose run — `33285647441` — is green. The twelfth's first move is to read this
+branch's run and only then advance the reference.
+
+**The tenth closed entire and left no note**, so what follows is reconstructed from its five commits
+and from the tree: `Domain` went from nine files under the bar to two — `16fc861`, with three
+branches measured unreachable by reading the IL — the ratchet came down from 212 to **205** on the
+second CI run (`a263436`), the `post-push.sh` hook started demanding the watcher after every
+`git push` (`ad02025`, `58f8503`), a CI run's duration was measured at **42-53 minutes** against the
+55-80 the guide claimed (`dcc876f`), and `CLAUDE.md` was reordered so the application comes before
+the tooling (`8296679`).
+
+### The dominant gap was one repeated shape, not ninety problems
+
+Ninety of the two hundred and five files under 96/96 were under it for **one reason**: a
+`?? throw new ArgumentNullException` in the constructor that no test had ever exercised. And it was
+invisible in line coverage, because **an untaken `throw` leaves no uncovered line**: the line runs
+every time the type is built. It leaves half a branch pair. That is why eight `Application` files
+measured exactly `100` and `50`.
+
+`tests/Shared/ConstructorGuardSweep.cs` builds each type with a stand-in in every position but one
+and a null in that one, and requires an `ArgumentNullException` **naming that parameter**:
+
+| assembly | guards exercised | accepting a null | unbuildable |
+| --- | --- | --- | --- |
+| `Application` | 127 | 7 | 0 |
+| `Presentation` | 112 | 0 | 1 → 0 |
+| `Infrastructure` | 64 | 1 | 0 |
+
+**303 guards, not one exercised before.** `Presentation` passed first time and **carries no list**:
+inventing one would be inventing a place for future debt to hide.
+
+The three exclusions are structural rather than a list — records by their `<Clone>$` method,
+exceptions by their base type, and what the compiler wrote by its attribute — because a list is a
+thing to maintain. The first probe measured **319** reference parameters in `Application` and 129
+threw; the other 190 were data records, which legitimately validate nothing.
+
+### What waits for the twelfth, and it is not optional
+
+**This branch's first CI run will go red, and that is the expected result.** The gate fails on a
+floor that is short exactly as it fails on one that is long, so the moment a file improves it asks
+for the file to leave the list or for its floor to rise. The second run is the one that copies the
+first's `coverage-debt` artefact and lowers `$debtRatchet` in `eng/check-coverage.ps1`, which sits at
+**205**.
+
+Measured with `Application.Tests` alone — which **understates**, because CI's merge adds what other
+suites cover — eleven `Application` files reach 96/96 that did not before, and thirty-nine improve.
+The real number comes from the artefact.
+
+### Three new traps, all of them in the instrument
+
+- **A heredoc in this environment collapses doubled backslashes.** `'\\d'` arrived as `'\d'` and
+  `r'\1'` as `'1'`, so a path `re.sub` returned strings that did not start with `src/` and the
+  coverage comparator reported **zero changes** with both sides full. The alarm was the instrument's,
+  not the code's: reading the XML directly said `50% (1/2) → 100% (2/2)`.
+- **coverlet's raw Cobertura carries paths RELATIVE to `<sources>`**; only the `reportgenerator`
+  merge has them absolute. A comparator written against the merged file reads zero files from the raw
+  one and does not fail — it returns empty.
+- **A Python script that rewrites a file changes its line endings to CRLF**, and `.gitattributes`
+  pins `eol=lf`, so `dotnet format` flags `ENDOFLINE` on every line of the whole file. Twenty-three
+  files at once. It is the same trap the note already had written down for PowerShell.
+
+### A harness red that could not be attributed
+
+The first full `UiTests` pass produced a `Test Case Cleanup Failure` reading "the calling thread
+cannot access this object", with the entire stack inside Avalonia and on a test that lasted 1 ms and
+never ran. **Fourteen passes of the whole suite later — six with the sweep in and six without — the
+other thirteen were green**, so one in fourteen names nobody. It is not attributed and not chased;
+what was done, for a reason of its own, was to lower the surface: the sweep ran once per test method
+measuring the same answer each time, and now runs once and shares the result. If CI raises it again,
+it will come back named.
+
+### What was closed off the pending list
+
+- **The drive root.** `RootRemapPolicy` returned the decision as `Remapped` and `Rewrite` rewrote
+  nothing, with no error. `IsUnder` asked for `root + '\'`, which for `D:\` is `D:\\`. The same seam
+  doubled the separator when the destination was a root. Both sides now join on exactly one
+  separator, with the red archived before anything was touched.
+- **The three orphan fields.** `Language` on `MetadataSearchResult` and `MetadataDetails` held **the
+  language that was asked for**, not the one the answer came back in, so it could not say what its
+  name promises; `WatchedTitle.Id` already has something doing its job in
+  `RecommendationCandidate.IsWatched`. Two tests went with them — tests asserting that a value
+  **existed** rather than that it was true.
+
+### Where the twelfth session starts
+
+1. **Read the CI run for `291bbc2`** and advance `main` only on its green. If it is red over floors
+   that have gone short, **that is the expected shape**: download the `coverage-debt` artefact, copy
+   it over `eng/coverage-debt.txt`, and lower the ratchet in the same change.
+2. **The eight primary constructors.** Converting them to explicit constructors with their guard
+   empties both closed lists this sweep leaves, and the rule becomes fully structural. They are
+   `ExecuteRename`, `PreviewRename`, `UndoRename`, `UpdateMetadata` and `IntegrityChecker` with one
+   parameter each, and `ApplyIdentification`, `RefreshMetadata` and `RefreshStaleMetadata` with five
+   or six.
+3. **Whatever is left of the 205 after this round**, starting with `Presentation`, which contributes
+   105 of them. The repeated shape is no longer the null guard: where it concentrates has to be
+   measured again.
+
 ## State at the close of 2026-08-29 (ninth session) — the warning nobody was receiving
 
 **Five commits, from `d4f65ae` to the one writing this note** — a range, because a list of SHAs never

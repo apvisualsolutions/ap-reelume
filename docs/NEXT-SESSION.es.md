@@ -1,5 +1,103 @@
 # Dónde retomar
 
+## Estado al cierre del 2026-08-30 (undécima sesión) — noventa archivos, una sola guarda
+
+**Tres commits, de `56bbc19` a `291bbc2`**, y esta nota encima. **`main` se queda en `8296679`**,
+que es donde lo dejó la décima y cuyo run —`33285647441`— está verde. Lo primero de la duodécima es
+leer el run de esta rama y sólo entonces avanzar la referencia.
+
+**La décima cerró entera y no dejó nota**, así que lo que sigue está reconstruido de sus cinco
+commits y del árbol: `Domain` bajó de nueve archivos por debajo del listón a dos —`16fc861`, con tres
+ramas medidas como inalcanzables leyendo el IL—, el trinquete bajó de 212 a **205** en la segunda
+vuelta de CI (`a263436`), el hook `post-push.sh` pasó a exigir el vigía tras cada `git push`
+(`ad02025`, `58f8503`), la duración de un run de CI se midió en **42-53 minutos** contra los 55-80
+que decía la guía (`dcc876f`), y `CLAUDE.md` se reordenó para que la aplicación vaya antes que las
+herramientas (`8296679`).
+
+### El hueco dominante era una forma repetida, no noventa problemas
+
+Noventa de los doscientos cinco archivos por debajo de 96/96 lo estaban por **un solo motivo**: un
+`?? throw new ArgumentNullException` en el constructor que ninguna prueba había ejercido nunca. Y no
+se veía leyendo la cobertura de líneas, porque **un `throw` que nadie toma no deja una línea sin
+cubrir**: la línea se ejecuta cada vez que se construye el tipo. Deja media pareja de ramas. Por eso
+ocho archivos de `Application` medían `100` y `50` clavados.
+
+`tests/Shared/ConstructorGuardSweep.cs` construye cada tipo con un sustituto en todas las posiciones
+menos una y un null en ésa, y exige un `ArgumentNullException` que **nombre ese parámetro**:
+
+| ensamblado | guardas ejercidas | aceptan un null | sustitutos imposibles |
+| --- | --- | --- | --- |
+| `Application` | 127 | 7 | 0 |
+| `Presentation` | 112 | 0 | 1 → 0 |
+| `Infrastructure` | 64 | 1 | 0 |
+
+**303 guardas, ninguna ejercida antes.** `Presentation` pasó a la primera y **no lleva lista**:
+inventarle una sería inventar un sitio donde la deuda futura pueda esconderse.
+
+Las tres exclusiones son estructurales y no una lista —records por su método `<Clone>$`, excepciones
+por su tipo base, y lo que escribió el compilador por su atributo—, porque una lista es algo que
+mantener. El primer sondeo midió **319** parámetros de referencia en `Application` y 129 lanzaban;
+los otros 190 eran records de datos, que legítimamente no validan.
+
+### Lo que espera a la duodécima, y no es opcional
+
+**La primera vuelta de CI de esta rama se pondrá roja, y ése es el resultado esperado.** La puerta
+falla igual ante un suelo corto que ante uno largo, así que en cuanto un archivo mejora pide sacarlo
+de la lista o subir su suelo. La segunda vuelta es la que copia el artefacto `coverage-debt` de la
+primera y baja `$debtRatchet` en `eng/check-coverage.ps1`, que está en **205**.
+
+Medido sólo con `Application.Tests` —que **subestima**, porque la fusión de CI añade lo que otras
+suites cubren—, once archivos de `Application` alcanzan 96/96 que antes no lo hacían, y treinta y
+nueve mejoran. El número real lo dirá el artefacto.
+
+### Tres trampas nuevas, todas del instrumento
+
+- **Un heredoc de este entorno colapsa las barras invertidas dobles.** `'\\d'` llegó como `'\d'` y
+  `r'\1'` como `'1'`, así que un `re.sub` de rutas devolvió cadenas que no empezaban por `src/` y el
+  comparador de cobertura informó **cero cambios** con los dos lados llenos. La alarma fue del
+  instrumento, no del código: la medición directa del XML decía `50% (1/2) → 100% (2/2)`.
+- **El Cobertura crudo de coverlet lleva rutas RELATIVAS a `<sources>`**; sólo el fusionado por
+  `reportgenerator` las trae absolutas. Un comparador escrito contra el fusionado lee cero archivos
+  del crudo y no falla: devuelve vacío.
+- **Un script de Python que reescribe un archivo cambia sus finales de línea a CRLF**, y
+  `.gitattributes` fija `eol=lf`, así que `dotnet format` marca `ENDOFLINE` en cada línea del archivo
+  entero. Veintitrés archivos de una vez. Es la misma trampa que la nota ya tenía escrita para
+  PowerShell.
+
+### Un rojo del arnés que no se ha podido atribuir
+
+La primera pasada completa de `UiTests` dio un `Test Case Cleanup Failure` con «the calling thread
+cannot access this object», con la traza entera dentro de Avalonia y sobre una prueba que duró 1 ms y
+ni llegó a correr. **Catorce pasadas de la suite entera después —seis con el barrido dentro y seis
+sin él— las trece restantes fueron verdes**, así que uno entre catorce no nombra a nadie. No se
+atribuye y no se persigue; lo que sí se hizo, con razón propia, fue bajar la superficie: el barrido
+corría una vez por método de prueba midiendo lo mismo cada vez, y ahora corre una sola y comparte el
+resultado. Si CI vuelve a sacarlo, saldrá nombrado.
+
+### Lo que se cerró de la lista pendiente
+
+- **La raíz de un disco.** `RootRemapPolicy` daba la decisión por `Remapped` y `Rewrite` no
+  reescribía ni una ruta, sin error. `IsUnder` preguntaba por `raíz + '\'`, que para `D:\` es `D:\\`.
+  La misma costura duplicaba el separador cuando el destino era una raíz. Las dos caras se unen ahora
+  por un separador exacto, con su rojo archivado antes de tocar nada.
+- **Los tres campos huérfanos.** El `Language` de `MetadataSearchResult` y `MetadataDetails` guardaba
+  **el idioma que se pidió**, no aquel en el que llegó la respuesta, así que no podía decir lo que su
+  nombre promete; `WatchedTitle.Id` ya tiene quien haga su trabajo, `RecommendationCandidate.IsWatched`.
+  Con ellos se fueron dos pruebas que afirmaban que un valor **existía**, no que fuera cierto.
+
+### Por dónde entra la duodécima
+
+1. **Leer el run de CI de `291bbc2`** y avanzar `main` sólo con él en verde. Si es rojo por suelos que
+   se han quedado cortos, **eso es lo esperado**: se descarga el artefacto `coverage-debt`, se copia
+   sobre `eng/coverage-debt.txt` y se baja el trinquete en el mismo cambio.
+2. **Los ocho constructores primarios.** Convertirlos a constructor explícito con su guarda vacía las
+   dos listas cerradas que este barrido deja, y la regla pasa a ser estructural del todo. Son
+   `ExecuteRename`, `PreviewRename`, `UndoRename`, `UpdateMetadata` e `IntegrityChecker` con un
+   parámetro cada uno, y `ApplyIdentification`, `RefreshMetadata` y `RefreshStaleMetadata` con cinco o
+   seis.
+3. **Lo que queda de los 205 tras esta vuelta**, empezando por `Presentation`, que aporta 105 de
+   ellos. La forma repetida ya no es la guarda de null: hay que volver a mirar dónde se concentra.
+
 ## Estado al cierre del 2026-08-29 (novena sesión) — el aviso que no recibía nadie
 
 **Cinco commits, de `d4f65ae` al que escribe esta nota** —un rango, porque una lista de SHA nunca
