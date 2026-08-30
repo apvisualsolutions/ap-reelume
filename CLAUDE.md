@@ -72,6 +72,13 @@ prueba van en inglés.
   fast-forward a `main`, que no dispara el flujo, y eso es deliberado: distinguirlo pedía adivinar la
   rama de destino, y una guarda que se equivoca **callando** es indistinguible de una que no corrió.
 
+  **Y sonó en su propio commit, que es el defecto que enseñó a escribirlo bien**: buscaba la cadena
+  suelta, y el mensaje del commit —escrito con un heredoc— hablaba de «after any git push». Ahora
+  **tira los heredocs primero** y exige que `git push` esté en **posición de comando** —inicio de
+  línea, o tras `;`, `&`, `|`, `(` o `&&`—. Diez casos por tubería: cuatro que suenan, seis que callan,
+  incluidos ese heredoc y `git pushd`. Un aviso que suena cuando no toca enseña a ignorarlo, que es
+  peor que no avisar.
+
   **Ninguno de los tres primeros dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así
   que siguen siendo un adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y
   `eng/verify-docs.ps1`.

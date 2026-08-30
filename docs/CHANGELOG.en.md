@@ -74,6 +74,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   Measured by pipe with three cases, one that must sound and two that must stay quiet, then fired for
   real.
 
+  **And then it fired on its own commit**, which is what taught it to be written properly: it searched
+  for the bare string, and the message — a heredoc — spoke of "after any git push". It now **strips
+  heredocs first** and requires `git push` in **command position**. Ten cases by pipe: four that
+  sound, six that stay quiet, including that heredoc and `git pushd`. A warning that fires when it
+  should not teaches you to ignore it, which is worse than not warning.
+
 - **The `Domain` layer reaches the coverage bar, and two files cannot: their ceiling is measured.**
   The nine that sat below 96/96 held **15 branches and 4 lines** between them. Twelve branches and all
   four lines close, and seven files reach the bar — `RenameOperation`, `RootRemapPolicy`,

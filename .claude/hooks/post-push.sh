@@ -26,10 +26,28 @@ set -u
 cmd=$(jq -r '.tool_input.command // empty' | tr -d '\r')
 [ -z "$cmd" ] && exit 0
 
-case "$cmd" in
-  *"git push"*) ;;
-  *) exit 0 ;;
-esac
+# `git push` tiene que ser un COMANDO, no texto. La primera version buscaba la
+# cadena suelta y sono en su propio commit: el mensaje, escrito con un heredoc,
+# hablaba de «after any git push». Un aviso que suena cuando no toca ensena a
+# ignorarlo, que es peor que no avisar.
+#
+# Asi que primero se tiran los heredocs —todo lo que va entre <<DELIM y la linea
+# DELIM, que es donde viven los mensajes de commit— y luego se exige que la
+# cadena este en posicion de comando: inicio de linea, o detras de ; & | ( o &&.
+stripped=$(printf '%s\n' "$cmd" | awk '
+  /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*$/ && skip && $1 == delim { skip = 0; next }
+  skip { next }
+  {
+    if (match($0, /<<-?[\047"]?[A-Za-z_][A-Za-z0-9_]*[\047"]?/)) {
+      d = substr($0, RSTART, RLENGTH)
+      gsub(/^<<-?[\047"]?|[\047"]?$/, "", d)
+      delim = d
+      skip = 1
+    }
+    print
+  }')
+
+printf '%s\n' "$stripped" | grep -Eq '(^|[;&|(]|&&|\|\|)[[:space:]]*git[[:space:]]+push([[:space:]]|$)' || exit 0
 
 sha=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --short HEAD 2>/dev/null || printf '<sha>')
 

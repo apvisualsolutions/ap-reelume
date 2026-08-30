@@ -74,6 +74,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   la misma trampa que este repositorio persigue en sus puertas, esta vez vista desde fuera. Medido por
   tubería con tres casos, uno que debe sonar y dos que deben callar, y luego disparado de verdad.
 
+  **Y entonces sonó en su propio commit**, que es lo que enseñó a escribirlo bien: buscaba la cadena
+  suelta y el mensaje —un heredoc— hablaba de «after any git push». Ahora **tira los heredocs primero**
+  y exige `git push` en **posición de comando**. Diez casos por tubería: cuatro que suenan, seis que
+  callan, incluidos ese heredoc y `git pushd`. Un aviso que suena cuando no toca enseña a ignorarlo,
+  que es peor que no avisar.
+
 - **La capa `Domain` llega al listón de cobertura, y dos archivos no pueden: su techo está medido.**
   Los nueve que estaban por debajo de 96/96 tenían entre todos **15 ramas y 4 líneas** sin cubrir. Se
   cierran 12 ramas y las 4 líneas, y siete archivos alcanzan el listón —`RenameOperation`,
