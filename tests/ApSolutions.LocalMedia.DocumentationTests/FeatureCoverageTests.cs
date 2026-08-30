@@ -25,7 +25,10 @@ public sealed class FeatureCoverageTests
         // 55 since 2026-08-23: PRD-006, the visual-parity undertaking itself, STABLE and
         // IN_PROGRESS until the captures matrix lands - the redesign was scope without a row,
         // which is exactly what this gate exists to refuse.
-        Assert.Equal(55, FeatureMatrix.Rows.Count);
+        // 60 since 2026-08-30: CRS-001..005, courses, POST_STABLE and DESIGN_APPROVED once
+        // ADR-0006 was accepted. The design package had them prototyped and specified while the
+        // matrix said nothing, and scope the matrix does not carry is scope nobody decided.
+        Assert.Equal(60, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,

@@ -114,6 +114,38 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Cursos entra en la matriz como `CRS-001`…`CRS-005`, y el no-objetivo que lo prohibía se acota en
+  vez de borrarse.** `ADR-0006` pasa a `ACCEPTED`: un curso es un tercer tipo de título, una raíz se
+  **declara** de cursos y **declara a qué profundidad** están, y el programa no adivina ni una cosa ni
+  la otra. Adivinarlo se intentó y se midió que no funciona: la regla candidata —hoja con vídeo, curso
+  como ancestro a distancia 0 o 1, secciones por número de cabecera— devolvió **31 cursos donde hay
+  12** sobre una colección real de 595 vídeos, y sus cuatro modos de fallo son todos reales. Con la
+  profundidad declarada la detección es exacta por construcción, y no queda heurística que mantener.
+
+  La hoja de ruta decía «no es una plataforma de cursos. No hay lecciones, ni progreso de formación,
+  ni certificados», y esa frase **se acota, no se borra**: sigue fuera todo lo que la motivaba
+  —matrículas, certificados, cuestionarios, rachas, estadísticas de estudio, porcentaje de formación
+  completada— y entra lo que la aplicación ya hace con una serie. El progreso es el que existe
+  (`PLY-008`, `PLY-009`) y la identidad es la que existe (`LIB-009`): no se inventa un segundo
+  almacén.
+
+  La puerta de documentación pasa de **60 a 65** identificadores declarados. Esa cifra se afirma en
+  vez de dejarse abierta justo para esto: una fila nueva en la matriz obliga a tocar el guion, que es
+  donde alguien se entera de que los documentos localizados también la necesitan.
+
+- **El paquete de diseño se pone al día, y trae 57 vistas en 57 archivos.** El proyecto remoto no se
+  leía desde el 17-08-2026 y desde entonces ha declarado el rediseño cerrado en este árbol y ha
+  abierto una sola propuesta. Llegan `design/vistas/` —un archivo por vista, nueve líneas cada uno,
+  que abren el prototipo ya situado en esa vista por la prop `view`, así que hay una sola fuente y
+  ninguna divergencia—, las 41 claves de Cursos en `Cadenas nuevas` con su texto en los dos idiomas,
+  y `README`, `PROMPT` y `github` reescritos para esta fase. `Auditoría del inventario` se retira
+  porque el proyecto la retiró.
+
+  **El prototipo navegable NO se actualiza, y es una limitación del transporte y no una elección**:
+  la herramienta de diseño corta una lectura en 256 KiB y el archivo es mayor, así que volvió
+  truncado en exactamente 262144 bytes. Cambiar un prototipo completo de agosto por uno nuevo y roto
+  es cambiar un archivo viejo por uno que no abre, así que se queda el que abre.
+
 - **Un barrido que le da un null a cada constructor, y con él 303 guardas que nunca se habían
   tomado.** Noventa de los doscientos cinco archivos por debajo del listón de cobertura lo estaban
   por una sola forma repetida: un `?? throw new ArgumentNullException` que ninguna prueba había

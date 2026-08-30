@@ -111,6 +111,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Courses enters the matrix as `CRS-001`…`CRS-005`, and the non-goal that forbade it is narrowed
+  rather than deleted.** `ADR-0006` moves to `ACCEPTED`: a course is a third kind of title, a root is
+  **declared** to hold courses and **declares the depth** they sit at, and the program guesses
+  neither. Guessing was tried and measured not to work: the candidate rule — video leaves, the course
+  as the ancestor at distance 0 or 1, sections recognised by a leading number — returned **31 courses
+  where there are 12** over a real collection of 595 videos, and its four failure modes are all real.
+  With the depth declared, detection is exact by construction and there is no heuristic left to
+  maintain.
+
+  The roadmap said "not a course platform. No lessons, no training progress, no certificates", and
+  that sentence is **narrowed, not deleted**: everything that motivated it stays out — enrolments,
+  certificates, quizzes, streaks, study statistics, percentage of training completed — and what comes
+  in is what the application already does with a show. Progress is the progress that exists
+  (`PLY-008`, `PLY-009`) and identity is the identity that exists (`LIB-009`): no second store is
+  invented.
+
+  The documentation gate goes from **60 to 65** declared identifiers. That number is asserted rather
+  than left open for exactly this: a new row in the matrix forces a change to the script, which is
+  where somebody notices that the localised documents need it too.
+
+- **The design package catches up, and brings 57 views in 57 files.** The remote project had not been
+  read since 2026-08-17 and has since declared the redesign closed in this tree and opened a single
+  proposal. In come `design/vistas/` — one file per view, nine lines each, opening the prototype
+  already positioned on that view through the `view` prop, so there is one source and no divergence —
+  the 41 Courses keys appended to `Cadenas nuevas` with their text in both languages, and `README`,
+  `PROMPT` and `github` rewritten for this phase. `Auditoría del inventario` is withdrawn because the
+  project withdrew it.
+
+  **The navigable prototype is NOT updated, and that is a limitation of the transport rather than a
+  choice**: the design tool caps a read at 256 KiB and the file is larger, so it came back truncated
+  at exactly 262144 bytes. Trading a complete August prototype for a new broken one is trading an old
+  file for one that does not open, so the one that opens stays.
+
 - **A sweep that hands every constructor a null, and with it 303 guards nothing had ever taken.**
   Ninety of the two hundred and five files short of the coverage bar were short of it for one
   repeated reason: a `?? throw new ArgumentNullException` no test had ever exercised. An untaken

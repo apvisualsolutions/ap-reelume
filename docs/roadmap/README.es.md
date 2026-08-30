@@ -58,7 +58,11 @@ especificación y la matriz, en ambos idiomas.
 - **No hay cuentas ni sesión remota.** Una persona, un PC. No hay registro, ni contraseña, ni perfil.
 - **No hay sincronización entre equipos ni nube.** Lo que ve la aplicación está en su disco.
 - **No reproduce varios vídeos a la vez.** Hay una sesión de reproducción, y una sola.
-- **No es una plataforma de cursos.** No hay lecciones, ni progreso de formación, ni certificados.
+- **No es una plataforma de cursos**, y desde `ADR-0006` la frase está acotada, no borrada. Lo que
+  sigue fuera es lo que la motivaba: no hay matrículas, ni certificados, ni cuestionarios, ni rachas,
+  ni estadísticas de estudio, ni porcentaje de formación completada, ni nada que hable con una
+  plataforma. Lo que entra (`CRS-001`…`CRS-005`) es lo que la aplicación ya hace con una serie:
+  reconocer lo que hay en el disco, ordenarlo, reproducirlo en orden y recordar por dónde iba.
 - **No gestiona vídeos más allá de catalogarlos.** No convierte, no recorta y no exporta vídeo. El
   renombrado seguro es la única operación que toca los archivos, y previsualiza antes de hacer nada.
 - **No hay notas ni marcadores personales en la línea de tiempo** (`UX-008`). Las marcas de

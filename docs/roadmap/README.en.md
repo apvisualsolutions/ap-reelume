@@ -58,7 +58,11 @@ matrix first, in both languages.
 - **No accounts and no remote session.** One person, one PC. No sign-up, no password, no profile.
 - **No cross-device sync and no cloud.** What the application sees is on your disk.
 - **No simultaneous playback of several videos.** There is one playback session, and only one.
-- **Not a course platform.** No lessons, no training progress, no certificates.
+- **Not a course platform**, and since `ADR-0006` that sentence is narrowed rather than deleted. What
+  stays out is the part that motivated it: no enrolments, no certificates, no quizzes, no streaks, no
+  study statistics, no percentage of training completed, and nothing that talks to a platform. What
+  comes in (`CRS-001`…`CRS-005`) is what the application already does with a show: recognise what is
+  on the disk, order it, play it in order, and remember where you were.
 - **No video management beyond cataloguing.** It does not transcode, trim, or export video. Safe
   rename is the only operation that touches files, and it previews before doing anything.
 - **No personal notes or bookmarks on the timeline** (`UX-008`). Intro and credits markers exist
