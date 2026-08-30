@@ -99,7 +99,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
   temporada negativa, y los tres patrones capturan `\d{1,3}`. Las tres quedan escritas en la prueba
   donde se buscarán la próxima vez, no sólo en la evidencia.
 
-  Los suelos nuevos los mide CI: este árbol no toca `eng/coverage-debt.txt`. Evidencia en
+  **El trinquete baja de 212 a 205**, y ese número lo dijo CI, no esta máquina: la lista se copió del
+  artefacto `coverage-debt` del run que la midió. Su diff contra la anterior mueve **ocho filas y
+  ninguna más** —siete que salen y `MatchModels` que sube de 80 a 90—, que es como se ve que nada del
+  resto del árbol se degradó. Evidencia en
   [audit-domain-coverage.md](evidence/stable/audit-domain-coverage.md), con los suelos de partida
   reproducidos **exactos** desde el artefacto de un run verde, que es lo que dice que el instrumento
   mide lo mismo que la puerta.

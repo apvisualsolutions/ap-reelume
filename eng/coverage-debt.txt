@@ -57,6 +57,29 @@
 ##                         If the next run reads 91, it comes back down with that written beside it,
 ##                         the way MarkerEditorViewModel's 81 did.
 
+##
+## 2026-08-30: the Domain layer. SEVEN files left by reaching the bar, so the ratchet goes 212 -> 205,
+## and MatchModels rises 80 -> 90 with its cause written down: FileNameContext.ForFile had never been
+## called on a file sitting directly in the root, nor on a path with no directory above it.
+##
+## Two Domain files stay, and neither for want of a test. Both have a CEILING, read off the IL and the
+## input domain on 2026-08-30 rather than assumed:
+##
+##   SegmentDetectionPolicy  100/92, and 92 is all MergeDetections can reach. Its fourteenth branch is
+##                           a `dup; brtrue.s` at IL offset 139 — the GroupBy lambda's delegate cache —
+##                           and that cache field lives on the closure the method allocates ONCE PER
+##                           CALL, so it is always null and the jump never fires. No input reaches it.
+##   MatchModels             100/90, and 90 is the ceiling. The empty arm of `relative is "." or ""`
+##                           would need GetRelativePath to return an empty string, and the only path
+##                           that produces one — a bare file name, whose directory is "" — throws
+##                           first.
+##
+## MediaNameParser left the list at 100/98 and not 100/100 for the same kind of reason: a season below
+## zero cannot exist when every pattern captures three digits at most. 98 clears the bar, so it needs
+## no floor of its own. A ceiling is written into the test that looks for it, not only here.
+##
+## The eight rows above are the ONLY ones that moved. Nothing else in the tree degraded, and that is
+## the diff against the previous list read line for line, not an assumption.
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  80
 src/ApSolutions.LocalMedia.Application/Backup/ExportLibrary.cs                               100  70
@@ -102,15 +125,8 @@ src/ApSolutions.LocalMedia.Application/Playback/SelectTrack.cs                  
 src/ApSolutions.LocalMedia.Application/Playback/StartPlayback.cs                             100  50
 src/ApSolutions.LocalMedia.Application/Playback/StopPlayback.cs                              100  50
 src/ApSolutions.LocalMedia.Application/Privacy/CreateDiagnostics.cs                          100  75
-src/ApSolutions.LocalMedia.Domain/Backup/RootRemapPolicy.cs                                  100  90
 src/ApSolutions.LocalMedia.Domain/Continuity/SegmentDetectionPolicy.cs                       100  92
-src/ApSolutions.LocalMedia.Domain/Discovery/RenameOperation.cs                                95  50
-src/ApSolutions.LocalMedia.Domain/Identification/MatchModels.cs                              100  80
-src/ApSolutions.LocalMedia.Domain/Identification/MediaNameParser.cs                          100  91
-src/ApSolutions.LocalMedia.Domain/Metadata/IMetadataProvider.cs                               93 100
-src/ApSolutions.LocalMedia.Domain/Metadata/MetadataMergePolicy.cs                            100  92
-src/ApSolutions.LocalMedia.Domain/Personalization/RecommendationModels.cs                     97  94
-src/ApSolutions.LocalMedia.Domain/Personalization/RecommendationPolicy.cs                    100  92
+src/ApSolutions.LocalMedia.Domain/Identification/MatchModels.cs                              100  90
 src/ApSolutions.LocalMedia.Infrastructure/Backup/BackupValidator.cs                           96  90
 src/ApSolutions.LocalMedia.Infrastructure/Backup/RotatingBackupStore.cs                      100  91
 src/ApSolutions.LocalMedia.Infrastructure/Backup/SqliteBackupService.cs                       96  70

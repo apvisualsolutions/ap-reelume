@@ -99,7 +99,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   patterns capture `\d{1,3}`. All three are written into the test someone will look at next time, not
   only into the evidence.
 
-  CI measures the new floors: this tree does not touch `eng/coverage-debt.txt`. Evidence in
+  **The ratchet goes from 212 to 205**, and CI said that number, not this machine: the list was copied
+  from the `coverage-debt` artefact of the run that measured it. Its diff against the previous one
+  moves **eight rows and no others** — seven leaving and `MatchModels` rising 80 to 90 — which is how
+  you see that nothing else in the tree degraded. Evidence in
   [audit-domain-coverage.md](evidence/stable/audit-domain-coverage.md), with the starting floors
   reproduced **exactly** from a green run's artefact, which is what says the instrument measures what
   the gate measures.
