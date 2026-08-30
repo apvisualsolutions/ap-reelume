@@ -1,30 +1,37 @@
-# Prompt para Claude Code
+# Orden de trabajo — implementar Cursos (CRS) en `apvisualsolutions/ap-reelume`
 
-Copia todo lo que hay debajo de la línea y pégalo como primer mensaje, con el repositorio abierto en la rama `codex/ap-reelume-mvp-x64` y esta carpeta descomprimida en `design/`.
+Rama de partida: `codex/ap-reelume-mvp-x64`. El rediseño de las 53 vistas ya está implementado y verificado (PRD-006); **no rehagas nada de eso**. Este encargo es solo el área de Cursos, y es una **propuesta**: el paso 1 decide si se hace.
 
----
+## Paso 0 — contexto
 
-Tienes el rediseño completo de la interfaz de este proyecto en `design/`. Empieza leyendo `design/README.md` de principio a fin antes de escribir una línea de código: es el rediseño de las 48 vistas de este árbol, con tokens, estados y cadenas calculados contra el código real, no contra un mockup genérico.
+1. Lee `design/README.md` (sección «Cursos (CRS)») — reglas, modelo de datos, vistas, restricciones.
+2. Abre en un navegador `design/vistas/CoursesView.dc.html`, `CourseDetailsView.dc.html`, `LessonRowView.dc.html` y `LessonsPanelView.dc.html` — son la referencia visual exacta, en los cuatro temas (panel Demostración).
+3. Las cadenas están en `design/Cadenas nuevas - AP Reelume.dc.html`, sección «Cursos (CRS)»: 41 claves con su texto definitivo en los dos idiomas.
 
-**Primera tarea: confirma `design/` en la rama** con un commit propio, separado de cualquier cambio de implementación.
+## Paso 1 — decisión de alcance (bloqueante)
 
-**Tres restricciones que este repositorio hace cumplir con pruebas.** No son preferencias de estilo; romperlas rompe la construcción:
+`docs/FEATURES.md` es el registro canónico y CRS no existe en él. Añade las filas CRS-001…CRS-005 (texto en el README) con estado `DESIGN_APPROVED`, objetivo `POST_STABLE` salvo que el dueño diga otra cosa, y criterio de aceptación por fila. **Si la decisión de alcance no está aprobada, para aquí y deja las filas propuestas en un commit propio.**
 
-1. Toda cadena visible existe en `Strings.es.axaml` **y** en `Strings.en.axaml`, por `DynamicResource`. Una cadena nueva va en los dos archivos o no va. Los únicos literales legítimos son símbolos: `○ ◐ ●`, `→`, `!`.
-2. Todo control interactivo necesita nombre accesible, con 80 pruebas que lo exigen y un paseo automático que identifica cada control **por su clave de recurso**. En este árbol `Content` y `AutomationProperties.Name` apuntan a la misma clave, así que **reescribir la etiqueta de un botón es renombrar el control**. No reescribas etiquetas existentes.
-3. Cada control nuevo necesita su prueba de nombre accesible y su línea en el paseo automático **en el mismo cambio** que lo introduce.
+## Paso 2 — orden de implementación
 
-**El orden de trabajo importa. No lo cambies:**
+Cada tramo con su commit y sus pruebas; ningún control sin nombre accesible ni cadena fuera de los dos archivos.
 
-1. **`Theme/DesignTokens.axaml` y los cuatro diccionarios de tema.** 12 brochas nuevas, 5 escalares nuevos, y el único valor existente que cambia: `AccentBrush` en los temas de alto contraste, de `#FFFF00` a `#00FFFF`, porque hoy el acento y el foco son el mismo amarillo y son indistinguibles justo donde el foco más importa. `--warn-fg` también debe salir del amarillo en ese tema. Añade el cuarto diccionario, `HighContrastLight`, y renombra `AppThemeVariants.HighContrast` a `HighContrastDark` — toca `AppThemeVariants`, `ThemePreference` y `FluentThemeService`. **No toques ninguna vista hasta que los tokens estén y las pruebas de tema pasen.**
-2. **Los cinco estados de control**, con el anillo doble de foco: borde exterior 2 px en `FocusStrokeBrush` más anillo interior 1 px del color de la superficie. Sube los selectores de foco de 8 a 10 añadiendo `ToggleSwitch` y `RadioButton`, que hoy caen al foco del tema base sin cobertura. El borde punteado del deshabilitado necesita un `Rectangle` con `StrokeDashArray` en la plantilla: `Border` no tiene trazo discontinuo.
-3. **`MiniPlayerWindow`** — hoy son diez líneas con un `Panel Background="Black"` y cero controles. Gana cinco, los cinco con el mismo estilo de 36×36 y radio 8 que el transporte del reproductor grande.
-4. **`UpdateView`** — 23 mensajes en cuatro gramáticas donde hoy hay una. Todo el estado en **un solo** `Border` con `LiveSetting="Polite"`: partirlo en dos parte el anuncio al lector de pantalla.
-5. **`PlayerView`** — 7 motivos de fallo con acciones condicionadas por motivo. «Elegir otra versión» es un flag independiente del motivo, no derivado de él.
-6. **El resto de las vistas**, un cambio por vista, siguiendo la §4 de `Propuesta de diseño`.
+1. **Cadenas**: las 41 claves en `Strings.es.axaml` y `Strings.en.axaml` en el mismo cambio (`BilingualHeadingTests` lo exige).
+2. **Modelo**: migración SQLite no destructiva — `courses` y `lessons` (`file_identity` = identidad LIB-009). El progreso por lección reutiliza el almacén de PLY-008; nada nuevo que respaldar salvo las dos tablas (entran en la copia DAT-002).
+3. **Marcado**: opción «Curso (carpeta de lecciones)» en el diálogo de añadir contenido + caso de uso que recorre la carpeta, ordena por nombre de archivo y agrupa por subcarpeta. Sin red, sin candidatos, sin bandeja.
+4. **`CoursesView`**: cuadrícula con progreso, restante (`{0} h {1} min`), última vez y CTA «Continuar · M·L»; vacío en positivo con la acción de marcar. Entrada de navegación «Cursos» con su menú (Todos · Con hilo pendiente · Terminados · Marcar carpeta…).
+5. **`CourseDetailsView` + `LessonRowView`**: cabecera (carpeta en mono, progreso, «Curso terminado» si aplica), módulos con lecciones (glifo ○◐●, barra parcial, reproducir, marcar/desmarcar), y el panel del hilo: «Dónde lo dejaste» + minuto + fecha, «Lo último que viste» (2 lecciones), CTA «Retomar el hilo».
+6. **Reproductor**: botón y panel «Lecciones» (320 px, **ausente** salvo `kind == lesson`), lección actual resaltada; al terminar una lección, la cuenta atrás existente ofrece «Siguiente lección» (misma cancelación por tres entradas de PLY-011, revalidación del archivo en cero).
+7. **Pruebas**: nombre accesible por control nuevo + línea en el paseo, bilingüe, y una prueba del hilo: ver a medias, cerrar a la fuerza, reabrir → «Retomar el hilo» apunta a la misma lección dentro de ±5 s.
 
-**No implementes los activos de instalación.** Los 35 PNG están bloqueados esperando el original vectorial de la marca. Los cinco que hay en el paquete son marcadores de posición de entre 576 B y 7 KiB.
+## Reglas duras (rompen pruebas si se ignoran)
 
-**Cuatro cosas quedan abiertas y están documentadas como tal** en la última sección del README. Si te encuentras con alguna, no improvises: `SURFACES.es.md` y `.en.md` necesitan diez correcciones ya listadas; `LooseFileBanner` no es verificable por un defecto medido; quedan 6 controles sin pulsar en `eng/walk-pending.txt`; y las 25 cadenas de consecuencia están **propuestas, no aprobadas** — pregunta antes de escribirlas.
+1. Toda cadena visible por `DynamicResource`, en los dos archivos o en ninguno.
+2. `Content` y `AutomationProperties.Name` comparten clave: reescribir una etiqueta es renombrar el control.
+3. Solo tokens de `Theme/DesignTokens.axaml`; los cuatro temas + movimiento reducido (`MotionDuration`).
+4. Filas de acciones en `WrapPanel`; paneles superpuestos con alineación y `MaxWidth` **y** `MaxHeight`; la columna del reproductor es de 320 px fijos.
+5. Ausente ≠ deshabilitado: el panel Lecciones y el carril de recomendaciones **no existen** cuando no aplican; no se ponen en gris.
 
-**Un aviso sobre versiones:** el encargo original hablaba de Avalonia 11, pero `Directory.Packages.props` pina **12.1.1**. Trabaja contra lo que pina el árbol.
+## Verificación final
+
+Captura la aplicación real junto a `design/vistas/CoursesView.dc.html`, `CourseDetailsView.dc.html` y `LessonsPanelView.dc.html` en claro y oscuro (el patrón de la matriz de paridad de PRD-006) y añade el changelog bilingüe del tramo.
