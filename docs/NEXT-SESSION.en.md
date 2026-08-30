@@ -1,5 +1,38 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-08-30, state after picking up the Courses batch
+>
+> **The block below is already handled**: its run was read, and everything here came out of it. It is
+> kept as history, not as a task.
+>
+> **What blocks `main`, still at `f10e53e`: the gate for files NEW against `main`.** It was not
+> biting in the earlier runs because the script threw first, in the debt section, and never reached
+> it. With the list agreeing it runs, and it **demands 96/96 of every new `.cs`, admitting no
+> measured ceilings** — unlike the debt list, which does admit them.
+>
+> **Three files remain and the work is measured branch by branch:**
+>
+> | file | branches missing |
+> | --- | --- |
+> | `CourseLessonReader.cs` | **2**, on one line: one of its six `IsDBNull` arms is never taken |
+> | `CoursesViewModel.cs` | **15** |
+> | `CourseDetailsViewModel.cs` | **39** |
+>
+> The two view models **have no unit tests of their own**: the autonomous walk covers them through
+> the assembled shell, which measures behaviour rather than branches. That is the bulk of it.
+>
+> **The three `.axaml` are not part of that and are already settled**: the new-file gate filters
+> `*.cs`, so they never reach it, and their `100/50` is the branch Avalonia's compiler emits —
+> measured across the tree's 48 views, every one with a single branch at `1/2`. They are on the list
+> with their reason.
+>
+> **And a warning that cost a run**: removing an unreachable branch only wins if what replaces it is
+> reachable. The first attempt on `CourseThreadPolicy` swapped the `TakeWhile` for an equivalent
+> loop, removed the delegate-cache branch **and left the file worse** (93 → 94), because the loop
+> brought eight branches of its own. What worked was simplifying: the thread **is** the first lesson
+> not watched, so everything before it is watched by definition and locating it was unnecessary.
+> 100/100 without adding a single test.
+
 > ## HOT HANDOFF — 2026-08-30, Courses session → main session
 >
 > **`fbc25a3` is PUSHED and its CI run is in flight. Nobody has read it.** The watcher that was

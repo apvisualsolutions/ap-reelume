@@ -1,5 +1,37 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-08-30, estado tras recoger la tanda de Cursos
+>
+> **El bloque de abajo ya está atendido**: su run se leyó, y de él salió todo lo que sigue. Se deja
+> como historia, no como tarea.
+>
+> **Lo que bloquea `main`, que sigue en `f10e53e`: la puerta de archivos NUEVOS contra `main`.** No
+> mordía en los runs anteriores porque el guion fallaba antes, en la sección de deuda, y nunca
+> llegaba hasta ella. Con la lista cuadrada sí corre, y **exige 96/96 a todo `.cs` nuevo, sin admitir
+> techos medidos** — a diferencia de la lista de deuda, que sí los admite.
+>
+> **Quedan tres archivos y el trabajo está medido rama a rama:**
+>
+> | archivo | ramas que faltan |
+> | --- | --- |
+> | `CourseLessonReader.cs` | **2**, en una sola línea: uno de sus seis `IsDBNull` no se toma nunca |
+> | `CoursesViewModel.cs` | **15** |
+> | `CourseDetailsViewModel.cs` | **39** |
+>
+> Los dos ViewModels **no tienen pruebas unitarias propias**: los cubre el paseo autónomo a través
+> del shell ensamblado, que mide comportamiento y no ramas. Ahí está el grueso.
+>
+> **Los tres `.axaml` NO son parte de eso y ya están resueltos**: la puerta de nuevos filtra `*.cs`,
+> así que no pasan por ella, y su `100/50` es la rama que el compilador de Avalonia genera —medida
+> sobre las 48 vistas del árbol, todas con una sola rama a `1/2`—. Están en la lista con su motivo.
+>
+> **Y una advertencia que costó una vuelta**: quitar una rama inalcanzable sólo gana si lo que la
+> sustituye es alcanzable. El primer intento sobre `CourseThreadPolicy` cambió el `TakeWhile` por un
+> bucle equivalente, quitó la rama del caché de delegado **y dejó el archivo peor** (93 → 94), porque
+> el bucle traía ocho ramas propias. Lo que funcionó fue simplificar: el hilo **es** la primera
+> lección no vista, luego todo lo anterior está visto por definición y localizarlo sobraba. 100/100
+> sin añadir una sola prueba.
+
 > ## RELEVO EN CALIENTE — 2026-08-30, sesión de Cursos → sesión principal
 >
 > **`fbc25a3` está EMPUJADO y su run de CI está corriendo. Nadie lo ha leído.** El vigía que lo
