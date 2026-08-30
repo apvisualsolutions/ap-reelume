@@ -14,13 +14,22 @@ Rama / Branch: `codex/ap-reelume-mvp-x64`. Fecha / Date: 2026-08-30.
 ## Por qué exactamente 100/50 / Why exactly 100 over 50
 
 Un `throw` que nadie toma no deja una línea sin cubrir: la línea se ejecuta cada vez que se construye
-el tipo. Deja **media pareja de ramas**. Por eso ocho archivos de `Application` medían
+el tipo. Deja **media pareja de ramas**. Por eso **seis** archivos de `Application` medían
 `100` de líneas y `50` de ramas clavados, y por eso ninguna lectura de la cobertura de líneas los
 señalaba. `StopPlayback.cs` es el caso mínimo del repositorio: dos líneas ejecutables, una rama, y la
 cobertura dice `50% (1/2)` en la línea 12. / An untaken `throw` leaves no uncovered line — the line
 runs every time the type is built. It leaves **half a branch pair**. That is why eight `Application`
 files measured exactly `100` lines and `50` branches, and why no reading of line coverage pointed at
 them.
+
+**Seis y no ocho, y la diferencia se cuenta**: el análisis de la décima sesión dijo ocho y la lista
+tiene seis —`SetPreferredVersion`, `GetNextEpisode`, `RemoveLibraryRoot`, `IdentifyingScanCoordinator`,
+`StartPlayback`, `StopPlayback`—. Y `100/50` no significa lo mismo en todas partes: **69 archivos del
+árbol medían ese par**, y los otros 63 son casi todos `.axaml`, que es el número que mide un archivo
+de vista por su propia forma. Un par de cifras idéntico no es una causa idéntica. / **Six, not
+eight**: the tenth session's analysis said eight and the list holds six. And `100/50` does not mean
+the same thing everywhere — **69 files measured that pair**, and 63 of them are `.axaml` views,
+where it is what a view file measures by its own shape.
 
 Medido con la suite de `Application` antes y después, sobre el mismo binario:
 
@@ -143,8 +152,37 @@ runner hospedado no puede ejercitar, y un suelo medido aquí sería un suelo par
 verifica nada. / It does not touch `Windows`, though twelve of its files are in the debt: they are
 native adapters a hosted runner cannot exercise.
 
-Y no baja el trinquete. Subir cobertura cuesta **dos vueltas de CI**: la puerta se pone roja en
-cuanto un archivo mejora —pidiendo sacarlo de la lista o subir su suelo—, y la segunda vuelta es la
-que copia el artefacto `coverage-debt` de la primera y mueve `$debtRatchet`. **El rojo de la primera
-es el resultado esperado, no un fallo.** / And it does not lower the ratchet. Raising coverage costs
-**two CI runs**, and the first one's red is the expected result rather than a failure.
+## Las dos vueltas, y lo que midió la primera / The two runs, and what the first one measured
+
+Subir cobertura cuesta **dos vueltas de CI**: la puerta se pone roja en cuanto un archivo mejora
+—pidiendo sacarlo de la lista o subir su suelo—, y la segunda copia el artefacto `coverage-debt` de la
+primera y mueve `$debtRatchet`. **El rojo de la primera es el resultado esperado, no un fallo.** /
+Raising coverage costs **two CI runs**, and the first one's red is the expected result rather than a
+failure.
+
+El run `33309085668`, sobre `899c360`, salió rojo por la puerta de cobertura **y por nada más**: las
+suites pasaron enteras, `AccessibilityTests` incluida con sus 146. Lo que dijo:
+
+```
+Coverage gate: 205 file(s) still short of 96/96, ratchet 205, 186 measured under the bar, 66 improved.
+```
+
+**Sesenta y seis archivos mejoran y diecinueve alcanzan 96/96 y salen**, así que el trinquete baja de
+205 a **186**: el mayor movimiento que esta lista ha tenido de una vez. **Ninguno entra**, que es la
+otra mitad de la lectura — la puerta exige que la lista sea completa además de exacta, así que un
+archivo degradado habría salido nombrado y no hay ninguno. / **Sixty-six files improve and nineteen
+reach 96/96 and leave**, so the ratchet comes down from 205 to **186**. **None enter**, which is the
+other half of the reading: the gate requires the list to be complete as well as accurate, so a
+degraded file would have been named and none was.
+
+**Cuatro de los seis** archivos de `Application` clavados en 100/50 están entre los que salen:
+`GetNextEpisode`, `IdentifyingScanCoordinator`, `StartPlayback` y `StopPlayback`.
+`SetPreferredVersion` sube a 100/75 y `RemoveLibraryRoot` se queda exactamente donde estaba, porque
+sus archivos tienen más ramas que la guarda: el barrido cubre la suya y deja las demás para quien las
+mire. / **Four of the six** `Application` files stuck at 100/50 are among those that leave. The other
+two have branches beyond the guard.
+
+**El artefacto se copió con sus 186 filas verbatim y convertido a LF**: viene con CRLF y
+`.gitattributes` fija `eol=lf`, que es la misma trampa que este árbol ya tenía escrita para
+PowerShell. / **The artefact was copied verbatim and converted to LF**: it arrives with CRLF and
+`.gitattributes` pins `eol=lf`.

@@ -86,10 +86,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **A sweep that hands every constructor a null, and with it 303 guards nothing had ever taken.**
   Ninety of the two hundred and five files short of the coverage bar were short of it for one
   repeated reason: a `?? throw new ArgumentNullException` no test had ever exercised. An untaken
-  `throw` is half a branch pair, which is why eight Application files measured exactly 100 lines and
-  50 branches. `ConstructorGuardSweep` builds each type with a stand-in in every position but one and
+  `throw` is half a branch pair, which is why **six** Application files measured exactly 100 lines
+  and 50 branches — the earlier analysis said eight, and counting them says six. `ConstructorGuardSweep` builds each type with a stand-in in every position but one and
   a null in that one, and requires an `ArgumentNullException` **naming that parameter**: **127**
   parameters in Application, **112** in Presentation and **64** in Infrastructure.
+
+  **What that is worth, measured by CI rather than estimated here**: 66 files improve and **nineteen
+  reach 96/96 and leave the list**, which comes down from 205 to **186** — the largest single move it
+  has had. None enter: nothing degraded. **Four of the six** files stuck at exactly 100/50 are among
+  those that leave; `SetPreferredVersion` rises to 100/75 and `RemoveLibraryRoot` stays, because its
+  file has branches beyond the guard.
 
   Three exclusions, all structural rather than a list, because a list is a thing to maintain:
   records, this repository's data carriers, which legitimately validate nothing — 190 of the 319

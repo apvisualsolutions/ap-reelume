@@ -20,7 +20,9 @@ Noventa de los doscientos cinco archivos por debajo de 96/96 lo estaban por **un
 `?? throw new ArgumentNullException` en el constructor que ninguna prueba había ejercido nunca. Y no
 se veía leyendo la cobertura de líneas, porque **un `throw` que nadie toma no deja una línea sin
 cubrir**: la línea se ejecuta cada vez que se construye el tipo. Deja media pareja de ramas. Por eso
-ocho archivos de `Application` medían `100` y `50` clavados.
+**seis** archivos de `Application` medían `100` y `50` clavados —el análisis de la décima decía
+ocho, y contarlos dice seis; `100/50` es además el valor que mide **todo** archivo `.axaml`, así que
+los 69 archivos del árbol con ese par no lo tienen por el mismo motivo—.
 
 `tests/Shared/ConstructorGuardSweep.cs` construye cada tipo con un sustituto en todas las posiciones
 menos una y un null en ésa, y exige un `ArgumentNullException` que **nombre ese parámetro**:
@@ -39,16 +41,25 @@ por su tipo base, y lo que escribió el compilador por su atributo—, porque un
 mantener. El primer sondeo midió **319** parámetros de referencia en `Application` y 129 lanzaban;
 los otros 190 eran records de datos, que legítimamente no validan.
 
-### Lo que espera a la duodécima, y no es opcional
+### Las dos vueltas de CI, hechas: el trinquete baja de 205 a 186
 
-**La primera vuelta de CI de esta rama se pondrá roja, y ése es el resultado esperado.** La puerta
-falla igual ante un suelo corto que ante uno largo, así que en cuanto un archivo mejora pide sacarlo
-de la lista o subir su suelo. La segunda vuelta es la que copia el artefacto `coverage-debt` de la
-primera y baja `$debtRatchet` en `eng/check-coverage.ps1`, que está en **205**.
+**La primera salió roja, y era el resultado esperado.** La puerta falla igual ante un suelo corto que
+ante uno largo, así que en cuanto un archivo mejora pide sacarlo de la lista o subirle el suelo. El
+run `33309085668` sobre `899c360` falló **sólo** por eso —las suites pasaron enteras,
+`AccessibilityTests` con sus 146 incluida— y dijo:
 
-Medido sólo con `Application.Tests` —que **subestima**, porque la fusión de CI añade lo que otras
-suites cubren—, once archivos de `Application` alcanzan 96/96 que antes no lo hacían, y treinta y
-nueve mejoran. El número real lo dirá el artefacto.
+```
+Coverage gate: 205 file(s) still short of 96/96, ratchet 205, 186 measured under the bar, 66 improved.
+```
+
+**66 archivos mejoran y diecinueve alcanzan 96/96 y salen**, así que `eng/coverage-debt.txt` pasa a
+las 186 filas del artefacto —copiadas verbatim y convertidas a LF, que viene en CRLF— y
+`$debtRatchet` baja a **186**. Es el mayor movimiento que esta lista ha tenido de una vez.
+**Ninguno entra**, y ésa es la otra mitad de la lectura: la puerta exige que la lista sea completa
+además de exacta, así que un archivo degradado habría salido nombrado.
+
+La estimación local decía once y la fusión dice diecinueve. **Una suite sola subestima**, y la
+dirección era la buena; el número, no.
 
 ### Tres trampas nuevas, todas del instrumento
 
@@ -87,9 +98,11 @@ resultado. Si CI vuelve a sacarlo, saldrá nombrado.
 
 ### Por dónde entra la duodécima
 
-1. **Leer el run de CI de `291bbc2`** y avanzar `main` sólo con él en verde. Si es rojo por suelos que
-   se han quedado cortos, **eso es lo esperado**: se descarga el artefacto `coverage-debt`, se copia
-   sobre `eng/coverage-debt.txt` y se baja el trinquete en el mismo cambio.
+1. **Leer el run de la segunda vuelta y avanzar `main` sólo con él en verde.** La primera ya está
+   leída y su rojo era el esperado; la segunda es la que verifica el trinquete en 186. Si volviera a
+   salir roja pidiendo mover un suelo, sería un **baile** —un archivo que mide distinto entre dos
+   runs— y entonces el suelo se pone en el más bajo de los que se hayan visto, nunca en la lectura
+   de un run.
 2. **Los ocho constructores primarios.** Convertirlos a constructor explícito con su guarda vacía las
    dos listas cerradas que este barrido deja, y la regla pasa a ser estructural del todo. Son
    `ExecuteRename`, `PreviewRename`, `UndoRename`, `UpdateMetadata` e `IntegrityChecker` con un

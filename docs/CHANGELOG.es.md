@@ -87,11 +87,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 - **Un barrido que le da un null a cada constructor, y con él 303 guardas que nunca se habían
   tomado.** Noventa de los doscientos cinco archivos por debajo del listón de cobertura lo estaban
   por una sola forma repetida: un `?? throw new ArgumentNullException` que ninguna prueba había
-  ejercido nunca. Un `throw` que nadie toma es media pareja de ramas, y por eso ocho archivos de
-  Application medían exactamente 100 de líneas y 50 de ramas. `ConstructorGuardSweep` construye cada
+  ejercido nunca. Un `throw` que nadie toma es media pareja de ramas, y por eso **seis** archivos de
+  Application medían exactamente 100 de líneas y 50 de ramas —el análisis previo decía ocho, y
+  contarlos dice seis—. `ConstructorGuardSweep` construye cada
   tipo con un sustituto en todas las posiciones menos una y un null en ésa, y exige un
   `ArgumentNullException` que **nombre ese parámetro**: **127** parámetros en Application, **112** en
   Presentation y **64** en Infrastructure.
+
+  **Lo que eso vale, medido por CI y no estimado aquí**: 66 archivos mejoran y **diecinueve alcanzan
+  96/96 y salen de la lista**, que baja de 205 a **186** — el mayor movimiento que ha tenido de una
+  vez. Ninguno entra: nada se degradó. Entre los que salen están **cuatro de los seis** que estaban
+  clavados en 100/50; `SetPreferredVersion` sube a 100/75 y `RemoveLibraryRoot` se queda, porque su
+  archivo tiene más ramas que la guarda.
 
   Tres exclusiones, todas estructurales en lugar de una lista, porque una lista es algo que
   mantener: los records, que son los portadores de datos de este repositorio y legítimamente no

@@ -19,7 +19,7 @@ the tooling (`8296679`).
 Ninety of the two hundred and five files under 96/96 were under it for **one reason**: a
 `?? throw new ArgumentNullException` in the constructor that no test had ever exercised. And it was
 invisible in line coverage, because **an untaken `throw` leaves no uncovered line**: the line runs
-every time the type is built. It leaves half a branch pair. That is why eight `Application` files
+every time the type is built. It leaves half a branch pair. That is why **six** `Application` files
 measured exactly `100` and `50`.
 
 `tests/Shared/ConstructorGuardSweep.cs` builds each type with a stand-in in every position but one
@@ -39,17 +39,25 @@ exceptions by their base type, and what the compiler wrote by its attribute — 
 thing to maintain. The first probe measured **319** reference parameters in `Application` and 129
 threw; the other 190 were data records, which legitimately validate nothing.
 
-### What waits for the twelfth, and it is not optional
+### Both CI runs, done: the ratchet comes down from 205 to 186
 
-**This branch's first CI run will go red, and that is the expected result.** The gate fails on a
-floor that is short exactly as it fails on one that is long, so the moment a file improves it asks
-for the file to leave the list or for its floor to rise. The second run is the one that copies the
-first's `coverage-debt` artefact and lowers `$debtRatchet` in `eng/check-coverage.ps1`, which sits at
-**205**.
+**The first went red, and that was the expected result.** The gate fails on a floor that is short
+exactly as it fails on one that is long, so the moment a file improves it asks for the file to leave
+the list or for its floor to rise. Run `33309085668` on `899c360` failed for **that alone** — every
+suite passed, `AccessibilityTests` with its 146 included — and said:
 
-Measured with `Application.Tests` alone — which **understates**, because CI's merge adds what other
-suites cover — eleven `Application` files reach 96/96 that did not before, and thirty-nine improve.
-The real number comes from the artefact.
+```
+Coverage gate: 205 file(s) still short of 96/96, ratchet 205, 186 measured under the bar, 66 improved.
+```
+
+**66 files improve and nineteen reach 96/96 and leave**, so `eng/coverage-debt.txt` becomes the
+artefact's 186 rows — copied verbatim and converted to LF, which it arrives without — and
+`$debtRatchet` comes down to **186**. It is the largest single move this list has had. **None
+enter**, which is the other half of the reading: the gate requires the list to be complete as well as
+accurate, so a degraded file would have been named.
+
+The local estimate said eleven and the merge says nineteen. **One suite alone understates**: the
+direction was right, the number was not.
 
 ### Three new traps, all of them in the instrument
 
@@ -88,9 +96,10 @@ it will come back named.
 
 ### Where the twelfth session starts
 
-1. **Read the CI run for `291bbc2`** and advance `main` only on its green. If it is red over floors
-   that have gone short, **that is the expected shape**: download the `coverage-debt` artefact, copy
-   it over `eng/coverage-debt.txt`, and lower the ratchet in the same change.
+1. **Read the second run and advance `main` only on its green.** The first is already read and its
+   red was the expected one; the second is what verifies the ratchet at 186. If it comes back red
+   asking for a floor to move, that is a **dance** — a file that measures differently between two
+   runs — and the floor then goes to the lowest reading seen, never to one run's.
 2. **The eight primary constructors.** Converting them to explicit constructors with their guard
    empties both closed lists this sweep leaves, and the rule becomes fully structural. They are
    `ExecuteRename`, `PreviewRename`, `UndoRename`, `UpdateMetadata` and `IntegrityChecker` with one
