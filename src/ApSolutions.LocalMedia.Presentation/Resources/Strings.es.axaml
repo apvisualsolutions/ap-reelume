@@ -13,6 +13,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="NavigationBackups">Copias</x:String>
   <x:String x:Key="NavigationSettings">Ajustes</x:String>
   <x:String x:Key="NavigationAddMedia">Añadir medios</x:String>
+  <x:String x:Key="NavigationCourses">Cursos</x:String>
   <x:String x:Key="NavigationDuplicates">Duplicados</x:String>
   <x:String x:Key="DuplicatesOverviewAccessibleName">Grupos de duplicados</x:String>
   <x:String x:Key="DuplicatesIntro">Los duplicados son versiones del mismo contenido. Ningún archivo se elimina, oculta ni mueve; solo eliges cuál se reproduce por defecto.</x:String>

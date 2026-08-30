@@ -2,18 +2,21 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Catalog;
+using ApSolutions.LocalMedia.Application.Courses;
 using ApSolutions.LocalMedia.Application.Data;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Events;
 using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Common;
+using ApSolutions.LocalMedia.Domain.Courses;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Media;
 using ApSolutions.LocalMedia.Infrastructure.Time;
+using ApSolutions.LocalMedia.Presentation.Courses;
 using ApSolutions.LocalMedia.Presentation.Navigation;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Windows.Shell;
@@ -59,6 +62,21 @@ public static partial class CompositionRoot
             // how a folder of episodes becomes one card. Registered and fed, this time.
             .AddSingleton<ICatalogRepository>(provider => provider.GetRequiredService<CatalogRepository>())
             .AddSingleton<ICatalogQueryService>(provider => provider.GetRequiredService<CatalogRepository>())
+            // Courses (CRS-001..CRS-003). One adapter answers both course ports - the depth a root
+            // declares is a column on `library_roots`, so splitting it into a store of its own would
+            // be a second class over one table - but only the port the grid uses is registered here.
+            //
+            // `ICourseRootDeclarationStore` and `MarkCoursesInRoot` are deliberately NOT registered
+            // yet: nothing resolves them until the add-media dialog offers «Curso (carpeta de
+            // lecciones)», and a service nobody resolves is this repository's own characteristic
+            // defect. ServiceConsumptionTests said so out loud when they were, which is what that
+            // gate is for.
+            .AddSingleton<CourseRepository>()
+            .AddSingleton<ICourseRepository>(provider => provider.GetRequiredService<CourseRepository>())
+            .AddSingleton<ICourseLessonReader, CourseLessonReader>()
+            .AddSingleton<GetCourses>()
+            .AddSingleton<CoursesViewModel>()
+            .AddSingleton<CourseDetailsViewModel>()
             .AddSingleton<IPathNormalizer, WindowsPathNormalizer>()
             .AddSingleton<IMediaFileEnumerator, MediaFileEnumerator>()
             .AddSingleton<IMediaProbe, LibVlcMediaProbe>()

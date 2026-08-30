@@ -13,6 +13,7 @@ using ApSolutions.LocalMedia.Application.Updates;
 using ApSolutions.LocalMedia.Domain.Appearance;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Courses;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
 using ApSolutions.LocalMedia.Domain.Metadata;
@@ -5935,6 +5936,160 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             : $"{opened} — idle={surfaces.Player.IsIdle} opening={surfaces.Player.IsOpening} "
                 + $"playing={surfaces.Player.IsPlaying} stopped={surfaces.Player.IsStopped} "
                 + $"failed={surfaces.Player.HasFailed} path={surfaces.Player.MediaPath}";
+
+    /// <summary>
+    /// The courses destination, pressed with the mouse (CRS-001..CRS-005): marking a folder, opening
+    /// a course, carrying on with its thread, and marking one lesson watched by hand.
+    /// </summary>
+    /// <remarks>
+    /// The mark is the one press whose effect is a row rather than a surface, and it is the one that
+    /// matters most here: it is what says a lesson's progress is PLY-008's progress. It is asserted
+    /// on the watch state the store holds, not on the glyph, because a glyph would prove the row
+    /// redrew itself and nothing about what was written down.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_courses_destination_marks_a_folder_and_carries_on_with_a_course()
+    {
+        var mediaRoot = Path.Combine(_dataRoot, "cursos");
+        Directory.CreateDirectory(Path.Combine(mediaRoot, "Composicion", "01 - Modulo uno"));
+        var factory = await SeedRootAsync(mediaRoot, ScanPolicy.Manual);
+
+        var first = Path.Combine(mediaRoot, "Composicion", "01 - Modulo uno", "01 - Intro.mp4");
+        var second = Path.Combine(mediaRoot, "Composicion", "01 - Modulo uno", "02 - El nodo.mp4");
+        File.WriteAllBytes(first, [0]);
+        File.WriteAllBytes(second, [0]);
+        var firstFile = await SeedMediaFileAsync(factory, mediaRoot, first, TimeSpan.FromMinutes(10));
+        var secondFile = await SeedMediaFileAsync(factory, mediaRoot, second, TimeSpan.FromMinutes(10));
+
+        var roots = await new LibraryRootRepository(factory).ListAsync(TestContext.Current.CancellationToken);
+        var rootId = roots.Single(candidate => candidate.Path == mediaRoot).Id;
+        var courseId = new CourseId(Guid.NewGuid());
+        var firstLesson = new LessonId(Guid.NewGuid());
+        await new CourseRepository(factory).SaveAsync(
+            new Course(courseId, rootId, "Composicion", "Composicion", DateTimeOffset.UnixEpoch, null),
+            [
+                new Lesson(
+                    firstLesson,
+                    CourseId: default,
+                    new MediaFileId(firstFile),
+                    "Modulo uno",
+                    new LessonOrdinal(1, null),
+                    new LessonOrdinal(1, null),
+                    "01 - Intro",
+                    "Intro",
+                    "Composicion/01 - Modulo uno/01 - Intro.mp4"),
+                new Lesson(
+                    new LessonId(Guid.NewGuid()),
+                    CourseId: default,
+                    new MediaFileId(secondFile),
+                    "Modulo uno",
+                    new LessonOrdinal(1, null),
+                    new LessonOrdinal(2, null),
+                    "02 - El nodo",
+                    "El nodo",
+                    "Composicion/01 - Modulo uno/02 - El nodo.mp4"),
+            ],
+            TestContext.Current.CancellationToken);
+
+        using var host = ShowShell(height: 1600);
+        Navigate(host, AppRoute.Courses);
+        var grid = host.ViewModel.Courses;
+        Assert.NotNull(grid);
+        await grid!.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // Marking a folder opens the one door the shell already owns, and the scrim closes it again.
+        await PressAsync(
+            host,
+            "CoursesMarkFolderAction",
+            () => host.ViewModel.IsAddingRoot,
+            "clicking Marcar una carpeta como curso never opened the add-media dialog");
+        Assert.True(host.ViewModel.IsAddingRoot);
+        await PressAsync(
+            host,
+            "AddRootCancelAction",
+            () => host.ViewModel.IsAddingRoot,
+            "clicking Cancelar never put the add-media dialog away");
+        Assert.False(host.ViewModel.IsAddingRoot);
+
+        // The card's second button opens the course under the grid without starting anything.
+        var card = Assert.Single(grid.Cards);
+        await PressAsync(
+            host,
+            card.AccessibleName,
+            () => host.ViewModel.HasCourseDetails,
+            "clicking a course card never opened the course under the grid",
+            recordAs: "{Binding AccessibleName}");
+        Assert.True(host.ViewModel.HasCourseDetails);
+        var details = host.ViewModel.CourseDetails;
+        Assert.NotNull(details);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // Marking a lesson watched by hand, asserted on the store rather than on the glyph: what
+        // this press claims is that a lesson's progress is the progress PLY-008 already keeps.
+        var watchStates = new WatchStateRepository(factory);
+        var key = CourseProgressKey.For(courseId, firstLesson);
+        var row = details!.Modules[0].Lessons[0];
+        await PressAsync(
+            host,
+            row.MarkAccessibleName,
+            async () => (await watchStates.GetAsync(key, TestContext.Current.CancellationToken))?.Status,
+            "clicking Marcar como vista never wrote the lesson down as watched",
+            recordAs: "{Binding MarkAccessibleName}");
+        var stored = await watchStates.GetAsync(key, TestContext.Current.CancellationToken);
+        Assert.NotNull(stored);
+        Assert.Equal(WatchStatus.Watched, stored!.Status);
+        Assert.True(stored.IsManualOverride);
+
+        // The thread's own button, and one lesson's play button: both open a session, which is the
+        // effect that proves them. The thread moved to the second lesson when the first was marked,
+        // so this is also the assertion that the thread is read and not remembered.
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            details.ThreadActionText,
+            () => host.ViewModel.IsPlayerVisible,
+            "clicking Retomar el hilo never opened the lesson it points at",
+            recordAs: "{Binding ThreadActionText}");
+        Assert.True(host.ViewModel.IsPlayerVisible);
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        Navigate(host, AppRoute.Courses);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        var playable = details.Modules[0].Lessons[1];
+        await PressAsync(
+            host,
+            playable.AccessibleName,
+            () => host.ViewModel.IsPlayerVisible,
+            "clicking a lesson never opened it",
+            recordAs: "{Binding AccessibleName}");
+        Assert.True(host.ViewModel.IsPlayerVisible);
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // And the card's first button, which is the one that carries straight on: it opens the
+        // course and starts the thread in one press.
+        Navigate(host, AppRoute.Courses);
+        await grid.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            grid.Cards[0].ActionText,
+            () => host.ViewModel.IsPlayerVisible,
+            "clicking Continuar on a course card never started the lesson the thread points at",
+            recordAs: "{Binding ActionText}");
+        Assert.True(host.ViewModel.IsPlayerVisible);
+        await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+    }
 
     private static void Navigate(ShellHost host, AppRoute route)
     {

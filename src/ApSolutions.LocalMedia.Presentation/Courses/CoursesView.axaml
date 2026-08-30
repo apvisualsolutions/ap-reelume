@@ -1,0 +1,180 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The courses destination (CRS-003). A grid of folders somebody marked, each card carrying the one
+thing that card is for: carrying on.
+
+The empty state is drawn on the positive surface and not as a blank, because it is the state every
+new install is in and it has an answer — mark a folder. The action that answers it lives in the
+header rather than inside the empty box, so it is still there once there are courses: an offer that
+disappears the moment it starts working is an offer somebody has to go looking for.
+
+The detection note is at the foot and not at the head. It says what a course is detected from — the
+folder, never a provider — which is a reassurance rather than an instruction, and a reassurance read
+before anybody has asked the question is just noise above the content.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Courses.CoursesView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:courses="clr-namespace:ApSolutions.LocalMedia.Presentation.Courses"
+    x:DataType="courses:CoursesViewModel"
+    automation:AutomationProperties.Name="{DynamicResource CoursesNavLabel}">
+  <StackPanel Spacing="{DynamicResource Space16}">
+    <StackPanel Spacing="{DynamicResource Space4}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeTitle}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource CoursesNavLabel}"
+          automation:AutomationProperties.HeadingLevel="1" />
+      <TextBlock
+          MaxWidth="900"
+          HorizontalAlignment="Left"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource CoursesIntro}"
+          TextWrapping="Wrap" />
+    </StackPanel>
+
+    <!--
+      A WrapPanel and not a horizontal StackPanel: an action row beside a label of free width is one
+      of the two shapes measured to push controls off the side, out to x=2146 in the worst case.
+    -->
+    <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+      <Button
+          Classes="primary-action"
+          Content="{DynamicResource CoursesMarkFolderAction}"
+          automation:AutomationProperties.Name="{DynamicResource CoursesMarkFolderAction}"
+          Command="{Binding MarkFolderCommand}" />
+    </WrapPanel>
+
+    <Border
+        IsVisible="{Binding IsEmpty}"
+        Padding="16"
+        Background="{DynamicResource PositiveSurfaceBrush}"
+        BorderBrush="{DynamicResource PositiveBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusMedium}">
+      <StackPanel Spacing="{DynamicResource Space4}">
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+          <TextBlock Classes="state-glyph" Text="✓" automation:AutomationProperties.AccessibilityView="Raw" />
+          <TextBlock
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource CoursesEmptyTitle}" />
+        </StackPanel>
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource CoursesEmptyDescription}"
+            TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <ItemsControl IsVisible="{Binding HasCourses}" ItemsSource="{Binding Cards}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel ItemSpacing="{DynamicResource Space16}" LineSpacing="{DynamicResource Space16}" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="courses:CourseCardViewModel">
+          <!--
+            280 px wide, which is what lets three cards sit inside the narrowest window the
+            application allows once the rail and the page margins are taken off. A card that sized
+            itself to its title would give a row of different heights and a grid that reflows every
+            time a folder is renamed.
+          -->
+          <Border
+              Width="280"
+              Padding="16"
+              Background="{DynamicResource CardSurfaceBrush}"
+              BorderBrush="{DynamicResource ShellHairlineBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource CornerRadiusMedium}"
+              automation:AutomationProperties.Name="{Binding AccessibleName}">
+            <StackPanel Spacing="{DynamicResource Space8}">
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeSubtitle}"
+                  FontWeight="SemiBold"
+                  Text="{Binding Title}"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+              <!--
+                The folder in the monospace face, which is what the tree already does with a path:
+                it is the thing that tells two courses of the same name apart.
+              -->
+              <TextBlock
+                  FontFamily="{DynamicResource FontFamilyMono}"
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource TextSecondaryBrush}"
+                  Text="{Binding RelativePath}"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+              <!--
+                The base theme gives a ProgressBar a minimum height of four and a minimum width of
+                200, so Height alone measures 4 and a bar inside a 248 px card clips rather than
+                fits. The three setters are the ones the episode row already needed.
+              -->
+              <ProgressBar
+                  Height="3"
+                  MinHeight="3"
+                  MinWidth="0"
+                  Background="{DynamicResource ControlFillBrush}"
+                  Foreground="{DynamicResource AccentBrush}"
+                  Maximum="1"
+                  Value="{Binding Progress}"
+                  automation:AutomationProperties.AccessibilityView="Raw" />
+              <TextBlock
+                  FontSize="{DynamicResource FontSizeCaption}"
+                  Foreground="{DynamicResource TextSecondaryBrush}"
+                  Text="{Binding Meta}"
+                  TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock
+                    Classes="state-glyph"
+                    Text="✓"
+                    IsVisible="{Binding IsFinished}"
+                    automation:AutomationProperties.AccessibilityView="Raw" />
+                <TextBlock
+                    FontSize="{DynamicResource FontSizeCaption}"
+                    FontWeight="SemiBold"
+                    IsVisible="{Binding IsFinished}"
+                    Text="{DynamicResource CourseFinishedChip}" />
+              </StackPanel>
+              <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+                <!--
+                  The card's own button, and it carries the label the state earns: a folder still
+                  being walked opens nothing, a finished course opens rather than resumes, and
+                  picking up is a different word from continuing. It is not accented — the screen has
+                  already spent its one accent on marking a folder, and a grid where every card
+                  shouts has no leading action at all.
+                -->
+                <Button
+                    Content="{Binding ActionText}"
+                    IsEnabled="{Binding CanAct}"
+                    automation:AutomationProperties.Name="{Binding ActionText}"
+                    Command="{Binding ResumeCommand}"
+                    CommandParameter="{Binding}" />
+                <Button
+                    Content="{DynamicResource CourseKicker}"
+                    automation:AutomationProperties.Name="{Binding AccessibleName}"
+                    Command="{Binding OpenCommand}"
+                    CommandParameter="{Binding}" />
+              </WrapPanel>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <TextBlock
+        MaxWidth="900"
+        HorizontalAlignment="Left"
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        Text="{DynamicResource CoursesDetectionNote}"
+        TextWrapping="Wrap" />
+  </StackPanel>
+</UserControl>

@@ -191,6 +191,7 @@ public sealed class CourseThreadPolicyTests
         WatchStatus status,
         TimeSpan? position = null) => new(
         new LessonId(Guid.NewGuid()),
+        new MediaFileId(Guid.NewGuid()),
         module,
         "Módulo " + module,
         number,

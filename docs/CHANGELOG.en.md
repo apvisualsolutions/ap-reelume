@@ -133,6 +133,68 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The course card and its lesson row, with the thread inside.** `CourseDetailsView` stacks under
+  the grid — the pattern the library and Duplicates already use, list above and detail below — so
+  coming back from a course is scrolling up rather than a button somebody has to find. Its title is a
+  **level-2** heading: the destination's level 1 belongs to the grid, and two in one destination is
+  the defect the settings column already cost once.
+
+  The thread panel sits in a `Grid`'s **fixed 320 px column** rather than stuck to the viewport,
+  which is what the design package asks for and what this framework allows: AXAML has no
+  `position: sticky`, and the settings column already solved that shape by putting the `ScrollViewer`
+  on one column and leaving the other alone.
+
+  `LessonRowView` mirrors the episode row: the same three states, the same **○ ◐ ●** glyphs — shape
+  before colour, for anybody who cannot tell the accent from the secondary text — the same partial
+  bar underneath, and a mark a person's hand wins with. The glyphs leave the automation tree because
+  the row's own name already says the state in words; announced twice it is read twice.
+
+- **Marking a lesson watched writes where PLY-008 already writes.** No new use case: it calls
+  `SetWatchStatus` with `CourseProgressKey`'s key, so a lesson's mark is a watch state like any other
+  — which is what makes it survive the file being moved.
+
+- **The walk scene exists and presses all six things** with the mouse: mark a folder, open the
+  course, mark a lesson, pick up the thread, play a lesson, and continue from the card. **The mark is
+  asserted against the store rather than the glyph**, because a glyph would only prove the row
+  redrew itself. The walk ratchet **stays at 20**: 238 declared command controls, 213 pressed, and
+  nothing new on the pending list.
+
+- **And one that was missing and could not be seen.** `IsCoursesVisible` was not among the properties
+  the shell announces on navigation, so the destination existed, the route changed and **the screen
+  never drew**. The walk found it by failing to find the button, which is exactly what pressing with
+  a mouse is for rather than checking a boolean.
+
+- **Courses is the rail's third destination, and the grid exists.** `CoursesView` with its positive
+  empty state, its 280 px cards carrying progress, what is left and the label the state earns —
+  "Continue · M2·L06", "Pick up · …", "Finished · open" or "Opens when scanned", which are four
+  different offers rather than four ways of saying one thing — and the detection note at the foot.
+
+  The leading action is **marking a folder**, and it lives in the header rather than inside the empty
+  box: an offer that disappears the moment it starts working is an offer somebody has to go looking
+  for. The cards' own buttons are not accented, because a grid where every card shouts has no leading
+  action at all.
+
+- **The icon was converted from the prototype, not drawn.** Its `course` shape is two rounded
+  rectangles and a play triangle; both rectangles become the arcs that draw them, as the other ten
+  converted ones already did, and the triangle is stroked rather than filled because that is what
+  `IconPlay` does with its own. One drawing tradition per rail.
+
+- **Five declared gates move and none is loosened**: the shell's routes and the navigation contract
+  go from five destinations to six — asserted **by name and in order** rather than by count, because
+  a route that entered the enum where the rail does not draw it would still pass a count — the icon
+  inventory takes its own, `LeadingActionTests` gains its row, and the accessibility keyboard walk
+  goes from five buttons to six, each pressed and checked against the route it opens.
+
+- **And one that fired and was right.** `ServiceConsumptionTests` refused two new registrations:
+  `MarkCoursesInRoot` and, hanging off it, `ICourseRootDeclarationStore`. Nothing resolves them until
+  the add-media dialog offers "Course (folder of lessons)", and a service nobody resolves is this
+  repository's characteristic defect. **They leave the container** and return with the tranche that
+  feeds them, with the reason written where they were.
+
+  The rail's mark-folder command **builds no door of its own**: the shell hands it the one it already
+  owns, the add-media dialog's, exactly as it does with the duplicates list's opener. A second door
+  onto the same room is one that can drift from the first.
+
 - **A course's thread, and the progress that already existed.** `CourseProgressKey` invents no
   store: it keeps a lesson's position under the key PLY-008 already uses, with the course where a
   title goes and the lesson where an episode goes. Resume, PLY-009's watched threshold, the manual

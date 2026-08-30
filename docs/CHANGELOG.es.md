@@ -135,6 +135,68 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La ficha del curso y su fila de lección, con el hilo dentro.** `CourseDetailsView` se apila bajo
+  la cuadrícula —el patrón que la biblioteca y Duplicados ya usan: lista arriba, detalle abajo—, así
+  que volver de un curso es subir con la rueda y no un botón que alguien tiene que encontrar. Su
+  título es de **nivel 2**: el nivel 1 del destino es de la cuadrícula, y dos en un mismo destino es
+  el defecto que la columna de Ajustes ya costó una vez.
+
+  El panel del hilo va en la **columna fija de 320 px de un `Grid`** y no pegado al viewport, que es
+  lo que el paquete de diseño pide y lo que este marco permite: AXAML no tiene `position: sticky`, y
+  la columna de Ajustes ya resolvió esa misma forma poniendo el `ScrollViewer` en una columna y
+  dejando la otra quieta.
+
+  `LessonRowView` es el espejo de la fila de episodio: los mismos tres estados, los mismos glifos
+  **○ ◐ ●** —forma antes que color, para quien no distinga el acento del texto secundario—, la misma
+  barra parcial debajo, y una marca que la mano gana. Los glifos salen del árbol de automatización
+  porque el nombre de la fila ya dice el estado con palabras: anunciado dos veces se lee dos veces.
+
+- **Marcar una lección vista escribe donde PLY-008 ya escribe.** No hay caso de uso nuevo: se llama a
+  `SetWatchStatus` con la clave de `CourseProgressKey`, así que la marca de una lección es un estado
+  de visto como cualquier otro — que es lo que hace que sobreviva a mover el archivo.
+
+- **La escena del paseo existe y pulsa las seis cosas** con el ratón: marcar carpeta, abrir el curso,
+  marcar una lección, retomar el hilo, reproducir una lección y continuar desde la tarjeta. **La
+  marca se comprueba contra el almacén, no contra el glifo**, porque un glifo sólo demostraría que la
+  fila se volvió a dibujar. El trinquete del paseo **se queda en 20**: 238 controles declarados, 213
+  pulsados, y ninguno nuevo en la lista de pendientes.
+
+- **Y una que faltaba y no se veía.** `IsCoursesVisible` no estaba entre las propiedades que el shell
+  anuncia al navegar, así que el destino existía, la ruta cambiaba y **la pantalla no se dibujaba**.
+  La encontró el paseo al no hallar el botón, que es exactamente para lo que sirve pulsar con el
+  ratón en vez de comprobar un booleano.
+
+- **Cursos es el tercer destino del riel, y la cuadrícula existe.** `CoursesView` con su estado
+  vacío en positivo, sus tarjetas de 280 px con progreso, restante y la etiqueta que el estado gana
+  —«Continuar · M2·L06», «Retomar · …», «Terminado · abrir» o «Se abrirá al escanear», que son cuatro
+  ofertas distintas y no cuatro maneras de decir lo mismo—, y la nota de detección al pie.
+
+  La acción líder es **marcar una carpeta**, y vive en la cabecera y no dentro de la caja vacía: una
+  oferta que desaparece en cuanto empieza a funcionar es una oferta que alguien tiene que ir a
+  buscar. Los botones de las tarjetas no van acentuados, porque una cuadrícula donde toda tarjeta
+  grita no tiene acción líder.
+
+- **El icono se convirtió del prototipo, no se dibujó.** Su `course` son dos rectángulos redondeados
+  y un triángulo de reproducción; los dos rectángulos pasan a los arcos que los dibujan, como ya se
+  hizo con los otros diez, y el triángulo se traza en vez de rellenarse porque es lo que `IconPlay`
+  hace con el suyo. Una tradición de dibujo por riel.
+
+- **Cinco puertas declaradas se mueven, ninguna se afloja**: las rutas del shell y el contrato de
+  navegación pasan de cinco destinos a seis —afirmados **por nombre y en orden**, no por conteo,
+  porque una ruta que entrara en el enum donde el riel no la dibuja seguiría pasando un conteo—, el
+  inventario de iconos suma el suyo, `LeadingActionTests` gana su fila, y el recorrido de teclado de
+  accesibilidad pasa de cinco botones a seis, cada uno pulsado y comprobado contra la ruta que abre.
+
+- **Y una que saltó y tenía razón.** `ServiceConsumptionTests` rechazó dos registros nuevos:
+  `MarkCoursesInRoot` y, colgando de él, `ICourseRootDeclarationStore`. Nada los resuelve hasta que
+  el diálogo de añadir medios ofrezca «Curso (carpeta de lecciones)», y un servicio que nadie resuelve
+  es el defecto característico de este repositorio. **Salen del contenedor** y entran en el tramo que
+  los alimenta, con el porqué escrito donde estaban.
+
+  El comando de marcar del riel **no construye una puerta propia**: el shell le pasa la suya, la del
+  diálogo de añadir medios, igual que hace con el abridor de la lista de duplicados. Una segunda
+  puerta a la misma habitación es una que puede desviarse de la primera.
+
 - **El hilo de un curso, y el progreso que ya existía.** `CourseProgressKey` no inventa un almacén:
   guarda la posición de una lección bajo la clave que PLY-008 ya usa, con el curso donde va un título
   y la lección donde va un episodio. Así reanudar, el umbral de visto de PLY-009, la marca manual que

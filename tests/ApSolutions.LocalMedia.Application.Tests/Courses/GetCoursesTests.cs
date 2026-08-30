@@ -154,6 +154,7 @@ public sealed class GetCoursesTests
         TimeSpan? position = null,
         string? module = "Módulo") => new(
         new LessonId(Guid.NewGuid()),
+        new MediaFileId(Guid.NewGuid()),
         moduleNumber,
         module,
         number,
