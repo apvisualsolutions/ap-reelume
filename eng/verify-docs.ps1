@@ -55,11 +55,11 @@ $featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
 $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
-# 60 since 2026-08-28, when LIB-017 put the poster on the film card and closed ART-A01. The count is
+# 65 since 2026-08-30, when ADR-0006 was accepted and CRS-001..005 entered the matrix. The count is
 # asserted rather than left open so that a row added to the matrix has to be added here too, which is
 # where somebody notices that the manifest and the localised documents need it as well.
-if ($featureIds.Count -ne 60) {
-    $errors.Add("Expected 60 feature IDs, found $($featureIds.Count).")
+if ($featureIds.Count -ne 65) {
+    $errors.Add("Expected 65 feature IDs, found $($featureIds.Count).")
 }
 if ($mvpIds.Count -ne 46) {
     $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")
