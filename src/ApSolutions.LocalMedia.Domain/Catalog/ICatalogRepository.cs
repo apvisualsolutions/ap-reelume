@@ -3,11 +3,25 @@
 
 namespace ApSolutions.LocalMedia.Domain.Catalog;
 
+/// <remarks>
+/// These are written to SQLite as their ordinal, so a value may only be <b>appended</b>. Putting
+/// <see cref="Course"/> where it reads best — beside <see cref="Movie"/> and <see cref="Show"/> —
+/// would renumber <see cref="Unidentified"/> from 2 to 3 and every unidentified title already in
+/// somebody's database would come back a course, silently and on the first read.
+/// </remarks>
 public enum CatalogTitleKind
 {
     Movie,
     Show,
     Unidentified,
+
+    /// <summary>
+    /// A folder of numbered videos studied in order (ADR-0006, CRS-001). It is a kind of its own and
+    /// not a show with different words, because the kind is what decides whether a title is ever
+    /// identified against a remote provider, and a rule that hangs off a name heuristic instead of a
+    /// kind is a rule that will be wrong in both directions.
+    /// </summary>
+    Course,
 }
 
 public sealed record CatalogTitle(
