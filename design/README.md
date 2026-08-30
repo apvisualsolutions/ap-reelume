@@ -79,6 +79,17 @@ Reuso sin vista nueva: `NextEpisodeOverlay` gana la variante «Siguiente lecció
 
 Bilingüe por `DynamicResource` (las 41 claves están en `Cadenas nuevas`); nombre accesible + prueba + línea en el paseo por cada control nuevo, en el mismo cambio; solo tokens de `DesignTokens.axaml` (ningún color literal); filas de acciones en `WrapPanel`; el panel del reproductor a 320 px fijos y todo superpuesto con alineación y `MaxWidth`/`MaxHeight`; ausente ≠ deshabilitado (el panel Lecciones y el carril de recomendaciones son **ausentes** cuando no aplican); glifos literales ○ ◐ ● con `AutomationProperties`; movimiento por `MotionDuration`.
 
+## Compatibilidad con Avalonia (verificado contra el árbol, no de memoria)
+
+Todo el proyecto —las 53 vistas y la propuesta de Cursos— traduce a AXAML sin dependencias nuevas, con las excepciones ya documentadas en `Propuesta de diseño` §7 (borde punteado del deshabilitado, cuadrícula fluida → `WrapPanel` + `ItemWidth` fijo). Esta pasada añadió lo que faltaba por nombrar:
+
+- **Proporción fija (`aspect-ratio`)** — no existe en AXAML. El árbol ya lo resuelve fijando `Width`/`Height` como escalares con nombre (`PosterCardWidth`/`Height` en `PosterCardView.axaml`), no con un contenedor de proporción. Cada cuadro nuevo de Cursos (arte del curso, miniatura de lección) necesita su propio par de escalares.
+- **Mayúsculas del antetítulo** — no es una propiedad de vista. El árbol ya sube mayúsculas en el ViewModel (`AccentHex => Options.Accent.ToUpperInvariant()`); el antetítulo se escribe en mayúsculas en el recurso de cadena o se sube con `ToUpperInvariant()` antes de enlazar.
+- **Paneles «de cristal» (menús, diálogos, mini reproductor)** — `backdrop-filter: blur()` no tiene equivalente fuera del shell. Mica vive aislada en `MicaBackdropService` (host Windows) con fallback sólido; ningún paquete de *acrylic*/blur está referenciado. En AXAML son `SolidColorBrush` casi opacos (el token `--glass` ya lo es), sin desenfoque real detrás.
+- **Selector de color libre** — `Avalonia.Controls.ColorPicker` no está en `Directory.Packages.props`. El control real de acento son los seis *swatches*; el `‹input type="color"›` del prototipo es comodidad de navegador, no pieza aprobada. Cursos no añade ningún selector de color, así que no hereda este hueco.
+- **Sticky del panel del hilo** (`CourseDetailsView`) — mismo patrón que la columna de Ajustes: `Grid` con el `ScrollViewer` sólo en la columna de módulos: el panel del hilo vive en la columna fija y no necesita `sticky`.
+- **Avalonia 12.1.1**, no 11 (`Directory.Packages.props`) — va sobrada de API para todo lo anterior.
+
 ## Cambios de esta pasada en el prototipo
 
 - Área **Cursos** completa (nav, cuadrícula, ficha con hilo, panel del reproductor, opción del diálogo de añadir, estado de demostración «Reproductor · lección de curso»).

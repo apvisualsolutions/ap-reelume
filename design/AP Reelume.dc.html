@@ -202,6 +202,32 @@ a:hover{text-decoration:underline}
                     </sc-for>
                   </div>
                 </div>
+
+                <sc-if value="{{ hasRecs }}">
+                  <div>
+                    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+                      <h2 style="margin:0;font-size:19px;font-weight:600;letter-spacing:-.012em">{{ recsTitle }}</h2>
+                      <span style="font-size:12px;color:var(--text2,#5B6675)">{{ recsSub }}</span>
+                      <div style="flex:1"></div>
+                      <button onClick="{{ recsManage }}" style="{{ btnLink }}">{{ recsManageLabel }}{{ icons.chev }}</button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:14px">
+                      <sc-for list="{{ recsItems }}" as="rc" hint-placeholder-count="4">
+                        <button onClick="{{ rc.open }}" aria-label="{{ rc.aria }}" style="text-align:left;font:inherit;color:inherit;background:transparent;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:8px">
+                          <div style="position:relative;aspect-ratio:2/3;border-radius:10px;overflow:hidden;border:1px solid var(--hair,rgba(15,23,42,.09));box-shadow:var(--elev,none)">
+                            <div style="{{ rc.art }}"></div>
+                            <span style="{{ rc.kindStyle }}">{{ rc.kindIcon }}</span>
+                          </div>
+                          <div>
+                            <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ rc.title }}</div>
+                            <div style="font-size:11px;color:var(--text2,#5B6675)">{{ rc.sub }}</div>
+                            <div style="font-size:11px;color:var(--accent-ink,#0B4A78);margin-top:3px;line-height:1.4;text-wrap:pretty">{{ rc.why }}</div>
+                          </div>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
               </div>
             </sc-if>
           </section>
@@ -313,6 +339,122 @@ a:hover{text-decoration:underline}
                 <button onClick="{{ onAddRoot }}" style="{{ btnPri }}">{{ t.addFolder }}</button>
               </div>
             </sc-if>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{ isCourses }}">
+          <section aria-label="{{ t.navCourses }}" data-screen-label="Cursos" style="display:flex;flex-direction:column;gap:18px;animation:apr-in var(--motion,160ms) ease-out">
+            <div>
+              <h1 style="margin:0;font-size:28px;font-weight:600;letter-spacing:-.02em">{{ t.navCourses }}</h1>
+              <p style="margin:6px 0 0;color:var(--text2,#5B6675);font-size:13px;max-width:820px;text-wrap:pretty">{{ crsIntro }}</p>
+            </div>
+            <sc-if value="{{ crsEmpty }}">
+              <div style="border:1px dashed var(--border-strong,#8A97A6);border-radius:8px;padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="font-size:16px;font-weight:600">{{ crsEmptyT }}</div>
+                <div style="font-size:13px;color:var(--text2,#5B6675);max-width:540px;text-wrap:pretty">{{ crsEmptyB }}</div>
+                <button onClick="{{ onMarkCourse }}" style="{{ btnPri }}">{{ icons.plus }}{{ crsMarkLabel }}</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ crsHasCards }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+                <sc-for list="{{ courseCards }}" as="cc" hint-placeholder-count="3">
+                  <div style="border:1px solid var(--hair,rgba(15,23,42,.09));border-radius:12px;background:var(--card,#fff);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--elev,none);transition:transform var(--motion,160ms) ease, box-shadow var(--motion,160ms) ease" style-hover="transform:translateY(-2px);box-shadow:var(--elev2,none)">
+                    <div style="position:relative;aspect-ratio:16/9">
+                      <div style="{{ cc.art }}"></div>
+                      <sc-if value="{{ cc.done }}"><span style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--accent,#1769AA);color:#fff;display:flex;align-items:center;justify-content:center">{{ icons.check }}</span></sc-if>
+                      <div style="position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.22)"><div style="{{ cc.bar }}"></div></div>
+                    </div>
+                    <div style="padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1">
+                      <div>
+                        <div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ cc.title }}</div>
+                        <div style="font-family:Consolas,'Cascadia Mono',ui-monospace,monospace;font-size:11px;color:var(--text2,#5B6675);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px">{{ cc.root }}</div>
+                      </div>
+                      <div style="font-size:12px;color:var(--text2,#5B6675)">{{ cc.meta }}</div>
+                      <sc-if value="{{ cc.last }}"><div style="font-size:11.5px;color:var(--text2,#5B6675)">{{ cc.last }}</div></sc-if>
+                      <div style="flex:1"></div>
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <button onClick="{{ cc.cta }}" aria-label="{{ cc.aria }}" style="{{ ccCtaStyle }}">{{ icons.play }}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ cc.ctaLabel }}</span></button>
+                        <button onClick="{{ cc.open }}" style="{{ btnSecSm }}">{{ t.details }}</button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size:12px;color:var(--text2,#5B6675);max-width:820px;text-wrap:pretty">{{ crsNote }}</div>
+              <div style="display:flex">
+                <button onClick="{{ onMarkCourse }}" style="{{ btnSec }}">{{ icons.plus }}{{ crsMarkLabel }}</button>
+              </div>
+            </sc-if>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{ isCourse }}">
+          <section aria-label="{{ crs.title }}" data-screen-label="Ficha de curso" style="display:flex;flex-direction:column;gap:20px;max-width:1180px;animation:apr-in var(--motion,160ms) ease-out">
+            <button onClick="{{ backToCourses }}" style="{{ btnLink }}">{{ t.back }} · {{ t.navCourses }}</button>
+            <div style="position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--hair,rgba(15,23,42,.09));display:flex;box-shadow:var(--elev,none)">
+              <div style="{{ crs.art }}"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg, rgba(9,12,16,.95) 0%, rgba(9,12,16,.72) 56%, rgba(9,12,16,.3) 100%)"></div>
+              <div style="position:relative;display:flex;flex-direction:column;gap:11px;padding:28px;color:#fff;width:100%">
+                <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#9FB2C6">{{ crs.kicker }}</div>
+                <h1 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-.024em;line-height:1.12">{{ crs.title }}</h1>
+                <div style="font-size:13px;opacity:.86">{{ crs.meta }} · {{ crs.lastSeen }}</div>
+                <div style="font-family:Consolas,'Cascadia Mono',ui-monospace,monospace;font-size:11.5px;opacity:.74;word-break:break-all">{{ crs.root }}</div>
+                <div style="max-width:360px">
+                  <div style="height:4px;border-radius:2px;background:rgba(255,255,255,.28);overflow:hidden"><div style="{{ crs.bar }}"></div></div>
+                  <div style="font-size:12px;opacity:.85;margin-top:5px">{{ crs.progressText }}</div>
+                </div>
+                <sc-if value="{{ crs.finished }}"><div><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;background:rgba(255,255,255,.16)">✓ {{ crs.doneChip }}</span></div></sc-if>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:18px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <sc-for list="{{ crs.mods }}" as="md" hint-placeholder-count="3">
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;align-items:baseline;gap:10px">
+                      <h2 style="margin:0;font-size:15px;font-weight:600">{{ md.label }}</h2>
+                      <span style="font-size:12px;color:var(--text2,#5B6675)">{{ md.count }}</span>
+                    </div>
+                    <div role="list" style="display:flex;flex-direction:column;gap:8px">
+                      <sc-for list="{{ md.rows }}" as="ls" hint-placeholder-count="3">
+                        <div role="listitem" style="{{ ls.style }}">
+                          <span aria-hidden="true" style="{{ ls.glyphStyle }}">{{ ls.glyph }}</span>
+                          <span style="font-size:12px;font-weight:700;color:var(--text2,#5B6675);width:34px;flex:0 0 auto">{{ ls.num }}</span>
+                          <div style="flex:1;min-width:0">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                              <span style="font-size:14px;font-weight:600">{{ ls.title }}</span>
+                              <sc-if value="{{ ls.nextChip }}"><span style="{{ ls.nextChipStyle }}">{{ ls.nextChip }}</span></sc-if>
+                            </div>
+                            <div style="font-size:12px;color:var(--text2,#5B6675);margin-top:2px">{{ ls.meta }}</div>
+                            <sc-if value="{{ ls.hasBar }}"><div style="margin-top:6px;max-width:220px;height:3px;border-radius:2px;background:var(--fill,#E2E8F0);overflow:hidden"><div style="{{ ls.bar }}"></div></div></sc-if>
+                          </div>
+                          <button onClick="{{ ls.onMark }}" style="{{ btnSecSm }}">{{ ls.markLabel }}</button>
+                          <button onClick="{{ ls.play }}" aria-label="{{ ls.aria }}" style="{{ ls.playStyle }}">{{ icons.play }}{{ t.play }}</button>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;position:sticky;top:0">
+                <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:12px;border:1px solid var(--accent,#1769AA);background:var(--accent-sub,#E4EFF9)">
+                  <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink,#0B4A78)">{{ crs.threadT }}</div>
+                  <div>
+                    <div style="font-size:15px;font-weight:600;text-wrap:pretty">{{ crs.threadLesson }}</div>
+                    <sc-if value="{{ crs.threadMinute }}"><div style="font-size:12.5px;color:var(--text2,#5B6675);margin-top:3px">{{ crs.threadMinute }} · {{ crs.lastSeen }}</div></sc-if>
+                  </div>
+                  <button onClick="{{ crs.onThread }}" style="{{ btnPri }}">{{ icons.play }}{{ crs.threadCta }}</button>
+                  <sc-if value="{{ crs.hasRecap }}">
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--hair,rgba(15,23,42,.09));padding-top:10px">
+                      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2,#5B6675)">{{ crs.recapT }}</div>
+                      <sc-for list="{{ crs.recap }}" as="rp" hint-placeholder-count="2">
+                        <div style="display:flex;gap:8px;align-items:baseline;font-size:12.5px;color:var(--text2,#5B6675)"><span aria-hidden="true" style="color:var(--accent,#1769AA)">●</span><span>{{ rp.label }}</span></div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+                <div style="font-size:12px;color:var(--text2,#5B6675);text-wrap:pretty;padding:0 4px">{{ crs.threadNote }}</div>
+              </div>
+            </div>
           </section>
         </sc-if>
 
@@ -922,6 +1064,7 @@ a:hover{text-decoration:underline}
         <button onClick="{{ pl.onPanelSubs }}" aria-pressed="{{ pl.panelSubs }}" style="{{ pl.pbtnSubs }}">{{ t.subs }}</button>
         <button onClick="{{ pl.onPanelVideo }}" aria-pressed="{{ pl.panelVideo }}" style="{{ pl.pbtnVideo }}">{{ t.video }}</button>
         <button onClick="{{ pl.onPanelMarks }}" aria-pressed="{{ pl.panelMarks }}" style="{{ pl.pbtnMarks }}">{{ pl.marksLabel }}</button>
+        <sc-if value="{{ pl.isLesson }}"><button onClick="{{ pl.onPanelLessons }}" aria-pressed="{{ pl.panelLessons }}" style="{{ pl.pbtnLessons }}">{{ pl.lessonsLabel }}</button></sc-if>
         <button onClick="{{ pl.onMini }}" aria-label="{{ pl.miniLabel }}" style="{{ pl.pbtn }}">{{ pl.miniIcon }}</button>
         <button onClick="{{ pl.onFull }}" aria-label="{{ pl.fullLabel }}" style="{{ pl.pbtn }}">{{ pl.fullIcon }}</button>
       </div>
@@ -1128,6 +1271,24 @@ a:hover{text-decoration:underline}
                       <sc-for list="{{ pl.mk.edActions }}" as="ea" hint-placeholder-count="2"><button onClick="{{ ea.on }}" aria-disabled="{{ ea.ariaDisabled }}" style="{{ ea.style }}">{{ ea.label }}</button></sc-for>
                     </div>
                   </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ pl.panelLessons }}">
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="font-size:12px;opacity:.78">{{ pl.crs.head }}</div>
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <sc-for list="{{ pl.crs.rows }}" as="lr" hint-placeholder-count="8">
+                      <sc-if value="{{ lr.isMod }}"><div style="{{ lr.style }}">{{ lr.label }}</div></sc-if>
+                      <sc-if value="{{ lr.isRow }}">
+                        <button onClick="{{ lr.on }}" style="{{ lr.style }}">
+                          <span aria-hidden="true" style="{{ lr.glyphStyle }}">{{ lr.glyph }}</span>
+                          <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ lr.label }}</span>
+                          <span style="font-size:11px;opacity:.6;flex:0 0 auto">{{ lr.dur }}</span>
+                        </button>
+                      </sc-if>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:11px;opacity:.72;line-height:1.5;border-top:1px solid rgba(255,255,255,.12);padding-top:10px;text-wrap:pretty">{{ pl.crs.note }}</div>
                 </div>
               </sc-if>
               <sc-if value="{{ pl.panelAudio }}">
@@ -1480,7 +1641,7 @@ a:hover{text-decoration:underline}
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;initialTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;,&quot;hc&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'light'|'dark'|'hc'&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;initialLang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;options&quot;:[&quot;#1769AA&quot;,&quot;#005A9C&quot;,&quot;#2D6A4F&quot;,&quot;#6B4E9B&quot;],&quot;default&quot;:&quot;#1769AA&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Apariencia&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;initialTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;,&quot;hc&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'light'|'dark'|'hc'&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;initialLang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;options&quot;:[&quot;#1769AA&quot;,&quot;#005A9C&quot;,&quot;#2D6A4F&quot;,&quot;#6B4E9B&quot;],&quot;default&quot;:&quot;#1769AA&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Apariencia&quot;},&quot;view&quot;:{&quot;editor&quot;:null,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 const E = React.createElement;
 const two = (n) => String(n).padStart(2, '0');
 function fmt(sec) {
@@ -1536,7 +1697,8 @@ function icon(n, s) {
     clock: [c(12, 12, 8.5, 'a'), p('M12 7.6V12l3 1.9', 'b')],
     cast: [rc(3.5, 5, 17, 11, 2, 'a'), p('M3.5 19.5h2.6', 'b'), p('M3.5 16.4c1.8 0 2.9 1.2 2.9 3.1', 'c')],
     eye: [p('M2.6 12S6.2 6.6 12 6.6 21.4 12 21.4 12 17.8 17.4 12 17.4 2.6 12 2.6 12Z', 'a'), c(12, 12, 2.7, 'b')],
-    hd: [rc(3.5, 6, 17, 12, 2, 'a'), p('M8 10v4', 'b'), p('M11 10v4', 'c'), p('M8 12h3', 'd'), p('M14 10v4h1.6a2 2 0 0 0 0-4z', 'e')]
+    hd: [rc(3.5, 6, 17, 12, 2, 'a'), p('M8 10v4', 'b'), p('M11 10v4', 'c'), p('M8 12h3', 'd'), p('M14 10v4h1.6a2 2 0 0 0 0-4z', 'e')],
+    course: [rc(3.5, 3.5, 17, 5, 1.5, 'a'), rc(3.5, 11.5, 17, 9, 1.5, 'b'), E('path', { d: 'M10.8 13.7 14.6 16 10.8 18.3Z', fill: 'currentColor', stroke: 'none', key: 'c' })]
   };
   return E('svg', { width: s || 18, height: s || 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': 'true', focusable: 'false', style: { flex: '0 0 auto' } }, m[n] || []);
 }
@@ -1587,6 +1749,7 @@ const D = {
   navMain: ['Navegación principal', 'Main navigation'],
   navHome: ['Inicio', 'Home'], navLib: ['Biblioteca', 'Library'], navReview: ['Revisión', 'Review'],
   navDup: ['Duplicados', 'Duplicates'], navSet: ['Ajustes', 'Settings'],
+  navCourses: ['Cursos', 'Courses'],
   roots: ['Raíces de medios', 'Media roots'],
   homeHi: ['Inicio', 'Home'],
   homeSub: ['Tu colección local, en su sitio. Nada se copia ni se mueve.', 'Your local collection, left in place. Nothing is copied or moved.'],
@@ -1662,6 +1825,32 @@ const AUD = [['Español · E-AC-3 5.1', 'Spanish · E-AC-3 5.1'], ['Inglés · E
 const SUB = [['Sin subtítulos', 'No subtitles'], ['Español (interno · SRT)', 'Spanish (embedded · SRT)'], ['Inglés (interno · ASS)', 'English (embedded · ASS)'], ['Español forzado (interno · SRT)', 'Spanish forced (embedded · SRT)']];
 const DEV = [['Altavoces del sistema', 'System speakers', '2.0'], ['Auriculares USB', 'USB headset', '2.0'], ['Receptor HDMI', 'HDMI receiver', '7.1'], ['Barra de sonido óptica', 'Optical soundbar', '5.1']];
 
+function fmtMin(min) {
+  min = Math.max(0, Math.round(min));
+  const h = Math.floor(min / 60), m = min % 60;
+  return h ? h + ' h' + (m ? ' ' + m + ' min' : '') : m + ' min';
+}
+
+/* Cursos: carpeta marcada como curso; lecciones = [nombre de archivo limpio, duración min, posición min]. */
+const CRS = [
+  { id: 'c1', t: 'Fotografía nocturna, de cero', h: 152, root: 'D:\\Cursos\\Fotografia nocturna', last: [2, 'días', 'days'], mods: [
+    { n: 1, t: 'El equipo y la luz', l: [['01 Qué cámara sirve (y cuál no)', 18, 18], ['02 Objetivos: abrir a f/2.8', 22, 22], ['03 Trípode, disparador y apps', 16, 16]] },
+    { n: 2, t: 'Exposición en oscuridad', l: [['04 El triángulo, de noche', 28, 28], ['05 La regla de los 500', 24, 24], ['06 Medir sin luz', 31, 14], ['07 Histograma nocturno', 19, 0]] },
+    { n: 3, t: 'La sesión', l: [['08 Localizar y planificar', 27, 0], ['09 Enfoque manual a infinito', 21, 0], ['10 Series y bracketing', 25, 0]] },
+    { n: 4, t: 'Revelado', l: [['11 Ruido: reducir sin borrar', 33, 0], ['12 Apilado de tomas', 29, 0]] }
+  ] },
+  { id: 'c2', t: 'Blender: modelado orgánico', h: 264, root: '\\\\NAS\\Cursos\\Blender organico', last: [5, 'semanas', 'weeks'], mods: [
+    { n: 1, t: 'Interfaz y esculpido base', l: [['01 La interfaz sin miedo', 24, 24], ['02 Mover, escalar, rotar', 19, 19], ['03 Esculpir: brochas base', 35, 35]] },
+    { n: 2, t: 'Topología', l: [['04 Retopología a mano', 41, 41], ['05 Loops y polos', 28, 11], ['06 Simetría y espejos', 22, 0]] },
+    { n: 3, t: 'Materiales', l: [['07 Nodos: lo mínimo viable', 37, 0], ['08 Piel y subsuperficie', 33, 0]] },
+    { n: 4, t: 'Proyecto final', l: [['09 Bloqueo de la criatura', 52, 0], ['10 Detalle y pose', 48, 0], ['11 Luz y render', 30, 0]] }
+  ] },
+  { id: 'c3', t: 'Inglés B2 · listening intensivo', h: 88, root: 'D:\\Cursos\\Ingles B2', last: [3, 'meses', 'months'], mods: [
+    { n: 1, t: 'Diálogos cotidianos', l: [['01 En el aeropuerto', 12, 12], ['02 La consulta médica', 14, 14], ['03 Reunión de equipo', 15, 15]] },
+    { n: 2, t: 'Acentos', l: [['04 Escocés sin subtítulos', 16, 16], ['05 Australiano a velocidad real', 13, 13]] }
+  ] }
+];
+
 class Component extends DCLogic {
   state = {
     lang: this.props.initialLang === 'en' ? 'en' : 'es',
@@ -1672,6 +1861,7 @@ class Component extends DCLogic {
     demoOpen: false,
     q: '', ftype: 'all', fstatus: 'all', sort: 'recent',
     movieId: 'm1', showId: 's1', season: 2,
+    courseId: 'c1', crsMarks: {},
     editorId: 'm1', editorTab: 'meta', renameState: 'preview',
     locks: { title: true, year: false, artwork: true, synopsis: false },
     artPick: 0, renameOk: false,
@@ -1684,7 +1874,7 @@ class Component extends DCLogic {
     addOpen: false, addKind: 'local', addPath: '', addMode: 'root', addAs: 'auto', added: [],
     setSection: 'appearance', pop: null, bkp: 'idle', rst: 'idle', rstRoots: {},
     upd: 'idle', updReason: 'unsigned', updAuto: true,
-    opt: { consent: true, refreshOld: true, segments: true, mica: true, anim: true, accent: '#1769AA', sysTheme: false, tint: 60, density: 'comfy', cover: 148, radius: 10, titles: true, startScan: true, watch: true, ignoreSamples: true, skipBack: 10, skipFwd: 30, watchedAt: 90, autoNext: true, limiter: true, subSize: 100, subBg: true, subLang: 'es', narrator: true, tray: false, startup: false, telemetry: false, backups: 5, external: false },
+    opt: { consent: true, refreshOld: true, segments: true, mica: true, anim: true, accent: '#1769AA', sysTheme: false, tint: 60, density: 'comfy', cover: 148, radius: 10, titles: true, startScan: true, watch: true, ignoreSamples: true, skipBack: 10, skipFwd: 30, watchedAt: 90, autoNext: true, limiter: true, subSize: 100, subBg: true, subLang: 'es', narrator: true, tray: false, startup: false, telemetry: false, backups: 5, external: false, recs: true },
     obRoots: [], obKind: 'local', obPath: '', obFail: false, obConfirm: null, obConsent: false,
     plOtherVersion: true,
     player: null, extSub: false, plOverlay: null, plVerPick: 'a', plRateMenu: false,
@@ -1699,6 +1889,7 @@ class Component extends DCLogic {
       this.setState({ player: Object.assign({}, p, { t: nt, playing: nt < p.dur }) });
     }, 500);
     window.addEventListener('keydown', this.onKey);
+    if (this.props.view) this.applyView(String(this.props.view));
   }
 
   componentWillUnmount() {
@@ -1731,6 +1922,87 @@ class Component extends DCLogic {
   openMovie = (id) => this.setState({ route: 'movie', movieId: id });
   openShow = (id) => this.setState({ route: 'show', showId: id, season: 1 });
   openEditor = (id, tab) => this.setState({ route: 'editor', editorId: id, editorTab: tab || 'meta', renameState: 'preview', renameOk: false });
+  openCourse = (id) => this.setState({ route: 'course', courseId: id });
+
+  lessonKey(c, m, li) { return c.id + '-' + m.n + '-' + li; }
+
+  lessonState(c, m, li) {
+    const l = m.l[li];
+    const ov = (this.state.crsMarks || {})[this.lessonKey(c, m, li)];
+    const watched = ov === true || (ov === undefined && l[2] >= l[1]);
+    const partial = !watched && ov === undefined && l[2] > 0 && l[2] < l[1];
+    return { watched: watched, partial: partial };
+  }
+
+  /* El hilo de un curso: hechas, total, la lección donde retomar, minutos restantes y las 2 últimas vistas (el resumen). */
+  crsProg(c) {
+    let done = 0, total = 0, cur = null, remain = 0, g = 0;
+    const lastDone = [];
+    c.mods.forEach((m) => {
+      m.l.forEach((l, li) => {
+        g++; total++;
+        const s = this.lessonState(c, m, li);
+        if (s.watched) { done++; lastDone.push({ m: m, l: l, li: li, g: g }); }
+        else {
+          remain += l[1] - (s.partial ? l[2] : 0);
+          if (!cur) cur = { m: m, l: l, li: li, g: g, partial: s.partial };
+        }
+      });
+    });
+    return { done: done, total: total, cur: cur, remain: remain, lastDone: lastDone.slice(-2) };
+  }
+
+  playLesson(c, m, li) {
+    const l = m.l[li];
+    const s = this.lessonState(c, m, li);
+    this.play({ kind: 'lesson', courseId: c.id, id: this.lessonKey(c, m, li), title: c.t, sub: 'M' + m.n + ' · ' + l[0], dur: l[1] * 60, t: (s.partial ? l[2] : 0) * 60, h: (c.h + m.n * 11) % 360, subs: 0, ch: '2.0' });
+  }
+
+  /* Prop `view`: abre el prototipo en una vista del censo (los archivos de vistas/ lo usan). */
+  applyView(v) {
+    const S = (s, extra) => Object.assign({ route: 'settings', setSection: s }, extra || {});
+    const pm = (extra) => { const m = MOV[0]; this.play(Object.assign({ kind: 'movie', id: m.id, title: m.t, sub: m.y + ' · ' + m.g[this.en() ? 1 : 0], dur: m.dur * 60, t: m.pos * 60, h: m.h }, extra || {})); };
+    const P = {
+      ShellView: { route: 'home' }, HomeView: { route: 'home' }, ResumeHeroView: { route: 'home' },
+      InProgressRailView: { route: 'home' }, RecentlyAddedRailView: { route: 'home' }, RecommendationsRailView: { route: 'home' },
+      LibraryView: { route: 'library' }, PosterCardView: { route: 'library' }, WatchStatusControl: { route: 'library' },
+      UnavailableBadge: { route: 'library', scenario: 'usb' },
+      MovieDetailsView: { route: 'movie', movieId: 'm5' },
+      ShowDetailsView: { route: 'show', showId: 's1', season: 2 },
+      EpisodeRowView: { route: 'show', showId: 's3', season: 2 },
+      ReviewInboxView: { route: 'review' }, CandidateCardView: { route: 'review' },
+      DuplicateReviewView: { route: 'duplicates' }, DuplicatesOverviewView: { route: 'duplicates' },
+      MetadataEditorView: { route: 'editor', editorId: 'm1', editorTab: 'meta' },
+      RenamePreviewView: { route: 'editor', editorId: 'm1', editorTab: 'rename', renameState: 'preview' },
+      PersonalActionsView: { route: 'movie', movieId: 'm1' },
+      AppearanceSettingsView: S('appearance'), PrivacySettingsView: S('privacy'),
+      ScanSettingsView: S('library'), RootManagementView: S('library'),
+      LifecycleSettingsView: S('privacy'), RecommendationSettingsView: S('recs'),
+      SegmentDetectionSettingsView: S('segments'), ShortcutSettingsView: S('shortcuts'),
+      SubtitleStyleView: S('subs'), CreditsView: S('credits'),
+      BackupView: S('backup', { bkp: 'done' }), RestoreWizardView: S('backup', { rst: 'preview' }),
+      UpdateView: S('updates', { upd: 'available' }),
+      RootOnboardingView: { scenario: 'firstrun' },
+      AddRootDialogView: { addOpen: true, addMode: 'root', addPath: '', addAs: 'auto' },
+      StartupView: { scenario: 'startup' }, DatabaseRecoveryView: { scenario: 'dbfail' },
+      LooseFileBanner: { addOpen: true, addMode: 'content', addPath: 'D:\\Descargas\\grabacion-charla.mkv', addAs: 'auto' },
+      CoursesView: { route: 'courses' }, CourseDetailsView: { route: 'course', courseId: 'c2' },
+      LessonRowView: { route: 'course', courseId: 'c1' }
+    };
+    const F = {
+      PlayerView: () => pm(), TransportControlsView: () => pm(),
+      VideoStatusOverlay: () => this.scn('hdr'), ResumePromptView: () => this.scn('resume'),
+      NextEpisodeOverlay: () => this.scn('nextep'), SkipMarkerButton: () => this.scn('skip'),
+      VersionSwitchDialog: () => this.scn('verswitch'), PlayerVersionsView: () => this.scn('verswitch'),
+      MarkerEditorView: () => pm({ panel: 'marks' }), DetectedMarkerReviewView: () => pm({ panel: 'marks' }),
+      TrackSelectorView: () => pm({ panel: 'subs' }), AudioOutputView: () => pm({ panel: 'audio' }),
+      MiniPlayerWindow: () => pm({ mode: 'mini' }), MiniPlayerChromeView: () => pm({ mode: 'mini' }),
+      LessonsPanelView: () => this.scn('lesson'),
+      DiagnosticsPreviewView: () => this.setState({ route: 'settings', setSection: 'privacy', opt: Object.assign({}, this.state.opt, { telemetry: true, preview: true }) })
+    };
+    if (F[v]) { F[v](); return; }
+    if (P[v]) this.setState(P[v]);
+  }
 
   play(media) {
     const p = this.state.player;
@@ -1781,6 +2053,10 @@ class Component extends DCLogic {
     if (id === 'ambiguous') patch.route = 'review';
     if (id === 'rename') { patch.route = 'editor'; patch.editorTab = 'rename'; patch.editorId = 'm1'; patch.renameState = 'preview'; }
     if (id === 'resume' || id === 'skip' || id === 'verswitch') patch.plOverlay = null;
+    if (id === 'lesson') {
+      patch.route = 'course'; patch.courseId = 'c1';
+      patch.player = { sessionId: 1, kind: 'lesson', courseId: 'c1', id: 'c1-2-2', title: CRS[0].t, sub: 'M2 · 06 Medir sin luz', dur: 1860, t: 852, h: 163, playing: true, rate: 1, vol: 100, muted: false, audio: 0, subs: 0, device: 0, ch: '2.0', mode: 'embedded', panel: 'lessons' };
+    }
     if (['corrupt', 'codec', 'audio', 'hdr', 'resume', 'skip', 'verswitch', 'notfound', 'openfail', 'noengine', 'notrack', 'extfail', 'noaudio', 'nextep', 'unsupfmt'].indexOf(id) >= 0) {
       if (!this.state.player) {
         const m = id === 'codec' ? MOV[4] : MOV[0];
@@ -1896,11 +2172,12 @@ class Component extends DCLogic {
     const navDef = [
       { id: 'home', label: t.navHome, ic: 'home' },
       { id: 'library', label: t.navLib, ic: 'grid' },
+      { id: 'courses', label: t.navCourses, ic: 'course' },
       { id: 'review', label: t.navReview, ic: 'review', badge: String(REV.filter((r) => !st.rev[r.id]).length) },
       { id: 'duplicates', label: t.navDup, ic: 'dupes' },
       { id: 'settings', label: t.navSet, ic: 'sliders' }
     ];
-    const routeGroup = { movie: 'library', show: 'library', editor: 'library' };
+    const routeGroup = { movie: 'library', show: 'library', editor: 'library', course: 'courses' };
     const activeNav = routeGroup[st.route] || st.route;
     const withPanel = {};
     const navItems = navDef.map((n, ni) => {
@@ -1955,10 +2232,16 @@ class Component extends DCLogic {
         mi(en ? 'All groups' : 'Todos los grupos', 'dupes', { sel: true, count: String(DUP.length), on: () => this.setState({ route: 'duplicates', menu: null }) }),
         mi(en ? 'Preferred by quality' : 'Preferidas por calidad', 'hd', { on: () => this.setState({ route: 'duplicates', menu: null }) })
       ],
+      courses: [
+        mi(en ? 'All courses' : 'Todos los cursos', 'course', { sel: true, count: String(CRS.length), on: () => this.setState({ route: 'courses', menu: null }) }),
+        mi(en ? 'Thread pending' : 'Con hilo pendiente', 'clock', { count: String(CRS.filter((c) => this.crsProg(c).cur).length), on: () => this.setState({ route: 'courses', menu: null }) }),
+        mi(en ? 'Finished' : 'Terminados', 'check', { count: String(CRS.filter((c) => !this.crsProg(c).cur).length), on: () => this.setState({ route: 'courses', menu: null }) }),
+        mi(en ? 'Mark a folder as a course' : 'Marcar una carpeta como curso', 'plus', { sep: true, on: () => { this.setState({ menu: null }); openAdd('content', 'course'); } })
+      ],
       settings: null
     };
-    const menuIndex = { home: 0, library: 1, review: 2, duplicates: 3, settings: 4 };
-    const menuTitles = { home: t.navHome, library: t.navLib, review: t.navReview, duplicates: t.navDup, settings: t.navSet };
+    const menuIndex = { home: 0, library: 1, courses: 2, review: 3, duplicates: 4, settings: 5 };
+    const menuTitles = { home: t.navHome, library: t.navLib, courses: t.navCourses, review: t.navReview, duplicates: t.navDup, settings: t.navSet };
     let menu = null;
     if (st.menu) {
       const items = st.menu === 'settings' ? [] : (menuDefs[st.menu] || []);
@@ -1977,7 +2260,7 @@ class Component extends DCLogic {
       if (r.kind === 'unc' && flags.denied) return { txt: en ? 'Access denied' : 'Acceso denegado', tone: 'err' };
       return { txt: en ? 'Connected' : 'Conectada', tone: 'ok' };
     };
-    const openAdd = (mode) => this.setState({ addOpen: true, addMode: mode || 'root', addPath: '', addAs: 'auto' });
+    const openAdd = (mode, as) => this.setState({ addOpen: true, addMode: mode || 'root', addPath: '', addAs: as || 'auto' });
     const isContent = st.addMode === 'content';
     const roots = st.rootList.map((r) => {
       const s = rootState(r);
@@ -2135,7 +2418,7 @@ class Component extends DCLogic {
       };
     });
 
-    const addedTiles = st.added.map((a) => ({
+    const addedTiles = st.added.filter((a) => a.kind !== 'course').map((a) => ({
       title: a.t, sub: (a.kind === 'show' ? t.show : t.movie) + ' · ' + a.path,
       art: art(a.h, 'p'), unavail: false, done: false, prog: false,
       bar: { width: '0%', height: '100%', background: 'var(--accent,#1769AA)' },
@@ -2164,6 +2447,7 @@ class Component extends DCLogic {
       ['noaudio', ['Reproductor · sin audio', 'Player · no audio track']],
       ['unsupfmt', ['Reproductor · formato no admitido', 'Player · unsupported format']],
       ['nextep', ['Reproductor · siguiente episodio', 'Player · next episode']],
+      ['lesson', ['Reproductor · lección de curso', 'Player · course lesson']],
       ['startup', ['Arranque de la aplicación', 'Application startup']],
       ['resume', ['Reproductor · reanudar', 'Player · resume prompt']],
       ['skip', ['Reproductor · saltar intro', 'Player · skip intro']],
@@ -2266,6 +2550,97 @@ class Component extends DCLogic {
         };
       })
     };
+
+    /* ——— Cursos ——— */
+    const addedCourses = st.added.filter((a) => a.kind === 'course').map((a) => ({
+      title: a.t, root: a.path, art: art(a.h, 'w'), justAdded: true, done: false,
+      meta: en ? 'Just marked · ordering lessons by file name' : 'Recién marcada · ordenando lecciones por nombre de archivo',
+      last: '', bar: { width: '0%', height: '100%', background: 'var(--accent,#1769AA)' },
+      ctaLabel: en ? 'Opens when scanned' : 'Se abrirá al escanear',
+      cta: () => this.toast(en ? 'Being scanned: lessons appear when the folder walk finishes.' : 'En escaneo: las lecciones aparecerán cuando termine el recorrido de la carpeta.'),
+      open: () => this.toast(en ? 'Being scanned: lessons appear when the folder walk finishes.' : 'En escaneo: las lecciones aparecerán cuando termine el recorrido de la carpeta.'),
+      aria: a.t
+    }));
+    const courseCards = addedCourses.concat(CRS.map((c) => {
+      const g = this.crsProg(c);
+      const fin = !g.cur;
+      return {
+        title: c.t, root: c.root, art: art(c.h, 'w'), justAdded: false, done: fin,
+        meta: g.done + '/' + g.total + ' ' + (en ? 'lessons' : 'lecciones') + (fin ? '' : ' · ' + fmtMin(g.remain) + ' ' + (en ? 'left' : 'restantes')),
+        last: en ? 'Last opened ' + c.last[0] + ' ' + c.last[2] + ' ago' : 'Última vez hace ' + c.last[0] + ' ' + c.last[1],
+        bar: { width: pct(g.done, g.total) + '%', height: '100%', background: 'var(--accent,#1769AA)' },
+        ctaLabel: fin ? (en ? 'Finished · open' : 'Terminado · abrir') : ((g.cur.partial ? (en ? 'Pick up · ' : 'Retomar · ') : (en ? 'Continue · ' : 'Continuar · ')) + 'M' + g.cur.m.n + '·L' + two(g.cur.g)),
+        cta: () => (g.cur ? this.playLesson(c, g.cur.m, g.cur.li) : this.openCourse(c.id)),
+        open: () => this.openCourse(c.id),
+        aria: c.t + ', ' + g.done + '/' + g.total + ' ' + (en ? 'lessons' : 'lecciones')
+      };
+    }));
+    const c0 = CRS.filter((x) => x.id === st.courseId)[0] || CRS[0];
+    const cg = this.crsProg(c0);
+    const cFin = !cg.cur;
+    let cTot = 0;
+    c0.mods.forEach((m) => m.l.forEach((l) => { cTot += l[1]; }));
+    let cgG = 0;
+    const crsDetail = {
+      title: c0.t, art: art(c0.h, 'w'), root: c0.root,
+      kicker: en ? 'Course' : 'Curso',
+      meta: c0.mods.length + ' ' + (en ? 'modules' : 'módulos') + ' · ' + cg.total + ' ' + (en ? 'lessons' : 'lecciones') + ' · ' + fmtMin(cTot),
+      lastSeen: en ? 'Last opened ' + c0.last[0] + ' ' + c0.last[2] + ' ago' : 'Última vez hace ' + c0.last[0] + ' ' + c0.last[1],
+      progressText: cg.done + '/' + cg.total + ' ' + (en ? 'watched' : 'vistas') + (cFin ? '' : ' · ' + fmtMin(cg.remain) + ' ' + (en ? 'left' : 'restantes')),
+      bar: { width: pct(cg.done, cg.total) + '%', height: '100%', background: 'var(--accent,#1769AA)' },
+      finished: cFin,
+      doneChip: en ? 'Course finished' : 'Curso terminado',
+      threadT: en ? 'Where you left off' : 'Dónde lo dejaste',
+      threadLesson: cg.cur ? 'M' + cg.cur.m.n + ' · ' + cg.cur.l[0] : (en ? 'Nothing pending' : 'Nada pendiente'),
+      threadMinute: cg.cur ? (cg.cur.partial ? (en ? 'Resume at ' : 'Reanudar en ') + fmt(cg.cur.l[2] * 60) + ' / ' + fmt(cg.cur.l[1] * 60) : (en ? 'Not started · ' : 'Sin empezar · ') + cg.cur.l[1] + ' min') : '',
+      threadCta: cFin ? (en ? 'Watch again from the start' : 'Volver a empezar') : (en ? 'Pick up the thread' : 'Retomar el hilo'),
+      onThread: () => (cg.cur ? this.playLesson(c0, cg.cur.m, cg.cur.li) : this.playLesson(c0, c0.mods[0], 0)),
+      recapT: en ? 'What you watched last' : 'Lo último que viste',
+      recap: cg.lastDone.map((x) => ({ label: 'M' + x.m.n + ' · ' + x.l[0] })),
+      hasRecap: cg.lastDone.length > 0 && !cFin,
+      threadNote: en ? 'The thread keeps itself: last lesson, exact minute, and date. Nothing to write down to come back.' : 'El hilo se guarda solo: última lección, minuto exacto y fecha. No hay que apuntar nada para volver.',
+      mods: c0.mods.map((m) => {
+        let mDone = 0;
+        const rows = m.l.map((l, li) => {
+          cgG++;
+          const s = this.lessonState(c0, m, li);
+          if (s.watched) mDone++;
+          const isCur = !!cg.cur && cg.cur.m.n === m.n && cg.cur.li === li;
+          const key = this.lessonKey(c0, m, li);
+          const g2 = cgG;
+          return {
+            glyph: s.watched ? '●' : s.partial ? '◐' : '○',
+            glyphStyle: { width: 16, textAlign: 'center', flex: '0 0 auto', fontSize: 12, color: s.watched || s.partial ? 'var(--accent,#1769AA)' : 'var(--text2,#5B6675)' },
+            num: 'L' + two(g2), title: l[0],
+            meta: l[1] + ' min · ' + (s.watched ? t.watched : s.partial ? (en ? 'Resume at ' : 'Reanudar en ') + fmt(l[2] * 60) : t.notStarted),
+            nextChip: isCur ? (en ? 'Next in the thread' : 'Siguiente en el hilo') : '',
+            nextChipStyle: chip('accent'),
+            hasBar: s.partial, bar: { width: pct(l[2], l[1]) + '%', height: '100%', background: 'var(--accent,#1769AA)' },
+            play: () => this.playLesson(c0, m, li), playStyle: btnSecSm,
+            markLabel: s.watched ? (en ? 'Unmark' : 'Quitar la marca') : (en ? 'Mark watched' : 'Marcar como vista'),
+            onMark: () => { const n = Object.assign({}, st.crsMarks); n[key] = !s.watched; this.setState({ crsMarks: n }); this.toast(!s.watched ? (en ? 'Lesson marked as watched. The thread moves to the next one.' : 'Lección marcada como vista. El hilo pasa a la siguiente.') : (en ? 'Mark removed. The thread points here again.' : 'Marca quitada. El hilo vuelve a apuntar aquí.')); },
+            style: Object.assign({}, rowBox, { gap: 12, borderColor: isCur ? 'var(--accent,#1769AA)' : 'var(--hair,rgba(15,23,42,.09))' }),
+            aria: 'L' + two(g2) + ' ' + l[0] + (isCur ? ', ' + (en ? 'next in the thread' : 'siguiente en el hilo') : '')
+          };
+        });
+        return { label: (en ? 'Module ' : 'Módulo ') + m.n + ' · ' + m.t, count: mDone + '/' + m.l.length, rows: rows };
+      })
+    };
+
+    /* ——— Recomendaciones locales (UX-006): explicables, apagado = ausente ——— */
+    const recsOn = st.opt.recs !== false;
+    const recsItems = !recsOn ? [] : [
+      { o: MOV[1], show: false, why: en ? 'Because you finished «Cartografía de un Verano»' : 'Porque terminaste «Cartografía de un Verano»' },
+      { o: MOV[6], show: false, why: en ? 'In the same vein as «El Faro de Piedra»' : 'En la línea de «El Faro de Piedra»' },
+      { o: SHW[1], show: true, why: en ? 'One short season to start tonight' : 'Una temporada corta para empezar hoy' },
+      { o: MOV[4], show: false, why: en ? 'The HDR copy in your library, still unwatched' : 'La copia HDR de tu biblioteca, aún sin ver' }
+    ].map((r) => ({
+      title: r.o.t, sub: r.show ? String(r.o.y) : r.o.y + ' · ' + r.o.g[i],
+      why: r.why, art: art(r.o.h, 'p'),
+      kindIcon: icon(r.show ? 'tv' : 'film', 13), kindStyle: kindBadge,
+      aria: r.o.t + '. ' + r.why,
+      open: () => (r.show ? this.openShow(r.o.id) : this.openMovie(r.o.id))
+    }));
 
     const revItems = REV.map((r) => {
       const done = st.rev[r.id];
@@ -2422,7 +2797,6 @@ class Component extends DCLogic {
       ['playback', en ? 'Playback' : 'Reproducción', [
         R('slider', en ? 'Skip back' : 'Salto atrás', en ? 'Seconds' : 'Segundos', { slider: sl('skipBack', 5, 60, 5, ' s') }),
         R('slider', en ? 'Skip forward' : 'Salto adelante', en ? 'Seconds' : 'Segundos', { slider: sl('skipFwd', 5, 60, 5, ' s') }),
-        R('slider', en ? 'Watched threshold' : 'Umbral de visto', en ? 'Percentage of runtime that marks an item as watched.' : 'Porcentaje de duración que marca un elemento como visto.', { slider: sl('watchedAt', 70, 100, 1, ' %') }),
         R('toggle', en ? 'Next-episode countdown' : 'Cuenta atrás del siguiente episodio', en ? 'Cancellable; returns to details if the next file is missing.' : 'Cancelable; vuelve a la ficha si falta el siguiente archivo.', { toggle: tg('autoNext') }),
         R('toggle', en ? 'Prefer external player' : 'Preferir reproductor externo', en ? 'The embedded engine stays default; external playback does not promise exact progress.' : 'El motor integrado sigue siendo el predeterminado; el externo no promete progreso exacto.', { toggle: tg('external') })
       ]],
@@ -2436,6 +2810,11 @@ class Component extends DCLogic {
         R('slider', en ? 'Subtitle size' : 'Tamaño de subtítulos', '75 – 200 %', { slider: sl('subSize', 75, 200, 5, ' %') }),
         R('toggle', en ? 'Contrast background' : 'Fondo de contraste', en ? 'Improves legibility over bright scenes.' : 'Mejora la legibilidad sobre escenas claras.', { toggle: tg('subBg') }),
         R('text', en ? 'External subtitles' : 'Subtítulos externos', en ? 'SRT, ASS, and VTT are read only from inside the media root.' : 'SRT, ASS y VTT se leen solo desde dentro de la raíz del medio.', { value: en ? 'Confined' : 'Confinado' })
+      ]],
+      ['recs', en ? 'Recommendations' : 'Recomendaciones', [
+        R('toggle', en ? 'Local recommendations' : 'Recomendaciones locales', en ? 'Computed on this machine, from your own library and history. Turning them off removes the home rail entirely: off is absent, not an empty rail.' : 'Se calculan en este equipo, con tu propia biblioteca e historial. Al desactivarlas el carril de Inicio desaparece por completo: apagado es ausente, no un carril vacío.', { toggle: tg('recs') }),
+        R('slider', en ? 'Watched threshold' : 'Umbral de visto', en ? 'The percentage that counts as watched. It feeds the watch states, the home rails, and what gets suggested.' : 'El porcentaje que cuenta como visto. Alimenta los estados, los carriles de Inicio y lo que se sugiere.', { slider: sl('watchedAt', 70, 100, 1, ' %') }),
+        R('text', en ? 'What they never do' : 'Lo que nunca hacen', en ? 'No history leaves this machine, and every suggestion says why it is there.' : 'Ningún historial sale de este equipo, y cada sugerencia dice por qué está ahí.', { value: en ? 'Explainable' : 'Explicables' })
       ]],
       ['a11y', en ? 'Accessibility' : 'Accesibilidad', [
         R('toggle', en ? 'Reduced motion' : 'Movimiento reducido', en ? 'Follows the Windows setting; can be forced here.' : 'Sigue la preferencia de Windows; puede forzarse aquí.', { toggle: { on: () => this.setState({ reduced: !st.reduced }), pressed: st.reduced ? 'true' : 'false', track: { width: 40, height: 20, borderRadius: 10, padding: 2, display: 'flex', justifyContent: st.reduced ? 'flex-end' : 'flex-start', alignItems: 'center', cursor: 'pointer', border: '1px solid ' + (st.reduced ? 'var(--accent,#1769AA)' : 'var(--border-strong,#8A97A6)'), background: st.reduced ? 'var(--accent,#1769AA)' : 'transparent' }, knob: { width: 14, height: 14, borderRadius: 7, background: st.reduced ? 'var(--on-accent,#fff)' : 'var(--border-strong,#8A97A6)' }, stateText: st.reduced ? (en ? 'On' : 'Activado') : (en ? 'Off' : 'Desactivado') } }),
@@ -2597,7 +2976,39 @@ class Component extends DCLogic {
         pbtnMarks: { height: 30, padding: '0 12px', borderRadius: 4, border: '1px solid ' + (p.panel === 'marks' ? '#62AEE8' : 'rgba(255,255,255,.24)'), background: p.panel === 'marks' ? 'rgba(98,174,232,.2)' : 'transparent', color: '#fff', font: 'inherit', fontSize: 12.5, cursor: 'pointer', whiteSpace: 'nowrap' },
         onPanelMarks: () => this.upd({ panel: p.panel === 'marks' ? null : 'marks' }),
         marksLabel: en ? 'Markers' : 'Marcadores',
-        panelTitle: p.panel === 'audio' ? (en ? 'Audio' : 'Audio') : p.panel === 'subs' ? (en ? 'Subtitles' : 'Subtítulos') : p.panel === 'marks' ? (en ? 'Markers' : 'Marcadores') : (en ? 'Video' : 'Vídeo'),
+        isLesson: p.kind === 'lesson',
+        lessonsLabel: en ? 'Lessons' : 'Lecciones',
+        pbtnLessons: { height: 30, padding: '0 12px', borderRadius: 4, border: '1px solid ' + (p.panel === 'lessons' ? '#62AEE8' : 'rgba(255,255,255,.24)'), background: p.panel === 'lessons' ? 'rgba(98,174,232,.2)' : 'transparent', color: '#fff', font: 'inherit', fontSize: 12.5, cursor: 'pointer', whiteSpace: 'nowrap' },
+        onPanelLessons: () => this.upd({ panel: p.panel === 'lessons' ? null : 'lessons' }),
+        panelLessons: p.panel === 'lessons',
+        crs: (function () {
+          if (p.kind !== 'lesson') return { rows: [], head: '', note: '' };
+          const c = CRS.filter((x) => x.id === p.courseId)[0];
+          if (!c) return { rows: [], head: '', note: '' };
+          const g = this.crsProg(c);
+          const rows = [];
+          c.mods.forEach((m) => {
+            rows.push({ isMod: true, isRow: false, label: (en ? 'Module ' : 'Módulo ') + m.n + ' · ' + m.t, style: { fontSize: 10.5, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', opacity: 0.62, padding: '8px 2px 2px' } });
+            m.l.forEach((l, li) => {
+              const s = this.lessonState(c, m, li);
+              const curNow = this.lessonKey(c, m, li) === p.id;
+              rows.push({
+                isMod: false, isRow: true,
+                glyph: s.watched ? '●' : s.partial || curNow ? '◐' : '○',
+                glyphStyle: { flex: '0 0 auto', width: 14, textAlign: 'center', color: s.watched || s.partial || curNow ? '#62AEE8' : 'rgba(255,255,255,.45)', fontSize: 11 },
+                label: l[0], dur: l[1] + ' min',
+                on: () => this.playLesson(c, m, li),
+                style: { display: 'flex', alignItems: 'center', gap: 9, width: '100%', boxSizing: 'border-box', minHeight: 34, padding: '6px 10px', borderRadius: 7, cursor: 'pointer', font: 'inherit', fontSize: 12.5, textAlign: 'left', color: '#fff', background: curNow ? 'rgba(98,174,232,.2)' : 'transparent', border: '1px solid ' + (curNow ? '#62AEE8' : 'transparent') }
+              });
+            });
+          });
+          return {
+            rows: rows,
+            head: g.done + '/' + g.total + ' ' + (en ? 'lessons' : 'lecciones') + (g.cur ? ' · ' + fmtMin(g.remain) + ' ' + (en ? 'left' : 'restantes') : ''),
+            note: en ? 'The thread keeps itself: position is written every 5 seconds, per lesson.' : 'El hilo se guarda solo: la posición se escribe cada 5 segundos, por lección.'
+          };
+        }).call(this),
+        panelTitle: p.panel === 'audio' ? (en ? 'Audio' : 'Audio') : p.panel === 'subs' ? (en ? 'Subtitles' : 'Subtítulos') : p.panel === 'marks' ? (en ? 'Markers' : 'Marcadores') : p.panel === 'lessons' ? (en ? 'Lessons' : 'Lecciones') : (en ? 'Video' : 'Vídeo'),
         mk: (function () {
           const secs = (v) => { const m = Math.floor(v / 60); const s = v % 60; return m + ':' + (s < 10 ? '0' : '') + s; };
           const det = st.mkDet === 'gone' ? [] : [{ k: 'intro', a: 42, b: 126, c: 0.94 }, { k: 'credits', a: 6420, b: 6720, c: 0.81 }];
@@ -2740,11 +3151,24 @@ class Component extends DCLogic {
         onErrVersion: () => this.setState({ plOverlay: 'version', scenario: 'normal' }),
         nx: (function () {
           const on = sc === 'nextep' || st.plNext === true;
+          const isL = p.kind === 'lesson';
+          let nextL = null;
+          if (isL) {
+            const c = CRS.filter((x) => x.id === p.courseId)[0];
+            if (c) {
+              const flat = [];
+              c.mods.forEach((m) => m.l.forEach((l, li) => flat.push({ m: m, l: l, key: this.lessonKey(c, m, li) })));
+              const at = flat.map((x) => x.key).indexOf(p.id);
+              nextL = at >= 0 && at + 1 < flat.length ? flat[at + 1] : null;
+            }
+          }
           return {
             on: on && st.plNext !== false,
-            label: en ? 'Next episode' : 'Siguiente episodio',
+            label: isL ? (en ? 'Next lesson' : 'Siguiente lección') : (en ? 'Next episode' : 'Siguiente episodio'),
             title: en ? 'Up next' : 'A continuación',
-            ep: 'T1E4 · ' + (en ? 'The tide that does not return' : 'La marea que no vuelve'),
+            ep: isL
+              ? (nextL ? 'M' + nextL.m.n + ' · ' + nextL.l[0] + ' · ' + nextL.l[1] + ' min' : (en ? 'Course finished' : 'Curso terminado'))
+              : 'T1E4 · ' + (en ? 'The tide that does not return' : 'La marea que no vuelve'),
             remainingLabel: en ? 'Starts in (seconds):' : 'Empieza en (segundos):',
             countdown: '12',
             playNow: en ? 'Play now' : 'Reproducir ahora',
@@ -2810,6 +3234,23 @@ class Component extends DCLogic {
       t: t, icons: { sliders: icon('sliders', 16), close: icon('close', 16), search: icon('search', 16), chev: icon('chev', 14), play: icon('play', 15), warn: icon('warn', 14), check: icon('check', 13), folder: icon('folder', 26), info: icon('info', 16), lock: icon('lock', 14), key: icon('key', 15), back: icon('chevd', 14), film: icon('film', 15), tv: icon('tv', 15), ext: icon('ext', 14), eye: icon('eye', 15), plus: icon('plus', 14) },
       isMovie: st.route === 'movie', isShow: st.route === 'show', isReview: st.route === 'review',
       isDup: st.route === 'duplicates', isEditor: st.route === 'editor', isSet: st.route === 'settings',
+      isCourses: st.route === 'courses', isCourse: st.route === 'course',
+      courseCards: courseCards, crs: crsDetail,
+      ccCtaStyle: Object.assign({}, btnPri, { height: 30, fontSize: 12, flex: 1, minWidth: 0, padding: '0 14px' }),
+      crsEmpty: flags.empty, crsHasCards: !flags.empty && courseCards.length > 0,
+      crsIntro: en ? 'Videos you study, not watch once: tutorials, video courses, folders of numbered lessons. Each course keeps its own thread — last lesson, exact minute — so losing track is not on you.' : 'Vídeos que se estudian, no que se ven una vez: tutoriales, videocursos, carpetas de lecciones numeradas. Cada curso guarda su propio hilo — última lección, minuto exacto — para que perderlo no dependa de ti.',
+      crsEmptyT: en ? 'No folder marked as a course yet' : 'Ninguna carpeta marcada como curso todavía',
+      crsEmptyB: en ? 'Mark a folder of numbered videos and it becomes a course: lessons in file-name order, subfolders as modules, progress per lesson. The files stay exactly where they are.' : 'Marca una carpeta de vídeos numerados y se convierte en curso: lecciones en el orden del nombre de archivo, subcarpetas como módulos, progreso por lección. Los archivos se quedan exactamente donde están.',
+      crsMarkLabel: en ? 'Mark a folder as a course…' : 'Marcar una carpeta como curso…',
+      onMarkCourse: () => openAdd('content', 'course'),
+      crsNote: en ? 'A course is detected from your folder, never from a provider: there is nothing to identify and nothing is looked up. Order comes from file names; modules from subfolders.' : 'Un curso se detecta de tu carpeta, nunca de un proveedor: no hay nada que identificar y nada se consulta. El orden sale de los nombres de archivo; los módulos, de las subcarpetas.',
+      backToCourses: () => this.go('courses'),
+      hasRecs: recsOn && !flags.empty && !flags.loading,
+      recsItems: recsItems,
+      recsTitle: en ? 'Suggested from your library' : 'Sugerencias de tu biblioteca',
+      recsSub: en ? 'Local and explainable · nothing leaves this machine' : 'Locales y explicables · nada sale de este equipo',
+      recsManageLabel: en ? 'Settings' : 'Ajustes',
+      recsManage: () => this.setState({ route: 'settings', setSection: 'recs' }),
       mv: mv, sh: sh, revItems: revItems, dupGroups: dupGroups,
       backToLib: () => this.go('library'),
       revIntro: en ? 'Ambiguous files are never auto-classified. Nothing here has been applied to your library yet.' : 'Los archivos dudosos nunca se clasifican solos. Nada de esto se ha aplicado todavía a tu biblioteca.',
@@ -3108,7 +3549,7 @@ class Component extends DCLogic {
       isContentMode: isContent, isRootMode: !isContent,
       rootsSubtitle: en ? 'Folders scanned recursively' : 'Carpetas que se escanean por completo',
       addAsLabel: en ? 'Catalogue as' : 'Catalogar como',
-      addAsDD: dd('add:as', en ? 'Add as' : 'Añadir como', st.addAs, [['auto', en ? 'Detect automatically' : 'Detectar automáticamente'], ['movie', en ? 'Movie' : 'Película'], ['show', en ? 'Series' : 'Serie']].map((x) => ({ v: x[0], l: x[1] })), (v) => this.setState({ addAs: v }), { h: 34 }),
+      addAsDD: dd('add:as', en ? 'Add as' : 'Añadir como', st.addAs, [['auto', en ? 'Detect automatically' : 'Detectar automáticamente'], ['movie', en ? 'Movie' : 'Película'], ['show', en ? 'Series' : 'Serie'], ['course', en ? 'Course (folder of lessons)' : 'Curso (carpeta de lecciones)']].map((x) => ({ v: x[0], l: x[1] })), (v) => this.setState({ addAs: v }), { h: 34 }),
       popOpen: !!st.pop, closePop: () => this.setState({ pop: null }),
       playOnlyLabel: en ? 'Play without adding' : 'Solo reproducir, sin añadir',
       onPlayOnly: () => { this.setState({ addOpen: false }); this.playMovie(MOV[6]); this.toast(en ? 'Playing a loose file. It was not added to the catalogue.' : 'Reproduciendo un archivo suelto. No se ha añadido al catálogo.'); },
@@ -3119,22 +3560,24 @@ class Component extends DCLogic {
       rootsHelp: en ? 'AP Reelume catalogues files where they are. Adding a root never copies, moves, or renames anything; removing one keeps the catalogue and marks its items unavailable.' : 'AP Reelume cataloga los archivos donde están. Añadir una raíz nunca copia, mueve ni renombra nada; quitarla conserva el catálogo y marca sus elementos como no disponibles.',
       addOpen: st.addOpen, addPath: st.addPath, addPlaceholder: addPlaceholder,
       detectedLabel: isContent
-        ? (rawPath ? (isFilePath ? (en ? 'Video file' : 'Archivo de vídeo') : (en ? 'Title folder' : 'Carpeta de un título')) + ' → ' + (contentKind === 'show' ? (en ? 'Series' : 'Serie') : (en ? 'Movie' : 'Película')) : (en ? 'Type is detected from the path' : 'El tipo se detecta a partir de la ruta'))
+        ? (rawPath ? (isFilePath ? (en ? 'Video file' : 'Archivo de vídeo') : (en ? 'Title folder' : 'Carpeta de un título')) + ' → ' + (contentKind === 'course' ? (en ? 'Course' : 'Curso') : contentKind === 'show' ? (en ? 'Series' : 'Serie') : (en ? 'Movie' : 'Película')) : (en ? 'Type is detected from the path' : 'El tipo se detecta a partir de la ruta'))
         : (detected ? kindLabel[detected] : (en ? 'Type is detected from the path' : 'El tipo se detecta a partir de la ruta')),
       detectedNote: isContent
         ? (rawPath ? (en ? 'Title: ' : 'Título: ') + (guessTitle || leaf) : (en ? 'Waiting for a valid path' : 'Esperando una ruta válida'))
         : (detected === 'unc' ? (en ? 'UNC network share' : 'Recurso de red UNC') : detected === 'usb' ? (en ? 'Removable volume' : 'Volumen extraíble') : detected === 'local' ? (en ? 'Fixed local volume' : 'Volumen local fijo') : (en ? 'Waiting for a valid path' : 'Esperando una ruta válida')),
       detectedStyle: chip((isContent ? !!rawPath : !!detected) ? 'accent' : 'neutral'),
       detectedTitle: en ? 'Detected source type' : 'Tipo de origen detectado',
-      addTitle: isContent ? (en ? 'Add a movie or a series' : 'Añadir una película o una serie') : (en ? 'Add media root' : 'Añadir raíz de medios'),
+      addTitle: isContent ? (contentKind === 'course' ? (en ? 'Mark a folder as a course' : 'Marcar una carpeta como curso') : (en ? 'Add a movie or a series' : 'Añadir una película o una serie')) : (en ? 'Add media root' : 'Añadir raíz de medios'),
       addRootTitle: en ? 'Add media root' : 'Añadir raíz de medios',
       addHelp: isContent
-        ? (en ? 'Point to one video file or to the folder of a single title. It is catalogued in place and is NOT turned into a scan root: the rest of the drive is not scanned.' : 'Indica un archivo de vídeo o la carpeta de un solo título. Se cataloga en su ubicación y NO se convierte en raíz de escaneo: no se recorre el resto de la unidad.')
+        ? (contentKind === 'course'
+          ? (en ? 'A course is a folder of numbered videos that you study in order. Lessons take the file-name order, subfolders become modules, and progress is kept per lesson. Nothing is copied, moved, or renamed — and it is NOT a scan root.' : 'Un curso es una carpeta de vídeos numerados que se estudian en orden. Las lecciones siguen el orden del nombre de archivo, las subcarpetas son módulos y el progreso se guarda por lección. Nada se copia, mueve ni renombra — y NO es una raíz de escaneo.')
+          : (en ? 'Point to one video file or to the folder of a single title. It is catalogued in place and is NOT turned into a scan root: the rest of the drive is not scanned.' : 'Indica un archivo de vídeo o la carpeta de un solo título. Se cataloga en su ubicación y NO se convierte en raíz de escaneo: no se recorre el resto de la unidad.'))
         : (en ? 'A root is a folder that AP Reelume scans in full, such as D:\\Movies or D:\\Series. Adding one never copies, moves, or renames anything; removing it keeps the catalogue and marks its items unavailable.' : 'Una raíz es una carpeta que AP Reelume escanea por completo, como D:\\Peliculas o D:\\Series. Añadirla nunca copia, mueve ni renombra nada; quitarla conserva el catálogo y marca sus elementos como no disponibles.'),
       addKindLabel: en ? 'Source type' : 'Tipo de origen',
       addPathLabel: isContent ? (en ? 'File or folder' : 'Archivo o carpeta') : (en ? 'Folder to scan' : 'Carpeta que se escaneará'),
       addBrowse: en ? 'Browse…' : 'Examinar…',
-      addConfirm: isContent ? (en ? 'Add to library' : 'Añadir a la biblioteca') : (en ? 'Add root' : 'Añadir raíz'),
+      addConfirm: isContent ? (contentKind === 'course' ? (en ? 'Mark as course' : 'Marcar como curso') : (en ? 'Add to library' : 'Añadir a la biblioteca')) : (en ? 'Add root' : 'Añadir raíz'),
       addCancel: en ? 'Cancel' : 'Cancelar',
       addScan: en ? 'Scan this root now after adding it' : 'Escanear esta raíz al añadirla',
       addRootLabel: en ? 'Add root' : 'Añadir raíz',
@@ -3151,8 +3594,10 @@ class Component extends DCLogic {
         if (isContent) {
           if (!rawPath) { this.toast(en ? 'Enter a file or folder path.' : 'Escribe la ruta de un archivo o carpeta.'); return; }
           const item = { id: 'ad' + st.added.length + '-' + Math.round(Math.random() * 999), t: guessTitle || leaf, kind: contentKind, path: rawPath, h: Math.round(Math.random() * 359) };
-          this.setState({ added: st.added.concat([item]), addOpen: false, route: 'library' });
-          this.toast((en ? 'Added in place as ' : 'Añadido en su ubicación como ') + (contentKind === 'show' ? (en ? 'series' : 'serie') : (en ? 'movie' : 'película')) + (en ? '. It is not a scan root and nothing was copied.' : '. No es una raíz de escaneo y no se ha copiado nada.'));
+          this.setState({ added: st.added.concat([item]), addOpen: false, route: contentKind === 'course' ? 'courses' : 'library' });
+          this.toast(contentKind === 'course'
+            ? (en ? 'Folder marked as a course. Lessons take the file-name order and progress is kept per lesson. Nothing was copied.' : 'Carpeta marcada como curso. Las lecciones siguen el orden del nombre de archivo y el progreso se guarda por lección. No se ha copiado nada.')
+            : (en ? 'Added in place as ' : 'Añadido en su ubicación como ') + (contentKind === 'show' ? (en ? 'series' : 'serie') : (en ? 'movie' : 'película')) + (en ? '. It is not a scan root and nothing was copied.' : '. No es una raíz de escaneo y no se ha copiado nada.'));
           return;
         }
         if (!detected) { this.toast(en ? 'Enter a valid local, USB, or UNC path.' : 'Escribe una ruta local, USB o UNC válida.'); return; }
