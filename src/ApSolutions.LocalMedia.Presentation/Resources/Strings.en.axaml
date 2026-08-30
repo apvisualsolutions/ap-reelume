@@ -690,4 +690,50 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerVersionsEmptyDescription">There is nothing to choose between for this title.</x:String>
   <x:String x:Key="ShortcutsEmptyTitle">No shortcuts assigned</x:String>
   <x:String x:Key="ShortcutsEmptyDescription">The system media keys still work.</x:String>
+  <!-- Courses (CRS-001..CRS-005). Forty-two keys, and the design package's own header says
+       forty-one: its "course card and its thread" group is labelled 15 and enumerates 16, because
+       two of its rows pack a pair of keys into one cell and one pair was counted once. Counted
+       from the document rather than read off its heading. -->
+  <x:String x:Key="CoursesNavLabel">Courses</x:String>
+  <x:String x:Key="CoursesIntro">Videos you study, not watch once: tutorials, video courses, folders of numbered lessons. Each course keeps its own thread — last lesson, exact minute — so losing track is not on you.</x:String>
+  <x:String x:Key="CoursesEmptyTitle">No folder marked as a course yet</x:String>
+  <x:String x:Key="CoursesEmptyDescription">Mark a folder of numbered videos and it becomes a course: lessons in file-name order, subfolders as modules, progress per lesson. The files stay exactly where they are.</x:String>
+  <x:String x:Key="CoursesMarkFolderAction">Mark a folder as a course…</x:String>
+  <x:String x:Key="CoursesDetectionNote">A course is detected from your folder, never from a provider: there is nothing to identify and nothing is looked up. Order comes from file names; modules from subfolders.</x:String>
+  <x:String x:Key="CoursesMenuAll">All courses</x:String>
+  <x:String x:Key="CoursesMenuThreadPending">Thread pending</x:String>
+  <x:String x:Key="CoursesMenuFinished">Finished</x:String>
+  <x:String x:Key="CourseLessonsFormat">{0}/{1} lessons</x:String>
+  <x:String x:Key="CourseRemainingFormat">{0} left</x:String>
+  <x:String x:Key="CourseLastOpenedFormat">Last opened {0} ago</x:String>
+  <x:String x:Key="CourseContinueFormat">Continue · {0}</x:String>
+  <x:String x:Key="CoursePickUpFormat">Pick up · {0}</x:String>
+  <x:String x:Key="CourseFinishedOpenAction">Finished · open</x:String>
+  <x:String x:Key="CourseJustMarkedStatus">Just marked · ordering lessons by file name</x:String>
+  <x:String x:Key="CourseOpensWhenScanned">Opens when scanned</x:String>
+  <x:String x:Key="CourseKicker">Course</x:String>
+  <x:String x:Key="CourseMetaFormat">{0} modules · {1} lessons · {2}</x:String>
+  <x:String x:Key="CourseWatchedFormat">{0}/{1} watched</x:String>
+  <x:String x:Key="CourseFinishedChip">Course finished</x:String>
+  <x:String x:Key="CourseModuleFormat">Module {0} · {1}</x:String>
+  <x:String x:Key="CourseNextInThreadChip">Next in the thread</x:String>
+  <x:String x:Key="CourseThreadTitle">Where you left off</x:String>
+  <x:String x:Key="CourseThreadCta">Pick up the thread</x:String>
+  <x:String x:Key="CourseThreadRestartCta">Watch again from the start</x:String>
+  <x:String x:Key="CourseResumeAtFormat">Resume at {0} / {1}</x:String>
+  <x:String x:Key="CourseRecapTitle">What you watched last</x:String>
+  <x:String x:Key="CourseThreadNote">The thread keeps itself: last lesson, exact minute, and date. Nothing to write down to come back.</x:String>
+  <x:String x:Key="CourseMarkWatchedAction">Mark as watched</x:String>
+  <x:String x:Key="CourseUnmarkAction">Unmark</x:String>
+  <x:String x:Key="CourseMarkedNotice">Lesson marked as watched. The thread moves to the next one.</x:String>
+  <x:String x:Key="CourseUnmarkedNotice">Mark removed. The thread points here again.</x:String>
+  <x:String x:Key="PlayerLessonsPanelTitle">Lessons</x:String>
+  <x:String x:Key="PlayerNextLessonLabel">Next lesson</x:String>
+  <x:String x:Key="PlayerCourseFinishedNotice">Course finished</x:String>
+  <x:String x:Key="PlayerLessonsThreadNote">The thread keeps itself: position is written every 5 seconds, per lesson.</x:String>
+  <x:String x:Key="AddAsCourseOption">Course (folder of lessons)</x:String>
+  <x:String x:Key="AddCourseTitle">Mark a folder as a course</x:String>
+  <x:String x:Key="AddCourseHelp">A course is a folder of numbered videos that you study in order. Lessons take the file-name order, subfolders become modules, and progress is kept per lesson. Nothing is copied, moved, or renamed — and it is NOT a scan root.</x:String>
+  <x:String x:Key="AddCourseConfirmAction">Mark as course</x:String>
+  <x:String x:Key="AddCourseDoneNotice">Folder marked as a course. Lessons take the file-name order and progress is kept per lesson. Nothing was copied.</x:String>
 </ResourceDictionary>

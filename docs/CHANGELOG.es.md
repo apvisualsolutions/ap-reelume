@@ -114,6 +114,31 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las cadenas de Cursos entran en los dos archivos, y son 42, no las 41 que el paquete anuncia.**
+  `Strings.es.axaml` y `Strings.en.axaml` pasan de **668 a 710 claves cada uno**, en el mismo orden y
+  sin una sola diferencia entre ellos. La cifra se contó del documento en vez de leerse de su
+  encabezado, y por eso se sabe que no cuadraba: el grupo «Ficha del curso y su hilo» se rotula 15 y
+  enumera 16, porque dos de sus filas empaquetan una pareja de claves en una celda —«Marcar como
+  vista / Quitar la marca» y sus dos avisos— y una de las dos parejas se contó una sola vez. Un
+  número que nadie recuenta es el que acaba justificando una lista incompleta, así que la corrección
+  va como comentario dentro de los dos archivos, donde la vuelve a leer quien añada la siguiente.
+
+  Aún no las consume nadie, y eso es deliberado: `PROMPT.md` pone las cadenas primero porque el
+  bilingüismo se comprueba por pareja de archivos y una clave nueva va en los dos o no va. Los tramos
+  que vienen —modelo, marcado, las cuatro vistas y el panel del reproductor— son los que las gastan.
+
+  **Y la puerta que las prohibía se acota, no se quita.** `ScopeBoundaryTests` tenía una fila que
+  vetaba las palabras «Curso», «Course», «Leccion» y «Lesson» en cualquier clave de recurso, y con
+  ellas vetaba catalogar una carpeta de vídeos numerados que ya está en el disco, que es a lo que
+  esta aplicación se dedica. Lo que la frase de la hoja de ruta protege es la **plataforma**, así que
+  los marcadores pasan a ser las palabras que el producto tendría que usar si matriculara a alguien,
+  certificara algo o llevara un expediente: matrícula, certificado, diploma, cuestionario, racha,
+  progreso de formación, porcentaje completado, estadísticas de estudio. «Badge» se queda fuera de la
+  lista a propósito, porque diez claves existentes lo llevan empezando por `UnavailableBadge`. Y en
+  la puerta del esquema, `courses` sale de la lista de tablas prohibidas y entran las cuatro que sí
+  serían una plataforma: matrículas, certificados, cuestionarios y rachas. Una tabla que se publica
+  no se puede deshacer.
+
 - **Cursos entra en la matriz como `CRS-001`…`CRS-005`, y el no-objetivo que lo prohibía se acota en
   vez de borrarse.** `ADR-0006` pasa a `ACCEPTED`: un curso es un tercer tipo de título, una raíz se
   **declara** de cursos y **declara a qué profundidad** están, y el programa no adivina ni una cosa ni
@@ -137,7 +162,7 @@ evidencia, es [FEATURES.md](FEATURES.md).
   leía desde el 17-08-2026 y desde entonces ha declarado el rediseño cerrado en este árbol y ha
   abierto una sola propuesta. Llegan `design/vistas/` —un archivo por vista, nueve líneas cada uno,
   que abren el prototipo ya situado en esa vista por la prop `view`, así que hay una sola fuente y
-  ninguna divergencia—, las 41 claves de Cursos en `Cadenas nuevas` con su texto en los dos idiomas,
+  ninguna divergencia—, las claves de Cursos en `Cadenas nuevas` con su texto en los dos idiomas,
   y `README`, `PROMPT` y `github` reescritos para esta fase. `Auditoría del inventario` se retira
   porque el proyecto la retiró.
 

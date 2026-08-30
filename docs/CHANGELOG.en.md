@@ -111,6 +111,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The Courses strings land in both files, and there are 42 of them rather than the 41 the package
+  announces.** `Strings.es.axaml` and `Strings.en.axaml` go from **668 to 710 keys each**, in the same
+  order and with not one difference between them. The number was counted out of the document instead
+  of read off its heading, which is how the mismatch showed: the "course card and its thread" group
+  is labelled 15 and enumerates 16, because two of its rows pack a pair of keys into one cell — "mark
+  as watched / unmark" and their two notices — and one of the pairs was counted once. A number nobody
+  recounts is the one that ends up justifying an incomplete list, so the correction goes in as a
+  comment inside both files, where whoever adds the next key reads it again.
+
+  Nothing consumes them yet, and that is deliberate: `PROMPT.md` puts the strings first because
+  bilingualism is checked as a pair of files and a new key goes into both or into neither. The
+  tranches that follow — model, marking, the four views, and the player panel — are what spend them.
+
+  **And the gate that forbade them is narrowed, not removed.** `ScopeBoundaryTests` carried a row
+  banning the words "Curso", "Course", "Leccion" and "Lesson" in any resource key, and with them it
+  banned cataloguing a folder of numbered videos already on the disk, which is what this application
+  does. What the roadmap sentence protects is the **platform**, so the markers become the words the
+  product would have to use if it enrolled somebody, certified something, or kept a record:
+  enrolment, certificate, diploma, quiz, streak, training progress, completion percentage, study
+  statistics. "Badge" is deliberately left out, because ten existing keys carry it starting with
+  `UnavailableBadge`. And in the schema gate, `courses` leaves the list of forbidden tables and the
+  four that would really be a platform join it: enrolments, certificates, quizzes, streaks. A table
+  that ships cannot be undone.
+
 - **Courses enters the matrix as `CRS-001`…`CRS-005`, and the non-goal that forbade it is narrowed
   rather than deleted.** `ADR-0006` moves to `ACCEPTED`: a course is a third kind of title, a root is
   **declared** to hold courses and **declares the depth** they sit at, and the program guesses
@@ -135,7 +159,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   read since 2026-08-17 and has since declared the redesign closed in this tree and opened a single
   proposal. In come `design/vistas/` — one file per view, nine lines each, opening the prototype
   already positioned on that view through the `view` prop, so there is one source and no divergence —
-  the 41 Courses keys appended to `Cadenas nuevas` with their text in both languages, and `README`,
+  the Courses keys appended to `Cadenas nuevas` with their text in both languages, and `README`,
   `PROMPT` and `github` rewritten for this phase. `Auditoría del inventario` is withdrawn because the
   project withdrew it.
 
