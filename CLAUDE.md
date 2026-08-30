@@ -180,6 +180,36 @@ pwsh -NoProfile -File eng/verify-docs.ps1
 
 `eng/verify.ps1` las corre todas más el empaquetado y la puerta de cobertura.
 
+**Una sola prueba**, que es lo que se quiere mientras se persigue un rojo — segundos en vez de
+minutos:
+
+```powershell
+dotnet test tests/ApSolutions.LocalMedia.Domain.Tests -c Release --no-build -m:1 `
+  --settings eng/test.runsettings --filter "FullyQualifiedName~El_nombre_de_la_prueba"
+```
+
+`--no-build` sólo después de haber compilado, o se mide el binario anterior y el resultado miente.
+
+**Y «la suite afectada» es quien LEE el archivo, no quien está en su carpeta.** Diez suites, y la
+elección se equivoca hacia abajo con facilidad —tocar el shell rompió una obligación de TMDB en
+`IntegrationTests`—:
+
+| Suite | Qué cubre | Coste |
+| --- | --- | --- |
+| `Domain.Tests` | políticas puras | < 1 s |
+| `Application.Tests` | casos de uso y puertos | ~ 1 s |
+| `ArchitectureTests` | las cinco reglas, red declarada, servicios huérfanos | ~ 2 s |
+| `DocumentationTests` | bilingüismo y matriz de alcance | < 1 s |
+| `UiTests` | AXAML, ViewModels, las 48 vistas | ~ 1 min |
+| `AccessibilityTests` | recorrido y paseo autónomo | ~ 5 min |
+| `IntegrationTests` | SQLite, sistema de archivos, TMDB | ~ 7 min |
+| `MediaTests` | LibVLC con vídeo real | ~ 7 min |
+| `PackagingTests` | MSIX y firma | ~ 10 s |
+| `PerformanceTests` | presupuestos de tiempo | ~ 2,5 min |
+
+`PackagingTests` da **30 rojos aquí y verde en CI** —le faltan `lifecycle.json` y
+`reproducibility.json` en `artifacts/package`—, así que no se persigue en local.
+
 **Y para mirar CI se usa `eng/watch-ci.ps1`, nunca un bucle escrito a mano.**
 
 ```powershell
@@ -192,13 +222,45 @@ y un techo a los 120 que avisa y sale. El motivo de que sea un guion y no un buc
 el filtro obvio pregunta por `status == "completed"` y **calla en todo lo demás**, y un vigía callado
 es indistinguible de un run que sigue. Peor aún, `2>/dev/null` sobre la consulta **entierra** el error
 de `gh` y `|| true` lo convierte en una cadena vacía que se lee como «aún no ha terminado». Un run de
-este repositorio tarda **55-80 minutos**, así que hay hueco de sobra para no enterarse.
+este repositorio tarda **42-53 minutos** —los doce completos del 2026-08-30 dieron 42,7 el más rápido
+y 52,6 el más lento—, así que hay hueco de sobra para no enterarse. **Esa cifra decía 55-80 hasta que
+se midió**, y era de las que se citan sin comprobar: el latido de 30 y el techo de 120 siguen bien
+porque el margen los cubre igual, pero un número que nadie vuelve a medir es el que acaba justificando
+la decisión equivocada.
+
+**Y armar el vigía ya no depende de acordarse**: `.claude/hooks/post-push.sh` lo exige tras cada
+`git push` (ver arriba). El comando llega con el SHA ya resuelto.
 
 **Los suelos de cobertura los mide CI, no esta máquina.** `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
 tiene: `WindowsAudioDeviceCatalog.cs` vale 79/61 aquí y 32/11 allí. Fuera de CI el trinquete informa
 y no bloquea. Nunca se edita a mano, y nunca se genera con una ejecución local.
+
+**El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **205** desde
+el 2026-08-30, cuando `Domain` bajó de 212.
+
+**Y por eso subir cobertura cuesta DOS vueltas de CI, no una.** La puerta falla igual ante un suelo
+que se queda corto **y ante uno que se queda largo**: en cuanto un archivo mejora, el run se pone
+rojo pidiendo sacarlo de la lista o subir su suelo. La segunda vuelta es la que copia el artefacto de
+la primera y baja el trinquete. Se planifica contando eso, y **el rojo de la primera es el resultado
+esperado, no un fallo**.
+
+**Lo que sí se puede hacer aquí es reproducir lo que CI mide, y evita perseguir a ciegas.**
+`gh run download <id> -n test-results` trae los **20 informes Cobertura** del run; fusionados con el
+mismo `reportgenerator` y leídos con la aritmética de `check-coverage.ps1` —líneas por número con
+«cubierta en cualquier sitio gana», ramas **sumadas**— reprodujeron los nueve suelos de `Domain`
+**exactos**. Medir una sola suite en local **miente**: `MatchModels` da 5 de 8 ramas en `Domain.Tests`
+y 7 de 8 en la fusión.
+
+**Cobertura dice «3 de 4» y no cuál; el JSON de coverlet sí lo dice.**
+`--collect:"XPlat Code Coverage;Format=json"` nombra la rama con línea, offset y camino, y con el
+offset en la mano `GetMethodBody().GetILAsByteArray()` cierra la pregunta. Así se supo que **tres de
+las quince ramas de `Domain` eran inalcanzables** —un caché de delegado sobre una clausura que se
+reasigna en cada llamada, un brazo que exigiría que `GetRelativePath` devolviera cadena vacía, y una
+temporada negativa que ningún `\d{1,3}` produce—. **Un techo medido se escribe en la prueba que
+alguien volverá a mirar**, no sólo en la evidencia.
 
 **Quien verifica de verdad es CI, y por eso el orden cambió el 2026-08-18.** CI corre ese mismo
 `verify.ps1` **y además** `run-accessibility.ps1 -Passes 2`, `run-recovery.ps1 -Passes 2` y
