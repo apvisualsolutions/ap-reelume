@@ -64,6 +64,46 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **`.flv` lands, and three unwatched copies of the container list go with it.** It is the only video
+  extension the application did not recognise across the owner's two course roots — **10 files, one
+  whole course invisible** — while the eight approved cover **98.3 %** of his video, measured. It goes
+  **at the end** of the list rather than in alphabetical order: it is the only addition after the MVP
+  specification, three files quote that sequence, and the packaging gate compares them **in order**.
+
+  **The list existed six times and only three were watched.** The three `FileAssociationPackageTests`
+  compares — the domain, the authored fragment and the manifest — cannot be unified, because each is
+  read by something different and that is why a test ties them together. The other three can, and
+  **one had already fallen behind**:
+
+  - **`MediaNameParser` kept its own**, and uses it to strip the container off a name before parsing
+    it. An extension the scanner accepts and that parser does not is **a title with its extension
+    glued on**: the file is catalogued and reads "Lección 01.flv". It now asks
+    `MediaFileExtensions`.
+  - **`MediaFileExtensions` held two of its own**, a set and an ordered list, both written by hand.
+    The set is now built from the list: a class that exists because two lists drift was the first
+    place it was going to happen.
+  - **Two suites carried the literal list** — `OpenLooseFileTests` and `IncrementalScanTests` — to
+    assert "every container the library recognises". A literal there **keeps passing** on the day the
+    library recognises one more, which is exactly what it was doing. They read the domain.
+
+  **And the bare number was written eight more times**, in two tests that did go red and said so:
+  `MsixLifecycleTests` compared the literal "8 of 8" against the lifecycle report, and
+  `IncrementalScanTests` asserted the number 8 **seven times** over a tree with one file per
+  container. Both derive it from the list now: a test about "every declared container" with a figure
+  inside it is a test about that figure.
+
+  **The packaging cycle was paid in full**, which is why this had been deferred for several sessions.
+  The manifest expires two measurements pinned by its SHA-256, so the sandbox cycle was re-run: **all
+  twelve phases match the archived ones outcome for outcome** and the only difference is the intended
+  one — the association goes from **8 of 8** to **9 of 9** containers with an Open-with entry.
+  `verify-package.ps1` confirms **12 phases, 0 blocked** and **688 identical files** across two builds
+  of the same commit.
+
+  **A local red nine days old fell with it**: the ARM64 artefact was from 22 August and the manifest's
+  background colour changed on the 24th, so `Arm64PackageTests` was comparing against a package older
+  than the change. Repackaged, `PackagingTests` gives **194 of 194** here — the "30 local reds" the
+  guide treated as normal are **missing artefacts**, not the machine.
+
 - **«Course (folder of lessons)»: the option that was missing to declare a course (CRS-001).**
   Everything else about Courses was built and unusable, because **nothing let anybody say "this
   folder is a course"**. The add dialog gains its second half, and with it `MarkCoursesInRoot` and

@@ -162,6 +162,11 @@ elección se equivoca hacia abajo con facilidad —tocar el shell rompió una ob
 `PackagingTests` da **30 rojos aquí y verde en CI** —le faltan `lifecycle.json` y
 `reproducibility.json` en `artifacts/package`—, así que no se persigue en local.
 
+**Pero esos rojos son por artefactos ausentes, no por esta máquina, y se cierran cuando el trabajo ya
+paga el ciclo de empaquetado.** El 2026-08-31, tras `package-x64.ps1` + `verify-package.ps1 -Mode
+Verify` + `package-arm64.ps1`, la suite dio **194 de 194**. Si tocas el manifiesto ya estás pagando
+ese ciclo: entonces sí se corre entera, porque es la única que mide lo que cambiaste.
+
 **Y para mirar CI se usa `eng/watch-ci.ps1`, nunca un bucle escrito a mano.**
 
 ```powershell

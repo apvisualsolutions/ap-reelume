@@ -64,6 +64,47 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **`.flv` entra, y con él salen tres copias de la lista que nadie vigilaba.** Es la única extensión
+  de vídeo que la aplicación no reconocía de las dos raíces de cursos del propietario —**10 archivos,
+  un curso entero invisible**—, mientras las ocho aprobadas cubren el **98,3 %** de su vídeo, medido.
+  Va **al final** de la lista y no en orden alfabético: es la única adición posterior a la
+  especificación del MVP, tres archivos citan esa secuencia y la puerta de empaquetado los compara
+  **en orden**.
+
+  **La lista existía seis veces y sólo tres estaban vigiladas.** Las tres que compara
+  `FileAssociationPackageTests` —el dominio, el fragmento autorizado y el manifiesto— no se pueden
+  unificar, porque cada una la lee algo distinto y por eso hay una prueba que las ata. Las otras tres
+  sí, y **una ya se había quedado atrás**:
+
+  - **`MediaNameParser` tenía la suya**, y la usa para quitar la extensión del nombre antes de
+    interpretarlo. Una extensión que el escáner acepta y ese parser no es **un título con la
+    extensión pegada**: el archivo se cataloga y se lee «Lección 01.flv». Ahora pregunta a
+    `MediaFileExtensions`.
+  - **`MediaFileExtensions` guardaba dos**, un conjunto y una lista ordenada, escritas a mano las
+    dos. El conjunto se construye ahora de la lista: una clase que existe porque dos listas derivan
+    era el primer sitio donde iba a pasar.
+  - **Dos suites llevaban la lista literal** —`OpenLooseFileTests` e `IncrementalScanTests`— para
+    afirmar «todos los contenedores que la biblioteca reconoce». Un literal ahí **sigue pasando** el
+    día que la biblioteca reconoce uno más, que es exactamente lo que hacía. Leen el dominio.
+
+  **Y el número suelto estaba escrito ocho veces más**, en dos pruebas que sí se pusieron rojas y lo
+  dijeron: `MsixLifecycleTests` comparaba el literal `«8 of 8»` contra el informe del ciclo de vida, e
+  `IncrementalScanTests` afirmaba **siete veces** el número 8 sobre un árbol con un archivo por
+  contenedor. Las dos se derivan ahora de la lista: una prueba sobre «todos los contenedores
+  declarados» con una cifra dentro es una prueba sobre esa cifra.
+
+  **El ciclo de empaquetado se pagó entero**, que es la razón por la que esto llevaba varias sesiones
+  aplazado. El manifiesto caduca dos mediciones fijadas por su SHA-256, así que se rehizo el ciclo del
+  sandbox: **las doce fases coinciden desenlace a desenlace con las archivadas** y la única diferencia
+  es la buscada —la asociación pasa de **8 de 8** a **9 de 9** contenedores con entrada «Abrir
+  con»—. `verify-package.ps1` confirma **12 fases, 0 bloqueadas** y **688 archivos idénticos** entre
+  dos construcciones del mismo commit.
+
+  **De paso cayó un rojo local que llevaba nueve días**: el artefacto ARM64 era del 22 de agosto y el
+  color de fondo del manifiesto cambió el 24, así que `Arm64PackageTests` comparaba con un paquete
+  anterior al cambio. Reempaquetado, `PackagingTests` da **194 de 194** aquí — los «30 rojos en local»
+  que la guía daba por normales son **artefactos ausentes**, no la máquina.
+
 - **«Curso (carpeta de lecciones)»: la opción que faltaba para declarar un curso (CRS-001).** Todo lo
   demás de Cursos estaba construido y no se podía usar, porque **nada permitía decir «esta carpeta es
   un curso»**. El diálogo de añadir gana su segunda mitad, y con ella vuelven al contenedor

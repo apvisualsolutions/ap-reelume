@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "manifestSha256": "07dda8458b0bbce240a7f195766a769ad7617e17c44dc6391f721878f3982113",
+  "manifestSha256": "6446ba791e03028b3d2bc78acdfc200bfc8b3c2ac09ca2c745c4a08eab10972c",
   "note": "The handover the updater performs, measured on both kinds of machine: one with nothing registered for .msix and one with the App Installer. Nothing was installed on the second; the package carries a certificate it does not trust. The sandbox half ran inside Windows Sandbox, created at launch and destroyed when the window closed.",
   "withoutHandler": {
     "runner": "Windows Sandbox",
@@ -41,9 +41,10 @@
           ".webm",
           ".m4v",
           ".ts",
-          ".m2ts"
+          ".m2ts",
+          ".flv"
         ],
-        "detail": "8 of 8 containers registered an Open-with entry",
+        "detail": "9 of 9 containers registered an Open-with entry",
         "id": "file-association",
         "locations": [
           ".mp4 -> HKCU:\\SOFTWARE\\Classes\\.mp4\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
@@ -53,13 +54,14 @@
           ".webm -> HKCU:\\SOFTWARE\\Classes\\.webm\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
           ".m4v -> HKCU:\\SOFTWARE\\Classes\\.m4v\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
           ".ts -> HKCU:\\SOFTWARE\\Classes\\.ts\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
-          ".m2ts -> HKCU:\\SOFTWARE\\Classes\\.m2ts\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf"
+          ".m2ts -> HKCU:\\SOFTWARE\\Classes\\.m2ts\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf",
+          ".flv -> HKCU:\\SOFTWARE\\Classes\\.flv\\OpenWithProgids :: AppXhazaapm44y0a3pjdnce7bybx0rm9kjdf"
         ]
       },
       {
         "id": "windows-launch",
         "documentedPath": "C:\\Users\\WDAGUtilityAccount\\AppData\\Local\\APSolutions\\LocalMedia",
-        "databaseBytes": 372736,
+        "databaseBytes": 401408,
         "databaseAtVirtualised": false,
         "virtualisedPath": "C:\\Users\\WDAGUtilityAccount\\AppData\\Local\\Packages\\APSolutions.LocalMedia_8sg7nj2tbse8g\\LocalCache\\Local\\APSolutions\\LocalMedia",
         "outcome": "Passed",
@@ -73,9 +75,9 @@
         "exceptionType": "",
         "exceptionMessage": "",
         "installedWithoutHelp": false,
-        "databaseBytesAfter": 372736,
+        "databaseBytesAfter": 401408,
         "databaseSurvived": true,
-        "databaseBytesBefore": 372736,
+        "databaseBytesBefore": 401408,
         "caughtByLauncher": true,
         "detail": "Windows started a handler: False. Version after 45s: 0.1.0.0. Exception: none",
         "outcome": "Refused"
@@ -84,15 +86,15 @@
         "id": "windows-upgrade",
         "version": "0.2.0.0",
         "outcome": "Passed",
-        "databaseAfter": 372736,
-        "detail": "0.1.0.0 replaced by 0.2.0.0; the database survived at 372736 bytes, was 372736",
-        "databaseBefore": 372736
+        "databaseAfter": 401408,
+        "detail": "0.1.0.0 replaced by 0.2.0.0; the database survived at 401408 bytes, was 401408",
+        "databaseBefore": 401408
       },
       {
         "outcome": "Passed",
         "detail": "Windows refused the older package and kept 0.2.0.0",
         "id": "windows-downgrade-refused",
-        "refusal": "Deployment failed with HRESULT: 0x80073D06, No se pudo instalar el paquete porque ya hay instalada una versión superior de este paquete.\r\n\r\nWindows no puede instalar el paquete APSolutions.LocalMedia_0.1.0.0_x64__8sg7nj2tbse8g porque tiene la versión 0.1.0.0. Ya está instalada una versión superior 0.2.0.0 de este paquete.\n\nNOTE: For additional information, look for [ActivityId] e2c2bff4-339e-0003-1996-c3e29e33dd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID e2c2bff4-339e-0003-1996-c3e29e33dd01\n",
+        "refusal": "Deployment failed with HRESULT: 0x80073D06, No se pudo instalar el paquete porque ya hay instalada una versión superior de este paquete.\r\n\r\nWindows no puede instalar el paquete APSolutions.LocalMedia_0.1.0.0_x64__8sg7nj2tbse8g porque tiene la versión 0.1.0.0. Ya está instalada una versión superior 0.2.0.0 de este paquete.\n\nNOTE: For additional information, look for [ActivityId] c38aa6d4-3986-0003-8a59-8bc38639dd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID c38aa6d4-3986-0003-8a59-8bc38639dd01\n",
         "version": "0.2.0.0"
       },
       {
@@ -111,7 +113,7 @@
       },
       {
         "outcome": "Recorded",
-        "detail": "",
+        "detail": "Elegir una aplicación",
         "id": "visible-windows"
       }
     ]

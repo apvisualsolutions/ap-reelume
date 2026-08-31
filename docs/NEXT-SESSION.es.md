@@ -103,6 +103,41 @@
 > Los dos archivos de audio que aquí leen más alto salen **en un bloque aparte**, no ocultos: un aviso
 > que suena cuando no toca enseña a ignorar el aviso.
 >
+> ### `.flv`, y el ciclo de empaquetado que llevaba varias sesiones aplazado
+>
+> **Ejecutado.** Era la única extensión de vídeo que la aplicación no reconocía de las dos raíces de
+> cursos del propietario —10 archivos, un curso entero invisible—. Va **al final** de la lista, no en
+> orden alfabético: es la única adición posterior a la especificación del MVP y la puerta de
+> empaquetado compara las tres copias **en orden**.
+>
+> **La lista existía seis veces y sólo tres estaban vigiladas.** Las tres que compara
+> `FileAssociationPackageTests` no se pueden unificar —cada una la lee algo distinto: C#, el fragmento
+> autorizado y el XML que lee Windows—, y por eso hay una prueba que las ata. Las otras tres sí, y
+> **`MediaNameParser` ya se había quedado atrás**: usa su lista para quitar la extensión del nombre,
+> así que un contenedor que el escáner acepta y ese parser no es **un título con la extensión pegada**
+> —«Lección 01.flv» catalogado tal cual—.
+>
+> **Y el número suelto estaba escrito ocho veces más.** Dos pruebas se pusieron rojas y lo dijeron:
+> `MsixLifecycleTests` comparaba el literal «8 of 8», e `IncrementalScanTests` afirmaba **siete
+> veces** el número 8 sobre un árbol con un archivo por contenedor. Las dos lo derivan ahora.
+>
+> ### Lo que costó el ciclo, y lo que dejó verde
+>
+> **El manifiesto caduca dos mediciones fijadas por su SHA-256**, así que se rehizo el ciclo del
+> sandbox con `eng/run-sandbox-handover.ps1 -SandboxTimeoutSeconds 1500`. **Se compararon los informes
+> antes de archivarlos**, que es lo que la memoria del ciclo exige: las doce fases coinciden desenlace
+> a desenlace con las archivadas y la única diferencia es la buscada — la asociación pasa de **8 de 8**
+> a **9 de 9**, con la ruta de registro de cada contenedor.
+>
+> `verify-package.ps1 -Mode Verify` da **12 fases pasadas, 0 bloqueadas**, y reproducibilidad de
+> **688 archivos idénticos** entre dos construcciones del mismo commit.
+>
+> **Y cayó un rojo local de nueve días que no era de esta tanda**: el artefacto ARM64 era del 22 de
+> agosto y el color de fondo del manifiesto cambió el 24 en `857b8ec`, así que `Arm64PackageTests`
+> comparaba contra un paquete anterior al cambio. Reempaquetado con paridad confirmada —0 sólo-x64,
+> 0 sólo-arm64—, `PackagingTests` da **194 de 194** aquí. **Los «30 rojos en local» que la guía daba
+> por normales son artefactos ausentes, no la máquina**, y eso está corregido en `CLAUDE.md`.
+>
 > ### Lo que esta tanda deja para usar, y lo que dejó decidido
 >
 > **Una herramienta nueva: `eng/preview-coverage-floors.ps1`.** Contesta qué suelos de cobertura se
@@ -134,7 +169,7 @@
 >    exactamente lo que se arregló en ese mismo archivo el 2026-08-31 con dos pruebas unitarias: la
 >    cifra dejó de oscilar y el suelo subió 79 → 84. Si queda otro tramo igual, la corrección es una
 >    **prueba**, no una banda de tolerancia.
-> 2. **`.flv` en `MediaFileExtensions`**, decidido y sin ejecutar desde hace varias sesiones: es la
+> 2. ~~**`.flv` en `MediaFileExtensions`**~~ **HECHA en esta misma tanda**, con su ciclo de empaquetado pagado. La tarea de fondo que la nombra puede descartarse. Lo que decía:, decidido y sin ejecutar desde hace varias sesiones: es la
 >    única extensión de vídeo que la aplicación no reconoce de las dos raíces de cursos del
 >    propietario —10 archivos, un curso entero invisible—. Va agrupado con el próximo cambio de
 >    empaquetado porque `PackagingTests` exige que el manifiesto MSIX declare exactamente

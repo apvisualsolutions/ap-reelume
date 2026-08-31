@@ -103,6 +103,42 @@
 > The two audio files that read higher here are reported **in a separate block**, not hidden: a
 > warning that fires when it should not teaches people to ignore the warning.
 >
+> ### `.flv`, and the packaging cycle deferred for several sessions
+>
+> **Done.** It was the only video extension the application did not recognise across the owner's two
+> course roots — 10 files, one whole course invisible. It goes **at the end** of the list rather than
+> in alphabetical order: it is the only addition after the MVP specification, and the packaging gate
+> compares the three copies **in order**.
+>
+> **The list existed six times and only three were watched.** The three `FileAssociationPackageTests`
+> compares cannot be unified — each is read by something different: C#, the authored fragment, and the
+> XML Windows reads — which is why a test ties them together. The other three can, and
+> **`MediaNameParser` had already fallen behind**: it uses its list to strip the container off a name,
+> so a container the scanner accepts and that parser does not is **a title with its extension glued
+> on** — "Lección 01.flv" catalogued as it stands.
+>
+> **And the bare number was written eight more times.** Two tests went red and said so:
+> `MsixLifecycleTests` compared the literal "8 of 8", and `IncrementalScanTests` asserted the number 8
+> **seven times** over a tree with one file per container. Both derive it now.
+>
+> ### What the cycle cost, and what it left green
+>
+> **The manifest expires two measurements pinned by its SHA-256**, so the sandbox cycle was re-run
+> with `eng/run-sandbox-handover.ps1 -SandboxTimeoutSeconds 1500`. **The reports were compared before
+> being archived**, which is what the cycle's own note demands: all twelve phases match the archived
+> ones outcome for outcome, and the only difference is the intended one — the association goes from
+> **8 of 8** to **9 of 9**, with each container's registry location.
+>
+> `verify-package.ps1 -Mode Verify` gives **12 phases passed, 0 blocked**, and reproducibility of
+> **688 identical files** across two builds of the same commit.
+>
+> **And a nine-day-old local red fell with it, one that was not this batch's**: the ARM64 artefact was
+> from 22 August and the manifest's background colour changed on the 24th in `857b8ec`, so
+> `Arm64PackageTests` was comparing against a package older than the change. Repackaged with parity
+> confirmed — 0 only-x64, 0 only-arm64 — `PackagingTests` gives **194 of 194** here. **The "30 local
+> reds" the guide treated as normal are missing artefacts, not the machine**, and that is corrected in
+> `CLAUDE.md`.
+>
 > ### What this batch leaves to use, and what it settled
 >
 > **A new tool: `eng/preview-coverage-floors.ps1`.** It answers which coverage floors are about to
@@ -133,7 +169,7 @@
 >    the walk reaches**, which is exactly what was fixed in that same file on 2026-08-31 with two unit
 >    tests: the number stopped moving and the floor rose 79 → 84. If another stretch is like that, the
 >    fix is a **test**, not a tolerance band.
-> 2. **`.flv` in `MediaFileExtensions`**, decided and unexecuted for several sessions: it is the only
+> 2. ~~**`.flv` in `MediaFileExtensions`**~~ **DONE in this same batch**, with its packaging cycle paid. The background task naming it can be dismissed. What it said:, decided and unexecuted for several sessions: it is the only
 >    video extension the application does not recognise across the owner's two course roots — 10
 >    files, one whole course invisible. It goes with the next packaging change because
 >    `PackagingTests` requires the MSIX manifest to declare exactly `MediaFileExtensions.All`, and

@@ -27,7 +27,7 @@ MSIX is for inspection and archival. **Use the ZIP**: extract it and run
 - Did you confirm the first scan? The application asks before scanning for the first time.
 - Did you press **Apply** afterwards? The catalogue refreshes when you apply.
 - Does the folder contain one of the recognised containers? They are `.mp4`, `.mkv`, `.avi`, `.mov`,
-  `.webm`, `.m4v`, `.ts`, and `.m2ts`. Other formats are not catalogued.
+  `.webm`, `.m4v`, `.ts`, `.m2ts`, and `.flv`. Other formats are not catalogued.
 
 ## It says the folder cannot be added
 
