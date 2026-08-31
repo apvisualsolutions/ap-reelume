@@ -2,9 +2,12 @@
 
 > ## RELEVO — 2026-08-31, decimocuarta sesión: `CRS-001`, la puerta por la que se declara un curso
 >
-> **`main` está en `45054e9`**, con toda esta tanda dentro y cada fast-forward hecho con su CI en verde;
-> deja `CRS-001` en `IMPLEMENTED`. Lo que faltaba no era código de Cursos: era **la opción del
-> diálogo**, sin la cual todo lo demás estaba construido y no se podía usar.
+> **`main` quedó al día con la rama**, con toda esta tanda dentro y cada fast-forward hecho con su CI
+> en verde. **El SHA no se escribe aquí a propósito**: el commit que lo escribiría lo cambia, así que
+> este bloque mintió sobre él dos veces en una tarde. Se lee del árbol con `git log --oneline -1 main`,
+> que es lo que manda. Esta tanda deja `CRS-001` en `IMPLEMENTED`. Lo que faltaba no era código de
+> Cursos: era **la opción del diálogo**, sin la cual todo lo demás estaba construido y no se podía
+> usar.
 >
 > ### Lo que entra
 >
@@ -104,7 +107,8 @@
 
 > ## RELEVO — 2026-08-31, decimotercera sesión: `main` desbloqueado y al día
 >
-> **`main` está en `a5ce821`**, con la rama y el árbol local en el mismo commit y nada sin confirmar.
+> **`main` está en `a5ce821`**, con la rama y el árbol local en el mismo commit y nada sin
+>  confirmar.
 > Venía parado en `f10e53e` desde el cierre de la undécima. Diez commits, seis fast-forwards, y cada
 > uno verificado por CI antes de tocar la referencia.
 >

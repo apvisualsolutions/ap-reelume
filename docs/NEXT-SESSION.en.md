@@ -2,9 +2,12 @@
 
 > ## HANDOVER — 2026-08-31, fourteenth session: `CRS-001`, the door a course is declared through
 >
-> **`main` is at `45054e9`**, with this whole batch in it and every fast-forward made on a green CI;
-> leaving `CRS-001` at `IMPLEMENTED`. What was missing was not course code: it was **the dialog's
-> option**, without which everything else was built and unusable.
+> **`main` ended level with the branch**, with this whole batch in it and every fast-forward made on a
+> green CI. **The SHA is deliberately not written here**: the commit that would write it changes it,
+> and this block was wrong about it twice in one afternoon. Read it off the tree with
+> `git log --oneline -1 main`, which is what governs. This batch leaves `CRS-001` at `IMPLEMENTED`.
+> What was missing was not course code: it was **the dialog's option**, without which everything else
+> was built and unusable.
 >
 > ### What lands
 >
