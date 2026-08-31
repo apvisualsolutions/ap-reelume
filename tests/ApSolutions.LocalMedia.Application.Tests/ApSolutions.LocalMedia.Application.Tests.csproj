@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Shared\ConstructorGuardSweep.cs" Link="ConstructorGuardSweep.cs" />
+    <Compile Include="..\Shared\CourseStubs.cs" Link="CourseStubs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Application\ApSolutions.LocalMedia.Application.csproj" />

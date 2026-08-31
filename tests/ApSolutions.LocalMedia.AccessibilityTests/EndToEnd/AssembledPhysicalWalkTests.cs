@@ -1889,7 +1889,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             host,
             "RootAddAction",
             () => RootPathsAsync(factory),
-            "clicking Añadir carpeta in the dialog never put the folder in the catalogue");
+            "clicking Añadir carpeta in the dialog never put the folder in the catalogue",
+            recordAs: DialogAction);
         Assert.Contains(second, await RootPathsAsync(factory));
         Assert.False(shell.IsAddingRoot, "A successful add left the dialog on screen.");
         Assert.True(onboarding.InitialScanConsentRequired);
@@ -5952,6 +5953,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     {
         var mediaRoot = Path.Combine(_dataRoot, "cursos");
         Directory.CreateDirectory(Path.Combine(mediaRoot, "Composicion", "01 - Modulo uno"));
+
+        // A second course folder beside the first, so pointing at one leaves exactly one neighbour
+        // for «Hemos encontrado {0} carpetas más. ¿Son todas cursos?» to ask about.
+        Directory.CreateDirectory(Path.Combine(mediaRoot, "Modelado"));
+        File.WriteAllBytes(Path.Combine(mediaRoot, "Modelado", "01 - Intro.mp4"), [0]);
         var factory = await SeedRootAsync(mediaRoot, ScanPolicy.Manual);
 
         var first = Path.Combine(mediaRoot, "Composicion", "01 - Modulo uno", "01 - Intro.mp4");
@@ -6089,7 +6095,106 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             recordAs: "{Binding ActionText}");
         Assert.True(host.ViewModel.IsPlayerVisible);
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+
+        // And the gesture that makes any of the above possible (CRS-001, ADR-0006 amendment 1): the
+        // dialog's course half, the folder pointed at, and the neighbours answered for. Left until
+        // last because it writes courses, and everything above counts them.
+        Navigate(host, AppRoute.Courses);
+        await PressAsync(
+            host,
+            "CoursesMarkFolderAction",
+            () => host.ViewModel.IsAddingRoot,
+            "reopening the add-media dialog for the course half never worked");
+        var marking = host.ViewModel.MarkCourse;
+        Assert.NotNull(marking);
+
+        await PressAsync(
+            host,
+            "AddAsCourseOption",
+            () => marking!.IsCourse,
+            "clicking Curso (carpeta de lecciones) never put the dialog on its course half");
+        Assert.True(marking!.IsCourse);
+        Assert.Equal("AddCourseTitle", marking.TitleKey);
+
+        // The path goes in the one box the dialog has, the same box the root half types into.
+        var onboardingForm = host.ViewModel.Onboarding;
+        Assert.NotNull(onboardingForm);
+        onboardingForm!.Path = Path.Combine(mediaRoot, "Composicion");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
+        // The probe is what the pass came back with, and NOT the number of courses: this folder is
+        // already a course here, so marking it again is an upsert and the count is identical before
+        // and after. A probe that cannot move is a press that proves nothing.
+        var courses = new CourseRepository(factory);
+        await PressAsync(
+            host,
+            marking.ConfirmKey,
+            () => marking.MarkedTitle,
+            "clicking Marcar como curso never came back with the course it marked",
+            recordAs: DialogAction);
+        Assert.False(marking.HasFailure, $"marking answered {marking.FailureKey}");
+        Assert.Equal("Composicion", marking.MarkedTitle);
+
+        // One neighbour at the derived depth, asked about rather than claimed.
+        Assert.Equal(1, marking.NeighbourCount);
+        Assert.True(marking.IsAskingAboutNeighbours);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "AddCourseNeighboursConfirmAction",
+            async () => (await courses.ListAsync(TestContext.Current.CancellationToken)).Count,
+            "answering that the neighbours are courses never marked them");
+        Assert.False(marking.IsAskingAboutNeighbours);
+        Assert.Equal(2, (await courses.ListAsync(TestContext.Current.CancellationToken)).Count);
+
+        // Marking again with nothing new leaves the question up, and «Sólo esta» is the way out of
+        // it: the one answer that has to change nothing.
+        onboardingForm.Path = Path.Combine(mediaRoot, "Composicion");
+        Dispatcher.UIThread.RunJobs();
+        host.Window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            marking.ConfirmKey,
+            () => marking.NeighbourCount,
+            "marking the same folder again never asked about its neighbour",
+            recordAs: DialogAction);
+        Assert.True(marking.IsAskingAboutNeighbours);
+        await PressAsync(
+            host,
+            "AddCourseNeighboursDeclineAction",
+            () => marking.IsAskingAboutNeighbours,
+            "answering «Sólo esta» never put the question away");
+        Assert.False(marking.IsAskingAboutNeighbours);
+        Assert.Equal(2, (await courses.ListAsync(TestContext.Current.CancellationToken)).Count);
+
+        // Back to the root half, which is where the dialog opens.
+        await PressAsync(
+            host,
+            "AddAsRootOption",
+            () => marking.IsCourse,
+            "clicking Raíz de medios never put the dialog back on its root half");
+        Assert.False(marking.IsCourse);
+        await PressAsync(
+            host,
+            "AddRootCancelAction",
+            () => host.ViewModel.IsAddingRoot,
+            "clicking Cancelar never put the dialog away");
+        Assert.False(host.ViewModel.IsAddingRoot);
     }
+
+    /// <summary>
+    /// How the add dialog's one action is recorded. Its accessible name is a binding, because what
+    /// the button says follows the chosen half — «Añadir carpeta» or «Marcar como curso» — so the
+    /// inventory in eng/check-walk-coverage.ps1 knows it by the binding it is declared with, the way
+    /// it already knows the two controls named by their own data.
+    /// </summary>
+    private const string DialogAction =
+        "{Binding MarkCourse.ConfirmKey, Converter={StaticResource DialogResourceKey}}";
 
     private static void Navigate(ShellHost host, AppRoute route)
     {

@@ -695,6 +695,11 @@ public static partial class CompositionRoot
     private static ShellSurfaces CreateShellSurfaces(IServiceProvider provider)
     {
         var host = provider.GetRequiredService<ApplicationHost.Accessor>().Required;
+
+        // Resolved once and handed to both halves of the add dialog. RootOnboardingViewModel is
+        // transient, so asking the provider a second time would give the course half a different
+        // instance: its Add would work perfectly, on a path box nobody is looking at.
+        var onboarding = provider.GetRequiredService<RootOnboardingViewModel>();
         return new ShellSurfaces
         {
             AppearanceSettings = provider.GetRequiredService<AppearanceSettingsViewModel>(),
@@ -706,7 +711,16 @@ public static partial class CompositionRoot
             Restore = provider.GetRequiredService<RestoreWizardViewModel>(),
             PrivacySettings = provider.GetRequiredService<PrivacySettingsViewModel>(),
             Updates = provider.GetRequiredService<UpdateViewModel>(),
-            Onboarding = provider.GetRequiredService<RootOnboardingViewModel>(),
+            Onboarding = onboarding,
+            MarkCourse = new MarkCourseViewModel(
+                provider.GetRequiredService<Application.Courses.DeclareCourseFolder>())
+            {
+                // The dialog has one path box and one action; which of the two things it does is the
+                // chosen pill's answer. A delegate rather than a reference to the other model, which
+                // is the shape the pickers already have.
+                AddRoot = () => onboarding.AddAsync(CancellationToken.None),
+                Kind = onboarding.SelectedKind,
+            },
             DuplicatesOverview = CreateDuplicatesOverview(provider),
             Courses = provider.GetRequiredService<Presentation.Courses.CoursesViewModel>(),
             CourseDetails = provider.GetRequiredService<Presentation.Courses.CourseDetailsViewModel>(),

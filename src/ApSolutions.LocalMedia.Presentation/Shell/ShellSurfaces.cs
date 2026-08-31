@@ -65,6 +65,12 @@ public sealed record ShellSurfaces
     public RootOnboardingViewModel? Onboarding { get; init; }
 
     /// <summary>
+    /// The add dialog's other half: marking a folder as a course (CRS-001). It shares the dialog's
+    /// one path box with <see cref="Onboarding"/> rather than owning a second one.
+    /// </summary>
+    public MarkCourseViewModel? MarkCourse { get; init; }
+
+    /// <summary>
     /// Scans one root. Consenting to the first scan has to start one: the surface asks the question
     /// and records the answer, and without this a new install adds a folder and stays empty.
     /// </summary>
