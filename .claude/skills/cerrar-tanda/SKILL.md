@@ -193,7 +193,11 @@ tres mayúsculas y `UX` tiene dos.
 
 El relevo (`NEXT-SESSION`) tiene que llevar, además del trabajo hecho:
 
-- **el SHA real** de `main` y de la rama, y si difieren, por qué;
+- **si `main` y la rama coinciden, y si no, por qué** — pero **NO el SHA**. Escribirlo es un bucle:
+  el commit que lo escribe lo cambia, así que nace caduco. El 2026-08-31 este bloque mintió sobre él
+  **dos veces en una tarde**, la segunda al «corregirlo» poniendo el SHA de entonces. Lo que se pone
+  es cómo leerlo —`git log --oneline -1 main`— y lo que sí aguanta: que quedaron al día, y que cada
+  fast-forward se hizo con CI en verde;
 - **las decisiones tomadas y NO ejecutadas**, que es lo que nadie puede deducir del diff;
 - **lo que está bloqueado por algo que no es código** —hardware, una firma, una respuesta de un
   tercero—, porque eso no se resuelve programando y conviene que se vea pronto;

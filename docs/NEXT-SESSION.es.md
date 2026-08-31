@@ -102,7 +102,45 @@
 >
 > Los dos archivos de audio que aquí leen más alto salen **en un bloque aparte**, no ocultos: un aviso
 > que suena cuando no toca enseña a ignorar el aviso.
->> ### Lo siguiente
+>
+> ### Lo que esta tanda deja para usar, y lo que dejó decidido
+>
+> **Una herramienta nueva: `eng/preview-coverage-floors.ps1`.** Contesta qué suelos de cobertura se
+> van a quedar cortos **antes** de empujar, con la aritmética de la puerta. Corre las suites que le
+> nombres:
+>
+> ```powershell
+> pwsh -NoProfile -File eng/preview-coverage-floors.ps1
+> pwsh -NoProfile -File eng/preview-coverage-floors.ps1 -Suites Domain.Tests,UiTests,IntegrationTests
+> ```
+>
+> **No escribe `eng/coverage-debt.txt`** —los suelos siguen saliendo del artefacto de CI—, y separa
+> en un bloque aparte los dos archivos de audio que aquí leen más alto que en el runner. Sus dos
+> límites están escritos dentro: sólo conoce las suites que corres, y esos archivos nunca leen aquí
+> como allí.
+>
+> **Y una decisión de diseño que la enmienda 1 daba por supuesta, ahora escrita en el `ADR-0006`:**
+> **de dónde sale la raíz.** Si la carpeta señalada está dentro de una raíz catalogada, esa raíz es
+> la que se declara —no hay alternativa, `AddLibraryRoot` rechaza una raíz dentro de otra—; si no, el
+> **padre** pasa a ser raíz a nivel 1, que es la lectura literal de «las hermanas del mismo nivel». Y
+> se añade con `ScanPolicy.Manual`, nunca de arranque, porque `AddCourseHelp` promete con sus propias
+> palabras que no se recorre el resto de la unidad.
+>
+> ### Dos tareas de fondo vivas, y ninguna es de Cursos
+>
+> 1. **El suelo de cobertura de un archivo que oscila.** `MarkerEditorViewModel` ha dado 79, 79, 79,
+>    81, 79 y otra vez 81. **No se sube su suelo** —ya se hizo una vez y el siguiente run falló por lo
+>    contrario—. La hipótesis fuerte es que le quedan ramas que **sólo alcanza el paseo**, que es
+>    exactamente lo que se arregló en ese mismo archivo el 2026-08-31 con dos pruebas unitarias: la
+>    cifra dejó de oscilar y el suelo subió 79 → 84. Si queda otro tramo igual, la corrección es una
+>    **prueba**, no una banda de tolerancia.
+> 2. **`.flv` en `MediaFileExtensions`**, decidido y sin ejecutar desde hace varias sesiones: es la
+>    única extensión de vídeo que la aplicación no reconoce de las dos raíces de cursos del
+>    propietario —10 archivos, un curso entero invisible—. Va agrupado con el próximo cambio de
+>    empaquetado porque `PackagingTests` exige que el manifiesto MSIX declare exactamente
+>    `MediaFileExtensions.All`, y **tocar el manifiesto caduca dos mediciones del sandbox**.
+>
+> ### Lo siguiente
 >
 > `CRS-004`, el panel «Lecciones» del reproductor, con cuatro claves escritas esperándolo. Después,
 > las dos cosas que llevan `CRS-002/003/005` a `VERIFIED`. `pwsh -NoProfile -File eng/list-pending.ps1`

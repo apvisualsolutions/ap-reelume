@@ -10,6 +10,33 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **«Subir cobertura cuesta dos vueltas de CI» era una excusa disfrazada de regla, y ahora hay un
+  guion que la sustituye.** Lo decía `CLAUDE.md`, lo repetía la skill de cierre, y esta misma tanda
+  actuó en consecuencia: midió un archivo en **83,33 %** de ramas, CI contestó **83**, y el número se
+  usó para escribir un aviso en el relevo en vez de para corregir `eng/coverage-debt.txt`. **Anunciar
+  un rojo previsible no es evitarlo.**
+
+  Lo cierto es más estrecho: la puerta rechaza igual un suelo que se queda corto y uno que se queda
+  largo, así que una tanda que mejora un archivo pone el run en rojo — **salvo que los suelos que van
+  a subir se midan antes de empujar y entren en el mismo commit**, con lo que el artefacto de CI pasa
+  a **confirmar** en vez de a descubrir. Dos vueltas sólo son inevitables para los **siete archivos
+  que dependen de hardware** que un runner hospedado no tiene.
+
+  **Y una regla en prosa no dispara**, que es algo que este repositorio ya aprendió caro, así que
+  `eng/preview-coverage-floors.ps1` contesta la pregunta con un comando. Reproduce la aritmética de la
+  puerta y **está validado contra el run que lo motivó**: nombra `AddLibraryRoot` en **100/92** y
+  `ResourceKeyConverter` en **100/83**, que son los dos números que escribió CI, y calla en cuanto
+  esos suelos están puestos.
+
+  **Sus tres versiones equivocadas dieron cifras verosímiles**, y por eso están escritas dentro:
+  filtrar los nombres por `src/`, que Cobertura no escribe nunca —un **cero rotundo sobre 442
+  archivos**—; quedarse con el mejor informe entero en vez de la mejor línea —78 % de ramas donde CI
+  lee 92, porque ninguna suite sola toma todas y la fusión sí—; y sumar ramas por `<class>`, que
+  cuenta una línea una vez por lambda —**28 ramas para un archivo que tiene 14**—.
+
+  Los dos archivos de audio que aquí leen más alto que en el runner se informan **aparte**, no
+  ocultos: un aviso que suena cuando no toca es lo que enseña a ignorar el aviso.
+
 - **La skill de cierre de tanda cubre ahora la tanda entera, y tres de sus datos habían dejado de ser
   ciertos.** `/cerrar-tanda` describía seis pasos —puertas, un commit, push, vigía, fast-forward y
   documentos— y se quedaba ahí, así que lo que viene después del verde no lo cubría nadie: cerrar las

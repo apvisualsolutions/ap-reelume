@@ -228,6 +228,35 @@ que va punto.
 Las cinco cadenas del diálogo que ya existen encajan sin cambios, porque siempre dijeron «marcar
 **una carpeta** como curso».
 
+**Los dos botones que contestan la pregunta son «Marcar todas» y «Sólo esta»**, decididos por el
+propietario el mismo día. Son verbos y no un sí y un no, que es la forma de las otras dos preguntas
+del producto, y van sin enclítico porque es lo que hace el resto del árbol —«Marcar como curso»,
+«Quitar la marca»—.
+
+### De dónde sale la raíz, que la enmienda daba por supuesto
+
+**Escrito el 2026-08-31 al implementar la enmienda**, porque señalar una carpeta deja una pregunta
+que hay que contestar antes de poder declarar nada: **¿en qué raíz?** La decisión 3 hablaba de la
+profundidad y daba la raíz por existente. Es exacto sólo la mitad de las veces.
+
+`CourseRootDeclarationPolicy` la deriva del mismo gesto, y las dos lecturas están forzadas por lo que
+el árbol ya decide en otro sitio:
+
+1. **Si la carpeta señalada está dentro de una raíz catalogada, esa raíz es la que se declara** y el
+   nivel es su profundidad relativa. No hay alternativa: `AddLibraryRoot` rechaza una raíz dentro de
+   otra, así que crear una nueva ahí es imposible por construcción.
+2. **Si no lo está, el padre de la carpeta pasa a ser raíz** y el nivel es 1. Es la lectura literal
+   de la enmienda: las «hermanas del mismo nivel» que ofrece marcar después son exactamente las otras
+   carpetas de ese padre.
+
+**Y una raíz creada así se añade con `ScanPolicy.Manual`, nunca de arranque.** No es una preferencia:
+`AddCourseHelp` promete en sus propias palabras que **no se recorre el resto de la unidad**, y una
+política que escanea al arrancar rompería esa promesa en silencio. Por el mismo motivo, una carpeta
+colgada directamente de una unidad —`D:\Curso`— **se rechaza**: su padre sería el volumen entero.
+
+**Lo que esto NO cambia:** la señal sigue siendo del usuario (decisión 2) y la profundidad sigue sin
+adivinarse (decisión 3). Sólo dice de dónde sale el otro dato que hace falta para escribirla.
+
 ---
 
 ## English
@@ -374,3 +403,32 @@ stop.
 
 The five dialog strings that already exist fit unchanged, because they always said "mark **a folder**
 as a course".
+
+**The two buttons that answer the question are «Marcar todas» and «Sólo esta»** — "Mark all" and
+"Only this one" — settled by the owner the same day. They are verbs rather than a yes and a no, which
+is the shape the product's other two questions have, and they go without the enclitic pronoun because
+that is what the rest of the tree does.
+
+### Where the root comes from, which the amendment took for granted
+
+**Written on 2026-08-31 while implementing the amendment**, because pointing at a folder leaves a
+question that has to be answered before anything can be declared: **in which root?** Decision 3 spoke
+about the depth and took the root as already existing. That is exactly half right.
+
+`CourseRootDeclarationPolicy` derives it from the same gesture, and both readings are forced by what
+the tree already decides elsewhere:
+
+1. **If the pointed-at folder sits inside a catalogued root, that root is the one declared** and the
+   level is its relative depth. There is no alternative: `AddLibraryRoot` refuses a root inside
+   another, so creating a new one there is impossible by construction.
+2. **If it does not, the folder's parent becomes a root** and the level is 1. That is the amendment's
+   literal reading: the "siblings at the same level" it offers to mark next are exactly that parent's
+   other folders.
+
+**And a root added this way gets `ScanPolicy.Manual`, never on startup.** This is not a preference:
+`AddCourseHelp` promises in its own words that **the rest of the drive is not scanned**, and a policy
+that scans at startup would break that promise silently. For the same reason a folder sitting
+directly on a drive — `D:\Curso` — **is refused**: its parent would be the whole volume.
+
+**What this does NOT change:** the signal is still the user's (decision 2) and the depth is still not
+guessed (decision 3). It only says where the other piece needed to write it down comes from.

@@ -10,6 +10,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **"Raising coverage costs two CI rounds" was an excuse dressed as a rule, and a script now replaces
+  it.** `CLAUDE.md` said it, the closing skill repeated it, and this very batch acted on it: it
+  measured a file at **83.33 %** of branches, CI answered **83**, and the number went into a handover
+  as a warning rather than into `eng/coverage-debt.txt` as a fix. **Announcing a predictable red is
+  not avoiding it.**
+
+  What is true is narrower: the gate refuses a floor left behind exactly as it refuses one dropped, so
+  a batch that improves a file does turn a run red — **unless the floors about to rise are measured
+  before pushing and go in the same commit**, which leaves the CI artefact **confirming** rather than
+  discovering. Two rounds are only unavoidable for the **seven hardware-bound files** a hosted runner
+  has no device for.
+
+  **And a rule in prose does not fire**, which this repository has already learned the expensive way,
+  so `eng/preview-coverage-floors.ps1` answers the question with a command. It reproduces the gate's
+  arithmetic and is **validated against the run that prompted it**: it names `AddLibraryRoot` at
+  **100/92** and `ResourceKeyConverter` at **100/83**, the two numbers CI wrote, and goes quiet once
+  those floors are in.
+
+  **Its three wrong versions all produced plausible numbers**, which is why they are written inside
+  it: filtering filenames on `src/`, which Cobertura never writes — a **confident zero over 442
+  files**; keeping the best whole report rather than the best line — 78 % of branches where CI reads
+  92, because no single suite takes them all and the merge does; and summing branches per `<class>`,
+  which counts a line once per lambda — **28 branches for a file that has 14**.
+
+  The two audio files that read higher here than on the runner are reported **apart**, not hidden: a
+  warning that fires when it should not is what teaches people to ignore the warning.
+
 - **The batch-closing skill now covers the whole batch, and three of its facts had stopped being
   true.** `/cerrar-tanda` described six steps — gates, one commit, push, watcher, fast-forward and
   documents — and stopped there, so what comes after the green belonged to nobody: closing the

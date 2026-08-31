@@ -102,7 +102,44 @@
 >
 > The two audio files that read higher here are reported **in a separate block**, not hidden: a
 > warning that fires when it should not teaches people to ignore the warning.
->> ### What comes next
+>
+> ### What this batch leaves to use, and what it settled
+>
+> **A new tool: `eng/preview-coverage-floors.ps1`.** It answers which coverage floors are about to
+> fall short **before** pushing, with the gate's own arithmetic. It runs the suites you name:
+>
+> ```powershell
+> pwsh -NoProfile -File eng/preview-coverage-floors.ps1
+> pwsh -NoProfile -File eng/preview-coverage-floors.ps1 -Suites Domain.Tests,UiTests,IntegrationTests
+> ```
+>
+> **It does not write `eng/coverage-debt.txt`** — floors still come from the CI artefact — and it
+> reports apart the two audio files that read higher here than on the runner. Its two limits are
+> written inside it: it only knows the suites you run, and those files never read here as they do
+> there.
+>
+> **And a design decision amendment 1 took for granted, now written into `ADR-0006`:** **where the
+> root comes from.** If the pointed-at folder sits inside a catalogued root, that root is the one
+> declared — there is no alternative, `AddLibraryRoot` refuses a root inside another; if it does not,
+> the **parent** becomes a root at level 1, which is the literal reading of "the siblings at the same
+> level". And it is added with `ScanPolicy.Manual`, never on startup, because `AddCourseHelp` promises
+> in its own words that the rest of the drive is not scanned.
+>
+> ### Two live background tasks, and neither is about Courses
+>
+> 1. **The coverage floor of a file whose measurement oscillates.** `MarkerEditorViewModel` has read
+>    79, 79, 79, 81, 79 and 81 again. **Its floor is not raised** — that was done once and the next
+>    run failed for the opposite reason. The strong hypothesis is that it still has branches **only
+>    the walk reaches**, which is exactly what was fixed in that same file on 2026-08-31 with two unit
+>    tests: the number stopped moving and the floor rose 79 → 84. If another stretch is like that, the
+>    fix is a **test**, not a tolerance band.
+> 2. **`.flv` in `MediaFileExtensions`**, decided and unexecuted for several sessions: it is the only
+>    video extension the application does not recognise across the owner's two course roots — 10
+>    files, one whole course invisible. It goes with the next packaging change because
+>    `PackagingTests` requires the MSIX manifest to declare exactly `MediaFileExtensions.All`, and
+>    **touching the manifest expires two sandbox measurements**.
+>
+> ### What comes next
 >
 > `CRS-004`, the player's «Lessons» panel, with four keys already written waiting for it. Then the two
 > things that take `CRS-002/003/005` to `VERIFIED`. `pwsh -NoProfile -File eng/list-pending.ps1` is
