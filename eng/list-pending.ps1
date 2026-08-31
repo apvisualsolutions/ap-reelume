@@ -197,10 +197,18 @@ foreach ($release in $targets) {
         Write-Output
 }
 
-# OUT_OF_SCOPE and DEFERRED are answers rather than work, and saying so is the point: a list that
-# prints them beside the real tasks invites somebody to start one.
-$decisions = @($pending | Where-Object { $_.Status -in @('OUT_OF_SCOPE', 'DEFERRED') })
-$work = @($pending | Where-Object { $_.Status -notin @('OUT_OF_SCOPE', 'DEFERRED') })
-Write-Output ("Totals: {0} open of {1}. {2} are work; {3} are standing decisions ({4}) that need a new decision before they become work." -f
-    $pending.Count, $rows.Count, $work.Count, $decisions.Count, (($decisions | ForEach-Object { $_.Id }) -join ', '))
+# OUT_OF_SCOPE is an answer rather than work, and saying so is the point: a list that prints it
+# beside the real tasks invites somebody to start one.
+#
+# DEFERRED is NOT in that group, and the distinction is the roadmap's rather than this script's. The
+# publishing rule of 2026-08-31 counts deferred rows and excludes out-of-scope ones, because
+# postponed is not rejected: a deferred row is work with a date, and it has to be verified before
+# anything ships. This said otherwise for a few hours and disagreed with the document that decides
+# it, which is the one thing a derived list must never do.
+$decisions = @($pending | Where-Object { $_.Status -eq 'OUT_OF_SCOPE' })
+$work = @($pending | Where-Object { $_.Status -ne 'OUT_OF_SCOPE' })
+Write-Output ("Totals: {0} open of {1}. {2} are work, deferred rows included, because the publishing rule counts them." -f
+    $pending.Count, $rows.Count, $work.Count)
+Write-Output ("        {0} are standing decisions NOT to build something ({1}); they need a new decision before they become work." -f
+    $decisions.Count, (($decisions | ForEach-Object { $_.Id }) -join ', '))
 exit 0

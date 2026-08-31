@@ -1,59 +1,59 @@
 # Where to pick up
 
-> ## HANDOVER — 2026-08-31, thirteenth session: the new-file gate no longer blocks
+> ## HANDOVER — 2026-08-31, thirteenth session: `main` unblocked and current
 >
-> **Both Courses ViewModels clear the NEW-file gate.** Measured on `UiTests` **alone**:
+> **`main` is at `70ffca1`**, with the branch and the local tree on the same commit and nothing
+> uncommitted. It had been stuck at `f10e53e` since the close of the eleventh. Six commits, three
+> fast-forwards, every one verified by CI before the reference moved.
 >
-> | file | before (CI merge) | now (`UiTests` alone) |
+> ### What unblocked `main`
+>
+> The **new-file** gate asks 96/96 and admits no ceilings. It held both Courses ViewModels, which had
+> arrived **without a single test**:
+>
+> | file | before | now |
 > | --- | --- | --- |
-> | `CoursesViewModel.cs` | 96.15 / **58.33** | **100 / 97.22** (35 of 36 branches) |
-> | `CourseDetailsViewModel.cs` | 93.91 / **58.51** | **100 / 96.81** (91 of 94 branches) |
+> | `CoursesViewModel.cs` | 96.15 / **58.33** | **100 / 97.22** |
+> | `CourseDetailsViewModel.cs` | 93.91 / **58.51** | **100 / 96.81** |
 >
-> Two new test files, 21 tests, and the whole of `UiTests` green (1,073).
+> 21 new tests in `UiTests`, and **four unreachable branches measured and written into both test
+> classes**, not only into the evidence. The debt ratchet came down **191 → 189**.
 >
-> **What is left is the OTHER half, and it is still what makes Courses usable**: the player's
-> «Lessons» panel (CRS-004) and the "Course (folder of lessons)" option in the add dialog — which is
-> what **returns `MarkCoursesInRoot` and `ICourseRootDeclarationStore` to the container**, and without
-> which **a course root cannot be declared at all**. It is described below, unchanged.
+> ### The decisions taken, and where they live
 >
-> ### Four things measured this batch, and all four cost something if forgotten
+> None of them lives in a chat any more. **They are in the tree:**
 >
-> 1. **Reproducing the CI merge works; running `check-coverage.ps1` against it does NOT.** The four
->    starting figures came out **exact** by merging the `test-results` artefact with
->    `reportgenerator`. But the whole script declares **"PASS (no instrumentable lines)" over all 430
->    files**: the merged report's filenames arrive without the leading `src/` and the gate looks them
->    up with `EndsWith('src/…')`. **A false green, not a red**: read the merged Cobertura by hand.
-> 2. **Everything new is covered inside ONE suite.** The merged report keeps **the best single report
->    for a line, not the union**, so a pair split across two suites reads half covered for ever. The
->    constructor sweep passes the null from `UiTests`; the other arm has to be taken **there too**, by
->    building over a real `GetCourses` and a real `SetWatchStatus`.
-> 3. **It is not the test that decides whether the UI thread is touched: it is the DATA.** A
->    `CourseModuleViewModel` built from a module **with a title** assembles its label through
->    `CourseText.Resource` and **throws** in a `[Fact]` with the whole suite; **with a null title it
->    passes**. Same test, same type, different data.
-> 4. **`Application.Current.Resources[key]` takes five of `Resource`'s six branches** — without the
->    key, with it, and with a non-string under it. The sixth — `Current is { }` by the no-application
->    arm — **is unreachable and measured**: a plain `[Fact]` reached `ActualThemeVariant` and threw,
->    which proves `Current` was not null.
+> 1. **Nothing ships until everything committed to is verified** — [roadmap](roadmap/README.en.md),
+>    "The publishing rule", and `CLAUDE.md`. `DEFERRED` counts, `OUT_OF_SCOPE` does not.
+> 2. **The depth is pointed at, not typed** — `ADR-0006`, "Amendment 1". One course folder is pointed
+>    at, the level is **derived** from that gesture, and the siblings at that level are then offered.
+>    **It amends decision 3, not 2**, and every measurement of it still stands.
+> 3. **The sibling question, written by the owner:** «Hemos encontrado {0} carpetas más. ¿Son todas
+>    cursos?» — "We found {0} more folders. Are they all courses?". It asks about the **fact** rather
+>    than the action, which is exactly the signal decision 2 asked for. It is **not in
+>    `Strings.*.axaml` yet**: it goes with the dialog that consumes it.
 >
-> **The four branches left uncovered are unreachable and are written into both test classes**, with
-> their reasons, because a measured ceiling belongs where somebody will look again.
+> ### The decided order of work, and why
 >
-> ### And three owner decisions, which govern everything above
+> 1. **`CRS-001`, the dialog.** First because it is small and **unblocks everything else in Courses**:
+>    without it no course can be declared at all, so what is already built cannot be used. No decision
+>    of its own is left open.
+> 2. **`CRS-004`, the "Lessons" panel.** Four keys already written, waiting.
+> 3. **The two that take `CRS-002/003/005` to `VERIFIED`**: the test that progress survives a file
+>    move, and the captures matrix.
+> 4. **`UX-007`, grouping across the whole catalogue**, which the owner wants for films and shows too.
+> 5. The rest of `STABLE`.
 >
-> 1. **Nothing ships until everything committed to is verified.** It is in
->    [the roadmap](roadmap/README.en.md) ("The publishing rule") and in `CLAUDE.md`. `DEFERRED` rows
->    count, `OUT_OF_SCOPE` rows do not. **It promotes two blockers no amount of code will clear**:
->    `PRD-003` needs an ARM64 machine there is not one of — the owner has a Surface and **whether it
->    is ARM64 is still unconfirmed** — and `PRD-002` needs the commercial signing certificate,
->    because its cycle was verified on a re-signed copy.
-> 2. **One selected folder = one course**, several = several. This supersedes decision 2 of
->    `ADR-0006` and **the amendment is unwritten**. Reason: there is no reliable way to tell a
->    category folder from a course folder. The dialog's notice will carry a **monospaced tree**, not
->    an image.
-> 3. **The grouping the owner asked for already exists as `UX-007`**, and he wants it **across the
->    catalogue** — films, shows and courses — not a list for courses. **Whether it moves up a release
->    is undecided.**
+> ### Three consequences of the publishing rule worth seeing early
+>
+> - **`PLY-016` is in.** It is `DEFERRED`, and postponed is not rejected, so the rule pulls it in
+>   before publishing. Nobody had said that out loud.
+> - **`PRD-003` (ARM64) blocks the whole release and no code will clear it.** A Windows 11 ARM64
+>   machine is needed. **The owner's Surface is NOT compatible — checked and ruled out by him**; he
+>   said he would find another way. Do not propose it again.
+> - **`PRD-002` cannot reach `VERIFIED` without the commercial signing certificate**: its cycle was
+>   verified on a **re-signed** copy and the unsigned artifact cannot repeat it. It is chained to
+>   `REL-001`.
 >
 > ### What is left is no longer read by hand
 >
@@ -61,21 +61,51 @@
 > pwsh -NoProfile -File eng/list-pending.ps1
 > ```
 >
-> **15 open of 65**, by release, separating the eleven that are work from the four that are
-> decisions. It reads statuses and releases from `FEATURES.md`'s own legends, counts rows by two
-> routes, and **refuses to print** when they disagree. It was born from a failure: the same list made
-> by hand with a three-capitals pattern lost **eight rows in silence** — `UX` has two — including the
-> one being asked about. It found three defects on day one: a blank line split the library table and
-> left `LIB-016`/`LIB-017` outside it, `Post-MVP` was used without being declared, and `A11Y-00x` was
-> dropped for having digits — which explained the documentation gate's 65 against every hand count's
-> 63.
+> **15 open of 65**, by release: **13 are work** — deferred rows included, because the publishing
+> rule counts them — and **2 are decisions NOT to build something** (`PLY-015`, `UX-008`).
+> It reads statuses and releases from `FEATURES.md`'s own legends, counts rows by two routes and
+> **refuses to print** when they disagree. It was born from a failure: the same list made by hand lost
+> **eight rows in silence** — the pattern asked for three capitals and `UX` has two — including the
+> one being asked about.
 >
-> **Fourteen background tasks are queued**, one per outstanding row (two Courses rows share the one
-> about progress surviving a file move), deferred and rejected ones included.
+> **A background task was queued for every outstanding row**, deferred and rejected included, plus
+> two for the defects below. **How many are still alive is what the task panel says, not this
+> document**: a number was written here and stopped being true within the same session.
+>
+> ### Five things measured that save rounds
+>
+> 1. **The CI merge reproduces here and its figures come out exact** (`gh run download <id> -n
+>    test-results` + `reportgenerator`). What does **NOT** work is running the whole of
+>    `check-coverage.ps1` against the artefact: filenames arrive without the leading `src/` and it
+>    gives a **false "PASS"** over all 430 files. Read the merged `Cobertura.xml` by hand.
+> 2. **Everything new is covered inside ONE suite.** The merged report keeps **the best single report
+>    for a line, not the union**, so a pair split across suites reads half covered for ever.
+> 3. **It is not the test that decides whether the UI thread is touched: it is the DATA.** A
+>    `CourseModuleViewModel` with a titled module throws in a `[Fact]` with the whole suite; with a
+>    null title it passes.
+> 4. **`MarkerEditorViewModel` OSCILLATES**: 79, 79, 79, 81, 79, and 81 again on 2026-08-31, felling a
+>    run that only touched a `.md`. **Do not raise its floor** — that was done once and the next run
+>    failed: re-run instead. With an oscillating file **no fixed floor is correct**, and that is a
+>    gate defect with a task of its own.
+> 5. **A walk test failed and it was intermittency**, proved with a fact rather than an impression:
+>    `git diff --name-only <green> <red> -- src tests` returned **zero files**.
+>
+> ### Two defects found and NOT fixed, each with its task
+>
+> - **The coverage gate has no correct floor for an oscillating file.** Two red runs so far.
+> - **Figures quoted in documentation go stale with nothing to catch them.** **Two were found false on
+>   the same day**: the ratchet said 205 and was 191, and the closing skill said a run takes 55-80
+>   minutes when it takes 42-53. `.claude/` **is under no gate at all**, so nothing checks what it
+>   says.
+>
+> ### And two breaks in the matrix, already fixed
+>
+> A **blank line mid-table** split the library section in two and left `LIB-016` and `LIB-017` outside
+> it — they rendered wrong on GitHub; and the release label `Post-MVP` was used by five rows **without
+> being declared**. With that, the documentation gate and the new script both say **65**.
 >
 > Still pending and decided, **not executed**: `.flv` in `MediaFileExtensions`, grouped with the next
-> packaging change.
-
+> packaging change (it is in the `PRD-002` task).
 > ## HANDOVER — 2026-08-30, close of the twelfth session
 >
 > **Pushed through `6e5a02c`. There are commits ahead of that locally, deliberately**, waiting for

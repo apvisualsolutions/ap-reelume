@@ -8,6 +8,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Changed
+
+- **The batch-closing skill now covers the whole batch, and three of its facts had stopped being
+  true.** `/cerrar-tanda` described six steps — gates, one commit, push, watcher, fast-forward and
+  documents — and stopped there, so what comes after the green belonged to nobody: closing the
+  decisions left open, bringing the background tasks up to date, and preparing the next session with
+  its prompt. It goes from 6 steps to 10.
+
+  **And it carried stale figures, which is the defect this same session caught three times.** It said
+  a CI run takes **55-80 minutes** when `CLAUDE.md` already carried **42-53** measured over twelve
+  runs; it gave `0 new file(s)` as the green's condition when what is read is the closing phrase — on
+  the same day a legitimate green said **14**; and it proposed moving `main` with `git checkout && git
+  merge --ff-only`, which switches branch twice and can leave somebody sitting on `main`, rather than
+  `git branch -f`.
+
+  **The three reds that are not the pusher's also go in**, because all three have been diagnosed from
+  scratch more than once: the first round's "N improved" when a batch raises coverage, the file whose
+  measurement oscillates, and a walk test that fails on its own — with the `git diff` that tells
+  intermittency from a regression in one command.
+
+- **`eng/list-pending.ps1` counted deferred rows as decisions, and the roadmap says the opposite.**
+  The publishing rule counts `DEFERRED` — postponed is not rejected — and excludes `OUT_OF_SCOPE`.
+  The script put both in one bucket, so it called `UX-007` and `PLY-016` "standing decisions" when
+  the rule had already pulled them in. It now says **13 work and 2 decisions** instead of 11 and 4.
+  **A derived list contradicting the document that decides is the one thing it must never do**, and
+  this lasted a few hours.
+
 ### Added
 
 - **`eng/list-pending.ps1`: what is left, read from the matrix rather than from anybody's memory.**

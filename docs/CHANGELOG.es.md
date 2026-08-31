@@ -8,6 +8,33 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Cambiado
+
+- **La skill de cierre de tanda cubre ahora la tanda entera, y tres de sus datos habían dejado de ser
+  ciertos.** `/cerrar-tanda` describía seis pasos —puertas, un commit, push, vigía, fast-forward y
+  documentos— y se quedaba ahí, así que lo que viene después del verde no lo cubría nadie: cerrar las
+  decisiones que quedaron abiertas, poner al día las tareas de fondo y preparar la sesión siguiente
+  con su prompt. Pasa de 6 pasos a 10.
+
+  **Y arrastraba cifras viejas, que es el defecto que la propia sesión cazó tres veces.** Decía que un
+  run de CI tarda **55-80 minutos** cuando `CLAUDE.md` ya llevaba **42-53** medidos sobre doce runs;
+  daba `0 new file(s)` como la condición del verde cuando lo que se lee es la frase final —el mismo
+  día, un verde legítimo dijo **14**—; y proponía mover `main` con `git checkout && git merge
+  --ff-only`, que cambia de rama dos veces y puede dejar a alguien en `main` por descuido, en vez de
+  `git branch -f`.
+
+  **Entran además los tres rojos que no son de quien empuja**, porque los tres se han diagnosticado
+  desde cero más de una vez: el «N improved» de la primera vuelta al subir cobertura, el archivo cuya
+  medición oscila, y una prueba del paseo que falla sola —con el `git diff` que distingue la
+  intermitencia de una regresión en un comando—.
+
+- **`eng/list-pending.ps1` contaba las aplazadas como decisiones, y la hoja de ruta dice lo
+  contrario.** La regla de publicación cuenta las `DEFERRED` —aplazado no es rechazado— y excluye
+  las `OUT_OF_SCOPE`. El guion las metía a las dos en el mismo saco, así que llamaba «decisión en
+  pie» a `UX-007` y `PLY-016`, que la regla ya había metido dentro. Ahora dice **13 de trabajo y 2
+  decisiones** en vez de 11 y 4. **Una lista derivada que contradice al documento que decide es
+  exactamente lo único que no puede hacer**, y duró unas horas.
+
 ### Añadido
 
 - **`eng/list-pending.ps1`: qué falta, leído de la matriz y no de la memoria de nadie.** La pregunta

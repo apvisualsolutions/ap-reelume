@@ -1,57 +1,59 @@
 # Dónde retomar
 
-> ## RELEVO — 2026-08-31, decimotercera sesión: la puerta de nuevos ya no bloquea
+> ## RELEVO — 2026-08-31, decimotercera sesión: `main` desbloqueado y al día
 >
-> **Los dos ViewModels de Cursos pasan la puerta de archivos NUEVOS.** Medidos en `UiTests` **sola**:
+> **`main` está en `70ffca1`**, con la rama y el árbol local en el mismo commit y nada sin confirmar.
+> Venía parado en `f10e53e` desde el cierre de la undécima. Seis commits, tres fast-forwards, y cada
+> uno verificado por CI antes de tocar la referencia.
 >
-> | archivo | antes (fusión de CI) | ahora (`UiTests` sola) |
+> ### Lo que desbloqueó `main`
+>
+> La puerta de archivos **nuevos** exige 96/96 y no admite techos. Tenía parados los dos ViewModels de
+> Cursos, que entraron **sin una sola prueba**:
+>
+> | archivo | antes | ahora |
 > | --- | --- | --- |
-> | `CoursesViewModel.cs` | 96,15 / **58,33** | **100 / 97,22** (35 de 36 ramas) |
-> | `CourseDetailsViewModel.cs` | 93,91 / **58,51** | **100 / 96,81** (91 de 94 ramas) |
+> | `CoursesViewModel.cs` | 96,15 / **58,33** | **100 / 97,22** |
+> | `CourseDetailsViewModel.cs` | 93,91 / **58,51** | **100 / 96,81** |
 >
-> Dos archivos de prueba nuevos, 21 pruebas, y `UiTests` entera en verde (1.073).
+> 21 pruebas nuevas en `UiTests`, y **cuatro ramas inalcanzables medidas y escritas en las dos clases
+> de prueba**, no sólo en la evidencia. El trinquete de deuda bajó **191 → 189**.
 >
-> **Lo que queda es la OTRA mitad, y sigue siendo lo que hace usable Cursos**: el panel «Lecciones»
-> del reproductor (CRS-004) y la opción «Curso (carpeta de lecciones)» del diálogo de añadir — que es
-> la que **devuelve `MarkCoursesInRoot` e `ICourseRootDeclarationStore` al contenedor**, y sin la cual
-> **no se puede declarar una raíz de cursos**. Está descrita abajo, sin cambios.
+> ### Las decisiones que se tomaron, y dónde viven
 >
-> ### Cuatro cosas medidas esta tanda, y las cuatro cuestan si se olvidan
+> Ninguna vive ya sólo en un chat. **Están en el árbol:**
 >
-> 1. **Reproducir la fusión de CI sí funciona; correr `check-coverage.ps1` contra ella NO.** Los
->    cuatro números de partida salieron **exactos** fusionando el artefacto `test-results` con
->    `reportgenerator`. Pero el guion entero declara **«PASS (no instrumentable lines)» sobre los 430
->    archivos**: los nombres del fusionado llegan sin el `src/` inicial y la puerta los busca con
->    `EndsWith('src/…')`. **Un falso verde, no un rojo**: se lee el Cobertura fusionado a mano.
-> 2. **Todo lo nuevo se cubre dentro de UNA suite.** El fusionado se queda con **el mejor informe de
->    una línea, no con la unión**, así que un par repartido entre dos suites lee la mitad para
->    siempre. El barrido de constructores pasa el null desde `UiTests`; el lado bueno tiene que
->    tomarse **ahí también**, construyendo con un `GetCourses` y un `SetWatchStatus` reales.
-> 3. **No es la prueba quien decide si toca el hilo de UI: es el DATO.** `CourseModuleViewModel` con
->    un módulo **con título** arma su etiqueta por `CourseText.Resource` y **revienta** en un `[Fact]`
->    con la suite entera; **con el título nulo pasa**. Misma prueba, mismo tipo, distinto dato.
-> 4. **`Application.Current.Resources[clave]` toma cinco de las seis ramas de `Resource`** — sin
->    clave, con clave, y con algo que no es cadena debajo. La sexta —`Current is { }` por el lado sin
->    aplicación— **es inalcanzable y está medida**: un `[Fact]` llano llegó a `ActualThemeVariant` y
->    reventó, que prueba que `Current` no era null.
+> 1. **No se publica nada hasta que todo lo comprometido esté verificado** —
+>    [hoja de ruta](roadmap/README.es.md), «La regla de publicación», y `CLAUDE.md`. Cuentan las
+>    `DEFERRED`, no cuentan las `OUT_OF_SCOPE`.
+> 2. **La profundidad se señala, no se teclea** — `ADR-0006`, «Enmienda 1». Se señala **una** carpeta
+>    de curso, el nivel se **deriva** de ese gesto, y después se ofrece marcar las vecinas del mismo
+>    nivel. **Enmienda la decisión 3, no la 2**, y toda su medición sigue en pie.
+> 3. **La pregunta de las vecinas, escrita por el propietario:** «Hemos encontrado {0} carpetas más.
+>    ¿Son todas cursos?». Pregunta por el **hecho** y no por la acción, que es justo la señal que
+>    pedía la decisión 2. Aún **no está en `Strings.*.axaml`**: va con el diálogo que la consume.
 >
-> **Las cuatro ramas que quedan sin cubrir son inalcanzables y están escritas en las dos clases de
-> prueba**, con su porqué, porque un techo medido va donde alguien vuelve a mirarlo.
+> ### El orden de trabajo decidido, y por qué
 >
-> ### Y tres decisiones del propietario, que mandan sobre lo de arriba
+> 1. **`CRS-001`, el diálogo.** Primero porque es pequeño y **desbloquea todo lo demás de Cursos**:
+>    sin él no se puede declarar ni un curso, así que lo ya construido no se puede usar. No le queda
+>    ninguna decisión abierta.
+> 2. **`CRS-004`, el panel «Lecciones».** Cuatro claves escritas esperándolo.
+> 3. **Las dos que llevan `CRS-002/003/005` a `VERIFIED`**: la prueba de que el progreso sobrevive a
+>    mover el archivo, y la matriz de capturas.
+> 4. **`UX-007`, la agrupación transversal**, que el propietario quiere para todo el catálogo.
+> 5. El resto de `STABLE`.
 >
-> 1. **No se publica nada hasta que todo lo comprometido esté verificado.** Está en
->    [la hoja de ruta](roadmap/README.es.md) («La regla de publicación») y en `CLAUDE.md`. Cuentan
->    las `DEFERRED`, no cuentan las `OUT_OF_SCOPE`. **Activa dos bloqueos que no se arreglan
->    programando**: `PRD-003` pide una máquina ARM64 que no hay —el propietario tiene una Surface y
->    **está por confirmar si es ARM64**—, y `PRD-002` pide el certificado comercial de firma, porque
->    su ciclo se verificó sobre una copia resellada.
-> 2. **Una carpeta seleccionada = un curso**, varias = varias. Supersede la decisión 2 del
->    `ADR-0006` y **la enmienda está sin escribir**. Motivo: no hay forma fiable de distinguir
->    carpeta-categoría de carpeta-curso. El aviso del diálogo llevará un **esquema en monoespaciada**,
->    no una imagen.
-> 3. **La agrupación que pidió ya existe como `UX-007`** y la quiere **transversal** —películas,
->    series y cursos—, no una lista para cursos. **Está sin decidir si sube de versión.**
+> ### Tres consecuencias de la regla de publicación que conviene ver pronto
+>
+> - **`PLY-016` entra.** Está `DEFERRED`, y aplazado no es rechazado, así que la regla la mete antes
+>   de publicar. Nadie lo había dicho en voz alta.
+> - **`PRD-003` (ARM64) bloquea la publicación entera y no se arregla programando.** Hace falta una
+>   máquina Windows 11 ARM64. **La Surface del propietario NO es compatible — comprobado y descartado
+>   por él**, dijo que buscaría otra solución. No volver a proponérsela.
+> - **`PRD-002` no llega a `VERIFIED` sin el certificado comercial de firma**: su ciclo se verificó
+>   sobre una copia **resellada** y el artefacto sin firmar no puede repetirlo. Queda encadenado a
+>   `REL-001`.
 >
 > ### Para saber qué falta ya no se lee a mano
 >
@@ -59,20 +61,51 @@
 > pwsh -NoProfile -File eng/list-pending.ps1
 > ```
 >
-> **15 abiertas de 65**, por versión, separando las once de trabajo de las cuatro que son decisiones.
-> Lee estados y versiones de las leyendas del propio `FEATURES.md`, cuenta las filas por dos caminos
-> y **se niega a imprimir** si no cuadra. Nació de un fallo: la misma lista hecha a mano con un patrón
-> de tres mayúsculas perdió **ocho filas en silencio** —`UX` tiene dos—, y entre ellas la que se
-> preguntaba. Encontró tres defectos el primer día: una línea en blanco partía la tabla de biblioteca
-> y dejaba `LIB-016`/`LIB-017` fuera, `Post-MVP` se usaba sin declarar, y `A11Y-00x` se caía por
-> llevar dígitos —lo que explicaba el 63 contra 65 de la puerta de documentación—.
+> **15 abiertas de 65**, por versión: **13 son trabajo** —las aplazadas incluidas, porque la regla de
+> publicación las cuenta— y **2 son decisiones de NO construir algo** (`PLY-015`, `UX-008`).
+> Lee estados y versiones de las leyendas del propio `FEATURES.md`, cuenta las filas por dos caminos y
+> **se niega a imprimir** si no cuadra. Nació de un fallo: la misma lista hecha a mano perdió **ocho
+> filas en silencio** —el patrón pedía tres mayúsculas y `UX` tiene dos—, justo la que se preguntaba.
 >
-> **Hay 14 tareas de fondo lanzadas**, una por cada pendiente (dos de Cursos comparten la de «el
-> progreso sobrevive a mover el archivo»), incluidas las aplazadas y las rechazadas.
+> **Se lanzó una tarea de fondo por cada pendiente**, incluidas las aplazadas y las rechazadas, más
+> dos por los defectos de abajo. **Cuántas siguen vivas lo dice el panel de tareas, no este
+> documento**: se escribió aquí un número y dejó de ser cierto en la misma sesión.
+>
+> ### Cinco cosas medidas que ahorran vueltas
+>
+> 1. **La fusión de CI se reproduce aquí y sus cifras salen exactas** (`gh run download <id> -n
+>    test-results` + `reportgenerator`). Lo que **NO** funciona es correr `check-coverage.ps1` entero
+>    contra el artefacto: los nombres llegan sin el `src/` inicial y **da un falso «PASS»** sobre los
+>    430 archivos. Se lee el `Cobertura.xml` a mano.
+> 2. **Todo lo nuevo se cubre dentro de UNA suite.** El informe fusionado se queda con **el mejor
+>    informe de una línea, no con la unión**, así que un par repartido entre dos suites lee la mitad
+>    para siempre.
+> 3. **No es la prueba quien decide si toca el hilo de UI: es el DATO.** Un `CourseModuleViewModel`
+>    con módulo **con título** revienta en un `[Fact]` con la suite entera; con el título nulo pasa.
+> 4. **`MarkerEditorViewModel` OSCILA**: 79, 79, 79, 81, 79, y otra vez 81 el 2026-08-31 tumbando un
+>    run que sólo tocaba un `.md`. **NO se sube su suelo** —ya se hizo una vez y el siguiente run
+>    falló—: se relanza. Con un archivo que oscila **ningún suelo fijo es correcto**, y eso es un
+>    defecto de la puerta con tarea propia.
+> 5. **Una prueba del paseo falló y era intermitencia**, probado con un dato y no con una impresión:
+>    `git diff --name-only <verde> <rojo> -- src tests` devolvió **cero archivos**.
+>
+> ### Dos defectos encontrados y NO arreglados, cada uno con su tarea
+>
+> - **La puerta de cobertura no tiene suelo correcto para un archivo que oscila.** Ya van dos runs
+>   rojos por eso.
+> - **Las cifras citadas en la documentación envejecen sin que nada avise.** Se encontraron **dos
+>   falsas el mismo día**: el trinquete decía 205 y era 191, y la skill de cierre decía que un run
+>   tarda 55-80 minutos cuando son 42-53. `.claude/` **no está bajo ninguna puerta**, así que nadie
+>   comprueba lo que dice.
+>
+> ### Y dos roturas de la matriz, ya corregidas
+>
+> Una **línea en blanco en mitad** de la tabla de biblioteca la partía en dos y dejaba `LIB-016` y
+> `LIB-017` fuera —se veían mal en GitHub—; y la versión `Post-MVP` la usaban cinco filas **sin estar
+> declarada**. Con eso, la puerta de documentación y el guion nuevo dicen los mismos **65**.
 >
 > Sigue pendiente y decidido, **no ejecutado**: `.flv` en `MediaFileExtensions`, agrupado con el
-> próximo cambio de empaquetado.
-
+> próximo cambio de empaquetado (va en la tarea de `PRD-002`).
 > ## RELEVO — 2026-08-30, cierre de la duodécima sesión
 >
 > **Empujado hasta `6e5a02c`. En local hay commits por delante, a propósito**, esperando trabajo que
