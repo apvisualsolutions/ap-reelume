@@ -112,6 +112,9 @@ tiene raíces de biblioteca y quien organiza cursos los tiene aparte, así que l
 usuario, no del programa.
 
 **3. Cada raíz de cursos declara a qué profundidad están sus cursos, y el programa no lo adivina.**
+**Enmendada el 2026-08-31 en cómo se declara** —se señala una carpeta en vez de teclear un número—;
+ver [Enmienda 1](#enmienda-1--2026-08-31-la-profundidad-se-señala-no-se-teclea). Lo que decide sigue
+en pie y la medición de abajo también.
 
 Se intentó adivinarlo y **se midió que no funciona**. La primera regla candidata —hoja con vídeo, y
 el curso es el ancestro a distancia 0 o 1, con las secciones reconocidas por llevar número de
@@ -180,6 +183,37 @@ reales tienen profundidades distintas y ninguna constante sirve para las dos.
 exactamente lo que el no-objetivo protege, y nada de eso hace falta para ver un curso que ya está en
 el disco.
 
+### Enmienda 1 — 2026-08-31: la profundidad se señala, no se teclea
+
+**Qué cambia:** la decisión 3 se mantiene entera en lo que decide —el programa no adivina el nivel—
+y cambia **cómo lo recibe**. Ya no se declara escribiendo un número: **la persona señala una carpeta
+de curso y el nivel se deriva de ese gesto**. Después, la aplicación dice cuántas carpetas hermanas
+ha encontrado a ese mismo nivel y ofrece marcarlas también, y esa respuesta también es suya.
+
+La decisión 2 **no se toca**: la señal sigue siendo del usuario y no del programa. Esto sólo cambia
+la forma de la señal.
+
+**Por qué**, y es del propietario: se le preguntó cómo debía declararse la profundidad y contestó que
+lo sano era que **la carpeta que se mete sea la del curso**, una por curso. Tenía razón por una razón
+que la decisión 3 ya había medido sin nombrarla así: **no hay forma de distinguir una carpeta
+categoría de una carpeta curso**, porque una categoría contiene sólo carpetas y un curso con módulos
+también. Señalar una carpeta resuelve eso sin regla ninguna.
+
+**Qué se conserva de lo medido:** todo. La detección sigue siendo **exacta por construcción** —el
+nivel derivado es el mismo número que se tecleaba—, y sobre la colección real sigue devolviendo los
+12 cursos con sus secciones. Lo que desaparece es la pregunta con un número dentro, que obligaba a
+contar carpetas mentalmente.
+
+**Y una alternativa que se descartó por medición, no por gusto:** dejar que el diálogo del sistema
+seleccione varias carpetas de golpe. `OpenFolderPickerAsync` devuelve una lista y admite
+`AllowMultiple`, así que **la API lo permite**; lo que **no está medido** es que el diálogo nativo de
+Windows deje marcar varias carpetas a la vez. Ofrecer las hermanas después de señalar una da el
+mismo resultado sin depender de eso, y además deja decir que no.
+
+**Lo que queda pendiente y es del propietario:** la cadena que hace la pregunta de las hermanas, con
+su `{0}`, en los dos idiomas. Las cinco cadenas del diálogo que ya existen encajan sin cambios,
+porque siempre dijeron «marcar **una carpeta** como curso».
+
 ---
 
 ## English
@@ -237,6 +271,9 @@ percentage of training completed, and nothing that talks to a platform.
 2. **A library root is declared to hold courses, and detection does not guess the kind.** Because the
    kind decides whether something leaves for the network, a wrong classification is not cosmetic.
 3. **Each course root declares the depth its courses sit at, and the program does not guess it.**
+   **Amended on 2026-08-31 in how it is declared** — a folder is pointed at instead of a number
+   typed; see [Amendment 1](#amendment-1--2026-08-31-the-depth-is-pointed-at-not-typed). What it
+   decides still stands, and so does the measurement below.
    Guessing was tried and **measured not to work**: the first candidate rule — video leaves, with the
    course as the ancestor at distance 0 or 1 and sections recognised by a leading number — was
    simulated over the real collection and returned **31 courses where there are 12**. Its four
@@ -276,3 +313,35 @@ a kind. The Product Owner chose the dedicated kind on 2026-08-30.
 have different depths and no constant serves both.
 
 **Adding training progress** — rejected: it is exactly what the non-goal protects.
+
+### Amendment 1 — 2026-08-31: the depth is pointed at, not typed
+
+**What changes:** decision 3 stands entire in what it decides — the program does not guess the level
+— and changes **how it receives it**. It is no longer declared by typing a number: **a person points
+at one course folder and the level is derived from that gesture**. The application then says how many
+sibling folders it found at that same level and offers to mark those too, and that answer is theirs
+as well.
+
+Decision 2 **is untouched**: the signal is still the user's rather than the program's. Only the shape
+of the signal changes.
+
+**Why**, and it is the owner's: asked how the depth should be declared, he answered that the sane
+thing was for **the folder you hand over to be the course's own**, one per course. He was right for a
+reason decision 3 had already measured without naming it that way: **there is no way to tell a
+category folder from a course folder**, because a category holds only folders and a course with
+modules does too. Pointing at a folder settles it with no rule at all.
+
+**What survives of the measurement:** all of it. Detection is still **exact by construction** — the
+derived level is the same number that used to be typed — and over the real collection it still
+returns the 12 courses with their sections. What goes away is the question with a number in it, which
+made somebody count folders in their head.
+
+**And one alternative rejected by measurement rather than taste:** letting the system dialog select
+several folders at once. `OpenFolderPickerAsync` returns a list and honours `AllowMultiple`, so **the
+API allows it**; what is **not measured** is that the native Windows dialog lets several folders be
+marked at a time. Offering the siblings after one is pointed at reaches the same place without
+depending on that, and it also allows saying no.
+
+**Left open and owned by the Product Owner:** the string that asks the sibling question, with its
+`{0}`, in both languages. The five dialog strings that already exist fit unchanged, because they
+always said "mark **a folder** as a course".
