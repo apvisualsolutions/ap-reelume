@@ -2,9 +2,34 @@
 
 > ## HANDOVER — 2026-08-31, thirteenth session: `main` unblocked and current
 >
-> **`main` is at `70ffca1`**, with the branch and the local tree on the same commit and nothing
-> uncommitted. It had been stuck at `f10e53e` since the close of the eleventh. Six commits, three
+> **`main` is at `a5ce821`**, with the branch and the local tree on the same commit and nothing
+> uncommitted. It had been stuck at `f10e53e` since the close of the eleventh. Ten commits, six
 > fast-forwards, every one verified by CI before the reference moved.
+>
+> ### And the two defects this note calls "not fixed" WERE fixed
+>
+> They were done after the rest of this block was written, so read it with that in front:
+>
+> 1. **The oscillating figure no longer oscillates, and it was NOT the gate's fault.** Three branches
+>    of `MarkerEditorViewModel` were covered **only by the autonomous walk**, which presses with a
+>    real mouse and reaches that state some runs and not others. No unit test touched them: every one
+>    saved a **new** marker (never the arm that **replaces** an existing one) and none changed the
+>    list during a delete's `await`. Two tests take them on purpose now, `UiTests` alone goes from
+>    34/44 to **37/44**, and the floor rose **79 → 84** with CI measuring **exactly** what was
+>    measured here. **Starting from the patch would have written a tolerance band around a hole in
+>    the tests.**
+> 2. **Quoted figures have a gate**: `QuotedFigureTests`. A figure opts in with `<!--medido:key-->`
+>    and is compared against its source. **Measuring before designing ruled out the obvious design**:
+>    a number scanner is unworkable — "96" appears 272 times — and, above all, **the changelog and
+>    `docs/evidence/` are historical minutes that must NOT be checked**. Only `CLAUDE.md`,
+>    `CONTRIBUTING.md` and `.claude/` are read. It has three anti-blindness floors, and the "fewer
+>    than four marks = blind" one **earned its keep immediately**: it found 1 of 9 because the marks
+>    sat on the line below. A **third** false figure turned up on the way: the guide said "48 views"
+>    and there are **59**.
+>
+> **And one instrument trap that nearly inverted a diagnosis: RE-RUNNING A WORKFLOW OVERWRITES ITS
+> ARTEFACTS**, and there is no by-attempt endpoint. If a run fails and you want to know why,
+> **download first and re-run after**.
 >
 > ### What unblocked `main`
 >

@@ -2,9 +2,33 @@
 
 > ## RELEVO — 2026-08-31, decimotercera sesión: `main` desbloqueado y al día
 >
-> **`main` está en `70ffca1`**, con la rama y el árbol local en el mismo commit y nada sin confirmar.
-> Venía parado en `f10e53e` desde el cierre de la undécima. Seis commits, tres fast-forwards, y cada
+> **`main` está en `a5ce821`**, con la rama y el árbol local en el mismo commit y nada sin confirmar.
+> Venía parado en `f10e53e` desde el cierre de la undécima. Diez commits, seis fast-forwards, y cada
 > uno verificado por CI antes de tocar la referencia.
+>
+> ### Y los dos defectos que esta nota daba por «no arreglados» SÍ se arreglaron
+>
+> Se hicieron después de escribir el resto de este bloque, así que léelo con eso delante:
+>
+> 1. **La cifra que oscilaba ya no oscila, y NO era culpa de la puerta.** Tres ramas de
+>    `MarkerEditorViewModel` las cubría **sólo el paseo autónomo**, que pulsa con un ratón real y
+>    llega a ese estado unos runs sí y otros no. Ninguna prueba unitaria las tocaba: todas guardaban
+>    un marcador **nuevo** (nunca el brazo que **sustituye** uno existente) y ninguna cambiaba la
+>    lista durante el `await` de un borrado. Dos pruebas las toman ya a propósito, `UiTests` sola pasa
+>    de 34/44 a **37/44**, y el suelo subió **79 → 84** con CI midiendo **exactamente** lo medido
+>    aquí. **Empezar por el parche habría escrito una banda de tolerancia alrededor de un hueco de
+>    pruebas.**
+> 2. **Las cifras citadas tienen puerta**: `QuotedFigureTests`. Una cifra se apunta con
+>    `<!--medido:clave-->` y se compara con su fuente. **Medir antes de diseñar descartó el diseño
+>    obvio**: un escáner de números es inviable —«96» aparece 272 veces— y, sobre todo, **el changelog
+>    y `docs/evidence/` son actas históricas que NO deben comprobarse**. Sólo se leen `CLAUDE.md`,
+>    `CONTRIBUTING.md` y `.claude/`. Tiene tres suelos anti-ceguera, y el de «menos de cuatro marcas =
+>    ciega» **se ganó el sueldo en el acto**: encontró 1 de 9 porque las marcas estaban en la línea de
+>    abajo. De paso apareció una **tercera** cifra falsa: la guía decía «48 vistas» y hay **59**.
+>
+> **Y una trampa del instrumento que casi invierte un diagnóstico: RELANZAR UN RUN SOBRESCRIBE SUS
+> ARTEFACTOS**, y no hay endpoint por intento. Si un run falla y quieres saber por qué, **descarga
+> primero y relanza después**.
 >
 > ### Lo que desbloqueó `main`
 >
