@@ -121,10 +121,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   while oscillating. Since the merge keeps the best report for each line, the merged figure **can no
   longer fall below 37**, and the number stops moving.
 
-  **Its floor will want raising on the next round, and that raise is legitimate**: not a lucky run,
-  but a branch a deterministic test now takes every time. The right correction was **covering the
-  branch on purpose, not loosening the gate** — which is what starting from the patch would have
-  done.
+  **Second round: CI confirmed it and the floor rose from 79 to 84.** The first round's red was the
+  expected one and the fix itself predicted it: the moment a file improves, the gate demands it leave
+  the list or be raised. The figure CI measured — **84** — is **exactly** the one measured here
+  before pushing: 37 of 44 branches.
+
+  **And this raise is legitimate, unlike August's**: not a lucky run, but a branch a deterministic
+  test takes every time. If the number ever moves again, the question is **which branch went back to
+  being covered by accident**, not what tolerance the gate should grow. Which is the whole point: the
+  right correction was **covering the branch on purpose, not loosening the gate** — and starting from
+  the patch would have written a tolerance band around a hole in the tests.
 
 - **The two Courses ViewModels arrived without a single test, and they were all that stood between
   `main` and being unblocked.** `CoursesViewModel` measured 96.15 % of lines and **58.33 % of

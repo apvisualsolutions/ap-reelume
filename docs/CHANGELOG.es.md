@@ -122,10 +122,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
   alcanzar mientras oscilaba. Como la fusión se queda con el mejor informe de cada línea, la cifra
   fusionada **ya no puede bajar de 37**, y el número deja de moverse.
 
-  **Su suelo pedirá subir en la próxima vuelta, y esa subida sí es legítima**: no es un run con
-  suerte, es una rama que una prueba determinista toma siempre. La corrección correcta era **cubrir
-  la rama a propósito, no aflojar la puerta** — que es lo que se habría hecho de haber empezado por
-  el parche.
+  **Segunda vuelta: CI lo confirmó y el suelo subió de 79 a 84.** El rojo de la primera era el
+  esperado y lo predijo la propia corrección: en cuanto un archivo mejora, la puerta exige sacarlo de
+  la lista o subirle el suelo. El número que midió CI —**84**— es **exactamente** el que se había
+  medido aquí antes de empujar: 37 de 44 ramas.
+
+  **Y esta subida sí es legítima, a diferencia de la de agosto**: no es un run con suerte, es una
+  rama que una prueba determinista toma siempre. Si la cifra vuelve a moverse, la pregunta es **qué
+  rama volvió a cubrirse por accidente**, no qué tolerancia debería crecerle a la puerta. Que es todo
+  el asunto: la corrección correcta era **cubrir la rama a propósito, no aflojar la puerta** — y
+  empezar por el parche habría escrito una banda de tolerancia alrededor de un hueco de pruebas.
 
 - **Los dos ViewModels de Cursos entraron sin una sola prueba, y son lo único que le quedaba a `main`
   para desbloquearse.** `CoursesViewModel` medía 96,15 % de líneas y **58,33 % de ramas**, y
