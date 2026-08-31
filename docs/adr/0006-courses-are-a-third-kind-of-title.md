@@ -210,9 +210,23 @@ seleccione varias carpetas de golpe. `OpenFolderPickerAsync` devuelve una lista 
 Windows deje marcar varias carpetas a la vez. Ofrecer las hermanas después de señalar una da el
 mismo resultado sin depender de eso, y además deja decir que no.
 
-**Lo que queda pendiente y es del propietario:** la cadena que hace la pregunta de las hermanas, con
-su `{0}`, en los dos idiomas. Las cinco cadenas del diálogo que ya existen encajan sin cambios,
-porque siempre dijeron «marcar **una carpeta** como curso».
+**La cadena que hace la pregunta la escribió el propietario el 2026-08-31 y es ésta:**
+
+> **«Hemos encontrado {0} carpetas más. ¿Son todas cursos?»**
+
+**Y es mejor que las dos que Engineering propuso, por una razón que conviene no perder:** las suyas
+—«¿Las marco también?»— preguntaban por **la acción** y daban por supuesto el hecho. Ésta pregunta
+por **el hecho**, que es exactamente lo único que el programa no puede saber y la decisión 2 dice que
+es del usuario. La pregunta es la señal.
+
+Encaja además con la forma que el producto ya usa, **medido sobre las cadenas del árbol**: sus dos
+únicas preguntas son «Dejaste esto empezado. ¿Continuar donde lo dejaste?» y «Esta versión no dura lo
+mismo. ¿Trasladamos tu progreso?» — hecho primero, pregunta después, y la pregunta en primera del
+plural. Lo único que se corrigió de la redacción original fue la coma antes del signo de apertura,
+que va punto.
+
+Las cinco cadenas del diálogo que ya existen encajan sin cambios, porque siempre dijeron «marcar
+**una carpeta** como curso».
 
 ---
 
@@ -342,6 +356,21 @@ API allows it**; what is **not measured** is that the native Windows dialog lets
 marked at a time. Offering the siblings after one is pointed at reaches the same place without
 depending on that, and it also allows saying no.
 
-**Left open and owned by the Product Owner:** the string that asks the sibling question, with its
-`{0}`, in both languages. The five dialog strings that already exist fit unchanged, because they
-always said "mark **a folder** as a course".
+**The Product Owner wrote the question on 2026-08-31, and it is this:**
+
+> **«Hemos encontrado {0} carpetas más. ¿Son todas cursos?»** — "We found {0} more folders. Are they
+> all courses?"
+
+**And it is better than the two Engineering proposed, for a reason worth not losing:** theirs — "mark
+them too?" — asked about **the action** and took the fact for granted. This asks about **the fact**,
+which is precisely the one thing the program cannot know and which decision 2 says belongs to the
+user. The question is the signal.
+
+It also matches the shape the product already uses, **measured over the strings in the tree**: its
+only two questions are "Dejaste esto empezado. ¿Continuar donde lo dejaste?" and "Esta versión no
+dura lo mismo. ¿Trasladamos tu progreso?" — fact first, question second, question in the first person
+plural. The only edit to the original wording was the comma before the opening mark, which is a full
+stop.
+
+The five dialog strings that already exist fit unchanged, because they always said "mark **a folder**
+as a course".
