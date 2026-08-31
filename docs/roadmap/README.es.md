@@ -4,6 +4,30 @@ Qué hace AP Reelume hoy, qué hará después y qué ha decidido no hacer. La ve
 [README.en.md](README.en.md). El registro canónico del alcance es
 [FEATURES.md](../FEATURES.md); esto es su lectura en prosa.
 
+## La regla de publicación
+
+**No se publica nada hasta que todo lo comprometido esté verificado.** Decisión del propietario del
+2026-08-31, y manda sobre la lectura habitual de las tres versiones de abajo: no se corta una
+primera publicación parcial para ir mejorándola después. Las tres versiones siguen ordenando **en
+qué orden se construye**; ya no autorizan **publicar** al terminar la primera.
+
+Qué cuenta como «todo», para que la regla sea comprobable y no una intención:
+
+- **Cuenta** cada fila de [FEATURES.md](../FEATURES.md) que la matriz reconoce como compromiso
+  —`DESIGN_APPROVED`, `PLANNED`, `IN_PROGRESS`, `IMPLEMENTED`, `BLOCKED`— y también las `DEFERRED`,
+  que son compromisos aplazados y no rechazados. Todas tienen que llegar a `VERIFIED`.
+- **No cuenta** lo que está `OUT_OF_SCOPE`, porque no es una funcionalidad pendiente sino una
+  decisión escrita de no hacerla —hoy `UX-008` y `PLY-015`—. Meterlas exige una decisión nueva, no
+  esta regla.
+
+`pwsh -NoProfile -File eng/list-pending.ps1` contesta en cualquier momento cuánto falta, y separa
+las dos categorías por su cuenta.
+
+**Lo que esta regla convierte en bloqueo de publicación, y conviene saberlo pronto:** `PRD-003` no
+depende de programar, sino de **una máquina Windows 11 ARM64 que no hay**; y `PRD-002` no puede
+llegar a `VERIFIED` sin el **certificado comercial de firma**, porque su ciclo se verificó sobre una
+copia resellada y el artefacto sin firmar no puede repetirlo — lo que lo encadena a `REL-001`.
+
 ## Las tres versiones
 
 | Versión | Qué significa |

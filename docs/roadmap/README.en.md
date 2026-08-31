@@ -4,6 +4,30 @@ What AP Reelume does today, what it will do next, and what it has decided not to
 version is at [README.es.md](README.es.md). The canonical scope record is
 [FEATURES.md](../FEATURES.md); this is its prose reading.
 
+## The publishing rule
+
+**Nothing ships until everything committed to is verified.** The owner's decision of 2026-08-31, and
+it overrides the usual reading of the three releases below: no partial first release gets cut and
+improved afterwards. The three releases still order **what gets built first**; they no longer
+authorise **publishing** once the first one is done.
+
+What counts as "everything", so the rule is checkable rather than an intention:
+
+- **Counts**: every row of [FEATURES.md](../FEATURES.md) the matrix treats as a commitment —
+  `DESIGN_APPROVED`, `PLANNED`, `IN_PROGRESS`, `IMPLEMENTED`, `BLOCKED` — and the `DEFERRED` ones
+  too, which are postponed commitments rather than rejected ones. All must reach `VERIFIED`.
+- **Does not count**: anything `OUT_OF_SCOPE`, because that is not an outstanding feature but a
+  written decision not to build it — today `UX-008` and `PLY-015`. Bringing those in takes a new
+  decision, not this rule.
+
+`pwsh -NoProfile -File eng/list-pending.ps1` answers how much is left at any moment, and separates
+the two categories on its own.
+
+**What this rule turns into a publishing blocker, worth knowing early:** `PRD-003` does not depend on
+writing code but on **a Windows 11 ARM64 machine that does not exist here**; and `PRD-002` cannot
+reach `VERIFIED` without the **commercial signing certificate**, because its cycle was verified on a
+re-signed copy and the unsigned artifact cannot repeat it — which chains it to `REL-001`.
+
 ## The three releases
 
 | Release | What it means |

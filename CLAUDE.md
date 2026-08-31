@@ -119,6 +119,15 @@ pwsh -NoProfile -File eng/verify-package.ps1   # su ciclo de vida, y que dos bui
 pwsh -NoProfile -File eng/prepare-release.ps1  # contesta si este árbol podría publicarse, y produce la release
 ```
 
+**Y desde el 2026-08-31 hay una regla del propietario por encima de ese guion: no se publica nada
+hasta que todo lo comprometido esté verificado.** No se corta una primera publicación parcial para
+mejorarla después; las tres versiones siguen ordenando en qué orden se construye y ya no autorizan
+publicar al terminar la primera. Cuenta todo lo que la matriz trata como compromiso —incluidas las
+`DEFERRED`, que son aplazadas y no rechazadas— y **no** cuenta lo `OUT_OF_SCOPE`, que es una decisión
+escrita de no hacerlo. Está en la
+[hoja de ruta](docs/roadmap/README.es.md) con sus dos bloqueos duros: `PRD-003` pide una máquina
+ARM64 que no hay, y `PRD-002` pide el certificado comercial de firma.
+
 `package-arm64.ps1` existe y **no se usa**: PRD-003 está BLOCKED por hardware. Tocar el manifiesto
 caduca dos mediciones del sandbox, así que después toca rehacer su ciclo.
 
