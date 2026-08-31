@@ -62,10 +62,13 @@ que es verdad **cuando se actúa sobre ella** y no cuando se calculó. / Yes is 
 re-reads the root: one extra walk, and an answer that is true when it is acted on.
 
 La frase la escribió el propietario el 2026-08-31 y pregunta por el **hecho**, no por la acción:
-«Hemos encontrado {0} carpetas más. ¿Son todas cursos?». Los dos botones son verbos —«Marcarlas
-todas» y «Sólo esta»— y no un sí y un no, que es la forma que ya tienen las otras dos preguntas de
-esta aplicación. / The sentence is the owner's and asks about the fact; both answers are verbs, which
-is the shape this application's other two questions already have.
+«Hemos encontrado {0} carpetas más. ¿Son todas cursos?». Los dos botones son verbos —**«Marcar
+todas»** y **«Sólo esta»**— y no un sí y un no, que es la forma que ya tienen las otras dos preguntas
+de esta aplicación. Los propuso Engineering como «Marcarlas todas» y **el propietario los revisó ese
+mismo día**: se queda la forma sin enclítico, que es la del resto del árbol —«Continuar», «Marcar
+como curso», «Quitar la marca»—. / The sentence is the owner's and asks about the fact; both answers
+are verbs, and the owner settled their wording the same day on the shorter form the rest of the tree
+uses.
 
 ## Lo que una puerta encontró y la lectura no / What a gate found and reading did not
 
@@ -134,7 +137,7 @@ propios datos. / The dialog's action is recorded under its binding expression ra
 
 ## Lo que encontró el paseo y ninguna prueba unitaria podía ver / What the walk found and no unit test could see
 
-«Marcarlas todas» se construye cuando **todavía no hay vecinas**. Contesta que no puede ejecutarse, y
+«Marcar todas» se construye cuando **todavía no hay vecinas**. Contesta que no puede ejecutarse, y
 sin nadie que le avise se queda **deshabilitado toda la vida del diálogo**: en pantalla, con el
 aspecto exactamente correcto, y sin poder pulsarse. El paseo lo dijo en una línea —
 `visible=True, enabled=False`— porque es lo único que aprieta el botón como lo aprieta una persona. /

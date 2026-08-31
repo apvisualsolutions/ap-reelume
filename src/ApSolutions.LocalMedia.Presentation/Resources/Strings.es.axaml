@@ -747,7 +747,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AddCourseShapeLabel">Así se ve un curso</x:String>
   <x:String x:Key="AddCourseShape">Curso de composición&#10;├─ 01 - Módulo uno&#10;│  ├─ 01 - Intro.mp4&#10;│  └─ 02 - El nodo.mp4&#10;└─ 02 - Módulo dos&#10;   └─ 01 - Máscaras.mp4</x:String>
   <x:String x:Key="AddCourseNeighboursQuestionFormat">Hemos encontrado {0} carpetas más. ¿Son todas cursos?</x:String>
-  <x:String x:Key="AddCourseNeighboursConfirmAction">Marcarlas todas</x:String>
+  <x:String x:Key="AddCourseNeighboursConfirmAction">Marcar todas</x:String>
   <x:String x:Key="AddCourseNeighboursDeclineAction">Sólo esta</x:String>
   <x:String x:Key="AddCourseInvalidFolder">Señala la carpeta de un curso: ni una unidad entera, ni una carpeta que ya sea raíz de la biblioteca.</x:String>
   <x:String x:Key="AddCourseNoVideoFound">Esa carpeta no tiene vídeos que la aplicación reconozca. Un curso necesita al menos una lección.</x:String>

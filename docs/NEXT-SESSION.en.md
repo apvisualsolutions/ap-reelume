@@ -49,11 +49,13 @@
 > - **A root created this way is `Manual`**, never on startup, because `AddCourseHelp` promises in its
 >   own words that the rest of the drive is not scanned.
 >
-> ### Two strings I wrote that the owner may want to change
+> ### The two strings still to be decided, now decided
 >
-> The question is his and is not to be touched. The **two buttons** that answer it I wrote following
-> the tree's measured pattern — a concrete verb rather than yes/no, the way «Continue» and «Start
-> over» already do: **«Mark them all»** and **«Only this one»**. Other wording is a two-string change.
+> The neighbours' question is the owner's and is not to be touched. The **two buttons** that answer
+> it were proposed following the tree's measured pattern — a concrete verb rather than yes/no, the
+> way «Continue» and «Start over» already do — and **the owner settled them the same day**: they are
+> **«Mark all»** and **«Only this one»**. The shorter form is the one the rest of the tree uses, so
+> the proposal was the longer of the two. **No string from this batch is still waiting on him.**
 >
 > ### The first round's coverage red, and its second round
 >

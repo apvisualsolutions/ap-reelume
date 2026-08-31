@@ -48,11 +48,14 @@
 > - **Una raíz creada así es `Manual`**, nunca de arranque, porque `AddCourseHelp` promete en sus
 >   propias palabras que no se recorre el resto de la unidad.
 >
-> ### Dos cadenas que escribí yo y el propietario puede querer cambiar
+> ### Las dos cadenas que faltaban por decidir, ya decididas
 >
-> La pregunta es suya y no se toca. Los **dos botones** que la contestan los escribí siguiendo el
-> patrón medido del árbol —verbo concreto, no sí/no, como «Continuar» y «Empezar de nuevo»—:
-> **«Marcarlas todas»** y **«Sólo esta»**. Si prefiere otras, es un cambio de dos cadenas.
+> La pregunta de las vecinas es del propietario y no se toca. Los **dos botones** que la contestan
+> los propuso Engineering siguiendo el patrón medido del árbol —verbo concreto, no sí/no, como
+> «Continuar» y «Empezar de nuevo»—, y **el propietario los revisó el mismo día**: quedan en
+> **«Marcar todas»** y **«Sólo esta»**. La forma sin enclítico es la del resto del árbol —«Marcar
+> como curso», «Quitar la marca»—, así que la propuesta era la más larga de las dos. **No queda
+> ninguna cadena de esta tanda pendiente de su revisión.**
 >
 > ### El rojo de cobertura de la primera vuelta, y su segunda
 >

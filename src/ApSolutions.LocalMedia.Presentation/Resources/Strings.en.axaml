@@ -747,7 +747,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AddCourseShapeLabel">What a course looks like</x:String>
   <x:String x:Key="AddCourseShape">Compositing course&#10;├─ 01 - Module one&#10;│  ├─ 01 - Intro.mp4&#10;│  └─ 02 - The node.mp4&#10;└─ 02 - Module two&#10;   └─ 01 - Masks.mp4</x:String>
   <x:String x:Key="AddCourseNeighboursQuestionFormat">We have found {0} more folders. Are they all courses?</x:String>
-  <x:String x:Key="AddCourseNeighboursConfirmAction">Mark them all</x:String>
+  <x:String x:Key="AddCourseNeighboursConfirmAction">Mark all</x:String>
   <x:String x:Key="AddCourseNeighboursDeclineAction">Only this one</x:String>
   <x:String x:Key="AddCourseInvalidFolder">Point at a course folder: not a whole drive, and not a folder that is already a library root.</x:String>
   <x:String x:Key="AddCourseNoVideoFound">That folder holds no video this application recognises. A course needs at least one lesson.</x:String>

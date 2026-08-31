@@ -70,7 +70,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   not decided what it is for, and `LeadingActionTests` refuses it. What it says and what it does both
   follow the chosen pill.
 
-  **And the autonomous walk found a defect no unit test could see.** «Mark them all» is created while
+  **And the autonomous walk found a defect no unit test could see.** «Mark all» is created while
   there are no neighbours yet, answers that it cannot execute, and **stays disabled for the whole life
   of the dialog**: on screen, looking exactly right, and unpressable. A button bound to a command asks
   `CanExecute` **once** and then waits to be told, and nothing was telling it. Reading `CanExecute`

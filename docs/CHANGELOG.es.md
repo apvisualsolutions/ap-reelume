@@ -69,7 +69,7 @@ evidencia, es [FEATURES.md](FEATURES.md).
   no ha decidido para qué es, y `LeadingActionTests` lo rechaza. Lo que dice y lo que hace siguen a la
   píldora elegida.
 
-  **Y el paseo autónomo encontró un defecto que ninguna prueba unitaria podía ver.** «Marcarlas todas»
+  **Y el paseo autónomo encontró un defecto que ninguna prueba unitaria podía ver.** «Marcar todas»
   se construye cuando todavía no hay vecinas, contesta que no puede ejecutarse y **se queda
   deshabilitado toda la vida del diálogo**: en pantalla, con el aspecto correcto, y sin poder
   pulsarse. Un botón atado a un comando pregunta `CanExecute` **una vez** y luego espera a que le
