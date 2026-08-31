@@ -37,6 +37,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Three figures in the guide were false on the same day, and there is now a gate that measures
+  them.** `CLAUDE.md` said the ratchet stood at **205** while the script said 191; the closing skill
+  put a CI run at **55-80 minutes** when the measured figure was 42-53; and the guide spoke of **"las
+  48 vistas"** in three places while the tree holds **59** by the project's own definition of a view.
+  None had been noticed, and `.claude/` **was under no gate at all** — neither the tests nor the
+  `eng/` scripts read it.
+
+  **It was measured before it was designed, and the measurement ruled out the obvious design.** A
+  scanner looking for numbers cannot work: **"96" appears 272 times** across these documents and
+  almost none of them is the bar. And the second finding weighs more: **most numbers in this
+  repository are history and must NOT be checked** — the changelog and all of `docs/evidence/` are
+  minutes of what was measured that day, so "las 48 vistas" is **correct there for ever**. Only
+  documents asserting the present are read.
+
+  **So a figure opts in**, carrying `<!--medido:key-->` after it, and the mark names its source. Six
+  sources — the ratchet, the files in debt, the walk ratchet, the views, the scope identifiers and the
+  bar — deliberately few: a gate covering what is actually quoted beats a general system nobody
+  maintains.
+
+  **And it has two floors against blindness, which is what killed the previous vigilance.** An unknown
+  key **fails** rather than being skipped, because a typo would switch the check off in silence; a
+  source nobody quotes **also fails**, the rule already applied to orphan services; and if fewer than
+  four marked figures are found, the test declares itself blind. That last floor earned its keep
+  immediately: the marks were first placed on the line after their number, the pattern looked on the
+  same line, and it **found 1 of 9** — without the floor it would have passed green measuring almost
+  nothing.
+
+  **Proven by biting**, not merely by passing: with the two figures that were genuinely wrong today
+  falsified on purpose, the gate named each one with file, line, claim and measurement.
+
 - **`eng/list-pending.ps1`: what is left, read from the matrix rather than from anybody's memory.**
   "What is still open before we publish?" had no answer you could look up: zero issues on the
   repository, 65 rows across six tables of `FEATURES.md` with both languages inside every cell, and

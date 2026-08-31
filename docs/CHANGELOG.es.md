@@ -37,6 +37,36 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Tres cifras de la guía eran falsas el mismo día, y ahora hay una puerta que las mide.** `CLAUDE.md`
+  decía que el trinquete estaba en **205** cuando el guion decía 191; la skill de cierre daba un run
+  de CI por **55-80 minutos** cuando la cifra medida era 42-53; y la guía hablaba de **«las 48
+  vistas»** en tres sitios cuando el árbol tiene **59** según la definición de vista del propio
+  proyecto. Ninguna se había notado, y `.claude/` **no estaba bajo ninguna puerta** — ni las pruebas
+  ni los guiones de `eng/` lo leían.
+
+  **Se midió antes de diseñar, y la medición descartó el diseño obvio.** Un barrido que buscara
+  números no puede funcionar: **«96» aparece 272 veces** en estos documentos y casi ninguna es el
+  listón. Y lo segundo pesa más: **la mayoría de los números de este repositorio son historia y NO
+  deben comprobarse** — el changelog y todo `docs/evidence/` son actas de lo que se midió aquel día,
+  así que «las 48 vistas» es **correcto ahí para siempre**. Sólo se leen los documentos que afirman
+  el presente.
+
+  **Así que una cifra se apunta sola**, con `<!--medido:clave-->` detrás, y la marca nombra su fuente.
+  Seis fuentes —el trinquete, los archivos en deuda, el trinquete del paseo, las vistas, los
+  identificadores de alcance y el listón—, deliberadamente pocas: una puerta que cubre lo que de
+  verdad se cita vale más que un sistema general que nadie mantiene.
+
+  **Y tiene dos suelos contra la ceguera, que es de lo que murió la vigilancia anterior.** Una clave
+  desconocida **falla** en vez de ignorarse, porque una errata apagaría la comprobación en silencio;
+  una fuente que nadie cita **también falla**, que es la regla que ya se aplica a los servicios
+  huérfanos; y si se encuentran menos de cuatro cifras marcadas, la prueba se declara ciega. Ese
+  último suelo se ganó el sueldo en el acto: las marcas se pusieron primero en la línea siguiente a
+  su número, el patrón las buscaba en la misma, y **encontró 1 de 9** — sin ese suelo habría pasado en
+  verde midiendo casi nada.
+
+  **Probada mordiendo**, no sólo pasando: falseadas a propósito las dos cifras que hoy estaban mal de
+  verdad, la puerta las nombró con documento, línea, lo dicho y lo medido.
+
 - **`eng/list-pending.ps1`: qué falta, leído de la matriz y no de la memoria de nadie.** La pregunta
   «¿qué queda antes de publicar?» no tenía respuesta consultable: cero incidencias en el
   repositorio, 65 filas repartidas en seis tablas de `FEATURES.md` con los dos idiomas dentro de

@@ -59,7 +59,8 @@ sobre dos píxeles de desalineación visible por medir el modelo en vez de la ti
 1. [docs/FEATURES.md](docs/FEATURES.md) — el registro **canónico** del alcance: qué existe, en qué
    estado y con qué evidencia. Si algo contradice esta guía, manda la matriz.
 
-   **Para «qué falta» no se lee a mano: `pwsh -NoProfile -File eng/list-pending.ps1`.** Son 65 filas
+   **Para «qué falta» no se lee a mano: `pwsh -NoProfile -File eng/list-pending.ps1`.** Son 65 <!--medido:identificadores-de-alcance-->
+   filas
    en seis tablas, con los dos idiomas dentro de cada celda y lo hecho mezclado con lo que no, y
    leerlas a ojo es cómo se pierden. El 2026-08-31 se perdieron **ocho de golpe** —`UX-007` entre
    ellas, que era justo la que se preguntaba— porque el patrón escrito a mano pedía tres mayúsculas
@@ -151,7 +152,7 @@ elección se equivoca hacia abajo con facilidad —tocar el shell rompió una ob
 | `Application.Tests` | casos de uso y puertos | ~ 1 s |
 | `ArchitectureTests` | las cinco reglas, red declarada, servicios huérfanos | ~ 2 s |
 | `DocumentationTests` | bilingüismo y matriz de alcance | < 1 s |
-| `UiTests` | AXAML, ViewModels, las 48 vistas | ~ 1 min |
+| `UiTests` | AXAML, ViewModels, las 59 vistas <!--medido:vistas--> | ~ 1 min |
 | `AccessibilityTests` | recorrido y paseo autónomo | ~ 5 min |
 | `IntegrationTests` | SQLite, sistema de archivos, TMDB | ~ 7 min |
 | `MediaTests` | LibVLC con vídeo real | ~ 7 min |
@@ -183,14 +184,16 @@ la decisión equivocada.
 `git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA ya
 resuelto.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** `eng/coverage-debt.txt` se copia del
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **189** <!--medido:archivos-en-deuda-->
+archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
 tiene: `WindowsAudioDeviceCatalog.cs` vale 79/61 aquí y 32/11 allí. Fuera de CI el trinquete informa
 y no bloquea. Nunca se edita a mano, y nunca se genera con una ejecución local.
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** desde
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** <!--medido:trinquete-de-deuda-->
+desde
 el 2026-08-31, cuando los dos ViewModels de Cursos salieron de la lista.
 
 **Y esta frase decía 205 mientras el guion decía 191**, durante toda una tanda: la cifra se copió a
@@ -283,14 +286,17 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    **el marcado no escribe el número**, no que el valor coincida: un token de 8 y un literal de 8
    pintan igual, así que comparar el valor aprueba justo lo que debía rechazar.
 7. **Cada vista lidera con el botón que se decidió, o con ninguno.** `LeadingActionTests` lleva una
-   tabla cerrada de las 48; **una vista que no esté en la tabla falla**, y `primary-action` se afirma
+   tabla cerrada de las 59 <!--medido:vistas-->; **una vista que no esté en la tabla falla**,
+   y `primary-action` se afirma
    como **la única** de su vista. Si tu vista es nueva, la decisión es tuya y hay que escribirla ahí.
 8. **Ningún control se dibuja fuera de la ventana más estrecha que la aplicación permite** (900, el
-   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 48, sin contexto de datos —lo
+   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 59 <!--medido:vistas-->, sin
+   contexto de datos —lo
    que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
    silencio suyo no es un certificado.
 9. **Un control nuevo llega con su escena de paseo en el mismo commit.** El trinquete de
-   `eng/check-walk-coverage.ps1` **sólo puede encoger**. Estuvo en 0 y **subió a 20 el 2026-08-25**,
+   `eng/check-walk-coverage.ps1` **sólo puede encoger**. Estuvo en 0 y **subió a 20** <!--medido:paseo-pendiente-->
+   el 2026-08-25,
    por el arnés y no por la aplicación: el hit test headless de Avalonia no sigue el desplazamiento
    de un `ScrollViewer`, y Ajustes creció de 949 a 1.797 px, así que veinte controles de
    `AppearanceSettingsView` caen fuera del primer viewport. Se probaron tres vías y las tres
