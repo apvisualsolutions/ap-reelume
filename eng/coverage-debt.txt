@@ -128,9 +128,10 @@
 ##   informe. El cambio se revirtio porque el bucle que la sustituye anade ocho ramas propias y
 ##   deja el archivo en 94, peor negocio que el techo.
 ##
-## Los otros cuatro SI son deuda perseguible y quedan nombrados aqui: CourseLessonReader 100/88,
-## CoursesViewModel 96/58, CourseDetailsViewModel 93/58. Sus ViewModels no tienen pruebas unitarias
-## propias -- los cubre el paseo autonomo a traves del shell ensamblado.
+## Los otros cuatro SI eran deuda perseguible, y DOS DE ELLOS YA SALIERON de esta lista el
+## 2026-08-31: CoursesViewModel llega a 100/97 y CourseDetailsViewModel a 100/96, con 21 pruebas
+## nuevas en UiTests. Su nota decia que no tenian pruebas unitarias propias y ya no es cierta. Queda
+## CourseLessonReader 100/88.
 ##
 ## Y la correccion de fondo queda nombrada, no hecha: si la puerta ignorase la cobertura de RAMAS
 ## de un .axaml -- no el archivo, cuyas lineas si miden algo -- saldrian 63 archivos de esta lista
@@ -234,9 +235,7 @@ src/ApSolutions.LocalMedia.Presentation/Catalog/TitleActionsView.axaml          
 src/ApSolutions.LocalMedia.Presentation/Catalog/WatchStatusControl.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Catalog/WatchStatusViewModel.cs                      100  70
 src/ApSolutions.LocalMedia.Presentation/Courses/CourseDetailsView.axaml                      100  50
-src/ApSolutions.LocalMedia.Presentation/Courses/CourseDetailsViewModel.cs                     93  58
 src/ApSolutions.LocalMedia.Presentation/Courses/CoursesView.axaml                            100  50
-src/ApSolutions.LocalMedia.Presentation/Courses/CoursesViewModel.cs                           96  58
 src/ApSolutions.LocalMedia.Presentation/Courses/LessonRowView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Home/ContinueCardView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Home/HomeView.axaml                                  100  50
