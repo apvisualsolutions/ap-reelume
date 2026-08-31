@@ -243,7 +243,7 @@ public sealed class MarkCourseViewModelTests
     }
 
     /// <summary>
-    /// «Marcarlas todas» through its command, which is what the button is wired to — the method
+    /// «Marcar todas» through its command, which is what the button is wired to — the method
     /// beneath it is already exercised, and a command nobody executes is a line nobody runs.
     /// </summary>
     [Fact]
@@ -322,7 +322,7 @@ public sealed class MarkCourseViewModelTests
     /// A button bound to a command asks <c>CanExecute</c> once and then waits to be told.
     /// </summary>
     /// <remarks>
-    /// This is the defect the autonomous walk found and no unit test had: «Marcarlas todas» is
+    /// This is the defect the autonomous walk found and no unit test had: «Marcar todas» is
     /// created while there are no neighbours, answers false, and without a raised event stays
     /// disabled for the whole life of the dialog — on screen, correct-looking, and unpressable. What
     /// is asserted is the <b>event</b>, because reading <c>CanExecute</c> straight off the model

@@ -314,7 +314,7 @@ public sealed class MarkCourseViewModel : INotifyPropertyChanged
     /// </summary>
     /// <remarks>
     /// A button bound to a command asks <c>CanExecute</c> once and then waits to be told. Without
-    /// this, «Marcarlas todas» is created while there are no neighbours, answers false, and stays
+    /// this, «Marcar todas» is created while there are no neighbours, answers false, and stays
     /// disabled for the whole life of the dialog — on screen, correct-looking, and unpressable. The
     /// autonomous walk is what found it: no unit test would have, because <c>CanExecute</c> read
     /// straight off the model gives the right answer every time.
