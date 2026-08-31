@@ -174,7 +174,7 @@ src/ApSolutions.LocalMedia.Application/Continuity/PlaybackProgressTracker.cs    
 src/ApSolutions.LocalMedia.Application/Continuity/ResumePlayback.cs                          100  87
 src/ApSolutions.LocalMedia.Application/Continuity/StartNextEpisodeCountdown.cs               100  89
 src/ApSolutions.LocalMedia.Application/Continuity/SwitchMediaVersion.cs                      100  80
-src/ApSolutions.LocalMedia.Application/Discovery/AddLibraryRoot.cs                           100  85
+src/ApSolutions.LocalMedia.Application/Discovery/AddLibraryRoot.cs                           100  92
 src/ApSolutions.LocalMedia.Application/Discovery/IRootWatcher.cs                              88 100
 src/ApSolutions.LocalMedia.Application/Discovery/ISafeFileRenamer.cs                          53 100
 src/ApSolutions.LocalMedia.Application/Discovery/ReconcileScanResults.cs                      95  83
@@ -258,7 +258,7 @@ src/ApSolutions.LocalMedia.Presentation/Home/InProgressRailView.axaml           
 src/ApSolutions.LocalMedia.Presentation/Home/RecentlyAddedRailView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsRailView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      96  95
-src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  78
+src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  83
 src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                      100  90
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
