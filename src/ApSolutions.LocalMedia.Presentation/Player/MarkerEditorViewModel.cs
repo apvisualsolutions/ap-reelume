@@ -50,7 +50,15 @@ public sealed class SkipMarkerViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task SkipAsync()
+    /// <summary>
+    /// Skips past the range under the playhead, if there is one and somebody is listening.
+    /// </summary>
+    /// <remarks>
+    /// Public so a test can await it, which is the shape the other models here already have
+    /// (<c>RootOnboardingViewModel.AddAsync</c>): a command hands back no task, so driving one from a
+    /// test means waiting on something else and hoping.
+    /// </remarks>
+    public async Task SkipAsync()
     {
         if (_active is not { } marker || _onSkip is not { } handler)
         {
@@ -72,7 +80,6 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
 {
     private readonly Func<MarkerKind, TimeSpan, TimeSpan, Guid?, Task<SaveManualMarkerResult>>? _onSave;
     private readonly Func<Guid, Task<bool>>? _onDelete;
-    private SeriesId _seriesId;
     private TimeSpan? _duration;
     private MarkerKind _selectedKind = MarkerKind.Intro;
     private double _startSeconds;
@@ -112,8 +119,6 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
     /// </summary>
     public bool IsEmpty => Markers.Count == 0;
 
-    public SeriesId SeriesId => _seriesId;
-
     public MarkerKind SelectedKind
     {
         get => _selectedKind;
@@ -144,11 +149,16 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
     /// <summary>True when the last attempt was refused because another range of the same kind was there.</summary>
     public bool HasOverlapError => _hasOverlapError;
 
-    /// <summary>Shows the ranges of one series; changing series replaces the list entirely.</summary>
-    public void Load(SeriesId seriesId, IReadOnlyList<IntroMarker> markers, TimeSpan? duration)
+    /// <summary>Shows a set of ranges; loading again replaces the list entirely.</summary>
+    /// <remarks>
+    /// It took a <c>SeriesId</c> until 2026-08-31 and did nothing with it beyond keeping it in a
+    /// property nothing read — no view bound to it, no test asserted it, and the save handler carries
+    /// its own series. That is this repository's characteristic defect in its quietest shape, and the
+    /// only trace it left was one uncoverable line dragging the file's own coverage down.
+    /// </remarks>
+    public void Load(IReadOnlyList<IntroMarker> markers, TimeSpan? duration)
     {
         ArgumentNullException.ThrowIfNull(markers);
-        _seriesId = seriesId;
         _duration = duration;
         Markers.Clear();
         foreach (var marker in markers)
@@ -158,10 +168,10 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
 
         SelectedMarker = null;
         ClearErrors();
-        OnPropertyChanged(nameof(SeriesId));
     }
 
-    private async Task SaveAsync()
+    /// <summary>Saves the range being edited, or does nothing where no handler was wired.</summary>
+    public async Task SaveAsync()
     {
         if (_onSave is not { } handler)
         {
@@ -192,7 +202,8 @@ public sealed class MarkerEditorViewModel : INotifyPropertyChanged
         RaiseErrors();
     }
 
-    private async Task DeleteAsync()
+    /// <summary>Deletes the selected range, if one is selected and a handler was wired.</summary>
+    public async Task DeleteAsync()
     {
         if (_onDelete is not { } handler || SelectedMarker is not { } marker)
         {

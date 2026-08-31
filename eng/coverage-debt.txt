@@ -43,6 +43,23 @@
 ## takes every time. If it ever moves again, the question is which branch went back to being taken
 ## by accident -- not what tolerance the gate should grow.
 ##
+## 2026-08-31, later the same day: MarkerEditorViewModel LEFT THIS LIST at 100/100, so the ratchet
+## goes 189 -> 188. The dance was already over -- the walk-only branches were fixed that morning --
+## and this is the answer to what was left: the file sat at 95/84 with seven branches nothing
+## deterministic took, and none of them was the walk's. Measured before writing anything, by reading
+## UiTests and AccessibilityTests apart: ZERO branches were taken by the walk and not by UiTests.
+##
+## The seven were four guards that answer "there is nothing to do" -- a skip with no active range, a
+## skip with no handler, a save with no handler, a delete with nothing selected -- one notification
+## with no listener, and the search arm that walks PAST a row before finding the one it wants, which
+## every other test avoided by deleting a list's only marker. All are states the application really
+## reaches, and all now have a test.
+##
+## An eighth line could not be covered at all: SeriesId, a public property nothing read -- no view
+## bound to it, no test asserted it, and the save handler carries its own series. Load took a
+## SeriesId it did nothing with. Removed, along with the parameter: this repository's characteristic
+## defect leaves exactly that trace, one uncoverable line pulling a file's own figure down.
+##
 ## 2026-08-28: this list is now checked for being COMPLETE, not only for being accurate.
 ##
 ## Until that day the gate iterated over the names written here and over nothing else, so a file that
@@ -285,7 +302,6 @@ src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml   
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileViewModel.cs                          97  82
 src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorView.axaml                        100  50
-src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorViewModel.cs                       95  84
 src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerChromeView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerWindow.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/NextEpisodeOverlay.axaml                      100  50

@@ -103,7 +103,27 @@
 > Los dos archivos de audio que aquí leen más alto salen **en un bloque aparte**, no ocultos: un aviso
 > que suena cuando no toca enseña a ignorar el aviso.
 >
-> ### `.flv`, y el ciclo de empaquetado que llevaba varias sesiones aplazado
+> ### El archivo que bailaba: 100/100, y la puerta no necesitaba nada
+>
+> **El defecto está cerrado, y ni la oscilación ni su causa supuesta eran lo que quedaba.** La
+> hipótesis era que a `MarkerEditorViewModel` le quedaban ramas que **sólo alcanza el paseo**. Se midió
+> antes de escribir nada, leyendo `UiTests` y `AccessibilityTests` **por separado** y comparando rama a
+> rama: **cero**. La oscilación ya la había resuelto la corrección de esa misma mañana.
+>
+> Lo que quedaba eran **siete ramas que no tomaba nada determinista**: cuatro guardas de «aquí no hay
+> nada que hacer», una notificación sin nadie escuchando, y el brazo de la búsqueda que **pasa de
+> largo** por una fila —que las demás pruebas esquivaban borrando el único marcador de la lista—. Y
+> una octava línea **imposible de cubrir**: `SeriesId`, una propiedad pública que no leía nadie, con
+> `Load` recibiendo un dato que no usaba. Fuera campo y parámetro.
+>
+> **44 de 44 ramas, ninguna línea sin ejecutar.** El archivo sale de `eng/coverage-debt.txt`, el
+> trinquete baja **189 → 188**, y las dos cifras de `CLAUDE.md` van en el mismo commit — que es la
+> regla que esta misma tanda escribió. **`QuotedFigureTests` las cazó desactualizadas**, que es
+> exactamente para lo que se creó.
+>
+> **Y así se ve la regla nueva funcionando**: `eng/preview-coverage-floors.ps1` dijo `95/84 -> 100/100`
+> antes de empujar, así que el suelo entra con el trabajo en vez de en una segunda vuelta.
+>> ### `.flv`, y el ciclo de empaquetado que llevaba varias sesiones aplazado
 >
 > **Ejecutado.** Era la única extensión de vídeo que la aplicación no reconocía de las dos raíces de
 > cursos del propietario —10 archivos, un curso entero invisible—. Va **al final** de la lista, no en

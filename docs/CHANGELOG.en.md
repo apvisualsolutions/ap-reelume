@@ -10,6 +10,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The file that danced reaches 100/100, and the gate needed no tolerance band at all.** The open
+  defect said `eng/check-coverage.ps1` cannot handle a file whose measurement oscillates, and proposed
+  deciding the gate's shape if the oscillation turned out to be inherent. **It was not, and the
+  starting hypothesis did not hold either.**
+
+  The hypothesis was that `MarkerEditorViewModel` still had branches **only the autonomous walk
+  reaches** — it presses with a real mouse and arrives at that state some runs and not others — like
+  the three fixed that same morning. It was measured before anything was written, by reading `UiTests`
+  and `AccessibilityTests` **apart** and comparing branch by branch: **zero**. No branch of the file
+  depended on the walk. The oscillation had been settled by the previous fix.
+
+  What was left was something else: **seven branches nothing deterministic took**. Four guards that
+  answer "there is nothing to do here" — skipping with no range under the playhead, skipping with no
+  handler, saving with no handler, deleting with nothing selected — one notification **with nobody
+  listening**, and the search arm that **walks past** a row before finding its own, which every other
+  test avoided by deleting a list's only marker. All six states really happen, and each now has a test.
+
+  **And an eighth line could not be covered at all**: `SeriesId`, a public property **nothing read** —
+  no view bound to it, no test asserted it, and the save handler carries its own series. `Load` took a
+  `SeriesId` and did nothing with it. Both are gone, field and parameter: this repository's
+  characteristic defect leaves exactly that trace, one uncoverable line dragging a whole file's figure
+  down.
+
+  **Measured result: 44 of 44 branches and no unexecuted line.** The file leaves
+  `eng/coverage-debt.txt` and the ratchet drops **189 → 188**. The three methods the tests need to
+  await become public, which is the shape the other models in this tree already have: a command hands
+  back no task, so driving one from a test means waiting on something else and hoping.
+
 - **"Raising coverage costs two CI rounds" was an excuse dressed as a rule, and a script now replaces
   it.** `CLAUDE.md` said it, the closing skill repeated it, and this very batch acted on it: it
   measured a file at **83.33 %** of branches, CI answered **83**, and the number went into a handover

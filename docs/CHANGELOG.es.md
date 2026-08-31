@@ -10,6 +10,35 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El archivo que bailaba llega a 100/100, y la puerta no necesitaba ninguna banda de tolerancia.**
+  El defecto abierto decía que `eng/check-coverage.ps1` no sabe tratar un archivo cuya medición
+  oscila, y proponía decidir la forma de la puerta si la oscilación resultaba inherente. **No lo era,
+  y la hipótesis de partida tampoco se sostuvo.**
+
+  La hipótesis era que a `MarkerEditorViewModel` le quedaban ramas que **sólo alcanza el paseo
+  autónomo** —que pulsa con un ratón real y llega a ese estado unos runs sí y otros no—, como las tres
+  que se corrigieron esa misma mañana. Se midió antes de escribir nada, leyendo `UiTests` y
+  `AccessibilityTests` **por separado** y comparando rama a rama: **cero**. Ninguna rama del archivo
+  dependía del paseo. La oscilación estaba resuelta desde la corrección anterior.
+
+  Lo que quedaba era otra cosa: **siete ramas que no tomaba nada determinista**. Cuatro guardas que
+  contestan «aquí no hay nada que hacer» —saltar sin rango bajo el cursor, saltar sin manejador,
+  guardar sin manejador, borrar sin nada seleccionado—, una notificación **sin nadie escuchando**, y
+  el brazo de la búsqueda que **pasa de largo** por una fila antes de encontrar la suya, que las demás
+  pruebas esquivaban borrando el único marcador de la lista. Los seis estados ocurren de verdad, y
+  ahora hay una prueba por cada uno.
+
+  **Y una octava línea no se podía cubrir de ninguna manera**: `SeriesId`, una propiedad pública que
+  **no leía nadie** —ninguna vista la enlazaba, ninguna prueba la afirmaba, y el manejador de guardado
+  lleva su propia serie—. `Load` recibía un `SeriesId` y no hacía nada con él. Fuera los dos, campo y
+  parámetro: el defecto característico de esta casa deja exactamente ese rastro, una línea imposible
+  de cubrir tirando hacia abajo de la cifra del archivo entero.
+
+  **Resultado medido: 44 de 44 ramas y ninguna línea sin ejecutar.** El archivo sale de
+  `eng/coverage-debt.txt` y el trinquete baja **189 → 188**. Los tres métodos que las pruebas
+  necesitan esperar pasan a públicos, que es la forma que ya tienen los otros modelos de este árbol:
+  un comando no devuelve tarea, así que dirigirlo desde una prueba es esperar otra cosa y confiar.
+
 - **«Subir cobertura cuesta dos vueltas de CI» era una excusa disfrazada de regla, y ahora hay un
   guion que la sustituye.** Lo decía `CLAUDE.md`, lo repetía la skill de cierre, y esta misma tanda
   actuó en consecuencia: midió un archivo en **83,33 %** de ramas, CI contestó **83**, y el número se

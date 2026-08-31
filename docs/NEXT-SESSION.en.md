@@ -103,7 +103,26 @@
 > The two audio files that read higher here are reported **in a separate block**, not hidden: a
 > warning that fires when it should not teaches people to ignore the warning.
 >
-> ### `.flv`, and the packaging cycle deferred for several sessions
+> ### The file that danced: 100/100, and the gate needed nothing
+>
+> **The defect is closed, and neither the oscillation nor its assumed cause was what remained.** The
+> hypothesis was that `MarkerEditorViewModel` still had branches **only the walk reaches**. It was
+> measured before anything was written, reading `UiTests` and `AccessibilityTests` **apart** and
+> comparing branch by branch: **zero**. The oscillation had already been settled that morning.
+>
+> What remained were **seven branches nothing deterministic took**: four "nothing to do here" guards,
+> one notification with nobody listening, and the search arm that **walks past** a row — which every
+> other test avoided by deleting a list's only marker. And an eighth line **impossible to cover**:
+> `SeriesId`, a public property nothing read, with `Load` taking a value it never used. Field and
+> parameter both gone.
+>
+> **44 of 44 branches, no unexecuted line.** The file leaves `eng/coverage-debt.txt`, the ratchet drops
+> **189 → 188**, and both figures in `CLAUDE.md` go in the same commit — the rule this same batch
+> wrote. **`QuotedFigureTests` caught them stale**, which is exactly what it was created for.
+>
+> **And that is the new rule working**: `eng/preview-coverage-floors.ps1` said `95/84 -> 100/100`
+> before pushing, so the floor lands with the work instead of in a second round.
+>> ### `.flv`, and the packaging cycle deferred for several sessions
 >
 > **Done.** It was the only video extension the application did not recognise across the owner's two
 > course roots — 10 files, one whole course invisible. It goes **at the end** of the list rather than

@@ -129,8 +129,15 @@ escrita de no hacerlo. Está en la
 [hoja de ruta](docs/roadmap/README.es.md) con sus dos bloqueos duros: `PRD-003` pide una máquina
 ARM64 que no hay, y `PRD-002` pide el certificado comercial de firma.
 
-`package-arm64.ps1` existe y **no se usa**: PRD-003 está BLOCKED por hardware. Tocar el manifiesto
-caduca dos mediciones del sandbox, así que después toca rehacer su ciclo.
+`package-arm64.ps1` **no produce nada publicable**: PRD-003 está BLOCKED por hardware y su matriz
+contesta «6 de 6 fases no pasadas» sobre un anfitrión x64. **Pero sí hay que correrlo al tocar el
+manifiesto**, porque `Arm64PackageTests` compara el manifiesto empaquetado con el fuente: el
+2026-08-31 ese artefacto llevaba nueve días caducado —era del 22 de agosto y el color de fondo cambió
+el 24— y daba un rojo local que nadie perseguía.
+
+Tocar el manifiesto caduca además dos mediciones del sandbox, así que después toca rehacer su ciclo.
+**Los informes se comparan con los archivados antes de sustituirlos**: lo caducado es la huella, no
+necesariamente la medición, y una diferencia inesperada ahí es un hallazgo.
 
 **Una sola prueba**, que es lo que se quiere mientras se persigue un rojo — segundos en vez de
 minutos:
@@ -189,7 +196,7 @@ la decisión equivocada.
 `git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA ya
 resuelto.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **189** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **188** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -197,9 +204,10 @@ tiene: `WindowsAudioDeviceCatalog.cs` vale 79/61 aquí y 32/11 allí. Fuera de C
 y no bloquea. Nunca se edita a mano, y nunca se genera con una ejecución local.
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **188** <!--medido:trinquete-de-deuda-->
 desde
-el 2026-08-31, cuando los dos ViewModels de Cursos salieron de la lista.
+el 2026-08-31: bajó a 189 cuando los dos ViewModels de Cursos salieron de la lista, y a 188 ese mismo
+día cuando `MarkerEditorViewModel` llegó a 100/100 y salió también.
 
 **Y esta frase decía 205 mientras el guion decía 191**, durante toda una tanda: la cifra se copió a
 mano y nadie la volvió a mirar, que es el mismo defecto que el propio párrafo describe. **La única

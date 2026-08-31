@@ -1086,7 +1086,7 @@ public static partial class CompositionRoot
                 .GetForFileAsync(mediaFileId, CancellationToken.None)
                 .ConfigureAwait(true);
             sessionMarkers = SegmentDetectionPolicy.ComposeForFile(manual, detected);
-            markers?.Load(seriesId, manual, file.TechnicalMetadata.Duration);
+            markers?.Load(manual, file.TechnicalMetadata.Duration);
         }
 
         // The overlay's buttons reach the countdown that is actually running: "play now" skips the
@@ -1351,7 +1351,7 @@ public static partial class CompositionRoot
                 await RefreshSessionMarkersAsync().ConfigureAwait(true);
                 return deleted;
             });
-        markers.Load(seriesId, manualMarkers, file.TechnicalMetadata.Duration);
+        markers.Load(manualMarkers, file.TechnicalMetadata.Duration);
 
         // The review surface shows what detection found in this very episode, and a person's
         // accept, adjust, or delete goes straight through the use case that locks it.
