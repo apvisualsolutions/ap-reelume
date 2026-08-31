@@ -8,6 +8,41 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Added
+
+- **`eng/list-pending.ps1`: what is left, read from the matrix rather than from anybody's memory.**
+  "What is still open before we publish?" had no answer you could look up: zero issues on the
+  repository, 65 rows across six tables of `FEATURES.md` with both languages inside every cell, and
+  5,900 lines of narrative handover. There is now a command, and it answers **15 open of 65**,
+  grouped by release and separating the eleven that are work from the four that are standing
+  decisions.
+
+  **It is not a second record, so it cannot drift**: it keeps no list of its own, reads the statuses
+  and releases from the document's **own two legend tables** — a label added to the legend works the
+  day it is added, and one used without being declared is an error it reports rather than absorbs —
+  and every fact it prints comes from the row it prints it for.
+
+  **What it really had to do was not go quiet.** The same list had been produced by hand with a
+  pattern asking for three capitals, and `UX` has two: **eight rows vanished with no error at all**,
+  including `UX-007`, which was exactly the one being asked about. So the script counts the rows by
+  **two independent routes** and requires them to agree, validates every identifier, status and
+  release against the legends, and **refuses to print** rather than print a shorter list when it
+  meets a row it does not understand.
+
+  **And it found three real defects on its first day, two of them in the matrix**: a **blank line in
+  the middle** of the library table, splitting it in two and leaving `LIB-016` and `LIB-017` outside
+  it — they render wrong on GitHub too; the release label `Post-MVP`, used by five rows and **never
+  declared** in the legend; and a pattern that dropped `A11Y-001` and `A11Y-002` for having digits in
+  their prefix. That last one explained a discrepancy that had been in plain sight: the documentation
+  gate counted 65 identifiers and every hand count came to 63.
+
+  **The third defect was the script's own, and it is written inside it.** Its `-Target` parameter and
+  the per-row `$target` variable **are the same variable**, because PowerShell variable names are
+  case-insensitive. By the end of the loop the parameter held the last row's release, and the "only
+  this release" filter ran with nobody asking for it: **the list came out with 3 entries instead of
+  15, with no error at all**. Precisely the failure the file exists to prevent, committed by the
+  file. The variable was renamed and the reason left in the comment, because this comes back.
+
 ### Fixed
 
 - **The two Courses ViewModels arrived without a single test, and they were all that stood between

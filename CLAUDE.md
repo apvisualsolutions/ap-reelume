@@ -58,6 +58,16 @@ sobre dos píxeles de desalineación visible por medir el modelo en vez de la ti
 
 1. [docs/FEATURES.md](docs/FEATURES.md) — el registro **canónico** del alcance: qué existe, en qué
    estado y con qué evidencia. Si algo contradice esta guía, manda la matriz.
+
+   **Para «qué falta» no se lee a mano: `pwsh -NoProfile -File eng/list-pending.ps1`.** Son 65 filas
+   en seis tablas, con los dos idiomas dentro de cada celda y lo hecho mezclado con lo que no, y
+   leerlas a ojo es cómo se pierden. El 2026-08-31 se perdieron **ocho de golpe** —`UX-007` entre
+   ellas, que era justo la que se preguntaba— porque el patrón escrito a mano pedía tres mayúsculas
+   y `UX` tiene dos. El guion **no es un segundo registro**: no guarda lista propia, así que no
+   puede desviarse de la matriz. Y **no puede callar**: lee los estados y las versiones de las dos
+   leyendas del propio documento, cuenta las filas por dos caminos distintos y exige que cuadren, y
+   ante cualquier fila que no entienda **se niega a imprimir** en vez de imprimir una lista más
+   corta. Acepta `-Target MVP` y `-Json`.
 2. [docs/NEXT-SESSION.es.md](docs/NEXT-SESSION.es.md) — dónde se retomó por última vez.
 3. [CONTRIBUTING.md](CONTRIBUTING.md) — el ciclo de trabajo, que no es opcional.
 4. [docs/legal/LEGAL.es.md](docs/legal/LEGAL.es.md) — lo que está resuelto y lo que sigue abierto.

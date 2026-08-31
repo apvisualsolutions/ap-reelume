@@ -8,6 +8,42 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Añadido
+
+- **`eng/list-pending.ps1`: qué falta, leído de la matriz y no de la memoria de nadie.** La pregunta
+  «¿qué queda antes de publicar?» no tenía respuesta consultable: cero incidencias en el
+  repositorio, 65 filas repartidas en seis tablas de `FEATURES.md` con los dos idiomas dentro de
+  cada celda, y 5.900 líneas de relevo narrativo. Ahora hay un comando, y contesta **15 abiertas de
+  65**, agrupadas por versión y separando las once que son trabajo de las cuatro que son decisiones
+  en pie.
+
+  **No es un segundo registro y por eso no puede desviarse**: no guarda lista propia, lee los
+  estados y las versiones de las **dos leyendas del propio documento** —una etiqueta añadida a la
+  leyenda funciona el día que se añade, y una usada sin declarar es un error que se reporta en vez
+  de absorberse— y cada dato que imprime sale de la fila que lo imprime.
+
+  **Lo que de verdad tenía que hacer era no callarse.** La lista se había producido antes a mano con
+  un patrón que pedía tres mayúsculas, y `UX` tiene dos: **ocho filas desaparecieron sin un solo
+  error**, incluida `UX-007`, que era exactamente la que se estaba preguntando. Así que el guion
+  cuenta las filas por **dos caminos independientes** y exige que cuadren, valida cada identificador,
+  estado y versión contra las leyendas, y ante cualquier fila que no entienda **se niega a imprimir**
+  en lugar de imprimir una lista más corta.
+
+  **Y encontró tres defectos reales el primer día, dos de ellos en la matriz**: una **línea en blanco
+  en mitad** de la tabla de biblioteca, que la partía en dos y dejaba `LIB-016` y `LIB-017` fuera de
+  la tabla —se renderizan mal también en GitHub—; la versión `Post-MVP`, usada por cinco filas y
+  **nunca declarada** en la leyenda; y un patrón que descartaba `A11Y-001` y `A11Y-002` por llevar
+  dígitos en el prefijo. Ese último explicaba una discrepancia que llevaba tiempo a la vista: la
+  puerta de documentación contaba 65 identificadores y cualquier recuento a mano daba 63.
+
+  **El tercer defecto era del propio guion, y es el que va escrito dentro de él.** Su parámetro
+  `-Target` y la variable `$target` de cada fila **son la misma variable**, porque PowerShell no
+  distingue mayúsculas en los nombres. Al terminar el bucle el parámetro contenía la versión de la
+  última fila leída, y el filtro «sólo esta versión» se aplicaba sin que nadie lo pidiera: **la lista
+  salía con 3 entradas en vez de 15, sin un solo error**. Exactamente el fallo que el archivo existe
+  para impedir, cometido por el archivo. La variable se renombró y el motivo quedó en el comentario,
+  porque esto vuelve.
+
 ### Corregido
 
 - **Los dos ViewModels de Cursos entraron sin una sola prueba, y son lo único que le quedaba a `main`
