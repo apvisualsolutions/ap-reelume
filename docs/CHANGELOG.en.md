@@ -37,6 +37,46 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **«Course (folder of lessons)»: the option that was missing to declare a course (CRS-001).**
+  Everything else about Courses was built and unusable, because **nothing let anybody say "this
+  folder is a course"**. The add dialog gains its second half, and with it `MarkCoursesInRoot` and
+  `ICourseRootDeclarationStore` come back to the container — out since `ServiceConsumptionTests`
+  refused them for having nobody to resolve them. The refusal was right, and they now have a consumer.
+
+  **The depth is pointed at rather than typed**, which is `ADR-0006`'s amendment 1: **one** course
+  folder is pointed at and `CourseRootDeclarationPolicy` derives the level from that gesture. If the
+  folder already sits inside a catalogued root, that root is the one declared and the level is its
+  relative depth; if it does not, the **parent** becomes a root and the level is 1. A root added this
+  way is `Manual` and never on startup, because the dialog's own help promises the rest of the drive
+  is not scanned.
+
+  **The neighbours are asked about, not claimed.** At the derived depth there are usually folders
+  nobody has said anything about, so the pointed-at one is marked and the rest are counted: «We have
+  found {0} more folders. Are they all courses?». The sentence is the owner's and asks about the
+  **fact** — the one thing the program cannot know — rather than about the action. Saying yes is a
+  second pass that **re-reads the root** instead of trusting what the first one counted.
+
+  **The notice carries a course's shape as a tree in the monospaced face**, the owner's call: no
+  binary to keep, nothing to translate twice, and it scales with the type. It is written with `&#10;`
+  and that was **measured** rather than assumed — the Avalonia MCP has no `TextBlock` page, and "no
+  results" is a fact too: it reaches the surface as **six lines** in both languages.
+
+  **And a gate found what reading did not.** `ViewHeightTests` measured the dialog at **640 px**
+  against a window whose minimum is **600**: the bottom of the panel was content nobody could reach.
+  It drops to **560** and its content scrolls inside it rather than the panel scrolling inside the
+  shell, because a centred child of a `ScrollViewer` stops being centred.
+
+  The dialog has **one action** and not two: two buttons wearing `primary-action` is a screen that has
+  not decided what it is for, and `LeadingActionTests` refuses it. What it says and what it does both
+  follow the chosen pill.
+
+  **And the autonomous walk found a defect no unit test could see.** «Mark them all» is created while
+  there are no neighbours yet, answers that it cannot execute, and **stays disabled for the whole life
+  of the dialog**: on screen, looking exactly right, and unpressable. A button bound to a command asks
+  `CanExecute` **once** and then waits to be told, and nothing was telling it. Reading `CanExecute`
+  off the model gives the right answer whether or not anybody was told, so what is asserted now is
+  **the event**.
+
 - **Three figures in the guide were false on the same day, and there is now a gate that measures
   them.** `CLAUDE.md` said the ratchet stood at **205** while the script said 191; the closing skill
   put a CI run at **55-80 minutes** when the measured figure was 42-53; and the guide spoke of **"las

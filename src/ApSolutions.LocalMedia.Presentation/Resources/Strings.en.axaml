@@ -737,4 +737,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AddCourseHelp">A course is a folder of numbered videos that you study in order. Lessons take the file-name order, subfolders become modules, and progress is kept per lesson. Nothing is copied, moved, or renamed — and it is NOT a scan root.</x:String>
   <x:String x:Key="AddCourseConfirmAction">Mark as course</x:String>
   <x:String x:Key="AddCourseDoneNotice">Folder marked as a course. Lessons take the file-name order and progress is kept per lesson. Nothing was copied.</x:String>
+  <!-- CRS-001, the dialog that consumes the five above. AddCourseNeighboursQuestionFormat is the
+       owner's own sentence, written on 2026-08-31: it asks about the fact and not about the action,
+       which is the signal ADR-0006 decision 2 says belongs to the user. Do not reword it.
+       AddCourseShape is a tree in the monospaced face rather than a picture — the owner's call, and
+       there is no binary to keep, nothing to translate twice, and it scales with the type. -->
+  <x:String x:Key="AddAsLabel">Catalogue as</x:String>
+  <x:String x:Key="AddAsRootOption">Media root</x:String>
+  <x:String x:Key="AddCourseShapeLabel">What a course looks like</x:String>
+  <x:String x:Key="AddCourseShape">Compositing course&#10;├─ 01 - Module one&#10;│  ├─ 01 - Intro.mp4&#10;│  └─ 02 - The node.mp4&#10;└─ 02 - Module two&#10;   └─ 01 - Masks.mp4</x:String>
+  <x:String x:Key="AddCourseNeighboursQuestionFormat">We have found {0} more folders. Are they all courses?</x:String>
+  <x:String x:Key="AddCourseNeighboursConfirmAction">Mark them all</x:String>
+  <x:String x:Key="AddCourseNeighboursDeclineAction">Only this one</x:String>
+  <x:String x:Key="AddCourseInvalidFolder">Point at a course folder: not a whole drive, and not a folder that is already a library root.</x:String>
+  <x:String x:Key="AddCourseNoVideoFound">That folder holds no video this application recognises. A course needs at least one lesson.</x:String>
 </ResourceDictionary>

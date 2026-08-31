@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Common;
 using ApSolutions.LocalMedia.Domain.Courses;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.Application.Tests.Courses;
@@ -190,6 +191,65 @@ public sealed class MarkCoursesInRootTests
                 TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// Pointing at one folder declares the depth for the whole root, and at that depth there are
+    /// usually neighbours nobody has said anything about. ADR-0006 amendment 1 has the application
+    /// ask rather than claim them, so this pass marks the one that was named and hands the rest
+    /// back to be counted into «Hemos encontrado {0} carpetas más».
+    /// </summary>
+    [Fact]
+    public async Task Only_the_folder_that_was_pointed_at_is_marked_and_the_others_are_named()
+    {
+        var world = new World(
+            @"D:\Cursos\Composición\01 - Intro.mp4",
+            @"D:\Cursos\Modelado\01 - Intro.mp4",
+            @"D:\Cursos\Render\01 - Intro.mp4");
+
+        var result = await world.ExecuteAsync(1, "Composición");
+
+        Assert.Equal(["Composición"], result.Marked.Select(course => course.RelativePath));
+        Assert.Equal(["Modelado", "Render"], result.Others.Order());
+        Assert.Single(world.Courses.Saved);
+
+        // The depth is the root's, so it is written down even though only one folder was claimed.
+        Assert.Equal(1, world.Declarations.Depth);
+    }
+
+    /// <summary>
+    /// "Yes, they are all courses" comes back as a pass with no filter at all: everything detected
+    /// is marked and there is nothing left over to ask about a second time.
+    /// </summary>
+    [Fact]
+    public async Task An_unfiltered_pass_marks_every_folder_at_the_depth_and_leaves_nothing_over()
+    {
+        var world = new World(
+            @"D:\Cursos\Composición\01 - Intro.mp4",
+            @"D:\Cursos\Modelado\01 - Intro.mp4");
+
+        var result = await world.UseCase.ExecuteAsync(
+            new MarkCoursesInRootCommand(RootId, 1),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(["Composición", "Modelado"], result.Marked.Select(course => course.RelativePath).Order());
+        Assert.Empty(result.Others);
+    }
+
+    /// <summary>
+    /// The filter is compared against what detection found rather than trusted as given: a folder
+    /// nobody detected is not a course this pass can mark, whoever named it.
+    /// </summary>
+    [Fact]
+    public async Task A_named_folder_detection_never_found_marks_nothing()
+    {
+        var world = new World(@"D:\Cursos\Composición\01 - Intro.mp4");
+
+        var result = await world.ExecuteAsync(1, "Inventada");
+
+        Assert.Empty(result.Marked);
+        Assert.Equal(["Composición"], result.Others);
+        Assert.Empty(world.Courses.Saved);
+    }
+
     private sealed class World
     {
         public World(params string[] files)
@@ -224,9 +284,14 @@ public sealed class MarkCoursesInRootTests
             init => Roots.Path = value;
         }
 
-        public Task<IReadOnlyList<MarkedCourse>> ExecuteAsync(int courseDepth) =>
-            UseCase.ExecuteAsync(
+        public async Task<IReadOnlyList<MarkedCourse>> ExecuteAsync(int courseDepth) =>
+            (await UseCase.ExecuteAsync(
                 new MarkCoursesInRootCommand(RootId, courseDepth),
+                TestContext.Current.CancellationToken)).Marked;
+
+        public Task<MarkedCourses> ExecuteAsync(int courseDepth, params string[] onlyRelativePaths) =>
+            UseCase.ExecuteAsync(
+                new MarkCoursesInRootCommand(RootId, courseDepth, OnlyRelativePaths: onlyRelativePaths),
                 TestContext.Current.CancellationToken);
     }
 
@@ -251,183 +316,5 @@ public sealed class MarkCoursesInRootTests
             LibraryRootId id,
             bool preserveCatalog = true,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
-    }
-
-    private sealed class StubDeclarations : ICourseRootDeclarationStore
-    {
-        public int? Depth { get; private set; }
-
-        public Task DeclareAsync(
-            LibraryRootId rootId,
-            int? courseDepth,
-            CancellationToken cancellationToken = default)
-        {
-            Depth = courseDepth;
-            return Task.CompletedTask;
-        }
-
-        public Task<int?> GetCourseDepthAsync(
-            LibraryRootId rootId,
-            CancellationToken cancellationToken = default) => Task.FromResult(Depth);
-    }
-
-    /// <summary>Keeps what was saved, and upserts on the folder the way the real store does.</summary>
-    private sealed class StubCourses : ICourseRepository
-    {
-        private readonly Dictionary<string, CourseId> _idsByPath = new(StringComparer.OrdinalIgnoreCase);
-
-        public Dictionary<CourseId, IReadOnlyList<Lesson>> Saved { get; } = [];
-
-        public Task<CourseId> SaveAsync(
-            Course course,
-            IReadOnlyList<Lesson> lessons,
-            CancellationToken cancellationToken = default)
-        {
-            if (!_idsByPath.TryGetValue(course.RelativePath, out var id))
-            {
-                id = course.Id;
-                _idsByPath.Add(course.RelativePath, id);
-            }
-
-            Saved[id] = lessons;
-            return Task.FromResult(id);
-        }
-
-        public Task<IReadOnlyList<Course>> ListAsync(CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<Course?> GetAsync(CourseId id, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task<IReadOnlyList<Lesson>> ListLessonsAsync(
-            CourseId courseId,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task RemoveAsync(CourseId id, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task TouchAsync(
-            CourseId id,
-            DateTimeOffset openedAtUtc,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-    }
-
-    /// <summary>Hands the files back one batch at a time, the way the real enumerator does.</summary>
-    private sealed class StubEnumerator(string[] files) : IMediaFileEnumerator
-    {
-        public List<string> Failing { get; } = [];
-
-        public async IAsyncEnumerable<IReadOnlyList<EnumeratedFile>> EnumerateBatchesAsync(
-            LibraryRoot root,
-            string? afterPath,
-            int batchSize,
-            [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
-        {
-            await Task.Yield();
-            yield return [.. files.Select(path => new EnumeratedFile(path, 1, default))];
-            yield return [.. Failing.Select(path => new EnumeratedFile(path, 0, default, "IoError"))];
-        }
-    }
-
-    private sealed class StubMediaFiles : IMediaFileRepository
-    {
-        private readonly Dictionary<string, MediaFile> _byPath = new(StringComparer.OrdinalIgnoreCase);
-
-        public MediaFileId Add(string path)
-        {
-            var id = new MediaFileId(Guid.NewGuid());
-            _byPath[path] = new MediaFile(
-                id,
-                RootId,
-                path,
-                1,
-                default,
-                new TechnicalMetadata(null, string.Empty, [], [], null, null));
-            return id;
-        }
-
-        public Task<IReadOnlyDictionary<string, MediaFile>> FindByPathsAsync(
-            LibraryRootId rootId,
-            IReadOnlyCollection<string> paths,
-            CancellationToken cancellationToken = default)
-        {
-            IReadOnlyDictionary<string, MediaFile> found = paths
-                .Where(_byPath.ContainsKey)
-                .ToDictionary(path => path, path => _byPath[path], StringComparer.OrdinalIgnoreCase);
-            return Task.FromResult(found);
-        }
-
-        public Task<MediaFile?> FindByPathAsync(
-            LibraryRootId rootId,
-            string path,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task<MediaFile?> FindByIdAsync(MediaFileId id, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task UpsertAsync(MediaFile mediaFile, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task UpsertBatchAsync(
-            IReadOnlyCollection<MediaFile> mediaFiles,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task<IdentifiedMediaFile?> FindByStableIdentityAsync(
-            FileIdentity identity,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task<IReadOnlyList<IdentifiedMediaFile>> FindByFingerprintAsync(
-            string fingerprint,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task SaveIdentityAsync(
-            MediaFileId mediaFileId,
-            FileIdentity identity,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task<FileIdentity?> GetIdentityAsync(
-            MediaFileId mediaFileId,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task RemoveAsync(MediaFileId mediaFileId, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
-
-        public Task ReassignAsync(
-            MediaFileId mediaFileId,
-            LibraryRootId libraryRootId,
-            string newPath,
-            FileIdentity identity,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task SetRootAvailabilityAsync(
-            LibraryRootId libraryRootId,
-            bool isAvailable,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task<string?> GetScanCheckpointAsync(
-            LibraryRootId rootId,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task SaveScanCheckpointAsync(
-            LibraryRootId rootId,
-            string resumeAfterPath,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task ClearScanCheckpointAsync(
-            LibraryRootId rootId,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-
-        public Task SetScannedTitleAsync(
-            MediaFileId mediaFileId,
-            ScannedTitle title,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
-    }
-
-    private sealed class FixedClock(DateTimeOffset now) : IClock
-    {
-        public DateTimeOffset UtcNow => now;
-
-        public Task DelayAsync(TimeSpan delay, CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
     }
 }

@@ -55,6 +55,51 @@ public sealed class ShellAssemblyTests
         Assert.NotNull(shell.SubtitleStyle);
     }
 
+    /// <summary>
+    /// The add dialog's two halves share one path box, so they also have to share the kind the root
+    /// half detects from it (CRS-001).
+    /// </summary>
+    /// <remarks>
+    /// Reading it once when the shell is built would freeze it at <c>Local</c>, which is what every
+    /// path that is not a fixed drive would then be catalogued as. And opening the dialog has to
+    /// clear both halves, or it opens on the last course's notice and on a question about the
+    /// neighbours of a folder nobody is looking at any more.
+    /// </remarks>
+    [Fact]
+    public void Opening_the_add_dialog_clears_both_halves_and_the_kind_follows_the_path()
+    {
+        var surfaces = FullSurfaces();
+        var shell = new ShellViewModel(new NavigationService(), surfaces);
+
+        Assert.True(shell.HasMarkCourse);
+        Assert.NotNull(shell.MarkCourse);
+        Assert.Equal(RootKind.Local, shell.MarkCourse!.Kind);
+
+        shell.Onboarding!.SelectKindCommand.Execute(RootKind.Unc);
+        Assert.Equal(RootKind.Unc, shell.MarkCourse.Kind);
+
+        shell.MarkCourse.SelectKindCommand.Execute("course");
+        Assert.True(shell.MarkCourse.IsCourse);
+
+        shell.BeginAddMedia();
+        Assert.True(shell.IsAddingRoot);
+        Assert.False(shell.MarkCourse.IsCourse);
+    }
+
+    /// <summary>A composition with no course store leaves the dialog its root half and nothing else.</summary>
+    [Fact]
+    public void A_shell_with_no_course_half_says_so_rather_than_offering_one()
+    {
+        var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
+
+        Assert.False(shell.HasMarkCourse);
+        Assert.Null(shell.MarkCourse);
+
+        // And opening the dialog with neither half is not a crash: it is a dialog with nothing in it.
+        shell.BeginAddMedia();
+        Assert.True(shell.IsAddingRoot);
+    }
+
     [Fact]
     public void A_shell_that_was_handed_nothing_still_runs()
     {
@@ -591,6 +636,7 @@ public sealed class ShellAssemblyTests
     {
         Library = BuildLibrary(),
         Onboarding = new RootOnboardingViewModel(new AddLibraryRoot(new StubRoots(), new StubNormalizer())),
+        MarkCourse = new MarkCourseViewModel(),
         ReviewInbox = new ReviewInboxViewModel(
             new GetReviewInbox(new StubCandidates()),
             new ResolveMatch(new StubCandidates(), new StubEvents(), SilentIdentification.Create()),

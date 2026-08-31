@@ -1,5 +1,85 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-08-31, fourteenth session: `CRS-001`, the door a course is declared through
+>
+> **`main` is at `8d92828`** — fast-forwarded with its CI green — and this batch sits on top of it,
+> leaving `CRS-001` at `IMPLEMENTED`. What was missing was not course code: it was **the dialog's
+> option**, without which everything else was built and unusable.
+>
+> ### What lands
+>
+> `MarkCoursesInRoot` and `ICourseRootDeclarationStore` **come back to the container** with the thing
+> that resolves them: `DeclareCourseFolder`. They were deliberately out because nothing resolved
+> them, and `ServiceConsumptionTests` was right to refuse them.
+>
+> The chain, outside in: two «Catalogue as» pills → `MarkCourseViewModel` → `DeclareCourseFolder` →
+> `CourseRootDeclarationPolicy.Derive` → `MarkCoursesInRoot` with a filter.
+>
+> ### Five things measured that reading did not give
+>
+> 1. **`ViewHeightTests` caught an unreachable dialog.** It measured **640 px** — its own `MaxHeight`
+>    — against a window whose minimum is **600**. The defect had been there before; the course half
+>    only made the content actually ask for that height. It drops to **560** with its content
+>    scrolling inside it, not the panel inside the shell, because a centred child of a `ScrollViewer`
+>    stops being centred.
+> 2. **The Avalonia MCP has no `TextBlock` page**, and "no results" is a fact: the monospaced tree is
+>    written with `&#10;` and it was **measured** to reach the surface as **six lines** in both
+>    languages rather than assumed.
+> 3. **`StringFormat` cannot carry the neighbours' question**: its format has to be a literal and the
+>    sentence has to follow the chosen language. The key travels as `ConverterParameter` and the count
+>    as the value, and `ResourceKeyConverter` gains that branch.
+> 4. **The composition held the defect in its quietest form.** `RootOnboardingViewModel` is
+>    **transient**: asking for it a second time for the course half would have given a different
+>    instance, and «Add folder» would have worked perfectly on a path box nobody is looking at. It is
+>    resolved once and handed to both halves.
+> 5. **`{x:True}` is not measured in this Avalonia**, so the choice travels as a word (`"course"` /
+>    `"root"`). A parameter arriving as the string `"True"` would leave both pills selecting nothing,
+>    looking exactly right.
+>
+> ### Two engineering decisions worth knowing
+>
+> - **Where the root comes from.** If the pointed-at folder already sits inside a catalogued root,
+>   that root is the one declared and the level is its relative depth — a root inside a root is
+>   refused, so there is no alternative. If it does not, the **parent** becomes a root and the level
+>   is 1. Under both readings, the neighbours at the same level are the ones the amendment offers to
+>   mark next.
+> - **A root created this way is `Manual`**, never on startup, because `AddCourseHelp` promises in its
+>   own words that the rest of the drive is not scanned.
+>
+> ### Two strings I wrote that the owner may want to change
+>
+> The question is his and is not to be touched. The **two buttons** that answer it I wrote following
+> the tree's measured pattern — a concrete verb rather than yes/no, the way «Continue» and «Start
+> over» already do: **«Mark them all»** and **«Only this one»**. Other wording is a two-string change.
+>
+> ### A CI red that is already expected, and is not yours
+>
+> **`ResourceKeyConverter.cs` improves, so the coverage gate will ask for its floor to be raised.** It
+> gained the `ConverterParameter` branch and both sides are covered: in `UiTests` alone it goes from
+> **82.35 % to 83.33 %** of branches, and its declared floor is **78**. This is the usual "N improved":
+> **the first round is red on purpose** and the second copies `coverage-debt` from the first round's
+> artefact. Plan for that second round.
+>
+> **What will NOT fail, measured here before pushing**, by reproducing the gate's arithmetic over each
+> suite's own report: all three new files clear the new-file bar — 96/96 with no measured ceilings —
+> inside **one suite**, which is how the merge counts.
+>
+> | file | suite | lines | branches |
+> | --- | --- | --- | --- |
+> | `CourseRootDeclarationPolicy.cs` | `Domain.Tests` | 100 % | 96.43 % |
+> | `DeclareCourseFolder.cs` | `Application.Tests` | 97.78 % | 100 % |
+> | `MarkCourseViewModel.cs` | `UiTests` | 100 % | 100 % |
+>
+> Getting there meant **removing two branches nothing could take**: an equality guard on `IsWorking`,
+> which is only ever written on the two edges of a pass, and a type test in `Describe` sitting beside
+> a word no other exception carries.
+>
+> ### What comes next
+>
+> `CRS-004`, the player's «Lessons» panel, with four keys already written waiting for it. Then the two
+> things that take `CRS-002/003/005` to `VERIFIED`. `pwsh -NoProfile -File eng/list-pending.ps1` is
+> still the answer to "what is left": **15 open of 65, 13 of them work**.
+
 > ## HANDOVER — 2026-08-31, thirteenth session: `main` unblocked and current
 >
 > **`main` is at `a5ce821`**, with the branch and the local tree on the same commit and nothing

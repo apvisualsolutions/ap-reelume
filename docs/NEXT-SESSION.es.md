@@ -1,5 +1,84 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-08-31, decimocuarta sesión: `CRS-001`, la puerta por la que se declara un curso
+>
+> **`main` está en `8d92828`** —fast-forward hecho con su CI en verde— y encima va esta tanda, que
+> deja `CRS-001` en `IMPLEMENTED`. Lo que faltaba no era código de Cursos: era **la opción del
+> diálogo**, sin la cual todo lo demás estaba construido y no se podía usar.
+>
+> ### Lo que entra
+>
+> `MarkCoursesInRoot` e `ICourseRootDeclarationStore` **vuelven al contenedor** con quien los
+> resuelve: `DeclareCourseFolder`. Estaban fuera a propósito porque nadie los resolvía, y
+> `ServiceConsumptionTests` tenía razón al rechazarlos.
+>
+> La cadena, de fuera adentro: dos píldoras «Catalogar como» → `MarkCourseViewModel` →
+> `DeclareCourseFolder` → `CourseRootDeclarationPolicy.Derive` → `MarkCoursesInRoot` con filtro.
+>
+> ### Cinco cosas medidas que la lectura no daba
+>
+> 1. **`ViewHeightTests` cazó un diálogo inalcanzable.** Medía **640 px** —su propio `MaxHeight`—
+>    contra una ventana cuyo mínimo son **600**. El defecto llevaba ahí desde antes; la mitad de curso
+>    sólo hizo que el contenido **pidiera** esa altura. Baja a **560** con su contenido desplazable
+>    dentro, y no el panel dentro del shell, porque un hijo centrado de un `ScrollViewer` deja de
+>    estar centrado.
+> 2. **El MCP de Avalonia no tiene página de `TextBlock`**, y «no results» es un dato: el árbol
+>    monoespaciado se escribe con `&#10;` y **se midió** que llega a la superficie como **seis
+>    líneas** en los dos idiomas, en vez de suponerlo.
+> 3. **`StringFormat` no sirve para la pregunta de las vecinas**: su formato tiene que ser un literal
+>    y la frase tiene que seguir el idioma. La clave viaja como `ConverterParameter` y la cuenta como
+>    valor, y `ResourceKeyConverter` gana esa rama.
+> 4. **La composición tenía la trampa en su forma más callada.** `RootOnboardingViewModel` es
+>    **transitorio**: pedirlo por segunda vez para la mitad de curso habría dado otra instancia, y
+>    «Añadir carpeta» habría funcionado perfectamente sobre una caja de ruta que nadie mira. Se
+>    resuelve una vez y se entrega a las dos mitades.
+> 5. **`{x:True}` no está medido en esta Avalonia**, así que la elección viaja como palabra
+>    (`"course"` / `"root"`). Un parámetro que llegase como la cadena `"True"` dejaría las dos
+>    píldoras sin seleccionar nada, con el aspecto exactamente correcto.
+>
+> ### Dos decisiones de ingeniería que tomé y conviene conocer
+>
+> - **De dónde sale la raíz.** Si la carpeta señalada ya está dentro de una raíz catalogada, esa raíz
+>   es la que se declara y el nivel es su profundidad relativa —una raíz dentro de otra está
+>   prohibida, así que no hay alternativa—. Si no lo está, el **padre** pasa a ser raíz y el nivel es
+>   1. En las dos lecturas, las vecinas del mismo nivel son las que la enmienda ofrece marcar después.
+> - **Una raíz creada así es `Manual`**, nunca de arranque, porque `AddCourseHelp` promete en sus
+>   propias palabras que no se recorre el resto de la unidad.
+>
+> ### Dos cadenas que escribí yo y el propietario puede querer cambiar
+>
+> La pregunta es suya y no se toca. Los **dos botones** que la contestan los escribí siguiendo el
+> patrón medido del árbol —verbo concreto, no sí/no, como «Continuar» y «Empezar de nuevo»—:
+> **«Marcarlas todas»** y **«Sólo esta»**. Si prefiere otras, es un cambio de dos cadenas.
+>
+> ### Un rojo de CI que ya está previsto, y no es tuyo
+>
+> **`ResourceKeyConverter.cs` mejora, así que la puerta de cobertura pedirá subir su suelo.** Ganó la
+> rama del `ConverterParameter` y sus dos lados están cubiertos: en `UiTests` sola pasa de **82,35 % a
+> 83,33 %** de ramas, y su suelo declarado son **78**. Es el «N improved» de siempre: **la primera
+> vuelta sale roja a propósito** y la segunda copia `coverage-debt` del artefacto de la primera. Se
+> planifica contando esa segunda vuelta.
+>
+> **Lo que NO va a fallar, medido aquí antes de empujar**, reproduciendo la aritmética de la puerta
+> sobre los informes de cada suite: los tres archivos nuevos llegan al listón de archivos nuevos
+> —96/96 sin techos— dentro de **una sola suite**, que es como cuenta la fusión.
+>
+> | archivo | suite | líneas | ramas |
+> | --- | --- | --- | --- |
+> | `CourseRootDeclarationPolicy.cs` | `Domain.Tests` | 100 % | 96,43 % |
+> | `DeclareCourseFolder.cs` | `Application.Tests` | 97,78 % | 100 % |
+> | `MarkCourseViewModel.cs` | `UiTests` | 100 % | 100 % |
+>
+> Para llegar ahí hubo que **quitar dos ramas que nada podía tomar**: una guarda de igualdad sobre
+> `IsWorking`, que sólo se escribe en los dos bordes de una pasada, y un test de tipo en `Describe`
+> junto a una palabra que ninguna otra excepción lleva.
+>
+> ### Lo siguiente
+>
+> `CRS-004`, el panel «Lecciones» del reproductor, con cuatro claves escritas esperándolo. Después,
+> las dos cosas que llevan `CRS-002/003/005` a `VERIFIED`. `pwsh -NoProfile -File eng/list-pending.ps1`
+> sigue siendo la respuesta a «qué falta»: **15 abiertas de 65, 13 de trabajo**.
+
 > ## RELEVO — 2026-08-31, decimotercera sesión: `main` desbloqueado y al día
 >
 > **`main` está en `a5ce821`**, con la rama y el árbol local en el mismo commit y nada sin confirmar.

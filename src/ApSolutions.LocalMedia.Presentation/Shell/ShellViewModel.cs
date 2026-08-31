@@ -383,6 +383,11 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public RootOnboardingViewModel? Onboarding => _surfaces.Onboarding;
 
+    /// <summary>The add dialog's course half, or null in a composition that has no course store.</summary>
+    public MarkCourseViewModel? MarkCourse => _surfaces.MarkCourse;
+
+    public bool HasMarkCourse => MarkCourse is not null;
+
     public ReviewInboxViewModel? ReviewInbox => _surfaces.ReviewInbox;
 
     public ScanSettingsViewModel? ScanSettings => _surfaces.ScanSettings;
@@ -1040,6 +1045,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public void BeginAddMedia()
     {
         Onboarding?.BeginAdd();
+
+        // Both halves clear, or the dialog opens on the last course's notice and on a question about
+        // neighbours of a folder nobody is looking at any more.
+        MarkCourse?.Begin();
         IsAddingRoot = true;
     }
 
@@ -1187,6 +1196,16 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             or nameof(RootOnboardingViewModel.InitialScanConsentRequired))
         {
             OnPropertyChanged(nameof(ShowsOnboarding));
+        }
+
+        // The kind is detected from the path once, by the root half, and the course half needs the
+        // same answer: a root it adds sits on the same volume. Reading it at construction time would
+        // freeze it at Local, which is what every path that is not a fixed drive would then be.
+        if (args.PropertyName == nameof(RootOnboardingViewModel.SelectedKind)
+            && Onboarding is { } detected
+            && MarkCourse is { } course)
+        {
+            course.Kind = detected.SelectedKind;
         }
 
         // A folder accepted from the dialog closes it: the form's job is done, and what is owed

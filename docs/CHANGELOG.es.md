@@ -37,6 +37,45 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **«Curso (carpeta de lecciones)»: la opción que faltaba para declarar un curso (CRS-001).** Todo lo
+  demás de Cursos estaba construido y no se podía usar, porque **nada permitía decir «esta carpeta es
+  un curso»**. El diálogo de añadir gana su segunda mitad, y con ella vuelven al contenedor
+  `MarkCoursesInRoot` e `ICourseRootDeclarationStore`, fuera desde que `ServiceConsumptionTests` los
+  rechazó por no tener quien los resolviera. El rechazo era correcto y ahora tienen consumidor.
+
+  **La profundidad se señala y no se teclea**, que es la enmienda 1 del `ADR-0006`: se apunta a **una**
+  carpeta de curso y `CourseRootDeclarationPolicy` deriva el nivel del gesto. Si la carpeta ya está
+  dentro de una raíz catalogada, esa raíz es la que se declara y el nivel es su profundidad relativa;
+  si no, el **padre** pasa a ser raíz y el nivel es 1. Una raíz añadida así es `Manual` y nunca de
+  arranque, porque la ayuda del propio diálogo promete que no se recorre el resto de la unidad.
+
+  **Las vecinas se preguntan, no se reclaman.** A la profundidad derivada suele haber carpetas sobre
+  las que nadie ha dicho nada, así que se marca la señalada y las demás se cuentan: «Hemos encontrado
+  {0} carpetas más. ¿Son todas cursos?». La frase es del propietario y pregunta por **el hecho** —lo
+  único que el programa no puede saber—, no por la acción. Decir que sí es una segunda pasada que
+  **relee la raíz** en vez de fiarse de lo que contó la primera.
+
+  **El aviso lleva el esquema de un curso como árbol en monoespaciada**, decisión del propietario: sin
+  binario que mantener, sin traducir dos veces, y escala con el tipo. Se escribe con `&#10;` y eso
+  **se midió** en vez de suponerse — el MCP de Avalonia no tiene página de `TextBlock`, y «no results»
+  también es un dato—: llega a la superficie como **seis líneas** en los dos idiomas.
+
+  **Y una puerta encontró lo que la lectura no.** `ViewHeightTests` midió el diálogo en **640 px**
+  contra una ventana cuyo mínimo son **600**: el fondo del panel era contenido que nadie podía
+  alcanzar. Baja a **560** y su contenido se desplaza dentro, y no el panel dentro del shell, porque
+  un hijo centrado de un `ScrollViewer` deja de estar centrado.
+
+  El diálogo tiene **una sola acción** y no dos: dos botones con `primary-action` son una pantalla que
+  no ha decidido para qué es, y `LeadingActionTests` lo rechaza. Lo que dice y lo que hace siguen a la
+  píldora elegida.
+
+  **Y el paseo autónomo encontró un defecto que ninguna prueba unitaria podía ver.** «Marcarlas todas»
+  se construye cuando todavía no hay vecinas, contesta que no puede ejecutarse y **se queda
+  deshabilitado toda la vida del diálogo**: en pantalla, con el aspecto correcto, y sin poder
+  pulsarse. Un botón atado a un comando pregunta `CanExecute` **una vez** y luego espera a que le
+  avisen, y nadie avisaba. Leer `CanExecute` del modelo da la respuesta buena se haya avisado o no,
+  así que lo que se afirma ahora es **el evento**.
+
 - **Tres cifras de la guía eran falsas el mismo día, y ahora hay una puerta que las mide.** `CLAUDE.md`
   decía que el trinquete estaba en **205** cuando el guion decía 191; la skill de cierre daba un run
   de CI por **55-80 minutos** cuando la cifra medida era 42-53; y la guía hablaba de **«las 48

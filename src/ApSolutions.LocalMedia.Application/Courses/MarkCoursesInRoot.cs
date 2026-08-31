@@ -16,9 +16,32 @@ namespace ApSolutions.LocalMedia.Application.Courses;
 /// How many folder levels down a course sits. It is the user's answer and never the program's:
 /// see <see cref="CourseStructurePolicy"/> for the measurement that rejected guessing it.
 /// </param>
-public sealed record MarkCoursesInRootCommand(LibraryRootId RootId, int CourseDepth, int BatchSize = 500);
+/// <param name="OnlyRelativePaths">
+/// Which of the detected folders to actually mark, or <see langword="null"/> for all of them.
+/// Pointing at one course declares the depth for the whole root, and at that depth there may be
+/// neighbours the person has not said anything about yet — ADR-0006 amendment 1 has the application
+/// ask before claiming them, so the first pass names the one folder and the answer decides the rest.
+/// </param>
+public sealed record MarkCoursesInRootCommand(
+    LibraryRootId RootId,
+    int CourseDepth,
+    int BatchSize = 500,
+    IReadOnlyCollection<string>? OnlyRelativePaths = null);
 
 public sealed record MarkedCourse(CourseId Id, string RelativePath, string Title, int ModuleCount, int LessonCount);
+
+/// <summary>
+/// What one pass marked, and what it found at the same depth and left alone.
+/// </summary>
+/// <param name="Others">
+/// The detected folders <see cref="MarkCoursesInRootCommand.OnlyRelativePaths"/> excluded — the
+/// neighbours the dialog counts into «Hemos encontrado {0} carpetas más». Empty when nothing was
+/// excluded, which is also what an unfiltered pass answers.
+/// </param>
+public sealed record MarkedCourses(IReadOnlyList<MarkedCourse> Marked, IReadOnlyList<string> Others)
+{
+    public static readonly MarkedCourses None = new([], []);
+}
 
 /// <summary>
 /// Marking a folder of numbered videos as a course, and re-reading one that already is (CRS-001).
@@ -62,7 +85,7 @@ public sealed class MarkCoursesInRoot
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
     }
 
-    public async Task<IReadOnlyList<MarkedCourse>> ExecuteAsync(
+    public async Task<MarkedCourses> ExecuteAsync(
         MarkCoursesInRootCommand command,
         CancellationToken cancellationToken = default)
     {
@@ -101,8 +124,17 @@ public sealed class MarkCoursesInRoot
         var detected = CourseStructurePolicy.Detect(absoluteByRelative.Keys, command.CourseDepth);
         if (detected.Count == 0)
         {
-            return [];
+            return MarkedCourses.None;
         }
+
+        // The filter is compared against what detection found rather than trusted as given: a path
+        // nobody detected is not a course this pass can mark, and one it did detect is claimed by
+        // the person who named it. Without the set, every detected folder is marked, which is what
+        // an answer of "yes, they are all courses" comes back as.
+        var wanted = command.OnlyRelativePaths is null
+            ? null
+            : new HashSet<string>(command.OnlyRelativePaths, StringComparer.OrdinalIgnoreCase);
+        var others = new List<string>();
 
         var identities = await _mediaFiles
             .FindByPathsAsync(root.Id, absoluteByRelative.Values.ToArray(), cancellationToken)
@@ -112,6 +144,12 @@ public sealed class MarkCoursesInRoot
         var marked = new List<MarkedCourse>(detected.Count);
         foreach (var course in detected)
         {
+            if (wanted is not null && !wanted.Contains(course.RelativePath))
+            {
+                others.Add(course.RelativePath);
+                continue;
+            }
+
             var lessons = new List<Lesson>();
             foreach (var section in course.Sections)
             {
@@ -156,7 +194,7 @@ public sealed class MarkCoursesInRoot
                 lessons.Count));
         }
 
-        return marked;
+        return new MarkedCourses(marked, others);
     }
 
     /// <summary>

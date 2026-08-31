@@ -167,8 +167,11 @@ public sealed class LeadingActionTests
 
         // Onboarding, recovery, credits, updates
         ["RootOnboardingView"] = "RootAddAction",
-        // The same decision in its floating frame: adding the folder is the point of the dialog.
-        ["AddRootDialogView"] = "RootAddAction",
+        // The same decision in its floating frame: acting on the folder is the point of the dialog.
+        // Named rather than keyed since CRS-001, because the dialog has two halves and its one
+        // action says «Añadir carpeta» or «Marcar como curso» depending on which is chosen. Two
+        // accented buttons would have been a screen with two leading actions, which this refuses.
+        ["AddRootDialogView"] = "AddOrMarkAction",
         ["DatabaseRecoveryView"] = "RecoveryOpenBackupFolder",
         ["CreditsView"] = null,
         ["UpdateView"] = "UpdateCheckButton",

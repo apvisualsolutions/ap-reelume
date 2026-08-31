@@ -18,8 +18,15 @@ public sealed class ResourceKeyConverter : IValueConverter
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         _ = targetType;
-        _ = parameter;
-        _ = culture;
+
+        // A key in the parameter makes the value the thing to put INTO it: «Hemos encontrado {0}
+        // carpetas más» is one sentence with a number in it, and the number is not a resource key.
+        // StringFormat cannot do this here, because its format has to be a literal and the sentence
+        // has to follow the chosen language.
+        if (parameter is string format && !string.IsNullOrWhiteSpace(format))
+        {
+            return string.Format(culture, Resolve(format), value);
+        }
 
         // A list as well as a key, because a help text is one string and an explanation is several
         // codes. Joining them here rather than in a view model is what keeps resource resolution -

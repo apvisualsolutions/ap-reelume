@@ -62,17 +62,21 @@ public static partial class CompositionRoot
             // how a folder of episodes becomes one card. Registered and fed, this time.
             .AddSingleton<ICatalogRepository>(provider => provider.GetRequiredService<CatalogRepository>())
             .AddSingleton<ICatalogQueryService>(provider => provider.GetRequiredService<CatalogRepository>())
-            // Courses (CRS-001..CRS-003). One adapter answers both course ports - the depth a root
+            // Courses (CRS-001..CRS-005). One adapter answers both course ports - the depth a root
             // declares is a column on `library_roots`, so splitting it into a store of its own would
-            // be a second class over one table - but only the port the grid uses is registered here.
+            // be a second class over one table.
             //
-            // `ICourseRootDeclarationStore` and `MarkCoursesInRoot` are deliberately NOT registered
-            // yet: nothing resolves them until the add-media dialog offers «Curso (carpeta de
-            // lecciones)», and a service nobody resolves is this repository's own characteristic
-            // defect. ServiceConsumptionTests said so out loud when they were, which is what that
-            // gate is for.
+            // `ICourseRootDeclarationStore` and `MarkCoursesInRoot` were deliberately absent until
+            // 2026-08-31: nothing resolved them, and a service nobody resolves is this repository's
+            // own characteristic defect - ServiceConsumptionTests said so out loud when they were.
+            // What resolves them now is the add dialog's «Curso (carpeta de lecciones)» half, which
+            // reaches them through DeclareCourseFolder. Registered and fed, this time as well.
             .AddSingleton<CourseRepository>()
             .AddSingleton<ICourseRepository>(provider => provider.GetRequiredService<CourseRepository>())
+            .AddSingleton<ICourseRootDeclarationStore>(provider =>
+                provider.GetRequiredService<CourseRepository>())
+            .AddSingleton<MarkCoursesInRoot>()
+            .AddSingleton<DeclareCourseFolder>()
             .AddSingleton<ICourseLessonReader, CourseLessonReader>()
             .AddSingleton<GetCourses>()
             .AddSingleton<CoursesViewModel>()

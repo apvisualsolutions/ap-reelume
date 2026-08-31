@@ -737,4 +737,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AddCourseHelp">Un curso es una carpeta de vídeos numerados que se estudian en orden. Las lecciones siguen el orden del nombre de archivo, las subcarpetas son módulos y el progreso se guarda por lección. Nada se copia, mueve ni renombra — y NO es una raíz de escaneo.</x:String>
   <x:String x:Key="AddCourseConfirmAction">Marcar como curso</x:String>
   <x:String x:Key="AddCourseDoneNotice">Carpeta marcada como curso. Las lecciones siguen el orden del nombre de archivo y el progreso se guarda por lección. No se ha copiado nada.</x:String>
+  <!-- CRS-001, the dialog that consumes the five above. AddCourseNeighboursQuestionFormat is the
+       owner's own sentence, written on 2026-08-31: it asks about the fact and not about the action,
+       which is the signal ADR-0006 decision 2 says belongs to the user. Do not reword it.
+       AddCourseShape is a tree in the monospaced face rather than a picture — the owner's call, and
+       there is no binary to keep, nothing to translate twice, and it scales with the type. -->
+  <x:String x:Key="AddAsLabel">Catalogar como</x:String>
+  <x:String x:Key="AddAsRootOption">Raíz de medios</x:String>
+  <x:String x:Key="AddCourseShapeLabel">Así se ve un curso</x:String>
+  <x:String x:Key="AddCourseShape">Curso de composición&#10;├─ 01 - Módulo uno&#10;│  ├─ 01 - Intro.mp4&#10;│  └─ 02 - El nodo.mp4&#10;└─ 02 - Módulo dos&#10;   └─ 01 - Máscaras.mp4</x:String>
+  <x:String x:Key="AddCourseNeighboursQuestionFormat">Hemos encontrado {0} carpetas más. ¿Son todas cursos?</x:String>
+  <x:String x:Key="AddCourseNeighboursConfirmAction">Marcarlas todas</x:String>
+  <x:String x:Key="AddCourseNeighboursDeclineAction">Sólo esta</x:String>
+  <x:String x:Key="AddCourseInvalidFolder">Señala la carpeta de un curso: ni una unidad entera, ni una carpeta que ya sea raíz de la biblioteca.</x:String>
+  <x:String x:Key="AddCourseNoVideoFound">Esa carpeta no tiene vídeos que la aplicación reconozca. Un curso necesita al menos una lección.</x:String>
 </ResourceDictionary>

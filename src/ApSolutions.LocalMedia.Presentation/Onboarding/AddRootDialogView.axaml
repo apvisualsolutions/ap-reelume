@@ -14,6 +14,14 @@ detected". A composition without a detector simply states no kind - the assemble
 always carries one, so pills for that branch were controls no person could ever reach. The
 Browse button is absent rather than disabled without a picker, because a dialog no run can open is
 an offer of something that cannot occur.
+
+CRS-001 gave it a second half: «Curso (carpeta de lecciones)». The title, the help and the one action
+follow MarkCourseViewModel's resource keys rather than swapping two sets of controls, because two
+buttons wearing primary-action is a screen with two leading actions — LeadingActionTests refuses it,
+and it would be right to. The prototype offers four options in a dropdown (auto, movie, series,
+course); two pills are what this tree can actually deliver, since nothing behind it distinguishes a
+movie root from a series one, and three options that do the same thing are three controls registered
+and never fed.
 -->
 <UserControl
     x:Class="ApSolutions.LocalMedia.Presentation.Onboarding.AddRootDialogView"
@@ -29,9 +37,16 @@ an offer of something that cannot occur.
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="DialogResourceKey" />
   </UserControl.Resources>
+  <!--
+    560 and not 640, measured: the course half made the panel ask for its full height, and the
+    shortest window this application allows is 600 (App.axaml.cs). A panel taller than its window is
+    a bottom nobody can reach, which is exactly what ViewHeightTests caught the day the half landed.
+    The content scrolls INSIDE the panel rather than the panel scrolling inside the shell, because
+    the overlay is centred and a centred child of a scroller stops being centred.
+  -->
   <Border
       MaxWidth="520"
-      MaxHeight="640"
+      MaxHeight="560"
       HorizontalAlignment="Center"
       VerticalAlignment="Center"
       Padding="24"
@@ -40,6 +55,7 @@ an offer of something that cannot occur.
       BorderThickness="1"
       BoxShadow="{DynamicResource ElevationShadowStrong}"
       CornerRadius="{DynamicResource CornerRadiusMedium}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Spacing="{DynamicResource Space16}">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
         <TextBlock
@@ -47,7 +63,7 @@ an offer of something that cannot occur.
             FontSize="{DynamicResource FontSizeSubtitle}"
             FontWeight="SemiBold"
             Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource AddRootDialogTitle}"
+            Text="{Binding MarkCourse.TitleKey, Converter={StaticResource DialogResourceKey}}"
             automation:AutomationProperties.HeadingLevel="2" />
         <!--
           The glyph is the content and the key is the name, which is the rail's own precedent: the
@@ -63,6 +79,48 @@ an offer of something that cannot occur.
           <Path Classes="icon size-16 navigation-glyph" Data="{DynamicResource IconClose}" />
         </Button>
       </Grid>
+      <!--
+        The dialog's two halves, chosen before the path so the words below already say which one is
+        being answered. Absent rather than disabled without a course store, which is this dialog's
+        own rule for the Browse button: an offer of something that cannot occur is worse than no
+        offer.
+      -->
+      <StackPanel IsVisible="{Binding HasMarkCourse}" Spacing="{DynamicResource Space4}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            Text="{DynamicResource AddAsLabel}" />
+        <!--
+          The choice travels as a word and not as {x:True}: this Avalonia carries no measurement of
+          that markup extension here, and a parameter that silently arrives as the string "True"
+          would leave both pills selecting nothing while looking exactly right.
+        -->
+        <WrapPanel
+            DataContext="{Binding MarkCourse}"
+            ItemSpacing="{DynamicResource Space8}"
+            LineSpacing="{DynamicResource Space8}">
+          <Button
+              Classes="theme-option"
+              automation:AutomationProperties.Name="{DynamicResource AddAsRootOption}"
+              Command="{Binding SelectKindCommand}"
+              CommandParameter="root">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <TextBlock Classes="state-glyph" Text="{Binding RootStateCue}" />
+              <TextBlock Text="{DynamicResource AddAsRootOption}" />
+            </StackPanel>
+          </Button>
+          <Button
+              Classes="theme-option"
+              automation:AutomationProperties.Name="{DynamicResource AddAsCourseOption}"
+              Command="{Binding SelectKindCommand}"
+              CommandParameter="course">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <TextBlock Classes="state-glyph" Text="{Binding CourseStateCue}" />
+              <TextBlock Text="{DynamicResource AddAsCourseOption}" />
+            </StackPanel>
+          </Button>
+        </WrapPanel>
+      </StackPanel>
       <StackPanel DataContext="{Binding Onboarding}" Spacing="{DynamicResource Space16}">
         <StackPanel Spacing="{DynamicResource Space4}">
           <TextBlock
@@ -111,17 +169,6 @@ an offer of something that cannot occur.
               Text="{Binding DetectedKindHintKey, Converter={StaticResource DialogResourceKey}}"
               TextWrapping="Wrap" />
         </StackPanel>
-        <Border
-            Padding="12"
-            Background="{DynamicResource AccentSubtleBrush}"
-            BorderBrush="{DynamicResource ShellHairlineBrush}"
-            BorderThickness="1"
-            CornerRadius="{DynamicResource CornerRadiusSmall}">
-          <TextBlock
-              Foreground="{DynamicResource TextPrimaryBrush}"
-              Text="{DynamicResource RootOnboardingDescription}"
-              TextWrapping="Wrap" />
-        </Border>
         <!--
           A refusal interrupts — the same Assertive the first-run form earned, because a person who
           just pressed Add is waiting for exactly this answer.
@@ -141,6 +188,96 @@ an offer of something that cannot occur.
               TextWrapping="Wrap" />
         </Border>
       </StackPanel>
+      <!--
+        Outside the Onboarding context on purpose: the help follows whichever half is chosen, and
+        reaching the shell back out of a nested DataContext takes a $parent cast this tree has no
+        measurement for.
+      -->
+      <Border
+          Padding="12"
+          Background="{DynamicResource AccentSubtleBrush}"
+          BorderBrush="{DynamicResource ShellHairlineBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusSmall}">
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding MarkCourse.HelpKey, Converter={StaticResource DialogResourceKey}}"
+            TextWrapping="Wrap" />
+      </Border>
+      <StackPanel DataContext="{Binding MarkCourse}" Spacing="{DynamicResource Space12}">
+        <!--
+          The shape of a course, as a tree in the monospaced face — the owner's call on 2026-08-31,
+          and a picture would be a binary to keep, a second thing to translate, and fixed while the
+          type around it scales. The same face the path box above uses, for the same reason.
+        -->
+        <StackPanel IsVisible="{Binding ShowsShape}" Spacing="{DynamicResource Space4}">
+          <TextBlock
+              FontSize="{DynamicResource FontSizeCaption}"
+              Foreground="{DynamicResource TextSecondaryBrush}"
+              Text="{DynamicResource AddCourseShapeLabel}" />
+          <Border
+              Padding="12"
+              Background="{DynamicResource ControlFillBrush}"
+              BorderBrush="{DynamicResource ShellHairlineBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource CornerRadiusSmall}">
+            <TextBlock
+                FontFamily="{DynamicResource FontFamilyMono}"
+                FontSize="{DynamicResource FontSizeCaption}"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="{DynamicResource AddCourseShape}" />
+          </Border>
+        </StackPanel>
+        <Border
+            IsVisible="{Binding HasMarked}"
+            Padding="12"
+            Background="{DynamicResource AccentSubtleBrush}"
+            BorderBrush="{DynamicResource ShellHairlineBrush}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource CornerRadiusSmall}"
+            automation:AutomationProperties.LiveSetting="Polite">
+          <TextBlock
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource AddCourseDoneNotice}"
+              TextWrapping="Wrap" />
+        </Border>
+        <!--
+          The neighbours, asked about rather than claimed (ADR-0006 amendment 1). The sentence is the
+          owner's and asks about the FACT — whether they are courses — because that is the one thing
+          the program cannot know and decision 2 says belongs to the user. Both answers are verbs
+          rather than yes/no, which is the shape this application's other two questions already have.
+        -->
+        <StackPanel IsVisible="{Binding IsAskingAboutNeighbours}" Spacing="{DynamicResource Space8}">
+          <TextBlock
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{Binding NeighbourCount, Converter={StaticResource DialogResourceKey}, ConverterParameter=AddCourseNeighboursQuestionFormat}"
+              TextWrapping="Wrap"
+              automation:AutomationProperties.LiveSetting="Polite" />
+          <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource AddCourseNeighboursConfirmAction}"
+                Command="{Binding MarkNeighboursCommand}"
+                Content="{DynamicResource AddCourseNeighboursConfirmAction}" />
+            <Button
+                automation:AutomationProperties.Name="{DynamicResource AddCourseNeighboursDeclineAction}"
+                Command="{Binding DismissNeighboursCommand}"
+                Content="{DynamicResource AddCourseNeighboursDeclineAction}" />
+          </WrapPanel>
+        </StackPanel>
+        <Border
+            IsVisible="{Binding HasFailure}"
+            Padding="12"
+            Background="{DynamicResource DangerSurfaceBrush}"
+            BorderBrush="{DynamicResource DangerBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource CornerRadiusSmall}"
+            automation:AutomationProperties.LiveSetting="Assertive">
+          <TextBlock
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{Binding FailureKey, Converter={StaticResource DialogResourceKey}}"
+              TextWrapping="Wrap" />
+        </Border>
+      </StackPanel>
       <WrapPanel
           HorizontalAlignment="Right"
           ItemSpacing="{DynamicResource Space12}"
@@ -149,12 +286,20 @@ an offer of something that cannot occur.
             automation:AutomationProperties.Name="{DynamicResource AddRootCancelAction}"
             Command="{Binding CancelAddMediaCommand}"
             Content="{DynamicResource AddRootCancelAction}" />
+        <!--
+          One action and not two, because two buttons wearing primary-action is a screen with two
+          leading actions. What it says and what it does both follow the chosen half, so it is named
+          here rather than by a resource key: LeadingActionTests reads that name.
+        -->
         <Button
+            x:Name="AddOrMarkAction"
             Classes="primary-action"
-            automation:AutomationProperties.Name="{DynamicResource RootAddAction}"
-            Command="{Binding Onboarding.AddRootCommand}"
-            Content="{DynamicResource RootAddAction}" />
+            automation:AutomationProperties.Name="{Binding MarkCourse.ConfirmKey, Converter={StaticResource DialogResourceKey}}"
+            Command="{Binding MarkCourse.ConfirmCommand}"
+            CommandParameter="{Binding Onboarding.Path}"
+            Content="{Binding MarkCourse.ConfirmKey, Converter={StaticResource DialogResourceKey}}" />
       </WrapPanel>
     </StackPanel>
+    </ScrollViewer>
   </Border>
 </UserControl>
