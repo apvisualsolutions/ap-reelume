@@ -85,6 +85,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `Application.Current.Resources`: without the key, with it, and with something that is not a string
   under it.
 
+  **Second round, and CI confirmed both figures: 100/97 and 100/96.** The first round's red was the
+  expected one and the guide describes it: the gate fails alike at a floor set too low **and one set
+  too high**, so the moment a file improves it asks for it to leave the list. Both leave, the ratchet
+  comes down from **191 to 189**, and the header note saying "their ViewModels have no unit tests of
+  their own" is corrected, because it stopped being true and `-WriteDebt` **keeps the header** rather
+  than regenerating it — a false line there carries itself from run to run.
+
+  **And one figure in the guide had been lying for a whole batch**: it said the ratchet stood at
+  **205** while the script said **191**. It was copied by hand and never looked at again, which is
+  exactly the defect that same paragraph describes. It now records that the only source is
+  `$debtRatchet` and that the guide's copy is a reference to be checked before quoting.
+
 - **The debt list rises for the first time, 186 to 193, because seven files are BORN below the bar.**
   The rule that it only shrinks was written against degradation — a file that was up and got worse —
   and a new file is not that: there is nothing to bring back. The gate's own error message allows it,

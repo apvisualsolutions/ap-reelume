@@ -85,6 +85,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   alcanzables de `Resource` se toman escribiendo en `Application.Current.Resources`: sin la clave, con
   la clave, y con algo que no es una cadena bajo ella.
 
+  **Segunda vuelta, y CI confirmó las dos cifras: 100/97 y 100/96.** El rojo de la primera era el
+  esperado y está descrito en la guía: la puerta falla igual ante un suelo que se queda corto **y
+  ante uno que se queda largo**, así que en cuanto un archivo mejora pide sacarlo de la lista. Los
+  dos salen, el trinquete baja de **191 a 189**, y la nota de cabecera que decía que «sus ViewModels
+  no tienen pruebas unitarias propias» se corrige, porque ya no era cierta y `-WriteDebt` **conserva
+  la cabecera** en vez de regenerarla — una frase falsa ahí se arrastra sola de run en run.
+
+  **Y una cifra de la guía llevaba una tanda entera mintiendo**: decía que el trinquete estaba en
+  **205** cuando el guion decía **191**. Se copió a mano y nadie volvió a mirarla, que es exactamente
+  el defecto que ese mismo párrafo describe. Queda escrito que la única fuente es `$debtRatchet` y
+  que lo de la guía es una referencia que se comprueba antes de citarla.
+
 - **La lista de deuda sube por primera vez, de 186 a 193, y el motivo es que siete archivos NACEN
   por debajo del listón.** La regla de que sólo encoge se escribió contra la degradación —un archivo
   que estaba arriba y empeora— y un archivo nuevo no es eso: no hay nada que recuperar. La propia

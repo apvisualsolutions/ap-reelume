@@ -190,8 +190,13 @@ tiene: `WindowsAudioDeviceCatalog.cs` vale 79/61 aquí y 32/11 allí. Fuera de C
 y no bloquea. Nunca se edita a mano, y nunca se genera con una ejecución local.
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **205** desde
-el 2026-08-30, cuando `Domain` bajó de 212.
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** desde
+el 2026-08-31, cuando los dos ViewModels de Cursos salieron de la lista.
+
+**Y esta frase decía 205 mientras el guion decía 191**, durante toda una tanda: la cifra se copió a
+mano y nadie la volvió a mirar, que es el mismo defecto que el propio párrafo describe. **La única
+fuente es `$debtRatchet`**; lo de aquí es una referencia y puede estar vieja, así que se comprueba
+en el guion antes de citarla.
 
 **Y por eso subir cobertura cuesta DOS vueltas de CI, no una.** La puerta falla igual ante un suelo
 que se queda corto **y ante uno que se queda largo**: en cuanto un archivo mejora, el run se pone
