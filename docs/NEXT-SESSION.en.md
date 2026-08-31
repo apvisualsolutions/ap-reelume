@@ -2,7 +2,7 @@
 
 > ## HANDOVER — 2026-08-31, fourteenth session: `CRS-001`, the door a course is declared through
 >
-> **`main` is at `8d92828`** — fast-forwarded with its CI green — and this batch sits on top of it,
+> **`main` is at `45054e9`**, with this whole batch in it and every fast-forward made on a green CI;
 > leaving `CRS-001` at `IMPLEMENTED`. What was missing was not course code: it was **the dialog's
 > option**, without which everything else was built and unusable.
 >
@@ -75,7 +75,29 @@
 > which is only ever written on the two edges of a pass, and a type test in `Describe` sitting beside
 > a word no other exception carries.
 >
-> ### What comes next
+> ### And a rule in this guide that was an excuse, corrected the same day
+>
+> **`CLAUDE.md` and `/cerrar-tanda` said that raising coverage "costs TWO CI rounds" and that the
+> first round's red "is the expected result".** The owner asked why predictable reds kept being
+> pushed, and was right: this very batch measured `ResourceKeyConverter` at **83.33 %** of branches,
+> CI answered **83**, and with the number in hand a warning went into the handover instead of a fix
+> into the file. **Announcing a predictable red is not avoiding it.**
+>
+> Both sources now say that **the floors that are going to rise are measured before pushing and go in
+> the same commit**, and that the CI artefact **confirms** rather than discovers. Two rounds are only
+> unavoidable for the **seven hardware-bound files** a hosted runner has no device for.
+>
+> **And it is not prose: it is `eng/preview-coverage-floors.ps1`.** It reproduces the gate's
+> arithmetic and is validated against the run that prompted it — it names `AddLibraryRoot` at
+> **100/92** and `ResourceKeyConverter` at **100/83**, the two numbers CI wrote, and goes quiet once
+> those floors are in. **Three versions of it gave plausible, false numbers**: filtering on `src/`,
+> which Cobertura never writes — **zero files** out of 442; picking the best whole report rather than
+> the best line — 78 % of branches where CI reads 92; and summing branches per `<class>`, which
+> counts a line once per lambda — 28 branches for a file that has 14.
+>
+> The two audio files that read higher here are reported **in a separate block**, not hidden: a
+> warning that fires when it should not teaches people to ignore the warning.
+>> ### What comes next
 >
 > `CRS-004`, the player's «Lessons» panel, with four keys already written waiting for it. Then the two
 > things that take `CRS-002/003/005` to `VERIFIED`. `pwsh -NoProfile -File eng/list-pending.ps1` is

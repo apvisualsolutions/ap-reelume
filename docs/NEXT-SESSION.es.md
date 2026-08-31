@@ -2,7 +2,7 @@
 
 > ## RELEVO — 2026-08-31, decimocuarta sesión: `CRS-001`, la puerta por la que se declara un curso
 >
-> **`main` está en `8d92828`** —fast-forward hecho con su CI en verde— y encima va esta tanda, que
+> **`main` está en `45054e9`**, con toda esta tanda dentro y cada fast-forward hecho con su CI en verde;
 > deja `CRS-001` en `IMPLEMENTED`. Lo que faltaba no era código de Cursos: era **la opción del
 > diálogo**, sin la cual todo lo demás estaba construido y no se podía usar.
 >
@@ -74,7 +74,29 @@
 > `IsWorking`, que sólo se escribe en los dos bordes de una pasada, y un test de tipo en `Describe`
 > junto a una palabra que ninguna otra excepción lleva.
 >
-> ### Lo siguiente
+> ### Y una regla de esta guía que era una excusa, corregida el mismo día
+>
+> **`CLAUDE.md` y `/cerrar-tanda` decían que subir cobertura «cuesta DOS vueltas de CI» y que el rojo
+> de la primera «es el resultado esperado».** El propietario preguntó por qué se seguían empujando
+> rojos previstos, y tenía razón: esta misma tanda midió `ResourceKeyConverter` en **83,33 %** de
+> ramas, CI contestó **83**, y con el número en la mano se escribió un aviso en el relevo en vez de
+> corregir el archivo. **Anunciar un rojo previsible no es evitarlo.**
+>
+> Ahora las dos fuentes dicen que **los suelos que van a subir se miden antes de empujar y entran en
+> el mismo commit**, y que el artefacto de CI **confirma** en lugar de descubrir. Dos vueltas sólo son
+> inevitables para los **siete archivos que dependen de hardware** que el runner no tiene.
+>
+> **Y no es una frase: es `eng/preview-coverage-floors.ps1`.** Reproduce la aritmética de la puerta y
+> está validado contra el run que lo motivó — nombra `AddLibraryRoot` en **100/92** y
+> `ResourceKeyConverter` en **100/83**, los dos números exactos que escribió CI, y calla en cuanto
+> esos suelos están puestos. **Tres versiones suyas dieron cifras verosímiles y falsas**: filtrar por
+> `src/`, que Cobertura no escribe —**cero archivos** sobre 442—; quedarse con el mejor informe entero
+> en vez de la mejor línea —78 % de ramas donde CI lee 92—; y sumar ramas por `<class>`, que cuenta
+> una línea una vez por lambda —28 ramas para un archivo que tiene 14—.
+>
+> Los dos archivos de audio que aquí leen más alto salen **en un bloque aparte**, no ocultos: un aviso
+> que suena cuando no toca enseña a ignorar el aviso.
+>> ### Lo siguiente
 >
 > `CRS-004`, el panel «Lecciones» del reproductor, con cuatro claves escritas esperándolo. Después,
 > las dos cosas que llevan `CRS-002/003/005` a `VERIFIED`. `pwsh -NoProfile -File eng/list-pending.ps1`
