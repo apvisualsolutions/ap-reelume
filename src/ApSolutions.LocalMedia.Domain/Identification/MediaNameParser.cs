@@ -3,6 +3,7 @@
 
 using System.Text;
 using System.Text.RegularExpressions;
+using ApSolutions.LocalMedia.Domain.Discovery;
 
 namespace ApSolutions.LocalMedia.Domain.Identification;
 
@@ -25,11 +26,6 @@ public sealed class MediaNameParser : IMediaNameParser
 
     private static readonly Regex YearPattern = CreatePattern(
         @"(?:^|[^\p{L}\p{N}])(?<year>\d{4})(?:$|[^\p{L}\p{N}])");
-
-    private static readonly HashSet<string> MediaExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4v", ".ts", ".m2ts",
-    };
 
     private static readonly HashSet<string> KnownNoiseTags = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -183,11 +179,20 @@ public sealed class MediaNameParser : IMediaNameParser
         return null;
     }
 
+    /// <summary>
+    /// Takes the container off the end of a name, so the title is what is parsed.
+    /// </summary>
+    /// <remarks>
+    /// It asks <see cref="MediaFileExtensions"/> rather than keeping a list of its own, which it did
+    /// until 2026-08-31. A second copy of that list is not a tidiness problem here: a container the
+    /// scanner accepts and this does not is a title that keeps its extension glued to it — the file
+    /// is catalogued and reads «Lección 01.flv». The copy had already fallen behind by one.
+    /// </remarks>
     private static string StripMediaExtension(string value)
     {
         var separator = Math.Max(value.LastIndexOf('/'), value.LastIndexOf('\\'));
         var dot = value.LastIndexOf('.');
-        if (dot > separator && MediaExtensions.Contains(value[dot..]))
+        if (dot > separator && MediaFileExtensions.IsApproved(value[dot..]))
         {
             return value[..dot];
         }

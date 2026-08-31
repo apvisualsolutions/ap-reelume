@@ -27,7 +27,7 @@ el MSIX de esta publicación sirve para inspección y archivo. **Use el ZIP**: d
 - ¿Confirmó el primer escaneo? La aplicación pregunta antes de escanear la primera vez.
 - ¿Pulsó **Aplicar** después? El catálogo se refresca al aplicar.
 - ¿La carpeta contiene alguno de los contenedores reconocidos? Son `.mp4`, `.mkv`, `.avi`, `.mov`,
-  `.webm`, `.m4v`, `.ts` y `.m2ts`. Otros formatos no se catalogan.
+  `.webm`, `.m4v`, `.ts`, `.m2ts` y `.flv`. Otros formatos no se catalogan.
 
 ## Dice que no puede añadir la carpeta
 

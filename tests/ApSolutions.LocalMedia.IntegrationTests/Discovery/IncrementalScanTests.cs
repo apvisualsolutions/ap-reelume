@@ -19,8 +19,9 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
 
 public sealed class IncrementalScanTests
 {
-    private static readonly string[] SupportedExtensions =
-        [".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4v", ".ts", ".m2ts"];
+    // The domain's list rather than a copy: this suite is about what the scanner picks up, and a
+    // literal here would keep passing on the day the scanner picks up one more container.
+    private static readonly string[] SupportedExtensions = [.. MediaFileExtensions.All];
 
     [Fact]
     public async Task Scan_schema_and_adapters_are_owned_by_the_incremental_scan_slice()
@@ -76,13 +77,17 @@ public sealed class IncrementalScanTests
             new StartScanCommand(fixture.Root.Id, ScanTrigger.Manual, 3),
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(8, first.EnumeratedCount);
-        Assert.Equal(8, first.ProbeCount);
-        Assert.Equal(8, first.MediaCount);
-        Assert.Equal(8, second.EnumeratedCount);
+        // One file per supported container, so the count is the list's length rather than a number
+        // written here. It said 8 seven times until 2026-08-31, and a ninth container turned a test
+        // about "the extensions the scanner filters" into a test about the number eight.
+        var expected = SupportedExtensions.Length;
+        Assert.Equal(expected, first.EnumeratedCount);
+        Assert.Equal(expected, first.ProbeCount);
+        Assert.Equal(expected, first.MediaCount);
+        Assert.Equal(expected, second.EnumeratedCount);
         Assert.Equal(0, second.ProbeCount);
-        Assert.Equal(8, second.UnchangedCount);
-        Assert.Equal(8, await CountMediaAsync(fixture.Factory));
+        Assert.Equal(expected, second.UnchangedCount);
+        Assert.Equal(expected, await CountMediaAsync(fixture.Factory));
         Assert.Equal(before, await ReadInventoryAsync(mediaPath));
     }
 

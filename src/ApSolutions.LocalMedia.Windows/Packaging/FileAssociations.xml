@@ -26,6 +26,7 @@
         <uap:FileType>.m4v</uap:FileType>
         <uap:FileType>.ts</uap:FileType>
         <uap:FileType>.m2ts</uap:FileType>
+        <uap:FileType>.flv</uap:FileType>
       </uap:SupportedFileTypes>
     </uap:FileTypeAssociation>
   </uap:Extension>

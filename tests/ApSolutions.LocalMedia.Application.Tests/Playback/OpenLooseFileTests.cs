@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Application.Playback;
+using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Playback;
 using Xunit;
 
@@ -31,7 +32,10 @@ public sealed class OpenLooseFileTests : IDisposable
     [Fact]
     public async Task Every_container_the_library_recognises_can_be_opened_loose()
     {
-        foreach (var extension in new[] { ".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4v", ".ts", ".m2ts" })
+        // The domain's list and not a copy of it: what this asserts is «every container the library
+        // recognises», so a literal here would keep passing on the day the library recognises one
+        // more. It had already fallen behind by one when .flv was added.
+        foreach (var extension in MediaFileExtensions.All)
         {
             var path = CreateFile($"sample{extension}");
 

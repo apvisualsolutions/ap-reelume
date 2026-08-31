@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Text.Json;
+using ApSolutions.LocalMedia.Domain.Discovery;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.PackagingTests;
@@ -216,7 +217,16 @@ public sealed class MsixLifecycleTests
         }
 
         Assert.Equal("Passed", phase.RequiredString("outcome"));
-        Assert.Contains("8 of 8", phase.RequiredString("detail"), StringComparison.Ordinal);
+
+        // Counted from the domain and not written here. This said "8 of 8" until 2026-08-31 and went
+        // red the day a ninth container was approved — the assertion was about "every declared
+        // container", and a literal is the one thing that cannot mean that.
+        var expected = MediaFileExtensions.All.Count;
+        Assert.Contains($"{expected} of {expected}", phase.RequiredString("detail"), StringComparison.Ordinal);
+
+        // Which containers, and not only how many, is asserted where the report carries them:
+        // windows-lifecycle.json lists every registry location it found and this one does not. An
+        // assertion over a field this report has never had would only have been measuring itself.
     }
 
     /// <summary>
