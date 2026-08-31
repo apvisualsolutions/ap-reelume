@@ -181,19 +181,23 @@
 > se añade con `ScanPolicy.Manual`, nunca de arranque, porque `AddCourseHelp` promete con sus propias
 > palabras que no se recorre el resto de la unidad.
 >
-> ### Dos tareas de fondo vivas, y ninguna es de Cursos
+> ### Las dos tareas de fondo de esta tanda, LAS DOS HECHAS
 >
-> 1. **El suelo de cobertura de un archivo que oscila.** `MarkerEditorViewModel` ha dado 79, 79, 79,
->    81, 79 y otra vez 81. **No se sube su suelo** —ya se hizo una vez y el siguiente run falló por lo
->    contrario—. La hipótesis fuerte es que le quedan ramas que **sólo alcanza el paseo**, que es
->    exactamente lo que se arregló en ese mismo archivo el 2026-08-31 con dos pruebas unitarias: la
->    cifra dejó de oscilar y el suelo subió 79 → 84. Si queda otro tramo igual, la corrección es una
->    **prueba**, no una banda de tolerancia.
-> 2. ~~**`.flv` en `MediaFileExtensions`**~~ **HECHA en esta misma tanda**, con su ciclo de empaquetado pagado. La tarea de fondo que la nombra puede descartarse. Lo que decía:, decidido y sin ejecutar desde hace varias sesiones: es la
->    única extensión de vídeo que la aplicación no reconoce de las dos raíces de cursos del
->    propietario —10 archivos, un curso entero invisible—. Va agrupado con el próximo cambio de
->    empaquetado porque `PackagingTests` exige que el manifiesto MSIX declare exactamente
->    `MediaFileExtensions.All`, y **tocar el manifiesto caduca dos mediciones del sandbox**.
+> 1. **El suelo de cobertura que oscilaba** — cerrado en **100/100**, con la hipótesis de partida
+>    resultando falsa: se midió `UiTests` y `AccessibilityTests` por separado y **ninguna** rama
+>    dependía del paseo. Lo que quedaba eran siete guardas deterministas sin cubrir y una propiedad
+>    pública que no leía nadie. Trinquete **189 → 188**. **La puerta no necesitaba nada.**
+> 2. **`.flv` en `MediaFileExtensions`** — dentro, con su ciclo de empaquetado pagado entero y las dos
+>    mediciones del sandbox rehechas y comparadas con las archivadas antes de sustituirlas.
+>
+> **Las dos figuran como iniciadas en el panel y no se pudieron retirar desde la sesión.** Están
+> hechas; se cierran desde el panel.
+>
+> **Y una consecuencia que conviene no perder**: el ciclo de empaquetado se pagó **por `.flv` solo**,
+> no agrupado con otro cambio, porque así se pidió. El siguiente cambio que toque el manifiesto vuelve
+> a pagarlo entero — unos 30 minutos entre `package-x64.ps1`, `run-sandbox-handover.ps1` y
+> `verify-package.ps1`, más `package-arm64.ps1`, que **también hay que correr** aunque PRD-003 siga
+> bloqueado: `Arm64PackageTests` compara el manifiesto empaquetado con el fuente.
 >
 > ### Lo siguiente
 >

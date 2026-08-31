@@ -180,19 +180,24 @@
 > level". And it is added with `ScanPolicy.Manual`, never on startup, because `AddCourseHelp` promises
 > in its own words that the rest of the drive is not scanned.
 >
-> ### Two live background tasks, and neither is about Courses
+> ### The two background tasks of this batch, BOTH DONE
 >
-> 1. **The coverage floor of a file whose measurement oscillates.** `MarkerEditorViewModel` has read
->    79, 79, 79, 81, 79 and 81 again. **Its floor is not raised** — that was done once and the next
->    run failed for the opposite reason. The strong hypothesis is that it still has branches **only
->    the walk reaches**, which is exactly what was fixed in that same file on 2026-08-31 with two unit
->    tests: the number stopped moving and the floor rose 79 → 84. If another stretch is like that, the
->    fix is a **test**, not a tolerance band.
-> 2. ~~**`.flv` in `MediaFileExtensions`**~~ **DONE in this same batch**, with its packaging cycle paid. The background task naming it can be dismissed. What it said:, decided and unexecuted for several sessions: it is the only
->    video extension the application does not recognise across the owner's two course roots — 10
->    files, one whole course invisible. It goes with the next packaging change because
->    `PackagingTests` requires the MSIX manifest to declare exactly `MediaFileExtensions.All`, and
->    **touching the manifest expires two sandbox measurements**.
+> 1. **The coverage floor that oscillated** — closed at **100/100**, with the starting hypothesis
+>    turning out false: `UiTests` and `AccessibilityTests` were measured apart and **no** branch
+>    depended on the walk. What remained were seven uncovered deterministic guards and a public
+>    property nothing read. Ratchet **189 → 188**. **The gate needed nothing.**
+> 2. **`.flv` in `MediaFileExtensions`** — in, with its packaging cycle paid in full and both sandbox
+>    measurements re-run and compared against the archived ones before replacing them.
+>
+> **Both show as started in the panel and could not be withdrawn from the session.** They are done;
+> they close from the panel.
+>
+> **And one consequence worth not losing**: the packaging cycle was paid **for `.flv` alone**, not
+> grouped with another change, because that is how it was asked for. The next change touching the
+> manifest pays it again in full — some 30 minutes across `package-x64.ps1`,
+> `run-sandbox-handover.ps1` and `verify-package.ps1`, plus `package-arm64.ps1`, which **must also be
+> run** even though PRD-003 stays blocked: `Arm64PackageTests` compares the packaged manifest with the
+> source one.
 >
 > ### What comes next
 >

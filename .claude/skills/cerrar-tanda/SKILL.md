@@ -41,7 +41,11 @@ Si has tocado `docs/`: `DocumentationTests`. Si has tocado `eng/` o el manifiest
 `ArchitectureTests`.
 
 **`PackagingTests` está roja en esta máquina y verde en CI** — artefactos caducados, medido con
-`git stash`. No la persigas.
+`git stash`. No la persigas… **salvo si la tanda toca el manifiesto**, y entonces es al revés: ya
+estás pagando el ciclo de empaquetado, y esa suite es la única que mide lo que cambiaste. Con
+`package-x64.ps1` + `verify-package.ps1 -Mode Verify` + `package-arm64.ps1` dio **194 de 194** el
+2026-08-31. Los «30 rojos» son **artefactos ausentes**, no esta máquina — y uno de ellos llevaba
+nueve días señalando un artefacto ARM64 anterior a un cambio del manifiesto.
 
 **Y si la tanda subió cobertura, medir en local ANTES de empujar sale gratis y ahorra 45 minutos.**
 La fusión de CI se reproduce aquí: `gh run download <id> -n test-results` y `reportgenerator` con los
@@ -101,11 +105,15 @@ diagnosticarlos desde cero:
    nuevas lo recorren de paso**. El 2026-08-31 se midió uno en 83,33 % y CI dijo 83, y aun así se
    empujó el rojo: el número estaba en la mano. **Sólo son dos vueltas de verdad** cuando lo que sube
    es uno de los siete archivos que dependen de hardware que el runner no tiene.
-2. **`MarkerEditorViewModel` pidiendo que le suban el suelo.** Su medición **oscila**: 79, 79, 79,
-   81, 79 en cinco runs seguidos, y otra vez 81 el 2026-08-31 tumbando un run que solo tocaba un
-   `.md`. **NO se sube.** Ya se subió a 81 una vez y el siguiente run falló por lo contrario. Se
-   relanza. Con un archivo que oscila **ningún suelo fijo es correcto**, y arreglarlo pide su propia
-   tanda.
+2. ~~**`MarkerEditorViewModel` pidiendo que le suban el suelo.**~~ **CERRADO el 2026-08-31 y ya no
+   pasa**: el archivo está en **100/100** y fuera de la lista. Se deja escrito porque la forma del
+   defecto vuelve, no el archivo. Oscilaba —79, 79, 79, 81, 79, y otra vez 81 tumbando un run que
+   sólo tocaba un `.md`— porque unas ramas **las cubría sólo el paseo**, que llega a ese estado unos
+   runs sí y otros no. **La regla que queda: ante una cifra que baila, mide QUÉ RAMA se cubre por
+   accidente antes de tolerar el baile.** Se compara suite por suite —`UiTests` y
+   `AccessibilityTests` por separado, rama a rama—, y la corrección es una **prueba**, nunca una
+   banda de tolerancia. Y ojo: la segunda vez la respuesta fue **cero ramas del paseo**; lo que
+   quedaba eran guardas que nada determinista tomaba y una propiedad pública que no leía nadie.
 3. **Una prueba del paseo que falla sola.** Antes de llamarlo intermitencia, **compruébalo con un
    dato**: `git diff --name-only <sha-verde> <sha-rojo> -- src tests`. Si no cambió nada ahí, el
    mismo código dio dos resultados y es intermitencia; relanza. Si cambió algo, es tuyo. Y un
