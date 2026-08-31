@@ -39,6 +39,40 @@
 > **The four branches left uncovered are unreachable and are written into both test classes**, with
 > their reasons, because a measured ceiling belongs where somebody will look again.
 >
+> ### And three owner decisions, which govern everything above
+>
+> 1. **Nothing ships until everything committed to is verified.** It is in
+>    [the roadmap](roadmap/README.en.md) ("The publishing rule") and in `CLAUDE.md`. `DEFERRED` rows
+>    count, `OUT_OF_SCOPE` rows do not. **It promotes two blockers no amount of code will clear**:
+>    `PRD-003` needs an ARM64 machine there is not one of — the owner has a Surface and **whether it
+>    is ARM64 is still unconfirmed** — and `PRD-002` needs the commercial signing certificate,
+>    because its cycle was verified on a re-signed copy.
+> 2. **One selected folder = one course**, several = several. This supersedes decision 2 of
+>    `ADR-0006` and **the amendment is unwritten**. Reason: there is no reliable way to tell a
+>    category folder from a course folder. The dialog's notice will carry a **monospaced tree**, not
+>    an image.
+> 3. **The grouping the owner asked for already exists as `UX-007`**, and he wants it **across the
+>    catalogue** — films, shows and courses — not a list for courses. **Whether it moves up a release
+>    is undecided.**
+>
+> ### What is left is no longer read by hand
+>
+> ```powershell
+> pwsh -NoProfile -File eng/list-pending.ps1
+> ```
+>
+> **15 open of 65**, by release, separating the eleven that are work from the four that are
+> decisions. It reads statuses and releases from `FEATURES.md`'s own legends, counts rows by two
+> routes, and **refuses to print** when they disagree. It was born from a failure: the same list made
+> by hand with a three-capitals pattern lost **eight rows in silence** — `UX` has two — including the
+> one being asked about. It found three defects on day one: a blank line split the library table and
+> left `LIB-016`/`LIB-017` outside it, `Post-MVP` was used without being declared, and `A11Y-00x` was
+> dropped for having digits — which explained the documentation gate's 65 against every hand count's
+> 63.
+>
+> **Fourteen background tasks are queued**, one per outstanding row (two Courses rows share the one
+> about progress surviving a file move), deferred and rejected ones included.
+>
 > Still pending and decided, **not executed**: `.flv` in `MediaFileExtensions`, grouped with the next
 > packaging change.
 

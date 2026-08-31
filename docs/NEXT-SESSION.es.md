@@ -38,6 +38,38 @@
 > **Las cuatro ramas que quedan sin cubrir son inalcanzables y están escritas en las dos clases de
 > prueba**, con su porqué, porque un techo medido va donde alguien vuelve a mirarlo.
 >
+> ### Y tres decisiones del propietario, que mandan sobre lo de arriba
+>
+> 1. **No se publica nada hasta que todo lo comprometido esté verificado.** Está en
+>    [la hoja de ruta](roadmap/README.es.md) («La regla de publicación») y en `CLAUDE.md`. Cuentan
+>    las `DEFERRED`, no cuentan las `OUT_OF_SCOPE`. **Activa dos bloqueos que no se arreglan
+>    programando**: `PRD-003` pide una máquina ARM64 que no hay —el propietario tiene una Surface y
+>    **está por confirmar si es ARM64**—, y `PRD-002` pide el certificado comercial de firma, porque
+>    su ciclo se verificó sobre una copia resellada.
+> 2. **Una carpeta seleccionada = un curso**, varias = varias. Supersede la decisión 2 del
+>    `ADR-0006` y **la enmienda está sin escribir**. Motivo: no hay forma fiable de distinguir
+>    carpeta-categoría de carpeta-curso. El aviso del diálogo llevará un **esquema en monoespaciada**,
+>    no una imagen.
+> 3. **La agrupación que pidió ya existe como `UX-007`** y la quiere **transversal** —películas,
+>    series y cursos—, no una lista para cursos. **Está sin decidir si sube de versión.**
+>
+> ### Para saber qué falta ya no se lee a mano
+>
+> ```powershell
+> pwsh -NoProfile -File eng/list-pending.ps1
+> ```
+>
+> **15 abiertas de 65**, por versión, separando las once de trabajo de las cuatro que son decisiones.
+> Lee estados y versiones de las leyendas del propio `FEATURES.md`, cuenta las filas por dos caminos
+> y **se niega a imprimir** si no cuadra. Nació de un fallo: la misma lista hecha a mano con un patrón
+> de tres mayúsculas perdió **ocho filas en silencio** —`UX` tiene dos—, y entre ellas la que se
+> preguntaba. Encontró tres defectos el primer día: una línea en blanco partía la tabla de biblioteca
+> y dejaba `LIB-016`/`LIB-017` fuera, `Post-MVP` se usaba sin declarar, y `A11Y-00x` se caía por
+> llevar dígitos —lo que explicaba el 63 contra 65 de la puerta de documentación—.
+>
+> **Hay 14 tareas de fondo lanzadas**, una por cada pendiente (dos de Cursos comparten la de «el
+> progreso sobrevive a mover el archivo»), incluidas las aplazadas y las rechazadas.
+>
 > Sigue pendiente y decidido, **no ejecutado**: `.flv` en `MediaFileExtensions`, agrupado con el
 > próximo cambio de empaquetado.
 
