@@ -201,11 +201,39 @@ mano y nadie la volvió a mirar, que es el mismo defecto que el propio párrafo 
 fuente es `$debtRatchet`**; lo de aquí es una referencia y puede estar vieja, así que se comprueba
 en el guion antes de citarla.
 
-**Y por eso subir cobertura cuesta DOS vueltas de CI, no una.** La puerta falla igual ante un suelo
-que se queda corto **y ante uno que se queda largo**: en cuanto un archivo mejora, el run se pone
-rojo pidiendo sacarlo de la lista o subir su suelo. La segunda vuelta es la que copia el artefacto de
-la primera y baja el trinquete. Se planifica contando eso, y **el rojo de la primera es el resultado
-esperado, no un fallo**.
+**La puerta falla igual ante un suelo que se queda corto y ante uno que se queda largo**: en cuanto un
+archivo mejora, el run se pone rojo pidiendo sacarlo de la lista o subir su suelo.
+
+**Eso NO significa que subir cobertura cueste dos vueltas.** Lo decía esta guía y era una excusa
+disfrazada de regla: se anunciaba el rojo en vez de evitarlo. El 2026-08-31 se midió
+`ResourceKeyConverter` en **83,33 %** de ramas y CI dijo **83**: el número estaba en la mano y se usó
+para escribir un aviso en el relevo en lugar de para corregir el archivo.
+
+**Y ya no es una frase, porque una frase no dispara:**
+
+```powershell
+pwsh -NoProfile -File eng/preview-coverage-floors.ps1
+pwsh -NoProfile -File eng/preview-coverage-floors.ps1 -Suites Domain.Tests,UiTests,IntegrationTests
+```
+
+Corre las suites que le nombras, lee los informes con **la aritmética de la puerta** y dice qué
+suelos se van a quedar cortos y qué archivo nuevo no llega a 96/96. **No escribe
+`eng/coverage-debt.txt`**: los suelos siguen saliendo del artefacto de CI, que es lo único que mide
+los siete archivos de hardware. Lo que cambia es que el artefacto **confirma** en vez de descubrir.
+
+**Sus dos límites están escritos dentro y un silencio suyo no es un certificado**: sólo conoce las
+suites que corres —un archivo cubierto por una que no corriste lee bajo—, y esos siete archivos
+nunca leen aquí como leen en el runner.
+
+**Y no basta con mirar los archivos nuevos.** Un archivo sube por dos vías, y la segunda es la que se
+olvida: porque le añades una rama cubierta, o porque **pruebas nuevas lo recorren de paso**. Ese día
+`AddLibraryRoot` pasó de 85 a 92 sin que nadie lo tocara, sólo porque las pruebas de
+`DeclareCourseFolder` lo atraviesan. Las dos vías se leen en el propio diff: **qué archivos toco, y
+qué archivos ejecuta lo que acabo de probar**.
+
+**Cuándo sí son dos vueltas**, y entonces se dice por qué en concreto en vez de citar esta sección:
+cuando el archivo que sube es uno de los **siete que dependen de hardware** que un runner hospedado no
+tiene, porque su cifra local no es la de CI y no hay forma de adelantarla.
 
 **Lo que sí se puede hacer aquí es reproducir lo que CI mide, y evita perseguir a ciegas.**
 `gh run download <id> -n test-results` trae los **20 informes Cobertura** del run; fusionados con el

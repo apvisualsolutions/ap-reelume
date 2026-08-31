@@ -91,11 +91,16 @@ gh run view <id> --log-failed        # y qué falló exactamente, sin suponer
 **Tres rojos conocidos que no significan que tu trabajo esté mal**, y los tres han costado tiempo por
 diagnosticarlos desde cero:
 
-1. **«N improved» en la puerta de cobertura.** Es el rojo **esperado** de la primera vuelta cuando
-   una tanda sube cobertura: la puerta falla igual ante un suelo corto y ante uno largo, así que en
-   cuanto un archivo mejora exige sacarlo de la lista. La corrección es la segunda vuelta —copiar
-   `eng/coverage-debt.txt` del artefacto `coverage-debt` de ese run y bajar `$debtRatchet`—, **nunca
-   editar la lista a mano**. Subir cobertura cuesta DOS vueltas y se planifica contando eso.
+1. **«N improved» en la puerta de cobertura**, y **es un rojo que casi siempre se pudo evitar**. La
+   puerta falla igual ante un suelo corto y ante uno largo, así que en cuanto un archivo mejora exige
+   subir su suelo. La corrección es copiar `eng/coverage-debt.txt` del artefacto `coverage-debt` de un
+   run, **nunca editar la lista a mano**.
+   **Lo que evita la vuelta perdida es medirlo ANTES de empujar**: los suelos que van a subir se
+   reproducen aquí y entran en el mismo commit, y el artefacto sirve para confirmar. Un archivo sube
+   por dos vías y la segunda se olvida — porque le añades una rama cubierta, o porque **pruebas
+   nuevas lo recorren de paso**. El 2026-08-31 se midió uno en 83,33 % y CI dijo 83, y aun así se
+   empujó el rojo: el número estaba en la mano. **Sólo son dos vueltas de verdad** cuando lo que sube
+   es uno de los siete archivos que dependen de hardware que el runner no tiene.
 2. **`MarkerEditorViewModel` pidiendo que le suban el suelo.** Su medición **oscila**: 79, 79, 79,
    81, 79 en cinco runs seguidos, y otra vez 81 el 2026-08-31 tumbando un run que solo tocaba un
    `.md`. **NO se sube.** Ya se subió a 81 una vez y el siguiente run falló por lo contrario. Se
