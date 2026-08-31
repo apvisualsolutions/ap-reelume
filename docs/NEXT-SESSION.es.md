@@ -51,17 +51,18 @@
 > patrón medido del árbol —verbo concreto, no sí/no, como «Continuar» y «Empezar de nuevo»—:
 > **«Marcarlas todas»** y **«Sólo esta»**. Si prefiere otras, es un cambio de dos cadenas.
 >
-> ### Un rojo de CI que ya está previsto, y no es tuyo
+> ### El rojo de cobertura de la primera vuelta, y su segunda
 >
-> **`ResourceKeyConverter.cs` mejora, así que la puerta de cobertura pedirá subir su suelo.** Ganó la
-> rama del `ConverterParameter` y sus dos lados están cubiertos: en `UiTests` sola pasa de **82,35 % a
-> 83,33 %** de ramas, y su suelo declarado son **78**. Es el «N improved» de siempre: **la primera
-> vuelta sale roja a propósito** y la segunda copia `coverage-debt` del artefacto de la primera. Se
-> planifica contando esa segunda vuelta.
+> **Pasó lo previsto y ya está corregido.** El run de `8901206` dio **todas las pruebas en verde**
+> —646, 290, 30, 508, 1097, 147, 144, 191, 93 y 17— y falló sólo la puerta de cobertura con
+> **«2 improved»**: `ResourceKeyConverter.cs` llega a **100/83** (ganó la rama del
+> `ConverterParameter`) y `AddLibraryRoot.cs` a **100/92** (lo ejercitan las pruebas de
+> `DeclareCourseFolder`). Los suelos se copiaron del artefacto `coverage-debt` de ese mismo run, que
+> es el único sitio de donde puede salir un suelo; la lista sigue en **189 filas** y `$debtRatchet`
+> sigue en 189, así que el guion no se toca.
 >
-> **Lo que NO va a fallar, medido aquí antes de empujar**, reproduciendo la aritmética de la puerta
-> sobre los informes de cada suite: los tres archivos nuevos llegan al listón de archivos nuevos
-> —96/96 sin techos— dentro de **una sola suite**, que es como cuenta la fusión.
+> **Y los tres archivos nuevos pasaron la puerta de archivos nuevos a la primera**, que era lo que se
+> midió aquí antes de empujar para no gastar la vuelta a ciegas:
 >
 > | archivo | suite | líneas | ramas |
 > | --- | --- | --- | --- |

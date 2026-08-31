@@ -52,17 +52,18 @@
 > the tree's measured pattern — a concrete verb rather than yes/no, the way «Continue» and «Start
 > over» already do: **«Mark them all»** and **«Only this one»**. Other wording is a two-string change.
 >
-> ### A CI red that is already expected, and is not yours
+> ### The first round's coverage red, and its second round
 >
-> **`ResourceKeyConverter.cs` improves, so the coverage gate will ask for its floor to be raised.** It
-> gained the `ConverterParameter` branch and both sides are covered: in `UiTests` alone it goes from
-> **82.35 % to 83.33 %** of branches, and its declared floor is **78**. This is the usual "N improved":
-> **the first round is red on purpose** and the second copies `coverage-debt` from the first round's
-> artefact. Plan for that second round.
+> **What was expected happened, and it is already fixed.** The run for `8901206` came back with
+> **every test green** — 646, 290, 30, 508, 1097, 147, 144, 191, 93 and 17 — and failed only the
+> coverage gate with **"2 improved"**: `ResourceKeyConverter.cs` reaches **100/83** (it gained the
+> `ConverterParameter` branch) and `AddLibraryRoot.cs` reaches **100/92** (the `DeclareCourseFolder`
+> tests exercise it). The floors were copied from that same run's `coverage-debt` artefact, which is
+> the only place a floor may come from; the list is still **189 rows** and `$debtRatchet` is still
+> 189, so the script is untouched.
 >
-> **What will NOT fail, measured here before pushing**, by reproducing the gate's arithmetic over each
-> suite's own report: all three new files clear the new-file bar — 96/96 with no measured ceilings —
-> inside **one suite**, which is how the merge counts.
+> **And all three new files cleared the new-file bar on the first round**, which is what was measured
+> here before pushing so the round was not spent blind:
 >
 > | file | suite | lines | branches |
 > | --- | --- | --- | --- |
