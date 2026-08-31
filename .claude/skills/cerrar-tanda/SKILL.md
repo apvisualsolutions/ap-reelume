@@ -1,7 +1,6 @@
 ---
 name: cerrar-tanda
 description: Cierra una tanda de trabajo entera — verificar que nada quedó roto, un commit, push solo a la rama, CI verifica, fast-forward a main con la conclusion leida, documentos en dos idiomas, decisiones abiertas cerradas, tareas de fondo al dia, y el prompt de la siguiente sesion listo para copiar. Usar cuando el trabajo esta terminado y hay que publicarlo y dejarlo recogido.
-disable-model-invocation: true
 ---
 
 # Cerrar una tanda
@@ -12,6 +11,17 @@ tiene un fallo que ya ha ocurrido**, y por eso está aquí en vez de en la memor
 **No se cierra a medias.** Los pasos 1 a 6 publican; los pasos 7 a 10 son los que hacen que la
 sesión siguiente no empiece preguntando. Saltarse los segundos deja el trabajo hecho y el contexto
 perdido, que es la forma cara de terminar.
+
+> **Este archivo llevó `disable-model-invocation: true` y se quitó el 2026-08-31, midiendo lo que
+> protegía: nada.** La idea era que mover `main` fuese siempre un acto explícito de una persona. Pero
+> `main` se mueve con `git branch -f` y `git push`, que son órdenes normales — ese mismo día se movió
+> **seis veces** sin pasar por aquí. Lo único que la marca impedía era **leer este documento**, así
+> que el cierre se hizo sin la lista de trampas en vez de sin el poder de cerrar: el peor de los dos
+> resultados. Una guarda que se declara y no guarda de nada es el defecto que este repositorio
+> persigue con nombre propio. **Lo que de verdad protege el paso peligroso está en el paso 6**, que
+> exige leer la conclusión antes de mover la referencia; y lo que limita a un agente son los permisos
+> de herramientas, no una línea de frontmatter. Si alguien vuelve a ponerla, que sea midiendo qué
+> impide.
 
 ## 1. Que nada quedó roto: las puertas, solo las suites afectadas
 
