@@ -72,6 +72,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The file whose coverage oscillated no longer does, and the cause was not the gate.**
+  `MarkerEditorViewModel` measured 79, 79, 79, 81, 79 over five consecutive runs and read 81 again on
+  2026-08-31, felling a run that **only touched a `.md`**. Its floor was raised once and the next run
+  failed for the opposite reason, so the gate had **no** correct position for it: at 79 it fails when
+  the run measures 81, at 81 it fails when the run measures 79.
+
+  **Why it moved was measured before the gate was touched**, and what turned up is that **three of
+  its branches were being covered by accident**: the null-conditional at line 171 and the index
+  guards at 182 and 205 were taken only by the **autonomous walk**, which presses with a real mouse
+  and reaches that state some runs and not others. No unit test touched them, for a precise reason:
+  every test saved a **new** marker, so the arm that **replaces** an existing one never ran; and none
+  changed the list during a delete's `await`, so the arm where the row **has already gone** never ran
+  either. Both are real states — editing a marker, and anything that reloads the card mid-delete —
+  and both now have a test.
+
+  **Measured after: `UiTests` alone goes from 34/44 to 37/44**, above the 36 this file ever reached
+  while oscillating. Since the merge keeps the best report for each line, the merged figure **can no
+  longer fall below 37**, and the number stops moving.
+
+  **Its floor will want raising on the next round, and that raise is legitimate**: not a lucky run,
+  but a branch a deterministic test now takes every time. The right correction was **covering the
+  branch on purpose, not loosening the gate** — which is what starting from the patch would have
+  done.
+
 - **The two Courses ViewModels arrived without a single test, and they were all that stood between
   `main` and being unblocked.** `CoursesViewModel` measured 96.15 % of lines and **58.33 % of
   branches**, `CourseDetailsViewModel` 93.91 % and **58.51 %**; the **new-file** gate asks for 96/96

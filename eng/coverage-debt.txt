@@ -23,11 +23,24 @@
 ## carried a floor from a luckier run. The LibVLC one is the audio-device enumeration and the
 ## EncounteredError event, which a hosted runner has no hardware to raise.
 ##
-## And one file DANCES: MarkerEditorViewModel measured 79, 79, 79, 81, 79 over five consecutive CI
-## runs on 2026-08-25 and 26. It was raised to 81 on the fourth of those and the fifth failed on it,
-## which is the whole lesson this gate can teach about itself: "improved" is what one run said, and a
-## floor is what every run has to meet. Its floor is the 79 it holds, and it is not to be raised
-## again on a single reading — the artefact of one run is a measurement, not a trend.
+## One file DANCED and it has stopped. MarkerEditorViewModel measured 79, 79, 79, 81, 79 over five
+## consecutive CI runs on 2026-08-25 and 26, was raised to 81 on the fourth and the fifth failed on
+## it, and it read 81 again on 2026-08-31, felling a run that only touched a .md. The lesson it
+## taught stands: "improved" is what ONE run said, and a floor is what EVERY run has to meet.
+##
+## 2026-08-31: the cause was found rather than tolerated, and it was not the gate. Three branches of
+## this file -- the null-conditional at 171 and the index guards at 182 and 205 -- were taken ONLY by
+## the autonomous walk, which presses with a real mouse and reaches that state some runs and not
+## others. Nothing unit-tested them: every test saved a NEW marker, so the arm that REPLACES an
+## existing one never ran; and no test changed the list during a delete's await, so the arm where the
+## row has already gone never ran either. Both are real states -- editing a marker, and anything that
+## reloads the card mid-delete -- and both now have a test in MarkerUiTests.
+##
+## Measured after: UiTests ALONE goes 34/44 to 37/44, above the 36 this file ever reached while it
+## oscillated. Since the merge keeps the best report per line, the merged figure can no longer fall
+## below 37, so the number stops moving. ITS FLOOR WILL WANT RAISING to whatever CI measures next,
+## and THAT raise is legitimate: not a lucky run, but a branch a deterministic test now takes every
+## time.
 ##
 ## 2026-08-28: this list is now checked for being COMPLETE, not only for being accurate.
 ##

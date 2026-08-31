@@ -162,6 +162,105 @@ public sealed class MarkerUiTests
         _ = view;
     }
 
+    /// <summary>
+    /// Saving a marker that is already in the list replaces it in place rather than adding a second
+    /// copy of it, which is what editing one does.
+    /// </summary>
+    /// <remarks>
+    /// The other arm the walk was taking by accident. <c>SaveAsync</c> looks the saved marker up and
+    /// either replaces it or appends it; every unit test until now saved a NEW marker, so only the
+    /// appending arm was taken here and the replacing one was covered — some runs — by the
+    /// autonomous walk editing an existing marker with a real mouse. That is the pair that made this
+    /// file measure 79 % on one run and 81 % on the next with no code change between them.
+    /// </remarks>
+    [AvaloniaFact]
+    public void Saving_a_marker_that_is_already_listed_replaces_it_instead_of_adding_a_second()
+    {
+        var existing = Marker(MarkerKind.Intro, 30, 120);
+        // Same identity, different minutes: that is what makes the save replace instead of append.
+        var edited = existing with
+        {
+            Start = TimeSpan.FromSeconds(45),
+            End = TimeSpan.FromSeconds(150),
+        };
+        var view = BuildEditor(
+            out var viewModel,
+            (_, _, _, _) => Task.FromResult(new SaveManualMarkerResult(SaveMarkerOutcome.Saved, edited, null)));
+        viewModel.Load(Series, [existing], TimeSpan.FromMinutes(50));
+        Assert.Single(viewModel.Markers);
+
+        viewModel.SelectedMarker = viewModel.Markers[0];
+        viewModel.StartSeconds = 45;
+        viewModel.EndSeconds = 150;
+        viewModel.SaveCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+
+        // One row, not two, and it is the edited one: the identity is what decides, not the position.
+        var row = Assert.Single(viewModel.Markers);
+        Assert.Equal(existing.Id, row.Id);
+        Assert.Equal(TimeSpan.FromSeconds(45), row.Start);
+        Assert.Equal(TimeSpan.FromSeconds(150), row.End);
+        _ = view;
+    }
+
+    /// <summary>
+    /// A marker that leaves the list while its own deletion is in flight, which is the arm
+    /// <c>DeleteAsync</c>'s index guard exists for.
+    /// </summary>
+    /// <remarks>
+    /// This is written on purpose because it was being covered <b>by accident</b>, and that cost two
+    /// red CI runs. <c>DeleteAsync</c> awaits the handler and only then looks the marker up again, so
+    /// the arm where it is no longer there needs the list to change during the await. No unit test
+    /// did that, and the only thing that ever took it was the autonomous walk pressing with a real
+    /// mouse — which reaches that state some runs and not others. The file's branch coverage
+    /// therefore oscillated between 79 % and 81 % with identical code, and the gate has no correct
+    /// floor for a file that oscillates: at 79 it fails when the run measures 81, and at 81 it fails
+    /// when the run measures 79. Both happened. Taking the arm deliberately here is what stops the
+    /// number from moving, and it is a real state rather than a contrived one: anything that reloads
+    /// the card mid-delete produces it.
+    /// </remarks>
+    [AvaloniaFact]
+    public void Deleting_a_marker_that_left_the_list_meanwhile_removes_nothing_and_still_clears_the_selection()
+    {
+        var saved = Marker(MarkerKind.Intro, 30, 120);
+        MarkerEditorViewModel? model = null;
+        var deleted = new List<Guid>();
+        var view = BuildEditor(
+            out var viewModel,
+            (_, _, _, _) => Task.FromResult(new SaveManualMarkerResult(SaveMarkerOutcome.Saved, saved, null)),
+            id =>
+            {
+                deleted.Add(id);
+
+                // The list is recomposed while the deletion is in flight, which is what a reload of
+                // the card does. The handler still reports success: the marker IS gone, it just went
+                // by another road.
+                model!.Markers.Clear();
+                return Task.FromResult(true);
+            });
+        model = viewModel;
+        viewModel.Load(Series, [], TimeSpan.FromMinutes(50));
+
+        viewModel.StartSeconds = 30;
+        viewModel.EndSeconds = 120;
+        viewModel.SaveCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+        viewModel.SelectedMarker = viewModel.Markers[0];
+
+        viewModel.DeleteCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+
+        // It asked for the deletion and did not fail looking for a row that had already gone. A
+        // RemoveAt on the -1 the lookup returns would have thrown at whoever was drawing.
+        Assert.Equal(saved.Id, Assert.Single(deleted));
+        Assert.Empty(viewModel.Markers);
+        Assert.True(viewModel.IsEmpty);
+
+        // And the selection is cleared either way, because the row it pointed at is gone in both.
+        Assert.Null(viewModel.SelectedMarker);
+        _ = view;
+    }
+
     [AvaloniaFact]
     public void Every_control_is_named_and_takes_keyboard_focus()
     {

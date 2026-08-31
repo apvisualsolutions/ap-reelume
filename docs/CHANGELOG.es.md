@@ -73,6 +73,30 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El archivo cuya cobertura oscilaba ya no oscila, y la causa no era la puerta.**
+  `MarkerEditorViewModel` medía 79, 79, 79, 81, 79 en cinco runs seguidos y volvió a dar 81 el
+  2026-08-31, tumbando un run que **sólo tocaba un `.md`**. Se subió su suelo una vez y el run
+  siguiente falló por lo contrario, así que la puerta no tenía **ninguna** posición correcta para él:
+  con 79 falla cuando mide 81, y con 81 falla cuando mide 79.
+
+  **Antes de tocar la puerta se midió por qué se movía**, y lo que se encontró es que **tres de sus
+  ramas se cubrían por accidente**: el condicional nulo de la línea 171 y las dos guardas de índice de
+  182 y 205 sólo las tomaba el **paseo autónomo**, que pulsa con un ratón de verdad y alcanza ese
+  estado unos runs sí y otros no. Ninguna prueba unitaria las tocaba, y el motivo es preciso: todas
+  guardaban un marcador **nuevo**, así que el brazo que **sustituye** uno existente no corría nunca; y
+  ninguna cambiaba la lista durante el `await` de un borrado, así que el brazo donde la fila **ya no
+  está** tampoco. Los dos son estados reales —editar un marcador, y cualquier cosa que recargue la
+  ficha a mitad de un borrado— y los dos tienen ya su prueba.
+
+  **Medido después: `UiTests` sola pasa de 34/44 a 37/44**, por encima del 36 que el archivo llegó a
+  alcanzar mientras oscilaba. Como la fusión se queda con el mejor informe de cada línea, la cifra
+  fusionada **ya no puede bajar de 37**, y el número deja de moverse.
+
+  **Su suelo pedirá subir en la próxima vuelta, y esa subida sí es legítima**: no es un run con
+  suerte, es una rama que una prueba determinista toma siempre. La corrección correcta era **cubrir
+  la rama a propósito, no aflojar la puerta** — que es lo que se habría hecho de haber empezado por
+  el parche.
+
 - **Los dos ViewModels de Cursos entraron sin una sola prueba, y son lo único que le quedaba a `main`
   para desbloquearse.** `CoursesViewModel` medía 96,15 % de líneas y **58,33 % de ramas**, y
   `CourseDetailsViewModel` 93,91 % y **58,51 %**; la puerta de archivos **nuevos** exige 96/96 y, a
