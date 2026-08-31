@@ -38,9 +38,10 @@
 ##
 ## Measured after: UiTests ALONE goes 34/44 to 37/44, above the 36 this file ever reached while it
 ## oscillated. Since the merge keeps the best report per line, the merged figure can no longer fall
-## below 37, so the number stops moving. ITS FLOOR WILL WANT RAISING to whatever CI measures next,
-## and THAT raise is legitimate: not a lucky run, but a branch a deterministic test now takes every
-## time.
+## below 37, so the number stops moving. ITS FLOOR WAS RAISED 79 -> 84 on 2026-08-31 by the very next
+## CI run, and THAT raise was legitimate: not a lucky run, but a branch a deterministic test now
+## takes every time. If it ever moves again, the question is which branch went back to being taken
+## by accident -- not what tolerance the gate should grow.
 ##
 ## 2026-08-28: this list is now checked for being COMPLETE, not only for being accurate.
 ##
@@ -284,7 +285,7 @@ src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml   
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileViewModel.cs                          97  82
 src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorView.axaml                        100  50
-src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorViewModel.cs                       95  79
+src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorViewModel.cs                       95  84
 src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerChromeView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Player/MiniPlayerWindow.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/NextEpisodeOverlay.axaml                      100  50
