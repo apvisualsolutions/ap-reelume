@@ -91,12 +91,12 @@ public sealed class MarkerUiTests
         var view = BuildEditor(out var viewModel);
         var list = view.GetVisualDescendants().OfType<ListBox>().Single(l => l.Name == "MarkerList");
 
-        viewModel.Load(Series, [Marker(MarkerKind.Intro, 30, 120), Marker(MarkerKind.Credits, 2_800, 3_000)], TimeSpan.FromMinutes(50));
+        viewModel.Load([Marker(MarkerKind.Intro, 30, 120), Marker(MarkerKind.Credits, 2_800, 3_000)], TimeSpan.FromMinutes(50));
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(2, viewModel.Markers.Count);
         Assert.Equal(2, list.ItemCount);
 
-        viewModel.Load(OtherSeries, [], TimeSpan.FromMinutes(90));
+        viewModel.Load([], TimeSpan.FromMinutes(90));
         Dispatcher.UIThread.RunJobs();
         Assert.Empty(viewModel.Markers);
         Assert.Equal(0, list.ItemCount);
@@ -114,7 +114,7 @@ public sealed class MarkerUiTests
             .OfType<TextBlock>()
             .Where(block => IsOwnControl(block.Name))
             .ToDictionary(block => block.Name!, block => block);
-        viewModel.Load(Series, [], TimeSpan.FromMinutes(50));
+        viewModel.Load([], TimeSpan.FromMinutes(50));
 
         viewModel.StartSeconds = 200;
         viewModel.EndSeconds = 100;
@@ -145,7 +145,7 @@ public sealed class MarkerUiTests
                 deleted.Add(id);
                 return Task.FromResult(true);
             });
-        viewModel.Load(Series, [], TimeSpan.FromMinutes(50));
+        viewModel.Load([], TimeSpan.FromMinutes(50));
 
         viewModel.StartSeconds = 30;
         viewModel.EndSeconds = 120;
@@ -186,7 +186,7 @@ public sealed class MarkerUiTests
         var view = BuildEditor(
             out var viewModel,
             (_, _, _, _) => Task.FromResult(new SaveManualMarkerResult(SaveMarkerOutcome.Saved, edited, null)));
-        viewModel.Load(Series, [existing], TimeSpan.FromMinutes(50));
+        viewModel.Load([existing], TimeSpan.FromMinutes(50));
         Assert.Single(viewModel.Markers);
 
         viewModel.SelectedMarker = viewModel.Markers[0];
@@ -239,7 +239,7 @@ public sealed class MarkerUiTests
                 return Task.FromResult(true);
             });
         model = viewModel;
-        viewModel.Load(Series, [], TimeSpan.FromMinutes(50));
+        viewModel.Load([], TimeSpan.FromMinutes(50));
 
         viewModel.StartSeconds = 30;
         viewModel.EndSeconds = 120;
@@ -265,7 +265,7 @@ public sealed class MarkerUiTests
     public void Every_control_is_named_and_takes_keyboard_focus()
     {
         var editor = BuildEditor(out var viewModel);
-        viewModel.Load(Series, [Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromMinutes(50));
+        viewModel.Load([Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromMinutes(50));
         Dispatcher.UIThread.RunJobs();
 
         Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(editor)));
@@ -321,7 +321,7 @@ public sealed class MarkerUiTests
             var editor = new MarkerEditorView { DataContext = editorViewModel };
             var editorWindow = new Window { Width = 560, Height = 380, Content = editor };
             editorWindow.Show();
-            editorViewModel.Load(Series, [Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromMinutes(50));
+            editorViewModel.Load([Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromMinutes(50));
             Dispatcher.UIThread.RunJobs();
             var editorFrame = editorWindow.CaptureRenderedFrame();
             Assert.NotNull(editorFrame);
@@ -346,6 +346,108 @@ public sealed class MarkerUiTests
     }
 
     /// <summary>True for a control this view named itself, rather than a template part of a built-in one.</summary>
+    /// <summary>
+    /// The four guards that answer «there is nothing to do», and the search arm that walks past a row
+    /// before finding the one it wants.
+    /// </summary>
+    /// <remarks>
+    /// These are the branches that kept this file's figure moving. None of them is defensive: a model
+    /// built with no handler is what a preview and an unassembled composition are, a skip with no
+    /// active range is the state the button spends most of an episode in, and deleting anything but
+    /// the first marker walks past one that does not match.
+    /// <para>
+    /// They are plain <c>[Fact]</c>s driving the models directly, because what they measure is a
+    /// decision and not a screen. Until 2026-08-31 the only things that reached some of them were the
+    /// autonomous walk — which arrives at that state some runs and not others — and nothing at all.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task Nothing_happens_where_there_is_nothing_to_do()
+    {
+        // No range under the playhead, which is most of an episode: the command is bound and pressing
+        // it must do nothing rather than throw.
+        var skipped = 0;
+        var idle = new SkipMarkerViewModel(_ =>
+        {
+            skipped++;
+            return Task.CompletedTask;
+        });
+        await idle.SkipAsync();
+        Assert.Equal(0, skipped);
+        Assert.False(idle.IsVisible);
+
+        // A range under the playhead but no handler: a composition that never wired one.
+        var unwired = new SkipMarkerViewModel();
+        unwired.Apply([Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromSeconds(60));
+        Assert.True(unwired.IsVisible);
+        await unwired.SkipAsync();
+
+        // And an editor with neither handler: Save and Delete answer by doing nothing.
+        var editor = new MarkerEditorViewModel();
+        editor.Load([Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromMinutes(50));
+        await editor.SaveAsync();
+        await editor.DeleteAsync();
+        Assert.Single(editor.Markers);
+        Assert.False(editor.HasRangeError);
+    }
+
+    /// <summary>
+    /// Delete with a handler and nothing selected, which is how the panel opens every time.
+    /// </summary>
+    [Fact]
+    public async Task Deleting_with_nothing_selected_asks_the_handler_nothing()
+    {
+        var asked = 0;
+        var editor = new MarkerEditorViewModel(onDelete: _ =>
+        {
+            asked++;
+            return Task.FromResult(true);
+        });
+        editor.Load([Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromMinutes(50));
+
+        Assert.Null(editor.SelectedMarker);
+        await editor.DeleteAsync();
+
+        Assert.Equal(0, asked);
+        Assert.Single(editor.Markers);
+    }
+
+    /// <summary>
+    /// Deleting the second of two markers, so the search walks past one that does not match. Every
+    /// other test deletes a list's only row, where the first row is already the answer.
+    /// </summary>
+    [Fact]
+    public async Task Deleting_a_marker_that_is_not_the_first_walks_past_the_ones_before_it()
+    {
+        var editor = new MarkerEditorViewModel(onDelete: _ => Task.FromResult(true));
+        var first = Marker(MarkerKind.Intro, 30, 120);
+        var second = Marker(MarkerKind.Credits, 2_800, 3_000);
+        editor.Load([first, second], TimeSpan.FromMinutes(50));
+        editor.SelectedMarker = second;
+
+        await editor.DeleteAsync();
+
+        Assert.Equal([first.Id], editor.Markers.Select(marker => marker.Id));
+        Assert.Null(editor.SelectedMarker);
+    }
+
+    /// <summary>
+    /// A model nobody is listening to. Every other test here mounts a view, which subscribes, so the
+    /// arm where <c>PropertyChanged</c> is null was reached by nothing deterministic.
+    /// </summary>
+    [Fact]
+    public void A_model_with_no_listener_still_recomputes_its_state()
+    {
+        var button = new SkipMarkerViewModel();
+
+        button.Apply([Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromSeconds(60));
+        Assert.True(button.IsVisible);
+        Assert.True(button.IsIntro);
+
+        button.Apply([Marker(MarkerKind.Intro, 30, 120)], TimeSpan.FromSeconds(600));
+        Assert.False(button.IsVisible);
+    }
+
     private static bool IsOwnControl(string? name) =>
         !string.IsNullOrEmpty(name) && !name.StartsWith("PART_", StringComparison.Ordinal);
 
