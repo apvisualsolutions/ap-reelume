@@ -5658,6 +5658,41 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var window = RootOf(host, control);
         Reveal(host, control);
 
+        // The layout is settled before a single Bounds is read, and this is the thirteenth cause of
+        // a red that only ever appeared in CI — twice now, which is why the fix moved here.
+        //
+        // Every number below comes from geometry: the centre, the rectangles of the controls that
+        // could take the click, and the offsets between them. A press that changed which controls
+        // sit in a row leaves all three describing the row as it was, so the point chosen to be
+        // "beside" everything lands on a neighbour that has since moved under it. On 2026-08-28
+        // that answered `Expected: Embedded, Actual: Fullscreen`, and the fix was an
+        // InvalidateMeasure in the one scene that had just changed a row. It came back on
+        // 2026-09-01 in the same scene, from the press after that one: pressing «back to 1×»
+        // REMOVES that button from the row, so the row recomposes again, and the next aim was
+        // taken at where it used to be.
+        //
+        // Settling it in the scene fixes the line somebody remembered; settling it here fixes the
+        // rule, because every beside-click reads geometry and any press can have changed it. The
+        // cost is one measure pass per press.
+        //
+        // <b>It is not reproducible on this machine</b> — the case alone and the whole suite have
+        // run green here every time, across both dates — so what confirms this is CI's second pass
+        // and nothing local can.
+        //
+        // <b>`window` and not `host.Window`</b>, which is a second defect this line had on the way
+        // in: everything below measures `window`, and RootOf returns the control's own Window with
+        // the shell's only as a fallback. With the mini player on screen those are two different
+        // windows, so settling the shell and then reading the mini player's Bounds would leave the
+        // same staleness this is here to remove — in the one situation the paragraph above the
+        // candidate set already warns about.
+        //
+        // InvalidateMeasure marks the layout dirty rather than running it, so RunJobs is what
+        // actually performs the pass the LayoutManager queued. Measured rather than assumed:
+        // removing the middle button of a three-button row moved the third from x=80 to x=40 after
+        // InvalidateMeasure + RunJobs, and a subsequent UpdateLayout moved it no further.
+        window.InvalidateMeasure();
+        Dispatcher.UIThread.RunJobs();
+
         var centre = control.TranslatePoint(
             new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
             window);
