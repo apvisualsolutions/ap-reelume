@@ -3,9 +3,10 @@
 - Fecha / Date: 2026-09-01
 - Rama / Branch: `codex/ap-reelume-mvp-x64`
 - Entorno / Environment: Windows 11 Pro 10.0.26200 x64, .NET SDK 10.0.302, LibVLC 3.0.23.1,
-  ffmpeg 2024-06-21, cuatro endpoints de render activos: dos ASUS ProArt PA279CRV por DisplayPort,
-  auriculares Logitech G535 y la salida digital Realtek
-- IDs: `PLY-004=BLOCKED` (sin cambio / unchanged)
+  ffmpeg 2024-06-21. Cuatro endpoints físicos de render: dos ASUS ProArt PA279CRV por DisplayPort,
+  auriculares Logitech G535 y la salida digital Realtek, los cuatro estéreo. Más ocho endpoints
+  virtuales de VoiceMeeter Banana 2.1.2.2, uno de ellos puesto a 7.1
+- IDs: `PLY-004=VERIFIED` (era `BLOCKED` / was blocked)
 
 ## Por qué existe / Why this exists
 
@@ -116,25 +117,89 @@ PLY-004 quiere verificar, y por eso nadie lo había visto. / The layout the pers
 reaches LibVLC. It is invisible today because every endpoint is stereo and the reduction coincides
 with what the engine would do anyway; it only shows up on a multichannel endpoint.
 
-**No se corrige en esta tanda a propósito**: la elección entre pasar la disposición al motor y
-quitarle a la interfaz un control que no puede cumplir depende de qué haga LibVLC de verdad sobre un
-endpoint de ocho canales, y eso no puede medirse aquí todavía. / It is deliberately not fixed yet,
-because the choice depends on what LibVLC actually does on an eight-channel endpoint.
+**Medido ya sobre ocho canales, y decidido.** Con el endpoint a 7.1, LibVLC entrega las ocho pistas
+correctas **sin que nadie le diga nada**: negocia con WASAPI y acierta. Lo que queda roto es sólo el
+control: si la persona elige «Estéreo» teniendo un endpoint 7.1, `ResolveLayout` devuelve `Stereo`
+—está en `SupportedLayouts`—, la interfaz muestra «Estéreo», y el motor sigue entregando ocho
+canales. **La interfaz miente sobre lo que suena.**
 
-## Lo que sigue bloqueado / What stays blocked
+**Decisión: se retira el control en vez de alimentarlo**, y el porqué es técnico, no de gusto.
+LibVLC 3 no ofrece ninguna vía para fijar 5.1/7.1 en caliente: `libvlc_audio_set_channel` sólo cubre
+modos estéreo (estéreo, invertido, izquierdo, derecho, Dolby) y `--stereo-mode` es opción de
+instancia o de medio, así que aplicarla exigiría **reabrir el medio** — y eso rompería la garantía ya
+verificada de que un cambio de salida pausa, cambia y reanuda sin perder posición ni pistas. La
+disposición efectiva la decide la negociación con el endpoint, que es donde Windows pone ese control,
+y el identificador pide **dispositivo** seleccionable, no disposición seleccionable. Un control que
+no puede cumplir su promesa es peor que no tenerlo.
 
-Los cuatro endpoints de render activos siguen declarando **dos canales**, remedido el 2026-09-01. El
-NVIDIA Virtual Audio Device está instalado como controlador pero ninguno de sus endpoints aparece
-activo. `Every_channel_of_a_surround_endpoint_carries_only_its_own_tone` se **omite** con el motivo
-escrito, y se convierte en la verificación de 7.1 en cuanto exista un endpoint de ocho canales, sin
-tocar una línea. / The four active endpoints still declare two channels; the surround test skips with
-its reason stated and becomes the 7.1 verification the moment an eight-channel endpoint exists.
+**No se ejecuta en esta tanda**, también por una razón concreta: quitar un control de una vista
+mueve el trinquete del paseo autónomo y toca `AudioOutputViewTests`, `AudioOutputWiringTests` y
+`AssembledPhysicalWalkTests`, que es tanda propia; y hay otra sesión trabajando en `Presentation`
+ahora mismo. Queda abierto con la decisión ya tomada. / Measured on eight channels: LibVLC delivers
+the correct eight tracks unprompted, so only the control is broken. The decision is to withdraw it
+rather than feed it, because LibVLC 3 has no way to set 5.1/7.1 without reopening the media, which
+would break the already-verified hot-switch guarantee. Not executed this batch: removing a control
+moves the walk ratchet and touches three view suites.
 
-Descartado por medición: el sonido espacial de Windows no cambia el formato de mezcla del endpoint, y
-ASIO4ALL no es un endpoint WASAPI de render. La decisión del propietario del 2026-09-01 acepta un
-endpoint **virtual** de ocho canales como verificación válida, anotando su naturaleza virtual. /
-Ruled out by measurement: Windows Spatial Sound does not change the endpoint mix format, and ASIO4ALL
-is not a WASAPI render endpoint.
+## El endpoint de ocho canales, y cómo se consiguió / The eight-channel endpoint, and how it was obtained
+
+Los cuatro endpoints físicos siguen declarando **dos canales** y ninguno puede subir: los tres que
+publican `PKEY_AudioEndpoint_PhysicalSpeakers` lo dan en 0, los dos PA279CRV van por DisplayPort con
+EDID estéreo, los auriculares son estéreo por hardware y S/PDIF sólo transporta dos canales PCM. El
+`NVIDIA Virtual Audio Device` está instalado como controlador pero ninguno de sus endpoints aparece
+activo. / The four physical endpoints still declare two channels and none can be raised.
+
+**La decisión del propietario del 2026-09-01 acepta un endpoint virtual**, y ésta es la anotación que
+esa decisión exige: **el endpoint sobre el que se midió es virtual**. Se instaló **VoiceMeeter Banana
+2.1.2.2** (`VB-Audio.Voicemeeter.Banana`, desde winget), que publica ocho endpoints de render nuevos.
+/ The endpoint measured on is virtual: VoiceMeeter Banana 2.1.2.2, installed from winget.
+
+**Windows los crea todos en estéreo**, así que instalar no basta. Antes de tocar nada se preguntó al
+controlador **qué formatos acepta**, con `IAudioClient::IsFormatSupported` en modo exclusivo, para no
+fijar uno inválido:
+
+| Canales / Channels | Aceptados / Accepted |
+|---|---|
+| 8 (7.1) | 48000 y 44100 Hz, 24 y 16 bits PCM |
+| 6 (5.1) | 48000 y 44100 Hz, 24 y 16 bits PCM |
+| 2 | 48000 y 44100 Hz, 24 y 16 bits PCM |
+
+Con esa respuesta en la mano, `Voicemeeter Input` pasó de `2 canales, mask 0x3` a **`8 canales, 48000
+Hz, 24 bit, mask 0x63F`**, y el registro lo confirma por el mismo camino que lee
+`WindowsAudioDeviceCatalog`. **Es reversible**: `IPolicyConfig::ResetDeviceFormat` sobre ese endpoint,
+o el desplegable «Formato predeterminado» del panel de sonido. / With that answer in hand the endpoint
+was set to eight channels, confirmed through the same registry read the catalog performs, and it is
+reversible.
+
+## Las tres disposiciones, verificadas / The three layouts, verified
+
+**7.1, grabado y contado.** El origen de tonos reproducido por el motor sobre el endpoint de ocho
+canales, capturado por loopback:
+
+| Canal / Channel | Tono propio / Own tone | Ajeno más alto / Loudest foreign | Contraste / Contrast |
+|---|---:|---:|---:|
+| FL (277 Hz) | −18,08 dBFS | −107,89 dBFS | **89,81 dB** |
+| FR (421 Hz) | −18,08 | −104,26 | **86,18 dB** |
+| FC (647 Hz) | −18,08 | −108,34 | **90,26 dB** |
+| LFE (983 Hz) | −18,08 | −111,76 | **93,68 dB** |
+| BL (1493 Hz) | −18,08 | −115,61 | **97,53 dB** |
+| BR (2269 Hz) | −18,08 | −118,92 | **100,84 dB** |
+| SL (3449 Hz) | −18,08 | −124,08 | **106,00 dB** |
+| SR (5237 Hz) | −18,08 | −125,06 | **106,98 dB** |
+
+Los ocho canales llegan, **cada uno con su tono y en su posición**, con un contraste mínimo de
+**86 dB** contra un umbral de prueba de 10. Que la diagonal salga en orden es además la comprobación
+de que la disposición no se permuta. Registro:
+`artifacts/test-results/PLY-004/loopback-71-channels.csv`. / All eight channels arrive, each carrying
+its own tone in its own position, at a minimum contrast of 86 dB against a 10 dB threshold.
+
+**Estéreo**, medido antes sobre los endpoints físicos, queda arriba. **5.1** lo cubre la misma prueba
+por construcción: el catálogo ofrece `Surround51` a todo endpoint de seis o más canales, y el de ocho
+la contiene. / The stereo row is above; 5.1 is covered by the same catalog rule.
+
+**Y el catálogo no miente sobre los canales**: el registro y el cliente de audio en vivo son dos
+lecturas independientes del mismo hecho, y coinciden en los doce endpoints activos, el de ocho
+incluido. / The registry and the live audio client agree across all twelve active endpoints.
 
 ## Límites de este instrumento / Limits of this instrument
 

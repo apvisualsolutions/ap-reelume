@@ -1,5 +1,62 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-01, sesión paralela: `PLY-004` desbloqueado, grabando la salida y contando los ocho canales
+>
+> **Esta tanda corrió en paralelo a la de `CRS-004`, sobre el mismo árbol.** Toca sólo audio y
+> documentos; nada de `Presentation` ni de Cursos. Sus commits son `96c850d` (el arnés, CI en verde)
+> y el que cierra esta documentación.
+>
+> ### Lo que estaba mal y nadie veía
+>
+> 1. **La muestra `mkv-audio-71` no podía verificar nada.** Declara ocho canales y una prueba los
+>    afirma, pero **siete están en silencio digital**: su receta hace `-ac 8` sobre una sinusoide
+>    mono, que es un **upmix**. Una grabación con ella habría sido indistinguible de un upmix trivial.
+>    La sustituye `mkv-audio-71-tones`, con un tono primo no armónico por canal, mapeado por nombre de
+>    altavoz, y contraste peor de **15,6 dB**. `join` **sin `map` desplaza la diagonal** —la entrada 1
+>    cayó en FC—, así que el mapeo se escribe y luego se mide.
+> 2. **La disposición elegida no llega nunca al motor.** `SelectedLayout` es escribible y la interfaz
+>    ofrece las tres, pero la elección muere en la política: se guarda, se muestra, y al motor sólo va
+>    el id de dispositivo. **Nada en `src/` fija una disposición en LibVLC.**
+>
+> ### Lo verificado, con tinta
+>
+> El arnés **graba** lo que recibe el endpoint por WASAPI loopback, en el formato del propio endpoint,
+> así que cuenta lo que la aplicación **entregó** y no lo que declaró.
+>
+> - **7.1**: los ocho canales llegan, cada uno con su tono y en su posición, con contraste de **86 a
+>   107 dB** contra un umbral de 10. Es la primera medición real de la fila.
+> - **Estéreo**: un origen 7.1 sobre endpoint de dos canales llega **plegado con coeficientes** —
+>   centro a −3,01 dB, los cuatro surround a −12,04 dB, **LFE descartado** por la convención BS.775—.
+>   La prueba **afirma esa ausencia** en vez de suponerla.
+> - **El catálogo no miente**: registro y cliente de audio en vivo coinciden en los doce endpoints.
+>
+> ### El endpoint, y cómo reproducirlo
+>
+> Es **virtual**, como la decisión del propietario permite, y la evidencia lo dice. VoiceMeeter Banana
+> desde winget; Windows crea sus endpoints **en estéreo**, así que instalar no basta. Antes de tocar
+> nada se preguntó al controlador qué formatos acepta con `IAudioClient::IsFormatSupported` en modo
+> exclusivo —acepta 8, 6 y 2 canales a 48/44,1 kHz, 24 y 16 bits PCM—, y con esa respuesta se fijó
+> `Voicemeeter Input` a **8 canales, 48 kHz, 24 bit, mask 0x63F**. Es reversible con
+> `IPolicyConfig::ResetDeviceFormat` o desde el panel de sonido.
+>
+> ### La decisión que queda ejecutar, ya tomada
+>
+> **El control de disposición se retira, no se alimenta.** Medido sobre ocho canales, LibVLC entrega
+> las ocho pistas correctas **sin que nadie se lo diga**. Lo roto es sólo el control: elegir «Estéreo»
+> con un endpoint 7.1 muestra «Estéreo» mientras el motor sigue entregando ocho canales. Alimentarlo
+> no se puede: `libvlc_audio_set_channel` sólo cubre modos estéreo y `--stereo-mode` exigiría
+> **reabrir el medio**, lo que rompería la garantía ya verificada de pausar, cambiar y reanudar sin
+> perder posición ni pistas. **No se ejecutó aquí** porque quitar un control mueve el trinquete del
+> paseo y toca tres suites de vista — es tanda propia, y había otra sesión en `Presentation`.
+>
+> ### Dónde mirar
+>
+> `tests/ApSolutions.LocalMedia.IntegrationTests/Playback/` — el arnés vive ahí y no en `MediaTests`
+> por una razón medida: la salida real exige `CreateDefault()`, que es un segundo conjunto de
+> opciones, y seis pruebas de fuga de `MediaTests` afirman `NativeInstanceCount == 1`.
+> La evidencia, en [`T23B`](evidence/mvp/T23B-audio-loopback.md).
+>
+
 > ## RELEVO — 2026-09-01, decimoquinta sesión: `CRS-004`, el panel «Lecciones» y la cadena de la lección siguiente
 >
 > **`main` quedó al día con la rama** al empezar, con el run de `768fee0` leído en verde antes de

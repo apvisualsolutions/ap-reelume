@@ -28,14 +28,15 @@ writing code but on **a Windows 11 ARM64 machine that does not exist here**; and
 reach `VERIFIED` without the **commercial signing certificate**, because its cycle was verified on a
 re-signed copy and the unsigned artifact cannot repeat it — which chains it to `REL-001`.
 
-**And a third one which, unlike the two above, is resolvable without buying hardware:** `PLY-004` is
-blocked because this machine's four output endpoints all declare a two-channel mix format, so the
-5.1 and 7.1 layouts have never been measured. **The owner decided on 2026-09-01 that a virtual
-eight-channel endpoint verifies it**, with the evidence recording that the endpoint was virtual; they
-chose VoiceMeeter Banana, and ruled out VB-CABLE because its own forum documents that it delivers the
+**And a third one that is now settled, on that same 2026-09-01:** `PLY-004` was blocked because this
+machine's four physical endpoints all declare a two-channel mix format. The owner decided that a
+**virtual** eight-channel endpoint verifies it, with the evidence recording as much; VoiceMeeter
+Banana was installed — VB-CABLE was ruled out because its own forum documents that it delivers the
 eight channels over Kernel Streaming and not always over shared WASAPI, which is the path the
-application uses. Installing it is the owner's. The harness that will measure it is already written
-and green.
+application uses — and on that endpoint the output was **recorded and its eight channels counted**,
+each carrying its own tone at a minimum contrast of 86 dB. `PLY-004` moves to `VERIFIED`, and **two
+of the three publishing blockers remain**, both of them purchases: the ARM64 machine and the signing
+certificate.
 
 ## The three releases
 

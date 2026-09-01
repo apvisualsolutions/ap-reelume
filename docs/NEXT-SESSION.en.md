@@ -1,5 +1,63 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-01, parallel session: `PLY-004` unblocked, recording the output and counting eight channels
+>
+> **This batch ran alongside `CRS-004`, on the same tree.** It touches audio and documents only;
+> nothing in `Presentation` or Courses. Its commits are `96c850d` (the harness, CI green) and the one
+> closing this documentation.
+>
+> ### What was wrong and nobody could see
+>
+> 1. **The `mkv-audio-71` sample could not verify anything.** It declares eight channels and a test
+>    asserts them, but **seven sit at digital silence**: its recipe runs `-ac 8` over a mono sine,
+>    which is an **upmix**. A recording of it would have been indistinguishable from a trivial upmix.
+>    `mkv-audio-71-tones` replaces it, one prime non-harmonic tone per channel, mapped by speaker
+>    name, worst contrast **15.6 dB**. `join` **without `map` shifts the diagonal** — input one landed
+>    in FC — so the mapping is written and then measured.
+> 2. **The chosen layout never reaches the engine.** `SelectedLayout` is writable and the interface
+>    offers all three, but the choice dies in the policy: stored, displayed, and only the device id is
+>    handed to the engine. **Nothing in `src/` sets a channel layout in LibVLC.**
+>
+> ### What is verified, with ink
+>
+> The harness **records** what the endpoint receives through WASAPI loopback, in the endpoint's own
+> format, so it counts what the application **delivered** rather than what it declared.
+>
+> - **7.1**: all eight channels arrive, each with its own tone in its own position, at a contrast of
+>   **86 to 107 dB** against a 10 dB threshold. The first real measurement of that row.
+> - **Stereo**: a 7.1 source on a two-channel endpoint arrives **folded with coefficients** — centre
+>   at −3.01 dB, the four surrounds at −12.04 dB, **LFE dropped** by the BS.775 convention. The test
+>   **asserts that absence** rather than assuming it.
+> - **The catalog does not lie**: registry and live audio client agree across all twelve endpoints.
+>
+> ### The endpoint, and how to reproduce it
+>
+> It is **virtual**, as the owner's decision allows, and the evidence says so. VoiceMeeter Banana from
+> winget; Windows creates its endpoints **in stereo**, so installing is not enough. Before changing
+> anything the driver was asked which formats it accepts, via `IAudioClient::IsFormatSupported` in
+> exclusive mode — it accepts 8, 6 and 2 channels at 48/44.1 kHz, 24- and 16-bit PCM — and with that
+> answer `Voicemeeter Input` was set to **8 channels, 48 kHz, 24-bit, mask 0x63F**. Reversible with
+> `IPolicyConfig::ResetDeviceFormat` or from the sound panel.
+>
+> ### The decision left to execute, already taken
+>
+> **The layout control is withdrawn, not fed.** Measured on eight channels, LibVLC delivers the eight
+> correct tracks **unprompted**. Only the control is broken: choosing "Stereo" with a 7.1 endpoint
+> displays "Stereo" while the engine keeps delivering eight channels. Feeding it is not possible:
+> `libvlc_audio_set_channel` only covers stereo modes and `--stereo-mode` would require **reopening
+> the media**, breaking the already-verified guarantee that an output switch pauses, switches and
+> resumes without losing position or tracks. **Not executed here** because removing a control moves
+> the walk ratchet and touches three view suites — that is its own batch, and another session was in
+> `Presentation`.
+>
+> ### Where to look
+>
+> `tests/ApSolutions.LocalMedia.IntegrationTests/Playback/` — the harness lives there rather than in
+> `MediaTests` for a measured reason: a real output needs `CreateDefault()`, which is a second option
+> set, and six leak tests in `MediaTests` assert `NativeInstanceCount == 1`.
+> The evidence is in [`T23B`](evidence/mvp/T23B-audio-loopback.md).
+>
+
 > ## HANDOVER — 2026-09-01, fifteenth session: `CRS-004`, the "Lessons" panel and the next-lesson chain
 >
 > **`main` ended level with the branch** at the start, with `768fee0`'s run read green before the

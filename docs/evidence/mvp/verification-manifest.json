@@ -437,7 +437,7 @@
     },
     {
       "id": "PLY-004",
-      "status": "BLOCKED",
+      "status": "VERIFIED",
       "tasks": [
         "T20",
         "T23",
@@ -455,12 +455,7 @@
         "docs/evidence/mvp/T23B-audio-loopback.md",
         "docs/evidence/mvp/T39B-assembly.md",
         "docs/evidence/stable/audit-wp2-assembly.md"
-      ],
-      "blocker": {
-        "reason": "Ningún endpoint de render activo declara más de dos canales, así que la selección de 5.1 y 7.1 no se ha ejercido sobre hardware real. Los auriculares conectados son estéreo con virtualización, que Windows expone como dos canales. / No active render endpoint declares more than two channels, so 5.1 and 7.1 selection has not been exercised on real hardware.",
-        "owner": "Engineering",
-        "unblockCondition": "Cualquier endpoint de render que declare seis u ocho canales, y repetir la matriz de salida de audio: un receptor A/V o una televisión por HDMI, una salida S/PDIF con codificación multicanal habilitada en el controlador, o unos auriculares USB que expongan 5.1 o 7.1 de verdad en lugar de virtualizarlo. / Any render endpoint declaring six or eight channels, and a repeat of the audio output matrix: an A/V receiver or television over HDMI, an S/PDIF output with multichannel encoding enabled in the driver, or USB headphones that expose real 5.1 or 7.1 rather than virtualising it."
-      }
+      ]
     },
     {
       "id": "PLY-005",
