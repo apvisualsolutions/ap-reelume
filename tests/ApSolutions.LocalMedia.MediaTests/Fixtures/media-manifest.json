@@ -222,6 +222,24 @@
       "expectedFailureCode": null
     },
     {
+      "id": "mkv-audio-71-tones",
+      "relativePath": "T23/mkv-audio-71-tones.mkv",
+      "container": "Matroska",
+      "videoCodec": "H.264",
+      "audioCodec": "FLAC 7.1",
+      "width": 320,
+      "height": 240,
+      "durationSeconds": 3.0,
+      "videoTracks": 1,
+      "audioTracks": 1,
+      "hdr": false,
+      "requiredEncoders": [ "libx264", "flac" ],
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=277:sample_rate=48000:duration=3 -f lavfi -i sine=frequency=421:sample_rate=48000:duration=3 -f lavfi -i sine=frequency=647:sample_rate=48000:duration=3 -f lavfi -i sine=frequency=983:sample_rate=48000:duration=3 -f lavfi -i sine=frequency=1493:sample_rate=48000:duration=3 -f lavfi -i sine=frequency=2269:sample_rate=48000:duration=3 -f lavfi -i sine=frequency=3449:sample_rate=48000:duration=3 -f lavfi -i sine=frequency=5237:sample_rate=48000:duration=3 -filter_complex [1:a][2:a][3:a][4:a][5:a][6:a][7:a][8:a]join=inputs=8:channel_layout=7.1:map=0.0-FL|1.0-FR|2.0-FC|3.0-LFE|4.0-BL|5.0-BR|6.0-SL|7.0-SR[aout] -map 0:v -map [aout] -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a flac -t 3",
+      "notes": "Each channel carries its own prime, mutually non-harmonic tone (FL 277, FR 421, FC 647, LFE 983, BL 1493, BR 2269, SL 3449, SR 5237 Hz), so a recording can name every channel and detect a permuted order. The plain 7.1 sample cannot: -ac 8 upmixes one mono sine, leaving seven channels at digital silence, which makes a real 7.1 path indistinguishable from a trivial upmix.",
+      "expectedOutcome": "Playable",
+      "expectedFailureCode": null
+    },
+    {
       "id": "mkv-hevc-hdr10",
       "relativePath": "T22/mkv-hevc-hdr10.mkv",
       "container": "Matroska",

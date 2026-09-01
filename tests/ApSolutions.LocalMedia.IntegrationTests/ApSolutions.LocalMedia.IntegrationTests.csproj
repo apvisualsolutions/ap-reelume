@@ -27,6 +27,20 @@
     <Compile Include="..\Shared\TestReleaseSigning.cs" Link="Updates\TestReleaseSigning.cs" />
   </ItemGroup>
   <ItemGroup>
+    <!--
+      The approved media matrix, linked from the media suite rather than copied. PLY-004's loopback
+      tests need a real audio output, and a real output means the default LibVLC instance rather than
+      the headless one; the media suite asserts that exactly one native instance exists in its
+      process, so a second option set has to live somewhere else. It lives here because this suite
+      already targets Windows and already reaches the Windows host, which the catalog comparison
+      needs. The manifest itself stays single-sourced: two copies of the recipes would be two places
+      for a sample to drift.
+    -->
+    <Compile Include="..\ApSolutions.LocalMedia.MediaTests\Fixtures\MediaManifest.cs" Link="Fixtures\MediaManifest.cs" />
+    <Compile Include="..\ApSolutions.LocalMedia.MediaTests\Fixtures\MediaToolchain.cs" Link="Fixtures\MediaToolchain.cs" />
+    <None Include="..\ApSolutions.LocalMedia.MediaTests\Fixtures\media-manifest.json" Link="Fixtures\media-manifest.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Avalonia.Headless.XUnit" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Microsoft.Data.Sqlite" />

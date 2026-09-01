@@ -441,6 +441,7 @@
       "tasks": [
         "T20",
         "T23",
+        "T23B",
         "T39B"
       ],
       "tests": [
@@ -451,6 +452,7 @@
       "evidence": [
         "docs/evidence/mvp/T20-tracks-subtitles.md",
         "docs/evidence/mvp/T23-audio-output.md",
+        "docs/evidence/mvp/T23B-audio-loopback.md",
         "docs/evidence/mvp/T39B-assembly.md",
         "docs/evidence/stable/audit-wp2-assembly.md"
       ],
