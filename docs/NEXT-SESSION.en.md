@@ -1,5 +1,57 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-02, seventeenth session: the walk's settling, and a probe that measured the wrong case
+>
+> **Batch 2 of the previous handover, and its premise was false.** It said `UpdateLayout()` and
+> `InvalidateMeasure()+RunJobs()` were "measured as equivalent". They are on a **dirty** tree — which
+> is what the three-button probe measured, and why it answered so cleanly; on a tree that **calls
+> itself clean**, `UpdateLayout()` runs nothing.
+>
+> ### The measurement that decides
+>
+> Instrumenting `BesidePoint` over a full walk, **250 beside-clicks** across 37 scenes:
+>
+> | | window valid before | controls moved by the settle |
+> |---|---|---|
+> | `Reveal` with `UpdateLayout()` | **250 of 250** | **5** |
+> | `Reveal` forcing the pass | **250 of 250** | **0** |
+>
+> **All 250 said the layout was current, and in five it was not.**
+>
+> ### What lands
+>
+> The forcing moves into `Reveal`, which both geometry-reading paths go through — and that uncovers
+> that **the ordinary press was outside the protection**: since 2026-09-01 the beside-click settled
+> and `Click` did not. With `Reveal` forcing, `BesidePoint`'s copy moves 0 of 250 and is withdrawn,
+> and with it the **33** `host.Window.InvalidateMeasure()` calls across the scenes — which also
+> settled the wrong window whenever two are on screen. **One form, one place.**
+>
+> Verified with the **two passes** of accessibility CI runs (147 of 147 each, no findings) and the
+> walk gate unchanged: 219 pressed, 20 pending.
+>
+> ### NEXT
+>
+> **1. The rest of the surface against the prototype**, where `ADR-0007` is still open: `Border`,
+> `TextBox` and `ComboBox` spend three tokens across **85 sites** while the design draws **twelve
+> radii**. Since the previous batch it can be measured against the screen.
+>
+> **2. `AudioOutputViewModel.SelectedLayout`** — withdraw the control, decided and unexecuted. It
+> moves the walk ratchet.
+>
+> **3. `CRS-002/003/005` to `VERIFIED`.**
+>
+> ### The trap this batch leaves
+>
+> · **A PROBE CAN ANSWER A SIMILAR QUESTION.** The three-button one was correct, reproducible, and
+>   unrelated to the case that decided, and its answer reached the handover as if it settled it.
+>   Before trusting a measurement, ask **what state the system is in when the question matters** —
+>   here, whether the tree is dirty or clean.
+> · **`IsMeasureValid` does not mean the geometry is current**, measured 250 times. A valid tree with
+>   stale descendants is indistinguishable from an up-to-date one to anyone who only asks.
+> · **Instrumenting the walk and writing to a temp file costs 2m40 a pass** and answers things no
+>   isolated probe does, because the state that matters is built by 37 scenes.
+
+
 > ## HANDOVER — 2026-09-01, sixteenth session: the fidelity sweep, and a preference that drew every corner
 >
 > **It began as batch 1 of the previous handover** — pairing the ten button classes `ADR-0007` left

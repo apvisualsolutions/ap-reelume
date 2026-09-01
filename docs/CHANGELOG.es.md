@@ -31,6 +31,28 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El asentado del layout del paseo estaba donde dolió, no donde está la regla — y una sonda había
+  medido el caso que no era.** La limpieza que el relevo dejó decidida partía de que
+  `UpdateLayout()` e `InvalidateMeasure()+RunJobs()` son equivalentes. Lo son sobre un árbol sucio,
+  que es lo que medía la sonda de la fila de tres botones; sobre un árbol que **se declara limpio**,
+  `UpdateLayout()` no ejecuta nada.
+
+  Instrumentando `BesidePoint` sobre el paseo completo —**250 clics «al lado»** en 37 escenas—, la
+  ventana contestó `IsMeasureValid` **en los 250**, y forzar el pase de todas formas movió el
+  rectángulo de un control **en cinco**. Un árbol que se declara limpio no es un árbol cuya geometría
+  esté vigente.
+
+  El forzado se muda a `Reveal`, por donde pasan **las dos** rutas que leen geometría — y eso destapa
+  que **el press ordinario estaba fuera de la protección**: desde el 2026-09-01 el clic de al lado
+  asentaba y el clic al centro de un control no, leyendo exactamente la staleness de la que el otro
+  estaba a salvo. Con `Reveal` forzando, la copia de `BesidePoint` mueve **0 de 250** y se retira, y
+  con ella los **33** `host.Window.InvalidateMeasure()` de las escenas. Queda **una** forma en **un**
+  sitio, y de paso deja de asentarse la ventana equivocada cuando hay dos en pantalla.
+
+  Verificado con las dos pasadas de accesibilidad que corre CI —147 de 147 cada una, sin hallazgos—
+  y con la puerta del paseo intacta en 219 pulsados y 20 pendientes.
+  Evidencia: [el asentado pertenece a Reveal](evidence/stable/audit-walk-settling-belongs-to-reveal.md).
+
 - **Una preferencia estaba dibujando todas las esquinas de la aplicación, y la puerta escrita el día
   anterior para impedirlo certificaba las que nadie veía.** `AppearanceService` escribía el ajuste
   «Redondeo de esquinas» **sobre los dos tokens de radio**, y el contenedor lo resuelve antes de

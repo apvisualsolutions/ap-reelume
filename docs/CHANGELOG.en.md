@@ -30,6 +30,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The walk's layout settling sat where it hurt rather than where the rule is — and a probe had
+  measured the wrong case.** The cleanup the handover left decided rested on `UpdateLayout()` and
+  `InvalidateMeasure()+RunJobs()` being equivalent. They are, on a dirty tree, which is what the
+  three-button probe measured; on a tree that **calls itself clean**, `UpdateLayout()` runs nothing.
+
+  Instrumenting `BesidePoint` over a full walk — **250 beside-clicks** across 37 scenes — the window
+  reported `IsMeasureValid` on **all 250**, and forcing the pass anyway moved a control's rectangle
+  in **five**. A tree that calls itself clean is not a tree whose geometry is current.
+
+  The forcing moves into `Reveal`, which both geometry-reading paths go through — and that uncovers
+  that **the ordinary press was outside the protection**: since 2026-09-01 the beside-click settled
+  and the click at a control's centre did not, reading exactly the staleness the other was shielded
+  from. With `Reveal` forcing, `BesidePoint`'s copy moves **0 of 250** and is withdrawn, and with it
+  the **33** `host.Window.InvalidateMeasure()` calls across the scenes. One form, in one place — and
+  it stops settling the wrong window when two are on screen.
+
+  Verified with the two accessibility passes CI runs — 147 of 147 each, no findings — and the walk
+  gate unchanged at 219 pressed and 20 pending.
+  Evidence: [settling belongs to Reveal](evidence/stable/audit-walk-settling-belongs-to-reveal.md).
+
 - **A preference was drawing every corner in the application, and the gate written the day before to
   prevent exactly that certified the ones nobody could see.** `AppearanceService` wrote the "Corner
   rounding" setting **over both radius tokens**, and the composition root resolves it before any

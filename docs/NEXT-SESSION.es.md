@@ -1,5 +1,57 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-02, decimoséptima sesión: el asentado del paseo, y una sonda que midió el caso que no era
+>
+> **La tanda 2 del relevo anterior, y su premisa era falsa.** Decía que `UpdateLayout()` e
+> `InvalidateMeasure()+RunJobs()` estaban «medidas como equivalentes». Lo están sobre un árbol
+> **sucio** —que es lo que medía la sonda de la fila de tres botones, y por eso contestó tan
+> limpio—; sobre un árbol que **se declara limpio**, `UpdateLayout()` no ejecuta nada.
+>
+> ### La medición que decide
+>
+> Instrumentando `BesidePoint` sobre el paseo completo, **250 clics «al lado»** en 37 escenas:
+>
+> | | ventana válida antes | controles movidos por el asentado |
+> |---|---|---|
+> | `Reveal` con `UpdateLayout()` | **250 de 250** | **5** |
+> | `Reveal` forzando el pase | **250 de 250** | **0** |
+>
+> **Los 250 decían que el layout estaba al día, y en cinco no lo estaba.**
+>
+> ### Lo que entra
+>
+> El forzado se muda a `Reveal`, por donde pasan **las dos** rutas que leen geometría — y eso destapa
+> que **el press ordinario estaba fuera de la protección**: desde el 2026-09-01 el clic de al lado
+> asentaba y `Click` no. Con `Reveal` forzando, la copia de `BesidePoint` mueve 0 de 250 y se retira,
+> y con ella los **33** `host.Window.InvalidateMeasure()` de las escenas —que además asentaban la
+> ventana equivocada cuando hay dos en pantalla—. **Una forma, un sitio.**
+>
+> Verificado con las **dos pasadas** de accesibilidad que corre CI (147 de 147 cada una, sin
+> hallazgos) y la puerta del paseo intacta: 219 pulsados, 20 pendientes.
+>
+> ### LO SIGUIENTE
+>
+> **1. El resto de la superficie contra el prototipo**, que es donde `ADR-0007` sigue abierto:
+> `Border`, `TextBox` y `ComboBox` gastan tres tokens en **85 sitios** mientras el diseño dibuja
+> **doce radios**. Desde la tanda anterior puede medirse contra la pantalla.
+>
+> **2. `AudioOutputViewModel.SelectedLayout`** — retirar el control, decidido y sin ejecutar. Mueve el
+> trinquete del paseo.
+>
+> **3. `CRS-002/003/005` a `VERIFIED`.**
+>
+> ### La trampa que deja esta tanda
+>
+> · **UNA SONDA PUEDE CONTESTAR UNA PREGUNTA PARECIDA.** La de los tres botones era correcta,
+>   reproducible y sin relación con el caso que decidía, y su respuesta llegó al relevo como si lo
+>   zanjara. Antes de fiarse de una medición, hay que preguntar **en qué estado está el sistema
+>   cuando la pregunta importa** — aquí, si el árbol está sucio o limpio.
+> · **`IsMeasureValid` no dice que la geometría esté vigente**, medido 250 veces. Un árbol válido con
+>   descendientes rancios es indistinguible de uno al día para quien sólo pregunta.
+> · **Instrumentar el paseo y escribir a un archivo temporal cuesta 2m40 por pasada** y contesta cosas
+>   que ninguna sonda aislada contesta, porque el estado que importa lo construyen 37 escenas.
+
+
 > ## RELEVO — 2026-09-01, decimosexta sesión: el barrido de fidelidad, y una preferencia que dibujaba todas las esquinas
 >
 > **Empezó como la tanda 1 del relevo anterior** —emparejar las diez clases de botón que `ADR-0007`
