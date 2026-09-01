@@ -4498,12 +4498,63 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking the output device never opened the list of outputs");
         CloseDropDown(host);
 
-        await PressAsync(
-            host,
-            "AudioOutputLayoutLabel",
-            () => Resolve(host, "AudioOutputLayoutLabel") is ComboBox { IsDropDownOpen: true },
-            "clicking the channel layout never opened the list of layouts");
-        CloseDropDown(host);
+        // The channel layout stopped being a drop-down on 2026-09-02 and is three buttons, which is
+        // what the prototype draws — and what the walk has to press, one by one, because each of
+        // them is its own command control. Which of the three a given machine will take is the
+        // driver's business, so what is asserted is that pressing one moves the choice, and the
+        // press is skipped on a layout this machine's endpoint refuses.
+        //
+        // Pressing a layout writes a Windows setting, and this walk runs on whatever endpoint the
+        // machine has. Stereo is pressed last and deliberately: it is what every endpoint carries,
+        // so the scene leaves the machine on the layout it would have chosen anyway.
+        foreach (var (name, layout) in new[]
+        {
+            ("AudioLayoutSurround71", AudioChannelLayout.Surround71),
+            ("AudioLayoutSurround51", AudioChannelLayout.Surround51),
+            ("AudioLayoutStereo", AudioChannelLayout.Stereo),
+        })
+        {
+            var control = Resolve(host, name);
+
+            // A layout this machine's endpoint will not take is a disabled button, and the harness
+            // refuses to press one — correctly, because a person cannot either. What is asserted
+            // instead is the correspondence: the button is disabled exactly when the driver says no.
+            // That is the half worth having, and it is the half a press could not check.
+            if (!audio.IsLayoutAvailable(layout))
+            {
+                Assert.False(control.IsEnabled, $"{name} is offered while the driver refuses it.");
+                continue;
+            }
+
+            Assert.True(control.IsEnabled, $"{name} is dimmed while the driver takes it.");
+
+            // Click and not PressAsync, which is what this loop learned the same day: PressAsync
+            // repeats until a probe MOVES, and pressing the layout already in force moves nothing.
+            // On a stereo-only endpoint — most of them, and every hosted runner — stereo is both the
+            // only one offered and the one already chosen, so the scene would fail on a button that
+            // worked perfectly. Same shape as the volume slider whose centre was where it already sat.
+            var before = audio.SelectedLayout;
+            var view = WalkLedger.ViewOf(control);
+            Click(host, control);
+            Dispatcher.UIThread.RunJobs();
+
+            // Click does not write to the ledger — PressAsync does — so the press is recorded here,
+            // under the identity the inventory gives this button. Stereo's accessible name is a
+            // resource, so the inventory names it by the resource key rather than by its x:Name, and
+            // a press recorded under the other one is a press the gate cannot see.
+            WalkLedger.Record(view, name == "AudioLayoutStereo" ? "AudioOutputLayoutStereo" : name);
+
+            if (before != layout)
+            {
+                await WaitForAsync(
+                    () => Task.FromResult(audio.SelectedLayout == layout),
+                    () => $"clicking {name} never moved the chosen layout from {before}");
+            }
+            else
+            {
+                Assert.Equal(before, audio.SelectedLayout);
+            }
+        }
 
         // The layouts are the application's own list rather than the machine's, so this one is the
         // same everywhere and can be asserted on.

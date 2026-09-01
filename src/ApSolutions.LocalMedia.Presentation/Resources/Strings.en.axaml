@@ -344,6 +344,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AudioOutputAccessibleName">Audio output</x:String>
   <x:String x:Key="AudioOutputDeviceLabel">Output device</x:String>
   <x:String x:Key="AudioOutputLayoutLabel">Channel layout</x:String>
+  <x:String x:Key="AudioOutputLayoutStereo">Stereo</x:String>
   <x:String x:Key="AudioOutputNoneAvailable">No output device is available.</x:String>
   <x:String x:Key="AudioOutputLayoutDegraded">The chosen device cannot take that layout; the largest it accepts is used.</x:String>
   <x:String x:Key="AudioOutputLayoutSystemWide">This changes the device format in Windows, so it affects every program on the machine, not just AP Reelume.</x:String>

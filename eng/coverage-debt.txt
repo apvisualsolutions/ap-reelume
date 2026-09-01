@@ -260,7 +260,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbMetadataProvider.cs      
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbOptions.cs                             95  42
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs                        100  50
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs               87  73
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                86  87
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                  86  87
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 92  79
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  61
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs           100  83
@@ -313,7 +313,7 @@ src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs         
 src/ApSolutions.LocalMedia.Presentation/Onboarding/AddRootDialogView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        98  79
+src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        99  84
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LessonsPanelView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
@@ -380,6 +380,7 @@ src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs          
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90
 src/ApSolutions.LocalMedia.Windows/Playback/ShellExternalPlaybackLauncher.cs                  40  50
 src/ApSolutions.LocalMedia.Windows/Playback/WindowsAudioDeviceCatalog.cs                      32  11
+src/ApSolutions.LocalMedia.Windows/Playback/WindowsAudioEndpointConfigurator.cs               23  20
 src/ApSolutions.LocalMedia.Windows/Playback/WindowsDisplayCapabilityProvider.cs               76  60
 src/ApSolutions.LocalMedia.Windows/Program.cs                                                  0 100
 src/ApSolutions.LocalMedia.Windows/Startup/WindowsStartupService.cs                          100  91

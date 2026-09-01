@@ -49,3 +49,20 @@ SubtitleStyleView#AppearanceAccentLightness
 SubtitleStyleView#AppearanceAccentSaturation
 SubtitleStyleView#SubtitleStyleBackgroundCustom
 SubtitleStyleView#SubtitleStyleForegroundCustom
+
+## RAISED ON 2026-09-02, from 20 to 22, and the reason is this machine rather than the harness.
+##
+## The channel layout became three buttons on 2026-09-02 — 2.0, 5.1 and 7.1, which is what the
+## prototype draws — and each of them is offered only where the chosen endpoint's driver takes it.
+## Measured that day: every physical endpoint on the development machine declares two channels and
+## none can be raised, and a hosted CI runner has no render endpoint at all. So 5.1 and 7.1 are
+## DISABLED wherever the walk runs, and the harness refuses to press a disabled control — correctly,
+## because a person cannot press one either.
+##
+## What the scene does instead is assert the correspondence in both directions: the button is dimmed
+## exactly when the driver refuses the layout, and enabled exactly when it takes it. Stereo is
+## pressed with a real mouse like everything else. The two below become pressable the day this walk
+## runs on a machine with a multichannel endpoint, and the scene needs no change for that: it presses
+## whatever is enabled.
+AudioOutputView#AudioLayoutSurround51
+AudioOutputView#AudioLayoutSurround71

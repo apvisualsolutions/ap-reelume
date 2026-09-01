@@ -76,12 +76,21 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # prototype's eleven rows. Three ways round it were tried and measured: sweeping the offset, swapping
 # the window's content for the page alone, and opening a second window. All three answered the same.
 #
-# So what the twenty entries mean is "the harness cannot reach this", not "nobody has pressed this":
+# So what those twenty entries mean is "the harness cannot reach this", not "nobody has pressed this":
 # every one is a control a real mouse presses in the real application. The ratchet still only
 # shrinks, and it shrinks the moment the harness can follow a scroll — or the moment somebody
 # chooses to press these through a directed pointer event instead of a window coordinate, which
 # would keep "the control was pressed" and give up "the control was reachable".
-$maximumPending = 20
+#
+# RAISED TO 22 ON 2026-09-02, and this time the reason is the machine rather than the harness. The
+# channel layout became three buttons, each offered only where the chosen endpoint's driver takes
+# it, and measured that day every physical endpoint on the development machine declares two channels
+# while a hosted runner has no render endpoint at all. So 5.1 and 7.1 are DISABLED wherever this
+# walk runs, and pressing a disabled control is something neither the harness nor a person can do.
+# The scene asserts the correspondence instead — dimmed exactly when the driver refuses — and needs
+# no change on the day it runs somewhere with a multichannel endpoint: it presses whatever is
+# enabled, so the ratchet shrinks by itself there.
+$maximumPending = 22
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)

@@ -89,8 +89,17 @@ public sealed class AudioOutputViewTests
         Assert.True(viewModel.FellBackToDefaultDevice);
     }
 
+    /// <summary>
+    /// The device is a drop-down, the layout is three buttons, and every one of them is named.
+    /// </summary>
+    /// <remarks>
+    /// The layout stopped being a drop-down on 2026-09-02, because the prototype draws
+    /// <c>chList</c> as a row of three with the chosen one accented. A drop-down also showed the
+    /// enumeration's own words — «Surround51» — identically in both languages, which is the
+    /// bilingual rule broken by a control nobody had read the contents of.
+    /// </remarks>
     [AvaloniaFact]
-    public async Task Both_selectors_are_named_and_no_option_offers_passthrough()
+    public async Task The_device_is_a_list_the_layout_is_three_buttons_and_all_are_named()
     {
         Assert.NotNull(Avalonia.Application.Current);
         foreach (var cultureName in new[] { "es-ES", "en-US" })
@@ -103,13 +112,34 @@ public sealed class AudioOutputViewTests
             window.Show();
             Dispatcher.UIThread.RunJobs();
 
-            var selectors = view.GetVisualDescendants()
+            var device = view.GetVisualDescendants()
                 .OfType<ComboBox>()
-                .Where(box => box.Name is "AudioDeviceSelector" or "AudioLayoutSelector")
+                .Single(box => box.Name == "AudioDeviceSelector");
+            Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(device)));
+            Assert.True(device.Focusable);
+
+            var choices = view.GetVisualDescendants()
+                .OfType<Button>()
+                .Where(button => button.Name is "AudioLayoutStereo"
+                    or "AudioLayoutSurround51"
+                    or "AudioLayoutSurround71")
                 .ToArray();
-            Assert.Equal(2, selectors.Length);
-            Assert.All(selectors, box => Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(box))));
-            Assert.All(selectors, box => Assert.True(box.Focusable));
+            Assert.Equal(3, choices.Length);
+            Assert.All(choices, button => Assert.False(
+                string.IsNullOrWhiteSpace(AutomationProperties.GetName(button))));
+            Assert.All(choices, button => Assert.True(button.Focusable));
+
+            // The one in force wears the class the prototype accents, and it is the only one.
+            Assert.Single(choices, button => button.Classes.Contains("selected"));
+
+            // And the layout is never named by the enumeration, which reads the same in both
+            // languages and in neither of them is a word anybody says.
+            Assert.DoesNotContain(
+                choices,
+                button => string.Equals(
+                    AutomationProperties.GetName(button),
+                    nameof(AudioChannelLayout.Surround51),
+                    StringComparison.Ordinal));
 
             Assert.False(AudioOutputViewModel.SupportsBitstreamPassthrough);
             Assert.All(
