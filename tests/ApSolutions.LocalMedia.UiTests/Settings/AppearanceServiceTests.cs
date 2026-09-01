@@ -47,7 +47,7 @@ public sealed class AppearanceServiceTests
         Assert.Equal(222d, application.Resources["PosterCardHeight"]);
         Assert.Equal(8d, application.Resources["DensityGutter"]);
         Assert.Equal(new Thickness(8), application.Resources["PosterCardPadding"]);
-        Assert.Equal(new CornerRadius(10), application.Resources["CornerRadiusMedium"]);
+        Assert.Equal(new CornerRadius(10), application.Resources["PosterCornerRadius"]);
         Assert.Equal(true, application.Resources["CoverTitlesVisible"]);
     }
 
@@ -74,8 +74,15 @@ public sealed class AppearanceServiceTests
         Assert.Equal(new Thickness(16), application.Resources["PosterCardPadding"]);
         Assert.Equal(200d, application.Resources["PosterCardWidth"]);
         Assert.Equal(300d, application.Resources["PosterCardHeight"]);
-        Assert.Equal(new CornerRadius(18), application.Resources["CornerRadiusMedium"]);
-        Assert.Equal(new CornerRadius(9), application.Resources["CornerRadiusSmall"]);
+        Assert.Equal(new CornerRadius(18), application.Resources["PosterCornerRadius"]);
+
+        // And the two radii the rest of the tree draws with are NOT among them, which is the whole
+        // of what moved on 2026-09-01: the preference used to be written over both, so the player's
+        // chrome drew 10 where the design draws 8 and its panel pills drew 5 where the design draws
+        // 4. Asserted as an absence, because that is the failure mode — a preference reaching one
+        // key too many is invisible until somebody measures the corner it changed.
+        Assert.False(application.Resources.ContainsKey("CornerRadiusMedium"));
+        Assert.False(application.Resources.ContainsKey("CornerRadiusSmall"));
         Assert.Equal(false, application.Resources["CoverTitlesVisible"]);
 
         // And what the slider cannot ask for is clamped rather than drawn: a caller can hand over
@@ -379,8 +386,7 @@ public sealed class AppearanceServiceTests
             "PosterCardPadding",
             "PosterCardWidth",
             "PosterCardHeight",
-            "CornerRadiusMedium",
-            "CornerRadiusSmall",
+            "PosterCornerRadius",
             "CoverTitlesVisible",
         ];
 

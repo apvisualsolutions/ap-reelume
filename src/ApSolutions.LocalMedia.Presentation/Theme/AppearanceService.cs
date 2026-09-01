@@ -290,10 +290,14 @@ public sealed class AppearanceService : IAppearanceService
             _ => 10.0,
         };
 
-        // The small radius keeps its proportion to the medium rather than being a second choice:
-        // the scale this tree gates is two radii, and the prototype offers one control over both.
-        _application.Resources["CornerRadiusMedium"] = new CornerRadius(radius);
-        _application.Resources["CornerRadiusSmall"] = new CornerRadius(Math.Round(radius / 2));
+        // The cover, and only the cover. This wrote CornerRadiusMedium and CornerRadiusSmall until
+        // 2026-09-01, on the stated ground that "the prototype offers one control over both" — and
+        // the prototype does not: its rounding option is read in exactly one place, artBox, which is
+        // the cover. The cost of the wider reach was not a preference behaving oddly, it was that
+        // NO radius in this tree drew its design value: the player's chrome is 8 in the design and
+        // drew 10, its panel pills are 4 and drew 5, and ButtonShapeTests certified the 8 and the 4
+        // by reading the token file instead of the screen.
+        _application.Resources["PosterCornerRadius"] = new CornerRadius(radius);
         _application.Resources["CoverTitlesVisible"] = options.CoverTitles;
         WriteBackdrop(options.Mica);
     }
