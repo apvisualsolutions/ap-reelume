@@ -1722,16 +1722,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <!--
     Round, and not a square with softened corners.
 
-    «Todos los botones o son redondos o son píldoras, pero nunca cuadrados», the owner said on
-    2026-08-25, and this was the one class that disagreed: 44 by 44 with the medium radius is a
-    square whose corners have been taken off. A square target of the same width as its height is a
-    circle when the radius is half of it, which is what the pill radius already is — so the icon
-    buttons become circles and the ones carrying a word stay pills, from one token either way.
+    <b>The medium radius again since 2026-09-01.</b> «Todos los botones o son redondos o son
+    píldoras, pero nunca cuadrados» made this a circle on 2026-08-25, and the owner withdrew that
+    rule the moment it was measured against the design: an element matches the prototype, and the
+    prototype draws <c>pbtn</c> — the player's icon buttons — at <c>borderRadius: 8</c>, which is
+    this scale's medium.
+
+    <b>The 44 px target is a separate decision and it stays.</b> The prototype draws pbtn at 36 by
+    36; 44 is the accessible target size, and shrinking it would trade a measurable accessibility
+    floor for eight pixels of shape. The radius was never what made this differ from the design —
+    the size was, deliberately, and it is written here rather than left to be rediscovered.
   -->
   <Style Selector="Button.player-chrome">
     <Setter Property="MinWidth" Value="44" />
     <Setter Property="MinHeight" Value="44" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
     <!--
       The player's ink and not the theme's: these icons sit on the chrome band, which is dark in all
       four modes, and the base ControlTheme's foreground is dark in two of them. The icons take it by
@@ -1753,8 +1758,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="Button.player-pill">
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
-    <!-- A class called player-pill drew a small radius, which is the one shape a pill is not. -->
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <!--
+      Back to the small radius on 2026-09-01. It drew one until 2026-08-25, when «a button is round
+      or a pill, never a square with its corners taken off» made it a pill; the owner withdrew that
+      rule the moment it was measured against the design, and the prototype draws pbtnAudio,
+      pbtnSubs, pbtnVideo, pbtnMarks and pbtnLessons at borderRadius: 4. The name stays because five
+      tests and the walk address it, and a rename buys nothing the comment does not.
+    -->
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="{DynamicResource PlayerHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
@@ -1768,6 +1779,49 @@ SPDX-License-Identifier: GPL-3.0-or-later
     is never alone either.
   -->
   <Style Selector="Button.player-pill.selected">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!--
+    One lesson in the player's «Lecciones» column (CRS-004). The whole row is the button, which is
+    what the prototype draws: a name held as text with a play button on the end would put the target
+    on the smallest thing in the row.
+
+    34 and not the 44 the pills above take. These are not a row of controls on a band — they are a
+    list somebody scrolls, and a course of forty lessons at 44 px is four hundred px of extra column
+    to travel. It is the prototype's own minimum, and the row is full-width, so the target is 320 px
+    wide even at that height.
+
+    Transparent and borderless at rest so that a list of forty reads as a list rather than as forty
+    buttons, which is the same reason the library's own rows carry no chrome until they are pointed
+    at.
+  -->
+  <Style Selector="Button.lesson-row">
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <!--
+      7, which is the prototype's own and which none of the three radius tokens carries: the scale is
+      4, 8 and the pill, and this sits between the first two. Written as the literal it is rather
+      than rounded to a token it is not - the owner's rule of 2026-09-01 is that an element matches
+      the design, and 4 or 8 here would be a shape the design does not draw.
+    -->
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource PlayerTextBrush}" />
+  </Style>
+
+  <!--
+    The lesson the session is on, said with a fill, a border and the ◐ its glyph already carries -
+    three signals rather than one, for the reason player-pill.selected is written the same way: both
+    high contrast dictionaries resolve AccentSubtleBrush and Transparent to surfaces a person cannot
+    tell apart, and there the glyph is the whole signal.
+  -->
+  <Style Selector="Button.lesson-row.current">
     <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
     <Setter Property="FontWeight" Value="SemiBold" />

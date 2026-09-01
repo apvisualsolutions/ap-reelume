@@ -1,0 +1,137 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The player's «Lecciones» panel (CRS-004): the whole course in the column's fixed 320 px, with the
+lesson being played marked and every other one a press away.
+
+The prototype draws three things per row and no more — a state glyph, the name, and how long it runs
+— and that is the whole reason this is not the course card's LessonRowView. That row carries a mark
+button, a progress bar, a chip and a two-part meta line; four of those in a 320 px column beside a
+picture is a second card, not a table of contents.
+
+The whole row is the button, which is what the prototype does. A row that held its name as text with
+a play button on the end would put the target on the smallest thing in the row.
+
+No leading action here, deliberately: this is a list that repeats, and the one accent of the player
+belongs to the transport. LeadingActionTests carries the decision.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.LessonsPanelView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:LessonsPanelViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PlayerLessonsPanelTitle}">
+  <StackPanel Spacing="{DynamicResource Space12}">
+    <!--
+      «7/24 lecciones · 6 h 30 min restantes». It is the course's progress and not this lesson's:
+      the transport underneath already says where this lesson is, and repeating that here would
+      leave the one thing the column is for — how much of the course is left — unsaid.
+    -->
+    <TextBlock
+        x:Name="LessonsPanelHead"
+        FontSize="{DynamicResource FontSizeCaption}"
+        Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+        Text="{Binding Head}"
+        TextWrapping="Wrap" />
+    <ItemsControl x:Name="LessonsPanelModules" ItemsSource="{Binding Modules}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="{DynamicResource Space12}" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="player:LessonsPanelModuleViewModel">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <!--
+              Absent for the lessons loose in the course folder rather than «Módulo 1» over them,
+              which is the same decision the course card made: a module drawn over material that is
+              not in one invents a structure the folder does not have.
+            -->
+            <TextBlock
+                FontSize="{DynamicResource FontSizeCaption}"
+                FontWeight="Bold"
+                Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                IsVisible="{Binding HasLabel}"
+                Text="{Binding Label}"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="NoWrap" />
+            <ItemsControl ItemsSource="{Binding Lessons}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="{DynamicResource Space4}" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="player:LessonsPanelRowViewModel">
+                  <Button
+                      Classes="lesson-row"
+                      Classes.current="{Binding IsCurrent}"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Stretch"
+                      IsEnabled="{Binding CanPlay}"
+                      automation:AutomationProperties.Name="{Binding AccessibleName}"
+                      Command="{Binding PlayCommand}"
+                      CommandParameter="{Binding}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space8}">
+                      <!--
+                        Raw in the automation tree because the row's own name already says the state
+                        in words. Announced beside it, «◐» is read out as the name of a shape.
+                      -->
+                      <TextBlock
+                          Grid.Column="0"
+                          Width="14"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          FontSize="{DynamicResource FontSizeCaption}"
+                          Text="{Binding Glyph}"
+                          automation:AutomationProperties.AccessibilityView="Raw" />
+                      <TextBlock
+                          Grid.Column="1"
+                          VerticalAlignment="Center"
+                          Text="{Binding Title}"
+                          TextTrimming="CharacterEllipsis"
+                          TextWrapping="NoWrap" />
+                      <!--
+                        Absent rather than «0 min» when the catalogue has no duration for the file:
+                        a lesson that runs no time is not a thing, and drawing it says the file is
+                        empty rather than that nothing has read it yet.
+                      -->
+                      <TextBlock
+                          Grid.Column="2"
+                          VerticalAlignment="Center"
+                          FontSize="{DynamicResource FontSizeCaption}"
+                          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+                          IsVisible="{Binding HasDuration}"
+                          Text="{Binding Duration}"
+                          automation:AutomationProperties.AccessibilityView="Raw" />
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <!--
+      The promise the panel is trusted on, and the reason nobody has to remember where they were. It
+      sits under a hairline because the prototype separates it from the list: it is about the course,
+      not about any row in it.
+    -->
+    <Border
+        Padding="0,10,0,0"
+        BorderBrush="{DynamicResource PlayerHairlineBrush}"
+        BorderThickness="0,1,0,0">
+      <TextBlock
+          x:Name="LessonsPanelNote"
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource PlayerTextSecondaryBrush}"
+          Text="{Binding Note}"
+          TextWrapping="Wrap" />
+    </Border>
+  </StackPanel>
+</UserControl>

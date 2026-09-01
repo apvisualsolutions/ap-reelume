@@ -79,6 +79,11 @@ public static partial class CompositionRoot
             .AddSingleton<DeclareCourseFolder>()
             .AddSingleton<ICourseLessonReader, CourseLessonReader>()
             .AddSingleton<GetCourses>()
+            // CRS-004. What resolves these two is the player: the session asks whether the file it
+            // opened is a lesson, and the end of a lesson asks what comes after it. Both are fed the
+            // moment they are registered, which is the rule the comment above was written for.
+            .AddSingleton<GetLessonSession>()
+            .AddTransient<StartNextLessonCountdown>()
             .AddSingleton<CoursesViewModel>()
             .AddSingleton<CourseDetailsViewModel>()
             .AddSingleton<IPathNormalizer, WindowsPathNormalizer>()

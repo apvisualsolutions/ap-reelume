@@ -1,5 +1,103 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-01, fifteenth session: `CRS-004`, the "Lessons" panel and the next-lesson chain
+>
+> **`main` ended level with the branch** at the start, with `768fee0`'s run read green before the
+> reference moved. The SHA is deliberately not written here — the commit that would write it changes
+> it: read it with `git log --oneline -1 main`.
+>
+> **`CRS-004` moves to `IMPLEMENTED`.** The panel takes the column's 320 px, it is **absent** outside
+> a lesson session, and when one ends the countdown offers the next lesson.
+>
+> ### The design decision everything rests on
+>
+> **The session asks the file whether it is a lesson; whoever opened it does not say so.**
+> `ICourseRepository` gains `FindLessonByFileAsync`, the mirror of the episode one. The reason is
+> measured: the countdown opens the next lesson with `PlayDetailsRequest(nextFileId, TimeSpan.Zero)`
+> and nothing else, and "pick up the thread" does the same from Home. A course riding on the request
+> **would go missing down every path that forgot to forward it**, and since the panel's failure mode
+> is **absence**, it would go quietly rather than visibly wrong.
+>
+> Along the way this repository's own defect turned up in a new shape: **`ix_lessons_media_file` had
+> existed since migration 0022 with no query in the tree using it**. Registered and never fed, as an
+> index.
+>
+> ### The countdown really is PLY-011's, not a copy
+>
+> The wait, the configured length and the cancellation move to `ContinuityCountdown`, and **both
+> chains use that object**. The setting key stays the episode one deliberately: a person configures
+> "how long before the next thing starts", and renaming it would have left every existing
+> installation's choice behind on the old key. `StartNextEpisodeCountdown` keeps its whole public
+> surface and **its 300 tests stay green without one of them being touched**.
+>
+> ### The defect the ficha's own words uncovered, worse than it looked
+>
+> The ficha promises "its three ways to cancel". **There were none of the three.** T28's test builds
+> **its own** router whose callback calls `Cancel()` — it tests the router, not the wiring; the
+> **application's** callback touched the countdown in none of its ten arms, and the only `Cancel()` in
+> all of `src/` was the overlay's two buttons.
+>
+> **And the consequence was not "it does not cancel":** pressing Stop closed the session while the
+> countdown kept running underneath, so ten seconds later the next episode opened over a player
+> somebody had just stopped. Wired now, for both chains.
+>
+> **The general lesson, which holds for any gate in this tree:** a test that **builds the wiring it is
+> supposed to be testing** passes for ever. When a piece of evidence claims something reaches end to
+> end, go and find who calls it **in `src/`**.
+>
+> ### A rule of the owner's withdrawn, and two classes returned to the prototype
+>
+> Asked about the lesson row's radius — the design draws it at 7 and the gate demanded a pill — the
+> owner **withdrew the rule of 2026-08-25**: "esa afirmación mía era equivocada, los botones deben ser
+> al igual que todos los elementos de la app, idénticos al 100 % al prototipo".
+>
+> Measured the same day, that rule had moved **two** classes away from the design: `player-chrome`
+> (`pbtn` is 8 and it was 999) and `player-pill` (`pbtnLessons` is 4 and it was 999). Both are back.
+> `ButtonShapeTests` stops asserting "round or pill" and asserts the correspondence **in two halves
+> that cannot go stale the same way**: the tree draws what the table says, and the table says what the
+> design draws, **reading the number out of `design/AP Reelume.dc.html`**.
+>
+> **The 44 px target stays**, and it is a separate decision: the prototype draws `pbtn` at 36×36, and
+> shrinking it would trade an accessibility floor for eight pixels of shape.
+>
+> ### WHAT COMES NEXT, and it is not optional
+>
+> **1. The coverage floor that will go red, deliberately.** `preview-coverage-floors.ps1` says
+> `StartNextEpisodeCountdown.cs` rises from **100/89 to 100/94** once the loop leaves it. **It was not
+> raised by hand**, for a reason the fourteenth session's rule does not cover: that preview measured
+> **3 of the 10 suites**, so its number is not necessarily the merged one CI reads, and the hook
+> refuses `eng/coverage-debt.txt` because CI produces it. **Copy the floor from this commit's run's
+> `coverage-debt` artefact and push again.** If somebody wants to close the underlying contradiction,
+> the honest fix is for the hook to look at the **direction** of the change — refuse falls, allow
+> rises — rather than refusing by file name; its own written reason is "it quietly relaxes coverage",
+> and raising a floor does the opposite.
+>
+> **2. The fidelity sweep this batch left half-measured.** The owner's new rule is that **every**
+> element matches the prototype, not just the three buttons this batch touched. `ButtonShapeTests`
+> pairs only four classes; still **unpaired** are `action-row`, `navigation-destination`,
+> `navigation-action`, `poster-card`, `accent-swatch`, `colour-cell`, `segment`, `rating-choice`,
+> `compact` and `icon-action`. The prototype uses **nine** different radii and this tree has three
+> tokens. Pairing them is a batch of its own, with its walk and its captures.
+>
+> **3. `CRS-002/003/005` to `VERIFIED`.** Still outstanding from the fourteenth.
+>
+> ### And another batch running in the same tree
+>
+> **A second session worked `PLY-004` at the same time and left `96c850d` underneath this work.** Its
+> loopback recording harness is green, and it uncovered that **the chosen channel layout never reaches
+> the engine** — invisible today because everything is stereo. It is in the project memory. `git add`
+> with another session alive means reading `git diff --cached` before committing.
+>
+> ### What is measured and saves rounds
+>
+> · `pwsh -NoProfile -File eng/list-pending.ps1` for "what is left". Never by hand.
+> · The Courses walk scene already opens a lesson: **that is where the panel is really proved**, and
+>   it is the only thing that sees the pill exists and that a row is reachable with a real mouse.
+> · Three new tests failed **only inside the full suite** and passed alone: they build a panel, and
+>   building one reads `Application.ActualThemeVariant` from a thread the framework did not start.
+>   They are `AvaloniaFact`, not `Fact`.
+> · `Assert.Throws<T>` demands an **exact** type; that was the symptom.
+
 > ## HANDOVER — 2026-08-31, fourteenth session: `CRS-001`, the door a course is declared through
 >
 > **`main` ended level with the branch**, with this whole batch in it and every fast-forward made on a

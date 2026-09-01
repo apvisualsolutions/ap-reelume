@@ -453,17 +453,21 @@ public sealed class PlayerViewDesignTests
     /// <remarks>
     /// It was the medium radius until 2026-08-25, which on a 44 by 44 target is a square with its
     /// corners taken off: «todos los botones o son redondos o son píldoras, pero nunca cuadrados».
+    /// <b>The owner withdrew that rule on 2026-09-01</b> — an element matches the prototype, and the
+    /// prototype draws <c>pbtn</c> at <c>borderRadius: 8</c>, which is this scale's medium — so the
+    /// chrome buttons are back to the radius they had before it. ButtonShapeTests carries the
+    /// pairing and reads the number out of the design rather than restating it.
     /// The surfaces around them keep the medium radius — a band is not a button.
     /// </remarks>
     private static CornerRadius ChromeButtonCorner()
     {
         var expected = Assert.IsType<CornerRadius>(
-            Avalonia.Application.Current!.TryFindResource("CornerRadiusPill", out var token)
+            Avalonia.Application.Current!.TryFindResource("CornerRadiusMedium", out var token)
                 ? token
                 : null);
         Assert.True(
             expected.TopLeft > 0,
-            "CornerRadiusPill resolved to nothing, so comparing against it proves nothing.");
+            "CornerRadiusMedium resolved to nothing, so comparing against it proves nothing.");
         return expected;
     }
 

@@ -563,6 +563,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(HasSubtitlePanel));
                 OnPropertyChanged(nameof(HasVideoPanel));
                 OnPropertyChanged(nameof(HasMarkerPanel));
+                OnPropertyChanged(nameof(HasLessonsPanel));
                 OnPropertyChanged(nameof(IsPlayerVisible));
                 OnPropertyChanged(nameof(PlayerTitle));
                 OnPropertyChanged(nameof(PlayerSubtitle));
@@ -783,6 +784,17 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public bool HasMarkerPanel => HasMarkers || HasDetectedReview;
 
+    /// <summary>
+    /// Whether this session is a lesson at all (CRS-004), which is what makes the pill and the panel
+    /// <b>absent</b> rather than disabled outside a course.
+    /// </summary>
+    /// <remarks>
+    /// Absent and not disabled, and the ficha says so in bold for a reason a film makes obvious: a
+    /// greyed «Lecciones» beside a film is a promise that the film has lessons and that something is
+    /// stopping you from seeing them. Nothing is. This is not that session.
+    /// </remarks>
+    public bool HasLessonsPanel => Player?.Lessons is not null;
+
     /// <summary>Which panel the column is showing; <see cref="PlayerPanel.None"/> closes it.</summary>
     public PlayerPanel PlayerPanel
     {
@@ -796,6 +808,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsVideoPanelOpen));
                 OnPropertyChanged(nameof(IsMarkerPanelOpen));
                 OnPropertyChanged(nameof(IsVersionsPanelOpen));
+                OnPropertyChanged(nameof(IsLessonsPanelOpen));
                 OnPropertyChanged(nameof(IsPlayerPanelOpen));
                 OnPropertyChanged(nameof(IsPlayerColumnVisible));
                 OnPropertyChanged(nameof(AudioPanelStateCue));
@@ -803,6 +816,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(VideoPanelStateCue));
                 OnPropertyChanged(nameof(MarkerPanelStateCue));
                 OnPropertyChanged(nameof(VersionsPanelStateCue));
+                OnPropertyChanged(nameof(LessonsPanelStateCue));
                 _closePlayerPanel.RaiseCanExecuteChanged();
             }
         }
@@ -817,6 +831,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public bool IsMarkerPanelOpen => _playerPanel is PlayerPanel.Markers;
 
     public bool IsVersionsPanelOpen => _playerPanel is PlayerPanel.Versions;
+
+    public bool IsLessonsPanelOpen => _playerPanel is PlayerPanel.Lessons;
 
     /// <summary>Whether the column takes its 320 px at all.</summary>
     public bool IsPlayerPanelOpen => _playerPanel is not PlayerPanel.None;
@@ -839,6 +855,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public string MarkerPanelStateCue => Cue(IsMarkerPanelOpen);
 
     public string VersionsPanelStateCue => Cue(IsVersionsPanelOpen);
+
+    public string LessonsPanelStateCue => Cue(IsLessonsPanelOpen);
 
     private static string Cue(bool selected) => selected ? "●" : "○";
 

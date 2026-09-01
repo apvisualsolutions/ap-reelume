@@ -159,7 +159,7 @@ elección se equivoca hacia abajo con facilidad —tocar el shell rompió una ob
 | `Application.Tests` | casos de uso y puertos | ~ 1 s |
 | `ArchitectureTests` | las cinco reglas, red declarada, servicios huérfanos | ~ 2 s |
 | `DocumentationTests` | bilingüismo y matriz de alcance | < 1 s |
-| `UiTests` | AXAML, ViewModels, las 59 vistas <!--medido:vistas--> | ~ 1 min |
+| `UiTests` | AXAML, ViewModels, las 60 vistas <!--medido:vistas--> | ~ 1 min |
 | `AccessibilityTests` | recorrido y paseo autónomo | ~ 5 min |
 | `IntegrationTests` | SQLite, sistema de archivos, TMDB | ~ 7 min |
 | `MediaTests` | LibVLC con vídeo real | ~ 7 min |
@@ -327,11 +327,11 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    **el marcado no escribe el número**, no que el valor coincida: un token de 8 y un literal de 8
    pintan igual, así que comparar el valor aprueba justo lo que debía rechazar.
 7. **Cada vista lidera con el botón que se decidió, o con ninguno.** `LeadingActionTests` lleva una
-   tabla cerrada de las 59 <!--medido:vistas-->; **una vista que no esté en la tabla falla**,
+   tabla cerrada de las 60 <!--medido:vistas-->; **una vista que no esté en la tabla falla**,
    y `primary-action` se afirma
    como **la única** de su vista. Si tu vista es nueva, la decisión es tuya y hay que escribirla ahí.
 8. **Ningún control se dibuja fuera de la ventana más estrecha que la aplicación permite** (900, el
-   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 59 <!--medido:vistas-->, sin
+   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 60 <!--medido:vistas-->, sin
    contexto de datos —lo
    que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
    silencio suyo no es un certificado.

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Globalization;
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
@@ -13,25 +14,60 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Theme;
 
 /// <summary>
-/// A button is round or it is a pill. It is never a square with its corners taken off.
+/// Every button draws the corner the prototype draws.
 /// </summary>
 /// <remarks>
-/// «Todos los botones o son redondos o son píldoras, pero nunca cuadrados», the owner said on
-/// 2026-08-25. Two classes disagreed: the player's chrome, 44 by 44 with the medium radius, and one
-/// actually called <c>player-pill</c> that drew the small one. What makes the rule hold rather than
-/// be restated is that a square target and a pill radius are the same thing — a circle — so both
-/// shapes come from one token and a third shape cannot appear without a setter that names it.
+/// <b>This file asserted the opposite until 2026-09-01</b>, and the story is kept because it is what
+/// the rule now guards against. «Todos los botones o son redondos o son píldoras, pero nunca
+/// cuadrados», the owner said on 2026-08-25, and two classes were changed to obey it: the player's
+/// chrome and one actually called <c>player-pill</c>. Asked about a third — the lesson row, which
+/// the design draws at 7 — the owner withdrew the rule outright: <i>«esa afirmación mía era
+/// equivocada, los botones deben ser al igual que todos los elementos de la app, idénticos al 100 %
+/// al prototipo»</i>.
 /// <para>
-/// The poster card is the one exception and says so in its own words: a card is a card, and it is
-/// a button only because a card is pressed.
+/// Measured against the design the same day, the withdrawn rule had moved both classes <b>away</b>
+/// from it: <c>pbtn</c>, the player's icon buttons, is <c>borderRadius: 8</c> and had been made a
+/// circle; <c>pbtnAudio</c> and its four siblings are <c>borderRadius: 4</c> and had been made
+/// pills. A rule stated from memory beat a design nobody re-read, which is this repository's own
+/// characteristic defect wearing a different hat.
+/// </para>
+/// <para>
+/// So what is asserted now is the correspondence itself, and in two halves that cannot both go stale
+/// the same way: the tree draws what the table says, and the table says what the design draws.
 /// </para>
 /// </remarks>
 public sealed class ButtonShapeTests
 {
-    private const string CardException = "Button.poster-card";
+    /// <summary>
+    /// Each button class that names a corner, the prototype control it draws, and how that control
+    /// is found in the design.
+    /// </summary>
+    /// <remarks>
+    /// Paired by the number the design writes rather than by the token, because the scale is 4, 8
+    /// and the pill while the design also draws 7 — a radius no token carries, and one that rounding
+    /// to 4 or 8 would quietly turn into a shape the design does not draw.
+    /// <para>
+    /// The pattern travels with the pairing instead of being derived from the control's name,
+    /// because the three are written three different ways: <c>pbtn</c> is an object literal,
+    /// <c>btnPri</c> is an <c>Object.assign</c> over a base, and the lesson row has no name at all —
+    /// the panel builds its rows inline, so it is found by its neighbourhood. A single clever
+    /// pattern over all three is a pattern that matches the wrong thing the day one of them moves.
+    /// </para>
+    /// </remarks>
+    private static readonly (string Selector, string Control, int Radius, string Pattern)[] Pairings =
+    [
+        ("Button, ToggleButton", "btnPri", 999,
+            @"const btnPri = Object\.assign\([^;]*?borderRadius: (?<radius>[0-9]+)"),
+        ("Button.player-chrome", "pbtn", 8,
+            @"\bpbtn: \{[^}]*?borderRadius: (?<radius>[0-9]+)"),
+        ("Button.player-pill", "pbtnLessons", 4,
+            @"\bpbtnLessons: \{[^}]*?borderRadius: (?<radius>[0-9]+)"),
+        ("Button.lesson-row", "the lesson row", 7,
+            @"minHeight: 34, padding: '6px 10px', borderRadius: (?<radius>[0-9]+)"),
+    ];
 
     [Fact]
-    public void No_button_style_names_a_corner_that_is_not_the_pill()
+    public void Every_paired_button_draws_the_corner_the_prototype_draws()
     {
         var markup = File.ReadAllText(RepositoryLayout.PathFromRoot(
             "src/ApSolutions.LocalMedia.Presentation/Theme/DesignTokens.axaml"));
@@ -44,31 +80,93 @@ public sealed class ButtonShapeTests
         // Anti-blindness floor: a pattern that matched nothing would pass by measuring nothing.
         Assert.True(styles.Count >= 8, $"only {styles.Count} button styles were read; this reads the wrong file.");
 
-        var offenders = new List<string>();
-        foreach (Match style in styles)
+        var radii = new Dictionary<string, int>(StringComparer.Ordinal)
         {
-            var selector = style.Groups["selector"].Value;
-            if (selector.Contains(CardException, StringComparison.Ordinal))
+            ["{DynamicResource CornerRadiusSmall}"] = 4,
+            ["{DynamicResource CornerRadiusMedium}"] = 8,
+            ["{DynamicResource CornerRadiusPill}"] = 999,
+        };
+
+        var offenders = new List<string>();
+        foreach (var (selector, control, expected, _) in Pairings)
+        {
+            // A selector can be declared more than once — player-chrome is written twice, once for
+            // its padding beside the swatch and once for its shape — so the corner is looked for
+            // across every block that names it rather than in whichever one comes first. Taking the
+            // first was this test's own first red, and it accused the tree of drawing nothing.
+            var blocks = styles
+                .Where(candidate => candidate.Groups["selector"].Value == selector)
+                .ToArray();
+            if (blocks.Length == 0)
             {
+                offenders.Add($"{selector} is paired with {control} and no longer exists");
                 continue;
             }
 
-            var corner = Regex.Match(
-                style.Groups["body"].Value,
-                "Property=\"CornerRadius\" Value=\"(?<value>[^\"]+)\"",
-                RegexOptions.None,
-                TimeSpan.FromSeconds(5));
-            if (corner.Success && !corner.Groups["value"].Value.Contains("CornerRadiusPill", StringComparison.Ordinal))
+            var corners = blocks
+                .Select(block => Regex.Match(
+                    block.Groups["body"].Value,
+                    "Property=\"CornerRadius\" Value=\"(?<value>[^\"]+)\"",
+                    RegexOptions.None,
+                    TimeSpan.FromSeconds(5)))
+                .Where(match => match.Success)
+                .ToArray();
+            if (corners.Length == 0)
             {
-                var drawn = corner.Groups["value"].Value;
-                offenders.Add($"{selector} draws {drawn}");
+                offenders.Add($"{selector} names no corner, and {control} draws {expected}");
+                continue;
+            }
+
+            // Two blocks naming two different corners is a class arguing with itself, and whichever
+            // one the renderer picks is not something a reader of either block can predict.
+            if (corners.Select(match => match.Groups["value"].Value).Distinct(StringComparer.Ordinal).Count() > 1)
+            {
+                offenders.Add($"{selector} names more than one corner");
+                continue;
+            }
+
+            var written = corners[0].Groups["value"].Value;
+            var drawn = radii.TryGetValue(written, out var token)
+                ? token
+                : int.TryParse(written, NumberStyles.Integer, CultureInfo.InvariantCulture, out var literal)
+                    ? literal
+                    : -1;
+            if (drawn != expected)
+            {
+                offenders.Add($"{selector} draws {written}, and {control} draws {expected}");
             }
         }
 
         Assert.True(
             offenders.Count == 0,
-            "A button is round or a pill, never a square with its corners taken off: "
-                + string.Join("; ", offenders));
+            "A button draws the corner its prototype control draws: " + string.Join("; ", offenders));
+    }
+
+    /// <summary>
+    /// The radii the table above claims are the ones the design actually writes.
+    /// </summary>
+    /// <remarks>
+    /// Without this half the table would be a second set of numbers copied by hand, which is exactly
+    /// how the withdrawn rule survived a week: it read like a decision and nobody re-read the design
+    /// behind it. Here the design is the source, so a pairing that drifts from it fails on the number
+    /// rather than certifying itself.
+    /// </remarks>
+    [Fact]
+    public void The_pairings_name_the_radius_the_design_writes()
+    {
+        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
+
+        foreach (var (selector, control, expected, pattern) in Pairings)
+        {
+            var match = Regex.Match(design, pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
+
+            Assert.True(
+                match.Success,
+                $"the design no longer draws {control}, so {selector} is paired with nothing.");
+            Assert.Equal(
+                expected,
+                int.Parse(match.Groups["radius"].Value, CultureInfo.InvariantCulture));
+        }
     }
 
     /// <summary>

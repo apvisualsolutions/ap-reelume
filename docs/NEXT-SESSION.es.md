@@ -1,5 +1,104 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-01, decimoquinta sesión: `CRS-004`, el panel «Lecciones» y la cadena de la lección siguiente
+>
+> **`main` quedó al día con la rama** al empezar, con el run de `768fee0` leído en verde antes de
+> mover la referencia. El SHA no se escribe aquí a propósito —el commit que lo escribiría lo cambia—:
+> se lee con `git log --oneline -1 main`.
+>
+> **`CRS-004` pasa a `IMPLEMENTED`.** El panel ocupa los 320 px de la columna, está **ausente** fuera
+> de una sesión de lección, y al terminar una la cuenta atrás ofrece la lección siguiente.
+>
+> ### La decisión de diseño que lo sostiene todo
+>
+> **La sesión le pregunta al archivo si es una lección; no se lo dice quien la abrió.**
+> `ICourseRepository` gana `FindLessonByFileAsync`, espejo del de episodios. La razón está medida: la
+> cuenta atrás abre la siguiente con `PlayDetailsRequest(nextFileId, TimeSpan.Zero)` y nada más, y
+> «Retomar el hilo» hace lo mismo desde Inicio. Un curso que viajara en la petición **desaparecería
+> por cada camino que olvidara reenviarlo**, y como el modo de fallo del panel es la **ausencia**, se
+> iría en silencio en vez de verse mal.
+>
+> De paso apareció el defecto de la casa en una forma nueva: **`ix_lessons_media_file` existía desde
+> la migración 0022 y ninguna consulta del árbol lo usaba**. Registrado y nunca alimentado, como
+> índice.
+>
+> ### La cuenta atrás es la de PLY-011 de verdad, no una copia
+>
+> La espera, la longitud configurada y la cancelación salen a `ContinuityCountdown`, y **las dos
+> cadenas usan ese objeto**. La clave de ajuste sigue siendo la de episodios a propósito: una persona
+> configura «cuánto tarda en empezar lo siguiente», y renombrarla habría dejado la elección de cada
+> instalación existente atrás en la clave vieja. `StartNextEpisodeCountdown` conserva su superficie
+> pública entera y **sus 300 pruebas siguen verdes sin tocar una sola**.
+>
+> ### El defecto que la propia ficha destapó, y que era peor de lo que parecía
+>
+> La ficha promete «sus tres formas de cancelarla». **No había ninguna de las tres.** La prueba de
+> T28 construye **su propio** enrutador cuyo callback llama a `Cancel()` —prueba el enrutador, no el
+> cableado—; el callback **de la aplicación** no tocaba la cuenta atrás en ninguno de sus diez brazos,
+> y la única llamada a `Cancel()` de todo `src/` estaba en los dos botones del overlay.
+>
+> **Y la consecuencia no era «no se cancela»:** pulsar Stop cerraba la sesión mientras la cuenta atrás
+> seguía corriendo por debajo, de modo que diez segundos después se abría el episodio siguiente sobre
+> un reproductor que alguien acababa de parar. Cableado ahora, y vale para las dos cadenas.
+>
+> **La lección general, que vale para cualquier puerta de este árbol:** una prueba que **construye el
+> cableado que debería estar probando** pasa para siempre. Cuando una evidencia afirme que algo llega
+> de punta a punta, hay que buscar quién lo llama **en `src/`**.
+>
+> ### Una regla del propietario retirada, y dos clases devueltas al prototipo
+>
+> Preguntado por el radio de la fila de lección —el diseño la dibuja a 7 y la puerta exigía píldora—,
+> el propietario **retiró la regla del 2026-08-25**: «esa afirmación mía era equivocada, los botones
+> deben ser al igual que todos los elementos de la app, idénticos al 100 % al prototipo».
+>
+> Medido el mismo día, aquella regla había apartado **dos** clases del diseño: `player-chrome`
+> (`pbtn` es 8 y era 999) y `player-pill` (`pbtnLessons` es 4 y era 999). Las dos vuelven.
+> `ButtonShapeTests` deja de afirmar «redondo o píldora» y afirma la correspondencia **en dos mitades
+> que no pueden caducar igual**: el árbol dibuja lo que la tabla dice, y la tabla dice lo que el
+> diseño dibuja, **leyendo el número de `design/AP Reelume.dc.html`**.
+>
+> **El objetivo de 44 px se queda**, y es una decisión distinta: el prototipo dibuja `pbtn` a 36×36 y
+> encogerlo cambiaría un suelo de accesibilidad por ocho píxeles de forma.
+>
+> ### LO SIGUIENTE, y no es opcional
+>
+> **1. El suelo de cobertura que va a salir rojo, a propósito.** `preview-coverage-floors.ps1` dice
+> que `StartNextEpisodeCountdown.cs` sube de **100/89 a 100/94** al salirle el bucle. **No se subió a
+> mano**, y la razón es una que la regla de la 14.ª no contempla: esa previsualización midió **3 de
+> las 10 suites**, así que su número no es necesariamente el de la fusión de CI, y el hook deniega
+> tocar `eng/coverage-debt.txt` porque lo produce CI. **Se copia del artefacto `coverage-debt` del
+> run de este commit y se empuja otra vez.** Si alguien quiere cerrar esa contradicción de fondo, lo
+> honesto es que el hook mire la **dirección** del cambio —denegar bajadas, permitir subidas— en vez
+> de denegar por nombre de archivo; su propio motivo escrito dice «relaja en silencio la cobertura», y
+> subir un suelo hace lo contrario.
+>
+> **2. El barrido de fidelidad que esta tanda dejó medido a medias.** La regla nueva del propietario
+> es que **todo** elemento sea idéntico al prototipo, no sólo los tres botones que esta tanda tocó.
+> `ButtonShapeTests` sólo empareja cuatro clases; siguen **sin pareja** `action-row`,
+> `navigation-destination`, `navigation-action`, `poster-card`, `accent-swatch`, `colour-cell`,
+> `segment`, `rating-choice`, `compact` e `icon-action`. El prototipo usa **nueve** radios distintos
+> (10, 999, 7, 4, 8, 6, 2, 12, 19, 16, 15, 26) y este árbol sólo tiene tres tokens. Emparejarlas es
+> una tanda propia, con su paseo y sus capturas.
+>
+> **3. `CRS-002/003/005` a `VERIFIED`.** Sigue pendiente de la 14.ª.
+>
+> ### Y una tanda ajena corriendo en el mismo árbol
+>
+> **Otra sesión trabajó `PLY-004` a la vez y dejó `96c850d` debajo de este trabajo.** Su arnés de
+> grabación por loopback está verde, y destapó que **la disposición de canales elegida nunca llega al
+> motor** — invisible hoy porque todo está en estéreo. Se lee en la memoria del proyecto. `git add`
+> con otra sesión viva exige leer `git diff --cached` antes de confirmar.
+>
+> ### Lo medido que ahorra vueltas
+>
+> · `pwsh -NoProfile -File eng/list-pending.ps1` para «qué falta». Nunca a mano.
+> · La escena del paseo de Cursos ya abre una lección: **es donde se prueba el panel de verdad**, y es
+>   lo único que ve que la píldora existe y que una fila es alcanzable con un ratón real.
+> · Tres pruebas nuevas fallaron **sólo dentro de la suite completa** y verdes en aislado: construyen
+>   un panel, y construirlo lee `Application.ActualThemeVariant` desde un hilo que el framework no
+>   arrancó. Son `AvaloniaFact`, no `Fact`.
+> · `Assert.Throws<T>` exige tipo **exacto**; ése fue el síntoma.
+
 > ## RELEVO — 2026-08-31, decimocuarta sesión: `CRS-001`, la puerta por la que se declara un curso
 >
 > **`main` quedó al día con la rama**, con toda esta tanda dentro y cada fast-forward hecho con su CI

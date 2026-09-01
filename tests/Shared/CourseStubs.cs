@@ -74,6 +74,10 @@ internal sealed class StubCourses : ICourseRepository
         CourseId courseId,
         CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
+    public Task<Lesson?> FindLessonByFileAsync(
+        MediaFileId fileId,
+        CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
     public Task RemoveAsync(CourseId id, CancellationToken cancellationToken = default) =>
         throw new NotSupportedException();
 
@@ -103,6 +107,7 @@ internal sealed class StubEnumerator(string[] files) : IMediaFileEnumerator
 internal sealed class StubMediaFiles : IMediaFileRepository
 {
     private readonly Dictionary<string, MediaFile> _byPath = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<MediaFileId, MediaFile> _byId = [];
 
     /// <summary>
     /// A file the catalogue has already seen. The root is not part of the answer:
@@ -111,14 +116,28 @@ internal sealed class StubMediaFiles : IMediaFileRepository
     public MediaFileId Add(string path)
     {
         var id = new MediaFileId(Guid.NewGuid());
-        _byPath[path] = new MediaFile(
+        var file = new MediaFile(
             id,
             default,
             path,
             1,
             default,
             new TechnicalMetadata(null, string.Empty, [], [], null, null));
+        _byPath[path] = file;
+        _byId[id] = file;
         return id;
+    }
+
+    /// <summary>
+    /// The drive pulled out. It is what the lesson chain's revalidation at zero has to find, and the
+    /// reason that revalidation is a re-read rather than a recheck of what was already held.
+    /// </summary>
+    public void Forget(MediaFileId id)
+    {
+        if (_byId.Remove(id, out var file))
+        {
+            _byPath.Remove(file.Path);
+        }
     }
 
     public Task<IReadOnlyDictionary<string, MediaFile>> FindByPathsAsync(
@@ -138,7 +157,7 @@ internal sealed class StubMediaFiles : IMediaFileRepository
         CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
     public Task<MediaFile?> FindByIdAsync(MediaFileId id, CancellationToken cancellationToken = default) =>
-        throw new NotSupportedException();
+        Task.FromResult(_byId.TryGetValue(id, out var file) ? file : null);
 
     public Task UpsertAsync(MediaFile mediaFile, CancellationToken cancellationToken = default) =>
         throw new NotSupportedException();

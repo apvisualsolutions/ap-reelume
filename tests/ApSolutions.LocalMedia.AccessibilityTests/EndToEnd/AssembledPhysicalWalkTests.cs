@@ -5345,6 +5345,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             PlayerPanel.Subtitles => "PlayerPanelSubtitles",
             PlayerPanel.Video => "PlayerPanelVideo",
             PlayerPanel.Markers => "PlayerPanelMarkers",
+            PlayerPanel.Lessons => "PlayerLessonsPanelTitle",
             _ => "PlayerVersionsTitle",
         };
 
@@ -6094,6 +6095,30 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Continuar on a course card never started the lesson the thread points at",
             recordAs: "{Binding ActionText}");
         Assert.True(host.ViewModel.IsPlayerVisible);
+
+        // The player's «Lecciones» panel (CRS-004), which only exists because the session that just
+        // opened is a lesson. Two things are asserted that no unit test can see: that the pill is
+        // there at all — the shell asked the catalogue whether this file is a lesson and got an
+        // answer — and that a row inside the column is reachable with a real mouse.
+        Assert.True(host.ViewModel.HasLessonsPanel);
+        await OpenPlayerPanelAsync(host, PlayerPanel.Lessons);
+        var lessonsPanel = host.ViewModel.Player!.Lessons;
+        Assert.NotNull(lessonsPanel);
+        var playing = lessonsPanel!.LessonId;
+
+        // The row that is not the one playing, because pressing the current one would open the same
+        // lesson and prove nothing about the press landing.
+        var otherRow = lessonsPanel.Modules
+            .SelectMany(module => module.Lessons)
+            .First(row => row.Id != playing);
+        await PressAsync(
+            host,
+            otherRow.AccessibleName,
+            () => host.ViewModel.Player?.Lessons?.LessonId,
+            "clicking a row in the player's Lecciones panel never moved the session to that lesson",
+            recordAs: "{Binding AccessibleName}");
+        Assert.Equal(otherRow.Id, host.ViewModel.Player?.Lessons?.LessonId);
+
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
 
         // And the gesture that makes any of the above possible (CRS-001, ADR-0006 amendment 1): the

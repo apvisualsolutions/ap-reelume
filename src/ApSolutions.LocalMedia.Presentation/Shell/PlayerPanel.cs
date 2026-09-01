@@ -31,4 +31,15 @@ public enum PlayerPanel
 
     /// <summary>The other versions of what is playing.</summary>
     Versions,
+
+    /// <summary>
+    /// The course this lesson belongs to, and every other lesson in it (CRS-004).
+    /// </summary>
+    /// <remarks>
+    /// The one panel here that is not about the media. The other five answer questions about the
+    /// file that is open — what am I hearing, what am I reading, what did the decoder do — and this
+    /// one answers where this sits in something longer. It is also the only one that is absent for
+    /// most sessions rather than for some of them: a film has no course.
+    /// </remarks>
+    Lessons,
 }

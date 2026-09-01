@@ -208,7 +208,7 @@ public sealed class ShellPlayerWindowTests
 
         // The header, and the buttons this session actually draws, named in the language in force
         // rather than by their glyphs — the glyph is what the eye lands on and the name is what a
-        // reader hears. Effectively visible and not merely declared: the five panel pills are
+        // reader hears. Effectively visible and not merely declared: the six panel pills are
         // declared on every session and drawn only by the ones that have those panels, and this
         // file has none of them, so what is left is the one that is always there.
         //
@@ -229,8 +229,12 @@ public sealed class ShellPlayerWindowTests
 
         // The pills are declared even here, and every one of them is a player-pill: a session that
         // grew a track list must not find a pill wearing the wrong grammar.
+        //
+        // Six since 2026-09-01, when «Lecciones» arrived (CRS-004). It is declared like the other
+        // five and drawn like them only when the session has it — and this session is a loose file,
+        // which is not a lesson, so the sixth is exactly as absent as the rest.
         Assert.Equal(
-            5,
+            6,
             header.GetVisualDescendants()
                 .OfType<Button>()
                 .Count(button => button.Classes.Contains("player-pill")));

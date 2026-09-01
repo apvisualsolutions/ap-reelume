@@ -8,6 +8,56 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Añadido
+
+- **El panel «Lecciones» del reproductor y la lección siguiente al terminar una (`CRS-004`).** El
+  curso entero en los 320 px de la columna, con la lección que suena marcada y cualquier otra a un
+  clic. **Ausente y no deshabilitado** fuera de una sesión de lección, que es lo que la ficha pedía
+  en negrita: un «Lecciones» apagado junto a una película promete que la película tiene lecciones.
+
+  **Cómo sabe la sesión que es una lección: se le pregunta al archivo.** `ICourseRepository` gana
+  `FindLessonByFileAsync`, espejo del de episodios, y la razón está medida — la cuenta atrás abre la
+  siguiente con `PlayDetailsRequest(nextFileId, TimeSpan.Zero)` y nada más, así que un curso que
+  viajara en la petición **desaparecería por cada camino que olvidara reenviarlo**, en silencio,
+  porque el modo de fallo del panel es la ausencia. De paso, `ix_lessons_media_file` **existía desde
+  la migración 0022 sin una sola consulta que lo usara**: el defecto de la casa en forma de índice.
+
+  **La cuenta atrás es la de PLY-011 literalmente, no una copia.** La espera, la longitud y la
+  cancelación salen a `ContinuityCountdown` y las dos cadenas usan **ese objeto**; la clave de ajuste
+  sigue siendo la de episodios, porque una persona configura «cuánto tarda en empezar lo siguiente» y
+  renombrarla habría dejado la elección de cada instalación atrás en la clave vieja.
+  `StartNextEpisodeCountdown` conserva su superficie entera y **sus 300 pruebas siguen verdes sin
+  tocar una sola**.
+
+### Corregido
+
+- **La cuenta atrás no se podía cancelar con el teclado ni con la tecla multimedia, y su ficha decía
+  que sí desde T28.** La prueba `Any_input_method_cancels_the_countdown` construye **su propio**
+  enrutador cuyo callback llama a `Cancel()`: prueba el enrutador, no el cableado. El callback **de la
+  aplicación** no tocaba la cuenta atrás en ninguno de sus diez brazos, y la única llamada a
+  `Cancel()` de todo `src/` estaba en los dos botones del overlay.
+
+  **La consecuencia era peor que «no se cancela»:** pulsar Stop cerraba la sesión mientras la cuenta
+  atrás seguía corriendo por debajo, de modo que diez segundos después se abría el episodio siguiente
+  sobre un reproductor que alguien acababa de parar — lo contrario exacto de «Nada se reproduce
+  solo». Cableado ahora para las dos cadenas.
+
+### Cambiado
+
+- **Los botones vuelven a la forma del prototipo, y la regla que los apartó de él queda retirada.**
+  «Todos los botones o son redondos o son píldoras, pero nunca cuadrados» era del 2026-08-25; el
+  propietario la retiró el 2026-09-01 al medirse contra el diseño: **un elemento es idéntico al
+  prototipo**. Aquella regla había movido dos clases **lejos** de él — `pbtn`, los botones de icono
+  del reproductor, es `borderRadius: 8` y se había vuelto círculo; `pbtnAudio` y sus cuatro hermanas
+  son `borderRadius: 4` y se habían vuelto píldoras.
+
+  `ButtonShapeTests` deja de afirmar «redondo o píldora» y pasa a afirmar la correspondencia **en dos
+  mitades que no pueden caducar igual**: que el árbol dibuja lo que la tabla dice, y que la tabla dice
+  lo que el diseño dibuja, leyendo el número de `design/AP Reelume.dc.html` en vez de repetirlo. Sin
+  la segunda mitad la tabla volvería a ser un número copiado a mano, que es cómo la regla retirada
+  sobrevivió una semana. **El objetivo de 44 px se queda**: es una decisión distinta y de
+  accesibilidad, y el radio nunca fue lo que separaba ese control del diseño.
+
 ### Cambiado
 
 - **El archivo que bailaba llega a 100/100, y la puerta no necesitaba ninguna banda de tolerancia.**

@@ -896,6 +896,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
               </StackPanel>
             </Button>
             <!--
+              «Lecciones» (CRS-004), and it is the sixth pill rather than a sixth subject: the other
+              five ask about the file that is open and this one asks where it sits in something
+              longer. It is last because it is the only one most sessions do not have at all.
+
+              Absent and not disabled outside a course, which the ficha writes in bold. A greyed
+              «Lecciones» beside a film promises the film has lessons and that something is stopping
+              you seeing them; nothing is.
+            -->
+            <Button
+                Classes="player-pill"
+                Classes.selected="{Binding IsLessonsPanelOpen}"
+                IsVisible="{Binding HasLessonsPanel}"
+                automation:AutomationProperties.Name="{DynamicResource PlayerLessonsPanelTitle}"
+                Command="{Binding TogglePlayerPanelCommand}"
+                CommandParameter="{x:Static shell:PlayerPanel.Lessons}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <TextBlock Classes="state-glyph" Text="{Binding LessonsPanelStateCue}" />
+                <TextBlock Text="{DynamicResource PlayerLessonsPanelTitle}" />
+              </StackPanel>
+            </Button>
+            <!--
               The two mode buttons that used to sit here are in the transport bar now, which is where
               the owner looked for them on 2026-08-25 and where every player puts them. They are not
               in both places: two controls answering to «Pantalla completa» on one screen is one name
@@ -1012,6 +1033,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   FontWeight="SemiBold"
                   IsVisible="{Binding IsVersionsPanelOpen}"
                   Text="{DynamicResource PlayerVersionsTitle}" />
+              <TextBlock
+                  VerticalAlignment="Center"
+                  FontWeight="SemiBold"
+                  IsVisible="{Binding IsLessonsPanelOpen}"
+                  Text="{DynamicResource PlayerLessonsPanelTitle}" />
               <Button
                   Grid.Column="1"
                   Classes="player-chrome"
@@ -1152,6 +1178,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
               </StackPanel>
               <ContentControl IsVisible="{Binding IsVersionsPanelOpen}">
                 <player:PlayerVersionsView DataContext="{Binding Player.Versions}" />
+              </ContentControl>
+              <ContentControl IsVisible="{Binding IsLessonsPanelOpen}">
+                <player:LessonsPanelView DataContext="{Binding Player.Lessons}" />
               </ContentControl>
             </Panel>
           </ScrollViewer>

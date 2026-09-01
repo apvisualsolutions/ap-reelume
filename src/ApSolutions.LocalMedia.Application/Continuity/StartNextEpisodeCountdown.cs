@@ -40,18 +40,21 @@ public sealed record NextEpisodeResult(NextEpisodeOutcome Outcome, EpisodeSequen
 public sealed class StartNextEpisodeCountdown
 {
     /// <summary>Where the chosen countdown length is stored between sessions.</summary>
-    public const string SettingKey = "continuity.next-episode-countdown-seconds";
+    /// <remarks>
+    /// The constants forward to <see cref="ContinuityCountdown"/>, which owns the wait since the
+    /// course chain arrived (CRS-004). They stay declared here because the settings surface, T28's
+    /// tests and the shortcut documentation all name them through this type.
+    /// </remarks>
+    public const string SettingKey = ContinuityCountdown.SettingKey;
 
-    public const int DefaultCountdownSeconds = 10;
+    public const int DefaultCountdownSeconds = ContinuityCountdown.DefaultCountdownSeconds;
 
-    public const int MaximumCountdownSeconds = 60;
+    public const int MaximumCountdownSeconds = ContinuityCountdown.MaximumCountdownSeconds;
 
     private readonly GetNextEpisode _next;
     private readonly IEpisodeSequenceRepository _repository;
     private readonly IPlaybackSessionCoordinator _coordinator;
-    private readonly ISettingsStore _settings;
-    private readonly IClock _clock;
-    private CancellationTokenSource? _countdown;
+    private readonly ContinuityCountdown _countdown;
 
     public StartNextEpisodeCountdown(
         GetNextEpisode next,
@@ -63,21 +66,21 @@ public sealed class StartNextEpisodeCountdown
         _next = next ?? throw new ArgumentNullException(nameof(next));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _coordinator = coordinator ?? throw new ArgumentNullException(nameof(coordinator));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+        _countdown = new ContinuityCountdown(settings, clock);
+        _countdown.Ticked += (sender, remaining) => Ticked?.Invoke(this, remaining);
     }
 
     /// <summary>Raised once per second with the seconds still to go, ending at zero.</summary>
     public event EventHandler<int>? Ticked;
 
     /// <summary>The countdown in force, from zero — which switches the chain off — to sixty.</summary>
-    public int CountdownSeconds => Clamp(_settings.Read<int?>(SettingKey) ?? DefaultCountdownSeconds);
+    public int CountdownSeconds => _countdown.CountdownSeconds;
 
     /// <summary>Stores a new countdown length, clamped to the accepted range.</summary>
-    public void ConfigureCountdown(int seconds) => _settings.Write(SettingKey, Clamp(seconds));
+    public void ConfigureCountdown(int seconds) => _countdown.ConfigureCountdown(seconds);
 
     /// <summary>Stops a countdown that is running; whoever calls it may be a key, a click, or a menu.</summary>
-    public void Cancel() => _countdown?.Cancel();
+    public void Cancel() => _countdown.Cancel();
 
     public async Task<NextEpisodeResult> ExecuteAsync(
         TitleId showId,
@@ -98,25 +101,9 @@ public sealed class StartNextEpisodeCountdown
             return new NextEpisodeResult(NextEpisodeOutcome.Disabled, candidate);
         }
 
-        using var countdown = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _countdown = countdown;
-        try
-        {
-            for (var remaining = seconds; remaining > 0; remaining--)
-            {
-                Ticked?.Invoke(this, remaining);
-                await _clock.DelayAsync(TimeSpan.FromSeconds(1), countdown.Token).ConfigureAwait(false);
-            }
-
-            Ticked?.Invoke(this, 0);
-        }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        if (!await _countdown.WaitAsync(seconds, cancellationToken).ConfigureAwait(false))
         {
             return new NextEpisodeResult(NextEpisodeOutcome.Cancelled, candidate);
-        }
-        finally
-        {
-            _countdown = null;
         }
 
         // The drive may have been pulled out while the countdown ran, so availability is confirmed
@@ -142,6 +129,4 @@ public sealed class StartNextEpisodeCountdown
 
         return new NextEpisodeResult(NextEpisodeOutcome.Started, confirmed);
     }
-
-    private static int Clamp(int seconds) => Math.Clamp(seconds, 0, MaximumCountdownSeconds);
 }

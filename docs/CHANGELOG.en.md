@@ -8,6 +8,55 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Added
+
+- **The player's "Lessons" panel, and the next lesson when one ends (`CRS-004`).** The whole course
+  in the column's 320 px, with the playing lesson marked and any other one a click away. **Absent
+  rather than disabled** outside a lesson session, which is what the ficha asked for in bold: a
+  greyed "Lessons" beside a film promises the film has lessons.
+
+  **How the session knows it is a lesson: the file is asked.** `ICourseRepository` gains
+  `FindLessonByFileAsync`, the mirror of the episode one, and the reason is measured — the countdown
+  opens the next lesson with `PlayDetailsRequest(nextFileId, TimeSpan.Zero)` and nothing else, so a
+  course riding on the request **would go missing down every path that forgot to forward it**,
+  quietly, because the panel's failure mode is absence. Along the way, `ix_lessons_media_file` **had
+  existed since migration 0022 with no query using it**: this repository's own defect, as an index.
+
+  **The countdown is PLY-011's, literally, not a copy of it.** The wait, the length and the
+  cancellation move to `ContinuityCountdown` and both chains use **that object**; the setting key
+  stays the episode one, because a person configures "how long before the next thing starts" and
+  renaming it would have left every installation's choice behind on the old key.
+  `StartNextEpisodeCountdown` keeps its whole surface and **its 300 tests stay green untouched**.
+
+### Fixed
+
+- **The countdown could not be cancelled from the keyboard or a media key, and its ficha had said it
+  could since T28.** The `Any_input_method_cancels_the_countdown` test builds **its own** router
+  whose callback calls `Cancel()`: it tests the router, not the wiring. The **application's** callback
+  touched the countdown in none of its ten arms, and the only `Cancel()` in all of `src/` was the
+  overlay's two buttons.
+
+  **The consequence was worse than "it does not cancel":** pressing Stop closed the session while the
+  countdown kept running underneath, so ten seconds later the next episode opened over a player
+  somebody had just stopped — the exact opposite of "nothing plays on its own". Wired now for both
+  chains.
+
+### Changed
+
+- **Buttons go back to the prototype's shape, and the rule that moved them away from it is
+  withdrawn.** "Todos los botones o son redondos o son píldoras, pero nunca cuadrados" was written on
+  2026-08-25; the owner withdrew it on 2026-09-01 once it was measured against the design: **an
+  element matches the prototype**. That rule had moved two classes **away** from it — `pbtn`, the
+  player's icon buttons, is `borderRadius: 8` and had become a circle; `pbtnAudio` and its four
+  siblings are `borderRadius: 4` and had become pills.
+
+  `ButtonShapeTests` stops asserting "round or pill" and asserts the correspondence instead, **in two
+  halves that cannot go stale the same way**: that the tree draws what the table says, and that the
+  table says what the design draws — reading the number out of `design/AP Reelume.dc.html` rather
+  than restating it. Without the second half the table would be a hand-copied number again, which is
+  how the withdrawn rule survived a week. **The 44 px target stays**: it is a separate, accessibility
+  decision, and the radius was never what set that control apart from the design.
+
 ### Changed
 
 - **The file that danced reaches 100/100, and the gate needed no tolerance band at all.** The open
