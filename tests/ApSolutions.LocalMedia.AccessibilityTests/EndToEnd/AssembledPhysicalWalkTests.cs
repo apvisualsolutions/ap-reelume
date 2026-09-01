@@ -151,8 +151,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotEmpty(library.Items);
         await library.OpenDetailsAsync(library.Items[0], TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         // Opened by its button rather than by its command: this is the only scene that has a real
         // version group to open, so it is the only one that can press it.
@@ -166,8 +164,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // And the group is decided with the mouse. Opening it already moved to the duplicates
         // destination, where the comparison sits under the overview; the layout still has to
         // settle before a click can land.
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
         // The copy that is not already the one that would play, so that pressing it has something to
@@ -198,8 +194,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.DuplicatesOverview is { HasGroups: true }),
             "the duplicates overview never listed the group the scan formed");
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
         var row = host.ViewModel.DuplicatesOverview!.Groups.Single();
@@ -390,8 +384,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
         await host.ViewModel.OpenMetadataEditorAsync(TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         var editor = host.ViewModel.MetadataEditor;
         Assert.NotNull(editor);
@@ -478,8 +470,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // there is one pill, pressing it would change nothing, and PressAsync refuses a press whose
         // effect never arrives — which is the whole reason it can be trusted.
         await host.ViewModel.OpenRenamePreviewAsync(TestContext.Current.CancellationToken);
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(1, host.ViewModel.EditorTab);
 
@@ -1049,8 +1039,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
         await host.ViewModel.OpenRenamePreviewAsync(TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         var rename = host.ViewModel.Rename;
         Assert.NotNull(rename);
@@ -1334,8 +1322,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await library!.LoadAsync(TestContext.Current.CancellationToken);
         await library.OpenDetailsAsync(library.Items[0], TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         await PressAsync(
             host,
@@ -1416,8 +1402,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(home);
         await home!.LoadAsync(TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         // The rail's switch, read from the setting it stores rather than from the rail: switched off,
         // the rail empties instead of hiding a result, and both look the same on screen.
@@ -1492,8 +1476,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // what "matched 0 controls" means when the same press lands on a faster machine.
         Navigate(host, AppRoute.Home);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
         await WaitForAsync(
             () => Task.FromResult(Reachable(host).Any(control =>
                 control.IsEffectivelyVisible
@@ -1565,8 +1547,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await SeedProgressAsync();
         Navigate(host, AppRoute.Home);
         await home.LoadAsync(TestContext.Current.CancellationToken);
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
         await WaitForAsync(
             () => Task.FromResult(Reachable(host).Any(control =>
@@ -1787,8 +1767,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // The row for the folder that is now in the catalogue, which is what removal acts on.
         await onboarding.RefreshRootsAsync(TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
         Assert.True(onboarding.HasRoots, "The folder that was added never reached the list.");
 
         await PressAsync(
@@ -1972,8 +1950,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await library!.LoadAsync(TestContext.Current.CancellationToken);
         await library.OpenDetailsAsync(Assert.Single(library.Items), TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         var watch = library.MovieDetails.WatchStatus;
         var personal = library.MovieDetails.PersonalActions;
@@ -2118,8 +2094,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             library.Items.Single(item => item.Item.Id.Value == filmId),
             TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
         Assert.True(
             library.MovieDetails.HasTrailerLink,
             "The film card offered no provider trailer, so there was nothing to press.");
@@ -2136,8 +2110,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await library.OpenDetailsAsync(
             library.Items.Single(item => item.Item.Kind == CatalogTitleKind.Show),
             TestContext.Current.CancellationToken);
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(LibrarySurface.ShowDetails, library.Surface);
         Assert.True(
@@ -2238,8 +2210,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await WaitForAsync(
             () => Task.FromResult(inbox!.Items.Count == 25),
             "the review inbox never loaded its first page");
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
         await PressAsync(
@@ -2551,8 +2521,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // expected to have noticed.
         await inbox.LoadAsync(TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
         await WaitForAsync(
             () => Task.FromResult(inbox.HasReassignments),
             "the queue was holding an offer and the review surface never showed it");
@@ -2616,8 +2584,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "the session never reached the playing state on the real engine");
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
         var player = host.ViewModel.Player!.Player;
@@ -2722,14 +2688,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await transport.SetSpeedAsync(1.5, TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
 
-        // The bar is laid out again before anything is aimed at it, and that is not belt and braces.
-        // «Volver a 1×» appears when the speed leaves 1×, so this line changes the composition of the
-        // row: everything to its side moves. PressAsync picks the point it clicks "beside" a control
-        // from the geometry on screen, and CI answered `Expected: Embedded, Actual: Fullscreen` on
-        // 2026-08-28 — the beside-click had landed on the mode button next door, before the layout
-        // that made room for the reset had settled. It does not reproduce here: the case alone three
-        // times and the whole suite twice, all green. A race is removed rather than hunted.
-        host.Window.InvalidateMeasure();
+        // This scene is where the race was found, twice, and the settling that answered it does not
+        // live here any more: it is in Reveal, which every press goes through. «Volver a 1×» appears
+        // when the speed leaves 1×, so this line changes the composition of the row and everything
+        // beside it moves — and so does pressing the reset, which removes that button again. Fixing
+        // the line somebody remembered is what left the second half of it standing on 2026-08-28.
         Dispatcher.UIThread.RunJobs();
         Assert.True(transport.IsAwayFromNormalSpeed, "the session never left 1×, so the reset has nothing to do.");
 
@@ -3506,8 +3469,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(outside, banner.FolderPath);
 
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         // The banner is a card, not a sheet over the picture. Measured before the correction at
         // 1280x1400 over a 1280x1400 stage — and it carries a background, so it also swallowed every
@@ -3612,8 +3573,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             await library.OpenDetailsAsync(
                 Assert.Single(library.Items),
                 TestContext.Current.CancellationToken);
-            Dispatcher.UIThread.RunJobs();
-            host.Window.InvalidateMeasure();
             Dispatcher.UIThread.RunJobs();
         }
 
@@ -3738,8 +3697,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var show = library.Items.FirstOrDefault(item => item.Item.Kind == CatalogTitleKind.Show);
         Assert.True(show is not null, "The seeded series never reached the library.");
         await library.OpenDetailsAsync(show!, TestContext.Current.CancellationToken);
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
         // The seasons are pills since 2026-08-25, not a drop-down, and a pill's effect is on this
@@ -4025,8 +3982,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "the session never reached the playing state on the real engine");
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
     }
 
     /// <summary>
@@ -4093,8 +4048,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "the session never reached the playing state on the real engine");
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
         var surfaces = host.ViewModel.Player!;
@@ -4467,8 +4420,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await WaitForAsync(
             () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
             "the session never reached the playing state on the real engine");
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
 
         // On the real engine, and this is the only place it can be measured: the picture started, so
@@ -5456,6 +5407,31 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             scroller.Offset = scroller.Offset.WithY(0);
         }
 
+        // <b>InvalidateMeasure and not UpdateLayout alone</b>, and this is the thirteenth cause of a
+        // red that only ever appeared in CI, finally put where the rule is rather than where it hurt.
+        //
+        // UpdateLayout runs the layout pass only if the tree is dirty, and measured over a full walk
+        // on 2026-09-02 the window reported IsMeasureValid and IsArrangeValid on <b>all 250</b>
+        // beside-clicks — and forcing a pass anyway moved a control's rectangle in five of them. So a
+        // tree that calls itself clean is not a tree whose descendants' geometry is current, and the
+        // difference is invisible to any caller that only asks.
+        //
+        // It lived in one scene from 2026-08-28 (`Expected: Embedded, Actual: Fullscreen`, when the
+        // beside-click landed on the mode button next door) and in BesidePoint from 2026-09-01, when
+        // the same red came back from the press after that one: pressing «back to 1×» REMOVES that
+        // button from the row, so the row recomposes again. Both were the line somebody remembered.
+        // Here it covers every press, because Click goes through Reveal too — and the ordinary press
+        // was reading a control's centre with exactly the staleness the beside-click was protected
+        // from.
+        //
+        // <b>`window` and not `host.Window`</b>: with the mini player on screen those are two
+        // different windows, and settling the shell to then read the other one's Bounds leaves the
+        // staleness this is here to remove.
+        //
+        // <b>It is not reproducible on this machine</b> — the case alone and the whole suite have run
+        // green here every time, across all three dates — so what confirms the red is CI's second
+        // pass. What is measurable here is the mechanism above, and that is what was measured.
+        window.InvalidateMeasure();
         window.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
         if (Fits(host, control))
@@ -5658,41 +5634,15 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var window = RootOf(host, control);
         Reveal(host, control);
 
-        // The layout is settled before a single Bounds is read, and this is the thirteenth cause of
-        // a red that only ever appeared in CI — twice now, which is why the fix moved here.
-        //
         // Every number below comes from geometry: the centre, the rectangles of the controls that
         // could take the click, and the offsets between them. A press that changed which controls
         // sit in a row leaves all three describing the row as it was, so the point chosen to be
-        // "beside" everything lands on a neighbour that has since moved under it. On 2026-08-28
-        // that answered `Expected: Embedded, Actual: Fullscreen`, and the fix was an
-        // InvalidateMeasure in the one scene that had just changed a row. It came back on
-        // 2026-09-01 in the same scene, from the press after that one: pressing «back to 1×»
-        // REMOVES that button from the row, so the row recomposes again, and the next aim was
-        // taken at where it used to be.
+        // "beside" everything lands on a neighbour that has since moved under it.
         //
-        // Settling it in the scene fixes the line somebody remembered; settling it here fixes the
-        // rule, because every beside-click reads geometry and any press can have changed it. The
-        // cost is one measure pass per press.
-        //
-        // <b>It is not reproducible on this machine</b> — the case alone and the whole suite have
-        // run green here every time, across both dates — so what confirms this is CI's second pass
-        // and nothing local can.
-        //
-        // <b>`window` and not `host.Window`</b>, which is a second defect this line had on the way
-        // in: everything below measures `window`, and RootOf returns the control's own Window with
-        // the shell's only as a fallback. With the mini player on screen those are two different
-        // windows, so settling the shell and then reading the mini player's Bounds would leave the
-        // same staleness this is here to remove — in the one situation the paragraph above the
-        // candidate set already warns about.
-        //
-        // InvalidateMeasure marks the layout dirty rather than running it, so RunJobs is what
-        // actually performs the pass the LayoutManager queued. Measured rather than assumed:
-        // removing the middle button of a three-button row moved the third from x=80 to x=40 after
-        // InvalidateMeasure + RunJobs, and a subsequent UpdateLayout moved it no further.
-        window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
-
+        // The settling that answers that is in Reveal, called on the line above, and it got there by
+        // measurement rather than by reasoning — see the comment there. This function carried its own
+        // copy from 2026-09-01 until 2026-09-02, and over 250 beside-clicks of a full walk that copy
+        // moved geometry in five of them; with Reveal forcing the pass it moves it in none.
         var centre = control.TranslatePoint(
             new Point(control.Bounds.Width / 2, control.Bounds.Height / 2),
             window);
@@ -6039,8 +5989,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(grid);
         await grid!.LoadAsync(TestContext.Current.CancellationToken);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         // Marking a folder opens the one door the shell already owns, and the scrim closes it again.
         await PressAsync(
@@ -6068,8 +6016,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var details = host.ViewModel.CourseDetails;
         Assert.NotNull(details);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         // Marking a lesson watched by hand, asserted on the store rather than on the glyph: what
         // this press claims is that a lesson's progress is the progress PLY-008 already keeps.
@@ -6091,8 +6037,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // effect that proves them. The thread moved to the second lesson when the first was marked,
         // so this is also the assertion that the thread is read and not remembered.
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
         await PressAsync(
             host,
             details.ThreadActionText,
@@ -6103,8 +6047,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
 
         Navigate(host, AppRoute.Courses);
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
         var playable = details.Modules[0].Lessons[1];
         await PressAsync(
@@ -6120,8 +6062,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // course and starts the thread in one press.
         Navigate(host, AppRoute.Courses);
         await grid.LoadAsync(TestContext.Current.CancellationToken);
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
         await PressAsync(
             host,
@@ -6181,8 +6121,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(onboardingForm);
         onboardingForm!.Path = Path.Combine(mediaRoot, "Composicion");
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
 
         // The probe is what the pass came back with, and NOT the number of courses: this folder is
         // already a course here, so marking it again is an upsert and the count is identical before
@@ -6201,8 +6139,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(1, marking.NeighbourCount);
         Assert.True(marking.IsAskingAboutNeighbours);
         Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
-        Dispatcher.UIThread.RunJobs();
         await PressAsync(
             host,
             "AddCourseNeighboursConfirmAction",
@@ -6214,8 +6150,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // Marking again with nothing new leaves the question up, and «Sólo esta» is the way out of
         // it: the one answer that has to change nothing.
         onboardingForm.Path = Path.Combine(mediaRoot, "Composicion");
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
         await PressAsync(
             host,
@@ -6259,8 +6193,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     private static void Navigate(ShellHost host, AppRoute route)
     {
         host.ViewModel.NavigateCommand.Execute(route);
-        Dispatcher.UIThread.RunJobs();
-        host.Window.InvalidateMeasure();
         Dispatcher.UIThread.RunJobs();
     }
 
