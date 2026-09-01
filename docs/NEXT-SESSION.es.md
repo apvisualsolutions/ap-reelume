@@ -122,6 +122,52 @@
 > que una discrepancia **por accesibilidad medida** sigue siendo legítima mientras se escriba junto al
 > control — lo que prohíbe es la discrepancia por gramática inventada.
 >
+> ### La carrera del paseo que volvió, y por qué la corrección de agosto no bastó
+>
+> **CI la cazó y no esta máquina**, que es lo que hay que saber antes de tocar el paseo.
+> `The_players_transport_is_operated_with_the_mouse` respondió otra vez `Expected: Embedded,
+> Actual: Fullscreen` — el mismo mensaje del 2026-08-28— y **sólo en la segunda pasada**: la primera
+> dio 147/147 y la segunda 146/147, con el mismo binario. Dos pasadas locales, antes y después del
+> arreglo, verdes las cuatro.
+>
+> **La corrección de agosto puso el asentado en la escena**, antes del reset de velocidad. Pero pulsar
+> «Volver a 1×» **quita ese botón de la fila**, así que la fila se recompone otra vez y el apuntado
+> siguiente se toma sobre la geometría vieja. **Se arregló la línea que alguien recordó, no la regla
+> que el propio comentario había escrito dos párrafos más arriba.**
+>
+> Ahora vive en `BesidePoint`, que es donde está la causa: todo lo que hay ahí dentro es geometría —el
+> centro, los rectángulos ocupados, los offsets— y cualquier press anterior puede haberla cambiado.
+> **Y usa `window`, no `host.Window`**: con el mini reproductor en pantalla son dos ventanas, y
+> asentar una para leer la otra dejaba el defecto puesto.
+>
+> **Tres hipótesis verosímiles murieron medidas esa tarde**, y conviene no repetirlas: que el cambio de
+> radio de `player-chrome` hubiera agrandado el área efectiva —no puede: `BesidePoint` construye sus
+> rectángulos con `Bounds.Size`, que ningún radio toca—; que `InvalidateMeasure()` no bastara sin
+> `UpdateLayout()` —una sonda quitó el botón central de una fila de tres y el tercero se movió de 80 a
+> 40 con `InvalidateMeasure+RunJobs`, sin movimiento adicional—; y que `Reveal` no asentara —sí lo
+> hace, con `UpdateLayout()` tras cada `BringIntoView()` y tras cada incremento de scroll—.
+>
+> **Queda pendiente y es limpieza, no defecto**: unas diez escenas siguen con
+> `host.Window.InvalidateMeasure()`, ahora redundante, y el archivo tiene **dos formas de decir lo
+> mismo** —`UpdateLayout()` en `Reveal` y `InvalidateMeasure()+RunJobs()` en el resto—, que es el
+> terreno donde nace una tercera. Se unifican en su propia tanda, no en la del arreglo.
+>
+> ### Y una trampa de medición que costó una conclusión falsa
+>
+> **La duración de un run NO es comparable si murieron en pasos distintos.** Cuatro runs de ese día
+> dieron 35,0 / 34,8 / 47,9 / 65,8 minutos y parecía que el rango escrito de **42-53** se había
+> quedado obsoleto por los dos lados. No: cada uno murió un paso más lejos que el anterior, y un run
+> que aborta en `Verify` **no ejecuta** la accesibilidad ×2, ni la recuperación ×2, ni el paseo del
+> paso 8. **Los 35 minutos no dicen que CI sea rápido: dicen que abortó pronto.**
+>
+> Lo que se puede afirmar: **hay UNA medida comparable y vale 65,8**; las otras tres no cuentan. Cae
+> fuera del 42-53 por arriba, y eso es **indicio y no prueba** — hace falta una tanda normal para
+> decidir si el rango se movió. **No se remide con los datos de un día de runs solapados.**
+>
+> Y un coste base que salió de paso: `check-walk-coverage.ps1` **relanza el paseo**, así que en un run
+> completo el paseo corre **tres veces**. Explica por qué el suelo de un run es alto; **no** explica
+> ninguna diferencia entre runs, porque es constante.
+>
 > ### LO SIGUIENTE, y no es opcional
 >
 > **1. El rojo de cobertura, YA CORREGIDO, y lo que enseñó.** El run de `17abe3f` dio **todas las

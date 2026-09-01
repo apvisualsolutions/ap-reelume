@@ -123,6 +123,52 @@
 > and that a divergence **for measured accessibility** stays legitimate as long as it is written
 > beside the control — what it forbids is divergence by invented grammar.
 >
+> ### The walk race that came back, and why August's fix was not enough
+>
+> **CI caught it and this machine cannot**, which is what to know before touching the walk.
+> `The_players_transport_is_operated_with_the_mouse` answered `Expected: Embedded, Actual: Fullscreen`
+> again — the same message as 2026-08-28 — and **only on the second pass**: the first gave 147/147 and
+> the second 146/147, same binary. Two local passes, before and after the fix, green all four.
+>
+> **August's fix put the settling in the scene**, before the speed reset. But pressing "back to 1x"
+> **removes that button from the row**, so the row recomposes again and the next aim is taken at the
+> old geometry. **The line somebody remembered was fixed; the rule its own comment had written two
+> paragraphs above was not.**
+>
+> It now lives in `BesidePoint`, where the cause is: everything in there is geometry — the centre, the
+> occupied rectangles, the offsets — and any earlier press can have changed it. **And it uses
+> `window`, not `host.Window`**: with the mini player on screen those are two windows, and settling
+> one to read the other left the defect in place.
+>
+> **Three plausible hypotheses died measured that evening**, and none is worth repeating: that
+> changing `player-chrome`'s radius had grown the effective area — it cannot, `BesidePoint` builds its
+> rectangles from `Bounds.Size`, which no radius touches; that `InvalidateMeasure()` would not do
+> without `UpdateLayout()` — a probe removed the middle button of a three-button row and the third
+> moved from 80 to 40 on `InvalidateMeasure+RunJobs`, with `UpdateLayout` adding nothing; and that
+> `Reveal` did not settle — it does, with `UpdateLayout()` after each `BringIntoView()` and each
+> scroll step.
+>
+> **Outstanding, and it is tidying rather than a defect**: about ten scenes still carry
+> `host.Window.InvalidateMeasure()`, now redundant, and the file has **two ways of saying the same
+> thing** — `UpdateLayout()` in `Reveal` and `InvalidateMeasure()+RunJobs()` everywhere else — which is
+> the ground a third one grows from. Unify them in their own batch, not in the fix's.
+>
+> ### And a measuring trap that cost a false conclusion
+>
+> **A run's duration is NOT comparable if they died at different steps.** Four runs that day gave
+> 35.0 / 34.8 / 47.9 / 65.8 minutes and it looked as though the written range of **42-53** had gone
+> stale at both ends. It had not: each died one step further than the last, and a run that aborts in
+> `Verify` **does not run** accessibility twice, nor recovery twice, nor step 8's walk. **The 35
+> minutes do not say CI got fast: they say it aborted early.**
+>
+> What can be claimed: **there is ONE comparable measurement and it is 65.8**; the other three do not
+> count. It falls outside 42-53 at the top, and that is an **indication, not proof** — a normal batch
+> is needed to decide whether the range moved. **Do not re-measure it from a day of overlapping runs.**
+>
+> And a base cost that surfaced along the way: `check-walk-coverage.ps1` **re-runs the walk**, so in a
+> complete run the walk runs **three times**. That explains why a run's floor is high; it explains
+> **no** difference between runs, because it is constant.
+>
 > ### WHAT COMES NEXT, and it is not optional
 >
 > **1. The coverage red, ALREADY FIXED, and what it taught.** The run of `17abe3f` was green on
