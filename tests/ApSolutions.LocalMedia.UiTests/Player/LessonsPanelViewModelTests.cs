@@ -198,6 +198,27 @@ public sealed class LessonsPanelViewModelTests
         Assert.NotEqual(rows[0].AccessibleName, rows[1].AccessibleName);
     }
 
+    /// <summary>
+    /// A lesson left part way through announces its own state, which is neither of the two the
+    /// current row and an untouched row already cover: the three have to be three sentences, the
+    /// same way the glyphs are three shapes.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_lesson_left_part_way_through_announces_its_own_state()
+    {
+        var lessons = new[]
+        {
+            Lesson(1, 1, "Intro", status: WatchStatus.InProgress, position: TimeSpan.FromMinutes(4)),
+            Lesson(1, 2, "El nodo", status: WatchStatus.Watched),
+            Lesson(1, 3, "Máscaras"),
+        };
+        var panel = new LessonsPanelViewModel(SessionOf(lessons, lessons[2].Id));
+        var rows = panel.Modules[0].Lessons;
+
+        Assert.Contains("Intro", rows[0].AccessibleName, StringComparison.Ordinal);
+        Assert.Equal(3, rows.Select(row => row.AccessibleName).Distinct().Count());
+    }
+
     /// <summary>A lesson with no duration says its name and its state, and nothing where the time went.</summary>
     [AvaloniaFact]
     public void A_row_with_no_duration_still_announces_its_name_and_state()

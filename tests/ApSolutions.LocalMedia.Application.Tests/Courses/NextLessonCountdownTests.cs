@@ -146,6 +146,26 @@ public sealed class NextLessonCountdownTests
         Assert.Empty(harness.Coordinator.Requests);
     }
 
+    /// <summary>
+    /// The identity still resolves at zero but to a row with no path — the shape of a corrupt
+    /// catalogue entry. It is reported rather than handed to the engine, which is what the second
+    /// half of the guard is for: «the file is still there» and «the file can be opened» are two
+    /// questions, and only the first one a re-read answers.
+    /// </summary>
+    [Fact]
+    public async Task A_lesson_whose_catalogued_file_has_no_path_is_reported_as_unavailable()
+    {
+        var harness = new Harness();
+        harness.Clock.CancelAfter(4, () => harness.Files.Replace(harness.FileOf(1), pathless: true));
+
+        var result = await harness.Countdown.ExecuteAsync(
+            harness.FileOf(0),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(NextEpisodeOutcome.Unavailable, result.Outcome);
+        Assert.Empty(harness.Coordinator.Requests);
+    }
+
     /// <summary>An engine that refuses the file is reported, never dressed up as a start.</summary>
     [Fact]
     public async Task A_lesson_the_engine_refuses_is_reported_as_unavailable()
@@ -176,11 +196,31 @@ public sealed class NextLessonCountdownTests
         Assert.Equal(1, harness.Coordinator.MaximumConcurrentSessions);
     }
 
+    /// <summary>
+    /// Nobody subscribed to the chain's own <c>Ticked</c>, which is the arm the composition root
+    /// never takes because it attaches a handler before every offer. It is a real state all the
+    /// same — the countdown runs whether or not an overlay is listening — and a null-conditional
+    /// invoke that threw here would take the session down with it.
+    /// </summary>
+    [Fact]
+    public async Task A_chain_nobody_is_listening_to_still_opens_the_next_lesson()
+    {
+        var harness = new Harness(listen: false);
+
+        var result = await harness.Countdown.ExecuteAsync(
+            harness.FileOf(0),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(NextEpisodeOutcome.Started, result.Outcome);
+        Assert.Empty(harness.Announced);
+        Assert.Single(harness.Coordinator.Requests);
+    }
+
     private sealed class Harness
     {
         private readonly StubCourseStore _courses = new();
 
-        public Harness()
+        public Harness(bool listen = true)
         {
             Files = new StubMediaFiles();
             var lessons = new List<Lesson>();
@@ -222,7 +262,10 @@ public sealed class NextLessonCountdownTests
                 Coordinator,
                 Settings,
                 Clock);
-            Countdown.Ticked += (_, remaining) => Announced.Add(remaining);
+            if (listen)
+            {
+                Countdown.Ticked += (_, remaining) => Announced.Add(remaining);
+            }
         }
 
         public StubMediaFiles Files { get; }

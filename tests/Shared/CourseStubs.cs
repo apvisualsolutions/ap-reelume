@@ -129,6 +129,23 @@ internal sealed class StubMediaFiles : IMediaFileRepository
     }
 
     /// <summary>
+    /// Replaces a catalogued file with one whose path is blank. The store's column is NOT NULL, so
+    /// this is the shape of a corrupt row rather than an ordinary one — and it is what the lesson
+    /// chain's guard at zero exists for: an identity that still resolves, to something the engine
+    /// cannot be handed.
+    /// </summary>
+    public void Replace(MediaFileId id, bool pathless)
+    {
+        if (!pathless || !_byId.TryGetValue(id, out var existing))
+        {
+            return;
+        }
+
+        _byPath.Remove(existing.Path);
+        _byId[id] = existing with { Path = string.Empty };
+    }
+
+    /// <summary>
     /// The drive pulled out. It is what the lesson chain's revalidation at zero has to find, and the
     /// reason that revalidation is a re-read rather than a recheck of what was already held.
     /// </summary>

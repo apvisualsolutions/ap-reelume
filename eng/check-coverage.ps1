@@ -371,7 +371,17 @@ try {
         is why -WriteDebt is run by the workflow on every build, pass or fail — moving a floor is
         then copying a measurement rather than guessing at one.
     #>
-    $debtRatchet = 188
+    # 189 desde el 2026-09-01, y es la primera vez que sube. La excepcion la autoriza esta misma
+    # puerta por escrito —«add it with the reason and raise the ratchet in the same change»— y la
+    # razon es estructural, no deuda: LessonsPanelView.axaml mide 100/50 porque esa es la UNICA rama
+    # que el compilador de Avalonia genera para un .axaml, en la linea del elemento raiz, y todas las
+    # vistas del arbol miden exactamente eso. Una vista nueva sube este numero en uno; cualquier otra
+    # cosa que lo suba hay que discutirla.
+    #
+    # Los otros cuatro archivos que CRS-004 trajo a la lista salieron de ella mejorando, que es el
+    # unico camino que admite: las ramas que les faltaban se nombraron con el JSON de coverlet y se
+    # cubrieron con pruebas antes de escribir el archivo.
+    $debtRatchet = 189
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.
