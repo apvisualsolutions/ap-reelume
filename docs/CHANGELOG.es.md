@@ -10,6 +10,46 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La disposición de canales dejó de ser un botón que no hacía nada y pasa a cambiar el sonido de
+  verdad.** «Si quiero 7.1, ¿por qué iba a sonar estéreo?», preguntó el propietario, y la respuesta
+  medida fue que **ya suena 7.1**: LibVLC negocia con el dispositivo y entrega lo que éste admite.
+  Lo que no se podía era lo contrario —pedir **menos** de lo que el equipo da, que es lo que hace
+  falta con un altavoz roto—, y ahora sí.
+
+  **Seis vías medidas antes de escribir una línea, y cinco no hacen nada.** La única API de canales
+  en caliente de LibVLC enumera `Stereo, RStereo, Left, Right, Dolbys` y, sobre un dispositivo de
+  ocho canales, no movió **ni un decibelio** de los ocho tonos. `--stereo-mode=1` tampoco;
+  `--stereo-mode=7` sí, pero da mono; `--audio-filter=mono` nada; `--audio-channels` **no existe** y
+  la instancia no arranca; y los otros módulos de salida no llegaron al dispositivo.
+
+  **Lo que decide el número de canales es el formato del dispositivo en Windows**, así que es eso lo
+  que se escribe, con la misma interfaz que usa el panel de sonido. Medido: devuelve éxito **sin
+  privilegios de administrador**, y un vídeo 7.1 sobre un dispositivo puesto en dos canales sale
+  plegado con los coeficientes de la convención —centro a −3 dB, los cuatro traseros a −12 dB y el
+  LFE descartado—.
+
+  **El orden importa y está escrito donde se hace.** Escribir el formato invalida el cliente de
+  audio de todos los programas (`AUDCLNT_E_DEVICE_INVALIDATED`, documentado), y la recuperación de
+  LibVLC **descarta el dispositivo elegido y cae al predeterminado** —`DeviceSelect(aout, NULL)` en
+  su `mmdevice.c`—. Por eso la disposición se escribe **antes** de enrutar: el enrutado posterior es
+  lo que devuelve el sonido al dispositivo que se eligió. Al revés, el sonido se va a otros
+  altavoces y la interfaz afirma lo contrario.
+
+  **Y lo que se ofrece lo dice el controlador, no lo que el dispositivo tiene puesto.** El catálogo
+  lee la disposición **actual**, y preguntarle aquí habría hecho del control una puerta de un solo
+  sentido: quien bajara a estéreo una vez no habría podido volver a subir nunca. Se pregunta al
+  controlador en modo exclusivo, y con **PCM entero** — copiar el formato del mezclador hizo que un
+  dispositivo de ocho canales dijera «sólo estéreo», porque el mezclador va en coma flotante.
+
+  **La interfaz avisa antes, no después**: cambiar la disposición cambia un ajuste de Windows y
+  afecta a todos los programas del equipo, y eso se dice junto al control. Donde no se puede
+  escribir, los tres valores son un indicador y la interfaz lo dice, en vez de ofrecer una elección
+  que no puede cumplir.
+
+  **La interfaz que esto usa no está documentada por Microsoft**, y se acepta a sabiendas porque no
+  hay equivalente documentado. `WindowsAudioEndpointConfiguratorTests` existe para que el día que
+  Windows la cambie se vea, en vez de dejar un control que calladamente no hace nada.
+
 - **El panel «Lecciones» del reproductor y la lección siguiente al terminar una (`CRS-004`).** El
   curso entero en los 320 px de la columna, con la lección que suena marcada y cualquier otra a un
   clic. **Ausente y no deshabilitado** fuera de una sesión de lección, que es lo que la ficha pedía

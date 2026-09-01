@@ -34,6 +34,43 @@ SPDX-License-Identifier: GPL-3.0-or-later
           automation:AutomationProperties.Name="{DynamicResource AudioOutputLayoutLabel}"
           ItemsSource="{x:Static player:AudioOutputViewModel.Layouts}"
           SelectedItem="{Binding SelectedLayout, Mode=TwoWay}" />
+
+      <!--
+        Said before the choice is made and not after it, which is the whole difference between an
+        application that changes a system setting and one that changes it behind somebody's back.
+        The layout is not a player setting: measured on 2026-09-02, LibVLC has no live API and no
+        instance option that reduces channels, so what carries the choice is the endpoint's own
+        format in Windows — and that reaches every program on the machine.
+      -->
+      <Border
+          x:Name="LayoutSystemWideNotice"
+          Padding="8,4"
+          Background="{DynamicResource WarningSurfaceBrush}"
+          BorderBrush="{DynamicResource WarningBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource CornerRadiusSmall}"
+          IsVisible="{Binding LayoutChangeIsSystemWide}">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
+          <TextBlock VerticalAlignment="Top" Text="⚠" />
+          <TextBlock
+              Grid.Column="1"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Text="{DynamicResource AudioOutputLayoutSystemWide}"
+              TextWrapping="Wrap" />
+        </Grid>
+      </Border>
+
+      <!--
+        And where nothing can write it, the three choices are a readout. Saying so is what keeps this
+        from being a control that appears to work: the row still shows what the device delivers.
+      -->
+      <TextBlock
+          x:Name="LayoutReadOnlyNotice"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          FontSize="{DynamicResource FontSizeCaption}"
+          IsVisible="{Binding !CanChangeLayout}"
+          Text="{DynamicResource AudioOutputLayoutReadOnly}"
+          TextWrapping="Wrap" />
     </StackPanel>
 
     <!--
@@ -80,6 +117,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Grid.Column="1"
             Foreground="{DynamicResource TextPrimaryBrush}"
             Text="{DynamicResource AudioOutputLayoutDegraded}"
+            TextWrapping="Wrap" />
+      </Grid>
+    </Border>
+
+    <Border
+        x:Name="LayoutAppliedNotice"
+        Padding="8,4"
+        Background="{DynamicResource PositiveSurfaceBrush}"
+        BorderBrush="{DynamicResource PositiveBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusSmall}"
+        IsVisible="{Binding LayoutWasApplied}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
+        <TextBlock VerticalAlignment="Top" Text="✓" />
+        <TextBlock
+            Grid.Column="1"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource AudioOutputLayoutApplied}"
+            TextWrapping="Wrap" />
+      </Grid>
+    </Border>
+
+    <Border
+        x:Name="LayoutRefusedNotice"
+        Padding="8,4"
+        Background="{DynamicResource WarningSurfaceBrush}"
+        BorderBrush="{DynamicResource WarningBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusSmall}"
+        IsVisible="{Binding LayoutWasRefused}">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
+        <TextBlock VerticalAlignment="Top" Text="⚠" />
+        <TextBlock
+            Grid.Column="1"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource AudioOutputLayoutRefused}"
             TextWrapping="Wrap" />
       </Grid>
     </Border>

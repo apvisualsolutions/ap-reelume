@@ -20,12 +20,23 @@ public sealed record AudioOutputOption(AudioOutputDevice Device, string Display)
 public sealed class AudioOutputViewModel : INotifyPropertyChanged
 {
     private readonly IAudioDeviceCatalog _catalog;
+    private readonly IAudioEndpointConfigurator? _endpoints;
     private AudioOutputOption? _selectedDevice;
     private AudioChannelLayout _selectedLayout = AudioChannelLayout.Stereo;
     private AudioOutputSelection? _effective;
+    private IReadOnlyList<AudioChannelLayout> _offered = AudioOutputPolicy.SelectableLayouts;
+    private AudioEndpointChange _lastChange = AudioEndpointChange.AlreadySet;
 
-    public AudioOutputViewModel(IAudioDeviceCatalog catalog) =>
+    /// <summary>
+    /// The configurator is optional, and its absence is the difference between a control that can
+    /// change the sound and one that can only report it. A surface built without it says so rather
+    /// than offering a choice it cannot honour.
+    /// </summary>
+    public AudioOutputViewModel(IAudioDeviceCatalog catalog, IAudioEndpointConfigurator? endpoints = null)
+    {
         _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
+        _endpoints = endpoints;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -37,8 +48,17 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
     /// </summary>
     public Func<string, AudioChannelLayout, Task<AudioOutputSelection?>>? SelectionHandler { get; set; }
 
+    /// <summary>What the session reported about the last layout write, for the surface to describe.</summary>
+    public Func<AudioEndpointChange>? LayoutChangeReporter { get; set; }
+
     public ObservableCollection<AudioOutputOption> Devices { get; } = [];
 
+    /// <summary>Every layout the interface draws, whether or not this endpoint takes it.</summary>
+    /// <remarks>
+    /// All three, always, because the prototype draws all three and dims the ones the device will not
+    /// take — a row that loses a button when a headset is plugged in is a row that moves under the
+    /// pointer. <see cref="IsLayoutAvailable"/> is what decides which of them can be pressed.
+    /// </remarks>
     public static IReadOnlyList<AudioChannelLayout> Layouts => AudioOutputPolicy.SelectableLayouts;
 
     public AudioOutputOption? SelectedDevice
@@ -81,11 +101,14 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         try
         {
             var applied = await handler(option.Device.Id, _selectedLayout).ConfigureAwait(true);
+            _lastChange = LayoutChangeReporter?.Invoke() ?? AudioEndpointChange.Unavailable;
             if (applied is not null)
             {
                 _effective = applied;
-                NotifyEffective();
             }
+
+            await RefreshOfferedLayoutsAsync().ConfigureAwait(true);
+            NotifyEffective();
         }
         catch (PlaybackFailureException)
         {
@@ -125,12 +148,60 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         _effective = resolved;
         OnPropertyChanged(nameof(SelectedDevice));
         OnPropertyChanged(nameof(HasNoOutput));
+        await RefreshOfferedLayoutsAsync().ConfigureAwait(true);
         NotifyEffective();
     }
 
-    /// <summary>True when at least one present endpoint can carry the layout.</summary>
-    public bool IsLayoutAvailable(AudioChannelLayout layout) =>
-        Devices.Any(option => option.Device.SupportedLayouts.Contains(layout));
+    /// <summary>Asks the chosen endpoint's driver what it takes, once per chosen endpoint.</summary>
+    /// <remarks>
+    /// Only for the one that is chosen: the query activates an audio client, and a machine with a
+    /// dozen endpoints would pay for eleven answers nobody is going to read.
+    /// </remarks>
+    private async Task RefreshOfferedLayoutsAsync()
+    {
+        if (_selectedDevice is not { } option)
+        {
+            // No endpoint, nothing on offer. A fallback to the full scale here would light all three
+            // choices on a machine with no sound at all, which is the shape of claim this whole
+            // change exists to remove.
+            _offered = [];
+            return;
+        }
+
+        if (_endpoints is not { IsAvailable: true })
+        {
+            // Nothing can write the layout, so what is on offer is what the endpoint already carries.
+            _offered = option.Device.SupportedLayouts;
+            return;
+        }
+
+        _offered = await _endpoints.GetSupportedLayoutsAsync(option.Device.Id).ConfigureAwait(true);
+    }
+
+    /// <summary>True when the chosen endpoint's driver will take the layout.</summary>
+    /// <remarks>
+    /// The driver's answer and not the catalogue's. The catalogue reads what an endpoint is currently
+    /// <b>set to</b>, so asking it here would dim every layout above the current one and a person who
+    /// reduced to stereo once could never raise it again.
+    /// </remarks>
+    public bool IsLayoutAvailable(AudioChannelLayout layout) => _offered.Contains(layout);
+
+    /// <summary>True where this machine can change the layout at all.</summary>
+    /// <remarks>
+    /// When it is false the three choices are a readout rather than a control, and the surface says
+    /// which of the two it is: an interface that offers a choice it cannot honour is the defect this
+    /// whole change exists to remove.
+    /// </remarks>
+    public bool CanChangeLayout => _endpoints is { IsAvailable: true };
+
+    /// <summary>True while the choice is one that would change a Windows setting.</summary>
+    public bool LayoutChangeIsSystemWide => CanChangeLayout;
+
+    /// <summary>True when the last choice reached Windows.</summary>
+    public bool LayoutWasApplied => _lastChange == AudioEndpointChange.Applied;
+
+    /// <summary>True when the chosen endpoint's driver refused the last choice.</summary>
+    public bool LayoutWasRefused => _lastChange == AudioEndpointChange.RefusedByDevice;
 
     private static string Describe(AudioOutputDevice device)
     {
@@ -171,6 +242,10 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(EffectiveLayout));
         OnPropertyChanged(nameof(LayoutWasDegraded));
         OnPropertyChanged(nameof(FellBackToDefaultDevice));
+        OnPropertyChanged(nameof(CanChangeLayout));
+        OnPropertyChanged(nameof(LayoutChangeIsSystemWide));
+        OnPropertyChanged(nameof(LayoutWasApplied));
+        OnPropertyChanged(nameof(LayoutWasRefused));
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

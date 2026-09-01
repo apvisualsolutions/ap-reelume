@@ -126,9 +126,104 @@ public sealed class AudioOutputViewTests
     public void The_view_model_refuses_to_exist_without_a_catalog() =>
         Assert.Throws<ArgumentNullException>(() => new AudioOutputViewModel(null!));
 
+    /// <summary>
+    /// What can be chosen comes from the driver, not from what the endpoint is set to.
+    /// </summary>
+    /// <remarks>
+    /// The one-way door this exists to prevent: the catalogue reports the layout an endpoint
+    /// <b>carries</b>, so a headset reduced to stereo would offer stereo alone and could never be
+    /// raised again. Here the catalogue says stereo and the driver says all three, and it is the
+    /// driver that decides.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task What_can_be_chosen_is_what_the_driver_takes_and_not_what_the_endpoint_carries()
+    {
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([Headset]),
+            new FakeConfigurator([
+                AudioChannelLayout.Stereo,
+                AudioChannelLayout.Surround51,
+                AudioChannelLayout.Surround71,
+            ]));
+
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Single(Headset.SupportedLayouts);
+        Assert.True(viewModel.IsLayoutAvailable(AudioChannelLayout.Surround71));
+        Assert.True(viewModel.CanChangeLayout);
+    }
+
+    /// <summary>
+    /// Where nothing can write the layout, the interface says so instead of offering a choice.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task A_machine_that_cannot_write_the_layout_offers_what_the_endpoint_already_carries()
+    {
+        var viewModel = new AudioOutputViewModel(new FakeCatalog([Headset]));
+
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(viewModel.CanChangeLayout);
+        Assert.False(viewModel.LayoutChangeIsSystemWide);
+        Assert.True(viewModel.IsLayoutAvailable(AudioChannelLayout.Stereo));
+        Assert.False(viewModel.IsLayoutAvailable(AudioChannelLayout.Surround71));
+    }
+
+    /// <summary>
+    /// What the surface says about a choice is what the write reported, not what was clicked.
+    /// </summary>
+    /// <remarks>
+    /// The two sentences are different and so are their causes: a device can route perfectly while
+    /// its driver refuses the layout. Asserting on the click would make both of them say the same
+    /// thing, which is the shape of claim that got this control rewritten.
+    /// </remarks>
+    [AvaloniaTheory]
+    [InlineData(AudioEndpointChange.Applied, true, false)]
+    [InlineData(AudioEndpointChange.RefusedByDevice, false, true)]
+    [InlineData(AudioEndpointChange.Unavailable, false, false)]
+    public async Task The_surface_reports_what_the_write_did_rather_than_what_was_clicked(
+        AudioEndpointChange reported,
+        bool applied,
+        bool refused)
+    {
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([Receiver]),
+            new FakeConfigurator([AudioChannelLayout.Stereo, AudioChannelLayout.Surround71]))
+        {
+            SelectionHandler = (_, _) => Task.FromResult<AudioOutputSelection?>(null),
+            LayoutChangeReporter = () => reported,
+        };
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        viewModel.SelectedLayout = AudioChannelLayout.Surround71;
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        Assert.Equal(applied, viewModel.LayoutWasApplied);
+        Assert.Equal(refused, viewModel.LayoutWasRefused);
+    }
+
     private sealed class FakeCatalog(IReadOnlyList<AudioOutputDevice> devices) : IAudioDeviceCatalog
     {
         public Task<IReadOnlyList<AudioOutputDevice>> GetOutputsAsync(
             CancellationToken cancellationToken = default) => Task.FromResult(devices);
+    }
+
+    private sealed class FakeConfigurator(IReadOnlyList<AudioChannelLayout> supported)
+        : IAudioEndpointConfigurator
+    {
+        public bool IsAvailable => true;
+
+        public Task<IReadOnlyList<AudioChannelLayout>> GetSupportedLayoutsAsync(
+            string deviceId,
+            CancellationToken cancellationToken = default) => Task.FromResult(supported);
+
+        public Task<AudioEndpointChange> SetLayoutAsync(
+            string deviceId,
+            AudioChannelLayout layout,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(
+                supported.Contains(layout)
+                    ? AudioEndpointChange.Applied
+                    : AudioEndpointChange.RefusedByDevice);
     }
 }

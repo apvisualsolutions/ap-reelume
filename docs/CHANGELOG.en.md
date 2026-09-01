@@ -10,6 +10,45 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The channel layout stopped being a control that did nothing and now changes the sound.** "If I
+  want 7.1, why would it sound stereo?", the owner asked, and the measured answer was that **it
+  already sounds 7.1**: LibVLC negotiates with the endpoint and delivers what it accepts. What could
+  not be done was the opposite — asking for **less** than the equipment gives, which is what a blown
+  speaker calls for — and now it can.
+
+  **Six routes measured before a line was written, and five do nothing.** LibVLC's only live channel
+  API enumerates `Stereo, RStereo, Left, Right, Dolbys` and, on an eight-channel endpoint, moved
+  **not one decibel** of the eight tones. `--stereo-mode=1` did nothing either; `--stereo-mode=7`
+  did, but gives mono; `--audio-filter=mono` nothing; `--audio-channels` **does not exist** and stops
+  the instance from starting; and the other output modules never reached the endpoint.
+
+  **What decides the channel count is the endpoint's format in Windows**, so that is what gets
+  written, through the same interface the sound panel uses. Measured: it returns success **without
+  administrator rights**, and a 7.1 video on an endpoint set to two channels comes out folded with
+  the conventional coefficients — centre at −3 dB, the four surrounds at −12 dB, LFE discarded.
+
+  **The order matters and is written where it happens.** Writing the format invalidates every
+  program's audio client (`AUDCLNT_E_DEVICE_INVALIDATED`, documented), and LibVLC's recovery
+  **discards the chosen device and falls back to the default** — `DeviceSelect(aout, NULL)` in its
+  `mmdevice.c`. So the layout is written **before** routing: the routing that follows is what brings
+  the sound back to the chosen device. The other way round, the sound moves to different speakers
+  and the interface claims otherwise.
+
+  **And what is on offer comes from the driver, not from what the endpoint is set to.** The catalogue
+  reads the **current** layout, and asking it here would have made this a one-way door: anyone who
+  reduced to stereo once could never raise it again. The driver is asked in exclusive mode, with
+  **integer PCM** — copying the mixer's own format made an eight-channel endpoint report stereo
+  alone, because a shared mixer runs in floating point.
+
+  **The interface warns before, not after**: changing the layout changes a Windows setting and
+  affects every program on the machine, and that is said beside the control. Where it cannot be
+  written, the three values are a readout and the interface says so, rather than offering a choice
+  it cannot honour.
+
+  **The interface this uses is not documented by Microsoft**, accepted knowingly because there is no
+  documented equivalent. `WindowsAudioEndpointConfiguratorTests` exists so that the day Windows
+  changes it, it shows — rather than leaving a control that quietly does nothing.
+
 - **The player's "Lessons" panel, and the next lesson when one ends (`CRS-004`).** The whole course
   in the column's 320 px, with the playing lesson marked and any other one a click away. **Absent
   rather than disabled** outside a lesson session, which is what the ficha asked for in bold: a

@@ -41,7 +41,14 @@ public static partial class CompositionRoot
             .AddSingleton(_ => LibVlcFactory.CreateDefault())
             .AddSingleton<IDisplayCapabilityProvider, WindowsDisplayCapabilityProvider>()
             .AddSingleton<IAudioDeviceCatalog, WindowsAudioDeviceCatalog>()
-            .AddSingleton<LibVlcAudioOutputAdapter>()
+            // The channel layout is a Windows setting rather than a player call, measured on
+            // 2026-09-02: LibVLC has no live API that reduces channels and no instance option that
+            // does either. Resolved by the adapter below, which is the only thing that asks for it.
+            .AddSingleton<IAudioEndpointConfigurator, WindowsAudioEndpointConfigurator>()
+            .AddSingleton(provider => new LibVlcAudioOutputAdapter(
+                provider.GetRequiredService<IAudioDeviceCatalog>(),
+                provider.GetRequiredService<IPlaybackPreferenceRepository>(),
+                provider.GetRequiredService<IAudioEndpointConfigurator>()))
             .AddTransient<AudioOutputViewModel>()
             .AddSingleton<LibVlcMediaPlayerEngine>()
             .AddSingleton<IMediaPlayerEngine>(provider => provider.GetRequiredService<LibVlcMediaPlayerEngine>())
