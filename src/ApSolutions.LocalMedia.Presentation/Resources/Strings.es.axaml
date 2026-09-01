@@ -360,6 +360,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MiniPlayerClose">Cerrar</x:String>
   <x:String x:Key="MiniPlayerChromeAccessibleName">Controles del mini reproductor</x:String>
   <x:String x:Key="ShortcutSettingsAccessibleName">Atajos de teclado</x:String>
+  <x:String x:Key="ShortcutCommandPlayPause">Reproducir o pausar</x:String>
+  <x:String x:Key="ShortcutCommandStop">Detener</x:String>
+  <x:String x:Key="ShortcutCommandSkipBackward">Retroceder</x:String>
+  <x:String x:Key="ShortcutCommandSkipForward">Avanzar</x:String>
+  <x:String x:Key="ShortcutCommandVolumeUp">Subir volumen</x:String>
+  <x:String x:Key="ShortcutCommandVolumeDown">Bajar volumen</x:String>
+  <x:String x:Key="ShortcutCommandToggleMute">Silenciar</x:String>
+  <x:String x:Key="ShortcutCommandToggleFullscreen">Pantalla completa</x:String>
+  <x:String x:Key="ShortcutCommandToggleMiniPlayer">Mini reproductor</x:String>
+  <x:String x:Key="ShortcutCommandExitMode">Salir del modo actual</x:String>
+  <x:String x:Key="ShortcutConflictFormat">{0} ya está asignado a «{1}».</x:String>
   <x:String x:Key="ShortcutSettingsDescription">Cada acción esencial tiene un atajo. Puedes cambiarlos; un atajo ya usado se rechaza indicando qué acción lo ocupa.</x:String>
   <x:String x:Key="ShortcutSettingsListName">Lista de atajos</x:String>
   <x:String x:Key="ShortcutSettingsCustomised">personalizado</x:String>

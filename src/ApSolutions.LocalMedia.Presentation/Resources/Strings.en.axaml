@@ -360,6 +360,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MiniPlayerClose">Close</x:String>
   <x:String x:Key="MiniPlayerChromeAccessibleName">Mini player controls</x:String>
   <x:String x:Key="ShortcutSettingsAccessibleName">Keyboard shortcuts</x:String>
+  <x:String x:Key="ShortcutCommandPlayPause">Play or pause</x:String>
+  <x:String x:Key="ShortcutCommandStop">Stop</x:String>
+  <x:String x:Key="ShortcutCommandSkipBackward">Skip backward</x:String>
+  <x:String x:Key="ShortcutCommandSkipForward">Skip forward</x:String>
+  <x:String x:Key="ShortcutCommandVolumeUp">Volume up</x:String>
+  <x:String x:Key="ShortcutCommandVolumeDown">Volume down</x:String>
+  <x:String x:Key="ShortcutCommandToggleMute">Mute</x:String>
+  <x:String x:Key="ShortcutCommandToggleFullscreen">Full screen</x:String>
+  <x:String x:Key="ShortcutCommandToggleMiniPlayer">Mini player</x:String>
+  <x:String x:Key="ShortcutCommandExitMode">Leave the current mode</x:String>
+  <x:String x:Key="ShortcutConflictFormat">{0} is already assigned to "{1}".</x:String>
   <x:String x:Key="ShortcutSettingsDescription">Every essential action has a shortcut. You can change them; a shortcut already in use is refused and names the action holding it.</x:String>
   <x:String x:Key="ShortcutSettingsListName">Shortcut list</x:String>
   <x:String x:Key="ShortcutSettingsCustomised">customised</x:String>

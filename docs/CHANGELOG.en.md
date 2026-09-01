@@ -88,6 +88,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The player's shortcut list spoke Spanish with the application set to English.** Ten command
+  names — "Reproducir o pausar", "Detener", "Pantalla completa" — and the sentence warning that a key
+  is already taken were **literals inside the `.cs`**, so that whole screen read in Spanish in both
+  languages. **No gate saw it**: bilingualism is checked over the views' markup, and a visible string
+  living in a code file is outside what they look at.
+
+  Eleven new keys in both languages, and a test asserting **the property those gates cannot**: that
+  all ten labels **differ** between Spanish and English, which is what a translated string does and a
+  literal cannot. Checking that one of them equals a particular word would have passed just as well
+  with the other nine hard-coded. Proved by mutating one back to a literal: it names it.
+
+  **And a second thing measured on the way**: reading a resource while asking for the current theme
+  touches an object owned by the UI thread, and four `ShellAssemblyTests` answered "the calling
+  thread cannot access this object" **inside the full suite** while passing alone. A string does not
+  change with the theme, so it is not asked for.
+
 - **The walk's layout settling sat where it hurt rather than where the rule is — and a probe had
   measured the wrong case.** The cleanup the handover left decided rested on `UpdateLayout()` and
   `InvalidateMeasure()+RunJobs()` being equivalent. They are, on a dirty tree, which is what the

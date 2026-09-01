@@ -90,6 +90,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La lista de atajos del reproductor hablaba español con la aplicación en inglés.** Diez nombres de
+  comando —«Reproducir o pausar», «Detener», «Pantalla completa»…— y la frase que avisa de una tecla
+  ya asignada eran **literales dentro del `.cs`**, así que esa pantalla entera se leía en español en
+  los dos idiomas. **Ninguna puerta lo vio**: el bilingüismo se comprueba sobre el marcado de las
+  vistas, y una cadena visible que vive en un archivo de código queda fuera de lo que miran.
+
+  Once claves nuevas en los dos idiomas, y una prueba que afirma **la propiedad que esas puertas no
+  pueden**: que las diez etiquetas **difieren** entre español e inglés, que es lo que hace una cadena
+  traducida y lo que un literal no puede hacer. Comprobar que una vale una palabra concreta habría
+  pasado igual con las otras nueve incrustadas. Probada mutando una a literal: la nombra.
+
+  **Y una segunda cosa medida al hacerlo**: leer un recurso pidiendo el tema en curso toca un objeto
+  que pertenece al hilo de la interfaz, y cuatro `ShellAssemblyTests` contestaron «el hilo que llama
+  no puede acceder a este objeto» **dentro de la suite completa** mientras pasaban en aislado. Una
+  cadena no cambia con el tema, así que no se pregunta por él.
+
 - **El asentado del layout del paseo estaba donde dolió, no donde está la regla — y una sonda había
   medido el caso que no era.** La limpieza que el relevo dejó decidida partía de que
   `UpdateLayout()` e `InvalidateMeasure()+RunJobs()` son equivalentes. Lo son sobre un árbol sucio,
