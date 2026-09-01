@@ -59,6 +59,16 @@ public sealed class CommandNotificationTests
                     "public bool CanExecute(object? parameter) => AccentPalette.IsAccent(parameter as string);",
                     "public bool CanExecute(object? parameter) => parameter is T value && Enum.IsDefined(value);",
                 ],
+            // The three channel layouts, whose question is whether the parameter is one of the three
+            // words the markup carries. Whether a layout can be CHOSEN is a different question and
+            // a moving one — the driver answers it, and it changes when the output device does — so
+            // it is asked by the button's IsEnabled binding, which notifies, rather than in here,
+            // which does not.
+            ["src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs"] =
+                [
+                    "public bool CanExecute(object? parameter) => parameter is string word "
+                    + "&& Words.ContainsKey(word);",
+                ],
             // The subtitle swatches, whose question is whether the parameter is a colour at all.
             ["src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs"] =
                 [
