@@ -34,13 +34,20 @@ cmd=$(jq -r '.tool_input.command // empty' | tr -d '\r')
 # Asi que primero se tiran los heredocs —todo lo que va entre <<DELIM y la linea
 # DELIM, que es donde viven los mensajes de commit— y luego se exige que la
 # cadena este en posicion de comando: inicio de linea, o detras de ; & | ( o &&.
+#
+# El [[:space:]]* detras de << llego el 2026-09-01 y NO es cosmetico: sin el, el
+# regex solo reconocia el heredoc pegado, y la forma con espacio —que es la que
+# usa este repositorio en cada commit— pasaba como si no fuera un heredoc.
+# Reproducido por tuberia con un documento que citaba una orden de push dentro
+# de uno: sono. El defecto que el parrafo de arriba dice haber corregido seguia
+# aqui, escondido en un espacio.
 stripped=$(printf '%s\n' "$cmd" | awk '
   /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*$/ && skip && $1 == delim { skip = 0; next }
   skip { next }
   {
-    if (match($0, /<<-?[\047"]?[A-Za-z_][A-Za-z0-9_]*[\047"]?/)) {
+    if (match($0, /<<-?[[:space:]]*[\047"]?[A-Za-z_][A-Za-z0-9_]*[\047"]?/)) {
       d = substr($0, RSTART, RLENGTH)
-      gsub(/^<<-?[\047"]?|[\047"]?$/, "", d)
+      gsub(/^<<-?[[:space:]]*[\047"]?|[\047"]?$/, "", d)
       delim = d
       skip = 1
     }

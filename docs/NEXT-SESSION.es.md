@@ -103,6 +103,10 @@
 >   un panel, y construirlo lee `Application.ActualThemeVariant` desde un hilo que el framework no
 >   arrancó. Son `AvaloniaFact`, no `Fact`.
 > · `Assert.Throws<T>` exige tipo **exacto**; ése fue el síntoma.
+> · **`git push origin <rama>:main` mueve el remoto y NO la referencia local.** Pasó en esta tanda:
+>   `origin/main` quedó bien y `main` local se quedó un commit atrás, justo el dato que este relevo
+>   manda leer. El paso 6 del skill dice `git branch -f main <sha> && git push origin main` por esto.
+>   Se comprueba con `git log --oneline origin/main -1` **y** `git log --oneline main -1`.
 
 > ## RELEVO — 2026-08-31, decimocuarta sesión: `CRS-001`, la puerta por la que se declara un curso
 >

@@ -102,6 +102,10 @@
 >   building one reads `Application.ActualThemeVariant` from a thread the framework did not start.
 >   They are `AvaloniaFact`, not `Fact`.
 > · `Assert.Throws<T>` demands an **exact** type; that was the symptom.
+> · **`git push origin <branch>:main` moves the remote and NOT the local ref.** It happened in this
+>   batch: `origin/main` was right and local `main` sat a commit behind — the very fact this handover
+>   tells you to read. Step 6 of the closing skill says `git branch -f main <sha> && git push origin
+>   main` for this reason. Check both `git log --oneline origin/main -1` and `git log --oneline main -1`.
 
 > ## HANDOVER — 2026-08-31, fourteenth session: `CRS-001`, the door a course is declared through
 >

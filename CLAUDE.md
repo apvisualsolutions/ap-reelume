@@ -441,6 +441,16 @@ rechaza aunque esté bien implementada.
   incluidos ese heredoc y `git pushd`. Un aviso que suena cuando no toca enseña a ignorarlo, que es
   peor que no avisar.
 
+  **Y ese arreglo estaba a medias hasta el 2026-09-01, escondido en un espacio.** El regex del
+  heredoc era `<<-?['"]?DELIM` **sin admitir espacio**, así que sólo reconocía la forma pegada y
+  dejaba pasar `<< 'EOF'` —que es la que este repositorio usa en cada commit— como si no fuera un
+  heredoc. Sonó al escribir un relevo que citaba una orden de push dentro de uno. **Reproducido por
+  tubería antes de tocarlo y vuelto a medir después, con ocho casos: cuatro que suenan —incluido un
+  push que va detrás de un heredoc y sí debe sonar— y cuatro que callan.** Los diez de la línea de
+  arriba son los originales y siguen valiendo; lo que faltaba era este caso. **Una guarda que dice
+  por escrito haber corregido un defecto puede seguir teniéndolo**: lo que lo demuestra es la
+  tubería, no el comentario.
+
   **Ninguno de los tres primeros dispara escribiendo por Bash** —`cat >`, `sed -i`, un heredoc—, así
   que siguen siendo un adelanto de aviso y no la puerta: la puerta es `dotnet format` con `IDE0073`, y
   `eng/verify-docs.ps1`.
