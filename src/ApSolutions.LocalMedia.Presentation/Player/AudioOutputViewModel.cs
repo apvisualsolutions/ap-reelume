@@ -316,8 +316,7 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
             remove { }
         }
 
-        public bool CanExecute(object? parameter) =>
-            parameter is string word && Words.ContainsKey(word);
+        public bool CanExecute(object? parameter) => parameter is string word && Words.ContainsKey(word);
 
         public void Execute(object? parameter)
         {
