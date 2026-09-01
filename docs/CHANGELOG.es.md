@@ -31,6 +31,50 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una preferencia estaba dibujando todas las esquinas de la aplicación, y la puerta escrita el día
+  anterior para impedirlo certificaba las que nadie veía.** `AppearanceService` escribía el ajuste
+  «Redondeo de esquinas» **sobre los dos tokens de radio**, y el contenedor lo resuelve antes de
+  construir superficie alguna: con la opción por defecto, todo lo que gastaba `CornerRadiusMedium`
+  dibujaba **10** y todo lo que gastaba `CornerRadiusSmall` dibujaba **5**, mientras el archivo de
+  tokens declaraba 8 y 4.
+
+  **`ButtonShapeTests` leía ese archivo**, así que aprobaba el 8 de `pbtn` y el 4 de `pbtnLessons`
+  —las dos clases que [`ADR-0007`](adr/0007-every-element-matches-the-prototype.md) había devuelto
+  al prototipo la víspera— mientras la pantalla enseñaba 10 y 5. Medido con una sonda que construye
+  el control, deja correr el servicio como hace el arranque y **lee la esquina del control**.
+
+  **El prototipo gasta esa preferencia en un solo sitio**: `st.opt.radius` sólo lo lee `artBox`, la
+  caja de la carátula. El comentario que justificaba el alcance ancho afirmaba lo contrario. Así que
+  la preferencia se muda a `PosterCornerRadius`, conserva sus tres opciones, y los dos tokens vuelven
+  a valer en pantalla lo que declaran. **Mientras el radio de todo fuera una preferencia, ningún
+  elemento podía afirmar que dibujaba su número.**
+
+  Evidencia: [una preferencia dibujando todas las esquinas](evidence/stable/audit-corner-radius-preference-over-the-design.md).
+
+### Cambiado
+
+- **Catorce clases de botón emparejadas con su control del prototipo, contra las cuatro que
+  `ADR-0007` dejó.** Cinco cambian de forma: los dos botones del riel pasan de píldora a **12**, la
+  baldosa de la biblioteca de 10 a **12**, y las dos filas de «Otras acciones» de píldora a **5** —
+  el prototipo escribe los otros dos números de ese estilo literalmente, `min-height:36px` y
+  `padding:0 12px`, y su esquina al lado es 5—.
+
+  **Y una sexta vuelve por otro camino.** Medido contra el commit anterior, la regla retirada del
+  2026-08-25 movió **siete** clases y no las dos que `ADR-0007` registró; la séptima es
+  `colour-cell`, cuyo comentario seguía diciendo «Square rather than round» encima de un setter que
+  escribía la píldora. El diseño no contesta por ella, así que vuelve a lo que era **antes de una
+  regla que ya no existe** — que no es inventarle una forma. Las cuatro clases que el prototipo no
+  dibuja se miden igual que las catorce que sí, porque son las más fáciles de mover sin que nadie
+  lo note.
+
+  **Y la puerta gana el censo que no tenía**: toda clase de botón del archivo de tokens está
+  emparejada con un control del prototipo **o** escrita en una lista cerrada de cuatro que el diseño
+  no contesta, cada una con lo que se buscó y no existe. Sin ese censo, una clase que nadie emparejó
+  es indistinguible de una que nadie ha emparejado todavía, que es el estado en el que `ADR-0007`
+  encontró diez. Las tres mutaciones que lo demuestran están en la evidencia.
+
+### Corregido
+
 - **La carrera del paseo volvió porque la corrección de agosto fue a la línea que alguien recordó, no
   a la regla.** `The_players_transport_is_operated_with_the_mouse` respondió otra vez `Expected:
   Embedded, Actual: Fullscreen`, **y sólo en la segunda pasada de CI**: la primera dio 147 de 147 y la

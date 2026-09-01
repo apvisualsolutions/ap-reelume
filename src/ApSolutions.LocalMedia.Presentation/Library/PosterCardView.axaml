@@ -73,7 +73,7 @@ and a name here would be a second announcement of the same card.
         BorderThickness="1"
         BoxShadow="{DynamicResource ElevationShadow}"
         ClipToBounds="True"
-        CornerRadius="{DynamicResource CornerRadiusMedium}">
+        CornerRadius="{DynamicResource PosterCornerRadius}">
       <Panel>
         <!--
         The prototype's cover, which is not a picture: a two-stop gradient from the title's hue, a

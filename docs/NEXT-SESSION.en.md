@@ -1,5 +1,73 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-01, sixteenth session: the fidelity sweep, and a preference that drew every corner
+>
+> **It began as batch 1 of the previous handover** — pairing the ten button classes `ADR-0007` left
+> unpaired — and ended somewhere else: **no class in this tree was drawing its design radius**,
+> including the two that ADR reported returned to the prototype the day before.
+>
+> ### What was wrong, and why nobody saw it
+>
+> `AppearanceService` wrote the "Corner rounding" setting **over both radius tokens**, and the
+> composition root resolves it before any surface is built. With the default option, everything
+> spending `CornerRadiusMedium` drew **10** and everything spending `CornerRadiusSmall` drew **5**,
+> while `DesignTokens.axaml` declared 8 and 4. **`ButtonShapeTests` read the file**, so it certified
+> `pbtn`'s 8 and `pbtnLessons`' 4 with the screen showing 10 and 5.
+>
+> **The prototype spends that preference on one element**: `st.opt.radius` is read only by `artBox`,
+> the cover. The comment justifying the wider reach claimed the opposite and nobody checked. The
+> preference moves to `PosterCornerRadius` and keeps its three options.
+>
+> **The lesson, and it holds for any token here: a value a service rewrites at startup is NOT the
+> value that gets drawn, and a gate reading the file measures startup.** Here it cost the gate
+> written to guarantee fidelity certifying its opposite for a day.
+>
+> ### What lands
+>
+> **Fourteen button classes paired against four**, and six change shape: the rail's two from pill to
+> **12**, the library tile from 10 to **12**, the two rows of other actions from pill to **5**, and
+> `colour-cell` back to `CornerRadiusSmall`.
+>
+> **The gate gains two halves it lacked**: it measures the radius **on the control with the service
+> running** rather than in the file, and it carries a **census** requiring every button class to be
+> paired or written into a closed list of four the design does not answer, with what was searched for
+> and did not exist. **Proved with four mutations**, one per half; the second reproduces the original
+> defect, and the old gate would have passed it.
+>
+> ### A fact that corrects the ADR
+>
+> **The rule withdrawn on 2026-08-25 moved SEVEN classes, not the two `ADR-0007` recorded.** Measured
+> by diffing the token file against `49a0502^`. A rule is remembered by where it hurt, not by where it
+> reached — and the clearest case is `colour-cell`, its comment saying "Square rather than round"
+> above a setter writing the pill, for a week.
+>
+> ### NEXT
+>
+> **1. The rest of the surface, which is where `ADR-0007` is still open.** It says "every element":
+> `Border`, `TextBox` and `ComboBox` spend the same three tokens across **eighty-five sites** while
+> the design draws **twelve distinct radii**. It can now be measured against the screen rather than
+> the dictionary, which is what was missing.
+>
+> **2, 3 and 4**: as in the previous handover — the walk cleanup,
+> `AudioOutputViewModel.SelectedLayout` and `CRS-002/003/005` to `VERIFIED`.
+>
+> ### Measured traps that save rounds
+>
+> · **Not every `border-radius` in `design/AP Reelume.dc.html` is the application's design.** The
+>   first forty lines are the prototype's own chrome — language picker, demo panel, fake window
+>   buttons — and pairing against them copies the wrong number with full confidence.
+> · **The prototype writes radii in TWO notations**: `borderRadius: N` in JavaScript and
+>   `border-radius:Npx` in inline CSS. Grepping the first misses the rows of actions and the library
+>   tile, which are CSS.
+> · **`design/vistas/` is not a second source**: its 58 files import the prototype with `dc-import`
+>   and declare no style of their own. The source is `AP Reelume.dc.html`.
+> · **Writing with Python `open(p,'w')` converts the whole file to CRLF on Windows** and
+>   `dotnet format` rejects it with thousands of `ENDOFLINE`. Pass the newline explicitly, and it
+>   only bites `.cs` files, because `format` does not look at `.axaml`.
+> · **A bash heredoc longer than ~128 lines is cut off and writes nothing**: the file stays as it was
+>   and the error says "unexpected EOF". It happened twice this batch. For a long file, use the
+>   direct write tool.
+
 > ## HANDOVER — 2026-09-01, parallel session: `PLY-004` unblocked, recording the output and counting eight channels
 >
 > **This batch ran alongside `CRS-004`, on the same tree.** It touches audio and documents only;

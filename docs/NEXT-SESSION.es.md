@@ -1,5 +1,74 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-01, decimosexta sesión: el barrido de fidelidad, y una preferencia que dibujaba todas las esquinas
+>
+> **Empezó como la tanda 1 del relevo anterior** —emparejar las diez clases de botón que `ADR-0007`
+> dejó sin pareja— y acabó en otro sitio: **ninguna clase de este árbol dibujaba su radio de diseño**,
+> incluidas las dos que ese ADR daba por devueltas al prototipo la víspera.
+>
+> ### Lo que estaba mal, y por qué nadie lo veía
+>
+> `AppearanceService` escribía el ajuste «Redondeo de esquinas» **sobre los dos tokens de radio**, y
+> el contenedor lo resuelve antes de construir superficie alguna. Con la opción por defecto, todo lo
+> que gastaba `CornerRadiusMedium` dibujaba **10** y todo lo que gastaba `CornerRadiusSmall` dibujaba
+> **5**, mientras `DesignTokens.axaml` declaraba 8 y 4. **`ButtonShapeTests` leía el archivo**, así
+> que certificaba el 8 de `pbtn` y el 4 de `pbtnLessons` con la pantalla enseñando 10 y 5.
+>
+> **El prototipo gasta esa preferencia en un solo elemento**: `st.opt.radius` sólo lo lee `artBox`,
+> la carátula. El comentario que justificaba el alcance ancho afirmaba lo contrario y nadie lo
+> comprobó. La preferencia se muda a `PosterCornerRadius` y conserva sus tres opciones.
+>
+> **La lección, que vale para cualquier token de este árbol: un valor que un servicio reescribe en
+> arranque NO es el valor que se dibuja, y una puerta que lee el archivo mide el arranque.** Aquí
+> costó que la puerta escrita para garantizar la fidelidad la certificara al revés durante un día.
+>
+> ### Lo que entra
+>
+> **Catorce clases de botón emparejadas contra cuatro**, y seis cambian de forma: los dos del riel de
+> píldora a **12**, la baldosa de la biblioteca de 10 a **12**, las dos filas de «Otras acciones» de
+> píldora a **5**, y `colour-cell` vuelve a `CornerRadiusSmall`.
+>
+> **La puerta gana dos mitades que no tenía**: mide el radio **en el control con el servicio
+> corriendo** —no en el archivo—, y lleva un **censo** que exige que toda clase de botón esté
+> emparejada o escrita en una lista cerrada de cuatro que el diseño no contesta, con lo que se buscó
+> y no existe. **Probada con cuatro mutaciones**, una por mitad; la segunda reproduce el defecto
+> original y la puerta vieja la habría aprobado.
+>
+> ### Un dato que corrige el ADR
+>
+> **La regla retirada del 2026-08-25 movió SIETE clases, no las dos que `ADR-0007` registró.** Medido
+> comparando el archivo de tokens contra `49a0502^`. Una regla se recuerda por donde dolió, no por
+> donde llegó — y el caso que mejor lo enseña es `colour-cell`, con su comentario diciendo «Square
+> rather than round» encima de un setter que escribía la píldora, durante una semana.
+>
+> ### LO SIGUIENTE
+>
+> **1. El resto de la superficie, que es donde `ADR-0007` sigue abierto.** Dice «todos los
+> elementos»: los `Border`, `TextBox` y `ComboBox` gastan los mismos tres tokens en **ochenta y cinco
+> sitios** mientras el prototipo dibuja **doce radios distintos**. Ahora puede medirse contra la
+> pantalla en vez de contra el diccionario, que es lo que faltaba.
+>
+> **2, 3 y 4**: siguen las del relevo anterior — la limpieza del paseo,
+> `AudioOutputViewModel.SelectedLayout` y `CRS-002/003/005` a `VERIFIED`.
+>
+> ### Trampas medidas que ahorran vueltas
+>
+> · **No todo `border-radius` de `design/AP Reelume.dc.html` es diseño de la aplicación.** Las
+>   primeras cuarenta líneas son el cromo del propio prototipo —selector de idioma, panel de
+>   demostración, botones de ventana falsos—, y emparejar contra ellos copia el número equivocado con
+>   toda la confianza.
+> · **El prototipo escribe los radios en DOS notaciones**: `borderRadius: N` en JavaScript y
+>   `border-radius:Npx` en CSS en línea. Un grep de la primera se deja fuera las filas de acciones y
+>   la baldosa de la biblioteca, que son CSS.
+> · **`design/vistas/` no es una segunda fuente**: los 58 archivos importan el prototipo con
+>   `dc-import` y no declaran un solo estilo. La fuente es `AP Reelume.dc.html`.
+> · **Escribir con Python `open(p,'w')` convierte el archivo entero a CRLF en Windows** y
+>   `dotnet format` lo rechaza con miles de `ENDOFLINE`. Va `newline` explícito en la escritura, y
+>   sólo muerde a los `.cs`, porque `format` no mira los `.axaml`.
+> · **Un heredoc de bash de más de ~128 líneas se corta y no escribe nada**: el archivo se queda como
+>   estaba y el error dice «unexpected EOF». Pasó dos veces esta tanda. Para un archivo largo, la
+>   herramienta de escritura directa.
+
 > ## RELEVO — 2026-09-01, sesión paralela: `PLY-004` desbloqueado, grabando la salida y contando los ocho canales
 >
 > **Esta tanda corrió en paralelo a la de `CRS-004`, sobre el mismo árbol.** Toca sólo audio y

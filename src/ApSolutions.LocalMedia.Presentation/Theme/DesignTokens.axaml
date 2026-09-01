@@ -65,6 +65,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
         These stay semantic where the spacing scale went numeric: two values with no gap between them
         cannot develop a missing step, which is the whole reason those had to be renamed.
+
+        <b>And these two numbers are now the ones that get drawn.</b> Until 2026-09-01
+        AppearanceService wrote the Rounding preference over both keys, so what this file declared
+        was only what the first frame drew before the service ran: every consumer of Medium drew 10
+        and every consumer of Small drew 5. The preference moved to PosterCornerRadius, which is the
+        one place the prototype spends it.
       -->
       <CornerRadius x:Key="CornerRadiusSmall">4</CornerRadius>
       <CornerRadius x:Key="CornerRadiusMedium">8</CornerRadius>
@@ -109,6 +115,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <sys:TimeSpan x:Key="MotionDuration">00:00:00.160</sys:TimeSpan>
       <x:Double x:Key="PosterCardWidth">148</x:Double>
       <x:Double x:Key="PosterCardHeight">222</x:Double>
+      <!--
+        The cover's own corner, and the only radius in this application that a preference moves.
+
+        It is written apart from the two above because of what was measured on 2026-09-01:
+        AppearanceService was writing the Rounding preference into CornerRadiusMedium and
+        CornerRadiusSmall, so every button, card, row and box in the tree drew 10 and 5 while this
+        file declared 8 and 4 — and ButtonShapeTests, reading this file, certified the 8 and the 4
+        nobody could see. The prototype spends its own rounding option in <b>one</b> place,
+        <c>artBox</c>, which is the cover; nothing else in it reads <c>st.opt.radius</c>. So the
+        preference lands here, on the one consumer the design gives it, and the two radii above go
+        back to being what the design says they are.
+
+        10 is what the prototype draws with nothing chosen; Sharp and Very round are its other two
+        stops, 4 and 18, and AppearanceService writes whichever is stored over this value.
+      -->
+      <CornerRadius x:Key="PosterCornerRadius">10</CornerRadius>
       <!--
         The four the Appearance page writes over, declared here so a host with no preference stored
         renders exactly as this tree always drew it. AppearanceService reads the tint once at
@@ -2051,12 +2073,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
     same — full width, icon, name, and whatever the current answer is at the right edge. Three of
     them were loose pills in a WrapPanel, which is a form dropped into a 320 px column.
   -->
+  <!--
+    5 and not the pill, which is the whole of what the withdrawn «round or pill» rule cost this row.
+    The prototype writes the other two numbers of this style verbatim — min-height:36px and
+    padding:0 12px — and its corner beside them is border-radius:5px. A pill was never the design's
+    answer here; it was a grammar applied over it.
+  -->
   <Style Selector="Button.action-row">
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="MinHeight" Value="36" />
     <Setter Property="Padding" Value="12,0" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="CornerRadius" Value="5" />
   </Style>
 
   <Style Selector="ToggleButton.action-row">
@@ -2064,7 +2092,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="MinHeight" Value="36" />
     <Setter Property="Padding" Value="12,0" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="CornerRadius" Value="5" />
   </Style>
 
   <!-- Ten of these fit a 320 px column on one line, which is the whole reason for the width. -->
@@ -2163,9 +2191,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
     walk still presses the same five identities - only the Content changed, which is exactly the move
     the mini player's chrome already made.
 
-    46 x 42 with a radius, from the prototype's own geometry, and the radius is CornerRadiusMedium
-    rather than the 12 it draws: this scale has two radii on purpose, and a third for one consumer is
-    the shape FontSizeMono was refused for.
+    46 x 42 with a radius, and the radius is the 12 the prototype draws. This comment claimed
+    CornerRadiusMedium until 2026-09-01 while the setter below wrote the pill — two numbers, neither
+    of them the design's, and the reason given was that a third value for one consumer is the shape
+    FontSizeMono was refused for. ADR-0007 retires that reasoning: a value with no token is written
+    as a literal, because rounding 12 to a token draws a corner the design does not have.
 
     The open destination is told by a fill AND a 3 px bar, which is two signals with one of them not
     colour - the bar is present or absent rather than tinted. The hollow-and-filled circle that used
@@ -2178,7 +2208,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Padding" Value="0" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="CornerRadius" Value="12" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
   </Style>
@@ -2200,7 +2230,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <!-- railAdd's own corner, the same 12 as the five above it. -->
+    <Setter Property="CornerRadius" Value="12" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
   </Style>
@@ -2265,7 +2296,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   -->
   <Style Selector="Border.apr-shim">
     <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <!-- A cover's hole wears a cover's corner: skelStyle is the same 10 artBox is. -->
+    <Setter Property="CornerRadius" Value="{DynamicResource PosterCornerRadius}" />
     <Style.Animations>
       <Animation Duration="{DynamicResource MotionDuration}" IterationCount="INFINITE" PlaybackDirection="Alternate">
         <KeyFrame Cue="0%">
@@ -2353,8 +2385,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     control - the five states stay one decision, made once.
   -->
   <Style Selector="Button.poster-card">
-    <!-- Not a pill: a card is a card. -->
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <!--
+      12, which is the tile's own corner in the prototype and not the cover's: the button is the
+      8 px of padding around the picture, and the picture's 10 belongs to the Border inside
+      PosterCardView. Two radii for two rectangles, which is what the design draws.
+    -->
+    <Setter Property="CornerRadius" Value="12" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="Padding" Value="{DynamicResource PosterCardPadding}" />
@@ -2452,6 +2488,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     One cell of the picker's grid. Square rather than round, and small: forty-eight of these are a
     palette to sweep an eye across, not forty-eight things to aim at one by one — the six presets
     above are the ones sized as targets.
+
+    <b>And it drew a pill for a week while this comment said «square».</b> The withdrawn «round or
+    pill» rule turned it on 2026-08-25 and left the sentence above it standing; measured on
+    2026-09-01, that rule moved seven classes and this was the only one whose own comment contradicted
+    what the setter did. The design does not answer here — the prototype opens the operating system's
+    colour control and draws no grid — so what it goes back to is what it was before a retired rule
+    changed it, which is a different thing from inventing a shape.
   -->
   <Style Selector="Button.colour-cell">
     <Setter Property="Width" Value="34" />
@@ -2460,7 +2503,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="Margin" Value="1" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
   </Style>

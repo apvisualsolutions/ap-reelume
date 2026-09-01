@@ -313,7 +313,7 @@ public static partial class CompositionRoot
 
         // And the nine appearance preferences, in that order and before any surface: the theme
         // decides which page the accent is derived against, and the cover size, the gutter and the
-        // two radii are read by every card the library is about to build.
+        // cover's own corner are read by every card the library is about to build.
         _ = services.GetRequiredService<IAppearanceService>();
 
         // The stored language is applied before any surface is built, so the first window already

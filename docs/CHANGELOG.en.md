@@ -30,6 +30,47 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A preference was drawing every corner in the application, and the gate written the day before to
+  prevent exactly that certified the ones nobody could see.** `AppearanceService` wrote the "Corner
+  rounding" setting **over both radius tokens**, and the composition root resolves it before any
+  surface is built: with the default option, everything spending `CornerRadiusMedium` drew **10** and
+  everything spending `CornerRadiusSmall` drew **5**, while the token file declared 8 and 4.
+
+  **`ButtonShapeTests` read that file**, so it approved `pbtn`'s 8 and `pbtnLessons`' 4 — the two
+  classes [`ADR-0007`](adr/0007-every-element-matches-the-prototype.md) had returned to the prototype
+  the previous day — while the screen showed 10 and 5. Measured with a probe that builds the control,
+  lets the service run as startup does, and **reads the corner off the control**.
+
+  **The prototype spends that preference in one place**: `st.opt.radius` is read only by `artBox`,
+  the cover box. The comment justifying the wider reach claimed the opposite. So the preference moves
+  to `PosterCornerRadius`, keeps its three options, and the two tokens are worth on screen what they
+  declare. **While every radius was a preference, no element could claim to draw its number.**
+
+  Evidence: [a preference drawing every corner](evidence/stable/audit-corner-radius-preference-over-the-design.md).
+
+### Changed
+
+- **Fourteen button classes paired with their prototype control, against the four `ADR-0007` left.**
+  Five change shape: the rail's two buttons go from pill to **12**, the library tile from 10 to
+  **12**, and the two rows of other actions from pill to **5** — the prototype writes that style's
+  other two numbers verbatim, `min-height:36px` and `padding:0 12px`, and its corner beside them
+  is 5.
+
+  **And a sixth comes back another way.** Diffed against the commit before it, the rule withdrawn on
+  2026-08-25 moved **seven** classes rather than the two `ADR-0007` recorded; the seventh is
+  `colour-cell`, whose comment went on saying "Square rather than round" above a setter writing the
+  pill. The design does not answer for it, so it goes back to what it was **before a rule that no
+  longer exists** — which is not inventing a shape for it. The four classes the prototype does not
+  draw are measured like the fourteen it does, because they are the easiest to move unnoticed.
+
+  **And the gate gains the census it lacked**: every button class in the token file is paired with a
+  prototype control **or** written into a closed list of four the design does not answer, each with
+  what was searched for and did not exist. Without that census, a class nobody paired is
+  indistinguishable from one nobody has got round to pairing — the state `ADR-0007` found ten in. The
+  three mutations proving it are in the evidence.
+
+### Fixed
+
 - **The walk race came back because August's fix went to the line somebody remembered, not to the
   rule.** `The_players_transport_is_operated_with_the_mouse` answered `Expected: Embedded, Actual:
   Fullscreen` again, **and only on CI's second pass**: the first gave 147 of 147 and the second 146,

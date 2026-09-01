@@ -35,7 +35,7 @@ la excepción o forzar la píldora, el propietario **retiró la regla**:
 La regla no era sólo discutible: **había apartado del diseño las dos clases que cambió**, no
 acercado.
 
-| Clase | Control del prototipo | Diseño | Con la regla | Ahora |
+| Clase | Control del prototipo | Diseño | Con la regla | Escrito |
 |---|---|---:|---:|---:|
 | `Button.player-chrome` | `pbtn` | 8 | 999 | **8** |
 | `Button.player-pill` | `pbtnAudio`…`pbtnLessons` | 4 | 999 | **4** |
@@ -45,6 +45,14 @@ acercado.
 Sólo la clase base coincidía por casualidad. **Una regla dicha de memoria le ganó durante una semana
 a un diseño que nadie volvió a leer**, que es el defecto característico de este repositorio aplicado
 a una decisión en vez de a un servicio.
+
+**Enmienda del 2026-09-01: fueron siete clases, no dos.** Esta tabla nombra las dos que su autor
+recordaba. Comparado el archivo de tokens contra el commit anterior a la regla, la lista completa
+añade `action-row` en sus dos formas —de `CornerRadiusSmall` a píldora, con el diseño en 5—, los dos
+botones del riel —de `CornerRadiusMedium` a píldora, con el diseño en 12— y `colour-cell`, cuyo
+comentario siguió diciendo «Square rather than round» encima de un setter que escribía la píldora.
+**Una regla se recuerda por donde dolió, no por donde llegó**, que es la misma razón por la que la
+enmienda de abajo existe.
 
 ### Decisión
 
@@ -82,15 +90,32 @@ pueden caducar de la misma manera:
 Sin la segunda mitad la tabla sería otra vez un número copiado a mano, que es exactamente cómo la
 regla retirada sobrevivió una semana.
 
+### La enmienda del 2026-09-01: un radio no puede ser una preferencia
+
+Emparejar las diez clases restantes destapó que **ninguna clase de este árbol dibujaba su radio**,
+incluidas las dos que la tabla de arriba daba por devueltas al diseño. `AppearanceService` escribía
+el ajuste «Redondeo de esquinas» sobre `CornerRadiusMedium` y `CornerRadiusSmall`, y el contenedor lo
+resuelve antes de construir superficie alguna: `player-chrome` dibujaba **10** donde el diseño dibuja
+8, y `player-pill` **5** donde dibuja 4. La tabla no mentía sobre el diseño; mentía sobre el árbol.
+
+El prototipo gasta esa preferencia **en un solo elemento**, `artBox`, que es la carátula. Así que
+esta decisión gana una tercera consecuencia:
+
+3. **Un radio que el diseño fija no puede depender de una preferencia.** Una preferencia sólo alcanza
+   los elementos que el prototipo le da; cualquier otro alcance convierte el número de diseño en un
+   valor por defecto, y entonces ningún elemento puede afirmar que dibuja el suyo. La preferencia
+   vive ahora en `PosterCornerRadius`, con la carátula y su esqueleto como únicos consumidores.
+
 ### Lo que queda pendiente
 
-**Sólo cuatro clases están emparejadas.** Siguen sin pareja `action-row`, `navigation-destination`,
-`navigation-action`, `poster-card`, `accent-swatch`, `colour-cell`, `segment`, `rating-choice`,
-`compact` e `icon-action`. Emparejarlas es una tanda propia, porque tocar la navegación, las tarjetas
-y los ajustes es un cambio visual de toda la aplicación y pide su paseo y sus capturas.
+**Los catorce botones están emparejados y el resto de la superficie no.** La puerta lleva ahora un
+censo: toda clase de botón está emparejada con un control del prototipo o escrita en una lista
+cerrada de las que el diseño no contesta —`colour-cell`, `rating-choice`, `icon-action` y
+`link-action`—, cada una con lo que se buscó y no existe.
 
-**Y la decisión no se limita a los botones**: dice «todos los elementos». Los botones son donde
-apareció y donde hay puerta; el resto de la superficie está sin medir contra el diseño.
+**Y la decisión no se limita a los botones**: dice «todos los elementos». Los `Border`, `TextBox` y
+`ComboBox` gastan los mismos tres tokens en ochenta y cinco sitios mientras el prototipo dibuja doce
+radios distintos. Eso es la tanda siguiente, y ya puede medirse contra la pantalla.
 
 ---
 
@@ -116,7 +141,7 @@ the pill, the owner **withdrew the rule**:
 The rule was not merely arguable: **it had moved the two classes it changed away from the design**,
 not towards it.
 
-| Class | Prototype control | Design | Under the rule | Now |
+| Class | Prototype control | Design | Under the rule | Written |
 |---|---|---:|---:|---:|
 | `Button.player-chrome` | `pbtn` | 8 | 999 | **8** |
 | `Button.player-pill` | `pbtnAudio`…`pbtnLessons` | 4 | 999 | **4** |
@@ -126,6 +151,13 @@ not towards it.
 Only the base class agreed by coincidence. **A rule stated from memory beat a design nobody re-read
 for a week**, which is this repository's characteristic defect applied to a decision rather than to a
 service.
+
+**2026-09-01 amendment: it was seven classes, not two.** This table names the two its author
+remembered. Diffed against the commit before the rule, the full list adds `action-row` in both its
+forms — from `CornerRadiusSmall` to the pill, with the design at 5 — the rail's two buttons — from
+`CornerRadiusMedium` to the pill, with the design at 12 — and `colour-cell`, whose comment went on
+saying "Square rather than round" above a setter writing the pill. **A rule is remembered by where it
+hurt, not by where it reached**, which is why the amendment below exists at all.
 
 ### Decision
 
@@ -163,12 +195,30 @@ cannot go stale the same way:
 Without the second half the table would be a hand-copied number again, which is exactly how the
 withdrawn rule survived a week.
 
+### The 2026-09-01 amendment: a radius cannot be a preference
+
+Pairing the ten remaining classes uncovered that **no class in this tree was drawing its radius**,
+including the two the table above reported returned to the design. `AppearanceService` wrote the
+"Corner rounding" setting over `CornerRadiusMedium` and `CornerRadiusSmall`, and the composition root
+resolves it before any surface is built: `player-chrome` drew **10** where the design draws 8, and
+`player-pill` **5** where it draws 4. The table was not lying about the design; it was lying about
+the tree.
+
+The prototype spends that preference on **one element**, `artBox`, the cover. So this decision gains
+a third consequence:
+
+3. **A radius the design fixes cannot depend on a preference.** A preference reaches only the
+   elements the prototype gives it; any wider reach turns the design number into a default, and then
+   no element can claim to draw its own. The preference now lives in `PosterCornerRadius`, with the
+   cover and its skeleton as its only consumers.
+
 ### What remains
 
-**Only four classes are paired.** Still unpaired are `action-row`, `navigation-destination`,
-`navigation-action`, `poster-card`, `accent-swatch`, `colour-cell`, `segment`, `rating-choice`,
-`compact` and `icon-action`. Pairing them is a batch of its own, because touching navigation, cards
-and settings is an application-wide visual change and needs its walk and its captures.
+**The fourteen buttons are paired and the rest of the surface is not.** The gate now carries a
+census: every button class is paired with a prototype control or written into a closed list of those
+the design does not answer — `colour-cell`, `rating-choice`, `icon-action` and `link-action` — each
+with what was searched for and did not exist.
 
-**And the decision is not limited to buttons**: it says "every element". Buttons are where it
-surfaced and where the gate is; the rest of the surface is unmeasured against the design.
+**And the decision is not limited to buttons**: it says "every element". `Border`, `TextBox` and
+`ComboBox` spend the same three tokens across eighty-five sites while the design draws twelve
+distinct radii. That is the next batch, and it can now be measured against the screen.
