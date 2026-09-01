@@ -381,7 +381,19 @@ try {
     # Los otros cuatro archivos que CRS-004 trajo a la lista salieron de ella mejorando, que es el
     # unico camino que admite: las ramas que les faltaban se nombraron con el JSON de coverlet y se
     # cubrieron con pruebas antes de escribir el archivo.
-    $debtRatchet = 189
+    #
+    # 190 desde el 2026-09-02, y la razon es hardware ausente y no deuda de nadie.
+    # WindowsAudioEndpointConfigurator.cs escribe el formato de un endpoint de audio con IPolicyConfig,
+    # asi que casi todo su cuerpo necesita un dispositivo de render. En esta maquina mide 64/54; en el
+    # runner hospedado, que no tiene ninguno, mide 23/20 — y ese es el suelo, porque el suelo lo mide
+    # CI. Es el octavo archivo de la lista de los que dependen de hardware, junto a
+    # WindowsAudioDeviceCatalog.cs, que lee 81/63 aqui y 32/11 alli.
+    #
+    # Y LibVlcAudioOutputAdapter.cs NO baja de 86/87 aunque el artefacto del run que lo destapo dijera
+    # 77/75: ese run midio el codigo nuevo antes de que existieran las cuatro pruebas que lo cubren,
+    # que entran en el mismo cambio. Medido aqui con la aritmetica de esta puerta: 88/87. Un suelo que
+    # baja es una bajada, y la salida a una bajada es cubrir, no rebajar.
+    $debtRatchet = 190
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

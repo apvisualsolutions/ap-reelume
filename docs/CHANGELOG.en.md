@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The prototype's three buttons, in place of the drop-down.** `chList` is a row of three — Stereo,
+  5.1, 7.1 — with the chosen one accented and the ones the device will not take dimmed rather than
+  absent; that is what is drawn now. **And the drop-down showed the program's internal names**:
+  "Surround51", identical in both languages, which is the bilingual rule broken by a control whose
+  contents nobody had read.
+
+  **Two ratchets move, both with their measured reason.** The walk's rises from 20 to **22**: 5.1 and
+  7.1 are disabled wherever the walk runs — every physical endpoint on this machine declares two
+  channels and a hosted runner has none — and the harness refuses to press a disabled control,
+  rightly, because a person cannot either. What the scene asserts instead is the correspondence both
+  ways: dimmed exactly when the driver refuses. The coverage one rises from 189 to **190** for
+  `WindowsAudioEndpointConfigurator.cs`, the eighth file bound to hardware a hosted runner lacks:
+  64/54 here and **23/20** there.
+
+  **And one that does not fall.** `LibVlcAudioOutputAdapter.cs` dropped to 77/75 in the run that
+  surfaced this, because that run measured the new code before the four tests covering it existed.
+  They land in the same change and take it back to **88/87**, so the floor stays at 86/87: a floor
+  that falls is a fall, and the answer to one is to cover, not to lower.
+
 - **The channel layout stopped being a control that did nothing and now changes the sound.** "If I
   want 7.1, why would it sound stereo?", the owner asked, and the measured answer was that **it
   already sounds 7.1**: LibVLC negotiates with the endpoint and delivers what it accepts. What could

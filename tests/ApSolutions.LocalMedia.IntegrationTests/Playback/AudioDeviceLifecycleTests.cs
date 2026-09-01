@@ -149,6 +149,135 @@ public sealed class AudioDeviceLifecycleTests
         Assert.Null(selection);
     }
 
+    /// <summary>
+    /// The layout is written on the endpoint before the device is routed, and never after.
+    /// </summary>
+    /// <remarks>
+    /// The order is the fix, not a detail. Writing the endpoint's format invalidates every audio
+    /// client on it, and LibVLC's recovery from that discards the chosen device for the default one
+    /// — so the routing has to come afterwards to put the choice back. Asserted on the order rather
+    /// than on the calls, because both orders make both calls and only one of them plays the sound
+    /// through the speakers somebody picked.
+    /// </remarks>
+    [Fact]
+    public async Task The_layout_is_written_before_the_device_is_routed()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var endpoints = new RecordingConfigurator([AudioChannelLayout.Stereo, AudioChannelLayout.Surround71]);
+        var adapter = new LibVlcAudioOutputAdapter(
+            new FakeCatalog([Speakers]),
+            new PlaybackPreferenceRepository(factory),
+            endpoints);
+        var engine = new RecordingEngine();
+
+        _ = await adapter.SelectAsync(
+            new AudioOutputRequest(
+                Speakers.Id,
+                AudioChannelLayout.Surround71,
+                PreferenceScope.Global,
+                PlaybackPreference.GlobalKey),
+            engine,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([(Speakers.Id, AudioChannelLayout.Surround71)], endpoints.Written);
+        Assert.Equal(AudioEndpointChange.Applied, adapter.LastLayoutChange);
+
+        // The routing happened, and it happened after: the engine's own ledger has the device in it
+        // and the write is already done by the time this is read.
+        Assert.Contains("device", engine.Order);
+    }
+
+    /// <summary>
+    /// A driver that refuses the layout is reported rather than routed around.
+    /// </summary>
+    [Fact]
+    public async Task A_layout_the_driver_refuses_is_reported_and_the_device_is_still_routed()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var endpoints = new RecordingConfigurator([AudioChannelLayout.Stereo]);
+        var adapter = new LibVlcAudioOutputAdapter(
+            new FakeCatalog([Speakers]),
+            new PlaybackPreferenceRepository(factory),
+            endpoints);
+        var engine = new RecordingEngine();
+
+        var selection = await adapter.SelectAsync(
+            new AudioOutputRequest(
+                Speakers.Id,
+                AudioChannelLayout.Surround71,
+                PreferenceScope.Global,
+                PlaybackPreference.GlobalKey),
+            engine,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(AudioEndpointChange.RefusedByDevice, adapter.LastLayoutChange);
+
+        // Refusing a layout is not refusing a device: the output still moves where it was asked to,
+        // because those are two choices and only one of them was turned down.
+        Assert.NotNull(selection);
+        Assert.Contains("device", engine.Order);
+    }
+
+    /// <summary>
+    /// An adapter built without a configurator routes and writes nothing.
+    /// </summary>
+    /// <remarks>
+    /// Which is every context that is not Windows, and every test that only cares about routing. It
+    /// reports Unavailable rather than pretending the layout was honoured — the difference between a
+    /// surface that can say «this machine cannot change it» and one that claims it did.
+    /// </remarks>
+    [Fact]
+    public async Task Without_a_configurator_the_layout_is_reported_as_unwritable()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var adapter = new LibVlcAudioOutputAdapter(
+            new FakeCatalog([Speakers]),
+            new PlaybackPreferenceRepository(factory));
+
+        _ = await adapter.SelectAsync(
+            new AudioOutputRequest(
+                Speakers.Id,
+                AudioChannelLayout.Surround71,
+                PreferenceScope.Global,
+                PlaybackPreference.GlobalKey),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(AudioEndpointChange.Unavailable, adapter.LastLayoutChange);
+    }
+
+    /// <summary>
+    /// A configurator this machine cannot use is the same as not having one.
+    /// </summary>
+    [Fact]
+    public async Task A_configurator_that_is_not_available_writes_nothing()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var endpoints = new RecordingConfigurator([AudioChannelLayout.Stereo]) { Available = false };
+        var adapter = new LibVlcAudioOutputAdapter(
+            new FakeCatalog([Speakers]),
+            new PlaybackPreferenceRepository(factory),
+            endpoints);
+
+        _ = await adapter.SelectAsync(
+            new AudioOutputRequest(
+                Speakers.Id,
+                AudioChannelLayout.Stereo,
+                PreferenceScope.Global,
+                PlaybackPreference.GlobalKey),
+            TestContext.Current.CancellationToken);
+
+        Assert.Empty(endpoints.Written);
+        Assert.Equal(AudioEndpointChange.Unavailable, adapter.LastLayoutChange);
+    }
+
     private sealed class FakeCatalog(IReadOnlyList<AudioOutputDevice> devices) : IAudioDeviceCatalog
     {
         private IReadOnlyList<AudioOutputDevice> _devices = devices;
@@ -189,6 +318,34 @@ public sealed class AudioDeviceLifecycleTests
         {
             Order.Add("device");
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingConfigurator(IReadOnlyList<AudioChannelLayout> supported)
+        : IAudioEndpointConfigurator
+    {
+        public List<(string Device, AudioChannelLayout Layout)> Written { get; } = [];
+
+        public bool Available { get; init; } = true;
+
+        public bool IsAvailable => Available;
+
+        public Task<IReadOnlyList<AudioChannelLayout>> GetSupportedLayoutsAsync(
+            string deviceId,
+            CancellationToken cancellationToken = default) => Task.FromResult(supported);
+
+        public Task<AudioEndpointChange> SetLayoutAsync(
+            string deviceId,
+            AudioChannelLayout layout,
+            CancellationToken cancellationToken = default)
+        {
+            if (!supported.Contains(layout))
+            {
+                return Task.FromResult(AudioEndpointChange.RefusedByDevice);
+            }
+
+            Written.Add((deviceId, layout));
+            return Task.FromResult(AudioEndpointChange.Applied);
         }
     }
 }

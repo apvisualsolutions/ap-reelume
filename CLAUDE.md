@@ -196,7 +196,7 @@ la decisión equivocada.
 `git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA ya
 resuelto.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **189** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **190** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -222,10 +222,18 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **190** <!--medido:trinquete-de-deuda-->
 desde
-el 2026-09-01: bajó a 189 el 2026-08-31 cuando los dos ViewModels de Cursos salieron de la lista, y a
+el 2026-09-02: bajó a 189 el 2026-08-31 cuando los dos ViewModels de Cursos salieron de la lista, y a
 188 ese mismo día cuando `MarkerEditorViewModel` llegó a 100/100 y salió también.
+
+**Y el 2026-09-02 subió por hardware ausente, que es el octavo archivo de esa clase.**
+`WindowsAudioEndpointConfigurator.cs` escribe el formato de un endpoint de audio, así que casi todo
+su cuerpo pide un dispositivo de render: mide 64/54 aquí y **23/20** en el runner, que es de donde
+sale el suelo. **Y en la misma tanda un suelo NO bajó**: `LibVlcAudioOutputAdapter.cs` leyó 77/75 en
+el run que lo destapó porque ese run midió código nuevo antes de que existieran las pruebas que lo
+cubren; entraron en el mismo cambio y lo devolvieron a 88/87. **Un suelo que baja es una bajada, y la
+salida es cubrir, no rebajar.**
 
 **Y el 2026-09-01 subió por primera vez, a 189, con la única razón que la puerta acepta por escrito**
 —«add it with the reason and raise the ratchet in the same change»—: `LessonsPanelView.axaml` mide
@@ -362,13 +370,21 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
    silencio suyo no es un certificado.
 9. **Un control nuevo llega con su escena de paseo en el mismo commit.** El trinquete de
-   `eng/check-walk-coverage.ps1` **sólo puede encoger**. Estuvo en 0 y **subió a 20** <!--medido:paseo-pendiente-->
+   `eng/check-walk-coverage.ps1` **sólo puede encoger**. Estuvo en 0 y **subió a 22** <!--medido:paseo-pendiente-->
    el 2026-08-25,
    por el arnés y no por la aplicación: el hit test headless de Avalonia no sigue el desplazamiento
    de un `ScrollViewer`, y Ajustes creció de 949 a 1.797 px, así que veinte controles de
    `AppearanceSettingsView` caen fuera del primer viewport. Se probaron tres vías y las tres
    contestaron lo mismo; **los veinte se pulsan con un ratón real**. Subirlo otra vez exige medir el
    porqué y escribirlo en la cabecera de `eng/walk-pending.txt`, como aquel día.
+
+   **Y el 2026-09-02 subió a 22, esta vez por la máquina y no por el arnés.** Los tres botones de la
+   disposición de canales se ofrecen sólo donde el controlador del dispositivo los admite, y cada
+   endpoint físico de esta máquina declara dos canales mientras un runner hospedado no tiene ninguno:
+   5.1 y 7.1 salen **deshabilitados** dondequiera que el paseo corra, y el arnés se niega a pulsar un
+   control deshabilitado —con razón, porque una persona tampoco puede—. La escena afirma en su lugar
+   la correspondencia en los dos sentidos, y **el trinquete encogerá solo** el día que el paseo corra
+   sobre una máquina con salida multicanal: pulsa lo que esté habilitado.
 
 ## El defecto característico de este proyecto
 

@@ -10,6 +10,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Los tres botones del prototipo, en vez del desplegable.** `chList` es una fila de tres —Estéreo,
+  5.1, 7.1— con el elegido acentuado y los que el dispositivo no admite atenuados en vez de
+  ausentes; eso es lo que se dibuja ahora. **Y el desplegable enseñaba los nombres internos del
+  programa**: «Surround51», idéntico en los dos idiomas, que es la regla del bilingüismo rota por un
+  control cuyo contenido nadie había leído.
+
+  **Dos trinquetes se mueven, y los dos con su razón medida.** El del paseo sube de 20 a **22**:
+  5.1 y 7.1 salen deshabilitados dondequiera que el paseo corra —cada endpoint físico de esta máquina
+  declara dos canales y un runner hospedado no tiene ninguno—, y el arnés se niega a pulsar un
+  control deshabilitado, con razón, porque una persona tampoco puede. Lo que la escena afirma en su
+  lugar es la correspondencia en los dos sentidos: atenuado exactamente cuando el controlador lo
+  rechaza. El de cobertura sube de 189 a **190** por `WindowsAudioEndpointConfigurator.cs`, que es el
+  octavo archivo que depende de hardware que el runner no tiene: 64/54 aquí y **23/20** allí.
+
+  **Y uno que no baja.** `LibVlcAudioOutputAdapter.cs` cayó a 77/75 en el run que destapó esto,
+  porque ese run midió el código nuevo antes de que existieran las cuatro pruebas que lo cubren.
+  Entran en el mismo cambio y lo devuelven a **88/87**, así que el suelo se queda en 86/87: un suelo
+  que baja es una bajada, y la salida a una bajada es cubrir, no rebajar.
+
 - **La disposición de canales dejó de ser un botón que no hacía nada y pasa a cambiar el sonido de
   verdad.** «Si quiero 7.1, ¿por qué iba a sonar estéreo?», preguntó el propietario, y la respuesta
   medida fue que **ya suena 7.1**: LibVLC negocia con el dispositivo y entrega lo que éste admite.

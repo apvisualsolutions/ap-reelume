@@ -28,12 +28,53 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource AudioOutputLayoutLabel}" />
-      <ComboBox
+      <!--
+        Three buttons and not a drop-down, which is what the prototype draws: `chList` is a row of
+        three, the one in force carrying the accent border and fill, and the ones the device will not
+        take dimmed rather than removed. A drop-down also hid the whole question behind a click and
+        showed the enumeration's own words — «Surround51» — in both languages.
+
+        player-pill and not a class of its own: these are the same control the player's panel heads
+        already are, paired with `pbtnAudio` at the design's own radius of 4, and the 44 px target
+        that class carries is a decision already taken and measured rather than one to re-take here.
+
+        The word and not the value as CommandParameter: `{x:True}` and its kin are not measured in
+        this Avalonia, and a parameter arriving as the string "Surround71" leaves every button
+        unpressed while looking exactly right.
+      -->
+      <StackPanel
           x:Name="AudioLayoutSelector"
-          MinWidth="200"
-          automation:AutomationProperties.Name="{DynamicResource AudioOutputLayoutLabel}"
-          ItemsSource="{x:Static player:AudioOutputViewModel.Layouts}"
-          SelectedItem="{Binding SelectedLayout, Mode=TwoWay}" />
+          Orientation="Horizontal"
+          Spacing="{DynamicResource Space4}"
+          automation:AutomationProperties.Name="{DynamicResource AudioOutputLayoutLabel}">
+        <Button
+            x:Name="AudioLayoutStereo"
+            Classes="player-pill"
+            Classes.selected="{Binding IsStereoChosen}"
+            Command="{Binding ChooseLayoutCommand}"
+            CommandParameter="stereo"
+            Content="{DynamicResource AudioOutputLayoutStereo}"
+            IsEnabled="{Binding IsStereoAvailable}"
+            automation:AutomationProperties.Name="{DynamicResource AudioOutputLayoutStereo}" />
+        <Button
+            x:Name="AudioLayoutSurround51"
+            Classes="player-pill"
+            Classes.selected="{Binding IsSurround51Chosen}"
+            Command="{Binding ChooseLayoutCommand}"
+            CommandParameter="surround51"
+            Content="5.1"
+            IsEnabled="{Binding IsSurround51Available}"
+            automation:AutomationProperties.Name="5.1" />
+        <Button
+            x:Name="AudioLayoutSurround71"
+            Classes="player-pill"
+            Classes.selected="{Binding IsSurround71Chosen}"
+            Command="{Binding ChooseLayoutCommand}"
+            CommandParameter="surround71"
+            Content="7.1"
+            IsEnabled="{Binding IsSurround71Available}"
+            automation:AutomationProperties.Name="7.1" />
+      </StackPanel>
 
       <!--
         Said before the choice is made and not after it, which is the whole difference between an

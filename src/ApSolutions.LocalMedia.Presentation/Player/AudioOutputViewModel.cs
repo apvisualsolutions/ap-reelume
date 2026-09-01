@@ -4,6 +4,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Playback;
 
@@ -36,7 +37,37 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
     {
         _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         _endpoints = endpoints;
+        ChooseLayoutCommand = new ChooseLayoutCommandImplementation(layout => SelectedLayout = layout);
     }
+
+    /// <summary>
+    /// Chooses one of the three layouts, by the word the markup carries.
+    /// </summary>
+    /// <remarks>
+    /// A word and not the enumeration value, because <c>{x:True}</c> and friends are not measured in
+    /// this Avalonia and a parameter that arrived as the string "Surround71" would leave every button
+    /// unpressed while looking exactly right — the same trap the course dialog's two pills were
+    /// rescued from on 2026-08-31.
+    /// </remarks>
+    public ICommand ChooseLayoutCommand { get; }
+
+    /// <summary>The three of them, each answering whether it is the one in force.</summary>
+    public bool IsStereoChosen => _selectedLayout == AudioChannelLayout.Stereo;
+
+    /// <summary>The three of them, each answering whether it is the one in force.</summary>
+    public bool IsSurround51Chosen => _selectedLayout == AudioChannelLayout.Surround51;
+
+    /// <summary>The three of them, each answering whether it is the one in force.</summary>
+    public bool IsSurround71Chosen => _selectedLayout == AudioChannelLayout.Surround71;
+
+    /// <summary>And whether the chosen endpoint's driver will take it.</summary>
+    public bool IsStereoAvailable => IsLayoutAvailable(AudioChannelLayout.Stereo);
+
+    /// <summary>And whether the chosen endpoint's driver will take it.</summary>
+    public bool IsSurround51Available => IsLayoutAvailable(AudioChannelLayout.Surround51);
+
+    /// <summary>And whether the chosen endpoint's driver will take it.</summary>
+    public bool IsSurround71Available => IsLayoutAvailable(AudioChannelLayout.Surround71);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -246,6 +277,12 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(LayoutChangeIsSystemWide));
         OnPropertyChanged(nameof(LayoutWasApplied));
         OnPropertyChanged(nameof(LayoutWasRefused));
+        OnPropertyChanged(nameof(IsStereoChosen));
+        OnPropertyChanged(nameof(IsSurround51Chosen));
+        OnPropertyChanged(nameof(IsSurround71Chosen));
+        OnPropertyChanged(nameof(IsStereoAvailable));
+        OnPropertyChanged(nameof(IsSurround51Available));
+        OnPropertyChanged(nameof(IsSurround71Available));
     }
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
@@ -262,4 +299,32 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private sealed class ChooseLayoutCommandImplementation(Action<AudioChannelLayout> apply) : ICommand
+    {
+        private static readonly Dictionary<string, AudioChannelLayout> Words =
+            new(StringComparer.Ordinal)
+            {
+                ["stereo"] = AudioChannelLayout.Stereo,
+                ["surround51"] = AudioChannelLayout.Surround51,
+                ["surround71"] = AudioChannelLayout.Surround71,
+            };
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public bool CanExecute(object? parameter) =>
+            parameter is string word && Words.ContainsKey(word);
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is string word && Words.TryGetValue(word, out var layout))
+            {
+                apply(layout);
+            }
+        }
+    }
 }
