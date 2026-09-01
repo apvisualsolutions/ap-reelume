@@ -28,6 +28,14 @@ depende de programar, sino de **una máquina Windows 11 ARM64 que no hay**; y `P
 llegar a `VERIFIED` sin el **certificado comercial de firma**, porque su ciclo se verificó sobre una
 copia resellada y el artefacto sin firmar no puede repetirlo — lo que lo encadena a `REL-001`.
 
+**Y un tercero, que a diferencia de los dos anteriores sí se resuelve sin comprar hardware:**
+`PLY-004` está bloqueado porque los cuatro endpoints de salida de este equipo declaran mezcla de dos
+canales, así que las disposiciones 5.1 y 7.1 nunca se han medido. **El propietario decidió el
+2026-09-01 que un endpoint virtual de ocho canales lo verifica**, anotando en la evidencia que era
+virtual; eligió VoiceMeeter Banana, y descartó VB-CABLE porque su propio foro documenta que entrega
+los ocho canales por Kernel Streaming y no siempre por WASAPI compartido, que es la vía que usa la
+aplicación. Instalarlo es del propietario. El arnés que lo medirá ya está escrito y verde.
+
 ## Las tres versiones
 
 | Versión | Qué significa |

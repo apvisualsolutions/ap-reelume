@@ -60,6 +60,11 @@
 > **El objetivo de 44 px se queda**, y es una decisión distinta: el prototipo dibuja `pbtn` a 36×36 y
 > encogerlo cambiaría un suelo de accesibilidad por ocho píxeles de forma.
 >
+> **La decisión está escrita en el árbol y no sólo aquí: [`ADR-0007`](adr/0007-every-element-matches-the-prototype.md).**
+> Dice que el prototipo es la fuente de la forma, que un valor sin token se escribe como literal, y
+> que una discrepancia **por accesibilidad medida** sigue siendo legítima mientras se escriba junto al
+> control — lo que prohíbe es la discrepancia por gramática inventada.
+>
 > ### LO SIGUIENTE, y no es opcional
 >
 > **1. El suelo de cobertura que va a salir rojo, a propósito.** `preview-coverage-floors.ps1` dice

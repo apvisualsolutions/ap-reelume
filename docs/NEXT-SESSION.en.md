@@ -60,6 +60,11 @@
 > **The 44 px target stays**, and it is a separate decision: the prototype draws `pbtn` at 36×36, and
 > shrinking it would trade an accessibility floor for eight pixels of shape.
 >
+> **The decision is written in the tree and not only here: [`ADR-0007`](adr/0007-every-element-matches-the-prototype.md).**
+> It says the prototype is the source of shape, that a value with no token is written as a literal,
+> and that a divergence **for measured accessibility** stays legitimate as long as it is written
+> beside the control — what it forbids is divergence by invented grammar.
+>
 > ### WHAT COMES NEXT, and it is not optional
 >
 > **1. The coverage floor that will go red, deliberately.** `preview-coverage-floors.ps1` says
