@@ -85,6 +85,26 @@ public interface ICourseRepository
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// The lesson a media file backs, or <see langword="null"/> when the file is not one.
+    /// </summary>
+    /// <remarks>
+    /// The mirror of <c>IEpisodeSequenceRepository.FindByFileAsync</c>, and it is asked the same way
+    /// for the same reason: a playing session holds a file and nothing else. The player's «Lecciones»
+    /// panel is <b>absent</b> outside a lesson session (CRS-004), so something has to answer whether
+    /// this file is one — and the answer cannot travel on the request that opened it. The countdown
+    /// opens the next lesson with nothing but a file id, and so does picking the thread up from the
+    /// home rail; a course that rode along on the request would go missing down every path that
+    /// forgot to forward it, leaving the panel quietly absent rather than wrong.
+    /// <para>
+    /// <c>ix_lessons_media_file</c> has existed since migration 0022 with nothing querying it. This
+    /// is the query it was created for.
+    /// </para>
+    /// </remarks>
+    Task<Lesson?> FindLessonByFileAsync(
+        MediaFileId fileId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Unmarks a folder. The videos are not touched and nothing on disk changes: what leaves is the
     /// course row and its lessons.
     /// </summary>

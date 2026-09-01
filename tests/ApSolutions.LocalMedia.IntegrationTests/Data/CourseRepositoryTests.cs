@@ -275,6 +275,69 @@ public sealed class CourseRepositoryTests
         new DateTimeOffset(2026, 8, 30, 12, 0, 0, TimeSpan.Zero),
         LastOpenedAtUtc: null);
 
+    /// <summary>
+    /// The lesson a file backs (CRS-004), which is how a playing session learns it is a lesson at
+    /// all — and the query <c>ix_lessons_media_file</c> had been waiting for since migration 0022.
+    /// </summary>
+    [Fact]
+    public async Task The_lesson_a_file_backs_is_found_by_that_file()
+    {
+        using var harness = await Harness.OpenAsync();
+        var files = new MediaFileRepository(harness.Factory);
+        var wanted = new MediaFileId(Guid.NewGuid());
+        var other = new MediaFileId(Guid.NewGuid());
+        foreach (var (id, name) in new[] { (wanted, "El nodo"), (other, "Máscaras") })
+        {
+            await files.UpsertAsync(
+                new MediaFile(
+                    id,
+                    harness.RootId,
+                    $@"D:\Cursos\Composición\{name}.mp4",
+                    1,
+                    DateTimeOffset.UnixEpoch,
+                    new TechnicalMetadata(TimeSpan.FromMinutes(10), "mp4", [], [], null, null)),
+                TestContext.Current.CancellationToken);
+        }
+
+        var courseId = new CourseId(Guid.NewGuid());
+        await harness.Repository.SaveAsync(
+            Course(courseId, harness.RootId, "Composición"),
+            [
+                Lesson("Módulo uno", new LessonOrdinal(1, null), "1 - El nodo", new LessonOrdinal(1, null))
+                    with
+                { MediaFileId = wanted },
+                Lesson("Módulo uno", new LessonOrdinal(1, null), "2 - Máscaras", new LessonOrdinal(2, null))
+                    with
+                { MediaFileId = other },
+                Lesson("Módulo uno", new LessonOrdinal(1, null), "3 - Sin archivo", new LessonOrdinal(3, null)),
+            ],
+            TestContext.Current.CancellationToken);
+
+        var found = await harness.Repository.FindLessonByFileAsync(wanted, TestContext.Current.CancellationToken);
+
+        Assert.Equal("1 - El nodo", found?.Name);
+        // The course identifier is what the panel is built from, and the save assigns it: asking for
+        // it back is the whole point of returning the lesson rather than a boolean.
+        Assert.Equal(courseId, found?.CourseId);
+        Assert.Equal(wanted, found?.MediaFileId);
+    }
+
+    /// <summary>
+    /// A file that backs nothing is not a lesson, which is the answer that makes the player's column
+    /// <b>absent</b> rather than empty for every film in the library.
+    /// </summary>
+    [Fact]
+    public async Task A_file_that_backs_no_lesson_is_not_one()
+    {
+        using var harness = await Harness.OpenAsync();
+
+        var found = await harness.Repository.FindLessonByFileAsync(
+            new MediaFileId(Guid.NewGuid()),
+            TestContext.Current.CancellationToken);
+
+        Assert.Null(found);
+    }
+
     private static Lesson Lesson(string? module, LessonOrdinal? moduleOrdinal, string name, LessonOrdinal? ordinal) =>
         new(
             new LessonId(Guid.NewGuid()),

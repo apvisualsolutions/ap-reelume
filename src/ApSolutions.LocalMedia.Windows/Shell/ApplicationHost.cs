@@ -195,10 +195,19 @@ public sealed class ApplicationHost : IAsyncDisposable
                     + "this session's teardown.");
     }
 
-    /// <summary>The countdown offered at the end of an episode, and what the buttons decided.</summary>
-    internal sealed class NextEpisodeOffer(StartNextEpisodeCountdown countdown)
+    /// <summary>
+    /// The countdown offered at the end of an episode or a lesson, and what the buttons decided.
+    /// </summary>
+    /// <remarks>
+    /// It holds an <see cref="Action"/> rather than the use case since CRS-004, because there are two
+    /// chains now and one overlay above both of them. Typing this to the episode countdown would have
+    /// meant the lesson chain needing a second field, a second null check in the button handler, and
+    /// a third the day a third chain arrives — and the failure mode of forgetting one is a Cancel
+    /// button that quietly does nothing, which is what PLY-011 already shipped once.
+    /// </remarks>
+    internal sealed class NextEpisodeOffer(Action cancel)
     {
-        public StartNextEpisodeCountdown Countdown { get; } = countdown;
+        public Action Cancel { get; } = cancel;
 
         public bool PlayNowRequested { get; set; }
     }

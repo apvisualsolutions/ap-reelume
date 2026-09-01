@@ -166,6 +166,37 @@ public sealed class CourseRepository : ICourseRepository, ICourseRootDeclaration
         return lessons;
     }
 
+    public async Task<Lesson?> FindLessonByFileAsync(
+        MediaFileId fileId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
+        await using var command = connection.CreateCommand();
+
+        // The same columns in the same order as ListLessonsAsync, because ReadLesson reads them by
+        // position: a column added to one of the two and not the other is a field silently read off
+        // its neighbour rather than a compiler error.
+        //
+        // LIMIT 1 with an order rather than a bare lookup. A file backs one lesson in every library
+        // this application builds -- the walk writes one row per video -- but nothing in the schema
+        // says so: ix_lessons_media_file is not unique, and the same video reachable from two marked
+        // folders would be two rows. Whichever way that lands, the session gets a stable answer
+        // rather than one that changes between two calls in the same session.
+        command.CommandText = """
+            SELECT id, course_id, media_file_id, module, module_sort_major, module_sort_minor,
+                   sort_major, sort_minor, name, title, relative_path
+            FROM lessons
+            WHERE media_file_id = $mediaFileId
+            ORDER BY course_id, id
+            LIMIT 1;
+            """;
+        command.Parameters.AddWithValue("$mediaFileId", Text(fileId.Value));
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        return await reader.ReadAsync(cancellationToken).ConfigureAwait(false)
+            ? ReadLesson(reader)
+            : null;
+    }
+
     public async Task RemoveAsync(CourseId id, CancellationToken cancellationToken = default)
     {
         await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);

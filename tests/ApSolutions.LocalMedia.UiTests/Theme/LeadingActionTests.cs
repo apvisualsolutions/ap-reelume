@@ -124,6 +124,10 @@ public sealed class LeadingActionTests
         ["SubtitleStyleView"] = null,
         ["ShortcutSettingsView"] = null,
         ["PlayerVersionsView"] = null,
+        // A list that repeats, like the version rows above it: forty lessons with one of them
+        // accented is not a hierarchy, it is a list with an arbitrary row painted. The player's one
+        // accent is the transport's.
+        ["LessonsPanelView"] = null,
         ["VersionSwitchDialog"] = "ConfirmSwitchButton",
         ["LooseFileBanner"] = "AddContainingFolderButton",
         ["MiniPlayerWindow"] = null,

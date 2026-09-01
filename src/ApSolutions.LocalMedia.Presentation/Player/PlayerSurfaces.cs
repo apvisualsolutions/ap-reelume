@@ -61,4 +61,16 @@ public sealed record PlayerSurfaces
 
     /// <summary>Present only when this session came from a file outside the library.</summary>
     public LooseFileViewModel? LooseFile { get; init; }
+
+    /// <summary>
+    /// The course around this lesson, and null for every session that is not one (CRS-004).
+    /// </summary>
+    /// <remarks>
+    /// Null is the panel's <b>absence</b> and not an empty panel, which is what the ficha asks for in
+    /// bold. It travels on the surfaces like everything else here for the reason the type exists: the
+    /// lesson list, the countdown's idea of what comes next, and the title in the header all describe
+    /// one session, and a shell that assembled them one by one is how a player ends up with the
+    /// previous file's course beside this file's picture.
+    /// </remarks>
+    public LessonsPanelViewModel? Lessons { get; init; }
 }

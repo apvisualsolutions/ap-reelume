@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Diagnostics;
+using System.Globalization;
 using ApSolutions.LocalMedia.Application.Backup;
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Application.Continuity;
+using ApSolutions.LocalMedia.Application.Courses;
 using ApSolutions.LocalMedia.Application.Data;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Events;
@@ -21,6 +23,7 @@ using ApSolutions.LocalMedia.Application.Updates;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Common;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Courses;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Identification;
 using ApSolutions.LocalMedia.Domain.Metadata;
@@ -1093,11 +1096,26 @@ public static partial class CompositionRoot
         // wait and "cancel" ends it. Resolved bare, both buttons only hid the card (PLY-011).
         var nextEpisode = new NextEpisodeViewModel(action => HandleNextEpisodeActionAsync(host, action));
 
+        // CRS-004. The file is asked whether it is a lesson rather than the request being trusted to
+        // say so: the countdown opens the next one with an id and nothing else, and so does picking
+        // the thread up from home. Absent for every session that is not one, which is what makes the
+        // pill and the 320 px column absent rather than disabled.
+        var lessonSession = await provider.GetRequiredService<GetLessonSession>()
+            .FindAsync(mediaFileId, cancellationToken)
+            .ConfigureAwait(true);
+        var lessons = lessonSession is null
+            ? null
+            : new LessonsPanelViewModel(
+                lessonSession,
+                lessonRequest => provider.GetRequiredService<ShellHost>().Shell is { } shell
+                    ? shell.OpenPlayerAsync(lessonRequest, CancellationToken.None)
+                    : Task.CompletedTask);
+
         // One router per session: keyboard and media keys resolve into the same action exactly
         // once, which is what stops a media key the focused window also sees as a key press from
         // toggling playback twice (ARQ-002).
         var router = new InputCommandRouter((command, token) =>
-            ExecutePlaybackInputAsync(provider, player, transport, command, token));
+            ExecutePlaybackInputAsync(host, provider, player, transport, command, token));
         var shortcuts = provider.GetRequiredService<ShortcutMap>();
         player.GestureHandler = gesture =>
         {
@@ -1275,6 +1293,14 @@ public static partial class CompositionRoot
             if (args.CurrentState == PlaybackState.Ended && episodeEntry is not null)
             {
                 PostSafely(() => OfferNextEpisodeAsync(host, provider, episodeEntry, nextEpisode));
+            }
+
+            // And the end of a lesson offers the next lesson (CRS-004), never both: a file is an
+            // episode or a lesson, and a course folder inside a series root would otherwise run two
+            // countdowns over one picture.
+            else if (args.CurrentState == PlaybackState.Ended && lessonSession is not null)
+            {
+                PostSafely(() => OfferNextLessonAsync(host, provider, mediaFileId, nextEpisode));
             }
         }
 
@@ -1512,6 +1538,7 @@ public static partial class CompositionRoot
                 : null,
             Skip = skip,
             NextEpisode = nextEpisode,
+            Lessons = lessons,
             VersionSwitch = versionSwitch,
             Versions = versions,
             VideoStatus = videoStatus,
@@ -1910,6 +1937,7 @@ public static partial class CompositionRoot
     /// their state changes included — and the window modes go through the shell that owns them.
     /// </summary>
     private static async Task ExecutePlaybackInputAsync(
+        ApplicationHost host,
         IServiceProvider provider,
         PlayerViewModel player,
         TransportControlsViewModel transport,
@@ -1918,6 +1946,24 @@ public static partial class CompositionRoot
     {
         var control = provider.GetRequiredService<ControlPlayback>();
         var shell = provider.GetRequiredService<ShellHost>().Shell;
+
+        // Stop ends a running countdown, whichever input asked for it (PLY-011, CRS-004).
+        //
+        // T28 measured cancellation from all three origins -- keyboard, mouse, media key -- but it
+        // measured them against a router whose callback the test wrote itself. This is the
+        // application's callback, and until 2026-09-01 not one of its ten arms touched the
+        // countdown: the only Cancel() in src/ was the overlay's two buttons. So in the real
+        // application Stop closed the session and the countdown kept running underneath, opening
+        // the next episode ten seconds later over a player somebody had just stopped -- the exact
+        // opposite of «Nada se reproduce solo».
+        //
+        // It goes before the switch rather than inside the Stop arm because it is not what Stop
+        // does to the session; it is what any deliberate stop means for an offer that is standing.
+        if (command == PlaybackInputCommand.Stop && host.NextEpisode is { } standing)
+        {
+            standing.Cancel();
+        }
+
         switch (command)
         {
             case PlaybackInputCommand.PlayPause:
@@ -2047,7 +2093,7 @@ public static partial class CompositionRoot
         if (host.NextEpisode is { } offer)
         {
             offer.PlayNowRequested = action == NextEpisodeAction.PlayNow;
-            offer.Countdown.Cancel();
+            offer.Cancel();
         }
 
         return Task.CompletedTask;
@@ -2088,7 +2134,7 @@ public static partial class CompositionRoot
         }
 
         overlay.Offer($"T{candidate.SeasonNumber} E{candidate.EpisodeNumber}", countdown.CountdownSeconds);
-        var offer = new ApplicationHost.NextEpisodeOffer(countdown);
+        var offer = new ApplicationHost.NextEpisodeOffer(countdown.Cancel);
         host.NextEpisode = offer;
         void OnTicked(object? sender, int remaining) =>
             Avalonia.Threading.Dispatcher.UIThread.Post(() => overlay.Tick(remaining));
@@ -2130,6 +2176,92 @@ public static partial class CompositionRoot
             await shell.ClosePlayerAsync(CancellationToken.None).ConfigureAwait(true);
         }
     }
+
+    /// <summary>
+    /// Offers the next lesson when one just ended (CRS-004), the course chain's half of PLY-011.
+    /// </summary>
+    /// <remarks>
+    /// The same overlay, the same countdown object and the same five outcomes as the episode chain —
+    /// what differs is the two ends: the label names a lesson, and the end of a course closes the
+    /// session the way the end of a season does.
+    /// </remarks>
+    private static async Task OfferNextLessonAsync(
+        ApplicationHost host,
+        IServiceProvider provider,
+        MediaFileId currentFile,
+        NextEpisodeViewModel overlay)
+    {
+        var countdown = provider.GetRequiredService<StartNextLessonCountdown>();
+        if (countdown.CountdownSeconds == 0)
+        {
+            // Zero is the off switch: no offer, no wait, nothing on screen.
+            return;
+        }
+
+        var shell = provider.GetRequiredService<ShellHost>().Shell;
+        var candidate = await countdown.PeekAsync(currentFile, CancellationToken.None).ConfigureAwait(true);
+        if (candidate is null)
+        {
+            // «Curso terminado». The shell returns to the card, which is where the finished chip and
+            // «Volver a empezar» are — the same outcome the end of a season gets.
+            if (shell is not null)
+            {
+                await shell.ClosePlayerAsync(CancellationToken.None).ConfigureAwait(true);
+            }
+
+            return;
+        }
+
+        overlay.Offer(LessonOfferLabel(candidate), countdown.CountdownSeconds);
+        var offer = new ApplicationHost.NextEpisodeOffer(countdown.Cancel);
+        host.NextEpisode = offer;
+        void OnTicked(object? sender, int remaining) =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => overlay.Tick(remaining));
+        countdown.Ticked += OnTicked;
+        NextLessonResult result;
+        try
+        {
+            result = await countdown.ExecuteAsync(currentFile, CancellationToken.None).ConfigureAwait(true);
+        }
+        finally
+        {
+            countdown.Ticked -= OnTicked;
+            host.NextEpisode = null;
+        }
+
+        overlay.Hide();
+        var chosen = result.Outcome == NextEpisodeOutcome.Started
+            || (result.Outcome == NextEpisodeOutcome.Cancelled && offer.PlayNowRequested);
+        if (chosen && result.Lesson is { MediaFileId: { } nextFileId })
+        {
+            // The shell rebuilds the surfaces around the chosen lesson, which is what gives the new
+            // session its own «Lecciones» panel with the row moved on. From zero, because a lesson
+            // offered as the next one is one nobody has started.
+            if (shell is not null)
+            {
+                await shell.OpenPlayerAsync(
+                        new PlayDetailsRequest(nextFileId, TimeSpan.Zero),
+                        CancellationToken.None)
+                    .ConfigureAwait(true);
+            }
+        }
+        else if (result.Outcome == NextEpisodeOutcome.Unavailable && shell is not null)
+        {
+            // The file stopped being playable while the countdown ran; the shell returns to the card
+            // rather than pretending.
+            await shell.ClosePlayerAsync(CancellationToken.None).ConfigureAwait(true);
+        }
+    }
+
+    /// <summary>
+    /// «M2 · 06 Medir sin luz», which is what the prototype writes in the offer.
+    /// </summary>
+    /// <remarks>
+    /// The module ordinal and the title, and no lesson number: the column beside it already numbers
+    /// them, and this card is read once, in a second, by somebody deciding whether to let it run.
+    /// </remarks>
+    private static string LessonOfferLabel(CourseLessonProgress lesson) =>
+        string.Create(CultureInfo.CurrentCulture, $"M{lesson.ModuleNumber} · {lesson.Title}");
 
     /// <summary>
     /// The periodic write, kept from taking the process down: a failing flush surfaces at the next

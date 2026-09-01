@@ -182,6 +182,10 @@ public sealed class GetCoursesTests
             CourseId courseId,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
+        public Task<Lesson?> FindLessonByFileAsync(
+            MediaFileId fileId,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
         public Task RemoveAsync(CourseId id, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
