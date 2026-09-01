@@ -124,15 +124,26 @@
 >
 > ### LO SIGUIENTE, y no es opcional
 >
-> **1. El suelo de cobertura que va a salir rojo, a propósito.** `preview-coverage-floors.ps1` dice
-> que `StartNextEpisodeCountdown.cs` sube de **100/89 a 100/94** al salirle el bucle. **No se subió a
-> mano**, y la razón es una que la regla de la 14.ª no contempla: esa previsualización midió **3 de
-> las 10 suites**, así que su número no es necesariamente el de la fusión de CI, y el hook deniega
-> tocar `eng/coverage-debt.txt` porque lo produce CI. **Se copia del artefacto `coverage-debt` del
-> run de este commit y se empuja otra vez.** Si alguien quiere cerrar esa contradicción de fondo, lo
-> honesto es que el hook mire la **dirección** del cambio —denegar bajadas, permitir subidas— en vez
-> de denegar por nombre de archivo; su propio motivo escrito dice «relaja en silencio la cobertura», y
-> subir un suelo hace lo contrario.
+> **1. El rojo de cobertura, YA CORREGIDO, y lo que enseñó.** El run de `17abe3f` dio **todas las
+> suites en verde** y falló sólo la puerta de cobertura, nombrando **cinco** archivos bajo el listón —
+> no el que la previsualización había anunciado. **Cuatro salieron mejorando**, que es el único camino
+> que la lista admite, y las ramas que faltaban **se nombraron con el JSON de coverlet** (línea y
+> offset) en vez de adivinarse: dos eran **un `Ticked?.Invoke` sin nadie suscrito**, el brazo que
+> ninguno de los dos llamadores toma porque ambos enganchan un handler en su constructor. Una quinta
+> rama se **quitó** en vez de probarse, porque `NextLessonPolicy` la hacía inalcanzable.
+>
+> **El quinto archivo se queda y NO es deuda**: `LessonsPanelView.axaml` mide 100/50 porque ésa es la
+> única rama que el compilador de Avalonia genera para un `.axaml`, y **todas** las vistas del árbol
+> miden eso. Por él **el trinquete sube por primera vez, 188 → 189**, con la razón escrita — que es la
+> excepción que la propia puerta autoriza. **Una vista nueva lo sube en uno más.**
+>
+> **Y la lección que costó la vuelta: `preview-coverage-floors.ps1` CALLÓ sobre cuatro de los cinco.**
+> Su límite está escrito dentro —mide las suites que le nombras y CI fusiona diez—, pero el silencio
+> engaña. **No es un certificado.** La contradicción de fondo sigue abierta: el hook deniega tocar
+> `eng/coverage-debt.txt` por nombre de archivo, y lo honesto sería que mirase la **dirección** del
+> cambio —denegar bajadas, permitir subidas—, porque su propio motivo dice «relaja en silencio la
+> cobertura» y subir un suelo hace lo contrario. Aquí se resolvió partiendo del artefacto de CI y
+> quitando sólo las filas corregidas, que no inventa ningún número.
 >
 > **2. El barrido de fidelidad que esta tanda dejó medido a medias.** La regla nueva del propietario
 > es que **todo** elemento sea idéntico al prototipo, no sólo los tres botones que esta tanda tocó.

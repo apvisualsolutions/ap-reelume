@@ -125,15 +125,26 @@
 >
 > ### WHAT COMES NEXT, and it is not optional
 >
-> **1. The coverage floor that will go red, deliberately.** `preview-coverage-floors.ps1` says
-> `StartNextEpisodeCountdown.cs` rises from **100/89 to 100/94** once the loop leaves it. **It was not
-> raised by hand**, for a reason the fourteenth session's rule does not cover: that preview measured
-> **3 of the 10 suites**, so its number is not necessarily the merged one CI reads, and the hook
-> refuses `eng/coverage-debt.txt` because CI produces it. **Copy the floor from this commit's run's
-> `coverage-debt` artefact and push again.** If somebody wants to close the underlying contradiction,
-> the honest fix is for the hook to look at the **direction** of the change — refuse falls, allow
-> rises — rather than refusing by file name; its own written reason is "it quietly relaxes coverage",
-> and raising a floor does the opposite.
+> **1. The coverage red, ALREADY FIXED, and what it taught.** The run of `17abe3f` was green on
+> **every suite** and failed on the coverage gate alone, naming **five** files under the bar — not the
+> one the preview had announced. **Four left by getting better**, which is the only way the list
+> admits, and the missing branches were **named with coverlet's JSON** (line and offset) rather than
+> guessed at: two of them were **a `Ticked?.Invoke` with nobody subscribed**, the arm neither caller
+> ever takes because both attach a handler in their constructor. A fifth branch was **removed** rather
+> than tested, because `NextLessonPolicy` made it unreachable.
+>
+> **The fifth file stays and is NOT debt**: `LessonsPanelView.axaml` measures 100/50 because that is
+> the only branch Avalonia's compiler generates for a `.axaml`, and **every** view in the tree
+> measures it. For it **the ratchet rises for the first time, 188 → 189**, with the reason written —
+> the exception the gate itself authorises. **A new view raises it by one more.**
+>
+> **And the lesson that cost the round: `preview-coverage-floors.ps1` SAID NOTHING about four of the
+> five.** Its limit is written inside — it measures the suites you name and CI merges ten — but the
+> silence misleads. **It is not a certificate.** The underlying contradiction is still open: the hook
+> refuses `eng/coverage-debt.txt` by file name, and the honest fix would be to look at the
+> **direction** of the change — refuse falls, allow rises — since its own reason is "it quietly
+> relaxes coverage" and raising a floor does the opposite. Here it was resolved by starting from CI's
+> artefact and removing only the corrected rows, which invents no number.
 >
 > **2. The fidelity sweep this batch left half-measured.** The owner's new rule is that **every**
 > element matches the prototype, not just the three buttons this batch touched. `ButtonShapeTests`

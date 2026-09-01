@@ -21,6 +21,17 @@
     from nowhere else, because seven files depend on hardware a hosted runner does not have and a
     floor measured here would be a floor for a machine that never verifies anything.
 
+    ITS SILENCE IS NOT A CERTIFICATE, and that is measured rather than cautionary. On 2026-09-01 it
+    named one file and CI then named FIVE, four of which it had said nothing about at all; the run
+    was lost to exactly the reassurance this paragraph now withdraws. It misses in both directions —
+    the same day it reported NextLessonPolicy at 91/80 from three suites while CI, merging ten, did
+    not raise it at all.
+
+    The mechanism is the -Suites note below and it is worth stating plainly here: this reads the
+    suites you name, CI merges twenty reports from ten. A file only some of its suites measure reads
+    low, and a file none of them measure does not read at all. So a clean run here means "nothing
+    among what I measured", never "nothing".
+
 .PARAMETER Suites
     Test project names under tests/, without the ApSolutions.LocalMedia. prefix. The default three
     are the ones that run clean and fast here. Name more when your change reaches further: what
