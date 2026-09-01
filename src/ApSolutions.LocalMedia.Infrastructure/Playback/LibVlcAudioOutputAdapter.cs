@@ -61,13 +61,26 @@ public sealed class LibVlcAudioOutputAdapter : IDisposable
 {
     private readonly IAudioDeviceCatalog _catalog;
     private readonly IPlaybackPreferenceRepository _preferences;
+    private readonly IAudioEndpointConfigurator? _endpoints;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    public LibVlcAudioOutputAdapter(IAudioDeviceCatalog catalog, IPlaybackPreferenceRepository preferences)
+    /// <summary>
+    /// The configurator is optional, and a session built without one simply routes without changing
+    /// any layout — which is what every context that is not Windows wants, and what the tests that
+    /// only care about routing want too.
+    /// </summary>
+    public LibVlcAudioOutputAdapter(
+        IAudioDeviceCatalog catalog,
+        IPlaybackPreferenceRepository preferences,
+        IAudioEndpointConfigurator? endpoints = null)
     {
         _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         _preferences = preferences ?? throw new ArgumentNullException(nameof(preferences));
+        _endpoints = endpoints;
     }
+
+    /// <summary>What the last layout change actually did, for the surface to describe.</summary>
+    public AudioEndpointChange LastLayoutChange { get; private set; } = AudioEndpointChange.AlreadySet;
 
     public void Dispose() => _gate.Dispose();
 
@@ -107,6 +120,32 @@ public sealed class LibVlcAudioOutputAdapter : IDisposable
             if (selection is null)
             {
                 return null;
+            }
+
+            // The layout is written on the endpoint before the device is routed, and the order is
+            // the whole of why this works. Writing it invalidates every audio client on that
+            // endpoint, and LibVLC's recovery from that discards the chosen device and falls back to
+            // the default one — so the routing below is what puts the choice back. Doing it the
+            // other way round moves the sound to a different pair of speakers and leaves the
+            // interface claiming otherwise.
+            if (_endpoints is { IsAvailable: true })
+            {
+                LastLayoutChange = await _endpoints
+                    .SetLayoutAsync(selection.Device.Id, request.Layout, cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (LastLayoutChange is AudioEndpointChange.Applied)
+                {
+                    // What the endpoint carries has changed, so what the session will actually play
+                    // is read again rather than assumed from the request.
+                    devices = await _catalog.GetOutputsAsync(cancellationToken).ConfigureAwait(false);
+                    selection = AudioOutputPolicy.Resolve(devices, selection.Device.Id, request.Layout)
+                        ?? selection;
+                }
+            }
+            else
+            {
+                LastLayoutChange = AudioEndpointChange.Unavailable;
             }
 
             if (target is { IsPlaying: true })

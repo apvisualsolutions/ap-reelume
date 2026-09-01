@@ -346,6 +346,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AudioOutputLayoutLabel">Channel layout</x:String>
   <x:String x:Key="AudioOutputNoneAvailable">No output device is available.</x:String>
   <x:String x:Key="AudioOutputLayoutDegraded">The chosen device cannot take that layout; the largest it accepts is used.</x:String>
+  <x:String x:Key="AudioOutputLayoutSystemWide">This changes the device format in Windows, so it affects every program on the machine, not just AP Reelume.</x:String>
+  <x:String x:Key="AudioOutputLayoutApplied">The chosen layout is applied in Windows. Other programs will sound this way too.</x:String>
+  <x:String x:Key="AudioOutputLayoutRefused">The chosen device will not take that layout. Pick another output to use 5.1 or 7.1.</x:String>
+  <x:String x:Key="AudioOutputLayoutReadOnly">This machine cannot change the layout, so what is shown here is the one the device delivers.</x:String>
   <x:String x:Key="AudioOutputDeviceFallback">The saved device is not connected; the default is used and your choice is remembered.</x:String>
   <x:String x:Key="MiniPlayerTitle">Mini player</x:String>
   <x:String x:Key="MiniPlayerPlayPause">Pause/play</x:String>

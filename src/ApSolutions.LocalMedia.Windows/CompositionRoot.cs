@@ -1327,6 +1327,11 @@ public static partial class CompositionRoot
             new AudioOutputRequest(deviceId, layout, PreferenceScope.Global, PlaybackPreference.GlobalKey),
             outputTarget,
             CancellationToken.None);
+
+        // What the layout write actually did, read from the adapter that did it rather than guessed
+        // from the selection that came back: a device can route perfectly while its driver refuses
+        // the layout, and those two answers are what the surface says with two different sentences.
+        audioOutput.LayoutChangeReporter = () => outputAdapter.LastLayoutChange;
         var storedOutput = await outputAdapter.ResolveStoredAsync(
                 PreferenceScope.Global,
                 PlaybackPreference.GlobalKey,
