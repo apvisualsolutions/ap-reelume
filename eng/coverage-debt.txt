@@ -180,6 +180,22 @@
 ## lado nulo. El caso que falta es el CURSO PLANO, sin secciones, y no es un rincon: de los doce
 ## cursos reales medidos el 2026-08-30, CINCO son planos. El JSON de coverlet nombro las dos ramas
 ## por offset y la prueba las cierra; 36/36 medido.
+##
+## 2026-09-01: cinco archivos de CRS-004 llegaron aqui en el artefacto del run de 17abe3f, y cuatro
+## se han ido por el unico camino que este archivo admite —mejorando— antes de escribirlo:
+## ContinuityCountdown 100/75, GetLessonSession 94/87, StartNextLessonCountdown 100/90 y
+## LessonsPanelViewModel 99/94. Las ramas que faltaban las nombro el JSON de coverlet con linea y
+## offset, no un vistazo: dos de ellas eran un Ticked?.Invoke SIN NADIE SUSCRITO —el arm que los dos
+## llamadores nunca toman porque ambos enganchan un handler en su constructor— y otra una guarda de
+## ruta vacia sobre una fila de catalogo corrupta.
+##
+## El unico que se queda es LessonsPanelView.axaml a 100/50, y NO es deuda: es la unica rama que el
+## compilador de Avalonia genera para un .axaml, en la linea del elemento raiz, y TODAS las vistas
+## del arbol miden exactamente eso. Por el sube el trinquete de 188 a 189, que es la excepcion que
+## la propia puerta autoriza por escrito: «add it with the reason and raise the ratchet in the same
+## change».
+##
+
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  94
 src/ApSolutions.LocalMedia.Application/Backup/PreviewRestore.cs                               98  94
@@ -189,7 +205,7 @@ src/ApSolutions.LocalMedia.Application/Catalog/GroupScannedVersions.cs          
 src/ApSolutions.LocalMedia.Application/Catalog/SetPreferredVersion.cs                        100  75
 src/ApSolutions.LocalMedia.Application/Continuity/PlaybackProgressTracker.cs                  97  90
 src/ApSolutions.LocalMedia.Application/Continuity/ResumePlayback.cs                          100  87
-src/ApSolutions.LocalMedia.Application/Continuity/StartNextEpisodeCountdown.cs               100  89
+src/ApSolutions.LocalMedia.Application/Continuity/StartNextEpisodeCountdown.cs               100  94
 src/ApSolutions.LocalMedia.Application/Continuity/SwitchMediaVersion.cs                      100  80
 src/ApSolutions.LocalMedia.Application/Discovery/AddLibraryRoot.cs                           100  92
 src/ApSolutions.LocalMedia.Application/Discovery/IRootWatcher.cs                              88 100
@@ -299,6 +315,7 @@ src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml     
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        98  79
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50
+src/ApSolutions.LocalMedia.Presentation/Player/LessonsPanelView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileViewModel.cs                          97  82
 src/ApSolutions.LocalMedia.Presentation/Player/MarkerEditorView.axaml                        100  50
@@ -357,7 +374,7 @@ src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs             
 src/ApSolutions.LocalMedia.Presentation/Theme/Icons.axaml                                    100  50
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
-src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         90  65
+src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         87  60
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  80
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90

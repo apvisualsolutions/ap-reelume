@@ -196,7 +196,7 @@ la decisión equivocada.
 `git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA ya
 resuelto.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **188** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **189** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -204,10 +204,18 @@ tiene: `WindowsAudioDeviceCatalog.cs` vale 79/61 aquí y 32/11 allí. Fuera de C
 y no bloquea. Nunca se edita a mano, y nunca se genera con una ejecución local.
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **188** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** <!--medido:trinquete-de-deuda-->
 desde
-el 2026-08-31: bajó a 189 cuando los dos ViewModels de Cursos salieron de la lista, y a 188 ese mismo
-día cuando `MarkerEditorViewModel` llegó a 100/100 y salió también.
+el 2026-09-01: bajó a 189 el 2026-08-31 cuando los dos ViewModels de Cursos salieron de la lista, y a
+188 ese mismo día cuando `MarkerEditorViewModel` llegó a 100/100 y salió también.
+
+**Y el 2026-09-01 subió por primera vez, a 189, con la única razón que la puerta acepta por escrito**
+—«add it with the reason and raise the ratchet in the same change»—: `LessonsPanelView.axaml` mide
+100/50 y **eso no es deuda**, es la única rama que el compilador de Avalonia genera para un `.axaml`,
+en la línea del elemento raíz, y todas las vistas del árbol miden exactamente eso. **Una vista nueva
+sube este número en uno.** Los otros cuatro archivos que esa tanda trajo a la lista salieron de ella
+**mejorando**, que es el único camino que admite: las ramas que faltaban se nombraron con el JSON de
+coverlet —línea y offset— y se cubrieron con pruebas antes de escribir el archivo.
 
 **Y esta frase decía 205 mientras el guion decía 191**, durante toda una tanda: la cifra se copió a
 mano y nadie la volvió a mirar, que es el mismo defecto que el propio párrafo describe. **La única

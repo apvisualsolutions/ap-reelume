@@ -100,9 +100,14 @@ public sealed class StartNextLessonCountdown
 
         // Confirmed now rather than trusted from when the offer was made, which is T28's own rule.
         // The lesson row carries LIB-009's identity; what has to exist at zero is the file behind it.
-        var confirmed = candidate.MediaFileId is { } fileId
-            ? await _files.FindByIdAsync(fileId, cancellationToken).ConfigureAwait(false)
-            : null;
+        //
+        // The identity is dereferenced rather than tested: NextLessonPolicy steps over any lesson
+        // with no file, so a candidate that reached this line has one by construction. Written as a
+        // test it was a branch nothing could take, which this tree's rule says to make reachable or
+        // remove — never to write an impossible test for.
+        var confirmed = await _files
+            .FindByIdAsync(candidate.MediaFileId!.Value, cancellationToken)
+            .ConfigureAwait(false);
         if (confirmed is null || string.IsNullOrWhiteSpace(confirmed.Path))
         {
             return new NextLessonResult(NextEpisodeOutcome.Unavailable, candidate);
