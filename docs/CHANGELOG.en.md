@@ -30,6 +30,59 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The walk race came back because August's fix went to the line somebody remembered, not to the
+  rule.** `The_players_transport_is_operated_with_the_mouse` answered `Expected: Embedded, Actual:
+  Fullscreen` again, **and only on CI's second pass**: the first gave 147 of 147 and the second 146,
+  same binary. The walk's beside-click landed on the button next door.
+
+  The 2026-08-28 fix put the layout settling **in the scene**, before the speed reset. But pressing
+  "back to 1x" **removes that button from the row**, so the row recomposes again and the next aim is
+  taken at the old geometry. The comment had written the general rule two paragraphs above and the
+  fix did not follow it.
+
+  It now lives in `BesidePoint`, where the cause is: everything inside is geometry — the centre, the
+  occupied rectangles, the offsets — and any earlier press can have changed it. And it uses `window`
+  rather than `host.Window`, because with the mini player on screen those are two different windows,
+  and settling one to read the other left the defect in place.
+
+  **Three plausible hypotheses died measured along the way**, none of them the cause: that changing
+  `player-chrome`'s radius had grown the effective area — `BesidePoint` builds its rectangles from
+  `Bounds.Size`, which no radius touches; that `InvalidateMeasure()` would not do without
+  `UpdateLayout()` — a probe removed the middle button of a three-button row and the third moved from
+  80 to 40 on `InvalidateMeasure+RunJobs`, with nothing further; and that `Reveal` did not settle,
+  when it does after each `BringIntoView()` and each scroll step. **It does not reproduce on the
+  developer's machine**: four local passes green, before and after.
+
+- **The guard that said in writing that it had fixed a defect still had it, hidden in one space.**
+  `.claude/hooks/post-push.sh` strips heredocs before looking for a `git push`, and its own comment
+  explains why: the first version sounded on its own commit. The regex it grew was `<<-?['"]?DELIM`
+  **with no space allowed**, so it only recognised the glued form and let `<< 'EOF'` — what this
+  repository writes in every commit — through as if it were not a heredoc. It sounded while writing a
+  handover that quoted a push command inside one. Measured down the pipe before and after, with eight
+  cases: four that sound — including a push that comes **after** a heredoc — and four that stay quiet.
+
+### Changed
+
+- **The debt list rises for the first time, 188 to 189, and the one file raising it is not debt.**
+  `CRS-004`'s run was green on **every suite** and failed on the coverage gate alone, naming **five**
+  files under the bar. **Four left by getting better**, the only way the list admits, and the missing
+  branches were **named with coverlet's JSON** — line and offset — rather than guessed at: two were
+  the same shape, **a `Ticked?.Invoke` with nobody subscribed**, the arm neither caller ever takes
+  because both attach a handler in their constructor. A fifth branch was **removed** rather than
+  tested, because `NextLessonPolicy` made it unreachable.
+
+  The fifth file is `LessonsPanelView.axaml` at **100/50**, and **that is not debt**: it is the only
+  branch Avalonia's compiler generates for a `.axaml`, on the root element's line, and every view in
+  the tree measures exactly it. The ratchet rises for it, with the reason written — the exception the
+  gate itself authorises. **A new view raises it by one.**
+
+  **And `eng/preview-coverage-floors.ps1` said nothing about four of the five.** Its limit was written
+  as a footnote to a parameter; the warning is now in its header, with **both** directions of the
+  failure measured, because it gives false positives too: the same day it reported a file at 91/80
+  from three suites when CI, merging ten, did not raise it.
+
+### Fixed
+
 - **The countdown could not be cancelled from the keyboard or a media key, and its ficha had said it
   could since T28.** The `Any_input_method_cancels_the_countdown` test builds **its own** router
   whose callback calls `Cancel()`: it tests the router, not the wiring. The **application's** callback

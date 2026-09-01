@@ -203,6 +203,24 @@ siete archivos de audio, LibVLC y temporizadores dependen de hardware que un run
 tiene: `WindowsAudioDeviceCatalog.cs` vale 79/61 aquí y 32/11 allí. Fuera de CI el trinquete informa
 y no bloquea. Nunca se edita a mano, y nunca se genera con una ejecución local.
 
+**Y el procedimiento exacto, que hasta el 2026-09-01 nadie había escrito y hubo que deducir bajo un
+rojo.** Esa frase —«nunca se edita a mano»— convive con la regla de que el suelo que va a subir entra
+en el mismo commit, y las dos parecen contradecirse: el hook deniega tocar el archivo, así que ¿cómo
+entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflojar la guarda:
+
+1. **Se descarga el artefacto del run que dio el rojo** — `gh run download <id> -n coverage-debt` —,
+   que es la única fuente de un suelo.
+2. **Se llevan al listón los archivos que se puedan**, con pruebas. Un archivo sale de la lista
+   **mejorando**, que es lo que el propio encabezado del archivo dice, y para saber **qué rama** falta
+   se usa el JSON de coverlet, que la nombra con línea y offset.
+3. **Se copia el artefacto quitando las filas de los que ya llegan.** Eso no inventa ningún número:
+   todos vienen de CI, y quitar una fila que mejoró es exactamente lo previsto.
+4. **El trinquete se ajusta en el mismo cambio** y las dos cifras tienen que cuadrar.
+
+**Lo que la guarda impide es escribir un suelo a mano; copiar el artefacto y podarlo no es eso.** Un
+`.axaml` nuevo es el único caso en que el trinquete **sube**, y la propia puerta lo autoriza por
+escrito: «add it with the reason and raise the ratchet in the same change».
+
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
 sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** <!--medido:trinquete-de-deuda-->
 desde

@@ -31,6 +31,60 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La carrera del paseo volvió porque la corrección de agosto fue a la línea que alguien recordó, no
+  a la regla.** `The_players_transport_is_operated_with_the_mouse` respondió otra vez `Expected:
+  Embedded, Actual: Fullscreen`, **y sólo en la segunda pasada de CI**: la primera dio 147 de 147 y la
+  segunda 146, con el mismo binario. El clic «al lado» del paseo aterrizó en el botón vecino.
+
+  La corrección del 2026-08-28 puso el asentado del layout **en la escena**, antes del reset de
+  velocidad. Pero pulsar «Volver a 1×» **quita ese botón de la fila**, así que la fila se recompone
+  otra vez y el apuntado siguiente se toma sobre la geometría vieja. El propio comentario había
+  escrito la regla general dos párrafos más arriba y la corrección no la siguió.
+
+  Ahora vive en `BesidePoint`, que es donde está la causa: todo lo que hay dentro es geometría —el
+  centro, los rectángulos ocupados, los offsets— y cualquier press anterior puede haberla cambiado. Y
+  usa `window` en vez de `host.Window`, porque con el mini reproductor en pantalla son dos ventanas
+  distintas y asentar una para leer la otra dejaba el defecto puesto.
+
+  **Tres hipótesis verosímiles murieron medidas por el camino**, y ninguna era la causa: que el cambio
+  de radio de `player-chrome` hubiera agrandado el área efectiva —`BesidePoint` construye sus
+  rectángulos con `Bounds.Size`, que ningún radio toca—; que `InvalidateMeasure()` no bastara sin
+  `UpdateLayout()` —una sonda quitó el botón central de una fila de tres y el tercero se movió de 80 a
+  40 con `InvalidateMeasure+RunJobs`, sin movimiento adicional—; y que `Reveal` no asentara, cuando lo
+  hace tras cada `BringIntoView()` y cada incremento de scroll. **No se reproduce en la máquina de
+  quien programa**: cuatro pasadas locales verdes, antes y después.
+
+- **La guarda que decía por escrito haber corregido un defecto seguía teniéndolo, escondido en un
+  espacio.** `.claude/hooks/post-push.sh` tira los heredocs antes de buscar un `git push`, y su propio
+  comentario explica por qué: la primera versión sonó en su propio commit. El regex que le pusieron
+  era `<<-?['"]?DELIM` **sin admitir espacio**, así que sólo reconocía la forma pegada y dejaba pasar
+  `<< 'EOF'` —la que este repositorio escribe en cada commit— como si no fuera un heredoc. Sonó al
+  escribir un relevo que citaba una orden de push dentro de uno. Medido por tubería antes y después,
+  con ocho casos: cuatro que suenan —incluido un push que va **detrás** de un heredoc— y cuatro que
+  callan.
+
+### Cambiado
+
+- **La lista de deuda sube por primera vez, de 188 a 189, y el único que la sube no es deuda.** El run
+  de `CRS-004` dio **todas las suites en verde** y falló sólo en la puerta de cobertura, nombrando
+  **cinco** archivos bajo el listón. **Cuatro salieron mejorando**, que es el único camino que la
+  lista admite, y las ramas que faltaban **se nombraron con el JSON de coverlet** —línea y offset— en
+  vez de adivinarse: dos eran la misma forma, **un `Ticked?.Invoke` sin nadie suscrito**, el brazo que
+  ninguno de los dos llamadores toma porque ambos enganchan un handler en su constructor. Una quinta
+  rama se **quitó** en vez de probarse, porque `NextLessonPolicy` la hacía inalcanzable.
+
+  El quinto archivo es `LessonsPanelView.axaml` a **100/50**, y **eso no es deuda**: es la única rama
+  que el compilador de Avalonia genera para un `.axaml`, en la línea del elemento raíz, y todas las
+  vistas del árbol miden exactamente eso. Por él sube el trinquete, con la razón escrita, que es la
+  excepción que la propia puerta autoriza. **Una vista nueva lo sube en uno.**
+
+  **Y `eng/preview-coverage-floors.ps1` calló sobre cuatro de los cinco.** Su límite estaba escrito
+  como nota al pie de un parámetro; ahora la advertencia está en su cabecera y con las **dos**
+  direcciones del fallo medidas, porque también da falsos positivos: el mismo día dio un archivo en
+  91/80 con tres suites cuando CI, fusionando diez, no lo levantó.
+
+### Corregido
+
 - **La cuenta atrás no se podía cancelar con el teclado ni con la tecla multimedia, y su ficha decía
   que sí desde T28.** La prueba `Any_input_method_cancels_the_countdown` construye **su propio**
   enrutador cuyo callback llama a `Cancel()`: prueba el enrutador, no el cableado. El callback **de la
