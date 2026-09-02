@@ -122,8 +122,33 @@
 >   canceló a los 90 minutos exactos por el `timeout-minutes: 90` del job, con `Verify` en 62 de sus
 >   70 propios. Parecía culpa de la tanda. Desglosado por suite contra el último verde: **la única
 >   suite que esta tanda tocó bajó** —`UiTests` de 1m03 a 46s— y las que no tocó subieron de 1,7x a
->   3x, con `IntegrationTests` de 9m34 a **29m16**. Eso no tiene forma de código. **Antes de culpar a
->   tu cambio, desglosa por suite; y el experimento que zanja es re-ejecutar el MISMO SHA.**
+>   3x, con `IntegrationTests` de 9m34 a **29m16**. Eso no tiene forma de código.
+> · **UNA GUARDA SOBRE UN SHA ANOTADO NO GUARDA NADA, Y EL COMMIT VIEJO NO DESAPARECE.** Con tres
+>   sesiones en el árbol, el protocolo para retirar un worktree era «no lo borro si su commit no está
+>   en `main`», comprobado con `git merge-base --is-ancestor <sha> main`. Falla en el caso normal:
+>   una sesión **enmendó** su commit, y el SHA anotado media hora antes **sigue existiendo** —
+>   `git cat-file -t` contesta «commit» sobre uno ya reemplazado—, así que la comprobación pasa sin
+>   enterarse; y si el contenido de ese commit viejo hubiera llegado a `main` por otra vía, habría
+>   autorizado borrar un worktree con trabajo nuevo dentro. **El SHA se lee del worktree en el
+>   momento** (`git worktree list --porcelain`), nunca de una nota.
+> · **Y esa lectura NO VE la suciedad**: da la misma salida con un archivo sin rastrear dentro,
+>   medido poniéndolo. `--is-ancestor` sólo habla de commits y un archivo sin confirmar no es
+>   ninguno. Lo que lo cierra es **`git worktree remove` SIN `--force`**: se niega solo —«contains
+>   modified or untracked files»— y el archivo sigue ahí. **Esa negativa es la guarda funcionando**;
+>   forzar la convierte en una que no existió. Los ignorados no obligan a forzar: un worktree con
+>   sólo `bin/` dentro se retira limpio. Antes del borrado va `git -C <worktree> status --porcelain`,
+>   que da el mismo dato con el nombre del archivo y a tiempo de decidir.
+> · **Y las tres cosas de arriba son la misma**: una afirmación que mezcla lo medido con lo deducido
+>   se lee como una sola y se hereda entera. Pasó tres veces en un día — la línea del cierre que
+>   declaraba «falso positivo conocido» cuando dos de sus tres piezas seguían siendo ciertas, la
+>   causa del rojo atribuida aquí a una hipótesis, y una guarda escrita sobre un SHA que ya no era.
+> · **Y lo que lo zanjó no fue re-ejecutar el mismo SHA, sino un SUPERCONJUNTO en otra VM.** La rama
+>   de la sesión paralela contenía esta tanda entera más cinco archivos suyos, y su `Verify` midió
+>   **33m19s contra los 62m18s** de aquí — por debajo del verde de referencia de 35. Si hubiera
+>   regresión de código, un árbol que contiene el mío no puede ser más rápido. **Cuando otra rama
+>   contenga la tuya, ése es el experimento y sale gratis**; el `rerun` es el que se usa cuando no
+>   existe. Con eso se cae también el susto del techo interno de `Verify`: los 62 de 70 eran de la
+>   máquina, y la holgura real es la de siempre.
 
 > ## RELEVO — 2026-09-02, decimoctava sesión: la disposición de canales no la decide el reproductor, y la pantalla completa no llegaba a ninguna ventana
 >

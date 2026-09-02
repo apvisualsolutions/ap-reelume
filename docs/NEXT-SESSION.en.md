@@ -122,8 +122,35 @@
 >   70. It looked like the batch's fault. Broken down per suite against the last green: **the only
 >   suite this batch touched went down** — `UiTests` from 1m03 to 46s — and the ones it did not touch
 >   rose between 1.7x and 3x, with `IntegrationTests` going from 9m34 to **29m16**. That has no shape
->   of code. **Before blaming your change, break it down per suite; the experiment that settles it is
->   re-running the SAME SHA.**
+>   of code.
+> · **A GUARD OVER A NOTED SHA GUARDS NOTHING, AND THE OLD COMMIT DOES NOT GO AWAY.** With three
+>   sessions in the tree, the protocol for retiring a worktree was "I do not delete it unless its
+>   commit is in `main`", checked with `git merge-base --is-ancestor <sha> main`. It fails in the
+>   ordinary case: one session **amended** its commit, and the SHA noted half an hour earlier **still
+>   exists** — `git cat-file -t` answers "commit" for one already replaced — so the check passes
+>   without noticing; and had that old commit's content reached `main` by another route, it would have
+>   authorised deleting a worktree with new work inside. **The SHA is read from the worktree at the
+>   moment** (`git worktree list --porcelain`), never from a note.
+> · **And that reading does NOT see dirt**: it gives the same output with an untracked file inside,
+>   measured by putting one there. `--is-ancestor` only speaks of commits, and an uncommitted file is
+>   none. What closes it is **`git worktree remove` WITHOUT `--force`**: it refuses on its own —
+>   "contains modified or untracked files" — and the file is still there afterwards. **That refusal
+>   is the guard working**; forcing turns it into one that never existed. Ignored files do not force
+>   your hand: a worktree holding only `bin/` retires cleanly. Before the removal comes
+>   `git -C <worktree> status --porcelain`, which gives the same fact with the file's name and in
+>   time to decide.
+> · **And the three above are one thing**: a claim that mixes what was measured with what was
+>   inferred reads as a single statement and is inherited whole. It happened three times in one day —
+>   the closing line calling an alert a "known false positive" while two of its three pieces were
+>   still true, the cause of a red attributed here to a hypothesis, and a guard written over a SHA
+>   that no longer was.
+> · **And what settled it was not re-running the same SHA, but a SUPERSET on another VM.** The
+>   parallel session's branch held this whole batch plus five files of its own, and its `Verify`
+>   measured **33m19s against 62m18s** here — below the 35-minute reference green. If there were a
+>   code regression, a tree containing mine cannot be faster. **When another branch contains yours,
+>   that is the experiment and it is free**; the `rerun` is for when no such branch exists. With it
+>   the scare about `Verify`'s inner ceiling goes too: the 62 of 70 belonged to the machine, and the
+>   real headroom is what it always was.
 
 > ## HANDOVER — 2026-09-02, eighteenth session: the channel layout is not the player's to decide, and full screen reached no window
 >
