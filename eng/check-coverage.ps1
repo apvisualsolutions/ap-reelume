@@ -382,18 +382,25 @@ try {
     # unico camino que admite: las ramas que les faltaban se nombraron con el JSON de coverlet y se
     # cubrieron con pruebas antes de escribir el archivo.
     #
-    # 190 desde el 2026-09-02, y la razon es hardware ausente y no deuda de nadie.
-    # WindowsAudioEndpointConfigurator.cs escribe el formato de un endpoint de audio con IPolicyConfig,
-    # asi que casi todo su cuerpo necesita un dispositivo de render. En esta maquina mide 64/54; en el
-    # runner hospedado, que no tiene ninguno, mide 23/20 — y ese es el suelo, porque el suelo lo mide
-    # CI. Es el octavo archivo de la lista de los que dependen de hardware, junto a
-    # WindowsAudioDeviceCatalog.cs, que lee 81/63 aqui y 32/11 alli.
+    # 189 desde el 2026-09-02, y esta vez BAJA: WindowsAudioEndpointConfigurator.cs entro en la lista
+    # a 23/20 —hardware ausente— y salio de ella a 100/100 el mismo dia, sin tocar esta puerta.
+    #
+    # Lo que lo movio no fue un suelo sino un seam. La clase era COM de arriba abajo, asi que la
+    # aritmetica que decide cuantos canales salen por los altavoces solo podia ejecutarse en una
+    # maquina con la tarjeta; detras de dos interfaces —IEndpointFormatStore e IEndpointFormatProbe—
+    # se ejecuta en cualquier sitio, y diecisiete pruebas la recorren. Lo unico que queda fuera es la
+    # CREACION de los objetos del sistema y sus catch, marcada con ExcludeFromCodeCoverage, que es lo
+    # que coverlet documenta para «metodos dificiles o imposibles de probar directamente».
+    #
+    # La regla que sale de esto: un archivo nuevo que no llega al liston porque depende de hardware
+    # casi siempre tiene dentro dos cosas distintas —lo que habla con la maquina y lo que decide—, y
+    # separarlas cuesta menos que discutir la puerta.
     #
     # Y LibVlcAudioOutputAdapter.cs NO baja de 86/87 aunque el artefacto del run que lo destapo dijera
     # 77/75: ese run midio el codigo nuevo antes de que existieran las cuatro pruebas que lo cubren,
     # que entran en el mismo cambio. Medido aqui con la aritmetica de esta puerta: 88/87. Un suelo que
     # baja es una bajada, y la salida a una bajada es cubrir, no rebajar.
-    $debtRatchet = 190
+    $debtRatchet = 189
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

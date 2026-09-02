@@ -183,6 +183,29 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El adaptador que escribe el formato del dispositivo pasa de 23/20 a 100/100, y sale de la lista
+  de deuda el mismo día que entró.** La puerta de archivos nuevos lo rechazaba —exige 96/96 y no
+  admite excepción, a diferencia de la lista de deuda, que sí sabe decir «esto depende de hardware
+  que el servidor no tiene»—.
+
+  **Lo que lo movió no fue un suelo sino una costura.** La clase era COM de arriba abajo, así que la
+  aritmética que decide cuántos canales salen por los altavoces sólo podía ejecutarse en una máquina
+  con la tarjeta. Detrás de dos interfaces —`IEndpointFormatStore` e `IEndpointFormatProbe`, públicas
+  por la misma razón que `IAudioOutputTarget` ya lo era— se ejecuta en cualquier sitio, y diecisiete
+  pruebas la recorren: el recuento de canales y la máscara de altavoces de cada disposición, el
+  alineado de bloque y los bytes por segundo que se derivan de ellos, la profundidad y la frecuencia
+  que **no** se tocan, un dispositivo que ya lleva la disposición pedida, un controlador que la
+  rechaza, una escritura que falla, y un sondeo que sólo acepta 16 bits.
+
+  **Y lo único que queda fuera es la creación de los objetos del sistema y sus `catch`**, marcada con
+  el atributo que la documentación de coverlet describe para «métodos difíciles o imposibles de
+  probar directamente». No se excluye lo que decide; se excluye lo que sólo puede fallar si Windows
+  falla.
+
+  La regla que deja: un archivo nuevo que no llega al listón por depender de hardware casi siempre
+  tiene dentro dos cosas distintas —lo que habla con la máquina y lo que decide—, y separarlas cuesta
+  menos que discutir la puerta.
+
 - **Dos de las seis diferencias del panel del reproductor con el prototipo.** La etiqueta de la fila
   de canales decía «Disposición de canales» y el prototipo dice **«Canales»**. Y el aviso de mezcla
   era uno de los tres recuadros de advertencia con borde y ⚠, mientras el prototipo lo dibuja como

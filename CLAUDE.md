@@ -196,7 +196,7 @@ la decisión equivocada.
 `git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA ya
 resuelto.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **190** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **189** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -222,7 +222,7 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **190** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** <!--medido:trinquete-de-deuda-->
 desde
 el 2026-09-02: bajó a 189 el 2026-08-31 cuando los dos ViewModels de Cursos salieron de la lista, y a
 188 ese mismo día cuando `MarkerEditorViewModel` llegó a 100/100 y salió también.

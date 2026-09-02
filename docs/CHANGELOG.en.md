@@ -176,6 +176,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The adapter that writes the device format goes from 23/20 to 100/100, and leaves the debt list
+  the same day it joined.** The new-file gate refused it — it demands 96/96 with no exception, unlike
+  the debt list, which does know how to say "this depends on hardware the runner lacks".
+
+  **What moved it was not a floor but a seam.** The class was COM all the way down, so the arithmetic
+  deciding how many channels come out of the speakers could only run on a machine with the card.
+  Behind two interfaces — `IEndpointFormatStore` and `IEndpointFormatProbe`, public for the reason
+  `IAudioOutputTarget` already was — it runs anywhere, and seventeen tests walk it: each layout's
+  channel count and speaker mask, the block align and bytes per second derived from them, the depth
+  and rate that are **not** touched, an endpoint already carrying what was asked, a driver that
+  refuses, a write that fails, and a probe that takes 16 bits only.
+
+  **The only thing left outside is the creation of the operating-system objects and their `catch`**,
+  marked with the attribute coverlet's own documentation describes for "methods that are difficult or
+  impossible to test directly". What decides is not excluded; what can only fail if Windows fails is.
+
+  The rule it leaves: a new file that misses the bar for depending on hardware almost always holds
+  two different things — what talks to the machine and what decides — and separating them costs less
+  than arguing with the gate.
+
 - **Two of the six differences between the player's panel and the prototype.** The channel row's
   label read "Channel layout" where the prototype says **"Channels"**. And the downmix notice was one
   of three bordered warnings with a ⚠, while the prototype draws it as **small grey text** under the
