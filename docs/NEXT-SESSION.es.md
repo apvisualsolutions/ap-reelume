@@ -1,5 +1,117 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-02, decimoctava sesión: la disposición de canales no la decide el reproductor, y la pantalla completa no llegaba a ninguna ventana
+>
+> **Cinco defectos, y tres de ellos eran la misma forma**: algo declarado en un sitio que nunca
+> llegaba a donde se ve.
+>
+> ### 1. La disposición de canales: NO se retira — se hizo funcionar
+>
+> **La decisión del relevo anterior queda REVOCADA** ([`T23B`](evidence/mvp/T23B-audio-loopback.md)
+> lleva la enmienda). El análisis del 2026-09-01 era correcto y estaba **incompleto**: medía que
+> LibVLC no puede fijar 5.1/7.1 en caliente —cierto, ni un decibelio en ocho tonos— y concluía que
+> no se podía. **La disposición no la decide el reproductor: la decide el formato del endpoint en
+> Windows**, y eso se escribe con `IPolicyConfig` sin permisos de administrador — la misma API que
+> la evidencia de `PLY-004` ya citaba para preparar su endpoint de pruebas.
+>
+> El caso que lo justifica lo dio el propietario: **un altavoz roto en un equipo 5.1**, donde lo que
+> hace falta es pedir **menos** canales, no más. Medido el plegado que produce: centro −3 dB,
+> envolventes −12 dB, LFE descartado.
+>
+> Los tres botones se ofrecen **sólo donde el controlador los admite**, preguntado con
+> `IAudioClient::IsFormatSupported` en modo exclusivo y con **PCM entero**: con el formato flotante
+> del mezclador un endpoint de 8 canales contesta que sólo admite estéreo.
+>
+> ### 2. La pantalla completa no llegaba a ninguna ventana
+>
+> `PlayerWindowCoordinator` sabía pedir `WindowState.FullScreen` y **nadie se lo pedía para la
+> ventana del shell**: el modo se aplicaba a la ventana desacoplada, que en el caso normal no existe.
+> Y aun aplicándolo, escribir la geometría **sin bajar antes a `Normal`** la dejaba sin efecto. Las
+> dos cosas corregidas, con tres pruebas de ventana.
+>
+> ### 3. Once literales en español con la aplicación en inglés
+>
+> `ShortcutSettingsViewModel` construía diez etiquetas y un mensaje de conflicto en español fijo.
+> `ShortcutLabelLanguageTests` lo mide en los dos idiomas. El formato del mensaje **no se cachea**:
+> el formato **es** el idioma.
+>
+> ### 4. La puerta de archivos nuevos, y la costura que salió de ahí
+>
+> El adaptador nuevo medía **23/20** en un runner sin tarjeta de sonido. La reacción fue proponer
+> **ensanchar la puerta**; el propietario lo paró antes de decidir y pidió documentarse. La
+> documentación de coverlet contestó en una consulta que `[ExcludeFromCodeCoverage]` existe para
+> esto — y que aplicarlo a la clase entera habría sido el arreglo equivocado. Salió
+> [`ADR-0008`](adr/0008-separate-what-talks-to-the-machine-from-what-decides.md) y la
+> **regla 10** de `CLAUDE.md`: **lo que habla con la máquina se separa de lo que decide, y sólo la
+> mitad de abajo se excluye.** El archivo pasó a **100/100** con 17 pruebas, y **el trinquete de
+> deuda bajó a 189**.
+>
+>
+> ### 5. Dos de las seis diferencias del panel del reproductor
+>
+> Los tres desplegables siguen siendo la tanda 1 de abajo, pero **dos** de las seis se cerraron ya:
+> los encabezados de sección van en **versalita** —clase `TextBlock.section-overline`, y AXAML no
+> tiene `text-transform`, así que el encabezado es un **segundo recurso** cuya puerta afirma que **es
+> su etiqueta en mayúsculas** en los dos idiomas, o los dos se separan en silencio—, y el aviso de
+> mezcla pasa de recuadro de advertencia a **nota al pie gris**, que es como lo dibuja el prototipo.
+> Con él entró `FontSizeFootnote` (11), el escalón que a la escala tipográfica le faltaba por abajo y
+> que el diseño usa **59 veces**.
+>
+> ### El estado
+>
+> `main` y la rama quedaron al día —léelo con `git log --oneline -1 main`—, y cada fast-forward se
+> hizo con CI en verde. MVP: **44 verificados de 46**; abierto sólo `PRD-002`, más `UX-008` que es
+> una decisión de no hacerlo.
+>
+> ### LO SIGUIENTE
+>
+> **1. Las tres listas de opciones del panel del reproductor** — dispositivo, pista de audio y
+> subtítulos son `ComboBox` y el prototipo dibuja **listas de radios**: fila de `minHeight:34`,
+> `padding:'0 8px'`, `borderRadius:4`, `gap:9`, fondo del seleccionado `rgba(98,174,232,.16)`, radio
+> de 15×15 con `accent-color:#62AEE8`, y —sólo en el dispositivo— las capacidades a `font-size:11;
+> opacity:.6`. **Decidido y sin ejecutar.** Mueve el trinquete del paseo: un `ComboBox` es un control
+> y N radios son N, y las dos escenas que lo abren dejan de valer.
+>
+> **2. El resto de la superficie contra el prototipo**, donde `ADR-0007` sigue abierto: **84 sitios**
+> con `CornerRadius` en las 60 vistas gastando tres tokens, mientras el diseño dibuja **doce radios**.
+> **Cinco discrepancias ya medidas**: `poster-chip` 999 vs 4, `setting-row` 10 vs 8, `candidate-card`
+> 10 vs 8, `state-chip` 999 vs 8, y la fila de `side-list` 7 vs 4.
+>
+> **3. `CRS-002/003/005` a `VERIFIED`.**
+>
+> **4. El encabezado en versalita** ya tiene clase (`TextBlock.section-overline`) y el prototipo lo
+> dibuja en **35 sitios**; en el árbol se usa en dos. Va con la tanda 2.
+>
+> ### Lo que NO se resuelve programando
+>
+> · **`PRD-002`** — el certificado comercial de firma. Del propietario.
+> · **`PRD-003`** — una máquina ARM64. Del propietario.
+> · **El aviso de mezcla** es hoy uno de los cuatro recuadros de advertencia, y el comentario de la
+>   vista razona por qué: «cada uno significa que la elección de alguien no se ha respetado». El
+>   prototipo lo dibuja como nota al pie, y **ya se cambió a nota al pie** siguiendo «el prototipo
+>   manda». Si el propietario prefiere lo contrario, es su decisión y está nombrada aquí.
+> · **El trinquete del paseo en 23** encogerá **solo** el día que el paseo corra sobre una máquina
+>   con salida multicanal: los tres botones salen deshabilitados donde cada endpoint declara dos
+>   canales, y el arnés se niega a pulsar un control deshabilitado — con razón.
+>
+> ### Las trampas que deja esta tanda
+>
+> · **«El reproductor no puede» no es «no se puede».** La diferencia son las capas que nadie miró, y
+>   aquí la de al lado ya se estaba usando para otra cosa en el mismo repositorio.
+> · **UNA PUERTA PUEDE MEDIR EL SITIO EQUIVOCADO Y SEGUIR VERDE PARA SIEMPRE.** `ButtonShapeTests`
+>   leía `DesignTokens.axaml`; el defecto vivía en quien **sobreescribe** esos tokens en caliente.
+>   Lo que se mide es el control, con el servicio corriendo.
+> · **Un formato flotante miente sobre las capacidades de un endpoint**: 8 canales contestaron
+>   «estéreo» hasta preguntar con PCM entero.
+> · **Sin `[PreserveSig]`, un rechazo de COM llega como excepción** y se lee como avería.
+> · **Una puerta simétrica no admite dos listas.** El paseo daba 219/22 aquí y 218/23 en CI porque la
+>   escena pulsaba lo que pudiera; ahora no pulsa ninguno de los tres, afirma la correspondencia en
+>   los dos sentidos, y los lista los tres.
+> · **Un heredoc de Bash de más de ~128 líneas se trunca en silencio** — «unexpected EOF» y ningún
+>   archivo escrito. Los archivos largos van con la herramienta de escritura.
+> · **`open(p,'w')` en Python convierte el archivo entero a CRLF** y produce miles de `ENDOFLINE` en
+>   `dotnet format`. Va con `newline='\n'`.
+
 > ## RELEVO — 2026-09-02, decimoséptima sesión: el asentado del paseo, y una sonda que midió el caso que no era
 >
 > **La tanda 2 del relevo anterior, y su premisa era falsa.** Decía que `UpdateLayout()` e

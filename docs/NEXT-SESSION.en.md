@@ -1,5 +1,116 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-02, eighteenth session: the channel layout is not the player's to decide, and full screen reached no window
+>
+> **Five defects, and three of them were the same shape**: something declared in one place that never
+> reached where it is seen.
+>
+> ### 1. The channel layout: NOT withdrawn — made to work
+>
+> **The previous handover's decision is REVOKED** ([`T23B`](evidence/mvp/T23B-audio-loopback.md)
+> carries the amendment). The 2026-09-01 analysis was correct and **incomplete**: it measured that
+> LibVLC cannot set 5.1/7.1 while playing — true, not one decibel across eight tones — and concluded
+> it could not be done. **The layout is not the player's to decide: it is the endpoint's format in
+> Windows**, and that is written with `IPolicyConfig` without administrator rights — the very API
+> `PLY-004`'s evidence already cited to prepare its test endpoint.
+>
+> The case that justifies it came from the owner: **a blown speaker in a 5.1 set**, where what is
+> needed is asking for **fewer** channels, not more. The fold it produces was measured: centre −3 dB,
+> surrounds −12 dB, LFE discarded.
+>
+> The three buttons are offered **only where the driver admits them**, asked with
+> `IAudioClient::IsFormatSupported` in exclusive mode and with **integer PCM**: with the mixer's float
+> format an 8-channel endpoint answers that it takes stereo only.
+>
+> ### 2. Full screen reached no window
+>
+> `PlayerWindowCoordinator` knew how to ask for `WindowState.FullScreen` and **nobody asked it for the
+> shell's window**: the mode went to the detached window, which in the ordinary case does not exist.
+> And even when applied, writing the geometry **without dropping to `Normal` first** left it inert.
+> Both fixed, with three window tests.
+>
+> ### 3. Eleven Spanish literals with the application in English
+>
+> `ShortcutSettingsViewModel` built ten labels and a conflict message in fixed Spanish.
+> `ShortcutLabelLanguageTests` measures it in both languages. The message's format string is **not
+> cached**: the format **is** the language.
+>
+> ### 4. The new-file gate, and the seam that came out of it
+>
+> The new adapter measured **23/20** on a runner with no sound card. The reaction was to propose
+> **widening the gate**; the owner stopped it before the decision and asked for documentation.
+> Coverlet's documentation answered in one query that `[ExcludeFromCodeCoverage]` exists for this —
+> and that applying it to the whole class would have been the wrong fix. Out came
+> [`ADR-0008`](adr/0008-separate-what-talks-to-the-machine-from-what-decides.md) and **rule 10** of
+> `CLAUDE.md`: **what talks to the machine is separated from what decides, and only the lower half is
+> excluded.** The file went to **100/100** with 17 tests, and **the debt ratchet came down to 189**.
+>
+>
+> ### 5. Two of the six the player's panel differs by
+>
+> The three drop-downs are still batch 1 below, but **two** of the six are closed already: the section
+> headings go in **small capitals** — class `TextBlock.section-overline`, and AXAML has no
+> `text-transform`, so the heading is a **second resource** whose gate asserts it **is** its label
+> uppercased in both languages, or the two drift apart in silence — and the downmix notice goes from
+> a warning box to a **grey footnote**, which is how the prototype draws it. With it came
+> `FontSizeFootnote` (11), the step the type scale was missing at the bottom and which the design uses
+> **59 times**.
+>
+> ### The state
+>
+> `main` and the branch were left level — read it with `git log --oneline -1 main` — and every
+> fast-forward was made with CI green. MVP: **44 verified of 46**; only `PRD-002` open, plus `UX-008`,
+> which is a standing decision not to build it.
+>
+> ### WHAT COMES NEXT
+>
+> **1. The player panel's three option lists** — device, audio track and subtitles are `ComboBox`es
+> and the prototype draws **radio lists**: a row of `minHeight:34`, `padding:'0 8px'`,
+> `borderRadius:4`, `gap:9`, selected background `rgba(98,174,232,.16)`, a 15×15 radio with
+> `accent-color:#62AEE8`, and — on the device only — its capabilities at `font-size:11; opacity:.6`.
+> **Decided and not executed.** It moves the walk ratchet: a `ComboBox` is one control and N radios
+> are N, and the two scenes that open it stop being valid.
+>
+> **2. The rest of the surface against the prototype**, where `ADR-0007` is still open: **84 sites**
+> with `CornerRadius` across the 60 views spending three tokens, while the design draws **twelve
+> radii**. **Five discrepancies already measured**: `poster-chip` 999 vs 4, `setting-row` 10 vs 8,
+> `candidate-card` 10 vs 8, `state-chip` 999 vs 8, and the `side-list` row 7 vs 4.
+>
+> **3. `CRS-002/003/005` to `VERIFIED`.**
+>
+> **4. The small-capitals heading** already has a class (`TextBlock.section-overline`) and the
+> prototype draws it in **35 places**; the tree uses it in two. It travels with batch 2.
+>
+> ### What programming does not resolve
+>
+> · **`PRD-002`** — the commercial signing certificate. The owner's.
+> · **`PRD-003`** — an ARM64 machine. The owner's.
+> · **The downmix notice** is today one of the four warning boxes, and the view's comment reasons why:
+>   "each one means somebody's choice was not honoured". The prototype draws it as a footnote, and it
+>   **has been changed to a footnote** following "the prototype rules". If the owner prefers
+>   otherwise, that is their decision and it is named here.
+> · **The walk ratchet at 23** will shrink **on its own** the day the walk runs on a machine with
+>   multichannel output: the three buttons come out disabled wherever every endpoint declares two
+>   channels, and the harness refuses to press a disabled control — rightly.
+>
+> ### The traps this batch leaves
+>
+> · **"The player cannot" is not "it cannot be done".** The difference is the layers nobody looked at,
+>   and here the next one along was already being used for something else in this same repository.
+> · **A GATE CAN MEASURE THE WRONG PLACE AND STAY GREEN FOREVER.** `ButtonShapeTests` read
+>   `DesignTokens.axaml`; the defect lived in what **overwrites** those tokens at runtime. What gets
+>   measured is the control, with the service running.
+> · **A float format lies about an endpoint's capabilities**: 8 channels answered "stereo" until asked
+>   with integer PCM.
+> · **Without `[PreserveSig]`, a COM refusal arrives as an exception** and reads as a breakdown.
+> · **A symmetric gate admits no two lists.** The walk gave 219/22 here and 218/23 in CI because the
+>   scene pressed whatever it could; now it presses none of the three, asserts the correspondence both
+>   ways, and lists all three.
+> · **A Bash heredoc beyond ~128 lines truncates silently** — "unexpected EOF" and no file written.
+>   Long files go through the write tool.
+> · **`open(p,'w')` in Python converts the whole file to CRLF** and produces thousands of `ENDOFLINE`
+>   errors in `dotnet format`. It goes with `newline='\n'`.
+
 > ## HANDOVER — 2026-09-02, seventeenth session: the walk's settling, and a probe that measured the wrong case
 >
 > **Batch 2 of the previous handover, and its premise was false.** It said `UpdateLayout()` and

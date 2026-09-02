@@ -141,6 +141,30 @@ rather than feed it, because LibVLC 3 has no way to set 5.1/7.1 without reopenin
 would break the already-verified hot-switch guarantee. Not executed this batch: removing a control
 moves the walk ratchet and touches three view suites.
 
+## ENMIENDA 2026-09-02: la decisión de retirar el control queda REVOCADA / AMENDMENT: the decision to withdraw the control is REVOKED
+
+**No se retiró: se hizo funcionar**, por decisión del propietario al preguntársele. «Si quiero que
+funcionen de verdad, o sea si quiero 7.1 por qué iba a sonar estéreo», y ante el caso que él mismo
+nombró —un altavoz roto en un equipo 5.1— quedó claro que lo que faltaba no era subir de calidad sino
+**poder pedir menos** de la que el equipo da. / It was not withdrawn: it was made to work, by the
+owner's decision.
+
+**Lo que el análisis de arriba no contemplaba** es que la disposición no la decide el reproductor: la
+decide **el formato del endpoint en Windows**, y eso sí se puede escribir. Las seis vías se midieron
+antes de escribir una línea, y cinco no hacen nada — incluidas las dos que este documento cita:
+`libvlc_audio_set_channel` no movió **ni un decibelio** de ocho tonos, y `--stereo-mode=1` tampoco.
+La conclusión de que **el reproductor** no puede era correcta; lo que faltaba era mirar fuera de él.
+
+**Y la garantía del cambio en caliente sigue intacta**, que era la razón de peso para no tocarlo:
+escribir el formato invalida el cliente de audio de todos los programas —comportamiento documentado—
+y LibVLC se reengancha **al dispositivo predeterminado**, así que la disposición se escribe **antes**
+de enrutar y el enrutado posterior devuelve el sonido al dispositivo elegido. No se reabre el medio.
+
+Lo medido y lo que cambia está en
+[la disposición es un ajuste de Windows](../stable/audit-channel-layout-is-a-windows-setting.md).
+La lección que deja esta enmienda: **«el reproductor no puede» no es «no se puede»**, y la diferencia
+entre las dos son las capas que nadie miró.
+
 ## El endpoint de ocho canales, y cómo se consiguió / The eight-channel endpoint, and how it was obtained
 
 Los cuatro endpoints físicos siguen declarando **dos canales** y ninguno puede subir: los tres que
