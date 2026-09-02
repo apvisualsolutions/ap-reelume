@@ -101,6 +101,29 @@
 > · **Los endpoints son de la máquina.** La escena del dispositivo **siembra su segunda fila** en vez
 >   de esperar que la máquina ofrezca dos: pulsar «cuando haya dos» dejaría el control pendiente en
 >   un sitio y pulsado en otro, que es la lista imposible de acertar en dos máquinas.
+> · **PERSEGUÍ LA CAUSA EQUIVOCADA DE UN ROJO, Y LA BUENA LA MIDIÓ OTRA SESIÓN.** El primer push se
+>   puso rojo en `ShellAssemblyTests` con `NullReferenceException` dentro de Avalonia —una prueba que
+>   esta tanda no tocó—, verde aquí cinco veces seguidas. Mi hipótesis fue el estado de recursos que
+>   mis pruebas dejaban. **La causa real**: `AvaloniaTestIsolationLevel.PerTest` es el valor por
+>   defecto, así que **cada `[AvaloniaFact]` construye y destruye su propia `Application`**, y
+>   `ShellAssemblyTests` era `[Fact]` leyéndola desde otro hilo. Reproducido con **4 excepciones en 6
+>   vueltas** contra **3.827.981 lecturas sin fallo** en el hilo del despachador. La lección no es
+>   sobre recursos: **en local no se reproducía porque el fallo es de HILO, y sólo se levanta cuando
+>   fabricas el lector concurrente**.
+> · **Aun así, dos mediciones del camino equivocado valen.** `App.ApplyLanguage` hace
+>   `application.Resources = new ResourceDictionary()` y **reemplaza el objeto**; unas veinte clases
+>   de `UiTests` lo llaman y ninguna lo restaura. Y un scope que restaure **clave por clave** no
+>   vale: capturaba **cero de treinta**, porque los tokens del acento viven en diccionarios de tema.
+>   El `ThemeScope` se queda por eso, no como arreglo de aquel rojo.
+> · **Y el orden dentro de ese scope es parte de la medición**: el idioma primero —aplicarlo
+>   reemplaza el diccionario— y `AppearanceService` después, o todo se mide con el acento del
+>   servicio ya descartado, que es justo lo que la clase dice hacer distinto.
+> · **UNA VM LENTA SE LEE COMO UNA REGRESIÓN TUYA SI SÓLO MIRAS EL TOTAL.** El run siguiente se
+>   canceló a los 90 minutos exactos por el `timeout-minutes: 90` del job, con `Verify` en 62 de sus
+>   70 propios. Parecía culpa de la tanda. Desglosado por suite contra el último verde: **la única
+>   suite que esta tanda tocó bajó** —`UiTests` de 1m03 a 46s— y las que no tocó subieron de 1,7x a
+>   3x, con `IntegrationTests` de 9m34 a **29m16**. Eso no tiene forma de código. **Antes de culpar a
+>   tu cambio, desglosa por suite; y el experimento que zanja es re-ejecutar el MISMO SHA.**
 
 > ## RELEVO — 2026-09-02, decimoctava sesión: la disposición de canales no la decide el reproductor, y la pantalla completa no llegaba a ninguna ventana
 >

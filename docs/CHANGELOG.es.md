@@ -73,6 +73,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
   `UnsetValue` para un token que vive en un diccionario de tema — hay que preguntarlo en la variante
   en la que el control se dibuja, o se lee nada y se llama a eso una comparación.
 
+  **Y una tercera, con una causa que no era la que esta sesión creyó.** CI contestó
+  `NullReferenceException` dentro de Avalonia en una prueba ajena —`ShellAssemblyTests`—, verde aquí
+  cinco ejecuciones seguidas de la suite entera. La hipótesis de aquí era el estado de recursos que
+  esta clase dejaba; **la causa real la midió la sesión que aisló esa suite**, y es otra:
+  `AvaloniaTestIsolationLevel.PerTest` es el valor por defecto, así que **cada `[AvaloniaFact]`
+  construye y destruye su propia `Application`**, mientras `ShellAssemblyTests` era `[Fact]` y leía
+  `Application.Current` desde otro hilo. Reproducido: **4 excepciones en 6 vueltas** con un lector en
+  un hilo de trabajo, y **3.827.981 lecturas sin un solo fallo** en el hilo del despachador.
+
+  **Del camino sí quedan dos mediciones que valen por sí solas.** Un `ThemeVariant` nulo **no** lanza
+  ante una clave ausente, así que el `null` de `CourseText.Resource` nunca fue la causa. Y el scope
+  original capturaba **cero de sus treinta claves** —los tokens del acento viven en diccionarios de
+  tema, no en `Application.Resources`—, así que no restauraba nada y lo poco que reponía iba a
+  **otro** diccionario: `App.ApplyLanguage` hace `application.Resources = new ResourceDictionary()`
+  y **reemplaza el objeto**. El scope se queda por eso, no como arreglo de aquel rojo: guarda el
+  diccionario y lo repone entero, y construye el idioma y el servicio de apariencia en el único
+  orden que funciona — el idioma primero, porque aplicarlo reemplaza el diccionario, y el servicio
+  después, o cada número se leería con su acento ya descartado.
+
 - **Los tres botones del prototipo, en vez del desplegable.** `chList` es una fila de tres —Estéreo,
   5.1, 7.1— con el elegido acentuado y los que el dispositivo no admite atenuados en vez de
   ausentes; eso es lo que se dibuja ahora. **Y el desplegable enseñaba los nombres internos del

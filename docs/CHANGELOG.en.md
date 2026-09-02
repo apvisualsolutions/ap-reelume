@@ -72,6 +72,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `UnsetValue` for a token that lives in a theme dictionary — it has to be asked in the variant the
   control is drawn in, or nothing is read and that is called a comparison.
 
+  **And a third, whose cause was not the one this session believed.** CI answered
+  `NullReferenceException` inside Avalonia in an unrelated test — `ShellAssemblyTests` — while green
+  here across five straight runs of the whole suite. The hypothesis here was the resource state this
+  class left behind; **the real cause was measured by the session that isolated that suite**, and it
+  is another one: `AvaloniaTestIsolationLevel.PerTest` is the default, so **every `[AvaloniaFact]`
+  builds and destroys its own `Application`**, while `ShellAssemblyTests` was `[Fact]` and read
+  `Application.Current` from another thread. Reproduced: **4 exceptions in 6 rounds** with a reader on
+  a worker thread, and **3,827,981 reads without a single failure** on the dispatcher thread.
+
+  **Two measurements from the way there stand on their own.** A null `ThemeVariant` does **not** throw
+  on a missing key, so the `null` in `CourseText.Resource` was never the cause. And the original
+  scope captured **zero of its thirty keys** — the accent tokens live in theme dictionaries, not in
+  `Application.Resources` — so it restored nothing, and what little it did put back went into a
+  **different** dictionary: `App.ApplyLanguage` does
+  `application.Resources = new ResourceDictionary()`, **replacing the object**. The scope stays for
+  that reason, not as a fix for that red: it holds the dictionary and puts the whole thing back, and
+  builds the language and the appearance service in the one order that works — language first,
+  because applying it replaces the dictionary, and the service after, or every number would be read
+  with its accent already discarded.
+
 - **The prototype's three buttons, in place of the drop-down.** `chList` is a row of three — Stereo,
   5.1, 7.1 — with the chosen one accented and the ones the device will not take dimmed rather than
   absent; that is what is drawn now. **And the drop-down showed the program's internal names**:

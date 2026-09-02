@@ -100,6 +100,30 @@
 > · **Endpoints belong to the machine.** The device scene **supplies its own second row** rather than
 >   hoping the machine offers two: pressing "when there are two" would leave the control pending on
 >   one machine and pressed on another, which is the list that cannot be right on both.
+> · **I CHASED THE WRONG CAUSE OF A RED, AND ANOTHER SESSION MEASURED THE RIGHT ONE.** The first push
+>   went red in `ShellAssemblyTests` with a `NullReferenceException` inside Avalonia — a test this
+>   batch never touched — while green here five straight times. My hypothesis was the resource state
+>   my tests left behind. **The real cause**: `AvaloniaTestIsolationLevel.PerTest` is the default, so
+>   **every `[AvaloniaFact]` builds and destroys its own `Application`**, and `ShellAssemblyTests` was
+>   `[Fact]` reading it from another thread. Reproduced with **4 exceptions in 6 rounds** against
+>   **3,827,981 reads with no failure** on the dispatcher thread. The lesson is not about resources:
+>   **it would not reproduce locally because the fault is about THREADS, and it only comes up once you
+>   build the concurrent reader.**
+> · **Two measurements from the wrong path still stand.** `App.ApplyLanguage` does
+>   `application.Resources = new ResourceDictionary()` and **replaces the object**; some twenty
+>   classes in `UiTests` call it and none restores it. And a scope that restores **key by key** is no
+>   answer: it captured **zero of thirty**, because the accent tokens live in theme dictionaries. The
+>   `ThemeScope` stays for that reason, not as a fix for that red.
+> · **And the order inside that scope is part of the measurement**: the language first — applying it
+>   replaces the dictionary — and `AppearanceService` after, or everything is measured with the
+>   service's accent already discarded, which is exactly what the class claims to do differently.
+> · **A SLOW VM READS AS YOUR OWN REGRESSION IF YOU ONLY LOOK AT THE TOTAL.** The next run was
+>   cancelled at exactly 90 minutes by the job's `timeout-minutes: 90`, with `Verify` at 62 of its own
+>   70. It looked like the batch's fault. Broken down per suite against the last green: **the only
+>   suite this batch touched went down** — `UiTests` from 1m03 to 46s — and the ones it did not touch
+>   rose between 1.7x and 3x, with `IntegrationTests` going from 9m34 to **29m16**. That has no shape
+>   of code. **Before blaming your change, break it down per suite; the experiment that settles it is
+>   re-running the SAME SHA.**
 
 > ## HANDOVER — 2026-09-02, eighteenth session: the channel layout is not the player's to decide, and full screen reached no window
 >
