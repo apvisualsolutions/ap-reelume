@@ -172,6 +172,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `ShellWindowModeTests` build **the same** surfaces through `EditorSurfaces()`, have always been
   `[AvaloniaFact]`, and have never failed. All 27 `ShellAssemblyTests` tests become `[AvaloniaFact]`.
 
+  **And a green CI run does not sustain this fix, which is worth saying because this tree has already
+  believed one.** The run on `4406741` came back `Verify: success` **with the defect in place**: the
+  failure is intermittent on the runner too, so a green says nothing was broken and says nothing more.
+  What sustains the fix is the **4 `NullReferenceException`s in 6 runs** from a worker thread against
+  **3,827,981 failure-free reads** on the dispatcher thread, and the **three mutations** of the new
+  gate. Reading the green as the proof is reading the weak evidence.
+
   **And the obvious guard was measured before it was written, because it was blind.**
   `Dispatcher.UIThread.CheckAccess()` answers `True` **on a plain `[Fact]` too** — four runs, both
   kinds, always `True` — so it would have passed on precisely the thread it existed to catch.
