@@ -344,6 +344,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AudioOutputAccessibleName">Salida de audio</x:String>
   <x:String x:Key="AudioOutputDeviceLabel">Dispositivo de salida</x:String>
   <x:String x:Key="AudioOutputLayoutLabel">Canales</x:String>
+  <x:String x:Key="AudioOutputDeviceHeading">DISPOSITIVO DE SALIDA</x:String>
+  <x:String x:Key="AudioOutputLayoutHeading">CANALES</x:String>
   <x:String x:Key="AudioOutputLayoutStereo">Estéreo</x:String>
   <x:String x:Key="AudioOutputNoneAvailable">No hay ningún dispositivo de salida disponible.</x:String>
   <x:String x:Key="AudioOutputLayoutDegraded">El dispositivo elegido no admite esa disposición; se usa la mayor que acepta.</x:String>

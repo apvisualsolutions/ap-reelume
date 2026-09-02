@@ -12,9 +12,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
     automation:AutomationProperties.Name="{DynamicResource AudioOutputAccessibleName}">
   <StackPanel x:Name="AudioOutputSurface" Spacing="{DynamicResource Space12}">
     <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource PlayerTextBrush}"
-          Text="{DynamicResource AudioOutputDeviceLabel}" />
+      <!--
+        The heading is its own resource rather than the label put through a converter, and the reason
+        is what AXAML does not have: no text-transform, and no way to compose a DynamicResource with
+        one — the strings are dynamic because they follow the language. A converter would have needed
+        a markup extension of its own to reach them.
+        The cost of a second string is that the two could drift apart, so they do not get to: a test
+        asserts each heading IS its label uppercased, in both languages.
+      -->
+      <TextBlock Classes="section-overline" Text="{DynamicResource AudioOutputDeviceHeading}" />
       <ComboBox
           x:Name="AudioDeviceSelector"
           MinWidth="280"
@@ -25,9 +31,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </StackPanel>
 
     <StackPanel Spacing="{DynamicResource Space4}">
-      <TextBlock
-          Foreground="{DynamicResource PlayerTextBrush}"
-          Text="{DynamicResource AudioOutputLayoutLabel}" />
+      <TextBlock Classes="section-overline" Text="{DynamicResource AudioOutputLayoutHeading}" />
       <!--
         Three buttons and not a drop-down, which is what the prototype draws: `chList` is a row of
         three, the one in force carrying the accent border and fill, and the ones the device will not
