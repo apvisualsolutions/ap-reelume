@@ -168,7 +168,6 @@ public sealed class OptionRowShapeTests
     {
         var application = Avalonia.Application.Current!;
         using var scope = new ThemeScope(application);
-        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
 
         // Both views of the census and not one of them, which is the correction this gate needed on
         // the day it was written: measured only on the track selector, taking Classes.selected off
@@ -279,7 +278,6 @@ public sealed class OptionRowShapeTests
     {
         var application = Avalonia.Application.Current!;
         using var scope = new ThemeScope(application);
-        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
 
         var viewModel = TrackSelector();
         var (window, rows, radios) = Show(
@@ -419,7 +417,6 @@ public sealed class OptionRowShapeTests
 
     private static (Window Window, Border[] Rows, RadioButton[] Radios) ShowEveryList()
     {
-        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
         var surfaces = new StackPanel();
         foreach (var surface in Surfaces())
         {
@@ -431,7 +428,6 @@ public sealed class OptionRowShapeTests
 
     private static (Window Window, Border[] Rows, RadioButton[] Radios) Show(Control content)
     {
-        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
         var window = new Window { Width = 420, Height = 900, Content = content };
         window.Show();
         Dispatcher.UIThread.RunJobs();
@@ -462,7 +458,6 @@ public sealed class OptionRowShapeTests
     {
         var application = Avalonia.Application.Current!;
         using var scope = new ThemeScope(application);
-        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
 
         var output = new AudioOutputViewModel(new TwoEndpoints());
         output.LoadAsync(cancellationToken: TestContext.Current.CancellationToken).GetAwaiter().GetResult();
@@ -519,13 +514,11 @@ public sealed class OptionRowShapeTests
     {
         var application = Avalonia.Application.Current!;
         using var scope = new ThemeScope(application);
-        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
 
         const double PanelWidth = 320;
         var output = new AudioOutputViewModel(new OneVeryLongName());
         output.LoadAsync(cancellationToken: TestContext.Current.CancellationToken).GetAwaiter().GetResult();
 
-        App.ApplyLanguage(application, CultureInfo.GetCultureInfo("es-ES"));
         var view = new AudioOutputView { DataContext = output };
         var window = new Window { Width = PanelWidth, Height = 400, Content = view };
         window.Show();
@@ -575,7 +568,6 @@ public sealed class OptionRowShapeTests
     {
         var application = Avalonia.Application.Current!;
         using var scope = new ThemeScope(application);
-        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
 
         var viewModel = TrackSelector();
         var (window, _, radios) = Show(new TrackSelectorView { DataContext = viewModel });
@@ -613,7 +605,6 @@ public sealed class OptionRowShapeTests
     {
         var application = Avalonia.Application.Current!;
         using var scope = new ThemeScope(application);
-        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
 
         // All three lists and each one after its own command has run, which is what this had to
         // become: measured by the auditor, deleting Mark(...) from the SelectedDevice setter and
@@ -723,49 +714,44 @@ public sealed class OptionRowShapeTests
     }
 
     /// <summary>
-    /// Puts back every resource the appearance service writes, so the surfaces the rest of this
-    /// suite builds are not left wearing this measurement's accent.
+    /// Puts the application's resources back exactly as they were.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The whole dictionary and not a list of keys, which is the correction this class needed after
+    /// its first run went red in CI and green here. <c>ButtonShapeTests</c> restores key by key and
+    /// is right to: it never changes the language. These measurements do — every surface is built
+    /// through <c>App.ApplyLanguage</c>, and that method does
+    /// <c>application.Resources = new ResourceDictionary()</c>, <b>replacing the object</b>. So keys
+    /// captured from one dictionary were being put back into another one, which leaves the
+    /// application carrying brushes that belong to a dictionary it no longer has.
+    /// </para>
+    /// <para>
+    /// Holding the reference and restoring it makes the question moot: whatever the measurement does
+    /// to the resources — write an accent over them, swap the language, both — the application ends
+    /// up with the object it started with.
+    /// </para>
+    /// </remarks>
+    /// <para>
+    /// It also puts the three steps in the one order that works, so they cannot be written the other
+    /// way round: the language first — because applying it replaces the dictionary — and the
+    /// appearance service after, because what it writes has to land in the dictionary the surfaces
+    /// are actually going to read. Built the other way round, every measurement here would be taken
+    /// with the service's accent already discarded, which is the one thing this class claims to do
+    /// differently.
+    /// </para>
     private sealed class ThemeScope : IDisposable
     {
-        private static readonly string[] Keys =
-        [
-            .. AppearanceService.AccentResources,
-            "AccentTintOpacity",
-            "DensityGutter",
-            "PosterCardPadding",
-            "PosterCardWidth",
-            "PosterCardHeight",
-            "PosterCornerRadius",
-            "CoverTitlesVisible",
-        ];
-
         private readonly Avalonia.Application _application;
-        private readonly Dictionary<string, object?> _before = [];
+        private readonly IResourceDictionary _before;
 
         public ThemeScope(Avalonia.Application application)
         {
             _application = application;
-            foreach (var key in Keys)
-            {
-                if (application.Resources.TryGetValue(key, out var value))
-                {
-                    _before[key] = value;
-                }
-            }
+            _before = application.Resources;
         }
 
-        public void Dispose()
-        {
-            foreach (var key in Keys)
-            {
-                _ = _application.Resources.Remove(key);
-                if (_before.TryGetValue(key, out var value))
-                {
-                    _application.Resources[key] = value;
-                }
-            }
-        }
+        public void Dispose() => _application.Resources = _before;
     }
 
     private sealed class EmptyStore : ISettingsStore

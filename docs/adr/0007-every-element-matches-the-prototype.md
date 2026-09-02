@@ -113,6 +113,24 @@ censo: toda clase de botón está emparejada con un control del prototipo o escr
 cerrada de las que el diseño no contesta —`colour-cell`, `rating-choice`, `icon-action` y
 `link-action`—, cada una con lo que se buscó y no existe.
 
+**Enmienda del 2026-09-02: la lista cerrada admite una quinta entrada por un motivo distinto, y la
+puerta medía el control equivocado.** Las tres listas del panel del reproductor pasaron a ser filas
+de radios, y `RadioButton.option` entró en esa lista **sin que el diseño calle**: el prototipo dibuja
+esa fila y le da `borderRadius: 4`. Lo que ocurre es que **la superficie que dibuja la esquina no es
+el control** — medido ese día, la plantilla base del `RadioButton` construye tres elipses y un
+presentador de contenido y **ningún `Border`**, así que un `CornerRadius` puesto en la clase es un
+número que nada lee. El 4 lo lleva el `Border` de la fila y lo mide `OptionRowShapeTests`. La lista
+sigue siendo cerrada y sigue exigiendo una razón escrita; lo que se aprende es que hay **dos** clases
+de razón, y confundirlas dejaría un elemento del diseño sin emparejar creyendo que el diseño no lo
+dibuja.
+
+**Y la puerta de este ADR medía un control que no era el suyo.** `Corner(kind, class)` construía un
+`Button` para cualquier tipo que no fuese `ToggleButton`, así que la primera medición de
+`RadioButton.option` leyó **999** —la píldora de un `Button`— donde un `RadioButton` real dibuja
+**3**. Corregido con un `switch` que se niega ante un tipo que no sabe construir, y con una línea que
+ata el tipo de cada fila al que nombra su selector. **Una puerta puede medir el control equivocado y
+dar un número perfectamente creíble**, que es esta misma decisión aplicada a su propia herramienta.
+
 **Y la decisión no se limita a los botones**: dice «todos los elementos». Los `Border`, `TextBox` y
 `ComboBox` gastan los mismos tres tokens en ochenta y cinco sitios mientras el prototipo dibuja doce
 radios distintos. Eso es la tanda siguiente, y ya puede medirse contra la pantalla.
@@ -218,6 +236,24 @@ a third consequence:
 census: every button class is paired with a prototype control or written into a closed list of those
 the design does not answer — `colour-cell`, `rating-choice`, `icon-action` and `link-action` — each
 with what was searched for and did not exist.
+
+**Amendment of 2026-09-02: the closed list takes a fifth entry for a different reason, and the gate
+was measuring the wrong control.** The player panel's three lists became rows of radios, and
+`RadioButton.option` joined that list **without the design being silent**: the prototype draws that
+row and gives it `borderRadius: 4`. What happens is that **the surface drawing the corner is not the
+control** — measured that day, the base theme's `RadioButton` template builds three ellipses and a
+content presenter and **no `Border` at all**, so a `CornerRadius` set on the class is a number nothing
+reads. The 4 is carried by the row's `Border` and measured by `OptionRowShapeTests`. The list stays
+closed and still demands a written reason; what is learnt is that there are **two** kinds of reason,
+and confusing them would leave an element of the design unpaired in the belief that the design does
+not draw it.
+
+**And this ADR's own gate was measuring a control that was not its own.** `Corner(kind, class)` built
+a `Button` for any kind that was not `ToggleButton`, so the first measurement of
+`RadioButton.option` read **999** — a `Button`'s pill — where a real `RadioButton` draws **3**.
+Corrected with a `switch` that refuses a kind it cannot build, and with a line tying each row's kind
+to the one its selector names. **A gate can measure the wrong control and return a perfectly
+plausible number**, which is this same decision applied to its own tooling.
 
 **And the decision is not limited to buttons**: it says "every element". `Border`, `TextBox` and
 `ComboBox` spend the same three tokens across eighty-five sites while the design draws twelve
