@@ -47,9 +47,10 @@
 > deuda bajó a 189**.
 >
 >
-> ### 5. Dos de las seis diferencias del panel del reproductor
+> ### 5. Tres de las seis diferencias del panel del reproductor
 >
-> Los tres desplegables siguen siendo la tanda 1 de abajo, pero **dos** de las seis se cerraron ya:
+> Los tres desplegables siguen siendo la tanda 1 de abajo, pero **tres** de las seis se cerraron ya:
+> la etiqueta de la fila decía «Disposición de canales» y el prototipo dice **«Canales»**;
 > los encabezados de sección van en **versalita** —clase `TextBlock.section-overline`, y AXAML no
 > tiene `text-transform`, así que el encabezado es un **segundo recurso** cuya puerta afirma que **es
 > su etiqueta en mayúsculas** en los dos idiomas, o los dos se separan en silencio—, y el aviso de

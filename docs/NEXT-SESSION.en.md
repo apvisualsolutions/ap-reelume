@@ -46,9 +46,10 @@
 > excluded.** The file went to **100/100** with 17 tests, and **the debt ratchet came down to 189**.
 >
 >
-> ### 5. Two of the six the player's panel differs by
+> ### 5. Three of the six the player's panel differs by
 >
-> The three drop-downs are still batch 1 below, but **two** of the six are closed already: the section
+> The three drop-downs are still batch 1 below, but **three** of the six are closed already: the row's
+> label said "Disposición de canales" and the prototype says **"Canales"**; the section
 > headings go in **small capitals** — class `TextBlock.section-overline`, and AXAML has no
 > `text-transform`, so the heading is a **second resource** whose gate asserts it **is** its label
 > uppercased in both languages, or the two drift apart in silence — and the downmix notice goes from
