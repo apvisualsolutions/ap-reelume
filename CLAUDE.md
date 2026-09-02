@@ -12,11 +12,23 @@ El orden es deliberado: **primero lo que hace falta para tocar el código**, y a
 skills y agentes—, que corre solo y se consulta cuando algo salta. Estuvo arriba hasta el 2026-08-30
 y eran noventa y cinco líneas de herramientas antes de la primera sobre la aplicación.
 
-## Regla 0, inquebrantable: el MCP de Avalonia antes que nada
+## Regla 0, inquebrantable: la documentación antes que nada
 
-**Antes de escribir una línea de AXAML, de tocar un estilo o de afirmar cómo se comporta un control,
-se consulta el MCP de Avalonia.** No es una sugerencia ni un último recurso: es el primer paso,
-delante incluso de la lista de lectura de abajo.
+**Antes de afirmar cómo se comporta una herramienta, y antes de proponer cambiar una regla de este
+repositorio porque «no contempla mi caso», se lee su documentación.** No es una sugerencia ni un
+último recurso: es el primer paso, delante incluso de la lista de lectura de abajo.
+
+**El caso más frecuente es Avalonia y tiene su MCP**, y por eso ocupa el resto de esta sección. Pero
+la regla es más ancha, y el 2026-09-02 costó una propuesta entera: la puerta de archivos nuevos
+rechazaba un adaptador de audio que no podía llegar al listón, y estaba a punto de proponerse
+**ensancharla**. El propietario lo paró con una frase —«antes de tomar ninguna decisión necesito que
+te asegures, documéntate»— y la documentación de coverlet contestó en una consulta que el mecanismo
+ya existía, que no hacía falta tocar ninguna guarda, **y** que aplicarlo a lo bruto habría sido el
+arreglo equivocado. Ver la regla 10.
+
+**Para lo que no tiene MCP hay `firecrawl` y `context7`**, y el orden es el mismo: la documentación
+de la herramienta antes que el razonamiento sobre ella. Un razonamiento correcto sobre una premisa
+que nadie comprobó es la forma más cara de equivocarse que tiene este repositorio.
 
 Las tres herramientas, y cuándo va cada una:
 
@@ -385,6 +397,32 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    control deshabilitado —con razón, porque una persona tampoco puede—. La escena afirma en su lugar
    la correspondencia en los dos sentidos, y **el trinquete encogerá solo** el día que el paseo corra
    sobre una máquina con salida multicanal: pulsa lo que esté habilitado.
+
+## Y una décima, para el código que habla con el sistema operativo
+
+10. **Lo que habla con la máquina se separa de lo que decide, y sólo lo primero se excluye de la
+    cobertura.** La puerta es la de archivos nuevos: exige 96/96 y **no admite excepción**, a
+    diferencia de `eng/coverage-debt.txt`, que sí sabe decir «esto depende de hardware que el runner
+    no tiene» y sostiene siete archivos en esos términos.
+
+    **La asimetría es deliberada y la regla sale de ella.** Un archivo nuevo que no llega al listón
+    por depender del hardware casi siempre lleva dentro dos cosas distintas, y confundirlas es lo que
+    hace que parezca imposible de probar. Medido el 2026-09-02 sobre
+    `WindowsAudioEndpointConfigurator`: era COM de arriba abajo y leía **23/20** en un runner sin
+    tarjeta de sonido; detrás de dos interfaces —`IEndpointFormatStore` e `IEndpointFormatProbe`,
+    públicas por la misma razón que `IAudioOutputTarget` ya lo era— la aritmética que decide cuántos
+    canales salen por los altavoces se ejecuta en cualquier sitio, y pasó a **100/100** con
+    diecisiete pruebas. El trinquete **bajó** en vez de subir.
+
+    **`[ExcludeFromCodeCoverage]` va sólo sobre la creación de los objetos del sistema y sus
+    `catch`** — lo que únicamente puede fallar si Windows falla—, con la razón escrita al lado. Es lo
+    que la documentación de coverlet describe para «métodos difíciles o imposibles de probar
+    directamente», y lo honra sin configurar nada en `eng/test.runsettings`. **Nunca sobre lo que
+    decide**: excluir la aritmética habría dejado sin ejecutar justo lo que una persona oye.
+
+    **Y qué línea excluir no se adivina**: `--collect:"XPlat Code Coverage;Format=json"` las nombra
+    una a una con su línea y su offset. Ese día nombró la creación de objetos y nada más, que es lo
+    que hizo evidente dónde estaba la costura.
 
 ## El defecto característico de este proyecto
 
