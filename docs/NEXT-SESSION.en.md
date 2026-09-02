@@ -139,6 +139,24 @@
 >   your hand: a worktree holding only `bin/` retires cleanly. Before the removal comes
 >   `git -C <worktree> status --porcelain`, which gives the same fact with the file's name and in
 >   time to decide.
+> · **WITH SEVERAL WORKTREES, "WHAT DOES THE REPOSITORY SAY" STOPS HAVING ONE ANSWER.** A `git grep`
+>   answers about the tree you are standing in. One session reported that `eng/watch-ci.ps1` claimed
+>   in the present tense "a run takes 55-80 minutes", contradicting `CLAUDE.md`'s 42-53 — true in
+>   **its** worktree and already fixed in the one next door, in the very commit that fixed the
+>   script. **Before treating what you read as live, look at which tree you read it from.** And a
+>   gate that sweeps the repository **must not walk into `.claude/worktrees/**`**: those are other
+>   sessions' trees, their presence depends on who has a session open, and in CI they do not exist —
+>   so the gate passes there and fails here, which is how one gets ignored.
+>   **The remedy: ask a REFERENCE, not a working directory** — `git grep <pattern> <ref>` and
+>   `git show <ref>:path` answer the same from all three sessions. And **a finding is not complete
+>   without the SHA it was read from**: that day's was true over `195f708` and stale over the whole.
+> · **A FILTER THAT TRUNCATES TURNS NO OUTPUT INTO NO FACT**, and it happened **twice in one day in
+>   two sessions**: a `git grep … | head` cut off before the file that mattered and declared clean
+>   what was not, and here a `grep … | head` declared `TrackOption.IsDisabled` dead while two tests
+>   used it — found by breaking the build. It is the family of the `2>/dev/null` this repository
+>   already documents. **When checking that something does NOT exist, count it or do not filter it**:
+>   if you truncate, count first with `| wc -l` to know what you are leaving out. A `head` with no
+>   count beside it is a partial answer dressed as a complete one.
 > · **And the three above are one thing**: a claim that mixes what was measured with what was
 >   inferred reads as a single statement and is inherited whole. It happened three times in one day —
 >   the closing line calling an alert a "known false positive" while two of its three pieces were

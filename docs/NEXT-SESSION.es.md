@@ -138,6 +138,25 @@
 >   forzar la convierte en una que no existió. Los ignorados no obligan a forzar: un worktree con
 >   sólo `bin/` dentro se retira limpio. Antes del borrado va `git -C <worktree> status --porcelain`,
 >   que da el mismo dato con el nombre del archivo y a tiempo de decidir.
+> · **CON VARIOS WORKTREES, «QUÉ DICE EL REPOSITORIO» DEJA DE TENER UNA SOLA RESPUESTA.** Un
+>   `git grep` contesta sobre el árbol en el que estás. Una sesión avisó de que `eng/watch-ci.ps1`
+>   afirmaba en presente «a run takes 55-80 minutes» contradiciendo los 42-53 de `CLAUDE.md` — era
+>   cierto en **su** worktree y ya estaba corregido en el de al lado, en el mismo commit que arregló
+>   el guion. **Antes de dar por vivo lo que lees, mira desde qué árbol lo lees.** Y una puerta que
+>   barre el repositorio **no debe entrar en `.claude/worktrees/**`**: son árboles ajenos, su
+>   presencia depende de quién tenga una sesión abierta, y en CI no existen — así que la puerta pasa
+>   allí y falla aquí, que es como se aprende a ignorarla.
+>   **El remedio: se pregunta a una REFERENCIA, no a un directorio de trabajo** — `git grep <patrón>
+>   <ref>` y `git show <ref>:ruta` contestan lo mismo desde las tres sesiones. Y **un hallazgo no
+>   está completo sin el SHA desde el que se leyó**: el de aquel día era cierto sobre `195f708` y
+>   obsoleto sobre el conjunto.
+> · **UN FILTRO QUE TRUNCA CONVIERTE LA AUSENCIA DE SALIDA EN AUSENCIA DEL HECHO**, y pasó **dos
+>   veces el mismo día en dos sesiones**: un `git grep … | head` cortó antes del archivo que
+>   importaba y dio por limpio lo que no lo estaba, y aquí un `grep … | head` dio por muerto
+>   `TrackOption.IsDisabled` cuando dos pruebas lo usaban — se supo al romper la compilación. Es la
+>   familia del `2>/dev/null` que este repositorio ya tiene documentada. **Al comprobar que algo NO
+>   existe, se cuenta o no se filtra**: si truncas, cuenta primero con `| wc -l` para saber qué
+>   dejas fuera. Un `head` sin recuento al lado es una respuesta parcial disfrazada de completa.
 > · **Y las tres cosas de arriba son la misma**: una afirmación que mezcla lo medido con lo deducido
 >   se lee como una sola y se hereda entera. Pasó tres veces en un día — la línea del cierre que
 >   declaraba «falso positivo conocido» cuando dos de sus tres piezas seguían siendo ciertas, la
