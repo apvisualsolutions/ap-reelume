@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using ApSolutions.LocalMedia.Domain.Playback;
@@ -28,13 +29,65 @@ namespace ApSolutions.LocalMedia.Windows.Playback;
 /// <c>administrator=False</c>, and the write returned <c>S_OK</c>.
 /// </para>
 /// </remarks>
+/// <summary>The endpoint's stored format, as writing one sees it.</summary>
+/// <remarks>
+/// Public and abstract for the reason <c>IAudioOutputTarget</c> already is: everything below it is
+/// COM against a real sound device, and everything above it is arithmetic over a byte array that
+/// decides what a person hears. Without the seam the second could only be run on a machine with the
+/// hardware — measured on a hosted runner, 23 % of the lines.
+/// </remarks>
+public interface IEndpointFormatStore
+{
+    /// <summary>The format the endpoint is set to. The buffer belongs to the caller to free.</summary>
+    int GetDeviceFormat(string deviceId, out nint format);
+
+    /// <summary>Writes a format onto the endpoint, and returns what the driver said.</summary>
+    int SetDeviceFormat(string deviceId, nint endpointFormat, nint mixFormat);
+}
+
+/// <summary>What the driver will accept, as asking one sees it.</summary>
+public interface IEndpointFormatProbe
+{
+    /// <summary>The shared mixer's format, which is where the sample rate is read from.</summary>
+    int GetMixFormat(out nint format);
+
+    /// <summary>Whether the driver takes a format, in the share mode given.</summary>
+    int IsFormatSupported(int shareMode, nint format, out nint closestMatch);
+}
+
 [SupportedOSPlatform("windows")]
 public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurator
 {
     private static readonly Guid PolicyConfigClass = new("870af99c-171d-4f9e-af0d-e63df40c2bc9");
 
+    private readonly Func<IEndpointFormatStore?> _store;
+    private readonly Func<string, IEndpointFormatProbe?> _probe;
+
+    /// <summary>The real thing: COM against whatever sound hardware this machine has.</summary>
+    public WindowsAudioEndpointConfigurator()
+        : this(OpenStore, OpenProbe)
+    {
+    }
+
+    /// <summary>
+    /// The same, over a store and a probe somebody else supplies.
+    /// </summary>
+    /// <remarks>
+    /// Which is what lets the arithmetic be tested at all. The bytes this class assembles decide how
+    /// many channels come out of the speakers, and until 2026-09-02 the only way to run any of it was
+    /// to own a multichannel endpoint — so on a hosted runner it measured 23/20 and the new-file gate
+    /// refused it, rightly: code nobody can run is code nobody has checked.
+    /// </remarks>
+    public WindowsAudioEndpointConfigurator(
+        Func<IEndpointFormatStore?> store,
+        Func<string, IEndpointFormatProbe?> probe)
+    {
+        _store = store ?? throw new ArgumentNullException(nameof(store));
+        _probe = probe ?? throw new ArgumentNullException(nameof(probe));
+    }
+
     /// <summary>True when the undocumented interface can be created on this machine.</summary>
-    public bool IsAvailable => TryCreate() is not null;
+    public bool IsAvailable => _store() is not null;
 
     /// <inheritdoc />
     public Task<IReadOnlyList<AudioChannelLayout>> GetSupportedLayoutsAsync(
@@ -44,7 +97,7 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
         ArgumentException.ThrowIfNullOrWhiteSpace(deviceId);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var client = TryActivateClient(deviceId);
+        var client = _probe(deviceId);
         if (client is null)
         {
             // Nothing was asked, so nothing is claimed: stereo is what every endpoint carries and
@@ -87,7 +140,7 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
     /// and the sample rate is left at whatever it is already running.
     /// </para>
     /// </remarks>
-    private static bool Accepts(IAudioClient client, AudioChannelLayout layout)
+    private static bool Accepts(IEndpointFormatProbe client, AudioChannelLayout layout)
     {
         if (client.GetMixFormat(out var mix) != 0 || mix == nint.Zero)
         {
@@ -107,7 +160,7 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
         return AcceptsAt(client, layout, sampleRate, 24) || AcceptsAt(client, layout, sampleRate, 16);
     }
 
-    private static bool AcceptsAt(IAudioClient client, AudioChannelLayout layout, int sampleRate, short bits)
+    private static bool AcceptsAt(IEndpointFormatProbe client, AudioChannelLayout layout, int sampleRate, short bits)
     {
         var candidate = Marshal.AllocHGlobal(ExtensibleSize);
         try
@@ -156,7 +209,22 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
         return format;
     }
 
-    private static IAudioClient? TryActivateClient(string deviceId)
+    /// <summary>Opens the audio client of one endpoint, as COM.</summary>
+    /// <remarks>
+    /// <b>Excluded from coverage, and this is the whole of the reason.</b> Every line below is the
+    /// creation of an operating-system object or a catch for it failing to be created, and neither
+    /// can be run on a machine without the hardware — measured on 2026-09-02 with coverlet's own
+    /// JSON, which named these lines and no others as the ones nothing reaches. Coverlet documents
+    /// the attribute for exactly this: methods that are difficult or impossible to test directly.
+    /// <para>
+    /// What it does <b>not</b> cover for is the arithmetic: the bytes assembled from what this
+    /// returns decide how many channels come out of the speakers, and they are behind
+    /// <see cref="IEndpointFormatProbe"/> so a test can run every one of them. Excluding the seam is
+    /// what made that possible; excluding the code behind it would be the opposite.
+    /// </para>
+    /// </remarks>
+    [ExcludeFromCodeCoverage]
+    private static IEndpointFormatProbe? OpenProbe(string deviceId)
     {
         try
         {
@@ -175,7 +243,8 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
             var clientId = AudioClientInterface;
             return device.Activate(ref clientId, LocalServerContext, nint.Zero, out var instance) == 0
                 && instance != nint.Zero
-                    ? Marshal.GetObjectForIUnknown(instance) as IAudioClient
+                && Marshal.GetObjectForIUnknown(instance) is IAudioClient client
+                    ? new ComProbe(client)
                     : null;
         }
         catch (COMException)
@@ -205,7 +274,7 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
             return AudioEndpointChange.RefusedByDevice;
         }
 
-        var configurator = TryCreate();
+        var configurator = _store();
         if (configurator is null)
         {
             return AudioEndpointChange.Unavailable;
@@ -214,9 +283,9 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
         return Write(configurator, deviceId, layout);
     }
 
-    private static AudioEndpointChange Write(IPolicyConfig policy, string deviceId, AudioChannelLayout layout)
+    private static AudioEndpointChange Write(IEndpointFormatStore policy, string deviceId, AudioChannelLayout layout)
     {
-        if (policy.GetDeviceFormat(deviceId, false, out var current) != 0 || current == nint.Zero)
+        if (policy.GetDeviceFormat(deviceId, out var current) != 0 || current == nint.Zero)
         {
             return AudioEndpointChange.Unavailable;
         }
@@ -279,12 +348,18 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
         _ => 0x3,
     };
 
-    private static IPolicyConfig? TryCreate()
+    /// <summary>Creates the undocumented policy interface, as COM.</summary>
+    /// <remarks>Excluded for the reason <see cref="OpenProbe"/> carries: it is object creation and
+    /// its catches, and nothing else.</remarks>
+    [ExcludeFromCodeCoverage]
+    private static IEndpointFormatStore? OpenStore()
     {
         try
         {
             var type = Type.GetTypeFromCLSID(PolicyConfigClass);
-            return type is null ? null : Activator.CreateInstance(type) as IPolicyConfig;
+            return type is not null && Activator.CreateInstance(type) is IPolicyConfig policy
+                ? new ComStore(policy)
+                : null;
         }
         catch (COMException)
         {
@@ -332,6 +407,29 @@ public sealed class WindowsAudioEndpointConfigurator : IAudioEndpointConfigurato
     /// <c>COMException 0x88890008</c> from inside the marshaller.
     /// </para>
     /// </remarks>
+    /// <summary>The undocumented interface, behind the seam.</summary>
+    /// <remarks>Two forwarding calls onto COM, which is the same case as the two factories.</remarks>
+    [ExcludeFromCodeCoverage]
+    private sealed class ComStore(IPolicyConfig policy) : IEndpointFormatStore
+    {
+        public int GetDeviceFormat(string deviceId, out nint format) =>
+            policy.GetDeviceFormat(deviceId, false, out format);
+
+        public int SetDeviceFormat(string deviceId, nint endpointFormat, nint mixFormat) =>
+            policy.SetDeviceFormat(deviceId, endpointFormat, mixFormat);
+    }
+
+    /// <summary>The audio client, behind the seam.</summary>
+    /// <remarks>Two forwarding calls onto COM, which is the same case as the two factories.</remarks>
+    [ExcludeFromCodeCoverage]
+    private sealed class ComProbe(IAudioClient client) : IEndpointFormatProbe
+    {
+        public int GetMixFormat(out nint format) => client.GetMixFormat(out format);
+
+        public int IsFormatSupported(int shareMode, nint format, out nint closestMatch) =>
+            client.IsFormatSupported(shareMode, format, out closestMatch);
+    }
+
     [ComImport]
     [Guid("f8679f50-850a-41cf-9c72-430f290290c8")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
