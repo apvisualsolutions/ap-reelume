@@ -120,8 +120,21 @@ public sealed partial class ShellView : UserControl
         //
         // The mini player is not included: it lives in a window of its own, made below, and telling
         // the shell's window to take its geometry would shrink the application behind it.
-        if (mode != PlaybackMode.Mini && TopLevel.GetTopLevel(this) is Window shell)
+        //
+        // <b>And only fullscreen and the way back out of it.</b> Written first as "any mode that is
+        // not Mini", which quietly resized the main window every time somebody left the mini player
+        // — a window that had never been touched being given the coordinator's embedded shape, for
+        // a mode change that happened in a different window entirely.
+        var leavingFullscreen = _windowCoordinator.Current == PlaybackMode.Fullscreen
+            && mode != PlaybackMode.Fullscreen;
+        if ((mode == PlaybackMode.Fullscreen || leavingFullscreen)
+            && TopLevel.GetTopLevel(this) is Window shell)
         {
+            // Going to the mini player is still leaving fullscreen for THIS window: the small one is
+            // built below in a window of its own, and a shell left in the state would sit behind it
+            // still covering the screen. So what is applied here is the embedded shape, whichever of
+            // the two modes is being gone to.
+            var shellMode = mode == PlaybackMode.Fullscreen ? mode : PlaybackMode.Embedded;
             // Where it was before fullscreen took the screen, so leaving it gives that back rather
             // than the coordinator's default embedded shape. Remembered only on the way in, because
             // on the way out the window is already the size of the screen.
@@ -138,7 +151,7 @@ public sealed partial class ShellView : UserControl
                     shell.RenderScaling);
             }
 
-            _windowCoordinator.Apply(shell, mode, ScreenOf(shell), shell.RenderScaling);
+            _windowCoordinator.Apply(shell, shellMode, ScreenOf(shell), shell.RenderScaling);
         }
 
         if (mode == PlaybackMode.Mini)
