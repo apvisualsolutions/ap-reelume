@@ -24,6 +24,7 @@ using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using Avalonia.Headless.XUnit;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Shell;
@@ -38,7 +39,7 @@ public sealed class ShellAssemblyTests
     private static readonly TitleId Title = new(new Guid("11111111-1111-1111-1111-111111111111"));
     private static readonly MediaFileId MediaFile = new(Title.Value);
 
-    [Fact]
+    [AvaloniaFact]
     public void The_long_lived_surfaces_arrive_built_and_the_shell_says_it_has_them()
     {
         var shell = new ShellViewModel(new NavigationService(), FullSurfaces());
@@ -65,7 +66,7 @@ public sealed class ShellAssemblyTests
     /// clear both halves, or it opens on the last course's notice and on a question about the
     /// neighbours of a folder nobody is looking at any more.
     /// </remarks>
-    [Fact]
+    [AvaloniaFact]
     public void Opening_the_add_dialog_clears_both_halves_and_the_kind_follows_the_path()
     {
         var surfaces = FullSurfaces();
@@ -87,7 +88,7 @@ public sealed class ShellAssemblyTests
     }
 
     /// <summary>A composition with no course store leaves the dialog its root half and nothing else.</summary>
-    [Fact]
+    [AvaloniaFact]
     public void A_shell_with_no_course_half_says_so_rather_than_offering_one()
     {
         var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
@@ -100,7 +101,7 @@ public sealed class ShellAssemblyTests
         Assert.True(shell.IsAddingRoot);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void A_shell_that_was_handed_nothing_still_runs()
     {
         var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
@@ -112,7 +113,7 @@ public sealed class ShellAssemblyTests
         Assert.True(shell.IsPrimaryContentVisible);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void The_review_route_shows_the_inbox_instead_of_the_welcome_card()
     {
         var navigation = new NavigationService();
@@ -129,7 +130,7 @@ public sealed class ShellAssemblyTests
     /// surface it shows: a Home that waits for a navigation that already happened starts empty and
     /// stays empty until somebody leaves and comes back.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public void The_route_the_shell_is_born_on_feeds_its_surface_without_a_navigation()
     {
         var home = new HomeViewModel(new GetHome(new StubHomeReadModel(
@@ -159,7 +160,7 @@ public sealed class ShellAssemblyTests
     /// A button bound to a command asks once and waits to be told. Choosing a title is what makes the
     /// three card actions possible, so choosing one has to raise the event.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public void Opening_a_title_tells_the_card_actions_they_became_possible()
     {
         var library = BuildLibrary();
@@ -176,7 +177,7 @@ public sealed class ShellAssemblyTests
         Assert.True(notifications > 0);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Asking_for_the_metadata_editor_puts_it_on_the_shell()
     {
         var library = BuildLibrary();
@@ -190,7 +191,7 @@ public sealed class ShellAssemblyTests
         Assert.NotNull(shell.MetadataEditor);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Asking_for_a_rename_preview_puts_it_on_the_shell_and_renames_nothing()
     {
         var library = BuildLibrary();
@@ -208,7 +209,7 @@ public sealed class ShellAssemblyTests
     /// Comparing two copies lands on the duplicates destination — the rail's own door since
     /// 2026-08-23 — whichever of the two ways in was used.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public async Task Asking_for_the_versions_of_a_title_moves_to_the_duplicates_destination()
     {
         var navigation = new NavigationService();
@@ -222,7 +223,7 @@ public sealed class ShellAssemblyTests
         Assert.Equal(AppRoute.Duplicates, navigation.CurrentRoute);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task A_title_with_a_single_version_produces_no_comparison_and_stays_where_it_is()
     {
         var navigation = new NavigationService();
@@ -242,7 +243,7 @@ public sealed class ShellAssemblyTests
         Assert.Equal(AppRoute.Home, navigation.CurrentRoute);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Playing_from_a_card_shows_the_session_and_everything_it_carries()
     {
         var shell = new ShellViewModel(new NavigationService(), FullSurfaces());
@@ -260,7 +261,7 @@ public sealed class ShellAssemblyTests
         Assert.False(shell.IsPrimaryContentVisible);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Closing_the_session_stops_the_media_and_returns_to_the_embedded_mode()
     {
         var stops = 0;
@@ -287,7 +288,7 @@ public sealed class ShellAssemblyTests
         Assert.Equal(PlaybackMode.Embedded, shell.PlaybackMode);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Asking_for_a_mode_twice_returns_to_the_embedded_one()
     {
         var shell = new ShellViewModel(new NavigationService(), FullSurfaces());
@@ -302,7 +303,7 @@ public sealed class ShellAssemblyTests
         Assert.Equal(PlaybackMode.Embedded, shell.PlaybackMode);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task Without_a_session_a_mode_change_does_nothing()
     {
         var shell = new ShellViewModel(new NavigationService(), FullSurfaces());
@@ -313,7 +314,7 @@ public sealed class ShellAssemblyTests
         Assert.False(shell.ToggleMiniPlayerCommand.CanExecute(null));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task A_shell_with_no_way_to_play_refuses_quietly_instead_of_failing()
     {
         var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
@@ -336,7 +337,7 @@ public sealed class ShellAssemblyTests
     /// The commands the buttons are bound to do what the methods do. A command that only looks right
     /// is the defect the whole increment exists to stop.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public async Task Every_command_a_button_is_bound_to_reaches_its_surface()
     {
         using var opened = new SemaphoreSlim(0, 6);
@@ -410,7 +411,7 @@ public sealed class ShellAssemblyTests
     /// Consenting to the first scan has to start one. The surface asked the question and recorded the
     /// answer; until something acted on it, a new install added a folder and stayed empty forever.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public async Task Consenting_to_the_first_scan_starts_it_and_reloads_the_library()
     {
         using var scanned = new SemaphoreSlim(0, 1);
@@ -457,7 +458,7 @@ public sealed class ShellAssemblyTests
     /// typed in and the catalogue would refuse it a second time. The shell stays on its route: the
     /// dialog floats, it does not navigate.
     /// </remarks>
-    [Fact]
+    [AvaloniaFact]
     public async Task Add_media_opens_the_folder_surface_with_the_form_cleared()
     {
         var roots = new RecordingRoots();
@@ -496,7 +497,7 @@ public sealed class ShellAssemblyTests
     /// A half-answered removal does not survive into the next add, and the shell without the surface
     /// offers the button disabled rather than offering nothing.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public async Task Add_media_calls_off_a_pending_removal_and_needs_the_surface_to_be_offered_at_all()
     {
         var roots = new RecordingRoots();
@@ -527,7 +528,7 @@ public sealed class ShellAssemblyTests
         Assert.False(bare.AddMediaCommand.CanExecute(null));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task A_folder_added_with_no_way_to_scan_it_simply_waits()
     {
         var roots = new RecordingRoots();
@@ -551,7 +552,7 @@ public sealed class ShellAssemblyTests
     /// the one with a way to play it. Sending it to the series card leaves a season list it does not
     /// have and no play action at all — which is what walking the real application found.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public async Task An_unidentified_file_opens_on_the_card_that_can_play_it()
     {
         var library = new LibraryViewModel(new StubCatalog(CatalogTitleKind.Unidentified));
@@ -563,7 +564,7 @@ public sealed class ShellAssemblyTests
         Assert.False(library.IsShowDetails);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task A_series_still_opens_on_the_series_card()
     {
         var library = new LibraryViewModel(new StubCatalog(CatalogTitleKind.Show));
@@ -575,7 +576,7 @@ public sealed class ShellAssemblyTests
         Assert.False(library.IsMovieDetails);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void A_command_that_cannot_run_does_nothing_when_it_is_pressed_anyway()
     {
         var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
@@ -592,7 +593,7 @@ public sealed class ShellAssemblyTests
     /// asserted in order rather than by count: the rail is written by hand in the AXAML, and a route
     /// that entered the enum somewhere the rail does not draw it would still pass a count.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public void The_shell_lists_the_six_approved_destinations_and_nothing_else()
     {
         var shell = new ShellViewModel(new NavigationService(), new ShellSurfaces());
@@ -611,7 +612,7 @@ public sealed class ShellAssemblyTests
         Assert.True(shell.NavigateCommand.CanExecute(AppRoute.Library));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void The_old_constructors_still_describe_the_same_shell()
     {
         var navigation = new NavigationService();
@@ -770,7 +771,7 @@ public sealed class ShellAssemblyTests
     /// The dialog's shell half: open puts the veil up and hides the first-run form, cancel is only
     /// an offer while it is up, and a folder accepted closes it without being asked.
     /// </summary>
-    [Fact]
+    [AvaloniaFact]
     public async Task The_add_dialog_opens_cancels_and_closes_itself_on_a_successful_add()
     {
         var roots = new RecordingRoots();
