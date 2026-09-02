@@ -153,6 +153,44 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **`ShellAssemblyTests` fallaba porque leía la aplicación de otra prueba, y el arreglo del día
+  anterior había silenciado la frase dejando la causa en pie.** Dos rojos en dos días —cuatro pruebas
+  con «the calling thread cannot access this object» sobre `ActualThemeVariant`, y luego
+  `Consenting_to_the_first_scan_starts_it_and_reloads_the_library` con un `NullReferenceException`
+  dentro de `Avalonia.Styling.Styles.TryGetResource`—, siempre dentro de la suite entera y siempre
+  verdes en solitario.
+
+  **La causa se midió, y no era la que decía el relevo.** La documentación del propio paquete
+  headless dice que `AvaloniaTestIsolationLevel.PerTest` es el defecto cuando no se declara ninguno,
+  y `TestAppBuilder` no declara ninguno: cada `[AvaloniaFact]` **construye y destruye su propia
+  `Application`**. Medido con una sonda, tres `[AvaloniaFact]` seguidos vieron tres instancias
+  distintas. `ShellAssemblyTests` usaba `[Fact]`, que corre en un hilo de xunit **en paralelo** con
+  esas otras colecciones, y `FullSurfaces()` llega a `Application.Current` por
+  `ShortcutSettingsViewModel` → `CourseText.Resource`. Leía, por tanto, una aplicación que otra
+  prueba está montando o ya destruyó.
+
+  **Reproducido en local, que es lo que faltaba.** Una sonda que lee desde un hilo de trabajo
+  mientras otras pruebas reciclan aplicaciones dio **cuatro `NullReferenceException` en seis
+  vueltas**, con la pila idéntica a la de CI. El mismo lector en el hilo del despachador hizo
+  **3.827.981 lecturas sin un solo fallo**. El experimento natural ya estaba en el árbol:
+  `EditorPageTests` y `ShellWindowModeTests` construyen **las mismas** superficies por
+  `EditorSurfaces()`, siempre han sido `[AvaloniaFact]` y nunca han fallado. Las 27 pruebas de
+  `ShellAssemblyTests` pasan a `[AvaloniaFact]`.
+
+  **Y la guarda obvia se midió antes de escribirla, porque era ciega.**
+  `Dispatcher.UIThread.CheckAccess()` contesta `True` **también en un `[Fact]`** —cuatro vueltas, los
+  dos tipos, siempre `True`—, así que habría aprobado justo el hilo que existía para cazar. Contar
+  con que `Application.Current` sea nula tampoco vale: lo es el 99,4 % del tiempo, que es una puerta
+  que acierta casi siempre. `ShellSurfaceIsolationTests` la sustituye con dos mitades, cada una
+  probada mutando lo que protege: devolver **un** atributo a `[Fact]` pone roja la primera, y tanto
+  sacar una clase de la tabla como añadir una cuarta consumidora ponen roja la segunda.
+
+  **El parche del 2026-09-02 no se retira, pero su comentario sí se corrige.** Pasar `null` como
+  `ThemeVariant` sigue siendo correcto por su propio motivo —una cadena no cambia con el tema, y
+  estas viven en `Application.Resources` y no en un diccionario de tema—, pero **no era un arreglo de
+  hilo**: la pila del segundo rojo pasa por él. Un comentario que atribuye una corrección a lo que no
+  la hizo es el que envía a la siguiente sesión al sitio equivocado.
+
 - **Siete puertas de esta misma tanda no medían lo que decían medir, y seis se comprobaron mutando el
   código que deberían proteger.** El auditor de puertas corrió antes de cerrar, que es para lo que
   está, y lo que encontró incluye **el defecto que originó la tanda, repetido dentro de ella**:

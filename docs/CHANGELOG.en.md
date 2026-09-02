@@ -150,6 +150,42 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **`ShellAssemblyTests` was failing because it read another test's application, and the previous
+  day's fix had silenced the sentence while leaving the cause standing.** Two reds in two days — four
+  tests answering "the calling thread cannot access this object" on `ActualThemeVariant`, then
+  `Consenting_to_the_first_scan_starts_it_and_reloads_the_library` with a `NullReferenceException`
+  inside `Avalonia.Styling.Styles.TryGetResource` — always inside the full suite, always green alone.
+
+  **The cause was measured, and it was not the one the handover named.** The headless package's own
+  documentation says `AvaloniaTestIsolationLevel.PerTest` is the default when none is declared, and
+  `TestAppBuilder` declares none: every `[AvaloniaFact]` **builds and destroys its own
+  `Application`**. Measured with a probe, three consecutive `[AvaloniaFact]`s saw three different
+  instances. `ShellAssemblyTests` used `[Fact]`, which runs on an xunit worker thread **in parallel**
+  with those other collections, and `FullSurfaces()` reaches `Application.Current` through
+  `ShortcutSettingsViewModel` → `CourseText.Resource`. It was therefore reading an application
+  another test is still assembling, or has already torn down.
+
+  **Reproduced locally, which is what was missing.** A probe reading from a worker thread while other
+  tests recycled applications produced **four `NullReferenceException`s in six runs**, on a stack
+  identical to CI's. The same reader on the dispatcher thread made **3,827,981 reads without a single
+  failure**. The natural experiment was already in the tree: `EditorPageTests` and
+  `ShellWindowModeTests` build **the same** surfaces through `EditorSurfaces()`, have always been
+  `[AvaloniaFact]`, and have never failed. All 27 `ShellAssemblyTests` tests become `[AvaloniaFact]`.
+
+  **And the obvious guard was measured before it was written, because it was blind.**
+  `Dispatcher.UIThread.CheckAccess()` answers `True` **on a plain `[Fact]` too** — four runs, both
+  kinds, always `True` — so it would have passed on precisely the thread it existed to catch.
+  Counting on `Application.Current` being null is no better: it is null 99.4% of the time, which is a
+  gate that is right most days. `ShellSurfaceIsolationTests` replaces it with two halves, each proved
+  by mutating what it guards: flipping **one** attribute back to `[Fact]` turns the first red, and
+  both removing a class from the table and adding a fourth consumer turn the second red.
+
+  **The 2026-09-02 patch stays, but its comment is corrected.** Passing `null` as the `ThemeVariant`
+  is still right on its own merits — a string does not change with the theme, and these live in
+  `Application.Resources` rather than in a theme dictionary — but it **was not a thread fix**: the
+  second red's stack runs through it. A comment crediting a fix to the thing that did not make it is
+  what sends the next session to the wrong place.
+
 - **Seven gates from this same batch did not measure what they said they measured, and six were
   proved by mutating the code they exist to protect.** The gate auditor ran before closing, which is
   what it is for, and what it found includes **the defect that started this batch, repeated inside
