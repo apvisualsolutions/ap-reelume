@@ -88,6 +88,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Two helpers for reading one translated string, both with the same defect.** The shortcut-label
+  fix wrote its own resource reader when `CourseText.Resource` already did exactly that and
+  twenty-seven places used it. The duplicate is withdrawn, and with it the branches no test reached —
+  the reason that file turned up on the debt list.
+
+  **And the original carried the same threading defect**: it asked for the current theme to read a
+  string, and a string does not change with the theme. It no longer does, so all twenty-seven uses
+  stop touching an object owned by the UI thread.
+
 - **Fullscreen swapped an arrow and nothing else.** `ApplyPlaybackMode` set two flags — which of the
   two arrows the transport button draws — and then built a window **only for the mini player**. The
   shell's own window was never touched.

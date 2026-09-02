@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Playback;
+using ApSolutions.LocalMedia.Presentation.Courses;
 using Avalonia.Input;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
@@ -72,32 +73,18 @@ public sealed class ShortcutSettingsViewModel : INotifyPropertyChanged
     /// </remarks>
     public static string Describe(PlaybackInputCommand command) => command switch
     {
-        PlaybackInputCommand.PlayPause => Text("ShortcutCommandPlayPause", "Play or pause"),
-        PlaybackInputCommand.Stop => Text("ShortcutCommandStop", "Stop"),
-        PlaybackInputCommand.SkipBackward => Text("ShortcutCommandSkipBackward", "Skip backward"),
-        PlaybackInputCommand.SkipForward => Text("ShortcutCommandSkipForward", "Skip forward"),
-        PlaybackInputCommand.VolumeUp => Text("ShortcutCommandVolumeUp", "Volume up"),
-        PlaybackInputCommand.VolumeDown => Text("ShortcutCommandVolumeDown", "Volume down"),
-        PlaybackInputCommand.ToggleMute => Text("ShortcutCommandToggleMute", "Mute"),
-        PlaybackInputCommand.ToggleFullscreen => Text("ShortcutCommandToggleFullscreen", "Full screen"),
-        PlaybackInputCommand.ToggleMiniPlayer => Text("ShortcutCommandToggleMiniPlayer", "Mini player"),
-        _ => Text("ShortcutCommandExitMode", "Leave the current mode"),
+        PlaybackInputCommand.PlayPause => CourseText.Resource("ShortcutCommandPlayPause", "Play or pause"),
+        PlaybackInputCommand.Stop => CourseText.Resource("ShortcutCommandStop", "Stop"),
+        PlaybackInputCommand.SkipBackward => CourseText.Resource("ShortcutCommandSkipBackward", "Skip backward"),
+        PlaybackInputCommand.SkipForward => CourseText.Resource("ShortcutCommandSkipForward", "Skip forward"),
+        PlaybackInputCommand.VolumeUp => CourseText.Resource("ShortcutCommandVolumeUp", "Volume up"),
+        PlaybackInputCommand.VolumeDown => CourseText.Resource("ShortcutCommandVolumeDown", "Volume down"),
+        PlaybackInputCommand.ToggleMute => CourseText.Resource("ShortcutCommandToggleMute", "Mute"),
+        PlaybackInputCommand.ToggleFullscreen => CourseText.Resource("ShortcutCommandToggleFullscreen", "Full screen"),
+        PlaybackInputCommand.ToggleMiniPlayer => CourseText.Resource("ShortcutCommandToggleMiniPlayer", "Mini player"),
+        _ => CourseText.Resource("ShortcutCommandExitMode", "Leave the current mode"),
     };
 
-    /// <summary>One label, in the language in force, without asking which theme is.</summary>
-    /// <remarks>
-    /// <b>No theme variant</b>, and that is not a shortcut: a string does not change with the theme,
-    /// and reading <c>ActualThemeVariant</c> touches an Avalonia object that belongs to the UI
-    /// thread. Measured on 2026-09-02 — with the variant, four <c>ShellAssemblyTests</c> answered
-    /// <i>the calling thread cannot access this object</i> inside the full suite while passing
-    /// alone, because this method is reached from a shell built off that thread.
-    /// </remarks>
-    private static string Text(string key, string fallback) =>
-        Avalonia.Application.Current is { } application
-            && application.TryGetResource(key, null, out var value)
-            && value is string text
-                ? text
-                : fallback;
 
     /// <summary>Rebinds a command, refusing and reporting a collision instead of storing one.</summary>
     public bool TryRebind(PlaybackInputCommand command, KeyGesture gesture)
@@ -112,7 +99,7 @@ public sealed class ShortcutSettingsViewModel : INotifyPropertyChanged
             // give: the format IS the language, and a cached one would keep the sentence of whatever
             // language happened to be in force the first time somebody hit a key collision.
             var format = CompositeFormat.Parse(
-                Text("ShortcutConflictFormat", "{0} is already assigned to \"{1}\"."));
+                CourseText.Resource("ShortcutConflictFormat", "{0} is already assigned to \"{1}\"."));
             _conflictMessage = string.Format(
                 CultureInfo.CurrentCulture,
                 format,

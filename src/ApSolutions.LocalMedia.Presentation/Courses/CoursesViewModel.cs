@@ -236,9 +236,17 @@ internal static class CourseText
             : string.Create(CultureInfo.CurrentCulture, $"{minutes} min");
     }
 
+    /// <summary>One string, in the language in force, without asking which theme it is.</summary>
+    /// <remarks>
+    /// <b>No theme variant</b>, since 2026-09-02, and it is not a shortcut: a string does not change
+    /// with the theme, while reading <c>ActualThemeVariant</c> touches an Avalonia object owned by
+    /// the UI thread. Measured that day on the shortcut labels, which reach this from a shell built
+    /// off that thread: with the variant, four <c>ShellAssemblyTests</c> answered <i>the calling
+    /// thread cannot access this object</i> inside the full suite while passing alone.
+    /// </remarks>
     public static string Resource(string key, string fallback) =>
         Avalonia.Application.Current is { } application
-            && application.TryGetResource(key, application.ActualThemeVariant, out var value)
+            && application.TryGetResource(key, null, out var value)
             && value is string text
                 ? text
                 : fallback;

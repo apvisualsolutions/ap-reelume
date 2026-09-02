@@ -313,7 +313,7 @@ src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs         
 src/ApSolutions.LocalMedia.Presentation/Onboarding/AddRootDialogView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        96  76
+src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        99  84
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LessonsPanelView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
@@ -362,7 +362,7 @@ src/ApSolutions.LocalMedia.Presentation/Settings/ScanSettingsViewModel.cs       
 src/ApSolutions.LocalMedia.Presentation/Settings/SegmentDetectionSettingsView.axaml          100  50
 src/ApSolutions.LocalMedia.Presentation/Shell/MainWindowPlacement.cs                          97  75
 src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml                                100  50
-src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml.cs                              98  73
+src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml.cs                              98  76
 src/ApSolutions.LocalMedia.Presentation/Shell/StartupView.axaml                              100  50
 src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Show/EpisodeRowView.axaml.cs                          88  50

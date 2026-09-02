@@ -90,6 +90,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Dos ayudantes para leer una cadena traducida, y los dos con el mismo defecto.** El arreglo de las
+  etiquetas de atajos escribió su propio lector de recursos cuando `CourseText.Resource` ya hacía
+  exactamente eso y lo usaban veintisiete sitios. El duplicado se retira, y con él las ramas que
+  ninguna prueba alcanzaba — la razón por la que ese archivo apareció en la lista de deuda.
+
+  **Y el original tenía el mismo defecto de hilo**: pedía el tema en curso para leer una cadena, y
+  una cadena no cambia con el tema. Ahora no lo pide, así que los veintisiete usos dejan de tocar un
+  objeto que pertenece al hilo de la interfaz.
+
 - **La pantalla completa cambiaba una flecha y nada más.** «Aun no funciona […] me refiero a todo el
   monitor, no que se vea el menú de Windows», dijo el propietario. `ApplyPlaybackMode` ponía dos
   banderas —cuál de las dos flechas dibuja el botón del transporte— y después construía una ventana
