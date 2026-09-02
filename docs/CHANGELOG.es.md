@@ -90,6 +90,46 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Siete puertas de esta misma tanda no medían lo que decían medir, y seis se comprobaron mutando el
+  código que deberían proteger.** El auditor de puertas corrió antes de cerrar, que es para lo que
+  está, y lo que encontró incluye **el defecto que originó la tanda, repetido dentro de ella**:
+  `SectionHeadingTests` se escribió para impedir que la etiqueta y su encabezado se separaran, y leía
+  las dos cadenas del diccionario sin construir nunca la vista — borrar los dos `TextBlock` de
+  `AudioOutputView.axaml` la dejaba verde. Ahora construye el panel, cuenta los encabezados que
+  pinta y afirma que cada uno **es** su etiqueta en mayúsculas.
+
+  **La peor era la del orden**, porque sus propias notas decían que el orden es el arreglo: la
+  disposición se escribe **antes** de enrutar, y la prueba llevaba dos registros separados, uno por
+  doble, así que afirmaba que las dos cosas ocurrieron —cierto en los dos órdenes—. Un solo registro
+  compartido, y `["layout", "pause", "device", "play"]`: invertir los dos bloques del adaptador la
+  pone roja, medido, y deja verdes las otras ocho.
+
+  Las otras cinco: la lista de atajos sólo rechazaba etiquetas **idénticas** en los dos idiomas, así
+  que borrar un brazo del `switch` la hacía caer en el `_ =>` y tomar prestadas las palabras de otro
+  comando —traducidas, distintas, y de otro sitio—; se añade que las diez sean **distintas** y que
+  sean **diez** y no «nueve o más». La frase de conflicto, que era el undécimo literal, no la cubría
+  nada. «A cualquiera de las dos profundidades» modelaba un solo controlador, y borrar la pregunta de
+  24 bits de producción no rompía nada mientras borrar la de 16 sí: la asimetría era la prueba. El
+  orden de la pantalla completa se afirmaba por su consecuencia, que el backend headless produce en
+  los dos sentidos; ahora se escucha `PropertyChanged` y se afirma que el estado baja **antes** de
+  que se mueva el ancho. Y la línea de `CompositionRoot` que conecta el informe del cambio de
+  disposición no la vigilaba nadie: borrarla deja los dos avisos inalcanzables para siempre.
+
+  **Y una de las correcciones nació ciega y hubo que medirla dos veces.** La primera versión de la
+  puerta de la frase de conflicto comparaba las dos frases enteras y pasaba con el formato vuelto a
+  ser un literal español, porque una de sus dos casillas es una etiqueta de comando **que sí está
+  traducida**. Lo que tiene que diferir es el **marco**, así que se vacían las dos casillas antes de
+  comparar. Es la misma forma del defecto que el archivo entero persigue, un nivel más adentro.
+
+  **Lo que NO se hizo, y por qué está escrito dentro de la suite en vez de aquí.** Ninguna prueba de
+  `WindowsAudioEndpointConfiguratorTests` llega a una escritura con éxito, así que sustituir el
+  cuerpo de esa llamada por `=> 0;` —S_OK y no escribe nada— la deja verde. Llegar ahí exigiría
+  escribir un formato que el dispositivo no lleva y luego restaurarlo, y **una ejecución de pruebas
+  no cambia lo que sale por los altavoces de nadie**: un proceso muerto entre la escritura y la
+  restauración lo dejaría cambiado. Las dos mitades de esa forma se miden por la costura en
+  `EndpointFormatArithmeticTests`, y el hueco queda nombrado en las notas de la clase para que un
+  verde no se lea como más de lo que es.
+
 - **Dos ayudantes para leer una cadena traducida, y los dos con el mismo defecto.** El arreglo de las
   etiquetas de atajos escribió su propio lector de recursos cuando `CourseText.Resource` ya hacía
   exactamente eso y lo usaban veintisiete sitios. El duplicado se retira, y con él las ramas que

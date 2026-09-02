@@ -93,6 +93,12 @@ public sealed class AudioOutputWiringTests
         Assert.Contains("SelectionHandler", composition, StringComparison.Ordinal);
         Assert.Contains("EngineAudioOutputTarget", composition, StringComparison.Ordinal);
         Assert.Contains("ResolveStoredAsync", composition, StringComparison.Ordinal);
+
+        // The fourth line of that join, added 2026-09-02 after an audit measured its absence:
+        // deleting it leaves `_lastChange` permanently Unavailable, so neither the "applied" nor the
+        // "the driver refused it" sentence can ever appear and every test still passes — the surface
+        // supplies its own reporter, so nothing else notices the one the application uses is gone.
+        Assert.Contains("LayoutChangeReporter", composition, StringComparison.Ordinal);
     }
 
     private static async Task WaitForAsync(Func<bool> condition)

@@ -88,6 +88,45 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Seven gates from this same batch did not measure what they said they measured, and six were
+  proved by mutating the code they exist to protect.** The gate auditor ran before closing, which is
+  what it is for, and what it found includes **the defect that started this batch, repeated inside
+  it**: `SectionHeadingTests` was written to stop a label and its heading drifting apart, and it read
+  both strings out of the dictionary without ever building the view — deleting both `TextBlock`s from
+  `AudioOutputView.axaml` left it green. It now builds the panel, counts the headings it paints, and
+  asserts each one **is** its label uppercased.
+
+  **The worst was the ordering one**, because its own remarks said the order is the fix: the layout
+  is written **before** the routing, and the test kept two separate ledgers, one per double, so it
+  asserted that both things happened — true in either order. One shared ledger now, and
+  `["layout", "pause", "device", "play"]`: inverting the adapter's two blocks turns it red, measured,
+  and leaves the other eight green.
+
+  The other five: the shortcut list only rejected labels that were **identical** across languages, so
+  deleting an arm of the `switch` dropped it into the `_ =>` and it borrowed another command's words
+  — translated, different, and belonging elsewhere; distinctness is asserted now, and the count is
+  **ten** rather than "nine or more". The collision sentence, which was the eleventh literal, was
+  covered by nothing. "At either depth" modelled one driver, and deleting the 24-bit question from
+  production broke nothing while deleting the 16-bit one did: the asymmetry was the proof. Full
+  screen's ordering was asserted through its consequence, which the headless backend produces either
+  way; `PropertyChanged` is listened to now and the state is asserted to drop **before** the width
+  moves. And the `CompositionRoot` line that connects the layout-change report was watched by
+  nobody: deleting it leaves both notices unreachable forever.
+
+  **And one of the fixes was born blind and had to be measured twice.** The first version of the
+  collision-sentence gate compared the two whole sentences and passed with the format reverted to a
+  Spanish literal, because one of its two holes is a command label **which is** translated. What has
+  to differ is the **frame**, so both holes are blanked out before the comparison. It is the same
+  shape of defect the whole file exists for, one level in.
+
+  **What was NOT done, and why it is written inside the suite rather than here.** No test in
+  `WindowsAudioEndpointConfiguratorTests` reaches a successful write, so replacing that call's body
+  with `=> 0;` — S_OK, nothing written — leaves it green. Reaching it would mean writing a format the
+  device does not carry and then restoring it, and **a test run does not change what comes out of
+  somebody's speakers**: a process killed between the write and the restore would leave it changed.
+  Both halves of that shape are measured through the seam in `EndpointFormatArithmeticTests`, and the
+  gap is named in the class remarks so a green is not read as more than it is.
+
 - **Two helpers for reading one translated string, both with the same defect.** The shortcut-label
   fix wrote its own resource reader when `CourseText.Resource` already did exactly that and
   twenty-seven places used it. The duplicate is withdrawn, and with it the branches no test reached —

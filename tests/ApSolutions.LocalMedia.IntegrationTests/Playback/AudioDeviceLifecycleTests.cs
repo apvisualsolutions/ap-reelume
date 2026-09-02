@@ -158,6 +158,12 @@ public sealed class AudioDeviceLifecycleTests
     /// — so the routing has to come afterwards to put the choice back. Asserted on the order rather
     /// than on the calls, because both orders make both calls and only one of them plays the sound
     /// through the speakers somebody picked.
+    /// <para>
+    /// Which is why the two doubles share <b>one</b> ledger. Until 2026-09-02 they kept one each and
+    /// this asserted that both lists were non-empty, which is true whichever way round the adapter
+    /// runs — the gate named the order in its own remarks and then measured something else. Moving
+    /// the endpoint block after the routing block left it green; it does not any more.
+    /// </para>
     /// </remarks>
     [Fact]
     public async Task The_layout_is_written_before_the_device_is_routed()
@@ -165,12 +171,15 @@ public sealed class AudioDeviceLifecycleTests
         using var directory = new DatabaseTestDirectory();
         var factory = new SqliteConnectionFactory(directory.DatabasePath);
         await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
-        var endpoints = new RecordingConfigurator([AudioChannelLayout.Stereo, AudioChannelLayout.Surround71]);
+        var ledger = new List<string>();
+        var endpoints = new RecordingConfigurator(
+            [AudioChannelLayout.Stereo, AudioChannelLayout.Surround71],
+            ledger);
         var adapter = new LibVlcAudioOutputAdapter(
             new FakeCatalog([Speakers]),
             new PlaybackPreferenceRepository(factory),
             endpoints);
-        var engine = new RecordingEngine();
+        var engine = new RecordingEngine { Order = ledger };
 
         _ = await adapter.SelectAsync(
             new AudioOutputRequest(
@@ -184,9 +193,8 @@ public sealed class AudioDeviceLifecycleTests
         Assert.Equal([(Speakers.Id, AudioChannelLayout.Surround71)], endpoints.Written);
         Assert.Equal(AudioEndpointChange.Applied, adapter.LastLayoutChange);
 
-        // The routing happened, and it happened after: the engine's own ledger has the device in it
-        // and the write is already done by the time this is read.
-        Assert.Contains("device", engine.Order);
+        // One list, written by both doubles in the order the adapter called them.
+        Assert.Equal(["layout", "pause", "device", "play"], ledger);
     }
 
     /// <summary>
@@ -290,7 +298,9 @@ public sealed class AudioDeviceLifecycleTests
 
     private sealed class RecordingEngine : IAudioOutputTarget
     {
-        public List<string> Order { get; } = [];
+        // Settable so a test can hand the same list to the configurator: two ledgers can only say
+        // that both things happened, and what has to be asserted here is which came first.
+        public List<string> Order { get; init; } = [];
 
         public int PauseCount { get; private set; }
 
@@ -321,7 +331,9 @@ public sealed class AudioDeviceLifecycleTests
         }
     }
 
-    private sealed class RecordingConfigurator(IReadOnlyList<AudioChannelLayout> supported)
+    private sealed class RecordingConfigurator(
+        IReadOnlyList<AudioChannelLayout> supported,
+        List<string>? ledger = null)
         : IAudioEndpointConfigurator
     {
         public List<(string Device, AudioChannelLayout Layout)> Written { get; } = [];
@@ -345,6 +357,7 @@ public sealed class AudioDeviceLifecycleTests
             }
 
             Written.Add((deviceId, layout));
+            ledger?.Add("layout");
             return Task.FromResult(AudioEndpointChange.Applied);
         }
     }

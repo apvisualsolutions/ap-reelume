@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -116,6 +117,58 @@ public sealed class WindowLifecycleTests
     /// and set after it.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// The state is dropped before the geometry is written, and that order is asserted as an order.
+    /// </summary>
+    /// <remarks>
+    /// The test below says the ordering is "the fix, not a detail" and then measures its consequence
+    /// — that the width came back — which the headless backend produces either way, because it obeys
+    /// a Width whatever the state. An audit inverted the two blocks on 2026-09-02 and every window
+    /// test stayed green. So this one listens instead: the window's own change notifications are
+    /// recorded, and what is asserted is that <c>WindowState</c> reaches <c>Normal</c> before
+    /// <c>Width</c> moves.
+    /// </remarks>
+    [AvaloniaFact]
+    public void Leaving_fullscreen_drops_the_state_before_it_writes_the_geometry()
+    {
+        var coordinator = new PlayerWindowCoordinator();
+        var window = new Window { Width = 800, Height = 600 };
+        window.Show();
+
+        coordinator.Apply(window, PlaybackMode.Fullscreen, Screen2560X1440, 1.0);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(WindowState.FullScreen, window.WindowState);
+
+        var order = new List<string>();
+        void Record(object? sender, AvaloniaPropertyChangedEventArgs args)
+        {
+            if (args.Property == Window.WindowStateProperty && args.NewValue is WindowState.Normal)
+            {
+                order.Add("state");
+            }
+            else if (args.Property == Layoutable.WidthProperty)
+            {
+                order.Add("width");
+            }
+        }
+
+        window.PropertyChanged += Record;
+        try
+        {
+            coordinator.Apply(window, PlaybackMode.Embedded, Screen2560X1440, 1.0);
+            Dispatcher.UIThread.RunJobs();
+        }
+        finally
+        {
+            window.PropertyChanged -= Record;
+        }
+
+        // Both happened, and the state happened first.
+        Assert.Contains("state", order);
+        Assert.Contains("width", order);
+        Assert.Equal("state", order[0]);
+    }
+
     [AvaloniaFact]
     public void Fullscreen_is_a_window_state_and_leaving_it_gives_the_state_back()
     {

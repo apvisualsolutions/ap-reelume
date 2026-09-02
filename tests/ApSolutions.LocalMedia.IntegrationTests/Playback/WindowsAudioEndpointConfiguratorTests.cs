@@ -21,6 +21,24 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Playback;
 /// Without a test that says so, a Windows update would turn the control into one that quietly does
 /// nothing, which is exactly the shape of defect this repository is named after.
 /// </para>
+/// <para>
+/// <b>And here is what it does NOT catch, measured 2026-09-02 rather than assumed.</b> No test in
+/// this file reaches a successful <c>SetDeviceFormat</c>, so replacing that call's body with
+/// <c>=&gt; 0;</c> — S_OK reported, nothing written — leaves the suite green. Reaching it would mean
+/// writing a format the endpoint does not already carry and then restoring it, and this suite
+/// deliberately does not: a test run must not change what comes out of somebody's speakers, and a
+/// process killed between the write and the restore would leave it changed. On a machine whose every
+/// endpoint declares two channels there is no <c>Applied</c> path that is not such a write, and both
+/// halves of that shape — the refusal and the layouts on offer — are measured deterministically
+/// through the seam in <c>EndpointFormatArithmeticTests</c> instead.
+/// </para>
+/// <para>
+/// So what this suite guards is narrower than "the control still works": that the interface still
+/// answers on this Windows, that a refusal arrives as a refusal rather than as an exception from the
+/// marshaller, and that an endpoint which is gone is told apart from a driver that says no. The day
+/// the vtable moves, the first of those goes red. A silent no-op inside a call that still returns
+/// S_OK would not, and that is written here so nobody reads a green run as more than it is.
+/// </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class WindowsAudioEndpointConfiguratorTests
@@ -52,13 +70,21 @@ public sealed class WindowsAudioEndpointConfiguratorTests
         Assert.Contains(AudioChannelLayout.Stereo, supported);
 
         // And what it is set to has to be among them, which is the half that catches a query that
-        // answered about the wrong endpoint — every count below has an entry in the enumeration.
-        var carried = endpoint.Channels switch
-        {
-            >= 8 => AudioChannelLayout.Surround71,
-            >= 6 => AudioChannelLayout.Surround51,
-            _ => AudioChannelLayout.Stereo,
-        };
+        // answered about the wrong endpoint.
+        //
+        // Skipped rather than asserted below two channels, and that is the point of the skip: on a
+        // stereo-only endpoint `carried` IS Stereo, so this second assertion becomes a copy of the
+        // first and the whole test asks one question twice. It read that way until 2026-09-02, on
+        // every machine it has ever run on — this one, where every endpoint declares two channels,
+        // and a hosted runner, which has none at all.
+        Assert.SkipWhen(
+            endpoint.Channels < 6,
+            $"the widest endpoint here carries {endpoint.Channels} channels, so what it is set to is "
+            + "Stereo and this half would repeat the assertion above.");
+
+        var carried = endpoint.Channels >= 8
+            ? AudioChannelLayout.Surround71
+            : AudioChannelLayout.Surround51;
         Assert.Contains(carried, supported);
     }
 
