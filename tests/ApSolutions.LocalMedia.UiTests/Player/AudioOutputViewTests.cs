@@ -232,6 +232,106 @@ public sealed class AudioOutputViewTests
         Assert.Equal(refused, viewModel.LayoutWasRefused);
     }
 
+    /// <summary>
+    /// The command takes the three words the markup carries, and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// A word rather than the enumeration value, because <c>{x:True}</c> and its kin are not measured
+    /// in this Avalonia — so a parameter arriving as anything else has to be refused rather than
+    /// guessed at, which is what leaves the three buttons looking right and doing nothing.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_layout_command_takes_the_three_words_and_refuses_anything_else()
+    {
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([Receiver]),
+            new FakeConfigurator([
+                AudioChannelLayout.Stereo,
+                AudioChannelLayout.Surround51,
+                AudioChannelLayout.Surround71,
+            ]));
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(viewModel.ChooseLayoutCommand.CanExecute("surround71"));
+        Assert.False(viewModel.ChooseLayoutCommand.CanExecute("Surround71"));
+        Assert.False(viewModel.ChooseLayoutCommand.CanExecute(AudioChannelLayout.Surround71));
+        Assert.False(viewModel.ChooseLayoutCommand.CanExecute(null));
+
+        viewModel.ChooseLayoutCommand.Execute("surround51");
+        Assert.Equal(AudioChannelLayout.Surround51, viewModel.SelectedLayout);
+        Assert.True(viewModel.IsSurround51Chosen);
+        Assert.False(viewModel.IsStereoChosen);
+        Assert.False(viewModel.IsSurround71Chosen);
+
+        // A word it does not know changes nothing rather than throwing, which is what a button
+        // wired with a typo would do.
+        viewModel.ChooseLayoutCommand.Execute("quadraphonic");
+        Assert.Equal(AudioChannelLayout.Surround51, viewModel.SelectedLayout);
+    }
+
+    /// <summary>
+    /// With no endpoint chosen, nothing is on offer and nothing is claimed about writing it.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task With_no_endpoint_nothing_is_offered_even_where_the_layout_can_be_written()
+    {
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([]),
+            new FakeConfigurator([AudioChannelLayout.Stereo, AudioChannelLayout.Surround71]));
+
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(viewModel.HasNoOutput);
+        Assert.False(viewModel.IsStereoAvailable);
+        Assert.False(viewModel.IsSurround51Available);
+        Assert.False(viewModel.IsSurround71Available);
+
+        // The machine can still write layouts; it is the endpoint that is missing, and those are
+        // two different sentences for the surface to say.
+        Assert.True(viewModel.CanChangeLayout);
+    }
+
+    /// <summary>
+    /// A surface with no reporter says the write is unavailable rather than claiming it worked.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task A_surface_with_no_reporter_claims_nothing_about_the_write()
+    {
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([Receiver]),
+            new FakeConfigurator([AudioChannelLayout.Stereo, AudioChannelLayout.Surround71]))
+        {
+            SelectionHandler = (_, _) => Task.FromResult<AudioOutputSelection?>(null),
+        };
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        viewModel.SelectedLayout = AudioChannelLayout.Surround71;
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        Assert.False(viewModel.LayoutWasApplied);
+        Assert.False(viewModel.LayoutWasRefused);
+    }
+
+    /// <summary>
+    /// A session that goes away under the choice leaves the surface standing.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task A_session_that_fails_under_the_choice_is_not_an_exception_on_screen()
+    {
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([Receiver]),
+            new FakeConfigurator([AudioChannelLayout.Stereo]))
+        {
+            SelectionHandler = (_, _) => throw new PlaybackFailureException("the session went away"),
+        };
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        viewModel.SelectedLayout = AudioChannelLayout.Surround71;
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        Assert.Equal(AudioChannelLayout.Surround71, viewModel.SelectedLayout);
+    }
+
     private sealed class FakeCatalog(IReadOnlyList<AudioOutputDevice> devices) : IAudioDeviceCatalog
     {
         public Task<IReadOnlyList<AudioOutputDevice>> GetOutputsAsync(
