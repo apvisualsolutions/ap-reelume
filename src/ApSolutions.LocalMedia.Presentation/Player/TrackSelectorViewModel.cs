@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Playback;
@@ -12,9 +13,48 @@ using ApSolutions.LocalMedia.Domain.Playback;
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>One selectable track, described by its attributes rather than by its position.</summary>
-public sealed record TrackOption(MediaTrack? Track, string Display)
+/// <remarks>
+/// <para>
+/// A class and no longer a record, because a row now carries whether it is the one in force. A
+/// record's synthesised equality compares every field, so two options that agree on track and label
+/// would be equal while disagreeing about which is chosen — and the selection setter compares with
+/// <c>EqualityComparer&lt;T&gt;</c>, which is where that would have surfaced as a choice that does
+/// not stick.
+/// </para>
+/// <para>
+/// The state lives here rather than in the view for the reason <c>SeasonViewModel</c> already
+/// carries: a row that cannot say whether it is the chosen one is a list of identical rows, and a
+/// second one could quietly light up beside the first.
+/// </para>
+/// </remarks>
+public sealed class TrackOption(MediaTrack? track, string display) : INotifyPropertyChanged
 {
+    private bool _isSelected;
+
+    public MediaTrack? Track { get; } = track;
+
+    public string Display { get; } = display ?? throw new ArgumentNullException(nameof(display));
+
+    /// <summary>The entry that turns subtitles off, which carries no track of its own.</summary>
     public bool IsDisabled => Track is null;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Whether this is the track being played, which is what fills its row.</summary>
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected == value)
+            {
+                return;
+            }
+
+            _isSelected = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+        }
+    }
 }
 
 /// <summary>
@@ -44,9 +84,23 @@ public sealed class TrackSelectorViewModel : INotifyPropertyChanged
         DisabledSubtitleDisplay = string.IsNullOrWhiteSpace(disabledSubtitleDisplay)
             ? "—"
             : disabledSubtitleDisplay;
+        ChooseAudioCommand = new ChooseTrackCommand(option => SelectedAudio = option);
+        ChooseSubtitleCommand = new ChooseTrackCommand(option => SelectedSubtitle = option);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Picks one row of the audio list, by the option the row carries.</summary>
+    /// <remarks>
+    /// A command and not a two-way <c>IsChecked</c>, which is the shape <c>ShowDetailsView</c>'s
+    /// season pills already have and for the same reason: a click that <em>un</em>checked a row
+    /// would leave the list showing a track no row claims. The choice of which row is lit belongs to
+    /// the selection, and the selection is what a click asks to change.
+    /// </remarks>
+    public ICommand ChooseAudioCommand { get; }
+
+    /// <summary>Picks one row of the subtitle list, by the option the row carries.</summary>
+    public ICommand ChooseSubtitleCommand { get; }
 
     public ObservableCollection<TrackOption> AudioTracks { get; } = [];
 
@@ -83,7 +137,13 @@ public sealed class TrackSelectorViewModel : INotifyPropertyChanged
         get => _selectedAudio;
         set
         {
-            if (SetField(ref _selectedAudio, value) && !_isLoading)
+            if (!SetField(ref _selectedAudio, value))
+            {
+                return;
+            }
+
+            Mark(AudioTracks, value);
+            if (!_isLoading)
             {
                 _ = ApplyAsync(MediaTrackKind.Audio);
             }
@@ -95,10 +155,32 @@ public sealed class TrackSelectorViewModel : INotifyPropertyChanged
         get => _selectedSubtitle;
         set
         {
-            if (SetField(ref _selectedSubtitle, value) && !_isLoading)
+            if (!SetField(ref _selectedSubtitle, value))
+            {
+                return;
+            }
+
+            Mark(SubtitleTracks, value);
+            if (!_isLoading)
             {
                 _ = ApplyAsync(MediaTrackKind.Subtitle);
             }
+        }
+    }
+
+    /// <summary>
+    /// Lights the chosen row and puts out every other one in the same list.
+    /// </summary>
+    /// <remarks>
+    /// Written over the whole list rather than over the pair that changed, because the pair is not
+    /// always two: loading rebuilds both lists, and a row left lit from the previous media would sit
+    /// under a selection that no longer names it.
+    /// </remarks>
+    private static void Mark(IEnumerable<TrackOption> options, TrackOption? chosen)
+    {
+        foreach (var option in options)
+        {
+            option.IsSelected = ReferenceEquals(option, chosen);
         }
     }
 
@@ -202,5 +284,33 @@ public sealed class TrackSelectorViewModel : INotifyPropertyChanged
         field = value;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         return true;
+    }
+
+    /// <summary>
+    /// The click on one row of either list.
+    /// </summary>
+    /// <remarks>
+    /// The silence of <c>CanExecuteChanged</c> is safe here and <c>CommandNotificationTests</c> holds
+    /// the predicate that makes it so: the question is whether the parameter is an option at all,
+    /// and that answer does not move while a row is on screen. Rewriting it to read state fails that
+    /// gate in the same change.
+    /// </remarks>
+    private sealed class ChooseTrackCommand(Action<TrackOption> apply) : ICommand
+    {
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public bool CanExecute(object? parameter) => parameter is TrackOption;
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is TrackOption option)
+            {
+                apply(option);
+            }
+        }
     }
 }

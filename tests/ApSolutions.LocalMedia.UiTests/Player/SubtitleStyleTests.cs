@@ -222,9 +222,15 @@ public sealed class SubtitleStyleTests
         var window = new Window { Width = 420, Height = 300, Content = view };
         window.Show();
         Dispatcher.UIThread.RunJobs();
-        var boxes = view.GetVisualDescendants().OfType<ComboBox>().ToArray();
-        Assert.Equal(2, boxes.Length);
-        Assert.All(boxes, box => Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(box))));
+        // One control per track rather than two drop-downs, which is what the prototype draws. The
+        // view shows both halves here, so what is on screen is every audio track and every subtitle
+        // track, each of them named.
+        var rows = view.GetVisualDescendants()
+            .OfType<RadioButton>()
+            .Where(radio => radio.Classes.Contains("option"))
+            .ToArray();
+        Assert.Equal(viewModel.AudioTracks.Count + viewModel.SubtitleTracks.Count, rows.Length);
+        Assert.All(rows, radio => Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(radio))));
         window.Close();
     }
 
@@ -258,6 +264,52 @@ public sealed class SubtitleStyleTests
             TestContext.Current.CancellationToken);
         Assert.NotNull(stored);
         Assert.Equal("spa", stored!.Audio!.Language);
+    }
+
+    /// <summary>
+    /// The row commands take an option and nothing else, and the two of them are separate.
+    /// </summary>
+    /// <remarks>
+    /// The refusal is asserted and not assumed, because the parameter arrives from markup: the
+    /// course dialog's two pills were rescued from exactly this, a value that reached the command as
+    /// a string and left every button unpressed while looking right. And they are separate commands
+    /// on purpose — one command for both lists would let a click on a subtitle row arrive at the
+    /// audio half, which no assertion about a single list could see.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_row_command_takes_an_option_and_refuses_anything_else()
+    {
+        var viewModel = new TrackSelectorViewModel(
+            new SelectTrack(new RecordingEngine(), new InMemoryPreferenceRepository()),
+            PlaybackPreference.FileKey(Guid.Empty));
+        var english = new MediaTrack("1", MediaTrackKind.Audio, "eng", "English", 2, "aac");
+        var spanish = new MediaTrack("2", MediaTrackKind.Audio, "spa", "Español 5.1", 6, "eac3");
+        var subtitle = new MediaTrack("5", MediaTrackKind.Subtitle, "spa", "Español", null, "subrip");
+        viewModel.Load([english, spanish, subtitle], english, activeSubtitle: null);
+
+        var chosenAudio = viewModel.SelectedAudio;
+        var chosenSubtitle = viewModel.SelectedSubtitle;
+
+        foreach (var parameter in new object?[] { null, "Español 5.1", 2, viewModel })
+        {
+            Assert.False(viewModel.ChooseAudioCommand.CanExecute(parameter));
+            Assert.False(viewModel.ChooseSubtitleCommand.CanExecute(parameter));
+
+            // Executed anyway, because CanExecute returning false does not stop a caller: a command
+            // that acted on a parameter it just refused would be a control that works by accident.
+            viewModel.ChooseAudioCommand.Execute(parameter);
+            viewModel.ChooseSubtitleCommand.Execute(parameter);
+            Assert.Same(chosenAudio, viewModel.SelectedAudio);
+            Assert.Same(chosenSubtitle, viewModel.SelectedSubtitle);
+        }
+
+        // And an option is taken by the command of its own list only. The subtitle command handed an
+        // audio option would move the audio choice if the two shared one command.
+        var otherAudio = viewModel.AudioTracks.Single(option => option.Track == spanish);
+        Assert.True(viewModel.ChooseSubtitleCommand.CanExecute(otherAudio));
+        viewModel.ChooseSubtitleCommand.Execute(otherAudio);
+        Assert.Same(chosenAudio, viewModel.SelectedAudio);
+        Assert.Same(otherAudio, viewModel.SelectedSubtitle);
     }
 
     [AvaloniaFact]

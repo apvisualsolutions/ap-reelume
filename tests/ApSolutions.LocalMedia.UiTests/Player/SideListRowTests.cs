@@ -201,17 +201,12 @@ public sealed class SideListRowTests
             AssertTruncatesIntoTooltip(row, "PlayerVersions");
         }
 
-        // The track selector's rows are its options, and both pickers carry the same template. A
-        // template is what DisplayMemberBinding cannot be: the two are exclusive, so the old one has
-        // to be gone rather than merely overridden.
-        var pickers = scope.Tracks.GetVisualDescendants().OfType<ComboBox>().ToArray();
-        Assert.Equal(2, pickers.Length);
-        Assert.All(pickers, box =>
-        {
-            Assert.Null(box.DisplayMemberBinding);
-            Assert.NotNull(box.ItemTemplate);
-            Assert.Contains("side-list", box.Classes);
-        });
+        // The track selector's two pickers stopped being drop-downs on 2026-09-02 and became lists
+        // of radios, which is what the prototype draws. Their rows are measured by
+        // OptionRowShapeTests against the design's own numbers; what belongs here is that they are
+        // gone from this class, because a picker still wearing side-list would be a row of 36 in a
+        // panel whose rows are 34.
+        Assert.Empty(scope.Tracks.GetVisualDescendants().OfType<ComboBox>());
     }
 
     /// <summary>

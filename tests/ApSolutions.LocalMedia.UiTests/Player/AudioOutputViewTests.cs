@@ -42,8 +42,12 @@ public sealed class AudioOutputViewTests
         await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(2, viewModel.Devices.Count);
-        Assert.Contains(viewModel.Devices, option => option.Display.EndsWith("7.1", StringComparison.Ordinal));
-        Assert.Contains(viewModel.Devices, option => option.Display.EndsWith("2.0", StringComparison.Ordinal));
+
+        // The name and what the endpoint can carry are two strings now, because the prototype draws
+        // them in two weights. The pair joined is what the foot of the transport still says.
+        Assert.Contains(viewModel.Devices, option => option is { Display: "Receptor HDMI", Capabilities: "7.1" });
+        Assert.Contains(viewModel.Devices, option => option is { Display: "Auriculares", Capabilities: "2.0" });
+        Assert.Contains(viewModel.Devices, option => option.Summary == "Receptor HDMI · 7.1");
         Assert.False(viewModel.HasNoOutput);
         Assert.Equal(Receiver.Id, viewModel.SelectedDevice!.Device.Id);
         Assert.True(viewModel.IsLayoutAvailable(AudioChannelLayout.Surround71));
@@ -90,7 +94,7 @@ public sealed class AudioOutputViewTests
     }
 
     /// <summary>
-    /// The device is a drop-down, the layout is three buttons, and every one of them is named.
+    /// The device is a list of radios, the layout is three buttons, and every one of them is named.
     /// </summary>
     /// <remarks>
     /// The layout stopped being a drop-down on 2026-09-02, because the prototype draws
@@ -112,11 +116,24 @@ public sealed class AudioOutputViewTests
             window.Show();
             Dispatcher.UIThread.RunJobs();
 
-            var device = view.GetVisualDescendants()
-                .OfType<ComboBox>()
-                .Single(box => box.Name == "AudioDeviceSelector");
-            Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(device)));
-            Assert.True(device.Focusable);
+            // The device stopped being a drop-down on 2026-09-02 and is a row of radios, which is
+            // what the prototype draws. So there is one control per endpoint rather than one for
+            // the list, and each of them is named and reachable by keyboard.
+            var devices = view.GetVisualDescendants()
+                .OfType<RadioButton>()
+                .Where(radio => radio.Classes.Contains("option"))
+                .ToArray();
+            Assert.Equal(viewModel.Devices.Count, devices.Length);
+            Assert.All(devices, radio => Assert.False(
+                string.IsNullOrWhiteSpace(AutomationProperties.GetName(radio))));
+            Assert.All(devices, radio => Assert.True(radio.Focusable));
+
+            // Exactly one of them is checked, and it is the one the model says is in force. A list
+            // where two rows claim the choice, or none does, is the defect a radio group hides best.
+            var chosen = Assert.Single(devices, radio => radio.IsChecked == true);
+            Assert.Equal(
+                viewModel.SelectedDevice!.Display,
+                AutomationProperties.GetHelpText(chosen));
 
             var choices = view.GetVisualDescendants()
                 .OfType<Button>()

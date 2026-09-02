@@ -11,7 +11,59 @@ using ApSolutions.LocalMedia.Domain.Playback;
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>One selectable output, described by its name and the layouts it can actually carry.</summary>
-public sealed record AudioOutputOption(AudioOutputDevice Device, string Display);
+/// <remarks>
+/// <para>
+/// The name and what the device can carry are two strings and no longer one, because the prototype
+/// draws them as two: the name takes the row and the capability sits at its end, smaller and dimmer.
+/// Joined into a single label they could only be drawn in one weight.
+/// </para>
+/// <para>
+/// A class and no longer a record, for the reason <see cref="TrackOption"/> carries: a row now says
+/// whether it is the one in force, and a record's synthesised equality would make two rows that
+/// agree on device and name equal while disagreeing about that.
+/// </para>
+/// </remarks>
+public sealed class AudioOutputOption(AudioOutputDevice device, string display, string capabilities)
+    : INotifyPropertyChanged
+{
+    private bool _isSelected;
+
+    public AudioOutputDevice Device { get; } = device ?? throw new ArgumentNullException(nameof(device));
+
+    public string Display { get; } = display ?? throw new ArgumentNullException(nameof(display));
+
+    /// <summary>The largest layout this endpoint carries, as the prototype's trailing caption.</summary>
+    public string Capabilities { get; } =
+        capabilities ?? throw new ArgumentNullException(nameof(capabilities));
+
+    /// <summary>
+    /// The two of them on one line, for the foot of the transport.
+    /// </summary>
+    /// <remarks>
+    /// The row draws them apart and the foot draws them together, so the joining lives here rather
+    /// than in either surface: a binding cannot concatenate two paths, and doing it in the shell
+    /// would put a piece of this model's grammar in a view that only passes it along.
+    /// </remarks>
+    public string Summary => $"{Display} · {Capabilities}";
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Whether this is the output in force, which is what fills its row.</summary>
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected == value)
+            {
+                return;
+            }
+
+            _isSelected = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+        }
+    }
+}
 
 /// <summary>
 /// Lets the person choose the output and the channel layout. A layout no endpoint accepts is shown as
@@ -38,7 +90,15 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         _endpoints = endpoints;
         ChooseLayoutCommand = new ChooseLayoutCommandImplementation(layout => SelectedLayout = layout);
+        ChooseDeviceCommand = new ChooseDeviceCommandImplementation(option => SelectedDevice = option);
     }
+
+    /// <summary>Picks one row of the output list, by the option the row carries.</summary>
+    /// <remarks>
+    /// A command and not a two-way <c>IsChecked</c>, the shape the season pills already have: a
+    /// click that <em>un</em>checked a row would leave the list showing an output no row claims.
+    /// </remarks>
+    public ICommand ChooseDeviceCommand { get; }
 
     /// <summary>
     /// Chooses one of the three layouts, by the word the markup carries.
@@ -99,9 +159,19 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         {
             if (SetField(ref _selectedDevice, value))
             {
+                Mark(Devices, value);
                 Recalculate();
                 _ = ApplySelectionAsync();
             }
+        }
+    }
+
+    /// <summary>Lights the chosen row and puts out every other one.</summary>
+    private static void Mark(IEnumerable<AudioOutputOption> options, AudioOutputOption? chosen)
+    {
+        foreach (var option in options)
+        {
+            option.IsSelected = ReferenceEquals(option, chosen);
         }
     }
 
@@ -169,13 +239,17 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         Devices.Clear();
         foreach (var device in devices.Where(device => device.IsAvailable))
         {
-            Devices.Add(new AudioOutputOption(device, Describe(device)));
+            Devices.Add(new AudioOutputOption(device, device.Name, Describe(device)));
         }
 
         var resolved = AudioOutputPolicy.Resolve(devices, storedDeviceId, _selectedLayout);
         _selectedDevice = resolved is null
             ? null
             : Devices.FirstOrDefault(option => option.Device.Id == resolved.Device.Id);
+
+        // The field is written directly here rather than through the setter, so the rows are lit
+        // here too: a load that leaves every row dark shows a list nothing in it claims.
+        Mark(Devices, _selectedDevice);
         _effective = resolved;
         OnPropertyChanged(nameof(SelectedDevice));
         OnPropertyChanged(nameof(HasNoOutput));
@@ -239,14 +313,13 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
         var largest = device.SupportedLayouts.Count == 0
             ? AudioChannelLayout.Stereo
             : device.SupportedLayouts.MaxBy(layout => (int)layout);
-        var suffix = largest switch
-        {
-            AudioChannelLayout.Surround71 => " · 7.1",
-            AudioChannelLayout.Surround51 => " · 5.1",
-            _ => " · 2.0",
-        };
 
-        return device.Name + suffix;
+        return largest switch
+        {
+            AudioChannelLayout.Surround71 => "7.1",
+            AudioChannelLayout.Surround51 => "5.1",
+            _ => "2.0",
+        };
     }
 
     private void Recalculate()
@@ -323,6 +396,33 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
             if (parameter is string word && Words.TryGetValue(word, out var layout))
             {
                 apply(layout);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The click on one row of the output list.
+    /// </summary>
+    /// <remarks>
+    /// The silence of <c>CanExecuteChanged</c> is safe for the same reason its neighbour's is, and
+    /// <c>CommandNotificationTests</c> holds the predicate that says so: whether the parameter is an
+    /// option at all does not change while a row is on screen.
+    /// </remarks>
+    private sealed class ChooseDeviceCommandImplementation(Action<AudioOutputOption> apply) : ICommand
+    {
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public bool CanExecute(object? parameter) => parameter is AudioOutputOption;
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is AudioOutputOption option)
+            {
+                apply(option);
             }
         }
     }
