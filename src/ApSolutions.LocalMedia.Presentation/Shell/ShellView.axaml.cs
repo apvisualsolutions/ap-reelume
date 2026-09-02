@@ -112,6 +112,35 @@ public sealed partial class ShellView : UserControl
             session.Player.IsFullscreen = mode == PlaybackMode.Fullscreen;
         }
 
+        // The shell's own window follows the mode, and until 2026-09-02 nothing did. Everything below
+        // was about the mini player's separate window, and the coordinator's fullscreen geometry —
+        // written, tested and reachable — was called by nobody with that mode. So pressing fullscreen
+        // swapped an arrow glyph and left the window exactly as it was: «aun no funciona la pantalla
+        // completa», reported that day. Registered and never fed, in the shape of a mode.
+        //
+        // The mini player is not included: it lives in a window of its own, made below, and telling
+        // the shell's window to take its geometry would shrink the application behind it.
+        if (mode != PlaybackMode.Mini && TopLevel.GetTopLevel(this) is Window shell)
+        {
+            // Where it was before fullscreen took the screen, so leaving it gives that back rather
+            // than the coordinator's default embedded shape. Remembered only on the way in, because
+            // on the way out the window is already the size of the screen.
+            if (mode == PlaybackMode.Fullscreen && _windowCoordinator.Current != PlaybackMode.Fullscreen)
+            {
+                _windowCoordinator.Remember(
+                    PlaybackMode.Embedded,
+                    new PlayerWindowGeometry(
+                        shell.Position.X / shell.RenderScaling,
+                        shell.Position.Y / shell.RenderScaling,
+                        shell.Width,
+                        shell.Height),
+                    ScreenOf(shell),
+                    shell.RenderScaling);
+            }
+
+            _windowCoordinator.Apply(shell, mode, ScreenOf(shell), shell.RenderScaling);
+        }
+
         if (mode == PlaybackMode.Mini)
         {
             // Built rather than reused, and the `??=` that was here first is gone on purpose: every

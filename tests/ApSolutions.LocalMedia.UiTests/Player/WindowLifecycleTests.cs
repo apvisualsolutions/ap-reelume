@@ -100,6 +100,66 @@ public sealed class WindowLifecycleTests
         window.Close();
     }
 
+    /// <summary>
+    /// Fullscreen is a window state and not just a size, and leaving it gives the state back.
+    /// </summary>
+    /// <remarks>
+    /// <b>It was only a size until 2026-09-02</b>, and the owner reported what that costs: the
+    /// Windows taskbar stayed on top of the picture. A window merely as large as the screen is not a
+    /// fullscreen window — the taskbar is drawn over ordinary windows whatever their size and steps
+    /// aside only for this state. Measured on a 2560x1440 display whose working area is 1392 tall:
+    /// 48 px of taskbar over the video.
+    /// <para>
+    /// The other direction matters as much and is easier to lose: a window left in the state is a
+    /// window whose Width and Height are stored and never drawn, so the embedded mode would come
+    /// back the size of the screen. That is why the state is dropped before the geometry is written
+    /// and set after it.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void Fullscreen_is_a_window_state_and_leaving_it_gives_the_state_back()
+    {
+        var coordinator = new PlayerWindowCoordinator();
+        var window = new Window { Width = 800, Height = 600 };
+        window.Show();
+
+        coordinator.Apply(window, PlaybackMode.Fullscreen, Screen2560X1440, 1.0);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(WindowState.FullScreen, window.WindowState);
+
+        // And the size is still written, because it is what the window returns to and what decides
+        // which screen the state applies on.
+        Assert.Equal(2560, window.Width);
+        Assert.Equal(1440, window.Height);
+
+        coordinator.Apply(window, PlaybackMode.Embedded, Screen2560X1440, 1.0);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(WindowState.Normal, window.WindowState);
+
+        // The embedded geometry actually reached the window rather than being stored behind a state
+        // that ignores it.
+        Assert.NotEqual(2560, window.Width);
+        window.Close();
+    }
+
+    /// <summary>The mini player is not a fullscreen window, and never inherits the state.</summary>
+    [AvaloniaFact]
+    public void Going_from_fullscreen_to_the_mini_player_leaves_the_state_behind()
+    {
+        var coordinator = new PlayerWindowCoordinator();
+        var window = new Window { Width = 800, Height = 600 };
+        window.Show();
+
+        coordinator.Apply(window, PlaybackMode.Fullscreen, Screen2560X1440, 1.0);
+        coordinator.Apply(window, PlaybackMode.Mini, Screen2560X1440, 1.0);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(WindowState.Normal, window.WindowState);
+        Assert.True(window.Topmost);
+        Assert.Equal(PlayerWindowCoordinator.DefaultMiniGeometry.Width, window.Width);
+        window.Close();
+    }
+
     [AvaloniaFact]
     public void Fullscreen_removes_the_decorations_and_returning_restores_them()
     {

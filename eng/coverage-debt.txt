@@ -260,7 +260,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbMetadataProvider.cs      
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbOptions.cs                             95  42
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs                        100  50
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs               87  73
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                  86  87
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs                89  87
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs                 92  79
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs                 77  61
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs           100  83
@@ -313,7 +313,7 @@ src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs         
 src/ApSolutions.LocalMedia.Presentation/Onboarding/AddRootDialogView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        99  84
+src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        96  76
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LessonsPanelView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50

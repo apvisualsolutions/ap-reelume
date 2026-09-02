@@ -90,6 +90,30 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La pantalla completa cambiaba una flecha y nada más.** «Aun no funciona […] me refiero a todo el
+  monitor, no que se vea el menú de Windows», dijo el propietario. `ApplyPlaybackMode` ponía dos
+  banderas —cuál de las dos flechas dibuja el botón del transporte— y después construía una ventana
+  **sólo para el mini reproductor**. A la ventana del shell no se la tocaba.
+
+  `PlayerWindowCoordinator` tiene la geometría de pantalla completa escrita, comentada, probada y
+  alcanzable, y **nadie la llamaba nunca con ese modo**: las dos únicas llamadas a `Apply` de todo
+  `src/` son del mini reproductor. **Registrado y nunca alimentado, en forma de modo.** Ninguna
+  puerta lo vio porque la suite que cubre esto afirma sobre `shell.PlaybackMode`, y el modelo sí
+  cambiaba, siempre; lo que faltaba era la mitad que nadie preguntaba.
+
+  Ahora el modo llega a la ventana del shell, y al entrar en pantalla completa se **recuerda** la que
+  había para devolverla al salir. Además se pone `WindowState.FullScreen`, que es lo que el sistema
+  entiende por pantalla completa, sin quitar el tamaño en unidades lógicas que la medición de agosto
+  pedía: **se hacen las dos cosas**, y el estado se suelta antes de escribir la geometría y se pone
+  después, porque una ventana en un estado tiene su tamaño guardado y no dibujado.
+
+  **Y dos deducciones mías murieron midiendo por el camino**, las dos anotadas en la evidencia: que
+  esta pantalla no estaba escalada —lo está, a factor 1,5; lo leí con una herramienta que informa en
+  unidades lógicas— y que una ventana del tamaño de la pantalla no tapa la barra de tareas —la tapa,
+  medido sobre la pantalla real, 960 de 960 muestras—. De haberme quedado en la segunda habría
+  «arreglado» algo que ya funcionaba con el defecto todavía puesto.
+  Evidencia: [la pantalla completa no llegaba a nada](evidence/stable/audit-fullscreen-reached-nothing.md).
+
 - **La lista de atajos del reproductor hablaba español con la aplicación en inglés.** Diez nombres de
   comando —«Reproducir o pausar», «Detener», «Pantalla completa»…— y la frase que avisa de una tecla
   ya asignada eran **literales dentro del `.cs`**, así que esa pantalla entera se leía en español en

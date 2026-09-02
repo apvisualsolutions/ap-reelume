@@ -88,6 +88,29 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Fullscreen swapped an arrow and nothing else.** `ApplyPlaybackMode` set two flags — which of the
+  two arrows the transport button draws — and then built a window **only for the mini player**. The
+  shell's own window was never touched.
+
+  `PlayerWindowCoordinator` has the fullscreen geometry written, commented, tested and reachable, and
+  **nobody ever called it with that mode**: both calls to `Apply` in `src/` are the mini player's.
+  **Registered and never fed, in the shape of a mode.** No gate saw it because the suite covering
+  this asserts on `shell.PlaybackMode`, and the view model did change every time; what was missing
+  was the half nobody asked about.
+
+  The mode now reaches the shell's window, and entering fullscreen **remembers** the one that went in
+  so leaving gives it back. `WindowState.FullScreen` is set too — what the system understands by
+  fullscreen — without dropping the logical-unit sizing August's measurement asked for: **both**, and
+  the state is released before the geometry is written and set after it, because a window in a state
+  has its size stored and not drawn.
+
+  **And two of my own deductions died measuring on the way**, both written into the evidence: that
+  this display was not scaled — it is, at 1.5; I read it with a tool reporting logical units — and
+  that a window the size of the screen does not cover the taskbar — it does, measured on the real
+  screen, 960 of 960 samples. Stopping at the second would have "fixed" something that already
+  worked while the defect stayed put.
+  Evidence: [fullscreen reached nothing](evidence/stable/audit-fullscreen-reached-nothing.md).
+
 - **The player's shortcut list spoke Spanish with the application set to English.** Ten command
   names — "Reproducir o pausar", "Detener", "Pantalla completa" — and the sentence warning that a key
   is already taken were **literals inside the `.cs`**, so that whole screen read in Spanish in both
