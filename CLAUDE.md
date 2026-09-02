@@ -382,7 +382,7 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
    silencio suyo no es un certificado.
 9. **Un control nuevo llega con su escena de paseo en el mismo commit.** El trinquete de
-   `eng/check-walk-coverage.ps1` **sólo puede encoger**. Estuvo en 0 y **subió a 22** <!--medido:paseo-pendiente-->
+   `eng/check-walk-coverage.ps1` **sólo puede encoger**. Estuvo en 0 y **subió a 23** <!--medido:paseo-pendiente-->
    el 2026-08-25,
    por el arnés y no por la aplicación: el hit test headless de Avalonia no sigue el desplazamiento
    de un `ScrollViewer`, y Ajustes creció de 949 a 1.797 px, así que veinte controles de
@@ -390,13 +390,16 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    contestaron lo mismo; **los veinte se pulsan con un ratón real**. Subirlo otra vez exige medir el
    porqué y escribirlo en la cabecera de `eng/walk-pending.txt`, como aquel día.
 
-   **Y el 2026-09-02 subió a 22, esta vez por la máquina y no por el arnés.** Los tres botones de la
+   **Y el 2026-09-02 subió a 23, esta vez por la máquina y no por el arnés.** Los tres botones de la
    disposición de canales se ofrecen sólo donde el controlador del dispositivo los admite, y cada
    endpoint físico de esta máquina declara dos canales mientras un runner hospedado no tiene ninguno:
    5.1 y 7.1 salen **deshabilitados** dondequiera que el paseo corra, y el arnés se niega a pulsar un
    control deshabilitado —con razón, porque una persona tampoco puede—. La escena afirma en su lugar
-   la correspondencia en los dos sentidos, y **el trinquete encogerá solo** el día que el paseo corra
-   sobre una máquina con salida multicanal: pulsa lo que esté habilitado.
+   la correspondencia en los dos sentidos — y **no pulsa ninguno de los tres**, porque esta puerta es
+   simétrica: falla un pendiente que no esté en la lista **y** un listado que resulte pulsado. Aquí
+   estéreo sí es pulsable y en el runner no, así que ninguna lista puede ser correcta en las dos
+   máquinas mientras la escena pulse lo que puede — 219 aquí contra 218 allí, medido. Los tres salen
+   de la lista el día que el paseo corra sobre una máquina con salida multicanal.
 
 ## Y una décima, para el código que habla con el sistema operativo
 

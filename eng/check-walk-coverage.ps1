@@ -82,15 +82,22 @@ $pendingFile = Join-Path $PSScriptRoot 'walk-pending.txt'
 # chooses to press these through a directed pointer event instead of a window coordinate, which
 # would keep "the control was pressed" and give up "the control was reachable".
 #
-# RAISED TO 22 ON 2026-09-02, and this time the reason is the machine rather than the harness. The
-# channel layout became three buttons, each offered only where the chosen endpoint's driver takes
-# it, and measured that day every physical endpoint on the development machine declares two channels
-# while a hosted runner has no render endpoint at all. So 5.1 and 7.1 are DISABLED wherever this
-# walk runs, and pressing a disabled control is something neither the harness nor a person can do.
-# The scene asserts the correspondence instead — dimmed exactly when the driver refuses — and needs
-# no change on the day it runs somewhere with a multichannel endpoint: it presses whatever is
-# enabled, so the ratchet shrinks by itself there.
-$maximumPending = 22
+# RAISED TO 23 ON 2026-09-02, and this time the reason is the machine rather than the harness — and
+# it took two goes to get right, which is the part worth keeping. The channel layout became three
+# buttons, each offered only where the chosen endpoint's driver takes it. On the development machine
+# every physical endpoint declares two channels, so stereo is pressable and 5.1 and 7.1 are not; on a
+# hosted runner there is no render endpoint at all and none of the three is.
+#
+# This gate is symmetrical: it fails a pending control that is not on the list AND a listed control
+# that turns out to be pressed. So a list holding stereo goes red on the development machine and a
+# list without it goes red in CI — 219 pressed here against 218 there, measured the same day. There
+# is no list that is right on both while the scene presses whatever it can.
+#
+# So the scene presses none of the three and asserts the correspondence in both directions instead,
+# which is the half a press could not check anyway: enabled exactly when the driver takes the layout.
+# All three leave this list the day the walk runs somewhere with multichannel output, and the press
+# loop comes back in the same change.
+$maximumPending = 23
 
 function Get-CommandControlInventory {
     param([string]$SourceRoot)

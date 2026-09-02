@@ -60,9 +60,18 @@ SubtitleStyleView#SubtitleStyleForegroundCustom
 ## because a person cannot press one either.
 ##
 ## What the scene does instead is assert the correspondence in both directions: the button is dimmed
-## exactly when the driver refuses the layout, and enabled exactly when it takes it. Stereo is
-## pressed with a real mouse like everything else. The two below become pressable the day this walk
-## runs on a machine with a multichannel endpoint, and the scene needs no change for that: it presses
-## whatever is enabled.
+## exactly when the driver refuses the layout, and enabled exactly when it takes it.
+##
+## RAISED AGAIN THE SAME DAY, to 23, and stereo joined them for a reason worth writing: no list can
+## be right on both machines. On this developer machine stereo IS pressable — every physical endpoint
+## declares two channels — while a hosted runner has no render endpoint at all and offers none of the
+## three. This gate is symmetrical: it fails a pending control that is not listed AND a listed one
+## that turns out to be pressed, so a list with stereo goes red here and a list without it goes red
+## in CI. Measured that day: 219 pressed here against 218 there.
+##
+## So the scene presses none of the three and asserts the correspondence, which is the half a press
+## could not check anyway. All three come off this list the day the walk runs somewhere with
+## multichannel output, and the scene gets its press loop back in the same change.
 AudioOutputView#AudioLayoutSurround51
 AudioOutputView#AudioLayoutSurround71
+AudioOutputView#AudioOutputLayoutStereo
