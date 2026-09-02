@@ -54,6 +54,12 @@ public sealed class ShellWindowModeTests
         Assert.Equal(PlaybackMode.Fullscreen, shell.PlaybackMode);
         Assert.Equal(WindowState.FullScreen, window.WindowState);
 
+        // Left before closing, and that is not tidiness. A window closed while still in the state
+        // leaves it behind for whatever runs next, and CI answered exactly that on 2026-09-02: an
+        // unrelated test failed in CLEANUP with "the calling thread cannot access this object",
+        // green here every time and red there. A test gives the world back the way it found it.
+        await shell.TogglePlaybackModeAsync(PlaybackMode.Fullscreen, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
         window.Close();
     }
 
@@ -91,6 +97,41 @@ public sealed class ShellWindowModeTests
         Assert.Equal(900, window.Width);
         Assert.Equal(700, window.Height);
 
+        window.Close();
+    }
+
+    /// <summary>
+    /// Going from fullscreen to the mini player takes the shell's window out of the state.
+    /// </summary>
+    /// <remarks>
+    /// The small player lives in a window of its own, so a shell left in the state would sit behind
+    /// it still covering the screen — and the person would find it there on closing the mini one.
+    /// The first condition written for this said "any mode that is not Mini", which excluded exactly
+    /// this path.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Going_from_fullscreen_to_the_mini_player_takes_the_shell_out_of_the_state()
+    {
+        var shell = new ShellViewModel(new NavigationService(), ShellAssemblyTests.EditorSurfaces());
+        var window = new Window { Width = 900, Height = 700, Content = new ShellView { DataContext = shell } };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        await shell.OpenPlayerAsync(
+            new PlayDetailsRequest(MediaFile, TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+        await shell.TogglePlaybackModeAsync(PlaybackMode.Fullscreen, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(WindowState.FullScreen, window.WindowState);
+
+        await shell.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(WindowState.Normal, window.WindowState);
+        Assert.Equal(900, window.Width);
+
+        await shell.TogglePlaybackModeAsync(PlaybackMode.Mini, TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
         window.Close();
     }
 }
