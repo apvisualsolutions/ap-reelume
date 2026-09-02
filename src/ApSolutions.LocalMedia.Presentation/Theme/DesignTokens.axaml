@@ -160,6 +160,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <x:Double x:Key="FontSizeSubtitle">20</x:Double>
       <x:Double x:Key="FontSizeBody">14</x:Double>
       <x:Double x:Key="FontSizeCaption">12</x:Double>
+      <!--
+        The step below the caption, added 2026-09-02 with the count that earns it: the prototype
+        writes 11 px <b>fifty-nine times</b> — second only to 12's eighty-six — and this scale
+        stopped at 12, so every one of those was going to arrive as a literal or as a caption a
+        pixel too big.
+        <para>
+        The rule this scale is held to is not «does the step make sense» but «does the design
+        contradict it», which is what refused FontSizeMono: that one was a step for a single
+        consumer. This one is the second most common size in the whole prototype — the section
+        overlines, the downmix note, the device capabilities beside each output.
+        </para>
+      -->
+      <x:Double x:Key="FontSizeFootnote">11</x:Double>
 
       <!--
         Fixed width, for the three surfaces where characters have to line up under each other: the
