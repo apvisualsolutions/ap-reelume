@@ -35,27 +35,40 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource TrackSelectorAudioLabel}" />
       <!--
-        A template and not DisplayMemberBinding, which is what this had: the two are exclusive, and
-        only a template can say that a track name too long for 320 px ends in an ellipsis with the
-        whole of it in a tooltip. A track's name is the one string in this column nobody can shorten -
-        it comes out of the file.
+        A list of radios and not a drop-down, which is what the prototype draws: the tracks of a file
+        are three or four, they fit, and a drop-down charges a click to learn what the other choices
+        even are. The row keeps the ellipsis and the tooltip it had — a track's name comes out of the
+        file and nobody can shorten it.
+
+        The accessible name is the list's own key on every row, with the track's name in HelpText,
+        and that is the shape PersonalActionsView's rating buttons already have. Two reasons, and the
+        second is the one that is easy to miss: the walk's inventory reads the anchor out of the
+        markup, so N rows declared once are one identity — and if that identity were {Binding
+        Display} it would be the SAME identity as the subtitle list's, because both are declared in
+        this one file. Pressing an audio row would then mark the subtitle row covered, and the gate
+        would stay green over a control nobody had ever clicked.
       -->
-      <ComboBox
-          x:Name="AudioTrackSelector"
-          Classes="side-list"
-          MinWidth="260"
-          automation:AutomationProperties.Name="{DynamicResource TrackSelectorAudioLabel}"
-          ItemsSource="{Binding AudioTracks}"
-          SelectedItem="{Binding SelectedAudio, Mode=TwoWay}">
-        <ComboBox.ItemTemplate>
+      <ItemsControl x:Name="AudioTrackSelector" ItemsSource="{Binding AudioTracks}">
+        <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="player:TrackOption">
-            <TextBlock
-                Classes="row-label"
-                Text="{Binding Display}"
-                ToolTip.Tip="{Binding Display}" />
+            <Border Classes="option-row" Classes.selected="{Binding IsSelected}">
+              <RadioButton
+                  Classes="option"
+                  Command="{Binding $parent[ItemsControl].((player:TrackSelectorViewModel)DataContext).ChooseAudioCommand}"
+                  CommandParameter="{Binding}"
+                  GroupName="AudioTrack"
+                  IsChecked="{Binding IsSelected, Mode=OneWay}"
+                  automation:AutomationProperties.Name="{DynamicResource TrackSelectorAudioLabel}"
+                  automation:AutomationProperties.HelpText="{Binding Display}">
+                <TextBlock
+                    Classes="row-label"
+                    Text="{Binding Display}"
+                    ToolTip.Tip="{Binding Display}" />
+              </RadioButton>
+            </Border>
           </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </StackPanel>
 
     <StackPanel
@@ -64,22 +77,31 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <TextBlock
           Foreground="{DynamicResource PlayerTextBrush}"
           Text="{DynamicResource TrackSelectorSubtitleLabel}" />
-      <ComboBox
-          x:Name="SubtitleTrackSelector"
-          Classes="side-list"
-          MinWidth="260"
-          automation:AutomationProperties.Name="{DynamicResource TrackSelectorSubtitleLabel}"
-          ItemsSource="{Binding SubtitleTracks}"
-          SelectedItem="{Binding SelectedSubtitle, Mode=TwoWay}">
-        <ComboBox.ItemTemplate>
+      <!--
+        The same list one panel over, and its own GroupName: two radio groups in one view that
+        shared a name would be one group, so choosing a subtitle would put out the audio row.
+      -->
+      <ItemsControl x:Name="SubtitleTrackSelector" ItemsSource="{Binding SubtitleTracks}">
+        <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="player:TrackOption">
-            <TextBlock
-                Classes="row-label"
-                Text="{Binding Display}"
-                ToolTip.Tip="{Binding Display}" />
+            <Border Classes="option-row" Classes.selected="{Binding IsSelected}">
+              <RadioButton
+                  Classes="option"
+                  Command="{Binding $parent[ItemsControl].((player:TrackSelectorViewModel)DataContext).ChooseSubtitleCommand}"
+                  CommandParameter="{Binding}"
+                  GroupName="SubtitleTrack"
+                  IsChecked="{Binding IsSelected, Mode=OneWay}"
+                  automation:AutomationProperties.Name="{DynamicResource TrackSelectorSubtitleLabel}"
+                  automation:AutomationProperties.HelpText="{Binding Display}">
+                <TextBlock
+                    Classes="row-label"
+                    Text="{Binding Display}"
+                    ToolTip.Tip="{Binding Display}" />
+              </RadioButton>
+            </Border>
           </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </StackPanel>
 
     <!--

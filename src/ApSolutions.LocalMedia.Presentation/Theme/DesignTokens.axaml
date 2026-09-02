@@ -159,6 +159,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <x:Double x:Key="FontSizeTitle">28</x:Double>
       <x:Double x:Key="FontSizeSubtitle">20</x:Double>
       <x:Double x:Key="FontSizeBody">14</x:Double>
+      <!--
+        The step between body and caption, added 2026-09-02 by the same rule FontSizeFootnote came in
+        under: not «does the step make sense» but «does the design contradict it». Counted in the
+        prototype that day, 13 px is written <b>seventy times</b> — third of all sizes, behind 12's
+        seventy-five and 11's fifty-three, and more than four times as often as the 14 this scale
+        calls body. It is the size of a row's own label: the three option lists of the player's panel
+        are the first to spend it.
+        <para>
+        Body stays at 14 and is not moved to meet it. What the count says is that the scale was
+        missing a step, not that the step it has is wrong, and re-reading every surface in the
+        application against the prototype is a measurement of its own rather than a side effect of
+        this one.
+        </para>
+      -->
+      <x:Double x:Key="FontSizeControl">13</x:Double>
       <x:Double x:Key="FontSizeCaption">12</x:Double>
       <!--
         The step below the caption, added 2026-09-02 with the count that earns it: the prototype
@@ -2393,6 +2408,100 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Height" Value="36" />
     <Setter Property="Padding" Value="8,0" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!--
+    One row of an option list — what the prototype draws where this application had a drop-down. The
+    three lists of the player's panel are audio track, output device and subtitle track, and all
+    three are `<label>` rows carrying a radio, not a `<select>`: the choices are three or four, they
+    fit, and hiding them behind a click costs a click to learn what the other two even are.
+
+    A Border around the RadioButton and not the RadioButton alone, and that is a measurement rather
+    than a preference. Measured 2026-09-02 on the base theme's own template: it builds three Ellipses
+    and a ContentPresenter and <b>no Border at all</b>, so Background and CornerRadius set on the
+    control are properties nothing in the template reads — the fill would simply not appear, and a
+    style that sets a property nobody reads is the shape of green this repository keeps finding.
+
+    The numbers are the design's, taken from the row's own style object rather than from a
+    screenshot: min-height 34, padding '0 8px', border-radius 4, and the chosen row washed with the
+    accent.
+  -->
+  <Style Selector="Border.option-row">
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <!--
+    The wash the design puts behind the row in force: rgba(98,174,232,.16) is the accent at 16%, and
+    AccentSubtleBrush is that same wash as a token — so it follows the six accents a person can pick
+    and it turns into the right thing in both high-contrast themes, which a literal could not.
+  -->
+  <Style Selector="Border.option-row.selected">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+  </Style>
+
+  <!--
+    The control inside it fills the row, so the whole row answers a click the way the prototype's
+    label does — a radio a person has to hit exactly is a 15 px target in a 34 px row.
+  -->
+  <Style Selector="RadioButton.option">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeControl}" />
+    <!--
+      4 and not the theme's 8, and it is derived rather than chosen. Measured 2026-09-02: the
+      template keeps a 20 px column for the circle whatever size the circle is, and the content
+      starts at 20 plus this padding. The ellipses below are pulled to the left of that column — so
+      the circle begins at the row's own 8 px of padding, which is where the prototype puts it — and
+      they end at 15, leaving 20 + 4 - 15 = 9, the gap the design writes.
+
+      At the theme's 8, with the circle centred in its column, the gap came out 10.5, and no whole
+      padding answers 9 from a centred 15 px ellipse: the layout rounds, so 6.5 measured 8.5 and 7
+      would measure 9.5. What the gate measures is the GAP and not this setter, so the day the base
+      theme changes that column, the measurement is what says 4 has stopped being the right answer.
+    -->
+    <Setter Property="Padding" Value="4,0,0,0" />
+  </Style>
+
+  <!--
+    15 and not the theme's 20, measured the same day: OuterEllipse and CheckOuterEllipse both come
+    out 20x20 with an 8x8 glyph inside. The design draws 15, which is a third smaller and the
+    difference between a control that sits in a 34 px row and one that fills it.
+
+    The glyph moves with them, at the ratio the theme itself uses — 8 of 20 is 6 of 15 — because
+    leaving it at 8 inside a 15 px circle would draw a dot with almost no ring around it.
+  -->
+  <Style Selector="RadioButton.option /template/ Ellipse#OuterEllipse">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Width" Value="15" />
+    <Setter Property="Height" Value="15" />
+  </Style>
+
+  <Style Selector="RadioButton.option /template/ Ellipse#CheckOuterEllipse">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Width" Value="15" />
+    <Setter Property="Height" Value="15" />
+  </Style>
+
+  <Style Selector="RadioButton.option /template/ Ellipse#CheckGlyph">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Margin" Value="4.5,0,0,0" />
+    <Setter Property="Width" Value="6" />
+    <Setter Property="Height" Value="6" />
+  </Style>
+
+  <!--
+    What the endpoint can carry, at the end of its own row. Eleven and dimmed, which is how the
+    design separates a fact about the device from the name a person is choosing by — and it is the
+    only one of the three lists that has a second string to draw at all.
+  -->
+  <Style Selector="TextBlock.option-capabilities">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeFootnote}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Opacity" Value="0.6" />
   </Style>
 
   <!--

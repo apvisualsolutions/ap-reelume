@@ -21,13 +21,48 @@ SPDX-License-Identifier: GPL-3.0-or-later
         asserts each heading IS its label uppercased, in both languages.
       -->
       <TextBlock Classes="section-overline" Text="{DynamicResource AudioOutputDeviceHeading}" />
-      <ComboBox
-          x:Name="AudioDeviceSelector"
-          MinWidth="280"
-          automation:AutomationProperties.Name="{DynamicResource AudioOutputDeviceLabel}"
-          DisplayMemberBinding="{Binding Display}"
-          ItemsSource="{Binding Devices}"
-          SelectedItem="{Binding SelectedDevice, Mode=TwoWay}" />
+      <!--
+        A list of radios and not a drop-down, which is what the prototype draws for all three of the
+        panel's lists. The row carries two strings and not one: the endpoint's name takes the width,
+        and what it can carry sits at the end, smaller and dimmed. Joined into a single label — which
+        is what this was — they could only ever be drawn in one weight.
+
+        The accessible name is the list's key on every row with the endpoint in HelpText, the shape
+        the rating buttons already have: the walk's inventory reads the anchor out of the markup, so
+        the whole list is one identity and the name has to be the one the inventory counts.
+      -->
+      <ItemsControl x:Name="AudioDeviceSelector" ItemsSource="{Binding Devices}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="player:AudioOutputOption">
+            <Border Classes="option-row" Classes.selected="{Binding IsSelected}">
+              <RadioButton
+                  Classes="option"
+                  Command="{Binding $parent[ItemsControl].((player:AudioOutputViewModel)DataContext).ChooseDeviceCommand}"
+                  CommandParameter="{Binding}"
+                  GroupName="AudioDevice"
+                  IsChecked="{Binding IsSelected, Mode=OneWay}"
+                  automation:AutomationProperties.Name="{DynamicResource AudioOutputDeviceLabel}"
+                  automation:AutomationProperties.HelpText="{Binding Display}">
+                <!--
+                  A Grid and not a horizontal StackPanel, for the reason the notice below already
+                  carries: a StackPanel offers its children infinite width, so the name would never
+                  give way and the capability would be pushed off the edge of a 320 px panel.
+                -->
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+                  <TextBlock
+                      Classes="row-label"
+                      Text="{Binding Display}"
+                      ToolTip.Tip="{Binding Display}" />
+                  <TextBlock
+                      Grid.Column="1"
+                      Classes="option-capabilities"
+                      Text="{Binding Capabilities}" />
+                </Grid>
+              </RadioButton>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </StackPanel>
 
     <StackPanel Spacing="{DynamicResource Space4}">

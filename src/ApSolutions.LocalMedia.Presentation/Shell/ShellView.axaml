@@ -944,7 +944,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         <Panel x:Name="PlayerStage">
         <player:PlayerView
             DataContext="{Binding Player.Player}"
-            OutputSummary="{Binding $parent[shell:ShellView].((shell:ShellViewModel)DataContext).Player.AudioOutput.SelectedDevice.Display}" />
+            OutputSummary="{Binding $parent[shell:ShellView].((shell:ShellViewModel)DataContext).Player.AudioOutput.SelectedDevice.Summary}" />
         <ContentControl IsVisible="{Binding HasVideoStatus}">
           <player:VideoStatusOverlay DataContext="{Binding Player.VideoStatus}" />
         </ContentControl>

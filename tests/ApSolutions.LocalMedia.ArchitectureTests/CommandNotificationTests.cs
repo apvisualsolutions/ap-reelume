@@ -64,11 +64,19 @@ public sealed class CommandNotificationTests
             // a moving one — the driver answers it, and it changes when the output device does — so
             // it is asked by the button's IsEnabled binding, which notifies, rather than in here,
             // which does not.
+            // And, from 2026-09-02, the row of the output list: whether the parameter is one of the
+            // options at all. Which endpoints exist does change — a headset is plugged in — but the
+            // list is rebuilt when it does, so a row that is on screen is a row that can be chosen.
             ["src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs"] =
                 [
                     "public bool CanExecute(object? parameter) => parameter is string word "
                     + "&& Words.ContainsKey(word);",
+                    "public bool CanExecute(object? parameter) => parameter is AudioOutputOption;",
                 ],
+            // The rows of the audio and subtitle lists, asking the same question: is this parameter
+            // an option. One command each, so choosing a subtitle cannot arrive at the audio half.
+            ["src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorViewModel.cs"] =
+                ["public bool CanExecute(object? parameter) => parameter is TrackOption;"],
             // The subtitle swatches, whose question is whether the parameter is a colour at all.
             ["src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs"] =
                 [

@@ -1,5 +1,106 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-02, nineteenth session: the three lists of radios, and a premise from the last handover that was false
+>
+> **Batch 1 is done and closed.** The player panel's three lists — audio track, output device and
+> subtitles — stop being `ComboBox`es and become lists of radios, with the prototype's numbers: a row
+> of `minHeight:34`, `padding:'0 8px'`, `borderRadius:4`, a 15×15 radio, a 13 px label and the chosen
+> row washed in the accent.
+>
+> ### The last handover's warning was false, and measuring before touching anything is what said so
+>
+> "A `ComboBox` is one control and N radios are N" — no. The inventory in
+> `eng/check-walk-coverage.ps1` reads **declarations out of the `.axaml`**, not instances on screen,
+> so N rows born of one template are **one** identity. Measured with that script before anything was
+> written and with the walk actually run at the end: **246 declarations, 241 identities, 218 pressed,
+> 23 pending**, both times. **The walk's ratchet does not move**, and the two scenes that opened a
+> drop-down do not "stop being valid": they measure more than before, because a row can be asked
+> which track is playing and a drop-down could only be asked whether it opened.
+>
+> ### The trap that same mechanism hides, and which decided the accessible name
+>
+> The audio and subtitle lists are declared **in one file**. An `AutomationProperties.Name` of
+> `{Binding Display}` on both would have made them a **single** identity: pressing an audio row would
+> have marked the subtitle row covered, and the gate would have stayed green forever over a control
+> nobody pressed. The name is the list's own key and the track goes in `HelpText` — the shape the
+> rating buttons already had.
+>
+> ### What came out of writing the gate, none of it what it was looking for
+>
+> · **`ButtonShapeTests` was measuring the wrong control.** `Corner(kind, class)` built a `Button`
+>   for any kind that was not `ToggleButton`, so `RadioButton.option` read **999** — a `Button`'s
+>   corner — where a real `RadioButton` draws **3**. Corrected with a `switch` that throws on a kind
+>   it cannot build, and with a line that **ties each row's `Kind` to the type its selector names**,
+>   since without one the table could ask for the wrong control all over again.
+> · **One of the ten mutations got through on the first pass.** Taking `Classes.selected` off the
+>   device list turned nothing red: the gate named two views and measured one. Corrected, all ten
+>   fall.
+>
+> ### And the auditor found eleven MORE holes, all closed and re-measured
+>
+> **It runs before closing and this time it paid for itself.** The worst was in the shape itself:
+> **the row drew a 10.5 px gap where the design writes 9**, and the table declared it while no test
+> asked for it — 1.5 px certified as measured. The cause, measured: the base template keeps a **20 px
+> column** for the circle whatever size the circle is, so a 15 px ellipse sits centred in it and
+> starts at 2.5. **And the fix surfaced another defect**: the inner dot stayed centred in the old
+> column, 2.5 px off-centre inside its own circle.
+>
+> The other ten, each measured by mutating what it protects: deleting the second string from the
+> device row left the application without its "7.1" and everything green; taking `Mark(...)` out of
+> the device setter **and** the subtitle one turned the wash into a photograph; dropping `row-label`
+> and its tooltip cut a track's name with no ellipsis; removing the two `Stretch` shrank the control
+> from **304 px to 115** in a 320 px row; swapping the `Grid` for a `StackPanel` pushed the capability
+> off the panel; and sharing one `GroupName` made choosing a subtitle put out the audio row.
+>
+> **Two of those eleven teach a new shape of blind gate**, worth keeping to hand:
+> `Assert.Equal(Views.Length, Surfaces().Length)` compares **two literals of the same file** and ties
+> nothing; and a test that looks at a list only **after it loads** cannot tell a wash that follows the
+> choice from one painted once.
+> · **The pattern that reads the design matched five rows, not three.** The two extra were other
+>   controls sharing the shape; it is anchored on each list's name now.
+> · **`Application.FindResource` answers `UnsetValue`** for a token living in a theme dictionary. It
+>   has to be asked in the variant the control is drawn in.
+> · **Fluent's `RadioButton` template has no `Border`**, so `Background` and `CornerRadius` set on
+>   the control are numbers nothing reads. The row carries them on a `Border` of its own. And its
+>   ellipse measures **20**, not the design's 15.
+>
+> ### `FontSizeControl` (13) joins the scale
+>
+> Under the rule `FontSizeFootnote` came in on: not "does the step make sense" but "does the design
+> contradict it". Counted in the prototype, 13 appears **seventy times** — third behind 12's
+> seventy-five and 11's fifty-three, and more than four times the 14 the scale calls body. **Body
+> stays at 14 and is not moved to meet it**: re-reading every surface against the prototype is batch
+> 2, not a side effect of this one.
+>
+> ### NEXT
+>
+> **2. The rest of the surface against the prototype**, with `ADR-0007` open: 84 `CornerRadius` sites
+> across the 60 views spending three tokens while the design draws twelve radii. Five discrepancies
+> already measured: `poster-chip` 999 vs 4, `setting-row` 10 vs 8, `candidate-card` 10 vs 8,
+> `state-chip` 999 vs 8, and the `side-list` row 7 vs 4. **It goes with the small caps**, and this
+> batch leaves a debt in plain view there: `AudioOutputView` draws its headings with
+> `TextBlock.section-overline` and `TrackSelectorView` draws them plain, **in the same panel**. The
+> prototype uses the small caps in 35 places and the tree in two.
+>
+> **3. `CRS-002/003/005` to `VERIFIED`.**
+>
+> ### The traps this batch leaves
+>
+> · **A premise from the previous handover is not a measurement.** This one took two minutes to check
+>   and was false; building on it would have moved a ratchet for no reason.
+> · **A gate that names N views and measures one is green about the N−1 it never looked at.** Only
+>   the mutation said so.
+> · **A gate can build the wrong control to measure it.** A `switch` falling back to a `Button`
+>   reports another control's number under your control's name.
+> · **Choosing a track rebuilds the lists**, so `Assert.Same` fails over equal options. Compare by
+>   what the row says.
+> · **A scene's order is the scene.** Pressing the track before "remember for the series" writes
+>   under the file, and the assertion that nothing is stored under the file was then measuring the
+>   scene's own first press.
+> · **Endpoints belong to the machine.** The device scene **supplies its own second row** rather than
+>   hoping the machine offers two: pressing "when there are two" would leave the control pending on
+>   one machine and pressed on another, which is the list that cannot be right on both.
+
 > ## HANDOVER — 2026-09-02, eighteenth session: the channel layout is not the player's to decide, and full screen reached no window
 >
 > **Five defects, and three of them were the same shape**: something declared in one place that never

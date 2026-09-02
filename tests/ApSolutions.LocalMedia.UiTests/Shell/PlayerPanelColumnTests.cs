@@ -197,8 +197,13 @@ public sealed class PlayerPanelColumnTests
         // is what carries one to the other. What it says is the device and what it can carry, which
         // is the pill the prototype draws at the right of its transport.
         Assert.Equal("Altavoces del sistema · 2.0", player.OutputSummary);
+
+        // Summary and not Display, since 2026-09-02: the panel's row draws the name and the
+        // capability apart, in two weights, and the foot is the one surface that still wants them
+        // joined. Asserting against the model as well as against the literal is what would catch the
+        // foot being wired to the half that says only the name.
         Assert.Equal(
-            viewModel.Player!.AudioOutput!.SelectedDevice!.Display,
+            viewModel.Player!.AudioOutput!.SelectedDevice!.Summary,
             player.OutputSummary);
 
         var surface = Assert.Single(

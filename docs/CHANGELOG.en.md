@@ -10,6 +10,68 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The player panel's three lists stop being drop-downs and become lists of radios**, which is what
+  the prototype draws: audio track, output device and subtitles. With three or four choices that fit
+  on the surface, a drop-down charges a click just to learn what the others are. The numbers come
+  from the style object the design writes three times over — once per list: a row of `minHeight:34`,
+  `padding:'0 8px'`, `borderRadius:4`, a 15×15 radio and a 13 px label, with the chosen row washed in
+  the accent.
+
+  **The walk's ratchet does NOT move, and that was measured before anything was touched.** The
+  previous handover warned that "a `ComboBox` is one control and N radios are N", and the premise
+  turned out to be **false**: the inventory in `eng/check-walk-coverage.ps1` reads declarations out
+  of the `.axaml`, not instances on screen, so N rows born of one template are **one** identity.
+  Measured with that same script before and after: **246 declarations and 241 identities** both
+  times, with the three keys intact.
+
+  **And there is a trap in that same mechanism, which is what decided the accessible name.** The
+  audio and subtitle lists are declared **in one file**, so an `AutomationProperties.Name` of
+  `{Binding Display}` on both would have made them a **single** identity: pressing an audio row would
+  have marked the subtitle row covered, and the gate would have stayed green over a control nobody
+  ever clicked. The name is the list's own key and the track goes in `HelpText`, which is the shape
+  the rating buttons already had.
+
+  **The walk's scene measures more than it did, not less.** A drop-down could only be asked whether
+  it opened; a row can be asked whether the track it names is the one playing. And the device scene
+  **supplies its own second row** rather than hoping the machine offers two: endpoints belong to the
+  machine, and a scene that pressed "when there are two" would leave this control pending on one
+  machine and pressed on another — the list that cannot be right on both, which already cost a
+  correction this same week.
+
+- **`FontSizeControl` (13) joins the type scale**, under the rule `FontSizeFootnote` came in on: not
+  "does the step make sense" but "does the design contradict it". Counted in the prototype, 13
+  appears **seventy times** — third behind 12's seventy-five and 11's fifty-three, and more than four
+  times the 14 this scale calls body. Body stays at 14 and is not moved to meet it: what the count
+  says is that the scale was missing a step, not that the one it has is wrong.
+
+- **`OptionRowShapeTests`, measured with twenty-one mutations across two rounds.** It reads the
+  numbers off **the control** with `AppearanceService` running — not off the token file, which is how
+  two shapes came to be certified and wrong — and the other half of every claim off **the design**,
+  with the pattern that finds the number inside the document. Ten mutations of its own fell; **the
+  auditor found eleven more holes and every one is closed and re-measured.**
+
+  **The worst was in the shape itself: the row drew a 10.5 px gap where the design writes 9.** The
+  table declared it and no test asked for it — 1.5 px certified as measured. The cause, measured: the
+  base template keeps a **20 px column** for the circle whatever size the circle is, so a 15 px
+  ellipse sits centred in it and starts at 2.5. Both ellipses are pulled left now — the circle starts
+  at the row's own 8 px of padding, which is where the prototype puts it — and the content padding
+  drops to 4. **And that fix surfaced another**: the inner dot stayed centred in the old column,
+  **2.5 px off-centre** inside its own circle.
+
+  **The other ten, all measured by mutating what they protect**: deleting the second string from the
+  device row left the application without its "7.1" and every suite green; taking `Mark(...)` out of
+  the device setter **and** the subtitle one turned the wash into a photograph; dropping `row-label`
+  and its tooltip cut a track's name with no ellipsis and no way to read the rest; removing the two
+  `Stretch` shrank the control from **304 px to 115** in a 320 px row; swapping the `Grid` for a
+  `StackPanel` pushed the capability off the panel; and sharing one `GroupName` between the two lists
+  made choosing a subtitle put out the audio row.
+
+  **Two more things came out of writing it, and neither was what it was looking for.** The pattern
+  that reads the design matched **five** rows rather than three: the two extra were other controls
+  that share the shape, so it is anchored on each list's name. And `Application.FindResource` answers
+  `UnsetValue` for a token that lives in a theme dictionary — it has to be asked in the variant the
+  control is drawn in, or nothing is read and that is called a comparison.
+
 - **The prototype's three buttons, in place of the drop-down.** `chList` is a row of three — Stereo,
   5.1, 7.1 — with the chosen one accented and the ones the device will not take dimmed rather than
   absent; that is what is drawn now. **And the drop-down showed the program's internal names**:

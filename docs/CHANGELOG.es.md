@@ -10,6 +10,69 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las tres listas del panel del reproductor dejan de ser desplegables y pasan a ser listas de
+  radios**, que es lo que el prototipo dibuja: pista de audio, dispositivo de salida y subtítulos.
+  Con tres o cuatro opciones que caben, un desplegable cobra un clic sólo por enterarse de cuáles
+  son las otras. Los números salen del objeto de estilo que el diseño escribe tres veces —una por
+  lista—: fila de `minHeight:34`, `padding:'0 8px'`, `borderRadius:4`, radio de 15×15 y etiqueta a
+  13, con la fila elegida lavada con el acento.
+
+  **El trinquete del paseo NO se mueve, y eso se midió antes de tocar nada.** El relevo anterior
+  avisaba de que «un `ComboBox` es un control y N radios son N», y la premisa resultó **falsa**: el
+  inventario de `eng/check-walk-coverage.ps1` lee las declaraciones del `.axaml`, no las instancias
+  en pantalla, así que N filas nacidas de una plantilla son **una** identidad. Medido en el mismo
+  guion antes y después: **246 declaraciones y 241 identidades** las dos veces, con las tres claves
+  intactas.
+
+  **Y hay una trampa en ese mismo mecanismo que costó elegir el nombre accesible.** Las listas de
+  audio y de subtítulos se declaran **en el mismo archivo**, así que un `AutomationProperties.Name`
+  de `{Binding Display}` en las dos habría dado **una sola** identidad para ambas: pulsar una fila de
+  audio habría dado por cubierta la de subtítulos y la puerta se habría quedado verde sobre un
+  control que nadie pulsó nunca. El nombre es la clave de la lista y la pista va en `HelpText`, que
+  es la forma que los botones de valoración ya tenían.
+
+  **La escena del paseo mide más que antes, no menos.** Un desplegable sólo podía contestar si se
+  había abierto; una fila contesta si la pista que nombra es la que suena. Y la del dispositivo
+  **siembra su propia segunda fila** en vez de esperar que la máquina ofrezca dos: los endpoints son
+  de la máquina, y una escena que pulsara «cuando haya dos» dejaría este control pendiente en un sitio
+  y pulsado en otro — la lista imposible de acertar en dos máquinas que esta misma semana ya costó
+  una corrección.
+
+- **`FontSizeControl` (13) entra en la escala tipográfica**, por la regla con la que entró
+  `FontSizeFootnote`: no «tiene sentido el escalón» sino «lo contradice el diseño». Contados en el
+  prototipo, 13 aparece **setenta veces** —tercero tras las setenta y cinco de 12 y las cincuenta y
+  tres de 11, y más de cuatro veces lo que el 14 que esta escala llama cuerpo—. El cuerpo se queda
+  en 14 y no se mueve a su encuentro: lo que la cuenta dice es que a la escala le faltaba un escalón,
+  no que el que tiene esté mal.
+
+- **`OptionRowShapeTests`, medida con veintiuna mutaciones en dos vueltas.** Lee los números **del
+  control** con `AppearanceService` corriendo —no del archivo de tokens, que es como dos formas
+  llegaron a estar certificadas y mal— y la otra mitad de cada afirmación la lee **del diseño**, con
+  el patrón que encuentra el número dentro del documento. Diez mutaciones propias cayeron; **el
+  auditor encontró once agujeros más y todos están cerrados y vueltos a medir.**
+
+  **El peor era el de la propia forma: la fila dibujaba un hueco de 10,5 px donde el diseño escribe
+  9.** La tabla lo declaraba y ninguna prueba lo preguntaba — 1,5 px certificados como medidos. La
+  causa, medida: la plantilla base reserva **20 px de columna** para el círculo mida lo que mida, así
+  que una elipse de 15 queda centrada y empieza en 2,5. Ahora las dos elipses se alinean a la
+  izquierda —el círculo empieza justo en el padding de 8 de la fila, que es donde el prototipo lo
+  pone— y el relleno del contenido baja a 4. **Y ese arreglo destapó otro**: el punto interior se
+  quedaba centrado en la columna vieja, **2,5 px descentrado** dentro de su propio círculo.
+
+  **Los otros diez, todos medidos mutando lo que protegen**: borrar la segunda cadena de la fila de
+  dispositivos dejaba la aplicación sin el «7.1» y las suites en verde; quitar `Mark(...)` del setter
+  del dispositivo **y** del de subtítulos convertía el lavado en una foto; quitar `row-label` y su
+  tooltip cortaba el nombre de una pista sin elipsis y sin forma de leer el resto; quitar los dos
+  `Stretch` encogía el control de **304 px a 115** en una fila de 320; cambiar el `Grid` por un
+  `StackPanel` empujaba la capacidad fuera del panel; y compartir el `GroupName` entre las dos listas
+  hacía que elegir un subtítulo apagara la pista de audio.
+
+  **Dos cosas más salieron de escribirla, y ninguna era la que se buscaba.** El patrón que lee el
+  diseño casaba **cinco** filas y no tres: las dos de más eran otros controles que comparten la
+  forma, así que va anclado al nombre de cada lista. Y `Application.FindResource` contesta
+  `UnsetValue` para un token que vive en un diccionario de tema — hay que preguntarlo en la variante
+  en la que el control se dibuja, o se lee nada y se llama a eso una comparación.
+
 - **Los tres botones del prototipo, en vez del desplegable.** `chList` es una fila de tres —Estéreo,
   5.1, 7.1— con el elegido acentuado y los que el dispositivo no admite atenuados en vez de
   ausentes; eso es lo que se dibuja ahora. **Y el desplegable enseñaba los nombres internos del

@@ -135,6 +135,16 @@ public sealed class ButtonShapeTests
         ("Button.link-action", "Button", "link-action", 999,
             "btnLink is the prototype's counterpart and gives no radius at all: no background and no "
             + "border, so there is no corner to draw. What this class inherits is never painted."),
+        ("RadioButton.option", "RadioButton", "option", 3,
+            "the prototype does draw this row — audioList, devList and subList share one style "
+            + "object with borderRadius 4 — but the surface that draws it here is the Border the "
+            + "row lives in, measured 2026-09-02: the base theme's RadioButton template builds "
+            + "three Ellipses and a ContentPresenter and no Border at all, so a corner set on this "
+            + "class is a number nothing reads. The 3 is what the base theme hands a RadioButton "
+            + "and it is never painted — and it is also what made the measurement itself wrong "
+            + "until that day: Corner built a Button for every kind that was not ToggleButton, so "
+            + "this class first measured 999, a Button's corner reported as a RadioButton's. "
+            + "Border.option-row carries the 4, and OptionRowShapeTests measures it."),
     ];
 
     /// <summary>
@@ -157,6 +167,15 @@ public sealed class ButtonShapeTests
             .Select(pairing => (pairing.Selector, pairing.Kind, pairing.Class, pairing.Radius, pairing.Control))
             .Concat(Unpaired.Select(entry =>
                 (entry.Selector, entry.Kind, entry.Class, entry.Radius, "the decision written beside it")));
+
+        // The kind a row names is the type its selector names, and that is asserted rather than
+        // assumed: Corner builds what Kind says, so an entry reading ("RadioButton.option",
+        // "Button", …) would measure a Button's corner and report it under the radio's name — the
+        // very false green the RadioButton entry below was written to record.
+        foreach (var (selector, kind, _, _, _) in measured)
+        {
+            Assert.Equal(selector.Split(',')[0].Split('.')[0], kind);
+        }
 
         var offenders = new List<string>();
         foreach (var (selector, kind, styleClass, radius, control) in measured)
@@ -379,7 +398,21 @@ public sealed class ButtonShapeTests
 
     private static CornerRadius Corner(string kind, string styleClass)
     {
-        ContentControl control = kind == "ToggleButton" ? new ToggleButton() : new Button();
+        // The type the table names, and not a Button standing in for all of them. Until 2026-09-02
+        // a ToggleButton was the only alternative and anything else silently became a Button — which
+        // would have measured a Button's corner and reported it as a RadioButton's, the shape of
+        // false green this whole class exists to catch.
+        ContentControl control = kind switch
+        {
+            "ToggleButton" => new ToggleButton(),
+            "RadioButton" => new RadioButton(),
+            "Button" => new Button(),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(kind),
+                kind,
+                "the table names a control this measurement cannot build, so it would be measured as "
+                    + "something else."),
+        };
         control.Content = "x";
         if (styleClass.Length > 0)
         {

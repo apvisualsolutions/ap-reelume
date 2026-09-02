@@ -1,5 +1,107 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-02, decimonovena sesión: las tres listas de radios, y una premisa del relevo anterior que era falsa
+>
+> **La tanda 1 está hecha y cerrada.** Las tres listas del panel del reproductor —pista de audio,
+> dispositivo de salida y subtítulos— dejan de ser `ComboBox` y son listas de radios, con los números
+> del prototipo: fila de `minHeight:34`, `padding:'0 8px'`, `borderRadius:4`, radio de 15×15,
+> etiqueta a 13 y la fila elegida lavada con el acento.
+>
+> ### El aviso del relevo anterior era falso, y medirlo antes de tocar fue lo que lo dijo
+>
+> «Un `ComboBox` es un control y N radios son N» — no. El inventario de
+> `eng/check-walk-coverage.ps1` lee **las declaraciones del `.axaml`**, no las instancias en
+> pantalla, así que N filas nacidas de una plantilla son **una** identidad. Medido con el propio
+> guion antes de escribir nada y con el paseo corrido de verdad al terminar: **246 declaraciones,
+> 241 identidades, 218 pulsadas, 23 pendientes**, las dos veces. **El trinquete del paseo no se
+> mueve** y las dos escenas que abrían el desplegable no «dejan de valer»: miden más que antes,
+> porque una fila contesta qué pista suena y un desplegable sólo contestaba si se había abierto.
+>
+> ### La trampa que ese mismo mecanismo esconde, y que decidió el nombre accesible
+>
+> Las listas de audio y de subtítulos se declaran **en el mismo archivo**. Un
+> `AutomationProperties.Name` de `{Binding Display}` en las dos habría dado **una sola** identidad:
+> pulsar una fila de audio habría dado por cubierta la de subtítulos, y la puerta se habría quedado
+> verde para siempre sobre un control que nadie pulsó. El nombre es la clave de la lista y la pista
+> va en `HelpText` — la forma que los botones de valoración ya tenían.
+>
+> ### Lo que salió de escribir la puerta, que no era lo que se buscaba
+>
+> · **`ButtonShapeTests` medía el control equivocado.** `Corner(kind, class)` construía un `Button`
+>   para cualquier tipo que no fuera `ToggleButton`, así que `RadioButton.option` leyó **999** —el
+>   radio de un `Button`— cuando un `RadioButton` real dibuja **3**. Corregido con un `switch` que
+>   lanza ante un tipo que no sabe construir, y con una línea que **ata el `Kind` de cada fila al
+>   tipo que nombra su selector**, porque sin ella la tabla podía volver a pedir el control
+>   equivocado.
+> · **Una de las diez mutaciones se escapó a la primera.** Quitar `Classes.selected` de la lista de
+>   dispositivos no puso nada en rojo: la puerta nombraba dos vistas y medía una. Corregida, las diez
+>   caen.
+>
+> ### Y el auditor encontró once agujeros MÁS, todos cerrados y vueltos a medir
+>
+> **Se corre antes de cerrar y esta vez pagó con creces.** El peor era de la propia forma: **la fila
+> dibujaba un hueco de 10,5 px donde el diseño escribe 9**, y la tabla lo declaraba sin que ninguna
+> prueba lo preguntara — 1,5 px certificados como medidos. La causa, medida: la plantilla base
+> reserva **20 px de columna** para el círculo mida lo que mida, así que una elipse de 15 queda
+> centrada y empieza en 2,5. **Y el arreglo destapó otro defecto**: el punto interior seguía centrado
+> en la columna vieja, 2,5 px descentrado dentro de su propio círculo.
+>
+> Los otros diez, cada uno medido mutando lo que protege: borrar la segunda cadena de la fila de
+> dispositivos dejaba la aplicación sin el «7.1» y todo en verde; quitar `Mark(...)` del setter del
+> dispositivo **y** del de subtítulos convertía el lavado en una foto; quitar `row-label` y su
+> tooltip cortaba el nombre de una pista sin elipsis; quitar los dos `Stretch` encogía el control de
+> **304 px a 115** en una fila de 320; cambiar el `Grid` por un `StackPanel` empujaba la capacidad
+> fuera del panel; y compartir el `GroupName` hacía que elegir un subtítulo apagara la pista de audio.
+>
+> **Dos de esos once enseñan una forma nueva de puerta ciega**, y conviene tenerlas a mano:
+> `Assert.Equal(Views.Length, Surfaces().Length)` compara **dos literales del mismo archivo** y no
+> ata nada; y una prueba que sólo mira la lista **después de cargar** no distingue un lavado que
+> sigue a la elección de uno pintado una vez.
+> · **El patrón que lee el diseño casaba cinco filas y no tres.** Las dos de más eran otros controles
+>   que comparten la forma; va anclado al nombre de cada lista.
+> · **`Application.FindResource` contesta `UnsetValue`** para un token que vive en un diccionario de
+>   tema. Hay que preguntarlo en la variante en la que el control se dibuja.
+> · **El template del `RadioButton` de Fluent no tiene `Border`**, así que `Background` y
+>   `CornerRadius` puestos en el control son números que nada lee. La fila los lleva en un `Border`
+>   propio. Y su elipse mide **20**, no los 15 del diseño.
+>
+> ### `FontSizeControl` (13) entra en la escala
+>
+> Por la regla con la que entró `FontSizeFootnote`: no «tiene sentido el escalón» sino «lo contradice
+> el diseño». Contado en el prototipo, 13 aparece **setenta veces** —tercero tras las setenta y cinco
+> de 12 y las cincuenta y tres de 11, y más de cuatro veces lo que el 14 que la escala llama cuerpo—.
+> **El cuerpo se queda en 14 y no se mueve a su encuentro**: recorrer toda la superficie contra el
+> prototipo es la tanda 2, no un efecto secundario de ésta.
+>
+> ### LO SIGUIENTE
+>
+> **2. El resto de la superficie contra el prototipo**, con `ADR-0007` abierto: 84 sitios con
+> `CornerRadius` en las 60 vistas gastando tres tokens mientras el diseño dibuja doce radios. Cinco
+> discrepancias ya medidas: `poster-chip` 999 vs 4, `setting-row` 10 vs 8, `candidate-card` 10 vs 8,
+> `state-chip` 999 vs 8, y la fila de `side-list` 7 vs 4. **Va con la versalita**, y ahí hay una
+> deuda que esta tanda deja a la vista: `AudioOutputView` dibuja sus encabezados con
+> `TextBlock.section-overline` y `TrackSelectorView` los dibuja planos, **en el mismo panel**. El
+> prototipo usa la versalita en 35 sitios y el árbol en dos.
+>
+> **3. `CRS-002/003/005` a `VERIFIED`.**
+>
+> ### Las trampas que deja esta tanda
+>
+> · **Una premisa del relevo anterior no es una medición.** Ésta costaba dos minutos comprobarla y
+>   era falsa; construir sobre ella habría movido un trinquete sin motivo.
+> · **Una puerta que nombra N vistas y mide una es verde sobre las N−1 que no miró.** Sólo lo dijo la
+>   mutación.
+> · **Una puerta puede construir el control equivocado para medirlo.** Un `switch` que cae a un
+>   `Button` por defecto reporta el número de otro control con el nombre del tuyo.
+> · **Elegir una pista reconstruye las listas**, así que `Assert.Same` falla sobre opciones iguales.
+>   Se compara por lo que la fila dice.
+> · **El orden de una escena es la escena.** Pulsar la pista antes de «recordar para la serie»
+>   escribe bajo el archivo, y la aserción de que no hay nada bajo el archivo pasaba a medir la
+>   primera pulsación de la propia escena.
+> · **Los endpoints son de la máquina.** La escena del dispositivo **siembra su segunda fila** en vez
+>   de esperar que la máquina ofrezca dos: pulsar «cuando haya dos» dejaría el control pendiente en
+>   un sitio y pulsado en otro, que es la lista imposible de acertar en dos máquinas.
+
 > ## RELEVO — 2026-09-02, decimoctava sesión: la disposición de canales no la decide el reproductor, y la pantalla completa no llegaba a ninguna ventana
 >
 > **Cinco defectos, y tres de ellos eran la misma forma**: algo declarado en un sitio que nunca

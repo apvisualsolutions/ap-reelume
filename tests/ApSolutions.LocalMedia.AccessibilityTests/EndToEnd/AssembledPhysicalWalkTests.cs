@@ -4386,10 +4386,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Four of the five are drop-downs, and a drop-down's effect is that it <b>opens</b>: what is
-    /// chosen inside one lands in a popup root of its own, which is a separate top level and not this
-    /// window's business. Same rule as the library's filter and sort. The lists are asserted on
-    /// separately, because a press that opens an empty list would prove nothing about the list.
+    /// <b>None</b> of the five is a drop-down any more, and that changed what this scene can ask
+    /// for. Until 2026-09-02 four of them were, and a drop-down's only observable effect is that it
+    /// <b>opens</b> — what is chosen inside one lands in a popup root of its own, which is a
+    /// separate top level and not this window's business. The three lists are rows of radios now, so
+    /// what each press is asked for is the choice itself: which track is playing, which output the
+    /// sound is going to.
     /// </para>
     /// <para>
     /// The media is a sample with two audio tracks and a subtitle track, played as an episode of a
@@ -4446,16 +4448,16 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // is hearing is one subject and what they are reading is another. So each one is reached the
         // way a person reaches it — by opening the panel that holds it first.
         await OpenPlayerPanelAsync(host, PlayerPanel.Audio);
-        await PressAsync(
-            host,
-            "TrackSelectorAudioLabel",
-            () => Resolve(host, "TrackSelectorAudioLabel") is ComboBox { IsDropDownOpen: true },
-            "clicking the audio track never opened the list of audio tracks");
-        CloseDropDown(host);
 
-        // The one that is not a drop-down, and the one an earlier batch found a defect in: it
-        // decides whether the choice is stored for this file or for the whole show. It is drawn
-        // under the audio half and only there — one setting governing the pair.
+        // The one that is not a list, and the one an earlier batch found a defect in: it decides
+        // whether the choice is stored for this file or for the whole show. It is drawn under the
+        // audio half and only there — one setting governing the pair.
+        //
+        // It is pressed BEFORE the track and that order is the scene, not a tidy-up: since
+        // 2026-09-02 the track row is a real choice rather than a drop-down being opened, so
+        // pressing it writes a preference. Pressed the other way round the write would land under
+        // the file, and the assertion below — that nothing is stored under the file — would be
+        // measuring the scene's own first press.
         await PressAsync(
             host,
             "TrackSelectorRememberForSeries",
@@ -4463,20 +4465,46 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Remember for this series never asked for the choice to apply to the series");
         Assert.True(tracks.RememberForSeries);
 
+        // The two lists stopped being drop-downs on 2026-09-02 and became rows of radios, which is
+        // what the prototype draws — and the press got stronger for it. A drop-down could only be
+        // asked whether it opened; a row can be asked whether the track it names is the one now
+        // playing, which is the thing a person came to the panel to do.
+        //
+        // The row pressed is the one that is NOT already chosen, because pressing the choice that is
+        // already in force has no effect to observe.
+        var otherAudio = tracks.AudioTracks.Single(option => !ReferenceEquals(option, tracks.SelectedAudio));
+        await PressAsync(
+            host,
+            "TrackSelectorAudioLabel",
+            () => tracks.SelectedAudio?.Display,
+            "clicking an audio track never changed which one is playing",
+            helpText: otherAudio.Display);
+
+        // By what the row says and not by instance: applying a track goes to the real engine, and
+        // the session rebuilds its lists from what the engine announces back — so the option that
+        // ends up chosen is an equal option, not the same object. Measured 2026-09-02, with both
+        // sides printing the identical track.
+        Assert.Equal(otherAudio.Display, tracks.SelectedAudio?.Display);
+
         await OpenPlayerPanelAsync(host, PlayerPanel.Subtitles);
+        var otherSubtitle = tracks.SubtitleTracks
+            .Single(option => !ReferenceEquals(option, tracks.SelectedSubtitle));
         await PressAsync(
             host,
             "TrackSelectorSubtitleLabel",
-            () => Resolve(host, "TrackSelectorSubtitleLabel") is ComboBox { IsDropDownOpen: true },
-            "clicking the subtitle track never opened the list of subtitle tracks");
-        CloseDropDown(host);
+            () => tracks.SelectedSubtitle?.Display,
+            "clicking a subtitle track never changed which one is showing",
+            helpText: otherSubtitle.Display);
+        Assert.Equal(otherSubtitle.Display, tracks.SelectedSubtitle?.Display);
 
-        // And what the box means, not only that it ticks. With it on the next choice is stored under
-        // the show rather than under this episode's file, and the key it is stored under is the same
-        // one the session reads back — which is the defect this batch found: the reading side asked
-        // for the series and the writing side had none, so the application could resolve a
+        // And what the box means, not only that it ticks. With it on, the choice is stored under the
+        // show rather than under this episode's file, and the key it is stored under is the same one
+        // the session reads back — which is the defect an earlier batch found: the reading side
+        // asked for the series and the writing side had none, so the application could resolve a
         // preference nothing in it could ever write.
-        await tracks.ApplyAsync(MediaTrackKind.Audio, TestContext.Current.CancellationToken);
+        //
+        // What performs the write is the row that was pressed two blocks up. Until 2026-09-02 this
+        // scene had to call ApplyAsync itself, because opening a drop-down chose nothing.
         var preferences = host.Application.Services.GetRequiredService<IPlaybackPreferenceRepository>();
         Assert.NotNull(await preferences.GetAsync(
             PreferenceScope.Series,
@@ -4491,12 +4519,60 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(audio);
 
         await OpenPlayerPanelAsync(host, PlayerPanel.Audio);
-        await PressAsync(
-            host,
-            "AudioOutputDeviceLabel",
-            () => Resolve(host, "AudioOutputDeviceLabel") is ComboBox { IsDropDownOpen: true },
-            "clicking the output device never opened the list of outputs");
-        CloseDropDown(host);
+
+        // The output list is a row per endpoint now, and pressing one has an effect only when there
+        // is a row that is not already the chosen one — which is a fact about the machine the walk
+        // happens to run on. This developer machine offers several and a hosted runner may offer
+        // one, and a scene that pressed only «when there are two» would put this control on
+        // eng/walk-pending.txt on one machine and not the other. That is the shape of list this
+        // repository already measured as impossible to get right on both, on 2026-09-02.
+        //
+        // So the scene supplies the second row itself instead of hoping for one, and it is pressed
+        // on every machine. The handler is put aside while it does: choosing a made-up endpoint has
+        // nothing to write to, and a walk must not leave somebody's sound pointing at it. Both are
+        // put back below, and the choice ends where it started.
+        var chosenBefore = audio.SelectedDevice;
+        var handler = audio.SelectionHandler;
+        audio.SelectionHandler = null;
+        var seeded = new AudioOutputOption(
+            new AudioOutputDevice(
+                "walk-second-endpoint",
+                "Segundo destino (paseo)",
+                [AudioChannelLayout.Stereo],
+                IsDefault: false,
+                IsAvailable: true),
+            "Segundo destino (paseo)",
+            "2.0");
+        audio.Devices.Add(seeded);
+        Dispatcher.UIThread.RunJobs();
+
+        // The seeded row is on the list before anything is pressed, and it is the only one this
+        // scene added. Without saying so, the assertions below would hold on a machine with no
+        // render endpoint at all by comparing one absence with another.
+        Assert.Contains(seeded, audio.Devices);
+        Assert.Single(audio.Devices, option => ReferenceEquals(option, seeded));
+        var countBefore = audio.Devices.Count;
+        try
+        {
+            await PressAsync(
+                host,
+                "AudioOutputDeviceLabel",
+                () => audio.SelectedDevice?.Display,
+                "clicking an output never changed where the sound is going",
+                helpText: seeded.Display);
+            Assert.Equal(seeded.Display, audio.SelectedDevice?.Display);
+        }
+        finally
+        {
+            audio.SelectedDevice = chosenBefore;
+            _ = audio.Devices.Remove(seeded);
+            audio.SelectionHandler = handler;
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        Assert.Equal(chosenBefore?.Display, audio.SelectedDevice?.Display);
+        Assert.DoesNotContain(seeded, audio.Devices);
+        Assert.Equal(countBefore - 1, audio.Devices.Count);
 
         // The channel layout stopped being a drop-down on 2026-09-02 and is three buttons, which is
         // what the prototype draws — and what the walk has to press, one by one, because each of
