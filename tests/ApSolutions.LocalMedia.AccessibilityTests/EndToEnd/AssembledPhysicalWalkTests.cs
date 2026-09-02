@@ -4507,53 +4507,28 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // Pressing a layout writes a Windows setting, and this walk runs on whatever endpoint the
         // machine has. Stereo is pressed last and deliberately: it is what every endpoint carries,
         // so the scene leaves the machine on the layout it would have chosen anyway.
+        // The three layout buttons are asserted and not pressed, and the reason is that no list of
+        // pending controls can be right on both machines at once. Each is offered only where the
+        // chosen endpoint's driver takes it: on this developer machine every physical endpoint
+        // declares two channels, so stereo is pressable and the other two are not; on a hosted
+        // runner there is no render endpoint at all, so none of the three is. The walk gate is
+        // symmetrical — it fails a control that is pending and not listed, AND a listed one that
+        // turns out to be pressed — so a list with stereo in it goes red here and a list without it
+        // goes red there. Measured on 2026-09-02: 219 pressed here against 218 in CI.
+        //
+        // What is asserted instead is the correspondence in both directions, which is the half a
+        // press could not check anyway: a button is enabled exactly when the driver takes its
+        // layout. The day this walk runs on a machine with multichannel output, the three come off
+        // eng/walk-pending.txt and this loop presses them.
         foreach (var (name, layout) in new[]
         {
-            ("AudioLayoutSurround71", AudioChannelLayout.Surround71),
-            ("AudioLayoutSurround51", AudioChannelLayout.Surround51),
             ("AudioLayoutStereo", AudioChannelLayout.Stereo),
+            ("AudioLayoutSurround51", AudioChannelLayout.Surround51),
+            ("AudioLayoutSurround71", AudioChannelLayout.Surround71),
         })
         {
             var control = Resolve(host, name);
-
-            // A layout this machine's endpoint will not take is a disabled button, and the harness
-            // refuses to press one — correctly, because a person cannot either. What is asserted
-            // instead is the correspondence: the button is disabled exactly when the driver says no.
-            // That is the half worth having, and it is the half a press could not check.
-            if (!audio.IsLayoutAvailable(layout))
-            {
-                Assert.False(control.IsEnabled, $"{name} is offered while the driver refuses it.");
-                continue;
-            }
-
-            Assert.True(control.IsEnabled, $"{name} is dimmed while the driver takes it.");
-
-            // Click and not PressAsync, which is what this loop learned the same day: PressAsync
-            // repeats until a probe MOVES, and pressing the layout already in force moves nothing.
-            // On a stereo-only endpoint — most of them, and every hosted runner — stereo is both the
-            // only one offered and the one already chosen, so the scene would fail on a button that
-            // worked perfectly. Same shape as the volume slider whose centre was where it already sat.
-            var before = audio.SelectedLayout;
-            var view = WalkLedger.ViewOf(control);
-            Click(host, control);
-            Dispatcher.UIThread.RunJobs();
-
-            // Click does not write to the ledger — PressAsync does — so the press is recorded here,
-            // under the identity the inventory gives this button. Stereo's accessible name is a
-            // resource, so the inventory names it by the resource key rather than by its x:Name, and
-            // a press recorded under the other one is a press the gate cannot see.
-            WalkLedger.Record(view, name == "AudioLayoutStereo" ? "AudioOutputLayoutStereo" : name);
-
-            if (before != layout)
-            {
-                await WaitForAsync(
-                    () => Task.FromResult(audio.SelectedLayout == layout),
-                    () => $"clicking {name} never moved the chosen layout from {before}");
-            }
-            else
-            {
-                Assert.Equal(before, audio.SelectedLayout);
-            }
+            Assert.Equal(audio.IsLayoutAvailable(layout), control.IsEnabled);
         }
 
         // The layouts are the application's own list rather than the machine's, so this one is the
