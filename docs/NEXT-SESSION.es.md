@@ -131,6 +131,17 @@
 >   enterarse; y si el contenido de ese commit viejo hubiera llegado a `main` por otra vía, habría
 >   autorizado borrar un worktree con trabajo nuevo dentro. **El SHA se lee del worktree en el
 >   momento** (`git worktree list --porcelain`), nunca de una nota.
+> · **Y esa lección estaba a medias: una guarda sobre IDENTIDAD de commit no sobrevive a que otro
+>   reescriba la historia.** Escrita ya la línea de arriba, la guarda de cierre acordada seguía
+>   preguntando `git merge-base --is-ancestor <su-sha> main` — y al consolidar el trabajo de tres
+>   sesiones por rebase, ese SHA dejó de existir en la historia publicada: la guarda habría dicho
+>   «su trabajo no está en main» **para siempre**, acertando el veredicto por la razón falsa, que es
+>   la que alguien afloja mañana. **La que sobrevive pregunta por el CONTENIDO.** Dos formas, y la
+>   elección depende de si la base cambió: con la misma base, los árboles coinciden byte a byte
+>   —`git rev-parse <sha>^{tree}`— y eso prueba más que cualquier diff de rutas; con base distinta
+>   **no pueden coincidir**, porque el commit rebasado arrastra lo de los demás, y entonces la prueba
+>   es `git diff <sha> <rama> -- <sus archivos>` vacío más una frase suya presente. Medido las dos
+>   veces el mismo día.
 > · **Y esa lectura NO VE la suciedad**: da la misma salida con un archivo sin rastrear dentro,
 >   medido poniéndolo. `--is-ancestor` sólo habla de commits y un archivo sin confirmar no es
 >   ninguno. Lo que lo cierra es **`git worktree remove` SIN `--force`**: se niega solo —«contains

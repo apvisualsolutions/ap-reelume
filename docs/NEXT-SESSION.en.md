@@ -131,6 +131,17 @@
 >   without noticing; and had that old commit's content reached `main` by another route, it would have
 >   authorised deleting a worktree with new work inside. **The SHA is read from the worktree at the
 >   moment** (`git worktree list --porcelain`), never from a note.
+> · **And that lesson was half-learnt: a guard over commit IDENTITY does not survive somebody else
+>   rewriting history.** With the line above already written, the agreed closing guard still asked
+>   `git merge-base --is-ancestor <their-sha> main` — and consolidating three sessions' work by
+>   rebase made that SHA cease to exist in the published history: the guard would have said "their
+>   work is not in main" **forever**, right verdict for the wrong reason, which is the kind somebody
+>   loosens tomorrow. **The one that survives asks about CONTENT.** Two forms, and which one depends
+>   on whether the base moved: with the same base the trees match byte for byte —
+>   `git rev-parse <sha>^{tree}` — and that proves more than any path diff; with a different base
+>   they **cannot** match, because the rebased commit now carries everybody else's work too, and then
+>   the proof is `git diff <sha> <branch> -- <their files>` empty plus one of their sentences present.
+>   Both measured on the same day.
 > · **And that reading does NOT see dirt**: it gives the same output with an untracked file inside,
 >   measured by putting one there. `--is-ancestor` only speaks of commits, and an uncommitted file is
 >   none. What closes it is **`git worktree remove` WITHOUT `--force`**: it refuses on its own —
