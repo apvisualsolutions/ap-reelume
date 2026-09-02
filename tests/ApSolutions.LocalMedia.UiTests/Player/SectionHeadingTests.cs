@@ -3,13 +3,17 @@
 
 using System.Globalization;
 using ApSolutions.LocalMedia.Presentation;
+using ApSolutions.LocalMedia.Presentation.Player;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// A section heading is its own label, shouted — and it stays that way.
+/// A section heading is its own label, shouted — it stays that way, and it stays on the panel.
 /// </summary>
 /// <remarks>
 /// The prototype writes these in small capitals, and AXAML has no <c>text-transform</c>: a converter
@@ -18,9 +22,19 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// <para>
 /// So the heading is a second resource, and the cost of a second string is that the two could drift
 /// apart — somebody edits the label and the heading keeps the old words in capitals, which is this
-/// repository's characteristic defect at one string long. They do not get to: what is asserted is
-/// that each heading <b>is</b> its label uppercased, in both languages, so an edit to one without
-/// the other fails here.
+/// repository's characteristic defect at one string long.
+/// </para>
+/// <para>
+/// <b>Measured on the control, not on the resource file.</b> Until 2026-09-02 this read both strings
+/// out of the dictionaries and never built the view, so deleting both heading blocks from
+/// <c>AudioOutputView.axaml</c> left it green — the same defect this batch had just fixed in
+/// <c>ButtonShapeTests</c>, one file later. What is asserted now is what the panel paints: the
+/// headings that carry the class, their count, and that each one <b>is</b> its label uppercased in
+/// both languages.
+/// </para>
+/// <para>
+/// Its limitation, written here rather than assumed: the census covers the headings of this panel.
+/// A <c>section-overline</c> added to another view is not seen from here.
 /// </para>
 /// </remarks>
 public sealed class SectionHeadingTests
@@ -32,27 +46,53 @@ public sealed class SectionHeadingTests
     ];
 
     [AvaloniaFact]
-    public void Every_heading_is_its_label_in_capitals_in_both_languages()
+    public void Every_heading_the_panel_paints_is_its_label_in_capitals_in_both_languages()
     {
         var application = Avalonia.Application.Current!;
 
-        foreach (var name in new[] { "es-ES", "en-US" })
+        try
         {
-            var culture = CultureInfo.GetCultureInfo(name);
-            App.ApplyLanguage(application, culture);
+            var view = new AudioOutputView();
+            var window = new Window { Width = 420, Height = 600, Content = view };
+            window.Show();
 
-            foreach (var (labelKey, headingKey) in Pairs)
+            foreach (var name in new[] { "es-ES", "en-US" })
             {
-                var label = Resource(labelKey);
-                var heading = Resource(headingKey);
+                var culture = CultureInfo.GetCultureInfo(name);
+                App.ApplyLanguage(application, culture);
+                Dispatcher.UIThread.RunJobs();
 
-                Assert.False(string.IsNullOrWhiteSpace(label), $"{labelKey} did not resolve in {name}.");
-                Assert.False(string.IsNullOrWhiteSpace(heading), $"{headingKey} did not resolve in {name}.");
-                Assert.Equal(label.ToUpper(culture), heading);
+                var painted = view.GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .Where(block => block.Classes.Contains("section-overline"))
+                    .Select(block => block.Text ?? string.Empty)
+                    .ToArray();
+
+                // The census, and the direction that matters: a heading removed from the markup
+                // fails here, and one added without its pair in this table fails here too.
+                Assert.Equal(Pairs.Length, painted.Length);
+
+                foreach (var (labelKey, headingKey) in Pairs)
+                {
+                    var label = Resource(labelKey);
+                    var heading = Resource(headingKey);
+
+                    Assert.False(string.IsNullOrWhiteSpace(label), $"{labelKey} did not resolve in {name}.");
+                    Assert.False(string.IsNullOrWhiteSpace(heading), $"{headingKey} did not resolve in {name}.");
+
+                    // The two strings agree with each other...
+                    Assert.Equal(label.ToUpper(culture), heading);
+
+                    // ...and the panel is actually painting that one.
+                    Assert.Contains(heading, painted);
+                }
             }
         }
-
-        App.ApplyLanguage(application, CultureInfo.GetCultureInfo("es-ES"));
+        finally
+        {
+            // Restored even on a red, or whatever runs next inherits an application in English.
+            App.ApplyLanguage(application, CultureInfo.GetCultureInfo("es-ES"));
+        }
     }
 
     private static string Resource(string key) =>

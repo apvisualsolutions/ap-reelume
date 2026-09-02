@@ -137,15 +137,25 @@ public sealed class EndpointFormatArithmeticTests
     /// </summary>
     /// <remarks>
     /// 24 bits first and 16 second, because those are the two the endpoint measured on 2026-09-02
-    /// accepted. A driver that takes only the second still offers the layout, which is the half a
+    /// accepted. A driver that takes only one of them still offers the layout, which is the half a
     /// single-depth question would answer wrongly.
+    /// <para>
+    /// <b>Both drivers are modelled, and that is not symmetry for its own sake.</b> Until 2026-09-02
+    /// only the 16-bit one was, so deleting the 24-bit question from production left this green while
+    /// deleting the 16-bit one reddened it — an audit measured exactly that. One depth cannot answer
+    /// "either".
+    /// </para>
     /// </remarks>
-    [Fact]
-    public async Task The_layouts_on_offer_come_from_the_driver_at_either_depth()
+    [Theory]
+    [InlineData(16)]
+    [InlineData(24)]
+    public async Task The_layouts_on_offer_come_from_the_driver_at_either_depth(int depth)
     {
         var configurator = new WindowsAudioEndpointConfigurator(
-            () => new RecordingStore(Format(2, 44100, 16)),
-            _ => new SixteenBitOnlyProbe(44100));
+            () => new RecordingStore(Format(2, 44100, (short)depth)),
+            _ => depth == 16
+                ? new SixteenBitOnlyProbe(44100)
+                : new TwentyFourBitOnlyProbe(44100));
 
         var supported = await configurator.GetSupportedLayoutsAsync(Endpoint, TestContext.Current.CancellationToken);
 
@@ -322,6 +332,27 @@ public sealed class EndpointFormatArithmeticTests
             // probe that always answered null would leave unrun.
             closestMatch = Allocate(Format(2, sampleRate, 16));
             return unchecked((int)0x88890008);
+        }
+    }
+
+    /// <summary>Takes 24 bits and nothing else — the mirror of <see cref="SixteenBitOnlyProbe"/>.</summary>
+    /// <remarks>
+    /// It exists because "either depth" was measured at one depth. With only the 16-bit driver
+    /// modelled, deleting the 24-bit question from production left the suite green while the
+    /// reciprocal deletion reddened it, and that asymmetry is the whole tell.
+    /// </remarks>
+    private sealed class TwentyFourBitOnlyProbe(int sampleRate) : IEndpointFormatProbe
+    {
+        public int GetMixFormat(out nint format)
+        {
+            format = Allocate(Format(2, sampleRate, 32));
+            return 0;
+        }
+
+        public int IsFormatSupported(int shareMode, nint format, out nint closestMatch)
+        {
+            closestMatch = nint.Zero;
+            return Marshal.ReadInt16(format, 14) == 24 ? 0 : unchecked((int)0x88890008);
         }
     }
 
