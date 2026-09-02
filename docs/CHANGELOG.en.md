@@ -192,6 +192,79 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `Application.Resources` rather than in a theme dictionary — but it **was not a thread fix**: the
   second red's stack runs through it. A comment crediting a fix to the thing that did not make it is
   what sends the next session to the wrong place.
+- **The CI watcher announced that a push had not triggered the workflow while the run was going.**
+  `eng/watch-ci.ps1` listed runs with `gh run list --branch`, and `-Branch` defaulted to **the local
+  branch**, which in a worktree is not the branch the commit was pushed to. A commit written on
+  `claude/goofy-aryabhata-1e2f4a` and pushed to `codex/shell-assembly-isolation` had no runs under
+  the name the watcher asked about — `ci.yml` only triggers on `codex/**` — so it said "NO RUN EXISTS
+  — the push did not trigger the workflow" and exited 1. The run was there, and `in_progress`.
+
+  **That is worse than the silence the script itself is written against.** Its docstring says a
+  silent watcher is indistinguishable from a run that is still going; a silence gets waited on, a
+  confident answer gets acted on, and what gets acted on here is "CI never ran". It was observed
+  twice on the same day from two different worktrees, once in real use.
+
+  **It now asks about the commit**, which is what a run belongs to, and the message **names where it
+  looked**: "NO RUN EXISTS for that commit", or "on branch" with the branch named, because the old
+  sentence read as a fact about the push when it was only ever an answer about one branch. `-Branch`
+  stays for when a branch really is the question.
+
+  **The second hole is the one a repair aimed only at the first walks into.** `gh run list --commit`
+  wants all **forty** characters: given a prefix it answers `[]` and exits **0**, which has exactly
+  the shape of "no run yet" — and `.claude/hooks/post-push.sh` was emitting `rev-parse --short HEAD`,
+  so the command it offered after every push carried a prefix. The hook now emits the full sha and
+  the script resolves any prefix through git before asking; when it cannot resolve one — outside a
+  checkout, or for a commit that is not here — it **widens** the search to the recent runs of every
+  branch instead of narrowing it wrongly.
+
+  **And `--commit` does return runs in this repository, against what an earlier note claimed.**
+  Measured with three real shas and all three states: `in_progress`, `success` and `failure`, each
+  returning its run. What does not work is the prefix, which is the likeliest thing behind that note.
+
+  **Both repairs are proved by mutating what they protect.** Against a scene driven through a pipe —
+  a repository whose local branch is not the pushed one, and a `gh` that answers the way the real one
+  was measured to answer — reverting the filter to the local branch and handing `gh` the short sha
+  **each put the false negative back, by its own route**; `WatchCiScopeTests` catches both and names
+  the defect in the failure. A fourth test measures what a repair like this takes down with it: that
+  a commit with **no** run is still reported as having none, or the watcher would have bought its
+  green by never saying no.
+
+  **The repair leaves a line false in another document, and it is corrected here rather than later.**
+  The closing skill said the hook firing after the fast-forward to `main` is "a known false
+  positive". It is not any more: `main` still does not trigger the workflow, but the watcher asks
+  about the commit and finds the run the working branch already produced, so it returns **its
+  conclusion** — measured with `3cdeeb3`, which reached `main` by fast-forward and whose run answers
+  `success`. Arming it there is a second reading of the green that authorised the advance, not a
+  warning to ignore.
+
+- **One figure lived in four places saying three different things.** How long a run takes:
+  `CLAUDE.md` and the closing skill said 42-53, `.claude/hooks/post-push.sh` said 42-50, and
+  `eng/watch-ci.ps1` still said 55-80. The first two were corrected on 2026-08-31 by somebody who did
+  not look outside `*.md`. All four now say 42-53, and `RunDurationFigureTests` sweeps `.md`, `.sh`
+  and `.ps1` so they cannot drift apart again.
+
+  **What that gate can and cannot do is written inside it**, because a gate that appears to measure
+  more than it does is worse than none: it checks that the tree does **not contradict itself**, not
+  that the figure is true — nothing here can re-measure twelve runs from a day in August, and four
+  copies saying 55-80 would pass. What it does tie to something real is the defaults of the script,
+  which its docstring says are set from this figure: the heartbeat has to fire before even the
+  fastest run ends — or a healthy run is silent until it is over — and the ceiling has to sit above
+  the slowest, or the watcher gives up on runs that were going to finish.
+
+  **The gate was born with two defects, neither visible from inside a worktree.** Run from the main
+  checkout it went red naming ten quotations: it swept `.claude/worktrees/` — whole copies of the
+  repository belonging to other sessions, excluded in `.git/info/exclude` and **absent on a runner**
+  — and it counted a changelog line that merely **recorded** the old figure as though it were
+  claiming it. It was therefore **red on the machine of whoever was writing and green in CI**, which
+  is the kind of gate people learn to ignore; and it forbade documents from saying the figure had
+  been corrected, inside the very change that corrected it. It now skips other checkouts and reads
+  only sentences with a present-tense verb.
+
+  **What closes the repair is having measured it against the real defect and not only the noise.**
+  Reverting `eng/watch-ci.ps1` to its line in `3cdeeb3` — "A run in this repository takes 55-80
+  minutes", an assertion in the present tense contradicting the measured figure — puts it red again,
+  with file, line and value. That was the case a narrower pattern could have lost, and losing it
+  would have been repairing the false positive by breaking the true one.
 
 - **Seven gates from this same batch did not measure what they said they measured, and six were
   proved by mutating the code they exist to protect.** The gate auditor ran before closing, which is

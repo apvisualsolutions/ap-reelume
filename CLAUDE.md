@@ -204,9 +204,26 @@ se midió**, y era de las que se citan sin comprobar: el latido de 30 y el techo
 porque el margen los cubre igual, pero un número que nadie vuelve a medir es el que acaba justificando
 la decisión equivocada.
 
+**Y el sexto desenlace no es un desenlace, sino la pregunta: mirar donde el run no está.** Hasta el
+2026-09-02 el guion listaba con `--branch` y esa rama era **la local**, que en un worktree no es la
+rama a la que se empuja. Un commit escrito en `claude/goofy-aryabhata-1e2f4a` y empujado a
+`codex/shell-assembly-isolation` no tenía runs bajo el nombre que el vigía preguntaba —`ci.yml` sólo
+dispara en `codex/**`—, así que **afirmó que el push no había disparado el flujo mientras el run
+corría**. Eso es peor que el silencio contra el que está escrito: un silencio se espera, una
+respuesta segura se obedece. Desde entonces **pregunta por el commit**, que es a quien pertenece un
+run; `-Branch` sigue ahí para cuando la pregunta sea de verdad una rama, y el mensaje **nombra dónde
+miró**.
+
+**Y `gh run list --commit` exige los cuarenta caracteres.** Con un prefijo contesta `[]` y sale **0**,
+que se lee igual que «aún no hay run» — medido el 2026-09-02, junto con lo contrario de una nota que
+circulaba: `--commit` **sí** devuelve runs aquí, comprobado con tres SHA y los tres estados
+(`in_progress`, `success`, `failure`). Así que el guion resuelve el prefijo con git antes de
+preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecharla mal.
+
 **Y armar el vigía ya no depende de acordarse**: `.claude/hooks/post-push.sh` lo exige tras cada
-`git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA ya
-resuelto.
+`git push` —ver «Lo que el repositorio automatiza por ti», al final—. El comando llega con el SHA
+**entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
+contesta `[]`.
 
 **Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **189** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del

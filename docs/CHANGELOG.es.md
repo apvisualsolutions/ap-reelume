@@ -197,6 +197,77 @@ evidencia, es [FEATURES.md](FEATURES.md).
   estas viven en `Application.Resources` y no en un diccionario de tema—, pero **no era un arreglo de
   hilo**: la pila del segundo rojo pasa por él. Un comentario que atribuye una corrección a lo que no
   la hizo es el que envía a la siguiente sesión al sitio equivocado.
+- **El vigía de CI afirmaba que un push no había disparado el flujo mientras el run corría.**
+  `eng/watch-ci.ps1` listaba con `gh run list --branch`, y `-Branch` tomaba por defecto **la rama
+  local**, que en un worktree no es la rama a la que se empuja. Un commit escrito en
+  `claude/goofy-aryabhata-1e2f4a` y empujado a `codex/shell-assembly-isolation` no tenía runs bajo el
+  nombre que el vigía preguntaba —`ci.yml` sólo dispara en `codex/**`—, así que dijo «NO RUN EXISTS
+  — the push did not trigger the workflow» y salió con 1. El run existía y estaba `in_progress`.
+
+  **Y eso es peor que el silencio contra el que el propio guion está escrito.** Su docstring dice que
+  un vigía callado es indistinguible de un run que sigue; un silencio se espera, pero una respuesta
+  segura se obedece, y lo que se obedece aquí es «CI nunca corrió». Se observó dos veces el mismo día
+  y desde dos worktrees distintos, una de ellas en uso real.
+
+  **Desde ahora pregunta por el commit**, que es a quien pertenece un run, y el mensaje **nombra
+  dónde miró**: «NO RUN EXISTS for that commit», o «on branch», con la rama nombrada, porque la frase
+  anterior se leía como un hecho sobre el push cuando sólo era una respuesta sobre una rama.
+  `-Branch` sigue ahí para cuando la pregunta sea de verdad una rama.
+
+  **El segundo agujero es el que se traga un arreglo apuntado sólo al primero.** `gh run list
+  --commit` exige los **cuarenta** caracteres: con un prefijo contesta `[]` y sale **0**, que tiene
+  exactamente la forma de «aún no hay run» — y `.claude/hooks/post-push.sh` emitía `rev-parse --short
+  HEAD`, así que el comando que ofrecía tras cada push llevaba un prefijo. Ahora el hook emite el SHA
+  entero y el guion resuelve cualquier prefijo con git antes de preguntar; si no puede resolverlo
+  —fuera de un árbol, o con un commit que no está aquí— **ensancha** la búsqueda a los runs recientes
+  de cualquier rama en vez de estrecharla mal.
+
+  **Y `--commit` sí devuelve runs en este repositorio, contra lo que decía una nota anterior.**
+  Medido con tres SHA reales y los tres estados: `in_progress`, `success` y `failure`; los tres
+  devolvieron su run. Lo que no funciona es el prefijo, que es lo más probable que hubiera detrás de
+  aquella nota.
+
+  **Los dos arreglos se demuestran mutando lo que protegen.** Sobre una escena por tubería —un repo
+  cuya rama local no es la empujada, y un `gh` que contesta como se midió que contesta el de verdad—,
+  devolver el filtro a la rama local y pasarle a `gh` el SHA corto **reponen el falso negativo, cada
+  uno por su vía**; `WatchCiScopeTests` caza los dos y nombra el defecto en el mensaje. Una cuarta
+  prueba mide lo que un arreglo así se lleva por delante con facilidad: que un commit **sin** run se
+  siga reportando como tal, o el vigía habría comprado su verde no diciendo nunca que no.
+
+  **Y el arreglo deja falsa una línea en otro documento, que se corrige aquí y no después.** La skill
+  de cierre decía que el aviso del hook tras el fast-forward a `main` es «un falso positivo
+  conocido». Ya no lo es: `main` sigue sin disparar el flujo, pero el vigía busca por commit y
+  encuentra el run que la rama de trabajo ya produjo, así que devuelve **su conclusión** — medido con
+  `3cdeeb3`, que llegó a `main` por fast-forward y cuyo run contesta `success`. Armarlo ahí es una
+  segunda lectura del verde que autorizó el avance, no un aviso que ignorar.
+
+- **La misma cifra vivía en cuatro sitios diciendo tres cosas.** Cuánto tarda un run: `CLAUDE.md` y
+  la skill de cierre decían 42-53, `.claude/hooks/post-push.sh` decía 42-50 y `eng/watch-ci.ps1`
+  seguía en 55-80. Los dos primeros se corrigieron el 2026-08-31, y quien lo hizo no miró fuera de
+  los `*.md`. Las cuatro dicen ahora 42-53, y `RunDurationFigureTests` barre `.md`, `.sh` y `.ps1`
+  para que no vuelvan a separarse.
+
+  **Lo que esa puerta puede y lo que no está escrito dentro de ella**, porque una puerta que aparenta
+  medir más de lo que mide es peor que ninguna: comprueba que el árbol **no se contradiga**, no que
+  la cifra sea verdad — nada aquí puede volver a medir doce runs de un día de agosto, y cuatro copias
+  diciendo 55-80 pasarían. Lo que sí ata a algo real son los valores por defecto del guion, que su
+  docstring dice sacados de esa cifra: el latido tiene que sonar antes de que acabe el run más rápido
+  —o un run sano calla hasta el final— y el techo quedar por encima del más lento, o el vigía
+  abandona runs que iban a terminar.
+
+  **Y la puerta nació con dos defectos que no se veían desde dentro de un worktree.** Corrida desde
+  el árbol principal se puso roja nombrando diez citas: barría `.claude/worktrees/` —copias enteras
+  del repositorio que pertenecen a otras sesiones, excluidas en `.git/info/exclude` y **ausentes en
+  un runner**— y contaba como afirmación una línea de changelog que sólo **narraba** la cifra vieja.
+  Era, por tanto, **roja en la máquina de quien programa y verde en CI**, que es la clase de puerta
+  que se aprende a ignorar; y prohibía contar que la cifra se había corregido, dentro del mismo
+  cambio que la corregía. Ahora salta las copias ajenas y sólo lee frases con verbo en presente.
+
+  **Lo que cierra el arreglo es haberlo medido contra el defecto de verdad y no sólo contra el
+  ruido.** Devolver `eng/watch-ci.ps1` a su línea de `3cdeeb3` —«A run in this repository takes
+  55-80 minutes», una afirmación en presente que contradecía la cifra medida— vuelve a ponerla roja
+  con archivo, línea y valor. Ése era el caso que un patrón más estrecho podía perder, y perderlo
+  habría sido arreglar el falso positivo rompiendo el verdadero.
 
 - **Siete puertas de esta misma tanda no medían lo que decían medir, y seis se comprobaron mutando el
   código que deberían proteger.** El auditor de puertas corrió antes de cerrar, que es para lo que

@@ -150,9 +150,15 @@ The walk: N declared ...; N pressed, 20 pending                        <- el tri
 verde legítimo dijo **14**, porque la tanda añadía catorce archivos que llegaban al listón. Lo que se
 lee es «are where they have to be».
 
-**El hook de post-push suena también en el fast-forward**, pide un vigía y es un falso positivo
-conocido: ese push no dispara flujo. Es deliberado — distinguirlo pedía adivinar la rama de destino,
-y una guarda que se equivoca callando es peor.
+**El hook de post-push suena también en el fast-forward** y pide un vigía. Es deliberado —
+distinguirlo pedía adivinar la rama de destino, y una guarda que se equivoca callando es peor.
+
+**Y desde el 2026-09-02 ya no es un falso positivo: armarlo ahí sirve.** Esta línea decía que lo
+era, y el cambio del vigía la dejó falsa. `main` sigue sin disparar el flujo, pero `watch-ci.ps1`
+busca por **commit** y no por rama, así que encuentra el run que la rama de trabajo ya produjo y
+devuelve **su conclusión**. Medido con `3cdeeb3`, que llegó a `main` por fast-forward:
+`gh run list --commit` contesta `success` en `codex/ap-reelume-mvp-x64`. Es una segunda lectura del
+verde que autorizó el fast-forward, no un aviso que ignorar.
 
 ## 7. Cerrar los documentos
 

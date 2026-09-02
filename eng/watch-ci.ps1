@@ -28,14 +28,32 @@
     - The run never ends. -TimeoutMinutes is a hard ceiling: the watcher says it is giving up and
       exits, instead of staying armed and mute.
 
-    A run in this repository takes 55-80 minutes: the `Verify` step alone is 33-55, and the
-    accessibility, recovery and walk gates follow it. The defaults are set from that.
+    A sixth way to be wrong is not an outcome but a question: looking where the run is not. Until
+    2026-09-02 the runs were listed with `--branch`, defaulting to the local branch, and in a
+    worktree the local branch is not the branch the commit was pushed to. `ci.yml` triggers on
+    `codex/**`, so a commit written on `claude/goofy-aryabhata-1e2f4a` and pushed to
+    `codex/shell-assembly-isolation` had no runs under the name this script asked about, and the
+    script answered that the push had not triggered the workflow. It had: the run was
+    `in_progress`, and `gh run list --commit` returned it. That is worse than the silence this
+    file is written against — a silence reads as "still going" and gets waited on, a confident
+    wrong answer gets acted on.
+
+    So the default no longer names a branch. A run belongs to a commit, not to a reference, and
+    the commit is what is asked for. -Branch stays for when a branch really is the question.
+
+    A run in this repository takes 42-53 minutes: the twelve complete runs of 2026-08-30 gave 42.7
+    for the fastest and 52.6 for the slowest. The defaults are set from that. This line said 55-80
+    until 2026-09-02, copied from an era nobody re-measured — the figure had already been fixed in
+    CLAUDE.md and in the closing skill, and nobody looked here. It is now held by a test.
 
 .PARAMETER Sha
-    The commit to watch. A short prefix is enough; it is matched with StartsWith.
+    The commit to watch. A short prefix is enough: it is resolved to the full forty characters
+    with git before being handed to gh, which needs them — given a prefix, `gh run list --commit`
+    answers `[]` and exits 0, which reads exactly like "no run yet". Measured 2026-09-02.
 
 .PARAMETER Branch
-    The branch whose runs are listed. Defaults to the current one.
+    Restricts the search to one branch's runs. Empty by default, and deliberately: the local
+    branch is not necessarily the branch the commit was pushed to.
 
 .EXAMPLE
     pwsh -NoProfile -File eng/watch-ci.ps1 -Sha 6057dda
@@ -61,15 +79,51 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not $Branch) {
-    $Branch = (git rev-parse --abbrev-ref HEAD 2>$null)
-    if (-not $Branch) {
-        Write-Output "CI ${Sha}: CANNOT DETERMINE BRANCH — not in a git repository?"
-        exit 1
+$short = $Sha.Substring(0, [Math]::Min(7, $Sha.Length))
+
+# gh wants the full forty characters for --commit: given a prefix it answers `[]` and exits 0,
+# which has the same shape as "no run yet". So the prefix is resolved here, and the search only
+# asks about a commit once it has one that can be asked about.
+$fullSha = $null
+if ($Sha -match '^[0-9a-fA-F]{40}$') {
+    $fullSha = $Sha.ToLowerInvariant()
+}
+else {
+    try {
+        $candidate = (& git rev-parse --verify --quiet "$Sha^{commit}" 2>$null | Out-String).Trim()
+        if ($candidate -match '^[0-9a-fA-F]{40}$') { $fullSha = $candidate.ToLowerInvariant() }
+    }
+    catch {
+        # Not a git repository, or no git on the path. Neither is fatal here: it only means the
+        # commit filter is unavailable, and the search widens instead of narrowing wrongly.
+        $fullSha = $null
     }
 }
 
-$short = $Sha.Substring(0, [Math]::Min(7, $Sha.Length))
+# Where to look, and what to say about the place when nothing is found. The message names the
+# place on purpose: "NO RUN EXISTS" was read as a fact about the push when it was only ever an
+# answer about one branch.
+if ($Branch) {
+    $filter = @('--branch', $Branch)
+    $limit = 10
+    $scope = "on branch '$Branch'"
+    $verdict = 'the push did not trigger the workflow, or it landed on another branch'
+}
+elseif ($fullSha) {
+    $filter = @('--commit', $fullSha)
+    $limit = 10
+    $scope = 'for that commit'
+    $verdict = 'the push did not trigger the workflow'
+}
+else {
+    # The prefix could not be resolved, so --commit would be a question that can only be answered
+    # wrongly. Widen rather than narrow: every branch's recent runs, matched with StartsWith.
+    $filter = @()
+    $limit = 30
+    $scope = "among the $limit most recent runs of any branch"
+    $verdict = "the push did not trigger the workflow, or its run is older than those $limit"
+}
+
 $minutes = 0
 $queryFailures = 0
 $unreadable = 0
@@ -83,7 +137,7 @@ while ($true) {
     $raw = $null
     $problem = $null
     try {
-        $raw = & gh run list --branch $Branch --limit 10 --json headSha,status,conclusion 2>&1
+        $raw = & gh run list @filter --limit $limit --json headSha,status,conclusion 2>&1
         if ($LASTEXITCODE -ne 0) {
             $problem = ($raw | Out-String).Trim()
         }
@@ -145,12 +199,12 @@ while ($true) {
     if (-not $run) {
         $missing++
         if ($missing -ge $MissingLimit) {
-            Write-Output "CI ${short}: NO RUN EXISTS after $missing min — the push did not trigger the workflow"
+            Write-Output "CI ${short}: NO RUN EXISTS $scope after $missing min — $verdict"
             exit 1
         }
 
         if ($minutes -ge $TimeoutMinutes) {
-            Write-Output "CI ${short}: no run for $Sha after $minutes min — check it by hand"
+            Write-Output "CI ${short}: no run $scope for $Sha after $minutes min — check it by hand"
             exit 1
         }
 
