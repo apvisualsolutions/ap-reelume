@@ -183,6 +183,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Los encabezados de sección del panel del reproductor, en versalita como el prototipo.** Tercera
+  de las seis diferencias. El diseño escribe «DISPOSITIVO DE SALIDA» y «CANALES» a 11 px, espaciados
+  y en mayúsculas, y esa forma aparece **treinta y cinco veces** en el prototipo, así que es un patrón
+  del sistema y no un adorno de este panel.
+
+  **Son dos overlines y no uno**, que es lo que la medición separó: el del héroe va a 0,16 em y éste a
+  0,06 em —trece usos contra siete en el diseño—, así que una sola clase tendría que elegir una y
+  estar equivocada en la otra.
+
+  **Y las mayúsculas van en un recurso propio, no en un conversor.** AXAML no tiene
+  `text-transform`, y las cadenas son recursos dinámicos porque siguen al idioma: componer las dos
+  cosas habría pedido una extensión de marcado propia. El precio de una segunda cadena es que las dos
+  se separen —alguien edita la etiqueta y el encabezado se queda con las palabras viejas en
+  mayúsculas—, así que no se les permite: una prueba afirma que cada encabezado **es** su etiqueta en
+  mayúsculas, en los dos idiomas.
+
 - **El adaptador que escribe el formato del dispositivo pasa de 23/20 a 100/100, y sale de la lista
   de deuda el mismo día que entró.** La puerta de archivos nuevos lo rechazaba —exige 96/96 y no
   admite excepción, a diferencia de la lista de deuda, que sí sabe decir «esto depende de hardware

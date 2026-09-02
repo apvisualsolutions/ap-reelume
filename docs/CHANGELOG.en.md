@@ -176,6 +176,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The player panel's section headings, in small capitals like the prototype.** Third of the six
+  differences. The design writes "OUTPUT DEVICE" and "CHANNELS" at 11 px, spaced and capitalised, and
+  that shape appears **thirty-five times** across the prototype — a pattern of the system rather than
+  an ornament of this panel.
+
+  **There are two overlines, not one**, which is what the measurement separated: the hero's runs at
+  0.16 em and this at 0.06 em — thirteen uses against seven in the design — so a single class would
+  have to pick one and be wrong on the other.
+
+  **And the capitals live in their own resource, not in a converter.** AXAML has no
+  `text-transform`, and the strings are dynamic resources because they follow the language:
+  composing the two would have needed a markup extension of its own. The cost of a second string is
+  that the two could drift — somebody edits the label and the heading keeps the old words in capitals
+  — so they are not allowed to: a test asserts each heading **is** its label uppercased, in both
+  languages.
+
 - **The adapter that writes the device format goes from 23/20 to 100/100, and leaves the debt list
   the same day it joined.** The new-file gate refused it — it demands 96/96 with no exception, unlike
   the debt list, which does know how to say "this depends on hardware the runner lacks".

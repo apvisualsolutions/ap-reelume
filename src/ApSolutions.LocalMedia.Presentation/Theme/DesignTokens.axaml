@@ -1628,6 +1628,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
+    The other overline, and the prototype draws two rather than one. This is the label over each
+    section of a panel — «DISPOSITIVO DE SALIDA», «CANALES» — and the difference from the one above
+    is not a rounding: the hero's is 0.16em and this is 0.06em, counted in the design at 13 uses
+    against the wide one's 7. Two spacings for two jobs, so a single class would have to pick one and
+    be wrong somewhere.
+
+    0.66 rather than «.06em», because AXAML has no em: it is 0.06 x 11, and the 11 is the token on
+    the same line. If FontSizeFootnote ever moves, this moves with it — the pair is declared here
+    because ScalarTokenTests does not watch LetterSpacing and cannot catch them drifting apart.
+
+    The capitals come from UpperCaseConverter, which is what AXAML has instead of text-transform, and
+    they are NOT written into the resource: the same string is what a screen reader announces.
+  -->
+  <Style Selector="TextBlock.section-overline">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeFootnote}" />
+    <Setter Property="LetterSpacing" Value="0.66" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+
+  <!--
     A link that happens to be a button: the prototype writes «Ver toda la biblioteca ›» in the accent
     colour with no fill and no border, because it goes somewhere rather than doing something. It
     keeps the 36 px height every other control has, so a row it sits in does not change height.
