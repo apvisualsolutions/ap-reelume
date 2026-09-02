@@ -177,6 +177,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   `EditorSurfaces()`, siempre han sido `[AvaloniaFact]` y nunca han fallado. Las 27 pruebas de
   `ShellAssemblyTests` pasan a `[AvaloniaFact]`.
 
+  **Y un verde de CI no sostiene esta corrección, que conviene decirlo porque este árbol ya se ha
+  creído uno.** El run de `4406741` dio `Verify: success` **con el defecto puesto**: el fallo es
+  intermitente también en el runner, así que un verde dice que no se ha roto nada y no dice nada más.
+  Lo que sostiene la corrección son los **4 `NullReferenceException` en 6 vueltas** desde un hilo de
+  trabajo contra **3.827.981 lecturas sin fallo** en el del despachador, y las **tres mutaciones** de
+  la puerta nueva. Quien lea el verde como la prueba está leyendo la evidencia floja.
+
   **Y la guarda obvia se midió antes de escribirla, porque era ciega.**
   `Dispatcher.UIThread.CheckAccess()` contesta `True` **también en un `[Fact]`** —cuatro vueltas, los
   dos tipos, siempre `True`—, así que habría aprobado justo el hilo que existía para cazar. Contar
