@@ -144,23 +144,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Grid>
     </Border>
 
-    <Border
+    <!--
+      A note and not a warning, and that is a decision that changed on 2026-09-02. The three notices
+      were warnings together on the ground that «each one means somebody's choice was not honoured»,
+      and this one is the exception the prototype draws differently: `downmix` is small grey text
+      under the buttons — `font-size:11px; opacity:.72` — rather than a bordered box.
+      «El prototipo manda», said the owner when asked which of the two to keep.
+      <b>The other two stay warnings</b>: no output at all and a device that went away are the ones
+      the prototype does not draw as notes either.
+    -->
+    <TextBlock
         x:Name="DegradedLayoutNotice"
-        Padding="8,4"
-        Background="{DynamicResource WarningSurfaceBrush}"
-        BorderBrush="{DynamicResource WarningBorderBrush}"
-        BorderThickness="1"
-        CornerRadius="{DynamicResource CornerRadiusSmall}"
-        IsVisible="{Binding LayoutWasDegraded}">
-      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{DynamicResource Space4}">
-        <TextBlock VerticalAlignment="Top" Text="⚠" />
-        <TextBlock
-            Grid.Column="1"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource AudioOutputLayoutDegraded}"
-            TextWrapping="Wrap" />
-      </Grid>
-    </Border>
+        FontSize="{DynamicResource FontSizeFootnote}"
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        IsVisible="{Binding LayoutWasDegraded}"
+        Text="{DynamicResource AudioOutputLayoutDegraded}"
+        TextWrapping="Wrap" />
 
     <Border
         x:Name="LayoutAppliedNotice"

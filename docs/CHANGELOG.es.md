@@ -183,6 +183,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Dos de las seis diferencias del panel del reproductor con el prototipo.** La etiqueta de la fila
+  de canales decía «Disposición de canales» y el prototipo dice **«Canales»**. Y el aviso de mezcla
+  era uno de los tres recuadros de advertencia con borde y ⚠, mientras el prototipo lo dibuja como
+  **nota gris pequeña** bajo los botones. Preguntado cuál de las dos formas conservar —la decisión
+  escrita en la vista o la del diseño—, el propietario contestó: «el prototipo manda». Los otros dos
+  avisos siguen siendo advertencias, que es como el prototipo también los dibuja.
+
+  **Y la escala tipográfica gana su escalón de abajo**, con la cuenta que lo justifica: el prototipo
+  escribe 11 px **cincuenta y nueve veces** —segundo sólo tras las ochenta y seis del 12— y esta
+  escala se paraba en 12, así que cada uno de esos cincuenta y nueve iba a llegar como literal o como
+  un pie de foto un píxel más grande. La regla a la que se somete esta escala no es «¿tiene sentido
+  el escalón?» sino «¿lo contradice el diseño?», que es lo que rechazó a `FontSizeMono` por ser un
+  escalón para un solo consumidor.
+
 - **Catorce clases de botón emparejadas con su control del prototipo, contra las cuatro que
   `ADR-0007` dejó.** Cinco cambian de forma: los dos botones del riel pasan de píldora a **12**, la
   baldosa de la biblioteca de 10 a **12**, y las dos filas de «Otras acciones» de píldora a **5** —

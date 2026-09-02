@@ -72,7 +72,7 @@ public sealed class SideListEmptyStateTests
         Assert.True(application.TryGetResource("WarningSurfaceBrush", application.ActualThemeVariant, out var warning));
         var expected = Assert.IsAssignableFrom<ISolidColorBrush>(warning).Color;
 
-        foreach (var name in new[] { "NoOutputNotice", "DegradedLayoutNotice", "DeviceFallbackNotice" })
+        foreach (var name in new[] { "NoOutputNotice", "DeviceFallbackNotice" })
         {
             var notice = Assert.Single(
                 view.GetVisualDescendants().OfType<Border>(),
@@ -81,6 +81,20 @@ public sealed class SideListEmptyStateTests
             Assert.True(notice.BorderThickness.Top > 0, $"{name} has no border, so its only signal is colour.");
             Assert.Contains(notice.GetVisualDescendants().OfType<TextBlock>(), block => block.Text == "⚠");
         }
+
+        // The third one is a note, and that is the prototype's own answer rather than a relaxation
+        // of the rule above: `downmix` is small grey text under the buttons, not a bordered box.
+        // Asserted rather than dropped, because a note that quietly grew a border again would be the
+        // decision coming back without anybody deciding it.
+        var downmix = Assert.Single(
+            view.GetVisualDescendants().OfType<TextBlock>(),
+            block => block.Name == "DegradedLayoutNotice");
+        Assert.DoesNotContain(downmix.GetVisualAncestors().OfType<Border>(), border => border.Name == "DegradedLayoutNotice");
+        Assert.True(
+            application.TryGetResource("FontSizeFootnote", application.ActualThemeVariant, out var footnote)
+            && footnote is double,
+            "FontSizeFootnote did not resolve, so comparing against it proves nothing.");
+        Assert.Equal((double)footnote!, downmix.FontSize);
 
         window.Close();
     }

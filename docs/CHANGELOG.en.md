@@ -176,6 +176,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Two of the six differences between the player's panel and the prototype.** The channel row's
+  label read "Channel layout" where the prototype says **"Channels"**. And the downmix notice was one
+  of three bordered warnings with a ⚠, while the prototype draws it as **small grey text** under the
+  buttons. Asked which of the two to keep — the decision written into the view or the design's — the
+  owner answered: "el prototipo manda". The other two stay warnings, which is how the prototype draws
+  them too.
+
+  **And the type scale gains its bottom step**, with the count that earns it: the prototype writes
+  11 px **fifty-nine times** — second only to 12's eighty-six — and this scale stopped at 12, so every
+  one of those was going to arrive as a literal or as a caption a pixel too large. The rule this
+  scale is held to is not "does the step make sense" but "does the design contradict it", which is
+  what refused `FontSizeMono` for being a step for a single consumer.
+
 - **Fourteen button classes paired with their prototype control, against the four `ADR-0007` left.**
   Five change shape: the rail's two buttons go from pill to **12**, the library tile from 10 to
   **12**, and the two rows of other actions from pill to **5** — the prototype writes that style's
