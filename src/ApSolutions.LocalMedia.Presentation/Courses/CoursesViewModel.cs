@@ -238,11 +238,22 @@ internal static class CourseText
 
     /// <summary>One string, in the language in force, without asking which theme it is.</summary>
     /// <remarks>
-    /// <b>No theme variant</b>, since 2026-09-02, and it is not a shortcut: a string does not change
-    /// with the theme, while reading <c>ActualThemeVariant</c> touches an Avalonia object owned by
-    /// the UI thread. Measured that day on the shortcut labels, which reach this from a shell built
-    /// off that thread: with the variant, four <c>ShellAssemblyTests</c> answered <i>the calling
-    /// thread cannot access this object</i> inside the full suite while passing alone.
+    /// <para>
+    /// <b>No theme variant</b>, since 2026-09-02, and the reason that survives measurement is the
+    /// plain one: a string does not change with the theme, and the strings this reads are merged
+    /// into <c>Application.Resources</c> rather than into a theme dictionary, so asking with a
+    /// variant asks for something no key here is filed under.
+    /// </para>
+    /// <para>
+    /// <b>What it is not is a fix for a thread.</b> It was written the same day as one, because four
+    /// <c>ShellAssemblyTests</c> had answered <i>the calling thread cannot access this object</i> on
+    /// <c>ActualThemeVariant</c> inside the full suite while passing alone. Dropping the variant
+    /// silenced that sentence and left the cause standing: hours later the same tests threw a
+    /// <c>NullReferenceException</c> inside <c>Avalonia.Styling.Styles.TryGetResource</c>, on a stack
+    /// that runs straight through this line. Reading <c>Application.Current</c> at all is the
+    /// UI-thread operation, and no argument passed here changes that — see
+    /// <c>ShellSurfaceIsolationTests</c>, which is where the cause was finally measured and gated.
+    /// </para>
     /// </remarks>
     public static string Resource(string key, string fallback) =>
         Avalonia.Application.Current is { } application
