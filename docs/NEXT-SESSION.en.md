@@ -57,6 +57,17 @@
 > `FontSizeFootnote` (11), the step the type scale was missing at the bottom and which the design uses
 > **59 times**.
 >
+>
+> ### 6. And seven gates from this same batch did not measure what they said
+>
+> The auditor ran **before** closing, which is what it is for, and it found **section 1's defect
+> repeated inside the batch**: the new heading gate read the dictionary without building the view, so
+> deleting both `TextBlock`s left it green. Six of the seven were proved by **mutating the code they
+> guard**; the worst was the ordering one, which kept a ledger per double and could only say that
+> both things happened — true in either order. And **one of the corrections was born blind**:
+> comparing the two whole collision sentences passes with the format reverted to a literal, because
+> one of its holes is a translated label. What has to differ is the frame.
+>
 > ### The state
 >
 > `main` and the branch were left level — read it with `git log --oneline -1 main` — and every
@@ -107,6 +118,9 @@
 > · **A symmetric gate admits no two lists.** The walk gave 219/22 here and 218/23 in CI because the
 >   scene pressed whatever it could; now it presses none of the three, asserts the correspondence both
 >   ways, and lists all three.
+> · **A GATE JUST WRITTEN IS NOT A GATE MEASURED.** Seven of this batch's passed without measuring
+>   what they claimed; the auditor runs **before** closing, and what convinces is the mutation, not
+>   the reading.
 > · **A Bash heredoc beyond ~128 lines truncates silently** — "unexpected EOF" and no file written.
 >   Long files go through the write tool.
 > · **`open(p,'w')` in Python converts the whole file to CRLF** and produces thousands of `ENDOFLINE`

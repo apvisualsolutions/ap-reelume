@@ -58,6 +58,18 @@
 > Con él entró `FontSizeFootnote` (11), el escalón que a la escala tipográfica le faltaba por abajo y
 > que el diseño usa **59 veces**.
 >
+>
+> ### 6. Y siete puertas de esta misma tanda no medían lo que decían
+>
+> El auditor corrió **antes** de cerrar, que es para lo que está, y encontró **el defecto de la
+> sección 1 repetido dentro de la tanda**: la puerta nueva de los encabezados leía el diccionario sin
+> construir la vista, así que borrar los dos `TextBlock` la dejaba verde. Seis de las siete se
+> comprobaron **mutando el código que protegen**; la peor era la del orden, que llevaba un registro
+> por doble y sólo podía decir que las dos cosas ocurrieron —cierto en los dos órdenes—. Y **una de
+> las correcciones nació ciega**: comparar las dos frases de conflicto enteras pasa con el formato
+> vuelto a literal, porque una de sus casillas es una etiqueta traducida. Lo que tiene que diferir es
+> el marco.
+>
 > ### El estado
 >
 > `main` y la rama quedaron al día —léelo con `git log --oneline -1 main`—, y cada fast-forward se
@@ -108,6 +120,9 @@
 > · **Una puerta simétrica no admite dos listas.** El paseo daba 219/22 aquí y 218/23 en CI porque la
 >   escena pulsaba lo que pudiera; ahora no pulsa ninguno de los tres, afirma la correspondencia en
 >   los dos sentidos, y los lista los tres.
+> · **UNA PUERTA RECIÉN ESCRITA NO ES UNA PUERTA MEDIDA.** Siete de las de esta tanda pasaban sin
+>   medir lo que decían; el auditor se corre **antes** de cerrar, y lo que convence es la mutación,
+>   no la lectura.
 > · **Un heredoc de Bash de más de ~128 líneas se trunca en silencio** — «unexpected EOF» y ningún
 >   archivo escrito. Los archivos largos van con la herramienta de escritura.
 > · **`open(p,'w')` en Python convierte el archivo entero a CRLF** y produce miles de `ENDOFLINE` en
