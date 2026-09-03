@@ -1,5 +1,58 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-03, tanda de radios: el número no basta para emparejar, y varios de los doce son el mismo
+>
+> **Las diez superficies que declaran esquina propia están emparejadas**, y **cinco dibujaban un
+> radio que el diseño no dibuja**: la fila de ajustes y la tarjeta del candidato en 8 contra 10, la
+> etiqueta de estado y el distintivo de la carátula en caja redondeada contra píldora, y la fila de la
+> lista lateral en 4 contra 7. Las cinco eran las que el relevo anterior nombraba, y **esta vez
+> acertaba** — comprobado contra el diseño antes de escribir la tabla, porque dos premisas del mismo
+> relevo ya habían salido cortas ese día.
+>
+> ### La precisión que la tabla de los botones no había necesitado
+>
+> **Emparejar por número es emparejar mal.** Los radios pequeños del diseño tienen dos significados
+> según dónde estén: **7** es la fila de la lista lateral **y** la mitad del botón de 14 px que corre
+> dentro de un interruptor; **10** es la fila de ajustes **y** la mitad del carril de 40×20 de ese
+> mismo interruptor. Una tabla ordenada por el número emparejaría una fila con un botón **siendo
+> perfectamente coherente consigo misma**.
+>
+> **Y «doce radios distintos» cuenta de más.** Varios son una sola decisión —la píldora— escrita como
+> la mitad de la altura que toque: 26 en un círculo de 52, 16 en un botón de 32, 15 en uno de 30.
+> Tratarlos como escalones distintos infla el trabajo e invita a inventar una escala que el diseño no
+> tiene, que es justo la gramática que ADR-0007 retiró.
+>
+> ### El píxel, porque dos de radio es lo que un rasterizador se traga
+>
+> Se mide **cuánta tinta falta en la esquina**: una caja redondeada pinta su relleno en todas partes
+> menos donde recorta, así que un radio mayor deja ver más fondo en el mismo cuadrado. Es lo que una
+> persona ve y lo único que un radio recortado o ignorado no puede fingir. Medido: 10 recorta más que
+> 8, y 7 más que 4.
+>
+> ### LO SIGUIENTE
+>
+> **1. Los 86 sitios que escriben el radio en el marcado**, repartidos en treinta vistas —56 con el
+> medio, 30 con el pequeño y dos con la píldora—. **La puerta no los ve**: habla de clases. Lo sujeta
+> un trinquete que sólo puede encoger y falla en las dos direcciones. Emparejarlos **no es trabajo de
+> clase**: cada uno pertenece a un elemento de una pantalla concreta, así que va vista por vista.
+>
+> **2. Las vistas que hay que tomar enteras**, y sigue nombrada la primera: **el rótulo del hilo de un
+> curso**, que el árbol dibuja como subtítulo de 20 px y el diseño como versalita de 10 en la tinta
+> del acento.
+>
+> **3. `CRS-002/003/005` a `VERIFIED`.**
+>
+> ### Las trampas que deja esta tanda
+>
+> · **UN NÚMERO NO IDENTIFICA UN ELEMENTO.** Dos elementos distintos comparten radio por razones que
+>   no tienen nada que ver, y una tabla ordenada por el número es coherente consigo misma mientras
+>   empareja mal.
+> · **UNA CIFRA DE ALCANCE PUEDE CONTAR DE MÁS.** «Doce radios» incluía la misma decisión escrita
+>   cuatro veces con distinta altura; medirlo redujo el trabajo en vez de aumentarlo.
+> · **Un trinquete dice más que una advertencia.** «Quedan 86 sitios» dentro de una prueba que falla
+>   si suben no se olvida, y una vista nueva gastando un token por reflejo es exactamente cómo
+>   llegaron los 86.
+
 > ## RELEVO — 2026-09-03, vigésima sesión: la versalita no era una, eran seis, y el umbral que la medía era de otro tamaño de letra
 >
 > **La mitad tipográfica de la tanda 2 está hecha.** Seis clases de versalita donde había tres, cada

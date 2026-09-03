@@ -32,6 +32,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Five surfaces drew a radius the prototype does not draw**, and now draw their own: the settings
+  row and the accepted candidate's card go from 8 to **10**, the state tag and the badge over the
+  cover become **capsules** — they drew a rounded box where the design draws a pill — and the side
+  list's row goes from 4 to **7**.
+
+  **Paired by element and never by number, and that is measured**: the design's small radii carry two
+  meanings depending on where they sit — 7 is the side list's row **and** half the knob inside a
+  switch; 10 is the settings row **and** half that switch's track — so a table keyed on the number
+  would pair a row with a knob while being perfectly self-consistent. **And several of the design's
+  "twelve distinct radii" are one decision — the pill — written as whatever half the height happens
+  to be**: 26 on a 52 px circle, 16 on a 32 px button, 15 on a 30 px one.
+
+  **10 and 7 are written as literals and that is not an oversight**: the scale has three tokens — 4,
+  8 and the pill — and rounding to the nearest would draw a shape the design does not have. It is
+  [ADR-0007](adr/0007-every-element-matches-the-prototype.md)'s first consequence.
+
+  **That the difference is visible is counted in pixels**, because two pixels of radius is exactly
+  what a renderer is free to swallow: what is measured is **how much ink is missing from the
+  corner**, which is what a person sees and the one reading a clamped radius cannot fake.
+
+
 - **The CI watcher now reports every step as it finishes, not just the ending.** This workflow's
   heaviest step runs for over half an hour, so a failure inside it **was knowable only from the run's
   own conclusion, forty minutes later**. Steps and not jobs because the workflow has **exactly one

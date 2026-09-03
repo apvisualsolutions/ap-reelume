@@ -1799,7 +1799,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
   <Style Selector="Border.poster-chip">
     <Setter Property="Padding" Value="7,2" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <!--
+      The pill, and it read as the small 4 until 2026-09-03: kindBadge is a capsule over the cover in
+      the prototype, not a rounded box. SurfaceCornerTests reads the number out of the design.
+    -->
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="Background" Value="#B8090C10" />
     <Setter Property="TextElement.Foreground" Value="#EDF1F6" />
   </Style>
@@ -2487,7 +2491,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Height" Value="36" />
     <Setter Property="Padding" Value="8,0" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <!--
+      7, written as a literal because the scale has no 7 and rounding to the 4 next to it would draw
+      a shape the design does not have - ADR-0007's first consequence. The prototype's row is 32 px
+      tall with 5px 9px of padding, and it read as 4 until 2026-09-03.
+    -->
+    <Setter Property="CornerRadius" Value="7" />
     <!--
       As wide as their own words, not the panel: the row of an index is a label, and the strip to
       its right is what gives the walk's beside-click somewhere that is inside no command — the
@@ -2833,7 +2842,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <!--
+      10, and not the medium token: the design draws this row at 10 and the scale stops at 8. A value
+      with no token is written as a literal, because rounding to the nearest one draws a shape the
+      design does not have - ADR-0007's first consequence, and ScalarTokenTests still forbids writing
+      a number that HAS a token, which is a different thing.
+    -->
+    <Setter Property="CornerRadius" Value="10" />
     <Setter Property="Padding" Value="16,12" />
     <!-- The prototype's elev shadow, and most of what reads as depth: a hairline alone is a drawing. -->
     <Setter Property="BoxShadow" Value="{DynamicResource ElevationShadow}" />
@@ -2875,7 +2890,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <!--
+      10, the same literal the settings row carries and for the same reason: the design draws this
+      card at 10, and it drew the medium 8 until 2026-09-03.
+    -->
+    <Setter Property="CornerRadius" Value="10" />
     <Setter Property="Padding" Value="16" />
   </Style>
 
@@ -2897,7 +2916,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   -->
   <Style Selector="Border.state-chip">
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <!--
+      The pill, and it read as the medium 8 until 2026-09-03: the prototype's tag is a capsule - a
+      nowrap span with 2px 8px of padding and no fixed height - rather than a rounded box.
+    -->
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
     <Setter Property="Padding" Value="10,2" />
     <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />

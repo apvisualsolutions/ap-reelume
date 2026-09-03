@@ -1,5 +1,53 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-03, the radii batch: the number is not enough to pair by, and several of the twelve are the same one
+>
+> **The ten corner-declaring surfaces are paired**, and **five drew a radius the design does not
+> draw**: the settings row and the candidate's card at 8 against 10, the state tag and the cover's
+> badge as rounded boxes against pills, and the side list's row at 4 against 7. All five were the ones
+> the last handover named, and **this time it was right** — checked against the design before the
+> table was written, because two premises from that same handover had already come up short that day.
+>
+> ### The precision the button table never needed
+>
+> **Pairing by number is pairing wrongly.** The design's small radii carry two meanings depending on
+> where they sit: **7** is the side list's row **and** half the 14 px knob inside a switch; **10** is
+> the settings row **and** half that switch's 40×20 track. A table keyed on the number would pair a
+> row with a knob **while being perfectly self-consistent**.
+>
+> **And "twelve distinct radii" over-counts.** Several are one decision — the pill — written as
+> whatever half the height happens to be: 26 on a 52 px circle, 16 on a 32 px button, 15 on a 30 px
+> one. Treating them as separate steps inflates the work and invites a scale the design does not
+> have, which is the grammar ADR-0007 withdrew.
+>
+> ### The pixel, because two of radius is what a renderer swallows
+>
+> What is measured is **how much ink is missing from the corner**: a rounded box paints its fill
+> everywhere except where it cuts, so a bigger radius shows more of the backdrop in the same square.
+> It is what a person sees and the one reading a clamped or ignored radius cannot fake. Measured: 10
+> cuts more than 8, and 7 more than 4.
+>
+> ### WHAT IS NEXT
+>
+> **1. The 86 sites that write the corner into the markup**, across thirty views — 56 medium, 30
+> small, two pill. **The gate does not see them**: it is about classes. A ratchet holds them, able
+> only to shrink and failing in both directions. Pairing them is **not a class-shaped job**: each
+> belongs to an element of a particular screen, so it goes view by view.
+>
+> **2. The views that have to be taken whole**, and the first is still named: **the course thread's
+> kicker**, which the tree draws as a 20 px subtitle and the design as a 10 px overline in the accent.
+>
+> **3. `CRS-002/003/005` to `VERIFIED`.**
+>
+> ### The traps this batch leaves
+>
+> · **A NUMBER DOES NOT IDENTIFY AN ELEMENT.** Two unrelated elements share a radius for unrelated
+>   reasons, and a table keyed on the number is self-consistent while pairing wrongly.
+> · **A SCOPE FIGURE CAN OVER-COUNT.** "Twelve radii" included one decision written four times at
+>   different heights; measuring it shrank the work rather than growing it.
+> · **A ratchet says more than a caveat.** "86 sites remain" inside a test that fails if they rise
+>   does not get forgotten, and a new view spending a token by reflex is exactly how the 86 got here.
+
 > ## HANDOVER — 2026-09-03, twentieth session: the overline was not one but six, and the threshold measuring it belonged to another size of type
 >
 > **The typographic half of batch 2 is done.** Six overline classes where there were three, each

@@ -32,6 +32,28 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Cinco superficies dibujaban un radio que el prototipo no dibuja**, y ahora dibujan el suyo: la
+  fila de ajustes y la tarjeta del candidato aceptado pasan de 8 a **10**, la etiqueta de estado y el
+  distintivo sobre la carátula pasan a **cápsula** —dibujaban una caja redondeada donde el diseño
+  dibuja una píldora— y la fila de la lista lateral pasa de 4 a **7**.
+
+  **Emparejadas por elemento y nunca por número, y eso está medido**: los radios pequeños del diseño
+  tienen dos significados según dónde estén —7 es la fila de la lista **y** la mitad del botón que
+  corre dentro de un interruptor; 10 es la fila de ajustes **y** la mitad del carril de ese mismo
+  interruptor—, así que una tabla ordenada por el número emparejaría una fila con un botón siendo
+  perfectamente coherente consigo misma. **Y varios de los «doce radios distintos» del diseño son una
+  sola decisión —la píldora— escrita como la mitad de la altura que toque**: 26 en un círculo de 52,
+  16 en un botón de 32, 15 en uno de 30.
+
+  **10 y 7 se escriben como números y no es un descuido**: la escala tiene tres tokens —4, 8 y la
+  píldora— y redondear al más cercano dibujaría una forma que el diseño no tiene. Es la primera
+  consecuencia de [ADR-0007](adr/0007-every-element-matches-the-prototype.md).
+
+  **Que la diferencia se ve está contado en píxeles**, porque dos píxeles de radio es justo lo que un
+  rasterizador puede tragarse: se mide **cuánta tinta falta en la esquina**, que es lo que una persona
+  ve y lo único que un radio recortado o ignorado no puede fingir.
+
+
 - **El vigía de CI avisa ahora de cada paso que termina, no sólo del final.** El paso pesado de este
   flujo dura más de media hora, así que un fallo dentro de él **sólo se conocía por la conclusión del
   run, cuarenta minutos después**. Son pasos y no trabajos porque el flujo tiene **un solo trabajo**:

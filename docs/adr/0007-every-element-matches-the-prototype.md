@@ -132,8 +132,32 @@ ata el tipo de cada fila al que nombra su selector. **Una puerta puede medir el 
 dar un número perfectamente creíble**, que es esta misma decisión aplicada a su propia herramienta.
 
 **Y la decisión no se limita a los botones**: dice «todos los elementos». Los `Border`, `TextBox` y
-`ComboBox` gastan los mismos tres tokens en ochenta y cinco sitios mientras el prototipo dibuja doce
-radios distintos. Eso sigue pendiente, y ya puede medirse contra la pantalla.
+`ComboBox` gastan los mismos tres tokens mientras el prototipo dibuja doce radios distintos.
+
+### La enmienda del 2026-09-03 (radios): el número no basta para emparejar, y varios de los doce son el mismo
+
+Emparejadas las diez superficies que declaran esquina propia, **cinco dibujaban un radio que el
+diseño no dibuja** —la fila de ajustes y la tarjeta del candidato en 8 contra 10, la etiqueta de
+estado y el distintivo de la carátula en una caja redondeada contra una píldora, y la fila de la
+lista lateral en 4 contra 7—. `SurfaceCornerTests` las sujeta con el mecanismo de este ADR.
+
+**Y aparece una precisión que la tabla de los botones no había necesitado: emparejar por número es
+emparejar mal.** Los radios pequeños del diseño tienen dos significados según dónde estén —7 es la
+fila de la lista lateral **y** la mitad del botón de 14 px que corre dentro de un interruptor; 10 es
+la fila de ajustes **y** la mitad del carril de 40×20 de ese mismo interruptor—, así que una tabla
+ordenada por el número emparejaría una fila con un botón **siendo perfectamente coherente consigo
+misma**.
+
+**Además, «doce radios distintos» cuenta de más.** Varios son una sola decisión —la píldora— escrita
+como la mitad de la altura que toque: 26 en un círculo de 52, 16 en un botón de 32, 15 en uno de 30.
+Tratarlos como escalones distintos infla el trabajo e invita a inventar una escala que el diseño no
+tiene, que es la gramática que la decisión de arriba retiró.
+
+**Lo que queda, escrito como número y no como advertencia**: la puerta habla de **clases**, y una
+vista que escribe el radio en su propio marcado le es invisible. El 2026-09-03 había **86 sitios así
+en treinta vistas**. Emparejarlos no es trabajo de clase —cada uno pertenece a un elemento de una
+pantalla concreta— así que va vista por vista, y mientras tanto lo sujeta un trinquete que sólo puede
+encoger.
 
 ### La enmienda del 2026-09-03: la versalita no era una, y la puerta que la mide tiene un lado ciego
 
@@ -278,8 +302,29 @@ to the one its selector names. **A gate can measure the wrong control and return
 plausible number**, which is this same decision applied to its own tooling.
 
 **And the decision is not limited to buttons**: it says "every element". `Border`, `TextBox` and
-`ComboBox` spend the same three tokens across eighty-five sites while the design draws twelve
-distinct radii. That is still open, and it can now be measured against the screen.
+`ComboBox` spend the same three tokens while the design draws twelve distinct radii.
+
+### The 2026-09-03 amendment (radii): the number is not enough to pair by, and several of the twelve are the same one
+
+With the ten corner-declaring surfaces paired, **five drew a radius the design does not draw** — the
+settings row and the candidate's card at 8 against 10, the state tag and the cover's badge as rounded
+boxes against pills, and the side list's row at 4 against 7. `SurfaceCornerTests` holds them with
+this ADR's mechanism.
+
+**And a precision the button table never needed appears: pairing by number is pairing wrongly.** The
+design's small radii carry two meanings depending on where they sit — 7 is the side list's row **and**
+half the 14 px knob inside a switch; 10 is the settings row **and** half that switch's 40×20 track —
+so a table keyed on the number would pair a row with a knob **while being perfectly self-consistent**.
+
+**"Twelve distinct radii" also over-counts.** Several are one decision — the pill — written as
+whatever half the height happens to be: 26 on a 52 px circle, 16 on a 32 px button, 15 on a 30 px
+one. Treating them as separate steps inflates the work and invites a scale the design does not have,
+which is the grammar the decision above withdrew.
+
+**What remains, written as a number rather than a caveat**: the gate is about **classes**, and a view
+writing its corner into its own markup is invisible to it. On 2026-09-03 there were **86 such sites
+across thirty views**. Pairing them is not a class-shaped job, so it goes view by view, held
+meanwhile by a ratchet that can only shrink.
 
 ### The 2026-09-03 amendment: the overline was not one, and the gate that measures it has a blind side
 
