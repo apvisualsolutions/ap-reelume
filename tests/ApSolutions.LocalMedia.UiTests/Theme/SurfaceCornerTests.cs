@@ -92,6 +92,11 @@ public sealed class SurfaceCornerTests
             "the rail's count",
             999,
             @"minWidth: 17, height: 17, padding: '0 5px', borderRadius: (?<radius>[0-9]+)"),
+        new(
+            "Border.thread-card",
+            "the course thread's card",
+            12,
+            @"gap:12px;padding:18px;border-radius:(?<radius>[0-9]+)px;border:1px solid var\(--accent,\#1769AA\)"),
     ];
 
     /// <summary>
@@ -113,6 +118,12 @@ public sealed class SurfaceCornerTests
             + "4 — but by OptionRowShapeTests, which measures the Border that actually draws the "
             + "corner rather than the RadioButton that names the row. Repeating the pairing here "
             + "would be a second copy of one number, which is how two of three end up agreeing."),
+        ("Border.thread-notice",
+            "what the last mark did, inside the course thread's card. The prototype has no such "
+            + "surface: there a mark raises a toast and this tree has no toast, so there is no "
+            + "design element to pair it with and inventing one would be a number nobody read. What "
+            + "the design DID decide is the card behind it, and that is what moved this notice off "
+            + "the accent's wash and onto the card's own surface on 2026-09-03."),
     ];
 
     /// <summary>Every surface draws the corner its prototype element draws.</summary>
@@ -327,8 +338,16 @@ public sealed class SurfaceCornerTests
     /// Pairing them is not a class-shaped job: each one belongs to a particular element of a
     /// particular screen, so it is done view by view along with everything else that view owes the
     /// prototype. What this holds meanwhile is the direction. The number can fall — every site
-    /// paired is a site that moves into a class or takes the design's own literal — and it must not
-    /// rise, because a new view spending a token by reflex is exactly how the other 86 got here.
+    /// paired is a site that moves into a class — and it must not rise, because a new view spending
+    /// a token by reflex is exactly how the other 86 got here.
+    /// </para>
+    /// <para>
+    /// <b>A site falls by moving into a class, and not by taking the design's literal.</b> An
+    /// earlier wording of this said either would do, and it was wrong on its own terms: this counts
+    /// <c>CornerRadius="</c> in the markup, so a view that swapped the token for the prototype's own
+    /// number would still be writing its corner where no gate can pair it — the number would not
+    /// move at all. The first view through, on 2026-09-03, was the course thread's: two sites, both
+    /// into classes of their own, 86 to 84.
     /// </para>
     /// <para>
     /// A ratchet and not an assertion of 86: passing at 80 while claiming 86 would be a gate lying
@@ -338,7 +357,7 @@ public sealed class SurfaceCornerTests
     [Fact]
     public void The_corners_written_in_the_views_themselves_do_not_grow()
     {
-        const int ratchet = 86;
+        const int ratchet = 84;
 
         var sites = Directory
             .EnumerateFiles(Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories)
