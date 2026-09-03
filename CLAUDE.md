@@ -71,7 +71,7 @@ sobre dos píxeles de desalineación visible por medir el modelo en vez de la ti
 1. [docs/FEATURES.md](docs/FEATURES.md) — el registro **canónico** del alcance: qué existe, en qué
    estado y con qué evidencia. Si algo contradice esta guía, manda la matriz.
 
-   **Para «qué falta» no se lee a mano: `pwsh -NoProfile -File eng/list-pending.ps1`.** Son 67 <!--medido:identificadores-de-alcance-->
+   **Para «qué falta» no se lee a mano: `pwsh -NoProfile -File eng/list-pending.ps1`.** Son 71 <!--medido:identificadores-de-alcance-->
    filas
    en seis tablas, con los dos idiomas dentro de cada celda y lo hecho mezclado con lo que no, y
    leerlas a ojo es cómo se pierden. El 2026-08-31 se perdieron **ocho de golpe** —`UX-007` entre

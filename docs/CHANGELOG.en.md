@@ -140,6 +140,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   them verified — are never compared against the manifest. It is named here and not touched: fixing
   it may uncover inconsistencies in those five, and that is a batch rather than a footnote.
 
+- **The rail's context menu is rejected, and the three things it was hiding enter on their own.** It
+  was raised as new scope because the prototype carries it written for all six destinations;
+  measuring said **the prototype does not draw it**. Nothing opens it: not a click, not a
+  right-click, not re-pressing the destination you are already on — checked against the running
+  prototype and against **both revisions that exist in the history**, so it was never alive here. Of
+  its nineteen entries, Library's are already on screen **and there are more of them** — three kind
+  buttons, seven statuses, four sort orders and a clear — and the menu **would cover that very row**
+  when opening. It enters the matrix as `UX-009`, `OUT_OF_SCOPE`, with its reason written down.
+
+- **And what was genuinely missing, which the menu had been covering, enters as three rows of its
+  own.** `LIB-019`: an already-added root **cannot be rescanned on request** — the engine declares
+  the manual trigger and **nothing outside the tests calls it**; the only scan the screen fires is
+  the initial one, on adding the folder. `CRS-007`: the courses grid cannot be filtered, and **its
+  three strings are already translated in both languages inside the application with no consumer** —
+  the house defect in string form. `LIB-020`: neither the review inbox nor the duplicate groups can
+  be narrowed.
+
+- **The capture of the real application does not enter the tree, and that is the rule rather than an
+  oversight.** It was photographed over its owner's library, with their paths and folder names; the
+  numbers are what stays written. It is in
+  [the evidence](evidence/stable/audit-rail-menu-never-drawn.md), along with the measurement's own
+  trap: the menu is drawn with an animation that starts transparent, and **the first three captures
+  came out with the panel invisible and the background reading through** — believable and false. The
+  computed style was read and the animation disabled before capturing again.
+
 - **Measured: the application can get a picture out of the video itself, and the hypothesis held
   before measuring was false.** It was expected not to, because the path this application draws video
   through is exactly the one where `PLY-016` measured that the filter layer **never processes a

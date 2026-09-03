@@ -142,6 +142,31 @@ evidencia, es [FEATURES.md](FEATURES.md).
   ellos verificado— nunca se comparan con el manifiesto. Se nombra aquí y no se toca: arreglarlo
   puede destapar incoherencias en esas cinco, y eso es una tanda, no una nota al pie.
 
+- **El menú contextual del riel se rechaza, y las tres cosas que escondía entran por su cuenta.** Se
+  planteó como alcance nuevo porque el prototipo lo lleva escrito para los seis destinos; medirlo
+  dijo que **el prototipo no lo dibuja**. Nada lo abre: ni el clic, ni el botón derecho, ni volver a
+  pulsar el destino donde ya estás — comprobado sobre el prototipo en ejecución y en **las dos
+  revisiones que existen en el historial**, así que nunca estuvo vivo aquí. De sus diecinueve
+  entradas, las de Biblioteca ya están en pantalla **y son más** —tres botones de tipo, siete
+  estados, cuatro ordenaciones y un «limpiar»—, y el menú **taparía justo esa fila** al abrirse. Va
+  a la matriz como `UX-009`, `OUT_OF_SCOPE`, con su razón escrita.
+
+- **Y lo que sí faltaba, que el menú tapaba, entra como tres filas propias.** `LIB-019`: una raíz ya
+  añadida **no se puede volver a escanear a petición** — el motor declara el disparador manual y
+  **no lo llama nadie fuera de las pruebas**; el único escaneo que la pantalla dispara es el inicial,
+  al añadir la carpeta. `CRS-007`: la cuadrícula de cursos no se puede filtrar, y **sus tres textos
+  ya están traducidos en los dos idiomas dentro de la aplicación sin que los use nadie** — el defecto
+  de la casa en su forma de cadena. `LIB-020`: ni la bandeja de revisión ni los grupos de duplicados
+  se pueden acotar.
+
+- **La captura de la aplicación real no entra en el árbol, y eso es la regla y no un descuido.** Se
+  fotografió sobre la biblioteca de quien la usa, con sus rutas y sus nombres de carpeta; lo que
+  queda escrito son los números. Está en
+  [la evidencia](evidence/stable/audit-rail-menu-never-drawn.md), junto con la trampa de la
+  medición: el menú se dibuja con una animación que arranca en transparente, y **las tres primeras
+  capturas salieron con el panel invisible y el fondo leyéndose a través** — creíbles y falsas. Se
+  leyó el estilo calculado y se anuló la animación antes de volver a capturar.
+
 - **Medido: la aplicación sí puede sacar una imagen del propio vídeo, y la hipótesis previa era
   falsa.** Se esperaba que no pudiera, porque la vía por la que esta aplicación pinta el vídeo es
   justo aquella en la que `PLY-016` midió que la capa de filtros **nunca procesa un fotograma**. No

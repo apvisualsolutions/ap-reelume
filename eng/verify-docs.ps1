@@ -55,13 +55,16 @@ $featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
 $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
-# 67 since 2026-09-03, when CRS-006 (a course card's picture, taken from the video) and LIB-018
-# (setting your own cover) entered the matrix. It was 65 from 2026-08-30, when ADR-0006 was accepted
-# and CRS-001..005 arrived. The count is asserted rather than left open so that a row added to the
-# matrix has to be added here too, which is where somebody notices that the manifest and the
-# localised documents need it as well.
-if ($featureIds.Count -ne 67) {
-    $errors.Add("Expected 67 feature IDs, found $($featureIds.Count).")
+# 71 since 2026-09-03, and it took three sessions in one day to get there. 65 came from 2026-08-30,
+# when ADR-0006 was accepted and CRS-001..005 arrived. Then CRS-006 (a course card's picture, taken
+# from the video) and LIB-018 (setting your own cover) made it 67. Then the rail menu was measured
+# and rejected as UX-009, and the three gaps it had been covering entered on their own: LIB-019
+# (rescanning a root on request), LIB-020 (filtering the review inbox and the duplicate groups) and
+# CRS-007 (filtering the courses grid). The count is asserted rather than left open so that a row
+# added to the matrix has to be added here too, which is where somebody notices that the manifest and
+# the localised documents need it as well.
+if ($featureIds.Count -ne 71) {
+    $errors.Add("Expected 71 feature IDs, found $($featureIds.Count).")
 }
 if ($mvpIds.Count -ne 46) {
     $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")

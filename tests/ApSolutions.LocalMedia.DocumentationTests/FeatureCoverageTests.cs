@@ -32,7 +32,16 @@ public sealed class FeatureCoverageTests
         // the video itself, and LIB-018, setting your own cover on anything that has one. The second
         // arrived because measuring the first found the store, the backup and the view model all
         // ready for a personal cover and nothing anywhere that could choose one.
-        Assert.Equal(62, FeatureMatrix.Rows.Count);
+        // 66 later the same day: the rail menu the prototype never draws was measured and rejected
+        // as UX-009, and the three gaps it had been hiding entered on their own - LIB-019 (rescanning
+        // a root on request, whose manual trigger the engine already declares with no caller in
+        // src/), LIB-020 (filtering the review inbox and the duplicate groups) and CRS-007 (filtering
+        // the courses grid, whose three strings were already translated and consumed by nobody).
+        // 66 and not 71: this reader still matches MVP|STABLE|POST_STABLE only, so the five Post-MVP
+        // rows stay invisible to it while verify-docs.ps1 counts all 71. The two numbers meet at 71
+        // when the reader is widened, which is a separate batch and not this one. A number written
+        // ahead of the change that earns it is a gate red on purpose.
+        Assert.Equal(66, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,
