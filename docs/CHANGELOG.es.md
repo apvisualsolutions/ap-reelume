@@ -201,6 +201,35 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La matriz de alcance tenía cinco filas que ninguna puerta miraba, y una de ellas se declaraba
+  verificada.** El lector de la matriz nombraba en su patrón las tres versiones que conocía, y cinco
+  funcionalidades estaban escritas con una cuarta, `Post-MVP`: no fallaban al leerse, **no estaban**.
+  Todo lo que se preguntaba a la matriz se contestaba sobre 60 filas de 65, y `LIB-017` —el póster en
+  la ficha— llevaba desde entonces «verificado» sin nada que comprobara su evidencia.
+
+  **Esas cinco pasan a `STABLE`, que es la versión que de verdad las publica.** `Post-MVP` no era una
+  versión: no hay artefacto con ese nombre, y su propia leyenda decía que estaba cerrada a filas
+  nuevas. Una etiqueta cerrada a nuevos miembros no es un destino, es una nota sobre cuándo llegó
+  algo, y esa nota va en la prosa de la fila y no en la columna que leen la regla de publicación y
+  todas las puertas. No cambia lo que bloquea publicar: las cinco están verificadas por cualquiera de
+  los dos caminos.
+
+  **Y el lector ya no puede volver a callar.** Las versiones y los estados se leen de las dos leyendas
+  del propio documento —como ya hacía el guion que lista lo pendiente—, cada fila se cuenta dos veces
+  por caminos distintos, y una versión o un estado que el documento no declare **nombra la fila** en
+  vez de dejarla caer. Medido con dos sondas: quitarle la evidencia a `LIB-017` y devolverle la
+  versión vieja fallan las dos, cada una con su mensaje.
+
+  **La misma comprobación pasa a leer todas las versiones en dos sitios más**: la puerta de evidencia
+  de la suite y el guion que decide si el árbol podría publicarse, que preguntaba sólo por el MVP
+  mientras lo que decide es si sale la versión estable.
+
+- **El generador del manifiesto llevaba desde el 2026-09-02 sin poder correr.** `PLY-004` se
+  desbloqueó ese día —la disposición de canales la escribe Windows, así que un dispositivo virtual de
+  ocho canales ejerció 5.1 y 7.1—, y el manifiesto lo recogió; el generador se quedó con el bloqueo
+  antiguo y se negaba en el acto. El documento que produce era, desde entonces, un documento que
+  nadie podía reproducir.
+
 - **Los radios escritos en el marcado bajan de 82 a 80**, con la tarjeta de curso y su caja de vacío.
   La pantalla de Cursos queda entera.
 

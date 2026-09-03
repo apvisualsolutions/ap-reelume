@@ -63,11 +63,13 @@ $extraSuites = @{
 # The commitments this hardware cannot settle. Each one names what would settle it, so the block is
 # a piece of work rather than a permanent footnote.
 $blockers = @{
-    'PLY-004' = [ordered]@{
-        reason           = 'Ningún endpoint de render activo declara más de dos canales, así que la selección de 5.1 y 7.1 no se ha ejercido sobre hardware real. Los auriculares conectados son estéreo con virtualización, que Windows expone como dos canales. / No active render endpoint declares more than two channels, so 5.1 and 7.1 selection has not been exercised on real hardware.'
-        owner            = 'Engineering'
-        unblockCondition = 'Cualquier endpoint de render que declare seis u ocho canales, y repetir la matriz de salida de audio: un receptor A/V o una televisión por HDMI, una salida S/PDIF con codificación multicanal habilitada en el controlador, o unos auriculares USB que expongan 5.1 o 7.1 de verdad en lugar de virtualizarlo. / Any render endpoint declaring six or eight channels, and a repeat of the audio output matrix: an A/V receiver or television over HDMI, an S/PDIF output with multichannel encoding enabled in the driver, or USB headphones that expose real 5.1 or 7.1 rather than virtualising it.'
-    }
+    # PLY-004 was blocked here from 2026-08-10 and unblocked on 2026-09-02, once the channel
+    # layout could be exercised without the hardware: the block said no render endpoint on this
+    # machine declares more than two channels, and that stayed true. What changed is that "the
+    # player cannot" was never "it cannot be done" — Windows writes the layout, so a virtual
+    # eight-channel endpoint exercised 5.1 and 7.1 end to end. The manifest recorded the
+    # unblocking that day; this file kept the block, so the generator refused to run at all and
+    # the manifest it produces became a document nobody could reproduce.
 
     # LIB-006 was blocked here on 2026-08-14 and unblocked on 2026-08-15, once the chain it named ran
     # end to end: ApplyIdentification writes what the provider knows on both callers, RefreshMetadata
@@ -89,7 +91,12 @@ $blockers = @{
 }
 
 $matrix = Get-Content -LiteralPath (Join-Path $repoRoot 'docs/FEATURES.md') -Raw
-$rowPattern = '(?m)^\|\s*(?<id>[A-Z0-9]+-[0-9]+)\s*\|(?<feature>[^|]*)\|\s*(?<target>MVP|STABLE|POST_STABLE)\s*\|\s*(?<status>[A-Z_]+)\s*\|(?<criterion>[^|]*)\|(?<evidence>.*)\|\s*$'
+# The release is captured as written rather than as one of a list spelled out here. On
+# 2026-09-03 this same pattern, copied into the test suite, named three releases while five
+# rows carried a fourth: those rows did not fail to parse, they were simply not there, and
+# every count taken from the matrix was short by five with nothing to show for it. Here the
+# 46-commitment check below is what catches an MVP row going missing.
+$rowPattern = '(?m)^\|\s*(?<id>[A-Z][A-Z0-9]{1,4}-[0-9]{3})\s*\|(?<feature>[^|]*)\|\s*(?<target>[^|]+?)\s*\|\s*(?<status>[^|]+?)\s*\|(?<criterion>[^|]*)\|(?<evidence>.*)\|\s*$'
 
 $features = @()
 foreach ($match in [regex]::Matches($matrix, $rowPattern)) {

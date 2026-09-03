@@ -199,6 +199,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The scope matrix had five rows no gate ever looked at, and one of them called itself verified.**
+  The matrix reader named the three releases it knew inside its pattern, and five features were
+  written with a fourth, `Post-MVP`: they did not fail to parse, they **were not there**. Every
+  question asked of the matrix was answered over 60 rows out of 65, and `LIB-017` — the poster on the
+  card — had sat "verified" ever since with nothing checking its evidence.
+
+  **Those five become `STABLE`, which is the release that actually publishes them.** `Post-MVP` was
+  not a release: no artifact carries that name, and its own legend said it was closed to new rows. A
+  label closed to new members is not a destination, it is a note about when something landed, and
+  that note belongs in the row's prose rather than in the column the publishing rule and every gate
+  read. It changes nothing about what blocks publishing: all five are verified either way.
+
+  **And the reader can no longer go quiet.** Releases and statuses are read from the document's own
+  two legends — as the script that lists what is pending already did — every row is counted twice by
+  two different routes, and a release or a status the document does not declare **names the row**
+  instead of dropping it. Measured with two probes: taking `LIB-017`'s evidence away and giving it
+  back its old release both fail, each with its own message.
+
+  **The same check now reads every release in two more places**: the suite's evidence gate, and the
+  script that decides whether this tree could be published, which asked only about the MVP while what
+  it decides is whether the stable release ships.
+
+- **The manifest generator had been unable to run since 2026-09-02.** `PLY-004` was unblocked that
+  day — Windows writes the channel layout, so a virtual eight-channel device exercised 5.1 and 7.1 —
+  and the manifest recorded it; the generator kept the old block and refused on the spot. The
+  document it produces had been, ever since, a document nobody could reproduce.
+
 - **Corners written into the markup fall from 82 to 80**, with the course card and its empty box.
   The Courses screen is done.
 

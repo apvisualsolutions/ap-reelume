@@ -37,11 +37,14 @@ public sealed class FeatureCoverageTests
         // a root on request, whose manual trigger the engine already declares with no caller in
         // src/), LIB-020 (filtering the review inbox and the duplicate groups) and CRS-007 (filtering
         // the courses grid, whose three strings were already translated and consumed by nobody).
-        // 66 and not 71: this reader still matches MVP|STABLE|POST_STABLE only, so the five Post-MVP
-        // rows stay invisible to it while verify-docs.ps1 counts all 71. The two numbers meet at 71
-        // when the reader is widened, which is a separate batch and not this one. A number written
-        // ahead of the change that earns it is a gate red on purpose.
-        Assert.Equal(66, FeatureMatrix.Rows.Count);
+        // 71 the same day, and NOT because scope grew again: this is the widening the line above was
+        // waiting for. LIB-013..017 were always in the matrix; the reader named the three releases it
+        // knew and those five rows carried a fourth, so the number this asserted was the number it
+        // could read. Both counts are now taken from the same 71 rows, which is why they agree — and
+        // agreeing is the point. They disagreed all day precisely because five rows were invisible to
+        // one of them. This number and verify-docs.ps1's are measured after the change, never written
+        // ahead of it.
+        Assert.Equal(71, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,
@@ -81,12 +84,35 @@ public sealed class FeatureCoverageTests
     }
 
     /// <summary>
+    /// The matrix has to be readable as a whole before any count taken from it means anything.
+    /// </summary>
+    /// <remarks>
+    /// This is the gate that was missing on 2026-09-03. Five rows used a release the parser did not
+    /// name, so they were not rejected — they were skipped, and every question asked of the matrix
+    /// was answered over the 60 rows that happened to match. A parser that drops what it does not
+    /// recognise gives a short answer with a confident face, which is worse than no answer.
+    /// </remarks>
+    [Fact]
+    public void Every_row_of_the_matrix_parses_and_uses_only_what_the_matrix_declares()
+    {
+        Assert.True(FeatureMatrix.Problems.Count == 0, string.Join("; ", FeatureMatrix.Problems));
+        Assert.NotEmpty(FeatureMatrix.DeclaredTargets);
+        Assert.NotEmpty(FeatureMatrix.DeclaredStatuses);
+    }
+
+    /// <summary>
     /// A status of `VERIFIED` with nothing linked is an assertion, not a verification.
     /// </summary>
+    /// <remarks>
+    /// Read over every row rather than only the MVP ones since 2026-09-03. While the parser could
+    /// not see LIB-013..017, this asked its question of a set that excluded them, and LIB-017 sat
+    /// `VERIFIED` with nothing at all checking that its evidence existed or was even linked. The
+    /// rule was never "an MVP claim needs evidence"; it is that a claim needs evidence.
+    /// </remarks>
     [Fact]
     public void Nothing_is_verified_without_evidence_linked_from_the_matrix()
     {
-        var unsupported = FeatureMatrix.Mvp
+        var unsupported = FeatureMatrix.Rows
             .Where(row => row.Status == "VERIFIED" && row.EvidenceLinks.Length == 0)
             .Select(row => row.Id)
             .ToArray();
