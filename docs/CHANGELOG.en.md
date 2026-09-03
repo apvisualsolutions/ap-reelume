@@ -87,13 +87,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   what it had pressed. Measured from the run's own result files: **13 minutes a round spent repeating
   the same thing**, out of a 79-minute run.
 
-  The verification now hands that suite to its gate, and the walk's counter reads the report the gate
-  just left instead of repeating it: **half a second instead of two minutes forty, with an identical
-  verdict**. It is a switch rather than a deletion, because the full verification is also used
-  locally, where that gate is not going to run afterwards.
+  The walk's counter now reads the report the gate just left instead of repeating it: **half a
+  second instead of two minutes forty, with an identical verdict**. That is four minutes.
 
-  **And it is written down that the switch and its step belong together**: remove the step from the
-  workflow and leave the switch, and that suite stops running in CI entirely with nothing to say so.
+  **The other nine were not free, and it took a red build to find out.** Taking that suite out of the
+  verification looked like it cost nothing, because the gate repeats it twice right afterwards — but
+  that suite mounts the whole application and walks every view, so **it is the only thing covering
+  much of the presentation in the pass the coverage gate measures**. Removing it dropped half a dozen
+  files at once, one from 81 to 18, and the gate refused, correctly. The saving is still there, but
+  it costs collecting coverage from the gate too. **A saving that does not measure what the piece
+  contributed in passing is not a saving.**
 
 - **And the figure this project quoted for how long CI takes had been false for four days.** It said
   42-53 minutes; today's five runs measured **56 in ordinary hours and 79 in the worst**, over the

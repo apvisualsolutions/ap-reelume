@@ -87,13 +87,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
   que había pulsado. Medido desde los archivos de resultados del propio run: **13 minutos por vuelta
   en repetir lo mismo**, de un run de 79.
 
-  Ahora la verificación cede esa suite a su puerta, y el contador del paseo lee el informe que la
-  puerta acaba de dejar en vez de repetirlo: **medio segundo en vez de dos minutos y cuarenta, con
-  el veredicto idéntico**. La cesión es un interruptor y no un borrado, porque la verificación
-  completa también se usa en local, donde esa puerta no va a correr después.
+  El contador del paseo lee ahora el informe que la puerta acaba de dejar en vez de repetirlo:
+  **medio segundo en vez de dos minutos y cuarenta, con el veredicto idéntico**. Son cuatro minutos.
 
-  **Y se escribe que el interruptor y su paso van juntos**: si alguien quita el paso del flujo y
-  deja el interruptor, esa suite deja de correr en CI entera y nada lo dice.
+  **Los otros nueve no eran gratis, y hizo falta un rojo para saberlo.** Sacar esa suite de la
+  verificación parecía no costar nada, porque la puerta la repite dos veces justo después — pero esa
+  suite monta la aplicación entera y recorre todas las vistas, así que **es lo único que cubre buena
+  parte de la presentación en la pasada que la puerta de cobertura mide**. Al quitarla se
+  desplomaron media docena de archivos, uno de 81 a 18, y la puerta lo rechazó con razón. El ahorro
+  sigue ahí, pero cuesta recoger cobertura también en la puerta. **Un ahorro que no mide lo que la
+  pieza aportaba de paso no es un ahorro.**
 
 - **Y la cifra que el proyecto citaba sobre lo que tarda CI llevaba cuatro días siendo falsa.** Decía
   42-53 minutos; los cinco runs de hoy dieron **56 en horas normales y 79 en la peor**, sobre el

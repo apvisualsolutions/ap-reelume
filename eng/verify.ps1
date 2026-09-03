@@ -18,21 +18,7 @@ param(
     # much as this code, so CI runs them, archives their result, and does not let their verdict
     # block. The budgets stay blocking wherever this switch is absent — the physical harness, where
     # they mean something.
-    [switch]$NonBlockingPerformance,
-
-    # CI runs the accessibility journey as a gate of its own, twice in a row and in Verify mode,
-    # immediately after this. Leaving it in the solution pass as well ran the same suite a third
-    # time over the same code for no second opinion — 8.8 minutes of a 79-minute job, measured on
-    # 2026-09-03 from the run's own TRX files.
-    #
-    # It is a switch rather than a removal because this script is also «the whole answer, here and
-    # now» on a developer's machine, and there the gate is not going to run afterwards. Absent, the
-    # suite runs exactly as it always did.
-    #
-    # WHAT THIS GIVES UP, and it is named rather than assumed: if the accessibility step is ever
-    # removed from the workflow while this switch stays, that suite stops running in CI entirely and
-    # nothing says so. The step and this switch belong together.
-    [switch]$AuditGatesRunSeparately
+    [switch]$NonBlockingPerformance
 )
 
 $ErrorActionPreference = 'Stop'
@@ -95,15 +81,8 @@ try {
 
     # `-m:1` keeps MSBuild from starting one VSTest invocation per project at the same time. Parallel
     # hosts destabilise LibVLC and made a host die on its sixty-second connection timeout.
-    #
-    # The filter is built rather than written twice: the two branches below differ in the budgets
-    # alone, and a second copy of it is how one of them keeps running a suite the other stopped.
-    $excluded = @('PerformanceTests')
-    if ($AuditGatesRunSeparately) { $excluded += 'AccessibilityTests' }
-    $solutionFilter = ($excluded | ForEach-Object { "FullyQualifiedName!~$_" }) -join '&'
-
     if ($NonBlockingPerformance) {
-        dotnet test $solution -c $Configuration --no-build -m:1 --settings (Join-Path $PSScriptRoot 'test.runsettings') --filter $solutionFilter --logger trx --results-directory $resultsDirectory --collect:'XPlat Code Coverage'
+        dotnet test $solution -c $Configuration --no-build -m:1 --settings (Join-Path $PSScriptRoot 'test.runsettings') --filter 'FullyQualifiedName!~PerformanceTests' --logger trx --results-directory $resultsDirectory --collect:'XPlat Code Coverage'
         if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
 
         # The budgets still run and their verdict is still written down — it just cannot block a
@@ -120,16 +99,7 @@ try {
         }
     }
     else {
-        # Everything, budgets included. Only the audit suite can be left out here, and only when
-        # something else is going to run it.
-        $blockingFilter = if ($AuditGatesRunSeparately) { 'FullyQualifiedName!~AccessibilityTests' } else { $null }
-        if ($blockingFilter) {
-            dotnet test $solution -c $Configuration --no-build -m:1 --settings (Join-Path $PSScriptRoot 'test.runsettings') --filter $blockingFilter --logger trx --results-directory $resultsDirectory --collect:'XPlat Code Coverage'
-        }
-        else {
-            dotnet test $solution -c $Configuration --no-build -m:1 --settings (Join-Path $PSScriptRoot 'test.runsettings') --logger trx --results-directory $resultsDirectory --collect:'XPlat Code Coverage'
-        }
-
+        dotnet test $solution -c $Configuration --no-build -m:1 --settings (Join-Path $PSScriptRoot 'test.runsettings') --logger trx --results-directory $resultsDirectory --collect:'XPlat Code Coverage'
         if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
     }
 

@@ -44,8 +44,14 @@
 > ### CI: the same work four times, measured from its own results
 >
 > The accessibility journey ran **four times a round** — once in the verification, twice as a gate,
-> and a fourth time to count what it pressed. Now twice, and the counter reads what the gate left:
-> **0.5 s instead of 2m39s with an identical verdict**. Some 13 minutes a round.
+> and a fourth time to count what it pressed. The fourth is gone: the counter reads what the gate
+> left, **0.5 s instead of 2m39s with an identical verdict**. That is four minutes.
+>
+> **The other nine were NOT free, and it took a red build to find out.** Taking that suite out of the
+> verification looked costless because the gate repeats it twice afterwards — but it mounts the whole
+> application and walks every view, so it is **the only thing covering much of the presentation in
+> the pass the coverage gate measures**. Half a dozen files dropped, one from 81 to 18. The saving is
+> still there and it costs collecting coverage from the gate too: that is its script, not a switch.
 >
 > **And the figure this repository quoted had been false for four days**: it said 42-53 minutes and
 > today it is **56 in ordinary hours and 79 in the worst**. Corrected with the measured breakdown,

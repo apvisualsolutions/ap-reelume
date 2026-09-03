@@ -43,8 +43,15 @@
 > ### CI: cuatro veces lo mismo, medido desde sus propios resultados
 >
 > El recorrido accesible corría **cuatro veces por vuelta** —una en la verificación, dos como puerta
-> y una cuarta para contar lo que pulsó—. Ahora dos, y el contador lee lo que la puerta dejó:
-> **0,5 s en vez de 2m39s con el veredicto idéntico**. Unos 13 minutos por vuelta.
+> y una cuarta para contar lo que pulsó—. La cuarta ya no: el contador lee lo que la puerta dejó,
+> **0,5 s en vez de 2m39s con el veredicto idéntico**. Son cuatro minutos.
+>
+> **Los otros nueve NO eran gratis, y hizo falta un rojo para saberlo.** Sacar esa suite de la
+> verificación parecía no costar nada porque la puerta la repite dos veces después — pero monta la
+> aplicación entera y recorre todas las vistas, así que es **lo único que cubre buena parte de la
+> presentación en la pasada que la puerta de cobertura mide**. Media docena de archivos se
+> desplomaron, uno de 81 a 18. El ahorro sigue existiendo y cuesta recoger cobertura también en la
+> puerta: eso es tocar su guion, no un interruptor.
 >
 > **Y la cifra que este repositorio citaba llevaba cuatro días siendo falsa**: decía 42-53 minutos y
 > hoy son **56 en horas normales y 79 en la peor**. Corregida con el reparto medido, que además

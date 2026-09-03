@@ -220,15 +220,22 @@ pruebas de integración **27 min** —20 de ellos en cuatro pruebas de volumen�
 **8,8 min** dentro de la verificación y **19,4 más** como puerta, el vídeo real 5,7 y los presupuestos
 4,0.
 
-**Ese recorrido corría CUATRO veces por run**: una en la verificación, dos como puerta —seguidas y
-sobre el mismo código— y una cuarta para contar lo que había pulsado. Desde el 2026-09-03 la
-verificación lo cede a su puerta con `-AuditGatesRunSeparately`, y el trinquete del paseo lee con
-`-SkipRun` el informe que la puerta acaba de dejar —el paseo escribe en `artifacts/walk` con o sin
-variable, que es lo que lo hace posible—: **0,5 s en vez de 2m39s y el veredicto idéntico**, medido.
-Unos 13 minutos por vuelta.
+**Ese recorrido corre CUATRO veces por run**: una en la verificación, dos como puerta —seguidas y
+sobre el mismo código— y una cuarta para contar lo que había pulsado. Desde el 2026-09-03 la cuarta
+ya no ocurre: el trinquete del paseo lee con `-SkipRun` el informe que la puerta acaba de dejar —el
+paseo escribe en `artifacts/walk` con o sin variable, que es lo que lo hace posible—, **0,5 s en vez
+de 2m39s y el veredicto idéntico**. Son unos 4 minutos por vuelta.
 
-**El interruptor y su paso van juntos**: si el paso de accesibilidad desaparece del flujo y el
-interruptor se queda, esa suite deja de correr en CI entera y nada lo dice.
+**Y sacarla de la verificación NO es gratis, medido el mismo día y con un rojo.** Parecía el ahorro
+grande —8,8 minutos— porque la puerta corre esa misma suite dos veces justo después. Pero esa suite
+monta la aplicación entera y recorre todas las vistas, así que **es lo único que cubre buena parte de
+`Presentation` EN ESA PASADA**, que es la pasada que la puerta de cobertura mide. Al quitarla cayeron
+media docena de archivos de golpe —`ScanSettingsViewModel` de 81/50 a **18/0**— y la puerta lo
+rechazó con razón. El ahorro sigue existiendo, pero cuesta recoger cobertura también en la puerta y
+fusionarla, que es tocar su guion y no un interruptor.
+
+**La lección, que es la de la casa otra vez: un ahorro que no mide lo que la pieza aportaba DE PASO
+no es un ahorro.**
 
 **Y el sexto desenlace no es un desenlace, sino la pregunta: mirar donde el run no está.** Hasta el
 2026-09-02 el guion listaba con `--branch` y esa rama era **la local**, que en un worktree no es la

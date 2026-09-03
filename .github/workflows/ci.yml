@@ -83,15 +83,22 @@ jobs:
       # accessibility, 2m09s for recovery, 3m00s-4m16s for the walk. A step that reaches its ceiling
       # is a hang worth reading, not a slow runner - which is the distinction that cost six runs to
       # learn the first time.
-      # -AuditGatesRunSeparately: the accessibility journey is the next step, run twice in Verify
-      # mode over this same code. Running it here as well was a third pass for no second opinion —
-      # 8.8 minutes of a 79-minute job, measured on 2026-09-03 from this workflow's own TRX files.
-      # THE SWITCH AND THE STEP BELOW BELONG TOGETHER: remove that step and this suite stops running
-      # in CI at all, with nothing to say so.
+      # THE ACCESSIBILITY SUITE STAYS IN THIS PASS, and the attempt to take it out is why that is
+      # written down rather than assumed. On 2026-09-03 it was moved to its gate alone — 8.8 minutes
+      # of a 79-minute job, apparently free because the gate runs the same suite twice right after.
+      # It was not free. That suite mounts the whole application and walks every view, so it is the
+      # only thing covering swathes of Presentation IN THIS PASS, which is the pass the coverage gate
+      # measures. Removing it dropped half a dozen files at once — ScanSettingsViewModel from 81/50
+      # to 18/0 — and the gate refused, correctly: coverage does not go backwards.
+      #
+      # The saving is real and still available, but it costs collecting coverage from the gate too
+      # and merging it here; that is a change to the gate's own script rather than a switch, and it
+      # is not worth doing blind at the end of a batch. What stays is the walk's, below, which costs
+      # nothing because the walk's counter never contributed coverage in the first place.
       - name: Verify both architectures
         timeout-minutes: 70
         shell: pwsh
-        run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -NonBlockingPerformance -AuditGatesRunSeparately
+        run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -NonBlockingPerformance
       # The two audit gates used to be manual-only (CI-001/CI-002): the accessibility journey and
       # the recovery matrix could regress and CI would stay green. Verify mode fails on any
       # critical or major finding, and each gate has to pass twice in a row to be called clean.
