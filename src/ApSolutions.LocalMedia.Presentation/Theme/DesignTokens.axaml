@@ -3190,6 +3190,43 @@ SPDX-License-Identifier: GPL-3.0-or-later
     MinWidth go with the height for the reason every other bar in this file needed them — the base
     ControlTheme sets minimums of its own and a bare Height loses to them.
   -->
+  <!--
+    THE COURSES SCREEN, whose numbers are its own rather than the scale's: the section stacks at 18,
+    the grid gaps at 14, and the empty state's heading is 16. None of the three is a step of a scale
+    this file carries, and CoursesScreenTests reads each one out of the design instead of restating
+    it.
+  -->
+  <Style Selector="StackPanel.courses-page">
+    <Setter Property="Spacing" Value="18" />
+  </Style>
+
+  <Style Selector="WrapPanel.course-grid">
+    <Setter Property="ItemSpacing" Value="14" />
+    <Setter Property="LineSpacing" Value="14" />
+  </Style>
+
+  <!--
+    A course's card: the row box's bigger cousin at 12, which is the corner the design gives anything
+    with a picture's worth of content in it rather than a line's.
+  -->
+  <Style Selector="Border.course-card">
+    <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ElevationShadow}" />
+  </Style>
+
+  <!--
+    The heading inside an empty state — «Ninguna carpeta marcada como curso todavía». Sixteen, which
+    is between the body and the subtitle and is what the design draws when a box has to say one thing
+    and then explain it.
+  -->
+  <Style Selector="TextBlock.empty-title">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
   <Style Selector="ProgressBar.lesson-bar">
     <Setter Property="Height" Value="3" />
     <Setter Property="MinHeight" Value="3" />

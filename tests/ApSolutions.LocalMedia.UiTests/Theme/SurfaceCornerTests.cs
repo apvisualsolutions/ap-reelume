@@ -98,6 +98,11 @@ public sealed class SurfaceCornerTests
             12,
             @"gap:12px;padding:18px;border-radius:(?<radius>[0-9]+)px;border:1px solid var\(--accent,\#1769AA\)"),
         new(
+            "Border.course-card",
+            "a course's card in the grid",
+            12,
+            @"border:1px solid var\(--hair,rgba\(15,23,42,\.09\)\);border-radius:(?<radius>[0-9]+)px;background:var\(--card,\#fff\);overflow:hidden"),
+        new(
             "Border.chip-accent",
             "the chip in the accent's tone — «Siguiente en el hilo»",
             999,
@@ -351,8 +356,9 @@ public sealed class SurfaceCornerTests
     /// earlier wording of this said either would do, and it was wrong on its own terms: this counts
     /// <c>CornerRadius="</c> in the markup, so a view that swapped the token for the prototype's own
     /// number would still be writing its corner where no gate can pair it — the number would not
-    /// move at all. The first screen through, on 2026-09-03, was a course: the thread card took two
-    /// sites into classes of their own and the lesson row took two more, 86 to 82.
+    /// move at all. The first screen through, on 2026-09-03, was Courses: the thread card took two
+    /// sites into classes of their own, the lesson row took two more and the grid took the last two,
+    /// 86 to 80.
     /// </para>
     /// <para>
     /// A ratchet and not an assertion of 86: passing at 80 while claiming 86 would be a gate lying
@@ -362,7 +368,7 @@ public sealed class SurfaceCornerTests
     [Fact]
     public void The_corners_written_in_the_views_themselves_do_not_grow()
     {
-        const int ratchet = 82;
+        const int ratchet = 80;
 
         var sites = Directory
             .EnumerateFiles(Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories)
