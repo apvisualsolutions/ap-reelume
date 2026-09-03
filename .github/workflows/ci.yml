@@ -83,10 +83,15 @@ jobs:
       # accessibility, 2m09s for recovery, 3m00s-4m16s for the walk. A step that reaches its ceiling
       # is a hang worth reading, not a slow runner - which is the distinction that cost six runs to
       # learn the first time.
+      # -AuditGatesRunSeparately: the accessibility journey is the next step, run twice in Verify
+      # mode over this same code. Running it here as well was a third pass for no second opinion —
+      # 8.8 minutes of a 79-minute job, measured on 2026-09-03 from this workflow's own TRX files.
+      # THE SWITCH AND THE STEP BELOW BELONG TOGETHER: remove that step and this suite stops running
+      # in CI at all, with nothing to say so.
       - name: Verify both architectures
         timeout-minutes: 70
         shell: pwsh
-        run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -NonBlockingPerformance
+        run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -NonBlockingPerformance -AuditGatesRunSeparately
       # The two audit gates used to be manual-only (CI-001/CI-002): the accessibility journey and
       # the recovery matrix could regress and CI would stay green. Verify mode fails on any
       # critical or major finding, and each gate has to pass twice in a row to be called clean.
@@ -101,10 +106,17 @@ jobs:
       # What the autonomous walk pressed with a real mouse, against what the views declare. The
       # pending list may only shrink, so an area that regresses to keyboard-only work fails here
       # rather than at the next redesign.
+      # -SkipRun: the accessibility gate above has already walked, twice, and the walk writes its
+      # ledger to artifacts/walk on every press whether or not anything asked it to — so the report
+      # this reads is the one that gate just produced. Walking a fourth time to count what the third
+      # walk pressed cost about four minutes a run.
+      #
+      # It therefore DEPENDS ON THE STEP ABOVE HAVING RUN. Without it there is no report and this
+      # fails saying so, which is the right failure: a stale count would be worse than none.
       - name: Walk coverage gate
         timeout-minutes: 15
         shell: pwsh
-        run: ./eng/check-walk-coverage.ps1
+        run: ./eng/check-walk-coverage.ps1 -SkipRun
       # The debt floors belong to the environment that measures them, and that is this one: the
       # runner has no audio device and its clocks are not a developer's, so seven files read
       # differently here — WindowsAudioDeviceCatalog.cs holds 79/61 on the machine that wrote the
