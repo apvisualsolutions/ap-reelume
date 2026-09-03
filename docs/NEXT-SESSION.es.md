@@ -1,152 +1,136 @@
 # Dónde retomar
 
-> ## RELEVO — 2026-09-03, tanda de radios: el número no basta para emparejar, y varios de los doce son el mismo
+> ## RELEVO — 2026-09-03, vigésima sesión: la mitad tipográfica y la de formas de la tanda 2, y dos cifras del relevo anterior que no eran
 >
-> **Las diez superficies que declaran esquina propia están emparejadas**, y **cinco dibujaban un
-> radio que el diseño no dibuja**: la fila de ajustes y la tarjeta del candidato en 8 contra 10, la
-> etiqueta de estado y el distintivo de la carátula en caja redondeada contra píldora, y la fila de la
-> lista lateral en 4 contra 7. Las cinco eran las que el relevo anterior nombraba, y **esta vez
-> acertaba** — comprobado contra el diseño antes de escribir la tabla, porque dos premisas del mismo
-> relevo ya habían salido cortas ese día.
+> **Cuatro commits, todos en `main` con CI verde leído uno a uno.** La tanda 2 —«el resto de la
+> superficie contra el prototipo»— queda hecha **por clases**; lo que falta va por vistas y está
+> medido más abajo con un trinquete encima.
 >
-> ### La precisión que la tabla de los botones no había necesitado
+> ### Las dos mitades del encargo, y lo que la medición corrigió
 >
-> **Emparejar por número es emparejar mal.** Los radios pequeños del diseño tienen dos significados
-> según dónde estén: **7** es la fila de la lista lateral **y** la mitad del botón de 14 px que corre
-> dentro de un interruptor; **10** es la fila de ajustes **y** la mitad del carril de 40×20 de ese
-> mismo interruptor. Una tabla ordenada por el número emparejaría una fila con un botón **siendo
-> perfectamente coherente consigo misma**.
+> **La versalita no era una, eran seis.** El relevo anterior decía «el prototipo la usa en 35 sitios
+> y el árbol en dos»: el árbol la dibujaba en **dieciséis con tres clases**, y el diseño no dibuja
+> una versalita sino **nueve combinaciones** de tamaño, peso y separación. Poner una clase en los 35
+> habría inventado una uniformidad que el diseño no tiene, que es `ADR-0007` apuntando al revés.
 >
-> **Y «doce radios distintos» cuenta de más.** Varios son una sola decisión —la píldora— escrita como
-> la mitad de la altura que toque: 26 en un círculo de 52, 16 en un botón de 32, 15 en uno de 30.
-> Tratarlos como escalones distintos infla el trabajo e invita a inventar una escala que el diseño no
-> tiene, que es justo la gramática que ADR-0007 retiró.
+> **Los radios: cinco de las diez superficies dibujaban una forma que el diseño no dibuja** —la fila
+> de ajustes y la tarjeta del candidato en 8 contra 10, la etiqueta de estado y el distintivo de la
+> carátula en caja contra cápsula, y la fila de la lista lateral en 4 contra 7—. **Aquí el relevo
+> acertaba en las cinco**, comprobado antes de fiarse.
 >
-> ### El píxel, porque dos de radio es lo que un rasterizador se traga
+> **Y una cifra de alcance contaba de más**: de los «doce radios distintos» del diseño, varios son
+> **una sola decisión —la píldora— escrita como la mitad de la altura que toque**: 26 en un círculo
+> de 52, 16 en un botón de 32, 15 en uno de 30. Medirlo **redujo** el trabajo.
 >
-> Se mide **cuánta tinta falta en la esquina**: una caja redondeada pinta su relleno en todas partes
-> menos donde recorta, así que un radio mayor deja ver más fondo en el mismo cuadrado. Es lo que una
-> persona ve y lo único que un radio recortado o ignorado no puede fingir. Medido: 10 recorta más que
-> 8, y 7 más que 4.
+> ### Lo que se ve distinto
 >
-> ### LO SIGUIENTE
->
-> **1. Los 86 sitios que escriben el radio en el marcado**, repartidos en treinta vistas —56 con el
-> medio, 30 con el pequeño y dos con la píldora—. **La puerta no los ve**: habla de clases. Lo sujeta
-> un trinquete que sólo puede encoger y falla en las dos direcciones. Emparejarlos **no es trabajo de
-> clase**: cada uno pertenece a un elemento de una pantalla concreta, así que va vista por vista.
->
-> **2. Las vistas que hay que tomar enteras**, y sigue nombrada la primera: **el rótulo del hilo de un
-> curso**, que el árbol dibuja como subtítulo de 20 px y el diseño como versalita de 10 en la tinta
-> del acento.
->
-> **3. `CRS-002/003/005` a `VERIFIED`.**
->
-> ### Las trampas que deja esta tanda
->
-> · **UN NÚMERO NO IDENTIFICA UN ELEMENTO.** Dos elementos distintos comparten radio por razones que
->   no tienen nada que ver, y una tabla ordenada por el número es coherente consigo misma mientras
->   empareja mal.
-> · **UNA CIFRA DE ALCANCE PUEDE CONTAR DE MÁS.** «Doce radios» incluía la misma decisión escrita
->   cuatro veces con distinta altura; medirlo redujo el trabajo en vez de aumentarlo.
-> · **Un trinquete dice más que una advertencia.** «Quedan 86 sitios» dentro de una prueba que falla
->   si suben no se olvida, y una vista nueva gastando un token por reflejo es exactamente cómo
->   llegaron los 86.
-
-> ## RELEVO — 2026-09-03, vigésima sesión: la versalita no era una, eran seis, y el umbral que la medía era de otro tamaño de letra
->
-> **La mitad tipográfica de la tanda 2 está hecha.** Seis clases de versalita donde había tres, cada
-> una emparejada con su elemento del prototipo y con el número **leído** del diseño — la forma que
-> `ADR-0007` puso sobre los botones, aplicada a «todos los elementos».
->
-> ### Las dos mitades del relevo anterior eran cortas, y medirlas cambió el trabajo
->
-> «El prototipo la usa en 35 sitios y el árbol en dos» — ni una cosa ni la otra. El árbol la dibujaba
-> en **dieciséis sitios con tres clases**, y el diseño no dibuja una versalita sino **nueve
-> combinaciones** distintas de tamaño, peso y separación. **Poner una sola clase en los 35 habría
-> inventado una uniformidad que el diseño no tiene**, que es el defecto de `ADR-0007` apuntando en la
-> otra dirección. Seis tienen sitio en este árbol; las otras tres no, y cada una dice por qué.
->
-> ### Lo que se ve distinto ahora
->
-> · El antetítulo de la portada dibujaba **12 donde el diseño dibuja 10,5**, y su comentario afirmaba
->   una separación de 0,16em cuando es 0,18em: **acertaba el número por casualidad** —0,16×12 y
->   0,18×10,5 dan 1,92 y 1,89, y estaba escrito 1,9— mientras erraba el tamaño en un tamaño y medio.
-> · Las ocho cabeceras de la tabla de duplicados eran **las únicas mayúsculas de toda la aplicación
->   sin separación entre letras**, que es lo único que todas las versalitas del diseño hacen.
+> · El antetítulo de la portada dibujaba 12 donde el diseño dibuja 10,5, y su comentario afirmaba una
+>   separación de 0,16em cuando es 0,18em: **acertaba el número por casualidad** mientras erraba el
+>   tamaño en un tamaño y medio.
+> · Las ocho cabeceras de la tabla de duplicados eran **las únicas mayúsculas de la aplicación sin
+>   separación entre letras**, que es lo único que todas las versalitas del diseño hacen.
 > · Los dos campos de tiempo de un marcador **no tenían etiqueta visible**: la única forma de saber
 >   cuál era el principio era tabular hasta él y escuchar.
+> · «CONFIANZA» dejó de gritarse, porque el diseño la dibuja en minúscula.
 >
-> ### La trampa que costó una hipótesis falsa: el umbral de tinta era el de otro tamaño de letra
+> ### El vigía avisa ahora por partes, y se estrenó cazando el rojo de esta misma tanda
 >
-> La primera lectura del píxel dijo que la separación más pequeña **no llegaba a la pantalla** con
-> una palabra corta. Era **falso**, y lo dijo medir el aparato en vez de creerle: con el umbral de
-> 110 que usa la puerta de los botones, el lector **perdía la «I» inicial de «INICIO» en cuatro de
-> las seis clases** y casi toda la más pequeña — contaba 12 px de tinta donde la clase dibuja 30. La
-> letra de 10 px es fina y sus astas no alcanzan un umbral calibrado para una etiqueta de 14.
+> `eng/watch-ci.ps1` emite una línea por **cada paso que termina**, no sólo por el desenlace. El paso
+> pesado dura más de media hora, así que un fallo dentro de él sólo se conocía cuarenta minutos
+> después. **Son pasos y no trabajos porque este flujo tiene un solo trabajo** —medido contra un run
+> vivo, junto con lo que lo hace posible: los pasos se consultan mientras el run sigue en curso—. El
+> andamiaje se filtra mientras pasa y **nunca cuando falla**, cada paso se anuncia una vez, y **el
+> paso que falla se nombra por encima del veredicto**. Las cuatro decisiones caen con su mutación.
 >
-> **Y 200 tampoco es una adivinanza**: la lectura es idéntica a 200, 230 y 245, así que cualquier
-> valor de esa banda encuentra la misma tinta y el blanco de la escena —255— se queda fuera. **Ese
-> tramo plano es lo que hace el número seguro en vez de afortunado.** La skill de medir píxeles ya
-> avisaba de que un umbral solo mide lo que no querías; lo que faltaba es que **el umbral bueno
-> depende del tamaño de la letra**.
+> **Y el hook de post-push ya dice cuándo no puede estar seguro** del commit que salió: si el comando
+> nombra una referencia, lo advierte y deja la comprobación a quien lee — **sin adivinar el refspec**,
+> que es lo que su cabecera rechazó dos veces. Once casos por tubería. Se estrenó acertando en el
+> fast-forward, que era el escenario del hallazgo.
 >
-> ### Un comentario nombraba un mecanismo que no existe
+> ### LA TRAMPA QUE COSTÓ UNA VUELTA, Y YA ESTABA ESCRITA
 >
-> El fichero de estilos decía que las mayúsculas «vienen de `UpperCaseConverter`, que es lo que AXAML
-> tiene en lugar de `text-transform`», y que **no** se escriben en el recurso. Buscado: **no hay tal
-> conversor en este árbol** y dieciséis recursos están escritos en mayúsculas. La vista de al lado
-> explica lo contrario y es la mitad que era cierta. **El defecto de la casa apuntado a su propia
-> documentación.**
+> **CI se puso rojo en una prueba que esta tanda no tocó, en una suite que aquí pasa entera.** La
+> traza era de Avalonia de arriba abajo y la prueba que nombró **duró 1 ms: ni llegó a ejecutarse**.
+> La causa: dos mediciones nuevas abrían una ventana **y no la cerraban si una aserción fallaba**, lo
+> que rompe el aislamiento por prueba del arnés.
 >
-> ### El punto ciego de la puerta nueva, escrito dentro de ella
+> **Este repositorio ya lo había medido el 2026-08-28, con la misma traza y el remedio escrito** —
+> cerrar en un `finally`—, y se volvió a pisar. **No se reproduce en local: es una carrera, y la
+> salida es quitarla, no buscarla.**
 >
-> El censo encuentra los sitios donde **el árbol** dibuja mayúsculas. Un sitio que el diseño dibuja
-> en versalita y el árbol dibuja plano **es invisible para él**: no hay cadena gritada que encontrar.
-> Nada mide esa dirección, así que se lleva a mano en una lista cerrada de cuatro entradas, y **una
-> entrada es el único registro de que alguien miró** — que es la situación en la que `ADR-0007`
-> encontró diez clases de botón.
+> **Y el arreglo traía su propia trampa**, que sí cazó la verificación local: **cerrar la ventana
+> antes de leer el valor devuelve el del tema**, no el que la clase dibuja. Se lee con la ventana viva
+> y se comprueba después.
 >
-> ### El hook del post-push ya dice cuándo no puede estar seguro
+> ### El umbral de tinta es un parámetro de la medición, no una constante
 >
-> El hallazgo que el relevo anterior dejó abierto, cerrado por **la vía que él mismo proponía**: no
-> se adivina el refspec —lo que la cabecera de ese archivo rechazó por escrito dos veces— sino que
-> **el aviso dice cuándo no puede estar seguro**. Si el comando nombra una referencia, lo advierte y
-> deja la comprobación a quien lee. Medido por tubería con **once casos**: cinco añaden la
-> advertencia, tres suenan sin ella —los tres en que HEAD sí es lo que sale— y tres callan.
+> La primera lectura del píxel dijo que la separación más pequeña **no llegaba a la pantalla**. Era
+> falso: con el umbral de 110 que usa la puerta de los botones, el lector **perdía la «I» inicial de
+> «INICIO» en cuatro de las seis clases** —contaba 12 px de tinta donde la clase dibuja 30—. La letra
+> de 10 px es fina. **200 tampoco es una adivinanza**: la lectura es idéntica a 200, 230 y 245, y ese
+> tramo plano es lo que hace el número seguro en vez de afortunado.
 >
 > ### LO SIGUIENTE
 >
-> **1. Los radios**, que es la otra mitad de la tanda 2 y la más grande: 88 sitios gastan tres
-> valores mientras el diseño dibuja doce. Cinco discrepancias ya medidas siguen en pie —`poster-chip`
-> 999 vs 4, `setting-row` 10 vs 8, `candidate-card` 10 vs 8, `state-chip` 999 vs 8 y la fila de
-> `side-list` 7 vs 4—. El mecanismo ya está construido y probado dos veces.
+> **1. Los 86 sitios que escriben el radio en su propio marcado**, en treinta vistas —56 con el medio,
+> 30 con el pequeño, dos con la píldora—. **La puerta no los ve**: habla de clases. Lo sujeta un
+> trinquete que sólo puede encoger y **falla en las dos direcciones**. Va **vista por vista**, junto
+> con lo demás que cada vista le debe al prototipo.
 >
-> **2. Las vistas que hay que tomar enteras**, y la lista empieza por una nombrada: **el rótulo del
-> hilo de un curso**. El árbol lo dibuja como subtítulo de 20 px y el diseño como versalita de 10 en
-> la tinta del acento, dándole el peso a la lección de debajo. **Cambiar sólo la letra dejaría esa
-> tarjeta a medio camino entre dos diseños.**
+> **2. La primera de esas vistas ya está nombrada: el hilo de un curso.** El árbol dibuja «Dónde lo
+> dejaste» como subtítulo de 20 px; el diseño, como versalita de 10 en la tinta del acento, dando el
+> peso a la lección de debajo. **Cambiar sólo la letra dejaría esa tarjeta a medio camino entre dos
+> diseños**, y por eso no se tocó.
 >
-> **3. `CRS-002/003/005` a `VERIFIED`.**
+> **3. `CRS-002/003/005` a `VERIFIED`**, que lleva dos relevos esperando.
+>
+> ### Decisiones tomadas y NO ejecutadas
+>
+> · **Las mayúsculas siguen escritas en el texto**, no en un conversor. Es una decisión anterior con
+>   su razón —AXAML no compone una transformación con un texto que sigue al idioma— y una prueba
+>   detrás. Lo que sí se corrigió es **un comentario que nombraba un conversor inexistente**.
+> · **Y queda una pregunta abierta que NO está medida**: si un lector de pantalla anuncia peor esos
+>   encabezados por estar en mayúsculas. **Que no la conteste nadie de memoria**: la recomendación es
+>   medirlo con un lector real antes de gastar en un mecanismo que la decisión anterior descartó por
+>   coste. Hasta entonces no es un defecto conocido, es una duda sin datos.
+>
+> ### Lo que NO se resuelve programando
+>
+> · **`PRD-002`** — el certificado comercial de firma. Del propietario.
+> · **`PRD-003`** — una máquina ARM64. Del propietario.
+> · **El aviso de mezcla** está como nota al pie siguiendo «el prototipo manda». Si el propietario
+>   prefiere el recuadro, es su decisión y sigue nombrada aquí.
+> · **El trinquete del paseo en 23** encogerá solo el día que el paseo corra sobre una máquina con
+>   salida multicanal.
+>
+> ### El estado del árbol
+>
+> `main` y la rama quedaron **al día y en el mismo commit**, y cada fast-forward se hizo con CI en
+> verde leído. **El SHA no se escribe aquí** —nace caduco—: se lee con `git log --oneline -1 main`.
 >
 > ### Las trampas que deja esta tanda
 >
-> · **UN UMBRAL DE MEDICIÓN ES UN PARÁMETRO DE LA MEDICIÓN, NO UNA CONSTANTE DEL REPOSITORIO.** El
->   110 que sirve para una etiqueta de 14 px miente sobre una de 10, y mintió con aplomo: dio un
->   número creíble —12 px— y una conclusión falsa. **Lo que lo cerró fue barrer el umbral y buscar el
->   tramo plano**, no elegir otro número mejor.
-> · **Un comentario puede describir con precisión un mecanismo que nadie construyó**, y sobrevive
->   porque suena a decisión. Dos comentarios de este árbol se contradecían y el correcto era el que
->   estaba pegado al código.
-> · **Un nombre que invita al uso equivocado hace que el error ocurra dos veces.** `card-eyebrow` no
->   llevaba separación ninguna y once de sus doce sitios dibujaban versalita apretada; su propio
->   comentario decía «sin que ninguno grite» mientras once de sus lectores gritaban.
-> · **Una clase declarada que ninguna vista usa es el defecto de la casa en el fichero de estilos**, y
->   las dos mitades de la puerta no lo ven: una clase emparejada y con los números correctos las pasa
->   las dos sin que nadie la haya pedido nunca. Tiene prueba propia.
-> · **Gritar un recurso que además es el nombre accesible de un campo hace que un lector de pantalla
->   anuncie el nombre del campo a gritos.** Se separa en dos cadenas, la que se pinta y la que se
->   anuncia.
+> · **UNA TRAMPA DOCUMENTADA NO PROTEGE SI NO SE LEE ANTES DE ESCRIBIR.** La de las ventanas llevaba
+>   una semana escrita con su remedio y se volvió a pisar. Antes de abrir una ventana en una prueba,
+>   se mira cómo lo hacen las de al lado.
+> · **UN UMBRAL DE MEDICIÓN ES UN PARÁMETRO, NO UNA CONSTANTE.** El que sirve para una etiqueta de 14
+>   px miente sobre una de 10, y miente con aplomo: da un número creíble y una conclusión falsa. Se
+>   barre el umbral y se busca el tramo plano.
+> · **UN NÚMERO NO IDENTIFICA UN ELEMENTO.** Dos elementos comparten radio por razones que no tienen
+>   que ver, y una tabla ordenada por el número es coherente consigo misma mientras empareja mal.
+> · **UNA CIFRA DE ALCANCE PUEDE CONTAR DE MÁS.** «Doce radios» incluía la misma decisión cuatro
+>   veces; medirlo redujo el trabajo en vez de aumentarlo.
+> · **UN COMENTARIO PUEDE DESCRIBIR UN MECANISMO QUE NADIE CONSTRUYÓ**, y sobrevive porque suena a
+>   decisión. Dos comentarios de este árbol se contradecían y el correcto era el pegado al código.
+> · **UN NOMBRE QUE INVITA AL USO EQUIVOCADO HACE QUE EL ERROR OCURRA DOS VECES.** `card-eyebrow` no
+>   llevaba separación y once de sus doce sitios dibujaban versalita apretada.
+> · **UNA CLASE DECLARADA QUE NINGUNA VISTA USA** es el defecto de la casa en el fichero de estilos, y
+>   las dos mitades de la puerta no lo ven: tiene prueba propia.
+> · **UN FILTRO QUE CALLA BIEN Y UNO ROTO SE VEN IGUAL DESDE FUERA.** El vigía pasó treinta minutos
+>   sin emitir un paso y era correcto —los cuatro terminados eran andamiaje—, pero **eso se comprobó
+>   preguntando por el estado real**, no deduciéndolo.
+> · **UN TRINQUETE DICE MÁS QUE UNA ADVERTENCIA.** «Quedan 86 sitios» dentro de una prueba que falla
+>   si suben no se olvida.
 
 > ## RELEVO — 2026-09-02, decimonovena sesión: las tres listas de radios, y una premisa del relevo anterior que era falsa
 >

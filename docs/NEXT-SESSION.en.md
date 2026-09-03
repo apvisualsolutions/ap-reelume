@@ -1,145 +1,136 @@
 # Where to pick up
 
-> ## HANDOVER — 2026-09-03, the radii batch: the number is not enough to pair by, and several of the twelve are the same one
+> ## HANDOVER — 2026-09-03, twentieth session: batch 2's typographic half and its shape half, and two figures from the last handover that were not
 >
-> **The ten corner-declaring surfaces are paired**, and **five drew a radius the design does not
-> draw**: the settings row and the candidate's card at 8 against 10, the state tag and the cover's
-> badge as rounded boxes against pills, and the side list's row at 4 against 7. All five were the ones
-> the last handover named, and **this time it was right** — checked against the design before the
-> table was written, because two premises from that same handover had already come up short that day.
+> **Four commits, all on `main` with CI green read one by one.** Batch 2 — "the rest of the surface
+> against the prototype" — is done **by class**; what remains goes view by view and is measured below
+> with a ratchet over it.
 >
-> ### The precision the button table never needed
+> ### The two halves of the job, and what measuring corrected
 >
-> **Pairing by number is pairing wrongly.** The design's small radii carry two meanings depending on
-> where they sit: **7** is the side list's row **and** half the 14 px knob inside a switch; **10** is
-> the settings row **and** half that switch's 40×20 track. A table keyed on the number would pair a
-> row with a knob **while being perfectly self-consistent**.
+> **The overline was not one but six.** The last handover said "the prototype uses it in 35 places
+> and the tree in two": the tree drew it in **sixteen across three classes**, and the design draws
+> not one overline but **nine combinations** of size, weight and tracking. Putting one class on all
+> 35 would have invented a uniformity the design does not have — `ADR-0007` pointing the other way.
 >
-> **And "twelve distinct radii" over-counts.** Several are one decision — the pill — written as
-> whatever half the height happens to be: 26 on a 52 px circle, 16 on a 32 px button, 15 on a 30 px
-> one. Treating them as separate steps inflates the work and invites a scale the design does not
-> have, which is the grammar ADR-0007 withdrew.
+> **The radii: five of the ten surfaces drew a shape the design does not draw** — the settings row
+> and the candidate's card at 8 against 10, the state tag and the cover's badge as boxes against
+> capsules, and the side list's row at 4 against 7. **Here the handover was right about all five**,
+> checked before it was trusted.
 >
-> ### The pixel, because two of radius is what a renderer swallows
+> **And a scope figure over-counted**: of the design's "twelve distinct radii", several are **one
+> decision — the pill — written as whatever half the height happens to be**: 26 on a 52 px circle, 16
+> on a 32 px button, 15 on a 30 px one. Measuring it **shrank** the work.
 >
-> What is measured is **how much ink is missing from the corner**: a rounded box paints its fill
-> everywhere except where it cuts, so a bigger radius shows more of the backdrop in the same square.
-> It is what a person sees and the one reading a clamped or ignored radius cannot fake. Measured: 10
-> cuts more than 8, and 7 more than 4.
+> ### What looks different
 >
-> ### WHAT IS NEXT
+> · The hero's kicker drew 12 where the design draws 10.5, and its comment claimed a tracking of
+>   0.16em when it is 0.18em: **right by coincidence** on the number while a size and a half out.
+> · The duplicates table's eight column headings were **the only capitals in the application with no
+>   tracking**, which is the one thing every overline in the design does.
+> · A marker's two time fields **had no visible label**: the only way to tell the start was to tab
+>   into it and listen.
+> · "CONFIANZA" stopped being shouted, because the design draws it in ordinary case.
 >
-> **1. The 86 sites that write the corner into the markup**, across thirty views — 56 medium, 30
-> small, two pill. **The gate does not see them**: it is about classes. A ratchet holds them, able
-> only to shrink and failing in both directions. Pairing them is **not a class-shaped job**: each
-> belongs to an element of a particular screen, so it goes view by view.
+> ### The watcher now reports by step, and its debut caught this batch's own red
 >
-> **2. The views that have to be taken whole**, and the first is still named: **the course thread's
-> kicker**, which the tree draws as a 20 px subtitle and the design as a 10 px overline in the accent.
+> `eng/watch-ci.ps1` emits a line for **every step that finishes**, not only for the ending. The
+> heavy step runs for over half an hour, so a failure inside it was knowable only forty minutes
+> later. **Steps and not jobs because this workflow has exactly one job** — measured against a live
+> run, along with what makes it possible: the steps can be queried while the run is still going. The
+> scaffolding is filtered while it passes and **never when it fails**, each step is announced once,
+> and **the failing step is named above the verdict**. All four decisions fall to their mutation.
 >
-> **3. `CRS-002/003/005` to `VERIFIED`.**
+> **And the post-push hook now says when it cannot be sure** which commit went out: if the command
+> names a reference, it says so and leaves the check to whoever reads it — **without guessing the
+> refspec**, which its header rejected twice. Eleven cases through a pipe. It debuted getting the
+> fast-forward right, which was the scenario behind the finding.
 >
-> ### The traps this batch leaves
+> ### THE TRAP THAT COST A ROUND, AND IT WAS ALREADY WRITTEN DOWN
 >
-> · **A NUMBER DOES NOT IDENTIFY AN ELEMENT.** Two unrelated elements share a radius for unrelated
->   reasons, and a table keyed on the number is self-consistent while pairing wrongly.
-> · **A SCOPE FIGURE CAN OVER-COUNT.** "Twelve radii" included one decision written four times at
->   different heights; measuring it shrank the work rather than growing it.
-> · **A ratchet says more than a caveat.** "86 sites remain" inside a test that fails if they rise
->   does not get forgotten, and a new view spending a token by reflex is exactly how the 86 got here.
-
-> ## HANDOVER — 2026-09-03, twentieth session: the overline was not one but six, and the threshold measuring it belonged to another size of type
+> **CI went red on a test this batch never touched, in a suite that passes entirely here.** The stack
+> was Avalonia's from top to bottom and the test it named **lasted 1 ms: it never ran.** The cause:
+> two new measurements opened a window **and did not close it when an assertion failed**, which
+> breaks the harness's per-test isolation.
 >
-> **The typographic half of batch 2 is done.** Six overline classes where there were three, each
-> paired with its prototype element and with the number **read** from the design — the arrangement
-> `ADR-0007` put over the buttons, applied to "every element".
+> **This repository had measured it on 2026-08-28, same stack and remedy written down** — close in a
+> `finally` — and it was walked into again. **It does not reproduce locally: it is a race, and the
+> way out is to remove it rather than hunt it.**
 >
-> ### Both halves of the last handover were short, and measuring them changed the job
+> **And the fix had a trap of its own**, which local verification did catch: **closing the window
+> before reading the value returns the theme's**, not the one the class draws. It is read while the
+> window is alive and asserted after.
 >
-> "The prototype uses it in 35 places and the tree in two" — neither. The tree drew it in **sixteen
-> places across three classes**, and the design draws not one overline but **nine distinct
-> combinations** of size, weight and tracking. **Putting one class on all 35 would have invented a
-> uniformity the design does not have**, which is `ADR-0007`'s defect pointing the other way. Six
-> have somewhere to live in this tree; the other three do not, and each says why.
+> ### The ink threshold is a parameter of the measurement, not a constant
 >
-> ### What looks different now
->
-> · The hero's kicker drew **12 where the design draws 10.5**, and its comment claimed a tracking of
->   0.16em when it is 0.18em: **it got the number right by coincidence** — 0.16×12 and 0.18×10.5 are
->   1.92 and 1.89, and 1.9 was written — while getting the size wrong by a size and a half.
-> · The duplicates table's eight column headings were **the only capitals in the whole application
->   with no tracking**, which is the one thing every overline in the design does.
-> · A marker's two time fields **had no visible label**: the only way to know which was the start was
->   to tab into it and listen.
->
-> ### The trap that cost a false hypothesis: the ink threshold belonged to another size of type
->
-> The first pixel reading said the smallest tracking **was not reaching the screen** with a short
-> word. It was **false**, and measuring the instrument rather than trusting it is what said so: at
-> the threshold of 110 the button gate uses, the reader **lost the leading "I" of "INICIO" in four of
-> the six classes** and most of the smallest one — it counted 12 px of ink where the class draws 30.
-> Ten-pixel type is thin and its stems never reach a threshold calibrated for a 14 px label.
->
-> **And 200 is not a guess either**: the reading is identical at 200, 230 and 245, so anything in
-> that band finds the same ink and the scene's own white — 255 — stays out of it. **That flat stretch
-> is what makes the number safe rather than lucky.** The pixel-measuring skill already warned that
-> one threshold measures what you did not want; what was missing is that **the right threshold
-> depends on the size of the type**.
->
-> ### A comment named a mechanism that does not exist
->
-> The token file said the capitals "come from `UpperCaseConverter`, which is what AXAML has instead
-> of `text-transform`", and that they are **not** written into the resource. Searched: **there is no
-> such converter in this tree** and sixteen resources are written in capitals. The view next door
-> explains the opposite and that was the half that was true. **This repository's own defect pointed
-> at its documentation.**
->
-> ### The new gate's blind side, written inside it
->
-> The census finds the places **the tree** draws capitals. A place the design draws in capitals and
-> the tree draws flat **is invisible to it**: there is no shouted string to find. Nothing measures
-> that direction, so it is kept by hand in a closed list of four entries, and **an entry is the only
-> record that somebody looked** — which is the state `ADR-0007` found ten button classes in.
->
-> ### The post-push hook now says when it cannot be sure
->
-> The finding the last handover left open, closed **by the route it proposed itself**: the refspec is
-> not guessed — which that file's header rejected in writing twice — instead **the warning says when
-> it cannot be sure**. If the command names a reference, it says so and leaves the check to whoever
-> reads it. Measured through a pipe with **eleven cases**: five add the warning, three sound without
-> it — the three where HEAD is what goes out — and three stay silent.
+> The first pixel reading said the smallest tracking **was not reaching the screen**. False: at the
+> threshold of 110 the button gate uses, the reader **lost the leading "I" of "INICIO" in four of the
+> six classes** — counting 12 px of ink where the class draws 30. Ten-pixel type is thin. **200 is
+> not a guess either**: the reading is identical at 200, 230 and 245, and that flat stretch is what
+> makes the number safe rather than lucky.
 >
 > ### WHAT IS NEXT
 >
-> **1. The radii**, which is batch 2's other and larger half: 88 sites spend three values while the
-> design draws twelve. Five measured divergences still stand — `poster-chip` 999 vs 4, `setting-row`
-> 10 vs 8, `candidate-card` 10 vs 8, `state-chip` 999 vs 8 and `side-list`'s row 7 vs 4. The
-> machinery is built and has now been proven twice.
+> **1. The 86 sites that write the corner into their own markup**, across thirty views — 56 medium,
+> 30 small, two pill. **The gate does not see them**: it is about classes. A ratchet holds them, able
+> only to shrink and **failing in both directions**. It goes **view by view**, along with everything
+> else each view owes the prototype.
 >
-> **2. The views that have to be taken whole**, and the list opens with one already named: **the
-> course thread's kicker**. The tree draws it as a 20 px subtitle and the design as a 10 px overline
-> in the accent ink, giving the weight to the lesson below. **Changing only the type would leave that
-> card half in each design.**
+> **2. The first of those views is already named: the course thread.** The tree draws "Dónde lo
+> dejaste" as a 20 px subtitle; the design as a 10 px overline in the accent ink, giving the weight
+> to the lesson below. **Changing only the type would leave that card half in each design**, which is
+> why it was left alone.
 >
-> **3. `CRS-002/003/005` to `VERIFIED`.**
+> **3. `CRS-002/003/005` to `VERIFIED`**, which has been waiting two handovers.
+>
+> ### Decisions taken and NOT executed
+>
+> · **The capitals stay written into the strings**, not in a converter. That is an earlier decision
+>   with its reason — AXAML cannot compose a transform with a string that follows the language — and
+>   a test behind it. What was corrected is **a comment naming a converter that does not exist**.
+> · **And one open question that is NOT measured**: whether a screen reader announces those headings
+>   worse for being in capitals. **Nobody should answer it from memory**: the recommendation is to
+>   measure it with a real reader before spending on a mechanism the earlier decision rejected on
+>   cost. Until then it is not a known defect, it is a doubt without data.
+>
+> ### What is not solved by programming
+>
+> · **`PRD-002`** — the commercial signing certificate. The owner's.
+> · **`PRD-003`** — an ARM64 machine. The owner's.
+> · **The mixing notice** sits as a footnote, following "the prototype rules". If the owner prefers
+>   the callout, that is his decision and it stays named here.
+> · **The walk ratchet at 23** will shrink on its own the day the walk runs on a machine with
+>   multichannel output.
+>
+> ### The state of the tree
+>
+> `main` and the branch were left **up to date and on the same commit**, and every fast-forward was
+> made with CI green and read. **The SHA is not written here** — it would be born stale: read it with
+> `git log --oneline -1 main`.
 >
 > ### The traps this batch leaves
 >
-> · **A measurement threshold is a parameter of the measurement, not a constant of the repository.**
->   The 110 that serves a 14 px label lies about a 10 px one, and it lied with poise: it returned a
->   plausible number — 12 px — and a false conclusion. **What closed it was sweeping the threshold
->   and looking for the flat stretch**, not picking a better number.
-> · **A comment can describe precisely a mechanism nobody built**, and it survives because it reads
->   like a decision. Two comments in this tree contradicted each other and the correct one was the
->   one sitting next to the code.
-> · **A name that invites the wrong use makes the mistake happen twice.** `card-eyebrow` carried no
->   tracking at all and eleven of its twelve sites drew packed capitals; its own comment said
->   "without any of them shouting" while eleven of its readers shouted.
-> · **A declared class no view wears is this repository's defect in the token file**, and the gate's
->   two halves cannot see it: a class that is paired and draws the right numbers passes both without
->   anybody ever having asked for it. It has a test of its own.
-> · **Shouting a resource that is also a field's accessible name has a screen reader announce the
->   field's name shouted.** It splits into two strings, the painted one and the announced one.
+> · **A DOCUMENTED TRAP DOES NOT PROTECT IF IT IS NOT READ BEFORE WRITING.** The window one had been
+>   written for a week with its remedy and was walked into again. Before opening a window in a test,
+>   look at how the ones next door do it.
+> · **A MEASUREMENT THRESHOLD IS A PARAMETER, NOT A CONSTANT.** The one that serves a 14 px label
+>   lies about a 10 px one, and lies with poise: a plausible number and a false conclusion. Sweep the
+>   threshold and look for the flat stretch.
+> · **A NUMBER DOES NOT IDENTIFY AN ELEMENT.** Two elements share a radius for unrelated reasons, and
+>   a table keyed on the number is self-consistent while pairing wrongly.
+> · **A SCOPE FIGURE CAN OVER-COUNT.** "Twelve radii" included one decision four times; measuring it
+>   shrank the work rather than growing it.
+> · **A COMMENT CAN DESCRIBE A MECHANISM NOBODY BUILT**, and survives because it reads like a
+>   decision. Two comments in this tree contradicted each other and the right one sat next to the code.
+> · **A NAME THAT INVITES THE WRONG USE MAKES THE MISTAKE HAPPEN TWICE.** `card-eyebrow` carried no
+>   tracking and eleven of its twelve sites drew packed capitals.
+> · **A DECLARED CLASS NO VIEW WEARS** is this repository's defect in the token file, and the gate's
+>   two halves cannot see it: it has a test of its own.
+> · **A FILTER THAT IS RIGHTLY SILENT AND A BROKEN ONE LOOK THE SAME FROM OUTSIDE.** The watcher went
+>   thirty minutes without emitting a step and was correct — the four finished ones were scaffolding
+>   — but **that was confirmed by asking for the real state**, not inferred.
+> · **A RATCHET SAYS MORE THAN A CAVEAT.** "86 sites remain" inside a test that fails if they rise
+>   does not get forgotten.
 
 > ## HANDOVER — 2026-09-02, nineteenth session: the three lists of radios, and a premise from the last handover that was false
 >
