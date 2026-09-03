@@ -23,7 +23,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <TextBlock
         Text="{DynamicResource RecommendationSettingsDescription}"
         TextWrapping="Wrap" />
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
           <TextBlock Classes="setting-name" Text="{DynamicResource RecommendationSettingsEnableLabel}" />
@@ -68,7 +68,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         rule, and the number was already here. The heading level stays on the name, which is what it
         was before it moved into the card.
       -->
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
             <TextBlock

@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource ScanSettingsDescription}"
           TextWrapping="Wrap" />
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <TextBlock
               Grid.Column="0"
@@ -62,7 +62,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         string was already there. Both point at the same key, which is what keeps them one label, and
         the row-card is what puts it beside the box instead of above it.
       -->
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <TextBlock
               Grid.Column="0"

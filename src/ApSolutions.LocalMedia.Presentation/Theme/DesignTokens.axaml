@@ -2838,7 +2838,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
     column holds the words and gives way; the Auto column holds the control and keeps the width it
     asks for.
   -->
-  <Style Selector="Border.setting-row">
+  <!--
+    THE ROW BOX, and the name is the design's own. The prototype builds it once as «rowBox» and
+    spends it on every row that is a box: the settings rows, the shortcut rows, the subtitle style
+    rows - and a course's lesson.
+
+    IT WAS CALLED setting-row UNTIL 2026-09-03, when the lesson row came to take it. Thirty-one of
+    its thirty-two sites were settings, so the name was true by accident and would have stopped being
+    true the moment anything else wore it - and this repository already knows what that costs: a
+    class named card-eyebrow spent eleven of its twelve sites drawing something an eyebrow is not.
+    A name that describes its first caller rather than its shape is a name that invites the second
+    caller to write a duplicate instead.
+  -->
+  <Style Selector="Border.row-box">
     <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
     <Setter Property="BorderThickness" Value="1" />
@@ -2849,7 +2861,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
       a number that HAS a token, which is a different thing.
     -->
     <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="16,12" />
+    <!--
+      16 across and 13 down, which is «13px 16px» read in the order AXAML takes it. IT DREW 12 DOWN
+      UNTIL 2026-09-03: one pixel per side over thirty-two rows, which is exactly the size of
+      difference that survives because nobody would open a screen to look for it. The corner was
+      paired with the design and the padding beside it was not, so half of one declaration was
+      measured and half was hand-written - which is the shape SurfaceCornerTests now closes.
+    -->
+    <Setter Property="Padding" Value="16,13" />
     <!-- The prototype's elev shadow, and most of what reads as depth: a hairline alone is a drawing. -->
     <Setter Property="BoxShadow" Value="{DynamicResource ElevationShadow}" />
   </Style>
@@ -3000,7 +3019,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     heading instead.
 
     12, and it is the design's own number rather than the medium token. The scale stops at 8 and this
-    is a card rather than a row, which is the same reading Border.setting-row wrote at 10: a value
+    is a card rather than a row, which is the same reading Border.row-box wrote at 10: a value
     with no token is a literal, and ScalarTokenTests forbids writing a number that HAS one, which is
     a different thing.
 
@@ -3096,5 +3115,88 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
   <Style Selector="StackPanel.thread-recap-body">
     <Setter Property="Spacing" Value="6" />
+  </Style>
+
+  <!--
+    THE LESSON ROW OF A COURSE, which the design builds out of the row box above plus four things of
+    its own. It is not the same control as Button.lesson-row: that one is the player panel's, drawn
+    over video and pressed to change lesson, while this is a row of the course screen with two
+    buttons inside it.
+
+    The lesson the thread points at is said with a border in the accent, which is the row box's own
+    hairline swapped for it - the design writes exactly that, as a borderColor over the shared box.
+  -->
+  <Style Selector="Border.row-box.current">
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <!--
+    The state in front of the row - ○ ◐ ● - which the design tints once a lesson has been reached and
+    leaves in the secondary ink until then. The SHAPE carries the state on its own, which is why the
+    tint is allowed to be a second signal rather than the only one.
+  -->
+  <Style Selector="TextBlock.lesson-glyph">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="TextAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+
+  <Style Selector="TextBlock.lesson-glyph.reached">
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <!--
+    «L01», and the design draws it BOLD IN THE SECONDARY INK rather than in a fixed-width family. The
+    tree reached for the mono family because the numbers line up under each other, and they do — but
+    34 px of fixed width already does that, and the design spends its three mono surfaces elsewhere.
+  -->
+  <Style Selector="TextBlock.lesson-number">
+    <Setter Property="Width" Value="34" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+
+  <!--
+    The design's chip in the accent's tone — «Siguiente en el hilo». It is NOT Border.state-chip:
+    that one is paired with the prototype's «tag», which is a different factory with different
+    numbers (10 px bold at 2×8 of padding against 11.5 semi-bold at 3×10). Two capsules that look
+    alike from a distance and are written apart in the design stay apart here, because pairing them
+    by their shape is how a table ends up agreeing with itself while describing the wrong control.
+  -->
+  <Style Selector="Border.chip-accent">
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
+    <Setter Property="Padding" Value="10,3" />
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!--
+    The accent's INK and not the accent: the design writes «accent-ink, #0B4A78» here,
+    and it is the same reading Button.link-action already made — the ink measures 9.03:1 against the
+    accent's 5.62:1 in light, and this chip's wash is exactly the surface that pair was measured on.
+  -->
+  <Style Selector="Border.chip-accent TextBlock">
+    <Setter Property="FontSize" Value="11.5" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentInkBrush}" />
+  </Style>
+
+  <!--
+    The part-watched bar under a lesson: three pixels tall and never wider than 220, which is what
+    keeps it a mark against the row rather than a second progress bar for the screen. MinHeight and
+    MinWidth go with the height for the reason every other bar in this file needed them — the base
+    ControlTheme sets minimums of its own and a bare Height loses to them.
+  -->
+  <Style Selector="ProgressBar.lesson-bar">
+    <Setter Property="Height" Value="3" />
+    <Setter Property="MinHeight" Value="3" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MaxWidth" Value="220" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Background" Value="{DynamicResource ControlFillBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
   </Style>
 </Styles>

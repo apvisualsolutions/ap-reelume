@@ -272,6 +272,13 @@ public sealed class CourseDetailsViewModelTests
         Assert.True(partial.IsNextInThread);
         Assert.Single(rows, row => row.IsNextInThread);
 
+        // «Reached» is the design's tint for the glyph and it covers BOTH of the states that have
+        // been opened, which is what separates it from IsWatched: a lesson left part way through is
+        // watched by neither reading and reached by this one.
+        Assert.True(watched.IsReached);
+        Assert.True(partial.IsReached);
+        Assert.False(fresh.IsReached);
+
         // Every row is bound to the card's own two commands rather than to a copy of them, which is
         // what lets the card refuse a press without every row having to know why.
         Assert.Same(model.PlayCommand, watched.PlayCommand);

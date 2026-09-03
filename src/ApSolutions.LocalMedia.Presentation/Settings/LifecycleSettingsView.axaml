@@ -32,7 +32,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       then the next switch - which reads as six things where there are three. Underneath the name is
       where the prototype puts the sentence, and it is the same string either way.
     -->
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
           <TextBlock Classes="setting-name" Text="{DynamicResource LifecycleTrayLabel}" />
@@ -69,7 +69,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Grid>
     </Border>
 
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <TextBlock
             Grid.Column="0"
@@ -132,7 +132,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Grid>
     </Border>
 
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
           <TextBlock Classes="setting-name" Text="{DynamicResource LifecycleStartupLabel}" />

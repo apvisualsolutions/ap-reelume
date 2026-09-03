@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       sign sits outside the numeric specifier, where it is a literal. Inside it, "0 %" multiplies by a
       hundred and writes 8000 for eighty.
     -->
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <TextBlock
             Classes="setting-name"
@@ -56,7 +56,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Grid>
     </Border>
 
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <TextBlock
             Classes="setting-name"
@@ -84,7 +84,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       colour reads as a radio button dropped on a swatch, and a ring is geometry all the same, so
       both high contrast dictionaries keep the cue.
     -->
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock Classes="setting-name" Text="{DynamicResource SubtitleStyleForegroundLabel}" />
         <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
@@ -219,7 +219,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </Border>
 
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <StackPanel Spacing="{DynamicResource Space8}">
         <TextBlock Classes="setting-name" Text="{DynamicResource SubtitleStyleBackgroundLabel}" />
         <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
@@ -354,7 +354,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
     </Border>
 
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <TextBlock
             Classes="setting-name"
@@ -380,7 +380,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Grid>
     </Border>
 
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <TextBlock
             Classes="setting-name"

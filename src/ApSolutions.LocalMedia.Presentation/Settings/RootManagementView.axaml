@@ -73,7 +73,7 @@ dialog, removed here, and listed there is one list that cannot disagree with its
             Remove at x=2146 in a 1600 px window. The chip says available or not in words — in the
             two high contrast themes its two fills are the same colour, and the words are the cue.
           -->
-          <Border Classes="setting-row">
+          <Border Classes="row-box">
             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space12}">
               <StackPanel Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
                 <TextBlock
