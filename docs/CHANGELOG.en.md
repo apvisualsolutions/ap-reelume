@@ -32,6 +32,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The CI watcher now reports every step as it finishes, not just the ending.** This workflow's
+  heaviest step runs for over half an hour, so a failure inside it **was knowable only from the run's
+  own conclusion, forty minutes later**. Steps and not jobs because the workflow has **exactly one
+  job**: a job-level event would land in the same second as the ending. Measured against a live run,
+  which is also what confirmed the steps can be queried **while the run is still in progress**.
+
+  **The runner's scaffolding is filtered while it passes and never when it fails** — a checkout that
+  fails is the run failing — each step is announced **once**, and a failing step is named **above**
+  the verdict line rather than below it. All four decisions are held by mutation: each one takes down
+  exactly its own test.
+
+
 - **«Confianza» stops being shouted**, because the design does not shout it: it draws it at 12 px in
   the secondary ink in ordinary case, with the figure in semi-bold beside it.
 

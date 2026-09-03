@@ -28,6 +28,23 @@
     - The run never ends. -TimeoutMinutes is a hard ceiling: the watcher says it is giving up and
       exits, instead of staying armed and mute.
 
+    Since 2026-09-03 it also reports PROGRESS, which is not an ending and is the reason the list
+    above says "including the ways that are not an ending". Every step that finishes gets a line
+    when it finishes rather than when the run does: this workflow's heaviest step runs for over
+    half an hour, so a failure inside it used to be knowable only from the run's own conclusion,
+    forty minutes later.
+
+    Steps and not jobs, and that was measured rather than chosen: this workflow has exactly one
+    job, so a job-level event lands in the same second the run ends and adds nothing. The thirteen
+    real gates are steps, and `gh run view <id> --json jobs` returns each one with its own status
+    while the run is still in_progress.
+
+    The runner's own bookkeeping is filtered while it passes — it is the same four lines on every
+    run — and never when it fails, because scaffolding that fails is the run failing. Each step is
+    announced once and not on every poll: this thing looks once a minute for the better part of an
+    hour, and an alert that fires forty times is the alert this file already says teaches people to
+    ignore it.
+
     A sixth way to be wrong is not an outcome but a question: looking where the run is not. Until
     2026-09-02 the runs were listed with `--branch`, defaulting to the local branch, and in a
     worktree the local branch is not the branch the commit was pushed to. `ci.yml` triggers on
@@ -50,6 +67,11 @@
     The commit to watch. A short prefix is enough: it is resolved to the full forty characters
     with git before being handed to gh, which needs them — given a prefix, `gh run list --commit`
     answers `[]` and exits 0, which reads exactly like "no run yet". Measured 2026-09-02.
+
+.PARAMETER NoStepEvents
+    Turns off the per-step progress and leaves only the outcome. On by default, because hearing
+    about a failure when it happens is the point; the switch is for a reader who wants the verdict
+    and nothing else.
 
 .PARAMETER Branch
     Restricts the search to one branch's runs. Empty by default, and deliberately: the local
@@ -74,7 +96,12 @@ param(
 
     [int]$MissingLimit = 5,
 
-    [int]$QueryFailureLimit = 3
+    [int]$QueryFailureLimit = 3,
+
+    # Steps are on by default: the whole point is to hear about a failure when it happens rather
+    # than forty minutes later. The switch exists for a reader who wants the outcome and nothing
+    # else, and for the tests, which assert both shapes.
+    [switch]$NoStepEvents
 )
 
 $ErrorActionPreference = 'Stop'
@@ -124,6 +151,80 @@ else {
     $verdict = "the push did not trigger the workflow, or its run is older than those $limit"
 }
 
+# One line per STEP that finishes, so a failure inside a run is known when it happens rather than
+# when the run ends. Measured 2026-09-03 against a live run: `gh run view <id> --json jobs` returns
+# every step with its own status while the run is still `in_progress`, so this costs one extra
+# query per poll and no waiting.
+#
+# WHY STEPS AND NOT JOBS. The obvious unit is the job, and here it says nothing: this workflow has
+# exactly one job, `verify`, so a job-level event lands at the same moment the run ends and adds
+# nothing to the line that was already printed. The steps are where the thirteen real gates live,
+# and the heaviest of them runs for over half an hour.
+#
+# WHAT IS FILTERED, AND WHY IT IS NOT EVERYTHING. Checkout, the SDK, ffmpeg and the runner's own
+# `Set up job` / `Post Run …` bookkeeping say nothing about this repository's code: they are the
+# same four lines on every run, and this file already has it written down that an alert which
+# fires when it should not teaches people to ignore it. What is left is around nine events across
+# forty-five minutes.
+#
+# A FAILED STEP IS NEVER FILTERED, whatever it is called. Scaffolding that fails is the run
+# failing, and it is the one case where the noise is the news.
+function Get-FinishedSteps {
+    param(
+        [Parameter(Mandatory = $true)][long]$RunId,
+        # AllowEmptyCollection, because a Mandatory parameter refuses an empty collection and the
+        # set is empty on the first poll — which is exactly the call that matters. Measured
+        # 2026-09-03: without it the watcher died on its first cycle with «Cannot bind argument».
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.Collections.Generic.HashSet[string]]$Announced
+    )
+
+    # This query is accessory: it reports progress, it does not decide the outcome. So unlike the
+    # run query — which is deliberately not silenced, because its failure IS one of the outcomes —
+    # a failure here must not kill the watcher over a commit whose verdict is still coming.
+    try {
+        $raw = & gh run view $RunId --json jobs 2>&1
+        if ($LASTEXITCODE -ne 0) { return @() }
+        $jobs = ($raw | Out-String | ConvertFrom-Json).jobs
+    }
+    catch {
+        return @()
+    }
+
+    $events = @()
+    foreach ($job in $jobs) {
+        foreach ($step in $job.steps) {
+            if ($step.status -ne 'completed') { continue }
+
+            $key = "$($job.name)/$($step.number)"
+            if ($Announced.Contains($key)) { continue }
+            [void]$Announced.Add($key)
+
+            $failed = $step.conclusion -and $step.conclusion -ne 'success' -and $step.conclusion -ne 'skipped'
+
+            # Scaffolding is skipped only while it passes. A checkout that fails is the run failing.
+            # «Install ffmpeg» is named here and not covered by the patterns above, which is how
+            # this filter was caught on its first live run: the comment claimed ffmpeg was
+            # scaffolding while the code let it through. A comment that describes what the code
+            # does not do is the defect this repository documented the same day.
+            $scaffolding = $step.name -match '^(Set up job|Complete job|Run actions/|Post Run |Post Set up|Install ffmpeg)'
+            if ($scaffolding -and -not $failed) { continue }
+
+            if ($failed) {
+                $events += "STEP FAILED '$($step.name)' — $($step.conclusion)"
+            }
+            else {
+                $events += "step ok '$($step.name)'"
+            }
+        }
+    }
+
+    return $events
+}
+
+$announcedSteps = [System.Collections.Generic.HashSet[string]]::new()
+
 $minutes = 0
 $queryFailures = 0
 $unreadable = 0
@@ -137,7 +238,7 @@ while ($true) {
     $raw = $null
     $problem = $null
     try {
-        $raw = & gh run list @filter --limit $limit --json headSha,status,conclusion 2>&1
+        $raw = & gh run list @filter --limit $limit --json databaseId,headSha,status,conclusion 2>&1
         if ($LASTEXITCODE -ne 0) {
             $problem = ($raw | Out-String).Trim()
         }
@@ -213,6 +314,15 @@ while ($true) {
     }
 
     $missing = 0
+
+    # The steps that finished since the last poll, including the ones that finished in the very
+    # cycle that saw the run complete: they are emitted BEFORE the conclusion, so the line naming
+    # the gate that failed arrives above the line saying the run failed rather than after it.
+    if (-not $NoStepEvents -and $run.databaseId) {
+        foreach ($event in Get-FinishedSteps -RunId $run.databaseId -Announced $announcedSteps) {
+            Write-Output "CI ${short}: $event"
+        }
+    }
 
     if ($run.status -eq 'completed') {
         # The conclusion literally, whatever it is. An empty one is reported as empty rather than

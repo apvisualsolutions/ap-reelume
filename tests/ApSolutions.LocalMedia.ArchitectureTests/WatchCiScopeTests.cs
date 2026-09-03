@@ -57,6 +57,10 @@ public sealed class WatchCiScene : IDisposable
                 "\r\n",
                 "@echo off",
                 "echo %*>>\"%GH_STUB_LOG%\"",
+                // `run view <id> --json jobs` carries no --commit and would otherwise fall through
+                // to the run list, so it is answered first.
+                "echo %*| findstr /C:\"--json jobs\" >nul",
+                "if %errorlevel%==0 (type \"%GH_STUB_JOBS%\" & exit /b 0)",
                 "echo %*| findstr /C:\"--commit %GH_STUB_SHA%\" >nul",
                 "if %errorlevel%==0 (type \"%GH_STUB_RUNS%\" & exit /b 0)",
                 "echo %*| findstr /C:\"--commit \" >nul",
@@ -78,18 +82,41 @@ public sealed class WatchCiScene : IDisposable
 
     /// <summary>The run body the stub serves wherever it serves a run at all.</summary>
     public string CompletedRun(string conclusion) =>
-        $"[{{\"conclusion\":\"{conclusion}\",\"headSha\":\"{FullSha}\",\"status\":\"completed\"}}]";
+        $"[{{\"conclusion\":\"{conclusion}\",\"databaseId\":42,\"headSha\":\"{FullSha}\",\"status\":\"completed\"}}]";
+
+    /// <summary>A run that is still going, which is the only state step events can be seen in.</summary>
+    public string RunningRun() =>
+        $"[{{\"conclusion\":\"\",\"databaseId\":42,\"headSha\":\"{FullSha}\",\"status\":\"in_progress\"}}]";
+
+    /// <summary>One job with the steps given, shaped the way `gh run view --json jobs` returns them.</summary>
+    public static string Jobs(params (int Number, string Status, string Conclusion, string Name)[] steps)
+    {
+        var body = string.Join(
+            ",",
+            steps.Select(step =>
+                $"{{\"number\":{step.Number},\"status\":\"{step.Status}\",\"conclusion\":\"{step.Conclusion}\",\"name\":\"{step.Name}\"}}"));
+
+        return $"{{\"jobs\":[{{\"name\":\"verify\",\"steps\":[{body}]}}]}}";
+    }
 
     /// <summary>
     /// Runs the real script against the scene. -PollSeconds 0 and -MissingLimit 1 collapse the
     /// waiting; nothing else about the script is changed, because the point is to measure the
     /// script the repository actually ships.
     /// </summary>
-    public WatchResult Watch(string sha, string? branch, string runsJson)
+    public WatchResult Watch(
+        string sha,
+        string? branch,
+        string runsJson,
+        string? jobsJson = null,
+        bool noStepEvents = false,
+        int? timeoutMinutes = null)
     {
         var runsPath = Path.Combine(_root, "runs.json");
+        var jobsPath = Path.Combine(_root, "jobs.json");
         var logPath = Path.Combine(_root, "gh-calls.log");
         File.WriteAllText(runsPath, runsJson + Environment.NewLine);
+        File.WriteAllText(jobsPath, (jobsJson ?? "{\"jobs\":[]}") + Environment.NewLine);
         File.Delete(logPath);
 
         var start = new ProcessStartInfo("pwsh")
@@ -116,9 +143,21 @@ public sealed class WatchCiScene : IDisposable
             start.ArgumentList.Add(branch);
         }
 
+        if (noStepEvents)
+        {
+            start.ArgumentList.Add("-NoStepEvents");
+        }
+
+        if (timeoutMinutes is not null)
+        {
+            start.ArgumentList.Add("-TimeoutMinutes");
+            start.ArgumentList.Add(timeoutMinutes.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
         start.Environment["PATH"] = Path.Combine(_root, "bin") + Path.PathSeparator + start.Environment["PATH"];
         start.Environment["GH_STUB_LOG"] = logPath;
         start.Environment["GH_STUB_RUNS"] = runsPath;
+        start.Environment["GH_STUB_JOBS"] = jobsPath;
         start.Environment["GH_STUB_SHA"] = FullSha;
         start.Environment["GH_STUB_BRANCH"] = PushedBranch;
 
@@ -202,6 +241,146 @@ public sealed class WatchCiScene : IDisposable
 /// </remarks>
 public sealed class WatchCiScopeTests(WatchCiScene scene) : IClassFixture<WatchCiScene>
 {
+    /// <summary>
+    /// A step that finishes while the run is still going is announced when it finishes, not when the
+    /// run ends.
+    /// </summary>
+    /// <remarks>
+    /// The whole point of the step events, added 2026-09-03: this workflow's heaviest step runs for
+    /// over half an hour, and a failure inside it used to be knowable only from the run's own
+    /// conclusion forty minutes later.
+    /// <para>
+    /// <b>Steps and not jobs, because jobs say nothing here.</b> Measured against a live run that
+    /// day: this workflow has exactly one job, so a job-level event lands in the same second the run
+    /// ends. The thirteen real gates are steps, and <c>gh run view --json jobs</c> returns each one
+    /// with its own status while the run is still <c>in_progress</c>.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_step_that_finishes_is_announced_before_the_run_ends()
+    {
+        var result = scene.Watch(
+            scene.ShortSha,
+            branch: null,
+            scene.RunningRun(),
+            WatchCiScene.Jobs(
+                (1, "completed", "success", "Set up job"),
+                (5, "completed", "success", "Verify both architectures"),
+                (6, "in_progress", string.Empty, "Accessibility gate")),
+            timeoutMinutes: 2);
+
+        Assert.Contains("step ok 'Verify both architectures'", result.Output, StringComparison.Ordinal);
+
+        // The scaffolding is filtered while it passes: it is the same four lines on every run and
+        // says nothing about this repository's code.
+        Assert.DoesNotContain("Set up job", result.Output, StringComparison.Ordinal);
+
+        // And a step that has not finished is not announced as if it had.
+        Assert.DoesNotContain("Accessibility gate", result.Output, StringComparison.Ordinal);
+    }
+
+    /// <summary>A step is announced once, however many times the watcher looks at it.</summary>
+    /// <remarks>
+    /// The watcher polls once a minute for the better part of an hour, so a reader that reported
+    /// what it saw rather than what had changed would emit the same line forty times. That is the
+    /// noise this repository has already written down as the thing that teaches people to ignore an
+    /// alert.
+    /// </remarks>
+    [Fact]
+    public void A_step_is_announced_once_and_not_on_every_poll()
+    {
+        var result = scene.Watch(
+            scene.ShortSha,
+            branch: null,
+            scene.RunningRun(),
+            WatchCiScene.Jobs((5, "completed", "success", "Verify both architectures")),
+            timeoutMinutes: 4);
+
+        var announcements = Regex.Count(
+            result.Output,
+            "step ok 'Verify both architectures'",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(5));
+
+        // Anti-blindness floor: a run that never announced anything would satisfy "not more than
+        // once" by announcing nothing.
+        Assert.True(announcements > 0, $"the step was never announced at all: {result.Output}");
+        Assert.True(announcements == 1, $"the step was announced {announcements} times: {result.Output}");
+    }
+
+    /// <summary>
+    /// A step that fails is announced whatever it is called, including the scaffolding the passing
+    /// case filters out.
+    /// </summary>
+    /// <remarks>
+    /// Scaffolding that fails is the run failing, and it is the one case where the noise is the
+    /// news: a checkout that cannot check out produces a red run whose cause is in the step nobody
+    /// wanted to hear about.
+    /// </remarks>
+    [Fact]
+    public void A_failing_step_is_announced_even_when_it_is_scaffolding()
+    {
+        var result = scene.Watch(
+            scene.ShortSha,
+            branch: null,
+            scene.RunningRun(),
+            WatchCiScene.Jobs(
+                (2, "completed", "failure", "Run actions/checkout@abc"),
+                (5, "completed", "success", "Verify both architectures")),
+            timeoutMinutes: 2);
+
+        Assert.Contains("STEP FAILED 'Run actions/checkout@abc'", result.Output, StringComparison.Ordinal);
+        Assert.Contains("failure", result.Output, StringComparison.Ordinal);
+    }
+
+    /// <summary>The step events can be turned off, and then nothing about steps is emitted.</summary>
+    /// <remarks>
+    /// Asserted because a switch nobody measures is a switch that stops working quietly, and this
+    /// one is the escape hatch for a reader who wants the outcome and nothing else.
+    /// </remarks>
+    [Fact]
+    public void NoStepEvents_emits_no_step_lines_at_all()
+    {
+        var result = scene.Watch(
+            scene.ShortSha,
+            branch: null,
+            scene.CompletedRun("success"),
+            WatchCiScene.Jobs((5, "completed", "success", "Verify both architectures")),
+            noStepEvents: true);
+
+        Assert.DoesNotContain("step ok", result.Output, StringComparison.Ordinal);
+        Assert.DoesNotContain("STEP FAILED", result.Output, StringComparison.Ordinal);
+
+        // The outcome still arrives: turning off the progress must not turn off the verdict.
+        Assert.Contains("success", result.Output, StringComparison.Ordinal);
+        Assert.True(result.ExitCode == 0, result.Output);
+    }
+
+    /// <summary>
+    /// The step that failed is named above the line saying the run failed, not below it.
+    /// </summary>
+    /// <remarks>
+    /// Order is the whole value here. The run's conclusion and the failing step can land in the same
+    /// poll — the cycle that sees the run complete is often the first to see the last step — and a
+    /// reader scrolling to the bottom for the verdict finds the cause already above it, or does not
+    /// find it at all.
+    /// </remarks>
+    [Fact]
+    public void The_failing_step_is_named_above_the_runs_own_verdict()
+    {
+        var result = scene.Watch(
+            scene.ShortSha,
+            branch: null,
+            scene.CompletedRun("failure"),
+            WatchCiScene.Jobs((6, "completed", "failure", "Accessibility gate")));
+
+        var step = result.Output.IndexOf("STEP FAILED 'Accessibility gate'", StringComparison.Ordinal);
+        var verdict = result.Output.LastIndexOf("failure", StringComparison.Ordinal);
+
+        Assert.True(step >= 0, $"the failing step was never named: {result.Output}");
+        Assert.True(verdict > step, $"the verdict came before its cause: {result.Output}");
+    }
+
     [Fact]
     public void A_run_on_a_branch_this_checkout_is_not_on_is_found_anyway()
     {

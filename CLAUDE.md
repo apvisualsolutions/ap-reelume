@@ -194,7 +194,17 @@ pwsh -NoProfile -File eng/watch-ci.ps1 -Sha <sha>
 
 Emite una línea por desenlace y **los cinco están cubiertos**: la conclusión literal —incluida una
 vacía—, que el push no disparara el flujo, que `gh` falle, un latido cada 30 minutos mientras corre,
-y un techo a los 120 que avisa y sale. El motivo de que sea un guion y no un bucle en el momento:
+y un techo a los 120 que avisa y sale.
+
+**Y desde el 2026-09-03 avisa también del progreso, que no es un desenlace**: una línea por cada paso
+que termina, en cuanto termina. El paso pesado de este flujo dura más de media hora, así que un fallo
+dentro de él **sólo se conocía por la conclusión del run, cuarenta minutos después**. Son pasos y no
+trabajos porque este flujo tiene **un solo trabajo**, así que un aviso por trabajo llegaría en el
+mismo segundo que el final y no adelantaría nada — medido contra un run vivo, junto con lo que lo
+hace posible: `gh run view <id> --json jobs` devuelve cada paso con su estado **mientras el run sigue
+en curso**. El andamiaje del runner se filtra mientras pasa y **nunca cuando falla**, y cada paso se
+anuncia **una sola vez**: el guion mira cada minuto durante tres cuartos de hora, y un aviso que suena
+cuarenta veces es el que enseña a ignorarlo. El motivo de que sea un guion y no un bucle en el momento:
 el filtro obvio pregunta por `status == "completed"` y **calla en todo lo demás**, y un vigía callado
 es indistinguible de un run que sigue. Peor aún, `2>/dev/null` sobre la consulta **entierra** el error
 de `gh` y `|| true` lo convierte en una cadena vacía que se lee como «aún no ha terminado». Un run de

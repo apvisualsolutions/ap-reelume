@@ -32,6 +32,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El vigía de CI avisa ahora de cada paso que termina, no sólo del final.** El paso pesado de este
+  flujo dura más de media hora, así que un fallo dentro de él **sólo se conocía por la conclusión del
+  run, cuarenta minutos después**. Son pasos y no trabajos porque el flujo tiene **un solo trabajo**:
+  un aviso por trabajo llegaría en el mismo segundo que el final. Medido contra un run vivo, que es
+  también lo que confirmó que se puede preguntar por los pasos **mientras el run sigue en curso**.
+
+  **El andamiaje del runner se filtra mientras pasa y nunca cuando falla** —un checkout que falla es
+  el run fallando—, cada paso se anuncia **una sola vez** y el paso que falla se nombra **por encima**
+  de la línea del veredicto, no por debajo. Las cuatro decisiones están medidas por mutación: cada una
+  tumba exactamente su prueba.
+
+
 - **«Confianza» deja de estar en mayúsculas**, porque el diseño no la grita: la dibuja a 12 px en la
   tinta secundaria y en minúscula, con la cifra en semi-negrita al lado.
 
