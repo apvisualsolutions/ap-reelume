@@ -205,12 +205,31 @@ try {
     $newShort = @()
     foreach ($file in $newFiles) {
         $relative = ($file -replace '\\', '/')
-        if (-not $measured.ContainsKey($relative)) {
+
+        # THE SAME FILE ARRIVES UNDER TWO KEYS AND ONLY ONE OF THEM MATCHES GIT, which is measured
+        # rather than defensive. A Cobertura report names a class by a path relative to ITS OWN
+        # project, so Domain's own suite calls a file "Discovery/Thing.cs" - which this reader turns
+        # into "src/Discovery/Thing.cs" - while every suite that merely loads the assembly reports
+        # the full "src/ApSolutions.LocalMedia.Domain/Discovery/Thing.cs", with zero hits, because it
+        # never ran there. Git only ever says the second. Looked up by that alone, a file covered
+        # 100% by its own suite reads 0/0 and this script sends somebody to fix code that is already
+        # right. Measured 2026-09-03 against two new Domain files whose own reports said line-rate=1.
+        #
+        # So the lookup takes the best of every key ending in this path, which is the same
+        # "covered anywhere wins" arithmetic the merge above already applies one level down.
+        $candidates = @($measured.Keys | Where-Object {
+            $_ -eq $relative -or $relative.EndsWith('/' + ($_ -replace '^src/', ''))
+        })
+
+        if ($candidates.Count -eq 0) {
             $newShort += [pscustomobject]@{ File = $relative; Now = 'not measured by these suites' }
             continue
         }
 
-        $current = $measured[$relative]
+        $current = [pscustomobject]@{
+            LinePct   = (@($candidates | ForEach-Object { $measured[$_].LinePct }) | Measure-Object -Maximum).Maximum
+            BranchPct = (@($candidates | ForEach-Object { $measured[$_].BranchPct }) | Measure-Object -Maximum).Maximum
+        }
         if ([math]::Floor($current.LinePct) -lt 96 -or [math]::Floor($current.BranchPct) -lt 96) {
             $newShort += [pscustomobject]@{
                 File = $relative

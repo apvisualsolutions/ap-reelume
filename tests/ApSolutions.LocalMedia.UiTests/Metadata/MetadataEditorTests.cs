@@ -4,6 +4,7 @@
 using System.Globalization;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Metadata;
@@ -214,6 +215,54 @@ public sealed class MetadataEditorTests
     private static readonly MetadataLanguage Language = new("es-ES", "en-US");
 
     /// <summary>The refresh as the composition root builds it: resolving through the provider.</summary>
+    /// <summary>The editor takes an imported cover and locks the field it went into (LIB-018).</summary>
+    /// <remarks>
+    /// <b>The lock is the half that is easy to leave out and impossible to notice.</b> Without it the
+    /// next provider refresh puts the provider's artwork back over the cover somebody chose, and the
+    /// only symptom is a cover that reverts days later — which nobody would connect to the button
+    /// that set it. It is asserted from a state where both are unset, so a fixture that happened to
+    /// arrive locked could not satisfy it.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task An_imported_cover_reaches_the_poster_field_and_locks_it()
+    {
+        var catalog = Unidentified() with
+        {
+            Metadata = Catalog().Metadata with
+            {
+                PosterPath = null,
+                LockedFields = new HashSet<MetadataField>(),
+            },
+        };
+
+        var repository = new UiMetadataRepository(catalog);
+        var picker = new ArtworkPickerViewModel(
+            _ => Task.FromResult<string?>(Path.Combine("C:", "arte", "portada.png")),
+            (_, _, _, _) => Task.FromResult(new PersonalCoverResult(
+                CoverImageVerdict.Approved,
+                Path.Combine("C:", "datos", "personal-artwork", "abc", "1.png"))));
+
+        var viewModel = new MetadataEditorViewModel(
+            catalog,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            picker);
+
+        Assert.Null(viewModel.PosterPath);
+        Assert.False(viewModel.LockPosterPath);
+
+        picker.ChooseCoverCommand.Execute(null);
+        for (var i = 0; i < 200 && picker.IsChoosing; i++)
+        {
+            await Task.Delay(5, TestContext.Current.CancellationToken);
+        }
+
+        Assert.Equal(Path.Combine("C:", "datos", "personal-artwork", "abc", "1.png"), viewModel.PosterPath);
+        Assert.True(
+            viewModel.LockPosterPath,
+            "the poster field was left unlocked, so the next provider refresh overwrites the chosen cover.");
+    }
+
     private static RefreshMetadata Refresh(ICatalogMetadataRepository repository) => new(
         repository,
         new AnsweringTmdb(ProviderMetadata()),

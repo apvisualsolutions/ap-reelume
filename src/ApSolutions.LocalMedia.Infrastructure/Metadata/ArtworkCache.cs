@@ -6,21 +6,10 @@ using System.Text;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Privacy;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Infrastructure.Privacy;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Metadata;
-
-public enum ArtworkOrigin
-{
-    Personal,
-    RemoteCache,
-}
-
-public sealed record ArtworkReference(
-    string Path,
-    ArtworkOrigin Origin,
-    string AlternativeText,
-    bool IsExportable);
 
 public sealed class ArtworkCache : IArtworkStore
 {
@@ -58,6 +47,22 @@ public sealed class ArtworkCache : IArtworkStore
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
         ValidateAlternativeText(alternativeText);
+
+        // The allow-list is checked HERE and not only in the use case above it, because this is the
+        // line that reads somebody's file into the application's own data — data the backup then
+        // carries. Until 2026-09-03 there was no check at all on either side: whatever arrived was
+        // read whole, with no ceiling, and written out under whatever extension it came with. A
+        // guard on the caller alone protects the callers that exist today.
+        var file = new FileInfo(sourcePath);
+        var verdict = CoverImageRules.Inspect(sourcePath, file.Exists ? file.Length : 0);
+        if (verdict != CoverImageVerdict.Approved)
+        {
+            throw new InvalidOperationException(
+                $"The chosen cover was refused: {verdict}. Approved covers are "
+                + $"{string.Join(", ", CoverImageRules.ApprovedExtensions)} up to "
+                + $"{CoverImageRules.MaximumBytes} bytes.");
+        }
+
         var bytes = await File.ReadAllBytesAsync(sourcePath, cancellationToken).ConfigureAwait(false);
         var destinationDirectory = Path.Combine(_personalRoot, titleId.Value.ToString("N"));
         Directory.CreateDirectory(destinationDirectory);

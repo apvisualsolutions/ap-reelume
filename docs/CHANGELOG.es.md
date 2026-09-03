@@ -10,6 +10,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Ya se puede poner tu propia portada (`LIB-018`): el botón que faltaba.** En el editor, junto al
+  campo de la ruta, un botón abre el explorador de Windows y la imagen que elijas queda como portada
+  de ese título. La ruta se escribe sola en el campo y **el candado de ese campo se marca**, así que
+  una consulta posterior al proveedor no te la pisa — que es el defecto silencioso de este trabajo:
+  la portada volvería a cambiar días después y nadie lo relacionaría con el botón.
+
+  **El campo de texto se queda.** Escribir la ruta a mano es lo que de verdad estaba verificado y hay
+  bibliotecas que dependen de ello; un selector que lo escondiera quitaría algo para añadir algo.
+
+  **Y lo que el explorador ofrece sale de la misma lista que la comprobación**, no de una copia: dos
+  listas del mismo asunto se separan, y aquí se separarían de la peor manera posible — el diálogo
+  ofrecería un tipo que la importación luego rechaza, así que elegirías un archivo que la aplicación
+  acababa de enseñarte y te diría que no.
+
+  Si el selector se monta sin lo que necesita, **el botón se niega a pulsarse** en vez de aceptar la
+  pulsación y no hacer nada: aceptar y callar es indistinguible, para quien lo pulsa, de una
+  aplicación rota. Y hay una prueba que lee el arranque real y exige que las dos piezas estén
+  conectadas — que es justo la que nadie había escrito y por lo que esto llevaba meses sin puerta.
+
 - **Poner tu propia portada entra en la lista de alcance (`LIB-018`), y llega primero su cerradura.**
   Sólo se aceptan cuatro tipos de imagen —lista cerrada, como la que gobierna el vídeo, no un
   filtro— y el mismo techo de diez megas que ya rechazaba una descarga y **no se aplicaba a un
@@ -24,6 +43,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
   prueba cruza las dos listas: ninguna extensión puede ser a la vez vídeo y portada.
 
 ### Corregido
+
+- **El previsualizador de suelos daba un veredicto FALSO sobre archivos nuevos**, y mandaba a
+  arreglar código que ya estaba bien. Un informe de cobertura nombra cada clase con una ruta
+  relativa a **su propio proyecto**, así que la suite del propio módulo llama a un archivo de una
+  manera y cualquier otra suite que sólo cargue ese módulo lo llama de otra —con cero, porque allí
+  no se ejecuta—. Buscando sólo por el nombre largo, un archivo cubierto al 100 % por su propia
+  suite se leía **0/0**. Ahora se queda con la mejor de todas las claves que terminan igual, que es
+  la misma aritmética de «cubierta en cualquier sitio gana» que ya usaba un nivel más abajo.
+
+- **Y en cuanto dejó de mentir, señaló algo real**: el selector de carátula pasó de 64 % a 98 % de
+  ramas al ganar su botón, **sale de la lista de deuda** y el trinquete baja de 189 a 188. Dos de
+  las ramas que faltaban apuntaban a un defecto y no a un hueco: el comando se suscribía a los
+  cambios del modelo dentro del propio `add` del evento y dejaba el `remove` vacío, es decir, una
+  suscripción por oyente que nada podía soltar. La cobertura fue lo que lo señaló.
 
 - **`LIB-011` baja de `VERIFIED` a `IMPLEMENTED`: decía «e imágenes» y no había por dónde.** La
   aplicación **ya sabe** guardar una portada tuya —copiarla a su sitio, exigirle texto alternativo,

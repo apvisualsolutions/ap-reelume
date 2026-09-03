@@ -31,4 +31,22 @@ public interface IArtworkStore
         Uri source,
         string alternativeText,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Copies a file the person chose into this title's own artwork, and answers where it landed.
+    /// Touches the disk and never the network.
+    /// </summary>
+    /// <remarks>
+    /// <b>It was on the adapter and not on this port until 2026-09-03, which is why nothing could
+    /// call it.</b> The adapter had implemented it, the backup carried what it wrote and the picker
+    /// had a property to hold the answer — and the only callers were tests, because a use case can
+    /// only reach what the port declares. A method missing from an interface is this repository's
+    /// characteristic defect at its quietest: nothing is unresolved, nothing is unregistered, and
+    /// there is simply no way through.
+    /// </remarks>
+    Task<ArtworkReference> ImportPersonalAsync(
+        TitleId titleId,
+        string sourcePath,
+        string alternativeText,
+        CancellationToken cancellationToken = default);
 }

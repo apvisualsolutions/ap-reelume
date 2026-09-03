@@ -253,6 +253,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MetadataReleaseYearLabel">Año de estreno</x:String>
   <x:String x:Key="MetadataGenresLabel">Géneros separados por comas</x:String>
   <x:String x:Key="MetadataPosterLabel">Ruta del póster</x:String>
+  <x:String x:Key="CoverChooseAction">Elegir una imagen…</x:String>
+  <x:String x:Key="CoverChooseDialogTitle">Elige la portada</x:String>
+  <x:String x:Key="CoverChosenStatus">Portada puesta. Se queda aunque vuelvas a consultar los datos.</x:String>
+  <x:String x:Key="CoverNotAnImageStatus">Ese archivo no es una de las imágenes que admite: JPG, PNG o WEBP.</x:String>
+  <x:String x:Key="CoverTooLargeStatus">Esa imagen pesa más de 10 MB, que es el techo de una portada.</x:String>
+  <x:String x:Key="CoverEmptyStatus">Ese archivo está vacío.</x:String>
+  <x:String x:Key="CoverNothingChosenStatus">No se eligió ningún archivo.</x:String>
   <x:String x:Key="MetadataBackdropLabel">Ruta de la imagen de fondo</x:String>
   <x:String x:Key="MetadataLockTitle">Bloquear título</x:String>
   <x:String x:Key="MetadataLockOriginalTitle">Bloquear título original</x:String>

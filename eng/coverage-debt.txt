@@ -302,7 +302,6 @@ src/ApSolutions.LocalMedia.Presentation/Library/PosterArtView.axaml             
 src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  77
 src/ApSolutions.LocalMedia.Presentation/Library/UnavailableBadge.axaml                       100  50
-src/ApSolutions.LocalMedia.Presentation/Metadata/ArtworkPickerViewModel.cs                    95  64
 src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  87
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewView.axaml                     100  50

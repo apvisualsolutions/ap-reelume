@@ -400,7 +400,7 @@ try {
     # 77/75: ese run midio el codigo nuevo antes de que existieran las cuatro pruebas que lo cubren,
     # que entran en el mismo cambio. Medido aqui con la aritmetica de esta puerta: 88/87. Un suelo que
     # baja es una bajada, y la salida a una bajada es cubrir, no rebajar.
-    $debtRatchet = 189
+    $debtRatchet = 188
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **You can now set your own cover (`LIB-018`): the button that was missing.** In the editor, beside
+  the path field, a button opens the Windows picker and the image you choose becomes that title's
+  cover. The path writes itself into the field and **that field's lock is ticked**, so a later
+  provider refresh cannot overwrite it — which is this work's silent defect: the cover would revert
+  days later and nobody would connect it to the button.
+
+  **The text field stays.** Typing a path is what was genuinely verified and libraries depend on it;
+  a chooser that hid it would take something away to add something.
+
+  **And what the picker offers comes from the same list as the check**, not from a copy: two lists of
+  one thing drift, and here they would drift the worst possible way — the dialog would offer a kind
+  the import then refuses, so you would pick a file the application had just shown you and be told
+  no.
+
+  A picker built without what it needs **refuses the press** rather than accepting it and doing
+  nothing: accepting and staying silent is indistinguishable, to the person pressing, from a broken
+  application. And a test reads the real composition and demands both halves are wired — which is
+  exactly the one nobody had written, and why this went months with no door.
+
 - **Setting your own cover enters the scope matrix (`LIB-018`), and its lock arrives first.** Only
   four image kinds are accepted — a closed list, like the one governing video, not a filter — and the
   same ten-megabyte ceiling that already refused a download and **did not apply to a local file**.
@@ -24,6 +43,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   lists: no extension may be both a video container and a cover.
 
 ### Fixed
+
+- **The coverage-floor previewer gave a FALSE verdict on new files**, sending somebody to fix code
+  that was already right. A coverage report names each class by a path relative to **its own
+  project**, so a module's own suite calls a file one thing and any other suite that merely loads
+  that module calls it another — with zero, because it never ran there. Looked up by the long name
+  alone, a file covered 100 % by its own suite read **0/0**. It now takes the best of every key
+  ending in the same path, which is the «covered anywhere wins» arithmetic it already used one level
+  down.
+
+- **And the moment it stopped lying it pointed at something real**: the artwork picker went from
+  64 % to 98 % of branches on gaining its button, **leaves the debt list**, and the ratchet comes
+  down from 189 to 188. Two of the missing branches were a defect rather than a gap: the command
+  subscribed to the model's changes inside the event's own `add` and left `remove` empty — one
+  subscription per listener that nothing could ever release. Coverage is what pointed at it.
 
 - **`LIB-011` comes down from `VERIFIED` to `IMPLEMENTED`: it said «and images» and there was no way
   in.** The application **already knows** how to keep a cover of yours — copy it into place, require

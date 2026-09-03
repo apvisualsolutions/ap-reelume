@@ -1872,6 +1872,44 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
+    /// Asks which image to use as a cover (LIB-018). The dialog offers exactly the containers the
+    /// allow-list approves, and a cancelled dialog answers null, which adds nothing.
+    /// </summary>
+    /// <remarks>
+    /// <b>The dialog's filter is built from <see cref="CoverImageRules.ApprovedExtensions"/> rather
+    /// than typed out beside it.</b> Two lists of the same thing drift, and the way this one would
+    /// drift is the worst available: the dialog would offer a kind the import then refuses, so
+    /// somebody would pick a file the application had just shown them and be told no.
+    /// <para>
+    /// The filter is a convenience and never the check. Windows lets anyone type a name past a
+    /// filter, and the import checks again on its own side and so does the store.
+    /// </para>
+    /// </remarks>
+    private static async Task<string?> ChooseCoverFileAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (Avalonia.Application.Current?.ApplicationLifetime
+            is not IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+        {
+            return null;
+        }
+
+        var files = await window.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = ReadResource("CoverChooseDialogTitle"),
+            AllowMultiple = false,
+            FileTypeFilter =
+            [
+                new FilePickerFileType(ReadResource("CoverChooseDialogTitle"))
+                {
+                    Patterns = [.. CoverImageRules.ApprovedExtensions.Select(extension => "*" + extension)],
+                },
+            ],
+        }).ConfigureAwait(true);
+        return files.Count == 0 ? null : files[0].TryGetLocalPath();
+    }
+
+    /// <summary>
     /// Asks which archive to restore from. As with the export, the folder comes from the Windows picker
     /// and never from anything the application composed on its own.
     /// </summary>

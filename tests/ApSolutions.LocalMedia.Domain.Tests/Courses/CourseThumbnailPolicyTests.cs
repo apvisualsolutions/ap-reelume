@@ -203,6 +203,33 @@ public sealed class CourseThumbnailPolicyTests
             + $"{measuredFailure} to give up, so this would wait for it rather than move on.");
     }
 
+    /// <summary>The stamp compares by value and says what it holds.</summary>
+    /// <remarks>
+    /// <b>Measured rather than assumed, because the file read 0 % of lines while the policy beside
+    /// it read 100 %.</b> A record's synthesised members are real code and coverlet counts them: the
+    /// whole point of this type is that two of them can be compared, so the comparison is asserted
+    /// in both directions rather than left to the one call the policy happens to make.
+    /// </remarks>
+    [Fact]
+    public void The_stamp_compares_by_value_and_describes_itself()
+    {
+        var monday = new CourseThumbnailStamp(100, Monday);
+        var same = new CourseThumbnailStamp(100, Monday);
+        var bigger = monday with { Length = 101 };
+
+        Assert.Equal(same, monday);
+        Assert.True(same == monday);
+        Assert.False(same != monday);
+        Assert.Equal(same.GetHashCode(), monday.GetHashCode());
+
+        Assert.NotEqual(bigger, monday);
+        Assert.Equal(101, bigger.Length);
+        Assert.Equal(Monday, bigger.ModifiedUtc);
+
+        // It has to be readable in a failure message, which is the one place anybody meets it.
+        Assert.Contains("100", monday.ToString(), StringComparison.Ordinal);
+    }
+
     private static CourseLessonProgress Lesson(int number, string title, bool hasFile) =>
         new(
             new LessonId(Guid.NewGuid()),

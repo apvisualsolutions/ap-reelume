@@ -154,5 +154,17 @@ internal static class TestIdentification
             Uri source,
             string alternativeText,
             CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
+
+        /// <summary>
+        /// Refuses rather than pretending: this double exists for the remote path, and a personal
+        /// import that quietly answered a made-up path would let a test pass over a call it never
+        /// meant to make.
+        /// </summary>
+        public Task<ArtworkReference> ImportPersonalAsync(
+            TitleId titleId,
+            string sourcePath,
+            string alternativeText,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException("This double covers the remote path only.");
     }
 }
