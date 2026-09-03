@@ -340,8 +340,7 @@ public sealed class ZipExportTests
             var directory = new DatabaseTestDirectory();
             var paths = new TestAppDataPaths(Path.Combine(directory.Path, "data"));
             Directory.CreateDirectory(paths.DataRoot);
-            var factory = new SqliteConnectionFactory(paths.DatabasePath);
-            await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+            var factory = await MigratedSchemaTemplate.CreateFactoryAsync(paths.DatabasePath, TestContext.Current.CancellationToken);
             await SeedPersonalDataAsync(factory);
 
             await System.IO.File.WriteAllTextAsync(

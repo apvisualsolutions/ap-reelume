@@ -56,11 +56,7 @@ public sealed class MediaFileLookupTests
 
     private static async Task<MediaFileRepository> CreateAsync(DatabaseTestDirectory directory)
     {
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using (var runner = new MigrationRunner(factory))
-        {
-            await runner.MigrateAsync(CancellationToken.None);
-        }
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, CancellationToken.None);
 
         return new MediaFileRepository(factory);
     }

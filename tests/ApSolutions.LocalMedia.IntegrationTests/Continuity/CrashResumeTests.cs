@@ -56,8 +56,7 @@ public sealed class CrashResumeTests
     public async Task A_committed_position_round_trips_and_upserts_instead_of_duplicating()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new WatchStateRepository(factory);
         var content = ContentKey.ForEpisode(
             new TitleId(Guid.Parse("2b7f0001-0000-4000-8000-000000000001")),
@@ -112,8 +111,7 @@ public sealed class CrashResumeTests
     public async Task Every_stored_state_can_be_read_back_for_a_threshold_change()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new WatchStateRepository(factory);
         var titles = new[]
         {
@@ -152,8 +150,7 @@ public sealed class CrashResumeTests
     public async Task An_absent_content_reports_no_progress_instead_of_failing()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
 
         var missing = await new WatchStateRepository(factory).GetAsync(
             ContentKey.ForTitle(new TitleId(Guid.NewGuid())),
@@ -177,8 +174,7 @@ public sealed class CrashResumeTests
     public async Task Progress_with_no_known_length_round_trips_as_no_length()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
 
         var repository = new WatchStateRepository(factory);
         var content = ContentKey.ForTitle(new TitleId(Guid.NewGuid()));
@@ -220,8 +216,7 @@ public sealed class CrashResumeTests
         for (var trial = 1; trial <= Trials; trial++)
         {
             using var directory = new DatabaseTestDirectory();
-            var factory = new SqliteConnectionFactory(directory.DatabasePath);
-            await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+            var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
             var content = ContentKey.ForTitle(new TitleId(Guid.NewGuid()));
             var tracePath = Path.Combine(directory.Path, "reached.trace");
             var signalPath = Path.Combine(directory.Path, "started.signal");

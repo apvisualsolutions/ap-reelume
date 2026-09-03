@@ -20,11 +20,7 @@ public sealed class DuplicateOverviewReaderTests
     public async Task Groups_of_two_or_more_are_listed_with_their_catalogue_names()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using (var runner = new MigrationRunner(factory))
-        {
-            await runner.MigrateAsync(CancellationToken.None);
-        }
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, CancellationToken.None);
 
         var pair = Guid.NewGuid();
         var single = Guid.NewGuid();
@@ -104,11 +100,7 @@ public sealed class DuplicateOverviewReaderTests
     public async Task A_row_survives_a_file_that_says_nothing_and_a_codec_written_before_the_json()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using (var runner = new MigrationRunner(factory))
-        {
-            await runner.MigrateAsync(CancellationToken.None);
-        }
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, CancellationToken.None);
 
         var title = Guid.NewGuid();
         var silent = Version("silent", 1920, 1080, "H264", "AAC", 0, isAvailable: true);

@@ -29,8 +29,7 @@ public sealed class RotatingBackupTests
     public async Task A_snapshot_taken_while_progress_is_written_opens_and_passes_integrity()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new WatchStateRepository(factory);
         using var writing = new CancellationTokenSource();
         var firstWrite = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -78,8 +77,7 @@ public sealed class RotatingBackupTests
     public async Task A_snapshot_never_leaves_a_half_written_file_at_the_destination()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var destination = Path.Combine(directory.Path, "snapshot.db");
         using var cancellation = new CancellationTokenSource();
         await cancellation.CancelAsync();
@@ -98,8 +96,7 @@ public sealed class RotatingBackupTests
             new SqliteConnectionFactory(Path.Combine(directory.Path, "absent.db")));
         Assert.Equal(0, missing.EstimateBytes());
 
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
 
         Assert.Equal(new FileInfo(directory.DatabasePath).Length, new SqliteBackupService(factory).EstimateBytes());
     }
@@ -108,8 +105,7 @@ public sealed class RotatingBackupTests
     public async Task A_destination_the_snapshot_cannot_take_leaves_no_temporary_file()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var destination = Path.Combine(directory.Path, "occupied");
         Directory.CreateDirectory(destination);
 

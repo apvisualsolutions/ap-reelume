@@ -389,8 +389,7 @@ internal sealed class RestoreFixture : IDisposable
             [0x41, 0x50, 0x53],
             TestContext.Current.CancellationToken);
 
-        var factory = new SqliteConnectionFactory(paths.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(paths.DatabasePath, TestContext.Current.CancellationToken);
         await SeedAsync(factory, rootPath, secondRoot);
         await File.WriteAllTextAsync(
             paths.SettingsPath,
@@ -580,8 +579,9 @@ internal sealed class RestoreFixture : IDisposable
     {
         SqliteConnection.ClearAllPools();
         File.Delete(Paths.DatabasePath);
-        await new MigrationRunner(new SqliteConnectionFactory(Paths.DatabasePath))
-            .MigrateAsync(TestContext.Current.CancellationToken);
+        await MigratedSchemaTemplate.CopyToAsync(
+            Paths.DatabasePath,
+            TestContext.Current.CancellationToken);
         File.Delete(Paths.SettingsPath);
         if (Directory.Exists(Paths.PersonalArtworkDirectory))
         {

@@ -45,8 +45,7 @@ public sealed class IdentifiedArtworkTests
     public async Task Identifying_a_title_puts_its_poster_on_the_disk_where_the_card_looks_for_it()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
 
         var handler = new ArtworkHandler(HttpStatusCode.OK);
         using var client = new HttpClient(handler);
@@ -100,8 +99,7 @@ public sealed class IdentifiedArtworkTests
     public async Task A_poster_that_cannot_be_had_does_not_cost_the_identification()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
 
         var handler = new ArtworkHandler(HttpStatusCode.ServiceUnavailable);
         using var client = new HttpClient(handler);
@@ -135,8 +133,7 @@ public sealed class IdentifiedArtworkTests
     public async Task A_title_with_no_poster_path_never_reaches_the_network()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
 
         var handler = new ArtworkHandler(HttpStatusCode.OK);
         using var client = new HttpClient(handler);

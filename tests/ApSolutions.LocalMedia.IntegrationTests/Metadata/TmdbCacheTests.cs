@@ -15,9 +15,7 @@ public sealed class TmdbCacheTests
     public async Task Cache_round_trips_normalized_key_language_version_etag_and_dates()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var cache = new SqliteMetadataCache(factory);
         var key = new MetadataCacheKey("tmdb", "search:movie:arrival:2016", "es-ES", 3);
         var entry = new MetadataCacheEntry(
@@ -37,9 +35,7 @@ public sealed class TmdbCacheTests
     public async Task Store_replaces_the_same_cache_key_transactionally()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var cache = new SqliteMetadataCache(factory);
         var key = new MetadataCacheKey("tmdb", "movie:329865", "es-ES", 3);
         var first = new MetadataCacheEntry(

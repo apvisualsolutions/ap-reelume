@@ -188,8 +188,7 @@ public sealed class IncrementalScanTests
 
     private static async Task<ScanFixture> CreateFixtureAsync(string databasePath, string mediaPath)
     {
-        var factory = new SqliteConnectionFactory(databasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(databasePath, TestContext.Current.CancellationToken);
         var root = new LibraryRoot(
             new LibraryRootId(Guid.NewGuid()),
             mediaPath,

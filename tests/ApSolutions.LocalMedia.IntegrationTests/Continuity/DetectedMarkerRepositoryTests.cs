@@ -29,8 +29,7 @@ public sealed class DetectedMarkerRepositoryTests
     public async Task A_detected_row_round_trips_through_a_new_repository_instance()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var row = Row(FileA, MarkerKind.Intro, 12, 37, corrected: true);
 
         await new DetectedMarkerRepository(factory).SaveAsync(row, TestContext.Current.CancellationToken);
@@ -55,8 +54,7 @@ public sealed class DetectedMarkerRepositoryTests
     public async Task Saving_the_same_identifier_edits_the_row_instead_of_duplicating_it()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new DetectedMarkerRepository(factory);
         var row = Row(FileA, MarkerKind.Intro, 12, 37, corrected: false);
 
@@ -75,8 +73,7 @@ public sealed class DetectedMarkerRepositoryTests
     public async Task Replacing_a_series_swaps_its_rows_atomically_and_leaves_other_series_alone()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new DetectedMarkerRepository(factory);
         var stale = Row(FileA, MarkerKind.Intro, 10, 35, corrected: false);
         var kept = Row(FileB, MarkerKind.Credits, 150, 180, corrected: true);
@@ -105,8 +102,7 @@ public sealed class DetectedMarkerRepositoryTests
     public async Task Deleting_a_row_removes_it_and_nothing_else()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new DetectedMarkerRepository(factory);
         var intro = Row(FileA, MarkerKind.Intro, 10, 35, corrected: false);
         var credits = Row(FileA, MarkerKind.Credits, 150, 180, corrected: false);
@@ -126,8 +122,7 @@ public sealed class DetectedMarkerRepositoryTests
         _ = Assert.Throws<ArgumentNullException>(() => new DetectedMarkerRepository(null!));
 
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new DetectedMarkerRepository(factory);
 
         _ = await Assert.ThrowsAsync<ArgumentNullException>(

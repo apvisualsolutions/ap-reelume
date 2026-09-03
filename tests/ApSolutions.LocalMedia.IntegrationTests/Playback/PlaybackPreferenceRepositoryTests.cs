@@ -20,8 +20,7 @@ public sealed class PlaybackPreferenceRepositoryTests
     public async Task A_preference_round_trips_through_a_new_repository_instance()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PlaybackPreferenceRepository(factory);
         var preference = new PlaybackPreference
         {
@@ -56,8 +55,7 @@ public sealed class PlaybackPreferenceRepositoryTests
     public async Task An_unset_field_stays_unset_so_the_next_scope_still_answers()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PlaybackPreferenceRepository(factory);
 
         await repository.SaveAsync(
@@ -102,8 +100,7 @@ public sealed class PlaybackPreferenceRepositoryTests
     public async Task Saving_the_same_scope_twice_updates_it_instead_of_duplicating_it()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PlaybackPreferenceRepository(factory);
         var key = PlaybackPreference.FileKey(Guid.Empty);
 

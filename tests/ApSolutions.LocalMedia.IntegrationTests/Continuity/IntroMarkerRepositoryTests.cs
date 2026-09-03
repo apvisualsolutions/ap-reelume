@@ -25,8 +25,7 @@ public sealed class IntroMarkerRepositoryTests
     public async Task A_marker_round_trips_through_a_new_repository_instance()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var marker = Marker(MarkerKind.Credits, 2_800, 3_000);
 
         await new IntroMarkerRepository(factory).SaveAsync(marker, TestContext.Current.CancellationToken);
@@ -42,8 +41,7 @@ public sealed class IntroMarkerRepositoryTests
     public async Task Saving_the_same_identifier_edits_the_marker_instead_of_duplicating_it()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new IntroMarkerRepository(factory);
         var marker = Marker(MarkerKind.Intro, 30, 120);
 
@@ -62,8 +60,7 @@ public sealed class IntroMarkerRepositoryTests
     public async Task Markers_are_read_per_series_in_ascending_order_and_can_be_deleted()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new IntroMarkerRepository(factory);
         var credits = Marker(MarkerKind.Credits, 2_800, 3_000);
         var intro = Marker(MarkerKind.Intro, 30, 120);
@@ -86,8 +83,7 @@ public sealed class IntroMarkerRepositoryTests
     public async Task The_origin_and_confidence_columns_hold_what_a_later_release_will_write()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new IntroMarkerRepository(factory);
         var detected = Marker(MarkerKind.Recap, 10, 60) with
         {
@@ -108,8 +104,7 @@ public sealed class IntroMarkerRepositoryTests
     public async Task An_inverted_range_is_refused_by_the_schema_itself()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new IntroMarkerRepository(factory);
         var inverted = Marker(MarkerKind.Intro, 30, 120) with
         {

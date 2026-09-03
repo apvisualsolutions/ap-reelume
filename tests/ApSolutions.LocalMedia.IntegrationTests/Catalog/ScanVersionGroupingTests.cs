@@ -35,8 +35,7 @@ public sealed class ScanVersionGroupingTests
         await File.WriteAllBytesAsync(secondPath, [0x41, 0x50, 0x51], TestContext.Current.CancellationToken);
         var inventoryBefore = Directory.GetFiles(mediaPath).Order(StringComparer.Ordinal).ToArray();
 
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var roots = new LibraryRootRepository(factory);
         var root = new LibraryRoot(
             new LibraryRootId(Guid.NewGuid()),

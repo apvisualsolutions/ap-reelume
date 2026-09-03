@@ -43,8 +43,7 @@ public sealed class ScanIdentificationTests
             [0x41, 0x50],
             TestContext.Current.CancellationToken);
 
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var rootRepository = new LibraryRootRepository(factory);
         var root = new LibraryRoot(
             new LibraryRootId(Guid.NewGuid()),

@@ -28,8 +28,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task A_marked_item_round_trips_through_a_new_repository_instance()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var state = PersonalState.Empty(Content(1)).WithFavorite(true).WithWatchLater(true).WithRating(5);
 
         await new PersonalStateRepository(factory).SaveAsync(state, Noon, TestContext.Current.CancellationToken);
@@ -45,8 +44,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task Saving_the_same_content_twice_edits_the_row_instead_of_duplicating_it()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PersonalStateRepository(factory);
 
         await repository.SaveAsync(
@@ -67,8 +65,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task Deleting_removes_the_row_and_deleting_an_unknown_key_is_not_a_failure()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PersonalStateRepository(factory);
         await repository.SaveAsync(
             PersonalState.Empty(Content(3)).WithFavorite(true),
@@ -86,8 +83,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task An_episode_and_its_show_hold_separate_rows()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PersonalStateRepository(factory);
         var show = new TitleId(Guid.Parse("c2000000-0000-4000-8000-000000000010"));
         var episode = new EpisodeId(Guid.Parse("c2000000-0000-4000-8000-000000000011"));
@@ -114,8 +110,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task The_schema_refuses_a_rating_outside_one_to_ten()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         await using var connection = await factory.OpenAsync(TestContext.Current.CancellationToken);
         await using var command = connection.CreateCommand();
         command.CommandText = """
@@ -132,8 +127,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task The_catalog_filters_by_favorite_watch_later_and_rated_without_hiding_anything_else()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var catalog = new CatalogRepository(factory);
         var favorite = new TitleId(Guid.Parse("c2000000-0000-4000-8000-000000000021"));
         var later = new TitleId(Guid.Parse("c2000000-0000-4000-8000-000000000022"));
@@ -177,8 +171,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task An_episode_mark_never_makes_its_show_appear_under_a_title_filter()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var catalog = new CatalogRepository(factory);
         var show = new TitleId(Guid.Parse("c2000000-0000-4000-8000-000000000031"));
         await catalog.UpsertTitleAsync(Title(show, "Crónicas"), TestContext.Current.CancellationToken);
@@ -196,8 +189,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task A_thousand_random_changes_survive_a_restart_and_match_a_reference_model()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PersonalStateRepository(factory);
         var reference = new Dictionary<string, PersonalState>(StringComparer.Ordinal);
         var random = new Random(20260803);
@@ -244,8 +236,7 @@ public sealed class PersonalStateRepositoryTests
     public async Task Concurrent_marking_and_searching_leave_the_stored_state_intact()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var catalog = new CatalogRepository(factory);
         var titles = Enumerable.Range(1, 20)
             .Select(index => new TitleId(Guid.Parse(
