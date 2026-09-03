@@ -10,6 +10,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The application now takes a course's picture out of the video itself, against a real file**: the
+  test opens a real video, seeks a tenth of the way in and checks a picture comes out — not an empty
+  file — in three seconds. All that is left is drawing it on the card.
+
+  **The picture comes from the first lesson** rather than the one you are watching: that one moves
+  every week, and a cover that changes on its own stops being how you recognise the course. **A cover
+  you chose always wins**, and then nothing is decoded at all — the cheapest frame is the one nobody
+  takes. It is taken again only when the file's size or date moves; with the disk unplugged the one
+  already taken is kept rather than thrown away and redone on return.
+
+  **It lives in the cache and does not travel in the backup**, because it can be remade. One you
+  chose does travel, like any other cover.
+
+- **And a house rule caught it on the spot**: the first draft built its own connection to the video
+  engine, and there may only be one in the whole program — building and tearing several down is a
+  failure this project has already had. A thumbnail pass over a whole library is exactly the shape
+  that causes it: one per course. It now borrows the only one there is.
+
 - **You can now set your own cover (`LIB-018`): the button that was missing.** In the editor, beside
   the path field, a button opens the Windows picker and the image you choose becomes that title's
   cover. The path writes itself into the field and **that field's lock is ticked**, so a later

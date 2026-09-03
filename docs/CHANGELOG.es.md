@@ -10,6 +10,24 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La aplicación ya saca la imagen del propio vídeo de un curso, y funciona sobre un archivo de
+  verdad**: la prueba abre un vídeo real, salta a un décimo de su duración y comprueba que sale una
+  imagen —no un archivo vacío— en tres segundos. Falta sólo dibujarla en la tarjeta.
+
+  **La imagen sale de la primera lección** y no de la que estás viendo: la que ves cambia cada
+  semana, y una portada que cambia sola deja de servir para reconocer el curso. **Una portada que
+  hayas elegido tú manda siempre**, y en ese caso no se decodifica nada — la imagen más barata es la
+  que nadie saca. Se vuelve a sacar sólo si el archivo cambia de tamaño o de fecha; si el disco está
+  desenchufado se conserva la que había, en vez de tirarla y tener que rehacerlo todo al volver.
+
+  **Vive en la caché y no viaja en la copia de seguridad**, porque se puede rehacer. La que elijas tú
+  sí viaja, como cualquier portada.
+
+- **Y una regla de la casa lo cazó en el acto**: el primer borrador creaba su propia conexión con el
+  motor de vídeo, y sólo puede haber una en todo el programa —crear y destruir varias es un fallo
+  que este proyecto ya había sufrido—. Una tanda de miniaturas sobre una biblioteca entera es
+  exactamente la forma de provocarlo: una por curso. Ahora pide prestada la única que hay.
+
 - **Ya se puede poner tu propia portada (`LIB-018`): el botón que faltaba.** En el editor, junto al
   campo de la ruta, un botón abre el explorador de Windows y la imagen que elijas queda como portada
   de ese título. La ruta se escribe sola en el campo y **el candado de ese campo se marca**, así que
