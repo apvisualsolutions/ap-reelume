@@ -1,5 +1,54 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-04: `main` NO tiene nada de esta tanda, y el último run salió ROJO
+>
+> **`main` sigue en el commit del que arrancó la tarde y lleva doce commits por detrás.** Todo lo de
+> abajo está empujado a `codex/ap-reelume-mvp-x64` y **ninguno de esos commits ha pasado en verde**.
+> Estar en la rama es seguridad, no integración: no se lee como «está hecho».
+>
+> **LO PRIMERO, y es acotado**: el último run falló en la puerta de cobertura, después de que las
+> diez suites pasaran. Seis archivos de las dos últimas tandas —la portada propia y la miniatura del
+> curso— más uno que mejoró y pide subir su suelo:
+>
+> | Archivo | Mide | Qué le pasa |
+> | --- | --- | --- |
+> | `Application/Courses/GetCourseThumbnail.cs` | 100/90 | nuevo: exige 96/96 |
+> | `Infrastructure/Playback/LibVlcCourseFrameGrabber.cs` | 96/90 | nuevo: exige 96/96 |
+> | `Windows/CompositionRoot.Identification.cs` | 100/75 | bajó sin lista |
+> | `Infrastructure/Metadata/ArtworkCache.cs` | 93/70 | cayó desde 96/73 |
+> | `Windows/CompositionRoot.cs` | 86/59 | cayó desde 87/60 |
+> | `Windows/AppDataPaths.cs` | 97,62/100 | contra un suelo de 100/100 |
+> | `Presentation/Metadata/MetadataEditorViewModel.cs` | 100/89 | **mejoró**: súbele el suelo |
+>
+> **Los suelos salen del artefacto `coverage-debt` del run 33812831673**, ya descargado y no generado
+> aquí — trae 191 filas contra un trinquete de 188, y esos tres de más son los tres primeros.
+> **Las ramas que faltan se nombran con el JSON de coverlet**, que ya dijo las cuatro del primero:
+> tres del parseo del archivo de huella (marcador corrupto) y una del camino sin fuente.
+>
+> **Y la parte de composición admite la salida de la regla 10**: lo que sólo abre un diálogo de
+> Windows se excluye con su razón escrita, y lo que decide se cubre. No al revés.
+>
+> ### Lo que sí quedó a salvo
+>
+> · Las tres tandas de la tarde están en la rama y empujadas.
+> · La cuarta —el arreglo del arranque de las pruebas de integración, que baja el trabajo de esa
+>   suite un 68 %— **no está en la rama**: vive en la etiqueta `handoff/integration-schema-template`,
+>   empujada a origin. Rebasada sobre `ac208e9` da un árbol comprobado en seco, sin conflictos.
+>   **Bórrala cuando la integres**; es una cuerda, no un punto de publicación.
+>
+> ### Dos defectos medidos que quedan sin arreglar, los dos con su caso
+>
+> · **`eng/watch-ci.ps1` anuncia «step ok» sobre pasos que salieron `skipped`.** Línea 212: el filtro
+>   trata `skipped` como no-fallido. Ha engañado dos veces hoy, la segunda en el run rojo. **El
+>   desenlace del run NO está afectado** —la línea 343 imprime la conclusión literal y sólo sale 0 en
+>   `success`—, así que el daño es anunciar como medido lo que nadie midió. Caso: run 33812831673.
+> · **Un disparador de interfaz declarado y sin llamador no lo caza nada.** `LIB-011` bajó hoy de
+>   `VERIFIED` a `IMPLEMENTED` por eso, y `LIB-002` tiene el mismo hueco: el escaneo manual existe
+>   como valor de enumeración y sólo lo pide una prueba. Las pruebas de arquitectura exigen que un
+>   servicio registrado tenga quien lo resuelva y **no existe la misma exigencia para un disparador
+>   de pantalla**. La pregunta que sí lo caza: «esto se puede pedir desde una pantalla, o sólo desde
+>   una prueba». Es tanda propia.
+
 > ## RELEVO — 2026-09-03, vigesimoprimera sesión: la tanda 3 empezada por pantallas, dos huecos sin puerta, y CI corriendo cuatro veces lo mismo
 >
 > **Cinco commits en la rama, esperando un solo run.** Es el cambio de método de esta sesión y el

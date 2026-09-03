@@ -1,5 +1,55 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-04: `main` has NONE of this batch, and the last run was RED
+>
+> **`main` is still on the commit it started the afternoon at, twelve commits behind.** Everything
+> below is pushed to `codex/ap-reelume-mvp-x64` and **not one of those commits has passed green**.
+> Being on the branch is safety, not integration: it does not read as «done».
+>
+> **FIRST, and it is bounded**: the last run failed at the coverage gate, after all ten suites
+> passed. Six files from the last two batches — the personal cover and the course thumbnail — plus
+> one that improved and needs its floor raised:
+>
+> | File | Measures | What happened |
+> | --- | --- | --- |
+> | `Application/Courses/GetCourseThumbnail.cs` | 100/90 | new: 96/96 required |
+> | `Infrastructure/Playback/LibVlcCourseFrameGrabber.cs` | 96/90 | new: 96/96 required |
+> | `Windows/CompositionRoot.Identification.cs` | 100/75 | fell with no floor |
+> | `Infrastructure/Metadata/ArtworkCache.cs` | 93/70 | fell from 96/73 |
+> | `Windows/CompositionRoot.cs` | 86/59 | fell from 87/60 |
+> | `Windows/AppDataPaths.cs` | 97.62/100 | against a 100/100 floor |
+> | `Presentation/Metadata/MetadataEditorViewModel.cs` | 100/89 | **improved**: raise its floor |
+>
+> **The floors come from run 33812831673's `coverage-debt` artefact**, already downloaded rather than
+> generated here — 191 rows against a ratchet of 188, and those three extra are the first three.
+> **The missing branches are named by coverlet's JSON**, which already gave the first file's four:
+> three in the stamp file's parsing (a corrupt marker) and one on the path with no source.
+>
+> **And the composition part admits rule 10's exit**: what only opens a Windows dialog is excluded
+> with its reason written, and what decides is covered. Not the other way round.
+>
+> ### What did end up safe
+>
+> · The afternoon's three batches are on the branch and pushed.
+> · The fourth — the integration-test startup fix, which cuts that suite's work by 68 % — is **not on
+>   the branch**: it lives on the tag `handoff/integration-schema-template`, pushed to origin.
+>   Rebased onto `ac208e9` it yields a tree verified dry, with no conflicts. **Delete the tag once
+>   integrated**; it is a rope, not a release point.
+>
+> ### Two measured defects left unfixed, each with its case
+>
+> · **`eng/watch-ci.ps1` announces «step ok» over steps that came out `skipped`.** Line 212: the
+>   filter treats `skipped` as not-failed. It misled twice today, the second time on the red run.
+>   **The run's outcome is NOT affected** — line 343 prints the literal conclusion and only exits 0
+>   on `success` — so the damage is announcing as measured what nobody measured. Case: run
+>   33812831673.
+> · **A declared UI trigger with no caller is caught by nothing.** `LIB-011` came down from
+>   `VERIFIED` to `IMPLEMENTED` for that today, and `LIB-002` has the same hole: manual scanning
+>   exists as an enum value and only a test asks for it. The architecture tests demand a registered
+>   service have someone resolving it and **no equivalent demand exists for a screen trigger**. The
+>   question that catches it: «can this be asked for from a screen, or only from a test». Its own
+>   batch.
+
 > ## HANDOVER — 2026-09-03, twenty-first session: batch 3 started by screen, two things built with no way in, and CI running the same work four times
 >
 > **Five commits on the branch, waiting on a single run.** That is this session's change of method
