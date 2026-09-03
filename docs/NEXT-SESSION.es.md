@@ -1,5 +1,102 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-03, vigesimoprimera sesión: la tanda 3 empezada por pantallas, dos huecos sin puerta, y CI corriendo cuatro veces lo mismo
+>
+> **Cinco commits en la rama, esperando un solo run.** Es el cambio de método de esta sesión y el
+> propietario lo pidió por su nombre: empujar por paso ponía tres runs solapados de 56 minutos, y dos
+> se cancelaron a mitad. **38 minutos tirados**, medidos. De aquí en adelante, un push por tanda.
+>
+> ### La tanda 3, por pantallas y no por sitios
+>
+> Los 86 radios escritos en el marcado bajan a **80**: la pantalla de Cursos entera —la tarjeta del
+> hilo, la fila de una lección y la cuadrícula—, cada uno con su número leído del diseño y no
+> copiado. Con ellos van los demás números de esas vistas, que es lo que evita dejar una tarjeta a
+> medio camino entre dos diseños.
+>
+> **Tres hallazgos que no se buscaban**, y los tres del mismo tipo: una clase compartida se llamaba
+> como su primer usuario y habría empujado al segundo a duplicarla; esa misma clase dibujaba **un
+> píxel de menos** por arriba y por abajo en 32 filas, porque su radio se leía del diseño y su
+> relleno estaba escrito a mano; y la fila de una lección medía casi el doble de alto que la del
+> diseño porque apilaba sus botones debajo.
+>
+> ### Lo que estaba construido y no tenía puerta
+>
+> **`LIB-011` bajó de `VERIFIED` a `IMPLEMENTED` por decisión del propietario.** Decía «edición de
+> metadatos e imágenes» y se leía como poder elegir una portada. El almacén sabía importarla, la
+> copia de seguridad la respaldaba, el modelo de la vista tenía dónde guardarla — **y nada la
+> llamaba**: los únicos que lo hacían eran las pruebas. La red que caza esto sólo mira servicios
+> registrados, y un método público sin llamadas pasa por debajo. **El MVP baja de 44 verificados a
+> 43**, que es lo que esa marca ocultaba.
+>
+> Ahora hay botón (`LIB-018`), y **su cerradura llegó primero**: la importación aceptaba cualquier
+> archivo de cualquier tamaño y lo copiaba a los datos de la aplicación —que viajan en la copia de
+> seguridad—, porque el techo de diez megas sólo se aplicaba a lo descargado.
+>
+> ### El fotograma: la hipótesis previa era falsa
+>
+> Se esperaba que no se pudiera sacar una imagen del vídeo, porque esta aplicación lo pinta por la
+> vía en la que `PLY-016` midió que la capa de filtros **nunca procesa un fotograma**. **No se
+> transfiere.** Sale en 137 ms, y con salto de posición cuesta unos 460 ms por archivo. `CRS-006`
+> entra en la matriz y su mitad que decide está cubierta sin decodificador; **falta dibujar la banda
+> en la tarjeta**.
+>
+> ### CI: cuatro veces lo mismo, medido desde sus propios resultados
+>
+> El recorrido accesible corría **cuatro veces por vuelta** —una en la verificación, dos como puerta
+> y una cuarta para contar lo que pulsó—. Ahora dos, y el contador lee lo que la puerta dejó:
+> **0,5 s en vez de 2m39s con el veredicto idéntico**. Unos 13 minutos por vuelta.
+>
+> **Y la cifra que este repositorio citaba llevaba cuatro días siendo falsa**: decía 42-53 minutos y
+> hoy son **56 en horas normales y 79 en la peor**. Corregida con el reparto medido, que además
+> señala lo siguiente: **27 minutos en pruebas de integración, 20 de ellos en cuatro pruebas de
+> volumen** — y esas mismas 536 pruebas tardan **1m17s en la máquina de quien programa**. Un factor
+> de veinte que nadie ha explicado todavía.
+>
+> ### Decisiones tomadas y NO ejecutadas
+>
+> · **La tarjeta de curso lleva banda de imagen**, decidido por el propietario. Falta dibujarla, y
+>   con ella una consecuencia elegida: la lista de cursos no sabe hoy qué archivo tiene cada uno, así
+>   que el plan es traer ese dato con la lista y **sacar las imágenes que falten en segundo plano**,
+>   para que la pantalla abra al instante.
+> · **El botón de marcar carpeta sigue al prototipo** —dentro del vacío, al pie cuando hay cursos—,
+>   y eso derogó una razón escrita en contra. La razón se retiró del archivo en vez de quedar
+>   contradiciendo lo que el archivo hace.
+> · **La imagen sale de la primera lección y no de la que se está viendo**: la del hilo cambia cada
+>   semana, y una portada que cambia sola deja de servir para reconocer el curso.
+>
+> ### Lo que NO se resuelve programando
+>
+> · **`PRD-002`** — el certificado comercial de firma. Del propietario.
+> · **`PRD-003`** — una máquina ARM64. Del propietario.
+> · **El menú de cada destino del riel**, que el prototipo dibuja y la aplicación no tiene. **No está
+>   en la matriz** y sigue esperando un sí o un no.
+> · **Que CI tarde 79 minutos en vez de 56** es la máquina que toca, no el trabajo: el run que lo
+>   midió sólo tocaba documentación.
+>
+> ### El estado del árbol
+>
+> `main` recibió el trabajo verificado; los cinco commits de esta tanda esperan su verde en la rama.
+> **El SHA no se escribe aquí** —nace caduco—: se lee con `git log --oneline -1 main`.
+>
+> ### Las trampas que deja esta tanda
+>
+> · **UNA HERRAMIENTA DE MEDICIÓN PUEDE DAR UN VEREDICTO FALSO Y MANDARTE A ARREGLAR LO QUE ESTÁ
+>   BIEN.** El previsualizador de suelos decía **0/0** sobre archivos cubiertos al 100 %: un informe
+>   de cobertura nombra cada clase con una ruta relativa a **su propio proyecto**, así que el mismo
+>   archivo entra con dos claves y la que se comparaba era la que tenía cero.
+> · **UNA PUERTA MÁS RÁPIDA CAZA MÁS.** El contador del paseo, al bajar de 2m39s a medio segundo,
+>   destapó en el acto un botón añadido esa misma sesión sin escena de paseo.
+> · **UN DIÁLOGO DEL SISTEMA NO PONE UN CONTROL FUERA DEL ALCANCE DEL PASEO.** La salida ya existía
+>   —la carpeta de traspaso del propio run— y se usaba para los enlaces externos.
+> · **UNA REGLA DE ARQUITECTURA CAZA EN EL MINUTO LO QUE UN COMENTARIO NO EVITA.** El primer borrador
+>   del extractor creaba su propia conexión con el motor de vídeo; sólo puede haber una por proceso,
+>   y una tanda de miniaturas es justo la forma de romperlo.
+> · **CINCO FILAS DEL ALCANCE SON INVISIBLES PARA LAS PRUEBAS QUE LO VIGILAN**, porque llevan un
+>   destino escrito de otra manera. Una de ellas está marcada como verificada sin que nadie la
+>   compruebe. Nombrado y no tocado: arreglarlo puede destapar más, y eso es una tanda.
+> · **UN NÚMERO QUE NADIE VUELVE A MEDIR ACABA JUSTIFICANDO LA DECISIÓN EQUIVOCADA**, y esta vez le
+>   tocó al tiempo de CI: 55-80, luego 42-53, y ahora 56-79.
+
 > ## RELEVO — 2026-09-03, vigésima sesión: la mitad tipográfica y la de formas de la tanda 2, y dos cifras del relevo anterior que no eran
 >
 > **Cuatro commits, todos en `main` con CI verde leído uno a uno.** La tanda 2 —«el resto de la

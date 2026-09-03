@@ -1,5 +1,103 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-03, twenty-first session: batch 3 started by screen, two things built with no way in, and CI running the same work four times
+>
+> **Five commits on the branch, waiting on a single run.** That is this session's change of method
+> and the owner asked for it by name: pushing per step put three overlapping 56-minute runs in the
+> air and two were cancelled halfway. **38 minutes thrown away**, measured. From here on, one push
+> per batch.
+>
+> ### Batch 3, by screen rather than by site
+>
+> The 86 corners written into the markup come down to **80**: the whole Courses screen — the thread
+> card, a lesson's row and the grid — each number read out of the design rather than copied. The rest
+> of those views' numbers go with them, which is what stops a card sitting halfway between two
+> designs.
+>
+> **Three findings nobody was looking for**, all of the same kind: a shared class was named after its
+> first caller and would have pushed the second into duplicating it; that same class drew **a pixel
+> short** above and below across 32 rows, because its corner was read from the design and its padding
+> was typed; and a lesson's row was nearly twice the design's height because it stacked its buttons
+> underneath.
+>
+> ### What was built and had no door
+>
+> **`LIB-011` came down from `VERIFIED` to `IMPLEMENTED` by the owner's decision.** It said «metadata
+> and image editing» and read as being able to choose a cover. The store knew how to import one, the
+> backup carried it, the view model had somewhere to keep it — **and nothing called it**: the only
+> callers were tests. The net that catches this only looks at registered services, and a public
+> method with no callers passes underneath. **The MVP drops from 44 verified to 43**, which is what
+> that mark was hiding.
+>
+> There is a button now (`LIB-018`), and **its lock arrived first**: the import accepted any file of
+> any size and copied it into application data — which travels in the backup — because the
+> ten-megabyte ceiling only ever applied to downloads.
+>
+> ### The frame: the hypothesis going in was false
+>
+> A picture was not expected to be obtainable from the video at all, because this application draws
+> it through the path where `PLY-016` measured that the filter layer **never processes a frame**. **It
+> does not carry over.** It arrives in 137 ms, and with a seek costs about 460 ms a file. `CRS-006`
+> enters the matrix and its deciding half is covered with no decoder; **the band still has to be
+> drawn on the card**.
+>
+> ### CI: the same work four times, measured from its own results
+>
+> The accessibility journey ran **four times a round** — once in the verification, twice as a gate,
+> and a fourth time to count what it pressed. Now twice, and the counter reads what the gate left:
+> **0.5 s instead of 2m39s with an identical verdict**. Some 13 minutes a round.
+>
+> **And the figure this repository quoted had been false for four days**: it said 42-53 minutes and
+> today it is **56 in ordinary hours and 79 in the worst**. Corrected with the measured breakdown,
+> which also names what comes next: **27 minutes in integration tests, 20 of them in four volume
+> tests** — and those same 536 tests take **1m17s on the developer's machine**. A factor of twenty
+> nobody has explained yet.
+>
+> ### Decisions taken and NOT executed
+>
+> · **The course card gets its picture band**, decided by the owner. It still has to be drawn, and
+>   with it a chosen consequence: the course list does not know which file each course has, so the
+>   plan is to bring that with the list and **take the missing pictures in the background**, so the
+>   screen opens at once.
+> · **The mark-a-folder button follows the prototype** — inside the empty state, at the foot once
+>   there are courses — which overrode a reason written against it. The reason left the file rather
+>   than staying there contradicting what the file does.
+> · **The picture comes from the first lesson rather than the one being watched**: the thread's moves
+>   every week, and a cover that changes on its own stops being how you recognise the course.
+>
+> ### What is not solved by programming
+>
+> · **`PRD-002`** — the commercial signing certificate. The owner's.
+> · **`PRD-003`** — an ARM64 machine. The owner's.
+> · **The menu on each rail destination**, which the prototype draws and the application lacks. **Not
+>   in the matrix**, and still waiting on a yes or a no.
+> · **CI taking 79 minutes instead of 56** is the runner of the hour rather than the work: the run
+>   that measured it only touched documentation.
+>
+> ### The state of the tree
+>
+> `main` has the verified work; this batch's five commits wait on the branch for their own green.
+> **The SHA is not written here** — it would be born stale: read it with `git log --oneline -1 main`.
+>
+> ### The traps this batch leaves
+>
+> · **A MEASURING TOOL CAN RETURN A FALSE VERDICT AND SEND YOU TO FIX WHAT IS ALREADY RIGHT.** The
+>   floor previewer said **0/0** about files covered 100 %: a coverage report names each class by a
+>   path relative to **its own project**, so the same file arrives under two keys and the one being
+>   compared was the one with zero.
+> · **A FASTER GATE CATCHES MORE.** The walk's counter, dropping from 2m39s to half a second, caught
+>   a button added in that same session with no walk scene.
+> · **A SYSTEM DIALOG DOES NOT PUT A CONTROL BEYOND THE WALK'S REACH.** The exit already existed —
+>   the run's own handover folder — and was in use for external links.
+> · **AN ARCHITECTURE RULE CATCHES IN A MINUTE WHAT A COMMENT DOES NOT PREVENT.** The frame
+>   grabber's first draft built its own connection to the video engine; there may only be one per
+>   process, and a pass of thumbnails is exactly the shape that breaks it.
+> · **FIVE SCOPE ROWS ARE INVISIBLE TO THE TESTS THAT WATCH SCOPE**, because their target is spelt
+>   another way. One of them is marked verified with nobody checking it. Named and untouched: fixing
+>   it may uncover more, and that is a batch.
+> · **A NUMBER NOBODY RE-MEASURES ENDS UP JUSTIFYING THE WRONG DECISION**, and this time it was CI's
+>   duration: 55-80, then 42-53, and now 56-79.
+
 > ## HANDOVER — 2026-09-03, twentieth session: batch 2's typographic half and its shape half, and two figures from the last handover that were not
 >
 > **Four commits, all on `main` with CI green read one by one.** Batch 2 — "the rest of the surface
