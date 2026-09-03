@@ -573,6 +573,22 @@ public sealed class OverlineTests
             Padding = new Avalonia.Thickness(10),
         };
         var window = new Window { Width = 400, Height = 60, Content = host };
+        try
+        {
+            return Read(window);
+        }
+        finally
+        {
+            // Closed in a finally, always: an exception between Show and Close leaves the window
+            // open, and a window left open across a test breaks the harness's per-test isolation —
+            // which surfaces as a «Test Case Cleanup Failure» naming some unrelated test that never
+            // even ran. Measured in this repository twice: 2026-08-28 and 2026-09-03.
+            window.Close();
+        }
+    }
+
+    private static (int Left, int Right, int Top, int Bottom) Read(Window window)
+    {
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
@@ -601,7 +617,6 @@ public sealed class OverlineTests
             }
         }
 
-        window.Close();
         return (left, right, top, bottom);
     }
 
@@ -612,11 +627,16 @@ public sealed class OverlineTests
         text.Classes.Add(styleClass);
 
         var window = new Window { Width = 400, Height = 200, Content = text };
-        window.Show();
-        Dispatcher.UIThread.RunJobs();
-        var drawn = (text.FontSize, text.FontWeight, text.LetterSpacing);
-        window.Close();
-        return drawn;
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            return (text.FontSize, text.FontWeight, text.LetterSpacing);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>The overline classes the token file declares, by the tracking that makes them one.</summary>
