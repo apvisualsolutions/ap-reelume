@@ -32,6 +32,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Dos mediciones nuevas abrían ventanas que no se cerraban si una comprobación fallaba**, y eso
+  rompe el aislamiento del arnés: aparece como un fallo de limpieza que **nombra una prueba distinta,
+  que ni siquiera llegó a ejecutarse**. Es la misma trampa que este repositorio ya había medido el
+  2026-08-28, con la misma traza y el mismo remedio — cerrar en un `finally`—, y se volvió a pisar el
+  2026-09-03. **No se reproduce en local**: es una carrera, y la salida es quitarla, no buscarla.
+
+  **Y el arreglo tenía su propia trampa**: cerrar la ventana antes de leer el valor devuelve el del
+  tema, no el que la clase dibuja. El valor se lee con la ventana viva y la comprobación va después.
+
+
 - **Cinco superficies dibujaban un radio que el prototipo no dibuja**, y ahora dibujan el suyo: la
   fila de ajustes y la tarjeta del candidato aceptado pasan de 8 a **10**, la etiqueta de estado y el
   distintivo sobre la carátula pasan a **cápsula** —dibujaban una caja redondeada donde el diseño

@@ -32,6 +32,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Two new measurements opened windows that were not closed when an assertion failed**, which breaks
+  the harness's isolation: it surfaces as a cleanup failure **naming a different test that never even
+  ran**. It is the same trap this repository measured on 2026-08-28, with the same stack and the same
+  remedy — close in a `finally` — and it was walked into again on 2026-09-03. **It does not reproduce
+  locally**: it is a race, and the way out is to remove it rather than hunt it.
+
+  **And the fix had a trap of its own**: closing the window before reading the value returns the
+  theme's rather than the one the class draws. The value is read while the window is alive and the
+  assertion comes after.
+
+
 - **Five surfaces drew a radius the prototype does not draw**, and now draw their own: the settings
   row and the accepted candidate's card go from 8 to **10**, the state tag and the badge over the
   cover become **capsules** — they drew a rounded box where the design draws a pill — and the side

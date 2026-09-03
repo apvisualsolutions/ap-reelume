@@ -215,6 +215,22 @@ public sealed class SurfaceCornerTests
             Padding = new Thickness(0),
         };
         var window = new Window { Width = 160, Height = 100, Content = host };
+        try
+        {
+            return PaleCorner(window);
+        }
+        finally
+        {
+            // Closed in a finally, always: an exception between Show and Close leaves the window
+            // open, and a window left open across a test breaks the harness's per-test isolation —
+            // which surfaces as a «Test Case Cleanup Failure» naming some unrelated test that never
+            // even ran. Measured in this repository twice: 2026-08-28 and 2026-09-03.
+            window.Close();
+        }
+    }
+
+    private static int PaleCorner(Window window)
+    {
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
@@ -240,7 +256,6 @@ public sealed class SurfaceCornerTests
             }
         }
 
-        window.Close();
         return pale;
     }
 
@@ -372,13 +387,26 @@ public sealed class SurfaceCornerTests
             var list = new ListBox { ItemsSource = new[] { "x" } };
             list.Classes.Add("side-list");
             var host = new Window { Width = 400, Height = 200, Content = list };
-            host.Show();
-            Dispatcher.UIThread.RunJobs();
-            var container = list.ContainerFromIndex(0) as ListBoxItem;
-            Assert.True(container is not null, "the side list built no item, so there is no corner to read.");
-            var itemRadius = container!.CornerRadius;
-            host.Close();
-            return itemRadius;
+            // The radius is READ while the window is still alive and asserted after it is closed.
+            // Both halves matter: a container read after Close has lost the styles that gave it the
+            // corner — measured 2026-09-03, it answered the theme's default — and an assertion
+            // between Show and Close leaves the window open when it fails, which breaks the
+            // harness's per-test isolation and surfaces as a «Test Case Cleanup Failure» naming some
+            // unrelated test that never ran.
+            CornerRadius? itemRadius;
+            try
+            {
+                host.Show();
+                Dispatcher.UIThread.RunJobs();
+                itemRadius = (list.ContainerFromIndex(0) as ListBoxItem)?.CornerRadius;
+            }
+            finally
+            {
+                host.Close();
+            }
+
+            Assert.True(itemRadius is not null, "the side list built no item, so there is no corner to read.");
+            return itemRadius!.Value;
         }
 
         var parts = selector.Split('.');
@@ -400,16 +428,21 @@ public sealed class SurfaceCornerTests
         }
 
         var window = new Window { Width = 400, Height = 200, Content = control };
-        window.Show();
-        Dispatcher.UIThread.RunJobs();
-        var radius = control switch
+        try
         {
-            Border border => border.CornerRadius,
-            TemplatedControl templated => templated.CornerRadius,
-            _ => throw new InvalidOperationException($"{selector} has no corner to read."),
-        };
-        window.Close();
-        return radius;
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            return control switch
+            {
+                Border border => border.CornerRadius,
+                TemplatedControl templated => templated.CornerRadius,
+                _ => throw new InvalidOperationException($"{selector} has no corner to read."),
+            };
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     /// <summary>Every non-button selector in the token file that writes a CornerRadius setter.</summary>
