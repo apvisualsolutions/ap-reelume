@@ -10,6 +10,19 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Medido: la aplicación sí puede sacar una imagen del propio vídeo, y la hipótesis previa era
+  falsa.** Se esperaba que no pudiera, porque la vía por la que esta aplicación pinta el vídeo es
+  justo aquella en la que `PLY-016` midió que la capa de filtros **nunca procesa un fotograma**. No
+  se transfiere: funciona por las tres vías probadas, la más barata entrega el fotograma en **137 ms**
+  y con salto de posición cuesta **unos 460 ms por archivo**, con cinco archivos seguidos y el
+  proceso en pie.
+
+  **Lo que la medición no dice está escrito con ella**: las muestras son cortas y pequeñas, cinco
+  archivos no son una biblioteca, no mide el guardado, y no dice si un fotograma al 10 % es una
+  miniatura *útil* o una diapositiva en blanco. Y hay un coste que no es una cifra: hoy sólo se
+  decodifica el vídeo que alguien decide ver. Queda en
+  [la evidencia](evidence/stable/CRS-thumbnail-spike.md) y la decisión sigue siendo del propietario.
+
 - **La pantalla de Cursos coloca el ofrecimiento donde el prototipo lo coloca**, por decisión del
   propietario del 2026-09-03: «Marcar una carpeta como curso…» va **dentro** de la caja de vacío
   mientras no hay cursos —acentuado, porque no hay nada más en la pantalla contra lo que ordenarlo—

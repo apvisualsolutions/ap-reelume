@@ -10,6 +10,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Measured: the application can get a picture out of the video itself, and the hypothesis held
+  before measuring was false.** It was expected not to, because the path this application draws video
+  through is exactly the one where `PLY-016` measured that the filter layer **never processes a
+  frame**. It does not carry over: it works by all three routes tried, the cheapest hands over the
+  frame in **137 ms**, and with a seek it costs **about 460 ms per file**, over five files in
+  sequence with the process still standing.
+
+  **What the measurement does not say is written with it**: the samples are short and small, five
+  files are not a library, it does not measure storage, and it does not say whether a frame at 10 %
+  is a *useful* thumbnail or a blank slide. And there is a cost that is not a figure: today only the
+  video somebody chooses to watch is decoded. It lives in
+  [the evidence](evidence/stable/CRS-thumbnail-spike.md) and the decision stays the owner's.
+
 - **The Courses screen puts the offer where the prototype puts it**, by the owner's decision of
   2026-09-03: «Marcar una carpeta como curso…» sits **inside** the empty box while there are no
   courses — accented, because there is nothing else on the screen to rank it against — and drops to

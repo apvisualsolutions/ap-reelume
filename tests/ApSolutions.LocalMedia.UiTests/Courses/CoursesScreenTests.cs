@@ -30,10 +30,12 @@ namespace ApSolutions.LocalMedia.UiTests.Courses;
 /// <para>
 /// <b>One thing the design draws is deliberately absent, and it is not an oversight.</b> Each card
 /// there opens with a 16:9 picture — the prototype's generated gradient, which stands in for artwork
-/// it cannot ship. Whether a course gets one is open: a course is detected from a folder and never
-/// looked up, so that panel would be a placeholder for ever unless the picture came from the video
-/// itself. Nothing here asserts its absence, because an assertion would make the open question look
-/// settled.
+/// it cannot ship. A course is detected from a folder and never looked up, so that panel would be a
+/// placeholder for ever unless the picture came from the video itself.
+/// <b>Whether it can is now measured and the answer is yes</b> — «docs/evidence/stable/CRS-thumbnail-spike.md»,
+/// a frame in 137 ms and about 460 ms per file with a seek — but whether this application should
+/// open files it was never asked to play is the owner's decision and is still open. Nothing here
+/// asserts the panel's absence, because an assertion would make that look settled.
 /// </para>
 /// </remarks>
 public sealed class CoursesScreenTests
