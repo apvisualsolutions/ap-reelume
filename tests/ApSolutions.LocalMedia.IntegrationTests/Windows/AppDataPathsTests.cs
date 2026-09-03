@@ -31,6 +31,7 @@ public sealed class AppDataPathsTests
                 paths.BackupsDirectory,
                 paths.PersonalArtworkDirectory,
                 paths.RemoteCacheDirectory,
+                paths.CourseThumbnailDirectory,
                 paths.DiagnosticsDirectory,
             },
             path => Assert.StartsWith(root, path, StringComparison.OrdinalIgnoreCase));
@@ -40,6 +41,12 @@ public sealed class AppDataPathsTests
         Assert.Equal("personal-artwork", Path.GetFileName(paths.PersonalArtworkDirectory));
         Assert.Equal("artwork", Path.GetFileName(paths.RemoteCacheDirectory));
         Assert.Equal("cache", Path.GetFileName(Path.GetDirectoryName(paths.RemoteCacheDirectory)));
+
+        // Under the cache and not beside the personal artwork, which is the difference that decides
+        // whether the backup carries it: a frame this application took for itself is regenerable
+        // from the video it came out of, and a cover somebody chose is not.
+        Assert.Equal("course-thumbnails", Path.GetFileName(paths.CourseThumbnailDirectory));
+        Assert.Equal("cache", Path.GetFileName(Path.GetDirectoryName(paths.CourseThumbnailDirectory)));
         Assert.Equal("diagnostics", Path.GetFileName(paths.DiagnosticsDirectory));
     }
 

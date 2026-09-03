@@ -193,6 +193,63 @@ public sealed class GetCourseThumbnailTests : IDisposable
         Assert.Equal(0, grabber.Calls);
     }
 
+    /// <summary>
+    /// The same lesson on the same disconnected disk, with no picture ever taken, gets none.
+    /// </summary>
+    /// <remarks>
+    /// <b>The other half of the test above, and it has to be written down separately.</b> Keeping a
+    /// picture that is there and answering nothing when there is not are one branch read both ways:
+    /// a cache that handed back a path to a file nobody had written would draw a broken image on
+    /// every card of a library that lives on an external disk.
+    /// </remarks>
+    [Fact]
+    public async Task A_disconnected_disk_with_no_picture_yet_leaves_the_card_without_one()
+    {
+        var grabber = new RecordingGrabber { Succeeds = true };
+        var subject = Subject(grabber);
+
+        var answer = await subject.ExecuteAsync(
+            _course,
+            [Lesson(hasFile: true)],
+            _ => Path.Combine(_root, "unplugged", "lesson.mkv"),
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Null(answer);
+        Assert.Equal(0, grabber.Calls);
+    }
+
+    /// <summary>A marker nobody can read is not believed: the frame is taken again.</summary>
+    /// <remarks>
+    /// <b>The three ways the small file beside a picture can stop being readable</b>, and the answer
+    /// is the same for all of them. It is written by this application and read by it, so a corrupt
+    /// one means a write that was interrupted — a machine switched off mid-copy — rather than
+    /// anything a person did. Trusting half of one would be worse than ignoring it: the picture
+    /// would be kept for ever against a file it no longer describes, and no later pass would notice.
+    /// </remarks>
+    [Theory]
+    [InlineData("a line with no separator in it")]
+    [InlineData("not-a-number|2026-09-03T10:00:00.0000000+00:00")]
+    [InlineData("4096|not-a-date")]
+    public async Task A_marker_nobody_can_read_is_taken_again(string marker)
+    {
+        var video = WriteFile("lesson.mkv", "a video");
+        var grabber = new RecordingGrabber { Succeeds = true };
+        var subject = Subject(grabber);
+
+        Directory.CreateDirectory(Path.Combine(_root, "cache", "course-thumbnails"));
+        File.WriteAllText(subject.FileFor(_course), "a picture taken earlier");
+        File.WriteAllText(subject.FileFor(_course) + ".from", marker);
+
+        var answer = await subject.ExecuteAsync(
+            _course,
+            [Lesson(hasFile: true)],
+            _ => video,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(subject.FileFor(_course), answer);
+        Assert.Equal(1, grabber.Calls);
+    }
+
     [Fact]
     public async Task The_arguments_it_cannot_work_without_are_refused()
     {

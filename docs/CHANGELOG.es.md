@@ -62,6 +62,26 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La cuenta de cuánto del programa está realmente probado se había quedado corta en siete
+  archivos, y era lo único que separaba esta tanda de estar verificada.** Las diez baterías de
+  pruebas pasaban; lo que fallaba después era el recuento. Los siete se midieron uno a uno
+  reproduciendo aquí el mismo informe que hace el servidor —una lectura local sola dice otra cosa— y
+  **ninguno se arregló bajando el listón**.
+
+  **Tres eran código recién escrito al que le faltaba una prueba**, y lo que faltaba se nombró con
+  precisión en vez de adivinarlo: un archivo de caché a medio escribir por un apagón, un vídeo que
+  esta máquina no sabe abrir, y de qué manera se pregunta por una imagen según dónde guarde sus
+  datos la ejecución. Los tres llegan ahora al cien por cien.
+
+  **Y el candado de la portada propia, que llegó en la tanda anterior, no tenía quien lo
+  comprobara.** Ahora se comprueba que una imagen que no se admite —porque no está, porque no es una
+  imagen o porque pasa del tamaño permitido— no llega a los datos de la aplicación, y que no se pide
+  nada por la red al intentarlo.
+
+  **Lo único que se aparta de la cuenta es el trozo que le pide a Windows un cuadro de diálogo**, que
+  es lo único que ninguna prueba puede contestar, y va con su razón escrita al lado. **Lo que decide
+  no se aparta**: cuál de los dos caminos se toma se comprueba por los dos lados.
+
 - **Una puerta de documentación se ponía roja porque otra sesión estaba trabajando.** Recorría
   todos los documentos del árbol, y ahí dentro viven ahora los espacios de trabajo de las sesiones
   paralelas —que git ignora—, cada uno con su copia de la guía en el commit del que arrancó. Una

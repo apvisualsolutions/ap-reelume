@@ -62,6 +62,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The count of how much of the program is actually tested fell short on seven files, and it was
+  the only thing standing between this batch and being verified.** All ten test suites passed; what
+  failed afterwards was the count. The seven were measured one at a time by reproducing the
+  server's own report here — a local reading on its own says something else — and **not one of them
+  was fixed by lowering the bar**.
+
+  **Three were freshly written code with a test missing**, and what was missing was named precisely
+  rather than guessed at: a cache file left half-written by a power cut, a video this machine cannot
+  open, and how a picture gets asked for depending on where the run keeps its data. All three now
+  reach a hundred per cent.
+
+  **And the lock on a cover of your own, which arrived in the previous batch, had nobody checking
+  it.** It is now checked that an image that is not allowed — because it is gone, because it is not
+  an image, or because it is over the permitted size — never reaches the application's own data, and
+  that nothing is asked of the network in the attempt.
+
+  **The only part held out of the count is the piece that asks Windows for a dialog box**, which is
+  the one thing no test can answer, and it carries its reason written beside it. **What decides is
+  not held out**: which of the two routes is taken is checked both ways.
+
 - **A documentation gate went red because another session was working.** It walked every document
   in the tree, and parallel sessions' worktrees now live inside it — ignored by git — each holding
   its own copy of the guide at whatever commit it started from. A figure this batch had just

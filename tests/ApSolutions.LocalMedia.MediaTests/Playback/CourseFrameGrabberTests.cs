@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Diagnostics;
+using ApSolutions.LocalMedia.Domain.Courses;
 using ApSolutions.LocalMedia.Infrastructure.Playback;
 using ApSolutions.LocalMedia.MediaTests.Fixtures;
 using Xunit;
@@ -136,6 +137,46 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
         Assert.True(
             watch.Elapsed < TimeSpan.FromSeconds(10),
             $"it waited {watch.Elapsed} for a frame that was never coming.");
+    }
+
+    /// <summary>A decoder that will not even open the file answers at once, and writes nothing.</summary>
+    /// <remarks>
+    /// <b>The refusal before the wait, which is a different failure from the one above.</b> A file
+    /// the container check approves can still be one this machine has no decoder for, and that has
+    /// to cost nothing: waiting the deadline out for a file that never opened would make a folder of
+    /// unsupported videos take three seconds a card. The double refuses because a real decoder that
+    /// refuses is a decoder this machine does not have, which is the one state a test cannot arrange.
+    /// </remarks>
+    [Fact]
+    public async Task A_decoder_that_will_not_open_the_file_answers_at_once()
+    {
+        Directory.CreateDirectory(_root);
+        var video = Path.Combine(_root, "unopenable.mkv");
+        await File.WriteAllTextAsync(video, "pretend", TestContext.Current.CancellationToken);
+        var destination = Path.Combine(_root, "out.png");
+
+        var watch = Stopwatch.StartNew();
+        var taken = await new LibVlcCourseFrameGrabber(_ => new RefusingCapture())
+            .TryCaptureAsync(video, TimeSpan.Zero, destination, TestContext.Current.CancellationToken);
+
+        Assert.False(taken);
+        Assert.False(File.Exists(destination));
+        Assert.True(
+            watch.Elapsed < CourseThumbnailPolicy.Deadline,
+            $"it waited {watch.Elapsed} on a file that never opened.");
+    }
+
+    /// <summary>Will not open at all, which is a machine with no decoder for this container.</summary>
+    private sealed class RefusingCapture : LibVlcCourseFrameGrabber.IFrameCapture
+    {
+        public bool Start(TimeSpan at) => false;
+
+        public LibVlcCourseFrameGrabber.CapturedFrame? WaitForFrame(TimeSpan deadline) =>
+            throw new InvalidOperationException("Nothing asks for a frame from a file that never opened.");
+
+        public void Dispose()
+        {
+        }
     }
 
     /// <summary>Opens fine and never hands over a frame, which is the failure the deadline is for.</summary>

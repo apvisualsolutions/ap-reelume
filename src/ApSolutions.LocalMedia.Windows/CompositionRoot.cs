@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using ApSolutions.LocalMedia.Application.Backup;
 using ApSolutions.LocalMedia.Application.Catalog;
@@ -1906,7 +1907,17 @@ public static partial class CompositionRoot
     /// The filter is a convenience and never the check. Windows lets anyone type a name past a
     /// filter, and the import checks again on its own side and so does the store.
     /// </para>
+    /// <para>
+    /// <b>Excluded from coverage, and only this.</b> Every line here asks Windows for a modal
+    /// dialog, which is the one thing no harness can answer — the tenth rule's own case. Nothing
+    /// here decides: <b>which</b> exit is built is the ternary in <c>AddCatalogEditing</c>, covered
+    /// both ways by <c>IsolatedRunTests</c>; what a chosen file is allowed to be is
+    /// <c>CoverImageRules</c>; and what happens to it is <c>SetPersonalCover</c> and
+    /// <c>ArtworkCache</c>. All three are covered without a dialog anywhere near them, which is what
+    /// makes this exclusion narrow enough to be honest.
+    /// </para>
     /// </remarks>
+    [ExcludeFromCodeCoverage(Justification = "Asks Windows for a modal file dialog; every decision around it is in CoverImageRules, SetPersonalCover and the composition ternary IsolatedRunTests covers both ways.")]
     private static async Task<string?> ChooseCoverFileAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

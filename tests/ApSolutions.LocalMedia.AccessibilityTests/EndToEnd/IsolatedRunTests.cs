@@ -5,9 +5,11 @@ using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Updates;
+using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Updates;
 using ApSolutions.LocalMedia.Infrastructure.Updates;
 using ApSolutions.LocalMedia.Presentation.Backup;
+using ApSolutions.LocalMedia.Presentation.Metadata;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Metadata;
 using ApSolutions.LocalMedia.Windows.Playback;
@@ -331,5 +333,86 @@ public sealed class IsolatedRunTests : IDisposable
         {
             Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, previous);
         }
+    }
+
+    /// <summary>
+    /// The same rule at the cover picker (LIB-018): an isolated run answers out of its own handover
+    /// folder, and the run that owns the profile is still the one Windows asks.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Both halves are here rather than in two tests for the reason the archive dialogs are: merged
+    /// Cobertura reports keep the better reading per line and not the union, so a two-way choice
+    /// split across suites reads as half covered for good.
+    /// </para>
+    /// <para>
+    /// The isolated half is pressed twice on purpose. The first press happens before the handover
+    /// folder exists at all, which is the state every isolated run starts in and the one a guard
+    /// that only checked for an empty folder would walk straight into; it has to read as a cancelled
+    /// dialog, because somebody who chose nothing is not somebody who chose badly. The owning half is
+    /// only resolved, never pressed: pressing it would open a file dialog on whoever ran the suite.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task An_isolated_run_answers_its_own_cover_dialog_and_the_owning_run_does_not()
+    {
+        var isolated = Path.Combine(_dataRoot, "cover-isolated");
+        await using (var host = ApplicationHost.Create(new AppDataPaths(isolated)))
+        {
+            var picker = host.Services.GetRequiredService<ArtworkPickerViewModel>();
+            picker.Target = new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000c0"));
+
+            await Press(picker);
+            Assert.Null(picker.Status);
+
+            var handoff = new AppDataPaths(isolated).SystemHandoffDirectory;
+            Assert.NotNull(handoff);
+            Directory.CreateDirectory(handoff);
+            await File.WriteAllBytesAsync(
+                Path.Combine(handoff, "chosen-cover.png"),
+                [1, 2, 3, 4],
+                TestContext.Current.CancellationToken);
+
+            await Press(picker);
+            Assert.NotNull(picker.Status);
+        }
+
+        var owned = Path.Combine(_dataRoot, "cover-owned");
+        var previous = Environment.GetEnvironmentVariable(AppDataPaths.DataRootVariableName);
+        Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, owned);
+        try
+        {
+            Assert.Null(new AppDataPaths().SystemHandoffDirectory);
+            await using var host = ApplicationHost.Create(new AppDataPaths());
+
+            // Which exit was built, asserted before anything is asked of it: with no window there is
+            // no dialog, and a picker that could be pressed here would be one opening a window on
+            // the machine measuring it.
+            var picker = host.Services.GetRequiredService<ArtworkPickerViewModel>();
+            picker.Target = new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000c1"));
+            Assert.True(picker.CanChoose);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(AppDataPaths.DataRootVariableName, previous);
+        }
+    }
+
+    /// <summary>Presses the picker's button and waits for what it started.</summary>
+    /// <remarks>
+    /// <c>ICommand.Execute</c> returns void, so the work it starts is not awaitable from here.
+    /// <see cref="ArtworkPickerViewModel.IsChoosing"/> is what says whether it is still running, and
+    /// polling that is honest about the shape rather than sleeping for a guessed interval.
+    /// </remarks>
+    private static async Task Press(ArtworkPickerViewModel picker)
+    {
+        picker.ChooseCoverCommand.Execute(null);
+
+        for (var i = 0; i < 400 && picker.IsChoosing; i++)
+        {
+            await Task.Delay(5, TestContext.Current.CancellationToken);
+        }
+
+        Assert.False(picker.IsChoosing, "the picker never finished choosing.");
     }
 }

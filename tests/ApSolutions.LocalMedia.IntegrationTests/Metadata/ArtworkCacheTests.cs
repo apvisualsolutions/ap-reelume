@@ -245,10 +245,90 @@ public sealed class ArtworkCacheTests
         Assert.Throws<ArgumentNullException>(() => cache.Find(new TitleId(Guid.Empty), null!));
     }
 
-    private static HttpResponseMessage Response(HttpStatusCode status, string body) => new(status)
+    /// <summary>
+    /// A cover the allow-list refuses is refused by the store itself, and copies nothing.
+    /// </summary>
+    /// <remarks>
+    /// <b>The check is here and not only in the use case above it.</b> This is the line that reads
+    /// somebody's file into the application's own data — data the backup then carries off the
+    /// machine — so a guard that lived only on the caller would protect the callers that exist
+    /// today and none of the ones written next. The three refusals are the three ways a chosen file
+    /// can be wrong: it is not there any more, it is not an image at all, or it is larger than the
+    /// ceiling a personal cover is allowed.
+    /// </remarks>
+    [Theory]
+    [InlineData("gone.png", -1)]
+    [InlineData("a-video.mkv", 4)]
+    [InlineData("enormous.png", (11 * 1024 * 1024))]
+    public async Task A_cover_the_allow_list_refuses_never_reaches_the_application_data(
+        string name,
+        int sizeInBytes)
     {
-        Content = new StringContent(body, Encoding.UTF8, "image/jpeg"),
-    };
+        using var directory = new DatabaseTestDirectory();
+        var source = Path.Combine(directory.Path, name);
+        if (sizeInBytes >= 0)
+        {
+            await File.WriteAllBytesAsync(
+                source,
+                new byte[sizeInBytes],
+                TestContext.Current.CancellationToken);
+        }
+
+        var handler = new ArtworkHandler([]);
+        using var client = new HttpClient(handler);
+        var cache = new ArtworkCache(directory.Path, client);
+
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => cache.ImportPersonalAsync(
+            new TitleId(Guid.Parse("60000000-0000-0000-0000-00000000000f")),
+            source,
+            "Una portada que no vale",
+            TestContext.Current.CancellationToken));
+
+        Assert.Empty(await cache.GetExportablePersonalArtworkAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(0, handler.Requests);
+    }
+
+    /// <summary>
+    /// A cached poster is named after the kind the provider said it was, and anything else is a JPEG.
+    /// </summary>
+    /// <remarks>
+    /// <b>The extension cannot be read off the address</b> — TMDB's paths end in <c>.jpg</c> whatever
+    /// they actually hold — so it comes from the media type, and getting it wrong means a file the
+    /// image decoder opens by name and refuses. The unknown kind falls back rather than refusing:
+    /// what arrived is a picture the provider offered, and a header nobody recognises is not a
+    /// reason to leave a card blank.
+    /// </remarks>
+    [Theory]
+    [InlineData("image/png", ".png")]
+    [InlineData("image/webp", ".webp")]
+    [InlineData("application/octet-stream", ".jpg")]
+    public async Task A_cached_poster_is_named_after_the_kind_the_provider_said_it_was(
+        string mediaType,
+        string extension)
+    {
+        using var directory = new DatabaseTestDirectory();
+        var handler = new ArtworkHandler([Response(HttpStatusCode.OK, "remote-image", mediaType)]);
+        using var client = new HttpClient(handler);
+        var cache = new ArtworkCache(directory.Path, client);
+
+        var remote = await cache.CacheRemoteAsync(
+            new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000a1")),
+            new Uri("https://image.tmdb.org/t/p/w500/poster.jpg"),
+            "Póster remoto",
+            previous: null,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(extension, Path.GetExtension(remote.Path));
+        Assert.True(File.Exists(remote.Path));
+    }
+
+    private static HttpResponseMessage Response(
+        HttpStatusCode status,
+        string body,
+        string mediaType = "image/jpeg") => new(status)
+        {
+            Content = new StringContent(body, Encoding.UTF8, mediaType),
+        };
 
     private sealed class ArtworkHandler(IEnumerable<HttpResponseMessage> responses) : HttpMessageHandler
     {
