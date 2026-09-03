@@ -208,11 +208,27 @@ cuarenta veces es el que enseña a ignorarlo. El motivo de que sea un guion y no
 el filtro obvio pregunta por `status == "completed"` y **calla en todo lo demás**, y un vigía callado
 es indistinguible de un run que sigue. Peor aún, `2>/dev/null` sobre la consulta **entierra** el error
 de `gh` y `|| true` lo convierte en una cadena vacía que se lee como «aún no ha terminado». Un run de
-este repositorio tarda **42-53 minutos** —los doce completos del 2026-08-30 dieron 42,7 el más rápido
-y 52,6 el más lento—, así que hay hueco de sobra para no enterarse. **Esa cifra decía 55-80 hasta que
-se midió**, y era de las que se citan sin comprobar: el latido de 30 y el techo de 120 siguen bien
-porque el margen los cubre igual, pero un número que nadie vuelve a medir es el que acaba justificando
-la decisión equivocada.
+este repositorio tardaba **42-53 minutos** el 2026-08-30 y **ya no**: los cinco del 2026-09-03 dieron
+**56 minutos** en horas normales y **79** en la peor, sobre el mismo trabajo. Así que hay hueco de
+sobra para no enterarse, y el latido de 30 y el techo de 120 siguen bien porque el margen los cubre
+igual — pero **la cifra decía 55-80, luego 42-53, y ahora vuelve a moverse**: un número que nadie
+vuelve a medir es el que acaba justificando la decisión equivocada, y éste llevaba cuatro días
+mintiendo.
+
+**El reparto, medido desde los TRX del propio run**, es lo que enseña dónde está el tiempo: las
+pruebas de integración **27 min** —20 de ellos en cuatro pruebas de volumen—, el recorrido accesible
+**8,8 min** dentro de la verificación y **19,4 más** como puerta, el vídeo real 5,7 y los presupuestos
+4,0.
+
+**Ese recorrido corría CUATRO veces por run**: una en la verificación, dos como puerta —seguidas y
+sobre el mismo código— y una cuarta para contar lo que había pulsado. Desde el 2026-09-03 la
+verificación lo cede a su puerta con `-AuditGatesRunSeparately`, y el trinquete del paseo lee con
+`-SkipRun` el informe que la puerta acaba de dejar —el paseo escribe en `artifacts/walk` con o sin
+variable, que es lo que lo hace posible—: **0,5 s en vez de 2m39s y el veredicto idéntico**, medido.
+Unos 13 minutos por vuelta.
+
+**El interruptor y su paso van juntos**: si el paso de accesibilidad desaparece del flujo y el
+interruptor se queda, esa suite deja de correr en CI entera y nada lo dice.
 
 **Y el sexto desenlace no es un desenlace, sino la pregunta: mirar donde el run no está.** Hasta el
 2026-09-02 el guion listaba con `--branch` y esa rama era **la local**, que en un worktree no es la

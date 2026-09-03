@@ -138,11 +138,24 @@ public static partial class CompositionRoot
             // file in. Built with neither — which is what every test that only displays a picker
             // does — its button refuses to be pressed rather than accepting a press and doing
             // nothing.
-            .AddTransient(provider => new ArtworkPickerViewModel(
-                ChooseCoverFileAsync,
-                (titleId, path, describedAs, cancellationToken) => provider
-                    .GetRequiredService<SetPersonalCover>()
-                    .ExecuteAsync(titleId, path, describedAs, cancellationToken)))
+            .AddTransient(provider =>
+            {
+                // The same exit the external link launcher above builds, and for the same rule: a
+                // modal Windows dialog is the one thing no harness can answer, so a run that keeps
+                // its data somewhere of its own takes the cover out of that root instead of opening
+                // anything on the machine it is running on. Without this the walk could press this
+                // button and nothing observable would happen — a control pressed and unprovable.
+                var paths = provider.GetRequiredService<IAppDataPaths>();
+                Func<CancellationToken, Task<string?>> choose = paths.SystemHandoffDirectory is { } handoff
+                    ? _ => Task.FromResult(FirstCoverIn(handoff))
+                    : ChooseCoverFileAsync;
+
+                return new ArtworkPickerViewModel(
+                    choose,
+                    (titleId, path, describedAs, cancellationToken) => provider
+                        .GetRequiredService<SetPersonalCover>()
+                        .ExecuteAsync(titleId, path, describedAs, cancellationToken));
+            })
             .AddSingleton<RenamePolicy>()
             .AddSingleton<PreviewRename>()
             .AddSingleton<ISafeFileRenamer>(provider => new SafeFileRenamer(

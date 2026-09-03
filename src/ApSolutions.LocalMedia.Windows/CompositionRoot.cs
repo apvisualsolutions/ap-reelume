@@ -1872,6 +1872,28 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
+    /// The first approved image a run's own handover folder holds, or nothing when it holds none.
+    /// </summary>
+    /// <remarks>
+    /// What a run with a data root of its own gets instead of a dialog. It asks the same allow-list
+    /// the import asks, so a handover folder carrying a video cannot slip a path past the check by
+    /// coming in through a different door.
+    /// </remarks>
+    private static string? FirstCoverIn(string handoff)
+    {
+        if (!Directory.Exists(handoff))
+        {
+            return null;
+        }
+
+        return Directory
+            .EnumerateFiles(handoff)
+            .Where(file => CoverImageRules.IsApprovedExtension(Path.GetExtension(file)))
+            .OrderBy(file => file, StringComparer.Ordinal)
+            .FirstOrDefault();
+    }
+
+    /// <summary>
     /// Asks which image to use as a cover (LIB-018). The dialog offers exactly the containers the
     /// allow-list approves, and a cancelled dialog answers null, which adds nothing.
     /// </summary>

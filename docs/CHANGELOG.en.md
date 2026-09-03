@@ -62,6 +62,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **CI ran the accessibility journey FOUR times a round**, and no longer does. Once inside the
+  verification, twice as a gate — back to back, over the same code — and a fourth time only to count
+  what it had pressed. Measured from the run's own result files: **13 minutes a round spent repeating
+  the same thing**, out of a 79-minute run.
+
+  The verification now hands that suite to its gate, and the walk's counter reads the report the gate
+  just left instead of repeating it: **half a second instead of two minutes forty, with an identical
+  verdict**. It is a switch rather than a deletion, because the full verification is also used
+  locally, where that gate is not going to run afterwards.
+
+  **And it is written down that the switch and its step belong together**: remove the step from the
+  workflow and leave the switch, and that suite stops running in CI entirely with nothing to say so.
+
+- **And the figure this project quoted for how long CI takes had been false for four days.** It said
+  42-53 minutes; today's five runs measured **56 in ordinary hours and 79 in the worst**, over the
+  same work. It is corrected with the step-by-step breakdown, which is what says where the time
+  actually goes: **27 minutes in integration tests**, 20 of them in four volume tests alone.
+
 - **The coverage-floor previewer gave a FALSE verdict on new files**, sending somebody to fix code
   that was already right. A coverage report names each class by a path relative to **its own
   project**, so a module's own suite calls a file one thing and any other suite that merely loads

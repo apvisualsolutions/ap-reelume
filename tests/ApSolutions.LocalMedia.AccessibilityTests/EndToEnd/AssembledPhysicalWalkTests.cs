@@ -441,6 +441,42 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             Assert.True(read());
         }
 
+        // LIB-018's own button, pressed with the mouse like everything else. The dialog it would open
+        // on somebody's machine is the one thing no harness can answer, so a run with a data root of
+        // its own takes the cover out of that root's handover folder — the same exit the external
+        // link launcher already uses, and the reason this control can be pressed at all rather than
+        // added to the pending list.
+        var handoff = Path.Combine(_dataRoot, "handoff");
+        Directory.CreateDirectory(handoff);
+        var chosenCover = Path.Combine(handoff, "portada.png");
+        await File.WriteAllBytesAsync(
+            chosenCover,
+            [0x89, (byte)'P', (byte)'N', (byte)'G', 0x0D, 0x0A, 0x1A, 0x0A],
+            TestContext.Current.CancellationToken);
+
+        // The poster's own lock was set by the loop above, so what is read back here is the
+        // path rather than the lock: choosing a cover after locking the field still has to fill
+        // it, because the lock protects it from the PROVIDER rather than from its owner.
+        await PressAsync(
+            host,
+            "CoverChooseAction",
+            () => editor.PosterPath,
+            "clicking Elegir una imagen never put a cover into the poster field");
+
+        // The path it stored is the application's own copy rather than the file that was picked:
+        // choosing a cover copies it in, so a poster still pointing at the handover folder would
+        // mean the copy never happened and the picture would vanish with that folder.
+        Assert.NotNull(editor.PosterPath);
+        Assert.NotEqual(chosenCover, editor.PosterPath);
+        Assert.True(
+            File.Exists(editor.PosterPath),
+            $"the poster field points at {editor.PosterPath}, which is not on this disk.");
+
+        // And the lock is still on. Without it the next provider refresh would put the provider's
+        // artwork back over the cover somebody chose, days later, with nothing to connect the two.
+        Assert.True(editor.LockPosterPath, "choosing a cover left the poster field unlocked.");
+
+
         // Save is the one whose effect is not on screen: it writes a row. Asserting on the editor
         // would prove only that the editor kept what was typed into it.
         var metadata = new CatalogMetadataRepository(factory);

@@ -62,6 +62,24 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **CI corría el recorrido accesible CUATRO veces por vuelta**, y ya no. Una dentro de la
+  verificación, dos como puerta —seguidas, sobre el mismo código— y una cuarta sólo para contar lo
+  que había pulsado. Medido desde los archivos de resultados del propio run: **13 minutos por vuelta
+  en repetir lo mismo**, de un run de 79.
+
+  Ahora la verificación cede esa suite a su puerta, y el contador del paseo lee el informe que la
+  puerta acaba de dejar en vez de repetirlo: **medio segundo en vez de dos minutos y cuarenta, con
+  el veredicto idéntico**. La cesión es un interruptor y no un borrado, porque la verificación
+  completa también se usa en local, donde esa puerta no va a correr después.
+
+  **Y se escribe que el interruptor y su paso van juntos**: si alguien quita el paso del flujo y
+  deja el interruptor, esa suite deja de correr en CI entera y nada lo dice.
+
+- **Y la cifra que el proyecto citaba sobre lo que tarda CI llevaba cuatro días siendo falsa.** Decía
+  42-53 minutos; los cinco runs de hoy dieron **56 en horas normales y 79 en la peor**, sobre el
+  mismo trabajo. Queda corregida con el reparto medido paso a paso, que es lo que dice dónde está el
+  tiempo: **27 minutos en pruebas de integración**, y 20 de ellos en sólo cuatro pruebas de volumen.
+
 - **El previsualizador de suelos daba un veredicto FALSO sobre archivos nuevos**, y mandaba a
   arreglar código que ya estaba bien. Un informe de cobertura nombra cada clase con una ruta
   relativa a **su propio proyecto**, así que la suite del propio módulo llama a un archivo de una
