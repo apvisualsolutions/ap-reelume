@@ -195,6 +195,25 @@
 ## la propia puerta autoriza por escrito: «add it with the reason and raise the ratchet in the same
 ## change».
 ##
+## 2026-09-04: la tanda del selector de portada dejo SEIS archivos rotos y el run 33812831673 los
+## nombro. Tres eran NUEVOS y no llegaban al liston —GetCourseThumbnail 100/90, el capturador de
+## fotograma 96/90 y CompositionRoot.Identification 100/75—, y NINGUNO entra en esta lista: los tres
+## salieron por el camino que este archivo admite, midiendo con el JSON de coverlet que rama faltaba
+## y cubriendola. Los tres miden ahora 100/100, asi que el trinquete no se mueve de 188.
+##
+## Los otros tres SI se quedan y sus suelos SUBEN, que es la otra mitad de la misma regla. Las tres
+## cifras salen de la aritmetica de la puerta aplicada al informe fusionado del propio run —los
+## veinte Cobertura del artefacto test-results, fusionados con el mismo reportgenerator— que
+## reprodujo EXACTO lo que la puerta dijo de los siete archivos, mas la unica diferencia que este
+## cambio introduce. ArtworkCache pasa a 99/85 al cubrir el rechazo de una portada que la lista
+## blanca no admite y los dos tipos de imagen que el nombre del archivo en cache implica; el
+## editor de metadatos a 100/89, que es lo que el artefacto ya media; y CompositionRoot.cs a 88/60.
+##
+## Ese ultimo sube por la salida de la regla 10 y no por una prueba: ChooseCoverFileAsync no hace
+## mas que pedirle a Windows un dialogo modal, que es lo unico que ningun arnes puede contestar, y
+## lleva su razon escrita al lado. Lo que DECIDE no se excluye: cual de las dos salidas se construye
+## es el ternario de AddCatalogEditing, y IsolatedRunTests lo cubre por los dos lados.
+##
 
 src/ApSolutions.LocalMedia.Application/Backup/BackupContracts.cs                             100  92
 src/ApSolutions.LocalMedia.Application/Backup/CreateBackup.cs                                100  94
@@ -253,7 +272,7 @@ src/ApSolutions.LocalMedia.Infrastructure/FileSystem/SafeFileRenamer.cs         
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/WindowsPathNormalizer.cs                 75  58
 src/ApSolutions.LocalMedia.Infrastructure/Media/LibVlcMediaProbe.cs                           96  71
 src/ApSolutions.LocalMedia.Infrastructure/Media/LocalSegmentFeatureExtractor.cs               91  97
-src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            96  73
+src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            99  85
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/MetadataCandidateSource.cs                 98  91
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/SqliteMetadataCache.cs                     78  72
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbMetadataProvider.cs                    97  76
@@ -303,7 +322,7 @@ src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml            
 src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  77
 src/ApSolutions.LocalMedia.Presentation/Library/UnavailableBadge.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorView.axaml                    100  50
-src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  87
+src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  89
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewViewModel.cs                    95  63
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsView.axaml                         100  50
@@ -373,7 +392,7 @@ src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs             
 src/ApSolutions.LocalMedia.Presentation/Theme/Icons.axaml                                    100  50
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
-src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         87  60
+src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         88  60
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  80
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90
