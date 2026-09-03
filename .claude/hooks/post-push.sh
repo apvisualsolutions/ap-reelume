@@ -71,8 +71,48 @@ printf '%s\n' "$stripped" | grep -Eq '(^|[;&|(]|&&|\|\|)[[:space:]]*git[[:space:
 
 sha=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse HEAD 2>/dev/null || printf '<sha>')
 
+# HEAD NO TIENE POR QUE SER LO QUE SALIO POR EL CABLE, y hasta el 2026-09-03 este
+# aviso lo daba por hecho. Visto en vivo el 2026-09-02, en un fast-forward: el
+# hook ofrecio armar el vigia sobre un commit que no se habia empujado, y el
+# vigia contesto «NO RUN EXISTS» — cierto, e inutil.
+#
+# No es el defecto del prefijo que se arreglo aquel dia: el SHA es entero y
+# correcto, solo que no es el que salio. Un aviso que apunta al commit
+# equivocado ensena a ignorar el hook, que es lo que este archivo existe para
+# evitar.
+#
+# LA SALIDA NO ES ADIVINAR EL REFSPEC. Sacar de la linea del push que commit
+# salio es exactamente lo que la cabecera de arriba rechazo por escrito dos
+# veces, y repetirlo seria deshacer dos decisiones sin decirlo. Lo que se hace
+# es lo contrario: DECIR CUANDO NO SE PUEDE ESTAR SEGURO. Si el comando nombra
+# una referencia, el aviso lo dice y deja la comprobacion a quien lee; si no
+# nombra ninguna, HEAD es lo que sale y no hay nada que advertir.
+#
+# «Nombra una referencia» se lee sin interpretarla: se recorta el comando desde
+# `git push` hasta el final de ESE comando, se tiran las banderas y el remoto, y
+# lo que quede es un refspec. `HEAD` y `HEAD:algo` no cuentan, porque nombran
+# justamente lo que el aviso ya va a decir.
+#
+# Medido por tuberia el 2026-09-03 con once casos: cinco anaden el OJO —rama,
+# rama:otra, -u origin rama, el remoto entrecomillado y el push encadenado tras
+# &&—, tres suenan sin el —`git push` a secas, `git push origin` y `HEAD:rama`,
+# que son los tres en los que HEAD SI es lo que sale— y tres callan: el heredoc
+# que cita una orden de push, `git pushd` y un push dentro de un echo.
+refspec=$(printf '%s\n' "$stripped" \
+  | sed -n 's/.*git[[:space:]][[:space:]]*push[[:space:]]*//p' \
+  | sed 's/[;&|].*//' \
+  | tr -d '\042\047' \
+  | tr ' \t' '\n\n' \
+  | grep -v '^-' \
+  | grep -v '^$' \
+  | tail -n +2 \
+  | head -1)
+
 printf 'EL PUSH NO FALLO. Falta el vigia: CI se mira con Monitor y eng/watch-ci.ps1, nunca con un bucle a mano, ni con gh run list repetido, ni esperando a que salga solo (CLAUDE.md).\n' >&2
 printf 'Armalo ahora, antes de seguir:\n' >&2
 printf '  Monitor(command: "pwsh -NoProfile -File eng/watch-ci.ps1 -Sha %s 2>&1", timeout_ms: 3600000)\n' "$sha" >&2
+if [ -n "$refspec" ] && [ "${refspec%%:*}" != "HEAD" ]; then
+  printf 'OJO: ese SHA es HEAD de este arbol, y el push nombra «%s». Si no son el mismo commit, el vigia contestara «NO RUN EXISTS» con razon: comprueba con `git rev-parse %s` y arma el vigia sobre ESE.\n' "$refspec" "${refspec%%:*}" >&2
+fi
 printf 'Un run tarda 42-53 min y el guion late cada 30, asi que su silencio inicial es normal y NO prueba que este armado. Sin el verde leido, main no avanza.\n' >&2
 exit 2

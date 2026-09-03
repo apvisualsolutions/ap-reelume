@@ -91,16 +91,32 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </DataTemplate>
         </ComboBox.ItemTemplate>
       </ComboBox>
-      <NumericUpDown
-          x:Name="MarkerStartSelector"
-          Minimum="0"
-          Value="{Binding StartSeconds, Mode=TwoWay}"
-          automation:AutomationProperties.Name="{DynamicResource MarkerEditorStartLabel}" />
-      <NumericUpDown
-          x:Name="MarkerEndSelector"
-          Minimum="0"
-          Value="{Binding EndSeconds, Mode=TwoWay}"
-          automation:AutomationProperties.Name="{DynamicResource MarkerEditorEndLabel}" />
+      <!--
+        Each spinner carries its label over it, which is what the prototype draws: a small dimmed
+        overline above the field rather than a name only a screen reader could hear. Until 2026-09-03
+        the two numbers sat side by side with nothing saying which was which, and the only answer to
+        «is this the start or the end?» was to tab into it and listen.
+
+        The heading is its own string and the label keeps ordinary case, because the label is still
+        the spinner's accessible name: shouting the resource would have the name announced in
+        capitals. AudioOutputView made the same pair for the same reason.
+      -->
+      <StackPanel Spacing="{DynamicResource Space4}">
+        <TextBlock Classes="player-overline" Text="{DynamicResource MarkerEditorStartHeading}" />
+        <NumericUpDown
+            x:Name="MarkerStartSelector"
+            Minimum="0"
+            Value="{Binding StartSeconds, Mode=TwoWay}"
+            automation:AutomationProperties.Name="{DynamicResource MarkerEditorStartLabel}" />
+      </StackPanel>
+      <StackPanel Spacing="{DynamicResource Space4}">
+        <TextBlock Classes="player-overline" Text="{DynamicResource MarkerEditorEndHeading}" />
+        <NumericUpDown
+            x:Name="MarkerEndSelector"
+            Minimum="0"
+            Value="{Binding EndSeconds, Mode=TwoWay}"
+            automation:AutomationProperties.Name="{DynamicResource MarkerEditorEndLabel}" />
+      </StackPanel>
     </WrapPanel>
 
     <TextBlock

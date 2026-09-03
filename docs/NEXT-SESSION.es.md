@@ -1,5 +1,100 @@
 # Dónde retomar
 
+> ## RELEVO — 2026-09-03, vigésima sesión: la versalita no era una, eran seis, y el umbral que la medía era de otro tamaño de letra
+>
+> **La mitad tipográfica de la tanda 2 está hecha.** Seis clases de versalita donde había tres, cada
+> una emparejada con su elemento del prototipo y con el número **leído** del diseño — la forma que
+> `ADR-0007` puso sobre los botones, aplicada a «todos los elementos».
+>
+> ### Las dos mitades del relevo anterior eran cortas, y medirlas cambió el trabajo
+>
+> «El prototipo la usa en 35 sitios y el árbol en dos» — ni una cosa ni la otra. El árbol la dibujaba
+> en **dieciséis sitios con tres clases**, y el diseño no dibuja una versalita sino **nueve
+> combinaciones** distintas de tamaño, peso y separación. **Poner una sola clase en los 35 habría
+> inventado una uniformidad que el diseño no tiene**, que es el defecto de `ADR-0007` apuntando en la
+> otra dirección. Seis tienen sitio en este árbol; las otras tres no, y cada una dice por qué.
+>
+> ### Lo que se ve distinto ahora
+>
+> · El antetítulo de la portada dibujaba **12 donde el diseño dibuja 10,5**, y su comentario afirmaba
+>   una separación de 0,16em cuando es 0,18em: **acertaba el número por casualidad** —0,16×12 y
+>   0,18×10,5 dan 1,92 y 1,89, y estaba escrito 1,9— mientras erraba el tamaño en un tamaño y medio.
+> · Las ocho cabeceras de la tabla de duplicados eran **las únicas mayúsculas de toda la aplicación
+>   sin separación entre letras**, que es lo único que todas las versalitas del diseño hacen.
+> · Los dos campos de tiempo de un marcador **no tenían etiqueta visible**: la única forma de saber
+>   cuál era el principio era tabular hasta él y escuchar.
+>
+> ### La trampa que costó una hipótesis falsa: el umbral de tinta era el de otro tamaño de letra
+>
+> La primera lectura del píxel dijo que la separación más pequeña **no llegaba a la pantalla** con
+> una palabra corta. Era **falso**, y lo dijo medir el aparato en vez de creerle: con el umbral de
+> 110 que usa la puerta de los botones, el lector **perdía la «I» inicial de «INICIO» en cuatro de
+> las seis clases** y casi toda la más pequeña — contaba 12 px de tinta donde la clase dibuja 30. La
+> letra de 10 px es fina y sus astas no alcanzan un umbral calibrado para una etiqueta de 14.
+>
+> **Y 200 tampoco es una adivinanza**: la lectura es idéntica a 200, 230 y 245, así que cualquier
+> valor de esa banda encuentra la misma tinta y el blanco de la escena —255— se queda fuera. **Ese
+> tramo plano es lo que hace el número seguro en vez de afortunado.** La skill de medir píxeles ya
+> avisaba de que un umbral solo mide lo que no querías; lo que faltaba es que **el umbral bueno
+> depende del tamaño de la letra**.
+>
+> ### Un comentario nombraba un mecanismo que no existe
+>
+> El fichero de estilos decía que las mayúsculas «vienen de `UpperCaseConverter`, que es lo que AXAML
+> tiene en lugar de `text-transform`», y que **no** se escriben en el recurso. Buscado: **no hay tal
+> conversor en este árbol** y dieciséis recursos están escritos en mayúsculas. La vista de al lado
+> explica lo contrario y es la mitad que era cierta. **El defecto de la casa apuntado a su propia
+> documentación.**
+>
+> ### El punto ciego de la puerta nueva, escrito dentro de ella
+>
+> El censo encuentra los sitios donde **el árbol** dibuja mayúsculas. Un sitio que el diseño dibuja
+> en versalita y el árbol dibuja plano **es invisible para él**: no hay cadena gritada que encontrar.
+> Nada mide esa dirección, así que se lleva a mano en una lista cerrada de cuatro entradas, y **una
+> entrada es el único registro de que alguien miró** — que es la situación en la que `ADR-0007`
+> encontró diez clases de botón.
+>
+> ### El hook del post-push ya dice cuándo no puede estar seguro
+>
+> El hallazgo que el relevo anterior dejó abierto, cerrado por **la vía que él mismo proponía**: no
+> se adivina el refspec —lo que la cabecera de ese archivo rechazó por escrito dos veces— sino que
+> **el aviso dice cuándo no puede estar seguro**. Si el comando nombra una referencia, lo advierte y
+> deja la comprobación a quien lee. Medido por tubería con **once casos**: cinco añaden la
+> advertencia, tres suenan sin ella —los tres en que HEAD sí es lo que sale— y tres callan.
+>
+> ### LO SIGUIENTE
+>
+> **1. Los radios**, que es la otra mitad de la tanda 2 y la más grande: 88 sitios gastan tres
+> valores mientras el diseño dibuja doce. Cinco discrepancias ya medidas siguen en pie —`poster-chip`
+> 999 vs 4, `setting-row` 10 vs 8, `candidate-card` 10 vs 8, `state-chip` 999 vs 8 y la fila de
+> `side-list` 7 vs 4—. El mecanismo ya está construido y probado dos veces.
+>
+> **2. Las vistas que hay que tomar enteras**, y la lista empieza por una nombrada: **el rótulo del
+> hilo de un curso**. El árbol lo dibuja como subtítulo de 20 px y el diseño como versalita de 10 en
+> la tinta del acento, dándole el peso a la lección de debajo. **Cambiar sólo la letra dejaría esa
+> tarjeta a medio camino entre dos diseños.**
+>
+> **3. `CRS-002/003/005` a `VERIFIED`.**
+>
+> ### Las trampas que deja esta tanda
+>
+> · **UN UMBRAL DE MEDICIÓN ES UN PARÁMETRO DE LA MEDICIÓN, NO UNA CONSTANTE DEL REPOSITORIO.** El
+>   110 que sirve para una etiqueta de 14 px miente sobre una de 10, y mintió con aplomo: dio un
+>   número creíble —12 px— y una conclusión falsa. **Lo que lo cerró fue barrer el umbral y buscar el
+>   tramo plano**, no elegir otro número mejor.
+> · **Un comentario puede describir con precisión un mecanismo que nadie construyó**, y sobrevive
+>   porque suena a decisión. Dos comentarios de este árbol se contradecían y el correcto era el que
+>   estaba pegado al código.
+> · **Un nombre que invita al uso equivocado hace que el error ocurra dos veces.** `card-eyebrow` no
+>   llevaba separación ninguna y once de sus doce sitios dibujaban versalita apretada; su propio
+>   comentario decía «sin que ninguno grite» mientras once de sus lectores gritaban.
+> · **Una clase declarada que ninguna vista usa es el defecto de la casa en el fichero de estilos**, y
+>   las dos mitades de la puerta no lo ven: una clase emparejada y con los números correctos las pasa
+>   las dos sin que nadie la haya pedido nunca. Tiene prueba propia.
+> · **Gritar un recurso que además es el nombre accesible de un campo hace que un lector de pantalla
+>   anuncie el nombre del campo a gritos.** Se separa en dos cadenas, la que se pinta y la que se
+>   anuncia.
+
 > ## RELEVO — 2026-09-02, decimonovena sesión: las tres listas de radios, y una premisa del relevo anterior que era falsa
 >
 > **La tanda 1 está hecha y cerrada.** Las tres listas del panel del reproductor —pista de audio,

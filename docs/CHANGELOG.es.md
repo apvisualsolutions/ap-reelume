@@ -10,6 +10,47 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La versalita deja de ser una y pasa a ser seis, que es lo que el prototipo dibuja.** El árbol
+  gastaba tres clases en dieciséis sitios; el diseño dibuja **nueve combinaciones** distintas de
+  tamaño, peso y separación entre letras en treinta y cinco. Poner una sola clase en los treinta y
+  cinco habría inventado una uniformidad que el diseño no tiene, que es el defecto de
+  [ADR-0007](adr/0007-every-element-matches-the-prototype.md) apuntando en la otra dirección.
+
+  **Las seis se emparejan con su elemento del prototipo y el número se LEE del diseño**, no se
+  repite, que es la forma que aquel documento puso sobre los botones. `OverlineTests` lo hace cumplir
+  por las dos mitades: el árbol dibuja lo que la tabla dice, y la tabla dice lo que el diseño dibuja.
+
+  **Tres discrepancias que se ven**: el antetítulo de la portada dibujaba 12 donde el diseño dibuja
+  10,5 —y su comentario afirmaba una separación de 0,16em cuando es 0,18em, acertando el número por
+  casualidad mientras erraba el tamaño—; las ocho cabeceras de la tabla de duplicados eran las
+  **únicas mayúsculas de toda la aplicación sin separación entre letras**; y el rótulo de «siguiente
+  episodio» llevaba la clase de la portada, que es otra versalita.
+
+- **Los dos campos de tiempo de un marcador ganan su etiqueta visible.** El diseño dibuja «INICIO» y
+  «FIN» sobre ellos y el árbol sólo tenía un nombre accesible, así que la única forma de contestar
+  «¿cuál de estos dos números es el principio?» era tabular hasta él y escuchar.
+
+### Corregido
+
+- **«Confianza» deja de estar en mayúsculas**, porque el diseño no la grita: la dibuja a 12 px en la
+  tinta secundaria y en minúscula, con la cifra en semi-negrita al lado.
+
+- **La ruta de la carpeta se separa en dos cadenas**, la que se pinta y la que se anuncia. Ese texto
+  es también el nombre accesible del campo, así que escribirlo en mayúsculas hacía que un lector de
+  pantalla anunciara el nombre del campo a gritos. Es la pareja que el panel de audio ya usaba.
+
+- **Un comentario del fichero de estilos nombraba un mecanismo que no existe.** Decía que las
+  mayúsculas vienen de un conversor «que es lo que AXAML tiene en lugar de `text-transform`» y que no
+  se escriben en el recurso. **No hay tal conversor en este árbol** y dieciséis recursos están
+  escritos en mayúsculas; la vista de al lado explica lo contrario y es la mitad que era cierta.
+
+- **`card-eyebrow` pasa a llamarse `card-caption` y se queda con un solo lector.** Una «eyebrow» es
+  una versalita y esa clase no lleva separación ninguna, así que once de sus doce sitios dibujaban
+  mayúsculas apretadas. Su propio comentario ya decía «sin que ninguno grite» mientras once de sus
+  lectores gritaban: **un nombre que invita al uso equivocado es cómo eso ocurre dos veces.**
+
+### Añadido
+
 - **Las tres listas del panel del reproductor dejan de ser desplegables y pasan a ser listas de
   radios**, que es lo que el prototipo dibuja: pista de audio, dispositivo de salida y subtítulos.
   Con tres o cuatro opciones que caben, un desplegable cobra un clic sólo por enterarse de cuáles

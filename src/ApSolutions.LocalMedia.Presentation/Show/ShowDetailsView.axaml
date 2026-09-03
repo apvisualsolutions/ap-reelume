@@ -152,8 +152,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   CornerRadius="{DynamicResource CornerRadiusMedium}">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
                 <StackPanel VerticalAlignment="Center">
+                  <!--
+                    The field label and not the hero's kicker, which is what this wore until
+                    2026-09-03: the design draws «SIGUIENTE EPISODIO» at 11/.06em, the same overline
+                    it puts over «UBICACIÓN DEL ARCHIVO», while the hero's is 10.5 at three times the
+                    tracking. Two overlines that look alike in a screenshot are two different ones in
+                    the design, and this card is not a hero.
+                  -->
                   <TextBlock
-                      Classes="hero-overline"
+                      Classes="section-overline"
                       Foreground="{DynamicResource PlayerTextSecondaryBrush}"
                       Text="{DynamicResource ShowNextEpisodeHeading}" />
                   <TextBlock

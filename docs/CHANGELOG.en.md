@@ -10,6 +10,47 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The overline stops being one and becomes six, which is what the prototype draws.** The tree spent
+  three classes over sixteen sites; the design draws **nine distinct combinations** of size, weight
+  and tracking over thirty-five. Putting one class on all thirty-five would have invented a
+  uniformity the design does not have, which is
+  [ADR-0007](adr/0007-every-element-matches-the-prototype.md)'s defect pointing the other way.
+
+  **Each of the six is paired with its prototype control and the number is READ from the design**
+  rather than restated, which is the arrangement that ADR put over the buttons. `OverlineTests`
+  enforces both halves: the tree draws what the table says, and the table says what the design draws.
+
+  **Three visible divergences**: the hero's kicker drew 12 where the design draws 10.5 — and its
+  comment claimed a tracking of 0.16em when it is 0.18em, getting the number right by coincidence
+  while getting the size wrong; the duplicates table's eight column headings were the **only capitals
+  in the whole application with no tracking**; and the «next episode» label wore the hero's class,
+  which is a different overline.
+
+- **A marker's two time fields gain their visible label.** The design draws «INICIO» and «FIN» over
+  them and the tree had only an accessible name, so the only way to answer «which of these two
+  numbers is the start?» was to tab into it and listen.
+
+### Fixed
+
+- **«Confianza» stops being shouted**, because the design does not shout it: it draws it at 12 px in
+  the secondary ink in ordinary case, with the figure in semi-bold beside it.
+
+- **The folder path splits into two strings**, the painted one and the announced one. That string is
+  also the field's accessible name, so writing it in capitals had a screen reader announce the
+  field's name shouted. It is the pair the audio panel already used.
+
+- **A comment in the token file named a mechanism that does not exist.** It said the capitals came
+  from a converter «which is what AXAML has instead of `text-transform`» and were not written into
+  the resource. **There is no such converter in this tree** and sixteen resources are written in
+  capitals; the view next door explains the opposite, and that half was true.
+
+- **`card-eyebrow` is renamed `card-caption` and keeps a single reader.** An eyebrow is an overline
+  and that class carries no tracking at all, so eleven of its twelve sites drew capitals packed
+  together. Its own comment already said «without any of them shouting» while eleven of its readers
+  shouted: **a name that invites the wrong use is how that happens twice.**
+
+### Added
+
 - **The player panel's three lists stop being drop-downs and become lists of radios**, which is what
   the prototype draws: audio track, output device and subtitles. With three or four choices that fit
   on the surface, a drop-down charges a click just to learn what the others are. The numbers come

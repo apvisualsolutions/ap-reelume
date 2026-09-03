@@ -78,7 +78,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
             <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="!" />
             <TextBlock
-                FontSize="{DynamicResource FontSizeCaption}"
+                Classes="notice-overline"
                 Foreground="{DynamicResource TextSecondaryBrush}"
                 Text="{DynamicResource UpdateRejectionReasonLabel}" />
           </StackPanel>

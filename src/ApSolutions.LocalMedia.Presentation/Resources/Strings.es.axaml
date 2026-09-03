@@ -50,6 +50,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootRemoveConfirmAction">Retirar del catálogo</x:String>
   <x:String x:Key="RootRemoveCancelAction">Cancelar</x:String>
   <x:String x:Key="RootPathLabel">Ruta de la carpeta</x:String>
+  <x:String x:Key="RootPathHeading">RUTA DE LA CARPETA</x:String>
   <x:String x:Key="RootKindLocal">Local</x:String>
   <x:String x:Key="RootKindUsb">USB</x:String>
   <x:String x:Key="RootKindUnc">UNC o NAS</x:String>
@@ -127,8 +128,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RecoveryAccessibleName">Recuperación segura de la biblioteca</x:String>
   <x:String x:Key="RecoveryTitle">La biblioteca necesita atención</x:String>
   <x:String x:Key="RecoveryDescription">La base activa y la copia previa se han conservado intactas. Revisa las rutas antes de continuar.</x:String>
-  <x:String x:Key="RecoveryDatabasePathLabel">Base de datos activa</x:String>
-  <x:String x:Key="RecoveryBackupPathLabel">Copia previa</x:String>
+  <x:String x:Key="RecoveryDatabasePathLabel">BASE DE DATOS ACTIVA</x:String>
+  <x:String x:Key="RecoveryBackupPathLabel">COPIA PREVIA</x:String>
   <x:String x:Key="RecoveryOpenBackupFolder">Abrir carpeta de la copia</x:String>
   <x:String x:Key="RecoveryExit">Salir</x:String>
   <x:String x:Key="LibraryAccessibleName">Biblioteca local</x:String>
@@ -181,7 +182,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MarkerOverlapConsequence">Dos marcadores solapados hacen ambiguo el botón de saltar.</x:String>
   <x:String x:Key="MetadataEditorTabLabel">Metadatos</x:String>
   <x:String x:Key="RenamePreviewTabLabel">Renombrado seguro</x:String>
-  <x:String x:Key="UpdateRejectionReasonLabel">Motivo del rechazo</x:String>
+  <x:String x:Key="UpdateRejectionReasonLabel">MOTIVO DEL RECHAZO</x:String>
   <x:String x:Key="UpdateNothingInstalledNotice">No se instaló nada. La versión que tienes sigue intacta.</x:String>
   <x:String x:Key="UpdateRejectionDetailAction">Ver el detalle técnico</x:String>
   <x:String x:Key="BackupHistoryEmptyTitle">Ninguna copia todavía</x:String>
@@ -235,7 +236,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ReviewLoadMoreAction">Cargar más</x:String>
   <x:String x:Key="ReviewConflictMessage">La coincidencia cambió en otra operación. Se conserva la decisión ya guardada.</x:String>
   <x:String x:Key="ReviewProposedCandidate">CANDIDATO PROPUESTO</x:String>
-  <x:String x:Key="ReviewConfidence">CONFIANZA</x:String>
+  <x:String x:Key="ReviewConfidence">Confianza</x:String>
   <x:String x:Key="ReviewStatusPending">Pendiente</x:String>
   <x:String x:Key="ReviewStatusSuggested">Sugerida</x:String>
   <x:String x:Key="ReviewExplanationHeading">SEÑALES CONSIDERADAS</x:String>
@@ -420,6 +421,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MarkerEditorListName">Lista de marcas</x:String>
   <x:String x:Key="MarkerEditorKindLabel">Tipo de marca</x:String>
   <x:String x:Key="MarkerEditorStartLabel">Inicio (segundos)</x:String>
+  <x:String x:Key="MarkerEditorStartHeading">INICIO</x:String>
+  <x:String x:Key="MarkerEditorEndHeading">FIN</x:String>
   <x:String x:Key="MarkerEditorEndLabel">Fin (segundos)</x:String>
   <x:String x:Key="MarkerEditorRangeError">El inicio debe ser menor que el fin y la marca debe caber dentro del episodio.</x:String>
   <x:String x:Key="MarkerEditorOverlapError">Ya hay una marca de ese tipo en esos segundos.</x:String>
@@ -760,7 +763,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
        which is the signal ADR-0006 decision 2 says belongs to the user. Do not reword it.
        AddCourseShape is a tree in the monospaced face rather than a picture — the owner's call, and
        there is no binary to keep, nothing to translate twice, and it scales with the type. -->
-  <x:String x:Key="AddAsLabel">Catalogar como</x:String>
+  <x:String x:Key="AddAsLabel">CATALOGAR COMO</x:String>
   <x:String x:Key="AddAsRootOption">Raíz de medios</x:String>
   <x:String x:Key="AddCourseShapeLabel">Así se ve un curso</x:String>
   <x:String x:Key="AddCourseShape">Curso de composición&#10;├─ 01 - Módulo uno&#10;│  ├─ 01 - Intro.mp4&#10;│  └─ 02 - El nodo.mp4&#10;└─ 02 - Módulo dos&#10;   └─ 01 - Máscaras.mp4</x:String>

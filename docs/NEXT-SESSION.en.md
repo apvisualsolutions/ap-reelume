@@ -1,5 +1,98 @@
 # Where to pick up
 
+> ## HANDOVER — 2026-09-03, twentieth session: the overline was not one but six, and the threshold measuring it belonged to another size of type
+>
+> **The typographic half of batch 2 is done.** Six overline classes where there were three, each
+> paired with its prototype element and with the number **read** from the design — the arrangement
+> `ADR-0007` put over the buttons, applied to "every element".
+>
+> ### Both halves of the last handover were short, and measuring them changed the job
+>
+> "The prototype uses it in 35 places and the tree in two" — neither. The tree drew it in **sixteen
+> places across three classes**, and the design draws not one overline but **nine distinct
+> combinations** of size, weight and tracking. **Putting one class on all 35 would have invented a
+> uniformity the design does not have**, which is `ADR-0007`'s defect pointing the other way. Six
+> have somewhere to live in this tree; the other three do not, and each says why.
+>
+> ### What looks different now
+>
+> · The hero's kicker drew **12 where the design draws 10.5**, and its comment claimed a tracking of
+>   0.16em when it is 0.18em: **it got the number right by coincidence** — 0.16×12 and 0.18×10.5 are
+>   1.92 and 1.89, and 1.9 was written — while getting the size wrong by a size and a half.
+> · The duplicates table's eight column headings were **the only capitals in the whole application
+>   with no tracking**, which is the one thing every overline in the design does.
+> · A marker's two time fields **had no visible label**: the only way to know which was the start was
+>   to tab into it and listen.
+>
+> ### The trap that cost a false hypothesis: the ink threshold belonged to another size of type
+>
+> The first pixel reading said the smallest tracking **was not reaching the screen** with a short
+> word. It was **false**, and measuring the instrument rather than trusting it is what said so: at
+> the threshold of 110 the button gate uses, the reader **lost the leading "I" of "INICIO" in four of
+> the six classes** and most of the smallest one — it counted 12 px of ink where the class draws 30.
+> Ten-pixel type is thin and its stems never reach a threshold calibrated for a 14 px label.
+>
+> **And 200 is not a guess either**: the reading is identical at 200, 230 and 245, so anything in
+> that band finds the same ink and the scene's own white — 255 — stays out of it. **That flat stretch
+> is what makes the number safe rather than lucky.** The pixel-measuring skill already warned that
+> one threshold measures what you did not want; what was missing is that **the right threshold
+> depends on the size of the type**.
+>
+> ### A comment named a mechanism that does not exist
+>
+> The token file said the capitals "come from `UpperCaseConverter`, which is what AXAML has instead
+> of `text-transform`", and that they are **not** written into the resource. Searched: **there is no
+> such converter in this tree** and sixteen resources are written in capitals. The view next door
+> explains the opposite and that was the half that was true. **This repository's own defect pointed
+> at its documentation.**
+>
+> ### The new gate's blind side, written inside it
+>
+> The census finds the places **the tree** draws capitals. A place the design draws in capitals and
+> the tree draws flat **is invisible to it**: there is no shouted string to find. Nothing measures
+> that direction, so it is kept by hand in a closed list of four entries, and **an entry is the only
+> record that somebody looked** — which is the state `ADR-0007` found ten button classes in.
+>
+> ### The post-push hook now says when it cannot be sure
+>
+> The finding the last handover left open, closed **by the route it proposed itself**: the refspec is
+> not guessed — which that file's header rejected in writing twice — instead **the warning says when
+> it cannot be sure**. If the command names a reference, it says so and leaves the check to whoever
+> reads it. Measured through a pipe with **eleven cases**: five add the warning, three sound without
+> it — the three where HEAD is what goes out — and three stay silent.
+>
+> ### WHAT IS NEXT
+>
+> **1. The radii**, which is batch 2's other and larger half: 88 sites spend three values while the
+> design draws twelve. Five measured divergences still stand — `poster-chip` 999 vs 4, `setting-row`
+> 10 vs 8, `candidate-card` 10 vs 8, `state-chip` 999 vs 8 and `side-list`'s row 7 vs 4. The
+> machinery is built and has now been proven twice.
+>
+> **2. The views that have to be taken whole**, and the list opens with one already named: **the
+> course thread's kicker**. The tree draws it as a 20 px subtitle and the design as a 10 px overline
+> in the accent ink, giving the weight to the lesson below. **Changing only the type would leave that
+> card half in each design.**
+>
+> **3. `CRS-002/003/005` to `VERIFIED`.**
+>
+> ### The traps this batch leaves
+>
+> · **A measurement threshold is a parameter of the measurement, not a constant of the repository.**
+>   The 110 that serves a 14 px label lies about a 10 px one, and it lied with poise: it returned a
+>   plausible number — 12 px — and a false conclusion. **What closed it was sweeping the threshold
+>   and looking for the flat stretch**, not picking a better number.
+> · **A comment can describe precisely a mechanism nobody built**, and it survives because it reads
+>   like a decision. Two comments in this tree contradicted each other and the correct one was the
+>   one sitting next to the code.
+> · **A name that invites the wrong use makes the mistake happen twice.** `card-eyebrow` carried no
+>   tracking at all and eleven of its twelve sites drew packed capitals; its own comment said
+>   "without any of them shouting" while eleven of its readers shouted.
+> · **A declared class no view wears is this repository's defect in the token file**, and the gate's
+>   two halves cannot see it: a class that is paired and draws the right numbers passes both without
+>   anybody ever having asked for it. It has a test of its own.
+> · **Shouting a resource that is also a field's accessible name has a screen reader announce the
+>   field's name shouted.** It splits into two strings, the painted one and the announced one.
+
 > ## HANDOVER — 2026-09-02, nineteenth session: the three lists of radios, and a premise from the last handover that was false
 >
 > **Batch 1 is done and closed.** The player panel's three lists — audio track, output device and

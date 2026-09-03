@@ -33,8 +33,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     -->
     <StackPanel IsVisible="{Binding HasDatabasePath}" Spacing="{DynamicResource Space4}">
       <TextBlock
-          FontSize="{DynamicResource FontSizeCaption}"
-          Foreground="{DynamicResource TextSecondaryBrush}"
+          Classes="group-overline"
           Text="{DynamicResource RecoveryDatabasePathLabel}" />
       <TextBlock
           x:Name="BackupDatabasePathText"

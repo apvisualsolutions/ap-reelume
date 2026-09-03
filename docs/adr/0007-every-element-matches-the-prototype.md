@@ -133,7 +133,29 @@ dar un número perfectamente creíble**, que es esta misma decisión aplicada a 
 
 **Y la decisión no se limita a los botones**: dice «todos los elementos». Los `Border`, `TextBox` y
 `ComboBox` gastan los mismos tres tokens en ochenta y cinco sitios mientras el prototipo dibuja doce
-radios distintos. Eso es la tanda siguiente, y ya puede medirse contra la pantalla.
+radios distintos. Eso sigue pendiente, y ya puede medirse contra la pantalla.
+
+### La enmienda del 2026-09-03: la versalita no era una, y la puerta que la mide tiene un lado ciego
+
+Lo mismo que esta decisión encontró en los radios volvió a aparecer en la tipografía, y con la misma
+forma: **el árbol gastaba tres clases donde el diseño dibuja nueve combinaciones** de tamaño, peso y
+separación entre letras. Emparejadas una a una, seis tienen sitio en este árbol y las otras tres no
+—una es andamiaje del propio prototipo, otra pertenece a un menú que aquí no existe y la tercera la
+pinta la plantilla de un desplegable—.
+
+**El mecanismo es el de esta decisión sin cambios**: cada clase emparejada con su elemento del
+prototipo, y el número **leído** del diseño en vez de repetido. Lo hace cumplir `OverlineTests`.
+
+**Lo que añade es una tercera clase de razón para no emparejar.** Los botones tenían dos —el diseño
+calla, o la superficie que dibuja no es el control—. Aquí aparece la que faltaba: **el diseño habla y
+este árbol no tiene dónde decirlo**, porque la superficie no existe todavía. «El diseño no lo dibuja»
+sería falso sobre las cuatro entradas de esa lista, así que se escribe como lo que es.
+
+**Y una consecuencia sobre las puertas de este ADR, que conviene tener a mano**: el censo de la
+versalita encuentra los sitios donde **el árbol** dibuja mayúsculas, así que un sitio que el diseño
+dibuja en versalita y el árbol dibuja plano **es invisible para él**. Nada mide esa dirección. Se
+lleva a mano en la lista cerrada, y una entrada es el único registro de que alguien miró — que es
+exactamente la situación en la que este ADR encontró diez clases de botón.
 
 ---
 
@@ -257,4 +279,26 @@ plausible number**, which is this same decision applied to its own tooling.
 
 **And the decision is not limited to buttons**: it says "every element". `Border`, `TextBox` and
 `ComboBox` spend the same three tokens across eighty-five sites while the design draws twelve
-distinct radii. That is the next batch, and it can now be measured against the screen.
+distinct radii. That is still open, and it can now be measured against the screen.
+
+### The 2026-09-03 amendment: the overline was not one, and the gate that measures it has a blind side
+
+What this decision found in the radii turned up again in the typography, in the same shape: **the
+tree spent three classes where the design draws nine combinations** of size, weight and tracking.
+Paired one by one, six have somewhere to live in this tree and three do not — one is the prototype's
+own scaffolding, one belongs to a menu that does not exist here, and the third is painted by a
+drop-down's template.
+
+**The mechanism is this decision's, unchanged**: each class paired with its prototype control, and
+the number **read** from the design rather than restated. `OverlineTests` enforces it.
+
+**What it adds is a third kind of reason not to pair.** The buttons had two — the design is silent,
+or the surface drawing it is not the control. Here the missing one appears: **the design speaks and
+this tree has nowhere to say it**, because the surface does not exist yet. "The design does not draw
+it" would be false about all four entries in that list, so it is written as what it is.
+
+**And a consequence about this ADR's gates worth keeping to hand**: the overline census finds the
+places **the tree** draws capitals, so a place the design draws in capitals and the tree draws flat
+**is invisible to it**. Nothing measures that direction. It is kept by hand in the closed list, and
+an entry is the only record that somebody looked — which is exactly the situation this ADR found ten
+button classes in.

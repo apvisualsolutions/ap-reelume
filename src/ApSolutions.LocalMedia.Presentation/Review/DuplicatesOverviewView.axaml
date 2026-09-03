@@ -118,14 +118,14 @@ positive surface, because "no duplicates" is the healthy answer, not a sad blank
                 Margin="0,4,0,0"
                 ColumnDefinitions="Auto,*,110,110,110,90,90,140,Auto"
                 ColumnSpacing="{DynamicResource Space8}">
-              <TextBlock Grid.Column="1" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnFile}" />
-              <TextBlock Grid.Column="2" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnResolution}" />
-              <TextBlock Grid.Column="3" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnCodec}" />
-              <TextBlock Grid.Column="4" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnAudio}" />
-              <TextBlock Grid.Column="5" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnSize}" />
-              <TextBlock Grid.Column="6" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnDuration}" />
-              <TextBlock Grid.Column="7" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnLocation}" />
-              <TextBlock Grid.Column="8" Classes="card-eyebrow" Text="{DynamicResource DuplicateColumnAvailability}" />
+              <TextBlock Grid.Column="1" Classes="column-overline" Text="{DynamicResource DuplicateColumnFile}" />
+              <TextBlock Grid.Column="2" Classes="column-overline" Text="{DynamicResource DuplicateColumnResolution}" />
+              <TextBlock Grid.Column="3" Classes="column-overline" Text="{DynamicResource DuplicateColumnCodec}" />
+              <TextBlock Grid.Column="4" Classes="column-overline" Text="{DynamicResource DuplicateColumnAudio}" />
+              <TextBlock Grid.Column="5" Classes="column-overline" Text="{DynamicResource DuplicateColumnSize}" />
+              <TextBlock Grid.Column="6" Classes="column-overline" Text="{DynamicResource DuplicateColumnDuration}" />
+              <TextBlock Grid.Column="7" Classes="column-overline" Text="{DynamicResource DuplicateColumnLocation}" />
+              <TextBlock Grid.Column="8" Classes="column-overline" Text="{DynamicResource DuplicateColumnAvailability}" />
             </Grid>
 
             <ItemsControl ItemsSource="{Binding Files}">

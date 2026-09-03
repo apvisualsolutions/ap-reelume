@@ -50,6 +50,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootRemoveConfirmAction">Remove from catalog</x:String>
   <x:String x:Key="RootRemoveCancelAction">Cancel</x:String>
   <x:String x:Key="RootPathLabel">Folder path</x:String>
+  <x:String x:Key="RootPathHeading">FOLDER PATH</x:String>
   <x:String x:Key="RootKindLocal">Local</x:String>
   <x:String x:Key="RootKindUsb">USB</x:String>
   <x:String x:Key="RootKindUnc">UNC or NAS</x:String>
@@ -127,8 +128,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RecoveryAccessibleName">Safe library recovery</x:String>
   <x:String x:Key="RecoveryTitle">The library needs attention</x:String>
   <x:String x:Key="RecoveryDescription">The active database and pre-migration copy remain intact. Review both paths before continuing.</x:String>
-  <x:String x:Key="RecoveryDatabasePathLabel">Active database</x:String>
-  <x:String x:Key="RecoveryBackupPathLabel">Pre-migration copy</x:String>
+  <x:String x:Key="RecoveryDatabasePathLabel">ACTIVE DATABASE</x:String>
+  <x:String x:Key="RecoveryBackupPathLabel">PRE-MIGRATION COPY</x:String>
   <x:String x:Key="RecoveryOpenBackupFolder">Open backup folder</x:String>
   <x:String x:Key="RecoveryExit">Exit</x:String>
   <x:String x:Key="LibraryAccessibleName">Local library</x:String>
@@ -181,7 +182,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MarkerOverlapConsequence">Two overlapping markers make the skip button ambiguous.</x:String>
   <x:String x:Key="MetadataEditorTabLabel">Metadata</x:String>
   <x:String x:Key="RenamePreviewTabLabel">Safe renaming</x:String>
-  <x:String x:Key="UpdateRejectionReasonLabel">Rejection reason</x:String>
+  <x:String x:Key="UpdateRejectionReasonLabel">REJECTION REASON</x:String>
   <x:String x:Key="UpdateNothingInstalledNotice">Nothing was installed. The version you have is untouched.</x:String>
   <x:String x:Key="UpdateRejectionDetailAction">See the technical detail</x:String>
   <x:String x:Key="BackupHistoryEmptyTitle">No copies yet</x:String>
@@ -235,7 +236,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ReviewLoadMoreAction">Load more</x:String>
   <x:String x:Key="ReviewConflictMessage">The match changed in another operation. The saved decision is preserved.</x:String>
   <x:String x:Key="ReviewProposedCandidate">PROPOSED CANDIDATE</x:String>
-  <x:String x:Key="ReviewConfidence">CONFIDENCE</x:String>
+  <x:String x:Key="ReviewConfidence">Confidence</x:String>
   <x:String x:Key="ReviewStatusPending">Pending</x:String>
   <x:String x:Key="ReviewStatusSuggested">Suggested</x:String>
   <x:String x:Key="ReviewExplanationHeading">SIGNALS CONSIDERED</x:String>
@@ -420,6 +421,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MarkerEditorListName">Marker list</x:String>
   <x:String x:Key="MarkerEditorKindLabel">Marker kind</x:String>
   <x:String x:Key="MarkerEditorStartLabel">Start (seconds)</x:String>
+  <x:String x:Key="MarkerEditorStartHeading">START</x:String>
+  <x:String x:Key="MarkerEditorEndHeading">END</x:String>
   <x:String x:Key="MarkerEditorEndLabel">End (seconds)</x:String>
   <x:String x:Key="MarkerEditorRangeError">The start must come before the end and the marker must fit inside the episode.</x:String>
   <x:String x:Key="MarkerEditorOverlapError">There is already a marker of that kind at those seconds.</x:String>
@@ -760,7 +763,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
        which is the signal ADR-0006 decision 2 says belongs to the user. Do not reword it.
        AddCourseShape is a tree in the monospaced face rather than a picture — the owner's call, and
        there is no binary to keep, nothing to translate twice, and it scales with the type. -->
-  <x:String x:Key="AddAsLabel">Catalogue as</x:String>
+  <x:String x:Key="AddAsLabel">CATALOGUE AS</x:String>
   <x:String x:Key="AddAsRootOption">Media root</x:String>
   <x:String x:Key="AddCourseShapeLabel">What a course looks like</x:String>
   <x:String x:Key="AddCourseShape">Compositing course&#10;├─ 01 - Module one&#10;│  ├─ 01 - Intro.mp4&#10;│  └─ 02 - The node.mp4&#10;└─ 02 - Module two&#10;   └─ 01 - Masks.mp4</x:String>
