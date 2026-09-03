@@ -36,6 +36,19 @@
 >   Rebased onto `ac208e9` it yields a tree verified dry, with no conflicts. **Delete the tag once
 >   integrated**; it is a rope, not a release point.
 >
+> **And the check that finds orphaned work does NOT certify that it no longer is.**
+> `git log --branches --tags --not --remotes` is what found that commit on no remote — the right
+> question, where the easy one («does the tag exist here?») does not answer it, because a local tag
+> survives a `gc` and a removed worktree but not a lost disk. But **after the tag is pushed that same
+> list still names the commit**: it compares against tracking branches, and a pushed tag creates
+> none. What settles it is `git ls-remote --tags origin`, which asks the remote. Measured 2026-09-04,
+> both directions.
+>
+> **The three worktrees were unregistered from git and their folders remain on disk**, because those
+> sessions still held files open when they were removed. Nothing was lost: the three
+> `apsolutionscode/*` branches still exist and all four commits are reachable. The folders can be
+> deleted by hand once those processes let go.
+>
 > ### Two measured defects left unfixed, each with its case
 >
 > · **`eng/watch-ci.ps1` announces «step ok» over steps that came out `skipped`.** Line 212: the

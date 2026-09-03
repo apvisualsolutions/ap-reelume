@@ -36,6 +36,19 @@
 >   empujada a origin. Rebasada sobre `ac208e9` da un árbol comprobado en seco, sin conflictos.
 >   **Bórrala cuando la integres**; es una cuerda, no un punto de publicación.
 >
+> **Y la comprobación que encuentra un trabajo huérfano NO sirve para certificar que ya no lo está.**
+> `git log --branches --tags --not --remotes` es lo que descubrió que ese commit no estaba en ningún
+> remoto — la pregunta correcta, donde la fácil («¿existe la etiqueta aquí?») no contesta, porque una
+> etiqueta local sobrevive a un `gc` y al borrado de un worktree pero no a perder el disco. Pero
+> **después de empujar la etiqueta esa misma lista sigue nombrando el commit**: compara contra ramas
+> de seguimiento, y una etiqueta empujada no crea ninguna. Lo que zanja es
+> `git ls-remote --tags origin`, que pregunta al remoto. Medido el 2026-09-04 en las dos direcciones.
+>
+> **Los tres worktrees quedaron desregistrados de git y sus carpetas siguen en disco**, porque las
+> sesiones aún tenían archivos abiertos cuando se retiraron. No se perdió nada: las tres ramas
+> `apsolutionscode/*` siguen existiendo y los cuatro commits son alcanzables. Las carpetas se pueden
+> borrar a mano cuando esos procesos suelten los archivos.
+>
 > ### Dos defectos medidos que quedan sin arreglar, los dos con su caso
 >
 > · **`eng/watch-ci.ps1` anuncia «step ok» sobre pasos que salieron `skipped`.** Línea 212: el filtro
