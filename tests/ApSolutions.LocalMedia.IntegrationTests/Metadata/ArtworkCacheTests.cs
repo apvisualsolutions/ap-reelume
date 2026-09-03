@@ -3,6 +3,7 @@
 
 using System.Net;
 using System.Text;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
 using ApSolutions.LocalMedia.IntegrationTests.Data;

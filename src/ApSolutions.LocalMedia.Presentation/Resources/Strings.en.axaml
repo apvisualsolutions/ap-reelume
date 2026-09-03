@@ -253,6 +253,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MetadataReleaseYearLabel">Release year</x:String>
   <x:String x:Key="MetadataGenresLabel">Comma-separated genres</x:String>
   <x:String x:Key="MetadataPosterLabel">Poster path</x:String>
+  <x:String x:Key="CoverChooseAction">Choose an image…</x:String>
+  <x:String x:Key="CoverChooseDialogTitle">Choose the cover</x:String>
+  <x:String x:Key="CoverChosenStatus">Cover set. It stays even if you look the details up again.</x:String>
+  <x:String x:Key="CoverNotAnImageStatus">That file is not one of the images this takes: JPG, PNG or WEBP.</x:String>
+  <x:String x:Key="CoverTooLargeStatus">That image is over 10 MB, which is the ceiling for a cover.</x:String>
+  <x:String x:Key="CoverEmptyStatus">That file is empty.</x:String>
+  <x:String x:Key="CoverNothingChosenStatus">No file was chosen.</x:String>
   <x:String x:Key="MetadataBackdropLabel">Backdrop path</x:String>
   <x:String x:Key="MetadataLockTitle">Lock title</x:String>
   <x:String x:Key="MetadataLockOriginalTitle">Lock original title</x:String>

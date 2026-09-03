@@ -132,7 +132,17 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<IPlaybackActivity>(),
                 provider.GetRequiredService<IScanActivity>(),
                 TimeProvider.System))
-            .AddTransient<ArtworkPickerViewModel>()
+            .AddTransient<SetPersonalCover>()
+            // LIB-018. The picker is handed the two things it cannot reach for itself: the system's
+            // own file dialog, which belongs to the host, and the use case that copies the chosen
+            // file in. Built with neither — which is what every test that only displays a picker
+            // does — its button refuses to be pressed rather than accepting a press and doing
+            // nothing.
+            .AddTransient(provider => new ArtworkPickerViewModel(
+                ChooseCoverFileAsync,
+                (titleId, path, describedAs, cancellationToken) => provider
+                    .GetRequiredService<SetPersonalCover>()
+                    .ExecuteAsync(titleId, path, describedAs, cancellationToken)))
             .AddSingleton<RenamePolicy>()
             .AddSingleton<PreviewRename>()
             .AddSingleton<ISafeFileRenamer>(provider => new SafeFileRenamer(

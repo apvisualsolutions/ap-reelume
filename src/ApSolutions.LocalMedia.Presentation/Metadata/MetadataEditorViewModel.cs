@@ -44,6 +44,12 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         _updateMetadata = updateMetadata ?? throw new ArgumentNullException(nameof(updateMetadata));
         _refreshMetadata = refreshMetadata ?? throw new ArgumentNullException(nameof(refreshMetadata));
         ArtworkPicker = artworkPicker ?? throw new ArgumentNullException(nameof(artworkPicker));
+
+        // The editor listens rather than the picker reaching back into it: a cover that has been
+        // imported is a new path for the poster field and a lock on it, and both of those are this
+        // view model's to write. Without the lock the next provider refresh would put the
+        // provider's artwork back over the one somebody chose, which is the whole point of LIB-011.
+        ArtworkPicker.PropertyChanged += OnPickerChanged;
         SaveCommand = new AsyncRelayCommand(SaveAsync);
         RefreshProviderCommand = new AsyncRelayCommand(() => RefreshAsync(restoreProviderFields: false));
         RestoreProviderCommand = new AsyncRelayCommand(() => RefreshAsync(restoreProviderFields: true));
@@ -167,9 +173,27 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         }
     }
 
+    private void OnPickerChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ArtworkPickerViewModel.SelectedPersonalPath)
+            || string.IsNullOrWhiteSpace(ArtworkPicker.SelectedPersonalPath))
+        {
+            return;
+        }
+
+        PosterPath = ArtworkPicker.SelectedPersonalPath;
+        LockPosterPath = true;
+    }
+
     private void ApplyCatalog(CatalogMetadata catalog)
     {
         _catalog = catalog;
+
+        // The picker needs to know which title a chosen cover belongs to, and it learns it here
+        // rather than in the constructor: the editor is reloaded with a new catalogue after every
+        // save and every refresh, and a target left behind would file the next cover under the last
+        // title somebody edited.
+        ArtworkPicker.Target = catalog.TitleId;
         Title = catalog.Metadata.Title;
         OriginalTitle = catalog.Metadata.OriginalTitle;
         Overview = catalog.Metadata.Overview;

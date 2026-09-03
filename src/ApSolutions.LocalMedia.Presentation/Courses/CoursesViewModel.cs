@@ -255,10 +255,11 @@ internal static class CourseText
     /// <c>ShellSurfaceIsolationTests</c>, which is where the cause was finally measured and gated.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// Delegates rather than repeating: the same three lines lived here and were wanted by the
+    /// metadata editor too, and two copies of a resource lookup is how one of them keeps asking for
+    /// the theme variant after the other stopped.
+    /// </summary>
     public static string Resource(string key, string fallback) =>
-        Avalonia.Application.Current is { } application
-            && application.TryGetResource(key, null, out var value)
-            && value is string text
-                ? text
-                : fallback;
+        PresentationText.Resource(key, fallback);
 }

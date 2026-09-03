@@ -51,9 +51,34 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </StackPanel>
       <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding LockGenres}" Content="{DynamicResource MetadataLockGenres}" automation:AutomationProperties.Name="{DynamicResource MetadataLockGenres}" />
 
+      <!--
+        The path stays editable and the button sits beside it, rather than replacing it: typing a
+        path is what LIB-011 actually verified and somebody's existing library depends on it, and a
+        chooser that hid the field would take that away to add something.
+
+        The button fills the poster field itself and ticks its lock, so a provider refresh cannot put
+        the provider's artwork back over a cover somebody chose. The outcome is said in words
+        underneath — every outcome, refusals included: a cover that did not change with nothing said
+        about it is the one failure this is most likely to produce.
+      -->
       <StackPanel Grid.Row="6" Spacing="{DynamicResource Space4}">
         <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataPosterLabel}" />
-        <TextBox Text="{Binding PosterPath}" automation:AutomationProperties.Name="{DynamicResource MetadataPosterLabel}" />
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
+          <TextBox Grid.Column="0" Text="{Binding PosterPath}" automation:AutomationProperties.Name="{DynamicResource MetadataPosterLabel}" />
+          <Button
+              Grid.Column="1"
+              x:Name="ChooseCoverAction"
+              Content="{DynamicResource CoverChooseAction}"
+              automation:AutomationProperties.Name="{DynamicResource CoverChooseAction}"
+              Command="{Binding ArtworkPicker.ChooseCoverCommand}" />
+        </Grid>
+        <TextBlock
+            FontSize="{DynamicResource FontSizeCaption}"
+            Foreground="{DynamicResource TextSecondaryBrush}"
+            IsVisible="{Binding ArtworkPicker.HasStatus}"
+            Text="{Binding ArtworkPicker.Status}"
+            TextWrapping="Wrap"
+            automation:AutomationProperties.LiveSetting="Polite" />
       </StackPanel>
       <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding LockPosterPath}" Content="{DynamicResource MetadataLockPoster}" automation:AutomationProperties.Name="{DynamicResource MetadataLockPoster}" />
 
