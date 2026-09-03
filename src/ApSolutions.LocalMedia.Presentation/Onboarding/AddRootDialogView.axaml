@@ -86,10 +86,7 @@ and never fed.
         offer.
       -->
       <StackPanel IsVisible="{Binding HasMarkCourse}" Spacing="{DynamicResource Space4}">
-        <TextBlock
-            FontSize="{DynamicResource FontSizeCaption}"
-            Foreground="{DynamicResource TextSecondaryBrush}"
-            Text="{DynamicResource AddAsLabel}" />
+        <TextBlock Classes="group-overline" Text="{DynamicResource AddAsLabel}" />
         <!--
           The choice travels as a word and not as {x:True}: this Avalonia carries no measurement of
           that markup extension here, and a parameter that silently arrives as the string "True"
@@ -123,9 +120,12 @@ and never fed.
       </StackPanel>
       <StackPanel DataContext="{Binding Onboarding}" Spacing="{DynamicResource Space16}">
         <StackPanel Spacing="{DynamicResource Space4}">
-          <TextBlock
-              Foreground="{DynamicResource TextPrimaryBrush}"
-              Text="{DynamicResource RootPathLabel}" />
+          <!--
+            The heading is its own string and the label stays in ordinary case, because the label is
+            also the text box's accessible name: shouting the resource would have a screen reader
+            announce the field's name in capitals. The pair is the one AudioOutputView already uses.
+          -->
+          <TextBlock Classes="group-overline" Text="{DynamicResource RootPathHeading}" />
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
             <TextBox
                 FontFamily="{DynamicResource FontFamilyMono}"

@@ -57,7 +57,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <StackPanel Grid.Column="1" Spacing="{DynamicResource Space12}">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
           <StackPanel Spacing="{DynamicResource Space4}">
-            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewPendingFile}" />
+            <TextBlock Classes="section-overline" Text="{DynamicResource ReviewPendingFile}" />
             <TextBlock
                 FontWeight="SemiBold"
                 Foreground="{DynamicResource TextPrimaryBrush}"
@@ -96,7 +96,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
         <Grid ColumnDefinitions="*,*" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Spacing="{DynamicResource Space4}">
-            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewProposedCandidate}" />
+            <TextBlock Classes="section-overline" Text="{DynamicResource ReviewProposedCandidate}" />
             <TextBlock
                 FontWeight="SemiBold"
                 Foreground="{DynamicResource TextPrimaryBrush}"
@@ -107,7 +107,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 Foreground="{DynamicResource TextSecondaryBrush}"
                 Text="{Binding KindKey, Converter={StaticResource ExplanationText}}" />
             <Grid Margin="0,4,0,0" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
-              <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewConfidence}" />
+              <TextBlock Classes="card-caption" Text="{DynamicResource ReviewConfidence}" />
               <TextBlock
                   Grid.Column="1"
                   FontSize="{DynamicResource FontSizeCaption}"
@@ -128,7 +128,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.AccessibilityView="Raw" />
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="{DynamicResource Space4}">
-            <TextBlock Classes="card-eyebrow" Text="{DynamicResource ReviewExplanationHeading}" />
+            <TextBlock Classes="section-overline" Text="{DynamicResource ReviewExplanationHeading}" />
             <ItemsControl ItemsSource="{Binding ExplanationCodes}">
               <ItemsControl.ItemTemplate>
                 <!-- x:DataType, because this control declares one and a template without its own inherits

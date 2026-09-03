@@ -28,8 +28,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{DynamicResource RecoveryDescription}"
           TextWrapping="Wrap" />
       <TextBlock
-          FontWeight="SemiBold"
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Classes="group-overline"
           Text="{DynamicResource RecoveryDatabasePathLabel}" />
       <TextBlock
           FontFamily="{DynamicResource FontFamilyMono}"
@@ -37,8 +36,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Text="{Binding DatabasePath}"
           TextWrapping="WrapWithOverflow" />
       <TextBlock
-          FontWeight="SemiBold"
-          Foreground="{DynamicResource TextPrimaryBrush}"
+          Classes="group-overline"
           Text="{DynamicResource RecoveryBackupPathLabel}" />
       <TextBlock
           FontFamily="{DynamicResource FontFamilyMono}"
