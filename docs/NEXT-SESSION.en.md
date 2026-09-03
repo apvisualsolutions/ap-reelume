@@ -54,10 +54,16 @@
 > still there and it costs collecting coverage from the gate too: that is its script, not a switch.
 >
 > **And the figure this repository quoted had been false for four days**: it said 42-53 minutes and
-> today it is **56 in ordinary hours and 79 in the worst**. Corrected with the measured breakdown,
-> which also names what comes next: **27 minutes in integration tests, 20 of them in four volume
-> tests** — and those same 536 tests take **1m17s on the developer's machine**. A factor of twenty
-> nobody has explained yet.
+> today it is **56 in ordinary hours and 79 in the worst**.
+>
+> **But the breakdown measured to explain it came from ONE run, and a parallel session corrected it
+> over seven.** It said «27 minutes in integration, 20 of them in four tests». The real median is
+> **11.8 minutes** — the seven give 7.5 / 9 / 11.6 / 11.8 / 12 / 14.8 and 27 — and it was not a slow
+> runner either: in that same run the other nine suites were normal or faster. The four volume tests
+> take **20 % of the work**, the same in the good run as in the bad; what blows up is **220 tests
+> that open a database**, each paying a fixed toll of nearly 22 seconds because they rebuild the
+> whole database and snapshot it before each of its 22 steps: 1.3 GB per run. **A red build on time
+> there can be the runner lottery rather than your change.**
 >
 > ### Decisions taken and NOT executed
 >

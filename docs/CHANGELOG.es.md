@@ -99,9 +99,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
   pieza aportaba de paso no es un ahorro.**
 
 - **Y la cifra que el proyecto citaba sobre lo que tarda CI llevaba cuatro días siendo falsa.** Decía
-  42-53 minutos; los cinco runs de hoy dieron **56 en horas normales y 79 en la peor**, sobre el
-  mismo trabajo. Queda corregida con el reparto medido paso a paso, que es lo que dice dónde está el
-  tiempo: **27 minutos en pruebas de integración**, y 20 de ellos en sólo cuatro pruebas de volumen.
+  42-53 minutos; hoy son **56 en horas normales y 79 en la peor**. Queda corregida con el reparto
+  medido paso a paso.
+
+  **Pero la primera lectura de ese reparto también era de un solo run, y una sesión paralela la
+  corrigió sobre siete.** Se dijo «27 minutos en integración, 20 de ellos en cuatro pruebas»: la
+  mediana real es **11,8 minutos** y ese 27 era el peor de los siete. Tampoco fue una máquina lenta
+  —en ese mismo run las otras nueve suites fueron normales—, y las cuatro pruebas se llevan **el
+  20 % del trabajo**, la misma proporción en el run bueno que en el malo. Lo que se dispara son 220
+  pruebas que abren base de datos. **Un rojo por tiempo en esa suite puede ser el sorteo del runner
+  y no tu cambio.**
 
 - **El previsualizador de suelos daba un veredicto FALSO sobre archivos nuevos**, y mandaba a
   arreglar código que ya estaba bien. Un informe de cobertura nombra cada clase con una ruta

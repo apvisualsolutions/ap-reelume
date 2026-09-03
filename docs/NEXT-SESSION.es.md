@@ -54,10 +54,16 @@
 > puerta: eso es tocar su guion, no un interruptor.
 >
 > **Y la cifra que este repositorio citaba llevaba cuatro días siendo falsa**: decía 42-53 minutos y
-> hoy son **56 en horas normales y 79 en la peor**. Corregida con el reparto medido, que además
-> señala lo siguiente: **27 minutos en pruebas de integración, 20 de ellos en cuatro pruebas de
-> volumen** — y esas mismas 536 pruebas tardan **1m17s en la máquina de quien programa**. Un factor
-> de veinte que nadie ha explicado todavía.
+> hoy son **56 en horas normales y 79 en la peor**.
+>
+> **Pero el reparto que se midió para explicarla salía de UN run, y una sesión paralela lo corrigió
+> sobre siete.** Se dijo «27 minutos en integración, 20 de ellos en cuatro pruebas». La mediana real
+> es **11,8 minutos** —los siete dan 7,5 / 9 / 11,6 / 11,8 / 12 / 14,8 y 27— y tampoco fue un runner
+> lento: en ese mismo run las otras nueve suites fueron normales o más rápidas. Las cuatro pruebas de
+> volumen se llevan **el 20 % del trabajo**, igual en el run bueno que en el malo; lo que se dispara
+> son **220 pruebas que abren base de datos**, con un peaje fijo de casi 22 segundos cada una porque
+> reconstruyen la base entera y guardan copia antes de cada uno de sus 22 pasos: 1,3 GB por
+> ejecución. **Un rojo por tiempo ahí puede ser el sorteo del runner y no tu cambio.**
 >
 > ### Decisiones tomadas y NO ejecutadas
 >

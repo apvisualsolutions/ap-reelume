@@ -80,7 +80,7 @@ Cubre los cinco desenlaces. Un bucle escrito en el momento pregunta por `status 
 **calla en todo lo demás** — un push que no disparó el flujo, un `gh` con la sesión caducada, un run
 encolado. Un vigía callado es indistinguible de un run que sigue.
 
-**Un run tarda 42-53 minutos.** Esta línea dijo «55-80» hasta el 2026-08-31, copiada de una época
+**Un run tarda 49-57 minutos cuando va bien, y uno de siete llegó a 86.** Esta línea dijo «55-80» hasta el 2026-08-31, y después «42-53» hasta el 2026-09-03, copiada cada vez de una época
 anterior y nunca vuelta a medir, mientras `CLAUDE.md` ya llevaba la cifra corregida sobre doce runs.
 Es el defecto de la casa aplicado a un número: **una cifra que nadie vuelve a medir acaba
 justificando la decisión equivocada.** Si vuelves a citarla, mídela.

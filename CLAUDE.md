@@ -208,17 +208,36 @@ cuarenta veces es el que enseña a ignorarlo. El motivo de que sea un guion y no
 el filtro obvio pregunta por `status == "completed"` y **calla en todo lo demás**, y un vigía callado
 es indistinguible de un run que sigue. Peor aún, `2>/dev/null` sobre la consulta **entierra** el error
 de `gh` y `|| true` lo convierte en una cadena vacía que se lee como «aún no ha terminado». Un run de
-este repositorio tardaba **42-53 minutos** el 2026-08-30 y **ya no**: los cinco del 2026-09-03 dieron
-**56 minutos** en horas normales y **79** en la peor, sobre el mismo trabajo. Así que hay hueco de
-sobra para no enterarse, y el latido de 30 y el techo de 120 siguen bien porque el margen los cubre
-igual — pero **la cifra decía 55-80, luego 42-53, y ahora vuelve a moverse**: un número que nadie
-vuelve a medir es el que acaba justificando la decisión equivocada, y éste llevaba cuatro días
-mintiendo.
+este repositorio **tarda 49-57 minutos cuando va bien, y uno de siete llegó a 86,2**. Los siete
+completos del 2026-09-03, todos verdes: 48,9 · 50,5 · 55,2 · 56,0 · 56,5 · 56,6 · **86,2**. Los seis
+sanos caben en ocho minutos entre sí, así que el séptimo **no es la cola de una distribución sino
+otra cosa** — ese día su suite de integración pasó de 11,8 a 27 minutos mientras las otras nueve
+seguían normales.
 
-**El reparto, medido desde los TRX del propio run**, es lo que enseña dónde está el tiempo: las
-pruebas de integración **27 min** —20 de ellos en cuatro pruebas de volumen—, el recorrido accesible
-**8,8 min** dentro de la verificación y **19,4 más** como puerta, el vídeo real 5,7 y los presupuestos
-4,0.
+**Y eso deja el corte del propio flujo sin margen: 86,2 de 90.** A menos de cuatro minutos de morir
+por reloj sin nada roto. El criterio escrito allí —«cortado a los 90 es un atasco»— dejaría de ser
+verdad la primera vez que un sorteo malo coincida con una tanda algo mayor: sería un rojo por reloj
+leído como un atasco. Subir el techo es la respuesta cómoda; el propio comentario del flujo dice lo
+contrario, que un run sano acercándose a 90 significa que el trabajo ha crecido.
+
+**La cifra dijo 55-80, luego 42-53, y ahora 49-57**: un número que nadie vuelve a medir es el que
+acaba justificando la decisión equivocada, y éste se ha movido dos veces en cuatro días, las dos
+porque alguien volvió a medirlo.
+
+**El reparto, medido desde los TRX**, es lo que enseña dónde está el tiempo — y la primera lectura
+que se hizo de él estaba mal por medir un solo run. Sobre **siete** runs del 2026-09-03, la suite de
+integración da 7,5 / 9 / 11,6 / **11,8** / 12 / 14,8 y **27** minutos: la mediana es 11,8 y el 27 que
+se citó era el peor de todos. El recorrido accesible son **8,8 min** dentro de la verificación y
+**19,4 más** como puerta, el vídeo real 5,7 y los presupuestos 4,0.
+
+**Y ese 27 NO fue un runner lento**, que es lo que se dedujo de una lectura: en ese mismo run las
+otras nueve suites fueron normales o más rápidas. Sólo la de integración se multiplicó por 3,6, así
+que es contención dentro de ella. Las cuatro pruebas de volumen se llevan **el 20 % del trabajo**, la
+misma proporción en el run bueno y en el malo; lo que se dispara son **220 pruebas que abren base de
+datos**, que pagan un peaje fijo de casi 22 segundos hagan lo que hagan.
+
+**El corolario práctico: un rojo por tiempo en esa suite puede ser el sorteo del runner y no tu
+cambio.** Antes de perseguirlo, compara con otro run del mismo día.
 
 **Ese recorrido corre CUATRO veces por run**: una en la verificación, dos como puerta —seguidas y
 sobre el mismo código— y una cuarta para contar lo que había pulsado. Desde el 2026-09-03 la cuarta

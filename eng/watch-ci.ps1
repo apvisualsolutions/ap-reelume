@@ -58,10 +58,18 @@
     So the default no longer names a branch. A run belongs to a commit, not to a reference, and
     the commit is what is asked for. -Branch stays for when a branch really is the question.
 
-    A run in this repository takes 42-53 minutes: the twelve complete runs of 2026-08-30 gave 42.7
-    for the fastest and 52.6 for the slowest. The defaults are set from that. This line said 55-80
-    until 2026-09-02, copied from an era nobody re-measured — the figure had already been fixed in
-    CLAUDE.md and in the closing skill, and nobody looked here. It is now held by a test.
+    A run in this repository takes 49-57 minutes: the seven complete runs of 2026-09-03 gave 48.9
+    for the fastest and 56.6 for the slowest of the six healthy ones. AND ONE OF THE SEVEN TOOK 86.2,
+    against a job ceiling of 90 — under four minutes from dying on the clock with nothing broken. The
+    six healthy ones fit inside eight minutes of each other, so that seventh is a different thing
+    rather than the tail of a spread: measured the same day, its integration suite alone went from
+    11.8 minutes to 27 while every other suite stayed normal. The defaults below are set from the
+    healthy range.
+
+    This line said 55-80 until 2026-09-02 and 42-53 until 2026-09-03, copied each time from an era
+    nobody re-measured. It is held by a test that compares the four places quoting it, which can say
+    they agree and never that they are true — so the number still has to be measured again, and this
+    is the second time in four days that it moved when somebody did.
 
 .PARAMETER Sha
     The commit to watch. A short prefix is enough: it is resolved to the full forty characters

@@ -99,9 +99,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   contributed in passing is not a saving.**
 
 - **And the figure this project quoted for how long CI takes had been false for four days.** It said
-  42-53 minutes; today's five runs measured **56 in ordinary hours and 79 in the worst**, over the
-  same work. It is corrected with the step-by-step breakdown, which is what says where the time
-  actually goes: **27 minutes in integration tests**, 20 of them in four volume tests alone.
+  42-53 minutes; today it is **56 in ordinary hours and 79 in the worst**. It is corrected with the
+  step-by-step breakdown.
+
+  **But the first reading of that breakdown came from a single run too, and a parallel session
+  corrected it over seven.** It said «27 minutes in integration, 20 of them in four tests»: the real
+  median is **11.8 minutes** and that 27 was the worst of the seven. Nor was it a slow machine — in
+  that same run the other nine suites were normal — and the four tests take **20 % of the work**, the
+  same share in the good run as in the bad one. What blows up is 220 tests that open a database. **A
+  red build on time in that suite can be the runner lottery rather than your change.**
 
 - **The coverage-floor previewer gave a FALSE verdict on new files**, sending somebody to fix code
   that was already right. A coverage report names each class by a path relative to **its own
