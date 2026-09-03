@@ -10,6 +10,39 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Poner tu propia portada entra en la lista de alcance (`LIB-018`), y llega primero su cerradura.**
+  Sólo se aceptan cuatro tipos de imagen —lista cerrada, como la que gobierna el vídeo, no un
+  filtro— y el mismo techo de diez megas que ya rechazaba una descarga y **no se aplicaba a un
+  archivo propio**. Cada negativa dice su motivo: nada elegido, no es una imagen, vacía o demasiado
+  grande, porque «no pasó nada» delante de una portada que no cambió es la peor respuesta posible.
+  Y el tipo se comprueba antes que el tamaño: a quien eligió una película por error se le dice qué
+  clase de archivo hace falta, no que su película pesa mucho.
+
+  Las cuatro ausencias son decisiones y están afirmadas: nada de imágenes vectoriales, que son
+  documentos capaces de traer instrucciones y referencias remotas; nada de formatos sin comprimir
+  que ocuparían decenas de megas; nada animado, porque ninguna de estas superficies lo dibuja. Y una
+  prueba cruza las dos listas: ninguna extensión puede ser a la vez vídeo y portada.
+
+### Corregido
+
+- **`LIB-011` baja de `VERIFIED` a `IMPLEMENTED`: decía «e imágenes» y no había por dónde.** La
+  aplicación **ya sabe** guardar una portada tuya —copiarla a su sitio, exigirle texto alternativo,
+  respaldarla en la copia de seguridad y no borrarla al limpiar lo descargado—, y todo eso tiene
+  pruebas. Lo que no existe es la puerta: **ningún sitio donde elegir el archivo**, y nadie que
+  llame a lo que ya sabe guardarlo. Los únicos que lo llaman son las propias pruebas.
+
+  Es el defecto de esta casa en su forma más completa: la maquinaria entera, con su copia de
+  seguridad y su cobertura, y ni una entrada. **La red que caza esto sólo mira servicios
+  registrados**, y esto no es un servicio, así que pasó por debajo. Lo que sí hace y sigue en pie es
+  editar la carátula escribiendo su ruta y bloquear ese campo contra un refresco remoto; eso queda
+  escrito en la fila, en el manifiesto y en el informe de publicación, que es la primera marca que
+  ese informe retira.
+
+- **Y hay cinco filas del alcance que las pruebas de documentación no ven.** El patrón que las lee
+  reconoce tres destinos y hay un cuarto escrito de otra manera, así que cinco compromisos —uno de
+  ellos verificado— nunca se comparan con el manifiesto. Se nombra aquí y no se toca: arreglarlo
+  puede destapar incoherencias en esas cinco, y eso es una tanda, no una nota al pie.
+
 - **Medido: la aplicación sí puede sacar una imagen del propio vídeo, y la hipótesis previa era
   falsa.** Se esperaba que no pudiera, porque la vía por la que esta aplicación pinta el vídeo es
   justo aquella en la que `PLY-016` midió que la capa de filtros **nunca procesa un fotograma**. No

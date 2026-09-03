@@ -10,6 +10,38 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Setting your own cover enters the scope matrix (`LIB-018`), and its lock arrives first.** Only
+  four image kinds are accepted — a closed list, like the one governing video, not a filter — and the
+  same ten-megabyte ceiling that already refused a download and **did not apply to a local file**.
+  Every refusal says why: nothing chosen, not an image, empty, or too large, because «nothing
+  happened» in front of a cover that did not change is the worst possible answer. And the kind is
+  checked before the size: somebody who picked a film by mistake is told what sort of file this
+  takes, not that their film is too big.
+
+  The four absences are decisions and they are asserted: no vector images, which are documents able
+  to carry instructions and remote references; no uncompressed formats that would run to tens of
+  megabytes; nothing animated, because none of these surfaces draws it. And a test crosses the two
+  lists: no extension may be both a video container and a cover.
+
+### Fixed
+
+- **`LIB-011` comes down from `VERIFIED` to `IMPLEMENTED`: it said «and images» and there was no way
+  in.** The application **already knows** how to keep a cover of yours — copy it into place, require
+  alternative text, carry it in the backup and not delete it when clearing what was downloaded — and
+  all of that is tested. What does not exist is the door: **nowhere to choose the file**, and nobody
+  calling what already knows how to store it. The only callers are the tests themselves.
+
+  It is this house's defect in its fullest form: the whole machine, with its backup and its coverage,
+  and no way in. **The net that catches this only looks at registered services**, and this is not a
+  service, so it passed underneath. What it does do, and what stands, is editing the cover by typing
+  its path and locking that field against a remote refresh; that is written into the row, the
+  manifest and the readiness report — the first mark that report has ever withdrawn.
+
+- **And five scope rows are invisible to the documentation gates.** The pattern reading them
+  recognises three targets and there is a fourth written another way, so five commitments — one of
+  them verified — are never compared against the manifest. It is named here and not touched: fixing
+  it may uncover inconsistencies in those five, and that is a batch rather than a footnote.
+
 - **Measured: the application can get a picture out of the video itself, and the hypothesis held
   before measuring was false.** It was expected not to, because the path this application draws video
   through is exactly the one where `PLY-016` measured that the filter layer **never processes a

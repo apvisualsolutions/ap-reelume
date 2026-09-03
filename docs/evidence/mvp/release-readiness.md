@@ -31,8 +31,16 @@ multicanal, no por falta de trabajo.
 | Compromisos MVP | **46** |
 | `VERIFIED` | **43** |
 | `OUT_OF_SCOPE` por decisión | **1** |
-| `BLOCKED` con condición de desbloqueo | **2** |
+| `IMPLEMENTED`, con su razón declarada | **2** |
 | Sin estado o sin evidencia | **0** |
+
+**`LIB-011` bajó de `VERIFIED` a `IMPLEMENTED` el 2026-09-03, por decisión del propietario**, y es la
+única marca que este documento ha retirado. Decía «edición manual de metadatos **e imágenes**» y se
+leía como poder elegir una portada. Medirlo dijo que no: el almacén sabe importar una imagen propia,
+la copia de seguridad la respalda y el modelo de la vista tiene dónde guardarla, pero **nada en la
+aplicación llama a lo primero ni escribe lo tercero** — las únicas llamadas son las de las pruebas.
+Lo que sí hace, y sigue verificado en la práctica, es editar la carátula **escribiendo su ruta** y
+bloquear ese campo contra un refresco remoto. Elegir el archivo es `LIB-018`, abierto el mismo día.
 
 Ningún compromiso queda informalmente pendiente. `FeatureCoverageTests` falla si alguno no está
 `VERIFIED` ni `OUT_OF_SCOPE` y no declara razón, responsable y condición de desbloqueo; y falla
@@ -215,8 +223,16 @@ for want of work.
 | MVP commitments | **46** |
 | `VERIFIED` | **43** |
 | `OUT_OF_SCOPE` by decision | **1** |
-| `BLOCKED` with an unblock condition | **2** |
+| `IMPLEMENTED`, with its reason declared | **2** |
 | Without status or without evidence | **0** |
+
+**`LIB-011` came down from `VERIFIED` to `IMPLEMENTED` on 2026-09-03, by the owner's decision**, and
+it is the only mark this document has ever withdrawn. It said «manual metadata **and image** editing»
+and read as being able to choose a cover. Measuring said otherwise: the store knows how to import a
+personal image, the backup carries it and the view model has somewhere to keep it, but **nothing in
+the application calls the first or writes the third** — the only callers are the tests. What it does
+do, and what stays verified in practice, is edit the cover **by typing its path** and lock that field
+against a remote refresh. Choosing the file is `LIB-018`, opened the same day.
 
 No commitment is informally pending. `FeatureCoverageTests` fails when one is neither `VERIFIED` nor
 `OUT_OF_SCOPE` and declares no reason, owner, and unblock condition; it fails equally when a settled

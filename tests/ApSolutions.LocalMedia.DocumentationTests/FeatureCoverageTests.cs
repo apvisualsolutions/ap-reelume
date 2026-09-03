@@ -28,7 +28,11 @@ public sealed class FeatureCoverageTests
         // 60 since 2026-08-30: CRS-001..005, courses, POST_STABLE and DESIGN_APPROVED once
         // ADR-0006 was accepted. The design package had them prototyped and specified while the
         // matrix said nothing, and scope the matrix does not carry is scope nobody decided.
-        Assert.Equal(60, FeatureMatrix.Rows.Count);
+        // 62 since 2026-09-03, by the owner's decision: CRS-006, a course card's picture taken from
+        // the video itself, and LIB-018, setting your own cover on anything that has one. The second
+        // arrived because measuring the first found the store, the backup and the view model all
+        // ready for a personal cover and nothing anywhere that could choose one.
+        Assert.Equal(62, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,
