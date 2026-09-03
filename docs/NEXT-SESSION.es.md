@@ -1,61 +1,42 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-04: `main` NO tiene nada de esta tanda, y el último run salió ROJO
+> ## AVISO AL FRENTE — 2026-09-04: los siete archivos de cobertura están arreglados y la etiqueta integrada; falta el veredicto de CI
 >
-> **`main` sigue en el commit del que arrancó la tarde y lleva doce commits por detrás.** Todo lo de
-> abajo está empujado a `codex/ap-reelume-mvp-x64` y **ninguno de esos commits ha pasado en verde**.
-> Estar en la rama es seguridad, no integración: no se lee como «está hecho».
+> **`main` sigue sin nada de esta tanda y ahora lleva dieciséis commits por detrás.** Todo está en
+> `codex/ap-reelume-mvp-x64`, y **el verde todavía no ha llegado**: lo que hay es una tanda entera
+> empujada de una vez y un run midiéndola. Estar en la rama es seguridad, no integración.
 >
-> **LO PRIMERO, y es acotado**: el último run falló en la puerta de cobertura, después de que las
-> diez suites pasaran. Seis archivos de las dos últimas tandas —la portada propia y la miniatura del
-> curso— más uno que mejoró y pide subir su suelo:
+> **Lo que se cerró**: la puerta de cobertura que paraba las tres tandas de ayer. Los siete archivos
+> se midieron reproduciendo aquí el informe fusionado del propio run rojo —los veinte Cobertura del
+> artefacto `test-results` de 33812831673, fusionados con el mismo `reportgenerator` y leídos con la
+> aritmética de `check-coverage.ps1`—, y **reprodujo los siete números exactos** antes de tocar nada.
+> Eso es lo que convierte los suelos nuevos en una cuenta y no en una apuesta.
 >
-> | Archivo | Mide | Qué le pasa |
-> | --- | --- | --- |
-> | `Application/Courses/GetCourseThumbnail.cs` | 100/90 | nuevo: exige 96/96 |
-> | `Infrastructure/Playback/LibVlcCourseFrameGrabber.cs` | 96/90 | nuevo: exige 96/96 |
-> | `Windows/CompositionRoot.Identification.cs` | 100/75 | bajó sin lista |
-> | `Infrastructure/Metadata/ArtworkCache.cs` | 93/70 | cayó desde 96/73 |
-> | `Windows/CompositionRoot.cs` | 86/59 | cayó desde 87/60 |
-> | `Windows/AppDataPaths.cs` | 97,62/100 | contra un suelo de 100/100 |
-> | `Presentation/Metadata/MetadataEditorViewModel.cs` | 100/89 | **mejoró**: súbele el suelo |
+> · Los tres archivos nuevos salen de la lista **mejorando**: 100/100 los tres.
+> · Tres se quedan con el suelo subido — `ArtworkCache` 99/85, `MetadataEditorViewModel` 100/89 y
+>   `CompositionRoot.cs` 88/60.
+> · `AppDataPaths` vuelve a 100/100: faltaba una sola línea, la carpeta de las miniaturas de curso,
+>   que se añadió a las rutas y no a la prueba que las recorre.
+> · La lista sigue en **188 filas** y el trinquete no se movió.
 >
-> **Los suelos salen del artefacto `coverage-debt` del run 33812831673**, ya descargado y no generado
-> aquí — trae 191 filas contra un trinquete de 188, y esos tres de más son los tres primeros.
-> **Las ramas que faltan se nombran con el JSON de coverlet**, que ya dijo las cuatro del primero:
-> tres del parseo del archivo de huella (marcador corrupto) y una del camino sin fuente.
+> **LO PRIMERO de la próxima sesión, y es una comprobación y no un trabajo**: mirar el run de
+> `10a57df`/`e45dda6`. Dos de esos suelos —`ArtworkCache` 99 y `CompositionRoot.cs` 88— caen
+> **justo en el mínimo de su banda**, así que si CI mide una línea menos de la prevista la puerta
+> pedirá corregirlos, y la corrección es de una cifra. Los tres números salen del artefacto del run
+> nuevo, como siempre.
 >
-> **Y la parte de composición admite la salida de la regla 10**: lo que sólo abre un diálogo de
-> Windows se excluye con su razón escrita, y lo que decide se cubre. No al revés.
->
-> ### Lo que sí quedó a salvo
->
-> · Las tres tandas de la tarde están en la rama y empujadas.
-> · La cuarta —el arreglo del arranque de las pruebas de integración, que baja el trabajo de esa
->   suite un 68 %— **no está en la rama**: vive en la etiqueta `handoff/integration-schema-template`,
->   empujada a origin. Rebasada sobre `ac208e9` da un árbol comprobado en seco, sin conflictos.
->   **Bórrala cuando la integres**; es una cuerda, no un punto de publicación.
->
-> **Y la comprobación que encuentra un trabajo huérfano NO sirve para certificar que ya no lo está.**
-> `git log --branches --tags --not --remotes` es lo que descubrió que ese commit no estaba en ningún
-> remoto — la pregunta correcta, donde la fácil («¿existe la etiqueta aquí?») no contesta, porque una
-> etiqueta local sobrevive a un `gc` y al borrado de un worktree pero no a perder el disco. Pero
-> **después de empujar la etiqueta esa misma lista sigue nombrando el commit**: compara contra ramas
-> de seguimiento, y una etiqueta empujada no crea ninguna. Lo que zanja es
-> `git ls-remote --tags origin`, que pregunta al remoto. Medido el 2026-09-04 en las dos direcciones.
->
-> **Los tres worktrees quedaron desregistrados de git y sus carpetas siguen en disco**, porque las
-> sesiones aún tenían archivos abiertos cuando se retiraron. No se perdió nada: las tres ramas
-> `apsolutionscode/*` siguen existiendo y los cuatro commits son alcanzables. Las carpetas se pueden
-> borrar a mano cuando esos procesos suelten los archivos.
+> **Y la etiqueta `handoff/integration-schema-template` ya está integrada** (`e45dda6`, rebasada sin
+> conflictos sobre el trabajo de cobertura). Baja el arranque de las pruebas de integración un 68 %
+> — medido aquí: la suite pasa de 607 s a poco más de un minuto. **Bórrala en cuanto el run confirme
+> que el commit está en el remoto**; era una cuerda, no un punto de publicación.
 >
 > ### Dos defectos medidos que quedan sin arreglar, los dos con su caso
 >
 > · **`eng/watch-ci.ps1` anuncia «step ok» sobre pasos que salieron `skipped`.** Línea 212: el filtro
->   trata `skipped` como no-fallido. Ha engañado dos veces hoy, la segunda en el run rojo. **El
+>   trata `skipped` como no-fallido. Engañó dos veces el 2026-09-03, la segunda en el run rojo. **El
 >   desenlace del run NO está afectado** —la línea 343 imprime la conclusión literal y sólo sale 0 en
 >   `success`—, así que el daño es anunciar como medido lo que nadie midió. Caso: run 33812831673.
-> · **Un disparador de interfaz declarado y sin llamador no lo caza nada.** `LIB-011` bajó hoy de
+> · **Un disparador de interfaz declarado y sin llamador no lo caza nada.** `LIB-011` bajó de
 >   `VERIFIED` a `IMPLEMENTED` por eso, y `LIB-002` tiene el mismo hueco: el escaneo manual existe
 >   como valor de enumeración y sólo lo pide una prueba. Las pruebas de arquitectura exigen que un
 >   servicio registrado tenga quien lo resuelva y **no existe la misma exigencia para un disparador

@@ -1,67 +1,48 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-04: `main` has NONE of this batch, and the last run was RED
+> ## READ THIS FIRST — 2026-09-04: the seven coverage files are fixed and the tag is integrated; CI's verdict is still out
 >
-> **`main` is still on the commit it started the afternoon at, twelve commits behind.** Everything
-> below is pushed to `codex/ap-reelume-mvp-x64` and **not one of those commits has passed green**.
-> Being on the branch is safety, not integration: it does not read as «done».
+> **`main` still has none of this batch and is now sixteen commits behind.** Everything is on
+> `codex/ap-reelume-mvp-x64`, and **green has not arrived yet**: what there is, is one whole batch
+> pushed at once and a run measuring it. Being on the branch is safety, not integration.
 >
-> **FIRST, and it is bounded**: the last run failed at the coverage gate, after all ten suites
-> passed. Six files from the last two batches — the personal cover and the course thumbnail — plus
-> one that improved and needs its floor raised:
+> **What was closed**: the coverage gate that was holding yesterday's three batches. All seven files
+> were measured by reproducing the failing run's own merged report here — the twenty Cobertura files
+> of 33812831673's `test-results` artefact, merged with the same `reportgenerator` and read with
+> `check-coverage.ps1`'s arithmetic — and it **reproduced all seven figures exactly** before anything
+> was touched. That is what makes the new floors a calculation rather than a bet.
 >
-> | File | Measures | What happened |
-> | --- | --- | --- |
-> | `Application/Courses/GetCourseThumbnail.cs` | 100/90 | new: 96/96 required |
-> | `Infrastructure/Playback/LibVlcCourseFrameGrabber.cs` | 96/90 | new: 96/96 required |
-> | `Windows/CompositionRoot.Identification.cs` | 100/75 | fell with no floor |
-> | `Infrastructure/Metadata/ArtworkCache.cs` | 93/70 | fell from 96/73 |
-> | `Windows/CompositionRoot.cs` | 86/59 | fell from 87/60 |
-> | `Windows/AppDataPaths.cs` | 97.62/100 | against a 100/100 floor |
-> | `Presentation/Metadata/MetadataEditorViewModel.cs` | 100/89 | **improved**: raise its floor |
+> · The three new files leave the list by **improving**: 100/100 all three.
+> · Three stay with their floors raised — `ArtworkCache` 99/85, `MetadataEditorViewModel` 100/89 and
+>   `CompositionRoot.cs` 88/60.
+> · `AppDataPaths` is back at 100/100: one line was missing, the course-thumbnail folder, added to
+>   the paths and never to the test that walks them.
+> · The list is still **188 rows** and the ratchet did not move.
 >
-> **The floors come from run 33812831673's `coverage-debt` artefact**, already downloaded rather than
-> generated here — 191 rows against a ratchet of 188, and those three extra are the first three.
-> **The missing branches are named by coverlet's JSON**, which already gave the first file's four:
-> three in the stamp file's parsing (a corrupt marker) and one on the path with no source.
+> **FIRST next session, and it is a check rather than a job**: look at the run for
+> `10a57df`/`e45dda6`. Two of those floors — `ArtworkCache` 99 and `CompositionRoot.cs` 88 — land
+> **exactly at the bottom of their band**, so if CI measures one line fewer than predicted the gate
+> will ask for them to be corrected, and the correction is one figure. All three come from the new
+> run's artefact, as always.
 >
-> **And the composition part admits rule 10's exit**: what only opens a Windows dialog is excluded
-> with its reason written, and what decides is covered. Not the other way round.
+> **And the `handoff/integration-schema-template` tag is integrated** (`e45dda6`, rebased with no
+> conflicts onto the coverage work). It cuts the integration suite's start-up by 68 % — measured
+> here: the suite goes from 607 s to a little over a minute. **Delete it as soon as the run confirms
+> the commit is on the remote**; it was a rope, not a publishing point.
 >
-> ### What did end up safe
+> ### Two measured defects still unfixed, both with their case
 >
-> · The afternoon's three batches are on the branch and pushed.
-> · The fourth — the integration-test startup fix, which cuts that suite's work by 68 % — is **not on
->   the branch**: it lives on the tag `handoff/integration-schema-template`, pushed to origin.
->   Rebased onto `ac208e9` it yields a tree verified dry, with no conflicts. **Delete the tag once
->   integrated**; it is a rope, not a release point.
->
-> **And the check that finds orphaned work does NOT certify that it no longer is.**
-> `git log --branches --tags --not --remotes` is what found that commit on no remote — the right
-> question, where the easy one («does the tag exist here?») does not answer it, because a local tag
-> survives a `gc` and a removed worktree but not a lost disk. But **after the tag is pushed that same
-> list still names the commit**: it compares against tracking branches, and a pushed tag creates
-> none. What settles it is `git ls-remote --tags origin`, which asks the remote. Measured 2026-09-04,
-> both directions.
->
-> **The three worktrees were unregistered from git and their folders remain on disk**, because those
-> sessions still held files open when they were removed. Nothing was lost: the three
-> `apsolutionscode/*` branches still exist and all four commits are reachable. The folders can be
-> deleted by hand once those processes let go.
->
-> ### Two measured defects left unfixed, each with its case
->
-> · **`eng/watch-ci.ps1` announces «step ok» over steps that came out `skipped`.** Line 212: the
->   filter treats `skipped` as not-failed. It misled twice today, the second time on the red run.
->   **The run's outcome is NOT affected** — line 343 prints the literal conclusion and only exits 0
->   on `success` — so the damage is announcing as measured what nobody measured. Case: run
+> · **`eng/watch-ci.ps1` announces «step ok» over steps that came back `skipped`.** Line 212: the
+>   filter treats `skipped` as not-failed. It misled twice on 2026-09-03, the second time in the red
+>   run. **The run's outcome is NOT affected** — line 343 prints the literal conclusion and only
+>   exits 0 on `success` — so the damage is announcing as measured what nobody measured. Case: run
 >   33812831673.
-> · **A declared UI trigger with no caller is caught by nothing.** `LIB-011` came down from
->   `VERIFIED` to `IMPLEMENTED` for that today, and `LIB-002` has the same hole: manual scanning
->   exists as an enum value and only a test asks for it. The architecture tests demand a registered
->   service have someone resolving it and **no equivalent demand exists for a screen trigger**. The
->   question that catches it: «can this be asked for from a screen, or only from a test». Its own
->   batch.
+> · **An interface trigger declared with no caller is caught by nothing.** `LIB-011` went from
+>   `VERIFIED` to `IMPLEMENTED` for that, and `LIB-002` has the same hole: the manual scan exists as
+>   an enumeration value and only a test ever asks for it. The architecture tests require a
+>   registered service to have somebody resolving it and **there is no such requirement for a screen
+>   trigger**. The question that does catch it: «can this be asked for from a screen, or only from a
+>   test». It is a batch of its own.
 
 > ## HANDOVER — 2026-09-03, twenty-first session: batch 3 started by screen, two things built with no way in, and CI running the same work four times
 >
