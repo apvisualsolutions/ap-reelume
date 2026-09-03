@@ -53,8 +53,8 @@ public sealed class SurfaceCornerTests
     private static readonly Surface[] Pairings =
     [
         new(
-            "Border.setting-row",
-            "the settings row",
+            "Border.row-box",
+            "the row box the design builds once and spends on every row that is a box",
             10,
             @"padding: '13px 16px', border: '1px solid var\(--hair,rgba\(15,23,42,\.09\)\)', borderRadius: (?<radius>[0-9]+)"),
         new(
@@ -97,6 +97,11 @@ public sealed class SurfaceCornerTests
             "the course thread's card",
             12,
             @"gap:12px;padding:18px;border-radius:(?<radius>[0-9]+)px;border:1px solid var\(--accent,\#1769AA\)"),
+        new(
+            "Border.chip-accent",
+            "the chip in the accent's tone — «Siguiente en el hilo»",
+            999,
+            @"const chip = \(tone\) => \(\{[^}]*?borderRadius: (?<radius>[0-9]+)"),
     ];
 
     /// <summary>
@@ -346,8 +351,8 @@ public sealed class SurfaceCornerTests
     /// earlier wording of this said either would do, and it was wrong on its own terms: this counts
     /// <c>CornerRadius="</c> in the markup, so a view that swapped the token for the prototype's own
     /// number would still be writing its corner where no gate can pair it — the number would not
-    /// move at all. The first view through, on 2026-09-03, was the course thread's: two sites, both
-    /// into classes of their own, 86 to 84.
+    /// move at all. The first screen through, on 2026-09-03, was a course: the thread card took two
+    /// sites into classes of their own and the lesson row took two more, 86 to 82.
     /// </para>
     /// <para>
     /// A ratchet and not an assertion of 86: passing at 80 while claiming 86 would be a gate lying
@@ -357,7 +362,7 @@ public sealed class SurfaceCornerTests
     [Fact]
     public void The_corners_written_in_the_views_themselves_do_not_grow()
     {
-        const int ratchet = 84;
+        const int ratchet = 82;
 
         var sites = Directory
             .EnumerateFiles(Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories)
@@ -378,6 +383,66 @@ public sealed class SurfaceCornerTests
             sites == ratchet,
             $"only {sites} sites write their own corner, which is fewer than the ratchet of {ratchet}. "
             + "That is progress and the ratchet has to come down with it, in the same change.");
+    }
+
+    /// <summary>
+    /// The row box draws the padding the design writes beside that corner, not only the corner.
+    /// </summary>
+    /// <remarks>
+    /// <b>Half of one declaration was measured and half was hand-written, and the hand-written half
+    /// was wrong.</b> The design writes <c>padding: '13px 16px', … borderRadius: 10</c> in a single
+    /// object; the corner was read out of it and the padding beside it was typed, as 12 down instead
+    /// of 13. One pixel per side over thirty-two rows — small enough that nobody would open a screen
+    /// to look for it, which is exactly why it survived from whenever it was written until
+    /// 2026-09-03.
+    /// <para>
+    /// It is asserted on the built control rather than on the token file, for the reason the corner
+    /// is: a setter certifies what a class declares and not what the appearance service leaves
+    /// behind once it has run.
+    /// </para>
+    /// <para>
+    /// Its limitation: this pairs the padding of the one class whose padding the design states in
+    /// the same breath as its corner. The other seven surfaces are still paired on corner alone.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_row_box_draws_the_padding_beside_that_corner()
+    {
+        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
+        var written = Regex.Match(
+            design,
+            @"padding: '(?<down>[0-9]+)px (?<across>[0-9]+)px', border: '1px solid var\(--hair",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(5));
+
+        Assert.True(written.Success, "the design no longer writes the row box's padding.");
+
+        var application = Avalonia.Application.Current!;
+        using var scope = new ResourceScope(application);
+        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
+
+        var row = new Border();
+        row.Classes.Add("row-box");
+        var window = new Window { Width = 400, Height = 200, Content = row };
+        Thickness drawn;
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            drawn = row.Padding;
+        }
+        finally
+        {
+            window.Close();
+        }
+
+        var down = double.Parse(written.Groups["down"].Value, CultureInfo.InvariantCulture);
+        var across = double.Parse(written.Groups["across"].Value, CultureInfo.InvariantCulture);
+
+        Assert.Equal(across, drawn.Left);
+        Assert.Equal(across, drawn.Right);
+        Assert.Equal(down, drawn.Top);
+        Assert.Equal(down, drawn.Bottom);
     }
 
     /// <summary>Every unpaired surface says why, and it is a sentence rather than a shrug.</summary>

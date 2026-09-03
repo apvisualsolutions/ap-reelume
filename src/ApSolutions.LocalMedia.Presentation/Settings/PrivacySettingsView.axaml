@@ -31,7 +31,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Text="{DynamicResource PrivacyDescription}"
         TextWrapping="Wrap" />
 
-    <Border Classes="setting-row">
+    <Border Classes="row-box">
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
         <TextBlock
             Grid.Column="0"
@@ -75,7 +75,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         x:Name="PrivacyAutoRefreshSurface"
         IsVisible="{Binding CanRefreshAutomatically}"
         Spacing="{DynamicResource Space4}">
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
             <TextBlock Classes="setting-name" Text="{DynamicResource PrivacyAutoRefreshLabel}" />

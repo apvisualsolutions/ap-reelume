@@ -44,6 +44,16 @@ public sealed class LessonRowViewModel
 
     public bool IsNextInThread { get; }
 
+    /// <summary>
+    /// Watched or left part way through — the two states the design tints the glyph for.
+    /// </summary>
+    /// <remarks>
+    /// The tint is a SECOND signal and never the only one: the shape already says all three states,
+    /// which is why this view can afford a colour that somebody who cannot tell the accent from the
+    /// secondary ink will not read.
+    /// </remarks>
+    public bool IsReached => _lesson.Status is WatchStatus.Watched or WatchStatus.InProgress;
+
     public ICommand PlayCommand { get; }
 
     public ICommand ToggleWatchedCommand { get; }

@@ -47,7 +47,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         to wrap inside, which is what they had, and what they gain is the surface the rest of the page
         now has. The pills against the right edge is a separate change with a separate measurement.
       -->
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceThemeLabel}" />
           <!--
@@ -124,10 +124,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </Border>
       <!--
         The nine rows the prototype offers beside the theme and the language, in its own order. Each
-        one is a setting-row: the name and the sentence that says what it does on the left, the state
+        one is a row-box: the name and the sentence that says what it does on the left, the state
         and the control against the right edge, which is what that class exists for.
       -->
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
             <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceFollowWindowsLabel}" />
@@ -168,7 +168,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         converter would be a converter whose only job is to turn a string into the string beside it.
         AppearanceSwatchTests compares the two lists, so they cannot drift apart in silence.
       -->
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceAccentLabel}" />
           <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceAccentDescription}" />
@@ -327,7 +327,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </StackPanel>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
             <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceMicaLabel}" />
@@ -357,7 +357,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </Grid>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceTintLabel}" />
           <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceTintDescription}" />
@@ -381,7 +381,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </StackPanel>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceDensityLabel}" />
           <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceDensityDescription}" />
@@ -420,7 +420,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </StackPanel>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceCoverSizeLabel}" />
           <TextBlock Classes="setting-description" Text="{DynamicResource AppearanceCoverSizeDescription}" />
@@ -444,7 +444,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </StackPanel>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceRoundingLabel}" />
           <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
@@ -482,7 +482,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </StackPanel>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
             <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceCoverTitlesLabel}" />
@@ -512,7 +512,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </Grid>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
             <TextBlock Classes="setting-name" Text="{DynamicResource AppearanceAnimationsLabel}" />
@@ -547,7 +547,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         dark in all four themes because a light strip under a picture is a seam, and that is a
         decision rather than a preference. Written down so nobody looks for the switch.
       -->
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}">
             <TextBlock Classes="setting-name" Text="{DynamicResource AppearancePlayerSurfaceLabel}" />
@@ -562,7 +562,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </Grid>
       </Border>
 
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <StackPanel Spacing="{DynamicResource Space8}">
           <TextBlock
               Classes="setting-name"

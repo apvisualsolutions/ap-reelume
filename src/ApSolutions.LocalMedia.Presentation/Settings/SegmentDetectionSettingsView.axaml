@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         name it already declared, so a reader hears the same words and only the paint moved - the
         same trade the navigation rail made when its destinations became glyphs.
       -->
-      <Border Classes="setting-row">
+      <Border Classes="row-box">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
           <TextBlock
               Grid.Column="0"

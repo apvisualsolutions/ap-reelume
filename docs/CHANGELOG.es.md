@@ -10,6 +10,34 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La fila de una lección pasa a ser una sola línea, que es lo que el prototipo dibuja.** El árbol
+  apilaba los dos botones **debajo** de la fila, así que cada lección medía cerca del doble de alto
+  que la del diseño y una lista de veinte se leía como una página de formularios. Ahora van al
+  extremo derecho, en el orden del prototipo —marcar y luego reproducir—, con el estado, el número y
+  la lección entre medias.
+
+  Con ello llegan los demás números de esa fila: el número de lección deja la letra de ancho fijo y
+  pasa a negrita en la tinta secundaria como el diseño la dibuja, el símbolo de estado se tiñe del
+  acento en cuanto la lección se ha abierto, la barra de avance deja de cruzar la fila entera y se
+  queda en los 220 px del prototipo, y la etiqueta «Siguiente en el hilo» toma su tamaño, su peso y
+  su relleno reales. **La altura se mide contra la que no podría tener si los botones siguieran
+  apilados**, en vez de comprobar una estructura que cualquier disposición podría declarar.
+
+### Corregido
+
+- **La caja de fila del diseño deja de llamarse «fila de ajustes».** El prototipo la construye una
+  vez y la gasta en toda fila que sea una caja; el árbol le había puesto el nombre de su primer
+  usuario, cierto en sus treinta y un sitios y falso en cuanto la lección quiso llevarla. **Un
+  nombre que describe a quien lo usó primero invita al segundo a escribir un duplicado**, que es lo
+  que ya costó una tanda con otra clase de este mismo fichero.
+
+- **Y esa caja dibujaba un píxel de menos por arriba y por abajo.** El diseño escribe su relleno y
+  su radio en la misma declaración; el radio se leía del diseño y el relleno estaba escrito a mano,
+  con 12 donde pone 13. Medía la mitad de una decisión y copiaba la otra, en treinta y dos filas.
+  Ahora las dos mitades se leen del diseño.
+
+- **Los radios escritos en el marcado bajan de 84 a 82**, con la fila de lección y su etiqueta.
+
 - **La tarjeta del hilo de un curso pasa a ser la que el prototipo dibuja, entera.** El árbol
   escribía «Dónde lo dejaste» como subtítulo de 20 px sobre una tarjeta corriente; el diseño la
   dibuja como versalita de 10 en la tinta del acento sobre una tarjeta **lavada en el acento y

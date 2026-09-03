@@ -58,7 +58,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       </ItemsControl.ItemsPanel>
       <ItemsControl.ItemTemplate>
         <DataTemplate DataType="player:ShortcutRow">
-          <Border Classes="setting-row">
+          <Border Classes="row-box">
             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space12}">
               <TextBlock
                   Classes="setting-name"

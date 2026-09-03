@@ -10,6 +10,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A lesson's row becomes one line, which is what the prototype draws.** The tree stacked the two
+  buttons **under** the row, so every lesson was close to twice the height of the design's and a list
+  of twenty read as a page of forms. They now sit at the right end of it, in the prototype's order —
+  mark, then play — with the state, the number and the lesson between them.
+
+  The rest of that row's numbers come with it: the lesson number drops the fixed-width family for the
+  bold secondary ink the design draws, the state glyph takes the accent once a lesson has been
+  opened, the progress bar stops crossing the whole row and stays at the prototype's 220 px, and the
+  «Siguiente en el hilo» chip takes its real size, weight and padding. **The height is measured
+  against the one it could not have if the buttons were still stacked**, rather than by checking a
+  structure any layout could declare.
+
+### Fixed
+
+- **The design's row box stops being called «the settings row».** The prototype builds it once and
+  spends it on every row that is a box; the tree had named it after its first caller, true across all
+  thirty-one of its sites and false the moment the lesson row wanted it. **A name that describes who
+  used it first invites the second caller to write a duplicate**, which already cost this repository
+  a round with another class in the same file.
+
+- **And that box drew a pixel short above and below.** The design writes its padding and its corner
+  in one declaration; the corner was read from the design and the padding beside it was typed, as 12
+  where it says 13. Half of one decision measured and half copied, over thirty-two rows. Both halves
+  now come from the design.
+
+- **Corners written into the markup fall from 84 to 82**, with the lesson row and its chip.
+
 - **The course thread's card becomes the one the prototype draws, all of it.** The tree wrote
   «Dónde lo dejaste» as a 20 px subtitle over an ordinary card; the design draws it as a 10 px
   overline in the accent's ink over a card **washed in the accent and ringed by it**, which puts the
