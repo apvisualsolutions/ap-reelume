@@ -10,6 +10,30 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La pantalla de Cursos coloca el ofrecimiento donde el prototipo lo coloca**, por decisión del
+  propietario del 2026-09-03: «Marcar una carpeta como curso…» va **dentro** de la caja de vacío
+  mientras no hay cursos —acentuado, porque no hay nada más en la pantalla contra lo que ordenarlo—
+  y baja **al pie** en el botón llano en cuanto los hay. Estaba arriba y acentuado siempre, con una
+  razón escrita justo en contra; esa razón se retira del archivo en vez de dejarla contradiciendo lo
+  que el archivo hace.
+
+  **El vacío pasa a ser una caja de trazo discontinuo**, que es lo que el diseño dibuja para un sitio
+  donde algo va a ir; estaba dibujado sobre la superficie de «esto va bien», que es lo que una
+  pantalla sin nada no es. Con ello llegan los números de la pantalla: el interlineado de la sección,
+  el hueco de la rejilla, el ancho de la introducción y de la nota, y los tres tamaños de la tarjeta.
+
+  **Ninguna tarjeta lidera.** El prototipo acentúa el botón de cada tarjeta y aquí no: una jerarquía
+  repetida N veces no es una jerarquía, que es la razón que ya sostiene la fila de un episodio.
+
+  **Y el ofrecimiento se cuenta en las dos posiciones**, porque el paseo autónomo no puede verlo: los
+  dos botones llevan el mismo nombre y el inventario los pliega en una sola identidad, así que perder
+  uno de los dos dejaría esa puerta igual de verde.
+
+### Corregido
+
+- **Los radios escritos en el marcado bajan de 82 a 80**, con la tarjeta de curso y su caja de vacío.
+  La pantalla de Cursos queda entera.
+
 - **La fila de una lección pasa a ser una sola línea, que es lo que el prototipo dibuja.** El árbol
   apilaba los dos botones **debajo** de la fila, así que cada lección medía cerca del doble de alto
   que la del diseño y una lista de veinte se leía como una página de formularios. Ahora van al

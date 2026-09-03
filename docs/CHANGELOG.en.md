@@ -10,6 +10,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The Courses screen puts the offer where the prototype puts it**, by the owner's decision of
+  2026-09-03: «Marcar una carpeta como curso…» sits **inside** the empty box while there are no
+  courses — accented, because there is nothing else on the screen to rank it against — and drops to
+  the **foot** in the plain button once there are. It was at the head and accented in both states,
+  with a reason written against exactly that; the reason leaves the file rather than staying there
+  contradicting what the file does.
+
+  **The empty state becomes a dashed box**, which is what the design draws for a place something is
+  going to go; it had been drawn on the «this is fine» surface, which a screen with nothing on it is
+  not. The screen's numbers come with it: the section's stacking, the grid's gap, the widths of the
+  intro and the note, and the card's three sizes.
+
+  **No card leads.** The prototype accents each card's own button and this does not: a hierarchy
+  repeated N times is not a hierarchy, which is the reason already holding the episode row.
+
+  **And the offer is counted in both positions**, because the autonomous walk cannot see it: both
+  buttons carry the same name and the inventory folds them into one identity, so losing either would
+  leave that gate exactly as green.
+
+### Fixed
+
+- **Corners written into the markup fall from 82 to 80**, with the course card and its empty box.
+  The Courses screen is done.
+
 - **A lesson's row becomes one line, which is what the prototype draws.** The tree stacked the two
   buttons **under** the row, so every lesson was close to twice the height of the design's and a list
   of twenty read as a page of forms. They now sit at the right end of it, in the prototype's order —
