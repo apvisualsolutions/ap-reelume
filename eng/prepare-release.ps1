@@ -183,11 +183,16 @@ try {
 
     # ---------------------------------------------------------------- the record
     $matrix = Get-Content -LiteralPath 'docs/FEATURES.md' -Raw
-    $unevidenced = @([regex]::Matches($matrix, '(?m)^\|\s*(?<id>[A-Z0-9]+-[0-9]+)\s*\|[^|]*\|\s*MVP\s*\|\s*VERIFIED\s*\|[^|]*\|(?<evidence>[^|]*)\|') |
+    # Every release, not just MVP. This asked only about MVP rows until 2026-09-03, which was the
+    # narrower question twice over: the publishing rule of 2026-08-31 counts every commitment, and
+    # what this script decides is whether the STABLE artifact may ship. LIB-013..017 sat VERIFIED
+    # with nothing checking their evidence, and a release gate that reads one release out of three
+    # is a gate that says yes about the part it looked at.
+    $unevidenced = @([regex]::Matches($matrix, '(?m)^\|\s*(?<id>[A-Z][A-Z0-9]{1,4}-[0-9]{3})\s*\|[^|]*\|[^|]*\|\s*VERIFIED\s*\|[^|]*\|(?<evidence>[^|]*)\|') |
         Where-Object { $_.Groups['evidence'].Value -notmatch '\]\(' } |
         ForEach-Object { $_.Groups['id'].Value })
     if ($unevidenced.Count -gt 0) {
-        Add-Blocker "Verified MVP commitments with no linked evidence: $($unevidenced -join ', ')."
+        Add-Blocker "Verified commitments with no linked evidence: $($unevidenced -join ', ')."
     }
 
     $arm64Matrix = Join-Path $repoRoot 'artifacts/package-arm64/arm64-matrix.json'
