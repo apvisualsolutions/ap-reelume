@@ -2991,4 +2991,110 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Style Selector="ProgressBar.confidence.pending">
     <Setter Property="Foreground" Value="{DynamicResource WarningBorderBrush}" />
   </Style>
+
+  <!--
+    THE COURSE'S THREAD CARD - «Dónde lo dejaste», the one panel of a course that answers where you
+    were. The prototype washes it in the accent and rings it in the accent itself, which is what
+    makes it the loudest thing on that screen without any of its text growing: the tree drew it as an
+    ordinary card - the shell's border over the card's surface - and gave the loudness to a 20 px
+    heading instead.
+
+    12, and it is the design's own number rather than the medium token. The scale stops at 8 and this
+    is a card rather than a row, which is the same reading Border.setting-row wrote at 10: a value
+    with no token is a literal, and ScalarTokenTests forbids writing a number that HAS one, which is
+    a different thing.
+
+    IT LIVES HERE RATHER THAN IN THE VIEW, and that is the whole point of the batch this belongs to:
+    a corner written into a view's own markup is invisible to SurfaceCornerTests, which pairs
+    classes. Eighty-six sites were doing that on 2026-09-03; this is the first of them to move.
+  -->
+  <Style Selector="Border.thread-card">
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="18" />
+  </Style>
+
+  <!--
+    The mark's notice, INSIDE the thread card and therefore over the accent's wash rather than over
+    the page. It is the one element of this card the prototype does not draw - there a mark raises a
+    toast, and this tree has no toast - so its shape is not read off the design: what is read off the
+    design is that it has to stay visible now that the card behind it is the wash the notice used to
+    use for itself.
+
+    Hence the card's own surface with the accent around it. The border is not decoration: both high
+    contrast dictionaries resolve AccentSubtleBrush and CardSurfaceBrush to the same ink, and a
+    notice told apart from its card by fill alone would stop existing there - which is the reading
+    Border.state-chip already wrote.
+  -->
+  <Style Selector="Border.thread-notice">
+    <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+    <Setter Property="Padding" Value="12" />
+  </Style>
+
+  <!--
+    The rule over «Lo último que viste», which the prototype draws as a hairline across the card with
+    ten pixels under it rather than as a gap. A gap alone would read as more spacing; the rule is what
+    says the recap is a section of the card and not a third paragraph of it.
+  -->
+  <Style Selector="Border.thread-recap">
+    <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="Padding" Value="0,10,0,0" />
+  </Style>
+
+  <!--
+    THE REST OF THE THREAD CARD'S NUMBERS, and they live here for the same reason its corner does:
+    ScalarTokenTests forbids a view writing a size or a spacing of its own, and every one of these is
+    a value the scale does not carry. Ten, six and three are not steps of the spacing scale and
+    fifteen and twelve and a half are not steps of the type scale - they are what the prototype draws
+    for this one card, and CourseThreadCardTests reads each of them out of the design rather than
+    trusting the numbers written below.
+
+    A class per element and not one clever shared one: the lesson and the minute differ in size,
+    weight AND ink, and a class that had to pick would be wrong on the line a person came to read.
+  -->
+  <Style Selector="StackPanel.thread-column">
+    <Setter Property="Spacing" Value="10" />
+  </Style>
+
+  <!--
+    Three pixels between the lesson and its minute, which the prototype writes as the minute's own
+    top margin. It is the tightest gap in the card on purpose: the two lines are one answer, and
+    anything wider reads as two.
+  -->
+  <Style Selector="StackPanel.thread-head">
+    <Setter Property="Spacing" Value="3" />
+  </Style>
+
+  <!-- The lesson itself: the one line the whole card exists to show, and the only 15 in the design. -->
+  <Style Selector="TextBlock.thread-lesson">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+
+  <!-- The minute under it and every line of the recap: the same half-pixel step in the same ink. -->
+  <Style Selector="TextBlock.thread-detail">
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+
+  <!--
+    The recap's bullet, in the accent rather than in the text it sits beside. It is the same size as
+    that text so the two share a line, and it carries no ink of the secondary sort: the dot is what
+    ties the recap back to the accent the card is washed in.
+  -->
+  <Style Selector="TextBlock.thread-bullet">
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="StackPanel.thread-recap-body">
+    <Setter Property="Spacing" Value="6" />
+  </Style>
 </Styles>

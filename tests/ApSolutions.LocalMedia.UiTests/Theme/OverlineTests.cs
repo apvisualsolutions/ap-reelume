@@ -306,7 +306,7 @@ public sealed class OverlineTests
         // Anti-blindness floor, and it is the one this test most needs: the whole check hangs on
         // finding the capitalised strings, and finding none would pass in silence.
         Assert.True(
-            shouted.Count >= 21,
+            shouted.Count >= 23,
             $"only {shouted.Count} capitalised strings were read; this reads the wrong file.");
 
         var classes = Pairings.Select(pairing => pairing.Class).ToArray();
@@ -346,10 +346,12 @@ public sealed class OverlineTests
             }
         }
 
-        // Twenty-one shouted strings, and one of them — «VELOCIDAD» — reaches no TextBlock at all:
-        // it is a ComboBox's Tag, which is why it is in the absent list above rather than here. One
-        // more is read from two views, so the sites outnumber the strings that reach one.
-        Assert.True(sites >= 21, $"only {sites} capitalised sites were found; this reads the wrong markup.");
+        // Twenty-three shouted strings, and one of them — «VELOCIDAD» — reaches no TextBlock at
+        // all: it is a ComboBox's Tag, which is why it is in the absent list above rather than here.
+        // One more is read from two views, so the sites outnumber the strings that reach one. The
+        // two newest are the course thread's own heading and its recap's, capitalised on 2026-09-03
+        // when that card stopped drawing its title as a 20 px subtitle.
+        Assert.True(sites >= 23, $"only {sites} capitalised sites were found; this reads the wrong markup.");
         Assert.True(
             offenders.Count == 0,
             "A view draws capitals without asking for an overline: " + string.Join(", ", offenders));

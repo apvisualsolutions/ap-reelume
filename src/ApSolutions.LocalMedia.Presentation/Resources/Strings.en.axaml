@@ -739,11 +739,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="CourseFinishedChip">Course finished</x:String>
   <x:String x:Key="CourseModuleFormat">Module {0} · {1}</x:String>
   <x:String x:Key="CourseNextInThreadChip">Next in the thread</x:String>
-  <x:String x:Key="CourseThreadTitle">Where you left off</x:String>
+  <x:String x:Key="CourseThreadTitle">WHERE YOU LEFT OFF</x:String>
   <x:String x:Key="CourseThreadCta">Pick up the thread</x:String>
   <x:String x:Key="CourseThreadRestartCta">Watch again from the start</x:String>
   <x:String x:Key="CourseResumeAtFormat">Resume at {0} / {1}</x:String>
-  <x:String x:Key="CourseRecapTitle">What you watched last</x:String>
+  <x:String x:Key="CourseRecapTitle">WHAT YOU WATCHED LAST</x:String>
   <x:String x:Key="CourseThreadNote">The thread keeps itself: last lesson, exact minute, and date. Nothing to write down to come back.</x:String>
   <x:String x:Key="CourseMarkWatchedAction">Mark as watched</x:String>
   <x:String x:Key="CourseUnmarkAction">Unmark</x:String>

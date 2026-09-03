@@ -10,6 +10,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The course thread's card becomes the one the prototype draws, all of it.** The tree wrote
+  «Dónde lo dejaste» as a 20 px subtitle over an ordinary card; the design draws it as a 10 px
+  overline in the accent's ink over a card **washed in the accent and ringed by it**, which puts the
+  weight on the lesson underneath — the line somebody opens that screen to read. **Changing only the
+  lettering would have left the card halfway between two designs**, so both halves went together.
+
+  With them go the rest of that card's numbers — the padding, the three gaps, the lesson's size and
+  the minute's — the rule over «Lo último que viste» with its bullet in the accent, and **the note
+  explaining the thread, which was inside the card and the prototype puts outside**: inside, it read
+  as a fifth line of the answer rather than as a remark about it.
+
+  **Every number is read from the design rather than copied**, by the two halves this repository
+  already demands: `CourseThreadCardTests` asserts that the tree draws what the table says and that
+  the table says what the design draws. **And the wash is counted in pixels** rather than in a
+  property: the card now covers more than four times the ink it covered, measured **at three
+  different thresholds**, because a threshold is a parameter of the measurement and not a constant.
+
+### Fixed
+
+- **The eighty-six corners written into the markup start coming down: 86 → 84.** No gate saw them,
+  because every one of them talks about classes. The ratchet holding them can only shrink and
+  **fails in both directions**, so each site paired has to bring it down in the same change. The
+  first two are the thread card's.
+
+  **And its own note was wrong**: it said a site closes by «moving into a class or taking the
+  design's own literal». The second closes nothing — the ratchet counts what the markup writes, so
+  swapping the token for the prototype's number leaves the site exactly where it was.
+
 - **The overline stops being one and becomes six, which is what the prototype draws.** The tree spent
   three classes over sixteen sites; the design draws **nine distinct combinations** of size, weight
   and tracking over thirty-five. Putting one class on all thirty-five would have invented a

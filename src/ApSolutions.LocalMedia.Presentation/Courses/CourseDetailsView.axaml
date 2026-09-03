@@ -129,75 +129,101 @@ never disagree.
     <!--
       The thread, 320 px of fixed column. Everything in it is one panel because it is one answer:
       where you left off, what you saw before that, and the button that carries on.
+
+      THE NOTE SITS OUTSIDE THE CARD, ten pixels under it, which is where the prototype puts it: it
+      explains that the thread keeps itself, so it is about the card rather than part of the answer.
+      It was inside until 2026-09-03, in the accent's wash, reading as a fifth line of the thread.
     -->
-    <Border
-        Grid.Column="1"
-        VerticalAlignment="Top"
-        Padding="16"
-        Background="{DynamicResource CardSurfaceBrush}"
-        BorderBrush="{DynamicResource ShellBorderBrush}"
-        BorderThickness="1"
-        CornerRadius="{DynamicResource CornerRadiusMedium}">
-      <StackPanel Spacing="{DynamicResource Space12}">
-        <TextBlock
-            FontSize="{DynamicResource FontSizeSubtitle}"
-            FontWeight="SemiBold"
-            Text="{DynamicResource CourseThreadTitle}"
-            automation:AutomationProperties.HeadingLevel="2" />
-        <StackPanel Spacing="{DynamicResource Space4}">
-          <TextBlock Text="{Binding ThreadLesson}" TextWrapping="Wrap" />
+    <StackPanel Grid.Column="1" Classes="thread-column" VerticalAlignment="Top">
+      <Border Classes="thread-card">
+        <StackPanel Spacing="{DynamicResource Space12}">
+          <!--
+            The overline the design draws here, and it is the accent's ink rather than a tone:
+            notice-overline sets no foreground precisely because this is one of the four places it
+            lands. It was a 20 px subtitle until 2026-09-03, which gave the card's weight to its own
+            title instead of to the lesson underneath - the one line a person is here to read.
+          -->
           <TextBlock
-              FontSize="{DynamicResource FontSizeCaption}"
-              Foreground="{DynamicResource TextSecondaryBrush}"
-              IsVisible="{Binding HasThreadMinute}"
-              Text="{Binding ThreadMinute}" />
+              Classes="notice-overline"
+              Foreground="{DynamicResource AccentInkBrush}"
+              Text="{DynamicResource CourseThreadTitle}"
+              automation:AutomationProperties.HeadingLevel="2" />
+          <StackPanel Classes="thread-head">
+            <TextBlock Classes="thread-lesson" Text="{Binding ThreadLesson}" />
+            <TextBlock
+                Classes="thread-detail"
+                IsVisible="{Binding HasThreadMinute}"
+                Text="{Binding ThreadMinute}" />
+          </StackPanel>
+          <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
+            <Button
+                x:Name="CourseThreadAction"
+                Classes="primary-action"
+                automation:AutomationProperties.Name="{Binding ThreadActionText}"
+                Command="{Binding ResumeThreadCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                <Path Classes="icon size-14 filled" VerticalAlignment="Center" Data="{DynamicResource IconPlay}" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding ThreadActionText}" />
+              </StackPanel>
+            </Button>
+          </WrapPanel>
+          <!--
+            What the last mark did, in ONE live region and announced politely: a mark is not an
+            interruption, and splitting it in two would split the announcement.
+
+            It carries the card's own surface now rather than the accent's wash, because the card
+            behind it IS that wash since 2026-09-03: a notice painted in its background's colour is
+            a notice nobody sees.
+          -->
+          <Border
+              Classes="thread-notice"
+              IsVisible="{Binding HasMarkNotice}"
+              automation:AutomationProperties.LiveSetting="Polite">
+            <TextBlock
+                FontSize="{DynamicResource FontSizeCaption}"
+                Text="{Binding MarkNotice}"
+                TextWrapping="Wrap" />
+          </Border>
+          <Border Classes="thread-recap" IsVisible="{Binding HasRecap}">
+            <StackPanel Classes="thread-recap-body">
+              <TextBlock Classes="group-overline" Text="{DynamicResource CourseRecapTitle}" />
+              <ItemsControl ItemsSource="{Binding Recap}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Classes="thread-recap-body" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+                      <!--
+                        The prototype's bullet, in the accent and hidden from the automation tree:
+                        the line beside it already says what it is, and a dot announced is a dot
+                        read out loud.
+                      -->
+                      <TextBlock
+                          Classes="thread-bullet"
+                          VerticalAlignment="Top"
+                          Text="●"
+                          automation:AutomationProperties.AccessibilityView="Raw" />
+                      <TextBlock
+                          Classes="thread-detail"
+                          Text="{Binding}"
+                          TextWrapping="Wrap" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
         </StackPanel>
-        <WrapPanel ItemSpacing="{DynamicResource Space8}" LineSpacing="{DynamicResource Space8}">
-          <Button
-              x:Name="CourseThreadAction"
-              Classes="primary-action"
-              Content="{Binding ThreadActionText}"
-              automation:AutomationProperties.Name="{Binding ThreadActionText}"
-              Command="{Binding ResumeThreadCommand}" />
-        </WrapPanel>
-        <!--
-          What the last mark did, in ONE live region and announced politely: a mark is not an
-          interruption, and splitting it in two would split the announcement.
-        -->
-        <Border
-            Padding="12"
-            Background="{DynamicResource AccentSubtleBrush}"
-            CornerRadius="{DynamicResource CornerRadiusSmall}"
-            IsVisible="{Binding HasMarkNotice}"
-            automation:AutomationProperties.LiveSetting="Polite">
-          <TextBlock
-              FontSize="{DynamicResource FontSizeCaption}"
-              Text="{Binding MarkNotice}"
-              TextWrapping="Wrap" />
-        </Border>
-        <StackPanel Spacing="{DynamicResource Space4}" IsVisible="{Binding HasRecap}">
-          <TextBlock
-              FontSize="{DynamicResource FontSizeCaption}"
-              FontWeight="SemiBold"
-              Foreground="{DynamicResource TextSecondaryBrush}"
-              Text="{DynamicResource CourseRecapTitle}" />
-          <ItemsControl ItemsSource="{Binding Recap}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="x:String">
-                <TextBlock
-                    FontSize="{DynamicResource FontSizeCaption}"
-                    Text="{Binding}"
-                    TextWrapping="Wrap" />
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </StackPanel>
-        <TextBlock
-            FontSize="{DynamicResource FontSizeCaption}"
-            Foreground="{DynamicResource TextSecondaryBrush}"
-            Text="{DynamicResource CourseThreadNote}"
-            TextWrapping="Wrap" />
-      </StackPanel>
-    </Border>
+      </Border>
+      <TextBlock
+          Padding="4,0"
+          FontSize="{DynamicResource FontSizeCaption}"
+          Foreground="{DynamicResource TextSecondaryBrush}"
+          Text="{DynamicResource CourseThreadNote}"
+          TextWrapping="Wrap" />
+    </StackPanel>
   </Grid>
 </UserControl>

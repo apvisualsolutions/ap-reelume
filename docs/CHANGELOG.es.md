@@ -10,6 +10,36 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La tarjeta del hilo de un curso pasa a ser la que el prototipo dibuja, entera.** El árbol
+  escribía «Dónde lo dejaste» como subtítulo de 20 px sobre una tarjeta corriente; el diseño la
+  dibuja como versalita de 10 en la tinta del acento sobre una tarjeta **lavada en el acento y
+  rodeada por él**, dando el peso a la lección de debajo, que es la línea por la que alguien abre
+  esa pantalla. **Cambiar sólo la letra habría dejado la tarjeta a medio camino entre dos diseños**,
+  así que las dos mitades van juntas.
+
+  Con ellas van los demás números de esa tarjeta —el relleno, los tres huecos, el tamaño de la
+  lección y el del minuto—, la regla sobre «Lo último que viste» con su viñeta en el acento, y **la
+  nota que explica el hilo, que estaba dentro de la tarjeta y el prototipo pone fuera**: dentro se
+  leía como una quinta línea de la respuesta en vez de como una aclaración sobre ella.
+
+  **Cada número se lee del diseño y no se copia**, por las dos mitades que este repositorio ya
+  exige: `CourseThreadCardTests` afirma que el árbol dibuja lo que la tabla dice y que la tabla dice
+  lo que el diseño dibuja. **Y el lavado se cuenta en píxeles**, no en una propiedad: la tarjeta
+  cubre ahora más de cuatro veces la tinta que cubría, medido **con tres umbrales distintos** porque
+  un umbral es un parámetro de la medición y no una constante.
+
+### Corregido
+
+- **Los ochenta y seis radios escritos en el marcado empiezan a bajar: 86 → 84.** Ninguna puerta los
+  veía, porque todas hablan de clases. El trinquete que los sujeta sólo puede encoger y **falla en
+  las dos direcciones**, así que cada sitio emparejado tiene que bajarlo en el mismo cambio. Los dos
+  primeros son los de la tarjeta del hilo.
+
+  **Y su propia nota estaba equivocada**: decía que un sitio se cierra «moviéndolo a una clase o
+  tomando el literal del diseño». Lo segundo no cierra nada — el trinquete cuenta lo que el marcado
+  escribe, así que cambiar el token por el número del prototipo deja el sitio exactamente donde
+  estaba.
+
 - **La versalita deja de ser una y pasa a ser seis, que es lo que el prototipo dibuja.** El árbol
   gastaba tres clases en dieciséis sitios; el diseño dibuja **nueve combinaciones** distintas de
   tamaño, peso y separación entre letras en treinta y cinco. Poner una sola clase en los treinta y

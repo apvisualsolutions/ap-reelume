@@ -739,11 +739,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="CourseFinishedChip">Curso terminado</x:String>
   <x:String x:Key="CourseModuleFormat">Módulo {0} · {1}</x:String>
   <x:String x:Key="CourseNextInThreadChip">Siguiente en el hilo</x:String>
-  <x:String x:Key="CourseThreadTitle">Dónde lo dejaste</x:String>
+  <x:String x:Key="CourseThreadTitle">DÓNDE LO DEJASTE</x:String>
   <x:String x:Key="CourseThreadCta">Retomar el hilo</x:String>
   <x:String x:Key="CourseThreadRestartCta">Volver a empezar</x:String>
   <x:String x:Key="CourseResumeAtFormat">Reanudar en {0} / {1}</x:String>
-  <x:String x:Key="CourseRecapTitle">Lo último que viste</x:String>
+  <x:String x:Key="CourseRecapTitle">LO ÚLTIMO QUE VISTE</x:String>
   <x:String x:Key="CourseThreadNote">El hilo se guarda solo: última lección, minuto exacto y fecha. No hay que apuntar nada para volver.</x:String>
   <x:String x:Key="CourseMarkWatchedAction">Marcar como vista</x:String>
   <x:String x:Key="CourseUnmarkAction">Quitar la marca</x:String>
