@@ -169,7 +169,17 @@ public sealed class QuotedFigureTests
                 RepositoryLayout.PathFromRoot(".claude"),
                 "*.md",
                 SearchOption.AllDirectories))
-            .Where(File.Exists);
+            .Where(File.Exists)
+
+            // NOT the worktrees, which are other sessions' checkouts of this same repository sitting
+            // inside it and ignored by git. Measured on 2026-09-03, when three sessions were started
+            // in parallel: each one holds its own CLAUDE.md at whatever commit it began from, so a
+            // figure this batch had just corrected read as wrong from three copies at once and put
+            // this gate red over work nobody had done. A gate that fails because somebody else is
+            // working is a gate that teaches people to ignore it.
+            .Where(path => !path
+                .Replace(Path.DirectorySeparatorChar, '/')
+                .Contains("/.claude/worktrees/", StringComparison.Ordinal));
 
         foreach (var path in documents)
         {

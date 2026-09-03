@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using ApSolutions.LocalMedia.Application.Courses;
 using ApSolutions.LocalMedia.Domain.Courses;
 using ApSolutions.LocalMedia.Domain.Discovery;
@@ -16,16 +17,16 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// <remarks>
 /// <b>Everything this class decides lives one layer up.</b> Which lesson, which moment, whether the
 /// picture is stale and how long to wait are <see cref="CourseThumbnailPolicy"/>'s, tested without a
-/// decoder anywhere near them. What is left here is opening a file, seeking, asking for a snapshot
-/// and waiting — and that is the shape the tenth rule asks for, so that only what genuinely needs a
-/// machine is excluded from coverage.
+/// decoder anywhere near them. What is left here is opening a file, seeking, keeping a frame and
+/// encoding it.
 /// <para>
-/// <b>The route was measured before it was written</b> — «docs/evidence/stable/CRS-thumbnail-spike.md»,
-/// 2026-09-03. The expectation going in was that this could not work at all: this application draws
-/// video through LibVLC's callback path, and PLY-016 measured that VLC 3's filter chain never
-/// processes a frame there. It does not carry over. A snapshot works with no video output attached,
-/// which is what this uses, and the four decodable samples answered between 433 and 472 ms after the
-/// seek.
+/// <b>IT ASKED LIBVLC FOR THE FILE UNTIL 2026-09-03, AND THAT DOES NOT SURVIVE A MACHINE WITH NO
+/// SCREEN.</b> <c>TakeSnapshot</c> works on a developer's desktop and produced <b>no frame at all</b>
+/// on a hosted runner — measured, one red build. A snapshot is written by the video output and a
+/// runner has none. The frames the callback path hands over need no output of any kind: they are the
+/// same frames this application already paints with, and the spike had measured them arriving in
+/// 137 ms while the snapshot route was never measured anywhere but here. <b>Choosing the route that
+/// only works where it was tried</b> is the mistake this paragraph exists to stop repeating.
 /// </para>
 /// <para>
 /// <b>The extension is checked before anything is opened.</b> LibVLC decodes in-process in native
@@ -36,13 +37,6 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// </remarks>
 public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
 {
-    /// <summary>
-    /// How wide a taken frame is written. The grid draws a 280 px card, so twice that covers a
-    /// high-DPI screen without keeping a full frame of a 4K lesson on disk for every course.
-    /// Zero height asks LibVLC to keep the source's own aspect ratio.
-    /// </summary>
-    private const uint ThumbnailWidth = 560;
-
     private readonly Func<string, IFrameCapture> _open;
 
     /// <summary>The adapter as the application uses it, over the one native instance there is.</summary>
@@ -60,8 +54,8 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
     }
 
     /// <summary>
-    /// The adapter over anything that can open and snapshot, which is what lets the waiting and the
-    /// refusing be measured without a decoder.
+    /// The adapter over anything that can open a file and hand back a frame, which is what lets the
+    /// waiting and the refusing be measured without a decoder.
     /// </summary>
     /// <remarks>
     /// Public, for the reason <c>IEndpointFormatStore</c> and <c>IEndpointFormatProbe</c> are: the
@@ -78,9 +72,21 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
         /// <summary>Starts decoding and seeks to <paramref name="at"/>. False when it will not open.</summary>
         bool Start(TimeSpan at);
 
-        /// <summary>Asks for a still to be written, and answers whether the ask was accepted.</summary>
-        bool RequestSnapshot(string destinationPath, uint width);
+        /// <summary>
+        /// The first frame decoded after the seek, or nothing if none arrived within
+        /// <paramref name="deadline"/>.
+        /// </summary>
+        CapturedFrame? WaitForFrame(TimeSpan deadline);
     }
+
+    /// <summary>One decoded frame, as it comes off the decoder.</summary>
+    /// <param name="Pixels">Blue-first, four bytes a pixel, which is LibVLC's RV32.</param>
+    /// <param name="Width">Pixels across.</param>
+    /// <param name="Height">Rows.</param>
+    /// <param name="Stride">
+    /// Bytes per row, which a decoder aligns and is not always four times the width.
+    /// </param>
+    public readonly record struct CapturedFrame(byte[] Pixels, int Width, int Height, int Stride);
 
     /// <inheritdoc />
     public async Task<bool> TryCaptureAsync(
@@ -98,63 +104,126 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
             return false;
         }
 
-        using var capture = _open(videoPath);
-        if (!capture.Start(at))
-        {
-            return false;
-        }
-
-        if (!capture.RequestSnapshot(destinationPath, ThumbnailWidth))
-        {
-            return false;
-        }
-
-        // The snapshot is written on LibVLC's own thread, so what says it happened is the file
-        // appearing rather than the call returning. The deadline is the policy's, measured to sit
-        // between the slowest success and the one file that never answers.
-        var deadline = DateTimeOffset.UtcNow + CourseThumbnailPolicy.Deadline;
-        while (DateTimeOffset.UtcNow < deadline)
-        {
-            if (File.Exists(destinationPath) && new FileInfo(destinationPath).Length > 0)
+        // On a pool thread because the wait below is a native event rather than a task: blocking the
+        // caller's thread here would stall whatever asked for the picture, and a grid of courses asks
+        // for many.
+        return await Task.Run(
+            () =>
             {
+                using var capture = _open(videoPath);
+                if (!capture.Start(at))
+                {
+                    return false;
+                }
+
+                if (capture.WaitForFrame(CourseThumbnailPolicy.Deadline) is not { } frame)
+                {
+                    return false;
+                }
+
+                PngWriter.WriteBgra(frame.Pixels, frame.Width, frame.Height, frame.Stride, destinationPath);
                 return true;
-            }
-
-            await Task.Delay(25, cancellationToken).ConfigureAwait(false);
-        }
-
-        return false;
+            },
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// The real decoder. Creating LibVLC objects and catching what only native code can raise.
+    /// The real decoder: LibVLC's callback path, which is how this application already receives every
+    /// frame it paints.
     /// </summary>
     /// <remarks>
-    /// <b>Excluded from coverage, and only this.</b> Every line here either constructs a native
-    /// object or catches what a machine without a decoder throws; none of it decides anything. What
-    /// decides — which frame, when to give up, whether to take it again — is
-    /// <see cref="CourseThumbnailPolicy"/> and <see cref="GetCourseThumbnail"/>, both covered
-    /// entirely without a video. That split is the tenth rule, and the reason this exclusion is
-    /// narrow enough to be honest.
+    /// <b>Excluded from coverage, and only this.</b> Every line here either borrows a native object,
+    /// marshals a buffer or catches what a machine without a decoder throws; none of it decides
+    /// anything. What decides is <see cref="CourseThumbnailPolicy"/> and
+    /// <see cref="GetCourseThumbnail"/>, and every byte written is <see cref="PngWriter"/>'s — all
+    /// three covered without a video anywhere near them. That split is the tenth rule, and the reason
+    /// this exclusion is narrow enough to be honest.
     /// </remarks>
-    [ExcludeFromCodeCoverage(Justification = "Borrows LibVLC objects and catches native failures; every decision is in CourseThumbnailPolicy.")]
+    [ExcludeFromCodeCoverage(Justification = "Borrows LibVLC objects and marshals its buffers; every decision is in CourseThumbnailPolicy and every byte written is PngWriter's.")]
     private sealed class LibVlcCapture : IFrameCapture
     {
         private readonly LibVlcFactory _factory;
         private readonly VlcMedia _media;
         private readonly MediaPlayer _player;
+        private readonly ManualResetEventSlim _arrived = new(false);
+        private readonly Lock _sync = new();
+
+        // Held for the life of the capture because LibVLC keeps the pointers: a delegate collected
+        // while the decoder still holds it is a native crash rather than an exception.
+        private readonly MediaPlayer.LibVLCVideoFormatCb _format;
+        private readonly MediaPlayer.LibVLCVideoCleanupCb _cleanup;
+        private readonly MediaPlayer.LibVLCVideoLockCb _lock;
+        private readonly MediaPlayer.LibVLCVideoDisplayCb _display;
+
+        private nint _buffer;
+        private uint _width;
+        private uint _height;
+        private uint _stride;
+        private uint _lines;
+        private bool _seeked;
+        private CapturedFrame? _kept;
 
         public LibVlcCapture(LibVlcFactory factory, string path)
         {
             _factory = factory;
             _media = factory.CreateMedia(path);
             _player = factory.CreateMediaPlayer();
+
+            _format = (ref nint opaque, nint chroma, ref uint width, ref uint height, ref uint pitch, ref uint lines) =>
+            {
+                WriteFourCc(chroma, "RV32");
+                pitch = width * 4;
+                lines = height;
+                _width = width;
+                _height = height;
+                _stride = pitch;
+                _lines = lines;
+                _buffer = Marshal.AllocHGlobal((int)(pitch * lines));
+                return 1;
+            };
+
+            _cleanup = (ref nint opaque) =>
+            {
+                if (_buffer != 0)
+                {
+                    Marshal.FreeHGlobal(_buffer);
+                    _buffer = 0;
+                }
+            };
+
+            _lock = (nint opaque, nint planes) =>
+            {
+                Marshal.WriteIntPtr(planes, _buffer);
+                return 0;
+            };
+
+            _display = (nint opaque, nint picture) =>
+            {
+                lock (_sync)
+                {
+                    // Only after the seek has landed: the frames before it are the ones at zero,
+                    // which is a black frame or a title card in almost every video anybody records.
+                    if (!_seeked || _kept is not null || _buffer == 0)
+                    {
+                        return;
+                    }
+
+                    var bytes = new byte[_stride * _lines];
+                    Marshal.Copy(_buffer, bytes, 0, bytes.Length);
+                    _kept = new CapturedFrame(bytes, (int)_width, (int)_height, (int)_stride);
+                }
+
+                _arrived.Set();
+            };
         }
 
         public bool Start(TimeSpan at)
         {
             try
             {
+                _player.SetVideoFormatCallbacks(_format, _cleanup);
+                _player.SetVideoCallbacks(_lock, null, _display);
+
                 if (!_player.Play(_media))
                 {
                     return false;
@@ -174,6 +243,11 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
 
                 _player.Time = (long)at.TotalMilliseconds;
                 Thread.Sleep(250);
+                lock (_sync)
+                {
+                    _seeked = true;
+                }
+
                 return true;
             }
             catch (VLCException)
@@ -182,15 +256,12 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
             }
         }
 
-        public bool RequestSnapshot(string destinationPath, uint width)
+        public CapturedFrame? WaitForFrame(TimeSpan deadline)
         {
-            try
+            _ = _arrived.Wait(deadline);
+            lock (_sync)
             {
-                return _player.TakeSnapshot(0, destinationPath, width, 0);
-            }
-            catch (VLCException)
-            {
-                return false;
+                return _kept;
             }
         }
 
@@ -212,6 +283,15 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
             // its player does is the native failure mode this repository keeps relearning, and the
             // factory is where the waiting lives.
             _factory.DeferRelease(_media);
+            _arrived.Dispose();
+        }
+
+        private static void WriteFourCc(nint chroma, string code)
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                Marshal.WriteByte(chroma, i, (byte)code[i]);
+            }
         }
     }
 }

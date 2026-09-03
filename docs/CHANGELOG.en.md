@@ -62,6 +62,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A documentation gate went red because another session was working.** It walked every document
+  in the tree, and parallel sessions' worktrees now live inside it — ignored by git — each holding
+  its own copy of the guide at whatever commit it started from. A figure this batch had just
+  corrected read as wrong from three copies at once. **A gate that fails because somebody else is
+  working is a gate that teaches people to ignore it.**
+
+- **The frame was taken by a route that only works where it was tried, and CI caught it.** The
+  first version asked the video layer for the picture, which is written by the **screen output** —
+  and a CI server has none: zero frames there, working here. It now keeps the frame the application
+  already receives in order to paint, which needs no output of any kind and was the fastest of the
+  three routes measured anyway.
+
+  The price is encoding the picture by hand — sixty lines and no new dependency — checked byte by
+  byte: the signature, the header, the channel order, padded rows, and **the checksum, which is the
+  detail a reader rejects the whole file over**.
+
+  **The lesson goes into the evidence and is wider than this: a route measured on one machine is
+  measured on one machine.** All three worked here, and the choice was made on convenience rather
+  than robustness. It cost a thirty-minute red build.
+
 - **CI ran the accessibility journey FOUR times a round**, and no longer does. Once inside the
   verification, twice as a gate — back to back, over the same code — and a fourth time only to count
   what it had pressed. Measured from the run's own result files: **13 minutes a round spent repeating

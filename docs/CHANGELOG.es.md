@@ -62,6 +62,26 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Una puerta de documentación se ponía roja porque otra sesión estaba trabajando.** Recorría
+  todos los documentos del árbol, y ahí dentro viven ahora los espacios de trabajo de las sesiones
+  paralelas —que git ignora—, cada uno con su copia de la guía en el commit del que arrancó. Una
+  cifra recién corregida se leía como equivocada desde tres copias a la vez. **Una puerta que falla
+  porque otro está trabajando es una puerta que enseña a ignorarla.**
+
+- **El fotograma se sacaba por una vía que sólo funciona donde se probó, y CI lo destapó.** La
+  primera versión le pedía la imagen a la capa de vídeo, que la escribe **la salida de pantalla** —
+  y un servidor de CI no tiene ninguna: cero fotogramas allí, funcionando aquí. Ahora se queda el
+  fotograma que la propia aplicación ya recibe para pintar, que no necesita salida de ninguna clase
+  y era además el más rápido de los tres caminos medidos.
+
+  El precio es codificar la imagen a mano —sesenta líneas y ninguna dependencia nueva—, comprobadas
+  byte a byte: la firma, la cabecera, el orden de los colores, las filas con relleno y **la suma de
+  control, que es el detalle por el que un lector rechaza el archivo entero**.
+
+  **La lección va a la evidencia y es más ancha que esto: una vía medida en una sola máquina está
+  medida en una sola máquina.** Las tres funcionaban aquí, y la elección se hizo por comodidad en
+  vez de por robustez. Costó un build rojo de media hora.
+
 - **CI corría el recorrido accesible CUATRO veces por vuelta**, y ya no. Una dentro de la
   verificación, dos como puerta —seguidas, sobre el mismo código— y una cuarta sólo para contar lo
   que había pulsado. Medido desde los archivos de resultados del propio run: **13 minutos por vuelta

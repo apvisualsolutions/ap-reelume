@@ -138,12 +138,19 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
             $"it waited {watch.Elapsed} for a frame that was never coming.");
     }
 
-    /// <summary>Accepts everything and delivers nothing, which is the failure the deadline is for.</summary>
+    /// <summary>Opens fine and never hands over a frame, which is the failure the deadline is for.</summary>
     private sealed class SilentCapture : LibVlcCourseFrameGrabber.IFrameCapture
     {
         public bool Start(TimeSpan at) => true;
 
-        public bool RequestSnapshot(string destinationPath, uint width) => true;
+        public LibVlcCourseFrameGrabber.CapturedFrame? WaitForFrame(TimeSpan deadline)
+        {
+            // It waits the deadline out rather than answering at once: what is being measured is
+            // that the caller gives up, and an instant refusal would pass on a caller that waits
+            // for ever.
+            Thread.Sleep(deadline);
+            return null;
+        }
 
         public void Dispose()
         {

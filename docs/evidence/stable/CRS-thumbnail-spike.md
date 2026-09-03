@@ -72,6 +72,38 @@ means no picture, which is the right answer — but it costs **4.5 s to give up*
 the harness's rather than LibVLC's. Any implementation needs a deadline of its own or one unreadable
 file stalls the grid.
 
+## Enmienda del 2026-09-03: dos de las tres vías no sirven fuera de esta máquina / Amendment, 2026-09-03: two of the three routes do not survive off this machine
+
+**Las vías A y B usan `TakeSnapshot`, y en un runner de GitHub no producen ningún fotograma.** Medido
+en un build rojo: la prueba que abre un MP4 y espera una imagen falló con «no frame came out of a
+sample the codec matrix calls playable». Una instantánea la escribe **la salida de vídeo**, y un
+runner hospedado no tiene ninguna. Aquí funcionaban porque esta máquina sí la tiene.
+
+**La vía C no depende de eso y es la que se implementó**: los fotogramas del camino por callbacks son
+los mismos que esta aplicación ya pinta, no necesitan salida de vídeo de ninguna clase, y eran
+además los más rápidos de los tres. Lo que faltaba era codificarlos, que resultó ser sesenta líneas
+sin dependencias nuevas.
+
+**La lección, que es más ancha que este spike: una vía medida en una sola máquina está medida en una
+sola máquina.** Las tres «funcionaron» aquí y el spike lo escribió sin distinguirlas, así que la
+elección se hizo por comodidad —`TakeSnapshot` escribe el archivo solo— y no por robustez. El coste
+fue un build rojo de treinta minutos.
+
+/ **Routes A and B use `TakeSnapshot`, and on a GitHub runner they produce no frame at all.** Measured
+in a red build: the test that opens an MP4 and waits for a picture failed with «no frame came out of
+a sample the codec matrix calls playable». A snapshot is written by the **video output**, and a
+hosted runner has none. They worked here because this machine has one.
+
+**Route C does not depend on that and is what was implemented**: the callback path's frames are the
+same ones this application already paints, need no video output of any kind, and were the fastest of
+the three anyway. What was missing was an encoder, which turned out to be sixty lines and no new
+dependency.
+
+**The lesson, wider than this spike: a route measured on one machine is measured on one machine.**
+All three «worked» here and the spike wrote that down without distinguishing them, so the choice was
+made on convenience — `TakeSnapshot` writes the file for you — rather than on robustness. It cost a
+thirty-minute red build.
+
 ## Lo que esta medición NO dice / What this measurement does NOT say
 
 - **Las muestras son sintéticas, cortas y pequeñas**: de 3 a 8 segundos, de 320×192 a 720×480. Una

@@ -81,6 +81,15 @@
 >
 > ### The traps this batch leaves
 >
+> · **A GATE CAN GO RED BECAUSE ANOTHER SESSION IS WORKING.** Parallel sessions' worktrees live
+>   inside the tree and git ignores them, but a gate walking «every document» read them: three copies
+>   of the guide, each at its own commit, failing a figure that had just been corrected. When working
+>   in parallel, check whose file the gate names before believing the red.
+> · **A ROUTE MEASURED ON ONE MACHINE IS MEASURED ON ONE MACHINE.** The frame spike tried three
+>   routes, all three worked here, and the most convenient was chosen — the one that asks the video
+>   layer for the picture. On a CI server there **is no screen output and no frame comes out at
+>   all**: a thirty-minute red build. The right route was the one using the frames the application
+>   already receives, which needs no output of anything.
 > · **A MEASURING TOOL CAN RETURN A FALSE VERDICT AND SEND YOU TO FIX WHAT IS ALREADY RIGHT.** The
 >   floor previewer said **0/0** about files covered 100 %: a coverage report names each class by a
 >   path relative to **its own project**, so the same file arrives under two keys and the one being

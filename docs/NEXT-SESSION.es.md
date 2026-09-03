@@ -80,6 +80,16 @@
 >
 > ### Las trampas que deja esta tanda
 >
+> · **UNA PUERTA PUEDE PONERSE ROJA PORQUE OTRA SESIÓN ESTÁ TRABAJANDO.** Los espacios de trabajo
+>   de las sesiones paralelas viven dentro del árbol y git los ignora, pero una puerta que recorría
+>   «todos los documentos» los leía: tres copias de la guía, cada una en su commit, tumbando una
+>   cifra recién corregida. Al trabajar en paralelo, comprueba de quién es el archivo que la puerta
+>   nombra antes de creerte el rojo.
+> · **UNA VÍA MEDIDA EN UNA SOLA MÁQUINA ESTÁ MEDIDA EN UNA SOLA MÁQUINA.** El spike del fotograma
+>   probó tres caminos, los tres funcionaron aquí, y se eligió el más cómodo — el que le pide la
+>   imagen a la capa de vídeo. En un servidor de CI **no hay salida de pantalla y no sale ningún
+>   fotograma**: build rojo de media hora. El camino bueno era el que usa los fotogramas que la
+>   aplicación ya recibe, que no necesita salida de nada.
 > · **UNA HERRAMIENTA DE MEDICIÓN PUEDE DAR UN VEREDICTO FALSO Y MANDARTE A ARREGLAR LO QUE ESTÁ
 >   BIEN.** El previsualizador de suelos decía **0/0** sobre archivos cubiertos al 100 %: un informe
 >   de cobertura nombra cada clase con una ruta relativa a **su propio proyecto**, así que el mismo
