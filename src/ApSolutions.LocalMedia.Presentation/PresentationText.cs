@@ -21,12 +21,23 @@ namespace ApSolutions.LocalMedia.Presentation;
 public static class PresentationText
 {
     /// <summary>The string for this key, or the fallback when nothing resolves it.</summary>
+    public static string Resource(string key, string fallback) =>
+        Resource(Avalonia.Application.Current, key, fallback);
+
+    /// <summary>The same, against a given application rather than the running one.</summary>
     /// <remarks>
+    /// <b>Public so that «there is no application» can be measured</b>, which is the arm that
+    /// matters most: it is what every view model built in a test takes, and the one where throwing
+    /// instead of answering would turn each of those into a crash. Reached through the running
+    /// application it is unreachable by definition — the harness has already built one — so a seam
+    /// is the difference between covering that arm and exempting it.
+    /// <para>
     /// The variant is null on purpose: these live in language dictionaries rather than theme ones,
     /// and asking for the running theme variant resolves none of them.
+    /// </para>
     /// </remarks>
-    public static string Resource(string key, string fallback) =>
-        Avalonia.Application.Current is { } application
+    public static string Resource(Avalonia.Application? application, string key, string fallback) =>
+        application is not null
             && application.TryGetResource(key, null, out var value)
             && value is string text
                 ? text

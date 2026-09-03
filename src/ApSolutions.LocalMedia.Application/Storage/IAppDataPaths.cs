@@ -26,6 +26,19 @@ public interface IAppDataPaths
     /// <summary>Artwork downloaded from a provider. It regenerates, so it never travels.</summary>
     string RemoteCacheDirectory { get; }
 
+    /// <summary>
+    /// Frames taken from a course's own video to stand as its picture (CRS-006).
+    /// </summary>
+    /// <remarks>
+    /// Beside the downloaded artwork rather than beside the personal kind, and that is the decision
+    /// this makes: nobody chose these, the application took them, and every one can be taken again
+    /// from a file that is still on the disk. So they regenerate and they never travel — the backup's
+    /// allow-list carries «personal-artwork» and nothing else, which is what already refuses them.
+    /// A cover somebody actually chose for a course does travel, because a course's identity is a
+    /// title's identity and it lands in the personal folder like any other.
+    /// </remarks>
+    string CourseThumbnailDirectory { get; }
+
     /// <summary>Where an exported diagnostic report is written, and nowhere a backup ever looks.</summary>
     string DiagnosticsDirectory { get; }
 

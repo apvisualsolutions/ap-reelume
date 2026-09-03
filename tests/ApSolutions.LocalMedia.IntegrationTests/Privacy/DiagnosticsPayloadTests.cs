@@ -345,6 +345,8 @@ public sealed class DiagnosticsPayloadTests
 
         public string RemoteCacheDirectory { get; } = Path.Combine(dataRoot, "cache", "artwork");
 
+        public string CourseThumbnailDirectory { get; } = Path.Combine(dataRoot, "cache", "course-thumbnails");
+
         public string DiagnosticsDirectory { get; } = Path.Combine(dataRoot, "diagnostics");
 
         // Never the key Windows reads at sign-in: a suite leaves nothing behind there.
