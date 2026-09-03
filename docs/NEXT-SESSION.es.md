@@ -131,6 +131,16 @@
 >   enterarse; y si el contenido de ese commit viejo hubiera llegado a `main` por otra vía, habría
 >   autorizado borrar un worktree con trabajo nuevo dentro. **El SHA se lee del worktree en el
 >   momento** (`git worktree list --porcelain`), nunca de una nota.
+> · **Y ese mismo defecto salió CINCO veces en un día, la última dentro de la guarda que decide si se
+>   borra el trabajo de alguien.** Al retirar el worktree de otra sesión, la comprobación por
+>   ancestría contestó que su trabajo **no** estaba en `main` — falso: estaba, con otro identificador,
+>   porque consolidar por rebase reescribe el commit. Habría bloqueado en falso, que es del lado
+>   seguro, pero por la razón equivocada. **Un identificador de commit no es su contenido**, y la
+>   guarda que decide un borrado tiene que preguntar por lo segundo.
+> · **`git worktree remove` no puede borrar la carpeta raíz si otra sesión la tiene como cwd**:
+>   contesta `Permission denied`, **vacía el contenido y desregistra el worktree igualmente**. Así
+>   que el directorio vacío que queda no es un fallo — desaparece al cerrarse esa sesión. Y sigue sin
+>   hacer falta `--force`.
 > · **Y esa lección estaba a medias: una guarda sobre IDENTIDAD de commit no sobrevive a que otro
 >   reescriba la historia.** Escrita ya la línea de arriba, la guarda de cierre acordada seguía
 >   preguntando `git merge-base --is-ancestor <su-sha> main` — y al consolidar el trabajo de tres
@@ -168,6 +178,13 @@
 >   familia del `2>/dev/null` que este repositorio ya tiene documentada. **Al comprobar que algo NO
 >   existe, se cuenta o no se filtra**: si truncas, cuenta primero con `| wc -l` para saber qué
 >   dejas fuera. Un `head` sin recuento al lado es una respuesta parcial disfrazada de completa.
+> · **LA FORMA DE ESTE DEFECTO NO ES EL SILENCIO: ES LA SEGURIDAD.** Cuatro guardas distintas dieron
+>   una respuesta **segura y equivocada** el mismo día — la del SHA anotado, el `-Branch` del vigía
+>   afirmando que el push no había disparado el flujo, una sonda de aviso con el año mal que contó
+>   525.624 minutos, y dos `| head` que convirtieron ausencia de salida en ausencia del hecho.
+>   **Ninguna calló. Todas contestaron.** Este repositorio lleva escrito que un vigía callado es
+>   indistinguible de uno que no corrió; la mitad que faltaba es que **una respuesta con aplomo es
+>   peor**, porque se obedece.
 > · **Y las tres cosas de arriba son la misma**: una afirmación que mezcla lo medido con lo deducido
 >   se lee como una sola y se hereda entera. Pasó tres veces en un día — la línea del cierre que
 >   declaraba «falso positivo conocido» cuando dos de sus tres piezas seguían siendo ciertas, la
@@ -275,7 +292,26 @@
 > **4. El encabezado en versalita** ya tiene clase (`TextBlock.section-overline`) y el prototipo lo
 > dibuja en **35 sitios**; en el árbol se usa en dos. Va con la tanda 2.
 >
-> ### Lo que NO se resuelve programando
+> ### Un hallazgo abierto: el hook de post-push apunta al commit equivocado
+
+**Visto en vivo el 2026-09-02, en el propio fast-forward.** `.claude/hooks/post-push.sh` emite
+`rev-parse HEAD`, y HEAD **no tiene por qué ser lo que salió por el cable**: tras avanzar `main` me
+ofreció armar el vigía sobre un commit local sin empujar, que no tiene run ninguno.
+
+**No es el defecto del prefijo que se arregló ese día**: el SHA es entero y correcto, sólo que no es
+el que se empujó. Y el vigía ya no miente — dirá «NO RUN EXISTS for that commit», que es **cierto**.
+Es un aviso engañoso, no una respuesta falsa; merece arreglo porque un aviso que apunta al commit
+equivocado enseña a ignorar el hook, pero no es de la misma familia.
+
+**Y aquí está la tensión, escrita para que quien lo tome no empiece por donde ya se descartó dos
+veces**: sacar el SHA empujado del refspec —`git push origin rama:otra` no empuja HEAD— es **adivinar
+el refspec**, que es justo lo que este hook rechazó por escrito en su cabecera y lo que se volvió a
+rechazar al no emitir `-Branch`. Repetirlo sería deshacer dos decisiones sin decirlo. **La vía que
+queda propuesta**: no cambiar el SHA, sino que el hook **diga cuándo no puede estar seguro** —
+cuando el comando del push nombra una referencia distinta de HEAD, decirlo en el aviso en vez de
+callarlo. Informar sin adivinar.
+
+### Lo que NO se resuelve programando
 >
 > · **`PRD-002`** — el certificado comercial de firma. Del propietario.
 > · **`PRD-003`** — una máquina ARM64. Del propietario.

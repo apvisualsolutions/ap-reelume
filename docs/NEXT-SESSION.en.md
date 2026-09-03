@@ -84,6 +84,26 @@
 >
 > **3. `CRS-002/003/005` to `VERIFIED`.**
 >
+> ### An open finding: the post-push hook points at the wrong commit
+>
+> **Seen live on 2026-09-02, in the fast-forward itself.** `.claude/hooks/post-push.sh` emits
+> `rev-parse HEAD`, and HEAD **need not be what went down the wire**: after advancing `main` it
+> offered to arm the watcher over an unpushed local commit, which has no run at all.
+>
+> **This is not the prefix defect fixed that day**: the SHA is whole and correct, it is simply not the
+> one that was pushed. And the watcher no longer lies — it will say «NO RUN EXISTS for that commit»,
+> which is **true**. It is a misleading alert, not a false answer; it still deserves fixing, because
+> an alert pointing at the wrong commit teaches people to ignore the hook, but it is not the same
+> family.
+>
+> **And here is the tension, written so whoever takes it does not start where it was already refused
+> twice**: deriving the pushed SHA from the refspec — `git push origin branch:other` does not push
+> HEAD — is **guessing the refspec**, which is exactly what this hook refused in writing in its own
+> header and what was refused again by not emitting `-Branch`. Repeating it would undo two decisions
+> without saying so. **The route left on the table**: do not change the SHA, make the hook **say when
+> it cannot be sure** — when the push command names a reference other than HEAD, say so in the alert
+> instead of staying quiet. Inform without guessing.
+>
 > ### The traps this batch leaves
 >
 > · **A premise from the previous handover is not a measurement.** This one took two minutes to check
@@ -131,6 +151,16 @@
 >   without noticing; and had that old commit's content reached `main` by another route, it would have
 >   authorised deleting a worktree with new work inside. **The SHA is read from the worktree at the
 >   moment** (`git worktree list --porcelain`), never from a note.
+> · **And that same defect turned up FIVE times in one day, the last inside the guard that decides
+>   whether somebody's work gets deleted.** Retiring another session's worktree, the ancestry check
+>   answered that their work was **not** in `main` — false: it was, under another identifier, because
+>   consolidating by rebase rewrites the commit. It would have blocked wrongly, on the safe side but
+>   for the wrong reason. **A commit's identifier is not its content**, and the guard that authorises
+>   a deletion has to ask about the second.
+> · **`git worktree remove` cannot delete the root folder while another session holds it as cwd**: it
+>   answers `Permission denied`, **empties the contents and deregisters the worktree anyway**. So the
+>   empty directory left behind is not a failure — it goes when that session closes. And `--force` is
+>   still not needed.
 > · **And that lesson was half-learnt: a guard over commit IDENTITY does not survive somebody else
 >   rewriting history.** With the line above already written, the agreed closing guard still asked
 >   `git merge-base --is-ancestor <their-sha> main` — and consolidating three sessions' work by
@@ -168,6 +198,13 @@
 >   already documents. **When checking that something does NOT exist, count it or do not filter it**:
 >   if you truncate, count first with `| wc -l` to know what you are leaving out. A `head` with no
 >   count beside it is a partial answer dressed as a complete one.
+> · **THE SHAPE OF THIS DEFECT IS NOT SILENCE: IT IS CONFIDENCE.** Four different guards gave a
+>   **confident and wrong** answer on the same day — the noted-SHA one, the watcher's `-Branch`
+>   declaring that the push had not triggered the workflow, an early-warning probe with the wrong
+>   year that counted 525,624 minutes, and two `| head`s that turned no output into no fact.
+>   **None of them went quiet. All of them answered.** This repository already has it written that a
+>   silent watcher is indistinguishable from one that never ran; the missing half is that **a
+>   confident answer is worse**, because it gets obeyed.
 > · **And the three above are one thing**: a claim that mixes what was measured with what was
 >   inferred reads as a single statement and is inherited whole. It happened three times in one day —
 >   the closing line calling an alert a "known false positive" while two of its three pieces were
