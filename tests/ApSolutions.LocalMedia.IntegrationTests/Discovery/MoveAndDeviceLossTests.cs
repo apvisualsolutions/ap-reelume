@@ -268,8 +268,7 @@ public sealed class MoveAndDeviceLossTests
 
     private static async Task<ReconciliationFixture> CreateFixtureAsync(string databasePath)
     {
-        var factory = new SqliteConnectionFactory(databasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(databasePath, TestContext.Current.CancellationToken);
         var repository = new MediaFileRepository(factory);
         return new ReconciliationFixture(
             factory,

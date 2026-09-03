@@ -26,8 +26,7 @@ public sealed class RecommendationReadModelTests
     public async Task Taste_is_summarized_from_watched_titles_and_their_personal_ratings()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var catalog = new CatalogRepository(factory);
         var loved = Title(1);
         var hated = Title(2);
@@ -68,8 +67,7 @@ public sealed class RecommendationReadModelTests
     public async Task Candidates_carry_genres_cast_availability_watched_state_and_rating()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var catalog = new CatalogRepository(factory);
         var watched = Title(11);
         var offline = Title(12);
@@ -112,8 +110,7 @@ public sealed class RecommendationReadModelTests
     public async Task An_empty_catalog_gives_the_empty_taste_and_no_candidates()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var readModel = new RecommendationReadModel(factory);
 
         Assert.Equal(
@@ -127,8 +124,7 @@ public sealed class RecommendationReadModelTests
     public async Task The_whole_pipeline_ranks_a_real_catalog_and_stays_deterministic()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var catalog = new CatalogRepository(factory);
         for (var index = 1; index <= 20; index++)
         {

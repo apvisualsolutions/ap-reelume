@@ -158,8 +158,7 @@ public sealed class ScanReconciliationTests
 
     private static async Task<ReconciliationHarness> HarnessAsync(DatabaseTestDirectory directory)
     {
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var roots = new LibraryRootRepository(factory);
         var mediaRoot = Path.Combine(directory.Path, "media");
         Directory.CreateDirectory(mediaRoot);

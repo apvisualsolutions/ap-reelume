@@ -23,8 +23,9 @@ public sealed class FileActivationTests : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         _databasePath = Path.Combine(_directory.FullName, "library.db");
-        _factory = new SqliteConnectionFactory(_databasePath);
-        await new MigrationRunner(_factory).MigrateAsync(TestContext.Current.CancellationToken);
+        _factory = await MigratedSchemaTemplate.CreateFactoryAsync(
+            _databasePath,
+            TestContext.Current.CancellationToken);
     }
 
     public ValueTask DisposeAsync()

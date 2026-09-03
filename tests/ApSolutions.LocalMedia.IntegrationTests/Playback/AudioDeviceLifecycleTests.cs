@@ -36,8 +36,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task The_chosen_device_survives_a_restart_of_the_application()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PlaybackPreferenceRepository(factory);
         var catalog = new FakeCatalog([Speakers, Headset]);
         var adapter = new LibVlcAudioOutputAdapter(catalog, repository);
@@ -61,8 +60,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task Losing_the_device_during_playback_falls_back_without_failing()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new PlaybackPreferenceRepository(factory);
         var catalog = new FakeCatalog([Speakers, Headset]);
         var adapter = new LibVlcAudioOutputAdapter(catalog, repository);
@@ -94,8 +92,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task A_hot_switch_pauses_and_resumes_the_session_exactly_once()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var catalog = new FakeCatalog([Speakers, Headset]);
         var adapter = new LibVlcAudioOutputAdapter(catalog, new PlaybackPreferenceRepository(factory));
         var engine = new RecordingEngine();
@@ -115,8 +112,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task A_degraded_layout_is_reported_so_the_interface_can_say_so()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var adapter = new LibVlcAudioOutputAdapter(
             new FakeCatalog([Headset with { IsDefault = true }]),
             new PlaybackPreferenceRepository(factory));
@@ -134,8 +130,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task With_no_output_at_all_the_adapter_reports_nothing_rather_than_crashing()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var adapter = new LibVlcAudioOutputAdapter(
             new FakeCatalog([]),
             new PlaybackPreferenceRepository(factory));
@@ -169,8 +164,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task The_layout_is_written_before_the_device_is_routed()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var ledger = new List<string>();
         var endpoints = new RecordingConfigurator(
             [AudioChannelLayout.Stereo, AudioChannelLayout.Surround71],
@@ -204,8 +198,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task A_layout_the_driver_refuses_is_reported_and_the_device_is_still_routed()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var endpoints = new RecordingConfigurator([AudioChannelLayout.Stereo]);
         var adapter = new LibVlcAudioOutputAdapter(
             new FakeCatalog([Speakers]),
@@ -242,8 +235,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task Without_a_configurator_the_layout_is_reported_as_unwritable()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var adapter = new LibVlcAudioOutputAdapter(
             new FakeCatalog([Speakers]),
             new PlaybackPreferenceRepository(factory));
@@ -266,8 +258,7 @@ public sealed class AudioDeviceLifecycleTests
     public async Task A_configurator_that_is_not_available_writes_nothing()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var endpoints = new RecordingConfigurator([AudioChannelLayout.Stereo]) { Available = false };
         var adapter = new LibVlcAudioOutputAdapter(
             new FakeCatalog([Speakers]),

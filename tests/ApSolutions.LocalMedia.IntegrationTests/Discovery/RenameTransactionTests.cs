@@ -58,9 +58,7 @@ public sealed class RenameTransactionTests
         var secondSource = Path.Combine(directory.Path, "show.s01e02.mkv");
         await File.WriteAllTextAsync(firstSource, "movie-content", TestContext.Current.CancellationToken);
         await File.WriteAllTextAsync(secondSource, "episode-content", TestContext.Current.CancellationToken);
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var adapter = new SafeFileRenamer(factory);
         var plan = new PreviewRename(new RenamePolicy()).Execute(new PreviewRenameCommand(directory.Path, [
             new RenameRequest(firstSource, "Arrival (2016).mkv"),
@@ -108,9 +106,7 @@ public sealed class RenameTransactionTests
         using var directory = new DatabaseTestDirectory();
         var source = Path.Combine(directory.Path, "arrival.2016.mkv");
         await File.WriteAllTextAsync(source, "movie-content", TestContext.Current.CancellationToken);
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var adapter = new SafeFileRenamer(factory);
         var plan = new PreviewRename(new RenamePolicy()).Execute(new PreviewRenameCommand(directory.Path, [
             new RenameRequest(source, "Arrival (2016).mkv"),
@@ -142,9 +138,7 @@ public sealed class RenameTransactionTests
     public async Task Simulated_unc_failure_after_one_move_keeps_a_recoverable_log_and_inventory()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var root = @"\\server\share\Media";
         var firstSource = Path.Combine(root, "one.mkv");
         var secondSource = Path.Combine(root, "two.mkv");
@@ -185,9 +179,7 @@ public sealed class RenameTransactionTests
     public async Task Destination_created_after_preview_blocks_the_entire_real_batch_without_audit_or_io()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var source = Path.Combine(directory.Path, "source.mkv");
         var destination = Path.Combine(directory.Path, "Destination.mkv");
         await File.WriteAllTextAsync(source, "source-content", TestContext.Current.CancellationToken);
@@ -210,9 +202,7 @@ public sealed class RenameTransactionTests
     public async Task Case_only_rename_uses_a_safe_intermediate_and_can_be_undone()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var source = Path.Combine(directory.Path, "arrival.mkv");
         await File.WriteAllTextAsync(source, "content", TestContext.Current.CancellationToken);
         var plan = new RenamePolicy().CreatePlan(directory.Path, [
@@ -235,9 +225,7 @@ public sealed class RenameTransactionTests
     public async Task Undo_refuses_changed_file_state_and_preview_view_model_requires_confirmation()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var source = Path.Combine(directory.Path, "movie.mkv");
         await File.WriteAllTextAsync(source, "content", TestContext.Current.CancellationToken);
         var adapter = new SafeFileRenamer(factory);

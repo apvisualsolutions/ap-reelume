@@ -233,8 +233,7 @@ public sealed class AutomaticSegmentDetectionTests
         DatabaseTestDirectory directory,
         IReadOnlyList<EpisodeSequenceEntry> episodes)
     {
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         return new Harness(
             new InMemorySettingsStore(),
             new FakeEpisodeSequenceRepository(episodes),

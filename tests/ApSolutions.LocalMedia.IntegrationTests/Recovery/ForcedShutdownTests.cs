@@ -66,8 +66,7 @@ public sealed class ForcedShutdownTests
     public async Task A_process_killed_mid_playback_keeps_the_position_it_had_written()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var signalPath = Path.Combine(directory.Path, "written.signal");
 
         var child = StartProgressWriter(directory.DatabasePath, signalPath);

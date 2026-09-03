@@ -31,8 +31,7 @@ public sealed class MediaEngineFailureTests
     public async Task An_engine_that_fails_mid_session_writes_the_position_and_releases_the_session()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new WatchStateRepository(factory);
         await using var tracker = new PlaybackProgressTracker(repository, new FixedClock(Noon));
         var engine = new FailingEngine();
@@ -109,8 +108,7 @@ public sealed class MediaEngineFailureTests
     public async Task An_unreachable_metadata_provider_costs_nothing_but_fresh_metadata()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new WatchStateRepository(factory);
         await repository.SaveAsync(
             new WatchState

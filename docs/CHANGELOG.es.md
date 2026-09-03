@@ -60,6 +60,47 @@ evidencia, es [FEATURES.md](FEATURES.md).
   que ocuparían decenas de megas; nada animado, porque ninguna de estas superficies lo dibuja. Y una
   prueba cruza las dos listas: ninguna extensión puede ser a la vez vídeo y portada.
 
+### Cambiado
+
+- **La suite de integración dejó de reconstruir la base de datos doscientas veces por ejecución, y
+  eso quita dos tercios de su trabajo.** Cada prueba que necesitaba una base la levantaba desde cero
+  aplicando las veintidós actualizaciones del esquema, y el motor guarda una copia completa del
+  archivo antes de cada una: **veinticuatro archivos y 5,5 MB creados y borrados por prueba, y unos
+  1,3 GB y 5.300 archivos por ejecución, todos en la misma carpeta temporal**. Ahora el esquema se
+  prepara una vez por proceso y se copia: **118 ms → 3 ms de arranque**, un archivo en lugar de
+  veinticuatro, y el trabajo de la suite pasa de **607 s a 193 s en local (−68 %)**. Las 228 pruebas
+  que más lo pagaban bajan de 2,18 s a 0,52 s de media.
+
+  **La plantilla la migra el motor de verdad**, así que el esquema que ve cada prueba sigue siendo el
+  que producen las actualizaciones y no una segunda definición que pudiera separarse de ellas.
+
+  **Por qué importaba fuera de esta máquina.** En el runner ese arranque dejaba de depender del
+  trabajo de cada prueba y se convertía en un peaje fijo: contra los tiempos locales, **21,7 segundos
+  fijos más 0,3 veces la duración local, con una correlación de 0,10**. Un coste que no depende del
+  trabajo es contención, y el recurso compartido era esa carpeta.
+
+- **Y el hallazgo de la tanda no es el porcentaje: es una prueba que se habría vuelto ciega en vez de
+  ponerse roja.** Las pruebas de base dañada **cuentan los archivos de copia que deja la migración**.
+  Con la plantilla no queda ninguno, así que habrían seguido pasando —verdes, rápidas— afirmando
+  sobre una lista vacía. Se quedan como estaban, y esa es la razón por la que **cada uno de los
+  cuarenta y cuatro archivos se revisó por lo que la prueba hace, nunca por la carpeta en la que
+  vive**. Esa revisión movió seis de sitio en los dos sentidos: tres de recuperación pasan a la
+  plantilla —un apagado forzoso, un fallo del motor de vídeo y una unidad retirada no tienen nada que
+  ver con el esquema— y tres de la carpeta de la base de datos también, porque sólo necesitan de
+  dónde leer. Cuatro llamadas se quedan dentro de archivos ya convertidos: las que construyen el
+  motor por reflexión para comprobar dónde vive cada tipo, donde **construirlo es la afirmación**.
+
+  Resultado: 37 archivos cambiados, 7 intactos, 96 llamadas de 100.
+
+  **Y la mejora queda sujeta por una prueba, no por esta nota**: una afirma que la copia deja un
+  archivo donde migrar dejaba veinticuatro, así que reintroducir las copias por prueba se pone rojo
+  en vez de devolver la suite a los veintisiete minutos sin que nadie lo note.
+
+  **La cobertura de la ruta de migración se midió antes y después, en un árbol aparte y con la misma
+  suite: idéntica cifra a cifra** —96,9 de línea y 75,0 de rama en el motor de migraciones, y sin
+  mover un punto el comprobador de integridad, el servicio de copia y la fábrica de conexiones—.
+  Ganar tiempo haciendo que las pruebas pasen por menos no es ganarlo.
+
 ### Corregido
 
 - **La cuenta de cuánto del programa está realmente probado se había quedado corta en siete

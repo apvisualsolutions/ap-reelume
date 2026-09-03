@@ -42,8 +42,7 @@ public sealed class RemovedDriveTests
             return;
         }
 
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var roots = new LibraryRootRepository(factory);
         var root = new LibraryRoot(
             new LibraryRootId(Guid.NewGuid()),
@@ -116,8 +115,7 @@ public sealed class RemovedDriveTests
             [0x41, 0x50],
             TestContext.Current.CancellationToken);
 
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var roots = new LibraryRootRepository(factory);
         var root = new LibraryRoot(
             new LibraryRootId(Guid.NewGuid()),
@@ -156,9 +154,7 @@ public sealed class RemovedDriveTests
     public async Task A_rename_that_collides_executes_none_of_the_batch()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var first = Path.Combine(directory.Path, "first.mkv");
         var second = Path.Combine(directory.Path, "second.mkv");
         var destination = Path.Combine(directory.Path, "Taken.mkv");

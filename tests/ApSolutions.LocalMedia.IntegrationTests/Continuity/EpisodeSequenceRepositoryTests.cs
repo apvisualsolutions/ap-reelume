@@ -30,8 +30,7 @@ public sealed class EpisodeSequenceRepositoryTests
     public async Task Episodes_are_read_in_viewing_order_with_specials_last_and_their_real_availability()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         await SeedAsync(factory);
 
         var episodes = await new EpisodeSequenceRepository(factory).GetSeriesAsync(
@@ -81,8 +80,7 @@ public sealed class EpisodeSequenceRepositoryTests
     public async Task One_series_never_returns_the_episodes_of_another()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         await SeedAsync(factory);
         var repository = new EpisodeSequenceRepository(factory);
 
@@ -97,8 +95,7 @@ public sealed class EpisodeSequenceRepositoryTests
     public async Task A_single_episode_can_be_revalidated_and_an_unknown_one_returns_nothing()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         await SeedAsync(factory);
         var repository = new EpisodeSequenceRepository(factory);
         var known = new EpisodeId(EpisodeGuid(1, 1));
@@ -117,8 +114,7 @@ public sealed class EpisodeSequenceRepositoryTests
     public async Task The_home_projection_reads_progress_recent_additions_and_the_summary()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         await SeedAsync(factory);
         var watchStates = new WatchStateRepository(factory);
         await watchStates.SaveAsync(
@@ -162,8 +158,7 @@ public sealed class EpisodeSequenceRepositoryTests
     public async Task The_home_projection_honours_its_limits_and_survives_an_empty_catalogue()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var readModel = new HomeReadModel(factory);
 
         Assert.Empty(await readModel.ReadProgressAsync(10, TestContext.Current.CancellationToken));
@@ -188,8 +183,7 @@ public sealed class EpisodeSequenceRepositoryTests
     public async Task Home_sees_a_library_that_was_scanned_and_never_identified()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         await SeedScannedOnlyAsync(factory);
         await new WatchStateRepository(factory).SaveAsync(
             Progress(ContentKey.ForTitle(new TitleId(ScannedFile)), Noon),

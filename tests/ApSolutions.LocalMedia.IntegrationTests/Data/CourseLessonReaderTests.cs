@@ -166,10 +166,7 @@ public sealed class CourseLessonReaderTests
         public static async Task<World> OpenAsync()
         {
             var world = new World();
-            using (var runner = new MigrationRunner(world.Factory))
-            {
-                await runner.MigrateAsync(CancellationToken.None);
-            }
+            await MigratedSchemaTemplate.CopyToAsync(world.Factory.DatabasePath, CancellationToken.None);
 
             world.RootId = new LibraryRootId(Guid.NewGuid());
             await new LibraryRootRepository(world.Factory).AddAsync(

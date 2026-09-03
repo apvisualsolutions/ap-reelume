@@ -41,8 +41,7 @@ public sealed class StaleMetadataQueryTests
     public async Task The_stalest_identified_entries_come_first_and_never_more_than_the_cap()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new CatalogMetadataRepository(factory);
 
         // Thirty identified entries past ninety days, one of them with no date at all, plus two that
@@ -83,8 +82,7 @@ public sealed class StaleMetadataQueryTests
     public async Task An_entry_refreshed_within_the_window_is_not_asked_about_again()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var repository = new CatalogMetadataRepository(factory);
         _ = await StoreAsync(repository, "just inside", "movie/1", Now.AddDays(-89));
 
@@ -98,8 +96,7 @@ public sealed class StaleMetadataQueryTests
     public async Task A_pass_of_no_entries_is_not_an_error()
     {
         using var directory = new DatabaseTestDirectory();
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
 
         Assert.Empty(await new CatalogMetadataRepository(factory).ListStaleAsync(
             MetadataRefreshPolicy.StaleBefore(Now),

@@ -370,10 +370,7 @@ public sealed class CourseRepositoryTests
         public static async Task<Harness> OpenAsync()
         {
             var harness = new Harness();
-            using (var runner = new MigrationRunner(harness.Factory))
-            {
-                await runner.MigrateAsync(CancellationToken.None);
-            }
+            await MigratedSchemaTemplate.CopyToAsync(harness.Factory.DatabasePath, CancellationToken.None);
 
             harness.RootId = await harness.AddRootAsync(@"D:\Cursos");
             return harness;

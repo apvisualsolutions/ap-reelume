@@ -394,8 +394,7 @@ public sealed class CatalogQueryTests
 
     private static async Task<CatalogFixture> CreateFixtureAsync(string databasePath)
     {
-        var factory = new SqliteConnectionFactory(databasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(databasePath, TestContext.Current.CancellationToken);
         return new CatalogFixture(factory, new CatalogRepository(factory));
     }
 

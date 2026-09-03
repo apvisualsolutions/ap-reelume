@@ -16,9 +16,7 @@ public sealed class MatchCandidateRepositoryTests
     public async Task Replacement_is_idempotent_ordered_and_preserves_explainable_fields()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var mediaFileId = new MediaFileId(Guid.Parse("40000000-0000-0000-0000-000000000001"));
         await SeedMediaFileAsync(factory, mediaFileId);
         var repository = new MatchCandidateRepository(factory);
@@ -51,9 +49,7 @@ public sealed class MatchCandidateRepositoryTests
     public async Task Candidate_for_a_different_file_rolls_back_the_replacement()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var mediaFileId = new MediaFileId(Guid.Parse("40000000-0000-0000-0000-000000000001"));
         await SeedMediaFileAsync(factory, mediaFileId);
         var repository = new MatchCandidateRepository(factory);
@@ -75,9 +71,7 @@ public sealed class MatchCandidateRepositoryTests
     public async Task Accepted_manual_choice_survives_rescan_and_stays_out_of_the_inbox()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var mediaFileId = new MediaFileId(Guid.Parse("40000000-0000-0000-0000-000000000001"));
         await SeedMediaFileAsync(factory, mediaFileId);
         var repository = new MatchCandidateRepository(factory);
@@ -132,9 +126,7 @@ public sealed class MatchCandidateRepositoryTests
     public async Task A_candidates_name_survives_every_reading_of_it()
     {
         using var directory = new DatabaseTestDirectory();
-        using var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        using var runner = new MigrationRunner(factory);
-        await runner.MigrateAsync(TestContext.Current.CancellationToken);
+        using var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var mediaFileId = new MediaFileId(Guid.Parse("40000000-0000-0000-0000-000000000001"));
         await SeedMediaFileAsync(factory, mediaFileId);
         var repository = new MatchCandidateRepository(factory);

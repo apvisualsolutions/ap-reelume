@@ -161,11 +161,7 @@ public sealed class MediaVersionGroupRepositoryTests
         public static async Task<GroupFixture> CreateAsync()
         {
             var directory = new DatabaseTestDirectory();
-            var factory = new SqliteConnectionFactory(directory.DatabasePath);
-            using (var runner = new MigrationRunner(factory))
-            {
-                await runner.MigrateAsync(CancellationToken.None);
-            }
+            var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, CancellationToken.None);
 
             return new GroupFixture(directory, new MediaVersionGroupRepository(factory));
         }

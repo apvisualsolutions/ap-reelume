@@ -416,8 +416,7 @@ public sealed class FileWatcherRecoveryTests
         var firstPath = Path.Combine(mediaPath, "first.mkv");
         var secondPath = Path.Combine(mediaPath, "missed.mkv");
         await File.WriteAllBytesAsync(firstPath, [0x41], TestContext.Current.CancellationToken);
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var root = Root(mediaPath, RootKind.Unc);
         var rootRepository = new LibraryRootRepository(factory);
         await rootRepository.AddAsync(root, TestContext.Current.CancellationToken);
@@ -459,8 +458,7 @@ public sealed class FileWatcherRecoveryTests
         Directory.CreateDirectory(mediaPath);
         var filePath = Path.Combine(mediaPath, "episode.mkv");
         await File.WriteAllBytesAsync(filePath, [0x41], TestContext.Current.CancellationToken);
-        var factory = new SqliteConnectionFactory(directory.DatabasePath);
-        await new MigrationRunner(factory).MigrateAsync(TestContext.Current.CancellationToken);
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
         var root = Root(mediaPath, RootKind.Unc);
         var rootRepository = new LibraryRootRepository(factory);
         var mediaRepository = new MediaFileRepository(factory);

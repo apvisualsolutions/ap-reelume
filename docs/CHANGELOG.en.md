@@ -60,6 +60,47 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   megabytes; nothing animated, because none of these surfaces draws it. And a test crosses the two
   lists: no extension may be both a video container and a cover.
 
+### Changed
+
+- **The integration suite stopped rebuilding the database two hundred times per run, which removes
+  two thirds of its work.** Every test that needed a database built one from scratch by applying the
+  twenty-two schema updates, and the runner writes a full copy of the file before each one:
+  **twenty-four files and 5.5 MB created and deleted per test, and roughly 1.3 GB and 5,300 files per
+  run, all in one temporary directory**. The schema is now prepared once per process and copied:
+  **118 ms → 3 ms of start-up**, one file instead of twenty-four, and the suite's work falls from
+  **607 s to 193 s locally (−68 %)**. The 228 tests that paid the most drop from 2.18 s to 0.52 s on
+  average.
+
+  **The template is migrated by the real runner**, so the schema each test sees is still the one the
+  updates produce rather than a second definition that could drift from them.
+
+  **Why it mattered off this machine.** On the runner that start-up stopped depending on each test's
+  own work and became a flat toll: against the local times, **21.7 seconds fixed plus 0.3 times the
+  local duration, with a correlation of 0.10**. A cost that does not depend on the work is
+  contention, and the shared resource was that directory.
+
+- **And the batch's finding is not the percentage: it is a test that would have gone blind instead of
+  red.** The damaged-database tests **count the backup files the migration leaves behind**. With the
+  template none are left, so they would have kept passing — green, fast — asserting over an empty
+  list. They stay as they were, and that is why **each of the forty-four files was judged by what the
+  test does, never by the folder it sits in**. That reading moved six across the line in both
+  directions: three recovery tests move to the template — a forced shutdown, a failing media engine
+  and a removed drive have nothing to do with schemas — and three under the database folder do too,
+  because they only need somewhere to read from. Four calls stay inside already-converted files: the
+  ones that build the runner through reflection to check where each type lives, where **building it
+  is the assertion**.
+
+  Result: 37 files changed, 7 untouched, 96 calls out of 100.
+
+  **And the improvement is held by a test rather than by this note**: one asserts that the copy leaves
+  one file where migrating left twenty-four, so reintroducing the per-test backups goes red instead of
+  quietly returning the suite to twenty-seven minutes.
+
+  **Coverage of the migration path was measured before and after, in a separate tree and with the same
+  suite: identical figure for figure** — 96.9 line and 75.0 branch on the migration runner, and not a
+  point moved on the integrity checker, the backup service and the connection factory. Buying time by
+  letting tests pass over less is not buying it.
+
 ### Fixed
 
 - **The count of how much of the program is actually tested fell short on seven files, and it was

@@ -234,11 +234,7 @@ public sealed class CatalogMetadataRepositoryTests
         public static async Task<MetadataFixture> CreateAsync()
         {
             var directory = new DatabaseTestDirectory();
-            var factory = new SqliteConnectionFactory(directory.DatabasePath);
-            using (var runner = new MigrationRunner(factory))
-            {
-                await runner.MigrateAsync(CancellationToken.None);
-            }
+            var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, CancellationToken.None);
 
             return new MetadataFixture(directory, factory, new CatalogMetadataRepository(factory));
         }
