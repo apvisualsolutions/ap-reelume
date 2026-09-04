@@ -21,11 +21,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   fallo suyo no pone el proyecto en rojo: una herramienta ausente no es un programa roto, y
   confundirlas enseña a ignorar los avisos. Pasará a ser exigente cuando se sepa qué contesta.
 
-  **Y ya contestó.** La aplicación **arrancó en un ordenador ARM, mostró su ventana y cerró sola sin
-  que nadie la matara**; el sonido pasó entero; y el ciclo de instalación completó sus doce fases sin
-  una sola pendiente. Nueve minutos de principio a fin. Las dos comprobaciones que quedaron marcadas
-  lo están por vídeos que **el mismo ordenador de siempre tampoco puede fabricar**, y la última
-  espera a la tanda ya decidida.
+  **Y ya contestó: cinco de las seis comprobaciones pasan.** La aplicación **arrancó en un ordenador
+  ARM, mostró su ventana y cerró sola sin que nadie la matara**; los vídeos y el HDR se
+  descodificaron ahí de forma nativa; el sonido pasó entero; y el ciclo de instalación completó sus
+  doce fases sin una sola pendiente. Nueve minutos de principio a fin. La sexta espera a la tanda ya
+  decidida.
+
+  **Cómo se lanza todo esto, cómo se lee su resultado y las trampas que tiene están escritos** en una
+  guía propia, en los dos idiomas, porque esta parte va a volver a tocarse cada vez que se implemente
+  algo que dependa del sistema operativo.
 
   **La máquina prestada tampoco es la que su propia documentación describe**: anuncia una versión
   vieja de las herramientas y trae exactamente la que este proyecto exige. Se instalan igual, porque

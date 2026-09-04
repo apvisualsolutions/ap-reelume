@@ -140,6 +140,13 @@ as visual proof. When a task changes the surface on purpose, the baseline is
 regenerated, the diff reviewed, and re-approved **in the same commit** that
 changes it: a baseline that does not follow the interface protects nothing.
 
+## Testing on ARM64
+
+The application is built, packaged **and run** on Windows 11 ARM64 on every CI pass, on a runner
+GitHub lends free to public repositories. How it is launched, how its result is read — which is
+**not** the colour of the run — and the five traps that each cost a round are in
+[arm64-ci.en.md](arm64-ci.en.md). Read it before touching anything OS-dependent.
+
 ## Run the x64 shell
 
 The host creates no accounts and uses no remote services. Build and run it as

@@ -147,6 +147,14 @@ visual. Cuando una tarea cambia la superficie a propósito, se regenera la
 baseline, se revisa el diff y se vuelve a aprobar **en el mismo commit** que la
 cambia: una baseline que no sigue a la interfaz deja de proteger nada.
 
+## Probar en ARM64
+
+La aplicación se compila, se empaqueta **y se ejecuta** en Windows 11 ARM64 en cada vuelta de CI,
+sobre un runner que GitHub presta gratis a los repositorios públicos. Cómo se lanza, cómo se lee su
+resultado —que **no** es el color del run— y las cinco trampas que ya costaron una vuelta cada una
+están en [arm64-ci.es.md](arm64-ci.es.md). Léelo antes de tocar nada que dependa del sistema
+operativo.
+
 ## Ejecutar el shell x64
 
 El host no crea cuentas ni usa servicios remotos. Compílalo y ejecútalo así:

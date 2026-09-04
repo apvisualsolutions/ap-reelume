@@ -1,6 +1,6 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-04: la matriz ARM64 ya se midió, y tres de sus seis fases pasaron
+> ## AVISO AL FRENTE — 2026-09-04: la matriz ARM64 ya se midió, y cinco de sus seis fases pasan
 >
 > **Antes de nada se mira el árbol**: `git log --oneline -1 main` y `gh run list --limit 3`. Aquí no
 > se escribe el número del commit, porque el commit que lo escribiría ya lo habría cambiado.
@@ -11,14 +11,15 @@
 >   `windows-11-arm` **gratis e ilimitados en repositorios públicos**, y éste lo es. Un trabajo nuevo
 >   de CI corre ahí el empaquetado ARM64 con su matriz, en **nueve minutos**.
 >
-> · **Tres fases pasaron limpias**: el programa arrancó, mostró ventana y cerró solo; el sonido pasó
->   entero; y el ciclo de instalación completó sus doce fases sin ninguna pendiente.
+> · **Cinco fases pasan**: el programa arrancó, mostró ventana y cerró solo; la matriz de códecs y
+>   la de HDR decodificaron de forma nativa; el sonido pasó entero; y el ciclo de instalación
+>   completó sus doce fases sin ninguna pendiente. La primera ejecución dejó dos marcadas y la
+>   segunda, con el listón bien puesto, las pasó.
 >
-> · **Dos quedaron marcadas por omisiones que no son de ARM64**, y eso está medido, no supuesto: al
->   `ffmpeg` que se instala le faltan dos codificadores y multiplexa la muestra HDR sin sus
->   metadatos de color, **y el runner x64 se salta las mismas** — cinco en esa suite, leídas del run
->   de `743af9a`. Con el listón corregido deberían pasar; **eso lo confirma el run siguiente, no esta
->   nota**.
+> · **Siguen omitiéndose tres pruebas, y no es de ARM64**: al `ffmpeg` que se instala le faltan dos
+>   codificadores y multiplexa la muestra HDR sin sus metadatos de color, **y el runner x64 se salta
+>   las mismas** — cinco en esa suite, leídas del run de `743af9a`. Las omisiones quedan anotadas en
+>   el detalle de cada fase; cerrarlas es la primera tanda de la cola.
 >
 > · **La sexta, `cross-architecture-data`, sigue `Blocked` por diseño**: pide una carpeta de datos
 >   escrita por el build x64 y hoy nadie la produce ni la traslada entre trabajos. Es la tanda que

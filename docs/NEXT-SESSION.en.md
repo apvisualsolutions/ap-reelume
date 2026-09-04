@@ -1,6 +1,6 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-04: the ARM64 matrix has been measured, and three of its six phases passed
+> ## READ THIS FIRST — 2026-09-04: the ARM64 matrix has been measured, and five of its six phases pass
 >
 > **Look at the tree first**: `git log --oneline -1 main` and `gh run list --limit 3`. The commit
 > number is not written here, because the commit that wrote it would already have changed it.
@@ -11,14 +11,15 @@
 >   runners **free and unlimited on public repositories**, and this is one. A new CI job runs the
 >   ARM64 packaging with its matrix there, in **nine minutes**.
 >
-> · **Three phases passed clean**: the program started, showed its window and closed itself; audio
->   passed in full; and the install cycle completed its twelve phases with none outstanding.
+> · **Five phases pass**: the program started, showed its window and closed itself; the codec matrix
+>   and the HDR one decoded natively; audio passed in full; and the install cycle completed its
+>   twelve phases with none outstanding. The first run left two flagged and the second, with the bar
+>   set correctly, passed them.
 >
-> · **Two were flagged over skips that are not about ARM64**, and that is measured rather than
->   assumed: the `ffmpeg` that gets installed is missing two encoders and muxes the HDR sample
->   without its colour metadata, **and the x64 runner skips the same ones** — five in that suite,
->   read from the run of `743af9a`. With the bar corrected they should pass; **the next run confirms
->   that, not this note**.
+> · **Three tests are still skipped, and it is not about ARM64**: the `ffmpeg` that gets installed is
+>   missing two encoders and muxes the HDR sample without its colour metadata, **and the x64 runner
+>   skips the same ones** — five in that suite, read from the run of `743af9a`. The skips stay
+>   recorded in each phase's detail; closing them is the first batch in the queue.
 >
 > · **The sixth, `cross-architecture-data`, is still `Blocked` by design**: it wants a data folder
 >   written by the x64 build, and today nothing produces or carries one between jobs. That is the

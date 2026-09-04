@@ -141,11 +141,20 @@ escrita de no hacerlo. Está en la
 [hoja de ruta](docs/roadmap/README.es.md) con sus dos bloqueos duros: `PRD-003` pide una máquina
 ARM64 que no hay, y `PRD-002` pide el certificado comercial de firma.
 
-`package-arm64.ps1` **no produce nada publicable**: PRD-003 está BLOCKED por hardware y su matriz
-contesta «6 de 6 fases no pasadas» sobre un anfitrión x64. **Pero sí hay que correrlo al tocar el
-manifiesto**, porque `Arm64PackageTests` compara el manifiesto empaquetado con el fuente: el
-2026-08-31 ese artefacto llevaba nueve días caducado —era del 22 de agosto y el color de fondo cambió
-el 24— y daba un rojo local que nadie perseguía.
+`package-arm64.ps1` **no produce nada publicable todavía**, y desde el 2026-09-04 el motivo ya no es
+el que decía esta línea. Decía «PRD-003 está BLOCKED por hardware»: **la máquina existe y es
+prestada**, porque los runners `windows-11-arm` de GitHub son gratis e ilimitados en repositorios
+públicos. Un trabajo de CI corre ahí la matriz y **cinco de sus seis fases pasan**; la que falta pide
+que el trabajo x64 le pase su carpeta de datos. **Cómo se lanza, cómo se lee su resultado —que NO es
+el color del run— y sus cinco trampas están en
+[docs/development/arm64-ci.es.md](docs/development/arm64-ci.es.md), y se lee antes de tocar nada que
+dependa del sistema operativo.**
+
+**Aquí, sobre un anfitrión x64, la matriz sigue contestando «6 de 6 fases no pasadas», y eso es
+correcto**: la rama que las ejecuta sólo corre cuando el anfitrión es ARM64. **Pero sí hay que
+correrlo al tocar el manifiesto**, porque `Arm64PackageTests` compara el manifiesto empaquetado con
+el fuente: el 2026-08-31 ese artefacto llevaba nueve días caducado —era del 22 de agosto y el color
+de fondo cambió el 24— y daba un rojo local que nadie perseguía.
 
 Tocar el manifiesto caduca además dos mediciones del sandbox, así que después toca rehacer su ciclo.
 **Los informes se comparan con los archivados antes de sustituirlos**: lo caducado es la huella, no

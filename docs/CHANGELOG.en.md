@@ -22,11 +22,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   broken program, and confusing the two teaches people to ignore warnings. It becomes strict once
   there is an answer to be strict about.
 
-  **And it has answered.** The application **started on an ARM computer, showed its window and closed
-  itself without being killed**; sound passed in full; and the install cycle completed its twelve
-  phases with none outstanding. Nine minutes start to finish. The two checks left flagged are flagged
-  over videos **the usual computer cannot produce either**, and the last one is waiting for the batch
-  already chosen.
+  **And it has answered: five of the six checks pass.** The application **started on an ARM computer,
+  showed its window and closed itself without being killed**; video and HDR were decoded there
+  natively; sound passed in full; and the install cycle completed its twelve phases with none
+  outstanding. Nine minutes start to finish. The sixth is waiting for the batch already chosen.
+
+  **How all of this is launched, how its result is read and the traps it carries are written down**
+  in a guide of its own, in both languages, because this part will be touched again every time
+  something OS-dependent is implemented.
 
   **The borrowed machine is not the one its own documentation describes either**: it advertises an
   old version of the tools and carries exactly the one this project requires. They are installed all
