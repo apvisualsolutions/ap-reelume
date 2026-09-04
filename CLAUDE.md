@@ -207,28 +207,34 @@ anuncia **una sola vez**: el guion mira cada minuto durante tres cuartos de hora
 cuarenta veces es el que enseña a ignorarlo. El motivo de que sea un guion y no un bucle en el momento:
 el filtro obvio pregunta por `status == "completed"` y **calla en todo lo demás**, y un vigía callado
 es indistinguible de un run que sigue. Peor aún, `2>/dev/null` sobre la consulta **entierra** el error
-de `gh` y `|| true` lo convierte en una cadena vacía que se lee como «aún no ha terminado». Un run de
-este repositorio **tarda 49-57 minutos cuando va bien, y uno de siete llegó a 86,2**. Los siete
-completos del 2026-09-03, todos verdes: 48,9 · 50,5 · 55,2 · 56,0 · 56,5 · 56,6 · **86,2**. Los seis
-sanos caben en ocho minutos entre sí, así que el séptimo **no es la cola de una distribución sino
-otra cosa** — ese día su suite de integración pasó de 11,8 a 27 minutos mientras las otras nueve
-seguían normales.
+de `gh` y `|| true` lo convierte en una cadena vacía que se lee como «aún no ha terminado».
 
-**Y eso deja el corte del propio flujo sin margen: 86,2 de 90.** A menos de cuatro minutos de morir
-por reloj sin nada roto. El criterio escrito allí —«cortado a los 90 es un atasco»— dejaría de ser
-verdad la primera vez que un sorteo malo coincida con una tanda algo mayor: sería un rojo por reloj
-leído como un atasco. Subir el techo es la respuesta cómoda; el propio comentario del flujo dice lo
-contrario, que un run sano acercándose a 90 significa que el trabajo ha crecido.
+**Cuánto tarda un run NO se escribe aquí: se mide cuando hace falta.**
 
-**La cifra dijo 55-80, luego 42-53, y ahora 49-57**: un número que nadie vuelve a medir es el que
-acaba justificando la decisión equivocada, y éste se ha movido dos veces en cuatro días, las dos
-porque alguien volvió a medirlo.
+```powershell
+pwsh -NoProfile -File eng/measure-ci-time.ps1              # la duración de hoy, y el margen que queda
+pwsh -NoProfile -File eng/measure-ci-time.ps1 -Detailed    # y en qué suite se va el tiempo
+```
 
-**El reparto, medido desde los TRX**, es lo que enseña dónde está el tiempo — y la primera lectura
-que se hizo de él estaba mal por medir un solo run. Sobre **siete** runs del 2026-09-03, la suite de
-integración da 7,5 / 9 / 11,6 / **11,8** / 12 / 14,8 y **27** minutos: la mediana es 11,8 y el 27 que
-se citó era el peor de todos. El recorrido accesible son **8,8 min** dentro de la verificación y
-**19,4 más** como puerta, el vídeo real 5,7 y los presupuestos 4,0.
+**Ésta es la cifra que más veces ha estado mal en este archivo, y por eso ya no vive en él.** Dijo
+55-80, luego 42-53, luego 49-57, y el 2026-09-04 eran 41-43 — cuatro cifras en cinco días, cada una
+correcta el día que alguien la midió y ninguna correcta después. El daño no es la imprecisión: es que
+**el criterio escrito al lado depende de ella**. «Cortado a los 90 es un atasco» se lee muy distinto
+según si un run sano tarda 43 o 86, y con la cifra vieja delante un rojo por reloj se persigue como
+si fuera un cuelgue. El propietario lo zanjó el 2026-09-04: **si un dato siempre va a estar
+desfasado, no se guarda — se mide en el momento en que alguien lo necesita.**
+
+El guion contesta las dos preguntas que la cifra pretendía contestar —cuánto tarda y cuánto margen
+queda hasta el corte, que lee del propio flujo en vez de repetirlo— y **avisa solo** cuando el margen
+baja de diez minutos. Subir el techo es la respuesta cómoda; el propio comentario del flujo dice lo
+contrario, que un run sano acercándose al corte significa que el trabajo ha crecido.
+
+**El mecanismo de `<!--medido:clave-->` no sirve para esto y conviene saber por qué**: mide el árbol,
+y una duración vive en el servidor. Una prueba que fuera a buscarla abriría una conexión que ninguna
+finalidad declara, que es la regla 2. De ahí que sea un guion y no una puerta.
+
+**Y una lectura no es una tendencia**, que es lo que el guion repite al pie: la suite de integración
+ha dado **7,5 y 27 minutos el mismo día con el mismo trabajo**.
 
 **Y ese 27 NO fue un runner lento**, que es lo que se dedujo de una lectura: en ese mismo run las
 otras nueve suites fueron normales o más rápidas. Sólo la de integración se multiplicó por 3,6, así
@@ -239,11 +245,12 @@ datos**, que pagan un peaje fijo de casi 22 segundos hagan lo que hagan.
 **El corolario práctico: un rojo por tiempo en esa suite puede ser el sorteo del runner y no tu
 cambio.** Antes de perseguirlo, compara con otro run del mismo día.
 
-**Ese recorrido corre CUATRO veces por run**: una en la verificación, dos como puerta —seguidas y
-sobre el mismo código— y una cuarta para contar lo que había pulsado. Desde el 2026-09-03 la cuarta
-ya no ocurre: el trinquete del paseo lee con `-SkipRun` el informe que la puerta acaba de dejar —el
-paseo escribe en `artifacts/walk` con o sin variable, que es lo que lo hace posible—, **0,5 s en vez
-de 2m39s y el veredicto idéntico**. Son unos 4 minutos por vuelta.
+**Ese recorrido corría CUATRO veces por run y desde el 2026-09-03 corre tres**: una en la
+verificación, dos como puerta —seguidas y sobre el mismo código— y una cuarta que ya no ocurre,
+porque el trinquete del paseo lee con `-SkipRun` el informe que la puerta acaba de dejar —el paseo
+escribe en `artifacts/walk` con o sin variable, que es lo que lo hace posible—, **0,5 s en vez de
+2m39s y el veredicto idéntico**. Cuántas corre hoy y cuánto cuestan entre sí lo dice
+`measure-ci-time.ps1 -Detailed`, en la columna `Passes`; sigue siendo la partida más cara del run.
 
 **Y sacarla de la verificación NO es gratis, medido el mismo día y con un rojo.** Parecía el ahorro
 grande —8,8 minutos— porque la puerta corre esa misma suite dos veces justo después. Pero esa suite
