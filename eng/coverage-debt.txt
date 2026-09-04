@@ -272,7 +272,7 @@ src/ApSolutions.LocalMedia.Infrastructure/FileSystem/SafeFileRenamer.cs         
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/WindowsPathNormalizer.cs                 75  58
 src/ApSolutions.LocalMedia.Infrastructure/Media/LibVlcMediaProbe.cs                           96  71
 src/ApSolutions.LocalMedia.Infrastructure/Media/LocalSegmentFeatureExtractor.cs               91  97
-src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            99  85
+src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            99  86
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/MetadataCandidateSource.cs                 98  91
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/SqliteMetadataCache.cs                     78  72
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbMetadataProvider.cs                    97  76
@@ -322,7 +322,7 @@ src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml            
 src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  77
 src/ApSolutions.LocalMedia.Presentation/Library/UnavailableBadge.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorView.axaml                    100  50
-src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  89
+src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  93
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewViewModel.cs                    95  63
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsView.axaml                         100  50
@@ -392,7 +392,7 @@ src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs             
 src/ApSolutions.LocalMedia.Presentation/Theme/Icons.axaml                                    100  50
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
-src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         88  60
+src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         88  61
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  80
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90

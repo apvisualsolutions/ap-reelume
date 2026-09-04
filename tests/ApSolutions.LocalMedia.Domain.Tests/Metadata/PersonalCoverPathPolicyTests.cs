@@ -106,6 +106,11 @@ public sealed class PersonalCoverPathPolicyTests
     // Outside the hexadecimal alphabet: 'g' and 'z' are letters and neither is a digit here.
     [InlineData("9f2c4a1b8e7d6053f4a2b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9eg.png")]
     [InlineData("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.png")]
+    // Below the digits, which every other refusal here reaches from above. A hyphen and a plus are
+    // ordinary characters in an ordinary file name, so this is the shape a name that was never a
+    // hash actually has — «mi-portada» rather than something hostile.
+    [InlineData("-f2c4a1b8e7d6053f4a2b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8.png")]
+    [InlineData("9f2c4a1b8e7d6053f4a2b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e+.png")]
     // A digit Unicode knows that this alphabet does not.
     [InlineData("٣f2c4a1b8e7d6053f4a2b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8.png")]
     // The right length and no extension at all, and the right length with nothing after the dot.
