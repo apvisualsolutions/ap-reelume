@@ -598,7 +598,11 @@ public static partial class CompositionRoot
             provider.GetRequiredService<ICatalogQueryService>(),
             movieDetails,
             showDetails,
-            provider.GetRequiredService<ScanProgressViewModel>());
+            provider.GetRequiredService<ScanProgressViewModel>(),
+            // The same lookup the two detail cards use, handed to the grid. Until 2026-09-04 the
+            // grid had none: covers were downloaded, chosen, stored and backed up, and the screen
+            // that shows the whole library drew a gradient over initials for every one of them.
+            (titleId, posterPath) => FindCachedPoster(provider, titleId, posterPath));
         library.DetailsLoader = async item =>
         {
             var stored = await catalogMetadata
@@ -695,18 +699,13 @@ public static partial class CompositionRoot
     /// locked field is one no refresh overwrites.
     /// </para>
     /// </remarks>
-    private static string? FindCachedPoster(IServiceProvider provider, TitleId titleId, string? posterPath)
-    {
-        if (PosterAddressPolicy.TryBuildPosterAddress(posterPath) is { } address)
-        {
-            return provider.GetRequiredService<IArtworkStore>()
-                .Find(titleId, new Uri(address, UriKind.Absolute));
-        }
-
-        return PersonalCoverPathPolicy.TryGetCoverFileName(posterPath) is { } cover
-            ? provider.GetRequiredService<IArtworkStore>().FindPersonal(titleId, cover)
-            : null;
-    }
+    /// <para>
+    /// <b>The rule itself moved out on 2026-09-04</b>, to <see cref="ResolveTitlePoster"/>. The
+    /// library grid needs the same answer these cards need, and the one thing worse than a rule with
+    /// no test is two copies of it. What stays here is the lookup.
+    /// </para>
+    private static string? FindCachedPoster(IServiceProvider provider, TitleId titleId, string? posterPath) =>
+        provider.GetRequiredService<ResolveTitlePoster>().Find(titleId, posterPath);
 
     /// <summary>
     /// Everything the shell is handed. The long-lived surfaces arrive built; the ones that describe

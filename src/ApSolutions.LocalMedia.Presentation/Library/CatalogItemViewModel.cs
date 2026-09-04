@@ -9,9 +9,16 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 
 namespace ApSolutions.LocalMedia.Presentation.Library;
 
-public sealed class CatalogItemViewModel(CatalogItem item) : IPosterCard
+public sealed class CatalogItemViewModel(CatalogItem item, string? posterFile = null) : IPosterCard
 {
     public CatalogItem Item { get; } = item ?? throw new ArgumentNullException(nameof(item));
+
+    /// <summary>
+    /// The cover file, already resolved. Resolving is the composition root's job here for the same
+    /// reason it is on the detail cards: the rule that turns a stored value into a file lives in
+    /// <c>ResolveTitlePoster</c>, and a view model that reached for it would be a second copy.
+    /// </summary>
+    public string? PosterFile { get; } = posterFile;
 
     public string Title => Item.Title;
 

@@ -128,6 +128,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Las portadas ya se ven en la biblioteca.** El programa descargaba la carátula de cada título,
+  dejaba poner la tuya, las guardaba y las metía en la copia de seguridad — y **la pantalla donde
+  miras tu biblioteca no dibujaba ninguna**: rectángulos de colores con dos letras, para todo. Sólo
+  aparecían al abrir la ficha de un título. La tarjeta de la rejilla no tenía siquiera dónde poner
+  una imagen.
+
+  **Y la regla que decide qué imagen se dibuja no la comprobaba nada.** Vivía en una línea suelta del
+  arranque a la que ninguna prueba podía llegar, y es la que decide si ves la portada que elegiste tú
+  o la del proveedor. Ahora está en su sitio, con once pruebas, incluida la que fija ese orden.
+
+  **La rejilla descomprime las imágenes a su propio tamaño**, no al del proveedor: veintiocho veces
+  menos memoria por imagen, porque lo que se paga es la superficie y no el ancho. La cesión, escrita
+  al lado: en una pantalla muy fina se verán algo menos nítidas de lo que podrían.
+
 - **Dos comprobaciones de la versión ARM habrían mentido el día que hubiera una máquina.** Las dos
   se encontraron leyendo el código antes de encender nada, y ninguna se habría notado desde fuera.
 

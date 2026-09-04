@@ -29,6 +29,25 @@ public interface IPosterCard
     /// <summary>The letters standing in for artwork; see <see cref="PosterInitials"/>.</summary>
     string Initials { get; }
 
+    /// <summary>
+    /// The file drawing this title's cover, or <see langword="null"/> when there is none to draw.
+    /// </summary>
+    /// <remarks>
+    /// <b>Until 2026-09-04 this member did not exist, and neither did the picture.</b> The
+    /// application downloaded covers from the provider and let somebody pick their own, stored both,
+    /// and backed both up — and the grid everybody looks at drew a generated gradient over initials,
+    /// because no card here had anywhere to put a real one. It is the same defect this repository
+    /// already names as its own, sitting on the most looked-at screen in the application.
+    /// <para>
+    /// It answers <see langword="null"/> by default so a card with no cover to offer says so by
+    /// saying nothing, which is what the rails on Home still do until they are given one.
+    /// </para>
+    /// </remarks>
+    string? PosterFile => null;
+
+    /// <summary>Whether there is a picture, which is what decides whether the initials show.</summary>
+    bool HasPoster => !string.IsNullOrWhiteSpace(PosterFile);
+
     /// <summary>Whether <see cref="CompletedFraction"/> is a number this list actually read.</summary>
     bool HasKnownProgress { get; }
 

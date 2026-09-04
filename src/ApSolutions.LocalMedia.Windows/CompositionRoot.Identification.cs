@@ -133,6 +133,7 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<IScanActivity>(),
                 TimeProvider.System))
             .AddTransient<SetPersonalCover>()
+            .AddTransient<ResolveTitlePoster>()
             // LIB-018. The picker is handed the two things it cannot reach for itself: the system's
             // own file dialog, which belongs to the host, and the use case that copies the chosen
             // file in. Built with neither — which is what every test that only displays a picker

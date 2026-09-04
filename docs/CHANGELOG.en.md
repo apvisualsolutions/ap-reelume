@@ -128,6 +128,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Covers now show in the library.** The application downloaded each title's artwork, let you set
+  your own, stored them and carried them in the backup — and **the screen you look at your library
+  through drew none of them**: coloured rectangles with two letters, for everything. They only
+  appeared once you opened a title. The grid's card had nowhere to put a picture at all.
+
+  **And the rule deciding which picture is drawn was checked by nothing.** It lived in a stray line
+  of the start-up that no test could reach, and it is the rule that decides whether you see the cover
+  you chose or the provider's. It now sits where it belongs, with eleven tests, including the one
+  that pins that order down.
+
+  **The grid decodes pictures at its own size**, not the provider's: twenty-eight times less memory
+  each, because what is paid for is area rather than width. The concession, written beside it: on a
+  very sharp display they will look slightly softer than they could.
+
 - **Two checks on the ARM build would have lied on the day there was a machine.** Both were found by
   reading the code before anything was switched on, and neither would have shown from outside.
 

@@ -49,6 +49,27 @@ public sealed class CachedPosterConverter : IValueConverter
     public const int Capacity = 8;
 
     /// <summary>
+    /// The width the grid decodes at, and the card's own width rather than the provider's.
+    /// </summary>
+    /// <remarks>
+    /// <b>A measured concession, not an oversight.</b> A poster decoded at 780 costs 3,65 MB of
+    /// pixels; the same picture at the card's 148 costs 131 KB — twenty-eight times less, because
+    /// area is what is paid, not width. The grid draws every card it has, so the provider's width
+    /// there would be hundreds of megabytes for pictures nobody can see the detail of at 148 points.
+    /// What is given up is sharpness on a high-density display, where the card is drawn at more
+    /// device pixels than this decodes.
+    /// </remarks>
+    public const int GridDecodeWidth = 148;
+
+    /// <summary>
+    /// How many the grid keeps. Larger than <see cref="Capacity"/> because a grid holds every card
+    /// it has at once — WrapPanel does not virtualise — so a cache of eight against a screenful
+    /// would decode and drop the same pictures on every pass. At <see cref="GridDecodeWidth"/> this
+    /// is about 17 MB full.
+    /// </summary>
+    public const int GridCapacity = 128;
+
+    /// <summary>
     /// The width every poster is decoded at, which is the width the provider already served.
     /// </summary>
     /// <remarks>
@@ -58,9 +79,22 @@ public sealed class CachedPosterConverter : IValueConverter
     /// </remarks>
     public const int DecodeWidth = 780;
 
+    /// <summary>
+    /// What this instance decodes at. Set from the resource so the grid can ask for its own width,
+    /// and defaulted to the detail cards' so nothing that already used this had to change.
+    /// </summary>
+    public int Width { get; set; } = DecodeWidth;
+
+    /// <summary>How many this instance keeps, for the same reason.</summary>
+    public int Kept { get; set; } = Capacity;
+
     private static readonly Lock Gate = new();
-    private static readonly Dictionary<string, LinkedListNode<CacheEntry>> Decoded =
-        new(StringComparer.OrdinalIgnoreCase);
+
+    // Keyed by width as well as by path, because the same file is now decoded at two sizes and a
+    // cache that forgot which one it held would hand the grid a 780-wide picture or the card a
+    // 148-wide one, whichever asked first.
+    private static readonly Dictionary<(string Path, int Width), LinkedListNode<CacheEntry>> Decoded =
+        new();
 
     /// <summary>Most recently used first, so the one to drop is always the last.</summary>
     private static readonly LinkedList<CacheEntry> Recency = new();
@@ -70,7 +104,7 @@ public sealed class CachedPosterConverter : IValueConverter
         _ = targetType;
         _ = parameter;
         _ = culture;
-        return value is string path && !string.IsNullOrWhiteSpace(path) ? Remember(path) : null;
+        return value is string path && !string.IsNullOrWhiteSpace(path) ? Remember(path, Width, Kept) : null;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -85,11 +119,12 @@ public sealed class CachedPosterConverter : IValueConverter
         throw new NotSupportedException("A poster is drawn, never written back.");
     }
 
-    private static Bitmap? Remember(string path)
+    private static Bitmap? Remember(string path, int width, int kept)
     {
         lock (Gate)
         {
-            if (Decoded.TryGetValue(path, out var known))
+            var key = (path, width);
+            if (Decoded.TryGetValue(key, out var known))
             {
                 Recency.Remove(known);
                 Recency.AddFirst(known);
@@ -99,30 +134,30 @@ public sealed class CachedPosterConverter : IValueConverter
             // A path that decoded to nothing is remembered as nothing, on purpose: without it, a
             // deleted file would be opened and refused again on every layout pass of every card that
             // names it.
-            var entry = new LinkedListNode<CacheEntry>(new CacheEntry(path, Decode(path)));
+            var entry = new LinkedListNode<CacheEntry>(new CacheEntry(path, Decode(path, width), width));
             Recency.AddFirst(entry);
-            Decoded[path] = entry;
+            Decoded[key] = entry;
             // Dropped and not disposed, deliberately. Both cards stay mounted while the shell shows
             // one of them, so an Image can still be holding the picture that is being evicted — and
             // a disposed bitmap under a control that draws it is a crash, where a dropped reference
             // is only a decode somebody may pay for again. Letting go is what bounds the memory;
             // the collector does the rest once no view is pointing at it.
-            if (Recency.Last is { } oldest && Decoded.Count > Capacity)
+            if (Recency.Last is { } oldest && Decoded.Count > kept)
             {
                 Recency.RemoveLast();
-                _ = Decoded.Remove(oldest.Value.Path);
+                _ = Decoded.Remove((oldest.Value.Path, oldest.Value.Width));
             }
 
             return entry.Value.Picture;
         }
     }
 
-    private static Bitmap? Decode(string path)
+    private static Bitmap? Decode(string path, int width)
     {
         try
         {
             using var file = File.OpenRead(path);
-            return Bitmap.DecodeToWidth(file, DecodeWidth);
+            return Bitmap.DecodeToWidth(file, width);
         }
         // NullReferenceException is in this list because it was measured, not because anything here
         // is careless. On Avalonia 12.1.1 the whole-file constructor answers an undecodable file with
@@ -140,5 +175,5 @@ public sealed class CachedPosterConverter : IValueConverter
         }
     }
 
-    private sealed record CacheEntry(string Path, Bitmap? Picture);
+    private sealed record CacheEntry(string Path, Bitmap? Picture, int Width);
 }

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Globalization;
-
 using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Application.Home;
 using ApSolutions.LocalMedia.Domain.Catalog;
@@ -14,6 +13,7 @@ using ApSolutions.LocalMedia.Presentation.Library;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -265,6 +265,93 @@ public sealed class PosterCardTests
         Assert.Equal(0, suggested.CompletedFraction);
     }
 
+    /// <summary>
+    /// A card with a cover draws it, and drops the letters that were standing in for it.
+    /// </summary>
+    /// <remarks>
+    /// <b>Until 2026-09-04 this could not be written, because the card had nowhere to put a
+    /// picture.</b> The application downloaded posters, let somebody pick their own, stored both and
+    /// backed both up, and this grid — the screen the whole library is looked at through — drew a
+    /// generated gradient over initials for every title. The defect this repository names as its own,
+    /// on its most looked-at surface.
+    /// </remarks>
+    [AvaloniaFact]
+    public void A_card_with_a_cover_draws_it_instead_of_its_initials()
+    {
+        var picture = Path.Combine(Path.GetTempPath(), $"poster-{Guid.NewGuid():N}.png");
+        WritePicture(picture);
+
+        try
+        {
+            var card = Mount(new PosterCardStub("Dune", string.Empty, false, 0)
+            {
+                PosterFile = picture,
+            });
+
+            var image = card.GetLogicalDescendants().OfType<Image>().Single(each => each.Name == "PosterPicture");
+            var initials = card.GetLogicalDescendants().OfType<TextBlock>()
+                .Single(each => string.Equals(each.Text, PosterInitials.From("Dune"), StringComparison.Ordinal));
+
+            Assert.True(image.IsVisible);
+            Assert.NotNull(image.Source);
+            Assert.False(initials.IsVisible);
+        }
+        finally
+        {
+            File.Delete(picture);
+        }
+    }
+
+    /// <summary>
+    /// And a card with none draws what it always drew, which is what keeps a library of scanned
+    /// folders from becoming a grid of empty rectangles.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_card_with_no_cover_keeps_the_generated_art_and_its_initials()
+    {
+        var card = Mount(new PosterCardStub("Dune", string.Empty, false, 0));
+
+        var image = card.GetLogicalDescendants().OfType<Image>().Single(each => each.Name == "PosterPicture");
+        var initials = card.GetLogicalDescendants().OfType<TextBlock>()
+            .Single(each => string.Equals(each.Text, PosterInitials.From("Dune"), StringComparison.Ordinal));
+
+        Assert.False(image.IsVisible);
+        Assert.True(initials.IsVisible);
+    }
+
+    /// <summary>
+    /// A name that is not a picture leaves the letters showing rather than a hole.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_cover_that_names_no_picture_leaves_the_initials_where_they_were()
+    {
+        var notAPicture = Path.Combine(Path.GetTempPath(), $"poster-{Guid.NewGuid():N}.png");
+        File.WriteAllText(notAPicture, "this is not a PNG");
+
+        try
+        {
+            var card = Mount(new PosterCardStub("Dune", string.Empty, false, 0)
+            {
+                PosterFile = notAPicture,
+            });
+
+            var image = card.GetLogicalDescendants().OfType<Image>().Single(each => each.Name == "PosterPicture");
+
+            // The card still says it has one — the field is filled — and the decode answered
+            // nothing, so what is drawn underneath is the generated art the grid always had.
+            Assert.Null(image.Source);
+        }
+        finally
+        {
+            File.Delete(notAPicture);
+        }
+    }
+
+    /// <summary>A one-pixel PNG, written by hand so the test owns no fixture file.</summary>
+    private static void WritePicture(string path) =>
+        File.WriteAllBytes(path, Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="));
+
     private static PosterCardView Mount(IPosterCard model)
     {
         Assert.NotNull(Avalonia.Application.Current);
@@ -323,5 +410,7 @@ public sealed class PosterCardTests
         public bool IsWatched { get; init; }
 
         public bool IsAvailable { get; init; } = true;
+
+        public string? PosterFile { get; init; }
     }
 }

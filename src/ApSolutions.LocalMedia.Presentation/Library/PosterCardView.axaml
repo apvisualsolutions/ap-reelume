@@ -30,6 +30,17 @@ and a name here would be a second announcement of the same card.
     x:DataType="library:IPosterCard">
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="CardWord" />
+    <!--
+      Its own width, and not the detail cards'. A poster decoded at the provider's 780 costs 3,65 MB
+      of pixels where the same picture at this card's 148 costs 131 KB, and the grid draws every card
+      it holds rather than the one or two a detail view shows. The cache is larger for the same
+      reason: WrapPanel does not virtualise, so a screenful of cards asks for a screenful of pictures
+      at once, and eight entries against that would decode and drop the same ones on every pass.
+    -->
+    <library:CachedPosterConverter
+        x:Key="GridPoster"
+        Kept="128"
+        Width="148" />
   </UserControl.Resources>
   <UserControl.Styles>
     <!--
@@ -84,12 +95,33 @@ and a name here would be a second announcement of the same card.
         the initials it has always had: a hue picked by a hash is a contrast ratio nobody decided.
         -->
         <library:PosterArtView x:Name="PosterArtSurface" Title="{Binding Title}" />
+        <!--
+          The cover, when there is one. Until 2026-09-04 there was nowhere here to put it: the
+          application downloaded posters from the provider and let somebody pick their own, stored
+          them, backed them up — and this grid, which is the screen the library is looked at through,
+          drew the generated gradient over initials for every title it had.
+
+          UniformToFill and not Uniform: the card is 2:3 and so is a provider's poster, so the two
+          agree; a personal cover is whatever shape somebody's file was, and filling is what keeps
+          the grid a grid rather than a row of different heights. The Border above already clips.
+        -->
+        <Image
+            x:Name="PosterPicture"
+            IsVisible="{Binding HasPoster}"
+            Source="{Binding PosterFile, Converter={StaticResource GridPoster}}"
+            Stretch="UniformToFill"
+            automation:AutomationProperties.AccessibilityView="Raw" />
+        <!--
+          The initials stand in for artwork, so they go when there is artwork. They stay underneath a
+          picture that fails to decode, which is what the detail cards already do.
+        -->
         <TextBlock
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontSize="{DynamicResource FontSizeDisplay}"
             FontWeight="SemiBold"
             Foreground="{DynamicResource PosterInitialsBrush}"
+            IsVisible="{Binding !HasPoster}"
             Text="{Binding Initials}"
             automation:AutomationProperties.AccessibilityView="Raw" />
         <!--
