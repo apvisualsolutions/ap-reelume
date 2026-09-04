@@ -24,7 +24,31 @@
 >
 > · **The only open row of work in the MVP is `PRD-002`**, and it is not solved by programming.
 >
-> ### The next batch, which the owner chose on 2026-09-04
+> ### FIRST THING next session, decided by the owner on 2026-09-04
+>
+> · **`PRD-003` — run the ARM64 matrix on a GitHub runner.** It stopped requiring buying anything:
+>   hosted Windows 11 ARM64 runners (`windows-11-arm`) are **free and unlimited on public
+>   repositories**, and this one is public. **And all six phases can be attempted, because none of
+>   them needs hardware** — that cost two false assumptions before anybody read the tests each phase
+>   runs: the audio phase runs the engine **muted** and looks at what the video carries, and the HDR
+>   phase **injects** a fake display and decodes in software. All six carried the **same** blocking
+>   reason, «this build ran on a X64 host», and not one mentions sound or a screen.
+>
+>   **Checked and not assumed**: `VideoLAN.LibVLC.Windows 3.0.23.1` ships `build/arm64` with
+>   `libvlc.dll`, `libvlccore.dll` and its plugins, 84 MB, read in the downloaded package.
+>
+>   **The unknown, and it only closes by running it**: that image is maintained by Arm, LLC and is
+>   **not the same** as the x64 one, so it may not carry Chocolatey, `ffmpeg` or the SDK the workflow
+>   expects. `ffmpeg` is installed today with `choco install ffmpeg --version 9.0.0`, which would run
+>   **emulated** there — fine for **generating** the samples, since it is not the code under test,
+>   but it goes into the evidence rather than being left implicit.
+>
+>   The work is a new job with `runs-on: windows-11-arm` running `eng/package-arm64.ps1`, and
+>   **measuring which of the six actually pass before touching the matrix**. `Arm64PlaybackTests`
+>   compares what the report declares against the architecture it runs on, so a report genuinely made
+>   on ARM64 stops saying «there was no machine».
+>
+> ### The batch after that, also chosen by the owner on 2026-09-04
 >
 > · **The backup ASKS whether to carry the personal covers**, and if they are carried, the program
 >   cleans up on its own the ones whose title no longer exists. His reasoning: restoring on another
@@ -39,9 +63,10 @@
 >
 > ### What is not solved by programming
 >
-> · **`PRD-003` needs an ARM64 machine** there is none of, and **`PRD-002` the commercial signing
->   certificate.** Under the 2026-08-31 rule — nothing ships until everything committed to is
->   verified — they are what stands between this tree and a release.
+> · **`PRD-002` needs the commercial signing certificate**, and it is the only one left that is
+>   solved neither by programming nor by renting: `PRD-003` left this list on 2026-09-04. Under the
+>   2026-08-31 rule — nothing ships until everything committed to is verified — it is what stands
+>   between this tree and a release.
 >
 > ### What changed in the house rules, and affects how this guide is read
 >

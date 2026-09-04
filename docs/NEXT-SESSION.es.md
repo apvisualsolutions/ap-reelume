@@ -24,7 +24,31 @@
 >
 > · **La única fila de trabajo abierta del MVP es `PRD-002`**, y no se resuelve programando.
 >
-> ### La tanda siguiente, que el propietario ya eligió el 2026-09-04
+> ### LO PRIMERO de la próxima sesión, decidido por el propietario el 2026-09-04
+>
+> · **`PRD-003` — correr la matriz ARM64 en un runner de GitHub.** Dejó de exigir comprar nada: los
+>   runners hospedados de Windows 11 ARM64 (`windows-11-arm`) son **gratis e ilimitados en
+>   repositorios públicos**, y éste lo es. **Y las seis fases se pueden intentar, porque ninguna
+>   necesita hardware** — eso costó dos suposiciones falsas antes de leer las pruebas que cada fase
+>   ejecuta: la de audio corre el motor **en mudo** y mira lo que el vídeo trae, y la de HDR
+>   **inyecta** una pantalla fingida y decodifica por software. Las seis llevaban la **misma** razón
+>   de bloqueo, «esto se ejecutó en un anfitrión x64», y ninguna menciona sonido ni pantalla.
+>
+>   **Comprobado y no supuesto**: `VideoLAN.LibVLC.Windows 3.0.23.1` trae `build/arm64` con
+>   `libvlc.dll`, `libvlccore.dll` y sus complementos, 84 MB, leído en el paquete descargado.
+>
+>   **La incógnita, y sólo se cierra corriéndolo**: esa imagen la mantiene Arm, LLC y **no es la
+>   misma** que la de x64, así que puede no traer Chocolatey, `ffmpeg` ni el SDK que el flujo espera.
+>   `ffmpeg` se instala hoy con `choco install ffmpeg --version 9.0.0`, que allí correría **emulado**
+>   — para **generar** las muestras vale, porque no es el código bajo prueba, pero se escribe en la
+>   evidencia en vez de dejarlo implícito.
+>
+>   El trabajo es un trabajo nuevo con `runs-on: windows-11-arm` que ejecute `eng/package-arm64.ps1`,
+>   y **medir cuáles de las seis pasan de verdad antes de tocar la matriz**. `Arm64PlaybackTests`
+>   compara lo que el informe declara con la arquitectura en la que corre, así que un informe hecho
+>   en ARM64 de verdad deja de decir «no había máquina».
+>
+> ### La tanda que va después, también elegida por el propietario el 2026-09-04
 >
 > · **La copia de seguridad PREGUNTA si llevarse las portadas propias**, y si se llevan, el programa
 >   limpia solo las de títulos que ya no existen. Su razonamiento: al restaurar en otro ordenador lo
@@ -39,9 +63,10 @@
 >
 > ### Lo que no se resuelve programando
 >
-> · **`PRD-003` pide una máquina ARM64** que no hay, y **`PRD-002` el certificado comercial de
->   firma.** Con la regla del 2026-08-31 —no se publica nada hasta que todo lo comprometido esté
->   verificado— son lo que separa el árbol de una publicación.
+> · **`PRD-002` pide el certificado comercial de firma**, y es lo único que ya no se resuelve
+>   programando ni alquilando: `PRD-003` dejó de estar en esta lista el 2026-09-04. Con la regla del
+>   2026-08-31 —no se publica nada hasta que todo lo comprometido esté verificado— es lo que separa
+>   el árbol de una publicación.
 >
 > ### Lo que cambió en las reglas de la casa, y afecta a cómo se lee esta guía
 >

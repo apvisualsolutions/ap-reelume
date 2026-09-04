@@ -23,10 +23,28 @@ Qué cuenta como «todo», para que la regla sea comprobable y no una intención
 `pwsh -NoProfile -File eng/list-pending.ps1` contesta en cualquier momento cuánto falta, y separa
 las dos categorías por su cuenta.
 
-**Lo que esta regla convierte en bloqueo de publicación, y conviene saberlo pronto:** `PRD-003` no
-depende de programar, sino de **una máquina Windows 11 ARM64 que no hay**; y `PRD-002` no puede
-llegar a `VERIFIED` sin el **certificado comercial de firma**, porque su ciclo se verificó sobre una
-copia resellada y el artefacto sin firmar no puede repetirlo — lo que lo encadena a `REL-001`.
+**Lo que esta regla convierte en bloqueo de publicación, y conviene saberlo pronto:** `PRD-002` no
+puede llegar a `VERIFIED` sin el **certificado comercial de firma**, porque su ciclo se verificó
+sobre una copia resellada y el artefacto sin firmar no puede repetirlo — lo que lo encadena a
+`REL-001`.
+
+**Y `PRD-003` dejó de ser lo que esta línea decía, el 2026-09-04.** Decía que dependía de «una
+máquina Windows 11 ARM64 que no hay». La hay y es gratis: GitHub ofrece runners hospedados de
+Windows 11 ARM64 —`windows-11-arm`—, **gratis e ilimitados en repositorios públicos**, y éste lo es
+desde el 2026-08-10.
+
+**Y las seis fases se pueden intentar, porque ninguna necesita hardware.** Eso costó dos
+suposiciones falsas antes de leer las pruebas que cada fase ejecuta: la de audio corre el motor en
+modo mudo y comprueba **lo que el vídeo trae**, no lo que sale por los altavoces; la de HDR
+**inyecta** una pantalla fingida para los dos casos y decodifica por software a propósito. La matriz
+lo decía desde el principio: las seis llevan la **misma** razón de bloqueo —«esto se ejecutó en un
+anfitrión x64»—, y ninguna menciona sonido ni pantalla. `VideoLAN.LibVLC.Windows` trae binarios
+ARM64 nativos con sus complementos, comprobado en el paquete descargado.
+
+**Lo que falta por saber es si esa imagen —que la mantiene Arm, LLC y no es la misma que la de
+x64— trae las herramientas que el flujo espera**, empezando por `ffmpeg`. Eso sólo se sabe
+corriéndolo, y es la tanda prioritaria de la sesión siguiente. Hasta medirlo, `PRD-003` sigue
+`BLOCKED`: lo que cambia es que el desbloqueo ya no exige comprar nada.
 
 **Y un tercero que ya está resuelto, el mismo 2026-09-01:** `PLY-004` estaba bloqueado porque los
 cuatro endpoints físicos de este equipo declaran mezcla de dos canales. El propietario decidió que un
@@ -64,7 +82,7 @@ abiertos se heredan en `STABLE` en vez de cerrarse. Con la aprobación arranca l
 
 | ID | Qué falta |
 |---|---|
-| `PRD-003` | Paridad ARM64. La compilación y el paquete nativo ya están hechos y verificados; falta certificar la reproducción en una máquina Windows 11 ARM64, que no hay. Bloquea la publicación estable. [T42](../evidence/stable/T42-arm64.md) |
+| `PRD-003` | Paridad ARM64. La compilación y el paquete nativo ya están hechos y verificados; falta correr las seis fases en una máquina ARM64. **Desde el 2026-09-04 ya no hace falta comprarla**: los runners `windows-11-arm` de GitHub son gratis en repositorios públicos, y ninguna de las seis fases pide hardware. Bloquea la publicación estable hasta medirlo. [T42](../evidence/stable/T42-arm64.md) |
 | `REL-001` | Microsoft Store como distribución principal, con su certificación. Lleva dos deudas conocidas del MVP: justificar ante la Store la capacidad restringida `unvirtualizedResources` —sin ella el paquete borra la biblioteca al desinstalarse— y decidir cuándo firmar, porque el certificado comercial cambiará la identidad del paquete. |
 | `REL-004` | Comprobación formal de marca, dominios y Store para el nombre público. |
 
