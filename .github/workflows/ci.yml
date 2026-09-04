@@ -169,3 +169,115 @@ jobs:
           name: test-results
           path: artifacts/test-results
           if-no-files-found: warn
+
+  # PRD-003. The ARM64 matrix has six phases and all six have always read "this build ran on a X64
+  # host", because the branch that runs them only runs when the host is ARM64 and there was no such
+  # machine. There is one now and it costs nothing: GitHub's `windows-11-arm` hosted runners are free
+  # and unlimited on public repositories, and this one has been public since 2026-08-10.
+  #
+  # The image is built and maintained by Arm Limited and is NOT the x64 image. It carries Chocolatey,
+  # Visual Studio 2022, the 10.0.22621.0 Windows SDK this project targets, and .NET 10.0.101 - which
+  # is a different feature band from the 10.0.302 global.json pins, so the SDK is installed here as
+  # it is above. It does not carry ffmpeg. What it carries beyond that list is the open question this
+  # job exists to answer, which is why its first real step is a probe.
+  #
+  # continue-on-error WHILE THIS IS BEING MEASURED, and that is a decision rather than an oversight.
+  # Nobody here has run anything on this image, and a red branch caused by a tool the image happens
+  # not to ship reads as broken code - which is the one thing a red must never mean. It starts
+  # blocking once there is an answer to block on.
+  #
+  # It does not run verify.ps1 and it does not run the whole suite. Arm64PlaybackTests lives in
+  # MediaTests and, on an ARM64 host, refuses any phase that is not Passed: running it in this pass
+  # would guarantee a red before anything had been measured.
+  arm64-matrix:
+    runs-on: windows-11-arm
+    continue-on-error: true
+    # The x64 job's 90 minutes are its own; a job carries its own clock, so this one cannot eat into
+    # the margin eng/measure-ci-time.ps1 reports. Sixty is a first guess on a 4-core machine, and the
+    # run itself is what will say whether it was the right one.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          # No cache on purpose: one fewer unknown on a runner that has never been used here.
+          dotnet-version: 10.0.302
+      # THE POINT OF THE FIRST RUN. Everything downstream can fail for reasons that belong to the
+      # image rather than to the code, so what the image actually carries is recorded before any of
+      # it is exercised, and it is recorded whether or not the rest gets that far.
+      - name: Probe what this image carries
+        if: always()
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $probe = [System.Collections.Generic.List[string]]::new()
+          $probe.Add("Image:                $env:ImageOS $env:ImageVersion")
+          $probe.Add("OS description:       $([Runtime.InteropServices.RuntimeInformation]::OSDescription)")
+          $probe.Add("OS architecture:      $([Runtime.InteropServices.RuntimeInformation]::OSArchitecture)")
+          $probe.Add("Process architecture: $([Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)")
+          $probe.Add("PowerShell:           $($PSVersionTable.PSVersion)")
+          $probe.Add('')
+          $probe.Add('dotnet --list-sdks:')
+          foreach ($line in (dotnet --list-sdks 2>&1)) { $probe.Add("  $line") }
+          $probe.Add('')
+          $choco = Get-Command choco -ErrorAction SilentlyContinue
+          $probe.Add("choco:  $(if ($choco) { ((choco --version 2>&1) -join ' ') } else { 'NOT PRESENT' })")
+          $ffmpeg = Get-Command ffmpeg -ErrorAction SilentlyContinue
+          $probe.Add("ffmpeg: $(if ($ffmpeg) { $ffmpeg.Source } else { 'NOT PRESENT' })")
+          $probe.Add('')
+          # eng/find-sdk-tool.ps1 looks under the SDK's `x64` folder only. On this host that either
+          # works through emulation or does not work at all, and which one decides whether the
+          # package can be sealed here. Widening it before knowing would be guessing.
+          $probe.Add('Windows SDK bin folders carrying makeappx.exe:')
+          $kits = Join-Path ${env:ProgramFiles(x86)} 'Windows Kits/10/bin'
+          if (Test-Path -LiteralPath $kits) {
+            $found = Get-ChildItem -LiteralPath $kits -Directory -ErrorAction SilentlyContinue |
+              ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Directory -ErrorAction SilentlyContinue } |
+              Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'makeappx.exe') }
+            if ($found) { foreach ($folder in $found) { $probe.Add("  $($folder.FullName)") } }
+            else { $probe.Add('  none') }
+          }
+          else {
+            $probe.Add("  $kits does not exist")
+          }
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          $probe | Tee-Object -FilePath artifacts/arm64-probe.txt
+      # Same pinned version and same three attempts as the x64 job, and one deliberate difference: it
+      # does not throw. On this host Chocolatey installs the x64 build and Windows runs it emulated,
+      # which is fine for PRODUCING the samples - ffmpeg is not the code under test - but it is
+      # written into the evidence rather than left implicit. If it cannot be installed at all, the
+      # media phases now say they could not measure instead of passing without measuring.
+      - name: Install ffmpeg
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.'; exit 0 }
+          foreach ($attempt in 1..3) {
+            choco install ffmpeg --version 9.0.0 -y --no-progress
+            if ($LASTEXITCODE -eq 0) { exit 0 }
+            "Attempt $attempt failed ($LASTEXITCODE); the community feed is the usual reason."
+            if ($attempt -lt 3) { Start-Sleep -Seconds (20 * $attempt) }
+          }
+          'ffmpeg could not be installed; the media phases will report that they could not measure.'
+      # verify.ps1 is what normally produces these and this job does not run it, so it asks directly.
+      # Without them CodecMatrixTests and HdrAccelerationTests skip themselves.
+      - name: Generate the media samples
+        continue-on-error: true
+        shell: pwsh
+        run: ./eng/generate-test-media.ps1 -Output artifacts/test-media
+      - name: Build the ARM64 package and run its matrix
+        shell: pwsh
+        run: ./eng/package-arm64.ps1 -Configuration Release
+      # A name of its own: the x64 job already publishes `arm64-matrix`, which is the same file
+      # answered from the wrong side of the question.
+      - name: Upload the natively measured ARM64 matrix
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arm64-matrix-native
+          path: |
+            artifacts/arm64-probe.txt
+            artifacts/package-arm64/arm64-matrix.json
+            artifacts/package-arm64/contents.json
+            artifacts/package-arm64/lifecycle.json
+          if-no-files-found: warn
