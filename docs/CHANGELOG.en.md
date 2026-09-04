@@ -103,6 +103,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The cover you chose was stored, locked and backed up, and you never saw it.** The button did its
+  whole job — it opened the file picker, copied your image into the program's own data and wrote
+  where it went — but the one thing that turns that into a picture on screen only knew how to read
+  the data provider's addresses. The screen said «Cover set» and the card did not change. Now it
+  shows.
+
+  **And it appears on saving, without leaving the title and coming back.** Closing the editor did not
+  reload the card behind it, so even a cover that had been found properly would have waited until the
+  next visit. It reloads only when the save actually happened: a version clash or a provider with no
+  answer leave the card alone, because redrawing the same thing teaches you the button does something
+  when it did not.
+
+  **Your cover now survives restoring a backup on another computer**, which it did not before. The
+  backup stored the image by its relative place while the card stored the absolute one, so restoring
+  onto another machine — or under another Windows account — left the image on the disk and the card
+  pointing where it no longer was. Now only the file name is read from what was stored, and the
+  program composes the folder itself.
+
+  **And that field can no longer point at any other file on the computer.** It is typed by hand and
+  anyone can put anything in it, so only the exact name the program itself writes is accepted: sixty
+  four characters of an alphabet in which you cannot write a slash, a drive's colon, or a climb to
+  the folder above. It is not a list of dangerous things being refused — which somebody would have to
+  keep complete — they simply cannot be written.
+
+  **With a price that was measured and is said out loud:** drawing a ten-megabyte photo of yours
+  would unpack tens of millions of dots into the program's memory, eight at a time, and leave the
+  window stiff when a card opened. Every cover is now unpacked at one fixed size. That enlarges a
+  small cover and costs memory it did not need, and that is the cession: a cost you can predict
+  instead of one you cannot.
+
 - **The count of how much of the program is actually tested fell short on seven files, and it was
   the only thing standing between this batch and being verified.** All ten test suites passed; what
   failed afterwards was the count. The seven were measured one at a time by reproducing the

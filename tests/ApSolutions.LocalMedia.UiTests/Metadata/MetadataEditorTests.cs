@@ -271,6 +271,75 @@ public sealed class MetadataEditorTests
         TimeProvider.System);
 
     /// <summary>A row nobody identified: no provider, no key, nothing to refresh against.</summary>
+    /// <summary>
+    /// A write that lands says so, and one that does not stays quiet.
+    /// </summary>
+    /// <remarks>
+    /// <b>This is what makes a chosen cover appear without leaving the title.</b> Closing the editor
+    /// drops both surfaces and reloads nothing, so until 2026-09-04 somebody could choose a cover, be
+    /// told «Portada puesta», save, and watch the card behind not change. The editor does not reach
+    /// for the card: it says a write landed, and composition decides what to re-read.
+    /// <para>
+    /// The conflict half is the one worth having. Telling the card to re-read after a write that
+    /// never happened would redraw exactly what is already there, and teach whoever is watching that
+    /// the button did something.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void Only_a_write_that_landed_tells_whoever_is_drawing_the_title()
+    {
+        var catalog = Catalog();
+        var repository = new UiMetadataRepository(catalog);
+        var told = 0;
+        var viewModel = new MetadataEditorViewModel(
+            catalog,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            new ArtworkPickerViewModel(),
+            onApplied: () =>
+            {
+                told++;
+                return Task.CompletedTask;
+            });
+
+        viewModel.Overview = "Resumen manual";
+        viewModel.SaveCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(1, told);
+
+        repository.ForceConflict = true;
+        viewModel.Overview = "Otro resumen";
+        viewModel.SaveCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(viewModel.HasConflict);
+        Assert.Equal(1, told);
+    }
+
+    /// <summary>
+    /// The editor that nobody handed a listener to saves exactly the same, which is the shape every
+    /// other test of this class builds and the shape a test of the fields alone should keep.
+    /// </summary>
+    [AvaloniaFact]
+    public void An_editor_with_nobody_listening_saves_all_the_same()
+    {
+        var catalog = Catalog();
+        var repository = new UiMetadataRepository(catalog);
+        var viewModel = new MetadataEditorViewModel(
+            catalog,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            new ArtworkPickerViewModel());
+
+        viewModel.Overview = "Sin nadie escuchando";
+        viewModel.SaveCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal("Sin nadie escuchando", repository.Value.Metadata.Overview);
+        Assert.False(viewModel.HasConflict);
+    }
+
     private static CatalogMetadata Unidentified() => Catalog() with { Provider = null, ProviderKey = null };
 
     private static CatalogMetadata Catalog() => new(

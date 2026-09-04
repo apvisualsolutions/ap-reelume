@@ -322,6 +322,116 @@ public sealed class ArtworkCacheTests
         Assert.True(File.Exists(remote.Path));
     }
 
+    /// <summary>
+    /// What the picker imported is found again from what the editor stored, which is the whole of
+    /// the defect closed on 2026-09-04: the file was written, the path was kept, and nothing ever
+    /// asked for it back.
+    /// </summary>
+    [Fact]
+    public async Task A_cover_that_was_imported_is_found_again_from_the_stored_path()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var source = Path.Combine(directory.Path, "elegida.png");
+        await File.WriteAllBytesAsync(source, [9, 8, 7, 6], TestContext.Current.CancellationToken);
+        using var client = new HttpClient(new ArtworkHandler([]));
+        var cache = new ArtworkCache(directory.Path, client);
+        var titleId = new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000a1"));
+
+        var imported = await cache.ImportPersonalAsync(
+            titleId,
+            source,
+            "Portada elegida",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(imported.Path, cache.FindPersonal(titleId, Path.GetFileName(imported.Path)));
+
+        // Somebody else's title does not get this cover, because the folder is composed from the
+        // title asked for and not from anything the stored value said.
+        Assert.Null(cache.FindPersonal(
+            new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000a2")),
+            Path.GetFileName(imported.Path)));
+    }
+
+    /// <summary>
+    /// A backup restored onto another machine puts the images under that machine's own folder while
+    /// the stored value still names the old one. The cover is found anyway, because the folder was
+    /// never the part that was read.
+    /// </summary>
+    [Fact]
+    public async Task A_cover_restored_under_a_different_data_root_is_still_found()
+    {
+        using var origin = new DatabaseTestDirectory();
+        using var restored = new DatabaseTestDirectory();
+        var source = Path.Combine(origin.Path, "elegida.png");
+        await File.WriteAllBytesAsync(source, [4, 5, 6, 7], TestContext.Current.CancellationToken);
+        using var client = new HttpClient(new ArtworkHandler([]));
+        var titleId = new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000b1"));
+
+        var before = await new ArtworkCache(origin.Path, client).ImportPersonalAsync(
+            titleId,
+            source,
+            "Portada elegida",
+            TestContext.Current.CancellationToken);
+
+        // What the restore does: the same relative shape under the new machine's data root.
+        var name = Path.GetFileName(before.Path);
+        var folder = Path.Combine(restored.Path, "personal-artwork", titleId.Value.ToString("N"));
+        Directory.CreateDirectory(folder);
+        File.Copy(before.Path, Path.Combine(folder, name));
+
+        var here = new ArtworkCache(restored.Path, client);
+
+        // The value the database still holds is the path from the machine the backup was made on.
+        Assert.NotEqual(before.Path, here.FindPersonal(titleId, Path.GetFileName(before.Path)));
+        Assert.Equal(Path.Combine(folder, name), here.FindPersonal(titleId, name));
+    }
+
+    /// <summary>
+    /// The guard is on the line that composes a path and not only on its caller, and this is what
+    /// exercises it: a value that names a real file somewhere else reaches nothing, and the file it
+    /// named is still sitting there afterwards, unread and unmoved.
+    /// </summary>
+    [Theory]
+    [InlineData(@"..\..\..\secreto.png")]
+    [InlineData(@"\\servidor\recurso\secreto.png")]
+    [InlineData("secreto.png")]
+    [InlineData("9f2c4a1b8e7d6053f4a2b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8.exe")]
+    [InlineData("9F2C4A1B8E7D6053F4A2B9C8D7E6F5A4B3C2D1E0F9A8B7C6D5E4F3A2B1C0D9E8.png")]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task A_name_the_policy_refuses_reaches_no_file_at_all(string coverFileName)
+    {
+        using var directory = new DatabaseTestDirectory();
+        var elsewhere = Path.Combine(directory.Path, "secreto.png");
+        await File.WriteAllBytesAsync(elsewhere, [1, 1, 1, 1], TestContext.Current.CancellationToken);
+        using var client = new HttpClient(new ArtworkHandler([]));
+        var cache = new ArtworkCache(directory.Path, client);
+
+        Assert.Null(cache.FindPersonal(
+            new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000c1")),
+            coverFileName));
+
+        // The assertion that keeps the one above from being blind: refusing must mean the file was
+        // left alone, not that it happened to be missing.
+        Assert.True(File.Exists(elsewhere), "the file the value named was not left where it was.");
+    }
+
+    /// <summary>
+    /// A name of the right shape whose file is not there is «no cover», which is a state every
+    /// surface already draws. Somebody who deleted the folder by hand gets their initials back.
+    /// </summary>
+    [Fact]
+    public void A_well_formed_name_with_nothing_behind_it_is_no_cover()
+    {
+        using var directory = new DatabaseTestDirectory();
+        using var client = new HttpClient(new ArtworkHandler([]));
+        var cache = new ArtworkCache(directory.Path, client);
+
+        Assert.Null(cache.FindPersonal(
+            new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000d1")),
+            "9f2c4a1b8e7d6053f4a2b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8.png"));
+    }
+
     private static HttpResponseMessage Response(
         HttpStatusCode status,
         string body,

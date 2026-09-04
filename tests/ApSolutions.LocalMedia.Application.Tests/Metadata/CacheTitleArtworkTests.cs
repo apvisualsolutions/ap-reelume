@@ -124,6 +124,8 @@ public sealed class CacheTitleArtworkTests
             return Found;
         }
 
+        public string? FindPersonal(TitleId titleId, string coverFileName) => null;
+
         public Task<string?> FetchAsync(
             TitleId titleId,
             Uri source,

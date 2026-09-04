@@ -103,6 +103,35 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La portada que elegías se guardaba, se bloqueaba y se respaldaba, y no la veías nunca.** El botón
+  hacía su trabajo entero —abría el explorador, copiaba tu imagen a los datos del programa y escribía
+  su sitio en la ficha—, pero lo único que convertía eso en una imagen en pantalla sólo sabía leer las
+  direcciones del proveedor de datos. En la pantalla ponía «Portada puesta» y la ficha no cambiaba.
+  Ahora se ve.
+
+  **Y aparece al guardar, sin salir del título y volver a entrar.** Cerrar el editor no recargaba la
+  ficha de detrás, así que incluso una portada bien encontrada habría tardado en aparecer hasta la
+  siguiente visita. Sólo se recarga cuando el guardado ha ocurrido de verdad: un choque de versiones
+  o un proveedor sin respuesta dejan la ficha como está, porque redibujar lo mismo enseña que el
+  botón hace algo cuando no lo ha hecho.
+
+  **Tu portada sobrevive ahora a restaurar una copia en otro ordenador**, que antes no sobrevivía. La
+  copia de seguridad guardaba la imagen por su sitio relativo y la ficha guardaba el sitio absoluto,
+  así que al restaurar en otra máquina —o con otra cuenta de Windows— la imagen quedaba en el disco y
+  la ficha señalaba a donde ya no estaba. Ahora de lo guardado sólo se lee el nombre del archivo y la
+  carpeta la compone el programa.
+
+  **Y ese campo deja de poder señalar a ningún otro archivo del ordenador.** Se escribe a mano y
+  cualquiera puede teclear en él, así que sólo se acepta el nombre exacto que el propio programa
+  escribe: sesenta y cuatro caracteres de un alfabeto en el que no se puede escribir ni una barra, ni
+  los dos puntos de una unidad, ni la subida a una carpeta de arriba. No se rechaza una lista de
+  cosas peligrosas —que alguien tendría que mantener completa—: es que no se pueden ni escribir.
+
+  **Con un precio medido y dicho:** dibujar una foto tuya de diez megas descomprimiría decenas de
+  millones de puntos en la memoria del programa, ocho a la vez, y dejaría la ventana tiesa al abrir
+  una ficha. Ahora toda portada se descomprime a un tamaño fijo. Eso agranda una portada pequeña y le
+  cuesta memoria de más, y es la cesión: un coste que se puede predecir en lugar de uno que no.
+
 - **La cuenta de cuánto del programa está realmente probado se había quedado corta en siete
   archivos, y era lo único que separaba esta tanda de estar verificada.** Las diez baterías de
   pruebas pasaban; lo que fallaba después era el recuento. Los siete se midieron uno a uno

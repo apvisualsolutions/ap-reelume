@@ -23,6 +23,20 @@ public interface IArtworkStore
     string? Find(TitleId titleId, Uri source);
 
     /// <summary>
+    /// The local file holding the cover this person chose for this title, or <see langword="null"/>
+    /// when there is none by that name. Touches the disk and never the network.
+    /// </summary>
+    /// <remarks>
+    /// <b>It takes a name and not a path, and that is the point.</b> The value the poster field
+    /// holds was written by whoever last edited the title — or by a provider, or by a backup made on
+    /// another machine — so the directory it names is not this application's to trust or even to
+    /// use. The caller keeps only the name, which <c>PersonalCoverPathPolicy</c> has agreed to, and
+    /// the folder is composed here out of the application's own data root and the title asked for.
+    /// A cover restored onto a different machine is found for exactly that reason.
+    /// </remarks>
+    string? FindPersonal(TitleId titleId, string coverFileName);
+
+    /// <summary>
     /// Fetches the artwork and answers where it was put, or <see langword="null"/> when it could not
     /// be had. A title without artwork is an ordinary state and not a failure to report.
     /// </summary>

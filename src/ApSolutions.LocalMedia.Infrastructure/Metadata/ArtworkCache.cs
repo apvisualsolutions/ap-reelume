@@ -7,6 +7,7 @@ using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Privacy;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Privacy;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Metadata;
@@ -160,6 +161,25 @@ public sealed class ArtworkCache : IArtworkStore
                 .Order(StringComparer.Ordinal)
                 .FirstOrDefault()
             : null;
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// The name is put through the policy again here, on the line that composes a path, and not only
+    /// at the caller — for the reason <see cref="ImportPersonalAsync"/> re-checks the allow-list on
+    /// the line that copies a file: a guard on the caller protects the callers that exist today.
+    /// Unlike the remote half this composes the path instead of listing the folder, because the name
+    /// is complete — the extension travelled with it, where a cached file's has to be discovered.
+    /// </remarks>
+    public string? FindPersonal(TitleId titleId, string coverFileName)
+    {
+        if (PersonalCoverPathPolicy.TryGetCoverFileName(coverFileName) is not { } name)
+        {
+            return null;
+        }
+
+        var candidate = Path.Combine(_personalRoot, titleId.Value.ToString("N"), name);
+        return File.Exists(candidate) ? candidate : null;
     }
 
     /// <inheritdoc />

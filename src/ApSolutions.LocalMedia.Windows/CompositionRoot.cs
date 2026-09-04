@@ -686,11 +686,27 @@ public static partial class CompositionRoot
     /// asks it to fetch one. What fetches is <c>ApplyIdentification</c>, at the moment somebody has
     /// consented to talk to the provider — which means a library identified before 2026-08-28 gets
     /// its posters at its next identification or refresh, the same way a scanned title got its name.
+    /// <para>
+    /// <b>Two questions and not one, since 2026-09-04.</b> The field holds either what a provider
+    /// sent or where somebody's own cover landed, and asking only the first is why choosing a cover
+    /// said «puesta» and changed nothing: the picker wrote an absolute path, and an absolute path is
+    /// not a provider path. The provider is asked first so a title that has both draws the same
+    /// thing it drew yesterday; a personal cover only ever reaches here with the lock set, and a
+    /// locked field is one no refresh overwrites.
+    /// </para>
     /// </remarks>
-    private static string? FindCachedPoster(IServiceProvider provider, TitleId titleId, string? posterPath) =>
-        PosterAddressPolicy.TryBuildPosterAddress(posterPath) is { } address
-            ? provider.GetRequiredService<IArtworkStore>().Find(titleId, new Uri(address, UriKind.Absolute))
+    private static string? FindCachedPoster(IServiceProvider provider, TitleId titleId, string? posterPath)
+    {
+        if (PosterAddressPolicy.TryBuildPosterAddress(posterPath) is { } address)
+        {
+            return provider.GetRequiredService<IArtworkStore>()
+                .Find(titleId, new Uri(address, UriKind.Absolute));
+        }
+
+        return PersonalCoverPathPolicy.TryGetCoverFileName(posterPath) is { } cover
+            ? provider.GetRequiredService<IArtworkStore>().FindPersonal(titleId, cover)
             : null;
+    }
 
     /// <summary>
     /// Everything the shell is handed. The long-lived surfaces arrive built; the ones that describe
@@ -839,7 +855,17 @@ public static partial class CompositionRoot
             catalog,
             provider.GetRequiredService<UpdateMetadata>(),
             provider.GetRequiredService<RefreshMetadata>(),
-            provider.GetRequiredService<ArtworkPickerViewModel>());
+            provider.GetRequiredService<ArtworkPickerViewModel>(),
+
+            // What the card behind the editor is filled with, asked for again. It is the same loader
+            // that filled it when the title was opened, so there is one description of what a card
+            // shows and not two — and a poster somebody just chose is drawn without them having to
+            // leave the title and come back.
+            onApplied: () =>
+                provider.GetRequiredService<ShellHost>().Shell?.Library is
+                { SelectedItem: { } item, DetailsLoader: { } reload }
+                    ? reload(item)
+                    : Task.CompletedTask);
     }
 
     /// <summary>

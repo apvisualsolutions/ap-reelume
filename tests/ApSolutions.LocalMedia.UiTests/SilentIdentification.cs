@@ -28,6 +28,8 @@ internal static class SilentIdentification
     {
         public string? Find(TitleId titleId, Uri source) => null;
 
+        public string? FindPersonal(TitleId titleId, string coverFileName) => null;
+
         public Task<string?> FetchAsync(
             TitleId titleId,
             Uri source,
