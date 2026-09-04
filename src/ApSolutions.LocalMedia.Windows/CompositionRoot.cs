@@ -602,7 +602,12 @@ public static partial class CompositionRoot
             // The same lookup the two detail cards use, handed to the grid. Until 2026-09-04 the
             // grid had none: covers were downloaded, chosen, stored and backed up, and the screen
             // that shows the whole library drew a gradient over initials for every one of them.
-            (titleId, posterPath) => FindCachedPoster(provider, titleId, posterPath));
+            //
+            // The use case's own method and not a lambda around it. A lambda here is a branch, and a
+            // branch nothing in this assembly's tests reaches is a branch that lowers this file's
+            // floor — which is exactly what it did on the run of 3661283. The signatures already
+            // agree, so the wrapper was never buying anything.
+            provider.GetRequiredService<ResolveTitlePoster>().Find);
         library.DetailsLoader = async item =>
         {
             var stored = await catalogMetadata
