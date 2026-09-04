@@ -1,48 +1,103 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-04: the seven coverage files are fixed and the tag is integrated; CI's verdict is still out
+> ## READ THIS FIRST — 2026-09-04: `main` is up to date and green for the first time since 2026-09-02
 >
-> **`main` still has none of this batch and is now sixteen commits behind.** Everything is on
-> `codex/ap-reelume-mvp-x64`, and **green has not arrived yet**: what there is, is one whole batch
-> pushed at once and a run measuring it. Being on the branch is safety, not integration.
+> **The branch and `main` point at the same commit, and that commit passed all of CI.** Read it with
+> `git log --oneline -1 main` and `gh run list --limit 3`; the number is not written here, because
+> the commit writing it would already have changed it. The sixteen commits that were in limbo — the
+> three batches of 2026-09-03 plus today's — are integrated.
 >
-> **What was closed**: the coverage gate that was holding yesterday's three batches. All seven files
-> were measured by reproducing the failing run's own merged report here — the twenty Cobertura files
-> of 33812831673's `test-results` artefact, merged with the same `reportgenerator` and read with
-> `check-coverage.ps1`'s arithmetic — and it **reproduced all seven figures exactly** before anything
-> was touched. That is what makes the new floors a calculation rather than a bet.
+> **Nothing is urgent.** The first thing next session is choosing between the two batches below, not
+> fixing anything.
 >
-> · The three new files leave the list by **improving**: 100/100 all three.
-> · Three stay with their floors raised — `ArtworkCache` 99/85, `MetadataEditorViewModel` 100/89 and
->   `CompositionRoot.cs` 88/60.
-> · `AppDataPaths` is back at 100/100: one line was missing, the course-thumbnail folder, added to
->   the paths and never to the test that walks them.
-> · The list is still **188 rows** and the ratchet did not move.
+> ### What has to be decided before touching code, and it is the owner's
 >
-> **FIRST next session, and it is a check rather than a job**: look at the run for
-> `10a57df`/`e45dda6`. Two of those floors — `ArtworkCache` 99 and `CompositionRoot.cs` 88 — land
-> **exactly at the bottom of their band**, so if CI measures one line fewer than predicted the gate
-> will ask for them to be corrected, and the correction is one figure. All three come from the new
-> run's artefact, as always.
+> · **`LIB-011` sits at `IMPLEMENTED` and could go back to `VERIFIED`.** It came down on 2026-09-03
+>   because "choosing a cover" had no button: the store knew how to import one and nothing called it.
+>   That button now exists (`LIB-018`), and as of today its lock has a test — an image that is not
+>   allowed never reaches the application's own data. **Raising it moves the MVP from 43 verified to
+>   44.** Lowering it was the owner's decision, so raising it is too.
 >
-> **And the `handoff/integration-schema-template` tag is integrated** (`e45dda6`, rebased with no
-> conflicts onto the coverage work). It cuts the integration suite's start-up by 68 % — measured
-> here: the suite goes from 607 s to a little over a minute. **Delete it as soon as the run confirms
-> the commit is on the remote**; it was a rope, not a publishing point.
+> ### The two batches left, and which one is recommended
 >
-> ### Two measured defects still unfixed, both with their case
+> · **`LIB-002` and the hole that exposed it**, recommended because it is a net rather than a
+>   feature. A screen trigger declared with nobody asking for it is caught by nothing: the
+>   architecture tests require a registered service to have somebody resolving it and **there is no
+>   such requirement for something asked for from a screen**. `LIB-011` fell for exactly that and
+>   `LIB-002` has the same hole — the manual scan exists as a value and only a test ever asks for it.
+>   The question that does catch it: «can this be asked for from a screen, or only from a test».
+> · **`CRS-006`, which is half done on purpose.** The picture already comes out of the video and is
+>   measured; what is missing is **drawing it on the course card**, which is view work and carries
+>   rule 0 in front of it.
 >
-> · **`eng/watch-ci.ps1` announces «step ok» over steps that came back `skipped`.** Line 212: the
->   filter treats `skipped` as not-failed. It misled twice on 2026-09-03, the second time in the red
->   run. **The run's outcome is NOT affected** — line 343 prints the literal conclusion and only
->   exits 0 on `success` — so the damage is announcing as measured what nobody measured. Case: run
->   33812831673.
-> · **An interface trigger declared with no caller is caught by nothing.** `LIB-011` went from
->   `VERIFIED` to `IMPLEMENTED` for that, and `LIB-002` has the same hole: the manual scan exists as
->   an enumeration value and only a test ever asks for it. The architecture tests require a
->   registered service to have somebody resolving it and **there is no such requirement for a screen
->   trigger**. The question that does catch it: «can this be asked for from a screen, or only from a
->   test». It is a batch of its own.
+> ### What programming does not solve
+>
+> · **`PRD-003` needs an ARM64 machine** that does not exist here. Its matrix answers «6 of 6 phases
+>   not passed» on an x64 host, and `package-arm64.ps1` produces nothing publishable.
+> · **`PRD-002` needs the commercial signing certificate.**
+> · Both, under the 2026-08-31 rule — nothing is published until everything committed to is verified
+>   — are what stands between this tree and a release. **21 open rows of 71**, of which 18 are work
+>   and 3 are written decisions not to build something.
+>
+> ### The traps that cost time today, measured
+>
+> · **CI's merge can be reproduced here, and today it REPLACED the second round.** Downloading the
+>   twenty Cobertura files of the red run's `test-results` artefact and merging them with the same
+>   `reportgenerator` produced **all seven exact figures** the gate had given. On that basis the new
+>   floors were calculated rather than waited for, and the next run's artefact came back with **the
+>   same 188 rows**. The condition is that the delta be deterministic: what an exclusion removes is
+>   measured by compiling and reading the instrumented total, and what a test adds by running it.
+> · **Two of those three floors landed exactly at the bottom of their band** — one line fewer and
+>   they would have failed. They were right, but the margin was zero and that gets said when writing
+>   them, not afterwards.
+> · **A «step ok» from the watcher is not a measurement.** The defect is still there: line 212 treats
+>   `skipped` as not-failed. Today every step was checked with `gh run view --json jobs` before being
+>   believed, and this time it was telling the truth. It is still a batch of its own.
+> · **A tag's commit integrated by `cherry-pick` does NOT end up an ancestor of `main`.** Its content
+>   does: the 38 non-changelog files were compared **byte for byte** against `main` before deleting
+>   it. `git merge-base --is-ancestor` would have said no, and that does not mean anything is
+>   missing.
+
+> ## HANDOVER — 2026-09-04, twenty-second session: the seven files that were holding three batches, and a prediction that landed on the nose
+>
+> **One batch, one push, one green run.** The new method worked first time: three commits waiting
+> together, fifty minutes of CI, and `main` moving sixteen commits at once. Before pushing, the two
+> runs still measuring the already-red tree were cancelled — their last two commits touched nothing
+> but documentation, so they could say nothing new.
+>
+> ### The coverage gate, closed without widening anything
+>
+> All seven files were measured **before** any code was touched, by reproducing the failing run's own
+> merged report here. It reproduced all seven figures exactly, and that turns everything that came
+> after into a calculation.
+>
+> **Three were new and short of the bar**, and all three leave by the only route the list allows — by
+> improving — with the missing branch named by the coverlet JSON rather than guessed at: a cache file
+> left half-written by a power cut, a decoder that will not even open the file, and how a picture gets
+> asked for depending on where the run keeps its data. **100/100 all three.**
+>
+> **Three stay with their floors raised**, and the third is rule 10's own case: the only part held out
+> of the count is the piece that asks Windows for a dialog box, with its reason written beside it.
+> **What decides is not held out** — which of the two exits is built is covered both ways, by the test
+> that already did exactly this for the backup dialogs.
+>
+> **And one file fell short by a single line**: the course-thumbnail folder was added to the
+> application's paths and never to the test that walks them. It lives under the cache and not beside
+> the covers, which is the difference that decides whether the backup carries it.
+>
+> ### The schema template, integrated from the tag
+>
+> The fourth batch of 2026-09-03 lived in `handoff/integration-schema-template` and is now in. It cuts
+> the integration suite's start-up by 68 % — measured here, the suite goes from 607 s to a little over
+> a minute. **The tag is deleted**, from the remote and from here, after comparing its 38 files byte
+> for byte against `main`.
+>
+> ### What this handover CANNOT say yet
+>
+> · **Whether `LIB-011` goes back to `VERIFIED`.** It is the owner's and it is above, with its
+>   recommendation.
+> · **Whether the watcher's defect gets fixed.** It is measured, it has its case, and it is a batch of
+>   its own.
 
 > ## HANDOVER — 2026-09-03, twenty-first session: batch 3 started by screen, two things built with no way in, and CI running the same work four times
 >

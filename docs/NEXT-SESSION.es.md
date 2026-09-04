@@ -1,47 +1,101 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-04: los siete archivos de cobertura están arreglados y la etiqueta integrada; falta el veredicto de CI
+> ## AVISO AL FRENTE — 2026-09-04: `main` está al día y en verde por primera vez desde el 2026-09-02
 >
-> **`main` sigue sin nada de esta tanda y ahora lleva dieciséis commits por detrás.** Todo está en
-> `codex/ap-reelume-mvp-x64`, y **el verde todavía no ha llegado**: lo que hay es una tanda entera
-> empujada de una vez y un run midiéndola. Estar en la rama es seguridad, no integración.
+> **La rama y `main` apuntan al mismo commit, y ese commit pasó CI entero.** Se lee con
+> `git log --oneline -1 main` y `gh run list --limit 3`; aquí no se escribe el número, porque el
+> commit que lo escribiría ya lo habría cambiado. Los dieciséis commits que estaban en el limbo
+> —las tres tandas del 2026-09-03 más lo de hoy— están integrados.
 >
-> **Lo que se cerró**: la puerta de cobertura que paraba las tres tandas de ayer. Los siete archivos
-> se midieron reproduciendo aquí el informe fusionado del propio run rojo —los veinte Cobertura del
-> artefacto `test-results` de 33812831673, fusionados con el mismo `reportgenerator` y leídos con la
-> aritmética de `check-coverage.ps1`—, y **reprodujo los siete números exactos** antes de tocar nada.
-> Eso es lo que convierte los suelos nuevos en una cuenta y no en una apuesta.
+> **No queda nada urgente.** Lo primero de la próxima sesión es elegir entre las dos tandas de abajo,
+> no arreglar nada.
 >
-> · Los tres archivos nuevos salen de la lista **mejorando**: 100/100 los tres.
-> · Tres se quedan con el suelo subido — `ArtworkCache` 99/85, `MetadataEditorViewModel` 100/89 y
->   `CompositionRoot.cs` 88/60.
-> · `AppDataPaths` vuelve a 100/100: faltaba una sola línea, la carpeta de las miniaturas de curso,
->   que se añadió a las rutas y no a la prueba que las recorre.
-> · La lista sigue en **188 filas** y el trinquete no se movió.
+> ### Lo que hay que decidir antes de tocar código, y es del propietario
 >
-> **LO PRIMERO de la próxima sesión, y es una comprobación y no un trabajo**: mirar el run de
-> `10a57df`/`e45dda6`. Dos de esos suelos —`ArtworkCache` 99 y `CompositionRoot.cs` 88— caen
-> **justo en el mínimo de su banda**, así que si CI mide una línea menos de la prevista la puerta
-> pedirá corregirlos, y la corrección es de una cifra. Los tres números salen del artefacto del run
-> nuevo, como siempre.
+> · **`LIB-011` está en `IMPLEMENTED` y podría volver a `VERIFIED`.** Bajó el 2026-09-03 porque
+>   «elegir una portada» no tenía botón: el almacén sabía importarla y nada la llamaba. Ese botón ya
+>   existe (`LIB-018`), y desde hoy su cerradura tiene prueba — una imagen que no se admite no llega
+>   a los datos de la aplicación. **Subirla mueve el MVP de 43 a 44 verificados.** La bajada fue una
+>   decisión suya, así que la subida también lo es.
 >
-> **Y la etiqueta `handoff/integration-schema-template` ya está integrada** (`e45dda6`, rebasada sin
-> conflictos sobre el trabajo de cobertura). Baja el arranque de las pruebas de integración un 68 %
-> — medido aquí: la suite pasa de 607 s a poco más de un minuto. **Bórrala en cuanto el run confirme
-> que el commit está en el remoto**; era una cuerda, no un punto de publicación.
+> ### Las dos tandas que quedan, y cuál se recomienda
 >
-> ### Dos defectos medidos que quedan sin arreglar, los dos con su caso
+> · **`LIB-002` y el hueco que lo destapó**, que es la recomendada porque es una red y no una
+>   funcionalidad. Un disparador de pantalla declarado y sin nadie que lo pida no lo caza nada: las
+>   pruebas de arquitectura exigen que un servicio registrado tenga quien lo resuelva y **no existe
+>   la misma exigencia para algo que se pide desde una pantalla**. `LIB-011` cayó por eso y `LIB-002`
+>   tiene el mismo agujero — el escaneo manual existe como valor y sólo lo pide una prueba. La
+>   pregunta que sí lo caza: «esto se puede pedir desde una pantalla, o sólo desde una prueba».
+> · **`CRS-006`, que está a medias a propósito.** La imagen ya se saca del vídeo y está medida; lo
+>   que falta es **dibujarla en la tarjeta del curso**, que es trabajo de vista y lleva la regla 0
+>   por delante.
 >
-> · **`eng/watch-ci.ps1` anuncia «step ok» sobre pasos que salieron `skipped`.** Línea 212: el filtro
->   trata `skipped` como no-fallido. Engañó dos veces el 2026-09-03, la segunda en el run rojo. **El
->   desenlace del run NO está afectado** —la línea 343 imprime la conclusión literal y sólo sale 0 en
->   `success`—, así que el daño es anunciar como medido lo que nadie midió. Caso: run 33812831673.
-> · **Un disparador de interfaz declarado y sin llamador no lo caza nada.** `LIB-011` bajó de
->   `VERIFIED` a `IMPLEMENTED` por eso, y `LIB-002` tiene el mismo hueco: el escaneo manual existe
->   como valor de enumeración y sólo lo pide una prueba. Las pruebas de arquitectura exigen que un
->   servicio registrado tenga quien lo resuelva y **no existe la misma exigencia para un disparador
->   de pantalla**. La pregunta que sí lo caza: «esto se puede pedir desde una pantalla, o sólo desde
->   una prueba». Es tanda propia.
+> ### Lo que no se resuelve programando
+>
+> · **`PRD-003` pide una máquina ARM64** que no hay. Su matriz contesta «6 de 6 fases no pasadas»
+>   sobre un anfitrión x64, y `package-arm64.ps1` no produce nada publicable.
+> · **`PRD-002` pide el certificado comercial de firma.**
+> · Los dos, con la regla del 2026-08-31 —no se publica nada hasta que todo lo comprometido esté
+>   verificado—, son lo que separa el árbol de una publicación. **21 filas abiertas de 71**, de las
+>   que 18 son trabajo y 3 son decisiones escritas de no hacer algo.
+>
+> ### Las trampas que costaron tiempo hoy, medidas
+>
+> · **La fusión de CI se puede reproducir aquí, y hoy SUSTITUYÓ a la segunda vuelta.** Bajando los
+>   veinte Cobertura del artefacto `test-results` del run rojo y fusionándolos con el mismo
+>   `reportgenerator`, salieron **los siete números exactos** que la puerta había dicho. Sobre esa
+>   base los suelos nuevos se calcularon en vez de esperarse, y el artefacto del run siguiente trajo
+>   **las 188 filas idénticas**. La condición es que el delta sea determinista: lo que quita una
+>   exclusión se mide compilando y leyendo el total instrumentado, y lo que añade una prueba se mide
+>   corriéndola.
+> · **Dos de esos tres suelos cayeron justo en el mínimo de su banda** — una línea menos y habrían
+>   fallado. Acertaron, pero el margen era cero y eso se dice al escribirlos, no después.
+> · **Un aviso «step ok» del vigía no es una medición.** El defecto sigue ahí: la línea 212 trata
+>   `skipped` como no-fallido. Hoy se comprobó cada paso con `gh run view --json jobs` antes de
+>   creerle, y esta vez decía la verdad. Sigue siendo tanda propia.
+> · **El commit de una etiqueta integrada por `cherry-pick` NO queda como ancestro de `main`.** Su
+>   contenido sí: los 38 archivos no-changelog se compararon **byte a byte** contra `main` antes de
+>   borrarla. `git merge-base --is-ancestor` habría contestado que no, y eso no significa que falte
+>   nada.
+
+> ## RELEVO — 2026-09-04, vigesimosegunda sesión: los siete archivos que paraban tres tandas, y una predicción que acertó al punto
+>
+> **Una tanda, un push, un run verde.** El método nuevo funcionó a la primera: tres commits esperando
+> juntos, cincuenta minutos de CI, y `main` avanzando dieciséis commits de golpe. Antes de empujar se
+> cancelaron los dos runs que seguían midiendo el árbol ya rojo — sus dos últimos commits sólo tocaban
+> documentación, así que no podían decir nada nuevo.
+>
+> ### La puerta de cobertura, cerrada sin ensanchar nada
+>
+> Los siete archivos se midieron **antes** de tocar código, reproduciendo aquí el informe fusionado
+> del propio run rojo. Reprodujo los siete números exactos, y eso convierte todo lo que vino después
+> en una cuenta.
+>
+> **Tres eran nuevos y no llegaban al listón**, y los tres salen por el único camino que la lista
+> admite —mejorando—, con la rama que faltaba nombrada por el JSON de coverlet y no adivinada: un
+> archivo de caché a medio escribir por un apagón, un decodificador que ni abre el archivo, y de qué
+> manera se pregunta por una imagen según dónde guarde sus datos la ejecución. **100/100 los tres.**
+>
+> **Tres se quedan con el suelo subido**, y el tercero es el caso propio de la regla 10: lo único que
+> se aparta de la cuenta es el trozo que le pide a Windows un cuadro de diálogo, con su razón escrita
+> al lado. **Lo que decide no se aparta** — cuál de las dos salidas se construye se cubre por los dos
+> lados, con la prueba que ya hacía esto mismo para los diálogos de copia de seguridad.
+>
+> **Y un archivo se quedó corto por una sola línea**: la carpeta de las miniaturas de curso se añadió
+> a las rutas de la aplicación y no a la prueba que las recorre. Está bajo la caché y no junto a las
+> portadas, que es la diferencia que decide si viaja en la copia de seguridad.
+>
+> ### La plantilla de esquema, integrada desde la etiqueta
+>
+> La cuarta tanda del 2026-09-03 vivía en `handoff/integration-schema-template` y ya está dentro. Baja
+> el arranque de las pruebas de integración un 68 % — medido aquí, la suite pasa de 607 s a poco más
+> de un minuto. **La etiqueta está borrada**, del remoto y de aquí, después de comparar sus 38
+> archivos byte a byte contra `main`.
+>
+> ### Lo que este relevo NO puede decir todavía
+>
+> · **Si `LIB-011` vuelve a `VERIFIED`.** Es del propietario y está arriba, con su recomendación.
+> · **Si el defecto del vigía se arregla.** Está medido, tiene su caso y es tanda propia.
 
 > ## RELEVO — 2026-09-03, vigesimoprimera sesión: la tanda 3 empezada por pantallas, dos huecos sin puerta, y CI corriendo cuatro veces lo mismo
 >
