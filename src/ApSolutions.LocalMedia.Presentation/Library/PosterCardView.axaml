@@ -32,10 +32,15 @@ and a name here would be a second announcement of the same card.
     <home:ResourceKeyConverter x:Key="CardWord" />
     <!--
       Its own width, and not the detail cards'. A poster decoded at the provider's 780 costs 3,65 MB
-      of pixels where the same picture at this card's 148 costs 131 KB, and the grid draws every card
-      it holds rather than the one or two a detail view shows. The cache is larger for the same
-      reason: WrapPanel does not virtualise, so a screenful of cards asks for a screenful of pictures
-      at once, and eight entries against that would decode and drop the same ones on every pass.
+      of pixels where the same picture at this card's 148 costs 131 KB — twenty-eight times less,
+      because what is paid for is area — and a grid asks for a screenful at once where a detail view
+      asks for one.
+
+      The cache is larger because a screenful is not one card. The library's grid virtualises by row
+      and keeps about thirty-six cards alive, measured in LibraryView.axaml's own comment; Courses'
+      WrapPanel keeps all of them. Eight entries against either would decode and drop the same
+      pictures on every pass, so this holds a screenful and the scroll either side of it: about
+      17 MB full, at this width.
     -->
     <library:CachedPosterConverter
         x:Key="GridPoster"

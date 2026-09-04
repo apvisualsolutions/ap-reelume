@@ -128,6 +128,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La biblioteca se cortaba en el título cincuenta y no había manera de ver el resto.** El programa
+  sabía traer los siguientes desde el principio —lo pide de cincuenta en cincuenta— y **ninguna
+  pantalla se lo pedía nunca**. Con más de cincuenta títulos, del cincuenta y uno en adelante no
+  existían, y la cabecera decía «50 elementos» para siempre. La bandeja de revisión ya tenía ese
+  botón, que es lo que convierte el hueco en un olvido y no en una decisión. Ahora está, y el
+  recorrido automático lo pulsa con un ratón de verdad sobre una biblioteca de cincuenta y uno.
+
+- **Y salió de mirar las sesenta pantallas una a una contra el diseño**, después de encontrar lo de
+  las portadas. Aparecieron **dieciocho** cosas de la misma familia: construidas, traducidas a los
+  dos idiomas y sin que ninguna pantalla las enseñe. Están escritas todas, con su prueba, en la
+  auditoría del proyecto.
+
+  **Dos de ellas rompían algo ya dado por bueno.** Ésta era una. La otra: la cuenta atrás del
+  siguiente episodio promete por escrito que **se puede configurar**, y no hay ninguna pantalla que
+  la configure — el valor sólo lo escriben las pruebas. Esa ficha vuelve a «implementada» con su
+  motivo, hasta que exista dónde ajustarla.
+
 - **Las portadas ya se ven en la biblioteca.** El programa descargaba la carátula de cada título,
   dejaba poner la tuya, las guardaba y las metía en la copia de seguridad — y **la pantalla donde
   miras tu biblioteca no dibujaba ninguna**: rectángulos de colores con dos letras, para todo. Sólo

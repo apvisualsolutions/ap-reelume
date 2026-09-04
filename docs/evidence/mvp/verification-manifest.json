@@ -1,24 +1,24 @@
 {
   "release": "MVP",
   "version": "0.1.0",
-  "commit": "f4c2790d01fef10a65f3d58246b41d79e04f699f",
+  "commit": "b1fe9383070a7e50465751e8a70498e36f4e71b4",
   "runtime": "win-x64",
   "signed": false,
   "artifacts": [
     {
       "name": "APSolutions.LocalMedia_0.1.0_x64.msix",
-      "sha256": "a422faeda0c9b450b627b9b9ad1ab3c55e960ed48522599976e48f162d34466d"
+      "sha256": "651f0156c6d934fb78a1a82b4d81d738fcfe6e5a2ad9f5ff013b3744e7470751"
     },
     {
       "name": "ApReelume-0.1.0-win-x64.zip",
-      "sha256": "0a42f1cea0df5bd97d177687b0058e34912ef1424cbe9571f161d0f3f9a8366c"
+      "sha256": "da434b06c021cb0ca909c54aedd2e36ce72ff3416c28ace07606f9884c08a184"
     }
   ],
   "summary": {
     "total": 46,
-    "verified": 44,
+    "verified": 43,
     "outOfScope": 1,
-    "blocked": 1
+    "blocked": 2
   },
   "features": [
     {
@@ -189,6 +189,7 @@
         "docs/evidence/mvp/T10-10k-performance.md",
         "docs/evidence/mvp/T6-scan.md",
         "docs/evidence/mvp/T7-catalog-search.md",
+        "docs/evidence/stable/audit-built-and-not-drawn.md",
         "docs/evidence/stable/audit-poster-card-and-the-grid-that-won.md"
       ]
     },
@@ -506,8 +507,8 @@
       "evidence": [
         "docs/evidence/mvp/T18-libvlc-spike.md",
         "docs/evidence/mvp/T24-windows-input.md",
-        "docs/evidence/stable/audit-mini-player-window.md",
-        "docs/evidence/stable/audit-mini-player-band.md"
+        "docs/evidence/stable/audit-mini-player-band.md",
+        "docs/evidence/stable/audit-mini-player-window.md"
       ]
     },
     {
@@ -568,7 +569,7 @@
     },
     {
       "id": "PLY-011",
-      "status": "VERIFIED",
+      "status": "IMPLEMENTED",
       "tasks": [
         "T28"
       ],
@@ -579,8 +580,14 @@
       ],
       "evidence": [
         "docs/evidence/mvp/T28-next-episode.md",
+        "docs/evidence/stable/audit-built-and-not-drawn.md",
         "docs/evidence/stable/audit-wp2-assembly.md"
-      ]
+      ],
+      "blocker": {
+        "unblockCondition": "A Settings surface that reads and writes continuity.next-episode-countdown-seconds, with zero switching the chain off, reachable by the autonomous walk in the same change.",
+        "reason": "The countdown is cancelable and revalidates, but nothing in the application configures it: the preference is written only by tests, and the Settings section the prototype draws for it does not exist.",
+        "owner": "Engineering"
+      }
     },
     {
       "id": "PLY-012",

@@ -128,6 +128,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The library stopped at title fifty with no way to see the rest.** The program has known how to
+  fetch the next ones from the start — it asks fifty at a time — and **no screen ever asked**. With
+  more than fifty titles, everything past the fiftieth did not exist, and the header said «50 items»
+  forever. The review inbox already had that button, which is what makes the gap an omission rather
+  than a decision. It is there now, and the automatic walk presses it with a real mouse over a
+  library of fifty-one.
+
+- **And it came out of going through all sixty screens against the design**, after the covers were
+  found. **Eighteen** things of the same family turned up: built, translated into both languages, and
+  shown by no screen. They are all written down, each with its evidence, in the project's audit.
+
+  **Two of them broke something already called good.** This was one. The other: the next-episode
+  countdown promises in writing that it **can be configured**, and no screen configures it — the
+  value is written only by the tests. That row goes back to «implemented» with its reason, until
+  there is somewhere to set it.
+
 - **Covers now show in the library.** The application downloaded each title's artwork, let you set
   your own, stored them and carried them in the backup — and **the screen you look at your library
   through drew none of them**: coloured rectangles with two letters, for everything. They only

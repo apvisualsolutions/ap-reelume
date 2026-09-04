@@ -18,7 +18,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <home:ResourceKeyConverter x:Key="CatalogResourceKey" />
   </UserControl.Resources>
   <Grid>
-    <Grid IsVisible="{Binding IsBrowsing}" RowDefinitions="Auto,Auto,Auto,*">
+    <Grid IsVisible="{Binding IsBrowsing}" RowDefinitions="Auto,Auto,Auto,*,Auto">
       <!--
         The prototype's header is one line: the name, how many are under it, and the search box against
         the right edge. The count sits in the elastic column and not the title, so what gives when the
@@ -395,6 +395,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </ItemsControl.ItemTemplate>
         </ItemsControl>
       </ScrollViewer>
+      <!--
+        The rest of the library. The model has paged by cursor since T7 — HasMore, LoadMoreCommand
+        and a page of fifty — and until 2026-09-04 NO VIEW BOUND ANY OF IT: a library of more than
+        fifty titles had fifty reachable ones and no way to say so. The review inbox already had this
+        button, which is what makes the omission legible rather than a design choice.
+
+        Outside the ScrollViewer and not at the end of the list, because the list virtualises by row:
+        a button living after ten thousand cards is a button nobody scrolls to, and one that only
+        exists when it has something to fetch is one nobody has to understand.
+      -->
+      <Button
+          x:Name="LoadMoreLibraryAction"
+          Grid.Row="4"
+          Margin="0,12,0,0"
+          HorizontalAlignment="Center"
+          automation:AutomationProperties.Name="{DynamicResource LibraryLoadMoreAction}"
+          Command="{Binding LoadMoreCommand}"
+          Content="{DynamicResource LibraryLoadMoreAction}"
+          IsVisible="{Binding HasMore}" />
     </Grid>
     <!--
       A details card scrolls as one page, banner and all, which is what the prototype does and what a
