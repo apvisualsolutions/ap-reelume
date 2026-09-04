@@ -1,62 +1,136 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-04: `main` is up to date and green for the first time since 2026-09-02
+> ## READ THIS FIRST — 2026-09-04: `main` is up to date and green, and nothing is broken
 >
 > **The branch and `main` point at the same commit, and that commit passed all of CI.** Read it with
 > `git log --oneline -1 main` and `gh run list --limit 3`; the number is not written here, because
-> the commit writing it would already have changed it. The sixteen commits that were in limbo — the
-> three batches of 2026-09-03 plus today's — are integrated.
+> the commit writing it would already have changed it. Today's three batches are integrated.
 >
-> **Nothing is urgent.** The first thing next session is choosing between the two batches below, not
-> fixing anything.
+> **Nothing is urgent.** The first thing next session is an owner's decision and a batch he has
+> already chosen, both below.
 >
-> ### What has to be decided before touching code, and it is the owner's
+> ### What has to be decided before touching code, and belongs to the owner
 >
-> · **`LIB-011` sits at `IMPLEMENTED` and could go back to `VERIFIED`.** It came down on 2026-09-03
->   because "choosing a cover" had no button: the store knew how to import one and nothing called it.
->   That button now exists (`LIB-018`), and as of today its lock has a test — an image that is not
->   allowed never reaches the application's own data. **Raising it moves the MVP from 43 verified to
->   44.** Lowering it was the owner's decision, so raising it is too.
+> · **`LIB-011` is still `IMPLEMENTED`, and NO LONGER for the reason it came down.** It came down
+>   because choosing a cover led nowhere; that is fixed and verified. What holds it now is something
+>   else, found by measuring: **courses have no way in at all for a cover**, and the matrix promises
+>   the one for «that film, series or course». Raising it would be calling whole something that is
+>   not. Raising it or waiting for courses is his call.
 >
-> ### The two batches left, and which one is recommended
+> ### The next batch, which the owner chose on 2026-09-04
 >
-> · **`LIB-002` and the hole that exposed it**, recommended because it is a net rather than a
->   feature. A screen trigger declared with nobody asking for it is caught by nothing: the
->   architecture tests require a registered service to have somebody resolving it and **there is no
->   such requirement for something asked for from a screen**. `LIB-011` fell for exactly that and
->   `LIB-002` has the same hole — the manual scan exists as a value and only a test ever asks for it.
->   The question that does catch it: «can this be asked for from a screen, or only from a test».
-> · **`CRS-006`, which is half done on purpose.** The picture already comes out of the video and is
->   measured; what is missing is **drawing it on the course card**, which is view work and carries
->   rule 0 in front of it.
+> · **The backup ASKS whether to carry the personal covers**, and if they are carried, the program
+>   cleans up on its own the ones whose title no longer exists. His reasoning: restoring on another
+>   computer most likely finds the videos in different places or not at all, so many titles do not
+>   survive the move and their covers would pile up forever.
 >
-> ### What programming does not solve
+>   **Two measured things not to relitigate.** The cover a person chooses is **not regenerable** — it
+>   is their file, and if it does not travel it is gone; what is regenerable is the provider's
+>   artwork, and that already does not travel. And the cleanup has a trap: **an external disk that is
+>   switched off is not a title that stopped existing**, so deleting on «I cannot see it now» would
+>   destroy somebody's whole library.
 >
-> · **`PRD-003` needs an ARM64 machine** that does not exist here. Its matrix answers «6 of 6 phases
->   not passed» on an x64 host, and `package-arm64.ps1` produces nothing publishable.
-> · **`PRD-002` needs the commercial signing certificate.**
-> · Both, under the 2026-08-31 rule — nothing is published until everything committed to is verified
->   — are what stands between this tree and a release. **21 open rows of 71**, of which 18 are work
->   and 3 are written decisions not to build something.
+> ### What is not solved by programming
 >
-> ### The traps that cost time today, measured
+> · **`PRD-003` needs an ARM64 machine** there is none of, and **`PRD-002` the commercial signing
+>   certificate.** Under the 2026-08-31 rule — nothing ships until everything committed to is
+>   verified — they are what stands between this tree and a release.
 >
-> · **CI's merge can be reproduced here, and today it REPLACED the second round.** Downloading the
->   twenty Cobertura files of the red run's `test-results` artefact and merging them with the same
->   `reportgenerator` produced **all seven exact figures** the gate had given. On that basis the new
->   floors were calculated rather than waited for, and the next run's artefact came back with **the
->   same 188 rows**. The condition is that the delta be deterministic: what an exclusion removes is
->   measured by compiling and reading the instrumented total, and what a test adds by running it.
-> · **Two of those three floors landed exactly at the bottom of their band** — one line fewer and
->   they would have failed. They were right, but the margin was zero and that gets said when writing
->   them, not afterwards.
-> · **A «step ok» from the watcher is not a measurement.** The defect is still there: line 212 treats
->   `skipped` as not-failed. Today every step was checked with `gh run view --json jobs` before being
->   believed, and this time it was telling the truth. It is still a batch of its own.
-> · **A tag's commit integrated by `cherry-pick` does NOT end up an ancestor of `main`.** Its content
->   does: the 38 non-changelog files were compared **byte for byte** against `main` before deleting
->   it. `git merge-base --is-ancestor` would have said no, and that does not mean anything is
->   missing.
+> ### What changed in the house rules, and affects how this guide is read
+>
+> · **The CI duration is NO LONGER written in `CLAUDE.md`.** It carried four figures in five days and
+>   the criterion beside it depended on it. It is now measured when needed:
+>   `pwsh -NoProfile -File eng/measure-ci-time.ps1`, with `-Detailed` for the per-suite split.
+>   **The rule is wider than that figure**: a datum that will always be stale does not get stored.
+> · **The `<!--medido:clave-->` mechanism cannot hold data from outside the tree**, and the guide now
+>   says why: it measures the tree, and a test that went to the server would open a connection no
+>   declared purpose covers.
+
+> ## HANDOVER — 2026-09-04, twenty-third session: the cover that was stored and nobody saw, and a figure that left the guide
+>
+> **Three batches, three pushes, `main` up to date.** The first fixed a defect that had been
+> invisible for months; the second closed a red that was a slip of our own; the third took out of the
+> guide a number that was always going to be wrong.
+>
+> ### The defect: stored, locked, backed up, and never seen
+>
+> The cover button did its whole job. What was missing was anybody asking for the cover when drawing,
+> and **there were TWO walls, not the one the diagnosis named**. The first is shape: the only
+> question ever asked of the field was «is this a provider path», and an absolute Windows path is not
+> — measured by running the policy, it answers null three times over. The second is place: even with
+> an address composed, the lookup searches the downloaded folder while the picker copies into the
+> personal one. **Fixing only the first would have searched correctly in the wrong place.**
+>
+> **No view needed touching**, and that was known before anything was written: the converter hands
+> any path to the decoder, and its own test already proved it with an absolute temp-folder path — the
+> very shape a personal cover has.
+>
+> ### What was gained along the way, and was not in the request
+>
+> **A cover now survives restoring on another computer.** The backup stores the image by its relative
+> place while the row stored the absolute one, so restoring on another machine left the image on disk
+> and the row pointing where it no longer was. It closes **without changing what is stored**: only
+> the file name is read from the stored value, and the program composes the folder itself.
+>
+> **And that field can no longer point at any other file on the disk.** It is free text, so only the
+> exact name the program itself writes is accepted: 64 characters of an alphabet that cannot spell a
+> separator, a drive's colon, an alternate stream's colon, a climb's pair of dots, a network share's
+> prefix or a device name. **They are not refused one by one — that is a list somebody has to keep
+> complete — they are unspellable.** What it does NOT defend against is written in the evidence: a
+> directory junction inside the application's own data folder, which whoever can plant can already
+> use to rewrite the image's bytes.
+>
+> ### The defect the fix would have created
+>
+> Until now every poster came from the provider and was `w780` by construction, so the converter's
+> memory budget held **by luck and not by rule**. A cover chosen off one's own disk is whatever the
+> camera produced. It is now decoded at one fixed size, and **the bound ENLARGES a small image**:
+> 300×450 comes to cost 3.65 MB where the file cost 0.5, while 2000×3000 drops from 24 MB to 3.65.
+> It is asserted in the test **as a cession**, so nobody «fixes» it thinking it is a fault.
+>
+> ### Two things the Avalonia docs get wrong, both measured
+>
+> · **The signature**: it presents `DecodeToWidth` as an instance method and it is **static and takes
+>   a stream**. Checked by reflection against the real 12.1.1 assembly.
+> · **The failure**: for a file that is not an image, the whole-file constructor throws
+>   `ArgumentException` while `DecodeToWidth` throws a **`NullReferenceException` from inside Skia**,
+>   for the very same file. **It was found by a green test going red**, not by reasoning about the API.
+>
+> ### The second batch's red was our own slip, and its lesson is about method
+>
+> The new evidence was linked from the matrix and **not from the manifest beside it**, which has a
+> test precisely because a manifest linking what the matrix does not is a second, quieter scope
+> record. What let it through: **`verify-docs.ps1` passed and the suite was not re-run**. The script
+> checks that links resolve, not that the two records agree. **Running the script after touching
+> documentation is NOT running the suite**, and both had run before the file existed.
+>
+> ### And the server exposed something this machine cannot see
+>
+> The new file read **100/100 here and 100/94 there**. That is not noise: the gate **sums branches
+> across all twenty measurements**, so a suite that loads a file without exercising it drags the
+> number down. Reproducing the merge from the run's own reports named **the one missing branch, with
+> its line**: the alphabet check was never tested from **below** the digits, because every refusal
+> written so far arrived from above. A hyphen and a plus cover it.
+>
+> **The three coverage floors came from the run's artefact**, never from a local reading, and the new
+> file's row was pruned because it now reaches the bar. The ratchet stays at 188.
+>
+> ### The figure that left the guide
+>
+> The owner settled it by asking whether the times had come down: **if a datum is always going to be
+> stale, do not store it — measure it when somebody needs it.** The CI duration had carried four
+> values in five days. There is now `eng/measure-ci-time.ps1`, which also answers **what the figure
+> was supporting**: the margin to the cut-off, read from the workflow rather than repeated, with a
+> warning of its own below ten minutes.
+>
+> **Using it exposed two faults of its own before it shipped**, both of the house's kind: it mixed
+> failed runs into the band — and a run that fails stops where it failed, so it made CI look faster
+> with nothing improved — and it returned fewer runs than asked without saying why, which reads as
+> «there are no more».
+>
+> **And it contradicted its author within the hour.** On two readings we said «from 49-57 to 41-43»;
+> with the day's four greens — 40.7 · 40.8 · 43.3 and **60.3** — the drop is real in three of four
+> and **is not uniform**. That is exactly what the script warns about at its foot.
 
 > ## HANDOVER — 2026-09-04, twenty-second session: the seven files that were holding three batches, and a prediction that landed on the nose
 >

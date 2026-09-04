@@ -1,62 +1,139 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-04: `main` está al día y en verde por primera vez desde el 2026-09-02
+> ## AVISO AL FRENTE — 2026-09-04: `main` está al día y en verde, y no queda nada roto
 >
 > **La rama y `main` apuntan al mismo commit, y ese commit pasó CI entero.** Se lee con
 > `git log --oneline -1 main` y `gh run list --limit 3`; aquí no se escribe el número, porque el
-> commit que lo escribiría ya lo habría cambiado. Los dieciséis commits que estaban en el limbo
-> —las tres tandas del 2026-09-03 más lo de hoy— están integrados.
+> commit que lo escribiría ya lo habría cambiado. Las tres tandas de hoy están integradas.
 >
-> **No queda nada urgente.** Lo primero de la próxima sesión es elegir entre las dos tandas de abajo,
-> no arreglar nada.
+> **No queda nada urgente.** Lo primero de la próxima sesión es una decisión del propietario y una
+> tanda que él ya eligió, las dos abajo.
 >
 > ### Lo que hay que decidir antes de tocar código, y es del propietario
 >
-> · **`LIB-011` está en `IMPLEMENTED` y podría volver a `VERIFIED`.** Bajó el 2026-09-03 porque
->   «elegir una portada» no tenía botón: el almacén sabía importarla y nada la llamaba. Ese botón ya
->   existe (`LIB-018`), y desde hoy su cerradura tiene prueba — una imagen que no se admite no llega
->   a los datos de la aplicación. **Subirla mueve el MVP de 43 a 44 verificados.** La bajada fue una
->   decisión suya, así que la subida también lo es.
+> · **`LIB-011` sigue en `IMPLEMENTED` y ya NO es por lo que bajó.** Bajó porque elegir una portada
+>   no llegaba a ninguna parte; eso está arreglado y verificado. Lo que la retiene ahora es otra
+>   cosa, encontrada midiendo: **los cursos no tienen por dónde ponerles portada**, y la matriz
+>   promete la de «esa película, serie o curso». Subirla sería decir que está entera algo que no lo
+>   está. La decisión de subirla o de esperar a los cursos es suya.
 >
-> ### Las dos tandas que quedan, y cuál se recomienda
+> ### La tanda siguiente, que el propietario ya eligió el 2026-09-04
 >
-> · **`LIB-002` y el hueco que lo destapó**, que es la recomendada porque es una red y no una
->   funcionalidad. Un disparador de pantalla declarado y sin nadie que lo pida no lo caza nada: las
->   pruebas de arquitectura exigen que un servicio registrado tenga quien lo resuelva y **no existe
->   la misma exigencia para algo que se pide desde una pantalla**. `LIB-011` cayó por eso y `LIB-002`
->   tiene el mismo agujero — el escaneo manual existe como valor y sólo lo pide una prueba. La
->   pregunta que sí lo caza: «esto se puede pedir desde una pantalla, o sólo desde una prueba».
-> · **`CRS-006`, que está a medias a propósito.** La imagen ya se saca del vídeo y está medida; lo
->   que falta es **dibujarla en la tarjeta del curso**, que es trabajo de vista y lleva la regla 0
->   por delante.
+> · **La copia de seguridad PREGUNTA si llevarse las portadas propias**, y si se llevan, el programa
+>   limpia solo las de títulos que ya no existen. Su razonamiento: al restaurar en otro ordenador lo
+>   más probable es que los vídeos no estén en la misma ubicación o no estén, así que muchos títulos
+>   no sobreviven al traslado y sus portadas se quedarían acumulándose para siempre.
+>
+>   **Dos cosas medidas que no hay que volver a discutir.** La portada que elige una persona **no es
+>   regenerable** —es su archivo, y si no viaja se pierde—; lo regenerable es la carátula del
+>   proveedor, y ésa ya no viaja. Y la limpieza tiene una trampa: **un disco externo apagado no es un
+>   título que haya dejado de existir**, así que borrar por «no lo veo ahora» destruiría la
+>   biblioteca entera de alguien.
 >
 > ### Lo que no se resuelve programando
 >
-> · **`PRD-003` pide una máquina ARM64** que no hay. Su matriz contesta «6 de 6 fases no pasadas»
->   sobre un anfitrión x64, y `package-arm64.ps1` no produce nada publicable.
-> · **`PRD-002` pide el certificado comercial de firma.**
-> · Los dos, con la regla del 2026-08-31 —no se publica nada hasta que todo lo comprometido esté
->   verificado—, son lo que separa el árbol de una publicación. **21 filas abiertas de 71**, de las
->   que 18 son trabajo y 3 son decisiones escritas de no hacer algo.
+> · **`PRD-003` pide una máquina ARM64** que no hay, y **`PRD-002` el certificado comercial de
+>   firma.** Con la regla del 2026-08-31 —no se publica nada hasta que todo lo comprometido esté
+>   verificado— son lo que separa el árbol de una publicación.
 >
-> ### Las trampas que costaron tiempo hoy, medidas
+> ### Lo que cambió en las reglas de la casa, y afecta a cómo se lee esta guía
 >
-> · **La fusión de CI se puede reproducir aquí, y hoy SUSTITUYÓ a la segunda vuelta.** Bajando los
->   veinte Cobertura del artefacto `test-results` del run rojo y fusionándolos con el mismo
->   `reportgenerator`, salieron **los siete números exactos** que la puerta había dicho. Sobre esa
->   base los suelos nuevos se calcularon en vez de esperarse, y el artefacto del run siguiente trajo
->   **las 188 filas idénticas**. La condición es que el delta sea determinista: lo que quita una
->   exclusión se mide compilando y leyendo el total instrumentado, y lo que añade una prueba se mide
->   corriéndola.
-> · **Dos de esos tres suelos cayeron justo en el mínimo de su banda** — una línea menos y habrían
->   fallado. Acertaron, pero el margen era cero y eso se dice al escribirlos, no después.
-> · **Un aviso «step ok» del vigía no es una medición.** El defecto sigue ahí: la línea 212 trata
->   `skipped` como no-fallido. Hoy se comprobó cada paso con `gh run view --json jobs` antes de
->   creerle, y esta vez decía la verdad. Sigue siendo tanda propia.
-> · **El commit de una etiqueta integrada por `cherry-pick` NO queda como ancestro de `main`.** Su
->   contenido sí: los 38 archivos no-changelog se compararon **byte a byte** contra `main` antes de
->   borrarla. `git merge-base --is-ancestor` habría contestado que no, y eso no significa que falte
->   nada.
+> · **La duración de CI ya NO está escrita en `CLAUDE.md`.** Llevaba cuatro cifras en cinco días y el
+>   criterio de al lado dependía de ella. Ahora se mide cuando hace falta:
+>   `pwsh -NoProfile -File eng/measure-ci-time.ps1`, con `-Detailed` para el reparto por suite.
+>   **La regla es más ancha que esa cifra**: un dato que siempre va a estar desfasado no se guarda.
+> · **El mecanismo `<!--medido:clave-->` no sirve para datos de fuera del árbol**, y ahora la guía
+>   dice por qué: mide el árbol, y una prueba que fuera al servidor abriría una conexión que ninguna
+>   finalidad declara.
+
+> ## RELEVO — 2026-09-04, vigesimotercera sesión: la portada que se guardaba y nadie veía, y una cifra que se fue de la guía
+>
+> **Tres tandas, tres pushes, `main` al día.** La primera arregló un defecto que llevaba meses
+> invisible; la segunda cerró un rojo que fue culpa de un descuido propio; la tercera sacó de la guía
+> un número que siempre iba a estar mal.
+>
+> ### El defecto: se guardaba, se bloqueaba, se respaldaba, y no se veía
+>
+> El botón de elegir portada hacía su trabajo entero. Lo que faltaba era que alguien preguntara por
+> ella al dibujar, y **había DOS muros, no el que el diagnóstico nombraba**. El primero es la forma:
+> lo único que se preguntaba del campo era «¿es esto una ruta del proveedor?», y una ruta absoluta de
+> Windows no lo es —medido ejecutando la política, contesta nulo tres veces—. El segundo es el sitio:
+> aunque la dirección se hubiera construido, la búsqueda mira en la carpeta de lo descargado y el
+> selector copia a la de lo propio. **Arreglar sólo el primero habría buscado bien en el sitio
+> equivocado.**
+>
+> **Ninguna vista hubo que tocar**, y eso se supo antes de escribir nada: el conversor entrega
+> cualquier ruta al decodificador, y su propia prueba ya lo demostraba con una ruta absoluta de la
+> carpeta temporal — la misma forma que tiene una portada propia.
+>
+> ### Lo que se ganó de paso, y no estaba en el encargo
+>
+> **La portada sobrevive ahora a restaurar en otro ordenador.** La copia guarda la imagen por su
+> sitio relativo y la ficha guardaba el absoluto, así que restaurar en otra máquina dejaba la imagen
+> en el disco y la ficha señalando a donde ya no está. Se cierra **sin cambiar lo guardado**: del
+> valor almacenado sólo se lee el nombre del archivo y la carpeta la compone el programa.
+>
+> **Y ese campo ya no puede señalar a ningún otro archivo del disco.** Es texto libre, así que sólo
+> se acepta el nombre exacto que el propio programa escribe: 64 caracteres de un alfabeto en el que
+> no se puede escribir un separador, los dos puntos de una unidad, los de un flujo alternativo, el
+> par de puntos de una escalada, el prefijo de un recurso de red ni un nombre de dispositivo. **No se
+> rechazan uno a uno —eso es una lista que alguien tiene que mantener completa—: son inescribibles.**
+> Lo que NO defiende está escrito en la evidencia: una unión de directorio dentro de la propia
+> carpeta de datos, que quien pueda plantarla ya puede reescribir los bytes de la imagen.
+>
+> ### El defecto que el arreglo habría creado
+>
+> Hasta ahora toda portada venía del proveedor y era `w780` por construcción, así que el presupuesto
+> de memoria del conversor se cumplía **por suerte y no por regla**. Una portada elegida del disco
+> propio es lo que diera la cámara. Ahora se descomprime a un tamaño fijo, y **el tope agranda una
+> imagen pequeña**: 300×450 pasa a costar 3,65 MB donde el archivo costaba 0,5, mientras 2000×3000
+> baja de 24 MB a 3,65. Está afirmado en la prueba **como cesión**, para que nadie lo «arregle»
+> creyendo que es un fallo.
+>
+> ### Dos cosas que la documentación de Avalonia contesta mal, las dos medidas
+>
+> · **La firma**: presenta `DecodeToWidth` como método de instancia y es **estática y recibe un
+>   flujo**. Comprobado por reflexión sobre el ensamblado real de 12.1.1.
+> · **El fallo**: ante un archivo que no es imagen, el constructor entero lanza `ArgumentException`
+>   mientras que `DecodeToWidth` lanza **`NullReferenceException` desde dentro de Skia**, para el
+>   mismo archivo. **Se descubrió porque una prueba verde se puso roja**, no razonando sobre la API.
+>
+> ### El rojo de la segunda tanda fue un descuido propio, y su lección es de método
+>
+> La evidencia nueva se enlazó desde la matriz y **no desde el manifiesto de al lado**, que tiene una
+> prueba precisamente porque un manifiesto que enlaza lo que la matriz no es un segundo registro de
+> alcance más callado. Lo que lo dejó pasar: **`verify-docs.ps1` pasó y la suite no se volvió a
+> correr**. El guion comprueba que los enlaces resuelvan, no que los dos registros concuerden.
+> **Correr el guion después de tocar documentación NO es correr la suite**, y las dos habían corrido
+> antes de que el archivo existiera.
+>
+> ### Y el servidor destapó algo que esta máquina no puede ver
+>
+> El archivo nuevo leía **100/100 aquí y 100/94 allí**. No es ruido: la puerta **suma las ramas de
+> las veinte mediciones**, así que una suite que carga un archivo sin ejercitarlo baja el número.
+> Reproduciendo la fusión con los propios informes del run salió **la única rama que faltaba, con su
+> línea**: la comprobación del alfabeto no se probaba nunca **por debajo** de los dígitos, porque
+> todos los rechazos escritos llegaban por arriba. Un guion y un más la cubren.
+>
+> **Los tres suelos de cobertura salieron del artefacto del run**, nunca de una lectura local, y la
+> fila del archivo nuevo se podó porque ya llega al listón. El trinquete se queda en 188.
+>
+> ### La cifra que se fue de la guía
+>
+> El propietario lo zanjó al preguntar si los tiempos habían bajado: **si un dato siempre va a estar
+> desfasado, no se guarda — se mide cuando alguien lo necesita.** La duración de CI llevaba cuatro
+> valores en cinco días. Ahora hay `eng/measure-ci-time.ps1`, que contesta también **lo que la cifra
+> sostenía**: el margen hasta el corte, leído del propio flujo en vez de repetido, con aviso propio
+> por debajo de diez minutos.
+>
+> **Usarlo destapó dos defectos suyos antes de publicarse**, los dos de la clase de la casa: mezclaba
+> en la banda los runs que fallaron —y uno que falla se para donde falló, así que hacía parecer CI
+> más rápido sin que nada hubiera mejorado— y devolvía menos runs de los pedidos sin decir por qué,
+> que se lee como «no hay más».
+>
+> **Y desmintió a quien lo escribió dentro de la misma hora.** Con dos lecturas se dijo «de 49-57 a
+> 41-43»; con los cuatro verdes del día —40,7 · 40,8 · 43,3 y **60,3**— la bajada es real en tres de
+> cuatro y **no es uniforme**. Es exactamente contra lo que el guion avisa al pie.
 
 > ## RELEVO — 2026-09-04, vigesimosegunda sesión: los siete archivos que paraban tres tandas, y una predicción que acertó al punto
 >
