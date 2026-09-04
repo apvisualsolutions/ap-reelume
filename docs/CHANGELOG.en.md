@@ -10,6 +10,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Checking the ARM build no longer depends on buying a machine.** The application has been compiled
+  and packaged for those computers for months, but **nobody had ever run it on one**: the six checks
+  that need one all carried the same note, «this was done on a different kind of computer». GitHub
+  lends Windows 11 ARM machines **free and without limit to public projects**, and this is one, so
+  every change is now tried on one too.
+
+  **This first pass measures rather than judges.** The borrowed machine is prepared by another
+  company and does not carry the same tools as the usual one, so the first thing it does is **record
+  what it carries**, and a failure of its own does not turn the project red: a missing tool is not a
+  broken program, and confusing the two teaches people to ignore warnings. It becomes strict once
+  there is an answer to be strict about.
+
 - **The application now takes a course's picture out of the video itself, against a real file**: the
   test opens a real video, seeks a tenth of the way in and checks a picture comes out — not an empty
   file — in three seconds. All that is left is drawing it on the card.
@@ -102,6 +114,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   letting tests pass over less is not buying it.
 
 ### Fixed
+
+- **Two checks on the ARM build would have lied on the day there was a machine.** Both were found by
+  reading the code before anything was switched on, and neither would have shown from outside.
+
+  **The first passed what it had not looked at.** Two of the six checks open real videos, and those
+  videos are produced by a tool that has to be installed separately. Without it the tests **skip
+  themselves and the result is still «all good»**, so they would have been recorded as passed
+  without a single frame being decoded. What actually ran is now counted, and a check that skipped
+  says it could not measure instead of saying it went well.
+
+  **The second looked for a report where nobody writes one.** The install-cycle check expected a file
+  under **a different name and in a different folder** from the one its producer uses, and on top of
+  that nothing ever asked for it to be produced. It would have gone on saying «there is no machine»
+  with the machine right there — which is exactly what that note must never mean.
 
 - **The cover you chose was stored, locked and backed up, and you never saw it.** The button did its
   whole job — it opened the file picker, copied your image into the program's own data and wrote

@@ -1,82 +1,52 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-04: `main` está al día y en verde, y no queda nada roto
+> ## AVISO AL FRENTE — 2026-09-04: la matriz ARM64 se está midiendo por primera vez
 >
-> **La rama y `main` apuntan al mismo commit, y ese commit pasó CI entero.** Se lee con
-> `git log --oneline -1 main` y `gh run list --limit 3`; aquí no se escribe el número, porque el
-> commit que lo escribiría ya lo habría cambiado. Las tres tandas de hoy están integradas.
+> **Hay un run en curso y hay que leerlo antes de nada.** Se comprueba con
+> `git log --oneline -1 main`, `gh run list --limit 3` y, si sigue vivo,
+> `pwsh -NoProfile -File eng/watch-ci.ps1 -Sha <sha entero>`. El commit anterior a éste dejó `main`
+> al día y en verde; **esta tanda aún no se ha fusionado a `main`** y no debe fusionarse hasta que
+> su run conteste.
 >
-> **No queda nada urgente.** Lo primero de la próxima sesión es una decisión del propietario y una
-> tanda que él ya eligió, las dos abajo.
+> ### Lo que se acaba de empujar, y lo que hay que ir a buscar
 >
-> ### Lo primero: el MVP está en 44 de 46, y sólo queda una fila de trabajo
+> · **Un trabajo nuevo de CI que corre en un ordenador ARM con Windows 11** — los que GitHub presta
+>   gratis y sin límite a los proyectos públicos—, y que ejecuta el empaquetado ARM64 **con su matriz
+>   de seis fases**. Es la primera vez que esas seis se intentan de verdad: hasta hoy las seis
+>   llevaban la misma nota, «esto se hizo en un ordenador de otro tipo».
 >
-> · **`LIB-011` volvió a `VERIFIED` el 2026-09-04**, y su criterio se reescribió a la vez para que no
->   vuelva a caer por lo mismo: decía que la carátula «se edita escribiendo su ruta», y eso admitía
->   una lectura que nunca fue cierta. Ahora dice lo que se puede comprobar — se elige con el
->   selector, se copia, se bloquea y **se dibuja, apareciendo al guardar**— y dice también lo que
->   **no** se hace y por qué: una ruta cualquiera escrita a mano no se dibuja, porque ese campo es
->   texto libre y leerlo como una ruta lo convertiría en un lector de archivos cualesquiera.
+> · **La respuesta que se busca está en un artefacto**, no en el color del run:
+>   `gh run download <id> -n arm64-matrix-native`. Trae la sonda —qué herramientas traía esa máquina,
+>   que es la incógnita— y el informe de las seis fases. **El trabajo no bloquea todavía**, así que
+>   el run puede salir verde con las seis fases sin pasar: el color no contesta la pregunta.
 >
->   **Ojo con un error que esta sesión cometió y corrigió**: se dijo que la frenaban los cursos. No
->   era suyo. La portada de un curso es promesa de **`LIB-018`**, que es `POST_STABLE` y no cuenta
->   para el MVP. Sigue sin tener por dónde, y sigue siendo trabajo real — pero de esa fila.
+> · **Con esos números en la mano se escribe la evidencia** en `docs/evidence/stable/T42-arm64.md`,
+>   en los dos idiomas, y se decide si `PRD-003` puede moverse. **Hasta entonces sigue `BLOCKED`, y
+>   `docs/FEATURES.md` no se toca.**
 >
-> · **La única fila de trabajo abierta del MVP es `PRD-002`**, y no se resuelve programando.
+> · **Puede que la respuesta sea «esa máquina no trae X» y no pase ninguna fase. Eso también es el
+>   resultado**: convierte una condición de desbloqueo que decía «compra un ordenador» en una lista
+>   concreta de lo que falta.
 >
-> ### LO PRIMERO de la próxima sesión, decidido por el propietario el 2026-09-04
+> ### Lo que esta tanda arregló de paso, y conviene no volver a romper
 >
-> · **`PRD-003` — correr la matriz ARM64 en un runner de GitHub.** Dejó de exigir comprar nada: los
->   runners hospedados de Windows 11 ARM64 (`windows-11-arm`) son **gratis e ilimitados en
->   repositorios públicos**, y éste lo es. **Y las seis fases se pueden intentar, porque ninguna
->   necesita hardware** — eso costó dos suposiciones falsas antes de leer las pruebas que cada fase
->   ejecuta: la de audio corre el motor **en mudo** y mira lo que el vídeo trae, y la de HDR
->   **inyecta** una pantalla fingida y decodifica por software. Las seis llevaban la **misma** razón
->   de bloqueo, «esto se ejecutó en un anfitrión x64», y ninguna menciona sonido ni pantalla.
+> · **Una fase se habría dado por superada sin medir nada.** Dos de las seis abren vídeos que hay que
+>   fabricar con una herramienta aparte; sin ella las pruebas se saltan solas y el resultado sigue
+>   siendo «todo bien». Ahora se cuenta qué se ejecutó de verdad, leyendo el informe de la ejecución
+>   y no el resumen de pantalla —que está traducido, y aquí se programa en español mientras el
+>   servidor va en inglés—.
 >
->   **Comprobado y no supuesto**: `VideoLAN.LibVLC.Windows 3.0.23.1` trae `build/arm64` con
->   `libvlc.dll`, `libvlccore.dll` y sus complementos, 84 MB, leído en el paquete descargado.
+> · **Otra buscaba su informe con otro nombre y en otra carpeta** de la que usa quien lo escribe, y
+>   nadie llegaba a pedir que se escribiera. Habría dicho «falta la máquina» con la máquina delante.
 >
->   **La incógnita, y sólo se cierra corriéndolo**: esa imagen la mantiene Arm, LLC y **no es la
->   misma** que la de x64, así que puede no traer Chocolatey, `ffmpeg` ni el SDK que el flujo espera.
->   `ffmpeg` se instala hoy con `choco install ffmpeg --version 9.0.0`, que allí correría **emulado**
->   — para **generar** las muestras vale, porque no es el código bajo prueba, pero se escribe en la
->   evidencia en vez de dejarlo implícito.
+> ### Lo demás sigue como estaba
 >
->   El trabajo es un trabajo nuevo con `runs-on: windows-11-arm` que ejecute `eng/package-arm64.ps1`,
->   y **medir cuáles de las seis pasan de verdad antes de tocar la matriz**. `Arm64PlaybackTests`
->   compara lo que el informe declara con la arquitectura en la que corre, así que un informe hecho
->   en ARM64 de verdad deja de decir «no había máquina».
->
-> ### La tanda que va después, también elegida por el propietario el 2026-09-04
->
-> · **La copia de seguridad PREGUNTA si llevarse las portadas propias**, y si se llevan, el programa
->   limpia solo las de títulos que ya no existen. Su razonamiento: al restaurar en otro ordenador lo
->   más probable es que los vídeos no estén en la misma ubicación o no estén, así que muchos títulos
->   no sobreviven al traslado y sus portadas se quedarían acumulándose para siempre.
->
->   **Dos cosas medidas que no hay que volver a discutir.** La portada que elige una persona **no es
->   regenerable** —es su archivo, y si no viaja se pierde—; lo regenerable es la carátula del
->   proveedor, y ésa ya no viaja. Y la limpieza tiene una trampa: **un disco externo apagado no es un
->   título que haya dejado de existir**, así que borrar por «no lo veo ahora» destruiría la
->   biblioteca entera de alguien.
->
-> ### Lo que no se resuelve programando
->
-> · **`PRD-002` pide el certificado comercial de firma**, y es lo único que ya no se resuelve
->   programando ni alquilando: `PRD-003` dejó de estar en esta lista el 2026-09-04. Con la regla del
->   2026-08-31 —no se publica nada hasta que todo lo comprometido esté verificado— es lo que separa
->   el árbol de una publicación.
->
-> ### Lo que cambió en las reglas de la casa, y afecta a cómo se lee esta guía
->
-> · **La duración de CI ya NO está escrita en `CLAUDE.md`.** Llevaba cuatro cifras en cinco días y el
->   criterio de al lado dependía de ella. Ahora se mide cuando hace falta:
->   `pwsh -NoProfile -File eng/measure-ci-time.ps1`, con `-Detailed` para el reparto por suite.
->   **La regla es más ancha que esa cifra**: un dato que siempre va a estar desfasado no se guarda.
-> · **El mecanismo `<!--medido:clave-->` no sirve para datos de fuera del árbol**, y ahora la guía
->   dice por qué: mide el árbol, y una prueba que fuera al servidor abriría una conexión que ninguna
->   finalidad declara.
+> · **El MVP está en 44 de 46** y su única fila de trabajo abierta es `PRD-002`, que pide el
+>   certificado comercial de firma y no se resuelve programándolo.
+> · **La tanda siguiente ya elegida**: la copia de seguridad pregunta si llevarse las portadas
+>   propias, y si se llevan, limpia las de títulos que ya no existen. Dos cosas medidas que no hay que
+>   rediscutir: la portada propia **no** es regenerable, y **un disco externo apagado no es un título
+>   que haya dejado de existir**.
 
 > ## RELEVO — 2026-09-04, vigesimotercera sesión: la portada que se guardaba y nadie veía, y una cifra que se fue de la guía
 >

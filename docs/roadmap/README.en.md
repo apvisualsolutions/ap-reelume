@@ -52,8 +52,15 @@ Banana was installed — VB-CABLE was ruled out because its own forum documents 
 eight channels over Kernel Streaming and not always over shared WASAPI, which is the path the
 application uses — and on that endpoint the output was **recorded and its eight channels counted**,
 each carrying its own tone at a minimum contrast of 86 dB. `PLY-004` moves to `VERIFIED`, and **two
-of the three publishing blockers remain**, both of them purchases: the ARM64 machine and the signing
-certificate.
+of the three publishing blockers remain**.
+
+**That paragraph was written on 2026-09-01 and said «both of them purchases: the ARM64 machine and
+the signing certificate». They are no longer two purchases but one**, and the 2026-09-04 block above
+refutes it: GitHub's `windows-11-arm` runners are free and unlimited on public repositories. There
+are still two blockers and `PRD-003` is still `BLOCKED` until its six phases are measured; what is no
+longer true is the reason it was. It is corrected here because **no test crosses the two claims**:
+`ScopeBoundaryTests` only requires that `PRD-003` be named in both languages, not that what is said
+about it agree with itself.
 
 ## The three releases
 

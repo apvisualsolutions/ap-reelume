@@ -10,6 +10,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La comprobación en máquinas ARM ya no depende de comprar una.** El programa se compila y se
+  empaqueta para esos ordenadores desde hace meses, pero **nadie había llegado a ejecutarlo en uno**:
+  las seis comprobaciones que lo exigen llevaban todas la misma nota, «esto se hizo en un ordenador
+  de otro tipo». GitHub presta ordenadores ARM con Windows 11 **gratis y sin límite a los proyectos
+  públicos**, y éste lo es, así que ahora cada cambio se prueba también en uno.
+
+  **Esta primera vuelta mide y no juzga.** El ordenador prestado lo prepara otra empresa y no trae
+  las mismas herramientas que el habitual, así que lo primero que hace es **anotar qué trae**, y un
+  fallo suyo no pone el proyecto en rojo: una herramienta ausente no es un programa roto, y
+  confundirlas enseña a ignorar los avisos. Pasará a ser exigente cuando se sepa qué contesta.
+
 - **La aplicación ya saca la imagen del propio vídeo de un curso, y funciona sobre un archivo de
   verdad**: la prueba abre un vídeo real, salta a un décimo de su duración y comprueba que sale una
   imagen —no un archivo vacío— en tres segundos. Falta sólo dibujarla en la tarjeta.
@@ -102,6 +113,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Ganar tiempo haciendo que las pruebas pasen por menos no es ganarlo.
 
 ### Corregido
+
+- **Dos comprobaciones de la versión ARM habrían mentido el día que hubiera una máquina.** Las dos
+  se encontraron leyendo el código antes de encender nada, y ninguna se habría notado desde fuera.
+
+  **La primera daba por bueno lo que no había mirado.** Dos de las seis comprobaciones abren vídeos
+  de verdad, y esos vídeos se fabrican con una herramienta que hay que instalar aparte. Sin ella las
+  pruebas **se saltan solas y el resultado sigue siendo «todo bien»**, así que se habrían dado por
+  superadas sin haber descodificado un solo fotograma. Ahora se cuenta qué se ejecutó de verdad, y
+  una comprobación que se saltó dice que no pudo medir en vez de decir que salió bien.
+
+  **La segunda buscaba un informe donde nadie lo escribe.** La comprobación del ciclo de instalación
+  esperaba un archivo con **otro nombre y en otra carpeta** de la que usa quien lo produce, y además
+  nadie llegaba a pedir que se produjera. Habría seguido diciendo «falta la máquina» con la máquina
+  delante — que es justo lo que esa nota no debe significar nunca.
 
 - **La portada que elegías se guardaba, se bloqueaba y se respaldaba, y no la veías nunca.** El botón
   hacía su trabajo entero —abría el explorador, copiaba tu imagen a los datos del programa y escribía

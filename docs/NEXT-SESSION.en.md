@@ -1,82 +1,54 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-04: `main` is up to date and green, and nothing is broken
+> ## READ THIS FIRST — 2026-09-04: the ARM64 matrix is being measured for the first time
 >
-> **The branch and `main` point at the same commit, and that commit passed all of CI.** Read it with
-> `git log --oneline -1 main` and `gh run list --limit 3`; the number is not written here, because
-> the commit writing it would already have changed it. Today's three batches are integrated.
+> **There is a run in flight and it has to be read before anything else.** Check with
+> `git log --oneline -1 main`, `gh run list --limit 3` and, if it is still alive,
+> `pwsh -NoProfile -File eng/watch-ci.ps1 -Sha <full sha>`. The commit before this one left `main` up
+> to date and green; **this batch has not been fast-forwarded to `main`** and must not be until its
+> run answers.
 >
-> **Nothing is urgent.** The first thing next session is an owner's decision and a batch he has
-> already chosen, both below.
+> ### What was just pushed, and what to go and fetch
 >
-> ### First: the MVP stands at 44 of 46, and only one row of work is left
+> · **A new CI job that runs on a Windows 11 ARM machine** — the ones GitHub lends free and without
+>   limit to public projects — running the ARM64 packaging **with its six-phase matrix**. It is the
+>   first time those six have actually been attempted: until today all six carried the same note,
+>   «this was done on a different kind of computer».
 >
-> · **`LIB-011` returned to `VERIFIED` on 2026-09-04**, and its criterion was rewritten at the same
->   time so it cannot fall for the same reason again: it said the cover «is edited by typing its
->   path», and that admitted a reading which was never true. It now says what can be checked — it is
->   chosen with the picker, copied, locked and **drawn, appearing on save** — and says as well what
->   is **not** done and why: an arbitrary hand-typed path is not drawn, because the field is free
->   text and reading it as a path would turn it into a reader of arbitrary files.
+> · **The answer being sought is in an artifact**, not in the colour of the run:
+>   `gh run download <id> -n arm64-matrix-native`. It carries the probe — what tools that machine
+>   turned out to have, which is the open question — and the six-phase report. **The job does not
+>   block yet**, so the run can be green with all six phases unpassed: the colour does not answer the
+>   question.
 >
->   **Note an error this session made and corrected**: it was said that courses held this row back.
->   They do not belong to it. A course's cover is **`LIB-018`**'s promise, which is `POST_STABLE` and
->   does not count towards the MVP. It still has no way in, and is still real work — but on that row.
+> · **With those numbers in hand the evidence gets written** in `docs/evidence/stable/T42-arm64.md`,
+>   in both languages, and then it is decided whether `PRD-003` can move. **Until then it stays
+>   `BLOCKED` and `docs/FEATURES.md` is not touched.**
 >
-> · **The only open row of work in the MVP is `PRD-002`**, and it is not solved by programming.
+> · **The answer may be «that machine does not carry X» with no phase passing. That is a result
+>   too**: it turns an unblock condition that said «buy a computer» into a concrete list of what is
+>   missing.
 >
-> ### FIRST THING next session, decided by the owner on 2026-09-04
+> ### What this batch fixed along the way, and is worth not breaking again
 >
-> · **`PRD-003` — run the ARM64 matrix on a GitHub runner.** It stopped requiring buying anything:
->   hosted Windows 11 ARM64 runners (`windows-11-arm`) are **free and unlimited on public
->   repositories**, and this one is public. **And all six phases can be attempted, because none of
->   them needs hardware** — that cost two false assumptions before anybody read the tests each phase
->   runs: the audio phase runs the engine **muted** and looks at what the video carries, and the HDR
->   phase **injects** a fake display and decodes in software. All six carried the **same** blocking
->   reason, «this build ran on a X64 host», and not one mentions sound or a screen.
+> · **One phase would have been recorded as passed without measuring anything.** Two of the six open
+>   videos that have to be produced with a separate tool; without it the tests skip themselves and
+>   the result is still «all good». What actually ran is now counted, read out of the run's own
+>   report rather than the console summary — which is translated, and this is developed in Spanish
+>   while the server runs in English.
 >
->   **Checked and not assumed**: `VideoLAN.LibVLC.Windows 3.0.23.1` ships `build/arm64` with
->   `libvlc.dll`, `libvlccore.dll` and its plugins, 84 MB, read in the downloaded package.
+> · **Another looked for its report under a different name and in a different folder** from the one
+>   its writer uses, and nothing ever asked for it to be written. It would have said «there is no
+>   machine» with the machine right there.
 >
->   **The unknown, and it only closes by running it**: that image is maintained by Arm, LLC and is
->   **not the same** as the x64 one, so it may not carry Chocolatey, `ffmpeg` or the SDK the workflow
->   expects. `ffmpeg` is installed today with `choco install ffmpeg --version 9.0.0`, which would run
->   **emulated** there — fine for **generating** the samples, since it is not the code under test,
->   but it goes into the evidence rather than being left implicit.
+> ### Everything else stands
 >
->   The work is a new job with `runs-on: windows-11-arm` running `eng/package-arm64.ps1`, and
->   **measuring which of the six actually pass before touching the matrix**. `Arm64PlaybackTests`
->   compares what the report declares against the architecture it runs on, so a report genuinely made
->   on ARM64 stops saying «there was no machine».
->
-> ### The batch after that, also chosen by the owner on 2026-09-04
->
-> · **The backup ASKS whether to carry the personal covers**, and if they are carried, the program
->   cleans up on its own the ones whose title no longer exists. His reasoning: restoring on another
->   computer most likely finds the videos in different places or not at all, so many titles do not
->   survive the move and their covers would pile up forever.
->
->   **Two measured things not to relitigate.** The cover a person chooses is **not regenerable** — it
->   is their file, and if it does not travel it is gone; what is regenerable is the provider's
->   artwork, and that already does not travel. And the cleanup has a trap: **an external disk that is
->   switched off is not a title that stopped existing**, so deleting on «I cannot see it now» would
->   destroy somebody's whole library.
->
-> ### What is not solved by programming
->
-> · **`PRD-002` needs the commercial signing certificate**, and it is the only one left that is
->   solved neither by programming nor by renting: `PRD-003` left this list on 2026-09-04. Under the
->   2026-08-31 rule — nothing ships until everything committed to is verified — it is what stands
->   between this tree and a release.
->
-> ### What changed in the house rules, and affects how this guide is read
->
-> · **The CI duration is NO LONGER written in `CLAUDE.md`.** It carried four figures in five days and
->   the criterion beside it depended on it. It is now measured when needed:
->   `pwsh -NoProfile -File eng/measure-ci-time.ps1`, with `-Detailed` for the per-suite split.
->   **The rule is wider than that figure**: a datum that will always be stale does not get stored.
-> · **The `<!--medido:clave-->` mechanism cannot hold data from outside the tree**, and the guide now
->   says why: it measures the tree, and a test that went to the server would open a connection no
->   declared purpose covers.
+> · **The MVP is at 44 of 46** and its only open row of work is `PRD-002`, which needs the commercial
+>   signing certificate and is not settled by programming.
+> · **The next batch is already chosen**: the backup asks whether to carry your own covers, and if it
+>   does, it cleans up the ones belonging to titles that no longer exist. Two measured things not to
+>   re-litigate: your own cover is **not** regenerable, and **an external disk that is switched off is
+>   not a title that has ceased to exist**.
 
 > ## HANDOVER — 2026-09-04, twenty-third session: the cover that was stored and nobody saw, and a figure that left the guide
 >

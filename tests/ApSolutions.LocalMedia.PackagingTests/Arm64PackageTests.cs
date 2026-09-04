@@ -57,6 +57,80 @@ public sealed class Arm64PackageTests
         Assert.All(sealing, line => Assert.DoesNotContain("/noValidation", line, StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>
+    /// A media phase may not be called passed on the strength of an exit code alone.
+    /// </summary>
+    /// <remarks>
+    /// <c>CodecMatrixTests</c> and <c>HdrAccelerationTests</c> skip themselves when ffmpeg is absent,
+    /// and a run in which every test skipped still exits zero. Reading only the exit code would
+    /// record those phases as passed, with their detail filled in, without a frame having been
+    /// decoded — the matrix written to measure the hardware would be the thing that measured nothing.
+    /// So the script has to count what ran, and the count has to come from the TRX: the console
+    /// summary is localised, and matching it asks about the runner's language instead of the tests.
+    /// </remarks>
+    [Fact]
+    public void The_matrix_cannot_call_a_media_suite_passed_without_counting_what_ran()
+    {
+        var body = ScriptFunctionBody("Invoke-MediaSuite");
+
+        Assert.Contains("--logger", body, StringComparison.Ordinal);
+        Assert.Contains("trx", body, StringComparison.Ordinal);
+        Assert.Contains("Read-TrxCounters", body, StringComparison.Ordinal);
+        Assert.Contains("skipped", body, StringComparison.Ordinal);
+        Assert.Contains("$counters.failed", body, StringComparison.Ordinal);
+        Assert.Contains("$counters.passed", body, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The lifecycle phase has to read the file the verifier writes, and something has to write it.
+    /// </summary>
+    /// <remarks>
+    /// Until 2026-09-04 the phase looked for <c>windows-lifecycle.json</c> in the ARM64 output folder
+    /// while <c>eng/verify-package.ps1</c> writes <c>lifecycle.json</c> into the package root it is
+    /// handed: the name and the folder both differed, so the phase would have reported itself blocked
+    /// on a real ARM64 machine for want of a file nobody ran anything to produce. A blocked phase is
+    /// supposed to mean the machine cannot answer, never that the script asked the wrong question.
+    /// </remarks>
+    [Fact]
+    public void The_lifecycle_phase_reads_the_report_the_verifier_actually_writes()
+    {
+        var script = Path.Combine(RepositoryLayout.Root, "eng", "package-arm64.ps1");
+        Assert.True(File.Exists(script), "eng/package-arm64.ps1 does not exist.");
+
+        var text = File.ReadAllText(script);
+        var assignment = File.ReadAllLines(script)
+            .Where(line => line.Contains("$lifecyclePath =", StringComparison.Ordinal))
+            .ToArray();
+
+        Assert.NotEmpty(assignment);
+        Assert.All(
+            assignment,
+            line => Assert.DoesNotContain("windows-lifecycle.json", line, StringComparison.Ordinal));
+        Assert.All(
+            assignment,
+            line => Assert.Contains("'lifecycle.json'", line, StringComparison.Ordinal));
+        Assert.Contains("verify-package.ps1", text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Returns the body of a PowerShell function in the ARM64 packaging script, so a rule about how a
+    /// phase decides can be asserted against the code that decides rather than against the whole file.
+    /// </summary>
+    private static string ScriptFunctionBody(string name)
+    {
+        var script = Path.Combine(RepositoryLayout.Root, "eng", "package-arm64.ps1");
+        Assert.True(File.Exists(script), "eng/package-arm64.ps1 does not exist.");
+
+        var lines = File.ReadAllLines(script);
+        var start = Array.FindIndex(lines, line => line.StartsWith($"function {name} {{", StringComparison.Ordinal));
+        Assert.True(start >= 0, $"eng/package-arm64.ps1 declares no function named {name}.");
+
+        var end = Array.FindIndex(lines, start + 1, line => line.StartsWith('}'));
+        Assert.True(end > start, $"The body of {name} has no closing brace in column one.");
+
+        return string.Join(Environment.NewLine, lines[start..(end + 1)]);
+    }
+
     [Fact]
     public void Both_arm64_distribution_paths_exist_and_hash_to_what_the_release_publishes()
     {

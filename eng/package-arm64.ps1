@@ -131,9 +131,49 @@ function Invoke-NativeHost {
 }
 
 <#
+    Reads what a run actually executed out of its TRX.
+
+    The counters come from the XML rather than the console summary because the summary is localised:
+    this repository is developed on an es-ES machine and CI runs en-US, so matching 'Passed!' or
+    'Superado:' asks a question about the runner's language instead of about the tests.
+
+    A skipped test is counted as the difference between `total` and `executed`, not read from an
+    attribute, because a dynamic skip and a statically disabled test are recorded under different
+    ones and both mean the same thing here: nobody ran it.
+#>
+function Read-TrxCounters {
+    param([Parameter(Mandatory)][string]$ResultsDirectory)
+
+    if (-not (Test-Path -LiteralPath $ResultsDirectory)) { return $null }
+    $trx = Get-ChildItem -LiteralPath $ResultsDirectory -Filter '*.trx' -Recurse -File -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTimeUtc | Select-Object -Last 1
+    if (-not $trx) { return $null }
+
+    $counters = ([xml](Get-Content -LiteralPath $trx.FullName -Raw)).TestRun.ResultSummary.Counters
+    if (-not $counters) { return $null }
+
+    $total = [int]$counters.total
+    return [pscustomobject]@{
+        total   = $total
+        passed  = [int]$counters.passed
+        failed  = [int]$counters.failed
+        skipped = $total - [int]$counters.executed
+    }
+}
+
+<#
     Runs one media suite and reports what it observed. The suites are the verification: they open real
     files with the engine that shipped, so running them on ARM64 is what makes the matrix a
     measurement rather than a restatement of the build succeeding.
+
+    A ZERO EXIT CODE IS NOT ENOUGH to call the phase passed, and that is the whole reason this reads
+    the counters. CodecMatrixTests and HdrAccelerationTests call Assert.SkipWhen when ffmpeg is
+    absent, so on a machine without it every test skips, `dotnet test` returns 0, and the phase would
+    have been recorded as Passed with its detail filled in — without a single frame being decoded. A
+    gate that passes by looking at nothing, inside the gate written to measure the hardware.
+
+    A suite that could not measure returns a reason, so the phase is recorded as Blocked rather than
+    Failed: the distinction is what tells a missing tool apart from ARM64 decoding a file wrongly.
 #>
 function Invoke-MediaSuite {
     param(
@@ -142,15 +182,34 @@ function Invoke-MediaSuite {
     )
 
     $project = Join-Path $repoRoot 'tests/ApSolutions.LocalMedia.MediaTests'
-    $output = & dotnet test $project -c $Configuration -m:1 `
+    & dotnet test $project -c $Configuration -m:1 `
         --settings (Join-Path $PSScriptRoot 'test.runsettings') `
         --filter $Filter `
-        --results-directory $ResultsDirectory 2>&1
-    $summary = @($output | Select-String -Pattern 'Superado:|Passed!|Failed!|Con error:' | Select-Object -Last 1)
+        --logger 'trx;LogFileName=results.trx' `
+        --results-directory $ResultsDirectory 2>&1 | Write-Output
+    $exitCode = $LASTEXITCODE
+
+    $counters = Read-TrxCounters -ResultsDirectory $ResultsDirectory
+    if ($null -eq $counters) {
+        return [pscustomobject]@{
+            succeeded = $false
+            summary   = 'No test results were produced.'
+            reason    = "The suite matching '$Filter' left no TRX in $ResultsDirectory, so nothing was measured. Exit code $exitCode."
+        }
+    }
+
+    $summary = "$($counters.passed) passed, $($counters.failed) failed, $($counters.skipped) skipped of $($counters.total); exit code $exitCode."
+    if ($counters.total -eq 0 -or $counters.skipped -gt 0) {
+        return [pscustomobject]@{
+            succeeded = $false
+            summary   = $summary
+            reason    = "The suite matching '$Filter' did not answer its question: $summary The usual cause is a missing tool — CodecMatrixTests and HdrAccelerationTests skip themselves when ffmpeg is absent."
+        }
+    }
 
     return [pscustomobject]@{
-        succeeded = $LASTEXITCODE -eq 0
-        summary   = if ($summary) { ($summary[0].ToString()).Trim() } else { 'No test summary was produced.' }
+        succeeded = $exitCode -eq 0 -and $counters.failed -eq 0 -and $counters.passed -gt 0
+        summary   = $summary
     }
 }
 
@@ -454,13 +513,47 @@ try {
                 @{ id = 'hdr-acceleration'; filter = 'FullyQualifiedName~HdrAccelerationTests' }
                 @{ id = 'audio-output'; filter = 'FullyQualifiedName~AudioChannelTests' })) {
             $run = Invoke-MediaSuite -Filter $suite.filter -ResultsDirectory (Join-Path $matrixResults $suite.id)
-            $observed[$suite.id] = [pscustomobject]@{
+            $entry = @{
                 passed = $run.succeeded
                 detail = "Executed natively on ARM64. $($run.summary)"
             }
+            # A suite that could not measure carries a reason, and a reason makes the phase Blocked
+            # instead of Failed further down. Its detail is cleared so the record cannot claim an
+            # observation it does not have.
+            if ($run.PSObject.Properties.Name -contains 'reason' -and $run.reason) {
+                $entry['reason'] = $run.reason
+                $entry['detail'] = ''
+            }
+            $observed[$suite.id] = [pscustomobject]$entry
         }
 
-        $lifecyclePath = Join-Path $outputRoot 'windows-lifecycle.json'
+        # The lifecycle report does not exist until something produces it, so this produces it.
+        # Until 2026-09-04 the phase read `windows-lifecycle.json` from this folder while
+        # verify-package.ps1 writes `lifecycle.json` into the package root it is handed: the name and
+        # the folder both differed, so the phase would have reported itself blocked ON A REAL ARM64
+        # MACHINE, for want of a file nobody had asked anyone to write. Invoking the verifier here is
+        # what this script already does for three of the other phases, which run `dotnet test`
+        # themselves.
+        #
+        # -SkipReproducibility: comparing two builds is the slow half of that script, and what it
+        # keeps fresh is `reproducibility.json` for the x64 package that ReproducibleBuildTests reads.
+        # This is not that package. -Work keeps its scratch folder out of the x64 verifier's.
+        #
+        # The verifier throws when it cannot complete — with no ffmpeg there is no sample and the
+        # file-association phase says so. That is caught rather than fatal: an unanswerable phase is
+        # this matrix's subject, not its accident, and the missing report below names it.
+        $lifecyclePath = Join-Path $outputRoot 'lifecycle.json'
+        try {
+            & (Join-Path $PSScriptRoot 'verify-package.ps1') `
+                -Mode Verify `
+                -PackageRoot $outputRoot `
+                -Work (Join-Path $outputRoot 'lifecycle-work') `
+                -SkipReproducibility
+        }
+        catch {
+            Write-Warning "The ARM64 lifecycle verification did not complete: $_"
+        }
+
         $observed['package-lifecycle'] = if (Test-Path -LiteralPath $lifecyclePath) {
             $lifecycle = Get-Content -LiteralPath $lifecyclePath -Raw | ConvertFrom-Json
             $notPassed = @($lifecycle.phases | Where-Object { $_.outcome -ne 'Passed' })
@@ -473,7 +566,7 @@ try {
             [pscustomobject]@{
                 passed = $false
                 detail = ''
-                reason = "The ARM64 lifecycle report is not at $lifecyclePath. Run eng/verify-package.ps1 against this package."
+                reason = "The ARM64 lifecycle report is not at $lifecyclePath, so eng/verify-package.ps1 did not get far enough to write one against this package."
             }
         }
 

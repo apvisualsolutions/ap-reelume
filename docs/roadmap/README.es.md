@@ -53,7 +53,15 @@ Banana —VB-CABLE quedó descartado porque su propio foro documenta que entrega
 Kernel Streaming y no siempre por WASAPI compartido, que es la vía que usa la aplicación—, y sobre
 ese endpoint se **grabó la salida y se contaron los ocho canales**: cada uno lleva su propio tono con
 un contraste mínimo de 86 dB. `PLY-004` pasa a `VERIFIED` y **de los tres bloqueos de publicación
-quedan dos**, los dos que exigen comprar: la máquina ARM64 y el certificado de firma.
+quedan dos**.
+
+**Ese párrafo se escribió el 2026-09-01 y decía «los dos que exigen comprar: la máquina ARM64 y el
+certificado de firma». Ya no son dos compras, sino una**, y lo refuta el bloque de arriba fechado el
+2026-09-04: los runners `windows-11-arm` de GitHub son gratis e ilimitados en repositorios públicos.
+Sigue habiendo dos bloqueos y `PRD-003` sigue `BLOCKED` hasta que se mida qué contestan sus seis
+fases; lo que ya no es cierto es el motivo por el que lo estaba. Se corrige aquí porque **ninguna
+prueba cruza las dos afirmaciones**: `ScopeBoundaryTests` sólo exige que `PRD-003` aparezca nombrado
+en los dos idiomas, no que lo que se diga de él concuerde consigo mismo.
 
 ## Las tres versiones
 
