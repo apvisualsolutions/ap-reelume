@@ -255,7 +255,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Backup/StagedRestoreService.cs        
 src/ApSolutions.LocalMedia.Infrastructure/Backup/ZipExportService.cs                         100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/IntegrityChecker.cs                            94  87
 src/ApSolutions.LocalMedia.Infrastructure/Data/MigrationRunner.cs                             96  75
-src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  90
+src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/CatalogRepository.cs              98  91
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs                 100  92
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       99  76
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  89
@@ -315,7 +315,7 @@ src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml               
 src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                      100  90
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  78
-src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           97  91
+src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           98  91
 src/ApSolutions.LocalMedia.Presentation/Library/ManualReassignmentViewModel.cs                94  70
 src/ApSolutions.LocalMedia.Presentation/Library/PosterArtView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml                         100  50
