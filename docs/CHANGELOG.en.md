@@ -22,6 +22,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   broken program, and confusing the two teaches people to ignore warnings. It becomes strict once
   there is an answer to be strict about.
 
+  **And it has answered.** The application **started on an ARM computer, showed its window and closed
+  itself without being killed**; sound passed in full; and the install cycle completed its twelve
+  phases with none outstanding. Nine minutes start to finish. The two checks left flagged are flagged
+  over videos **the usual computer cannot produce either**, and the last one is waiting for the batch
+  already chosen.
+
+  **The borrowed machine is not the one its own documentation describes either**: it advertises an
+  old version of the tools and carries exactly the one this project requires. They are installed all
+  the same, because a precaution that depends on a third party changing nothing is not a precaution.
+
 - **The application now takes a course's picture out of the video itself, against a real file**: the
   test opens a real video, seeks a tenth of the way in and checks a picture comes out — not an empty
   file — in three seconds. All that is left is drawing it on the card.
@@ -128,6 +138,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   under **a different name and in a different folder** from the one its producer uses, and on top of
   that nothing ever asked for it to be produced. It would have gone on saying «there is no machine»
   with the machine right there — which is exactly what that note must never mean.
+
+- **And the first fix arrived with two faults of its own, which the machine uncovered the same day.**
+  The bar demanded that **not a single** test be skipped, and that would have made the check
+  impossible to pass on any borrowed computer for a reason with nothing to do with ARM: the program
+  that produces the videos is missing two formats, **and the usual computer is missing the same
+  ones**. It would have tied the unblocking to a third party packaging a codec. The line is now that
+  **something ran and passed**, with whatever was skipped still recorded in plain sight.
+
+  **The other was quieter**: the text the tests emit was leaking into the value the function
+  returned, so the reason behind the two flagged checks was lost on the way and they read as failures
+  rather than as «I could not measure». Both now carry a guard of their own — and the first caught
+  itself, because its explanation contained the very thing it forbids.
 
 - **The cover you chose was stored, locked and backed up, and you never saw it.** The button did its
   whole job — it opened the file picker, copied your image into the program's own data and wrote

@@ -21,6 +21,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
   fallo suyo no pone el proyecto en rojo: una herramienta ausente no es un programa roto, y
   confundirlas enseña a ignorar los avisos. Pasará a ser exigente cuando se sepa qué contesta.
 
+  **Y ya contestó.** La aplicación **arrancó en un ordenador ARM, mostró su ventana y cerró sola sin
+  que nadie la matara**; el sonido pasó entero; y el ciclo de instalación completó sus doce fases sin
+  una sola pendiente. Nueve minutos de principio a fin. Las dos comprobaciones que quedaron marcadas
+  lo están por vídeos que **el mismo ordenador de siempre tampoco puede fabricar**, y la última
+  espera a la tanda ya decidida.
+
+  **La máquina prestada tampoco es la que su propia documentación describe**: anuncia una versión
+  vieja de las herramientas y trae exactamente la que este proyecto exige. Se instalan igual, porque
+  una precaución que depende de que un tercero no cambie nada no es una precaución.
+
 - **La aplicación ya saca la imagen del propio vídeo de un curso, y funciona sobre un archivo de
   verdad**: la prueba abre un vídeo real, salta a un décimo de su duración y comprueba que sale una
   imagen —no un archivo vacío— en tres segundos. Falta sólo dibujarla en la tarjeta.
@@ -127,6 +137,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
   esperaba un archivo con **otro nombre y en otra carpeta** de la que usa quien lo produce, y además
   nadie llegaba a pedir que se produjera. Habría seguido diciendo «falta la máquina» con la máquina
   delante — que es justo lo que esa nota no debe significar nunca.
+
+- **Y el primer arreglo llegó con dos fallos propios, que la máquina destapó el mismo día.** El
+  listón exigía que **no se saltara ni una** prueba, y eso habría hecho la comprobación imposible de
+  superar en ningún ordenador prestado por un motivo que no tiene nada que ver con ARM: al programa
+  que fabrica los vídeos le faltan dos formatos, **y al ordenador de siempre le faltan los mismos**.
+  Habría atado el desbloqueo a que un tercero empaquetara un códec. Ahora la línea es que **algo se
+  haya ejecutado y haya pasado**, y lo que se saltó sigue anotado a la vista.
+
+  **El otro era más callado**: el texto que sueltan las pruebas se colaba en el resultado que la
+  función devolvía, así que el motivo de las dos comprobaciones marcadas se perdía por el camino y
+  se leían como fallos en vez de como «no pude medir». Las dos cosas llevan ahora su propia guarda
+  — y la primera se cazó a sí misma, porque su explicación contenía justo lo que prohíbe.
 
 - **La portada que elegías se guardaba, se bloqueaba y se respaldaba, y no la veías nunca.** El botón
   hacía su trabajo entero —abría el explorador, copiaba tu imagen a los datos del programa y escribía

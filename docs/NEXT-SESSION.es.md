@@ -1,52 +1,89 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-04: la matriz ARM64 se está midiendo por primera vez
+> ## AVISO AL FRENTE — 2026-09-04: la matriz ARM64 ya se midió, y tres de sus seis fases pasaron
 >
-> **Hay un run en curso y hay que leerlo antes de nada.** Se comprueba con
-> `git log --oneline -1 main`, `gh run list --limit 3` y, si sigue vivo,
-> `pwsh -NoProfile -File eng/watch-ci.ps1 -Sha <sha entero>`. El commit anterior a éste dejó `main`
-> al día y en verde; **esta tanda aún no se ha fusionado a `main`** y no debe fusionarse hasta que
-> su run conteste.
+> **Antes de nada se mira el árbol**: `git log --oneline -1 main` y `gh run list --limit 3`. Aquí no
+> se escribe el número del commit, porque el commit que lo escribiría ya lo habría cambiado.
 >
-> ### Lo que se acaba de empujar, y lo que hay que ir a buscar
+> ### Lo que dejó de ser cierto: `PRD-003` ya no espera a que alguien compre un ordenador
 >
-> · **Un trabajo nuevo de CI que corre en un ordenador ARM con Windows 11** — los que GitHub presta
->   gratis y sin límite a los proyectos públicos—, y que ejecuta el empaquetado ARM64 **con su matriz
->   de seis fases**. Es la primera vez que esas seis se intentan de verdad: hasta hoy las seis
->   llevaban la misma nota, «esto se hizo en un ordenador de otro tipo».
+> · **La aplicación se ejecutó en una máquina ARM de verdad, por primera vez.** GitHub presta runners
+>   `windows-11-arm` **gratis e ilimitados en repositorios públicos**, y éste lo es. Un trabajo nuevo
+>   de CI corre ahí el empaquetado ARM64 con su matriz, en **nueve minutos**.
 >
-> · **La respuesta que se busca está en un artefacto**, no en el color del run:
->   `gh run download <id> -n arm64-matrix-native`. Trae la sonda —qué herramientas traía esa máquina,
->   que es la incógnita— y el informe de las seis fases. **El trabajo no bloquea todavía**, así que
->   el run puede salir verde con las seis fases sin pasar: el color no contesta la pregunta.
+> · **Tres fases pasaron limpias**: el programa arrancó, mostró ventana y cerró solo; el sonido pasó
+>   entero; y el ciclo de instalación completó sus doce fases sin ninguna pendiente.
 >
-> · **Con esos números en la mano se escribe la evidencia** en `docs/evidence/stable/T42-arm64.md`,
->   en los dos idiomas, y se decide si `PRD-003` puede moverse. **Hasta entonces sigue `BLOCKED`, y
->   `docs/FEATURES.md` no se toca.**
+> · **Dos quedaron marcadas por omisiones que no son de ARM64**, y eso está medido, no supuesto: al
+>   `ffmpeg` que se instala le faltan dos codificadores y multiplexa la muestra HDR sin sus
+>   metadatos de color, **y el runner x64 se salta las mismas** — cinco en esa suite, leídas del run
+>   de `743af9a`. Con el listón corregido deberían pasar; **eso lo confirma el run siguiente, no esta
+>   nota**.
 >
-> · **Puede que la respuesta sea «esa máquina no trae X» y no pase ninguna fase. Eso también es el
->   resultado**: convierte una condición de desbloqueo que decía «compra un ordenador» en una lista
->   concreta de lo que falta.
+> · **La sexta, `cross-architecture-data`, sigue `Blocked` por diseño**: pide una carpeta de datos
+>   escrita por el build x64 y hoy nadie la produce ni la traslada entre trabajos. Es la tanda que
+>   viene.
 >
-> ### Lo que esta tanda arregló de paso, y conviene no volver a romper
+> · **`PRD-003` sigue `BLOCKED` y `docs/FEATURES.md` no se ha tocado.** Se mueve cuando las seis
+>   pasen, no antes. Lo medido está en `docs/evidence/stable/T42-arm64.md`, sección «La primera
+>   ejecución nativa».
 >
-> · **Una fase se habría dado por superada sin medir nada.** Dos de las seis abren vídeos que hay que
->   fabricar con una herramienta aparte; sin ella las pruebas se saltan solas y el resultado sigue
->   siendo «todo bien». Ahora se cuenta qué se ejecutó de verdad, leyendo el informe de la ejecución
->   y no el resumen de pantalla —que está traducido, y aquí se programa en español mientras el
->   servidor va en inglés—.
+> ### Lo que hay que ir a buscar, y dónde
 >
-> · **Otra buscaba su informe con otro nombre y en otra carpeta** de la que usa quien lo escribe, y
->   nadie llegaba a pedir que se escribiera. Habría dicho «falta la máquina» con la máquina delante.
+> · **La respuesta no es el color del run**: el trabajo ARM64 **no bloquea todavía**, así que puede
+>   salir verde con fases sin pasar. Lo que contesta es el artefacto:
+>   `gh run download <id> -n arm64-matrix-native`. Trae la sonda —qué herramientas tenía esa
+>   máquina—, el informe de las seis fases, el del ciclo de instalación y, desde esta tanda, **los
+>   informes de prueba**, que dicen QUÉ se saltó y no sólo cuántas.
+>
+> ### Tres cosas que costaron y conviene no volver a aprender
+>
+> · **La documentación de la imagen ARM miente sobre sí misma.** Su manifiesto público anuncia
+>   `.NET 10.0.101` y `Chocolatey 2.6.0`; la máquina trae `10.0.302` —el exacto que `global.json`
+>   exige— y `2.7.4`. La sonda lo destapó. El SDK se instala igualmente: **una guarda que depende de
+>   que un tercero no cambie su imagen no es una guarda**.
+>
+> · **Un listón puede ser imposible sin que se note.** El primer intento exigía cero omisiones, lo
+>   que habría atado el desbloqueo de `PRD-003` a que Chocolatey empaquetara un codificador AV1.
+>   Antes de subir un listón se comprueba **si la máquina de referencia lo cumple**; aquí no lo
+>   cumplía ninguna.
+>
+> · **`| Write-Output` dentro de una función de PowerShell destruye su valor de retorno.** Quien la
+>   llama recibe un array cuyo último elemento es el objeto, y preguntarle al array por las
+>   propiedades del objeto **contesta que no** — en silencio. Dos fases perdieron así su motivo y se
+>   leyeron como fallos. Hay una prueba que lo prohíbe, y **se cazó a sí misma** al principio, porque
+>   su propio comentario contenía lo que prohíbe: ahora mira el código y no los comentarios.
 >
 > ### Lo demás sigue como estaba
 >
 > · **El MVP está en 44 de 46** y su única fila de trabajo abierta es `PRD-002`, que pide el
 >   certificado comercial de firma y no se resuelve programándolo.
-> · **La tanda siguiente ya elegida**: la copia de seguridad pregunta si llevarse las portadas
->   propias, y si se llevan, limpia las de títulos que ya no existen. Dos cosas medidas que no hay que
->   rediscutir: la portada propia **no** es regenerable, y **un disco externo apagado no es un título
->   que haya dejado de existir**.
+> ### La cola de tandas, en este orden
+>
+> · **PRIMERO, y el propietario pidió expresamente que no se olvide (2026-09-04): CI instala el
+>   `ffmpeg` reducido y hay que pasarlo al completo.** El flujo hace
+>   `choco install ffmpeg --version 9.0.0`, que **no trae `libsvtav1` ni `libxavs2`**: dos muestras de
+>   vídeo no se generan y **tres pruebas se saltan solas** — dos de códecs y una de HDR, esta última
+>   porque ese build multiplexa la muestra HDR10 sin sus metadatos de transferencia de color.
+>
+>   **Pasa en las DOS arquitecturas**: cinco saltos en `MediaTests` en el runner x64, leídos del run
+>   de `743af9a`, y los mismos tres en el ARM64. **En la máquina del propietario pasan las 24, con 0
+>   omitidas**, porque ahí está el full build de gyan.dev — así que el hueco es del servidor y no del
+>   proyecto, y lleva meses sin que nadie lo supiera.
+>
+>   El arreglo es `ffmpeg-full`, que existe en Chocolatey —9.0.1 el 2026-09-04— y es ese mismo build.
+>   Toca `.github/workflows/ci.yml` **y** `.github/workflows/release.yml`, que llevan el mismo bloque
+>   de instalación con tres intentos. **Dos costes que se miden y no se suponen**: el paquete pesa más
+>   y el paso tardará más —el reducido tarda un minuto—, y **puede destapar pruebas que nunca han
+>   llegado a ejecutarse en CI**, que es a la vez lo que se busca y el riesgo.
+>
+> · **DESPUÉS**: la copia de seguridad pregunta si llevarse las portadas propias, y si se llevan,
+>   limpia las de títulos que ya no existen. Dos cosas medidas que no hay que rediscutir: la portada
+>   propia **no** es regenerable, y **un disco externo apagado no es un título que haya dejado de
+>   existir**.
+>
+> · **Y la sexta fase ARM64**, `cross-architecture-data`, cuando toque: pide que el trabajo x64 le
+>   pase su carpeta de datos por artefacto.
 
 > ## RELEVO — 2026-09-04, vigesimotercera sesión: la portada que se guardaba y nadie veía, y una cifra que se fue de la guía
 >

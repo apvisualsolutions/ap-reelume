@@ -1,54 +1,89 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-04: the ARM64 matrix is being measured for the first time
+> ## READ THIS FIRST — 2026-09-04: the ARM64 matrix has been measured, and three of its six phases passed
 >
-> **There is a run in flight and it has to be read before anything else.** Check with
-> `git log --oneline -1 main`, `gh run list --limit 3` and, if it is still alive,
-> `pwsh -NoProfile -File eng/watch-ci.ps1 -Sha <full sha>`. The commit before this one left `main` up
-> to date and green; **this batch has not been fast-forwarded to `main`** and must not be until its
-> run answers.
+> **Look at the tree first**: `git log --oneline -1 main` and `gh run list --limit 3`. The commit
+> number is not written here, because the commit that wrote it would already have changed it.
 >
-> ### What was just pushed, and what to go and fetch
+> ### What stopped being true: `PRD-003` is no longer waiting for anyone to buy a computer
 >
-> · **A new CI job that runs on a Windows 11 ARM machine** — the ones GitHub lends free and without
->   limit to public projects — running the ARM64 packaging **with its six-phase matrix**. It is the
->   first time those six have actually been attempted: until today all six carried the same note,
->   «this was done on a different kind of computer».
+> · **The application ran on a real ARM machine for the first time.** GitHub lends `windows-11-arm`
+>   runners **free and unlimited on public repositories**, and this is one. A new CI job runs the
+>   ARM64 packaging with its matrix there, in **nine minutes**.
 >
-> · **The answer being sought is in an artifact**, not in the colour of the run:
+> · **Three phases passed clean**: the program started, showed its window and closed itself; audio
+>   passed in full; and the install cycle completed its twelve phases with none outstanding.
+>
+> · **Two were flagged over skips that are not about ARM64**, and that is measured rather than
+>   assumed: the `ffmpeg` that gets installed is missing two encoders and muxes the HDR sample
+>   without its colour metadata, **and the x64 runner skips the same ones** — five in that suite,
+>   read from the run of `743af9a`. With the bar corrected they should pass; **the next run confirms
+>   that, not this note**.
+>
+> · **The sixth, `cross-architecture-data`, is still `Blocked` by design**: it wants a data folder
+>   written by the x64 build, and today nothing produces or carries one between jobs. That is the
+>   next batch.
+>
+> · **`PRD-003` stays `BLOCKED` and `docs/FEATURES.md` has not been touched.** It moves when all six
+>   pass, not before. What was measured is in `docs/evidence/stable/T42-arm64.md`, under «The first
+>   native run».
+>
+> ### What to go and fetch, and where
+>
+> · **The answer is not the colour of the run**: the ARM64 job **does not block yet**, so it can be
+>   green with phases unpassed. What answers is the artifact:
 >   `gh run download <id> -n arm64-matrix-native`. It carries the probe — what tools that machine
->   turned out to have, which is the open question — and the six-phase report. **The job does not
->   block yet**, so the run can be green with all six phases unpassed: the colour does not answer the
->   question.
+>   had — the six-phase report, the lifecycle report and, from this batch, **the test reports**,
+>   which say WHAT was skipped rather than only how many.
 >
-> · **With those numbers in hand the evidence gets written** in `docs/evidence/stable/T42-arm64.md`,
->   in both languages, and then it is decided whether `PRD-003` can move. **Until then it stays
->   `BLOCKED` and `docs/FEATURES.md` is not touched.**
+> ### Three things that cost something and are worth not relearning
 >
-> · **The answer may be «that machine does not carry X» with no phase passing. That is a result
->   too**: it turns an unblock condition that said «buy a computer» into a concrete list of what is
->   missing.
+> · **The ARM image's documentation lies about itself.** Its public manifest advertises
+>   `.NET 10.0.101` and `Chocolatey 2.6.0`; the machine carries `10.0.302` — the exact one
+>   `global.json` requires — and `2.7.4`. The probe uncovered it. The SDK is installed regardless:
+>   **a guard that depends on a third party not changing its image is not a guard**.
 >
-> ### What this batch fixed along the way, and is worth not breaking again
+> · **A bar can be impossible without anyone noticing.** The first attempt demanded zero skips, which
+>   would have tied `PRD-003`'s unblocking to Chocolatey packaging an AV1 encoder. Before raising a
+>   bar, check **whether the reference machine clears it**; here no machine did.
 >
-> · **One phase would have been recorded as passed without measuring anything.** Two of the six open
->   videos that have to be produced with a separate tool; without it the tests skip themselves and
->   the result is still «all good». What actually ran is now counted, read out of the run's own
->   report rather than the console summary — which is translated, and this is developed in Spanish
->   while the server runs in English.
->
-> · **Another looked for its report under a different name and in a different folder** from the one
->   its writer uses, and nothing ever asked for it to be written. It would have said «there is no
->   machine» with the machine right there.
+> · **`| Write-Output` inside a PowerShell function destroys its return value.** The caller receives
+>   an array whose last element is the object, and asking the array for the object's properties
+>   **answers no** — silently. Two phases lost their reason that way and read as failures. There is a
+>   test forbidding it, and **it caught itself** at first, because its own comment contained what it
+>   forbids: it now looks at the code rather than the comments.
 >
 > ### Everything else stands
 >
 > · **The MVP is at 44 of 46** and its only open row of work is `PRD-002`, which needs the commercial
 >   signing certificate and is not settled by programming.
-> · **The next batch is already chosen**: the backup asks whether to carry your own covers, and if it
->   does, it cleans up the ones belonging to titles that no longer exist. Two measured things not to
->   re-litigate: your own cover is **not** regenerable, and **an external disk that is switched off is
->   not a title that has ceased to exist**.
+> ### The batch queue, in this order
+>
+> · **FIRST, and the owner explicitly asked that it not be forgotten (2026-09-04): CI installs the
+>   cut-down `ffmpeg` and it has to move to the full one.** The workflow runs
+>   `choco install ffmpeg --version 9.0.0`, which **carries neither `libsvtav1` nor `libxavs2`**: two
+>   video samples are never generated and **three tests skip themselves** — two codec ones and one
+>   HDR one, the latter because that build muxes the HDR10 sample without its colour-transfer
+>   metadata.
+>
+>   **It happens on BOTH architectures**: five skips in `MediaTests` on the x64 runner, read from the
+>   run of `743af9a`, and the same three on ARM64. **On the owner's machine all 24 pass with 0
+>   skipped**, because the gyan.dev full build is installed there — so the gap belongs to the server
+>   rather than to the project, and has gone months without anyone knowing.
+>
+>   The fix is `ffmpeg-full`, which exists on Chocolatey — 9.0.1 as of 2026-09-04 — and is that same
+>   build. It touches `.github/workflows/ci.yml` **and** `.github/workflows/release.yml`, which carry
+>   the same three-attempt install block. **Two costs to be measured rather than assumed**: the
+>   package is larger and the step will take longer — the cut-down one takes a minute — and it **may
+>   uncover tests that have never actually run in CI**, which is both the point and the risk.
+>
+> · **THEN**: the backup asks whether to carry your own covers, and if it does, it cleans up the ones
+>   belonging to titles that no longer exist. Two measured things not to re-litigate: your own cover
+>   is **not** regenerable, and **an external disk that is switched off is not a title that has ceased
+>   to exist**.
+>
+> · **And the sixth ARM64 phase**, `cross-architecture-data`, when its turn comes: it wants the x64
+>   job to hand over its data folder as an artifact.
 
 > ## HANDOVER — 2026-09-04, twenty-third session: the cover that was stored and nobody saw, and a figure that left the guide
 >
