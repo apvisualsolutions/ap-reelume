@@ -22,6 +22,7 @@ public enum LibrarySurface
 public sealed class LibraryViewModel : INotifyPropertyChanged
 {
     private readonly ICatalogQueryService _queryService;
+    private readonly Func<TitleId, string?, string?> _findPoster;
     private readonly RelayCommand _back;
     private readonly AsyncRelayCommand _clearSearch;
     private readonly AsyncRelayCommand _clearFilters;
@@ -39,13 +40,21 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     private bool _isLoading;
     private ICommand? _addMedia;
 
+    /// <param name="findPoster">
+    /// Turns what a title stores about its cover into the file that draws it. A delegate rather than
+    /// the use case itself, for the same reason the detail cards take one: the presentation layer
+    /// does not get to know what an artwork store is. Absent, every card draws the generated art it
+    /// drew before, which is what keeps every existing test of this view model standing.
+    /// </param>
     public LibraryViewModel(
         ICatalogQueryService queryService,
         MovieDetailsViewModel? movieDetails = null,
         ShowDetailsViewModel? showDetails = null,
-        ScanProgressViewModel? scanProgress = null)
+        ScanProgressViewModel? scanProgress = null,
+        Func<TitleId, string?, string?>? findPoster = null)
     {
         _queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
+        _findPoster = findPoster ?? ((_, _) => null);
         MovieDetails = movieDetails ?? new MovieDetailsViewModel();
         ShowDetails = showDetails ?? new ShowDetailsViewModel();
         ScanProgress = scanProgress ?? new ScanProgressViewModel();
@@ -442,7 +451,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             var page = await _queryService.QueryAsync(
                 CreateQuery(cursor: null),
                 cancellationToken).ConfigureAwait(false);
-            Items = page.Items.Select(item => new CatalogItemViewModel(item)).ToArray();
+            Items = page.Items.Select(Card).ToArray();
             _nextCursor = page.NextCursor;
             _hasLoaded = true;
             OnPropertyChanged(nameof(HasMore));
@@ -472,7 +481,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         var page = await _queryService.QueryAsync(
             CreateQuery(_nextCursor),
             cancellationToken).ConfigureAwait(false);
-        Items = Items.Concat(page.Items.Select(item => new CatalogItemViewModel(item))).ToArray();
+        Items = Items.Concat(page.Items.Select(Card)).ToArray();
         _nextCursor = page.NextCursor;
         OnPropertyChanged(nameof(HasMore));
     }
@@ -517,6 +526,13 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         Sort,
         PageSize: 50,
         Cursor: cursor);
+
+    /// <summary>
+    /// One card, with its cover already looked up. Both pages build cards through here so the first
+    /// page and the ones scrolled after it cannot come to differ.
+    /// </summary>
+    private CatalogItemViewModel Card(CatalogItem item) =>
+        new(item, _findPoster(item.Id, item.PosterPath));
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {

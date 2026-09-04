@@ -66,7 +66,8 @@ public sealed record CatalogItem(
     WatchStatus Status = WatchStatus.NotStarted,
     double CompletedFraction = 0,
     int EpisodeCount = 0,
-    int EpisodesWatched = 0);
+    int EpisodesWatched = 0,
+    string? PosterPath = null);
 
 public sealed record CatalogPage(
     IReadOnlyList<CatalogItem> Items,

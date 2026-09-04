@@ -262,7 +262,13 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                        (SELECT COUNT(*) FROM episodes e WHERE e.show_id = t.id) AS episode_count,
                        (SELECT COUNT(*) FROM watch_state w
                         INNER JOIN episodes e ON e.id = w.episode_id
-                        WHERE e.show_id = t.id AND w.status = 2) AS episodes_watched
+                        WHERE e.show_id = t.id AND w.status = 2) AS episodes_watched,
+                       -- What the title stores about its cover, which is either a provider address
+                       -- or the name of a file somebody picked. Which of the two it is, and where
+                       -- the file lives, is ResolveTitlePoster's question and not this one's: a
+                       -- query that answered it would be a second copy of that rule.
+                       (SELECT m.poster_path FROM catalog_metadata m WHERE m.title_id = t.id)
+                           AS poster_path
                 FROM titles t
                 UNION ALL
                 -- The year comes out of the projection now rather than being a literal NULL. It was
@@ -271,7 +277,9 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                 SELECT scanned.media_file_id, 2, scanned.display_title, scanned.sort_title,
                        scanned.release_year,
                        media.is_available, 0, 0, scanned.added_utc, NULL,
-                       media.duration_ticks, NULL, NULL, NULL, NULL, 0, 0
+                       media.duration_ticks, NULL, NULL, NULL, NULL, 0, 0,
+                       -- A scanned file has no metadata row, so it has no cover to name.
+                       NULL
                 FROM scanned_titles scanned
                 INNER JOIN media_files media ON media.id = scanned.media_file_id
                 WHERE NOT EXISTS (
@@ -287,7 +295,7 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                    t.has_progress, t.is_personal, t.added_utc, t.last_played_utc,
                    {sortExpression} AS sort_key,
                    t.duration_ticks, t.genres, t.watch_status, t.watch_position, t.watch_duration,
-                   t.episode_count, t.episodes_watched
+                   t.episode_count, t.episodes_watched, t.poster_path
             FROM catalog_items t
             {where}
             ORDER BY {sortExpression} {direction}, t.id {direction}
@@ -332,7 +340,8 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                     // be a number the catalogue invented.
                     observed > 0 ? Math.Clamp((double)position / observed, 0, 1) : 0,
                     reader.IsDBNull(15) ? 0 : reader.GetInt32(15),
-                    reader.IsDBNull(16) ? 0 : reader.GetInt32(16)),
+                    reader.IsDBNull(16) ? 0 : reader.GetInt32(16),
+                    reader.IsDBNull(17) ? null : reader.GetString(17)),
                 Convert.ToString(reader.GetValue(9), CultureInfo.InvariantCulture) ?? string.Empty));
         }
 
