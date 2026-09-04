@@ -15,6 +15,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
 {
     private readonly UpdateMetadata _updateMetadata;
     private readonly RefreshMetadata _refreshMetadata;
+    private readonly Func<Task>? _onApplied;
     private CatalogMetadata _catalog;
     private string _title = string.Empty;
     private string? _originalTitle;
@@ -34,16 +35,30 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
     private bool _isUnidentified;
     private bool _hasNoProviderAnswer;
 
+    /// <param name="onApplied">
+    /// Told that a write landed, so whatever is drawing this title behind the editor can read it
+    /// again. Optional, and a test that only asks what the editor holds hands in nothing.
+    /// </param>
+    /// <remarks>
+    /// <b><paramref name="onApplied"/> is what makes a saved cover appear.</b> Closing the editor
+    /// drops both surfaces and reloads nothing, so the card underneath is the one built when the
+    /// title was opened — which meant that until 2026-09-04 somebody could choose a cover, be told
+    /// «Portada puesta», save, and watch nothing change until they left the title and came back. The
+    /// editor does not reach for the card itself: it says a write landed, and composition decides
+    /// what that is worth re-reading.
+    /// </remarks>
     public MetadataEditorViewModel(
         CatalogMetadata catalog,
         UpdateMetadata updateMetadata,
         RefreshMetadata refreshMetadata,
-        ArtworkPickerViewModel artworkPicker)
+        ArtworkPickerViewModel artworkPicker,
+        Func<Task>? onApplied = null)
     {
         _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         _updateMetadata = updateMetadata ?? throw new ArgumentNullException(nameof(updateMetadata));
         _refreshMetadata = refreshMetadata ?? throw new ArgumentNullException(nameof(refreshMetadata));
         ArtworkPicker = artworkPicker ?? throw new ArgumentNullException(nameof(artworkPicker));
+        _onApplied = onApplied;
 
         // The editor listens rather than the picker reaching back into it: a cover that has been
         // imported is a new path for the poster field and a lock on it, and both of those are this
@@ -125,7 +140,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
                 BackdropPath),
             GetLockedFields(),
             _catalog.Revision)).ConfigureAwait(true);
-        ApplyResult(result);
+        await ApplyResultAsync(result).ConfigureAwait(true);
     }
 
     private async Task RefreshAsync(bool restoreProviderFields)
@@ -134,7 +149,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
             _catalog.TitleId,
             _catalog.Revision,
             restoreProviderFields)).ConfigureAwait(true);
-        ApplyResult(result);
+        await ApplyResultAsync(result).ConfigureAwait(true);
     }
 
     private HashSet<MetadataField> GetLockedFields()
@@ -158,7 +173,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         }
     }
 
-    private void ApplyResult(MetadataWriteResult result)
+    private async Task ApplyResultAsync(MetadataWriteResult result)
     {
         HasConflict = result.Outcome == MetadataWriteOutcome.Conflict;
 
@@ -167,9 +182,19 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         // explained why.
         IsUnidentified = result.Outcome == MetadataWriteOutcome.NotIdentified;
         HasNoProviderAnswer = result.Outcome == MetadataWriteOutcome.Unavailable;
-        if (result.Outcome == MetadataWriteOutcome.Applied && result.Catalog is not null)
+        if (result.Outcome != MetadataWriteOutcome.Applied || result.Catalog is null)
         {
-            ApplyCatalog(result.Catalog);
+            return;
+        }
+
+        ApplyCatalog(result.Catalog);
+
+        // Only a write that landed. A conflict, an unidentified title and a provider with no answer
+        // all leave the stored row exactly as it was, so re-reading it would redraw the same card
+        // and teach whoever is watching that the button does something when it did not.
+        if (_onApplied is { } notify)
+        {
+            await notify().ConfigureAwait(true);
         }
     }
 

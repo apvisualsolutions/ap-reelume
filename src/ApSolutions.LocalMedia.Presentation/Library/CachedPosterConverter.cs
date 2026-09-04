@@ -30,11 +30,33 @@ namespace ApSolutions.LocalMedia.Presentation.Library;
 /// image at all. Every one of those is "no poster", which is a state this card already draws: the
 /// generated art is underneath, always, and it is what an unidentified library shows anyway.
 /// </para>
+/// <para>
+/// <b>And the decode is bounded, since 2026-09-04.</b> Until then every poster here came from the
+/// provider and was <c>w780</c> by construction, so the bound above held by luck rather than by
+/// rule. A cover somebody chooses off their own disk is whatever their camera produced: ten
+/// megabytes of JPEG is tens of millions of pixels, which at four bytes each is the difference
+/// between the 3.5 MB this class budgets and something nearer seventy — eight of those, on the
+/// thread that draws. Measured on Avalonia 12.1.1: a 2000×3000 source decoded whole is 24 MB and
+/// bounded is 3.65 MB. The bound is paid on the way in too, and honestly: a 300×450 cover is
+/// <em>enlarged</em> to 780×1170, so it costs 3.65 MB where it would have cost 0.5. That is the
+/// trade — a fixed cost per entry instead of one nobody can predict — and it is the cost this
+/// class was already written around.
+/// </para>
 /// </remarks>
 public sealed class CachedPosterConverter : IValueConverter
 {
     /// <summary>How many decoded posters are kept. See the remarks for why there is a number here.</summary>
     public const int Capacity = 8;
+
+    /// <summary>
+    /// The width every poster is decoded at, which is the width the provider already served.
+    /// </summary>
+    /// <remarks>
+    /// The same 780 as <c>PosterAddressPolicy.Size</c>, and deliberately the same number rather than
+    /// a second opinion: the raised card is 158 wide and the header bleed about 1,180, so one size
+    /// covers both, and two sizes for one picture is how one of them ends up forgotten.
+    /// </remarks>
+    public const int DecodeWidth = 780;
 
     private static readonly Lock Gate = new();
     private static readonly Dictionary<string, LinkedListNode<CacheEntry>> Decoded =
@@ -99,12 +121,20 @@ public sealed class CachedPosterConverter : IValueConverter
     {
         try
         {
-            return new Bitmap(path);
+            using var file = File.OpenRead(path);
+            return Bitmap.DecodeToWidth(file, DecodeWidth);
         }
+        // NullReferenceException is in this list because it was measured, not because anything here
+        // is careless. On Avalonia 12.1.1 the whole-file constructor answers an undecodable file with
+        // ArgumentException — «Unable to load bitmap from provided data» — while DecodeToWidth throws
+        // a NullReferenceException from inside Avalonia.Skia.ImmutableBitmap for the very same file.
+        // The bound above is worth having and this is its price; the try holds two statements and
+        // nothing of ours can raise it, so what is being swallowed is unambiguous.
         catch (Exception exception) when (exception is IOException
             or UnauthorizedAccessException
             or ArgumentException
-            or NotSupportedException)
+            or NotSupportedException
+            or NullReferenceException)
         {
             return null;
         }

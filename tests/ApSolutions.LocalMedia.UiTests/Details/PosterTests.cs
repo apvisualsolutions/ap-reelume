@@ -8,8 +8,11 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Movie;
 using ApSolutions.LocalMedia.Presentation.Show;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -258,6 +261,63 @@ public sealed class PosterTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return (window, view);
+    }
+
+    /// <summary>
+    /// Every poster is decoded at one width, whatever the file on the disk actually holds.
+    /// </summary>
+    /// <remarks>
+    /// <b>The bound exists because a personal cover is not a provider poster.</b> Until 2026-09-04
+    /// everything here arrived as <c>w780</c> from TMDB, so the memory this class budgets held by
+    /// construction. A cover chosen off somebody's own disk is whatever their camera produced: ten
+    /// megabytes of JPEG is tens of millions of pixels, and eight of those decoded whole is most of
+    /// a gigabyte on the thread that draws.
+    /// <para>
+    /// <b>The enlarging half is asserted on purpose, not tolerated.</b> A picture narrower than the
+    /// bound is decoded <em>up</em> to it — 300×450 becomes 780×1170, which costs 3.65 MB where the
+    /// file would have cost 0.5 — and somebody reading this later would be right to call that
+    /// wasteful and wrong to call it a mistake. It is the price of one predictable cost per entry
+    /// instead of one nobody can predict, and it is written down here so that changing it is a
+    /// decision rather than a tidy-up.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public void Every_poster_is_decoded_at_one_width_however_big_the_file_is()
+    {
+        var wide = WritePng(2000, 3000);
+        var narrow = WritePng(300, 450);
+        var converter = new CachedPosterConverter();
+
+        try
+        {
+            var bounded = Assert.IsType<Bitmap>(Convert(converter, wide));
+            Assert.Equal(CachedPosterConverter.DecodeWidth, bounded.PixelSize.Width);
+
+            // Aspect ratio is kept, which is what makes one width enough for both surfaces.
+            Assert.Equal(CachedPosterConverter.DecodeWidth * 3 / 2, bounded.PixelSize.Height);
+
+            var enlarged = Assert.IsType<Bitmap>(Convert(converter, narrow));
+            Assert.Equal(CachedPosterConverter.DecodeWidth, enlarged.PixelSize.Width);
+        }
+        finally
+        {
+            File.Delete(wide);
+            File.Delete(narrow);
+        }
+    }
+
+    /// <summary>A real picture of a given size, written by a real encoder.</summary>
+    private static string WritePng(int width, int height)
+    {
+        var target = new RenderTargetBitmap(new PixelSize(width, height));
+        using (var context = target.CreateDrawingContext())
+        {
+            context.FillRectangle(Brushes.Teal, new Rect(0, 0, width, height));
+        }
+
+        var path = Path.Combine(Path.GetTempPath(), $"ap-poster-{Guid.NewGuid():N}.png");
+        target.Save(path, new PngBitmapEncoderOptions());
+        return path;
     }
 
     /// <summary>The smallest thing that is genuinely a picture, so the converter has one to decode.</summary>

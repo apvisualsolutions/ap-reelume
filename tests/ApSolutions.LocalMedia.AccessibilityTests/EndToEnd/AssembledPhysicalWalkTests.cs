@@ -492,6 +492,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "La llegada (edición personal)",
             (await metadata.GetAsync(new TitleId(fileId), TestContext.Current.CancellationToken))?.Metadata.Title);
 
+        // And the card behind the editor is holding the cover, without anybody having left the title
+        // and come back. This is the assertion the whole 2026-09-04 change exists for, and it fails
+        // for either of the two reasons it could: a poster nobody resolved, or a card nobody told.
+        //
+        // Until that day the field was only ever asked «is this a provider path», and the picker
+        // writes an absolute one — so a cover was copied in, locked, carried in the backup, and
+        // never drawn. Then closing the editor dropped both surfaces without reloading, so even a
+        // resolved cover would not have appeared until the title was opened again.
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(
+            library.MovieDetails.HasPoster,
+            "the card behind the editor has no poster after a cover was chosen and saved.");
+        Assert.Equal(editor.PosterPath, library.MovieDetails.PosterFile);
+        Assert.True(
+            File.Exists(library.MovieDetails.PosterFile),
+            $"the card points at {library.MovieDetails.PosterFile}, which is not on this disk.");
+
         // And Restore puts the provider's answer back over it, which is the whole point of having
         // edited by hand being reversible.
         await PressAsync(
