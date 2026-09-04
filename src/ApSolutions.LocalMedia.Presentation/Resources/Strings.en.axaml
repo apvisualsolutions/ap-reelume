@@ -156,6 +156,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="LibrarySortLastPlayed">Last played</x:String>
   <x:String x:Key="LibraryBackShortAction">Back · Library</x:String>
   <x:String x:Key="LibraryBackAction">Back to library</x:String>
+  <x:String x:Key="LibraryLoadMoreAction">Show more titles</x:String>
   <x:String x:Key="LibraryResultsListName">Library results</x:String>
   <x:String x:Key="LibraryEmptyTitle">Nothing in the library yet</x:String>
   <x:String x:Key="LibraryEmptyDescription">Add a media root and the scan does the rest.</x:String>

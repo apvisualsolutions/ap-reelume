@@ -3,8 +3,10 @@
 
 using System.Reflection;
 using ApSolutions.LocalMedia.Application.Catalog;
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
@@ -82,6 +84,56 @@ public sealed class CatalogQueryTests
         Assert.Contains("seasons", objects);
         Assert.Contains("episodes", objects);
         Assert.Contains("catalog_fts", objects);
+    }
+
+    /// <summary>
+    /// The grid asks the catalogue what each title stores about its cover, and gets it.
+    /// </summary>
+    /// <remarks>
+    /// <b>The query did not carry it until 2026-09-04</b>, which is half of why the library grid drew
+    /// a generated gradient over every title while the covers sat on the disk. A scanned file has no
+    /// metadata row and so has nothing to say, and that half is asserted here too: the two branches
+    /// are one column that is there and one that is not, and only measuring both says the query knows
+    /// the difference.
+    /// </remarks>
+    [Fact]
+    public async Task The_catalogue_hands_over_what_each_title_stores_about_its_cover()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var fixture = await CreateFixtureAsync(directory.DatabasePath);
+        var withCover = Title(1, CatalogTitleKind.Movie, "Arrival", 2016);
+        var without = Title(2, CatalogTitleKind.Movie, "Dune", 2021);
+
+        await fixture.Repository.UpsertTitleAsync(withCover, TestContext.Current.CancellationToken);
+        await fixture.Repository.UpsertTitleAsync(without, TestContext.Current.CancellationToken);
+
+        var written = await new CatalogMetadataRepository(fixture.Factory).TrySaveAsync(
+            new CatalogMetadata(
+                withCover.Id,
+                new EditableMetadata(
+                    "Arrival",
+                    null,
+                    null,
+                    2016,
+                    [],
+                    "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
+                    null,
+                    null,
+                    new HashSet<MetadataField>()),
+                Revision: 1),
+            expectedRevision: 0,
+            TestContext.Current.CancellationToken);
+        Assert.Equal(MetadataWriteOutcome.Applied, written.Outcome);
+
+        var page = await fixture.Repository.QueryAsync(
+            new CatalogQuery(PageSize: 10),
+            TestContext.Current.CancellationToken);
+
+        var arrival = Assert.Single(page.Items, item => item.Title == "Arrival");
+        var dune = Assert.Single(page.Items, item => item.Title == "Dune");
+
+        Assert.Equal("/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg", arrival.PosterPath);
+        Assert.Null(dune.PosterPath);
     }
 
     [Fact]

@@ -1956,6 +1956,70 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The rest of the library, fetched by pressing for it.
+    /// </summary>
+    /// <remarks>
+    /// <b>Until 2026-09-04 there was nothing to press.</b> The model has paged by cursor since T7 —
+    /// fifty to a page, with `HasMore` and `LoadMoreCommand` — and no view bound any of it, so a
+    /// library of more than fifty titles had fifty reachable ones. `LIB-004` promises ten thousand.
+    /// <para>
+    /// Fifty-one titles and not two, because the button only exists when there is a second page: a
+    /// scene seeded with the usual handful would walk past a control that was never there, and pass.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_rest_of_the_library_is_fetched_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var repository = new CatalogRepository(factory);
+
+        for (var index = 0; index < 51; index++)
+        {
+            var name = $"Title {index:D3}";
+            await repository.UpsertTitleAsync(
+                new CatalogTitle(
+                    new TitleId(Guid.NewGuid()),
+                    CatalogTitleKind.Movie,
+                    name,
+                    name.ToLowerInvariant(),
+                    2024,
+                    [],
+                    [],
+                    [],
+                    DateTimeOffset.UnixEpoch,
+                    LastPlayedUtc: null,
+                    HasProgress: false,
+                    IsPersonal: false,
+                    IsAvailable: true),
+                TestContext.Current.CancellationToken);
+        }
+
+        using var host = ShowShell();
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(50, library.Items.Count);
+        Assert.True(library.HasMore, "Fifty-one titles in fifty-sized pages leaves a second page.");
+
+        await PressAsync(
+            host,
+            // The anchor the inventory records, which is the accessible name's resource key and not
+            // the control's own name: eng/check-walk-coverage.ps1 reads the views for the first and
+            // the walk would otherwise press something the inventory does not know it has.
+            "LibraryLoadMoreAction",
+            () => Task.FromResult(library.Items.Count),
+            "pressing for the rest of the library brought nothing back");
+
+        Assert.Equal(51, library.Items.Count);
+        Assert.False(library.HasMore, "There was one title left, so nothing is left after it.");
+    }
+
+    /// <summary>
     /// The catalogue row a film has once somebody identified it, written through SQL because the
     /// catalogue writes it during identification, which needs the network the harness does not have.
     /// </summary>
