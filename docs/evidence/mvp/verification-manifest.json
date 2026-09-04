@@ -16,9 +16,9 @@
   ],
   "summary": {
     "total": 46,
-    "verified": 43,
+    "verified": 44,
     "outOfScope": 1,
-    "blocked": 2
+    "blocked": 1
   },
   "features": [
     {
@@ -331,7 +331,7 @@
     },
     {
       "id": "LIB-011",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "tasks": [
         "T13",
         "T16",
@@ -351,12 +351,7 @@
         "docs/evidence/mvp/T39B-assembly.md",
         "docs/evidence/stable/audit-editor-page.md",
         "docs/evidence/stable/audit-personal-cover-never-drawn.md"
-      ],
-      "blocker": {
-        "reason": "Decía «edición manual de metadatos E IMÁGENES» y se leía como poder elegir una portada. Medido el 2026-09-03: el almacén sabe importar una imagen propia, la copia de seguridad la respalda y el modelo de la vista tiene dónde guardarla, pero nada en la aplicación llama a lo primero ni escribe lo tercero — las únicas llamadas son las de las pruebas. Lo verificado de verdad es editar la carátula escribiendo su ruta y bloquear ese campo contra un refresco remoto. / It said «manual metadata AND IMAGE editing» and read as being able to choose a cover. Measured on 2026-09-03: the store knows how to import a personal image, the backup carries it and the view model has somewhere to keep it, but nothing in the application calls the first or writes the third — the only callers are the tests. What is genuinely verified is editing the cover by typing its path and locking that field against a remote refresh.",
-        "owner": "Engineering",
-        "unblockCondition": "LIB-018 pone el selector de archivo y la llamada que faltan; con eso, elegir una portada es comprobable y esta fila vuelve a VERIFIED. / LIB-018 adds the missing file picker and the missing call; with those, choosing a cover is checkable and this row returns to VERIFIED."
-      }
+      ]
     },
     {
       "id": "LIB-012",

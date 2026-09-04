@@ -9,13 +9,20 @@
 > **Nothing is urgent.** The first thing next session is an owner's decision and a batch he has
 > already chosen, both below.
 >
-> ### What has to be decided before touching code, and belongs to the owner
+> ### First: the MVP stands at 44 of 46, and only one row of work is left
 >
-> · **`LIB-011` is still `IMPLEMENTED`, and NO LONGER for the reason it came down.** It came down
->   because choosing a cover led nowhere; that is fixed and verified. What holds it now is something
->   else, found by measuring: **courses have no way in at all for a cover**, and the matrix promises
->   the one for «that film, series or course». Raising it would be calling whole something that is
->   not. Raising it or waiting for courses is his call.
+> · **`LIB-011` returned to `VERIFIED` on 2026-09-04**, and its criterion was rewritten at the same
+>   time so it cannot fall for the same reason again: it said the cover «is edited by typing its
+>   path», and that admitted a reading which was never true. It now says what can be checked — it is
+>   chosen with the picker, copied, locked and **drawn, appearing on save** — and says as well what
+>   is **not** done and why: an arbitrary hand-typed path is not drawn, because the field is free
+>   text and reading it as a path would turn it into a reader of arbitrary files.
+>
+>   **Note an error this session made and corrected**: it was said that courses held this row back.
+>   They do not belong to it. A course's cover is **`LIB-018`**'s promise, which is `POST_STABLE` and
+>   does not count towards the MVP. It still has no way in, and is still real work — but on that row.
+>
+> · **The only open row of work in the MVP is `PRD-002`**, and it is not solved by programming.
 >
 > ### The next batch, which the owner chose on 2026-09-04
 >

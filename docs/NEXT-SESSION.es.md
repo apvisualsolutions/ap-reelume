@@ -9,13 +9,20 @@
 > **No queda nada urgente.** Lo primero de la próxima sesión es una decisión del propietario y una
 > tanda que él ya eligió, las dos abajo.
 >
-> ### Lo que hay que decidir antes de tocar código, y es del propietario
+> ### Lo primero: el MVP está en 44 de 46, y sólo queda una fila de trabajo
 >
-> · **`LIB-011` sigue en `IMPLEMENTED` y ya NO es por lo que bajó.** Bajó porque elegir una portada
->   no llegaba a ninguna parte; eso está arreglado y verificado. Lo que la retiene ahora es otra
->   cosa, encontrada midiendo: **los cursos no tienen por dónde ponerles portada**, y la matriz
->   promete la de «esa película, serie o curso». Subirla sería decir que está entera algo que no lo
->   está. La decisión de subirla o de esperar a los cursos es suya.
+> · **`LIB-011` volvió a `VERIFIED` el 2026-09-04**, y su criterio se reescribió a la vez para que no
+>   vuelva a caer por lo mismo: decía que la carátula «se edita escribiendo su ruta», y eso admitía
+>   una lectura que nunca fue cierta. Ahora dice lo que se puede comprobar — se elige con el
+>   selector, se copia, se bloquea y **se dibuja, apareciendo al guardar**— y dice también lo que
+>   **no** se hace y por qué: una ruta cualquiera escrita a mano no se dibuja, porque ese campo es
+>   texto libre y leerlo como una ruta lo convertiría en un lector de archivos cualesquiera.
+>
+>   **Ojo con un error que esta sesión cometió y corrigió**: se dijo que la frenaban los cursos. No
+>   era suyo. La portada de un curso es promesa de **`LIB-018`**, que es `POST_STABLE` y no cuenta
+>   para el MVP. Sigue sin tener por dónde, y sigue siendo trabajo real — pero de esa fila.
+>
+> · **La única fila de trabajo abierta del MVP es `PRD-002`**, y no se resuelve programando.
 >
 > ### La tanda siguiente, que el propietario ya eligió el 2026-09-04
 >
