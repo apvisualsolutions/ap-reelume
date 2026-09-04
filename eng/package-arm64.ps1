@@ -172,6 +172,19 @@ function Read-TrxCounters {
     have been recorded as Passed with its detail filled in — without a single frame being decoded. A
     gate that passes by looking at nothing, inside the gate written to measure the hardware.
 
+    WHERE THE LINE IS, AND WHY IT IS NOT "no skips", measured on 2026-09-04 by the first native run.
+    The first draft refused any suite carrying a skipped test, which would have made this phase
+    unpassable on any hosted machine for a reason with nothing to do with ARM64: Chocolatey's ffmpeg
+    package carries neither libsvtav1 nor libxavs2, so two samples are never generated, and one more
+    test skips because that build muxes the HDR sample without its colour-transfer metadata. THE X64
+    RUNNER SKIPS THE SAME ONES: five in this suite, read from the run of 743af9a. The gap belongs to
+    the ffmpeg package and is identical on both architectures, so tying PRD-003's unblocking to
+    Chocolatey shipping an AV1 encoder would be a bar nobody can reach and nobody chose.
+
+    So the line is that SOMETHING RAN AND PASSED: a suite that executed nothing measured nothing,
+    whatever its exit code says. Skips are recorded in the detail either way, so nobody reads
+    "Passed" without also reading how much of the question went unanswered.
+
     A suite that could not measure returns a reason, so the phase is recorded as Blocked rather than
     Failed: the distinction is what tells a missing tool apart from ARM64 decoding a file wrongly.
 #>
@@ -182,12 +195,18 @@ function Invoke-MediaSuite {
     )
 
     $project = Join-Path $repoRoot 'tests/ApSolutions.LocalMedia.MediaTests'
-    & dotnet test $project -c $Configuration -m:1 `
+    # Captured and then written to the host rather than piped onward. `| Write-Output` puts every
+    # line of dotnet test into THIS FUNCTION'S output, so the caller receives an array whose last
+    # element is the report, and `$run.PSObject.Properties.Name -contains 'reason'` then asks the
+    # array about its own properties and answers no. Measured on the first native run: two phases
+    # that carried a reason were recorded as Failed with the reason dropped.
+    $output = & dotnet test $project -c $Configuration -m:1 `
         --settings (Join-Path $PSScriptRoot 'test.runsettings') `
         --filter $Filter `
         --logger 'trx;LogFileName=results.trx' `
-        --results-directory $ResultsDirectory 2>&1 | Write-Output
+        --results-directory $ResultsDirectory 2>&1
     $exitCode = $LASTEXITCODE
+    foreach ($line in $output) { Write-Host $line }
 
     $counters = Read-TrxCounters -ResultsDirectory $ResultsDirectory
     if ($null -eq $counters) {
@@ -199,16 +218,16 @@ function Invoke-MediaSuite {
     }
 
     $summary = "$($counters.passed) passed, $($counters.failed) failed, $($counters.skipped) skipped of $($counters.total); exit code $exitCode."
-    if ($counters.total -eq 0 -or $counters.skipped -gt 0) {
+    if ($counters.passed -eq 0) {
         return [pscustomobject]@{
             succeeded = $false
             summary   = $summary
-            reason    = "The suite matching '$Filter' did not answer its question: $summary The usual cause is a missing tool — CodecMatrixTests and HdrAccelerationTests skip themselves when ffmpeg is absent."
+            reason    = "The suite matching '$Filter' executed nothing that passed, so it measured nothing: $summary The usual cause is a missing tool: CodecMatrixTests and HdrAccelerationTests skip themselves when ffmpeg is absent."
         }
     }
 
     return [pscustomobject]@{
-        succeeded = $exitCode -eq 0 -and $counters.failed -eq 0 -and $counters.passed -gt 0
+        succeeded = $exitCode -eq 0 -and $counters.failed -eq 0
         summary   = $summary
     }
 }

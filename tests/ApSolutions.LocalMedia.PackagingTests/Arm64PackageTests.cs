@@ -78,7 +78,18 @@ public sealed class Arm64PackageTests
         Assert.Contains("Read-TrxCounters", body, StringComparison.Ordinal);
         Assert.Contains("skipped", body, StringComparison.Ordinal);
         Assert.Contains("$counters.failed", body, StringComparison.Ordinal);
-        Assert.Contains("$counters.passed", body, StringComparison.Ordinal);
+
+        // And the report has to reach the caller as a report. Piping dotnet test onward with
+        // Write-Output puts every line of it into the function's own output, so the caller gets an
+        // array whose last element is the report and every question asked of the object is answered
+        // by the array instead. Measured on the first native run of 2026-09-04: two phases that
+        // carried a reason were recorded as Failed with the reason silently dropped.
+        //
+        // Comments are stripped first, because the paragraph above says the very thing this forbids
+        // and a rule that trips over its own explanation gets deleted rather than obeyed.
+        Assert.All(
+            ScriptStatements(body),
+            line => Assert.DoesNotContain("Write-Output", line, StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -111,6 +122,14 @@ public sealed class Arm64PackageTests
             line => Assert.Contains("'lifecycle.json'", line, StringComparison.Ordinal));
         Assert.Contains("verify-package.ps1", text, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// The lines of a PowerShell body that are statements rather than commentary.
+    /// </summary>
+    private static string[] ScriptStatements(string body) =>
+        body.Split(Environment.NewLine)
+            .Where(line => !line.TrimStart().StartsWith('#'))
+            .ToArray();
 
     /// <summary>
     /// Returns the body of a PowerShell function in the ARM64 packaging script, so a rule about how a

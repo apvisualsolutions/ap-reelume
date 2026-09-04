@@ -193,9 +193,12 @@ jobs:
     runs-on: windows-11-arm
     continue-on-error: true
     # The x64 job's 90 minutes are its own; a job carries its own clock, so this one cannot eat into
-    # the margin eng/measure-ci-time.ps1 reports. Sixty is a first guess on a 4-core machine, and the
-    # run itself is what will say whether it was the right one.
-    timeout-minutes: 60
+    # the margin eng/measure-ci-time.ps1 reports. Sixty was a first guess on a 4-core machine and the
+    # first native run answered it: nine minutes end to end, six of them in the packaging step. Thirty
+    # leaves more than triple the margin and makes a hang announce itself in half an hour rather than
+    # in one. The number to watch is the healthy job, as above: if it approaches thirty, the work has
+    # grown rather than the ceiling being wrong.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -280,4 +283,5 @@ jobs:
             artifacts/package-arm64/arm64-matrix.json
             artifacts/package-arm64/contents.json
             artifacts/package-arm64/lifecycle.json
+            artifacts/package-arm64/matrix/**/*.trx
           if-no-files-found: warn
