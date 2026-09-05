@@ -85,6 +85,34 @@ empezar a fallar por falta de un códec.
 `Install ffmpeg` por su literal para tratarlo como andamiaje y no anunciarlo en cada run.
 Renombrarlo habría convertido el vigía en algo que suena siempre, que es lo que enseña a ignorarlo.
 
+
+### La corrección: fueron cuatro de cinco, y la quinta no era del paquete
+
+El run de `c30e7d6` —el primero con `ffmpeg-full`— dio **154 de 155 con una omitida**, no 155 de 155.
+Cuatro de las cinco se destaparon; la de HDR sigue saltándose, y con el mismo motivo literal.
+
+**La causa era otra desde el principio, y la medición lo dice sin ambigüedad.** La receta de
+`mkv-hevc-hdr10` pide `libx265`, que **el paquete reducido también trae**: esa fila nunca se saltó
+por un codificador ausente. Lo que falla es que el multiplexor no escribe la curva de transferencia
+que la receta pide, y eso **no depende del build sino de la versión**:
+
+| ffmpeg | Origen | `color_transfer` que escribe |
+| --- | --- | --- |
+| 2024-06-21, full build | la máquina del propietario | **`smpte2084`** |
+| 9.0.0, full build | el runner, este run | **ausente** |
+
+Generado aquí con la misma receta recortada a un segundo y leído con `ffprobe`. Así que fijar la
+versión en 9.0.0 —que era lo correcto para aislar el cambio del paquete— es también lo que mantiene
+esa fila omitida.
+
+**Lo que esto deja escrito, para que nadie lo persiga como si fuera del paquete**: la omisión que
+queda es un cambio de comportamiento entre versiones de ffmpeg, no una pieza que falte. Las salidas
+son tres y ninguna se toma aquí: subir la versión fijada y volver a medir, cambiar la receta para que
+el metadato sobreviva a 9.0.0, o aceptar la omisión con este número al lado.
+
+**Y la lección de método es la de siempre en esta casa**: la evidencia de arriba se escribió
+prediciendo cinco antes de que el servidor contestara. El servidor contestó cuatro. Lo que vale es el
+número que volvió, no el que se esperaba.
 ---
 
 ## English
@@ -160,3 +188,31 @@ start failing for want of a codec.
 `Install ffmpeg` by its literal to treat it as scaffolding rather than announce it on every run.
 Renaming it would have turned the watcher into something that always sounds, which is what teaches
 people to ignore it.
+
+### The correction: it was four of five, and the fifth was never the package
+
+The run of `c30e7d6` — the first with `ffmpeg-full` — gave **154 of 155 with one skipped**, not 155
+of 155. Four of the five came back; the HDR one still skips, with the same literal reason.
+
+**The cause was different all along, and the measurement says so without ambiguity.**
+`mkv-hevc-hdr10`'s recipe asks for `libx265`, which **the reduced package carries too**: that row
+never skipped for a missing encoder. What fails is that the muxer does not write the transfer curve
+the recipe asks for, and that **depends on the version rather than the build**:
+
+| ffmpeg | Where | `color_transfer` it writes |
+| --- | --- | --- |
+| 2024-06-21, full build | the owner's machine | **`smpte2084`** |
+| 9.0.0, full build | the runner, this run | **absent** |
+
+Generated here with the same recipe cut to one second and read with `ffprobe`. So pinning the version
+at 9.0.0 — which was the right thing to do to isolate the package change — is also what keeps that
+row skipped.
+
+**What this writes down, so nobody chases it as a package problem**: the remaining skip is a
+behaviour change between ffmpeg versions, not a missing piece. There are three ways out and none is
+taken here: raise the pinned version and measure again, change the recipe so the metadata survives
+9.0.0, or accept the skip with this number beside it.
+
+**And the method lesson is this house's usual one**: the evidence above was written predicting five
+before the server answered. The server answered four. What counts is the number that came back, not
+the one that was expected.

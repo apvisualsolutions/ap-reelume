@@ -67,20 +67,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
   porque dentro caben un encabezado, el nombre del archivo, una explicación, su acción y dos botones
   más.
 
-- **Cinco comprobaciones de vídeo que llevaban meses sin ejecutarse en el servidor vuelven a
+- **Cuatro comprobaciones de vídeo que llevaban meses sin ejecutarse en el servidor vuelven a
   ejecutarse.** El servidor instalaba una versión recortada del programa que fabrica los vídeos de
   prueba, y le faltaban dos formatos. Sin ellos, dos de esas muestras no se podían crear y las
   comprobaciones que las usan **se saltaban solas, sin poner nada en rojo**: una omisión con su
-  motivo escrito no es un fallo, así que todo seguía verde mientras cinco promesas del programa no
+  motivo escrito no es un fallo, así que todo seguía verde mientras cuatro promesas del programa no
   se comprobaban. Se descubrió midiendo otra cosa, no por un aviso.
 
-  **La quinta no era por un formato ausente**, y confundirla habría hecho perseguir el defecto
-  equivocado: esa versión recortada sí fabrica el vídeo de alto rango dinámico, pero lo escribe sin
-  los datos que dicen que lo es, así que no quedaba nada que reconocer.
-
   Ahora se instala la versión completa. **Es la misma versión del mismo programa**, sólo que con
-  todas sus piezas, así que nada de lo que hoy funciona puede empezar a fallar. Y en el ordenador
-  del propietario, que ya la tenía, esas comprobaciones pasan las 155 sin saltarse ninguna.
+  todas sus piezas, así que nada de lo que hoy funciona puede empezar a fallar. El servidor pasó de
+  150 comprobaciones de vídeo a 154, de 155.
+
+  **Y hay una quinta que sigue sin ejecutarse, por un motivo distinto que conviene no confundir.**
+  Parecía del mismo problema y no lo era: el vídeo de alto rango dinámico se fabrica con una pieza
+  que ya estaba en la versión recortada. Lo que ocurre es que **la versión del programa que usa el
+  servidor lo escribe sin los datos que dicen que es de alto rango**, mientras que la del ordenador
+  del propietario —más antigua— sí los escribe. Está medido con las dos y anotado, para que nadie lo
+  persiga como si faltara algo que instalar.
 
 
 - **La comprobación en máquinas ARM ya no depende de comprar una.** El programa se compila y se
