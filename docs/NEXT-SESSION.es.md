@@ -74,6 +74,32 @@
 >   hace cumplir, que es lo que no caduca. Y **la razón del chip rojo estaba tres estilos por encima
 >   de él**, con el bloque de avisos en medio.
 >
+> ### La decisión que cambia el criterio de toda la comparación
+>
+> **Paridad pasa a significar «no peor que el prototipo», no «idéntico».** Decidido por el
+> propietario el 2026-09-05 con la lista de la comparación delante, y escrito como **enmienda fechada
+> en [ADR-0007](adr/0007-every-element-matches-the-prototype.md)**, que es donde vivía la regla
+> anterior.
+>
+> **Lo que NO cambia, y sostiene el ADR entero**: la forma de lo que los dos dibujan sigue siendo
+> **idéntica**. Un radio, un tamaño de letra o un color de lo compartido no se negocia, y todas las
+> puertas siguen exigiéndolo. Esto toca **qué elementos existen**, no **cómo se dibujan los que
+> existen**.
+>
+> **El criterio, tal cual, para el resto de la comparación:**
+>
+> | Lo que se ve | Veredicto |
+> |---|---|
+> | Los dos lo dibujan, de forma distinta | **Defecto** salvo cesión escrita |
+> | El prototipo lo dibuja y la aplicación no | **Defecto** |
+> | La aplicación lo dibuja y el prototipo no, sin coste medible | **NO es hallazgo** |
+> | La aplicación lo dibuja y el prototipo no, con coste medible | **Defecto**, y el coste se escribe |
+>
+> **Por qué se preguntó**: la aplicación resultó ir **por delante** en cuatro sitios —atajos
+> cambiables, editor de estilo de subtítulos con previsualización, tres acciones en el editor de
+> metadatos, y el aviso de dependencia de la bandeja—. Con la regla anterior los cuatro eran
+> desviaciones a justificar una a una, y cada comparación los volvía a levantar.
+>
 > ### Decisión tomada y NO ejecutada
 >
 > · **La contradicción sobre la duración de un run se cierra invirtiendo la puerta, en tanda propia.**

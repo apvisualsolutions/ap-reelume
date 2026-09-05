@@ -74,6 +74,32 @@
 >   enforces, which is what does not rot. And **the red chip's reason sat three styles above it**,
 >   with the notices block in between.
 >
+> ### The decision that changes the whole comparison's criterion
+>
+> **Parity now means "no worse than the prototype", not "identical".** Decided by the owner on
+> 2026-09-05 with the comparison's list in hand, and written as a **dated amendment to
+> [ADR-0007](adr/0007-every-element-matches-the-prototype.md)**, which is where the previous rule
+> lived.
+>
+> **What does NOT change, and holds the whole ADR up**: the form of what both draw stays
+> **identical**. A radius, a font size or a colour of what is shared is not negotiable, and every
+> gate still demands it. This touches **which elements exist**, not **how the existing ones are
+> drawn**.
+>
+> **The criterion, as it stands, for the rest of the comparison:**
+>
+> | What is seen | Verdict |
+> |---|---|
+> | Both draw it, differently | **Defect** unless a written concession |
+> | The prototype draws it and the application does not | **Defect** |
+> | The application draws it and the prototype does not, at no measurable cost | **Not a finding** |
+> | The application draws it and the prototype does not, at a measurable cost | **Defect**, and the cost is written |
+>
+> **Why it was asked**: the application turned out to be **ahead** in four places — changeable
+> shortcuts, a subtitle style editor with a preview, three actions in the metadata editor, and the
+> tray's own dependency notice. Under the previous rule all four were deviations to justify one by
+> one, and every comparison raised them again.
+>
 > ### Decision taken and NOT executed
 >
 > · **The contradiction about a run's duration is closed by inverting the gate, in its own stretch.**

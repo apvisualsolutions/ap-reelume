@@ -181,6 +181,55 @@ dibuja en versalita y el árbol dibuja plano **es invisible para él**. Nada mid
 lleva a mano en la lista cerrada, y una entrada es el único registro de que alguien miró — que es
 exactamente la situación en la que este ADR encontró diez clases de botón.
 
+### La enmienda del 2026-09-05: paridad es «no peor que el prototipo», no «idéntico»
+
+**Esta decisión nunca contestó qué pasa cuando la aplicación tiene ALGO MÁS**, y la comparación
+pantalla a pantalla lo convirtió en la pregunta más frecuente. Todo lo escrito arriba trata
+discrepancias de **forma** —un radio, una versalita, un tamaño— donde los dos dibujan lo mismo de
+manera distinta. Nada decía qué hacer con una pantalla que dibuja algo que el prototipo no dibuja.
+
+Preguntado el 2026-09-05 con la lista delante, el propietario contestó: **«no peor que el
+prototipo»**.
+
+**Lo que eso cambia.** Un elemento que la aplicación tiene y el prototipo no **deja de ser una
+desviación que justificar una a una**. Hasta hoy lo era, y se pagaba caro: cada comparación volvía a
+levantar los mismos añadidos —el botón de detener, el panel «Otras versiones», las iniciales sobre la
+carátula— y cada uno necesitaba su párrafo. Eran ya **añadidos deliberados** por decisión del
+propietario del 2026-08-25; esta enmienda generaliza aquel precedente en vez de repetirlo.
+
+**Lo que NO cambia, y es la mitad que sostiene el ADR entero.** La forma de lo que los dos dibujan
+sigue siendo **idéntica**: un radio, un tamaño de letra o un color de lo compartido no es negociable
+por «es que así queda mejor», y todas las puertas de arriba siguen exigiéndolo. La gramática
+inventada sigue prohibida. Esta enmienda toca **qué elementos existen**, no **cómo se dibujan los
+que existen**.
+
+**Y «no peor» tiene un lado que sigue siendo defecto**, o la regla no serviría para nada:
+
+1. **Menos que el prototipo es un defecto.** Una promesa que el diseño dibuja y la aplicación no
+   cumple no se cierra apelando a esta enmienda. Es el caso de los dieciocho hallazgos de
+   [lo construido que ninguna pantalla enseña](../evidence/stable/audit-built-and-not-drawn.md).
+2. **Un añadido que empeora algo medible es un defecto.** Si cuesta accesibilidad, contraste,
+   rendimiento o una regla de este árbol, «lo tiene de más» no lo salva — lo condena.
+3. **Un añadido sigue necesitando su razón escrita junto al control**, exactamente como una
+   discrepancia por accesibilidad medida. Lo que se retira es la obligación de **justificar su
+   existencia** ante el diseño; no la de decir qué hace y por qué.
+
+**El criterio operativo para comparar**, que es para lo que se escribe esta enmienda:
+
+| Lo que se ve | Veredicto |
+|---|---|
+| Los dos lo dibujan, de forma distinta | **Defecto** salvo cesión escrita |
+| El prototipo lo dibuja y la aplicación no | **Defecto** |
+| La aplicación lo dibuja y el prototipo no, sin coste medible | **No es hallazgo** — se anota y sigue |
+| La aplicación lo dibuja y el prototipo no, con coste medible | **Defecto**, y el coste se escribe |
+
+**Qué la motivó, con nombres.** En la comparación del 2026-09-05 la aplicación resultó ir **por
+delante** del prototipo en cuatro sitios: sus atajos se pueden cambiar y el prototipo los dibuja
+fijos; los subtítulos tienen un editor de estilo completo con previsualización donde el prototipo
+pone cuatro ajustes; el editor de metadatos ofrece tres acciones donde el prototipo una; y la bandeja
+avisa de su propia dependencia, cosa que el prototipo no hace. Con la regla anterior, los cuatro eran
+desviaciones a justificar. Con ésta, son lo que son.
+
 ---
 
 ## English
@@ -347,3 +396,50 @@ places **the tree** draws capitals, so a place the design draws in capitals and 
 **is invisible to it**. Nothing measures that direction. It is kept by hand in the closed list, and
 an entry is the only record that somebody looked — which is exactly the situation this ADR found ten
 button classes in.
+
+### The 2026-09-05 amendment: parity is "no worse than the prototype", not "identical"
+
+**This decision never answered what happens when the application has SOMETHING MORE**, and the
+screen-by-screen comparison turned that into the most frequent question. Everything written above
+deals with differences of **form** — a radius, an overline, a size — where both draw the same thing
+differently. Nothing said what to do with a screen that draws something the prototype does not.
+
+Asked on 2026-09-05 with the list in hand, the owner answered: **"no worse than the prototype"**.
+
+**What that changes.** An element the application has and the prototype does not **stops being a
+deviation to justify one by one**. Until today it was, and it cost: every comparison raised the same
+additions again — the stop button, the "Other versions" panel, the initials over the artwork — and
+each needed its paragraph. They were already **deliberate additions** by the owner's decision of
+2026-08-25; this amendment generalises that precedent rather than repeating it.
+
+**What does NOT change, and it is the half that holds the whole ADR up.** The form of what both draw
+stays **identical**: a radius, a font size or a colour of what is shared is not negotiable on "it
+looks better that way", and every gate above still demands it. Invented grammar stays forbidden.
+This amendment touches **which elements exist**, not **how the existing ones are drawn**.
+
+**And "no worse" has a side that is still a defect**, or the rule would be useless:
+
+1. **Less than the prototype is a defect.** A promise the design draws and the application does not
+   keep is not closed by appealing to this amendment. That is the case of the eighteen findings in
+   [what is built and no screen shows](../evidence/stable/audit-built-and-not-drawn.md).
+2. **An addition that makes something measurable worse is a defect.** If it costs accessibility,
+   contrast, performance or a rule of this tree, "it has more" does not save it — it condemns it.
+3. **An addition still needs its reason written beside the control**, exactly like a difference by
+   measured accessibility. What is withdrawn is the duty to **justify its existence** against the
+   design; not the duty to say what it does and why.
+
+**The operating rule for comparing**, which is what this amendment is written for:
+
+| What is seen | Verdict |
+|---|---|
+| Both draw it, differently | **Defect** unless a written concession |
+| The prototype draws it and the application does not | **Defect** |
+| The application draws it and the prototype does not, at no measurable cost | **Not a finding** — note it and move on |
+| The application draws it and the prototype does not, at a measurable cost | **Defect**, and the cost is written |
+
+**What motivated it, with names.** In the 2026-09-05 comparison the application turned out to be
+**ahead** of the prototype in four places: its shortcuts can be changed while the prototype draws
+them fixed; subtitles have a full style editor with a preview where the prototype puts four settings;
+the metadata editor offers three actions where the prototype offers one; and the tray warns about its
+own dependency, which the prototype does not. Under the previous rule all four were deviations to
+justify. Under this one, they are what they are.

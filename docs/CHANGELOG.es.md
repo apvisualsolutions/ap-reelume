@@ -189,6 +189,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **«Parecerse al prototipo» pasa a significar «no ser peor que el prototipo».** Hasta hoy la regla
+  era ser idéntico, y eso convertía en problema cada sitio donde el programa **hace más** de lo que
+  el boceto dibujaba: los atajos de teclado, que aquí se pueden cambiar y allí están fijos; el
+  editor de subtítulos, que aquí enseña cómo van a verse; el aviso que te explica que una opción
+  depende de otra.
+
+  **Lo que no cambia es la mitad que importa**: lo que los dos dibujan se sigue dibujando igual, al
+  píxel. Un color, un tamaño de letra o la forma de un botón no se negocian. Lo que cambia es que
+  tener algo de más deja de ser una desviación que justificar, y **quedarse corto sigue siendo un
+  defecto**: una cosa que el diseño promete y el programa no cumple no se arregla apelando a esto.
+
+  Y hay un límite escrito: un añadido que empeore algo medible —lo que se lee, lo que se oye, lo que
+  tarda— sigue siendo un defecto, y entonces se escribe cuánto cuesta.
+
 - **Queda escrito de dónde sale una portada y en qué orden manda cada una.** La que eliges tú gana;
   si no hay, la que trae el proveedor; y si tampoco, una imagen sacada del propio vídeo — ahora
   también para películas y series, no sólo para cursos. El orden se cambia de una vez para toda la

@@ -188,6 +188,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **"Looking like the prototype" now means "being no worse than the prototype".** Until today the
+  rule was to be identical, and that turned every place where the program **does more** than the
+  sketch drew into a problem: the keyboard shortcuts, which can be changed here and are fixed there;
+  the subtitle editor, which here shows you how they will look; the notice telling you one option
+  depends on another.
+
+  **What does not change is the half that matters**: what both draw is still drawn the same, to the
+  pixel. A colour, a font size or the shape of a button are not negotiable. What changes is that
+  having something extra stops being a deviation to justify, and **falling short is still a
+  defect**: something the design promises and the program does not deliver is not fixed by appealing
+  to this.
+
+  And there is a written limit: an addition that makes something measurable worse — what can be
+  read, what can be heard, how long it takes — is still a defect, and then the cost is written down.
+
 - **Where a cover comes from, and which one wins, is now written down.** The one you choose wins;
   failing that, the one the provider brings; failing that, a picture taken from the video itself —
   now for films and shows too, not only for courses. The order is changed once for the whole library,
