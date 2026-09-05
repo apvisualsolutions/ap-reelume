@@ -1,5 +1,94 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-05, noche: dos cosas que sólo se ven mirando píxeles
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
+> `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
+> escribiría ya lo habría cambiado.
+>
+> ### El defecto más caro de la sesión, y costó NUEVE mediciones
+>
+> **Montar la franja de avisos llevó una escena del recorrido de 4 segundos a agotar su espera a los
+> 63**: catalogaba las dos copias del vigilante y no las agrupaba nunca. Se descartaron por este
+> orden el oyente del aviso, la publicación del estado, el coordinador de escaneo, el cableado del
+> arranque, la lista de avisos y el punto pulsante — **todos seguían fallando**. Quitar la vista
+> entera hacía pasar, y dentro de ella el culpable era **el enlace de la orden al botón de cancelar**.
+>
+> **No era una excepción: era saturación.** El escaneo publica su progreso una vez por lote y ese
+> código corre en el hilo del escaneo. Anunciar «puede que ahora se pueda pulsar» en cada uno ponía a
+> la interfaz a recalcular el estado de un botón cientos de veces por segundo, y el catálogo esperaba
+> detrás de la avalancha.
+>
+> **La lección, nueva en esta casa**: un modelo suscrito a un bus corre en el hilo de quien publica, y
+> hasta ahora eso sólo movía texto. Una orden enlazada a un botón es otra cosa. **Un aviso
+> incondicional dentro de un bucle de progreso es un cuello de botella, no un detalle de estilo.**
+>
+> ### La pantalla de Cursos era ilegible, y apareció fotografiando
+>
+> **«Cursos» y «Tu biblioteca, en tu PC» se dibujaban uno encima del otro**, en la misma línea, con
+> las dos descripciones también superpuestas. La tarjeta de bienvenida se retira mirando una lista de
+> superficies y **Cursos no estaba en ella**.
+>
+> **Ninguna puerta podía verlo**, y eso importa más que el defecto: las de desborde montan **cada
+> vista por separado** —que es justo lo que las hace ver todas las ramas a la vez—, así que dos
+> superficies dibujadas una sobre otra es exactamente lo que no pueden mirar. Y sí había una prueba,
+> escrita para **una** ruta y nunca generalizada. Ahora es una **tabla cerrada sobre el enumerado**.
+>
+> **Salió de la primera pareja de capturas que nadie había mirado nunca.** La comparación anterior
+> cubrió ocho pantallas y Cursos no estaba entre ellas.
+>
+> ### La trampa del arnés, que casi hace perseguir un fantasma
+>
+> **`shoot.ps1` apunta al binario de DEBUG por defecto, y el ciclo compila en Release.** Con el
+> arreglo puesto, la captura **seguía saliendo rota**: estaba fotografiando código viejo. Se cerró
+> midiendo en las dos direcciones con `-Exe` apuntando a Release. Es la misma trampa que `--no-build`
+> sin haber compilado, un piso más arriba.
+>
+> ### Un rojo de CI que NO era del código, cerrado sin tocar nada
+>
+> Una prueba de la rejilla dio **«0 tarjetas vivas»** en el servidor con un commit que aquí pasa
+> **tres veces seguidas**. Cero no es «demasiadas»: es que la pantalla no llegó a montarse. Se
+> relanzó el trabajo y **el mismo commit pasó entero**. Un cero o un vacío obliga a comprobar el
+> aparato antes que el código.
+>
+> ### Lo que se cerró
+>
+> · **La lista de carpetas de Ajustes decía «Disponible» siempre.** Tres estados ahora —disponible,
+>   desconectada y **sin permiso**—, y la lista se relee también al entrar en Ajustes, que era un
+>   segundo fallo detrás del primero. La columna existía en la base desde el principio y **sólo se
+>   escribía al crear la carpeta**.
+> · **La franja de avisos de la Biblioteca**: cancelar el escaneo, decir que terminó, y avisar de una
+>   carpeta que no se puede leer. Y **un escaneo que arranca solo ya se ve**, con marca discreta
+>   frente a franja completa, que es el quinto punto del ADR-0010.
+> · **El trinquete de esquinas escritas a mano bajó de 80 a 79** mientras se AÑADÍA un distintivo: el
+>   prototipo dibuja los tres estados de carpeta con el mismo elemento, que ya estaba emparejado.
+>
+> ### Lo que queda listo para la siguiente
+>
+> **Los treinta estados del prototipo ya son fotografiables, y antes no lo eran.** Cada uno es una
+> casilla de opción sin nombre accesible, y el ayudante sólo sabía pulsar botones: `?press=Cargando`
+> **no seleccionaba nada y no lo decía**. Ahora hay `?scn=N` —por número, que no depende de acentos—
+> y el ayudante **avisa en la propia imagen** cuando no encuentra lo que le piden. La copia de trabajo
+> estaba **once días atrasada** y le faltaba un estado entero; ya está al día, con los treinta
+> capturados.
+>
+> **Y comparar a ojo produce hallazgos falsos.** Lo que más salta al poner las dos bibliotecas juntas
+> es que la aplicación dibuja **iniciales** donde el prototipo deja un anillo. No es un defecto: el
+> propio código lo dice y la §4 pide iniciales y **nunca un hueco**. Cada diferencia se cruza con las
+> cesiones escritas antes de llamarla defecto.
+>
+> ### Lo que se decidió dejar fuera, y por qué se dice
+>
+> El prototipo pone un botón **«Permisos»** en el aviso de acceso denegado, que abre los ajustes de
+> Windows. Eso es arrancar un proceso del sistema, vive en otra capa y tiene sus propias reglas: es
+> alcance nuevo y necesita una decisión antes que código.
+>
+> ### Lo que no se resuelve programando
+>
+> · **`PRD-002` pide el certificado comercial de firma.** Es el único bloqueo del MVP.
+> · **Los cinco iconos de instalación son marcadores**, esperando el logotipo vectorial.
+> · **La notificación de exportación sigue sin enviarse**, con el texto ya redactado.
+
 > ## AVISO AL FRENTE — 2026-09-05, tarde: la guardia se escribe antes que la limpieza
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y

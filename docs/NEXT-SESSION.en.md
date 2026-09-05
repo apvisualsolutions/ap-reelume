@@ -1,5 +1,94 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-05, evening: two things only pixels show
+>
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
+> `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it
+> would already have changed it.
+>
+> ### The session's costliest defect, and it took NINE measurements
+>
+> **Mounting the notices strip took one walk scene from 4 seconds to timing out at 63**: it
+> catalogued the watcher's two copies and never grouped them. Ruled out in this order: the notice
+> listener, publishing the root's availability, the scan coordinator's changes, the startup wiring,
+> the notices list and the pulsing dot — **all still failing**. Removing the whole view made it pass,
+> and inside it the culprit was **the cancel button's Command binding**.
+>
+> **Not an exception: saturation.** A scan publishes progress once per batch and that code runs on the
+> scanning thread. Announcing «this may be pressable now» on every one of them put a button's
+> enabled-state recalculation on the interface thread hundreds of times a second, and the catalogue
+> waited behind the flood.
+>
+> **The lesson, new in this house**: a view model subscribed to a bus runs on the publisher's thread,
+> and until now that only moved text. A command bound to a button is another matter. **An
+> unconditional announcement inside a progress loop is a bottleneck, not a matter of style.**
+>
+> ### The Courses screen was unreadable, and photography found it
+>
+> **«Cursos» and «Tu biblioteca, en tu PC» were drawn over each other**, on the same line, with both
+> descriptions overlapping too. The welcome card stands down by consulting a list of surfaces and
+> **Courses was not in it**.
+>
+> **No gate could have seen it**, and that matters more than the defect: the overflow gates mount
+> **each view on its own** — the very thing that makes them see every branch at once — so two surfaces
+> drawn over one another is precisely what they cannot look at. A test did exist, written for **one**
+> route and never generalised. It is now a **closed table over the enum**.
+>
+> **It came out of the first pair of captures nobody had ever looked at.** The earlier comparison
+> covered eight screens and Courses was not among them.
+>
+> ### The harness trap, which nearly meant chasing a ghost
+>
+> **`shoot.ps1` points at the DEBUG binary by default, and the cycle builds Release.** With the fix in
+> place the capture **still came out broken**: it was photographing old code. Settled by measuring
+> both ways with `-Exe` pointed at Release. Same trap as `--no-build` without having built, one floor
+> up.
+>
+> ### A CI red that was NOT the code, closed without touching anything
+>
+> A grid test reported **«0 cards alive»** on the runner for a commit that passes **three times in a
+> row** here. Zero is not «too many»: it is the screen never mounting. The job was re-run and **the
+> same commit passed in full**. A zero or an empty is what most demands checking the apparatus before
+> the code.
+>
+> ### What was closed
+>
+> · **The settings folder list said «Available» always.** Three states now — available, disconnected
+>   and **refused** — and the list is re-read on entering Settings too, which was a second fault
+>   behind the first. The column has been in the database from the start and was **only written when
+>   the folder was created**.
+> · **The Library's notices strip**: cancel a scan, say it finished, and announce a folder that cannot
+>   be read. And **a scan that starts on its own is now visible**, as a discreet mark rather than the
+>   full strip, which is ADR-0010's fifth point.
+> · **The hand-written corners ratchet fell 80 to 79** while a chip was being ADDED: the prototype
+>   draws all three root states with the same element, already paired.
+>
+> ### What is ready for the next session
+>
+> **The prototype's thirty states can be photographed now, and could not before.** Each is a radio
+> with no accessible name, and the helper only knew how to press buttons: `?press=Cargando`
+> **selected nothing and did not say so**. There is now `?scn=N` — by number, which no accent breaks —
+> and the helper **says so in the image itself** when it cannot find what it was asked for. The
+> working copy was **eleven days stale** and missing a whole state; it is current, with all thirty
+> captured.
+>
+> **And comparing by eye produces false findings.** What stands out most with the two libraries side
+> by side is that the application draws **initials** where the prototype leaves a ring. It is not a
+> defect: the code says so and §4 asks for initials and **never a hole**. Every difference is checked
+> against the written concessions before it is called a defect.
+>
+> ### What was deliberately left out, and why it is said
+>
+> The prototype puts a **«Permissions»** button on the access-denied notice, opening Windows' settings
+> for that share. That is starting a system process, it lives in another layer and has rules of its
+> own: new scope, needing a decision before code.
+>
+> ### What programming does not solve
+>
+> · **`PRD-002` needs the commercial signing certificate.** It is the MVP's only block.
+> · **The five install icons are placeholders**, waiting for the vector logo.
+> · **The export notification is still unsent**, with its text already written.
+
 > ## READ THIS FIRST — 2026-09-05, later: the guard is written before the cleanup
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
