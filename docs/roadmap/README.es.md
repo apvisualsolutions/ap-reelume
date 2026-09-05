@@ -73,16 +73,37 @@ con la galería que el prototipo ya dibuja. Cierra un defecto medido: hoy un sol
 cosas, y refrescar contra el proveedor deja la portada de alguien huérfana dentro de cada copia de
 seguridad.
 
-**Y hay quince cosas construidas que ninguna pantalla enseña**, de las dieciocho que encontró
-[la auditoría del 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). Las tres cerradas
-fueron las portadas en la rejilla, la biblioteca que se cortaba en cincuenta títulos, y la ficha de
-la cuenta atrás que prometía ser configurable sin serlo. Las quince restantes van en tres grupos: lo
-que sólo falta enseñar, lo que el diseño tiene y la aplicación no, y la limpieza de lo que sobra.
+**Y quedan trece cosas construidas que ninguna pantalla enseña**, de las dieciocho que encontró
+[la auditoría del 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). Las cinco cerradas
+son las portadas en la rejilla, la biblioteca que se cortaba en cincuenta títulos, la ficha de la
+cuenta atrás que prometía ser configurable sin serlo —**cerrada de verdad el 2026-09-05**, con la
+sección «Reproducción» de Ajustes—, los tres nombres del mini reproductor, y las cadenas huérfanas,
+que además ganaron [una puerta](../evidence/stable/audit-orphaned-strings.md) para que no vuelvan.
+Las trece restantes van en dos grupos: lo que sólo falta enseñar, y lo que el diseño tiene y la
+aplicación no.
 
 **La paridad visual se vuelve a pasar.** `PRD-006` está `VERIFIED` sobre «las 53 vistas» y el árbol
 tiene 60; y de esas 53 sólo se fotografiaron **ocho pantallas** junto al prototipo. Además las fichas
 por vista contra las que se compararía llegaron seis días después de darla por buena. Baja a
 `IMPLEMENTED` y sube cuando cubra las sesenta.
+
+**Un aviso que describe un estado ocupa sitio; uno que narra un suceso flota**, y está escrito en
+[ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). Se decidió porque nadie lo había
+decidido nunca: ni la franja de avisos ni el mensaje efímero estaban en el inventario de controles ni
+en su lista de exclusiones, así que la misma pregunta podía contestarse de dos maneras. **Los avisos
+del prototipo NO estaban rotos** —empujan 77 px a propósito—, y coincide con Microsoft, Material y
+Carbon, y con lo que esta aplicación ya decidió en agosto para la banda de archivo suelto. De ahí
+salen dos decisiones del propietario: **el aviso de disco desconectado va sólo en la Biblioteca**, no
+persiguiendo por toda la aplicación; y **el escaneo se dibuja de dos maneras** — franja completa
+cuando lo lanza una persona, marca discreta cuando arranca solo al abrir.
+
+**Deshacer una decisión en la bandeja de revisión se aplaza, con su medición escrita.** Parecía
+«añadir un botón» y no lo es: hoy hay **tres cerrojos** —el almacén rechaza devolver una ficha a
+pendiente, la fila queda con el candado puesto, y no se guarda el estado anterior— y, además,
+aceptar ya reescribió los metadatos del título sin copia de lo que había. El prototipo promete por
+escrito «puedes cambiarla después», así que la promesa queda registrada y la decisión se toma con
+ese número delante, no antes.
+
 
 ## Las tres versiones
 

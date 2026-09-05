@@ -71,16 +71,37 @@ for courses. The order is changed in a general setting and can be overridden on 
 gallery the prototype already draws. It closes a measured defect: today one field holds two things,
 and a provider refresh leaves somebody's cover orphaned inside every backup.
 
-**And fifteen things are built that no screen shows**, out of the eighteen found by
-[the audit of 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). The three closed were the
-covers in the grid, the library that stopped at fifty titles, and the countdown row that promised to
-be configurable without being so. The remaining fifteen come in three groups: what only needs
-showing, what the design has and the application does not, and clearing away what is left over.
+**And thirteen things remain built that no screen shows**, out of the eighteen found by
+[the audit of 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). The five closed are the
+covers in the grid, the library that stopped at fifty titles, the countdown row that promised to be
+configurable without being so — **actually closed on 2026-09-05**, with Settings' «Playback» section
+— the mini player's three names, and the orphaned strings, which also gained
+[a gate](../evidence/stable/audit-orphaned-strings.md) so they cannot come back. The remaining
+thirteen come in two groups: what only needs showing, and what the design has and the application
+does not.
 
 **Visual parity gets another pass.** `PRD-006` is `VERIFIED` over «the 53 views» and the tree has 60;
 and of those 53 only **eight screens** were photographed beside the prototype. On top of that, the
 per-view files it would be compared against arrived six days after it was called done. It drops to
 `IMPLEMENTED` and rises when it covers all sixty.
+
+**A notice describing a state takes space; one narrating an event floats**, and it is written in
+[ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). It was decided because nobody
+ever had: neither the notices strip nor the transient message was in the controls inventory or in its
+exclusion list, so the same question could be answered two ways. **The prototype's notices were NOT
+broken** — they push 77 px on purpose — and this matches Microsoft, Material and Carbon, and what
+this application already decided in August for the loose-file band. Two owner decisions follow from
+it: **the disconnected-disk notice goes in the Library only**, not following you around the
+application; and **the scan is drawn two ways** — the full strip when a person launches it, a quiet
+marker when it starts on its own at opening.
+
+**Undoing a decision in the review inbox is deferred, with its measurement written down.** It looked
+like «adding a button» and is not: today there are **three locks** — the store refuses to return an
+entry to pending, the row keeps its decision locked, and no previous state is stored — and,
+moreover, accepting has already rewritten the title's metadata with no copy of what was there. The
+prototype promises in writing «you can change it later», so the promise is on record and the decision
+is taken with that number in front of it, not before.
+
 
 ## The three releases
 

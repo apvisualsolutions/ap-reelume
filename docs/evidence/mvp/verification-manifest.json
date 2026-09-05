@@ -142,6 +142,7 @@
         "ApSolutions.LocalMedia.UiTests"
       ],
       "evidence": [
+        "docs/adr/0010-a-state-takes-space-and-an-event-floats.md",
         "docs/evidence/mvp/C2-library-gate.md",
         "docs/evidence/mvp/T10-10k-performance.md",
         "docs/evidence/mvp/T39-recovery-load.md",
