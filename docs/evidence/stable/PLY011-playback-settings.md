@@ -56,11 +56,11 @@ estado en vez de vivir cada una por su lado.
 
 | Puerta | Resultado |
 | --- | --- |
-| `UiTests` completa | **1.215 de 1.215**, cero omitidas |
-| `PlaybackSettingsTests` | **13 de 13** |
+| `UiTests` completa | **1.233 de 1.233**, cero omitidas |
+| `PlaybackSettingsTests` | **16 de 16**, y el ViewModel a **100/100** |
 | Escena del paseo con ratón real | pasa en 13 s |
 | Trinquete del paseo | **223 pulsados, 23 pendientes** — se mantiene |
-| Suelos de cobertura | ningún suelo se mueve, ningún archivo nuevo se queda corto |
+| Suelos de cobertura | el ViewModel a 100/100; la vista a la lista, trinquete 188 → 189 |
 
 **Los dos controles se pulsan con un ratón de verdad** en la escena de preferencias, y la aserción
 no lee el control ni el modelo de la vista: lee **la misma fachada que el reproductor consulta al
@@ -78,6 +78,30 @@ su medición:
   sesión.
 - **Preferir reproductor externo.** Es alcance entero: el lanzador externo existe sólo como
   recuperación tras un fallo, y no hay preferencia ni bifurcación al abrir una sesión.
+
+### El segundo rojo, y por qué la previsualización de suelos no lo vio
+
+El run de `9a2aae6` arregló las dos pruebas de arquitectura y salió rojo por otra puerta: **la de
+cobertura**, con los dos archivos nuevos de la sección.
+
+| Archivo | Medido | Qué se hizo |
+| --- | --- | --- |
+| `PlaybackSettingsView.axaml` | **100/50** | a la lista de deuda, trinquete **188 → 189** |
+| `PlaybackSettingsViewModel.cs` | **90/95** | **cubierto hasta 100/100** |
+
+**Los dos casos son distintos y confundirlos habría sido el error.** La mitad de ramas de un `.axaml`
+es **la única rama que el compilador de Avalonia genera** para él, en la línea del elemento raíz:
+las sesenta vistas del árbol miden exactamente eso, así que no es deuda y una vista nueva sube el
+trinquete en uno. La propia puerta lo autoriza por escrito. El ViewModel **sí podía mejorar**, y la
+regla dice que un archivo entra en la lista sólo cuando no puede: el JSON de coverlet nombró las
+cuatro líneas y las dos ramas —los dos topes del deslizador, leer la duración con la cuenta atrás
+apagada, y escribirla en ese mismo estado—, y tres pruebas lo llevaron a **100/100**.
+
+**Y la previsualización de suelos se corrió, con cuatro suites, y dijo que ningún archivo nuevo se
+quedaba corto.** Su límite está escrito dentro y aquí se cobró: **sólo mide lo que le nombras**, y
+lo que faltaba no era una suite sino el momento — se corrió con la sección ya escrita pero antes de
+que la vista existiera como archivo compilado que el informe pudiera medir. **Su silencio no es un
+certificado**, que es exactamente lo que su propia cabecera advierte.
 
 ---
 
@@ -125,11 +149,11 @@ state rather than living apart.
 
 | Gate | Result |
 | --- | --- |
-| Full `UiTests` | **1,215 of 1,215**, zero skipped |
-| `PlaybackSettingsTests` | **13 of 13** |
+| Full `UiTests` | **1,233 of 1,233**, zero skipped |
+| `PlaybackSettingsTests` | **16 of 16**, and the view model at **100/100** |
 | Walk scene with a real mouse | passes in 13 s |
 | Walk ratchet | **223 pressed, 23 pending** — unchanged |
-| Coverage floors | no floor moves, no new file falls short |
+| Coverage floors | the view model at 100/100; the view onto the list, ratchet 188 → 189 |
 
 **Both controls are pressed with a real mouse** in the preferences scene, and the assertion reads
 neither the control nor the view model beside it: it reads **the same facade the player consults when
@@ -146,3 +170,27 @@ measurement:
   key, because today the seconds live in an in-memory field that dies with the session.
 - **Prefer external player.** Whole scope: the external launcher exists only as recovery after a
   failure, and there is neither a preference nor a branch when a session opens.
+
+### The second red, and why the coverage-floor preview did not see it
+
+The run of `9a2aae6` fixed both architecture tests and came back red on another gate: **coverage**,
+with the section's two new files.
+
+| File | Measured | What was done |
+| --- | --- | --- |
+| `PlaybackSettingsView.axaml` | **100/50** | onto the debt list, ratchet **188 → 189** |
+| `PlaybackSettingsViewModel.cs` | **90/95** | **covered up to 100/100** |
+
+**The two cases are different, and confusing them would have been the mistake.** An `.axaml`'s half
+of branches is **the only branch Avalonia's compiler generates** for it, on the root element's line:
+all sixty views in the tree measure exactly that, so it is not debt and a new view raises the ratchet
+by one. The gate authorises that in writing. The ViewModel **could** improve, and the rule is that a
+file enters the list only when it cannot: coverlet's JSON named the four lines and two branches — the
+slider's two bounds, reading the length while the countdown is off, and writing it in that same state
+— and three tests took it to **100/100**.
+
+**And the floor preview was run, with four suites, and said no new file fell short.** Its limit is
+written inside it and was collected here: **it only measures what you name**, and what was missing
+was not a suite but the moment — it ran with the section written but before the view existed as a
+compiled artifact its report could measure. **Its silence is not a certificate**, which is exactly
+what its own header warns.

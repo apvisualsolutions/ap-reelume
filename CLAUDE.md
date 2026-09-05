@@ -293,7 +293,7 @@ preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecha
 **entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
 contesta `[]`.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **188** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **189** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -319,11 +319,18 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **188** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **189** <!--medido:trinquete-de-deuda-->
 desde
-el 2026-09-03, cuando el selector de carátula llegó a 100/98 al ganar su botón y salió de la lista. Antes
-bajó a 189 el 2026-08-31 cuando los dos ViewModels de Cursos salieron, y a
-188 ese mismo día cuando `MarkerEditorViewModel` llegó a 100/100 y salió también.
+el 2026-09-05, cuando subió por una vista nueva: `PlaybackSettingsView.axaml` mide 100/50 como las
+otras sesenta, porque esa mitad es la única rama que el compilador de Avalonia genera para un
+`.axaml`. Antes estuvo en 188 desde el 2026-09-03, cuando el selector de carátula llegó a 100/98 al
+ganar su botón y salió de la lista; y en 189 el 2026-08-31, cuando los dos ViewModels de Cursos
+salieron, bajando a 188 ese mismo día al llegar `MarkerEditorViewModel` a 100/100.
+
+**Y el ViewModel que llegó con esa vista NO entró en la lista, que es la otra mitad de la regla.** El
+run lo midió a 90/95 y la salida fue cubrirlo: el JSON de coverlet nombró las cuatro líneas y las dos
+ramas que faltaban, y con tres pruebas quedó en 100/100. **Un archivo nuevo sólo entra en la lista
+cuando no puede mejorar**; si puede, se cubre.
 
 **Y el 2026-09-02 subió por hardware ausente, que es el octavo archivo de esa clase.**
 `WindowsAudioEndpointConfigurator.cs` escribe el formato de un endpoint de audio, así que casi todo

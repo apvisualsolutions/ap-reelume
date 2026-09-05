@@ -400,7 +400,17 @@ try {
     # 77/75: ese run midio el codigo nuevo antes de que existieran las cuatro pruebas que lo cubren,
     # que entran en el mismo cambio. Medido aqui con la aritmetica de esta puerta: 88/87. Un suelo que
     # baja es una bajada, y la salida a una bajada es cubrir, no rebajar.
-    $debtRatchet = 188
+    # 189 desde el 2026-09-05, y por la unica razon que esta puerta acepta por escrito: una vista
+    # nueva. PlaybackSettingsView.axaml mide 100/50 igual que las otras sesenta, porque esa mitad es
+    # la unica rama que el compilador de Avalonia genera para un .axaml, en la linea del elemento
+    # raiz. No es deuda: es lo que vale un .axaml.
+    #
+    # Su ViewModel llego en el mismo cambio y NO esta en la lista. El run lo midio a 90/95 y la
+    # salida fue cubrirlo, no aparcarlo: el JSON de coverlet nombro las cuatro lineas y las dos ramas
+    # -los dos topes del deslizador, leer la duracion con la cuenta atras apagada, y escribirla en
+    # ese mismo estado-, y con sus tres pruebas quedo en 100/100. Un archivo sale de esta lista
+    # mejorando, y uno nuevo solo entra cuando no puede mejorar.
+    $debtRatchet = 189
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.
