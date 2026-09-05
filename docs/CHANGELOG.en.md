@@ -10,6 +10,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The red badge on a folder Windows refuses can no longer go grey without anyone noticing.** A
+  folder's three states — connected, disconnected and refused — are told apart by colour as well as
+  by the word, and until now no check looked at whether the red and the green were really the
+  design's.
+
+  **It matters because the failure would be silent.** The colour is not written into the screen: it
+  is asked for by name from the palette. Rename that name and the badge does not break or disappear
+  — it keeps the neutral grey of the rest and goes on saying «access denied» in the same tone as
+  everything else. The check mounts the real screen and looks at both badges there, not at a
+  laboratory sample: a hand-built one would always wear whatever colour the test gave it and would
+  keep passing after the screen stopped asking for it.
+
+  It also checks that a refused folder wears **one badge and not two**: «unavailable» is shown when
+  the medium is not there, and that is also true of a folder without permission, so without care it
+  would wear both at once and one of them would be a lie.
+
+- **Comparing the application against its prototype stopped giving false answers, and that unblocks
+  the sixty screens.** The design package ships one file per screen, which is what would allow them
+  to be compared one by one instead of the eight compared in August. Opened as a loose file they
+  came out **blank and did not say so**; served as a web page they come out whole.
+
+  **And the first comparison with the fixed rig nearly produced an invented defect**: the prototype
+  hands over its screens in the light theme, the application was being photographed in dark, and a
+  button came out a different colour. Both colours were the correct one, each in its own theme. **A
+  capture's theme is measured, not looked at.**
+
 - **Eight translated texts no screen ever asked for are gone, and something now stops them coming
   back.** They were written in both languages, reviewed, and read by nobody. Two of them were a
   third name for the mini player and a second for «full screen», left over from a player bar that no

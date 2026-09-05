@@ -2986,7 +2986,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
     «Conectada», «Desconectada», «Acceso denegado» — and draws all three with tag(tone), which is the
     element this class is already paired with. Both failures wear tone 'err' there, so the red is the
     design's; what tells them apart is the word.
+
+    It sat three styles below this paragraph until 2026-09-05, with the whole notices block wedged
+    in between, so the next person to read that block would have found this justification sitting on
+    top of it. A reason separated from the thing it justifies is a reason nobody reads.
   -->
+  <Style Selector="Border.state-chip.denied">
+    <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
+  </Style>
+
   <!--
     THE NOTICES STRIP, and the whole of ADR-0010 in one class: a notice that describes a STATE takes
     space and pushes the grid down. The prototype's banner() is what it draws — 12 px of gap, 12 by 14
@@ -3010,11 +3019,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <Style Selector="Border.notice-strip.danger">
-    <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
-  </Style>
-
-  <Style Selector="Border.state-chip.denied">
     <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
   </Style>

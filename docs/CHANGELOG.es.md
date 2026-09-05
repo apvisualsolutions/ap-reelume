@@ -10,6 +10,32 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El distintivo rojo de una carpeta que Windows rechaza ya no puede quedarse en gris sin que nadie
+  se entere.** Los tres estados de una carpeta —conectada, desconectada y sin permiso— se distinguen
+  por el color además de por la palabra, y hasta ahora ninguna comprobación miraba que el rojo y el
+  verde fueran de verdad los del diseño.
+
+  **Importa porque el fallo sería silencioso.** El color no se escribe en la pantalla: se pide por
+  nombre a la paleta. Si alguien renombra ese nombre, la etiqueta no se rompe ni desaparece — se
+  queda con el gris de las demás y sigue diciendo «acceso denegado» en el mismo tono que todo lo
+  otro. La comprobación monta la pantalla de verdad y mira los dos distintivos ahí, no un ejemplo de
+  laboratorio: uno hecho a mano llevaría siempre el color que la prueba le diera y seguiría pasando
+  después de que la pantalla dejara de pedirlo.
+
+  De paso comprueba que una carpeta rechazada lleva **una etiqueta y no dos**: la de «no disponible»
+  se enseña cuando el medio no está, y eso también es cierto de una carpeta sin permiso, así que sin
+  cuidado llevaría las dos a la vez y una de ellas sería mentira.
+
+- **Comparar la aplicación con su prototipo dejó de dar respuestas falsas, y eso desbloquea las
+  sesenta pantallas.** El paquete de diseño trae un archivo por pantalla, que es lo que permitiría
+  compararlas una a una en vez de las ocho que se compararon en agosto. Abiertos como un archivo
+  suelto salían **en blanco y sin decirlo**; servidos como una página web salen enteros.
+
+  **Y la primera comparación con el aparejo arreglado casi produce un defecto inventado**: el
+  prototipo entrega sus pantallas en tema claro, la aplicación se estaba fotografiando en oscuro, y
+  un botón salía de otro color. Los dos colores eran el correcto, cada uno en su tema. **El tema de
+  una captura se mide, no se mira.**
+
 - **Ocho textos traducidos que ninguna pantalla pedía se han ido, y ahora hay algo que impide que
   vuelvan.** Estaban escritos en los dos idiomas, revisados, y no los leía nadie. Dos de ellos eran
   un tercer nombre para el mini reproductor y un segundo para «pantalla completa», restos de una

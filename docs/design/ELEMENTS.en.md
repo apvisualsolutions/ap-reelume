@@ -377,3 +377,11 @@ What this tree draws differently from the prototype, and why.
   is written into the test rather than asserted downwards.
 - **In the two high contrasts the fill says nothing** and the second sign says it: the pill's glyph,
   the rail's bar, the menu row's border.
+- **The access-denied notice does not carry the «Permisos» button the prototype draws.** That button
+  opens Windows' settings for the resource, and that is starting a system process: it lives in the
+  host layer, the one place in this tree with `Process.Start`, and would bring its own attack
+  surface into a decision about shape. Decided by the owner on 2026-09-05, with the sixty-screen
+  comparison ahead, so that the absence is not counted as a defect on every pass. The notice already
+  says what happened and that the application never changes permissions on its own, which is the
+  half that matters. If it is reopened, it is reopened as new scope with its decision written before
+  the code.

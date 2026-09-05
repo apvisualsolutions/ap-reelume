@@ -378,3 +378,11 @@ Lo que este árbol dibuja distinto del prototipo, y por qué.
   en la prueba y no afirmado a la baja.
 - **En los dos altos contrastes el relleno no dice nada** y lo dice el segundo signo: el glifo de la
   píldora, la barra del rail, el borde de la fila de menú.
+- **El aviso de acceso denegado no lleva el botón «Permisos» que el prototipo dibuja.** Ese botón
+  abre los ajustes de Windows para ese recurso, y eso es arrancar un proceso del sistema: vive en la
+  capa del anfitrión, que es el único sitio de este árbol con `Process.Start`, y traería su propia
+  superficie de ataque a una decisión de forma. Decidido por el propietario el 2026-09-05 con la
+  comparación de las sesenta pantallas por delante, para que la ausencia no se cuente como defecto
+  en cada vuelta. El aviso ya dice qué pasa y que la aplicación nunca cambia permisos por su cuenta,
+  que es la mitad que importa. Si se reabre, se reabre como alcance nuevo y con su decisión escrita
+  delante del código.

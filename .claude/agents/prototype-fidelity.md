@@ -25,7 +25,26 @@ grep -n "pbtn\|btnPri\|btnSec" "design/AP Reelume.dc.html"
 ```
 
 Los estilos van **en línea** en cada elemento, así que `grep` de una propiedad CSS encuentra su valor
-literal. `?press=A|B|C` fotografía pantallas que no tienen ruta.
+literal.
+
+**Y para fotografiarlo hay tres vías, que no son intercambiables:**
+
+- `?press=A|B|C` sobre la copia de trabajo pulsa por `aria-label` y por el texto de un botón.
+- **`?scn=N` para los treinta estados del panel «Demostración»**, que **no son botones**: cada uno es
+  una casilla de opción sin nombre accesible, así que `?press=Cargando` no seleccionaba nada **y no
+  lo decía**. Va por número porque los acentos y los puntos medios no sobreviven a la línea de
+  órdenes, y el ayudante avisa **en la propia imagen** —franja roja y título cambiado— cuando no
+  encuentra lo que le piden.
+- **`design/vistas/`, una vista por archivo, y sólo por HTTP.** Cada archivo son ~490 bytes: un
+  `<dc-import>` que `support.js` resuelve leyendo el fichero vecino, y bajo `file://` esa lectura
+  está bloqueada. Chrome escribe entonces un PNG **en blanco de 6.756 bytes** —el mismo tamaño exacto
+  para cualquier vista— sin decir nada; `--allow-file-access-from-files` no lo arregla. Servida por
+  un servidor estático local sobre `design/`, la misma vista da 511.804 bytes y dibuja. Medido el
+  2026-09-05, y es lo que hace posible comparar vista a vista en vez de sólo ocho pantallas.
+
+**Cuidado al contarlas: 57 archivos de vista son 42 pantallas distintas.** Diez grupos comparten
+referencia —las seis de Inicio, las tres de Biblioteca, y siete parejas más—, así que una matriz que
+prometa 57 referencias distintas está prometiendo lo que no hay.
 
 ## Qué comparar, y con qué medida
 
