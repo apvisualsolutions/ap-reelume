@@ -1,5 +1,97 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-05, closing: the rig lied five ways, three of them in green
+>
+> **Look at the tree first, it overrules this document**: `git log --oneline -1 main` and
+> `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it
+> would already have changed it. `main` and the branch were left level, and every fast-forward was
+> made with CI green.
+>
+> ### What this stretch delivers, and why it was the blocker
+>
+> **Comparing the sixty screens is now possible, and it was not before.** The design package ships
+> one file per view — `design/vistas/`, 57 of them — which is what allows the one-by-one comparison
+> instead of August's eight screens. **Opened as a loose file they come out BLANK**, 6,756 bytes
+> exactly for any of the 57, with no error and no exit code: their `<dc-import>` cannot read the
+> neighbouring prototype under `file://`, and `--allow-file-access-from-files` does not fix it.
+> Served by a local static server over `design/` they give 511,804 and draw. All 57 come out.
+>
+> **And they are 42 screens, not 57**: ten groups share a reference (Home's six, the Library's three,
+> and seven more pairs). A matrix promising 57 distinct references promises what is not there.
+>
+> ### The trap that would have produced a list of invented defects
+>
+> **The prototype hands over its views in the LIGHT theme.** Measuring the background pixel across
+> the 57: **41 light, 14 dark, 2 in between**. The fourteen are the player's, and that is correct on
+> both sides. Compared against the application photographed in dark, the first thing that jumps out
+> is a **blue (#1769AA)** button against a **white (#F3F6FA)** one — which are **both correct values
+> of `PrimaryActionBrush`, one per theme**. What closed it was measuring the **page background**, not
+> the button.
+>
+> **A capture's theme is measured, not looked at**, and it is the opposite of the case this tree
+> already knew: a light capture read as dark because its upper half is a photograph.
+>
+> ### The rig lost fourteen scenes and left seven applications open
+>
+> Settings' index is made of **selection** elements, not buttons: `InvokePattern` threw "Modelo no
+> admitido". **It is the same defect `?press=` had with the prototype's radios.** The costly part was
+> not the failure: the exception aborted the script before its closing line, **seven instances** piled
+> up, and from the third on the next ones would not start, because they competed for the same data
+> root. **One failure became fourteen.** It now tries `Invoke`, `Select` and `Expand`, and a `trap`
+> closes the application even when the script aborts.
+>
+> **And a new script reported green over zero captures**: `pwsh -File script.ps1 -Only A,B` hands over
+> **a single string**, not a list, so the filter discarded all twenty scenes and the summary said "all
+> captured and none suspicious" over an empty directory. A filter that selects nothing is an error,
+> and every summary needs its counter of attempts.
+>
+> ### What was actually compared, with a rig that can be trusted
+>
+> **Library**: the application draws **146 px** cards where the prototype puts **154**, with the same
+> 20 px gap, and its content starts at **x = 130** against **x = 98**. The missing column — seven
+> cards per row instead of eight — **belongs to the margin, not to the size of the card**.
+>
+> **Home**: the prototype treats the hero as a surface **over an image** and gives it inverted
+> buttons; the application applies the theme to it. In dark they match, in light they do not. The
+> circular restart button is not a finding: it is the concession already written for the film card,
+> applied to the hero.
+>
+> **The remaining eighteen screens are captured in light and not yet compared**, which is where the
+> next stretch starts.
+>
+> ### What was closed
+>
+> · **A folder without permission now has its colour measured**, and so does the green of a connected
+>   one. It mattered because the failure would be mute: a style class that does not exist does not
+>   fail, so a rename would leave the badge with the family's grey saying "access denied". Measured
+>   in both directions — with the class removed the chip reads **#EDF1F6** and the test names it.
+> · **`IsVisible` is not "is seen"**, and that was the first red: the row is a `DataTemplate`, so
+>   three folders mean three copies of every badge, and a control inside a hidden parent still reports
+>   `IsVisible = true`. It is measured with `IsEffectivelyVisible`, which the walk already used.
+> · **The prototype's «Permisos» button is now a written concession** in `docs/design/ELEMENTS`, with
+>   its reason, so the absence is not counted as a defect on every comparison.
+> · **The rail's comment said "five names" and there are six**; it now names the rule the test
+>   enforces, which is what does not rot. And **the red chip's reason sat three styles above it**,
+>   with the notices block in between.
+>
+> ### Decision taken and NOT executed
+>
+> · **The contradiction about a run's duration is closed by inverting the gate, in its own stretch.**
+>   `RunDurationFigureTests` cannot measure — doing so would open a connection no purpose declares,
+>   which is rule 2 — so "compare against the script" can only mean that the tree **stops asserting
+>   the figure** and defers to `eng/measure-ci-time.ps1`. The test goes from "the four copies say the
+>   same" to "nobody asserts it in the present tense", keeping the anti-blindness floor it already
+>   has. And its second test is re-anchored to something that does not rot: the workflow's own cut-off,
+>   `timeout-minutes: 90` in `.github/workflows/ci.yml`, against the watcher's 30-minute heartbeat and
+>   120-minute ceiling. **It did not go in here because it touches six files and a stretch stops
+>   growing.**
+>
+> ### What is not solved by programming
+>
+> · **`PRD-002` needs the commercial signing certificate.** It is the MVP's only blocker.
+> · **The five installation icons are placeholders**, waiting for the vector logo.
+> · **The export notification is still unsent**, with its text already written.
+
 > ## READ THIS FIRST — 2026-09-05, evening: two things only pixels show
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main` and

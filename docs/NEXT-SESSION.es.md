@@ -1,5 +1,96 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-05, cierre: el aparejo mentía de cinco maneras, tres de ellas en verde
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
+> `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
+> escribiría ya lo habría cambiado. `main` y la rama quedaron al día, y cada fast-forward se hizo con
+> CI en verde.
+>
+> ### Lo que esta tanda entrega, y por qué era el bloqueo
+>
+> **Comparar las sesenta pantallas ya se puede hacer, y antes no.** El paquete de diseño trae un
+> archivo por vista —`design/vistas/`, 57 de ellos—, que es lo que permite la comparación una a una
+> en vez de las ocho pantallas de agosto. **Abiertos como fichero suelto salen EN BLANCO**, 6.756
+> bytes exactos para cualquiera de los 57, sin error ni código de salida: su `<dc-import>` no puede
+> leer el prototipo vecino bajo `file://`, y `--allow-file-access-from-files` no lo arregla. Servidos
+> por un servidor estático local sobre `design/` dan 511.804 y dibujan. Las 57 salen.
+>
+> **Y son 42 pantallas, no 57**: diez grupos comparten referencia (las seis de Inicio, las tres de
+> Biblioteca, y siete parejas más). Una matriz que prometa 57 referencias distintas promete lo que no
+> hay.
+>
+> ### La trampa que habría producido una lista de defectos inventados
+>
+> **El prototipo entrega sus vistas en tema CLARO.** Medido el píxel de fondo en las 57: **41 claras,
+> 14 oscuras, 2 intermedias**. Las catorce son las del reproductor, y eso es correcto en los dos
+> lados. Comparándolas contra la aplicación fotografiada en oscuro, lo primero que salta es un botón
+> **azul (#1769AA)** frente a uno **blanco (#F3F6FA)** — que son **los dos valores correctos de
+> `PrimaryActionBrush`, uno por tema**. La cerró medir el **fondo de la página**, no el botón.
+>
+> **El tema de una captura se mide, no se mira**, y es el caso contrario al que este árbol ya
+> conocía: una captura clara leída como oscura porque su mitad superior es una fotografía.
+>
+> ### El arnés perdía catorce escenas y dejaba siete aplicaciones abiertas
+>
+> El índice de Ajustes son elementos de **selección**, no botones: `InvokePattern` lanzaba «Modelo no
+> admitido». **Es el mismo defecto que `?press=` tenía con los radios del prototipo.** Lo caro no fue
+> el fallo: la excepción abortaba el guion antes de su línea de cierre, se acumularon **siete
+> instancias** y desde la tercera las siguientes ni arrancaban, porque competían por la misma raíz de
+> datos. **Un fallo se convirtió en catorce.** Hoy prueba `Invoke`, `Select` y `Expand`, y un `trap`
+> cierra la aplicación aunque el guion aborte.
+>
+> **Y un guion nuevo cantó verde sobre cero capturas**: `pwsh -File guion.ps1 -Only A,B` entrega
+> **una sola cadena**, no una lista, así que el filtro descartó las veinte escenas y el resumen dijo
+> «todas capturadas y ninguna sospechosa» sobre un directorio vacío. Un filtro que no selecciona nada
+> es un error, y todo resumen necesita su contador de intentos.
+>
+> ### Lo comparado de verdad, con el aparejo ya fiable
+>
+> **Biblioteca**: la aplicación dibuja tarjetas de **146 px** donde el prototipo pone **154**, con el
+> mismo hueco de 20, y su contenido empieza en **x = 130** frente a **x = 98**. La columna que falta
+> —siete tarjetas por fila en vez de ocho— **es del margen, no del tamaño de la ficha**.
+>
+> **Inicio**: el prototipo trata el héroe como una superficie **sobre imagen** y le da botones
+> invertidos; la aplicación le aplica el tema. En oscuro coinciden, en claro no. El botón circular de
+> reiniciar no es un hallazgo: es la cesión ya escrita para la ficha de película, aplicada al héroe.
+>
+> **Las dieciocho pantallas restantes están capturadas en claro y sin comparar**, que es donde
+> empieza la siguiente tanda.
+>
+> ### Lo que se cerró
+>
+> · **El distintivo de una carpeta sin permiso ya tiene medición de color**, y el verde de una
+>   conectada también. Importaba porque el fallo sería mudo: una clase de estilo inexistente no
+>   falla, así que un renombrado dejaría la etiqueta con el gris de la familia diciendo «acceso
+>   denegado». Medido en las dos direcciones — quitando la clase, el chip lee **#EDF1F6** y la prueba
+>   lo nombra.
+> · **`IsVisible` no es «se ve»**, y ése fue el primer rojo: la fila es un `DataTemplate`, así que
+>   tres carpetas son tres copias de cada distintivo, y un control dentro de un padre oculto sigue
+>   diciendo `IsVisible = true`. Se mide con `IsEffectivelyVisible`, que es lo que el paseo ya usaba.
+> · **El botón «Permisos» del prototipo es ya una cesión escrita** en `docs/design/ELEMENTS`, con su
+>   razón, para que la ausencia no se cuente como defecto en cada comparación.
+> · **El comentario del riel decía «cinco nombres» y son seis**; ahora nombra la regla que la prueba
+>   hace cumplir, que es lo que no caduca. Y **la razón del chip rojo estaba tres estilos por encima
+>   de él**, con el bloque de avisos en medio.
+>
+> ### Decisión tomada y NO ejecutada
+>
+> · **La contradicción sobre la duración de un run se cierra invirtiendo la puerta, en tanda propia.**
+>   `RunDurationFigureTests` no puede medir —hacerlo abriría una conexión que ninguna finalidad
+>   declara, que es la regla 2—, así que «comparar contra el guion» sólo puede significar que el árbol
+>   **deje de aseverar la cifra** y remita a `eng/measure-ci-time.ps1`. La prueba pasa de «las cuatro
+>   copias dicen lo mismo» a «nadie la asevera en presente», conservando el suelo antiblindaje que ya
+>   tiene. Y su segunda prueba se re-ancla a algo que no caduca: el corte del propio flujo,
+>   `timeout-minutes: 90` en `.github/workflows/ci.yml`, contra el latido de 30 y el techo de 120 del
+>   vigía. **No entró aquí porque toca seis archivos y la tanda deja de crecer.**
+>
+> ### Lo que no se resuelve programando
+>
+> · **`PRD-002` pide el certificado comercial de firma.** Es el único bloqueo del MVP.
+> · **Los cinco iconos de instalación son marcadores**, esperando el logotipo vectorial.
+> · **La notificación de exportación sigue sin enviarse**, con el texto ya redactado.
+
 > ## AVISO AL FRENTE — 2026-09-05, noche: dos cosas que sólo se ven mirando píxeles
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
