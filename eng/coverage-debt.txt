@@ -370,6 +370,7 @@ src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsView.axaml   
 src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsViewModel.cs              100  89
 src/ApSolutions.LocalMedia.Presentation/Settings/DiagnosticsPreviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsView.axaml                 100  50
+src/ApSolutions.LocalMedia.Presentation/Settings/PlaybackSettingsView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PrivacySettingsView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PrivacySettingsViewModel.cs                  96  92
 src/ApSolutions.LocalMedia.Presentation/Settings/RecommendationSettingsView.axaml            100  50

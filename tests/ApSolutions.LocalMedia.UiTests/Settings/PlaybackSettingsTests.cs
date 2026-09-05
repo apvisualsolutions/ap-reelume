@@ -145,6 +145,55 @@ public sealed class PlaybackSettingsTests
         Assert.Equal(0, writes);
     }
 
+    /// <summary>
+    /// The slider is hidden while the countdown is off, so a write can only arrive from a binding
+    /// settling as the row disappears. It must be remembered and must not switch the chain back on:
+    /// a control going away is not somebody asking for the next episode to play itself.
+    /// </summary>
+    [Fact]
+    public void A_length_written_while_the_countdown_is_off_is_remembered_without_switching_it_on()
+    {
+        var viewModel = Build(0, out var read);
+        var announced = new List<string?>();
+        viewModel.PropertyChanged += (_, args) => announced.Add(args.PropertyName);
+
+        viewModel.CountdownSeconds = 40;
+
+        Assert.Equal(0, read());
+        Assert.False(viewModel.IsCountdownEnabled);
+        Assert.Contains(nameof(PlaybackSettingsViewModel.CountdownSeconds), announced);
+
+        // And it is the length that comes back, which is the whole point of remembering it.
+        viewModel.IsCountdownEnabled = true;
+        Assert.Equal(40, read());
+    }
+
+    /// <summary>
+    /// Reading the length while the countdown is off answers the floor rather than the stored zero,
+    /// so the slider never shows a value it could not produce if the row came back.
+    /// </summary>
+    [Fact]
+    public void The_length_read_while_off_is_never_the_stored_zero()
+    {
+        var viewModel = Build(0, out _);
+
+        Assert.False(viewModel.IsCountdownEnabled);
+        Assert.True(viewModel.CountdownSeconds >= PlaybackSettingsViewModel.MinimumSeconds);
+    }
+
+    /// <summary>
+    /// The slider's own bounds, which the view binds to by static reference. They are doubles because
+    /// a <c>RangeBase</c> takes doubles, and asserting them here is what makes that a decision rather
+    /// than a compiler accident nobody would notice changing.
+    /// </summary>
+    [Fact]
+    public void The_slider_bounds_are_the_seconds_the_store_accepts()
+    {
+        Assert.Equal(PlaybackSettingsViewModel.MinimumSeconds, PlaybackSettingsViewModel.MinimumCountdownSeconds);
+        Assert.Equal(PlaybackSettingsViewModel.MaximumSeconds, PlaybackSettingsViewModel.MaximumCountdownSeconds);
+        Assert.True(PlaybackSettingsViewModel.MinimumCountdownSeconds > 0);
+    }
+
     [Fact]
     public void The_section_refuses_to_exist_half_armed()
     {
