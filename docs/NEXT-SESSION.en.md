@@ -1,6 +1,78 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-05: fifteen things built that no screen shows
+> ## READ THIS FIRST — 2026-09-05, later: the guard is written before the cleanup
+>
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
+> `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it
+> would already have changed it.
+>
+> ### The session's lesson, and it took three passes to find
+>
+> · **A gate that catches orphaned strings called FORTY live ones dead on its first version.** It
+>   swept the presentation project only, and keys travel: the domain hands identification codes and
+>   restore findings over as text, and the Windows host owns the tray menu and the system dialogs.
+>   Sweeping the whole of `src/` took it from 58 to 42, and thirteen were still alive because **a key
+>   is composed two ways** and the gate knew one: it recognised `"MarkerKind" + kind` and not
+>   `$"RestoreFinding{finding.Kind}"`. Twenty-one on the third pass.
+>
+>   **Deleting without the gate, or with the first pass's gate, would have taken forty strings the
+>   program draws every session, with no test saying anything.** That is why the guard is written
+>   before the cleanup. It is in `docs/evidence/stable/audit-orphaned-strings.md`.
+>
+> ### The session's own error, corrected by measuring
+>
+> · **Five checks were predicted to come back with full ffmpeg and four did.** The fifth was never
+>   about the package: its sample uses `libx265`, which the reduced package **also carries**. What
+>   fails is the muxer, and it **depends on the version and not the build**: ffmpeg 2024-06 writes
+>   `color_transfer=smpte2084` and 9.0.0 writes nothing, measured on both with the same recipe. Three
+>   ways out are written and none was taken: raise the pinned version and measure again, change the
+>   recipe, or accept the skip with the number beside it.
+>
+> ### What was closed
+>
+> · **`ffmpeg-full` in all three CI steps.** The server went from 150 video checks to 154, of 155.
+>   **Do not rename the step**: `eng/watch-ci.ps1` matches its literal to treat it as scaffolding.
+> · **Five prototype defects**, and for the first time the notices rule written down: **what
+>   describes a state takes space and pushes; what narrates an event floats and withdraws.** It
+>   matches Microsoft, Material and Carbon, and what this application already decided on 2026-08-21
+>   for the loose-file band. **The prototype's notices are NOT broken**: they push 77 px on purpose.
+> · **Settings' «Playback» section**, closing `PLY-011` and taking the MVP to **44 of 46**.
+> · **Eight orphaned strings** gone, with their gate.
+>
+> ### What is left, smallest first
+>
+> · **Settings' folder list lies**: it always says «available». `SetRootAvailabilityAsync` updates
+>   `media_files.is_available` and **not** the root's `availability` column, and no method writes it
+>   — `WithAvailability` is called by one test only. It is the most bounded thing left and touches
+>   four layers. It would also close «access denied» being indistinguishable from «disconnected»: the
+>   domain has the third state and nobody writes it.
+> · **The Library's notices strip**, closing two findings at once: cancelling the scan and warning
+>   about the disconnected disk. It **pushes**, in an `Auto` row measuring 0 when there is nothing.
+>   Owner's decision: **Library only**, not global; and the full strip when the scan is launched by
+>   hand, a quiet marker when it starts on its own. The colours already exist in the tree with the
+>   prototype's values, and the event bus already publishes four notices — two with no listener — but
+>   **the disconnected-root one is emitted by nothing**.
+> · **The «Demostración» panel's thirty states are the checklist** `PRD-006` goes back up against.
+>   The previous comparison looked at **eight screens in their normal state**.
+>
+> ### Four more inconsistencies, none in the original audit
+>
+> · The player's failure **is not announced** to screen readers; it is the only serious one with no
+>   live region.
+> · The **seven audio-output notices are mute**.
+> · The rename failure is the only one **with no coloured box**.
+> · The same add-folder refusal is painted **in two different colours** depending on the way in.
+>
+> ### What no amount of programming settles
+>
+> · **`PRD-002` needs the commercial signing certificate.** It is the only block left.
+> · **`PRD-003` is at five of six phases**; the missing one asks the x64 job to hand its data folder
+>   over as an artifact, and that is programmable.
+> · **The five install icons are placeholders** since 3 August, waiting on the vector logo, which is
+>   the owner's and is in no document of the repository.
+> · **The export notification is still unsent**, with its text already written.
+
+> ## HANDOVER — 2026-09-05, small hours: fifteen things built that no screen shows
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
 > `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it

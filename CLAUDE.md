@@ -447,6 +447,26 @@ No son estilo: hay una puerta que falla si las rompes.
    salir mal.
 4. **Bilingüismo.** Cadenas visibles y documentos públicos, en los dos idiomas.
    `BilingualHeadingTests` compara la estructura de ambos.
+
+   **Y desde el 2026-09-05, en los dos idiomas O EN NINGUNO NO BASTA: también tiene que leerla
+   alguien.** `OrphanedResourceTests` falla ante una clave traducida que ninguna pantalla pide, y
+   existe porque la puerta de al lado **no puede verlo**: compara los dos diccionarios entre sí, así
+   que una clave muerta en ambos la deja igual de contenta. Ocho cadenas vivían de ese hueco, entre
+   ellas un tercer nombre para el mini reproductor.
+
+   **La lección de cómo se escribió vale más que la puerta**, y es la que hay que recordar antes de
+   borrar nada: en su primera versión **dio CUARENTA cadenas vivas por muertas**. Barría sólo
+   `Presentation`, y las claves viajan — el dominio entrega los códigos de identificación y los
+   hallazgos de restauración como texto, y `Windows` tiene el menú de la bandeja y los diálogos del
+   sistema. Barriendo todo `src/` bajó de 58 a 42, y trece seguían vivas porque **una clave se compone
+   de dos maneras y sólo conocía una**: `"MarkerKind" + kind` sí, `$"RestoreFinding{finding.Kind}"`
+   no. Veintiuna en la tercera pasada, y ésa es la lista que coincide con la auditoría.
+
+   **Borrar sin la puerta, o con la puerta de la primera pasada, se habría llevado cuarenta cadenas
+   que el programa dibuja cada sesión, y ninguna prueba habría dicho nada.** Por eso la guardia se
+   escribe ANTES que la limpieza. Su lista de excepciones admite una clave sólo cuando algo ya escrito
+   dice que se va a dibujar —una fila de la matriz, o un hallazgo de una auditoría que la nombre—, y
+   encoge dibujando lo que hay en ella.
 5. **Nada personal en el árbol.** Ni rutas de una máquina concreta, ni nombres de la biblioteca de
    nadie. `RepositoryPrivacyTests` lo mide.
 

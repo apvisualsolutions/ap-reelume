@@ -1,6 +1,79 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-05: quince cosas construidas que ninguna pantalla enseña
+> ## AVISO AL FRENTE — 2026-09-05, tarde: la guardia se escribe antes que la limpieza
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
+> `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
+> escribiría ya lo habría cambiado.
+>
+> ### La lección de la sesión, y costó tres pasadas descubrirla
+>
+> · **Una puerta que caza cadenas huérfanas dio, en su primera versión, CUARENTA cadenas vivas por
+>   muertas.** Barría sólo el proyecto de presentación, y las claves viajan: el dominio entrega los
+>   códigos de identificación y los hallazgos de restauración como texto, y el anfitrión de Windows
+>   tiene el menú de la bandeja y los diálogos del sistema. Al barrer todo `src/` bajó de 58 a 42, y
+>   trece seguían vivas porque **una clave se compone de dos maneras** y la puerta conocía una:
+>   reconocía `"MarkerKind" + kind` y no `$"RestoreFinding{finding.Kind}"`. Veintiuna en la tercera.
+>
+>   **Borrar sin la puerta, o con la puerta de la primera pasada, se habría llevado cuarenta cadenas
+>   que el programa dibuja cada sesión, sin que ninguna prueba dijera nada.** Por eso la guardia se
+>   escribe antes que la limpieza. Está en `docs/evidence/stable/audit-orphaned-strings.md`.
+>
+> ### El error propio de la sesión, corregido con medición
+>
+> · **Se predijo que el `ffmpeg` completo destaparía cinco pruebas y destapó cuatro.** La quinta
+>   nunca fue del paquete: su muestra usa `libx265`, que el paquete reducido **también trae**. Lo que
+>   falla es el multiplexor, y **depende de la versión y no del build**: el ffmpeg de 2024-06 escribe
+>   `color_transfer=smpte2084` y el 9.0.0 no escribe nada, medido con los dos generando la misma
+>   receta. Las tres salidas están escritas y ninguna se tomó: subir la versión fijada y volver a
+>   medir, cambiar la receta, o aceptar la omisión con el número al lado.
+>
+> ### Lo que se cerró
+>
+> · **`ffmpeg-full` en los tres pasos de CI.** El servidor pasó de 150 comprobaciones de vídeo a 154,
+>   de 155. **No renombrar el paso**: `eng/watch-ci.ps1` lo reconoce por su literal para tratarlo como
+>   andamiaje.
+> · **Cinco defectos del prototipo**, y por primera vez escrita la regla de los avisos: **lo que
+>   describe un estado ocupa sitio y empuja; lo que narra un suceso flota y se retira solo.** Coincide
+>   con Microsoft, Material y Carbon, y con lo que esta aplicación ya decidió el 2026-08-21 para la
+>   banda de archivo suelto. **Los avisos del prototipo NO están rotos**: empujan 77 px a propósito.
+> · **La sección «Reproducción» de Ajustes**, que cierra `PLY-011` y sube el MVP a **44 de 46**.
+> · **Ocho cadenas huérfanas** fuera, con su puerta.
+>
+> ### Lo que queda, ordenado por tamaño
+>
+> · **La lista de carpetas de Ajustes miente**: dice «disponible» siempre. `SetRootAvailabilityAsync`
+>   actualiza `media_files.is_available` y **no** la columna `availability` de la raíz, y no existe
+>   ningún método que la escriba — `WithAvailability` sólo lo llama una prueba. Es el más acotado de
+>   lo que queda y toca cuatro capas. De paso cerraría que «acceso denegado» no se distinga de
+>   «desconectado»: el dominio tiene el tercer estado y nadie lo escribe.
+> · **La franja de avisos de la Biblioteca**, que cierra dos hallazgos de una vez: cancelar el
+>   escaneo y avisar del disco desconectado. **Empuja**, en una fila `Auto` que mide 0 cuando no hay
+>   nada. Decisión del propietario: **sólo en la Biblioteca**, no global; y franja completa cuando el
+>   escaneo lo lanza él, marca discreta cuando arranca solo. Los colores ya existen en el árbol con
+>   los valores del prototipo, y el bus de eventos ya publica cuatro avisos —dos sin oyente—, pero
+>   **falta emitir el de carpeta desconectada**.
+> · **Los treinta estados del panel «Demostración» son la lista de comprobación** contra la que
+>   `PRD-006` vuelve a subir. La comparación anterior miró **ocho pantallas en estado normal**.
+>
+> ### Cuatro incoherencias más, ninguna en la auditoría original
+>
+> · El fallo del reproductor **no se anuncia** a lectores de pantalla; es el único grave sin región
+>   activa.
+> · Los **siete avisos de la salida de audio son mudos**.
+> · El fallo al renombrar es el único **sin recuadro de color**.
+> · El mismo rechazo al añadir carpeta se pinta **de dos colores** según por dónde entre.
+>
+> ### Lo que no se resuelve programando
+>
+> · **`PRD-002` pide el certificado comercial de firma.** Es el único bloqueo que queda.
+> · **`PRD-003` está en cinco de seis fases**; la que falta pide que el trabajo x64 pase su carpeta
+>   de datos por artefacto, y eso sí es programable.
+> · **Los cinco iconos de instalación son marcadores** desde el 3 de agosto, esperando el logotipo
+>   vectorial, que es del propietario y no está en ningún documento del repositorio.
+> · **La notificación de exportación sigue sin enviarse**, con el texto ya redactado.
+
+> ## RELEVO — 2026-09-05, madrugada: quince cosas construidas que ninguna pantalla enseña
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
 > `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
