@@ -440,6 +440,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="SegmentDetectionSettingsTitle">Detección automática de segmentos</x:String>
   <x:String x:Key="SegmentDetectionSettingsDescription">Compara localmente los episodios de cada serie para encontrar introducciones, resúmenes y créditos recurrentes. No envía nada a ningún sitio, cede el paso a la reproducción y puedes revisar o corregir cada detección.</x:String>
   <x:String x:Key="SegmentDetectionSettingsEnable">Detectar segmentos automáticamente</x:String>
+  <x:String x:Key="PlaybackSettingsAccessibleName">Reproducción</x:String>
+  <x:String x:Key="PlaybackSettingsTitle">Reproducción</x:String>
+  <x:String x:Key="PlaybackSettingsDescription">Qué ocurre cuando termina un episodio o una lección. Nada de esto sale de este equipo.</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownEnable">Cuenta atrás del siguiente episodio</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownDescription">Al terminar, el siguiente empieza solo. Es cancelable, y vuelve a la ficha si el archivo siguiente no está.</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownSeconds">Segundos de espera</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownSecondsDescription">Cuánto tiempo tienes para decir que no antes de que empiece.</x:String>
+  <x:String x:Key="PlaybackSettingsSecondsSuffix">s</x:String>
   <x:String x:Key="DetectedMarkerReviewAccessibleName">Detecciones de este episodio</x:String>
   <x:String x:Key="DetectedMarkerReviewTitle">Segmentos detectados</x:String>
   <x:String x:Key="DetectedMarkerReviewDescription">Rangos que la detección automática encontró en este episodio. Aceptar o corregir uno lo protege frente a detecciones futuras; eliminarlo permite que vuelva a aparecer.</x:String>

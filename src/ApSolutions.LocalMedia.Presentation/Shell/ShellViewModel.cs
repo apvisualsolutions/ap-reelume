@@ -398,6 +398,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public SegmentDetectionSettingsViewModel? SegmentDetection => _surfaces.SegmentDetection;
 
+    public PlaybackSettingsViewModel? PlaybackSettings => _surfaces.PlaybackSettings;
+
     /// <summary>Where the mini player was left last time, for the view that owns its window.</summary>
     public IMiniPlayerPlacementStore? MiniPlayerPlacement => _surfaces.MiniPlayerPlacement;
 
@@ -669,6 +671,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsLibrarySection));
                 OnPropertyChanged(nameof(IsRecommendationsSection));
                 OnPropertyChanged(nameof(IsSubtitlesSection));
+                OnPropertyChanged(nameof(IsPlaybackSection));
                 OnPropertyChanged(nameof(IsSegmentDetectionSection));
                 OnPropertyChanged(nameof(IsShortcutsSection));
                 OnPropertyChanged(nameof(IsLifecycleSection));
@@ -687,6 +690,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public bool IsRecommendationsSection => CurrentSettingsSection == SettingsSection.Recommendations;
 
     public bool IsSubtitlesSection => CurrentSettingsSection == SettingsSection.Subtitles;
+
+    public bool IsPlaybackSection => CurrentSettingsSection == SettingsSection.Playback;
 
     public bool IsSegmentDetectionSection => CurrentSettingsSection == SettingsSection.SegmentDetection;
 
@@ -717,6 +722,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public bool HasShortcuts => Shortcuts is not null;
 
     public bool HasSubtitleStyle => SubtitleStyle is not null;
+
+    public bool HasPlaybackSettings => PlaybackSettings is not null;
 
     public bool HasSegmentDetection => SegmentDetection is not null;
 

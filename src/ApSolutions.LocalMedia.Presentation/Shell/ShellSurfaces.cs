@@ -87,6 +87,9 @@ public sealed record ShellSurfaces
     /// <summary>The switch for automatic segment detection; off until a person turns it on.</summary>
     public SegmentDetectionSettingsViewModel? SegmentDetection { get; init; }
 
+    /// <summary>The countdown that chains the next episode or lesson, and how long it waits.</summary>
+    public PlaybackSettingsViewModel? PlaybackSettings { get; init; }
+
     /// <summary>Builds the metadata editor of one title, or nothing when it has no metadata yet.</summary>
     public Func<TitleId, CancellationToken, Task<MetadataEditorViewModel?>>? OpenMetadataEditor { get; init; }
 

@@ -140,6 +140,9 @@ public sealed class LeadingActionTests
         ["LifecycleSettingsView"] = null,
         ["RecommendationSettingsView"] = null,
         ["SegmentDetectionSettingsView"] = null,
+        // Playback carries a toggle and a slider and no button at all, so it has nothing to
+        // rank one against - the same reason every other settings section reads null here.
+        ["PlaybackSettingsView"] = null,
         ["DiagnosticsPreviewView"] = null,
 
         // Review

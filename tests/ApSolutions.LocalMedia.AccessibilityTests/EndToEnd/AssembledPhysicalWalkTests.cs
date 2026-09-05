@@ -608,6 +608,65 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Apariencia in the settings index never opened the appearance section");
         Assert.Equal(SettingsSection.Appearance, host.ViewModel.CurrentSettingsSection);
 
+        // Playback, the section PLY-011's criterion promised and did not have. Pressed from the
+        // index like the others, and then its switch. The assertion reads the same facade the player
+        // reads at chaining time, not the view model beside it: a switch that moves and writes
+        // nothing is exactly the defect this application keeps finding in itself, and only the
+        // store can tell the two apart.
+        await PressAsync(
+            host,
+            "PlaybackSettingsTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Reproducción in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Playback, host.ViewModel.CurrentSettingsSection);
+
+        var playback = host.ViewModel.PlaybackSettings;
+        Assert.NotNull(playback);
+        var chain = host.Application.Services.GetRequiredService<StartNextEpisodeCountdown>();
+        Assert.True(playback!.IsCountdownEnabled);
+
+        await PressAsync(
+            host,
+            "PlaybackSettingsCountdownEnable",
+            () => playback.IsCountdownEnabled,
+            "clicking the next-episode countdown switch never turned it off");
+        Assert.False(playback.IsCountdownEnabled);
+
+        // Off is a stored zero, which is what the chaining code reads to stay quiet. And the length
+        // row goes with it: absent rather than disabled, because a wait that does not happen has no
+        // length to ask for.
+        Assert.Equal(0, chain.CountdownSeconds);
+
+        await PressAsync(
+            host,
+            "PlaybackSettingsCountdownEnable",
+            () => playback.IsCountdownEnabled,
+            "clicking the countdown switch again never turned it back on");
+        Assert.True(playback.IsCountdownEnabled);
+        Assert.Equal(playback.CountdownSeconds, chain.CountdownSeconds);
+        Assert.True(chain.CountdownSeconds >= PlaybackSettingsViewModel.MinimumSeconds);
+
+        // And the length itself, pressed rather than assigned. A click lands the slider wherever the
+        // pointer fell, which is why the assertion is that the store followed it and stayed inside
+        // the range - not that it reached one particular number the harness would have to predict.
+        await PressAsync(
+            host,
+            "PlaybackSettingsCountdownSeconds",
+            () => playback.CountdownSeconds,
+            "clicking the countdown length never changed the stored wait");
+        Assert.Equal(playback.CountdownSeconds, chain.CountdownSeconds);
+        Assert.InRange(
+            chain.CountdownSeconds,
+            PlaybackSettingsViewModel.MinimumSeconds,
+            PlaybackSettingsViewModel.MaximumSeconds);
+
+        await PressAsync(
+            host,
+            "AppearanceTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Apariencia after Playback never came back to the appearance section");
+        Assert.Equal(SettingsSection.Appearance, host.ViewModel.CurrentSettingsSection);
+
         var appearance = host.ViewModel.AppearanceSettings;
         Assert.NotNull(appearance);
         Assert.Equal(ThemePreference.System, appearance!.CurrentPreference);
