@@ -171,9 +171,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MediaAvailable">Available</x:String>
   <x:String x:Key="RootAccessDenied">No permission</x:String>
   <x:String x:Key="ScanProgressAccessibleName">Scan progress</x:String>
-  <x:String x:Key="ScanProgressIdle">No scan is running.</x:String>
-  <x:String x:Key="ScanProgressRunning">Scanning the library.</x:String>
   <x:String x:Key="ScanProgressCompleted">The scan has finished.</x:String>
+  <x:String x:Key="LibraryNoticesAccessibleName">Library notices</x:String>
+  <x:String x:Key="ScanNoticeTitle">Incremental scan running</x:String>
+  <x:String x:Key="ScanNoticeBody">The interface stays usable and the scan can be cancelled. Whatever is already catalogued stays.</x:String>
+  <x:String x:Key="ScanNoticeCancelAction">Cancel the scan</x:String>
+  <x:String x:Key="LibraryNoticeRootGoneTitle">Folder disconnected</x:String>
+  <x:String x:Key="LibraryNoticeRootGoneBody">Its titles stay in the catalogue marked unavailable. Nothing is deleted; they recover on reconnect.</x:String>
+  <x:String x:Key="LibraryNoticeAccessDeniedTitle">Folder without permission</x:String>
+  <x:String x:Key="LibraryNoticeAccessDeniedBody">Windows will not let us into this folder. The catalogue keeps its titles as unavailable, and the application never changes permissions on its own.</x:String>
   <x:String x:Key="ScanProgressFilesLabel">files found</x:String>
   <x:String x:Key="NavigationCurrentStatus">Current destination</x:String>
   <x:String x:Key="SettingsSectionLibrary">Library and scanning</x:String>

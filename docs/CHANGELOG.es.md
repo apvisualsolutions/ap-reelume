@@ -219,6 +219,24 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El escaneo ya se puede parar desde la pantalla.** El programa sabía cancelarlo desde dentro desde
+  siempre —guarda por dónde iba y lo ya catalogado se queda—, pero la fila que lo anunciaba enseñaba
+  un punto, una frase y un recuento, y **ningún botón**.
+
+  **Y había dos cosas más que nadie había mirado.** Un escaneo que arranca solo —al abrir el
+  programa, o cuando el vigilante ve un archivo nuevo— **no dibujaba absolutamente nada**: mandaba su
+  progreso a un sitio que estaba oculto. Ahora se ve, pero de otra manera: quien lanza el escaneo a
+  mano recibe una franja completa con su botón, y el que arranca solo, sólo un punto discreto arriba,
+  porque mover la pantalla cuando nadie lo ha pedido molesta más de lo que informa.
+
+- **La biblioteca avisa de una carpeta que no puede leer**, y distingue las dos maneras: un disco
+  desenchufado y una carpeta en la que Windows no deja entrar. El aviso sale donde están los títulos
+  afectados y donde se puede hacer algo, no persiguiéndote por toda la aplicación. Se retira solo
+  cuando la carpeta vuelve.
+
+- **Y el escaneo ya dice cuándo ha terminado**, en vez de desaparecer sin más. La frase estaba
+  traducida en los dos idiomas desde hacía meses y no la leía nadie.
+
 - **La lista de carpetas de Ajustes decía «Disponible» aunque el disco estuviera desenchufado.** Y lo
   decía siempre: el estado de cada carpeta se guardaba una sola vez, al añadirla, y nunca se volvía a
   escribir. Lo que sí se actualizaba al escanear era la disponibilidad de cada **archivo**, que es

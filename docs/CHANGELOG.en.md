@@ -218,6 +218,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A scan can now be stopped from the screen.** The program has always known how to cancel one from
+  the inside — it remembers where it was and whatever is already catalogued stays — but the row that
+  announced it showed a dot, a sentence and a count, and **no button**.
+
+  **And two more things nobody had looked at.** A scan that starts on its own — when the program
+  opens, or when the watcher sees a new file — **drew absolutely nothing**: it sent its progress to a
+  place that was hidden. It shows now, but differently: a scan you launch by hand gets the full strip
+  with its button, and one that starts on its own gets only a discreet dot up top, because moving the
+  screen when nobody asked annoys more than it informs.
+
+- **The library says when it cannot read a folder**, and tells the two cases apart: an unplugged
+  drive, and a folder Windows will not let it into. The notice appears where the affected titles are
+  and where something can be done, rather than chasing you through the application. It clears itself
+  when the folder comes back.
+
+- **And a scan now says when it has finished**, instead of just vanishing. The sentence had been
+  translated in both languages for months with nobody reading it.
+
 - **The settings folder list said «Available» even with the drive unplugged.** And it always did: a
   folder's state was written once, when it was added, and never written again. What a scan did update
   was each **file's** availability, which is a different thing and a different badge — which is why

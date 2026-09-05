@@ -171,9 +171,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MediaAvailable">Disponible</x:String>
   <x:String x:Key="RootAccessDenied">Sin permiso</x:String>
   <x:String x:Key="ScanProgressAccessibleName">Progreso del escaneo</x:String>
-  <x:String x:Key="ScanProgressIdle">No hay ningún escaneo en curso.</x:String>
-  <x:String x:Key="ScanProgressRunning">Escaneando la biblioteca.</x:String>
   <x:String x:Key="ScanProgressCompleted">El escaneo ha terminado.</x:String>
+  <x:String x:Key="LibraryNoticesAccessibleName">Avisos de la biblioteca</x:String>
+  <x:String x:Key="ScanNoticeTitle">Escaneo incremental en curso</x:String>
+  <x:String x:Key="ScanNoticeBody">La interfaz sigue disponible y el escaneo puede cancelarse. Lo que ya se ha catalogado se queda.</x:String>
+  <x:String x:Key="ScanNoticeCancelAction">Cancelar el escaneo</x:String>
+  <x:String x:Key="LibraryNoticeRootGoneTitle">Carpeta desconectada</x:String>
+  <x:String x:Key="LibraryNoticeRootGoneBody">Sus títulos siguen en el catálogo marcados como no disponibles. No se borra nada; se recuperan al reconectar.</x:String>
+  <x:String x:Key="LibraryNoticeAccessDeniedTitle">Carpeta sin permiso</x:String>
+  <x:String x:Key="LibraryNoticeAccessDeniedBody">Windows no deja entrar en esta carpeta. El catálogo conserva sus títulos como no disponibles, y la aplicación nunca cambia permisos por su cuenta.</x:String>
   <x:String x:Key="ScanProgressFilesLabel">archivos encontrados</x:String>
   <x:String x:Key="NavigationCurrentStatus">Destino actual</x:String>
   <x:String x:Key="SettingsSectionLibrary">Biblioteca y escaneo</x:String>

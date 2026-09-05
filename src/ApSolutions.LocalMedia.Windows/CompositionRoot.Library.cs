@@ -77,6 +77,7 @@ public static partial class CompositionRoot
                 return onboarding;
             })
             .AddSingleton<ScanProgressViewModel>()
+            .AddSingleton<RootNoticeViewModel>()
             .AddTransient<ManualReassignmentViewModel>()
             .AddSingleton<Application.Catalog.IDuplicateOverviewReader, ApSolutions.LocalMedia.Infrastructure.Data.Repositories.DuplicateOverviewReader>()
             .AddTransient(provider => new Application.Catalog.GetDuplicateOverview(

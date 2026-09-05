@@ -49,6 +49,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <TextBlock
                 Foreground="{DynamicResource TextSecondaryBrush}"
                 Text="{DynamicResource LibraryItemCountLabel}" />
+            <!--
+              The discreet mark, and it is up here rather than in the strip on purpose: a scan that
+              started ON ITS OWN may not push the grid down (ADR-0010, fifth point), and this row's
+              space is already spent. It is a symbol and not a word, so it stays literal like the
+              other five and is raw to a reader; the strip below is what speaks, and only for a scan
+              somebody asked for.
+            -->
+            <TextBlock
+                x:Name="ScanProgressPulse"
+                Classes="state-glyph scan-pulse"
+                IsVisible="{Binding ScanProgress.ShowsPulse}"
+                Text="●"
+                automation:AutomationProperties.AccessibilityView="Raw" />
           </StackPanel>
         </StackPanel>
         <!--
@@ -104,43 +117,111 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </WrapPanel>
       </Grid>
       <!--
-        Only while a scan runs, which is the prototype's grammar: a row that said "no scan is
-        running" was a sentence about nothing, permanently parked between the header and the
-        filters. The live setting still announces the row when it appears, which is the moment the
-        sentence starts being news.
+        THE NOTICES STRIP (ADR-0010). Everything here describes a STATE that lasts as long as its
+        condition, so it takes space and pushes the grid down rather than covering it: hiding a
+        disconnected drive behind the titles it affects is worse than moving them once.
+
+        The row is Auto and every child carries IsVisible, so with nothing to say it measures zero -
+        the same shape ShellView uses for the loose-file band, which is where that was settled on
+        2026-08-21.
+
+        A scan somebody LAUNCHED is here. A scan that started on its own is the pulse up in the
+        header instead, because the ADR's fifth point is that a shift nobody asked for is not paid
+        for. Both were invisible until 2026-09-05: the row only ever lit for the hand-launched one,
+        and the automatic scan drew nothing at all.
       -->
       <StackPanel
-          x:Name="ScanProgressSurface"
+          x:Name="LibraryNoticesSurface"
           Grid.Row="1"
           Margin="0,12,0,0"
-          DataContext="{Binding ScanProgress}"
-          IsVisible="{Binding IsRunning}"
-          Orientation="Horizontal"
           Spacing="{DynamicResource Space8}"
-          automation:AutomationProperties.Name="{DynamicResource ScanProgressAccessibleName}"
+          automation:AutomationProperties.Name="{DynamicResource LibraryNoticesAccessibleName}"
           automation:AutomationProperties.LiveSetting="Polite">
+        <Border
+            x:Name="ScanNoticeSurface"
+            Classes="notice-strip"
+            DataContext="{Binding ScanProgress}"
+            IsVisible="{Binding ShowsStrip}"
+            automation:AutomationProperties.Name="{DynamicResource ScanProgressAccessibleName}">
+          <StackPanel Spacing="{DynamicResource Space8}">
+            <TextBlock FontWeight="SemiBold" Text="{DynamicResource ScanNoticeTitle}" />
+            <TextBlock
+                MaxWidth="640"
+                Text="{DynamicResource ScanNoticeBody}"
+                TextWrapping="Wrap" />
+            <!--
+              THE PULSE AND NOT A BAR, and the prototype's bar is why this needed measuring. It draws
+              «3.412 de 10.000» at 34 %, and this application does not know its total until the scan
+              has finished enumerating - so a proportion here would be invented.
+              An indeterminate ProgressBar was tried and rejected on a number: Avalonia's template
+              animates its indicator in from outside the control, and ViewOverflowTests caught it
+              ending at x=-75 in a 900 px window. The dot is what this house already uses to say a
+              scan is alive, it is measured, and it stays inside.
+            -->
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
+              <TextBlock
+                  x:Name="ScanNoticePulse"
+                  Classes="state-glyph scan-pulse"
+                  Text="●"
+                  automation:AutomationProperties.AccessibilityView="Raw" />
+              <TextBlock x:Name="ScanNoticeCount" Text="{Binding EnumeratedCount}" />
+              <TextBlock Text="{DynamicResource ScanProgressFilesLabel}" />
+            </StackPanel>
+            <!--
+              Not primary-action: this view already leads with «Añadir medios» and LeadingActionTests
+              asserts that class is the only one of its view.
+            -->
+            <WrapPanel
+                HorizontalAlignment="Right"
+                ItemSpacing="{DynamicResource Space8}"
+                LineSpacing="{DynamicResource Space8}">
+              <Button
+                  x:Name="CancelScanButton"
+                  Command="{Binding CancelCommand}"
+                  Content="{DynamicResource ScanNoticeCancelAction}"
+                  automation:AutomationProperties.Name="{DynamicResource ScanNoticeCancelAction}" />
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
         <!--
-          The dot is the only thing on this row that says a scan is still going: the count beside it
-          moves in steps, and between two steps a scan that is working and one that has stopped look
-          identical. It is a symbol and not a word, so it stays literal like the other five; the
-          sentence beside it is what a reader hears.
+          The scan saying it is done, which the row used to skip entirely: it vanished, and the words
+          for saying so sat translated in both dictionaries with nobody reading them. Finding 4 of the
+          2026-09-04 audit.
         -->
-        <TextBlock
-            x:Name="ScanProgressPulse"
-            Classes="state-glyph scan-pulse"
-            IsVisible="{Binding IsRunning}"
-            Text="●"
-            automation:AutomationProperties.AccessibilityView="Raw" />
-        <TextBlock
-            x:Name="ScanProgressRunningText"
-            IsVisible="{Binding IsRunning}"
-            Text="{DynamicResource ScanProgressRunning}" />
-        <TextBlock
-            x:Name="ScanProgressIdleText"
-            IsVisible="{Binding !IsRunning}"
-            Text="{DynamicResource ScanProgressIdle}" />
-        <TextBlock IsVisible="{Binding IsRunning}" Text="{Binding EnumeratedCount}" />
-        <TextBlock IsVisible="{Binding IsRunning}" Text="{DynamicResource ScanProgressFilesLabel}" />
+        <Border
+            x:Name="ScanFinishedNotice"
+            Classes="notice-strip"
+            DataContext="{Binding ScanProgress}"
+            IsVisible="{Binding HasFinished}">
+          <TextBlock Text="{DynamicResource ScanProgressCompleted}" />
+        </Border>
+
+        <ItemsControl x:Name="RootNoticesSurface" ItemsSource="{Binding RootNotices.Notices}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="library:RootNoticeRowViewModel">
+              <Border
+                  Margin="0,0,0,8"
+                  Classes="notice-strip"
+                  Classes.danger="{Binding IsAccessDenied}"
+                  Classes.warning="{Binding !IsAccessDenied}">
+                <StackPanel Spacing="{DynamicResource Space8}">
+                  <TextBlock
+                      FontWeight="SemiBold"
+                      Text="{Binding TitleKey, Converter={StaticResource CatalogResourceKey}}" />
+                  <TextBlock
+                      FontFamily="{DynamicResource FontFamilyMono}"
+                      Text="{Binding Path}"
+                      TextTrimming="CharacterEllipsis" />
+                  <TextBlock
+                      MaxWidth="640"
+                      Text="{Binding BodyKey, Converter={StaticResource CatalogResourceKey}}"
+                      TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
       </StackPanel>
       <!--
         Search, two filters and the apply button all carry translated words, and a Grid of fixed

@@ -2987,6 +2987,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
     element this class is already paired with. Both failures wear tone 'err' there, so the red is the
     design's; what tells them apart is the word.
   -->
+  <!--
+    THE NOTICES STRIP, and the whole of ADR-0010 in one class: a notice that describes a STATE takes
+    space and pushes the grid down. The prototype's banner() is what it draws — 12 px of gap, 12 by 14
+    of padding, a 1 px border in the tone's own ink and its wash behind — and the radius of 10 comes
+    from there rather than from a token, which is why row-box already writes the same number.
+
+    The tone lives in the modifier because severity picks the colour and never the position, which is
+    the ADR's third point: an info scan and a refused share sit in exactly the same place.
+  -->
+  <Style Selector="Border.notice-strip">
+    <Setter Property="Padding" Value="12,14" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="Border.notice-strip.warning">
+    <Setter Property="Background" Value="{DynamicResource WarningSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource WarningBorderBrush}" />
+  </Style>
+
+  <Style Selector="Border.notice-strip.danger">
+    <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
+  </Style>
+
   <Style Selector="Border.state-chip.denied">
     <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
