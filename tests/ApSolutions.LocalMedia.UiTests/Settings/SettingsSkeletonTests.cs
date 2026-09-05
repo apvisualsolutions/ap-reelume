@@ -167,6 +167,7 @@ public sealed class SettingsSkeletonTests
             new ScanSettingsView(),
             new RecommendationSettingsView(),
             new SegmentDetectionSettingsView(),
+            new PlaybackSettingsView(),
             new AppearanceSettingsView(),
         })
         {

@@ -757,6 +757,12 @@ public static partial class CompositionRoot
             SegmentDetection = new SegmentDetectionSettingsViewModel(
             () => provider.GetRequiredService<DetectSeriesSegments>().IsEnabled,
             enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)),
+            // The surface PLY-011's criterion promised and ContinuityCountdown's comment
+            // already claimed existed. The same facade the player reads at chaining time, so
+            // there is one stored length and not a second copy that can drift from it.
+            PlaybackSettings = new PlaybackSettingsViewModel(
+            () => provider.GetRequiredService<StartNextEpisodeCountdown>().CountdownSeconds,
+            seconds => provider.GetRequiredService<StartNextEpisodeCountdown>().ConfigureCountdown(seconds)),
             OpenMetadataEditor = (titleId, cancellationToken) =>
                 OpenMetadataEditorAsync(provider, titleId, cancellationToken),
             OpenRename = (titleId, cancellationToken) => OpenRenameAsync(provider, titleId, cancellationToken),

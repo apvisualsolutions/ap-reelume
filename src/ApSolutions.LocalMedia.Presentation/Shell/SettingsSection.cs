@@ -15,6 +15,9 @@ public enum SettingsSection
     /// <summary>The library's folders and the scanning that watches them: «Biblioteca y escaneo».</summary>
     Library,
 
+    /// <summary>What happens when an episode or a lesson ends: «Reproducción».</summary>
+    Playback,
+
     Recommendations,
     Subtitles,
     SegmentDetection,

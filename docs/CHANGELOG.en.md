@@ -10,6 +10,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **You can now decide whether the next episode starts on its own, and how long it takes to.**
+  Settings gains a section, «Playback», with a switch and — underneath, only while it is on — the
+  seconds to wait.
+
+  **This already worked and there was no way to touch it.** The program has stored how long to wait
+  before chaining for months, read it at playback, and the only thing that ever wrote it was the
+  tests. This feature's record promised in writing that it was «configurable» and no screen allowed
+  it; now one does, which is why it counts as settled again.
+
+  **Two rows and not one, and the reason matters**: switching off and back on does not discard the
+  time you had chosen. If you set thirty seconds and switch the chain off for an evening, it is
+  still thirty when you switch it back on, not the factory ten. And the slider can never switch it
+  off by itself: the switch decides that, so there is no way to leave it off while believing it is
+  still set.
+
+  Both controls are pressed with a real mouse in the automatic walk, and what is checked is not that
+  the control moves but that **the program stores what you said**.
+
 - **The design prototype showed five things wrong, and one of them left a button with no
   destination.** It is the tool the look of the program is decided with, so a defect in it is paid
   for in every decision that comes out of it. Its sheet said it walked 28 situations and it walks

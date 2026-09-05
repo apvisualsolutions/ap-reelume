@@ -440,6 +440,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="SegmentDetectionSettingsTitle">Automatic segment detection</x:String>
   <x:String x:Key="SegmentDetectionSettingsDescription">Compares the episodes of each series locally to find recurring intros, recaps, and credits. Nothing is sent anywhere, playback always comes first, and every detection can be reviewed or corrected.</x:String>
   <x:String x:Key="SegmentDetectionSettingsEnable">Detect segments automatically</x:String>
+  <x:String x:Key="PlaybackSettingsAccessibleName">Playback</x:String>
+  <x:String x:Key="PlaybackSettingsTitle">Playback</x:String>
+  <x:String x:Key="PlaybackSettingsDescription">What happens when an episode or a lesson ends. None of this leaves this machine.</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownEnable">Next-episode countdown</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownDescription">When one ends, the next starts on its own. It is cancelable, and returns to the card when the next file is missing.</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownSeconds">Seconds to wait</x:String>
+  <x:String x:Key="PlaybackSettingsCountdownSecondsDescription">How long you have to say no before it starts.</x:String>
+  <x:String x:Key="PlaybackSettingsSecondsSuffix">s</x:String>
   <x:String x:Key="DetectedMarkerReviewAccessibleName">Detections in this episode</x:String>
   <x:String x:Key="DetectedMarkerReviewTitle">Detected segments</x:String>
   <x:String x:Key="DetectedMarkerReviewDescription">Ranges automatic detection found in this episode. Accepting or correcting one protects it from future runs; deleting it lets it come back.</x:String>

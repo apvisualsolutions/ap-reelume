@@ -16,9 +16,9 @@
   ],
   "summary": {
     "total": 46,
-    "verified": 43,
+    "verified": 44,
     "outOfScope": 1,
-    "blocked": 2
+    "blocked": 1
   },
   "features": [
     {
@@ -571,7 +571,7 @@
     },
     {
       "id": "PLY-011",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "tasks": [
         "T28"
       ],
@@ -583,13 +583,9 @@
       "evidence": [
         "docs/evidence/mvp/T28-next-episode.md",
         "docs/evidence/stable/audit-built-and-not-drawn.md",
-        "docs/evidence/stable/audit-wp2-assembly.md"
-      ],
-      "blocker": {
-        "unblockCondition": "A Settings surface that reads and writes continuity.next-episode-countdown-seconds, with zero switching the chain off, reachable by the autonomous walk in the same change.",
-        "reason": "The countdown is cancelable and revalidates, but nothing in the application configures it: the preference is written only by tests, and the Settings section the prototype draws for it does not exist.",
-        "owner": "Engineering"
-      }
+        "docs/evidence/stable/audit-wp2-assembly.md",
+        "docs/evidence/stable/PLY011-playback-settings.md"
+      ]
     },
     {
       "id": "PLY-012",

@@ -443,6 +443,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Tag="{x:Static shell:SettingsSection.Library}"
               automation:AutomationProperties.Name="{DynamicResource SettingsSectionLibrary}" />
           <ListBoxItem
+              Content="{DynamicResource PlaybackSettingsTitle}"
+              IsVisible="{Binding HasPlaybackSettings}"
+              Tag="{x:Static shell:SettingsSection.Playback}"
+              automation:AutomationProperties.Name="{DynamicResource PlaybackSettingsTitle}" />
+          <ListBoxItem
               Content="{DynamicResource RecommendationSettingsTitle}"
               IsVisible="{Binding HasRecommendationSettings}"
               Tag="{x:Static shell:SettingsSection.Recommendations}"
@@ -505,6 +510,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
                   <settings:ScanSettingsView DataContext="{Binding ScanSettings}" />
                 </ContentControl>
               </StackPanel>
+            </ContentControl>
+            <ContentControl Margin="48,0" IsVisible="{Binding IsPlaybackSection}">
+              <ContentControl IsVisible="{Binding HasPlaybackSettings}">
+                <settings:PlaybackSettingsView DataContext="{Binding PlaybackSettings}" />
+              </ContentControl>
             </ContentControl>
             <ContentControl Margin="48,0" IsVisible="{Binding IsRecommendationsSection}">
               <ContentControl IsVisible="{Binding HasRecommendationSettings}">

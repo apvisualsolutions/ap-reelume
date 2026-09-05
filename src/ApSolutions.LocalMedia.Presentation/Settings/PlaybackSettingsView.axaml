@@ -1,0 +1,111 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.PlaybackSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:PlaybackSettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PlaybackSettingsAccessibleName}">
+  <!-- §4's skeleton for a settings page: the padded surface, the 620 column, and the title at the
+       size every other section uses. -->
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel x:Name="PlaybackSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource PlaybackSettingsTitle}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource PlaybackSettingsDescription}"
+          TextWrapping="Wrap" />
+      <!--
+        The toggle owns on and off, which is the shape the prototype draws. The store keeps seconds
+        with zero meaning off, so this row writes the zero and the row below writes the length.
+      -->
+      <Border Classes="row-box">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-name"
+                Text="{DynamicResource PlaybackSettingsCountdownEnable}"
+                automation:AutomationProperties.HeadingLevel="3" />
+            <TextBlock
+                Classes="setting-description"
+                Text="{DynamicResource PlaybackSettingsCountdownDescription}"
+                TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space8}"
+              VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding IsCountdownEnabled}"
+                Text="{DynamicResource SettingStateOn}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <TextBlock
+                Classes="setting-state"
+                IsVisible="{Binding !IsCountdownEnabled}"
+                Text="{DynamicResource SettingStateOff}"
+                automation:AutomationProperties.AccessibilityView="Raw" />
+            <CheckBox
+                x:Name="PlaybackCountdownSwitch"
+                automation:AutomationProperties.Name="{DynamicResource PlaybackSettingsCountdownEnable}"
+                IsChecked="{Binding IsCountdownEnabled, Mode=TwoWay}"
+                VerticalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+      </Border>
+      <!--
+        The length, absent rather than disabled while the countdown is off: a wait that does not
+        happen has no length to ask for, and the application already answers that question this way
+        wherever an option cannot happen - the refresh row of Privacy is the precedent.
+      -->
+      <Border Classes="row-box" IsVisible="{Binding IsCountdownEnabled}">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+          <StackPanel Grid.Column="0" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+            <TextBlock
+                Classes="setting-name"
+                Text="{DynamicResource PlaybackSettingsCountdownSeconds}"
+                automation:AutomationProperties.HeadingLevel="3" />
+            <TextBlock
+                Classes="setting-description"
+                Text="{DynamicResource PlaybackSettingsCountdownSecondsDescription}"
+                TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="{DynamicResource Space12}"
+              VerticalAlignment="Center">
+            <Slider
+                x:Name="PlaybackCountdownSeconds"
+                Width="170"
+                Minimum="{x:Static settings:PlaybackSettingsViewModel.MinimumCountdownSeconds}"
+                Maximum="{x:Static settings:PlaybackSettingsViewModel.MaximumCountdownSeconds}"
+                TickFrequency="5"
+                IsSnapToTickEnabled="True"
+                Value="{Binding CountdownSeconds}"
+                VerticalAlignment="Center"
+                automation:AutomationProperties.Name="{DynamicResource PlaybackSettingsCountdownSeconds}" />
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}" VerticalAlignment="Center">
+              <TextBlock
+                  Classes="setting-state"
+                  Text="{Binding CountdownSeconds, StringFormat={}{0:0}}" />
+              <TextBlock
+                  Classes="setting-state"
+                  Text="{DynamicResource PlaybackSettingsSecondsSuffix}" />
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>

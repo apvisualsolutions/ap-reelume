@@ -10,6 +10,24 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Ya puedes decidir si el siguiente episodio empieza solo, y cuánto tarda en empezar.** Ajustes
+  estrena una sección, «Reproducción», con un interruptor y —debajo, sólo cuando está encendido— los
+  segundos de espera.
+
+  **Esto ya funcionaba y no había forma de tocarlo.** El programa guardaba desde hace meses cuánto
+  esperar antes de encadenar, lo leía al reproducir, y lo único que llegaba a escribirlo eran las
+  pruebas. La ficha de esta función prometía por escrito que era «configurable» y ninguna pantalla
+  lo permitía; ahora sí, y por eso vuelve a darse por buena.
+
+  **Dos filas y no una, y el motivo importa**: apagar y volver a encender no te descarta el tiempo
+  que hubieras elegido. Si pusiste treinta segundos y apagas la cadena una tarde, al encenderla
+  siguen siendo treinta y no los diez de fábrica. Y el deslizador nunca puede apagarla por su
+  cuenta: eso lo decide el interruptor, así que no hay forma de dejarla apagada creyendo que sigue
+  puesta.
+
+  Los dos controles se pulsan con un ratón de verdad en el recorrido automático, y lo que se
+  comprueba no es que el control se mueva sino que **el programa guarde lo que dijiste**.
+
 - **El prototipo del diseño enseñaba mal cinco cosas, y una de ellas dejaba un botón sin destino.**
   Es la herramienta con la que se decide cómo se ve el programa, así que un defecto suyo se paga en
   todas las decisiones que salen de él. La ficha decía que recorría 28 situaciones y recorre 30; una

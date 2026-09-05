@@ -63,17 +63,14 @@ $extraSuites = @{
 # The commitments this hardware cannot settle. Each one names what would settle it, so the block is
 # a piece of work rather than a permanent footnote.
 $blockers = @{
-    # PLY-011 fell back here on 2026-09-04. Its criterion says «cancelable, CONFIGURABLE, and returns
-    # to details when the next file is missing», and the first and third are true. The second is not:
-    # ContinuityCountdown stores its duration in a preference and zero switches the whole chain off,
-    # it is read at playback, and the only thing that writes it is the tests. That class's own comment
-    # claims «the settings surface already reads and writes» the key — the surface does not exist. The
-    # prototype puts it in a «Reproducción» section of Settings the application does not have.
-    'PLY-011' = @{
-        reason = 'The countdown is cancelable and revalidates, but nothing in the application configures it: the preference is written only by tests, and the Settings section the prototype draws for it does not exist.'
-        owner = 'Engineering'
-        unblockCondition = 'A Settings surface that reads and writes continuity.next-episode-countdown-seconds, with zero switching the chain off, reachable by the autonomous walk in the same change.'
-    }
+    # PLY-011 fell back here on 2026-09-04 and was unblocked on 2026-09-05. The block asked for «a
+    # Settings surface that reads and writes continuity.next-episode-countdown-seconds, with zero
+    # switching the chain off, reachable by the autonomous walk in the same change», and that is
+    # exactly what PlaybackSettingsView is: a toggle that writes the zero the chaining code reads, a
+    # slider under it that owns the length and can never write that zero, both reading the same
+    # facade the player reads, and both pressed with a real mouse by the preferences scene. The
+    # comment ContinuityCountdown had been carrying since T28 — «the settings surface already reads
+    # and writes» the key — is true for the first time.
 
     # PLY-004 was blocked here from 2026-08-10 and unblocked on 2026-09-02, once the channel
     # layout could be exercised without the hardware: the block said no render endpoint on this
