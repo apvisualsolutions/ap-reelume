@@ -109,12 +109,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
           "Add media" at the foot, which is where the prototype puts it and what somebody opening this
           application with an empty library needs first. It is declared before the destinations
           because a DockPanel gives its bands away in declaration order and the last child takes what
-          is left; written after them it would be handed the whole rail and the five would have
+          is left; written after them it would be handed the whole rail and the six would have
           nowhere to go.
 
-          It is an action and not a sixth destination, and that is a decision rather than a shortcut:
-          AppRoute is asserted to hold exactly five names, and the surface where a folder is added
-          lives inside the library rather than on a route of its own. So this presses through
+          It is an action and not a seventh destination, and that is a decision rather than a
+          shortcut: every name in AppRoute is asserted to have a surface, and the place where a
+          folder is added lives inside the library rather than on a route of its own. It said "five
+          names" until 2026-09-05, and had said it since before Cursos made them six: a count
+          written into a comment is a number nobody re-measures, so the sentence now names the rule
+          that WelcomeCardRouteTests actually enforces instead of a total that rots. So this presses
+          through
           AddMediaCommand, which goes to that surface AND clears the form - the path, the refusal and
           any half-finished removal - because "add media" means start adding, not go to the library.
           Without the clearing it would be a second button doing what Biblioteca already does, and
