@@ -72,14 +72,21 @@ gallery the prototype already draws. It closes a measured defect: today one fiel
 and a provider refresh leaves somebody's cover orphaned inside every backup.
 
 **And twelve things remain built that no screen shows**, out of the eighteen found by
-[the audit of 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). The six closed are the
-covers in the grid, the library that stopped at fifty titles, the countdown row that promised to be
-configurable without being so — **actually closed on 2026-09-05**, with Settings' «Playback» section
-— the mini player's three names, the orphaned strings, which also gained
-[a gate](../evidence/stable/audit-orphaned-strings.md) so they cannot come back, and **the scan that
-could be cancelled from inside and not from outside**, closed that same afternoon with
-[the notices strip](../evidence/stable/audit-lib002-the-notices-strip.md). The remaining twelve come
-in two groups: what only needs showing, and what the design has and the application does not.
+[the audit of 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). **The count was measured
+one by one on 2026-09-06** and the six closed are the library that stopped at fifty titles, the
+countdown row that promised to be configurable without being so — **actually closed on 2026-09-05**,
+with Settings' «Playback» section — the mini player's three names, the orphaned strings, which also
+gained [a gate](../evidence/stable/audit-orphaned-strings.md) so they cannot come back, **the scan
+that could be cancelled from inside and not from outside**, closed that same afternoon with
+[the notices strip](../evidence/stable/audit-lib002-the-notices-strip.md), and **editing a single
+episode's card, which closes because its premise was false** — the show card does have a route to the
+editor. The remaining twelve come in two groups: what only needs showing, and what the design has and
+the application does not.
+
+**This paragraph counted «the covers in the grid» among the six, and that was counting wrong even
+though the total came out right**: that cover was the audit's **trigger**, not one of its eighteen,
+and in exchange it held open the one already closed. Two counts that agree are not a confirmed
+count.
 
 **And one turned up that the audit did not have, because it only shows in pixels**: the Courses
 screen was drawn **under** the welcome card, with both titles and both descriptions overlapping and

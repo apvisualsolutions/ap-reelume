@@ -74,14 +74,21 @@ cosas, y refrescar contra el proveedor deja la portada de alguien huérfana dent
 seguridad.
 
 **Y quedan doce cosas construidas que ninguna pantalla enseña**, de las dieciocho que encontró
-[la auditoría del 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). Las seis cerradas
-son las portadas en la rejilla, la biblioteca que se cortaba en cincuenta títulos, la ficha de la
-cuenta atrás que prometía ser configurable sin serlo —**cerrada de verdad el 2026-09-05**, con la
-sección «Reproducción» de Ajustes—, los tres nombres del mini reproductor, las cadenas huérfanas,
-que además ganaron [una puerta](../evidence/stable/audit-orphaned-strings.md) para que no vuelvan, y
-**el escaneo que se podía cancelar por dentro y no por fuera**, cerrado esa misma tarde con
-[la franja de avisos](../evidence/stable/audit-lib002-the-notices-strip.md). Las doce restantes van
-en dos grupos: lo que sólo falta enseñar, y lo que el diseño tiene y la aplicación no.
+[la auditoría del 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). **La cuenta se midió
+una a una el 2026-09-06** y las seis cerradas son la biblioteca que se cortaba en cincuenta títulos,
+la ficha de la cuenta atrás que prometía ser configurable sin serlo —**cerrada de verdad el
+2026-09-05**, con la sección «Reproducción» de Ajustes—, los tres nombres del mini reproductor, las
+cadenas huérfanas, que además ganaron [una puerta](../evidence/stable/audit-orphaned-strings.md) para
+que no vuelvan, **el escaneo que se podía cancelar por dentro y no por fuera**, cerrado esa misma
+tarde con [la franja de avisos](../evidence/stable/audit-lib002-the-notices-strip.md), y **editar la
+ficha de un episodio suelto, que se cierra porque su premisa era falsa** — la ficha de serie sí tiene
+ruta al editor. Las doce restantes van en dos grupos: lo que sólo falta enseñar, y lo que el diseño
+tiene y la aplicación no.
+
+**Este párrafo contaba «las portadas en la rejilla» entre las seis, y eso era contar mal aunque el
+total saliera bien**: esa portada fue el **detonante** de la auditoría, no uno de sus dieciocho, y a
+cambio daba por abierto el que ya estaba cerrado. Dos cuentas que coinciden no son una cuenta
+confirmada.
 
 **Y apareció uno que la auditoría no tenía, porque sólo se ve en píxeles**: la pantalla de Cursos se
 dibujaba **debajo** de la tarjeta de bienvenida, con los dos títulos y las dos descripciones
