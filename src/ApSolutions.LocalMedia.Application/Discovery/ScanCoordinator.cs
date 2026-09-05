@@ -105,6 +105,11 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
                     await _rootRepository
                         .SetAvailabilityAsync(root.Id, rootFailure.Value, CancellationToken.None)
                         .ConfigureAwait(false);
+                    await _eventPublisher
+                        .PublishAsync(
+                            new RootAvailabilityChanged(root.Id, root.Path, rootFailure.Value),
+                            CancellationToken.None)
+                        .ConfigureAwait(false);
                 }
 
                 var validItems = batch.Where(item => item.ErrorCode is null).ToArray();
@@ -165,6 +170,7 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
                         probeCount,
                         resumeAfterPath,
                         isCompleted: false,
+                        command.Trigger,
                         cancellationToken).ConfigureAwait(false));
             }
         }
@@ -181,6 +187,14 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
             await _rootRepository
                 .SetAvailabilityAsync(root.Id, RootAvailability.Available, cancellationToken)
                 .ConfigureAwait(false);
+
+            // Published on the way back as well, because a notice that never clears is the same lie
+            // told the other way round.
+            await _eventPublisher
+                .PublishAsync(
+                    new RootAvailabilityChanged(root.Id, root.Path, RootAvailability.Available),
+                    cancellationToken)
+                .ConfigureAwait(false);
         }
 
         await _mediaFileRepository.ClearScanCheckpointAsync(root.Id, cancellationToken).ConfigureAwait(false);
@@ -193,6 +207,7 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
                 probeCount,
                 currentPath: null,
                 isCompleted: true,
+                command.Trigger,
                 cancellationToken).ConfigureAwait(false));
         await _eventPublisher
             .PublishAsync(new CatalogChanged(root.Id, mediaCount - unchangedCount), cancellationToken)
@@ -265,11 +280,12 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
         int probeCount,
         string? currentPath,
         bool isCompleted,
+        ScanTrigger trigger,
         CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         await _eventPublisher.PublishAsync(
-                new ScanProgressChanged(rootId, enumeratedCount, probeCount, currentPath, isCompleted),
+                new ScanProgressChanged(rootId, enumeratedCount, probeCount, currentPath, isCompleted, trigger),
                 cancellationToken)
             .ConfigureAwait(false);
         return stopwatch.Elapsed;

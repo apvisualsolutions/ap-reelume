@@ -75,9 +75,8 @@ public sealed class OrphanedResourceTests
         ["PlayerNextLessonLabel"] = "audit finding 9, open",
         ["CourseLastOpenedFormat"] = "audit finding 10, open",
 
-        // Finding 4: the scan row vanishes without saying it finished. It goes with the cancel
-        // button, in the notices strip.
-        ["ScanProgressCompleted"] = "audit finding 4, open",
+        // Finding 4 left this list on 2026-09-05: the notices strip draws it, beside the cancel
+        // button it was always waiting for. A key leaves here by being drawn, which is the only way.
     };
 
     [Fact]

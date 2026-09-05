@@ -51,13 +51,15 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         MovieDetailsViewModel? movieDetails = null,
         ShowDetailsViewModel? showDetails = null,
         ScanProgressViewModel? scanProgress = null,
-        Func<TitleId, string?, string?>? findPoster = null)
+        Func<TitleId, string?, string?>? findPoster = null,
+        RootNoticeViewModel? rootNotices = null)
     {
         _queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
         _findPoster = findPoster ?? ((_, _) => null);
         MovieDetails = movieDetails ?? new MovieDetailsViewModel();
         ShowDetails = showDetails ?? new ShowDetailsViewModel();
         ScanProgress = scanProgress ?? new ScanProgressViewModel();
+        RootNotices = rootNotices ?? new RootNoticeViewModel();
         RefreshCommand = new AsyncRelayCommand(() => LoadAsync(CancellationToken.None));
         LoadMoreCommand = new AsyncRelayCommand(() => LoadMoreAsync(CancellationToken.None));
         OpenDetailsCommand = new RelayCommand(
@@ -417,6 +419,12 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// is stated in words instead of only moving a bar.
     /// </summary>
     public ScanProgressViewModel ScanProgress { get; }
+
+    /// <summary>
+    /// The roots this library cannot read right now. ADR-0010 puts the notice here and nowhere else:
+    /// it belongs where the affected titles are and where somebody can do something about it.
+    /// </summary>
+    public RootNoticeViewModel RootNotices { get; }
 
     /// <summary>
     /// Fills the detail surfaces for the item that was opened. The library itself reads nothing but

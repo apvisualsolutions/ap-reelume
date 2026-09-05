@@ -607,7 +607,10 @@ public static partial class CompositionRoot
             // branch nothing in this assembly's tests reaches is a branch that lowers this file's
             // floor — which is exactly what it did on the run of 3661283. The signatures already
             // agree, so the wrapper was never buying anything.
-            provider.GetRequiredService<ResolveTitlePoster>().Find);
+            provider.GetRequiredService<ResolveTitlePoster>().Find,
+            // The notices strip's other half. A root that cannot be read is announced where the
+            // affected titles are (ADR-0010), and until this line the event was published to nobody.
+            provider.GetRequiredService<RootNoticeViewModel>());
         library.DetailsLoader = async item =>
         {
             var stored = await catalogMetadata

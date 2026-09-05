@@ -2079,6 +2079,54 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// The scan is stopped from outside, which is what LIB-002 promises and what nothing offered.
+    /// </summary>
+    /// <remarks>
+    /// The view model has had <c>CanCancel</c> and a complete <c>Cancel()</c> since scanning existed,
+    /// and the progress row drew the dot, the sentence and the count — and no button. The audit of
+    /// 2026-09-04 called it "cancellable from inside and not from outside", which is this house's
+    /// defect in its plainest form.
+    /// <para>
+    /// The scene starts a real scan and holds it open with a token source of its own, because a
+    /// button that can only be pressed while work is in flight needs work in flight: the cancel is
+    /// pressed with a real mouse and asserted on the token, which is what actually stops the scan.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_scan_is_cancelled_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell();
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+
+        // The token the running scan would carry. Begin is what the hand-launched route calls, and
+        // calling it here is what puts the strip on screen with something real behind its button.
+        using var cancellation = new CancellationTokenSource();
+        library!.ScanProgress.Begin(cancellation);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(library.ScanProgress.ShowsStrip, "a scan launched by hand draws the strip.");
+        Assert.False(library.ScanProgress.ShowsPulse, "and not the discreet mark, which is the other case.");
+        Assert.False(cancellation.IsCancellationRequested);
+
+        await PressAsync(
+            host,
+            "ScanNoticeCancelAction",
+            () => Task.FromResult(cancellation.IsCancellationRequested),
+            "pressing cancel did not ask the scan to stop");
+
+        Assert.True(
+            cancellation.IsCancellationRequested,
+            "the scan kept going after the button that exists to stop it was pressed.");
+        Assert.False(library.ScanProgress.CanCancel, "a scan already asked to stop cannot be asked twice.");
+    }
+
+    /// <summary>
     /// The catalogue row a film has once somebody identified it, written through SQL because the
     /// catalogue writes it during identification, which needs the network the harness does not have.
     /// </summary>

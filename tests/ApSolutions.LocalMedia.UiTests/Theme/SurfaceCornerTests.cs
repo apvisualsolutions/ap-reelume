@@ -103,6 +103,11 @@ public sealed class SurfaceCornerTests
             12,
             @"border:1px solid var\(--hair,rgba\(15,23,42,\.09\)\);border-radius:(?<radius>[0-9]+)px;background:var\(--card,\#fff\);overflow:hidden"),
         new(
+            "Border.notice-strip",
+            "the notices strip - the scan, and a root that cannot be read",
+            10,
+            @"alignItems: 'flex-start', padding: '12px 14px', borderRadius: (?<radius>[0-9]+)"),
+        new(
             "Border.chip-accent",
             "the chip in the accent's tone — «Siguiente en el hilo»",
             999,
