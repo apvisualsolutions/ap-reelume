@@ -46,6 +46,26 @@ literal.
 referencia —las seis de Inicio, las tres de Biblioteca, y siete parejas más—, así que una matriz que
 prometa 57 referencias distintas está prometiendo lo que no hay.
 
+## Qué cuenta como defecto, desde el 2026-09-05
+
+**Paridad significa «no peor que el prototipo», no «idéntico».** Es la enmienda fechada de
+`docs/adr/0007`, decidida por el propietario. Aplícala antes de reportar nada:
+
+| Lo que ves | Veredicto |
+| --- | --- |
+| Los dos lo dibujan, de forma distinta | **Defecto** salvo cesión escrita |
+| El prototipo lo dibuja y la aplicación no | **Defecto** |
+| La aplicación lo dibuja y el prototipo no, sin coste medible | **NO es hallazgo** |
+| La aplicación lo dibuja y el prototipo no, con coste medible | **Defecto**, y el coste se escribe |
+
+**La forma de lo compartido sigue siendo idéntica**: esto no autoriza un radio distinto, un color
+propio ni un tamaño de letra que el diseño no dibuje. Toca **qué elementos existen**, no **cómo se
+dibujan los que existen** — que es todo lo que este archivo mide más abajo.
+
+Y **un añadido sigue necesitando su razón escrita junto al control**: es lo que hace la lista cerrada
+de `ButtonShapeTests`, donde `colour-cell`, `rating-choice`, `icon-action` y `link-action` viven con
+lo que se buscó y no existe.
+
 ## Qué comparar, y con qué medida
 
 | Aspecto | Del prototipo | De la aplicación |
