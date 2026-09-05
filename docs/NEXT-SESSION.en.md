@@ -6,6 +6,22 @@
 > `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it
 > would already have changed it.
 >
+> ### The three CI reds of this session, and only two were the code's
+>
+> · **Architecture**: the new gate wrote its own way of finding the repository root, which `ARQ-012`
+>   reduced to one place. **Four suites were run and the architecture one was not**, because the new
+>   file lives in `UiTests`. The rule says the opposite: **the affected suite is whoever READS the
+>   file**, and a new test is always read by the architecture suite.
+> · **Coverage**: the new section's two files, and **they were two different cases**. The view
+>   measures 100/50 like the other sixty — the only branch the compiler generates for an `.axaml` —
+>   and goes on the list with the ratchet at 189; the view model measured 90/95, **could improve and
+>   was covered to 100/100**. A file enters the list only when it cannot improve.
+> · **Accessibility, and this one was NOT the code's**: a scene expected `00:00:00` and read
+>   `00:01:00`, on the second pass only. That minute is **the seeded video's observed duration**: the
+>   periodic progress loop wrote before the restart landed. **Measured before touching anything**: the
+>   scene alone passes twice, and the whole `run-accessibility.ps1 -Passes 2` gives **149 of 149 on
+>   both passes**. The job was rerun. **A red that is not the code's is not fixed by changing the
+>   code**, least of all by relaxing the assertion: that zero is the entire meaning of «start over».
 > ### The session's lesson, and it took three passes to find
 >
 > · **A gate that catches orphaned strings called FORTY live ones dead on its first version.** It
@@ -786,7 +802,6 @@
 > `CLAUDE.md`: **what talks to the machine is separated from what decides, and only the lower half is
 > excluded.** The file went to **100/100** with 17 tests, and **the debt ratchet came down to 189**.
 >
->
 > ### 5. Three of the six the player's panel differs by
 >
 > The three drop-downs are still batch 1 below, but **three** of the six are closed already: the row's
@@ -797,7 +812,6 @@
 > a warning box to a **grey footnote**, which is how the prototype draws it. With it came
 > `FontSizeFootnote` (11), the step the type scale was missing at the bottom and which the design uses
 > **59 times**.
->
 >
 > ### 6. And seven gates from this same batch did not measure what they said
 >

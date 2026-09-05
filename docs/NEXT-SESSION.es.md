@@ -6,6 +6,23 @@
 > `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
 > escribiría ya lo habría cambiado.
 >
+> ### Los tres rojos de CI de esta sesión, y sólo dos eran del código
+>
+> · **Arquitectura**: la puerta nueva escribió su propia forma de encontrar la raíz del repositorio,
+>   que `ARQ-012` redujo a un solo sitio. **Se corrieron cuatro suites y no la de arquitectura**,
+>   porque el archivo nuevo vive en `UiTests`. La regla dice lo contrario: **la suite afectada es
+>   quien LEE el archivo**, y una prueba nueva la lee siempre la de arquitectura.
+> · **Cobertura**: los dos archivos de la sección nueva, y **eran dos casos distintos**. La vista mide
+>   100/50 como las otras sesenta —la única rama que el compilador genera para un `.axaml`— y va a la
+>   lista con el trinquete a 189; el ViewModel medía 90/95, **podía mejorar y se cubrió a 100/100**.
+>   Un archivo entra en la lista sólo cuando no puede mejorar.
+> · **Accesibilidad, y éste NO era del código**: una escena esperaba `00:00:00` y leyó `00:01:00`,
+>   sólo en la segunda pasada. Ese minuto es **la duración observada del vídeo sembrado**: el bucle
+>   periódico de progreso escribió antes de que el reinicio se aplicara. **Medido antes de tocar
+>   nada**: la escena sola pasa dos veces, y `run-accessibility.ps1 -Passes 2` entero da **149 de 149
+>   en las dos pasadas**. Se reintentó el trabajo. **Un rojo que no es del código no se arregla
+>   cambiando el código**, y menos relajando la aserción: ese cero es el significado entero de
+>   «volver a empezar».
 > ### La lección de la sesión, y costó tres pasadas descubrirla
 >
 > · **Una puerta que caza cadenas huérfanas dio, en su primera versión, CUARENTA cadenas vivas por
@@ -771,7 +788,6 @@
 > mitad de abajo se excluye.** El archivo pasó a **100/100** con 17 pruebas, y **el trinquete de
 > deuda bajó a 189**.
 >
->
 > ### 5. Tres de las seis diferencias del panel del reproductor
 >
 > Los tres desplegables siguen siendo la tanda 1 de abajo, pero **tres** de las seis se cerraron ya:
@@ -782,7 +798,6 @@
 > mezcla pasa de recuadro de advertencia a **nota al pie gris**, que es como lo dibuja el prototipo.
 > Con él entró `FontSizeFootnote` (11), el escalón que a la escala tipográfica le faltaba por abajo y
 > que el diseño usa **59 veces**.
->
 >
 > ### 6. Y siete puertas de esta misma tanda no medían lo que decían
 >

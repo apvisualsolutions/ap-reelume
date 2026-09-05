@@ -103,6 +103,31 @@ lo que faltaba no era una suite sino el momento — se corrió con la sección y
 que la vista existiera como archivo compilado que el informe pudiera medir. **Su silencio no es un
 certificado**, que es exactamente lo que su propia cabecera advierte.
 
+
+### Y un tercer rojo que NO era del código, medido antes de tocar nada
+
+El mismo commit falló después en la **puerta de accesibilidad**, y sólo en la **segunda pasada**:
+`The_other_version_is_switched_to_with_the_mouse_and_its_question_answered` esperaba `00:00:00` y
+leyó `00:01:00`.
+
+**Ese minuto es exactamente la duración observada del vídeo sembrado**, sesenta segundos, y eso es lo
+que lo delata. La escena comprueba la posición **guardada**, y quien la escribe es el bucle periódico
+de progreso; si ese bucle escribe justo antes de que el reinicio se aplique, guarda dónde estaba la
+sesión anterior — que había llegado al final. La escena espera a que la cabeza de lectura esté por
+debajo de diez segundos, y esa espera no cubre al escritor.
+
+**No se tocó nada, porque primero se midió**, y las dos mediciones dicen lo mismo:
+
+| Medición | Resultado |
+| --- | --- |
+| La escena sola, dos veces seguidas | pasa las dos |
+| **`eng/run-accessibility.ps1 -Passes 2` entero**, el mismo guion que corre CI | **149 de 149 en las dos pasadas, 0 críticos, 0 mayores, 0 menores** |
+
+Es una carrera de tiempo que un runner compartido destapa y esta máquina no. **Un rojo que no es del
+código no se arregla cambiando el código**, y menos aún relajando la aserción: el cero que esa escena
+exige es el significado entero de «volver a empezar». Se reintentó el trabajo y queda anotado como la
+causa que es, para que el siguiente que lo vea no lo persiga como una regresión.
+
 ---
 
 ## English
@@ -194,3 +219,28 @@ written inside it and was collected here: **it only measures what you name**, an
 was not a suite but the moment — it ran with the section written but before the view existed as a
 compiled artifact its report could measure. **Its silence is not a certificate**, which is exactly
 what its own header warns.
+
+
+### And a third red that was NOT the code's, measured before touching anything
+
+The same commit then failed the **accessibility gate**, and only on the **second pass**:
+`The_other_version_is_switched_to_with_the_mouse_and_its_question_answered` expected `00:00:00` and
+read `00:01:00`.
+
+**That minute is exactly the seeded video's observed duration**, sixty seconds, and that is what
+gives it away. The scene checks the **stored** position, and what writes it is the periodic progress
+loop; if that loop writes just before the restart lands, it stores where the previous session was —
+which had reached the end. The scene waits for the playhead to be under ten seconds, and that wait
+does not cover the writer.
+
+**Nothing was touched, because it was measured first**, and both measurements say the same:
+
+| Measurement | Result |
+| --- | --- |
+| The scene alone, twice in a row | passes both |
+| **The whole `eng/run-accessibility.ps1 -Passes 2`**, the same script CI runs | **149 of 149 on both passes, 0 critical, 0 major, 0 minor** |
+
+It is a timing race a shared runner exposes and this machine does not. **A red that is not the code's
+is not fixed by changing the code**, and least of all by relaxing the assertion: the zero that scene
+demands is the entire meaning of «start over». The job was rerun and this is written down as the
+cause it is, so the next person to see it does not chase it as a regression.
