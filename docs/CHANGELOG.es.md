@@ -219,6 +219,19 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La pantalla de Cursos era ilegible: su título y su descripción salían pisados por los de la
+  pantalla de bienvenida.** Se leían «Cursos» y «Tu biblioteca, en tu PC» uno encima del otro, en la
+  misma línea, y las dos descripciones también.
+
+  La tarjeta de bienvenida se aparta cuando otra pantalla toma el sitio, y **Cursos no estaba en esa
+  lista**: llegó después y nadie la amplió. Ninguna comprobación podía verlo, porque las que vigilan
+  que nada se salga de la ventana montan **cada pantalla por separado** — y esto era justo dos
+  pantallas dibujándose una encima de otra.
+
+  **Apareció fotografiando el programa al lado de su diseño**, en la primera pareja que nadie había
+  mirado nunca. La comprobación nueva ya no es una por pantalla: cubre **todos** los destinos a la
+  vez, así que el siguiente que se añada no puede olvidarse.
+
 - **El escaneo ya se puede parar desde la pantalla.** El programa sabía cancelarlo desde dentro desde
   siempre —guarda por dónde iba y lo ya catalogado se queda—, pero la fila que lo anunciaba enseñaba
   un punto, una frase y un recuento, y **ningún botón**.

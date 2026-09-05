@@ -218,6 +218,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The Courses screen was unreadable: its title and description came out under the welcome
+  screen's.** «Cursos» and «Tu biblioteca, en tu PC» read over each other on the same line, and both
+  descriptions too.
+
+  The welcome card steps aside when another screen takes the stage, and **Courses was not on that
+  list**: it arrived later and nobody widened it. No check could see it, because the ones guarding
+  against anything falling outside the window mount **each screen on its own** — and this was exactly
+  two screens drawn over one another.
+
+  **It turned up photographing the program beside its design**, in the first pair nobody had ever
+  looked at. The new check is no longer one per screen: it covers **every** destination at once, so
+  the next one added cannot be forgotten.
+
 - **A scan can now be stopped from the screen.** The program has always known how to cancel one from
   the inside — it remembers where it was and whatever is already catalogued stays — but the row that
   announced it showed a dot, a sentence and a count, and **no button**.

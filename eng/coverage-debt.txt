@@ -232,7 +232,7 @@ src/ApSolutions.LocalMedia.Application/Discovery/ISafeFileRenamer.cs            
 src/ApSolutions.LocalMedia.Application/Discovery/ReconcileScanResults.cs                      95  83
 src/ApSolutions.LocalMedia.Application/Discovery/RemoveLibraryRoot.cs                        100  50
 src/ApSolutions.LocalMedia.Application/Discovery/RootWatchCoordinator.cs                      96  89
-src/ApSolutions.LocalMedia.Application/Events/CatalogEvents.cs                                90 100
+src/ApSolutions.LocalMedia.Application/Events/CatalogEvents.cs                                93 100
 src/ApSolutions.LocalMedia.Application/Home/GetHome.cs                                        99  91
 src/ApSolutions.LocalMedia.Application/Identification/GetReviewInbox.cs                       92  64
 src/ApSolutions.LocalMedia.Application/Identification/ResolveMatch.cs                         98  94
@@ -315,11 +315,11 @@ src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml               
 src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                      100  90
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  78
-src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           98  91
+src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           98  92
 src/ApSolutions.LocalMedia.Presentation/Library/ManualReassignmentViewModel.cs                94  70
 src/ApSolutions.LocalMedia.Presentation/Library/PosterArtView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  77
+src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  85
 src/ApSolutions.LocalMedia.Presentation/Library/UnavailableBadge.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  93
