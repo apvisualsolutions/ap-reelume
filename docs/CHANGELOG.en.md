@@ -10,6 +10,41 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The nineteen screens compared against the design now each have a verdict, one by one.** Looking
+  at them left «some forty» loose notes; broken down and crossed against what the program already has
+  decided in writing they are **108**, and each one comes out with an answer: **43 differences that
+  do have to be fixed**, 32 already decided, 22 where the program goes beyond the design at no cost,
+  and 5 that cannot be compared until the data they need is seeded.
+
+  **Verification was not a formality**: six of the apparent defects fell when checked, and two of
+  them were the ones the notes called the most visible difference across the whole Settings screen.
+  One had its reason written one file beyond where anyone had looked.
+
+  **And the most serious of the forty-three is not about looks**: the notice shown when removing a
+  folder promises opposite things in the design and in the program — that the catalogue keeps its
+  titles marked unavailable, or that they leave with their markers and their progress. It is on the
+  record, to be decided with the data in view.
+
+- **A list that does not exist can no longer be cited by number.** The previous round's working notes
+  closed four differences against the design by pointing each one at a number in a list of decisions
+  already taken. That numbered list does not exist: there are **five** notes, unnumbered.
+
+  **What makes it expensive is that the numbers did lead somewhere** — to another list in another
+  document that happens to carry those digits. A citation like that gets checked, finds something,
+  and passes. From today a check refuses to let any document in the program cite one of those
+  decisions by number: it has to name where it is written and what it says.
+
+- **The Credits screen now says who plays the video.** Playback is done by LibVLC, from VideoLAN, and
+  until now that was only recorded in files that travel inside the package and nobody opens. It was
+  not a compliance gap — the notices and the corresponding source have always been there — but its
+  licence asks for that to be said visibly, and a desktop application says it on a screen, not in a
+  text file.
+
+  **And it does not say what the design said, which fell short.** The prototype writes «LibVLC ·
+  LGPL», and «LGPL» is not a licence: the engine is LGPL-2.1-or-later, its three hundred plugins
+  carry their own — some GPL-2.0-or-later — and the library ships unmodified. All three facts are on
+  the screen now.
+
 - **The red badge on a folder Windows refuses can no longer go grey without anyone noticing.** A
   folder's three states — connected, disconnected and refused — are told apart by colour as well as
   by the word, and until now no check looked at whether the red and the green were really the
@@ -258,6 +293,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   letting tests pass over less is not buying it.
 
 ### Fixed
+
+- **A Settings button contradicted a written rule of the program, and now says why it exists.** The
+  «Apply threshold» button in Recommendations goes against a written decision — that in this program
+  a setting applies as you choose it, with no button to repeat that — and carried no explanation
+  beside it. The button stays, because this setting is not merely stored: it **recomputes**. Dragging
+  the slider from end to end under the general rule would have walked the whole watched-state table
+  **fifty-one times**, writing on every pass.
+
+  **The explanation that was about to be written belonged to something else.** A measurement from a
+  different screen came noted down, and putting it there would have placed a false number into the
+  program — worse than none at all: a button with no explanation gets noticed, and an explanation
+  with a number never gets looked at again.
+
+- **The comparison against the design said the library was missing a column, and it is not.**
+  Measured again: both draw **eight** covers per row. Nor is it true that the design uses a
+  fixed-size card — its grid stretches, so the same screen gives eight cards at one width and nine at
+  another, and comparing it with ours as if it were a fixed number is comparing two results of a
+  division.
+
+  What is true and stays on the record: **the application leaves 56 points between the side menu and
+  the first cover where the design leaves 32**, and everything else follows from that.
+
+- **One feature's criterion promised «the 53 screens» and the program has 61.** The 53 came from
+  counting only the files whose name ends in «view», and eight screens do not follow that habit. A
+  feature cannot be called finished against a count that no longer describes it, so the figure is
+  corrected **and now checks itself**: the document it lives in joins the list a test watches, and it
+  was the one place where a stale figure cost the most and nobody was looking.
 
 - **The Courses screen was unreadable: its title and description came out under the welcome
   screen's.** «Cursos» and «Tu biblioteca, en tu PC» read over each other on the same line, and both

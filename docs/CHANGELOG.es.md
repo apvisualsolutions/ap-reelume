@@ -10,6 +10,41 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Las diecinueve pantallas comparadas con el diseño ya tienen veredicto, una por una.** Mirarlas
+  dejaba «unos cuarenta» apuntes sueltos; desglosados y cruzados con lo que el programa ya tiene
+  decidido por escrito son **108**, y cada uno sale con una respuesta: **43 diferencias que sí hay
+  que corregir**, 32 que ya estaban decididas, 22 en las que el programa va por delante del diseño
+  sin coste, y 5 que no se pueden comparar hasta sembrar los datos que les faltan.
+
+  **La verificación no era un trámite**: seis de las que parecían defectos se cayeron al comprobarlas,
+  y dos de ellas eran las que las notas daban por la diferencia más visible de toda la pantalla de
+  Ajustes. Una tenía su razón escrita un archivo más allá de donde se había mirado.
+
+  **Y la diferencia más seria de las cuarenta y tres no es de aspecto**: el aviso que sale al retirar
+  una carpeta promete cosas contrarias en el diseño y en el programa —que el catálogo conserva sus
+  títulos marcados como no disponibles, o que salen con sus marcas y su progreso—. Queda registrada
+  para decidirla con los datos delante.
+
+- **Ya no se puede citar por número una lista que no existe.** Las notas de trabajo de la vuelta
+  anterior cerraban cuatro diferencias con el diseño remitiendo cada una a un número de una lista de
+  decisiones ya tomadas. Esa lista numerada no existe: son **cinco** apuntes sin numerar.
+
+  **Lo caro es que los números sí llevaban a algo**, a otra lista de otro documento que casualmente
+  tiene esos dígitos. Una cita así se comprueba, encuentra algo y pasa por buena. Desde hoy una
+  comprobación se niega a que ningún documento del programa cite una de esas decisiones por número:
+  hay que nombrar dónde está escrita y qué dice.
+
+- **La pantalla de Créditos ya dice quién reproduce el vídeo.** La reproducción la hace LibVLC, de
+  VideoLAN, y hasta ahora eso sólo constaba en archivos que viajan dentro del paquete y que nadie
+  abre. No era un incumplimiento —los avisos y el código fuente correspondiente siempre han estado
+  ahí—, pero su licencia pide que se diga de forma visible, y una aplicación de escritorio lo dice en
+  una pantalla, no en un archivo de texto.
+
+  **Y no dice lo que decía el diseño, que se quedaba corto.** El prototipo escribe «LibVLC · LGPL», y
+  «LGPL» no es una licencia: el motor es LGPL-2.1-or-later, sus trescientos complementos llevan las
+  suyas —algunas GPL-2.0-or-later— y la biblioteca viaja sin modificar. Los tres hechos están en la
+  pantalla ahora.
+
 - **El distintivo rojo de una carpeta que Windows rechaza ya no puede quedarse en gris sin que nadie
   se entere.** Los tres estados de una carpeta —conectada, desconectada y sin permiso— se distinguen
   por el color además de por la palabra, y hasta ahora ninguna comprobación miraba que el rojo y el
@@ -258,6 +293,34 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Ganar tiempo haciendo que las pruebas pasen por menos no es ganarlo.
 
 ### Corregido
+
+- **Un botón de Ajustes contradecía una regla escrita del programa, y ahora dice por qué existe.** El
+  botón «Aplicar umbral» de Recomendaciones va contra una decisión escrita —que en este programa un
+  ajuste se aplica al elegirlo, sin botón que lo repita—, y no llevaba ninguna explicación al lado.
+  El botón se queda, porque este ajuste no se guarda y ya está: **recalcula**. Mover el deslizador de
+  extremo a extremo con la regla general habría recorrido la tabla entera de lo visto **cincuenta y
+  una veces**, escribiendo en cada pasada.
+
+  **La explicación que estaba a punto de escribirse era de otra cosa.** Se traía apuntada una
+  medición de una pantalla distinta, y ponerla ahí habría metido en el programa un número falso —que
+  es peor que no poner ninguno: un botón sin explicación se nota, y una explicación con número no se
+  vuelve a mirar.
+
+- **La comparación con el diseño decía que a la biblioteca le faltaba una columna, y no le falta.**
+  Medida otra vez: las dos dibujan **ocho** carátulas por fila. Tampoco es cierto que el diseño use
+  una ficha de un tamaño fijo — su rejilla se estira, así que la misma pantalla da ocho fichas en un
+  ancho y nueve en otro, y compararla con la nuestra como si fuera un número fijo es comparar dos
+  resultados de una división.
+
+  Lo que sí es cierto y se queda registrado: **la aplicación deja 56 puntos entre el menú lateral y
+  la primera carátula donde el diseño deja 32**, y todo lo demás sale de ahí.
+
+- **El criterio de una de las funciones prometía «las 53 pantallas» y el programa tiene 61.** El 53
+  salía de contar sólo los archivos cuyo nombre acaba en «vista», y ocho pantallas no siguen esa
+  costumbre. Una función no puede darse por terminada contra un recuento que ya no la describe, así
+  que la cifra se corrige **y pasa a comprobarse sola**: el documento donde vive entra en la lista de
+  los que una prueba vigila, y era el único sitio donde una cifra caducada costaba más y nadie
+  miraba.
 
 - **La pantalla de Cursos era ilegible: su título y su descripción salían pisados por los de la
   pantalla de bienvenida.** Se leían «Cursos» y «Tu biblioteca, en tu PC» uno encima del otro, en la

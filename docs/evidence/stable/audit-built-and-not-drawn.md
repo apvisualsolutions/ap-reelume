@@ -176,6 +176,51 @@ se componen por interpolación y se traducen con el conversor de claves. Las est
 usan el código detrás en vez de una orden. Las vistas de Actualización y Privacidad están completas
 contra su modelo.
 
+### Estado medido el 2026-09-06, porque había tres cuentas y ninguna cuadraba
+
+El relevo de la madrugada del 2026-09-05 decía «quedan quince», la hoja de ruta de esa misma noche
+dijo «quedan doce», y un barrido del código daba trece. Las dos primeras se suceden en el tiempo y no
+discrepan; lo que había que medir era el doce contra el trece. Medido hallazgo a hallazgo:
+
+| # | Estado | Lo que lo dice, medido en el árbol |
+| --- | --- | --- |
+| 1 | **cerrado** | `LibraryView.axaml` enlaza `LoadMoreCommand` y `HasMore` |
+| 2 | **cerrado** | `Settings/PlaybackSettingsView.axaml` existe |
+| 3 | abierto | `Strings.es.axaml:669` sigue diciendo «N mini · Esc cierra» |
+| 4 | **cerrado** | `LibraryView.axaml` enlaza `CancelScan` |
+| 5 | abierto | `HomeView.axaml` no nombra ninguna de las seis claves del resumen |
+| 6 | abierto | `PosterFile` no aparece en ninguna vista ni modelo de `Home/` |
+| 7 | abierto | `Movie/MovieDetailsView.axaml` no tiene barra de progreso ni posición |
+| 8 | abierto | `ScrollAnchorId` sólo vive en su ViewModel y dos pruebas; no hay `ScrollIntoView` en `src/` |
+| 9 | abierto | `PlayerCourseFinishedNotice` y `PlayerNextLessonLabel`, sólo en los diccionarios |
+| 10 | abierto | `CourseLastOpenedFormat`, sólo en los diccionarios |
+| 11 | **cerrado** | con la puerta `OrphanedResourceTests` detrás |
+| 12 | **cerrado** | las dos órdenes aparecen hoy en `MiniPlayerChromeView` y `TransportControlsView` |
+| 13 | abierto | `SelectedRemoteUri` sólo vive en `ArtworkPickerViewModel`; gobernado por `ADR-0009` |
+| 14 | abierto | con su medición escrita: tres cerrojos en el almacén |
+| 15 | **cerrado, y su premisa era falsa** | ver abajo |
+| 16 | abierto | `LibraryView` no tiene `KeyBinding` ni `KeyDown` |
+| 17 | abierto | `CRS-007`, `DESIGN_APPROVED`, sin empezar |
+| 18 | abierto | el bloque `LibraryEmptySurface` no contiene ningún `Button` |
+
+**Seis cerrados y doce abiertos.** El doce coincide con el de la hoja de ruta **por un camino
+distinto**, y eso importa más que el número: la hoja de ruta cuenta entre sus seis «las portadas en
+la rejilla», que fue el detonante de esta auditoría y no uno de sus dieciocho, y no había visto que
+el 15 estaba cerrado. Dos cuentas iguales no son una cuenta confirmada.
+
+**El hallazgo 15 se cierra porque lo que afirma no es cierto.** Decía que «no hay ruta al editor
+desde la ficha de serie», y la hay: `Show/ShowDetailsView.axaml:203` monta `TitleActionsView`, que
+ofrece `EditMetadataCommand`, `PreviewRenameCommand` y `ReviewDuplicatesCommand`. Lo que queda en pie
+—que el editor abre por **título** y no por episodio— no es un hallazgo, sino la diferencia ya
+escrita con su razón en
+[la comparación vista a vista](audit-prototype-fidelity-round-three.md): `CatalogMetadata` está
+indexado por `TitleId`, así que un botón por fila diría una cosa y haría otra.
+
+**Y ésa es la lección de esta reconciliación**, más útil que la cifra: este hallazgo se escribió
+**tres días después** de esa razón y sin citarla, de modo que pedía exactamente el botón que la
+comparación anterior había decidido no poner. Una auditoría que no cruza contra lo ya decidido
+reabre lo cerrado, y cada vuelta lo vuelve a levantar.
+
 ---
 
 ## English
@@ -336,3 +381,49 @@ So nobody repeats the pass: the identification codes, the recommendation reasons
 findings, the updater's refusals and the marker kinds **are** drawn — they are composed by
 interpolation and translated through the key converter. The rating stars use code-behind rather than
 a command. The Update and Privacy views are complete against their models.
+
+### Status measured on 2026-09-06, because there were three counts and none agreed
+
+The handover from the early hours of 2026-09-05 said «fifteen left», the roadmap from that same night
+said «twelve left», and a sweep of the code gave thirteen. The first two follow one another in time
+and do not disagree; what had to be measured was the twelve against the thirteen. Measured finding by
+finding:
+
+| # | Status | What says so, measured in the tree |
+| --- | --- | --- |
+| 1 | **closed** | `LibraryView.axaml` binds `LoadMoreCommand` and `HasMore` |
+| 2 | **closed** | `Settings/PlaybackSettingsView.axaml` exists |
+| 3 | open | `Strings.es.axaml:669` still says «N mini · Esc cierra» |
+| 4 | **closed** | `LibraryView.axaml` binds `CancelScan` |
+| 5 | open | `HomeView.axaml` names none of the summary's six keys |
+| 6 | open | `PosterFile` appears in no view or model under `Home/` |
+| 7 | open | `Movie/MovieDetailsView.axaml` has no progress bar and no position |
+| 8 | open | `ScrollAnchorId` lives only in its ViewModel and two tests; there is no `ScrollIntoView` in `src/` |
+| 9 | open | `PlayerCourseFinishedNotice` and `PlayerNextLessonLabel`, only in the dictionaries |
+| 10 | open | `CourseLastOpenedFormat`, only in the dictionaries |
+| 11 | **closed** | with the `OrphanedResourceTests` gate behind it |
+| 12 | **closed** | both commands appear today in `MiniPlayerChromeView` and `TransportControlsView` |
+| 13 | open | `SelectedRemoteUri` lives only in `ArtworkPickerViewModel`; governed by `ADR-0009` |
+| 14 | open | with its measurement written down: three locks in the store |
+| 15 | **closed, and its premise was false** | see below |
+| 16 | open | `LibraryView` has neither `KeyBinding` nor `KeyDown` |
+| 17 | open | `CRS-007`, `DESIGN_APPROVED`, not started |
+| 18 | open | the `LibraryEmptySurface` block contains no `Button` |
+
+**Six closed and twelve open.** The twelve matches the roadmap's **by a different route**, and that
+matters more than the number: the roadmap counts «the posters in the grid» among its six, which was
+what triggered this audit and is not one of its eighteen, and it had not seen that 15 was closed. Two
+counts that agree are not a confirmed count.
+
+**Finding 15 closes because what it claims is not true.** It said there is «no route to the editor
+from the show card», and there is: `Show/ShowDetailsView.axaml:203` mounts `TitleActionsView`, which
+offers `EditMetadataCommand`, `PreviewRenameCommand` and `ReviewDuplicatesCommand`. What remains
+standing — that the editor opens per **title** and not per episode — is not a finding but the
+difference already written with its reason in
+[the view-by-view comparison](audit-prototype-fidelity-round-three.md): `CatalogMetadata` is indexed
+by `TitleId`, so a per-row button would say one thing and do another.
+
+**And that is this reconciliation's lesson**, more useful than the figure: this finding was written
+**three days after** that reason and without citing it, so it asked for exactly the button the
+previous comparison had decided not to add. An audit that does not cross-check against what is
+already decided reopens what was closed, and every round raises it again.

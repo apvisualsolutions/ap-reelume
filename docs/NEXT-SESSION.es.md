@@ -1,5 +1,111 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-06: verificar no es mirar, y el registro contra el que se verificaba no existía
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
+> `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
+> escribiría ya lo habría cambiado.
+>
+> ### El error que se cometió aquí, y la regla que lo evita
+>
+> **Un commit llegó a `main` sin haber pasado CI.** El fast-forward se hizo con
+> `git push origin HEAD:main` en vez de con el SHA que se había leído en verde, y entre la lectura y
+> el push **otra sesión commiteó en este mismo árbol**. Como `main` no dispara el flujo desde el
+> 2026-08-18, ese commit no tuvo run propio hasta que se empujó a la rama a mano.
+>
+> **La regla que faltaba: un push a `main` nombra el SHA verificado, nunca `HEAD`.** `HEAD` se mueve
+> debajo, y en este árbol se mueve de verdad — hay dos sesiones trabajando.
+>
+> ### Las «38 cesiones» son cinco, y el error tiene causa
+>
+> Las notas de la vuelta anterior mandaban cruzar cada candidato «con las 38 cesiones escritas de
+> `ELEMENTS.es.md`» y cerraban cuatro remitiendo cada uno a un número de esa lista. **La sección son
+> cinco viñetas sin numerar**, y un barrido por `cesi[oó]n` seguido de dígitos no casa en ninguna
+> parte del árbol.
+>
+> **Y los números citados llevaban a algo, que es lo que hace el error caro**: a los puntos de otra
+> sección de otro documento que casualmente tiene esos dígitos. Tres numeraciones locales
+> concatenadas en una global imaginaria. Una cita así se comprueba, encuentra algo, y pasa por buena.
+>
+> **La causa raíz es la palabra**: «cesión» se usa en cuatro sentidos —las cinco viñetas, un veredicto
+> del ADR-0007, cualquier compromiso medido del changelog, y punteros del relevo—. Suena a registro
+> numerable y es un adjetivo. Las razones sí existen, repartidas en **siete casas**, y la lista está
+> en [la evidencia de esta vuelta](evidence/stable/audit-prototype-fidelity-round-four.md).
+>
+> **Y ya tiene guarda**: `EvidenceLinkTests` se niega a que ningún documento del árbol cite una de
+> esas decisiones por número. **Nació roja sobre dos escrituras de esta misma tanda.**
+>
+> ### El hallazgo geométrico de la vuelta anterior estaba mal en dos de sus cuatro números
+>
+> Decía «tarjeta de 146 contra 154, siete por fila en vez de ocho». Medido de nuevo:
+>
+> · **Son ocho en las dos.** No falta ninguna columna.
+> · **El prototipo no tiene una tarjeta de 154 px**: su rejilla es fluida. A 1500 pone 8 de 154; a
+>   1600 —el ancho que `ELEMENTS.es.md` declara canónico— pone **9 de 145**, menos que la aplicación.
+> · **Lo que sí es defecto: el margen.** 32 px entre el riel y la primera tarjeta en el prototipo,
+>   **56** en la aplicación. Los 8 px de tarjeta salen de ahí, no son un hallazgo aparte.
+>
+> **La prueba que lo destapa es barata y ahora está escrita**: rehacer la vista del prototipo a otro
+> ancho. Si el número se mueve, no es un número del diseño.
+>
+> **Y sus capturas archivadas están a 750 × 500**, ya reducidas: los anchos salieron de medir ahí y
+> doblar. `half.ps1` sirve para saber **dónde** mirar, nunca para medir; las nativas de 1500 × 1000
+> viven al lado.
+>
+> ### Los dieciocho hallazgos: seis cerrados, doce abiertos
+>
+> Había tres cuentas —quince, doce, trece— y ninguna era la buena. El doce coincide con el de la hoja
+> de ruta **por un camino distinto**: ella cuenta «las portadas en la rejilla», que no es uno de los
+> dieciocho, y no había visto que el **15 se cierra porque su premisa es falsa** — sí hay ruta al
+> editor desde la ficha de serie, en «Otras acciones». **Dos cuentas que coinciden no son una cuenta
+> confirmada.**
+>
+> ### El libro de candidatos: 108 entraron, 43 defectos salieron
+>
+> Las notas anotaban «unos cuarenta»; desglosados uno a uno son **108**. Repartidos: **49 defectos**,
+> de los que **43 sobreviven a la refutación**; **32 cerrados por una razón ya escrita**; **22 que no
+> son hallazgo** porque la aplicación tiene de más sin coste; y **5 no comparables** con esta siembra.
+>
+> **El dato que justifica el registro por sí solo**: de los 32 cerrados por razón escrita, **sólo dos
+> se apoyan en `ELEMENTS.es.md`**, que era la única casa que las notas mandaban consultar. Ocho se
+> apoyan en comentarios del propio marcado. **Cruzar sólo contra «las cesiones» habría levantado 30
+> defectos falsos.**
+>
+> **Los seis que la refutación tumbó cayeron por razón escrita, no por error de observación** — entre
+> ellos los dos candidatos estructurales de Ajustes que las notas daban por la diferencia más visible
+> de toda la superficie. Uno tenía su razón **en el modelo que alimenta la vista y no en la vista**.
+>
+> **El más serio de los 43, y no es un píxel**: la confirmación de retirar una carpeta **dice lo
+> contrario en cada mitad** — el prototipo promete que el catálogo conserva sus elementos marcados
+> como no disponibles, y la aplicación avisa de que los títulos salen con sus marcas y su progreso.
+> Son dos promesas distintas sobre los datos de quien usa el programa.
+>
+> **Y uno ata un cabo suelto de la otra auditoría**: el prototipo da `N` al minirreproductor y la
+> aplicación `Ctrl+P`, que es justo lo que el hallazgo 3 lleva meses diciendo que el rótulo del
+> reproductor promete y no cumple. El rótulo copió el prototipo y el atajo no.
+>
+> ### Lo que se corrigió
+>
+> · **Créditos nombra a LibVLC**, con el texto de los avisos de terceros y no el del prototipo, que
+>   dice «LGPL» y eso no es una licencia.
+> · **El botón «Aplicar umbral» dice por qué existe**, con medición propia: aplicar barre la tabla
+>   entera de estados, y el deslizador tiene 51 posiciones. **La razón que venía apuntada era de otra
+>   pantalla**, y escribirla habría metido un número falso en el árbol.
+> · **El criterio de `PRD-006` decía 53 vistas y son 61**, y `docs/FEATURES.md` entra en los
+>   documentos que vigila `QuotedFigureTests`: era el único sitio donde una cifra caducada costaba más
+>   y nadie miraba.
+>
+> ### Lo que queda
+>
+> · Los tres candidatos estructurales de Ajustes —tarjeta por ajuste contra filas en una tarjeta,
+>   casilla contra conmutador, índice de 12 contra 13—. Doce vistas; tanda propia y probablemente un
+>   ADR, porque `ELEMENTS.es.md` ya especifica el conmutador y el árbol dibuja una casilla.
+> · Los estados que hay que fabricar, con `tools/preview/` y `shoot-states.ps1`.
+> · El reproductor entero, con `faro.mkv` y `-Screen`.
+> · La contradicción sobre la duración de un run, decidida y sin ejecutar.
+> · **`design/README.md` sigue diciendo 53 vistas y «implementado y verificado»**: el mismo desfase
+>   que la matriz tenía, en el paquete de diseño.
+
 > ## AVISO AL FRENTE — 2026-09-05, cierre: el aparejo mentía de cinco maneras, tres de ellas en verde
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y

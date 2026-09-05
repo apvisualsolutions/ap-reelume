@@ -1,5 +1,115 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-06: verifying is not looking, and the register it was verified against did not exist
+>
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
+> `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it
+> would already have changed it.
+>
+> ### The mistake made here, and the rule that prevents it
+>
+> **A commit reached `main` without having passed CI.** The fast-forward was done with
+> `git push origin HEAD:main` rather than with the SHA that had been read green, and between the
+> reading and the push **another session committed in this same tree**. Since `main` has not
+> triggered the workflow since 2026-08-18, that commit had no run of its own until it was pushed to
+> the branch by hand.
+>
+> **The rule that was missing: a push to `main` names the verified SHA, never `HEAD`.** `HEAD` moves
+> underneath, and in this tree it really does — there are two sessions working.
+>
+> ### The «38 concessions» are five, and the error has a cause
+>
+> The previous round's notes required crossing every candidate «against the 38 written concessions in
+> `ELEMENTS.es.md`» and closed four by pointing each at a number in that list. **The section is five
+> unnumbered bullets**, and a sweep for «concession» followed by digits matches nowhere in the tree.
+>
+> **And the cited numbers led somewhere, which is what makes the error expensive**: to the points of
+> another section of another document that happens to carry those digits. Three local numberings
+> concatenated into an imaginary global one. A citation like that gets checked, finds something, and
+> passes.
+>
+> **The root cause is the word**: «concession» is used in four senses — the five bullets, a verdict of
+> ADR-0007, any measured commitment in the changelog, and handover pointers. It sounds like a
+> numberable register and it is an adjective. The reasons do exist, spread across **seven houses**,
+> and the list is in [this round's evidence](evidence/stable/audit-prototype-fidelity-round-four.md).
+>
+> **And it now has a gate**: `EvidenceLinkTests` refuses to let any document in the tree cite one of
+> those decisions by number. **It was born red on two writes from this very batch.**
+>
+> ### The previous round's geometric finding was wrong in two of its four numbers
+>
+> It said «a 146 card against 154, seven per row instead of eight». Measured again:
+>
+> · **There are eight on both sides.** No column is missing.
+> · **The prototype does not have a 154 px card**: its grid is fluid. At 1500 it puts 8 of 154; at
+>   1600 — the width `ELEMENTS.es.md` declares canonical — it puts **9 of 145**, fewer than the
+>   application.
+> · **What is a defect: the margin.** 32 px between the rail and the first card in the prototype,
+>   **56** in the application. The 8 px of card follow from that; they are not a separate finding.
+>
+> **The test that uncovers it is cheap and is now written down**: re-shoot the prototype's view at
+> another width. If the number moves, it is not a number of the design.
+>
+> **And its archived captures are 750 × 500**, already halved: the widths came from measuring there
+> and doubling. `half.ps1` is for knowing **where** to look, never for measuring; the native
+> 1500 × 1000 ones sit beside them.
+>
+> ### The eighteen findings: six closed, twelve open
+>
+> There were three counts — fifteen, twelve, thirteen — and none was right. The twelve matches the
+> roadmap's **by a different route**: it counts «the posters in the grid», which is not one of the
+> eighteen, and it had not seen that **15 closes because its premise is false** — there is a route to
+> the editor from the show card, under «Other actions». **Two counts that agree are not a confirmed
+> count.**
+>
+> ### The candidate book: 108 went in, 43 defects came out
+>
+> The notes recorded «some forty»; broken down one by one they are **108**. Split: **49 defects**, of
+> which **43 survive refutation**; **32 closed by a reason already written**; **22 that are not
+> findings** because the application has more at no cost; and **5 not comparable** with this seed.
+>
+> **The figure that alone justifies the register**: of the 32 closed by a written reason, **only two
+> rest on `ELEMENTS.es.md`**, which was the one house the notes required consulting. Eight rest on
+> comments in the markup itself. **Crossing only against «the concessions» would have raised 30 false
+> defects.**
+>
+> **The six refutation knocked down fell on a written reason, not on an observation error** — among
+> them the two structural candidates the notes called the most visible difference across the whole
+> surface of Settings. One had its reason **in the model that feeds the view rather than in the
+> view**.
+>
+> **The most serious of the 43, and it is not a pixel**: the confirmation for removing a folder **says
+> the opposite on each side** — the prototype promises the catalogue keeps its items marked
+> unavailable, and the application warns that the titles leave with their markers and their progress.
+> Those are two different promises about the user's data.
+>
+> **And one ties a loose end of the other audit**: the prototype gives `N` to the mini player and the
+> application `Ctrl+P`, which is exactly what finding 3 has been saying for months that the player's
+> hint promises and does not keep. The hint copied the prototype and the shortcut did not.
+>
+> ### What was corrected
+>
+> · **Credits names LibVLC**, with the third-party notices' wording rather than the prototype's, which
+>   says «LGPL» and that is not a licence.
+> · **The «Apply threshold» button says why it exists**, with its own measurement: applying sweeps the
+>   whole watch-state table, and the slider has 51 positions. **The reason that came noted down
+>   belonged to another screen**, and writing it would have put a false number into the tree.
+> · **`PRD-006`'s criterion said 53 views and there are 61**, and `docs/FEATURES.md` joins the
+>   documents `QuotedFigureTests` watches: it was the one place where a stale figure cost the most and
+>   nobody was looking.
+>
+> ### What is left
+>
+> · The three structural candidates in Settings — a bordered card per setting against rows inside one
+>   card, checkbox against toggle, and the 12-against-13 index. Twelve views; its own batch and
+>   probably an ADR, because `ELEMENTS.es.md` already specifies the toggle and the tree draws a
+>   checkbox.
+> · The states that have to be manufactured, with `tools/preview/` and `shoot-states.ps1`.
+> · The whole player, with `faro.mkv` and `-Screen`.
+> · The contradiction about a run's duration, decided and not executed.
+> · **`design/README.md` still says 53 views and «implemented and verified»**: the same drift the
+>   matrix had, in the design package.
+
 > ## READ THIS FIRST — 2026-09-05, closing: the rig lied five ways, three of them in green
 >
 > **Look at the tree first, it overrules this document**: `git log --oneline -1 main` and

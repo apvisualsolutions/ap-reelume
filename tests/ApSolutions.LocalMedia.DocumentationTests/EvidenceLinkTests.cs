@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.TestSupport;
 
 namespace ApSolutions.LocalMedia.DocumentationTests;
@@ -172,6 +173,109 @@ public sealed class EvidenceLinkTests
             [$"APSolutions.LocalMedia_{version}_x64.msix", $"ApReelume-{version}-win-x64.zip"],
             names);
         Assert.Equal(version, FeatureMatrix.Manifest().GetProperty("version").GetString());
+    }
+
+    /// <summary>
+    /// Nobody may cite a concession by number, because there is no numbered register of them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// On 2026-09-06 a set of working notes closed four parity candidates by citing «la cesión 11»,
+    /// «la 12», «la 15» and «la 25». The section they pointed at —
+    /// <c>docs/design/ELEMENTS.es.md</c> §«Las cesiones, con su razón» — is five unnumbered bullets,
+    /// and no numbering of concessions exists anywhere in this tree.
+    /// </para>
+    /// <para>
+    /// What makes it worth a gate rather than a correction is that the cited numbers do resolve to
+    /// something: 4, 5 and 6 are points of the «Lo que sigue siendo distinto» section of
+    /// <c>audit-prototype-fidelity-round-three.md</c>. Three local numberings had been concatenated
+    /// into an imaginary global one, so the citation gets checked, finds something, and passes.
+    /// </para>
+    /// <para>
+    /// The root cause is the word: «concession» is used in four senses here — those five bullets, a
+    /// verdict of ADR-0007 («<b>Defect</b> unless a written concession»), any measured commitment in
+    /// the changelog, and handover pointers. It sounds like a closed register and it is an
+    /// adjective. This is born green with a real floor and turns red the day somebody reinvents the
+    /// numbering inside the tree.
+    /// </para>
+    /// <para>
+    /// Its blind side, stated rather than hidden: the notes that made the claim live outside the
+    /// repository, under the user's profile. No gate here can see them. What this prevents is the
+    /// invention reaching the tree.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void No_document_cites_a_concession_by_number()
+    {
+        // Both languages, because the English half of a bilingual document would carry the same
+        // invention under its own word.
+        var citation = new Regex(
+            @"\b(cesi[oó]n|cesiones|concession|concessions)\s+(?:n[.º°]?\s*)?\d+",
+            RegexOptions.IgnoreCase,
+            TimeSpan.FromSeconds(5));
+
+        // The one document allowed to write those citations, because writing them down is what it is
+        // for: it archives the invention and explains why the numbers resolved to something. A gate
+        // that could not quote the defect it exists to prevent would force the record to be vague.
+        // This is a closed list: anything else that cites a concession by number is a new offence.
+        string[] archives = ["docs/evidence/stable/audit-prototype-fidelity-round-four.md"];
+
+        var offences = new List<string>();
+        var read = 0;
+
+        foreach (var document in Documents())
+        {
+            read++;
+            var relativePath = Path.GetRelativePath(RepositoryLayout.Root, document).Replace('\\', '/');
+            if (archives.Contains(relativePath, StringComparer.Ordinal))
+            {
+                continue;
+            }
+
+            var lines = File.ReadAllLines(document);
+            for (var index = 0; index < lines.Length; index++)
+            {
+                if (citation.IsMatch(lines[index]))
+                {
+                    offences.Add($"{relativePath}:{index + 1} → {lines[index].Trim()}");
+                }
+            }
+        }
+
+        // A sweep that reads nothing agrees with everything. The tree carried 289 Markdown files the
+        // day this was written; a floor well below that catches a broken enumeration without
+        // breaking on every new document.
+        Assert.True(read >= 100, $"Only {read} documents were read; the sweep is measuring nothing.");
+        Assert.True(
+            offences.Count == 0,
+            "There is no numbered register of concessions in this tree, so a citation by number "
+                + "points at nothing — or worse, at a different local numbering that happens to "
+                + "have that digit. Name the file and the reason instead: "
+                + string.Join("; ", offences));
+    }
+
+    /// <summary>Every Markdown document of the tree, skipping build output and the design package.</summary>
+    private static IEnumerable<string> Documents()
+    {
+        string[] roots = ["docs", "design", ".claude"];
+        foreach (var relative in roots)
+        {
+            var directory = RepositoryLayout.PathFromRoot(relative);
+            if (!Directory.Exists(directory))
+            {
+                continue;
+            }
+
+            foreach (var path in Directory.EnumerateFiles(directory, "*.md", SearchOption.AllDirectories))
+            {
+                yield return path;
+            }
+        }
+
+        foreach (var path in Directory.EnumerateFiles(RepositoryLayout.Root, "*.md", SearchOption.TopDirectoryOnly))
+        {
+            yield return path;
+        }
     }
 
     private static string DeclaredVersion()

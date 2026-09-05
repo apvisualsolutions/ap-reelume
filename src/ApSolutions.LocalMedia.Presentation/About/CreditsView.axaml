@@ -79,6 +79,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
       package, and the day they get a screen of their own is the day monospace belongs to them.
     -->
     <TextBlock Text="{DynamicResource AboutLicenseNotice}" TextWrapping="Wrap" />
+    <!--
+      LibVLC's attribution, which the prototype draws and this screen did not until 2026-09-06. It is
+      not a compliance gap on its own — NOTICE, licenses/ and the corresponding source all travel
+      inside the package — but LGPL-2.1 §6 asks for a prominent notice that the library is used, and
+      nobody using a desktop application opens NOTICE.
+
+      The wording is NOT the prototype's. The prototype says "LibVLC · LGPL", and "LGPL" is not a
+      licence: the core is LGPL-2.1-or-later, its three hundred plugins carry their own — some of
+      them GPL-2.0-or-later, like the x264 behind libx26410b_plugin.dll — and the library ships
+      unmodified. Those are the three facts docs/release/THIRD-PARTY-NOTICES.es.md establishes, and
+      the owner decided on 2026-09-06 that this row says them rather than the prototype's shorthand.
+    -->
+    <TextBlock Text="{DynamicResource AboutPlaybackEngineAttribution}" TextWrapping="Wrap" />
   </StackPanel>
   </Border>
 </UserControl>

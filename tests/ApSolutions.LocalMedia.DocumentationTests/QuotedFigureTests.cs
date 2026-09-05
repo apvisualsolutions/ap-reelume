@@ -46,6 +46,12 @@ public sealed class QuotedFigureTests
     [
         "CLAUDE.md",
         "CONTRIBUTING.md",
+        // The scope matrix, added on 2026-09-06 because it was the one document where a stale figure
+        // cost the most and nothing was watching. PRD-006's acceptance criterion promised "the 53
+        // views" while the tree measured 61: the 53 came from counting only the files whose name
+        // ends in View, and eight surfaces do not. A criterion cannot be closed honestly against a
+        // census that no longer describes it, so the figure now carries its mark like the rest.
+        "docs/FEATURES.md",
     ];
 
     /// <summary>
