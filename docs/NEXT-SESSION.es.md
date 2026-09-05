@@ -95,6 +95,18 @@
 >   documentos que vigila `QuotedFigureTests`: era el único sitio donde una cifra caducada costaba más
 >   y nadie miraba.
 >
+> ### Lo que espera al propietario, con su recomendación delante
+>
+> · **Qué pasa al retirar una carpeta de la biblioteca.** El prototipo promete que el catálogo
+>   conserva sus elementos marcados como no disponibles; la aplicación avisa de que los títulos salen
+>   con sus marcas y su progreso. **Son dos promesas distintas sobre datos suyos, así que la decisión
+>   es del propietario y no técnica.** Recomendación: quedarse con la del prototipo —conservar y
+>   marcar— porque un disco desconectado y una carpeta retirada son la misma situación para quien
+>   mira la pantalla, y perder marcas y minutos vistos no se deshace. Antes de decidir conviene medir
+>   cuántos títulos, marcas y minutos desaparecen hoy con la siembra delante.
+> · **En qué orden se atacan los 43 defectos.** Recomendación: ése el primero, por ser el único que
+>   promete algo falso sobre los datos.
+>
 > ### Lo que queda
 >
 > · Los tres candidatos estructurales de Ajustes —tarjeta por ajuste contra filas en una tarjeta,

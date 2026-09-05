@@ -98,6 +98,18 @@
 >   documents `QuotedFigureTests` watches: it was the one place where a stale figure cost the most and
 >   nobody was looking.
 >
+> ### What waits for the owner, with the recommendation first
+>
+> · **What happens when a folder is removed from the library.** The prototype promises the catalogue
+>   keeps its items marked unavailable; the application warns that the titles leave with their markers
+>   and their progress. **Those are two different promises about his data, so the decision is the
+>   owner's and not a technical one.** Recommendation: keep the prototype's — retain and mark —
+>   because an unplugged disk and a removed folder are the same situation for whoever is looking at
+>   the screen, and losing markers and watched minutes cannot be undone. Before deciding, it is worth
+>   measuring how many titles, markers and minutes disappear today with the seed in front.
+> · **The order in which the 43 defects get tackled.** Recommendation: that one first, as the only one
+>   that promises something false about the data.
+>
 > ### What is left
 >
 > · The three structural candidates in Settings — a bordered card per setting against rows inside one
