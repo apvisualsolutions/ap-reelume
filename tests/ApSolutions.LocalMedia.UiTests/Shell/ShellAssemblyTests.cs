@@ -820,15 +820,83 @@ public sealed class ShellAssemblyTests
         public Task AddAsync(LibraryRoot root, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
         public Task RemoveAsync(
             LibraryRootId id,
             bool preserveCatalog = true,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
+    /// <summary>
+    /// The folder list is drawn on Settings and it used to be refreshed only on Library, so a drive
+    /// unplugged while somebody sat in Settings kept saying it was connected until they walked
+    /// through the Library and came back.
+    /// </summary>
+    /// <remarks>
+    /// Asserted on the read reaching the repository rather than on a word on screen: what broke was
+    /// that nothing asked, and a test that only looked at the row would pass on a list refreshed by
+    /// the previous route.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Walking_into_settings_reads_the_folder_list_again()
+    {
+        var navigation = new NavigationService();
+        var roots = new CountingRoots();
+        var onboarding = new RootOnboardingViewModel(
+            new AddLibraryRoot(roots, new StubNormalizer()),
+            removeLibraryRoot: null,
+            roots);
+        _ = new ShellViewModel(navigation, new ShellSurfaces { Onboarding = onboarding });
+        var before = roots.Reads;
+
+        navigation.Navigate(AppRoute.Settings);
+        for (var attempt = 0; attempt < 100 && roots.Reads == before; attempt++)
+        {
+            await Task.Delay(20, TestContext.Current.CancellationToken);
+        }
+
+        Assert.True(
+            roots.Reads > before,
+            "walking into Settings never asked the repository for the folder list, so the list on "
+            + "screen is whatever the last route left there.");
+    }
+
     private sealed class StubNormalizer : IPathNormalizer
     {
         public string NormalizeAndValidate(string path, RootKind kind) => path;
+    }
+
+    private sealed class CountingRoots : ILibraryRootRepository
+    {
+        private int _reads;
+
+        public int Reads => Volatile.Read(ref _reads);
+
+        public Task<LibraryRoot?> GetAsync(LibraryRootId id, CancellationToken cancellationToken = default) =>
+            Task.FromResult<LibraryRoot?>(null);
+
+        public Task<IReadOnlyList<LibraryRoot>> ListAsync(CancellationToken cancellationToken = default)
+        {
+            _ = Interlocked.Increment(ref _reads);
+            return Task.FromResult<IReadOnlyList<LibraryRoot>>([]);
+        }
+
+        public Task AddAsync(LibraryRoot root, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task RemoveAsync(
+            LibraryRootId id,
+            bool preserveCatalog = true,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
     private sealed class RecordingRoots : ILibraryRootRepository
@@ -846,6 +914,11 @@ public sealed class ShellAssemblyTests
             Added = root;
             return Task.CompletedTask;
         }
+
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         public Task RemoveAsync(
             LibraryRootId id,

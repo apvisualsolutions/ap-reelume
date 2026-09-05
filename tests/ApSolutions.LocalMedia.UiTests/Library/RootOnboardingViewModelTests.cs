@@ -317,11 +317,21 @@ public sealed class RootOnboardingViewModelTests
         Assert.False(usb.IsAvailable);
         Assert.Equal("MediaUnavailable", usb.AvailabilityKey);
 
+        // The third state has its own sentence. Saying "Unavailable" for a share Windows refuses sends
+        // somebody to look for a cable that is already plugged in.
         var unc = new LibraryRootRowViewModel(new LibraryRoot(
             new LibraryRootId(Guid.NewGuid()), "\\\\nas\\cine", RootKind.Unc,
             RootAvailability.AccessDenied, ScanPolicy.Manual));
         Assert.Equal("RootKindUnc", unc.KindKey);
-        Assert.Equal("MediaUnavailable", unc.AvailabilityKey);
+        Assert.False(unc.IsAvailable);
+        Assert.False(unc.IsDisconnected);
+        Assert.True(unc.IsAccessDenied);
+        Assert.Equal("RootAccessDenied", unc.AvailabilityKey);
+
+        Assert.True(usb.IsDisconnected);
+        Assert.False(usb.IsAccessDenied);
+        Assert.False(local.IsDisconnected);
+        Assert.False(local.IsAccessDenied);
 
         var viewModel = Create(new StubRoots());
         viewModel.SelectKindCommand.Execute("not a kind");
@@ -365,6 +375,11 @@ public sealed class RootOnboardingViewModelTests
             _roots.Add(root);
             return Task.CompletedTask;
         }
+
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         public Task RemoveAsync(
             LibraryRootId id,

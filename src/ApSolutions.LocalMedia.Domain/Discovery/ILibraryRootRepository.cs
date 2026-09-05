@@ -13,6 +13,17 @@ public interface ILibraryRootRepository
 
     Task AddAsync(LibraryRoot root, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Writes what a scan just learned about a root: available, gone, or refused by the operating
+    /// system. It takes the three-state value rather than a boolean because the two failures are not
+    /// the same sentence to a person, and because <c>IMediaFileRepository.SetRootAvailabilityAsync</c>
+    /// — which sounds like this one — writes the files under a root and never the root itself.
+    /// </summary>
+    Task SetAvailabilityAsync(
+        LibraryRootId id,
+        RootAvailability availability,
+        CancellationToken cancellationToken = default);
+
     Task RemoveAsync(
         LibraryRootId id,
         bool preserveCatalog = true,

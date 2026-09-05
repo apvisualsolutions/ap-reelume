@@ -169,6 +169,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ShowDetailsAccessibleName">Show details</x:String>
   <x:String x:Key="MediaUnavailable">Unavailable</x:String>
   <x:String x:Key="MediaAvailable">Available</x:String>
+  <x:String x:Key="RootAccessDenied">No permission</x:String>
   <x:String x:Key="ScanProgressAccessibleName">Scan progress</x:String>
   <x:String x:Key="ScanProgressIdle">No scan is running.</x:String>
   <x:String x:Key="ScanProgressRunning">Scanning the library.</x:String>

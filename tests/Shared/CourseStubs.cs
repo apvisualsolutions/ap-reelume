@@ -269,6 +269,11 @@ internal sealed class CatalogueOfRoots : ILibraryRootRepository
     public Task<LibraryRoot?> GetAsync(LibraryRootId id, CancellationToken cancellationToken = default) =>
         Task.FromResult(All.FirstOrDefault(root => root.Id == id));
 
+    public Task SetAvailabilityAsync(
+        LibraryRootId id,
+        RootAvailability availability,
+        CancellationToken cancellationToken = default) => Task.CompletedTask;
+
     public Task RemoveAsync(
         LibraryRootId id,
         bool preserveCatalog = true,

@@ -666,6 +666,11 @@ public static class CanonicalJourney
             return Task.CompletedTask;
         }
 
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            ApSolutions.LocalMedia.Domain.Discovery.RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
         public Task RemoveAsync(
             LibraryRootId id,
             bool preserveCatalog = true,

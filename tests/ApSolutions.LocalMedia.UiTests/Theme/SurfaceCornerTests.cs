@@ -361,14 +361,23 @@ public sealed class SurfaceCornerTests
     /// 86 to 80.
     /// </para>
     /// <para>
-    /// A ratchet and not an assertion of 86: passing at 80 while claiming 86 would be a gate lying
+    /// <b>80 to 79 on 2026-09-05</b>, and it fell while a chip was being ADDED rather than removed.
+    /// The folder list grew a third state — a root Windows refuses is not a root that is gone — and
+    /// the answer was not a class of its own: the prototype draws all three of its root states with
+    /// <c>tag(tone)</c>, which <c>Border.state-chip</c> is already paired with. So the list's
+    /// home-made green chip moved onto that class and the new red one was born on it. One site out,
+    /// one that never came in: the gate turned a new chip into the occasion to pair the old one,
+    /// which is what a ratchet that only falls is for.
+    /// </para>
+    /// <para>
+    /// A ratchet and not an assertion of 86: passing at 79 while claiming 86 would be a gate lying
     /// about its own progress, so it fails in both directions and says which.
     /// </para>
     /// </remarks>
     [Fact]
     public void The_corners_written_in_the_views_themselves_do_not_grow()
     {
-        const int ratchet = 80;
+        const int ratchet = 79;
 
         var sites = Directory
             .EnumerateFiles(Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories)

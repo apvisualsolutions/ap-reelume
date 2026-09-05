@@ -75,6 +75,13 @@ public sealed class RemovedDriveTests
             Assert.Equal(1, await CountMediaAsync(factory));
             Assert.Equal(0, await CountAvailableMediaAsync(factory));
 
+            // The row the settings list reads. Marking the files and leaving the root saying
+            // "Available" is the whole of the defect: LIB-010 promises the disconnected drive is
+            // shown as unavailable, and the only surface that names a root is this column.
+            var whileGone = await roots.GetAsync(root.Id, TestContext.Current.CancellationToken);
+            Assert.NotNull(whileGone);
+            Assert.Equal(RootAvailability.Unavailable, whileGone.Availability);
+
             MountSubstitutedDrive(source, letter);
             var afterReconnect = await coordinator.StartAsync(
                 new StartScanCommand(root.Id, ScanTrigger.Manual),
@@ -83,6 +90,11 @@ public sealed class RemovedDriveTests
             Assert.Equal(1, afterReconnect.EnumeratedCount);
             Assert.Equal(1, await CountMediaAsync(factory));
             Assert.Equal(1, await CountAvailableMediaAsync(factory));
+
+            // And back, because a state that never clears is the same lie told the other way round.
+            var afterReturn = await roots.GetAsync(root.Id, TestContext.Current.CancellationToken);
+            Assert.NotNull(afterReturn);
+            Assert.Equal(RootAvailability.Available, afterReturn.Availability);
         }
         finally
         {

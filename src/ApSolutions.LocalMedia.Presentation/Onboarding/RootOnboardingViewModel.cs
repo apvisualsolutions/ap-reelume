@@ -34,7 +34,24 @@ public sealed class LibraryRootRowViewModel(LibraryRoot root)
 
     public bool IsAvailable => _root.Availability == RootAvailability.Available;
 
-    public string AvailabilityKey => IsAvailable ? "MediaAvailable" : "MediaUnavailable";
+    /// <summary>
+    /// The drive is not there. Plugging it back in is what fixes it, so it gets its own word.
+    /// </summary>
+    public bool IsDisconnected => _root.Availability == RootAvailability.Unavailable;
+
+    /// <summary>
+    /// The folder is there and Windows refuses it — a share whose credentials expired, a disk that
+    /// belongs to another user. Saying "Unavailable" here sends somebody to look for a cable that is
+    /// already plugged in, which is why the third state stopped sharing the second one's sentence.
+    /// </summary>
+    public bool IsAccessDenied => _root.Availability == RootAvailability.AccessDenied;
+
+    public string AvailabilityKey => _root.Availability switch
+    {
+        RootAvailability.Available => "MediaAvailable",
+        RootAvailability.AccessDenied => "RootAccessDenied",
+        _ => "MediaUnavailable",
+    };
 }
 
 public sealed class RootOnboardingViewModel : INotifyPropertyChanged
