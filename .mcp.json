@@ -3,6 +3,11 @@
     "avalonia-docs": {
       "type": "http",
       "url": "https://docs-mcp.avaloniaui.net/mcp"
+    },
+    "second-brain-common": {
+      "type": "http",
+      "url": "https://brain-common.apsolutions.company/mcp",
+      "headersHelper": "pwsh -NoProfile -File S:/IT/Omada/.claude/worktrees/segundo-cerebro-claude-code-631f6a/.claude/scripts/second-brain-mcp-headers.ps1 common"
     }
   }
 }
