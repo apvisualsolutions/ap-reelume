@@ -26,7 +26,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="DuplicateColumnDuration">DURATION</x:String>
   <x:String x:Key="DuplicateColumnLocation">LOCATION</x:String>
   <x:String x:Key="DuplicateColumnAvailability">AVAILABILITY</x:String>
-  <x:String x:Key="DuplicateGroupCountLabel">versions</x:String>
   <x:String x:Key="DuplicatesEmptyTitle">No duplicates found</x:String>
   <x:String x:Key="DuplicatesEmptyDescription">Every title resolves to a single file. Nothing was deleted to get here.</x:String>
   <x:String x:Key="AboutAccessibleName">About AP Reelume</x:String>
@@ -477,7 +476,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="Identification.Warning.AmbiguousName">The file name reads more than one way</x:String>
   <x:String x:Key="Identification.Warning.EpisodeContradiction">The file name and its data disagree about which episode this is</x:String>
   <x:String x:Key="HomeAccessibleName">Home</x:String>
-  <x:String x:Key="HomeTitle">Home</x:String>
   <x:String x:Key="HomeResumeAccessibleName">Continue watching</x:String>
   <x:String x:Key="HomeResumeHeading">Continue watching</x:String>
   <x:String x:Key="HomeResumeRemaining">left {0}</x:String>
@@ -485,7 +483,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="HomeResumeAction">Continue</x:String>
   <x:String x:Key="HomeRestartAction">Play from the start</x:String>
   <x:String x:Key="HomeResumeProgressLabel">Progress</x:String>
-  <x:String x:Key="HomePercentSuffix">%</x:String>
   <x:String x:Key="HomeInProgressAccessibleName">Items in progress</x:String>
   <x:String x:Key="HomeInProgressSubheading">Pick up where you left off</x:String>
   <x:String x:Key="HomeInProgressHeading">In progress</x:String>
@@ -512,7 +509,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="MovieVersionPreferred">Chosen by you</x:String>
   <x:String x:Key="ShowDetailsEmpty">This show has no episodes in the catalog yet.</x:String>
   <x:String x:Key="ShowEpisodesHeading">Episodes</x:String>
-  <x:String x:Key="ShowSeasonSuffixOne">season</x:String>
   <x:String x:Key="CatalogEpisodeSuffixOne">episode</x:String>
   <x:String x:Key="ShowSeasonsSuffix">seasons</x:String>
   <x:String x:Key="ShowWatchedOfTotal">{0}/{1} watched</x:String>
@@ -524,8 +520,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="SeasonHeading">Season</x:String>
   <x:String x:Key="SeasonPickerLabel">Choose a season</x:String>
   <x:String x:Key="SeasonSpecialsHeading">Specials</x:String>
-  <x:String x:Key="SeasonEpisodeCountLabel">episodes</x:String>
-  <x:String x:Key="EpisodePrefix">Episode</x:String>
   <x:String x:Key="EpisodePlayAction">Play episode</x:String>
   <x:String x:Key="EpisodeNoFile">No file in the catalog</x:String>
   <x:String x:Key="PersonalActionsAccessibleName">Personal marks</x:String>
@@ -666,8 +660,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PlayerSessionAccessibleName">Playback session</x:String>
   <x:String x:Key="PlayerShortcutHint">Space plays · ← → skips · ↑ ↓ volume · F fullscreen · N mini · Esc closes</x:String>
   <x:String x:Key="PlayerCloseAction">Close the player</x:String>
-  <x:String x:Key="PlayerMiniModeAction">Mini player</x:String>
-  <x:String x:Key="PlayerFullscreenAction">Fullscreen</x:String>
   <x:String x:Key="PlayerSessionBadge">Session {0} · single active engine</x:String>
   <x:String x:Key="PlayerPanelAudio">Audio</x:String>
   <x:String x:Key="PlayerPanelSubtitles">Subtitles</x:String>

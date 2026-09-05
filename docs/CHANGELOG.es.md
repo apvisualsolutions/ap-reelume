@@ -10,6 +10,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Ocho textos traducidos que ninguna pantalla pedía se han ido, y ahora hay algo que impide que
+  vuelvan.** Estaban escritos en los dos idiomas, revisados, y no los leía nadie. Dos de ellos eran
+  un tercer nombre para el mini reproductor y un segundo para «pantalla completa», restos de una
+  barra del reproductor que ya no existe.
+
+  **Lo interesante es lo que casi pasa.** La comprobación que los caza se escribió antes de borrar
+  nada, y en su primera versión señaló **cincuenta y ocho** textos como muertos. Cuarenta de ellos
+  estaban vivos: son los que el programa compone sobre la marcha —los motivos por los que te
+  recomienda algo, lo que encuentra al restaurar una copia, por qué rechaza una actualización— y no
+  se parecen a un texto usado hasta que sabes cómo se arman. Borrarlos habría roto pantallas enteras
+  sin que ninguna prueba dijera nada.
+
+  Hicieron falta tres intentos hasta que la comprobación dijo la verdad. **Por eso se escribe la
+  guardia antes que la limpieza**, y no al revés.
+
+  Trece textos más se quedan, cada uno con su motivo escrito: o tienen ficha propia pendiente, o son
+  parte de algo que ya se ha decidido construir. Esa lista sólo puede encoger dibujando lo que hay
+  en ella.
+
 - **Ya puedes decidir si el siguiente episodio empieza solo, y cuánto tarda en empezar.** Ajustes
   estrena una sección, «Reproducción», con un interruptor y —debajo, sólo cuando está encendido— los
   segundos de espera.

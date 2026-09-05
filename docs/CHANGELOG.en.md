@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Eight translated texts no screen ever asked for are gone, and something now stops them coming
+  back.** They were written in both languages, reviewed, and read by nobody. Two of them were a
+  third name for the mini player and a second for «full screen», left over from a player bar that no
+  longer exists.
+
+  **The interesting part is what nearly happened.** The check that catches them was written before
+  anything was deleted, and its first version flagged **fifty-eight** texts as dead. Forty of them
+  were alive: they are the ones the program assembles on the fly — why it recommends something, what
+  it finds when restoring a backup, why it refuses an update — and they do not look like used text
+  until you know how they are built. Deleting them would have broken whole screens without a single
+  test saying anything.
+
+  It took three passes before the check told the truth. **That is why the guard is written before the
+  cleanup**, not after it.
+
+  Thirteen more texts stay, each with its reason written down: either they have an open record of
+  their own, or they belong to something already decided. That list can only shrink by drawing what
+  is in it.
+
 - **You can now decide whether the next episode starts on its own, and how long it takes to.**
   Settings gains a section, «Playback», with a switch and — underneath, only while it is on — the
   seconds to wait.
