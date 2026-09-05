@@ -32,6 +32,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="AboutCreditsHeading">Créditos</x:String>
   <x:String x:Key="AboutTmdbLogoAlt">Logotipo de TMDB</x:String>
   <x:String x:Key="AboutTmdbAttribution">Este producto usa TMDB y las API de TMDB, pero no está avalado, certificado ni aprobado de ningún otro modo por TMDB.</x:String>
+  <x:String x:Key="AboutPlaybackEngineAttribution">La reproducción de vídeo la hace LibVLC, de VideoLAN, sin modificar y bajo la licencia LGPL-2.1-or-later; algunos de sus complementos llevan licencias propias, como GPL-2.0-or-later. Los textos de esas licencias y el código fuente correspondiente se entregan con el programa.</x:String>
   <x:String x:Key="WelcomeTitle">Tu biblioteca, en tu PC</x:String>
   <x:String x:Key="WelcomeDescription">Organiza y revisa tus vídeos locales sin cuentas, nube ni sincronización.</x:String>
   <x:String x:Key="CurrentAreaAccessibleName">Área de contenido actual</x:String>

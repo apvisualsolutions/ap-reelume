@@ -100,6 +100,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
           </StackPanel>
         </Grid>
       </Border>
+      <!--
+        An "Apply" button, which PRD006-parity-matrix.md says this tree does not have: the prototype
+        applies on choosing, and a button whose only job was to repeat what the control beside it
+        already said is the definition of one control too many. That reasoning holds for a
+        preference that is merely stored. This one is not stored: it recomputes.
+
+        Measured on 2026-09-06. ConfigureWatchedThreshold.ExecuteAsync reads every watch state
+        through GetAllAsync and writes back each one whose status changed. The slider above runs
+        from 50 to 100 with TickFrequency="1" and IsSnapToTickEnabled, so applying on choosing would
+        sweep the whole table 51 times for a single drag from end to end, writing on every sweep.
+
+        The general shape of that mistake has already been paid for here, and the analogy is cited
+        rather than borrowed: a command announcing itself inside a progress loop took a walk scene
+        from 4 s to 63 s, in audit-lib002-the-notices-strip.md. That measurement is the notices
+        strip's, not this control's.
+
+        So the button stays, and this is the reason ADR-0007's third consequence asks to be written
+        beside it.
+      -->
       <Button
           Content="{DynamicResource RecommendationSettingsThresholdApply}"
           Command="{Binding ApplyWatchedThresholdCommand}"
