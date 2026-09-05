@@ -60,12 +60,22 @@ jobs:
       # The community feed answers 503 often enough to have cost two runs on 2026-08-24 alone, and a
       # build that never compiled is not a verdict about the code. Three attempts with a widening
       # wait; the version stays pinned, so what a retry can change is the transport and nothing else.
+      # ffmpeg-full and not ffmpeg: the community's plain package is gyan.dev's ESSENTIALS build,
+      # which carries neither libsvtav1 nor libxavs2. Two samples of the codec matrix were therefore
+      # never produced and their rows skipped themselves, on both architectures and in silence. The
+      # HDR row skipped for a third reason: that build muxes the HDR10 sample without its transfer
+      # characteristics, so there is nothing left to recognise. Five skips in MediaTests, read from
+      # the run of 743af9a, against 24 of 24 passing on a machine that carries the full build.
+      # The version stays at 9.0.0, which ffmpeg-full publishes too, so this change moves the build
+      # and nothing else. The full package is a strict superset of the essentials one - its own
+      # description says it "provides everything included in the 'essentials' build with additional
+      # libraries" - so nothing green today can turn red for want of a codec.
       - name: Install ffmpeg
         shell: pwsh
         run: |
           if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.'; exit 0 }
           foreach ($attempt in 1..3) {
-            choco install ffmpeg --version 9.0.0 -y --no-progress
+            choco install ffmpeg-full --version 9.0.0 -y --no-progress
             if ($LASTEXITCODE -eq 0) { exit 0 }
             "Attempt $attempt failed ($LASTEXITCODE); the community feed is the usual reason."
             if ($attempt -lt 3) { Start-Sleep -Seconds (20 * $attempt) }
@@ -250,13 +260,16 @@ jobs:
       # which is fine for PRODUCING the samples - ffmpeg is not the code under test - but it is
       # written into the evidence rather than left implicit. If it cannot be installed at all, the
       # media phases now say they could not measure instead of passing without measuring.
+      # ffmpeg-full and not ffmpeg, for the reason written over the x64 job's step: the plain
+      # package is the essentials build and lacks libsvtav1 and libxavs2, so the codec matrix and
+      # the HDR row skipped themselves here too. Same pinned version, so only the build moves.
       - name: Install ffmpeg
         continue-on-error: true
         shell: pwsh
         run: |
           if (Get-Command ffmpeg -ErrorAction SilentlyContinue) { 'ffmpeg is already present.'; exit 0 }
           foreach ($attempt in 1..3) {
-            choco install ffmpeg --version 9.0.0 -y --no-progress
+            choco install ffmpeg-full --version 9.0.0 -y --no-progress
             if ($LASTEXITCODE -eq 0) { exit 0 }
             "Attempt $attempt failed ($LASTEXITCODE); the community feed is the usual reason."
             if ($attempt -lt 3) { Start-Sleep -Seconds (20 * $attempt) }
