@@ -88,23 +88,36 @@ dialog, removed here, and listed there is one list that cannot disagree with its
               </StackPanel>
               <Panel Grid.Column="1" VerticalAlignment="Center">
                 <!--
-                  The unavailable half is the one badge the whole application shares — a gate
-                  refuses any view that draws its own - and the available half is this view's,
-                  because "connected" is a sentence only this list says.
+                  Three states, and the third one is why this stopped being two. The unavailable half
+                  is the one badge the whole application shares — a gate refuses any view that draws
+                  its own — and the other two are this view's, because "connected" and "refused" are
+                  sentences only this list says.
+
+                  The shared badge shows itself on !IsAvailable, which is true of both failures, so it
+                  is wrapped in a panel that narrows it to the one it means. Without the wrapper a
+                  refused share would wear both badges at once.
                 -->
                 <Border
-                    Padding="8,4"
-                    IsVisible="{Binding IsAvailable}"
-                    Background="{DynamicResource PositiveSurfaceBrush}"
-                    BorderBrush="{DynamicResource PositiveBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="{DynamicResource CornerRadiusSmall}">
-                  <TextBlock
-                      FontSize="{DynamicResource FontSizeCaption}"
-                      Foreground="{DynamicResource TextPrimaryBrush}"
-                      Text="{DynamicResource MediaAvailable}" />
+                    x:Name="RootConnectedBadge"
+                    Classes="state-chip ok"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding IsAvailable}">
+                  <TextBlock Text="{DynamicResource MediaAvailable}" />
                 </Border>
-                <library:UnavailableBadge />
+                <Panel IsVisible="{Binding IsDisconnected}">
+                  <library:UnavailableBadge />
+                </Panel>
+                <Border
+                    x:Name="RootAccessDeniedBadge"
+                    Classes="state-chip denied"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding IsAccessDenied}"
+                    automation:AutomationProperties.Name="{DynamicResource RootAccessDenied}">
+                  <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
+                    <TextBlock Text="⚠" />
+                    <TextBlock Text="{DynamicResource RootAccessDenied}" />
+                  </StackPanel>
+                </Border>
               </Panel>
               <Button
                   Grid.Column="2"

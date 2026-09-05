@@ -70,6 +70,24 @@ public sealed class LibraryRootRepository : ILibraryRootRepository
         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// The column has been in the schema since 0002, with a CHECK that already admits all three
+    /// values, and until now only the INSERT ever wrote it — always as Available. No migration is
+    /// needed to start telling the truth.
+    /// </summary>
+    public async Task SetAvailabilityAsync(
+        LibraryRootId id,
+        RootAvailability availability,
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _connectionFactory.OpenAsync(cancellationToken).ConfigureAwait(false);
+        await using var command = connection.CreateCommand();
+        command.CommandText = "UPDATE library_roots SET availability = $availability WHERE id = $id;";
+        command.Parameters.AddWithValue("$availability", (int)availability);
+        command.Parameters.AddWithValue("$id", id.Value.ToString("D"));
+        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task RemoveAsync(
         LibraryRootId id,
         bool preserveCatalog = true,

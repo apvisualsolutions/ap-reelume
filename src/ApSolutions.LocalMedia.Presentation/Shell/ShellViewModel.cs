@@ -1299,10 +1299,15 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             await duplicates.LoadAsync(CancellationToken.None).ConfigureAwait(true);
         }
 
-        if (route == AppRoute.Library && Onboarding is { } onboarding)
+        if (route is AppRoute.Library or AppRoute.Settings && Onboarding is { } onboarding)
         {
             // The folder list is read on every visit: managing folders is this route's job, and a
             // stale list would offer removals of folders that already left.
+            //
+            // Settings joined Library here because the list is drawn on both, and only Library was
+            // refreshing it. A drive unplugged while somebody sat in Settings kept saying it was
+            // connected until they walked through the Library and came back — the write was fixed and
+            // the read was not, which is the same defect one floor up.
             await onboarding.RefreshRootsAsync(CancellationToken.None).ConfigureAwait(true);
         }
 

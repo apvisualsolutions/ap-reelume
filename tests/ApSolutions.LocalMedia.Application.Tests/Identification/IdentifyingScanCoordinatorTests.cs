@@ -105,6 +105,11 @@ public sealed class IdentifyingScanCoordinatorTests
         public Task AddAsync(LibraryRoot root, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
         public Task RemoveAsync(
             LibraryRootId id,
             bool preserveCatalog = true,

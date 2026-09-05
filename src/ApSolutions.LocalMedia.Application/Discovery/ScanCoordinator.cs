@@ -75,7 +75,9 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
         var probeCount = 0;
         var unchangedCount = 0;
         var errorCount = 0;
-        var rootUnavailable = false;
+        // Why this is not a boolean any more: the enumerator already tells the two failures apart, and
+        // collapsing them here was what left the settings list unable to say which one happened.
+        RootAvailability? rootFailure = null;
         var maxDispatchDuration = TimeSpan.Zero;
         string? resumeAfterPath = checkpoint;
 
@@ -87,13 +89,21 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
                                command.BatchSize,
                                cancellationToken).ConfigureAwait(false))
             {
-                if (batch.Any(item =>
+                var rootFailureCode = batch
+                    .FirstOrDefault(item =>
                         item.ErrorCode is "IoError" or "AccessDenied" &&
-                        string.Equals(item.Path, root.Path, StringComparison.OrdinalIgnoreCase)))
+                        string.Equals(item.Path, root.Path, StringComparison.OrdinalIgnoreCase))
+                    ?.ErrorCode;
+                if (rootFailureCode is not null)
                 {
-                    rootUnavailable = true;
+                    rootFailure = rootFailureCode == "AccessDenied"
+                        ? RootAvailability.AccessDenied
+                        : RootAvailability.Unavailable;
                     await _mediaFileRepository
                         .SetRootAvailabilityAsync(root.Id, isAvailable: false, CancellationToken.None)
+                        .ConfigureAwait(false);
+                    await _rootRepository
+                        .SetAvailabilityAsync(root.Id, rootFailure.Value, CancellationToken.None)
                         .ConfigureAwait(false);
                 }
 
@@ -163,10 +173,13 @@ public sealed class ScanCoordinator : IScanCoordinator, IScanActivity
             return CreateSummary(isCancelled: true);
         }
 
-        if (!rootUnavailable)
+        if (rootFailure is null)
         {
             await _mediaFileRepository
                 .SetRootAvailabilityAsync(root.Id, isAvailable: true, cancellationToken)
+                .ConfigureAwait(false);
+            await _rootRepository
+                .SetAvailabilityAsync(root.Id, RootAvailability.Available, cancellationToken)
                 .ConfigureAwait(false);
         }
 

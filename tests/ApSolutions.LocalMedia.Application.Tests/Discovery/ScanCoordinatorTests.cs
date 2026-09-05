@@ -200,6 +200,57 @@ public sealed class ScanCoordinatorTests
         Assert.Equal(1, enumerator.MaxConcurrentEnumerations);
     }
 
+    /// <summary>
+    /// The two ways a root stops being readable, which the scan already tells apart in its error code
+    /// and used to collapse into one boolean. They are not the same sentence to a person: a drive that
+    /// is gone comes back by plugging it in, and a folder Windows refuses needs permission instead.
+    /// </summary>
+    [Theory]
+    [InlineData("IoError", RootAvailability.Unavailable)]
+    [InlineData("AccessDenied", RootAvailability.AccessDenied)]
+    public async Task A_root_that_cannot_be_read_is_marked_with_the_reason_it_could_not(
+        string errorCode,
+        RootAvailability expected)
+    {
+        var root = CreateRoot();
+        var roots = new SingleRootRepository(root);
+        var coordinator = new ScanCoordinator(
+            roots,
+            new InMemoryMediaFileRepository(),
+            new FakeMediaFileEnumerator([new EnumeratedFile(root.Path, 0, DateTimeOffset.UnixEpoch, errorCode)]),
+            new CountingProbe(),
+            new RecordingPublisher());
+
+        await coordinator.StartAsync(
+            new StartScanCommand(root.Id, ScanTrigger.Manual),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([expected], roots.Written);
+    }
+
+    /// <summary>
+    /// And the state clears itself. A root marked unavailable that nothing ever sets back is the same
+    /// lie told the other way round, so a scan that reads the root writes Available.
+    /// </summary>
+    [Fact]
+    public async Task A_root_that_reads_again_is_marked_available()
+    {
+        var root = CreateRoot() with { Availability = RootAvailability.Unavailable };
+        var roots = new SingleRootRepository(root);
+        var coordinator = new ScanCoordinator(
+            roots,
+            new InMemoryMediaFileRepository(),
+            new FakeMediaFileEnumerator([FileItem(@"C:\Media\film.mkv", 1)]),
+            new CountingProbe(),
+            new RecordingPublisher());
+
+        await coordinator.StartAsync(
+            new StartScanCommand(root.Id, ScanTrigger.Manual),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([RootAvailability.Available], roots.Written);
+    }
+
     private static ScanCoordinator CreateCoordinator(
         LibraryRoot root,
         IMediaFileRepository mediaRepository,
@@ -236,16 +287,35 @@ public sealed class ScanCoordinatorTests
 
     private sealed class SingleRootRepository(LibraryRoot root) : ILibraryRootRepository
     {
+        private LibraryRoot _root = root;
+
+        /// <summary>Every availability written to the root, in order, so a test can assert the last one.</summary>
+        public List<RootAvailability> Written { get; } = [];
+
         public Task<IReadOnlyList<LibraryRoot>> ListAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<LibraryRoot>>([root]);
+            Task.FromResult<IReadOnlyList<LibraryRoot>>([_root]);
 
         public Task<LibraryRoot?> GetAsync(
             LibraryRootId id,
             CancellationToken cancellationToken = default) =>
-            Task.FromResult<LibraryRoot?>(id == root.Id ? root : null);
+            Task.FromResult<LibraryRoot?>(id == _root.Id ? _root : null);
 
         public Task AddAsync(LibraryRoot item, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
+
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default)
+        {
+            if (id == _root.Id)
+            {
+                Written.Add(availability);
+                _root = _root.WithAvailability(availability);
+            }
+
+            return Task.CompletedTask;
+        }
 
         public Task RemoveAsync(
             LibraryRootId id,

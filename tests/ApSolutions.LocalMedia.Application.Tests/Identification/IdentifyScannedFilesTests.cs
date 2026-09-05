@@ -284,6 +284,11 @@ public sealed class IdentifyScannedFilesTests
         public Task AddAsync(LibraryRoot added, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
         public Task RemoveAsync(
             LibraryRootId id,
             bool preserveCatalog = true,

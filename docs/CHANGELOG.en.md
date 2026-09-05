@@ -218,6 +218,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The settings folder list said «Available» even with the drive unplugged.** And it always did: a
+  folder's state was written once, when it was added, and never written again. What a scan did update
+  was each **file's** availability, which is a different thing and a different badge — which is why
+  the check that passed this was passing: it measured the files and not the folder.
+
+  **There are three answers now instead of two.** A folder can be available, disconnected, or
+  **refused**, which is when the folder is exactly where it was and Windows will not let you in — a
+  network share whose credentials expired, or another user's disk. Saying «unavailable» there sends
+  somebody to look for a cable that is already plugged in. The program already told the two failures
+  apart and merged them into one right before saving.
+
+  **And there was a second fault behind the first**: even written correctly, the list was only re-read
+  by walking through the Library. A drive unplugged while you sat in Settings would have kept saying
+  «Available» until you left and came back. Both are fixed.
+
 - **The library stopped at title fifty with no way to see the rest.** The program has known how to
   fetch the next ones from the start — it asks fifty at a time — and **no screen ever asked**. With
   more than fifty titles, everything past the fiftieth did not exist, and the header said «50 items»

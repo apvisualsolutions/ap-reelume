@@ -2974,6 +2974,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
+    THE RED TWIN THAT IS NOT ONE, added 2026-09-05 with the prototype measured rather than assumed.
+
+    The comment above says there is none, and it is right about the case it names: a file that is NOT
+    THERE gets UnavailableBadge and nothing else, which is what UnavailableBadgeTests refuses a second
+    shape for. This is a different sentence. A root Windows REFUSES is sitting right where it always
+    was, and telling somebody it is unavailable sends them to look for a cable that is already plugged
+    in.
+
+    It is the prototype's own answer and not an invention: rootState() returns three states —
+    «Conectada», «Desconectada», «Acceso denegado» — and draws all three with tag(tone), which is the
+    element this class is already paired with. Both failures wear tone 'err' there, so the red is the
+    design's; what tells them apart is the word.
+  -->
+  <Style Selector="Border.state-chip.denied">
+    <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DangerBorderBrush}" />
+  </Style>
+
+  <!--
     The label over a value - "Confianza". Small and secondary, which is the only way a card can name
     five things without any of them shouting.
 

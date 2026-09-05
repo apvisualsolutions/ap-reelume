@@ -219,6 +219,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La lista de carpetas de Ajustes decía «Disponible» aunque el disco estuviera desenchufado.** Y lo
+  decía siempre: el estado de cada carpeta se guardaba una sola vez, al añadirla, y nunca se volvía a
+  escribir. Lo que sí se actualizaba al escanear era la disponibilidad de cada **archivo**, que es
+  otra cosa y otra insignia — por eso la comprobación que dio esto por bueno pasaba: medía los
+  archivos y no la carpeta.
+
+  **Ahora hay tres respuestas y no dos.** Una carpeta puede estar disponible, desconectada o **sin
+  permiso**, que es cuando la carpeta está exactamente donde estaba y Windows no deja entrar — una
+  carpeta de red cuyas credenciales caducaron, o un disco de otro usuario. Decir «no disponible» en
+  ese caso manda a alguien a buscar un cable que ya está puesto. El programa ya sabía distinguir los
+  dos fallos y los juntaba en uno justo antes de guardarlos.
+
+  **Y había un segundo fallo detrás del primero**: aunque se guardara bien, la lista sólo se volvía a
+  leer al pasar por la Biblioteca. Un disco desenchufado mientras estabas en Ajustes habría seguido
+  diciendo «Disponible» hasta salir y volver a entrar. Se arreglaron los dos.
+
 - **La biblioteca se cortaba en el título cincuenta y no había manera de ver el resto.** El programa
   sabía traer los siguientes desde el principio —lo pide de cincuenta en cincuenta— y **ninguna
   pantalla se lo pedía nunca**. Con más de cincuenta títulos, del cincuenta y uno en adelante no

@@ -440,6 +440,11 @@ public sealed class BackupWorkflowTests : IDisposable
         public Task AddAsync(LibraryRoot root, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
 
+        public Task SetAvailabilityAsync(
+            LibraryRootId id,
+            RootAvailability availability,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+
         public Task RemoveAsync(
             LibraryRootId id,
             bool preserveCatalog = true,
