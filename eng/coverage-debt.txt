@@ -392,7 +392,7 @@ src/ApSolutions.LocalMedia.Presentation/Theme/FluentThemeService.cs             
 src/ApSolutions.LocalMedia.Presentation/Theme/Icons.axaml                                    100  50
 src/ApSolutions.LocalMedia.Presentation/Updates/UpdateView.axaml                             100  50
 src/ApSolutions.LocalMedia.Windows/Accessibility/WindowsReducedMotionService.cs               87  50
-src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         88  61
+src/ApSolutions.LocalMedia.Windows/CompositionRoot.cs                                         90  63
 src/ApSolutions.LocalMedia.Windows/CompositionRoot.Updates.cs                                100  80
 src/ApSolutions.LocalMedia.Windows/MediaKeys/WindowsMediaKeyService.cs                        92  76
 src/ApSolutions.LocalMedia.Windows/Playback/SegmentDetectionBackground.cs                    100  90
