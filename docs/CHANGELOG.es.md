@@ -10,6 +10,26 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El prototipo del diseño enseñaba mal cinco cosas, y una de ellas dejaba un botón sin destino.**
+  Es la herramienta con la que se decide cómo se ve el programa, así que un defecto suyo se paga en
+  todas las decisiones que salen de él. La ficha decía que recorría 28 situaciones y recorre 30; una
+  de ellas no cambiaba nada al pulsarla —preparaba su señal y nadie la leía, así que enseñaba
+  exactamente la misma pantalla que el estado normal—; el botón «Permisos» de uno de los avisos se
+  limitaba a repetir el título del propio aviso; un rojo estaba escrito con un valor distinto al del
+  resto; y una cuenta interna se había quedado en trece.
+
+  **Lo que NO estaba roto, y se midió antes de tocar nada**: los avisos empujan el contenido hacia
+  abajo en vez de flotar sobre él, y eso es lo correcto. Lo dice Microsoft de su propio componente
+  —«ocupa sitio y no tapa ni flota sobre el contenido»—, lo dicen Google e IBM, y es la misma
+  decisión que este programa ya tomó en agosto para un aviso igual, midiendo. La regla, que hasta
+  hoy no estaba escrita en ninguna parte: **lo que describe una situación ocupa sitio; lo que
+  cuenta algo que acaba de pasar flota y se retira solo.**
+
+  **Y la ficha de un aviso llevaba desde agosto diciendo que no se podía comprobar**, cuando se
+  comprobó ese mismo mes: pedía cuarenta y ocho píxeles de alto y hacen falta entre 286 y 336,
+  porque dentro caben un encabezado, el nombre del archivo, una explicación, su acción y dos botones
+  más.
+
 - **Cinco comprobaciones de vídeo que llevaban meses sin ejecutarse en el servidor vuelven a
   ejecutarse.** El servidor instalaba una versión recortada del programa que fabrica los vídeos de
   prueba, y le faltaban dos formatos. Sin ellos, dos de esas muestras no se podían crear y las

@@ -779,7 +779,7 @@ a:hover{text-decoration:underline}
                   </div>
                 </sc-for>
                 <sc-if value="{{ rnBlocked }}">
-                  <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:6px;border:1px solid var(--err-fg,#8E1123);background:var(--err-bg,#FDE7E9);color:var(--err-fg,#8E1123);font-size:13px">{{ icons.warn }}<span>{{ rnBlockedText }}</span></div>
+                  <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:6px;border:1px solid var(--err-fg,#8E1123);background:var(--err-bg,#FDECEE);color:var(--err-fg,#8E1123);font-size:13px">{{ icons.warn }}<span>{{ rnBlockedText }}</span></div>
                 </sc-if>
                 <sc-if value="{{ rnPreviewMode }}">
                   <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px;border:1px solid var(--border,#D8E0E8);border-radius:8px;background:var(--card,#fff)">
@@ -1616,7 +1616,7 @@ a:hover{text-decoration:underline}
         <div>
           <div style="font-size:12px;font-weight:600;margin-bottom:8px">{{ t.scenarios }}</div>
           <div role="radiogroup" aria-label="{{ t.scenarios }}" style="display:flex;flex-direction:column;gap:2px">
-            <sc-for list="{{ scenarios }}" as="sc" hint-placeholder-count="13">
+            <sc-for list="{{ scenarios }}" as="sc" hint-placeholder-count="30">
               <label style="{{ sc.style }}">
                 <input type="radio" name="apr-scn" checked="{{ sc.sel }}" onChange="{{ sc.pick }}" style="width:15px;height:15px;accent-color:var(--accent,#1769AA)" />
                 <span style="flex:1">{{ sc.label }}</span>
@@ -2316,7 +2316,10 @@ class Component extends DCLogic {
     if (flags.denied) banners.push(banner('err', 'warn',
       st.lang === 'en' ? 'Access denied: \\\\NAS\\Cine' : 'Acceso denegado: \\\\NAS\\Cine',
       st.lang === 'en' ? 'Windows refused the credentials for this share. The catalogue keeps the entries as unavailable.' : 'Windows rechazó las credenciales de este recurso. El catálogo conserva las entradas como no disponibles.',
-      st.lang === 'en' ? 'Permissions' : 'Permisos'));
+      st.lang === 'en' ? 'Permissions' : 'Permisos',
+      () => this.toast(st.lang === 'en'
+        ? 'Opens Windows’ settings for this share. The application never changes credentials itself.'
+        : 'Abre los ajustes de Windows para este recurso. La aplicación nunca cambia credenciales por su cuenta.')));
 
     const pct = (p, d) => Math.max(0, Math.min(100, Math.round((p / d) * 100)));
     const stateOf = (p, d) => (p >= d ? t.watched : p > 0 ? t.inProgress : t.notStarted);
@@ -2642,7 +2645,12 @@ class Component extends DCLogic {
       open: () => (r.show ? this.openShow(r.o.id) : this.openMovie(r.o.id))
     }));
 
-    const revItems = REV.map((r) => {
+    // «Identificacion ambigua» ordena la bandeja por confianza ascendente, de modo que el caso
+    // que obliga a decidir a mano -34 %, tres candidatos con la misma puntuacion- queda arriba.
+    // Hasta el 2026-09-05 este estado solo navegaba a Revision y su bandera se calculaba sin que
+    // nadie la leyera, asi que pulsarlo mostraba exactamente la misma bandeja que «Normal».
+    const revSource = flags.ambiguous ? REV.slice().sort((a, b) => a.conf - b.conf) : REV;
+    const revItems = revSource.map((r) => {
       const done = st.rev[r.id];
       const band = r.conf >= 60 ? (en ? 'Suggested (60–89 %)' : 'Sugerido (60–89 %)') : (en ? 'Pending (< 60 %)' : 'Pendiente (< 60 %)');
       const stat = done === 'accepted' ? (en ? 'Accepted by you' : 'Aceptado por ti') : done === 'rejected' ? (en ? 'Rejected by you' : 'Rechazado por ti') : done === 'manual' ? (en ? 'Manual search open' : 'Búsqueda manual abierta') : done === 'kept' ? (en ? 'Kept pending' : 'Mantenido pendiente') : band;

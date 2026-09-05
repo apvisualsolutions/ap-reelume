@@ -8,7 +8,7 @@ Biblioteca de medios local para Windows 11 (C# + Avalonia 12.1.1, LibVLC, SQLite
 
 | Archivo | Qué es |
 | --- | --- |
-| `AP Reelume.dc.html` | Prototipo navegable completo: las 53 vistas del censo + el área de Cursos propuesta. El panel **Demostración** recorre 28 estados |
+| `AP Reelume.dc.html` | Prototipo navegable completo: las 53 vistas del censo + el área de Cursos propuesta. El panel **Demostración** recorre 30 estados |
 | `vistas/` | **57 archivos, una vista cada uno.** Abren el prototipo directamente en esa vista (misma fuente, cero divergencia) |
 | `Propuesta de diseño - AP Reelume.dc.html` | El sistema: tokens en los 4 temas con ratios, tipografía, los 5 estados de cada control, vista por vista, activos de instalación, compatibilidad AXAML |
 | `Catálogo de elementos - AP Reelume.dc.html` | Cada elemento en sus estados y las 4 animaciones, ordenado por elemento |

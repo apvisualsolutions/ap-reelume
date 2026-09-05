@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The design prototype showed five things wrong, and one of them left a button with no
+  destination.** It is the tool the look of the program is decided with, so a defect in it is paid
+  for in every decision that comes out of it. Its sheet said it walked 28 situations and it walks
+  30; one of them changed nothing when pressed — it prepared its signal and nobody read it, so it
+  showed exactly the same screen as the normal state; the «Permissions» button on one notice merely
+  repeated that notice's own title; a red was written with a different value from the rest; and an
+  internal count had stayed at thirteen.
+
+  **What was NOT broken, measured before anything was touched**: the notices push content downwards
+  rather than floating over it, and that is correct. Microsoft says it of its own component — «takes
+  up space and will not cover up other content or float on top of it» — Google and IBM say it too,
+  and it is the same decision this program already took in August for an identical notice, by
+  measuring. The rule, unwritten anywhere until today: **what describes a situation takes space;
+  what reports something that just happened floats and withdraws on its own.**
+
+  **And one notice's sheet had said since August that it could not be checked**, when it was checked
+  that very month: it asked for forty-eight pixels of height and between 286 and 336 are needed,
+  because inside it live a heading, the file's name, an explanation, its action and two more buttons.
+
 - **Five video checks that had gone unrun on the server for months run again.** The server installed
   a trimmed-down version of the program that builds the test videos, and it lacked two formats.
   Without them two of those samples could not be created, and the checks that use them **skipped
