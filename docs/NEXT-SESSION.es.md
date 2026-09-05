@@ -90,6 +90,16 @@
 >   capa y tiene sus propias reglas — no es «un botón más». **Recomendación: no construirlo por
 >   ahora**; el aviso ya dice qué pasa y que la aplicación nunca cambia permisos por su cuenta.
 >
+> · **Dos reglas de la casa se contradicen sobre la duración de un run, y hoy se vio.** Una puerta
+>   exige que **cuatro copias** del árbol digan lo mismo sobre cuánto tarda; `CLAUDE.md` decidió el
+>   2026-09-04 que esa cifra **no se guarda, se mide** con `eng/measure-ci-time.ps1`, porque siempre
+>   estará desfasada. Hoy las cuatro dicen **49-57** y la medición dio **mediana de 42**: el árbol es
+>   coherente consigo mismo y **coherentemente desfasado**, que es el límite que la propia puerta
+>   admite por escrito. Corregir una sola la pone roja; corregir las cuatro repite por cuarta vez lo
+>   que ya caducó tres. **Recomendación: que la puerta compare contra el guion en vez de contra las
+>   otras copias** — es el único arreglo que no vuelve a caducar. Se intentó y se revirtió hoy, para
+>   no dejar una puerta rota en un cierre.
+>
 > ### Un hueco pequeño que queda abierto, con su motivo
 >
 > · **El distintivo rojo de «sin permiso» no tiene medición de color.** La familia sí —la puerta de

@@ -85,6 +85,14 @@ anterior y nunca vuelta a medir, mientras `CLAUDE.md` ya llevaba la cifra correg
 Es el defecto de la casa aplicado a un número: **una cifra que nadie vuelve a medir acaba
 justificando la decisión equivocada.** Si vuelves a citarla, mídela.
 
+**Y medirla no es opcional, porque hoy las tres copias están desfasadas.** El 2026-09-05
+`eng/measure-ci-time.ps1` dio **mediana de 42 minutos** sobre los diez últimos verdes, no 49-57. La
+cifra no se corrigió aquí a propósito: `RunDurationFigureTests` exige que las **cuatro** copias del
+árbol digan lo mismo, así que corregir una sola pone la puerta roja — y corregir las cuatro a un
+número que volverá a caducar es lo que esta misma línea lleva tres veces haciendo.
+**Es una decisión del propietario**, escrita en el relevo: o la puerta pasa a comparar contra el
+guion, o las cuatro copias se sustituyen por él.
+
 ## 5. Leer la conclusión — y saber cuáles de esos rojos NO son tuyos
 
 ```powershell
@@ -143,8 +151,12 @@ Coverage gate: N short of 96/96, ratchet N, N measured under the bar   <- los do
                                                                           y SIN "N improved"
 Coverage gate: N new file(s) ... are where they have to be             <- lo que importa es la frase
                                                                           final, no que N sea 0
-The walk: N declared ...; N pressed, 20 pending                        <- el trinquete NO sube
+The walk: N declared ...; N pressed, 23 pending                        <- el trinquete NO sube
 ```
+
+**El trinquete del paseo son 23 y esta línea dijo 20 hasta el 2026-09-05**, que es la misma clase de
+cifra copiada que el paso 4. La única fuente es `$maximumPending` en `eng/check-walk-coverage.ps1`;
+si la citas, léela ahí.
 
 **La segunda cifra no tiene que ser 0.** Decía «0 new file(s)» aquí y es engañoso: el 2026-08-31 un
 verde legítimo dijo **14**, porque la tanda añadía catorce archivos que llegaban al listón. Lo que se

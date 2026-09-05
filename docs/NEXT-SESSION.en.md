@@ -91,6 +91,16 @@
 >   for now**; the notice already says what is happening and that the application never changes
 >   permissions on its own.
 >
+> · **Two house rules contradict each other about how long a run takes, and it showed today.** A gate
+>   requires **four copies** in the tree to say the same thing; `CLAUDE.md` decided on 2026-09-04 that
+>   this figure **is not stored, it is measured** with `eng/measure-ci-time.ps1`, because it will
+>   always be stale. Today all four say **49-57** and the measurement gave a **median of 42**: the
+>   tree agrees with itself and is **consistently stale**, which is the limit the gate itself admits
+>   in writing. Correcting one turns it red; correcting all four repeats for the fourth time what has
+>   already expired three. **Recommendation: have the gate compare against the script rather than
+>   against the other copies** — the only fix that does not expire again. It was attempted and
+>   reverted today, so as not to leave a broken gate in a close.
+>
 > ### One small gap left open, with its reason
 >
 > · **The red «no permission» chip has no colour measurement.** The family does — the corners gate
