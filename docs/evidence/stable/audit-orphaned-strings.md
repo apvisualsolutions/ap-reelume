@@ -84,6 +84,29 @@ anti-ceguera —afirma que barrió más de doscientos archivos y que encontró c
 cuatrocientas claves—, porque una puerta que no encuentra nada porque no leyó nada es el modo de
 fallo que este repositorio nombra como suyo.
 
+### El rojo que costó esta puerta, y por qué era inevitable de la forma en que se trabajó
+
+El run de `59768ac` salió **rojo con dos pruebas de arquitectura**:
+`RepositoryAnchorTests.The_repository_root_is_found_in_one_place` y `The_anchor_is_named_in_one_place`.
+
+**La puerta nueva escribió su propia forma de encontrar la raíz del repositorio.** Ese paseo hacia
+arriba desde el directorio de salida estaba copiado en cincuenta y ocho archivos, y **ni siquiera era
+el mismo paseo** —dos copias se anclaban en la matriz de alcance y el resto en la solución—, así que
+`ARQ-012` lo redujo a un solo sitio: `tests/Shared/RepositoryLayout.cs`, enlazado en cada proyecto de
+pruebas. La lista de excepciones está **vacía** y sólo puede encoger.
+
+**El arreglo es una línea**: usar `RepositoryLayout.PathFromRoot`, que ya existía y hace exactamente
+lo que la copia hacía.
+
+**Lo que no es una línea es el motivo de no haberlo visto**, y es la trampa que esta guía ya nombra:
+se corrieron `UiTests`, `AccessibilityTests`, `DocumentationTests` y la previsualización de suelos, y
+**no `ArchitectureTests`** — porque el archivo nuevo vive en `UiTests` y ahí es donde se buscó. La
+regla escrita dice lo contrario: **la suite afectada es quien LEE el archivo, no quien está en su
+carpeta.** Una prueba nueva la lee la suite de arquitectura, siempre, porque su trabajo es mirar
+todos los archivos de prueba del árbol.
+
+**Ocho minutos de suite local contra cuarenta de CI**, que es la aritmética de siempre.
+
 ---
 
 ## English
@@ -156,3 +179,26 @@ Full `UiTests`: **1,230 of 1,230**, zero skipped. The gate carries its own anti-
 asserts that it swept more than two hundred files and found a consumer for more than four hundred
 keys — because a gate that finds nothing because it read nothing is the failure mode this repository
 names as its own.
+
+### The red this gate cost, and why the way it was worked made it inevitable
+
+The run of `59768ac` came back **red with two architecture tests**:
+`RepositoryAnchorTests.The_repository_root_is_found_in_one_place` and `The_anchor_is_named_in_one_place`.
+
+**The new gate wrote its own way of finding the repository root.** That walk up from the output
+directory had been pasted into fifty-eight files, and **it was not even the same walk** — two copies
+anchored on the scope record and the rest on the solution file — so `ARQ-012` reduced it to one
+place: `tests/Shared/RepositoryLayout.cs`, linked into every test project. Its exception list is
+**empty** and may only shrink.
+
+**The fix is one line**: use `RepositoryLayout.PathFromRoot`, which already existed and does exactly
+what the copy did.
+
+**What is not one line is the reason it went unseen**, and it is the trap this guide already names:
+`UiTests`, `AccessibilityTests`, `DocumentationTests` and the coverage-floor preview were all run,
+and **`ArchitectureTests` was not** — because the new file lives in `UiTests` and that is where it
+was looked for. The written rule says the opposite: **the affected suite is whoever READS the file,
+not whoever sits in its folder.** A new test is read by the architecture suite, always, because its
+job is to look at every test file in the tree.
+
+**Eight minutes of local suite against forty of CI**, which is the usual arithmetic.

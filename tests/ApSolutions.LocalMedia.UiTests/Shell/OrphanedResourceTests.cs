@@ -3,6 +3,9 @@
 
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+
+using ApSolutions.LocalMedia.TestSupport;
+
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Shell;
@@ -168,27 +171,16 @@ public sealed class OrphanedResourceTests
     /// </summary>
     private static string SourceRoot()
     {
-        var root = Path.Combine(RepositoryRoot(), "src");
+        var root = RepositoryLayout.PathFromRoot("src");
         Assert.True(Directory.Exists(root), $"Source root is missing: {root}");
         return root;
     }
 
     private static string PresentationRoot()
     {
-        var root = Path.Combine(RepositoryRoot(), "src", "ApSolutions.LocalMedia.Presentation");
+        var root = RepositoryLayout.PathFromRoot("src", "ApSolutions.LocalMedia.Presentation");
         Assert.True(Directory.Exists(root), $"Presentation project is missing: {root}");
         return root;
     }
 
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "ApSolutions.LocalMedia.sln")))
-        {
-            directory = directory.Parent;
-        }
-
-        Assert.NotNull(directory);
-        return directory!.FullName;
-    }
 }
