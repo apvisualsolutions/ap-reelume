@@ -105,10 +105,17 @@ cuenta, que es la parte que evita que alguien espere de ella algo que no hace. Q
 nuevo, esperando un sí o un no.
 
 
-**La paridad visual se vuelve a pasar.** `PRD-006` está `VERIFIED` sobre «las 53 vistas» y el árbol
-tiene 60; y de esas 53 sólo se fotografiaron **ocho pantallas** junto al prototipo. Además las fichas
-por vista contra las que se compararía llegaron seis días después de darla por buena. Baja a
+**La paridad visual se vuelve a pasar.** `PRD-006` estaba `VERIFIED` sobre «las 53 vistas» y el árbol
+tiene **61**; y de esas 53 sólo se fotografiaron **ocho pantallas** junto al prototipo. Además las
+fichas por vista contra las que se compararía llegaron seis días después de darla por buena. Bajó a
 `IMPLEMENTED` y sube cuando cubra las sesenta.
+
+**El 2026-09-06 su criterio se corrigió a 61 y su comparación llegó a diecinueve parejas de las
+cuarenta y dos pantallas del prototipo**, con **43 defectos medidos** y otros 65 candidatos cerrados
+con veredicto escrito, en
+[la vuelta cuatro](../evidence/stable/audit-prototype-fidelity-round-four.md). **Eso es lo que la
+regla de publicación cuenta**: `PRD-006` es un compromiso, así que esos 43 se corrigen antes de
+publicar nada. Faltan por comparar los estados que hay que fabricar y el reproductor entero.
 
 **Un aviso que describe un estado ocupa sitio; uno que narra un suceso flota**, y está escrito en
 [ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). Se decidió porque nadie lo había

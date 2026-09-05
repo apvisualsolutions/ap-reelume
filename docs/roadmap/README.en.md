@@ -103,10 +103,17 @@ already says what is happening and that the application never changes permission
 is the part that stops anybody expecting from it something it does not do. It stands as new scope,
 awaiting a yes or a no.
 
-**Visual parity gets another pass.** `PRD-006` is `VERIFIED` over «the 53 views» and the tree has 60;
-and of those 53 only **eight screens** were photographed beside the prototype. On top of that, the
-per-view files it would be compared against arrived six days after it was called done. It drops to
-`IMPLEMENTED` and rises when it covers all sixty.
+**Visual parity gets another pass.** `PRD-006` was `VERIFIED` over «the 53 views» and the tree has
+**61**; and of those 53 only **eight screens** were photographed beside the prototype. On top of
+that, the per-view files it would be compared against arrived six days after it was called done. It
+dropped to `IMPLEMENTED` and rises when it covers all sixty.
+
+**On 2026-09-06 its criterion was corrected to 61 and its comparison reached nineteen pairs of the
+prototype's forty-two screens**, with **43 measured defects** and another 65 candidates closed with a
+written verdict, in
+[round four](../evidence/stable/audit-prototype-fidelity-round-four.md). **That is what the
+publishing rule counts**: `PRD-006` is a commitment, so those 43 are fixed before anything is
+published. Still to compare: the states that have to be manufactured, and the whole player.
 
 **A notice describing a state takes space; one narrating an event floats**, and it is written in
 [ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). It was decided because nobody
