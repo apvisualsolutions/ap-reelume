@@ -971,12 +971,28 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// <summary>True while a session is on screen; it covers whatever route is underneath it.</summary>
     public bool IsPlayerVisible => Player is not null;
 
+    /// <summary>
+    /// The welcome card, which shows only when nothing else has the stage.
+    /// </summary>
+    /// <remarks>
+    /// <b>Courses was missing from this list until 2026-09-05, and the screen was unreadable.</b> The
+    /// route drew its own view AND the welcome card over it: «Cursos» and «Tu biblioteca, en tu PC»
+    /// on the same line, both descriptions on top of each other. Measured on the real application
+    /// rather than deduced, because no gate could see it — the overflow gates mount each view ON ITS
+    /// OWN, so two surfaces drawn over one another is exactly what they cannot look at.
+    /// <para>
+    /// The list is now asserted route by route in <c>ShellAssemblyTests</c>, from a closed table: a
+    /// route that is not in the table fails. One test per route was what let this through — there was
+    /// one, written for Review, and Courses arrived afterwards.
+    /// </para>
+    /// </remarks>
     public bool IsPrimaryContentVisible =>
         !IsSettingsVisible
         && !IsLibraryVisible
         && !IsHomeVisible
         && !IsDuplicatesVisible
         && !IsReviewVisible
+        && !IsCoursesVisible
         && !IsPlayerVisible;
 
     /// <summary>Opens one media file and shows everything that session puts on screen.</summary>
