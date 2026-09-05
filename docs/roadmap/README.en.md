@@ -71,14 +71,30 @@ for courses. The order is changed in a general setting and can be overridden on 
 gallery the prototype already draws. It closes a measured defect: today one field holds two things,
 and a provider refresh leaves somebody's cover orphaned inside every backup.
 
-**And thirteen things remain built that no screen shows**, out of the eighteen found by
-[the audit of 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). The five closed are the
+**And twelve things remain built that no screen shows**, out of the eighteen found by
+[the audit of 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). The six closed are the
 covers in the grid, the library that stopped at fifty titles, the countdown row that promised to be
 configurable without being so — **actually closed on 2026-09-05**, with Settings' «Playback» section
-— the mini player's three names, and the orphaned strings, which also gained
-[a gate](../evidence/stable/audit-orphaned-strings.md) so they cannot come back. The remaining
-thirteen come in two groups: what only needs showing, and what the design has and the application
-does not.
+— the mini player's three names, the orphaned strings, which also gained
+[a gate](../evidence/stable/audit-orphaned-strings.md) so they cannot come back, and **the scan that
+could be cancelled from inside and not from outside**, closed that same afternoon with
+[the notices strip](../evidence/stable/audit-lib002-the-notices-strip.md). The remaining twelve come
+in two groups: what only needs showing, and what the design has and the application does not.
+
+**And one turned up that the audit did not have, because it only shows in pixels**: the Courses
+screen was drawn **under** the welcome card, with both titles and both descriptions overlapping and
+unreadable. It came out of photographing the application beside the prototype, in the first pair
+nobody had ever looked at. It is
+[closed, with its gate](../evidence/stable/audit-courses-under-the-welcome-card.md), which now covers
+**every** destination rather than one.
+
+**The «Permissions» button on the access-denied notice is left out, and that is the owner's
+decision.** The prototype draws it: it opens Windows' settings for that share. Here that means
+**starting a system process**, which lives in the host layer and has isolation rules of its own — it
+is not «one more button» in a view. The recommendation is **not to build it for now**: the notice
+already says what is happening and that the application never changes permissions on its own, which
+is the part that stops anybody expecting from it something it does not do. It stands as new scope,
+awaiting a yes or a no.
 
 **Visual parity gets another pass.** `PRD-006` is `VERIFIED` over «the 53 views» and the tree has 60;
 and of those 53 only **eight screens** were photographed beside the prototype. On top of that, the

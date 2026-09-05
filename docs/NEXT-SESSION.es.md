@@ -83,6 +83,21 @@
 > Windows. Eso es arrancar un proceso del sistema, vive en otra capa y tiene sus propias reglas: es
 > alcance nuevo y necesita una decisión antes que código.
 >
+> ### Decisiones que esperan un sí o un no
+>
+> · **El botón «Permisos» del aviso de acceso denegado.** El prototipo lo dibuja y abre los ajustes
+>   de Windows para ese recurso. Aquí eso es **arrancar un proceso del sistema**, que vive en otra
+>   capa y tiene sus propias reglas — no es «un botón más». **Recomendación: no construirlo por
+>   ahora**; el aviso ya dice qué pasa y que la aplicación nunca cambia permisos por su cuenta.
+>
+> ### Un hueco pequeño que queda abierto, con su motivo
+>
+> · **El distintivo rojo de «sin permiso» no tiene medición de color.** La familia sí —la puerta de
+>   esquinas monta un control con la clase y mide su forma real—, pero nadie comprueba que la
+>   variante nueva pinte el rojo del prototipo en los cuatro temas. Importa porque **una clase de
+>   estilo inexistente no falla**: si alguien la renombra, el distintivo se queda con el fondo de la
+>   familia y ninguna prueba lo dice. Hay precedente de cómo se mide, en la insignia compartida.
+>
 > ### Lo que no se resuelve programando
 >
 > · **`PRD-002` pide el certificado comercial de firma.** Es el único bloqueo del MVP.

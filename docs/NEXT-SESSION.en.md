@@ -83,6 +83,22 @@
 > for that share. That is starting a system process, it lives in another layer and has rules of its
 > own: new scope, needing a decision before code.
 >
+> ### Decisions waiting for a yes or a no
+>
+> · **The «Permissions» button on the access-denied notice.** The prototype draws it, opening
+>   Windows' settings for that share. Here that is **starting a system process**, which lives in
+>   another layer and has rules of its own — not «one more button». **Recommendation: do not build it
+>   for now**; the notice already says what is happening and that the application never changes
+>   permissions on its own.
+>
+> ### One small gap left open, with its reason
+>
+> · **The red «no permission» chip has no colour measurement.** The family does — the corners gate
+>   mounts a control with the class and measures its real shape — but nothing checks that the new
+>   variant paints the prototype's red in all four themes. It matters because **a style class that
+>   does not exist does not fail**: rename it and the chip keeps the family's background with no test
+>   saying so. There is precedent for measuring it, on the shared badge.
+>
 > ### What programming does not solve
 >
 > · **`PRD-002` needs the commercial signing certificate.** It is the MVP's only block.

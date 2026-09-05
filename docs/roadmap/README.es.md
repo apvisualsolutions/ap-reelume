@@ -73,14 +73,30 @@ con la galería que el prototipo ya dibuja. Cierra un defecto medido: hoy un sol
 cosas, y refrescar contra el proveedor deja la portada de alguien huérfana dentro de cada copia de
 seguridad.
 
-**Y quedan trece cosas construidas que ninguna pantalla enseña**, de las dieciocho que encontró
-[la auditoría del 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). Las cinco cerradas
+**Y quedan doce cosas construidas que ninguna pantalla enseña**, de las dieciocho que encontró
+[la auditoría del 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). Las seis cerradas
 son las portadas en la rejilla, la biblioteca que se cortaba en cincuenta títulos, la ficha de la
 cuenta atrás que prometía ser configurable sin serlo —**cerrada de verdad el 2026-09-05**, con la
-sección «Reproducción» de Ajustes—, los tres nombres del mini reproductor, y las cadenas huérfanas,
-que además ganaron [una puerta](../evidence/stable/audit-orphaned-strings.md) para que no vuelvan.
-Las trece restantes van en dos grupos: lo que sólo falta enseñar, y lo que el diseño tiene y la
-aplicación no.
+sección «Reproducción» de Ajustes—, los tres nombres del mini reproductor, las cadenas huérfanas,
+que además ganaron [una puerta](../evidence/stable/audit-orphaned-strings.md) para que no vuelvan, y
+**el escaneo que se podía cancelar por dentro y no por fuera**, cerrado esa misma tarde con
+[la franja de avisos](../evidence/stable/audit-lib002-the-notices-strip.md). Las doce restantes van
+en dos grupos: lo que sólo falta enseñar, y lo que el diseño tiene y la aplicación no.
+
+**Y apareció uno que la auditoría no tenía, porque sólo se ve en píxeles**: la pantalla de Cursos se
+dibujaba **debajo** de la tarjeta de bienvenida, con los dos títulos y las dos descripciones
+superpuestos e ilegibles. Salió de fotografiar la aplicación al lado del prototipo, en la primera
+pareja que nadie había mirado. Está
+[cerrado y con su puerta](../evidence/stable/audit-courses-under-the-welcome-card.md), que ahora
+cubre **todos** los destinos y no uno.
+**El botón «Permisos» del aviso de acceso denegado se deja fuera, y es una decisión del
+propietario.** El prototipo lo dibuja: abre los ajustes de Windows para ese recurso compartido. Aquí
+eso significa **arrancar un proceso del sistema**, que vive en la capa del anfitrión y tiene sus
+propias reglas de aislamiento — no es «un botón más» en una vista. La recomendación es **no
+construirlo por ahora**: el aviso ya dice qué pasa y que la aplicación nunca cambia permisos por su
+cuenta, que es la parte que evita que alguien espere de ella algo que no hace. Queda como alcance
+nuevo, esperando un sí o un no.
+
 
 **La paridad visual se vuelve a pasar.** `PRD-006` está `VERIFIED` sobre «las 53 vistas» y el árbol
 tiene 60; y de esas 53 sólo se fotografiaron **ocho pantallas** junto al prototipo. Además las fichas
