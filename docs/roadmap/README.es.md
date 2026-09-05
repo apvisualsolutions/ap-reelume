@@ -63,6 +63,27 @@ fases; lo que ya no es cierto es el motivo por el que lo estaba. Se corrige aqu�
 prueba cruza las dos afirmaciones**: `ScopeBoundaryTests` sólo exige que `PRD-003` aparezca nombrado
 en los dos idiomas, no que lo que se diga de él concuerde consigo mismo.
 
+### Lo decidido el 2026-09-05 y todavía sin construir
+
+**Las portadas tienen tres orígenes y un orden, y está escrito en
+[ADR-0009](../adr/0009-a-cover-has-three-origins-and-an-order.md).** La elegida a mano gana, luego la
+del proveedor, y si no hay ninguna se saca un fotograma del vídeo — para películas y series también,
+no sólo para cursos. El orden se cambia en un ajuste general y se puede saltar en un título concreto,
+con la galería que el prototipo ya dibuja. Cierra un defecto medido: hoy un solo campo guarda dos
+cosas, y refrescar contra el proveedor deja la portada de alguien huérfana dentro de cada copia de
+seguridad.
+
+**Y hay quince cosas construidas que ninguna pantalla enseña**, de las dieciocho que encontró
+[la auditoría del 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). Las tres cerradas
+fueron las portadas en la rejilla, la biblioteca que se cortaba en cincuenta títulos, y la ficha de
+la cuenta atrás que prometía ser configurable sin serlo. Las quince restantes van en tres grupos: lo
+que sólo falta enseñar, lo que el diseño tiene y la aplicación no, y la limpieza de lo que sobra.
+
+**La paridad visual se vuelve a pasar.** `PRD-006` está `VERIFIED` sobre «las 53 vistas» y el árbol
+tiene 60; y de esas 53 sólo se fotografiaron **ocho pantallas** junto al prototipo. Además las fichas
+por vista contra las que se compararía llegaron seis días después de darla por buena. Baja a
+`IMPLEMENTED` y sube cuando cubra las sesenta.
+
 ## Las tres versiones
 
 | Versión | Qué significa |

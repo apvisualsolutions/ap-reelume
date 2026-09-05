@@ -1,90 +1,77 @@
 # Where to pick up
 
-> ## READ THIS FIRST — 2026-09-04: the ARM64 matrix has been measured, and five of its six phases pass
+> ## READ THIS FIRST — 2026-09-05: fifteen things built that no screen shows
 >
-> **Look at the tree first**: `git log --oneline -1 main` and `gh run list --limit 3`. The commit
-> number is not written here, because the commit that wrote it would already have changed it.
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
+> `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it
+> would already have changed it. When the previous session closed, `main` and the branch were up to
+> date and green, and every advance of `main` was made with CI's conclusion read.
 >
-> ### What stopped being true: `PRD-003` is no longer waiting for anyone to buy a computer
+> ### What to know before touching anything
 >
-> · **The application ran on a real ARM machine for the first time.** GitHub lends `windows-11-arm`
->   runners **free and unlimited on public repositories**, and this is one. A new CI job runs the
->   ARM64 packaging with its matrix there, in **nine minutes**.
+> · **An audit of all sixty screens found EIGHTEEN things built, translated into both languages, and
+>   shown by no screen.** They are all in [the audit](evidence/stable/audit-built-and-not-drawn.md),
+>   each with its evidence in the code and in the prototype, separating what **breaks something
+>   already promised** from what is **new scope**. **Three were closed; fifteen remain.**
 >
-> · **Five phases pass**: the program started, showed its window and closed itself; the codec matrix
->   and the HDR one decoded natively; audio passed in full; and the install cycle completed its
->   twelve phases with none outstanding. The first run left two flagged and the second, with the bar
->   set correctly, passed them.
+> · **The worst was the library stopping at title fifty.** The program has known how to fetch the
+>   next ones from the start and no screen ever asked. That is done, with its scene in the automatic
+>   walk seeding fifty-one titles — with the usual two the button would not even exist and the test
+>   would have passed without looking at anything.
 >
-> · **Three tests are still skipped, and it is not about ARM64**: the `ffmpeg` that gets installed is
->   missing two encoders and muxes the HDR sample without its colour metadata, **and the x64 runner
->   skips the same ones** — five in that suite, read from the run of `743af9a`. The skips stay
->   recorded in each phase's detail; closing them is the first batch in the queue.
+> · **The MVP is at 43 of 46, not 44.** `PLY-011` dropped to `IMPLEMENTED` because its criterion says
+>   «configurable» and no screen configures the countdown: the value is written only by the tests. It
+>   is not a regression — the row said something that was never true.
 >
-> · **The sixth, `cross-architecture-data`, is still `Blocked` by design**: it wants a data folder
->   written by the x64 build, and today nothing produces or carries one between jobs. That is the
->   next batch.
+> ### Decisions taken and NOT executed, which is what the diff cannot tell you
 >
-> · **`PRD-003` stays `BLOCKED` and `docs/FEATURES.md` has not been touched.** It moves when all six
->   pass, not before. What was measured is in `docs/evidence/stable/T42-arm64.md`, under «The first
->   native run».
+> · **Covers have three origins and an order**, in
+>   [ADR-0009](adr/0009-a-cover-has-three-origins-and-an-order.md): yours wins, then the provider's,
+>   and failing both a frame is taken **for films and shows too**. The order is changed in a general
+>   setting and overridden on one title, with the gallery the prototype already draws. **None of it
+>   is built**, and it carries a migration — the 23rd — because today one field holds two things.
 >
-> ### What to go and fetch, and where
+> · **`PRD-006` drops and gets another pass.** It is `VERIFIED` over «the 53 views», the tree has 60,
+>   and of those 53 only **eight screens** were photographed. The per-view files it would be compared
+>   against arrived **six days after** it was called done.
 >
-> · **The answer is not the colour of the run**: the ARM64 job **does not block yet**, so it can be
->   green with phases unpassed. What answers is the artifact:
->   `gh run download <id> -n arm64-matrix-native`. It carries the probe — what tools that machine
->   had — the six-phase report, the lifecycle report and, from this batch, **the test reports**,
->   which say WHAT was skipped rather than only how many.
+> · **The `ffmpeg` matter is still undone**, and the owner asked explicitly that it not be forgotten:
+>   CI installs the cut-down package and it has to move to the full one. It touches both workflows.
 >
-> ### Three things that cost something and are worth not relearning
+> ### The traps that cost time this time
 >
-> · **The ARM image's documentation lies about itself.** Its public manifest advertises
->   `.NET 10.0.101` and `Chocolatey 2.6.0`; the machine carries `10.0.302` — the exact one
->   `global.json` requires — and `2.7.4`. The probe uncovered it. The SDK is installed regardless:
->   **a guard that depends on a third party not changing its image is not a guard**.
+> · **The coverage-floor preview only measures the suites you name, and you must name the ones that
+>   READ the files you touched, not the ones in their folder.** It was run with two and its silence
+>   was read as a certificate; that cost a run. The missing ones were integration — which is what
+>   covers the catalogue repository — and the ones that mount the shell.
 >
-> · **A bar can be impossible without anyone noticing.** The first attempt demanded zero skips, which
->   would have tied `PRD-003`'s unblocking to Chocolatey packaging an AV1 encoder. Before raising a
->   bar, check **whether the reference machine clears it**; here no machine did.
+> · **Moving well-tested code OUT of a file lowers its percentage.** Taking a rule out of the start-up
+>   removed two covered branches and its figure fell from 60,96 to 60,73: the gate read it as coverage
+>   going backwards, when that code went from zero tests to eleven. **The gate accounts for moved code
+>   for the file that RECEIVES it and not for the one that gives it up.** The way out was applying to
+>   three modal dialogs the exclusion an identical fourth already had, never lowering a floor.
 >
-> · **`| Write-Output` inside a PowerShell function destroys its return value.** The caller receives
->   an array whose last element is the object, and asking the array for the object's properties
->   **answers no** — silently. Two phases lost their reason that way and read as failures. There is a
->   test forbidding it, and **it caught itself** at first, because its own comment contained what it
->   forbids: it now looks at the code rather than the comments.
+> · **CI's coverage merge can be reproduced here, and it has to be done right**: the twenty reports
+>   merge **per line**, keeping for each branch the measurement that covered most. Summing them raw
+>   gives 15 % where the gate says 60. Done right, it reproduced the exact 88/60.
 >
-> ### Everything else stands
+> · **A new control is anchored in the walk by ITS ACCESSIBLE NAME'S KEY, not by its `x:Name`.** The
+>   inventory is built by reading the views and records the first; with the other name, the walk
+>   presses something the inventory does not know exists.
 >
-> · **The MVP is at 44 of 46** and its only open row of work is `PRD-002`, which needs the commercial
->   signing certificate and is not settled by programming.
-> ### The batch queue, in this order
+> · **To create a file with content, use the write tool, not a heredoc through the shell.** It failed
+>   three times in one session; and of every escape, the only one that transforms is the double
+>   backslash, which arrives as one.
 >
-> · **FIRST, and the owner explicitly asked that it not be forgotten (2026-09-04): CI installs the
->   cut-down `ffmpeg` and it has to move to the full one.** The workflow runs
->   `choco install ffmpeg --version 9.0.0`, which **carries neither `libsvtav1` nor `libxavs2`**: two
->   video samples are never generated and **three tests skip themselves** — two codec ones and one
->   HDR one, the latter because that build muxes the HDR10 sample without its colour-transfer
->   metadata.
+> ### What is not settled by programming
 >
->   **It happens on BOTH architectures**: five skips in `MediaTests` on the x64 runner, read from the
->   run of `743af9a`, and the same three on ARM64. **On the owner's machine all 24 pass with 0
->   skipped**, because the gyan.dev full build is installed there — so the gap belongs to the server
->   rather than to the project, and has gone months without anyone knowing.
->
->   The fix is `ffmpeg-full`, which exists on Chocolatey — 9.0.1 as of 2026-09-04 — and is that same
->   build. It touches `.github/workflows/ci.yml` **and** `.github/workflows/release.yml`, which carry
->   the same three-attempt install block. **Two costs to be measured rather than assumed**: the
->   package is larger and the step will take longer — the cut-down one takes a minute — and it **may
->   uncover tests that have never actually run in CI**, which is both the point and the risk.
->
-> · **THEN**: the backup asks whether to carry your own covers, and if it does, it cleans up the ones
->   belonging to titles that no longer exist. Two measured things not to re-litigate: your own cover
->   is **not** regenerable, and **an external disk that is switched off is not a title that has ceased
->   to exist**.
->
-> · **And the sixth ARM64 phase**, `cross-architecture-data`, when its turn comes: it wants the x64
->   job to hand over its data folder as an artifact.
+> · **`PRD-002` needs the commercial signing certificate.** It is the only thing no longer settled by
+>   programming or by renting.
+> · **`PRD-003` is at five of six phases.** The missing one wants the x64 job to hand over its data
+>   folder as an artifact — that part is programmable.
+> · **The five installation icons are placeholders** since 3 August, waiting on the vector logo, which
+>   is the owner's. **It appears in no document in the repository.**
+> · **The export notification is still unsent**, with its text already drafted.
 
 > ## HANDOVER — 2026-09-04, twenty-third session: the cover that was stored and nobody saw, and a figure that left the guide
 >

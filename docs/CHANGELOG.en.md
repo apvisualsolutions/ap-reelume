@@ -87,6 +87,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **Where a cover comes from, and which one wins, is now written down.** The one you choose wins;
+  failing that, the one the provider brings; failing that, a picture taken from the video itself —
+  now for films and shows too, not only for courses. The order is changed once for the whole library,
+  and can be overridden on a single title.
+
+  **It closes a measured problem**: today one field holds two different things, so refreshing a card
+  against the provider replaces the cover you set, and its file is left loose on the disk, inside
+  every backup, with nothing naming it. It is not built yet; what exists is the decision, with its
+  reasons and its price.
+
+- **And the row saying the application matches the design is open again.** It promised the 53 screens
+  of the time, there are 60 today, and of those 53 only **eight** were compared beside the design. The
+  per-screen files it would be compared against arrived six days after it was called done. It will be
+  passed again, against all sixty.
+
 - **The integration suite stopped rebuilding the database two hundred times per run, which removes
   two thirds of its work.** Every test that needed a database built one from scratch by applying the
   twenty-two schema updates, and the runner writes a full copy of the file before each one:

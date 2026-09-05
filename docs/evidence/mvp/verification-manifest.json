@@ -585,8 +585,8 @@
       ],
       "blocker": {
         "unblockCondition": "A Settings surface that reads and writes continuity.next-episode-countdown-seconds, with zero switching the chain off, reachable by the autonomous walk in the same change.",
-        "reason": "The countdown is cancelable and revalidates, but nothing in the application configures it: the preference is written only by tests, and the Settings section the prototype draws for it does not exist.",
-        "owner": "Engineering"
+        "owner": "Engineering",
+        "reason": "The countdown is cancelable and revalidates, but nothing in the application configures it: the preference is written only by tests, and the Settings section the prototype draws for it does not exist."
       }
     },
     {

@@ -1,90 +1,79 @@
 # Dónde retomar
 
-> ## AVISO AL FRENTE — 2026-09-04: la matriz ARM64 ya se midió, y cinco de sus seis fases pasan
+> ## AVISO AL FRENTE — 2026-09-05: quince cosas construidas que ninguna pantalla enseña
 >
-> **Antes de nada se mira el árbol**: `git log --oneline -1 main` y `gh run list --limit 3`. Aquí no
-> se escribe el número del commit, porque el commit que lo escribiría ya lo habría cambiado.
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
+> `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
+> escribiría ya lo habría cambiado. Al cerrar la sesión anterior `main` y la rama quedaron al día y
+> en verde, y cada avance de `main` se hizo con la conclusión de CI leída.
 >
-> ### Lo que dejó de ser cierto: `PRD-003` ya no espera a que alguien compre un ordenador
+> ### Lo que hay que saber antes de tocar nada
 >
-> · **La aplicación se ejecutó en una máquina ARM de verdad, por primera vez.** GitHub presta runners
->   `windows-11-arm` **gratis e ilimitados en repositorios públicos**, y éste lo es. Un trabajo nuevo
->   de CI corre ahí el empaquetado ARM64 con su matriz, en **nueve minutos**.
+> · **Una auditoría de las sesenta pantallas encontró DIECIOCHO cosas construidas, traducidas a los
+>   dos idiomas, y que ninguna pantalla enseña.** Están todas en
+>   [la auditoría](evidence/stable/audit-built-and-not-drawn.md), cada una con su prueba en el código
+>   y en el prototipo, y separando lo que **rompe algo ya prometido** de lo que es **alcance nuevo**.
+>   **Se cerraron tres; quedan quince.**
 >
-> · **Cinco fases pasan**: el programa arrancó, mostró ventana y cerró solo; la matriz de códecs y
->   la de HDR decodificaron de forma nativa; el sonido pasó entero; y el ciclo de instalación
->   completó sus doce fases sin ninguna pendiente. La primera ejecución dejó dos marcadas y la
->   segunda, con el listón bien puesto, las pasó.
+> · **El peor era que la biblioteca se cortaba en el título cincuenta.** El programa sabía traer los
+>   siguientes desde el principio y ninguna pantalla se lo pedía. Ya está, con su escena en el
+>   recorrido automático que siembra cincuenta y un títulos — con los dos de siempre el botón ni
+>   existiría y la prueba habría pasado sin mirar nada.
 >
-> · **Siguen omitiéndose tres pruebas, y no es de ARM64**: al `ffmpeg` que se instala le faltan dos
->   codificadores y multiplexa la muestra HDR sin sus metadatos de color, **y el runner x64 se salta
->   las mismas** — cinco en esa suite, leídas del run de `743af9a`. Las omisiones quedan anotadas en
->   el detalle de cada fase; cerrarlas es la primera tanda de la cola.
+> · **El MVP está en 43 de 46, no en 44.** `PLY-011` bajó a `IMPLEMENTED` porque su criterio dice
+>   «configurable» y no hay ninguna pantalla que configure la cuenta atrás: el valor sólo lo escriben
+>   las pruebas. No es una regresión — es que la ficha decía algo que nunca fue cierto.
 >
-> · **La sexta, `cross-architecture-data`, sigue `Blocked` por diseño**: pide una carpeta de datos
->   escrita por el build x64 y hoy nadie la produce ni la traslada entre trabajos. Es la tanda que
->   viene.
+> ### Decisiones tomadas y NO ejecutadas, que es lo que no se deduce del diff
 >
-> · **`PRD-003` sigue `BLOCKED` y `docs/FEATURES.md` no se ha tocado.** Se mueve cuando las seis
->   pasen, no antes. Lo medido está en `docs/evidence/stable/T42-arm64.md`, sección «La primera
->   ejecución nativa».
+> · **Las portadas tienen tres orígenes y un orden**, en
+>   [ADR-0009](adr/0009-a-cover-has-three-origins-and-an-order.md): la tuya gana, luego la del
+>   proveedor, y si no hay ninguna se saca un fotograma **para películas y series también**. El orden
+>   se cambia en un ajuste general y se salta en un título concreto, con la galería que el prototipo
+>   ya dibuja. **Nada de esto está construido**, y lleva migración —la 23— porque hoy un solo campo
+>   guarda dos cosas.
 >
-> ### Lo que hay que ir a buscar, y dónde
+> · **`PRD-006` se baja y se vuelve a pasar.** Está `VERIFIED` sobre «las 53 vistas», el árbol tiene
+>   60, y de esas 53 sólo se fotografiaron **ocho pantallas**. Las fichas por vista contra las que se
+>   compararía llegaron **seis días después** de darla por buena.
 >
-> · **La respuesta no es el color del run**: el trabajo ARM64 **no bloquea todavía**, así que puede
->   salir verde con fases sin pasar. Lo que contesta es el artefacto:
->   `gh run download <id> -n arm64-matrix-native`. Trae la sonda —qué herramientas tenía esa
->   máquina—, el informe de las seis fases, el del ciclo de instalación y, desde esta tanda, **los
->   informes de prueba**, que dicen QUÉ se saltó y no sólo cuántas.
+> · **Lo de `ffmpeg` sigue sin hacerse**, y el propietario pidió expresamente que no se olvide: CI
+>   instala el paquete reducido y hay que pasarlo al completo. Toca los dos flujos.
 >
-> ### Tres cosas que costaron y conviene no volver a aprender
+> ### Las trampas que costaron tiempo esta vez
 >
-> · **La documentación de la imagen ARM miente sobre sí misma.** Su manifiesto público anuncia
->   `.NET 10.0.101` y `Chocolatey 2.6.0`; la máquina trae `10.0.302` —el exacto que `global.json`
->   exige— y `2.7.4`. La sonda lo destapó. El SDK se instala igualmente: **una guarda que depende de
->   que un tercero no cambie su imagen no es una guarda**.
+> · **La previsualización de suelos de cobertura sólo mide las suites que le nombras, y hay que
+>   nombrar las que LEEN los archivos tocados, no las de su carpeta.** Se corrió con dos y su silencio
+>   se leyó como un certificado; costó un run. Las que faltaban eran la de integración —que es quien
+>   cubre el repositorio del catálogo— y las que montan el shell.
 >
-> · **Un listón puede ser imposible sin que se note.** El primer intento exigía cero omisiones, lo
->   que habría atado el desbloqueo de `PRD-003` a que Chocolatey empaquetara un codificador AV1.
->   Antes de subir un listón se comprueba **si la máquina de referencia lo cumple**; aquí no lo
->   cumplía ninguna.
+> · **Mover código bien probado FUERA de un archivo baja su porcentaje.** Sacar una regla del arranque
+>   se llevó dos ramas cubiertas y su cifra cayó de 60,96 a 60,73: la puerta lo leyó como que la
+>   cobertura va hacia atrás, cuando ese código pasó de cero pruebas a once. **La puerta contempla el
+>   código movido para el archivo que lo RECIBE y no para el que lo cede.** La salida fue aplicar a
+>   tres diálogos modales la exclusión que un cuarto idéntico ya tenía, nunca rebajar un suelo.
 >
-> · **`| Write-Output` dentro de una función de PowerShell destruye su valor de retorno.** Quien la
->   llama recibe un array cuyo último elemento es el objeto, y preguntarle al array por las
->   propiedades del objeto **contesta que no** — en silencio. Dos fases perdieron así su motivo y se
->   leyeron como fallos. Hay una prueba que lo prohíbe, y **se cazó a sí misma** al principio, porque
->   su propio comentario contenía lo que prohíbe: ahora mira el código y no los comentarios.
+> · **La fusión de cobertura de CI se reproduce aquí, y hay que hacerlo bien**: los veinte informes
+>   se fusionan **por línea**, quedándose de cada rama con la medición que más cubrió. Sumarlas a lo
+>   bruto da 15 % donde la puerta dice 60. Bien hecho, reprodujo el 88/60 exacto.
 >
-> ### Lo demás sigue como estaba
+> · **Un control nuevo se ancla en el paseo por la CLAVE DE SU NOMBRE ACCESIBLE, no por su `x:Name`.**
+>   El inventario se construye leyendo las vistas y registra la primera; con el otro nombre, el paseo
+>   pulsa algo que el inventario no sabe que existe.
 >
-> · **El MVP está en 44 de 46** y su única fila de trabajo abierta es `PRD-002`, que pide el
->   certificado comercial de firma y no se resuelve programándolo.
-> ### La cola de tandas, en este orden
+> · **Para crear un archivo con contenido se usa la herramienta de escritura, no un heredoc por la
+>   consola.** Falló tres veces en una sesión; y de todos los escapes, el único que se transforma es
+>   el backslash doble, que llega como uno solo.
 >
-> · **PRIMERO, y el propietario pidió expresamente que no se olvide (2026-09-04): CI instala el
->   `ffmpeg` reducido y hay que pasarlo al completo.** El flujo hace
->   `choco install ffmpeg --version 9.0.0`, que **no trae `libsvtav1` ni `libxavs2`**: dos muestras de
->   vídeo no se generan y **tres pruebas se saltan solas** — dos de códecs y una de HDR, esta última
->   porque ese build multiplexa la muestra HDR10 sin sus metadatos de transferencia de color.
+> ### Lo que no se resuelve programando
 >
->   **Pasa en las DOS arquitecturas**: cinco saltos en `MediaTests` en el runner x64, leídos del run
->   de `743af9a`, y los mismos tres en el ARM64. **En la máquina del propietario pasan las 24, con 0
->   omitidas**, porque ahí está el full build de gyan.dev — así que el hueco es del servidor y no del
->   proyecto, y lleva meses sin que nadie lo supiera.
->
->   El arreglo es `ffmpeg-full`, que existe en Chocolatey —9.0.1 el 2026-09-04— y es ese mismo build.
->   Toca `.github/workflows/ci.yml` **y** `.github/workflows/release.yml`, que llevan el mismo bloque
->   de instalación con tres intentos. **Dos costes que se miden y no se suponen**: el paquete pesa más
->   y el paso tardará más —el reducido tarda un minuto—, y **puede destapar pruebas que nunca han
->   llegado a ejecutarse en CI**, que es a la vez lo que se busca y el riesgo.
->
-> · **DESPUÉS**: la copia de seguridad pregunta si llevarse las portadas propias, y si se llevan,
->   limpia las de títulos que ya no existen. Dos cosas medidas que no hay que rediscutir: la portada
->   propia **no** es regenerable, y **un disco externo apagado no es un título que haya dejado de
->   existir**.
->
-> · **Y la sexta fase ARM64**, `cross-architecture-data`, cuando toque: pide que el trabajo x64 le
->   pase su carpeta de datos por artefacto.
+> · **`PRD-002` pide el certificado comercial de firma.** Es lo único que ya no se resuelve
+>   programando ni alquilando.
+> · **`PRD-003` está en cinco de seis fases.** La que falta pide que el trabajo x64 le pase su carpeta
+>   de datos por artefacto — eso sí es programable.
+> · **Los cinco iconos de instalación son marcadores de posición** desde el 3 de agosto, esperando el
+>   logotipo vectorial, que es del propietario. **No está en ningún documento del repositorio.**
+> · **La notificación de exportación sigue sin enviarse**, con el texto ya redactado.
 
 > ## RELEVO — 2026-09-04, vigesimotercera sesión: la portada que se guardaba y nadie veía, y una cifra que se fue de la guía
 >

@@ -62,6 +62,26 @@ longer true is the reason it was. It is corrected here because **no test crosses
 `ScopeBoundaryTests` only requires that `PRD-003` be named in both languages, not that what is said
 about it agree with itself.
 
+### Decided on 2026-09-05 and not yet built
+
+**Covers have three origins and an order, written down in
+[ADR-0009](../adr/0009-a-cover-has-three-origins-and-an-order.md).** The hand-picked one wins, then
+the provider's, and failing both a frame is taken from the video — for films and shows too, not only
+for courses. The order is changed in a general setting and can be overridden on one title, with the
+gallery the prototype already draws. It closes a measured defect: today one field holds two things,
+and a provider refresh leaves somebody's cover orphaned inside every backup.
+
+**And fifteen things are built that no screen shows**, out of the eighteen found by
+[the audit of 2026-09-04](../evidence/stable/audit-built-and-not-drawn.md). The three closed were the
+covers in the grid, the library that stopped at fifty titles, and the countdown row that promised to
+be configurable without being so. The remaining fifteen come in three groups: what only needs
+showing, what the design has and the application does not, and clearing away what is left over.
+
+**Visual parity gets another pass.** `PRD-006` is `VERIFIED` over «the 53 views» and the tree has 60;
+and of those 53 only **eight screens** were photographed beside the prototype. On top of that, the
+per-view files it would be compared against arrived six days after it was called done. It drops to
+`IMPLEMENTED` and rises when it covers all sixty.
+
 ## The three releases
 
 | Release | What it means |

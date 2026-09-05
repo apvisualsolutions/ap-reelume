@@ -87,6 +87,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Queda escrito de dónde sale una portada y en qué orden manda cada una.** La que eliges tú gana;
+  si no hay, la que trae el proveedor; y si tampoco, una imagen sacada del propio vídeo — ahora
+  también para películas y series, no sólo para cursos. El orden se cambia de una vez para toda la
+  biblioteca, y se puede saltar en un título concreto.
+
+  **Cierra un problema medido**: hoy un solo campo guarda dos cosas distintas, así que si se refresca
+  la ficha contra el proveedor, la portada que hubieras puesto tú se sustituye y su archivo se queda
+  suelto en el disco, dentro de cada copia de seguridad, sin nada que lo nombre. Todavía no está
+  construido; lo que hay es la decisión, con sus motivos y su precio.
+
+- **Y la ficha que decía que la aplicación se parece al diseño vuelve a estar abierta.** Prometía las
+  53 pantallas de entonces, hoy hay 60, y de aquellas 53 sólo se compararon **ocho** junto al diseño.
+  Las fichas por pantalla contra las que se compararía llegaron seis días después de darla por buena.
+  Se volverá a pasar, contra las sesenta.
+
 - **La suite de integración dejó de reconstruir la base de datos doscientas veces por ejecución, y
   eso quita dos tercios de su trabajo.** Cada prueba que necesitaba una base la levantaba desde cero
   aplicando las veintidós actualizaciones del esquema, y el motor guarda una copia completa del
