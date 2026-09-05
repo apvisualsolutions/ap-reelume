@@ -415,7 +415,8 @@
         "ApSolutions.LocalMedia.UiTests"
       ],
       "evidence": [
-        "docs/evidence/mvp/T19-codec-matrix.md"
+        "docs/evidence/mvp/T19-codec-matrix.md",
+        "docs/evidence/stable/audit-ci-ffmpeg-build.md"
       ]
     },
     {
@@ -434,7 +435,8 @@
         "docs/adr/0005-verify-the-video-matrix-on-available-adapters.md",
         "docs/evidence/mvp/hardware-video-matrix.md",
         "docs/evidence/mvp/T22-hdr-acceleration.md",
-        "docs/evidence/mvp/T40-x64-packaging.md"
+        "docs/evidence/mvp/T40-x64-packaging.md",
+        "docs/evidence/stable/audit-ci-ffmpeg-build.md"
       ]
     },
     {
@@ -584,9 +586,9 @@
         "docs/evidence/stable/audit-wp2-assembly.md"
       ],
       "blocker": {
+        "reason": "The countdown is cancelable and revalidates, but nothing in the application configures it: the preference is written only by tests, and the Settings section the prototype draws for it does not exist.",
         "unblockCondition": "A Settings surface that reads and writes continuity.next-episode-countdown-seconds, with zero switching the chain off, reachable by the autonomous walk in the same change.",
-        "owner": "Engineering",
-        "reason": "The countdown is cancelable and revalidates, but nothing in the application configures it: the preference is written only by tests, and the Settings section the prototype draws for it does not exist."
+        "owner": "Engineering"
       }
     },
     {

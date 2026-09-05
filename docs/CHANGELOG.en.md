@@ -10,6 +10,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Five video checks that had gone unrun on the server for months run again.** The server installed
+  a trimmed-down version of the program that builds the test videos, and it lacked two formats.
+  Without them two of those samples could not be created, and the checks that use them **skipped
+  themselves without turning anything red**: a skip with its reason written down is not a failure, so
+  everything stayed green while five of the program's promises went unchecked. It surfaced while
+  measuring something else, not from an alert.
+
+  **The fifth was not about a missing format**, and confusing it would have sent somebody after the
+  wrong defect: that trimmed build does create the high-dynamic-range video, but writes it without
+  the data that says it is one, so there was nothing left to recognise.
+
+  The full version is installed now. **It is the same version of the same program**, only with all
+  its parts, so nothing working today can start failing. And on the owner's computer, which already
+  had it, those checks pass all 155 without skipping one.
+
+
 - **Checking the ARM build no longer depends on buying a machine.** The application has been compiled
   and packaged for those computers for months, but **nobody had ever run it on one**: the six checks
   that need one all carried the same note, «this was done on a different kind of computer». GitHub

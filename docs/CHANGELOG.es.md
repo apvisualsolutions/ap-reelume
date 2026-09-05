@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Cinco comprobaciones de vídeo que llevaban meses sin ejecutarse en el servidor vuelven a
+  ejecutarse.** El servidor instalaba una versión recortada del programa que fabrica los vídeos de
+  prueba, y le faltaban dos formatos. Sin ellos, dos de esas muestras no se podían crear y las
+  comprobaciones que las usan **se saltaban solas, sin poner nada en rojo**: una omisión con su
+  motivo escrito no es un fallo, así que todo seguía verde mientras cinco promesas del programa no
+  se comprobaban. Se descubrió midiendo otra cosa, no por un aviso.
+
+  **La quinta no era por un formato ausente**, y confundirla habría hecho perseguir el defecto
+  equivocado: esa versión recortada sí fabrica el vídeo de alto rango dinámico, pero lo escribe sin
+  los datos que dicen que lo es, así que no quedaba nada que reconocer.
+
+  Ahora se instala la versión completa. **Es la misma versión del mismo programa**, sólo que con
+  todas sus piezas, así que nada de lo que hoy funciona puede empezar a fallar. Y en el ordenador
+  del propietario, que ya la tenía, esas comprobaciones pasan las 155 sin saltarse ninguna.
+
+
 - **La comprobación en máquinas ARM ya no depende de comprar una.** El programa se compila y se
   empaqueta para esos ordenadores desde hace meses, pero **nadie había llegado a ejecutarlo en uno**:
   las seis comprobaciones que lo exigen llevaban todas la misma nota, «esto se hizo en un ordenador
