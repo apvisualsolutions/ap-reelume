@@ -1,5 +1,63 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-06, cierre: retirar una carpeta borra de verdad, y el aviso dice cuánto
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y
+> `gh run list --limit 3`. Aquí no se escribe el número del commit, porque el commit que lo
+> escribiría ya lo habría cambiado.
+>
+> ### La decisión que estaba abierta, tomada y ejecutada
+>
+> El propietario decidió el 2026-09-06: **retirar una carpeta borra su catálogo**, y antes se
+> muestra una pregunta flotante que enumera lo que se pierde y advierte de que no se deshace. La
+> recomendación escrita aquí era la contraria —conservar y marcar— y quedó revocada. El porqué, en
+> [`ADR-0011`](adr/0011-a-destructive-question-floats-and-blocks.md).
+>
+> ### La medición que se pidió antes de decidir, y lo que destapó
+>
+> Con la siembra delante: **1 carpeta, 9 títulos, 28 archivos, 14 entradas de progreso = 706,4
+> minutos**, 0 marcas, 0 cursos. **Y lo que desaparecía era nada**: el borrado ejecutaba una sola
+> sentencia y descartaba en su primera línea la bandera que habría decidido el resto. Los nueve
+> títulos y los 706 minutos seguían en el catálogo marcados como **disponibles**.
+>
+> **Así que no eran dos promesas enfrentadas sino tres, y el código no cumplía ninguna.**
+>
+> ### Cuatro cosas que las puertas dijeron y conviene no volver a pagar
+>
+> · **Quitar la bandera NO dejó de compilar**, que es lo que el plan predijo. La puerta ciega que la
+>   cubría estaba escrita con reflexión, así que habría fallado en ejecución. Una puerta por reflexión
+>   no avisa al compilador.
+> · **La prueba que se esperaba verde salió roja, y eso mejoró la pareja.** Se había anotado que la
+>   del título que sobrevive pasaría «por accidente»; medida, falla también. Ninguna de las dos
+>   mitades era una puerta ciega.
+> · **`Padding="{DynamicResource Space24}"` tumbó el shell entero**: ese token es un número, no un
+>   grosor de cuatro lados. Veinticinco pruebas del shell en rojo por una superficie que ni tocaban.
+> · **Una aserción medía `IsVisible` y tenía que medir `IsEffectivelyVisible`**: el bloque de texto
+>   seguía marcado visible mientras quien estaba oculto era el panel que lo contiene.
+>
+> ### Los trinquetes que se movieron
+>
+> · **Esquinas escritas a mano: 79 → 78.** La confirmación estaba dibujada dos veces y pasó a ser una.
+> · **El paseo: 150 de 150 y el trinquete quieto en 23.** La pregunta flotante se alcanza y se pulsa.
+> · **El censo de vistas: 61 → 62**, y `QuotedFigureTests` lo cazó en cuatro sitios.
+>
+> ### Lo que queda registrado y NO entró
+>
+> · **El vigilante zombi**: `RootWatchBackground` no sabe «deja de vigilar esta raíz». Tras retirar,
+>   su vigilante sigue vivo hasta cerrar el programa; no puede deshacer el borrado, pero cada cambio
+>   en esa carpeta produce una excepción callada. Existe desde antes y se hace más visible ahora.
+> · **Una migración de datos**, separable: cada retirada hecha hasta hoy dejó escombro inalcanzable.
+> · **Los 42 defectos de paridad restantes**, pantalla por pantalla y en el orden que decidió el
+>   propietario. El siguiente es el margen del riel de Biblioteca: **56 px → 32 px**, una sola cifra
+>   que cierra tres apariencias.
+>
+> ### Y una corrección de ruta que costó buscar
+>
+> **`tools/` no existe en el repositorio** —`git ls-files tools` vacío, `git log -- tools` sin un solo
+> commit—. El aparejo de capturas vive en `%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume\tools\`,
+> con su propio `README.md`. Escribir `tools\shoot-states.ps1` como si fuera del árbol manda a alguien
+> a una carpeta que no existe.
+
 > ## AVISO AL FRENTE — 2026-09-06: verificar no es mirar, y el registro contra el que se verificaba no existía
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y

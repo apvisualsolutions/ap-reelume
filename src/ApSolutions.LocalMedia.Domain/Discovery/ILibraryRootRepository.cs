@@ -24,8 +24,19 @@ public interface ILibraryRootRepository
         RootAvailability availability,
         CancellationToken cancellationToken = default);
 
-    Task RemoveAsync(
+    /// <summary>
+    /// Removes a folder and the catalogue that belonged to it: its files, and the titles that are
+    /// left without any file to reach. It never touches a video on disk.
+    ///
+    /// <para>It returns the titles that left, because their covers live on disk and a repository
+    /// that deleted files would be deciding and writing at once. The caller hands those ids to the
+    /// artwork store after the transaction commits — a deleted file does not roll back.</para>
+    ///
+    /// <para>There is no flag to keep the catalogue. There was one until 2026-09-06, defaulted to
+    /// true, threaded through a command, this interface, the adapter and sixteen test doubles, and
+    /// read by nobody. Removing a folder is one thing now, and this is what it is.</para>
+    /// </summary>
+    Task<IReadOnlyList<TitleId>> RemoveAsync(
         LibraryRootId id,
-        bool preserveCatalog = true,
         CancellationToken cancellationToken = default);
 }

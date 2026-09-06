@@ -150,5 +150,8 @@ public sealed class CacheTitleArtworkTests
             string alternativeText,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException("This double covers the remote path only.");
+
+        public Task RemoveTitleAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 }

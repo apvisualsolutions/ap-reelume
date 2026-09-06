@@ -1,5 +1,63 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-06, closing: removing a folder really deletes, and the notice says how much
+>
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
+> `gh run list --limit 3`. The commit number is not written here, because the commit that wrote it
+> would already have changed it.
+>
+> ### The decision that was open, taken and carried out
+>
+> The owner decided on 2026-09-06: **removing a folder deletes its catalogue**, and a floating
+> question is shown first, stating what will be lost and warning it cannot be undone. The
+> recommendation written here was the opposite — keep and mark — and it was revoked. The reasoning is
+> in [`ADR-0011`](adr/0011-a-destructive-question-floats-and-blocks.md).
+>
+> ### The measurement asked for before deciding, and what it uncovered
+>
+> With the seeded library: **1 folder, 9 titles, 28 files, 14 progress rows = 706.4 minutes**, 0
+> marks, 0 courses. **And what disappeared was nothing**: the removal ran one statement and discarded
+> on its first line the flag that would have decided the rest. The nine titles and the 706 minutes
+> stayed in the catalogue marked **available**.
+>
+> **So they were not two competing promises but three, and the code honoured none of them.**
+>
+> ### Four things the gates said that are worth not paying twice
+>
+> · **Removing the flag did NOT stop it compiling**, which is what the plan predicted. The blind gate
+>   covering it was written with reflection, so it would have failed at run time. A reflection gate
+>   does not warn the compiler.
+> · **The test expected green came out red, and that improved the pair.** It had been noted the
+>   surviving-title one would pass "by accident"; measured, it fails too. Neither half was a blind
+>   gate.
+> · **`Padding="{DynamicResource Space24}"` brought the whole shell down**: that token is a number,
+>   not a four-sided thickness. Twenty-five shell tests red over a surface they never touched.
+> · **One assertion measured `IsVisible` where it had to measure `IsEffectivelyVisible`**: the text
+>   block was still flagged visible while what was hidden was the panel holding it.
+>
+> ### The ratchets that moved
+>
+> · **Hand-written corners: 79 → 78.** The confirmation was drawn twice and became one.
+> · **The walk: 150 of 150 and the ratchet still at 23.** The floating question is reached and pressed.
+> · **The view census: 61 → 62**, and `QuotedFigureTests` caught it in four places.
+>
+> ### What is recorded and did NOT go in
+>
+> · **The zombie watcher**: `RootWatchBackground` has no "stop watching this root". After a removal
+>   its watcher stays alive until the program closes; it cannot undo the deletion, but every change in
+>   that folder produces a swallowed exception. It predates this and is more visible now.
+> · **A data migration**, separable: every removal made until today left unreachable debris.
+> · **The remaining 42 parity defects**, screen by screen and in the order the owner decided. Next is
+>   the Library rail's margin: **56 px → 32 px**, one figure that closes three apparent defects.
+>
+> ### And a path correction that took finding
+>
+> **`tools/` does not exist in the repository** — `git ls-files tools` empty, `git log -- tools`
+> without a single commit. The capture rig lives in
+> `%USERPROFILE%\.claude\projects\D--Proyectos-ap-reelume\tools\`, with a `README.md` of its own.
+> Writing `tools\shoot-states.ps1` as if it were in the tree sends somebody to a folder that is not
+> there.
+
 > ## READ THIS FIRST — 2026-09-06: verifying is not looking, and the register it was verified against did not exist
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main` and

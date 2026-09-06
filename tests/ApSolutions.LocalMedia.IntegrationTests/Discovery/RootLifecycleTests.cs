@@ -109,7 +109,6 @@ public sealed class RootLifecycleTests
         var persisted = await harness.GetAsync(root);
         Assert.NotNull(persisted);
         Assert.Equal(Read(root, "Path"), Read(persisted, "Path"));
-        Assert.True(RootHarness.RemoveCommandPreserveCatalogDefaultsToTrue());
         await harness.RemoveAsync(root);
 
         Assert.Equal(before, await HashInventoryAsync(rootPath));
@@ -253,14 +252,17 @@ public sealed class RootLifecycleTests
             var removeType = RequireType(
                 "ApSolutions.LocalMedia.Application",
                 "ApSolutions.LocalMedia.Application.Discovery.RemoveLibraryRoot");
-            var remove = Activator.CreateInstance(removeType, _repository);
+            // The artwork store is optional and absent here, and reflection does not fill defaults on
+            // its own: this harness measures that no video on disk is touched, and covers are not
+            // videos.
+            var remove = Activator.CreateInstance(removeType, _repository, null);
             Assert.NotNull(remove);
             var commandType = RequireType(
                 "ApSolutions.LocalMedia.Application",
                 "ApSolutions.LocalMedia.Application.Discovery.RemoveLibraryRootCommand");
             var id = Read(root, "Id");
             Assert.NotNull(id);
-            var command = Activator.CreateInstance(commandType, id, true);
+            var command = Activator.CreateInstance(commandType, id);
             Assert.NotNull(command);
             await InvokeTaskAsync(remove, "ExecuteAsync", command, CancellationToken.None);
         }
@@ -270,15 +272,6 @@ public sealed class RootLifecycleTests
             var id = Read(root, "Id");
             Assert.NotNull(id);
             return await InvokeTaskAsync(_repository, "GetAsync", id, CancellationToken.None);
-        }
-
-        public static bool RemoveCommandPreserveCatalogDefaultsToTrue()
-        {
-            var commandType = RequireType(
-                "ApSolutions.LocalMedia.Application",
-                "ApSolutions.LocalMedia.Application.Discovery.RemoveLibraryRootCommand");
-            var parameter = Assert.Single(commandType.GetConstructors()).GetParameters()[1];
-            return parameter.HasDefaultValue && Equals(true, parameter.DefaultValue);
         }
 
         public static object EnumValue(string enumName, string value) => Enum.Parse(
@@ -293,7 +286,8 @@ public sealed class RootLifecycleTests
                 "ApSolutions.LocalMedia.Presentation.Onboarding.RootOnboardingViewModel");
             // The folder-management collaborators (LIB-A01) are optional and absent here: this
             // harness exercises adding a root, and reflection does not fill defaults on its own.
-            var viewModel = Activator.CreateInstance(type, _addRoot, null, null);
+            // The fourth is the removal summariser, absent for the same reason.
+            var viewModel = Activator.CreateInstance(type, _addRoot, null, null, null);
             Assert.NotNull(viewModel);
             return viewModel;
         }

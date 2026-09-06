@@ -375,14 +375,19 @@ public sealed class SurfaceCornerTests
     /// which is what a ratchet that only falls is for.
     /// </para>
     /// <para>
-    /// A ratchet and not an assertion of 86: passing at 79 while claiming 86 would be a gate lying
+    /// <b>79 to 78 on 2026-09-06</b>, and this one fell by subtraction. The removal confirmation was
+    /// drawn twice — once in the first run and once in Settings — and became one floating question
+    /// over the shell. Two sites out, one in.
+    /// </para>
+    /// <para>
+    /// A ratchet and not an assertion of 86: passing at 78 while claiming 86 would be a gate lying
     /// about its own progress, so it fails in both directions and says which.
     /// </para>
     /// </remarks>
     [Fact]
     public void The_corners_written_in_the_views_themselves_do_not_grow()
     {
-        const int ratchet = 79;
+        const int ratchet = 78;
 
         var sites = Directory
             .EnumerateFiles(Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories)

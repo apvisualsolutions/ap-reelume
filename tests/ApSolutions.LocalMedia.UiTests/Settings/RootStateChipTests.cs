@@ -184,13 +184,12 @@ public sealed class RootStateChipTests
             RootAvailability availability,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-        public Task RemoveAsync(
+        public Task<IReadOnlyList<TitleId>> RemoveAsync(
             LibraryRootId id,
-            bool preserveCatalog = true,
             CancellationToken cancellationToken = default)
         {
             _roots.RemoveAll(root => root.Id == id);
-            return Task.CompletedTask;
+            return Task.FromResult<IReadOnlyList<TitleId>>([]);
         }
     }
 

@@ -120,7 +120,8 @@
       "evidence": [
         "docs/evidence/mvp/C2-library-gate.md",
         "docs/evidence/mvp/T39B-assembly.md",
-        "docs/evidence/mvp/T5-roots.md"
+        "docs/evidence/mvp/T5-roots.md",
+        "docs/evidence/stable/audit-root-removal-deletes-the-catalogue.md"
       ]
     },
     {
@@ -330,7 +331,8 @@
         "docs/evidence/mvp/T5-roots.md",
         "docs/evidence/mvp/T8-identity-availability.md",
         "docs/evidence/mvp/T9-watching.md",
-        "docs/evidence/stable/audit-lib010-the-root-column-nobody-wrote.md"
+        "docs/evidence/stable/audit-lib010-the-root-column-nobody-wrote.md",
+        "docs/evidence/stable/audit-root-removal-deletes-the-catalogue.md"
       ]
     },
     {

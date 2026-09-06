@@ -110,9 +110,8 @@ public sealed class IdentifyingScanCoordinatorTests
             RootAvailability availability,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-        public Task RemoveAsync(
+        public Task<IReadOnlyList<TitleId>> RemoveAsync(
             LibraryRootId id,
-            bool preserveCatalog = true,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 

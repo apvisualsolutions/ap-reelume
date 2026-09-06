@@ -46,9 +46,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootListEmptyDescription">Añade la primera aquí arriba: escribe su ruta, elige de qué tipo es y confírmala. Aparecerá en esta lista.</x:String>
   <x:String x:Key="RootRemoveAction">Retirar</x:String>
   <x:String x:Key="RootRemoveConfirmAccessibleName">Confirmar la retirada de la carpeta</x:String>
-  <x:String x:Key="RootRemoveConfirmDescription">La carpeta se retira del catálogo. Ningún vídeo del disco se toca, y si vuelves a añadirla se cataloga de nuevo.</x:String>
+  <x:String x:Key="RootRemoveConfirmDescription">Vas a retirar esta carpeta de la biblioteca.</x:String>
   <x:String x:Key="RootRemoveConfirmAction">Retirar del catálogo</x:String>
-  <x:String x:Key="RootRemoveCancelAction">Cancelar</x:String>
   <x:String x:Key="RootPathLabel">Ruta de la carpeta</x:String>
   <x:String x:Key="RootPathHeading">RUTA DE LA CARPETA</x:String>
   <x:String x:Key="RootKindLocal">Local</x:String>
@@ -57,7 +56,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootAddAction">Añadir carpeta</x:String>
   <x:String x:Key="RootManagementAccessibleName">Gestión de carpetas de la biblioteca</x:String>
   <x:String x:Key="RootRemoveKeepsFilesNotice">Los archivos de vídeo no se tocan: se quedan exactamente donde están.</x:String>
-  <x:String x:Key="RootRemoveLosesMarksNotice">Sus títulos salen del catálogo, junto con sus marcas y su progreso.</x:String>
+  <x:String x:Key="RootRemoveLosesMarksNotice">Sus títulos salen del catálogo con sus marcas y su progreso. Esto es lo que se pierde:</x:String>
+  <x:String x:Key="RootRemoveIrreversibleNotice">Esto no se puede deshacer. Volver a añadir la carpeta la cataloga de nuevo, pero las marcas y el progreso no vuelven.</x:String>
+  <x:String x:Key="RootRemoveSummaryTitlesFormat">{0} títulos salen del catálogo.</x:String>
+  <x:String x:Key="RootRemoveSummaryMarksFormat">{0} marcas se pierden: favoritos, ver después, valoraciones y rangos guardados.</x:String>
+  <x:String x:Key="RootRemoveSummaryMinutesFormat">{0} minutos de progreso se pierden.</x:String>
+  <x:String x:Key="RootRemoveSummaryEmpty">No hay ningún título, ninguna marca ni ningún minuto que perder en esta carpeta.</x:String>
   <x:String x:Key="LibraryAddMediaAction">Añadir medios…</x:String>
   <x:String x:Key="AddRootDialogTitle">Añadir raíz de medios</x:String>
   <x:String x:Key="AddRootDismissAction">Cerrar</x:String>

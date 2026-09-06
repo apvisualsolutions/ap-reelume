@@ -46,9 +46,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootListEmptyDescription">Add the first one above: type its path, choose which kind it is and confirm. It will appear in this list.</x:String>
   <x:String x:Key="RootRemoveAction">Remove</x:String>
   <x:String x:Key="RootRemoveConfirmAccessibleName">Confirm removing the folder</x:String>
-  <x:String x:Key="RootRemoveConfirmDescription">The folder is removed from the catalog. No video on disk is touched, and adding it again catalogs it anew.</x:String>
+  <x:String x:Key="RootRemoveConfirmDescription">You are about to remove this folder from the library.</x:String>
   <x:String x:Key="RootRemoveConfirmAction">Remove from catalog</x:String>
-  <x:String x:Key="RootRemoveCancelAction">Cancel</x:String>
   <x:String x:Key="RootPathLabel">Folder path</x:String>
   <x:String x:Key="RootPathHeading">FOLDER PATH</x:String>
   <x:String x:Key="RootKindLocal">Local</x:String>
@@ -57,7 +56,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="RootAddAction">Add folder</x:String>
   <x:String x:Key="RootManagementAccessibleName">Library folder management</x:String>
   <x:String x:Key="RootRemoveKeepsFilesNotice">The video files are not touched: they stay exactly where they are.</x:String>
-  <x:String x:Key="RootRemoveLosesMarksNotice">Its titles leave the catalogue, along with their marks and progress.</x:String>
+  <x:String x:Key="RootRemoveLosesMarksNotice">Its titles leave the catalogue with their marks and progress. This is what is lost:</x:String>
+  <x:String x:Key="RootRemoveIrreversibleNotice">This cannot be undone. Adding the folder again catalogues it anew, but the marks and the progress do not come back.</x:String>
+  <x:String x:Key="RootRemoveSummaryTitlesFormat">{0} titles leave the catalogue.</x:String>
+  <x:String x:Key="RootRemoveSummaryMarksFormat">{0} marks are lost: favourites, watch later, ratings and kept ranges.</x:String>
+  <x:String x:Key="RootRemoveSummaryMinutesFormat">{0} minutes of progress are lost.</x:String>
+  <x:String x:Key="RootRemoveSummaryEmpty">There is no title, no mark and no minute to lose in this folder.</x:String>
   <x:String x:Key="LibraryAddMediaAction">Add media…</x:String>
   <x:String x:Key="AddRootDialogTitle">Add media root</x:String>
   <x:String x:Key="AddRootDismissAction">Close</x:String>

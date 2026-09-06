@@ -229,44 +229,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ItemsControl>
       </StackPanel>
       <!--
-        Danger, which §4 asks for and which this tree already spends on three surfaces. Until now the
-        three borders on this screen were the same accent: a refusal, a folder about to leave the
-        catalog and a request for permission, all painted alike. This is the one of the three that
-        destroys something, and the only one asking somebody to authorise it.
+        The removal confirmation used to be a third danger border here, beside a refusal and a
+        request for permission. It floats over the shell now (RootRemoveDialog): the removal deletes
+        the folder's catalogue, and that question is asked over everything rather than in a strip.
+        Moving it also ended the duplication with the settings page, where the same keys were drawn
+        a second time.
       -->
-      <Border
-          x:Name="RootRemoveConfirmationSurface"
-          IsVisible="{Binding IsConfirmingRemoval}"
-          Padding="16"
-          Background="{DynamicResource DangerSurfaceBrush}"
-          BorderBrush="{DynamicResource DangerBorderBrush}"
-          BorderThickness="1"
-          CornerRadius="{DynamicResource CornerRadiusMedium}"
-          automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}"
-          automation:AutomationProperties.LiveSetting="Assertive">
-        <StackPanel Spacing="{DynamicResource Space12}">
-          <TextBlock
-              FontFamily="{DynamicResource FontFamilyMono}"
-              FontWeight="SemiBold"
-              Foreground="{DynamicResource TextPrimaryBrush}"
-              Text="{Binding PendingRemovalPath}"
-              TextWrapping="WrapWithOverflow" />
-          <TextBlock
-              Foreground="{DynamicResource TextPrimaryBrush}"
-              Text="{DynamicResource RootRemoveConfirmDescription}"
-              TextWrapping="Wrap" />
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space12}">
-            <Button
-                automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAction}"
-                Command="{Binding ConfirmRemoveCommand}"
-                Content="{DynamicResource RootRemoveConfirmAction}" />
-            <Button
-                automation:AutomationProperties.Name="{DynamicResource RootRemoveCancelAction}"
-                Command="{Binding CancelRemoveCommand}"
-                Content="{DynamicResource RootRemoveCancelAction}" />
-          </StackPanel>
-        </StackPanel>
-      </Border>
       <!--
         Accent stays here, and that is decided rather than left over. This one is not a refusal and
         not a destruction: the folder is saved and the screen is asking whether the first scan may

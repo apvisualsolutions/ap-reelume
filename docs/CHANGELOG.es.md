@@ -294,6 +294,29 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Retirar una carpeta prometía dos cosas contrarias y no hacía ninguna. Ahora borra de verdad, y
+  antes te dice cuánto.** El diseño prometía que el catálogo conservaba sus títulos marcados como no
+  disponibles; el aviso del programa avisaba de que salían con sus marcas y su progreso; y el
+  programa no hacía ni lo uno ni lo otro: se limitaba a olvidar la carpeta. Medido sobre la
+  biblioteca de ejemplo —9 títulos, 28 archivos y **11 h 46 min de progreso**—, tras retirarla
+  seguían ahí los nueve títulos y los 706 minutos, marcados como **disponibles**, aunque su carpeta
+  ya no se vigilase.
+
+  **La decisión es del propietario y está tomada**: retirar borra. Sale del catálogo lo que se queda
+  sin ningún archivo, y sólo eso — una serie con episodios en otra carpeta sobrevive con lo que le
+  quede, y una copia de una película en otra carpeta ni se toca, porque es otra ficha con su propio
+  progreso.
+
+  **Y la pregunta que lo autoriza cambió de forma**: ahora flota sobre el programa, dice **cuántos
+  títulos, cuántas marcas y cuántos minutos** se van a perder, y advierte de que no se deshace. No se
+  cierra tocando fuera: una pregunta que destruye datos se responde. Estaba dibujada dos veces —en la
+  primera ejecución y en Ajustes—, y ahora es una sola.
+
+  **Lo que no cambia, y es coherente**: un disco USB desconectado sigue prometiendo que sus títulos se
+  quedan marcados como no disponibles. Desconectar un disco no es una decisión de quien usa el
+  programa y se deshace enchufando el cable; retirar una carpeta sí lo es. El porqué está escrito en
+  `ADR-0011`.
+
 - **Un botón de Ajustes contradecía una regla escrita del programa, y ahora dice por qué existe.** El
   botón «Aplicar umbral» de Recomendaciones va contra una decisión escrita —que en este programa un
   ajuste se aplica al elegirlo, sin botón que lo repita—, y no llevaba ninguna explicación al lado.

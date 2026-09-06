@@ -73,12 +73,20 @@ removal. The migration uses the SHA-256 shown above.
 La prueba automatizada crea tres vídeos pequeños, calcula un inventario SHA-256,
 añade y quita la raíz y vuelve a calcularlo. La demo local/USB/UNC repite la
 comparación sobre tres ubicaciones. Ambos resultados son idénticos: mismo nombre,
-tamaño, contenido y conteo; no aparece archivo copiado y el borrado sólo afecta
-la fila `library_roots`. / The automated test creates three small videos,
-calculates a SHA-256 inventory, adds/removes the root, and recalculates it. The
-local/USB/UNC demo repeats the comparison across three locations. Both
-inventories are identical in name, size, content, and count; no copy appears,
-and removal affects only the `library_roots` row.
+tamaño, contenido y conteo; no aparece archivo copiado. **Desde el 2026-09-06 el
+borrado ya no afecta sólo a la fila `library_roots`**: retirar una carpeta se
+lleva su catálogo —los títulos que se quedan sin archivo, sus marcas y su
+progreso—, decisión del propietario registrada en `ADR-0011`. Lo que esta
+evidencia mide sigue valiendo, y es lo que no cambió: ningún vídeo del disco se
+toca. / The automated test creates three small videos, calculates a SHA-256
+inventory, adds/removes the root, and recalculates it. The local/USB/UNC demo
+repeats the comparison across three locations. Both inventories are identical in
+name, size, content, and count; no copy appears. **Since 2026-09-06 removal no
+longer affects only the `library_roots` row**: removing a folder takes its
+catalogue with it — the titles left without a file, their marks and their
+progress — the owner's decision recorded in `ADR-0011`. What this evidence
+measures still holds, and it is the half that did not change: no video on disk is
+touched.
 
 ## Consentimiento y persistencia / Consent and persistence
 

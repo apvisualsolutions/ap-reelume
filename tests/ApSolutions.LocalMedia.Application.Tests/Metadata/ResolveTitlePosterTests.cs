@@ -153,5 +153,8 @@ public sealed class ResolveTitlePosterTests
             string alternativeText,
             CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
+
+        public Task RemoveTitleAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 }

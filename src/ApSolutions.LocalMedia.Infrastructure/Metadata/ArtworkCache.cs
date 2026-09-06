@@ -183,6 +183,42 @@ public sealed class ArtworkCache : IArtworkStore
     }
 
     /// <inheritdoc />
+    public Task RemoveTitleAsync(TitleId titleId, CancellationToken cancellationToken = default)
+    {
+        var folder = titleId.Value.ToString("N");
+        foreach (var root in new[] { _personalRoot, _remoteRoot })
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            DeleteFolder(Path.Combine(root, folder));
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// The catalogue row is already gone when this runs, so a failure here has nothing to undo and
+    /// nowhere to be reported: what is left behind is a folder of images no title names any more.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(
+        Justification = "Only the file system can take these branches.")]
+    private static void DeleteFolder(string path)
+    {
+        try
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, recursive: true);
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+    }
+
+    /// <inheritdoc />
     /// <remarks>
     /// The refusals <see cref="CacheRemoteAsync"/> makes are all of them worth having and none of
     /// them worth stopping an identification for, so they are turned into "no artwork" here: an

@@ -200,5 +200,8 @@ public sealed class SetPersonalCoverTests : IDisposable
             LastAlternativeText = alternativeText;
             return Task.FromResult(new ArtworkReference(Answered, ArtworkOrigin.Personal, alternativeText, IsExportable: true));
         }
+
+        public Task RemoveTitleAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 }

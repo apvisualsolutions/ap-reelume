@@ -1813,9 +1813,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(folder, await RootPathsAsync(factory));
         Assert.Null(onboarding.FailureKey);
 
-        // While the consent is still owed the first-run form is still up, and its own removal
-        // confirmation is pressed here — asked and refused — because this is the only state in
-        // which the inline pair is reachable at all.
+        // While the consent is still owed the first-run form is still up, and the removal question is
+        // asked and refused here. Since 2026-09-06 the question is one floating surface over the
+        // shell instead of a strip inside each of the two pages that offer «Retirar»: it is reached
+        // from here all the same, and «Conservar» is what refuses it.
         Assert.True(host.ViewModel.ShowsOnboarding);
         await PressAsync(
             host,
@@ -1824,14 +1825,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Remove on the first-run list never asked for the confirmation it owes");
         await PressAsync(
             host,
-            "RootRemoveCancelAction",
+            "RootRemoveKeepAction",
             () => onboarding.IsConfirmingRemoval,
-            "clicking Cancelar on the first-run list never called off the removal");
+            "clicking Conservar on the removal question never called off the removal");
         Assert.Equal(folder, await RootPathsAsync(factory));
 
-        // And accepted: the inline confirmation destroys for real - the folder leaves the
-        // catalogue and the first run is back at its empty form - then the walk adds it again,
-        // because the rest of this scene is about the consent a kept folder owes.
+        // And accepted: the confirmation destroys for real - the folder leaves the catalogue and the
+        // first run is back at its empty form - then the walk adds it again, because the rest of this
+        // scene is about the consent a kept folder owes.
         await PressAsync(
             host,
             "RootRemoveAction",

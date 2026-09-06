@@ -294,6 +294,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Removing a folder promised two opposite things and did neither. It now really deletes, and tells
+  you how much first.** The design promised the catalogue kept its titles marked unavailable; the
+  program's notice warned they left with their marks and progress; and the program did neither — it
+  simply forgot the folder. Measured over the sample library — 9 titles, 28 files and **11 h 46 min
+  of progress** — after removing it the nine titles and the 706 minutes were still there, marked
+  **available**, although their folder was no longer watched.
+
+  **The decision is the owner's and it is made**: removing deletes. What leaves the catalogue is what
+  runs out of files, and only that — a show with episodes in another folder survives with what it has
+  left, and a copy of a film in another folder is not touched at all, because it is a different card
+  with progress of its own.
+
+  **And the question that authorises it changed shape**: it now floats over the program, states **how
+  many titles, how many marks and how many minutes** are about to be lost, and warns that it cannot
+  be undone. Clicking outside does not close it: a question that destroys data is answered. It used
+  to be drawn twice — in the first run and in Settings — and is now one.
+
+  **What does not change, and is consistent**: a disconnected USB drive still promises its titles stay
+  marked unavailable. Unplugging a drive is not a decision of the person using the program and undoes
+  itself when the cable goes back; removing a folder is. The reasoning is written in `ADR-0011`.
+
 - **A Settings button contradicted a written rule of the program, and now says why it exists.** The
   «Apply threshold» button in Recommendations goes against a written decision — that in this program
   a setting applies as you choose it, with no button to repeat that — and carried no explanation

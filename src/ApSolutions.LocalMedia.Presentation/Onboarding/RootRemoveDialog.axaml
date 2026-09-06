@@ -1,0 +1,118 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+The question asked before a folder's catalogue is deleted. It floats over the shell behind a scrim,
+and that is a third shape neither ADR-0010 category covers: it is not a state that lasts as long as
+a condition, and not an event already over. It is a question, and until it is answered the rest of
+the application is not an offer.
+
+The scrim does not dismiss it. A destructive question is answered, not waved away by a click that
+landed beside it — and that is also what makes the walk's "press next to it" step harmless here.
+
+Neither button wears primary-action, and the view is in LeadingActionTests' table as leading with
+none. Accenting the affirmative of a consent is a dark pattern; accenting one that destroys would be
+worse. It is what RootManagementView already does for the same reason.
+
+Both dimensions are bounded and the alignment is explicit — §4's overlay grammar — because the panel
+that declared neither was measured at 1280x1400, opaque over the transport.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Onboarding.RootRemoveDialog"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:onboarding="clr-namespace:ApSolutions.LocalMedia.Presentation.Onboarding"
+    x:DataType="onboarding:RootOnboardingViewModel"
+    automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}">
+  <UserControl.Resources>
+    <home:ResourceKeyConverter x:Key="DialogResourceKey" />
+  </UserControl.Resources>
+  <Border
+      x:Name="RootRemoveDialogPanel"
+      MaxWidth="520"
+      MaxHeight="560"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center"
+      Padding="24"
+      Background="{DynamicResource DangerSurfaceBrush}"
+      BorderBrush="{DynamicResource DangerBorderBrush}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource CornerRadiusMedium}"
+      automation:AutomationProperties.LiveSetting="Assertive">
+    <StackPanel Spacing="{DynamicResource Space12}">
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource RootRemoveConfirmDescription}"
+          TextWrapping="Wrap" />
+      <TextBlock
+          FontFamily="{DynamicResource FontFamilyMono}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{Binding PendingRemovalPath}"
+          TextWrapping="WrapWithOverflow" />
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RootRemoveKeepsFilesNotice}"
+          TextWrapping="Wrap" />
+
+      <!--
+        The three counts, each its own line because the converter that puts a number inside a
+        translated sentence takes one placeholder per string — and because three figures on one line
+        of a destructive warning is three figures nobody reads.
+      -->
+      <StackPanel IsVisible="{Binding HasSomethingToLose}" Spacing="{DynamicResource Space8}">
+        <TextBlock
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource RootRemoveLosesMarksNotice}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="RootRemoveSummaryTitles"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding RemovalTitleCount, Converter={StaticResource DialogResourceKey}, ConverterParameter=RootRemoveSummaryTitlesFormat}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="RootRemoveSummaryMarks"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding RemovalMarkCount, Converter={StaticResource DialogResourceKey}, ConverterParameter=RootRemoveSummaryMarksFormat}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            x:Name="RootRemoveSummaryMinutes"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{Binding RemovalMinutes, Converter={StaticResource DialogResourceKey}, ConverterParameter=RootRemoveSummaryMinutesFormat}"
+            TextWrapping="Wrap" />
+      </StackPanel>
+
+      <!--
+        A folder added a moment ago and not yet scanned has nothing to lose, and three zeros read as
+        a broken count rather than as an empty folder.
+      -->
+      <TextBlock
+          x:Name="RootRemoveSummaryEmpty"
+          IsVisible="{Binding !HasSomethingToLose}"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource RootRemoveSummaryEmpty}"
+          TextWrapping="Wrap" />
+
+      <TextBlock
+          x:Name="RootRemoveIrreversibleNotice"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          FontWeight="SemiBold"
+          Text="{DynamicResource RootRemoveIrreversibleNotice}"
+          TextWrapping="Wrap" />
+
+      <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space8}">
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAction}"
+            Command="{Binding ConfirmRemoveCommand}"
+            Content="{DynamicResource RootRemoveConfirmAction}" />
+        <Button
+            automation:AutomationProperties.Name="{DynamicResource RootRemoveKeepAction}"
+            Command="{Binding CancelRemoveCommand}"
+            Content="{DynamicResource RootRemoveKeepAction}" />
+      </WrapPanel>
+    </StackPanel>
+  </Border>
+</UserControl>
