@@ -48,17 +48,41 @@
 > mano —se intentó y lo denegó, con razón— y el único camino es el que `CLAUDE.md` escribe: bajar el
 > artefacto del run que da el rojo y podarlo.
 >
-> **Los dos números ya están previstos y medidos en local**:
+> **El run ya salió y su artefacto ya está leído, así que aquí van los números REALES y no la
+> predicción.** El único fallo del run fue la puerta de cobertura: las diez suites en verde,
+> incluidas `MediaTests` (154/155) y `PackagingTests` (193/196), que en esta máquina no se pueden
+> correr. CI dijo: `189 file(s) still short of 96/96, ratchet 189, 190 measured under the bar, 2
+> improved`.
 >
-> · `RemoveLibraryRoot.cs` pasó de **100/50 a 100/100** y **sale** de la lista.
-> · `RootRemoveDialog.axaml` **entra** con 100/50, que es la única razón por la que la puerta acepta
->   que el trinquete suba: esa media rama es la única que el compilador de Avalonia genera para un
->   `.axaml`.
-> · **Neto: `$debtRatchet` se queda en 189.** Una fila fuera, una dentro.
+> Comparado el artefacto con la lista del árbol —189 filas contra 190—:
 >
-> El procedimiento, en orden: `gh run download <id> -n coverage-debt`, copiar el artefacto podando la
-> fila que mejoró, comprobar que las dos cifras cuadran, y empujar. Después, y sólo con el verde
-> leído, el fast-forward a `main` **nombrando ese SHA**, nunca `HEAD`.
+> · **Salen**: `RemoveLibraryRoot.cs`, de **100/50 a 100/100**, al irse la bandera muerta.
+> · **Mejora sin salir**: `ArtworkCache.cs`, de 99/86 a **99/87**. Es el segundo «improved» y no
+>   estaba previsto: lo recorrieron de paso las pruebas nuevas.
+> · **Entran DOS, y la predicción decía una.** `RootRemoveDialog.axaml` con 100/50, que es la única
+>   razón que la puerta acepta por escrito para subir el trinquete. Y
+>   **`LibraryRootRemovalReader.cs` con 100/62**, que NO estaba previsto.
+>
+> **Y ése segundo no se mete en la lista: se cubre.** Es un archivo nuevo, la regla 10 exige 96/96
+> sin excepción, y puede llegar — no depende de ningún hardware que el runner no tenga. Meterlo en la
+> deuda sería relajar la cobertura en silencio, que es exactamente lo que el hook protege. Las ramas
+> candidatas están a la vista en `LibraryRootRemovalReader.cs`: la guarda del constructor, el `finally`
+> que suelta las tablas temporales, y un `value is null or DBNull` que **probablemente sea rama
+> muerta** —`COUNT(*)` y `COALESCE(...,0)` nunca devuelven nulo—, en cuyo caso se quita en vez de
+> probarse. **Se mide con el JSON de coverlet, que nombra la rama con línea y offset, antes de tocar
+> nada.**
+>
+> ### Y una trampa nueva que costó esta vuelta
+>
+> **`eng/preview-coverage-floors.ps1` no vio ninguno de los dos archivos nuevos.** Sólo nombró el que
+> mejoraba, y su silencio se leyó como «los nuevos llegan al listón». No fue su límite conocido —las
+> suites que lee sí se corrieron—: es que compara contra la lista existente. **Su silencio no
+> certifica un archivo nuevo**, y ahí se perdió la vuelta que este aviso existe para no repetir.
+>
+> El procedimiento, en orden: cubrir `LibraryRootRemovalReader.cs` con pruebas, volver a medir,
+> copiar el artefacto del run siguiente podando lo que ya llegue, cuadrar `$debtRatchet` con las
+> filas, y empujar junto con `d9ca9c6`, que espera en local. Después, y sólo con el verde leído, el
+> fast-forward a `main` **nombrando ese SHA**, nunca `HEAD`.
 >
 > ### Lo que queda registrado y NO entró
 >

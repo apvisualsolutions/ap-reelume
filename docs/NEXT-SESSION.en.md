@@ -48,16 +48,40 @@
 > hook refuses to let it be edited by hand — it was tried and refused, rightly — and the only path is
 > the one `CLAUDE.md` writes: download the artefact of the run that goes red and prune it.
 >
-> **Both numbers are already predicted and measured locally**:
+> **The run has already been and its artefact already read, so these are the REAL numbers and not the
+> prediction.** The run's only failure was the coverage gate: all ten suites green, including
+> `MediaTests` (154/155) and `PackagingTests` (193/196), which cannot be run on this machine. CI said:
+> `189 file(s) still short of 96/96, ratchet 189, 190 measured under the bar, 2 improved`.
 >
-> · `RemoveLibraryRoot.cs` went from **100/50 to 100/100** and **leaves** the list.
-> · `RootRemoveDialog.axaml` **enters** at 100/50, which is the one reason the gate accepts the
->   ratchet going up: that half branch is the only one Avalonia's compiler generates for an `.axaml`.
-> · **Net: `$debtRatchet` stays at 189.** One row out, one row in.
+> Comparing the artefact against the tree's list — 189 rows against 190:
 >
-> The procedure, in order: `gh run download <id> -n coverage-debt`, copy the artefact pruning the row
-> that improved, check the two figures agree, and push. Then, and only with the green read, the
-> fast-forward to `main` **naming that SHA**, never `HEAD`.
+> · **Leaves**: `RemoveLibraryRoot.cs`, from **100/50 to 100/100**, once the dead flag went.
+> · **Improves without leaving**: `ArtworkCache.cs`, from 99/86 to **99/87**. It is the second
+>   "improved" and was not predicted: the new tests walked through it in passing.
+> · **TWO enter, and the prediction said one.** `RootRemoveDialog.axaml` at 100/50, which is the one
+>   reason the gate accepts in writing for raising the ratchet. And **`LibraryRootRemovalReader.cs` at
+>   100/62**, which was not predicted.
+>
+> **And that second one does not go into the list: it gets covered.** It is a new file, rule 10
+> demands 96/96 with no exception, and it can get there — it depends on no hardware the runner
+> lacks. Putting it in the debt would quietly relax coverage, which is exactly what the hook guards
+> against. The candidate branches are visible in `LibraryRootRemovalReader.cs`: the constructor
+> guard, the `finally` that drops the temporary tables, and a `value is null or DBNull` that is
+> **probably a dead branch** — `COUNT(*)` and `COALESCE(...,0)` never return null — in which case it
+> is removed rather than tested. **Measure it with coverlet's JSON, which names the branch with line
+> and offset, before touching anything.**
+>
+> ### And a new trap this round paid for
+>
+> **`eng/preview-coverage-floors.ps1` saw neither of the two new files.** It named only the one that
+> improved, and its silence was read as "the new ones meet the bar". This was not its known limit —
+> the suites it reads were run: it compares against the existing list. **Its silence does not certify
+> a new file**, and that is where the round this notice exists to prevent was lost.
+>
+> The procedure, in order: cover `LibraryRootRemovalReader.cs` with tests, measure again, copy the
+> next run's artefact pruning whatever now meets the bar, make `$debtRatchet` agree with the rows, and
+> push together with `d9ca9c6`, waiting locally. Then, and only with the green read, the fast-forward
+> to `main` **naming that SHA**, never `HEAD`.
 >
 > ### What is recorded and did NOT go in
 >
