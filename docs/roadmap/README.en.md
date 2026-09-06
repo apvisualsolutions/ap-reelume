@@ -115,6 +115,25 @@ written verdict, in
 publishing rule counts**: `PRD-006` is a commitment, so those 43 are fixed before anything is
 published. Still to compare: the states that have to be manufactured, and the whole player.
 
+**The owner decided on 2026-09-06 in what order they are attacked: screen by screen**, starting with
+Library and scanning, which holds nine of them and contained the most serious of all. The order is
+Library and scanning, film details, keyboard shortcuts, metadata editor, updates, the Settings index,
+subtitles, backups, privacy, courses and segment detection. **Its price is measured**: seven of the
+forty-three are shared labels spread over six screens, and one sweep would close them at once; going
+screen by screen they are touched in passing, on condition that none is left for a label pass that no
+longer exists.
+
+**The first is closed**: removing a folder deletes its catalogue, after a question stating what will
+be lost. It is the only one of the forty-three that promised something false about the data of the
+person using the program, and its decision is in
+[ADR-0011](../adr/0011-a-destructive-question-floats-and-blocks.md). **42** remain.
+
+**And the next on that same screen is the most profitable of all**: the margin between the rail and
+the first card, **56 px against the prototype's 32**. One figure that dissolves three apparent
+defects, because the 8 px of card and the 32 of shifted content are its arithmetic consequence. **The
+card width is not touched**: the prototype's grid is fluid, and at 1600 px — its canonical width — it
+puts nine of 145, fewer than the application.
+
 **A notice describing a state takes space; one narrating an event floats**, and it is written in
 [ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). It was decided because nobody
 ever had: neither the notices strip nor the transient message was in the controls inventory or in its

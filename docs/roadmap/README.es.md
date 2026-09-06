@@ -117,6 +117,25 @@ con veredicto escrito, en
 regla de publicación cuenta**: `PRD-006` es un compromiso, así que esos 43 se corrigen antes de
 publicar nada. Faltan por comparar los estados que hay que fabricar y el reproductor entero.
 
+**El propietario decidió el 2026-09-06 en qué orden se atacan: pantalla por pantalla**, empezando por
+Biblioteca y escaneo, que concentra nueve y contenía el más serio de todos. El orden es Biblioteca y
+escaneo, ficha de película, atajos de teclado, editor de metadatos, actualizaciones, índice de
+Ajustes, subtítulos, copias, privacidad, cursos y detección de segmentos. **Su precio está medido**:
+siete de los cuarenta y tres son rótulos compartidos repartidos por seis pantallas, y un solo barrido
+los cerraría de golpe; yendo pantalla por pantalla se tocan al pasar por cada una, con la condición
+de no dejar ninguno para una pasada de rótulos que ya no existe.
+
+**El primero está cerrado**: la retirada de una carpeta borra su catálogo, tras una pregunta que
+enumera lo que se pierde. Es la única de las cuarenta y tres que prometía algo falso sobre los datos
+de quien usa el programa, y su decisión está en
+[ADR-0011](../adr/0011-a-destructive-question-floats-and-blocks.md). Quedan **42**.
+
+**Y el siguiente de esa misma pantalla es el más rentable de todos**: el margen entre el riel y la
+primera tarjeta, **56 px contra los 32 del prototipo**. Una sola cifra que disuelve tres defectos
+aparentes, porque los 8 px de tarjeta y los 32 de contenido desplazado son su consecuencia
+aritmética. **El ancho de tarjeta no se toca**: la rejilla del prototipo es fluida y a 1600 px —su
+ancho canónico— pone nueve de 145, menos que la aplicación.
+
 **Un aviso que describe un estado ocupa sitio; uno que narra un suceso flota**, y está escrito en
 [ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). Se decidió porque nadie lo había
 decidido nunca: ni la franja de avisos ni el mensaje efímero estaban en el inventario de controles ni

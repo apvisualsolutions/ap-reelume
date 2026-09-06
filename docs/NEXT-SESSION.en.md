@@ -41,6 +41,24 @@
 > · **The walk: 150 of 150 and the ratchet still at 23.** The floating question is reached and pressed.
 > · **The view census: 61 → 62**, and `QuotedFigureTests` caught it in four places.
 >
+> ### FIRST THING BACK: the coverage gate, and why its red is by design
+>
+> **The branch carries a pushed commit and `main` did NOT advance**, because its run was known red
+> before it was launched. That is not an oversight: `eng/coverage-debt.txt` **is produced by CI**, a
+> hook refuses to let it be edited by hand — it was tried and refused, rightly — and the only path is
+> the one `CLAUDE.md` writes: download the artefact of the run that goes red and prune it.
+>
+> **Both numbers are already predicted and measured locally**:
+>
+> · `RemoveLibraryRoot.cs` went from **100/50 to 100/100** and **leaves** the list.
+> · `RootRemoveDialog.axaml` **enters** at 100/50, which is the one reason the gate accepts the
+>   ratchet going up: that half branch is the only one Avalonia's compiler generates for an `.axaml`.
+> · **Net: `$debtRatchet` stays at 189.** One row out, one row in.
+>
+> The procedure, in order: `gh run download <id> -n coverage-debt`, copy the artefact pruning the row
+> that improved, check the two figures agree, and push. Then, and only with the green read, the
+> fast-forward to `main` **naming that SHA**, never `HEAD`.
+>
 > ### What is recorded and did NOT go in
 >
 > · **The zombie watcher**: `RootWatchBackground` has no "stop watching this root". After a removal

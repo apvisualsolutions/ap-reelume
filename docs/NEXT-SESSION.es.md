@@ -41,6 +41,25 @@
 > · **El paseo: 150 de 150 y el trinquete quieto en 23.** La pregunta flotante se alcanza y se pulsa.
 > · **El censo de vistas: 61 → 62**, y `QuotedFigureTests` lo cazó en cuatro sitios.
 >
+> ### LO PRIMERO AL VOLVER: la puerta de cobertura, y por qué su rojo es de diseño
+>
+> **La rama lleva un commit empujado y `main` NO avanzó**, porque su run se sabía rojo antes de
+> lanzarlo. No es un descuido: `eng/coverage-debt.txt` **lo produce CI**, un hook deniega editarlo a
+> mano —se intentó y lo denegó, con razón— y el único camino es el que `CLAUDE.md` escribe: bajar el
+> artefacto del run que da el rojo y podarlo.
+>
+> **Los dos números ya están previstos y medidos en local**:
+>
+> · `RemoveLibraryRoot.cs` pasó de **100/50 a 100/100** y **sale** de la lista.
+> · `RootRemoveDialog.axaml` **entra** con 100/50, que es la única razón por la que la puerta acepta
+>   que el trinquete suba: esa media rama es la única que el compilador de Avalonia genera para un
+>   `.axaml`.
+> · **Neto: `$debtRatchet` se queda en 189.** Una fila fuera, una dentro.
+>
+> El procedimiento, en orden: `gh run download <id> -n coverage-debt`, copiar el artefacto podando la
+> fila que mejoró, comprobar que las dos cifras cuadran, y empujar. Después, y sólo con el verde
+> leído, el fast-forward a `main` **nombrando ese SHA**, nunca `HEAD`.
+>
 > ### Lo que queda registrado y NO entró
 >
 > · **El vigilante zombi**: `RootWatchBackground` no sabe «deja de vigilar esta raíz». Tras retirar,
