@@ -9,6 +9,7 @@ using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Presentation.Home;
 using ApSolutions.LocalMedia.Presentation.Library;
@@ -58,12 +59,18 @@ public static partial class CompositionRoot
             .AddTransient<ReconcileScannedFiles>()
             .AddTransient<AddLibraryRoot>()
             .AddTransient<RemoveLibraryRoot>()
+            // What the removal would cost, so the question can be asked with the numbers in it. It is
+            // registered next to the removal and resolved right below, because a reader nobody
+            // resolves is a warning that shows three zeros over a folder full of titles.
+            .AddSingleton<ILibraryRootRemovalReader, LibraryRootRemovalReader>()
+            .AddTransient<SummarizeLibraryRootRemoval>()
             .AddTransient(provider =>
             {
                 var onboarding = new RootOnboardingViewModel(
                     provider.GetRequiredService<AddLibraryRoot>(),
                     provider.GetRequiredService<RemoveLibraryRoot>(),
-                    provider.GetRequiredService<ILibraryRootRepository>());
+                    provider.GetRequiredService<ILibraryRootRepository>(),
+                    provider.GetRequiredService<SummarizeLibraryRootRemoval>());
 
                 // The dialog's two host answers, decided here the way the archive pickers are:
                 // the kind is read from the path, and Browse goes to the Windows picker for the

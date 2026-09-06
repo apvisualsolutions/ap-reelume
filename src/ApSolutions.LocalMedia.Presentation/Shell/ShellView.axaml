@@ -733,6 +733,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <onboarding:AddRootDialogView />
     </Panel>
 
+    <!--
+      The removal question, over everything for the same reason and with one difference that matters:
+      its scrim does not dismiss it. Deleting a folder's catalogue is answered, not waved away.
+      It lives here rather than inside the two pages that offer «Retirar» because it was in both, and
+      two visible controls answering to one name is what the walk refuses to walk past.
+    -->
+    <Panel
+        x:Name="RootRemoveDialogSurface"
+        Grid.RowSpan="2"
+        Grid.ColumnSpan="2"
+        IsVisible="{Binding Onboarding.IsConfirmingRemoval, FallbackValue=False}">
+      <Border Background="{DynamicResource ScrimBrush}" />
+      <onboarding:RootRemoveDialog DataContext="{Binding Onboarding}" />
+    </Panel>
+
     <Grid
         x:Name="PlayerSurface"
         Grid.Row="1"

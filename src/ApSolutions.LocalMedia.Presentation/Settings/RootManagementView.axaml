@@ -132,53 +132,13 @@ dialog, removed here, and listed there is one list that cannot disagree with its
       </ItemsControl.ItemTemplate>
     </ItemsControl>
     <!--
-      The same confirmation the onboarding draws, danger and assertive for the same reasons, plus
-      the two consequences the design package wrote for it: what stays (every video on disk) and
-      what leaves (the titles, their marks and their progress). One Border, so the announcement is
-      one announcement.
+      The confirmation is not drawn here any more. It floats over the shell (RootRemoveDialog), for
+      two reasons: the removal now deletes the folder's catalogue, and a question whose answer
+      destroys data is asked over everything rather than in a strip somebody can scroll past; and it
+      was drawn twice — here and in the first run — so the same keys appeared on two surfaces, which
+      the walk refuses. «Conservar» and not «Cancelar» survives the move, because the update section
+      on this same page keeps a Cancel of its own.
     -->
-    <Border
-        x:Name="RootManagementRemoveConfirmationSurface"
-        IsVisible="{Binding IsConfirmingRemoval}"
-        Padding="16"
-        Background="{DynamicResource DangerSurfaceBrush}"
-        BorderBrush="{DynamicResource DangerBorderBrush}"
-        BorderThickness="1"
-        CornerRadius="{DynamicResource CornerRadiusMedium}"
-        automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAccessibleName}"
-        automation:AutomationProperties.LiveSetting="Assertive">
-      <StackPanel Spacing="{DynamicResource Space12}">
-        <TextBlock
-            FontFamily="{DynamicResource FontFamilyMono}"
-            FontWeight="SemiBold"
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{Binding PendingRemovalPath}"
-            TextWrapping="WrapWithOverflow" />
-        <TextBlock
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource RootRemoveKeepsFilesNotice}"
-            TextWrapping="Wrap" />
-        <TextBlock
-            Foreground="{DynamicResource TextPrimaryBrush}"
-            Text="{DynamicResource RootRemoveLosesMarksNotice}"
-            TextWrapping="Wrap" />
-        <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space8}">
-          <Button
-              automation:AutomationProperties.Name="{DynamicResource RootRemoveConfirmAction}"
-              Command="{Binding ConfirmRemoveCommand}"
-              Content="{DynamicResource RootRemoveConfirmAction}" />
-          <!--
-            «Conservar», which is the inventory's own word for refusing this — and not «Cancelar»,
-            because the update section on this same page keeps a Cancel of its own, and two visible
-            commands answering to one name is the ambiguity the walk refuses to walk past.
-          -->
-          <Button
-              automation:AutomationProperties.Name="{DynamicResource RootRemoveKeepAction}"
-              Command="{Binding CancelRemoveCommand}"
-              Content="{DynamicResource RootRemoveKeepAction}" />
-        </WrapPanel>
-      </StackPanel>
-    </Border>
   </StackPanel>
   </Border>
 </UserControl>

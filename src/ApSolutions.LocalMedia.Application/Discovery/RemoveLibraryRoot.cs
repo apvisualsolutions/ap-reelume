@@ -1,30 +1,48 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
 
 namespace ApSolutions.LocalMedia.Application.Discovery;
 
-public sealed record RemoveLibraryRootCommand(LibraryRootId LibraryRootId, bool PreserveCatalog = true);
+public sealed record RemoveLibraryRootCommand(LibraryRootId LibraryRootId);
 
 public sealed class RemoveLibraryRoot
 {
     private readonly ILibraryRootRepository _repository;
+    private readonly IArtworkStore? _artwork;
 
-    public RemoveLibraryRoot(ILibraryRootRepository repository)
+    /// <summary>
+    /// The artwork store is optional because the covers are the one thing here that lives outside the
+    /// database: without it the catalogue still leaves, and the folders are orphaned rather than the
+    /// removal being refused.
+    /// </summary>
+    public RemoveLibraryRoot(ILibraryRootRepository repository, IArtworkStore? artwork = null)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _artwork = artwork;
     }
 
-    public Task ExecuteAsync(
+    public async Task ExecuteAsync(
         RemoveLibraryRootCommand command,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
-        return _repository.RemoveAsync(
-            command.LibraryRootId,
-            command.PreserveCatalog,
-            cancellationToken);
+        var leaving = await _repository
+            .RemoveAsync(command.LibraryRootId, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (_artwork is null)
+        {
+            return;
+        }
+
+        // After the transaction, never inside it: a deleted file does not roll back.
+        foreach (var title in leaving)
+        {
+            await _artwork.RemoveTitleAsync(title, cancellationToken).ConfigureAwait(false);
+        }
     }
 }

@@ -445,10 +445,9 @@ public sealed class BackupWorkflowTests : IDisposable
             RootAvailability availability,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-        public Task RemoveAsync(
+        public Task<IReadOnlyList<TitleId>> RemoveAsync(
             LibraryRootId id,
-            bool preserveCatalog = true,
-            CancellationToken cancellationToken = default) => Task.CompletedTask;
+            CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TitleId>>([]);
     }
 
     private sealed class ImmediateProgress<T>(Action<T> handler) : IProgress<T>

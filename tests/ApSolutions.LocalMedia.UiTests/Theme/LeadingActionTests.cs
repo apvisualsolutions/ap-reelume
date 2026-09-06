@@ -96,6 +96,11 @@ public sealed class LeadingActionTests
         ["LibraryView"] = "LibraryAddMediaAction",
         // Managing the folders is upkeep, not the point of Settings: nothing leads.
         ["RootManagementView"] = null,
+        // Nothing leads, and here that is the stronger version of the same reason. Accenting the
+        // affirmative of a consent is a dark pattern; this affirmative deletes a folder's titles,
+        // their marks and their progress, so accenting it would be pointing at the door that
+        // destroys. Neither button is accented and the person reads both.
+        ["RootRemoveDialog"] = null,
         ["UnavailableBadge"] = null,
         ["PosterCardView"] = null,
 

@@ -825,10 +825,9 @@ public sealed class ShellAssemblyTests
             RootAvailability availability,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-        public Task RemoveAsync(
+        public Task<IReadOnlyList<TitleId>> RemoveAsync(
             LibraryRootId id,
-            bool preserveCatalog = true,
-            CancellationToken cancellationToken = default) => Task.CompletedTask;
+            CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TitleId>>([]);
     }
 
     /// <summary>
@@ -893,10 +892,9 @@ public sealed class ShellAssemblyTests
             RootAvailability availability,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-        public Task RemoveAsync(
+        public Task<IReadOnlyList<TitleId>> RemoveAsync(
             LibraryRootId id,
-            bool preserveCatalog = true,
-            CancellationToken cancellationToken = default) => Task.CompletedTask;
+            CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TitleId>>([]);
     }
 
     private sealed class RecordingRoots : ILibraryRootRepository
@@ -920,10 +918,9 @@ public sealed class ShellAssemblyTests
             RootAvailability availability,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-        public Task RemoveAsync(
+        public Task<IReadOnlyList<TitleId>> RemoveAsync(
             LibraryRootId id,
-            bool preserveCatalog = true,
-            CancellationToken cancellationToken = default) => Task.CompletedTask;
+            CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TitleId>>([]);
     }
 
     private sealed class StubCandidates : IMatchCandidateRepository

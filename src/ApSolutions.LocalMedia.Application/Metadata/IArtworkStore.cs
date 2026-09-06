@@ -63,4 +63,14 @@ public interface IArtworkStore
         string sourcePath,
         string alternativeText,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes everything this title had on disk — the cover the person chose and whatever a provider
+    /// fetched. Called when the title leaves the catalogue, and never otherwise.
+    /// </summary>
+    /// <remarks>
+    /// It cannot fail loudly: it runs after the removal has already committed, so throwing here would
+    /// report a failure for work that succeeded, and there would be nothing left to roll back to.
+    /// </remarks>
+    Task RemoveTitleAsync(TitleId titleId, CancellationToken cancellationToken = default);
 }

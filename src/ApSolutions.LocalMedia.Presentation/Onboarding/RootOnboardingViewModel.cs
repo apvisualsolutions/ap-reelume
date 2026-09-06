@@ -59,6 +59,8 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
     private readonly AddLibraryRoot _addLibraryRoot;
     private readonly RemoveLibraryRoot? _removeLibraryRoot;
     private readonly ILibraryRootRepository? _roots;
+    private readonly SummarizeLibraryRootRemoval? _summarizeRemoval;
+    private LibraryRootRemovalSummary _removalSummary = LibraryRootRemovalSummary.Empty;
     private string _path = string.Empty;
     private RootKind _selectedKind = RootKind.Local;
     private ScanPolicy _selectedScanPolicy = ScanPolicy.Startup | ScanPolicy.Manual;
@@ -72,11 +74,13 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
     public RootOnboardingViewModel(
         AddLibraryRoot addLibraryRoot,
         RemoveLibraryRoot? removeLibraryRoot = null,
-        ILibraryRootRepository? roots = null)
+        ILibraryRootRepository? roots = null,
+        SummarizeLibraryRootRemoval? summarizeRemoval = null)
     {
         _addLibraryRoot = addLibraryRoot ?? throw new ArgumentNullException(nameof(addLibraryRoot));
         _removeLibraryRoot = removeLibraryRoot;
         _roots = roots;
+        _summarizeRemoval = summarizeRemoval;
         SelectKindCommand = new RelayCommand(parameter =>
         {
             if (parameter is RootKind kind)
@@ -86,14 +90,24 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         });
         AddRootCommand = new AsyncRelayCommand(() => AddAsync(CancellationToken.None));
         GrantInitialScanConsentCommand = new RelayCommand(_ => GrantInitialScanConsent());
-        RequestRemoveCommand = new RelayCommand(parameter =>
+        // The question appears before its numbers do. PendingRemoval is set before the first await,
+        // which is what keeps the surface answering synchronously to a press; the counts arrive when
+        // the reader has them, and until then the notice reads as an empty folder.
+        RequestRemoveCommand = new AsyncRelayCommand(async parameter =>
         {
-            if (parameter is LibraryRootRowViewModel row)
+            if (parameter is not LibraryRootRowViewModel row)
             {
-                PendingRemoval = row;
+                return;
             }
+
+            PendingRemoval = row;
+            await LoadRemovalSummaryAsync(row, CancellationToken.None).ConfigureAwait(true);
         });
-        CancelRemoveCommand = new RelayCommand(_ => PendingRemoval = null);
+        CancelRemoveCommand = new RelayCommand(_ =>
+        {
+            PendingRemoval = null;
+            RemovalSummary = LibraryRootRemovalSummary.Empty;
+        });
         ConfirmRemoveCommand = new AsyncRelayCommand(() => ConfirmRemoveAsync(CancellationToken.None));
         BrowseFolderCommand = new AsyncRelayCommand(async () =>
         {
@@ -270,6 +284,53 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
 
     public string PendingRemovalPath => PendingRemoval?.Path ?? string.Empty;
 
+    /// <summary>
+    /// What this removal would cost, so the question can be asked with the numbers in it. It goes
+    /// back to zero when the question is answered or dropped, because the next folder's warning
+    /// showing the previous folder's figures is worse than showing none.
+    /// </summary>
+    public LibraryRootRemovalSummary RemovalSummary
+    {
+        get => _removalSummary;
+        private set
+        {
+            _removalSummary = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(RemovalTitleCount));
+            OnPropertyChanged(nameof(RemovalMarkCount));
+            OnPropertyChanged(nameof(RemovalMinutes));
+            OnPropertyChanged(nameof(HasSomethingToLose));
+        }
+    }
+
+    public int RemovalTitleCount => RemovalSummary.TitleCount;
+
+    public int RemovalMarkCount => RemovalSummary.MarkCount;
+
+    public int RemovalMinutes => (int)RemovalSummary.Progress.TotalMinutes;
+
+    /// <summary>
+    /// Whether there is anything at all to lose. A folder added a moment ago and not yet scanned has
+    /// nothing, and three zeros read as a broken count rather than as an empty folder.
+    /// </summary>
+    public bool HasSomethingToLose =>
+        RemovalSummary.TitleCount > 0 || RemovalSummary.MarkCount > 0 || RemovalSummary.Progress > TimeSpan.Zero;
+
+    private async Task LoadRemovalSummaryAsync(
+        LibraryRootRowViewModel row,
+        CancellationToken cancellationToken)
+    {
+        if (_summarizeRemoval is null)
+        {
+            RemovalSummary = LibraryRootRemovalSummary.Empty;
+            return;
+        }
+
+        RemovalSummary = await _summarizeRemoval
+            .ExecuteAsync(row.Id, cancellationToken)
+            .ConfigureAwait(true);
+    }
+
     /// <summary>The last root a confirmation actually removed, so the shell can reload the catalog.</summary>
     public LibraryRootId? RemovedRootId
     {
@@ -379,8 +440,9 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Removes the folder a person confirmed. Only the catalog forgets it: no video on disk is
-    /// touched, and adding the folder again catalogs it anew — which is what the confirmation says.
+    /// Removes the folder a person confirmed, and its catalogue with it: the titles that are left
+    /// without a file, their marks and their progress. No video on disk is touched — which is what
+    /// the confirmation says, alongside the count of what is about to be lost.
     /// </summary>
     public async Task ConfirmRemoveAsync(CancellationToken cancellationToken = default)
     {
@@ -393,6 +455,7 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
             .ExecuteAsync(new RemoveLibraryRootCommand(row.Id), cancellationToken)
             .ConfigureAwait(true);
         PendingRemoval = null;
+        RemovalSummary = LibraryRootRemovalSummary.Empty;
         RemovedRootId = row.Id;
         await RefreshRootsAsync(cancellationToken).ConfigureAwait(true);
     }

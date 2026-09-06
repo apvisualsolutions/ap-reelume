@@ -63,6 +63,11 @@ public sealed class RootOnboardingViewTests
     /// <c>AccentSubtleBrush</c>. Each is asserted to be the brush it should be <b>and</b> to differ
     /// from the accent it was, because comparing only against the right one passes just as well if
     /// somebody later makes them equal again.
+    /// <para>
+    /// The removal is no longer one of this view's surfaces: since 2026-09-06 it is a question that
+    /// floats over the shell, and its danger brush is asserted where it lives now
+    /// (<c>RootRemoveDialogTests</c>). What is asserted here is that it did not leave a copy behind.
+    /// </para>
     /// </remarks>
     [AvaloniaFact]
     public void A_refusal_a_removal_and_a_request_for_permission_no_longer_share_one_surface()
@@ -71,17 +76,14 @@ public sealed class RootOnboardingViewTests
         using var scope = Mount(Create());
 
         var refusal = scope.Surface("RootAddFailureSurface");
-        var removal = scope.Surface("RootRemoveConfirmationSurface");
 
         Assert.Equal(Brush("WarningSurfaceBrush"), refusal.Background);
         Assert.Equal(Brush("WarningBorderBrush"), refusal.BorderBrush);
         Assert.NotEqual(accent, refusal.Background);
 
-        Assert.Equal(Brush("DangerSurfaceBrush"), removal.Background);
-        Assert.Equal(Brush("DangerBorderBrush"), removal.BorderBrush);
-        Assert.NotEqual(accent, removal.Background);
-
-        Assert.NotEqual(refusal.Background, removal.Background);
+        Assert.DoesNotContain(
+            scope.Borders(),
+            border => border.Name == "RootRemoveConfirmationSurface");
     }
 
     /// <summary>
@@ -190,6 +192,8 @@ public sealed class RootOnboardingViewTests
 
         internal TextBlock[] Blocks() => [.. _view.GetVisualDescendants().OfType<TextBlock>()];
 
+        internal Border[] Borders() => [.. _view.GetVisualDescendants().OfType<Border>()];
+
         internal Border Surface(string name)
         {
             var border = _view.GetVisualDescendants().OfType<Border>().FirstOrDefault(
@@ -224,13 +228,12 @@ public sealed class RootOnboardingViewTests
             RootAvailability availability,
             CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-        public Task RemoveAsync(
+        public Task<IReadOnlyList<TitleId>> RemoveAsync(
             LibraryRootId id,
-            bool preserveCatalog = true,
             CancellationToken cancellationToken = default)
         {
             _roots.RemoveAll(root => root.Id == id);
-            return Task.CompletedTask;
+            return Task.FromResult<IReadOnlyList<TitleId>>([]);
         }
     }
 
