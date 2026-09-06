@@ -294,6 +294,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The repository, which is public, was publishing the name of an internal company server and a path
+  on the office's network drive.** It sat in the file declaring the development environment's tools,
+  versioned and on the main branch since 5 September. That file again declares only Avalonia's public
+  documentation service, which is what it exists for; the company's own moves to each machine's local
+  configuration, which is not published.
+
+  **And what matters more than the fix: a rule forbade this and a guard enforces it, and it did not
+  see it.** The guard swept seven folders and, at the root, only two kinds of file. The one that got
+  through sat at the root and was neither. It now reads every text file at the root, and a new check
+  demands that file declare **exactly** the services that may be published: it does not try to
+  recognise what is private — that is filtering the bad, the shape this program refuses everywhere
+  else — but to permit what is good.
+
+  **A third check was also attempted and withdrawn within the hour**, because a drive letter is too
+  poor a pattern: the first version flagged every web address in the program — «https://» ends in
+  «s:/» — and, once narrowed, still flagged half a dozen invented paths in other tests. A noisy guard
+  is one that gets switched off, so what is recorded is the attempt and not the check.
+
 - **Removing a folder promised two opposite things and did neither. It now really deletes, and tells
   you how much first.** The design promised the catalogue kept its titles marked unavailable; the
   program's notice warned they left with their marks and progress; and the program did neither — it

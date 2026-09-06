@@ -105,6 +105,53 @@ public sealed class RepositoryPrivacyTests
     }
 
     /// <summary>
+    /// The versioned MCP configuration declares the public documentation server and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// <b>A closed list, because the two checks above cannot see this one.</b> They look for the
+    /// account, the computer and the profile path of whoever built the tree — and a company's own
+    /// server is none of those. On 2026-09-05 a connector for an internal service landed in
+    /// <c>.mcp.json</c> carrying its host name and a path on a mapped network drive, and it reached
+    /// the public <c>main</c> without a single gate saying anything: the file sits at the root, and
+    /// the sweep only read <c>*.md</c> and <c>*.props</c> there.
+    /// <para>
+    /// So this does not try to recognise what is private, which is the filter-the-bad shape this
+    /// repository refuses everywhere else. It allows what is known to be publishable, and anything
+    /// else has to be argued for here first. The host is deliberately not written down, not even as
+    /// something to forbid: naming it in a test would publish it again.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_versioned_mcp_configuration_declares_only_servers_that_are_safe_to_publish()
+    {
+        var configuration = Path.Combine(RepositoryLayout.Root, ".mcp.json");
+        Assert.True(File.Exists(configuration), ".mcp.json is versioned and has to be there.");
+
+        using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(configuration));
+        var declared = document.RootElement
+            .GetProperty("mcpServers")
+            .EnumerateObject()
+            .Select(server => server.Name)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        // Avalonia's own documentation service, public and named by CLAUDE.md as the reason this file
+        // is versioned at all. A connector to anything of this company's goes in local configuration,
+        // which is not published.
+        Assert.Equal(["avalonia-docs"], declared);
+    }
+
+    // A check for mapped network drives was written here on 2026-09-06 and taken out the same hour,
+    // and the attempt is worth more than the check would have been. A drive letter derived from this
+    // machine is too poor a pattern to be one: the first version matched every URL in the tree,
+    // because "https://" ends in "s:/"; anchored to the start of a path it still matched half a dozen
+    // test fixtures that use the same letter as an invented path. There is no way to tell "the share
+    // this office maps" from "a letter somebody typed into a fixture", so it would have been a gate
+    // that cries on honest work — and this repository has already learned that a noisy guard is one
+    // that gets switched off. The precise check is the one above: a closed list of what may be
+    // published, which caught the real defect with no false positives at all.
+
+    /// <summary>
     /// The folders beside the repository that are not versioned. They are the personal library: git
     /// was told to ignore them, which is the repository's own statement that they do not belong to it.
     /// </summary>
@@ -137,7 +184,11 @@ public sealed class RepositoryPrivacyTests
                     && IsText(file)));
         }
 
-        files.AddRange(Directory.EnumerateFiles(root, "*.md").Concat(Directory.EnumerateFiles(root, "*.props")));
+        // Every text file at the root and not two extensions of it. It read *.md and *.props until
+        // 2026-09-06, and the file that carried a company host to the public main was .mcp.json,
+        // sitting right there and never opened. A sweep that names extensions one by one is a filter
+        // for what somebody thought of.
+        files.AddRange(Directory.EnumerateFiles(root, "*").Where(IsText));
         return files;
     }
 

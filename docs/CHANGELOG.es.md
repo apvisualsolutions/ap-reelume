@@ -294,6 +294,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El repositorio, que es público, publicaba el nombre de un servidor interno de la empresa y una
+  ruta de la unidad de red de la oficina.** Estaba en el fichero que declara las herramientas del
+  entorno de desarrollo, versionado y en la rama principal desde el 5 de septiembre. Ese fichero
+  vuelve a declarar sólo el servicio público de documentación de Avalonia, que es para lo que existe;
+  lo de la empresa pasa a la configuración local de cada máquina, que no se publica.
+
+  **Y lo que importa más que el arreglo: había una regla que lo prohibía y un guardián que la hace
+  cumplir, y no lo vio.** El guardián barría siete carpetas y, en la raíz, sólo dos tipos de fichero.
+  El que se coló estaba en la raíz y no era ninguno de los dos. Ahora lee todos los ficheros de texto
+  de la raíz, y una comprobación nueva exige que ese fichero declare **exactamente** los servicios que
+  se pueden publicar: no intenta reconocer lo privado —que es filtrar lo malo, la forma que este
+  programa rechaza en todas partes— sino permitir lo bueno.
+
+  **Se intentó además una tercera comprobación y se retiró en la misma hora**, porque una letra de
+  unidad es un patrón demasiado pobre: la primera versión señalaba cada dirección web del programa
+  —«https://» acaba en «s:/»— y, afinada, seguía señalando media docena de rutas inventadas en otras
+  pruebas. Un guardián ruidoso acaba desactivado, así que queda escrito el intento y no la
+  comprobación.
+
 - **Retirar una carpeta prometía dos cosas contrarias y no hacía ninguna. Ahora borra de verdad, y
   antes te dice cuánto.** El diseño prometía que el catálogo conservaba sus títulos marcados como no
   disponibles; el aviso del programa avisaba de que salían con sus marcas y su progreso; y el
