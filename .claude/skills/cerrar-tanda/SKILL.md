@@ -47,6 +47,15 @@ estás pagando el ciclo de empaquetado, y esa suite es la única que mide lo que
 2026-08-31. Los «30 rojos» son **artefactos ausentes**, no esta máquina — y uno de ellos llevaba
 nueve días señalando un artefacto ARM64 anterior a un cambio del manifiesto.
 
+**Si la tanda añadió o cambió pruebas, el agente `gate-auditor` va AQUÍ, antes del commit, y en una
+copia aislada** (`isolation: "worktree"`), porque aplica mutaciones para medir. No es opcional ni un
+remate: el 2026-09-02 encontró **siete** puertas de esa tanda que no medían lo que decían, y el
+2026-09-11 **ocho** más un defecto real de contraste, las dos veces lanzado al cerrar y no antes. Lo
+que convence es la mutación medida, y cada puerta corregida se vuelve a mutar: la corrección también
+puede nacer ciega. **Su copia vive dentro de `.claude/worktrees/`** y las suites que recorren el disco
+la leen: `EvidenceLinkTests` da un rojo falso mientras exista. Las suites de documentación se corren
+con ella ya retirada.
+
 **Y si la tanda subió cobertura, medir en local ANTES de empujar sale gratis y ahorra 45 minutos.**
 La fusión de CI se reproduce aquí: `gh run download <id> -n test-results` y `reportgenerator` con los
 argumentos de la puerta. **Lo que NO funciona es correr `eng/check-coverage.ps1` entero contra ese
