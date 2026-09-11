@@ -299,6 +299,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **At 1600 px, the last cover of every library row ran 9 px into the right margin.** The grid
+  counts how many cards fit by dividing by the cover's width and its margin, and every card also
+  carries a 1 px border on each side — the prototype's, transparent and seen only under the pointer —
+  that the count did not add. Every card was 2 px wider than the count believed, and close to the
+  edge of each column it took one that did not fit. At 1600 px, the width the design is drawn at,
+  that was nine columns where eight fit. Now the count adds the border and lays out eight.
+
+  **And a card that took the keyboard's focus grew by 2 px and pushed the rest of its row along**,
+  because every button thickens its border under the keyboard and on a card that border is not
+  seen: the focus ring is a separate drawing. Now the card is the same width in every state.
+
 - **Pages started 48 px from the side menu where the prototype puts 32, and the library's covers at
   56.** The prototype uses one padding for all its pages — 28 under the title bar, 32 on the sides,
   48 at the bottom — measured on seven of them, and the program wrote 48 on each; home, the other way

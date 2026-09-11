@@ -136,9 +136,18 @@ cifra**, como decía este párrafo: el prototipo escribe un único relleno de p�
 llevaba además los 8 px de su baldosa sin compensar, 56 en total. Ahora las páginas abren a 32 y la
 portada en la línea del título, con la técnica del propio prototipo, en
 [la evidencia del margen](../evidence/stable/audit-page-margin.md). **No era uno de los 42** —era el
-defecto geométrico que dejó la vuelta cuatro—, así que la cuenta no se mueve. **El ancho de tarjeta
-no se toca**: la rejilla del prototipo es fluida y a 1600 px —su ancho canónico— pone nueve de 145,
-menos que la aplicación.
+defecto geométrico que dejó la vuelta cuatro—, así que la cuenta no se mueve.
+
+**Medirlo a 1600 px destapó otro, cerrado el mismo día**: la rejilla no contaba el borde de 1 px de
+cada tarjeta y a ese ancho metía una columna que no cabía, así que la última portada se comía 9 px del
+margen derecho. **Y dejó registrado uno que falta: la rejilla fluida.** El prototipo estira sus
+celdas hasta llenar el ancho —a 1600, nueve portadas de unos 147— y la aplicación usa una tarjeta
+fija de 148 que a 1600 cabe ocho veces, con unos 160 px libres a la derecha. El código decía que no
+podía hacerse porque «Avalonia no tiene relación de aspecto», y era falso: `Viewbox` escala
+conservando la proporción y un panel puede calcular el alto a partir del ancho. **Es trabajo, y su
+sitio en el orden de paridad lo pone el propietario**; la recomendación es ponerlo el primero, porque
+es la diferencia más visible que le queda a la Biblioteca en el ancho canónico. Todo, en
+[la evidencia del margen](../evidence/stable/audit-page-margin.md).
 
 **Y uno que tampoco estaba en la cuenta, señalado por el propietario el mismo día y cerrado**: las
 veintisiete píldoras de opción dibujaban un botón de opción dentro, y en dieciocho era lo único que

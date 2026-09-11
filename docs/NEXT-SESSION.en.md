@@ -19,6 +19,11 @@
 > · **The prototype's page margin on every destination**: `padding:28px 32px 48px` as `PageMargin`,
 >   inside each `ScrollViewer`; the cover on the title's line with the prototype's tile technique
 >   (`padding:8px; margin:-8px`). Measured in pixels: 32 where there were 48 and 56.
+> · **The library's column count, uncovered by measuring that margin at 1600 px**: it did not add each
+>   card's 1 px border and at that width took a column that did not fit — the last cover ate 9 px of
+>   the right margin — and under the keyboard the card grew another 2 px. Now the border is a token the
+>   style paints and the count adds. `LibraryView.axaml.cs` left the debt list (ratchet 186) by losing
+>   three guards on the card click that nothing could take.
 >
 > ### `main` and the branch
 >
@@ -35,6 +40,13 @@
 >   starts at 610 where the prototype puts it at 330), subtitles, backups, privacy, courses and segment
 >   detection. **The margin was not one of the 42**, so the count stays at 42.
 > · **The run-duration figure**, the owner's decision, still open (see below, in the notice of the 6th).
+> · **The fluid grid, and its place in the order is the owner's to set.** The prototype stretches its
+>   cells to fill the width — at 1600, nine covers of about 147 — and the application uses a fixed 148
+>   card that fits eight times at 1600 and leaves about 160 px free on the right. What held it back was
+>   false: «Avalonia has no aspect ratio», and `Viewbox` scales keeping the proportion.
+>   **Recommendation: put it first**, because it is the most visible difference the library has left
+>   at the canonical width. With it, the count goes back to dividing by 164 — the prototype's minimum
+>   includes the border — and the cards stretch to fill the row.
 >
 > ### Registered and not done
 >
@@ -46,9 +58,10 @@
 >   «Start over», the stored position was 1:00 instead of 0 (1:00 is the short version's whole
 >   length). It happened in the margin commit's instrumented pass; the same commit passed it twice in
 >   the accessibility gate and 8 of 8 locally, and it had not failed in any of the forty red runs since
->   28 August. The job was rerun with the artefacts already downloaded, and it stays as a background
->   task: **if it repeats, it is a race, and somebody who starts over could find their resume point
->   somewhere else**.
+>   28 August. The job was rerun with the artefacts already downloaded, and the rerun passed it three
+>   more times — the instrumented pass and the gate's two. It stays as a background task: **if it
+>   repeats, it is a race, and somebody who starts over could find their resume point somewhere
+>   else**.
 >
 > ### Blocked by something that is not code
 >
@@ -70,6 +83,12 @@
 >   the mutated binary into its measurement.
 > · **`replace_all` can glue attributes** when the searched string ends in a space and the new one does
 >   not: check with a grep afterwards.
+> · **At 1500 px the cover grid shows nothing**: it lays out eight fixed cards with room to spare. It is
+>   measured at 1600, the canonical width, which is where the count's defect showed.
+> · **A code comment is not documentation.** The one in `PosterCardView` claimed Avalonia cannot keep a
+>   proportion, it was repeated without consulting the MCP, and it was false: that is rule 0.
+> · **The real application is not opened while the owner is working on that machine**: it steals their
+>   focus. Measure in the in-memory harness, and open the real window only with their permission.
 
 > ## READ THIS FIRST — 2026-09-06, closing: removing a folder really deletes, and the notice says how much
 >

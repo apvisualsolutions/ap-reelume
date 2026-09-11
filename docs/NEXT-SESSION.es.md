@@ -19,6 +19,11 @@
 > · **El margen de página del prototipo en todos los destinos**: `padding:28px 32px 48px` como
 >   `PageMargin`, dentro de cada `ScrollViewer`; la portada en la línea del título con la técnica de
 >   la baldosa del prototipo (`padding:8px; margin:-8px`). Medido en píxeles: 32 donde había 48 y 56.
+> · **La cuenta de columnas de la Biblioteca, destapada al medir ese margen a 1600 px**: no sumaba el
+>   borde de 1 px de cada tarjeta y a ese ancho metía una columna que no cabía —la última portada se
+>   comía 9 px del margen derecho—, y con el foco del teclado la tarjeta crecía otros 2 px. Ahora el
+>   borde es un token que pinta el estilo y suma la cuenta. `LibraryView.axaml.cs` salió de la lista de
+>   deuda (trinquete 186) al quitar tres guardas del clic que nada podía tomar.
 >
 > ### `main` y la rama
 >
@@ -37,6 +42,13 @@
 >   era uno de los 42**, así que la cuenta sigue en 42.
 > · **La cifra de duración de un run**, decisión del propietario que sigue abierta (ver abajo, en el
 >   aviso del 06).
+> · **La rejilla fluida, y su sitio en el orden lo pone el propietario.** El prototipo estira sus
+>   celdas hasta llenar el ancho —a 1600, nueve portadas de unos 147— y la aplicación usa una tarjeta
+>   fija de 148 que a 1600 cabe ocho veces y deja unos 160 px libres a la derecha. Lo que la frenaba
+>   era falso: «Avalonia no tiene relación de aspecto», y `Viewbox` escala conservando la proporción.
+>   **Recomendación: ponerla la primera**, porque es la diferencia más visible que le queda a la
+>   Biblioteca en el ancho canónico. Con ella, la cuenta vuelve a dividir por 164 —el mínimo del
+>   prototipo incluye el borde— y las tarjetas se estiran hasta llenar la fila.
 >
 > ### Registrado y sin hacer
 >
@@ -49,9 +61,10 @@
 >   elegir «Empezar de nuevo», la posición guardada fue 1:00 en vez de 0 (1:00 es la duración entera
 >   de la versión corta). Fue en la pasada instrumentada del commit del margen; el mismo commit la pasó
 >   dos veces en la puerta de accesibilidad y 8 de 8 en local, y no había fallado en ninguno de los
->   cuarenta runs rojos desde el 28 de agosto. Se relanzó el trabajo con los artefactos ya bajados, y
->   queda como tarea de fondo: **si se repite, es una carrera y alguien que empieza de nuevo podría
->   encontrar su punto de reanudación en otro sitio**.
+>   cuarenta runs rojos desde el 28 de agosto. Se relanzó el trabajo con los artefactos ya bajados y
+>   el relanzamiento la pasó tres veces más —la pasada instrumentada y las dos de la puerta—. Queda
+>   como tarea de fondo: **si se repite, es una carrera y alguien que empieza de nuevo podría encontrar
+>   su punto de reanudación en otro sitio**.
 >
 > ### Bloqueado por algo que no es código
 >
@@ -72,6 +85,12 @@
 >   meter el binario mutado en su medición.
 > · **`replace_all` puede pegar atributos** si la cadena buscada acaba en espacio y la nueva no:
 >   se comprueba con un grep después.
+> · **A 1500 px la rejilla de portadas no enseña nada**: pone ocho fijas y le sobra sitio. Se mide a
+>   1600, el ancho canónico, que es donde asomaba el defecto de la cuenta.
+> · **Un comentario del código no es documentación.** El de `PosterCardView` afirmaba que Avalonia no
+>   puede mantener una proporción, se repitió sin consultar el MCP, y era falso: es la regla 0.
+> · **La aplicación real no se abre mientras el propietario trabaja en esa máquina**: le roba el foco.
+>   Se mide en el arnés en memoria, y la ventana real sólo con su permiso.
 
 > ## AVISO AL FRENTE — 2026-09-06, cierre: retirar una carpeta borra de verdad, y el aviso dice cuánto
 >

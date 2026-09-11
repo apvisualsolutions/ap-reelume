@@ -134,9 +134,18 @@ the sides, 48 at the bottom — for all its destinations, and the application pu
 the cover also carried its tile's 8 px uncompensated, 56 in all. Pages now open at 32 and the cover on
 the title's line, with the prototype's own technique, in
 [the margin's evidence](../evidence/stable/audit-page-margin.md). **It was not one of the 42** — it
-was the geometric defect round four left standing — so the count does not move. **The card width is
-not touched**: the prototype's grid is fluid, and at 1600 px — its canonical width — it puts nine of
-145, fewer than the application.
+was the geometric defect round four left standing — so the count does not move.
+
+**Measuring it at 1600 px uncovered another, closed the same day**: the grid did not count each
+card's 1 px border and at that width took a column that did not fit, so the last cover ate 9 px of
+the right margin. **And it left one registered that is missing: the fluid grid.** The prototype
+stretches its cells to fill the width — at 1600, nine covers of about 147 — and the application uses
+a fixed 148 card that fits eight times at 1600, with about 160 px free on the right. The code said it
+could not be done because «Avalonia has no aspect ratio», and that was false: `Viewbox` scales
+keeping the proportion, and a panel can compute the height from the width. **It is work, and its
+place in the parity order is the owner's to set**; the recommendation is to put it first, because it
+is the most visible difference the library has left at the canonical width. All of it is in
+[the margin's evidence](../evidence/stable/audit-page-margin.md).
 
 **And one that was not in the count either, raised by the owner the same day and closed**: the
 twenty-seven option pills drew a radio button inside, and in eighteen it was the only thing saying

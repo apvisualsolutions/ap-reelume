@@ -299,6 +299,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **A 1600 px, la última portada de cada fila de la Biblioteca se metía 9 px en el margen derecho.**
+  La rejilla cuenta cuántas tarjetas caben dividiendo por el ancho de la portada y su margen, y cada
+  tarjeta lleva además un borde de 1 px a cada lado —el del prototipo, transparente y visible sólo al
+  pasar el ratón— que la cuenta no sumaba. Cada tarjeta medía 2 px más de lo que la cuenta creía, y
+  cerca del límite de cada columna metía una que no cabía. A 1600 px, el ancho al que se dibuja el
+  diseño, eran nueve columnas donde caben ocho. Ahora la cuenta suma el borde y pone ocho.
+
+  **Y una tarjeta que recibía el foco del teclado ensanchaba 2 px y empujaba al resto de su fila**,
+  porque todos los botones engordan su borde con el teclado y en la tarjeta ese borde no se ve: el
+  anillo de foco es otro dibujo. Ahora la tarjeta mide lo mismo en todos sus estados.
+
 - **Las páginas empezaban a 48 px del menú lateral donde el prototipo pone 32, y las portadas de la
   Biblioteca a 56.** El prototipo usa un único relleno para todas sus páginas —28 bajo la barra de
   título, 32 a los lados, 48 abajo—, medido en siete de ellas, y el programa escribía 48 en cada

@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Presentation.Library;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -51,15 +52,23 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 /// </remarks>
 public sealed class LibraryGridTests
 {
-    /// <summary>The card is 148 and its button pads 8 on each side, so the step is 164.</summary>
+    /// <summary>
+    /// The card is 148 and its button pads 8 and borders 1 on each side, so the step is 166.
+    /// </summary>
+    /// <remarks>
+    /// 1494 and 1493 are nine steps and one pixel short of them: the pair the count got wrong while it
+    /// divided by 164, which put nine cards into 1493 px and the ninth past the edge.
+    /// </remarks>
     [Theory]
+    [InlineData(1494, 9)]
+    [InlineData(1493, 8)]
     [InlineData(1352, 8)]
     [InlineData(900, 5)]
-    [InlineData(164, 1)]
+    [InlineData(166, 1)]
     [InlineData(100, 1)]
     [InlineData(0, 1)]
     public void The_column_count_is_how_many_padded_cards_fit(double available, int expected) =>
-        Assert.Equal(expected, LibraryView.ColumnsThatFit(available, 148, 8));
+        Assert.Equal(expected, LibraryView.ColumnsThatFit(available, 148, 8, 1));
 
     /// <summary>The card's width comes from the theme, and from nowhere else.</summary>
     /// <remarks>
@@ -79,6 +88,8 @@ public sealed class LibraryGridTests
 
         Assert.Equal(148, LibraryView.Scalar(view, "PosterCardWidth", -1));
         Assert.Equal(8, LibraryView.Scalar(view, "Space8", -1));
+        Assert.Equal(1, LibraryView.Scalar(view, "PosterCardBorderThickness", -1));
+        Assert.Equal(-1, LibraryView.Scalar(view, "PosterCornerRadius", -1));
         Assert.Equal(-1, LibraryView.Scalar(view, "NoSuchToken", -1));
         Assert.Equal(-1, LibraryView.Scalar(null, "PosterCardWidth", -1));
 
@@ -176,6 +187,90 @@ public sealed class LibraryGridTests
     }
 
     /// <summary>
+    /// The count agrees with the cards it lays out, right at the edge where one more card fits.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The count divided by the card and its padding, and the card carries one more thing: a 1 px
+    /// border on each side, transparent at rest and the hairline the prototype draws on hover — its
+    /// tile is `border:1px solid transparent`. So every card was 2 px wider than the count believed,
+    /// and within two pixels per column of one more card the grid counted a column that did not fit.
+    /// At 1600 px, the width the design is drawn at, that was nine columns in the room of eight and a
+    /// bit: the ninth cover ran 9 px into the page's right margin, measured on a capture of the
+    /// application on 2026-09-11, where the prototype keeps 32 on both sides.
+    /// </para>
+    /// <para>
+    /// The two widths above never fell in that gap, which is why these are not round numbers: they
+    /// are read off a card the grid actually laid out, one pixel short of N cards and exactly N.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_count_agrees_with_the_cards_it_lays_out_at_the_edge_of_each_column()
+    {
+        var viewModel = await BrowseAsync(40);
+        var view = new LibraryView { DataContext = viewModel };
+        var window = new Window { Width = 1352, Height = 1000, Content = view };
+        window.Show();
+        Settle(window);
+        var surface = view.GetVisualDescendants().OfType<ScrollViewer>().Single(
+            viewer => viewer.Name == "LibraryGridSurface");
+        var step = Cards(view).First().Bounds.Width;
+        Assert.True(step > 100, $"a card measured {step} px wide, so this would compare nothing.");
+
+        foreach (var columns in new[] { 5, 8, 9 })
+        {
+            var exact = Math.Ceiling(step * columns);
+            foreach (var (width, expected) in new[] { (exact - 1, columns - 1), (exact, columns) })
+            {
+                window.Width = width;
+                Settle(window);
+
+                Assert.True(
+                    viewModel.Columns == expected,
+                    $"at {width} px the grid counted {viewModel.Columns} columns of cards {step} px wide, "
+                        + $"and {expected} fit.");
+                var furthest = Cards(view).Max(card =>
+                    card.TranslatePoint(new Point(card.Bounds.Width, 0), surface)!.Value.X);
+                Assert.True(
+                    furthest <= surface.Bounds.Width + 0.01,
+                    $"at {width} px a card ends at {furthest}, past the grid's {surface.Bounds.Width}.");
+            }
+        }
+
+        window.Close();
+    }
+
+    /// <summary>A card the keyboard lands on keeps its width, so the rest of its row stays put.</summary>
+    /// <remarks>
+    /// Every button thickens its border to 2 px under the keyboard (<c>Button:focus-visible</c>), and
+    /// on a card the brush stays transparent — the ring a person sees is the focus adorner, which
+    /// <c>FocusRingTests</c> holds. On a card that thickening drew nothing and did one thing: it grew
+    /// the focused card by 2 px and pushed every card after it along the row, which at the edge of a
+    /// column is 2 px past the grid.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task A_card_the_keyboard_lands_on_keeps_its_width()
+    {
+        var viewModel = await BrowseAsync(8);
+        var view = new LibraryView { DataContext = viewModel };
+        var window = new Window { Width = 1352, Height = 1000, Content = view };
+        window.Show();
+        Settle(window);
+        var card = Cards(view).First();
+        var resting = card.Bounds.Width;
+        Assert.True(resting > 100, $"a card measured {resting} px wide, so this would compare nothing.");
+
+        Assert.True(card.Focus(NavigationMethod.Tab), "the card refused keyboard focus, so nothing was proven.");
+        Settle(window);
+
+        Assert.True(
+            card.Classes.Contains(":focus-visible"),
+            "focus arrived without :focus-visible, so the state under test never happened.");
+        Assert.Equal(resting, card.Bounds.Width);
+        window.Close();
+    }
+
+    /// <summary>
     /// Ten thousand titles keep a screenful of controls alive, not ten thousand.
     /// </summary>
     /// <remarks>
@@ -201,6 +296,23 @@ public sealed class LibraryGridTests
             $"{live} cards are alive for ten thousand titles, so the grid is not virtualising.");
 
         window.Close();
+    }
+
+    private static IEnumerable<Button> Cards(LibraryView view) =>
+        view.GetVisualDescendants().OfType<Button>().Where(button => button.Classes.Contains("poster-card"));
+
+    /// <summary>
+    /// A resize moves the count, the count regroups the rows, and the rows need their own pass.
+    /// </summary>
+    private static void Settle(Window window)
+    {
+        for (var pass = 0; pass < 3; pass++)
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.InvalidateMeasure();
+        }
+
+        Dispatcher.UIThread.RunJobs();
     }
 
     private static async Task<LibraryViewModel> BrowseAsync(int count)

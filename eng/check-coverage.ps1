@@ -425,7 +425,12 @@ try {
     # lista suelos que suben. La salida fue cubrir lo que nadie tomaba (una segunda ficha del mismo
     # tipo, pedir más sin cursor, fijar el filtro o el orden que ya se tiene, comandos que rechazan un
     # valor ajeno y avisos sin nadie escuchando), no rebajar ningún suelo.
-    $debtRatchet = 187
+    #
+    # 186 aún el 2026-09-11, otra vez por mejora: LibraryView.axaml.cs llega a 100/100 y sale. La
+    # cuenta de columnas no contaba el borde de 1 px de cada tarjeta y a 1600 px metía una columna que
+    # no cabía; leer ese borde añadió dos ramas cubiertas, y en vez de subirle el suelo se quitaron
+    # las tres guardas del clic en una tarjeta, que ninguna prueba ni ninguna persona podía tomar.
+    $debtRatchet = 186
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

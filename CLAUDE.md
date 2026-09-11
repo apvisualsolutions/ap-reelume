@@ -293,7 +293,7 @@ preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecha
 **entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
 contesta `[]`.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **187** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **186** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -319,11 +319,13 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **187** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **186** <!--medido:trinquete-de-deuda-->
 desde
-el 2026-09-11, cuando bajó por mejora: quitar los círculos de las píldoras de opción se llevó ramas
-cubiertas de dos ViewModels, y en vez de rebajar sus suelos se cubrió lo que faltaba hasta que los
-dos llegaron al listón y salieron. Estuvo en 189 desde el 2026-09-05, cuando subió por una vista
+el 2026-09-11, cuando bajó por mejora dos veces el mismo día. Primero a 187: quitar los círculos de
+las píldoras de opción se llevó ramas cubiertas de dos ViewModels, y en vez de rebajar sus suelos se
+cubrió lo que faltaba hasta que los dos llegaron al listón y salieron. Después a 186: la cuenta de
+columnas de la Biblioteca aprendió a contar el borde de las tarjetas, y `LibraryView.axaml.cs` llegó
+a 100/100 quitando tres guardas del clic que nada podía tomar. Estuvo en 189 desde el 2026-09-05, cuando subió por una vista
 nueva: `PlaybackSettingsView.axaml` mide 100/50 como las
 otras sesenta, porque esa mitad es la única rama que el compilador de Avalonia genera para un
 `.axaml`. Antes estuvo en 188 desde el 2026-09-03, cuando el selector de carátula llegó a 100/98 al

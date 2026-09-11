@@ -88,5 +88,11 @@ lo que se buscó y no existe.
    «Las cesiones, con su razón». Léela antes de reportar: lo que está ahí no es un hallazgo.
 4. **Reporta lo que el propietario vería.** Prioriza lo visible a simple vista sobre lo que sólo
    aparece midiendo.
+5. **No abras la aplicación real si quien te lanza no te lo ha dicho expresamente.** `shoot.ps1` y
+   `dotnet run` levantan una ventana en el escritorio de quien trabaja en esa máquina y le quitan el
+   foco en cada captura: el 2026-09-11 el propietario tuvo que pedir que parara. Mide sobre capturas
+   ya hechas, sobre el prototipo —que se fotografía sin ventana— o en el arnés en memoria de
+   `UiTests` (skill `medir-pixeles`). Si sin la ventana real no se puede contestar, dilo en el informe
+   y no la abras.
 
 No cambies nada. Este agente informa; la corrección es una decisión aparte.
