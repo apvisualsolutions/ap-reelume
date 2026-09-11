@@ -30,7 +30,9 @@
 >   enlaces, Inicio y la primera portada no se medían, y una prueba de consulta no cargaba la página—.
 >   Ahora cada una caza la mutación que dejaba pasar, vista fallar. **Y un defecto real**: en oscuro,
 >   tres acentos pintaban el borde de la elegida por debajo de 3:1 sobre su tarjeta; el acento se
->   deriva ahora contra la página y la tarjeta.
+>   deriva ahora contra la página y la tarjeta. Esas pruebas recorrieron de paso `AudioOutputViewModel.cs`
+>   y CI lo midió por encima de su suelo: se cubrieron sus cinco ramas y salió de la lista (trinquete
+>   **185**).
 >
 > ### `main` y la rama
 >
@@ -102,6 +104,9 @@
 >   píldora y se nombra la que se enciende.
 > · **Una puerta que lee el diccionario de colores no mide lo que se pinta** si el programa lo
 >   sustituye al arrancar: en Claro y Oscuro el acento es el derivado del color elegido.
+> · **La previsualización de cobertura no vio subir `AudioOutputViewModel.cs`, y CI sí**: el paseo lo
+>   recorre con el catálogo de audio real, que aquí tiene salidas y en el runner no. Un archivo que el
+>   paseo toca con hardware debajo se confirma en el artefacto de CI, no en local.
 
 > ## AVISO AL FRENTE — 2026-09-06, cierre: retirar una carpeta borra de verdad, y el aviso dice cuánto
 >

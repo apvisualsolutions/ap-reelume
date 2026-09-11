@@ -30,7 +30,8 @@
 >   first cover were not measured, and a query test never loaded the page. Now each one catches the
 >   mutation it let through, seen failing. **And a real defect**: in dark, three accents painted the
 >   chosen pill's border below 3:1 on its card; the accent is now derived against the page and the
->   card.
+>   card. Those tests walked `AudioOutputViewModel.cs` in passing and CI measured it above its floor:
+>   its five branches were covered and it left the list (ratchet **185**).
 >
 > ### `main` and the branch
 >
@@ -100,6 +101,9 @@
 >   name the one that lights.
 > · **A gate that reads the colour dictionary does not measure what is painted** when the program
 >   replaces it at start: in light and dark the accent is the one derived from the chosen colour.
+> · **The coverage preview did not see `AudioOutputViewModel.cs` rise, and CI did**: the walk goes
+>   through it with the real audio catalogue, which has outputs here and none on the runner. A file the
+>   walk touches with hardware underneath is confirmed on CI's artefact, not locally.
 
 > ## READ THIS FIRST — 2026-09-06, closing: removing a folder really deletes, and the notice says how much
 >

@@ -430,7 +430,13 @@ try {
     # cuenta de columnas no contaba el borde de 1 px de cada tarjeta y a 1600 px metía una columna que
     # no cabía; leer ese borde añadió dos ramas cubiertas, y en vez de subirle el suelo se quitaron
     # las tres guardas del clic en una tarjeta, que ninguna prueba ni ninguna persona podía tomar.
-    $debtRatchet = 186
+    #
+    # 185 también el 2026-09-11, y por la segunda vía de subir, la que se olvida: pruebas nuevas que
+    # recorren un archivo de paso. Las del auditor de puertas pulsaron las tres disposiciones de audio
+    # y AudioOutputViewModel.cs pasó de 99/88 a 100/91 en CI, que la previsualización local no vio
+    # porque esta máquina tiene salidas de audio de verdad y el runner no. En vez de copiar el suelo
+    # nuevo se cubrieron las cinco ramas que faltaban, cada una con sus dos mitades en la misma prueba.
+    $debtRatchet = 185
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.
