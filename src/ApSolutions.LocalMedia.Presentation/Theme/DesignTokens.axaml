@@ -108,12 +108,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <CornerRadius x:Key="CornerRadiusPill">999</CornerRadius>
       <!--
         The poster, in exactly 2:3, and here rather than inside PosterCardView because two things read
-        it: the card paints it, and the library grid divides its own width by it to decide how many
-        columns fit. Written in one place, the two cannot disagree — and they would, because the one
-        that divides is C# and the one that paints is markup.
+        it: Home's rails paint their cards at it, and the library grid takes it as the narrowest a
+        column may be - the prototype's minmax(148px, 1fr), where the 148 is the tile with its 1 px
+        border inside. Written in one place, the two cannot disagree — and they would, because the one
+        that counts is C# and the one that paints is markup. The grid's own cards do not paint this
+        width: on the grid's surface it is overridden to automatic, and they stretch to their cells.
 
-        148 is the width the prototype's library grid is approved at (minmax(148px, 1fr)); its rails
-        use 132, and the wider of the two is the one a grid of them is measured against.
+        148 is the width the prototype's library grid is approved at; its rails use 132, and the
+        wider of the two is the one a grid of them is measured against.
       -->
       <!--
         The one duration in the application, and the reason it is a TimeSpan token rather than a
@@ -131,11 +133,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <x:Double x:Key="PosterCardHeight">222</x:Double>
       <!--
         The card's border, the prototype's `border:1px solid transparent` on its tile. A token and not
-        a literal on the card's style because the library counts columns with it too: a card is
-        PosterCardWidth plus the padding and this on each side. Until 2026-09-11 the count left it
-        out, so every card was 2 px wider than the count believed, and at 1600 px the ninth cover of
-        every row ran 9 px into the page's right margin. Button.poster-card holds it in every state,
-        and LibraryView reads this same Thickness rather than a number of its own.
+        a literal on the card's style because the library reads it too: a cover in the grid is its
+        cell less the padding and this on each side, and its height is taken from that width. The
+        prototype's 148 minimum already holds it, which is why the column count leaves it out. Until
+        2026-09-11 the count and the cards disagreed about it, first at 1600 px by nine pixels of
+        overflow, then by the 160 px a fixed card left empty. Button.poster-card holds it in every
+        state, and LibraryView reads this same Thickness rather than a number of its own.
       -->
       <Thickness x:Key="PosterCardBorderThickness">1</Thickness>
       <!--
@@ -2674,10 +2677,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <!--
-      One pixel on each side whatever the state, because the column count reads this number.
+      One pixel on each side whatever the state, because the grid reads this number to size a cover.
       Button:focus-visible gives every button 2 px, and on a card the brush stays this style's
-      Transparent, so the extra pixel drew nothing and grew the focused card by 2 px, pushing the rest
-      of its row along. Later in this file than that selector, so this one wins.
+      Transparent, so the extra pixel drew nothing and took 2 px out of the focused cover - a card
+      fills its cell, so what moves is the cover inside it. Later in this file than that selector, so
+      this one wins.
     -->
     <Setter Property="BorderThickness" Value="{DynamicResource PosterCardBorderThickness}" />
     <Setter Property="Padding" Value="{DynamicResource PosterCardPadding}" />

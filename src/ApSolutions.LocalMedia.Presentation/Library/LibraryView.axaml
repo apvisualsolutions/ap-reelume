@@ -13,6 +13,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:movie="clr-namespace:ApSolutions.LocalMedia.Presentation.Movie"
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="library:LibraryViewModel"
+    MinimumCover="{DynamicResource PosterCardWidth}"
+    Gutter="{DynamicResource DensityGutter}"
     automation:AutomationProperties.Name="{DynamicResource LibraryAccessibleName}">
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="CatalogResourceKey" />
@@ -426,12 +428,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
         LibraryView.axaml.cs measures this surface and tells the model how many fit. An ItemsControl
         rather than a ListBox because a row is not something to select: the card inside it is a
         button, which is what the keyboard reaches and what the walk presses.
+
+        That reflowed the grid and left its cards fixed; since 2026-09-11 they stretch too, which is
+        the other half of the prototype's auto-fill - see the surface below.
       -->
       <!--
         NegativePosterGutterX takes back the gutter the view's content is inset by, so the grid spans
         the view's full width and its first cover starts where the title starts. The columns are
         counted over this surface, which is exactly right: the padding outside the first and the last
         card is gutter, not room for another card.
+
+        The count reaches every row through PosterRowPanel.Columns, inherited from here: a row is a
+        template of a template, and a binding from inside it to the model finds the row's own
+        ItemsControl first.
       -->
       <ScrollViewer
           x:Name="LibraryGridSurface"
@@ -439,7 +448,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
           Margin="{DynamicResource NegativePosterGutterX}"
           HorizontalScrollBarVisibility="Disabled"
           IsVisible="{Binding !IsSearchWithoutResults}"
+          library:PosterRowPanel.Columns="{Binding Columns}"
           SizeChanged="OnGridSurfaceSizeChanged">
+        <!--
+          THE FLUID GRID, which is the prototype's: its tracks are minmax(148px, 1fr), so a cover is
+          never narrower than the chosen size and the row always fills. Here that is two resources
+          overridden for this surface and nothing under it. The card's width is NaN - automatic - so
+          each card takes its cell; its height is written by LibraryView.axaml.cs from the cell,
+          because a cover is 2:3 and Avalonia has no aspect-ratio property to say so. Home's rails
+          are not under this surface and keep the fixed card, and the count reads the chosen size
+          from the view, above this override.
+        -->
+        <ScrollViewer.Resources>
+          <x:Double x:Key="PosterCardWidth">NaN</x:Double>
+        </ScrollViewer.Resources>
         <ItemsControl
             ItemsSource="{Binding Rows}"
             automation:AutomationProperties.Name="{DynamicResource LibraryResultsListName}">
@@ -454,20 +476,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 No spacing here and no margin under the row: the card button's own 8 px padding is the
                 whole gap, 8 from one card and 8 from the next, horizontally and vertically alike.
                 One source for it is what lets the column count be arithmetic - a second gap on top
-                of the padding is a number the counting would have to know about, and the first
-                measurement of this grid got it wrong exactly there: eight columns were counted into
-                1352 px and the eighth was drawn 72 px past the edge.
+                of the padding is a number the counting would have to know about.
+
+                The row is a PosterRowPanel and not a StackPanel since 2026-09-11: it shares the row
+                out into equal cells with every edge on a pixel, the way the browser lays out the
+                prototype's tracks, and the card stretches across its cell. That is why the button
+                says Stretch here rather than in its style, which Home's rails share.
               -->
               <ItemsControl ItemsSource="{Binding}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
+                    <library:PosterRowPanel />
                   </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="library:CatalogItemViewModel">
                     <Button
                         Classes="poster-card"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
                         Click="OnCatalogItemClick"
                         automation:AutomationProperties.Name="{Binding Title}"
                         automation:AutomationProperties.HelpText="{Binding AvailabilityKey, Converter={StaticResource CatalogResourceKey}}">

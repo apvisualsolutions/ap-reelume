@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Xml.Linq;
+using ApSolutions.LocalMedia.Application.Catalog;
 using ApSolutions.LocalMedia.Application.Home;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Domain.Catalog;
@@ -11,7 +12,9 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Personalization;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Home;
+using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.Presentation.Navigation;
+using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.TestSupport;
 using Avalonia;
 using Avalonia.Controls;
@@ -269,6 +272,56 @@ public sealed class HomeLayoutTests
         Assert.Contains("Arrival", texts);
         Assert.Contains("2016", texts);
         Assert.Contains("Crónicas", texts);
+    }
+
+    /// <summary>
+    /// A recently added card keeps the declared cover after the library has laid out its fluid grid.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The library stretches its cards by overriding two resources on its own grid surface — the
+    /// width to automatic in its markup, the height in code each time it counts — and Home's rails
+    /// are not under that surface. Written anywhere wider, this card would take them. The width shows
+    /// on Home alone; the height only once a library has counted, which is why the shell shows the
+    /// library first and comes back, and why the library's own covers are measured at 233 before
+    /// Home is: without that, nothing here proves a height was ever written.
+    /// </para>
+    /// <para>
+    /// This rail and not the suggestions one, because that one wraps its card in a column of the same
+    /// width and would hide the width. Until the gate audit of 2026-09-11 this test mounted Home on
+    /// its own and asserted the width alone; writing the height into the application's resources
+    /// passed it.
+    /// </para>
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task A_recently_added_card_keeps_the_declared_cover_after_the_library_counts()
+    {
+        ApplyLanguage("es-ES");
+        var navigation = new NavigationService();
+        var home = await CreateViewModelWithRecentAsync(
+            new RecentlyAddedItem(Movie, CatalogTitleKind.Movie, "Arrival", 2016, true, Noon));
+        var library = new LibraryViewModel(new TwelveTitles());
+        await library.LoadAsync(TestContext.Current.CancellationToken);
+        var shell = new ShellView
+        {
+            DataContext = new ShellViewModel(navigation, new ShellSurfaces { Home = home, Library = library }),
+        };
+        var window = new Window { Width = 1500, Height = 1000, Content = shell };
+        window.Show();
+
+        navigation.Navigate(AppRoute.Library);
+        SettleShell(window);
+        var grid = shell.GetVisualDescendants().OfType<LibraryView>().Single();
+        var gridCover = CoverOf(grid.GetVisualDescendants().OfType<PosterCardView>().First());
+        Assert.Equal(233, gridCover.Bounds.Height, 2);
+
+        navigation.Navigate(AppRoute.Home);
+        SettleShell(window);
+        var rail = Assert.Single(shell.GetVisualDescendants().OfType<RecentlyAddedRailView>());
+        var card = Assert.Single(rail.GetVisualDescendants().OfType<PosterCardView>());
+        Assert.Equal(148, card.Bounds.Width);
+        Assert.Equal(222, CoverOf(card).Bounds.Height);
+        window.Close();
     }
 
     /// <summary>
@@ -627,6 +680,22 @@ public sealed class HomeLayoutTests
         return new ViewHost(window, view);
     }
 
+    /// <summary>A navigation moves a page in, and the grid on it counts and regroups in passes.</summary>
+    private static void SettleShell(Window window)
+    {
+        for (var pass = 0; pass < 3; pass++)
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.InvalidateMeasure();
+        }
+
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>The cover of a card: the rounded frame around its art, hairline included.</summary>
+    private static Border CoverOf(Visual card) =>
+        card.GetVisualDescendants().OfType<PosterArtView>().Single().GetVisualAncestors().OfType<Border>().First();
+
     private static Control Named(ViewHost host, string name) =>
         host.View.GetVisualDescendants()
             .OfType<Control>()
@@ -753,6 +822,24 @@ public sealed class HomeLayoutTests
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult<IReadOnlyList<RecommendationCandidate>>([]);
         }
+    }
+
+    /// <summary>A library of twelve films, enough to fill a row at 1500 px and start another.</summary>
+    private sealed class TwelveTitles : ICatalogQueryService
+    {
+        public Task<CatalogPage> QueryAsync(CatalogQuery query, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new CatalogPage(
+                [.. Enumerable.Range(0, 12).Select(index => new CatalogItem(
+                    new TitleId(Guid.Parse($"00000000-0000-0000-0000-{index:D12}")),
+                    CatalogTitleKind.Movie,
+                    string.Create(CultureInfo.InvariantCulture, $"Título {index}"),
+                    2000 + index,
+                    true,
+                    false,
+                    false,
+                    DateTimeOffset.UnixEpoch,
+                    null))],
+                null));
     }
 
     private sealed class StubHomeReadModel(HomeProgressEntry[] entries) : IHomeReadModel
