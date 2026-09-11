@@ -72,6 +72,37 @@ objeción allí.
 - `docs/design/ELEMENTS` pedía «siempre un glifo de estado» en la píldora de opción. Se corrige en los
   dos idiomas, con la razón.
 
+### Lo que la auditoría de puertas encontró el mismo día, y cómo se mide ahora
+
+El agente `gate-auditor` aplicó a estas puertas las mutaciones que deberían cazar. **Cuatro pasaban**,
+y las cuatro se vieron fallar con la puerta nueva antes de darla por buena:
+
+- **Un círculo dibujado como figura pasaba**: la prueba buscaba sólo el carácter. Una `Ellipse` de
+  10 px junto a «Claro» dejó las dos suites en verde. Ahora ninguna píldora puede tener una figura
+  dentro.
+- **El suelo de 27 tenía holgura**, porque el shell dibuja 30 y la cuenta encontraba 48 con las
+  vistas duplicadas. Una píldora escondida por el valor de reserva de un enlace seguía contando, con
+  su círculo dentro y sin que nadie lo mirara. Ahora la cuenta es exacta, 30, y cada píldora tiene
+  que estar en pantalla con su palabra.
+- **La fila de Apariencia nunca probó una instalación nueva**: Sistema, Cómoda y Suave no se
+  encendían nunca, y un indicador que respondía por otro tema pasaba. Ahora empieza ahí y enciende
+  las trece.
+- **Que toda píldora enlace el estilo de elegida se leía en el marcado, no en pantalla.** Intercambiar
+  los enlaces de Películas y Series, de las dos mitades del diálogo de añadir o de Audio y Vídeo en
+  el reproductor encendía la equivocada y nada fallaba. La disposición de audio tenía la misma forma:
+  exigía «exactamente una encendida», que es también lo que dan dos enlaces cruzados. Ahora cada
+  grupo se pulsa, píldora a píldora, y se nombra la que se enciende.
+
+**Y encontró un defecto real, sin mutar nada.** En Claro y Oscuro la aplicación no pinta el acento del
+diccionario: lo sustituye al arrancar por uno derivado del color elegido, y esa derivación sólo lo
+llevaba a 3:1 contra la página. Las píldoras están sobre tarjetas, y en Oscuro la tarjeta es más
+clara que la página: **tres de los seis acentos del prototipo pintaban el borde de la elegida por
+debajo de 3:1 sobre su tarjeta** —2,86 el verde y 2,78 el morado, medidos en píxeles, y 2,78 el
+marrón, calculado—, mientras `ContrastTokenTests` decía 7,61 leyendo un acento que en Oscuro no se
+pinta nunca. Ahora el acento y su tinta se derivan para leerse sobre
+la página y sobre la tarjeta; `AppearanceServiceTests` exige los seis en los dos temas contra las
+dos superficies, y nació roja con esos tres.
+
 ### Y la cobertura, que es la trampa de mover código otra vez
 
 Los círculos se llevaron **ramas cubiertas**. En `LibraryViewModel.cs` eso bajaba las ramas de 92 a
@@ -85,6 +116,11 @@ ficha del mismo tipo, pedir más sin cursor, fijar el filtro o el orden que ya s
 rechazan un valor ajeno y el cambio de idioma sin nadie escuchando. `LibraryViewModel.cs` y
 `AppearanceSettingsViewModel.cs` llegan al listón y **salen de la lista de deuda**, y el trinquete
 baja de 189 a **187**.
+
+**Una de esas pruebas no podía fallar en la mitad que importaba**, y la encontró la misma auditoría:
+«fijar el orden que ya se tiene no vuelve a consultar» corría sin haber cargado la página, y antes de
+la primera carga la consulta está apagada haga lo que haga el orden. Sacar la consulta de la guarda
+dejaba la prueba en verde. Ahora carga primero, y esa mutación la pone roja.
 
 ## English
 
@@ -144,6 +180,34 @@ there.
 - `docs/design/ELEMENTS` asked for «always a state glyph» on the option pill. It is corrected in both
   languages, with the reason.
 
+### What the gate audit found the same day, and how it is measured now
+
+The `gate-auditor` agent applied to these gates the mutations they should catch. **Four got
+through**, and all four were seen failing with the new gate before it was taken as good:
+
+- **A circle drawn as a shape got through**: the test only looked for the character. A 10 px
+  `Ellipse` beside «Claro» left both suites green. Now no pill may hold a shape.
+- **The floor of 27 had slack**, because the shell draws 30 and the count found 48 with the
+  duplicated views. A pill hidden by a binding's fallback value still counted, with its circle inside
+  and nobody looking. Now the count is exact, 30, and every pill has to be on screen with its word.
+- **The appearance row never tried a new installation**: System, Comfortable and Soft were never
+  lit, and a flag that answered for another theme passed. Now it starts there and lights all
+  thirteen.
+- **That every pill binds the chosen style was read in the markup, not on screen.** Swapping the
+  bindings of Movies and Series, of the add dialog's two halves, or of Audio and Video in the player
+  lit the wrong one and nothing failed. The audio layout had the same shape: it required «exactly one
+  lit», which is also what two crossed bindings give. Now every group is pressed, pill by pill, and
+  the one that lights is named.
+
+**And it found a real defect, without mutating anything.** In light and dark the application does not
+paint the dictionary's accent: it replaces it at start with one derived from the chosen colour, and
+that derivation only took it to 3:1 against the page. The pills sit on cards, and in dark a card is
+lighter than the page: **three of the prototype's six accents painted the chosen pill's border below
+3:1 on its card** — 2.86 the green and 2.78 the purple, measured in pixels, and 2.78 the brown,
+calculated — while `ContrastTokenTests` said 7.61 reading an accent that dark never paints. Now the accent and its ink are derived to read on the page and on
+the card; `AppearanceServiceTests` requires all six in both themes against both surfaces, and was
+born red with those three.
+
 ### And the coverage, which is the moving-code trap once more
 
 The circles took **covered branches** with them. In `LibraryViewModel.cs` that dropped branches from
@@ -157,3 +221,8 @@ the same kind, asking for more without a cursor, setting the filter or the order
 commands refusing a value that is not theirs, and the language changing with nobody listening.
 `LibraryViewModel.cs` and `AppearanceSettingsViewModel.cs` reach the bar and **leave the debt list**,
 and the ratchet goes from 189 to **187**.
+
+**One of those tests could not fail in the half that mattered**, and the same audit found it:
+«setting the order already held does not query again» ran without the page ever loading, and before
+the first load the query is off whatever the order does. Moving the query out of its guard left the
+test green. It now loads first, and that mutation turns it red.

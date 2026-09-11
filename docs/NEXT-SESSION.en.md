@@ -24,6 +24,13 @@
 >   the right margin — and under the keyboard the card grew another 2 px. Now the border is a token the
 >   style paints and the count adds. `LibraryView.axaml.cs` left the debt list (ratchet 186) by losing
 >   three guards on the card click that nothing could take.
+> · **The batch's gate audit (the `gate-auditor` agent)**: eight of today's tests measured less than
+>   they said — a circle drawn as a shape got through, the pill count had slack, the appearance row
+>   never tried a new installation, four groups of pills could cross their bindings, home and the
+>   first cover were not measured, and a query test never loaded the page. Now each one catches the
+>   mutation it let through, seen failing. **And a real defect**: in dark, three accents painted the
+>   chosen pill's border below 3:1 on its card; the accent is now derived against the page and the
+>   card.
 >
 > ### `main` and the branch
 >
@@ -89,6 +96,10 @@
 >   proportion, it was repeated without consulting the MCP, and it was false: that is rule 0.
 > · **The real application is not opened while the owner is working on that machine**: it steals their
 >   focus. Measure in the in-memory harness, and open the real window only with their permission.
+> · **«Exactly one lit» does not say which**: two crossed bindings also give one. Press every pill and
+>   name the one that lights.
+> · **A gate that reads the colour dictionary does not measure what is painted** when the program
+>   replaces it at start: in light and dark the accent is the one derived from the chosen colour.
 
 > ## READ THIS FIRST — 2026-09-06, closing: removing a folder really deletes, and the notice says how much
 >

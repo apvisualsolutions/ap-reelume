@@ -122,6 +122,14 @@ el modelo, en el arnés en memoria, y no en una captura**: la aplicación real s
 de quien trabaja en esa máquina, y el propietario pidió ese día que no se abriera. El «antes» sí está
 fotografiado, y su desbordamiento medido —9 px— es el que predice el modelo.
 
+**Y dos puertas de este documento medían menos de lo que decían**, según la auditoría de puertas del
+mismo día: `PageMarginTests` decía cubrir Inicio y lo descartaba —su página es una vista y no un
+panel—, así que devolver sus filas a 24 dejaba todo en verde; y la prueba de «la portada en la línea
+del título» corría sin biblioteca, sin tarjetas, midiendo sólo la superficie de la rejilla, de modo
+que mover todas las portadas 8 px a la derecha —el defecto que este trabajo quitó— también pasaba.
+Ahora mide las filas de Inicio y la bienvenida, y la portada real de una biblioteca con datos, que
+cae un borde dentro de la línea del título como la del prototipo. Las dos mutaciones se vieron fallar.
+
 Las puertas: `LibraryGridTests` lee el ancho de una tarjeta ya dibujada y la pone al límite de cinco,
 ocho y nueve columnas —un píxel antes y justo en él—; se vio fallar sin el borde en la cuenta («at 829
 px the grid counted 5 columns of cards 166 px wide, and 4 fit») y con el token a 0. Otra prueba exige
@@ -253,6 +261,14 @@ columns and no card passes the edge of the grid. **That last part is measured on
 in-memory harness, and not on a capture**: the real application opens on the desktop of whoever is
 working on that machine, and the owner asked that day for it not to be opened. The «before» is
 photographed, and its measured overflow — 9 px — is the one the model predicts.
+
+**And two gates in this document measured less than they said**, according to the same day's gate
+audit: `PageMarginTests` claimed to cover home and discarded it — its page is a view and not a panel
+— so putting its rows back at 24 left everything green; and the «cover on the title's line» test ran
+with no library, no cards, measuring only the grid's surface, so moving every cover 8 px to the right
+— the defect this work removed — also passed. It now measures home's rows and the welcome, and the
+real cover of a library with data, which lands one border inside the title's line as the
+prototype's does. Both mutations were seen failing.
 
 The gates: `LibraryGridTests` reads the width of a card already laid out and puts it at the edge of
 five, eight and nine columns — one pixel short and exactly on it; it was seen failing without the

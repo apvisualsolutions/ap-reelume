@@ -350,10 +350,12 @@ public sealed class AppearanceService : IAppearanceService
             return;
         }
 
-        // The page it will be drawn on, and nothing else. The focus ring was a third argument until
-        // 2026-08-28, when the nudge it fed was measured to move a colour by one byte and removed;
-        // the ring is a double one and reads as geometry, so it needs no help from the accent.
-        var tones = AccentPalette.Derive(accent, Colour("ShellSurfaceBrush"));
+        // The page it will be drawn on and the cards raised over it, and nothing else. The card joined
+        // on 2026-09-11: the chosen pills sit on cards, and in the dark theme a card is lighter than
+        // its page, so three presets drew that border under 3:1. The focus ring was an argument until
+        // 2026-08-28, when the nudge it fed was measured to move a colour by one byte and removed; the
+        // ring is a double one and reads as geometry, so it needs no help from the accent.
+        var tones = AccentPalette.Derive(accent, Colour("ShellSurfaceBrush"), Colour("CardSurfaceBrush"));
         foreach (var (key, tone) in AccentResourceKeys)
         {
             _application.Resources[key] = Brush(tone switch

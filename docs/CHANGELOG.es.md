@@ -299,6 +299,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **En tema oscuro, con tres de los seis colores de acento, el borde de la opción elegida no se
+  distinguía bien de su tarjeta**: se quedaba entre 2,78 y 2,86:1, por debajo del 3:1 que pide la
+  norma de accesibilidad. El programa ajusta cada acento para que se lea sobre la página, y las
+  opciones están sobre tarjetas, que en oscuro son más claras que la página. Ahora el acento y su
+  texto se ajustan para leerse sobre las dos. Lo encontró una auditoría de las propias comprobaciones
+  del programa: la que medía ese borde leía un color que en oscuro nunca se pinta.
+
 - **A 1600 px, la última portada de cada fila de la Biblioteca se metía 9 px en el margen derecho.**
   La rejilla cuenta cuántas tarjetas caben dividiendo por el ancho de la portada y su margen, y cada
   tarjeta lleva además un borde de 1 px a cada lado —el del prototipo, transparente y visible sólo al

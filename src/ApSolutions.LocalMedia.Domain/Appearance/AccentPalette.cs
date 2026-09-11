@@ -140,10 +140,28 @@ public static class AccentPalette
     /// picker.
     /// </para>
     /// </remarks>
-    public static AccentTones Derive(string accent, string surface)
+    public static AccentTones Derive(string accent, string surface) => Derive(accent, surface, surface);
+
+    /// <summary>
+    /// The family <paramref name="accent"/> becomes on <paramref name="page"/> and on the cards
+    /// raised over it, <paramref name="card"/>.
+    /// </summary>
+    /// <param name="accent">What the person picked, as <c>#RRGGBB</c>.</param>
+    /// <param name="page">The page, as <c>#RRGGBB</c>; it decides which way the walk goes.</param>
+    /// <param name="card">A card on that page, as <c>#RRGGBB</c>.</param>
+    /// <remarks>
+    /// The accent and its ink have to read on both, because the chosen pills and the rows they mark
+    /// sit on cards. The page alone was the whole question until 2026-09-11, and in the dark theme a
+    /// card is lighter than its page: three of the prototype's six drew the chosen pill's border at
+    /// 2,78 to 2,86:1 on its card, measured by a gate audit. The walk still ends by accepting — a card is
+    /// on the same side of <see cref="EqualContrastLuminance"/> as its page in every theme, so the
+    /// end of the scale that answers for one answers for the other.
+    /// </remarks>
+    public static AccentTones Derive(string accent, string page, string card)
     {
         var picked = Parse(accent);
-        var ground = Parse(surface);
+        var ground = Parse(page);
+        var raised = Parse(card);
         // Which way the walk goes is a fact about the page, not about the pick: on a light page
         // every readable accent is darker than it, and on a dark page every one is lighter. Deciding
         // it by comparing the two was measured wrong — #000033 is darker than the dark theme's own
@@ -158,14 +176,13 @@ public static class AccentPalette
         // a byte or two away in the bytes, which is close enough for every ratio here and not close
         // enough for the comparison below: a pick that <em>is</em> the focus ring came back not
         // equal to it, so the nudge that exists for exactly that case could never run.
-        var body = Contrast(picked, ground) >= ShapeMinimum
+        var body = ReadsOnBoth(picked, ShapeMinimum)
             ? picked
-            : Walk(hue, saturation, lightness, darker, candidate =>
-                Contrast(candidate, ground) >= ShapeMinimum);
+            : Walk(hue, saturation, lightness, darker, candidate => ReadsOnBoth(candidate, ShapeMinimum));
 
         var wash = Blend(body, ground, WashTowardsSurface);
         var ink = Walk(hue, saturation, ToHsl(body).L, darker, candidate =>
-            Contrast(candidate, ground) >= TextMinimum && Contrast(candidate, wash) >= TextMinimum);
+            ReadsOnBoth(candidate, TextMinimum) && Contrast(candidate, wash) >= TextMinimum);
 
         // White or black, whichever reads better on the accent — and one of them always does. A
         // colour light enough that white fails is dark enough for black to pass, and the two
@@ -175,6 +192,9 @@ public static class AccentPalette
         var text = Contrast(white, body) >= Contrast(black, body) ? white : black;
 
         return new AccentTones(Format(body), Format(wash), Format(ink), Format(text));
+
+        bool ReadsOnBoth((byte R, byte G, byte B) candidate, double minimum) =>
+            Contrast(candidate, ground) >= minimum && Contrast(candidate, raised) >= minimum;
     }
 
     /// <summary>The contrast ratio between two opaque colours, as WCAG defines it.</summary>

@@ -106,6 +106,52 @@ public sealed class PlayerPanelColumnTests
         window.Close();
     }
 
+    /// <summary>Every pill the session shows lights for its own panel and for no other.</summary>
+    /// <remarks>
+    /// The test above opens one panel, and the gate that said every pill binds its chosen style read
+    /// that the binding was written, not what it pointed at: a gate audit on 2026-09-11 swapped the
+    /// bindings of Audio and Vídeo in <c>ShellView</c>, the wrong one of the two lit up, and nothing
+    /// failed. Each pill is pressed here through its own command, as a click would, and closed again.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Every_pill_lights_for_its_own_panel_and_for_no_other()
+    {
+        var (window, view, _) = await ShowSessionAsync();
+        var pills = view.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(button => button.Classes.Contains("player-pill") && button.CommandParameter is PlayerPanel)
+            .Where(button => button.IsEffectivelyVisible)
+            .ToArray();
+        Assert.Equal(4, pills.Length);
+
+        foreach (var pill in pills)
+        {
+            pill.Command!.Execute(pill.CommandParameter);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal([Named(pill)], Lit(view));
+
+            pill.Command.Execute(pill.CommandParameter);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Empty(Lit(view));
+        }
+
+        window.Close();
+    }
+
+    private static string Named(Button pill) =>
+        $"{AutomationProperties.GetName(pill)} ({pill.CommandParameter}, visible={pill.IsEffectivelyVisible})";
+
+    /// <summary>
+    /// The column pills that are lit. Only those that open a panel: the audio panel carries pills of
+    /// its own — the output layout, whose chosen one is lit whenever that panel is open.
+    /// </summary>
+    private static string[] Lit(ShellView view) =>
+        [.. view.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(button => button.Classes.Contains("player-pill") && button.Classes.Contains("selected"))
+            .Where(button => button.CommandParameter is PlayerPanel)
+            .Select(Named)];
+
     [AvaloniaFact]
     public async Task The_audio_panel_holds_the_audio_tracks_and_the_output_and_the_subtitle_panel_the_rest()
     {

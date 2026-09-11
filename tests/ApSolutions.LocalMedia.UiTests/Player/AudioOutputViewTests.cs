@@ -286,6 +286,47 @@ public sealed class AudioOutputViewTests
         Assert.Equal(AudioChannelLayout.Surround51, viewModel.SelectedLayout);
     }
 
+    /// <summary>Each layout button lights for its own layout, and alone.</summary>
+    /// <remarks>
+    /// The test above asserts that exactly one of the three is lit, and one lit is also what two
+    /// swapped bindings produce: that is the shape a gate audit on 2026-09-11 found in three other
+    /// rows of pills, where the wrong pill lit and nothing failed. Here all three layouts can be
+    /// written, and each button is pressed through its own command, as a click would.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Each_layout_button_lights_for_its_own_layout()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current!, CultureInfo.GetCultureInfo("es-ES"));
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([Receiver]),
+            new FakeConfigurator([
+                AudioChannelLayout.Stereo,
+                AudioChannelLayout.Surround51,
+                AudioChannelLayout.Surround71,
+            ]));
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+        var view = new AudioOutputView { DataContext = viewModel };
+        var window = new Window { Width = 480, Height = 320, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var choices = view.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(button => button.Name is "AudioLayoutStereo" or "AudioLayoutSurround51" or "AudioLayoutSurround71")
+            .ToArray();
+        Assert.Equal(3, choices.Length);
+        foreach (var choice in choices)
+        {
+            Assert.True(choice.IsEnabled, $"{choice.Name} cannot be pressed, so its light proves nothing.");
+            choice.Command!.Execute(choice.CommandParameter);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal([choice.Name], choices.Where(button => button.Classes.Contains("selected")).Select(button => button.Name));
+        }
+
+        window.Close();
+    }
+
     /// <summary>
     /// With no endpoint chosen, nothing is on offer and nothing is claimed about writing it.
     /// </summary>

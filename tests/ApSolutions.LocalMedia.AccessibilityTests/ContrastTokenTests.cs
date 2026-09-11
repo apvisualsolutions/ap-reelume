@@ -314,6 +314,13 @@ public sealed class ContrastTokenTests
 
         // An edge nobody can see is not a cue: against every surface a pill sits on, in all four
         // themes. The shell is held a test above; the appearance rows and the add dialog are cards.
+        //
+        // In light and dark this reads the dictionaries' own accent, and the application does not
+        // paint it: AppearanceService replaces it at start with one derived from the chosen preset. A
+        // gate audit on 2026-09-11 measured the gap — this said 7,61:1 in dark while three presets drew
+        // the edge at 2,78 to 2,86:1 on the card. What is painted in those two themes is held by
+        // AppearanceServiceTests, every preset against the page and the card; this stays the check on
+        // the pairs as written, which is what the two high contrast themes do paint.
         var themes = LoadThemeBrushes();
         foreach (var theme in ThemeNames)
         {
@@ -326,7 +333,11 @@ public sealed class ContrastTokenTests
         }
 
         // And every pill in the tree binds the chosen class, so no row is left with no way to say
-        // which one is on. The floor keeps an empty sweep from passing for a clean one.
+        // which one is on. That the binding is WRITTEN is all this can see: which pill it lights is
+        // held where the pills are pressed — OptionPillTests, PlayerPanelColumnTests,
+        // ShellAssemblyTests, RootOnboardingViewTests and AudioOutputViewTests — since a gate audit on
+        // 2026-09-11 swapped three pairs of these bindings and this stayed green. The count is exact,
+        // the thirty the markup holds, so a pill added without being counted fails here first.
         var presentationRoot = System.IO.Path.Combine(
             RepositoryLayout.Root,
             "src",
@@ -337,7 +348,7 @@ public sealed class ContrastTokenTests
                     && (classes.Contains("theme-option") || classes.Contains("player-pill")))
                 .Select(element => (File: System.IO.Path.GetFileName(file), Element: element)))
             .ToArray();
-        Assert.True(pills.Length >= 27, $"only {pills.Length} option pills were found in the markup.");
+        Assert.Equal(30, pills.Length);
         Assert.Empty(pills
             .Where(pill => pill.Element.Attribute("Classes.selected") is null)
             .Select(pill => $"{pill.File}: {pill.Element.Attributes().FirstOrDefault(

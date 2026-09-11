@@ -24,6 +24,13 @@
 >   comía 9 px del margen derecho—, y con el foco del teclado la tarjeta crecía otros 2 px. Ahora el
 >   borde es un token que pinta el estilo y suma la cuenta. `LibraryView.axaml.cs` salió de la lista de
 >   deuda (trinquete 186) al quitar tres guardas del clic que nada podía tomar.
+> · **La auditoría de puertas de la tanda (agente `gate-auditor`)**: ocho pruebas de hoy medían menos
+>   de lo que decían —un círculo dibujado como figura pasaba, la cuenta de píldoras tenía holgura, la
+>   fila de Apariencia nunca probó una instalación nueva, cuatro grupos de píldoras podían cruzar sus
+>   enlaces, Inicio y la primera portada no se medían, y una prueba de consulta no cargaba la página—.
+>   Ahora cada una caza la mutación que dejaba pasar, vista fallar. **Y un defecto real**: en oscuro,
+>   tres acentos pintaban el borde de la elegida por debajo de 3:1 sobre su tarjeta; el acento se
+>   deriva ahora contra la página y la tarjeta.
 >
 > ### `main` y la rama
 >
@@ -91,6 +98,10 @@
 >   puede mantener una proporción, se repitió sin consultar el MCP, y era falso: es la regla 0.
 > · **La aplicación real no se abre mientras el propietario trabaja en esa máquina**: le roba el foco.
 >   Se mide en el arnés en memoria, y la ventana real sólo con su permiso.
+> · **«Exactamente una encendida» no dice cuál**: dos enlaces cruzados también dan una. Se pulsa cada
+>   píldora y se nombra la que se enciende.
+> · **Una puerta que lee el diccionario de colores no mide lo que se pinta** si el programa lo
+>   sustituye al arrancar: en Claro y Oscuro el acento es el derivado del color elegido.
 
 > ## AVISO AL FRENTE — 2026-09-06, cierre: retirar una carpeta borra de verdad, y el aviso dice cuánto
 >

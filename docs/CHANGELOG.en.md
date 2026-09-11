@@ -299,6 +299,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **In the dark theme, with three of the six accent colours, the chosen option's border did not
+  stand out enough from its card**: it stayed between 2.78 and 2.86:1, below the 3:1 the
+  accessibility standard asks for. The program adjusts every accent to read on the page, and the
+  options sit on cards, which in dark are lighter than the page. Now the accent and its text are
+  adjusted to read on both. It was found by an audit of the program's own checks: the one measuring
+  that border read a colour that dark never paints.
+
 - **At 1600 px, the last cover of every library row ran 9 px into the right margin.** The grid
   counts how many cards fit by dividing by the cover's width and its margin, and every card also
   carries a 1 px border on each side — the prototype's, transparent and seen only under the pointer —
