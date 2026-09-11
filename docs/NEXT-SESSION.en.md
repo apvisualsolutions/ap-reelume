@@ -70,7 +70,11 @@
 >   and both are false. It reaches every word: a batch of its own.
 > · **The horizontal half of the density** (column gaps of 10/16/22 against 8/16/32), **the filters at
 >   36 tall where the prototype puts 32**, the notices row that takes 12 px while empty with a comment
->   that says 0, and the card's hover in high contrast, deduced and unmeasured.
+>   that says 0.
+> · **And one that fell over when it was measured**: the card's hover in high contrast looked, from
+>   the Fluent template, as though it left the title white on white. In pixels it does not: the
+>   hover's background is painted by the presenter and not by the button, so in light it comes out as
+>   a black plate with the word in white, and in dark the opposite inversion. There is no defect.
 >
 > ### Blocked by something that is not code
 >

@@ -71,7 +71,11 @@
 >   14 px» y son falsos. Afecta a todo el texto: tanda propia.
 > · **La mitad horizontal de la densidad** (huecos de columna 10/16/22 contra 8/16/32), **los filtros
 >   a 36 de alto donde el prototipo pone 32**, la fila de avisos que ocupa 12 px vacía con un
->   comentario que dice 0, y el hover de la tarjeta en alto contraste, deducido y sin medir.
+>   comentario que dice 0.
+> · **Y uno que se cayó al medirlo**: el hover de la tarjeta en alto contraste parecía dejar el título
+>   blanco sobre blanco leyendo la plantilla Fluent. En píxeles no: el fondo del hover lo pinta el
+>   presenter y no el botón, así que en claro sale una placa negra con la palabra en blanco y en
+>   oscuro la inversión contraria. No hay defecto.
 >
 > ### Bloqueado por algo que no es código
 >

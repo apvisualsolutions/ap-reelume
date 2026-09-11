@@ -229,7 +229,13 @@ ensamblado y varias escriben el diccionario de recursos que todas comparten.
   cuenta de columnas.
 - **Los filtros miden 36 de alto donde el prototipo pone 32**, y la fila de avisos ocupa 12 px aunque
   esté vacía, con un comentario que dice 0.
-- **El hover de la tarjeta en alto contraste**, deducido de la plantilla Fluent y sin medir.
+Y uno que se registró y **resultó no serlo**, medido el mismo día: **el hover de la tarjeta en alto
+contraste**. Leyendo la plantilla Fluent parecía que el título se volvía blanco sobre una página
+blanca, porque su pincel pasa a `ControlTextActiveBrush` y el botón deja su `Background` en
+transparente. En píxeles no ocurre: la plantilla pinta el fondo en el **presenter**, no en el botón,
+así que en alto contraste claro el hover da una placa negra con la palabra en blanco —fila del
+título: el más oscuro pasa de 18 a 0 y el más claro sigue en 255— y en oscuro la inversión
+contraria. Sigue siendo legible; la deducción era falsa y la medición la descarta.
 
 ---
 
@@ -442,4 +448,11 @@ inside the assembly and several of them write the resource dictionary they all s
   column count.
 - **The filters are 36 tall where the prototype puts 32**, and the notices row takes 12 px even when
   it is empty, with a comment that says 0.
-- **The card's hover in high contrast**, deduced from the Fluent template and not measured.
+And one that was registered and **turned out not to be one**, measured the same day: **the card's
+hover in high contrast**. Reading the Fluent template it looked as though the title went white on a
+white page, because its brush becomes `ControlTextActiveBrush` and the button leaves its own
+`Background` transparent. In pixels it does not happen: the template paints the background on the
+**presenter** and not on the button, so in high contrast light the hover gives a black plate with the
+word in white — on the title's row the darkest pixel goes from 18 to 0 and the lightest stays at 255
+— and in dark the opposite inversion. It stays legible; the deduction was false and the measurement
+discards it.
