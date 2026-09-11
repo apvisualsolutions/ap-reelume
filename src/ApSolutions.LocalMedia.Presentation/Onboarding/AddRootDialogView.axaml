@@ -98,23 +98,19 @@ and never fed.
             LineSpacing="{DynamicResource Space8}">
           <Button
               Classes="theme-option"
+              Classes.selected="{Binding IsRoot}"
               automation:AutomationProperties.Name="{DynamicResource AddAsRootOption}"
               Command="{Binding SelectKindCommand}"
               CommandParameter="root">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding RootStateCue}" />
-              <TextBlock Text="{DynamicResource AddAsRootOption}" />
-            </StackPanel>
+            <TextBlock Text="{DynamicResource AddAsRootOption}" />
           </Button>
           <Button
               Classes="theme-option"
+              Classes.selected="{Binding IsCourse}"
               automation:AutomationProperties.Name="{DynamicResource AddAsCourseOption}"
               Command="{Binding SelectKindCommand}"
               CommandParameter="course">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding CourseStateCue}" />
-              <TextBlock Text="{DynamicResource AddAsCourseOption}" />
-            </StackPanel>
+            <TextBlock Text="{DynamicResource AddAsCourseOption}" />
           </Button>
         </WrapPanel>
       </StackPanel>

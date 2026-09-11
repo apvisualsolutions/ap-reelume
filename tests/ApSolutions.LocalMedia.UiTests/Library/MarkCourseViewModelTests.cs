@@ -31,8 +31,6 @@ public sealed class MarkCourseViewModelTests
 
         Assert.False(viewModel.IsCourse);
         Assert.True(viewModel.IsRoot);
-        Assert.Equal("●", viewModel.RootStateCue);
-        Assert.Equal("○", viewModel.CourseStateCue);
         Assert.Equal("AddRootDialogTitle", viewModel.TitleKey);
         Assert.Equal("RootOnboardingDescription", viewModel.HelpKey);
         Assert.Equal("RootAddAction", viewModel.ConfirmKey);
@@ -53,8 +51,6 @@ public sealed class MarkCourseViewModelTests
 
         Assert.True(viewModel.IsCourse);
         Assert.False(viewModel.IsRoot);
-        Assert.Equal("○", viewModel.RootStateCue);
-        Assert.Equal("●", viewModel.CourseStateCue);
         Assert.Equal("AddCourseTitle", viewModel.TitleKey);
         Assert.Equal("AddCourseHelp", viewModel.HelpKey);
         Assert.Equal("AddCourseConfirmAction", viewModel.ConfirmKey);

@@ -127,6 +127,40 @@ public sealed class LibraryNavigationTests
         Assert.Equal(2, announcements);
     }
 
+    /// <summary>
+    /// A second card of the same kind changes the card and not the page, and the page after the last
+    /// one is never asked for.
+    /// </summary>
+    /// <remarks>
+    /// Two halves of this model no test reached until 2026-09-11, when taking the pills' circles out
+    /// removed two covered branches from this file and left its percentage under the floor CI holds
+    /// it to. The answer is the house's: cover, never lower. The page staying put is counted by the
+    /// Back announcements, which move only when the page does.
+    /// </remarks>
+    [Fact]
+    public async Task A_second_card_of_the_same_kind_keeps_the_page_and_the_last_page_asks_for_nothing()
+    {
+        var queryService = new RecordingQueryService(new CatalogPage(
+            [Item(1, CatalogTitleKind.Movie, "Arrival"), Item(2, CatalogTitleKind.Movie, "Heat")],
+            null));
+        var viewModel = new LibraryViewModel(queryService);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        var announcements = 0;
+        viewModel.BackCommand.CanExecuteChanged += (_, _) => announcements++;
+
+        viewModel.OpenDetails(viewModel.Items[0]);
+        viewModel.OpenDetails(viewModel.Items[1]);
+
+        Assert.Equal(LibrarySurface.MovieDetails, viewModel.Surface);
+        Assert.Equal(viewModel.Items[1], viewModel.SelectedItem);
+        Assert.Equal(1, announcements);
+
+        // The first page came back with no cursor, so there is no second one to fetch.
+        await viewModel.LoadMoreAsync(TestContext.Current.CancellationToken);
+        Assert.Single(queryService.Queries);
+        Assert.False(viewModel.HasMore);
+    }
+
     [AvaloniaFact]
     public async Task Library_renders_virtualized_bilingual_snapshots()
     {

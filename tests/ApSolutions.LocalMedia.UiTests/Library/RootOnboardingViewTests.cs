@@ -26,33 +26,31 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 /// </remarks>
 public sealed class RootOnboardingViewTests
 {
-    private const string Filled = "\u25CF";
-    private const string Hollow = "\u25CB";
-
     /// <summary>
     /// Pressing a kind changes the screen, which is what it did not do.
     /// </summary>
     /// <remarks>
     /// Nothing read <c>SelectedKind</c>: three buttons set it and no view painted it, so all three
     /// looked identical whichever was pressed. The field starts at <c>Local</c>, so there was not
-    /// even an empty moment to make the absence obvious - which is why this asserts the circle moves
-    /// rather than that one exists.
+    /// even an empty moment to make the absence obvious - which is why this asserts the chosen pill
+    /// moves rather than that one exists. It asserted a circle until 2026-09-11, when the circles
+    /// came off every pill and the chosen style became what says it, as the prototype draws it.
     /// </remarks>
     [AvaloniaFact]
-    public void The_chosen_kind_is_the_only_one_wearing_the_filled_circle()
+    public void The_chosen_kind_is_the_only_pill_painted_as_chosen()
     {
         var model = Create();
         using var scope = Mount(model);
 
-        Assert.Equal([Filled, Hollow, Hollow], scope.Cues());
+        Assert.Equal([true, false, false], scope.Chosen());
 
         model.SelectedKind = RootKind.Usb;
         Dispatcher.UIThread.RunJobs();
-        Assert.Equal([Hollow, Filled, Hollow], scope.Cues());
+        Assert.Equal([false, true, false], scope.Chosen());
 
         model.SelectKindCommand.Execute(RootKind.Unc);
         Dispatcher.UIThread.RunJobs();
-        Assert.Equal([Hollow, Hollow, Filled], scope.Cues());
+        Assert.Equal([false, false, true], scope.Chosen());
     }
 
     /// <summary>
@@ -184,10 +182,12 @@ public sealed class RootOnboardingViewTests
             Dispatcher.UIThread.RunJobs();
         }
 
-        /// <summary>The three kind circles, in the order the markup declares them.</summary>
-        internal string[] Cues() =>
+        /// <summary>Which of the three kind pills is painted as chosen, in the order the markup declares them.</summary>
+        internal bool[] Chosen() =>
         [
-            .. Blocks().Where(block => block.Classes.Contains("state-glyph")).Select(block => block.Text ?? string.Empty),
+            .. _view.GetVisualDescendants().OfType<Button>()
+                .Where(button => button.Classes.Contains("theme-option"))
+                .Select(button => button.Classes.Contains("selected")),
         ];
 
         internal TextBlock[] Blocks() => [.. _view.GetVisualDescendants().OfType<TextBlock>()];

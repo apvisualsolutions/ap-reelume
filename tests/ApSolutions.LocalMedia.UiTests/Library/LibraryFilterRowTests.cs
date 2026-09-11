@@ -86,28 +86,49 @@ public sealed class LibraryFilterRowTests
     }
 
     [Fact]
-    public void Each_pill_cues_its_own_selection_and_Todo_covers_both_spellings_of_everything()
+    public void Each_pill_says_its_own_selection_and_Todo_covers_both_spellings_of_everything()
     {
         var viewModel = new LibraryViewModel(new RecordingQueryService(new CatalogPage([], null)));
 
-        Assert.True(viewModel.IsEveryKind);
-        Assert.Equal("●", viewModel.EveryKindStateCue);
-        Assert.Equal("○", viewModel.MoviesOnlyStateCue);
-        Assert.Equal("○", viewModel.ShowsOnlyStateCue);
+        Assert.Equal([true, false, false], Kinds(viewModel));
 
         viewModel.TypeFilter = CatalogFilter.Movie;
-        Assert.True(viewModel.IsMoviesOnly);
-        Assert.False(viewModel.IsEveryKind);
-        Assert.Equal("●", viewModel.MoviesOnlyStateCue);
+        Assert.Equal([false, true, false], Kinds(viewModel));
 
         viewModel.TypeFilter = CatalogFilter.Show;
-        Assert.True(viewModel.IsShowsOnly);
-        Assert.Equal("●", viewModel.ShowsOnlyStateCue);
+        Assert.Equal([false, false, true], Kinds(viewModel));
 
         // Both kind bits at once is "everything" too: the mask spelling of Todo.
         viewModel.TypeFilter = CatalogFilter.Movie | CatalogFilter.Show;
-        Assert.True(viewModel.IsEveryKind);
+        Assert.Equal([true, false, false], Kinds(viewModel));
     }
+
+    /// <summary>
+    /// Setting the filters or the order the page already holds announces nothing, so nothing drawn
+    /// from them is asked to redraw — the kind pills among them — and no query runs again.
+    /// </summary>
+    [Fact]
+    public void Setting_what_the_page_already_holds_announces_nothing()
+    {
+        var service = new RecordingQueryService(new CatalogPage([], null));
+        var viewModel = new LibraryViewModel(service)
+        {
+            Filters = CatalogFilter.Movie | CatalogFilter.Available,
+            Sort = CatalogSort.Year,
+        };
+        var announced = new List<string?>();
+        viewModel.PropertyChanged += (_, args) => announced.Add(args.PropertyName);
+
+        viewModel.Filters = CatalogFilter.Movie | CatalogFilter.Available;
+        viewModel.Sort = CatalogSort.Year;
+
+        Assert.Empty(announced);
+        Assert.Empty(service.Queries);
+    }
+
+    /// <summary>The three flags the three kind pills paint as chosen, in the order they are drawn.</summary>
+    private static bool[] Kinds(LibraryViewModel viewModel) =>
+        [viewModel.IsEveryKind, viewModel.IsMoviesOnly, viewModel.IsShowsOnly];
 
     [Fact]
     public async Task An_empty_grid_is_the_library_or_the_search_and_never_both()

@@ -85,8 +85,6 @@ public sealed class MarkCourseViewModel : INotifyPropertyChanged
             if (SetField(ref _isCourse, value))
             {
                 OnPropertyChanged(nameof(IsRoot));
-                OnPropertyChanged(nameof(RootStateCue));
-                OnPropertyChanged(nameof(CourseStateCue));
                 OnPropertyChanged(nameof(TitleKey));
                 OnPropertyChanged(nameof(HelpKey));
                 OnPropertyChanged(nameof(ConfirmKey));
@@ -95,12 +93,11 @@ public sealed class MarkCourseViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// The root half of the choice, which the dialog's first pill paints as chosen. The two pills
+    /// said it with a circle beside the word until 2026-09-11, and the circle was all they had.
+    /// </summary>
     public bool IsRoot => !IsCourse;
-
-    /// <summary>The circle this repository uses for "chosen", and the one it uses for "not".</summary>
-    public string RootStateCue => IsCourse ? "○" : "●";
-
-    public string CourseStateCue => IsCourse ? "●" : "○";
 
     /// <summary>
     /// What the dialog calls itself, what it explains, and what its one action says — as resource

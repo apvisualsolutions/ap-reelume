@@ -180,8 +180,8 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
     /// The three buttons that set this painted nothing back: no view read the property, so the kind
     /// was chosen and the screen looked identical whichever one was pressed - and it starts at
     /// <c>Local</c>, so there was never even a moment with nothing selected to make the absence
-    /// obvious. The three cues below are what the buttons now show, the same way the theme and
-    /// language pills already do it.
+    /// obvious. The three flags below are what the buttons now show: the chosen pill's own border
+    /// and fill, since 2026-09-11, where it used to be a circle beside the word.
     /// </remarks>
     public RootKind SelectedKind
     {
@@ -189,19 +189,19 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         set
         {
             SetField(ref _selectedKind, value);
-            OnPropertyChanged(nameof(LocalStateCue));
-            OnPropertyChanged(nameof(UsbStateCue));
-            OnPropertyChanged(nameof(UncStateCue));
+            OnPropertyChanged(nameof(IsLocalKind));
+            OnPropertyChanged(nameof(IsUsbKind));
+            OnPropertyChanged(nameof(IsUncKind));
             OnPropertyChanged(nameof(DetectedKindKey));
             OnPropertyChanged(nameof(DetectedKindHintKey));
         }
     }
 
-    public string LocalStateCue => StateCue(RootKind.Local);
+    public bool IsLocalKind => SelectedKind == RootKind.Local;
 
-    public string UsbStateCue => StateCue(RootKind.Usb);
+    public bool IsUsbKind => SelectedKind == RootKind.Usb;
 
-    public string UncStateCue => StateCue(RootKind.Unc);
+    public bool IsUncKind => SelectedKind == RootKind.Unc;
 
     public ScanPolicy SelectedScanPolicy
     {
@@ -470,9 +470,6 @@ public sealed class RootOnboardingViewModel : INotifyPropertyChanged
         InitialScanConsentRequired = false;
         CanStartInitialScan = true;
     }
-
-    /// <summary>The circle this repository uses for "chosen", and the one it uses for "not".</summary>
-    private string StateCue(RootKind kind) => SelectedKind == kind ? "●" : "○";
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {

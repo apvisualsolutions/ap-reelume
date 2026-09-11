@@ -818,12 +818,6 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsLessonsPanelOpen));
                 OnPropertyChanged(nameof(IsPlayerPanelOpen));
                 OnPropertyChanged(nameof(IsPlayerColumnVisible));
-                OnPropertyChanged(nameof(AudioPanelStateCue));
-                OnPropertyChanged(nameof(SubtitlePanelStateCue));
-                OnPropertyChanged(nameof(VideoPanelStateCue));
-                OnPropertyChanged(nameof(MarkerPanelStateCue));
-                OnPropertyChanged(nameof(VersionsPanelStateCue));
-                OnPropertyChanged(nameof(LessonsPanelStateCue));
                 _closePlayerPanel.RaiseCanExecuteChanged();
             }
         }
@@ -843,29 +837,6 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     /// <summary>Whether the column takes its 320 px at all.</summary>
     public bool IsPlayerPanelOpen => _playerPanel is not PlayerPanel.None;
-
-    /// <summary>
-    /// The glyph each pill carries beside its name, saying whether its panel is the open one.
-    /// </summary>
-    /// <remarks>
-    /// The same pair the library's kind filter and the appearance pills already spend, for the same
-    /// measured reason: in either high contrast dictionary AccentSubtleBrush and the resting fill
-    /// resolve to the same white or the same black, so a pill that said "open" in colour alone would
-    /// say nothing at all there.
-    /// </remarks>
-    public string AudioPanelStateCue => Cue(IsAudioPanelOpen);
-
-    public string SubtitlePanelStateCue => Cue(IsSubtitlePanelOpen);
-
-    public string VideoPanelStateCue => Cue(IsVideoPanelOpen);
-
-    public string MarkerPanelStateCue => Cue(IsMarkerPanelOpen);
-
-    public string VersionsPanelStateCue => Cue(IsVersionsPanelOpen);
-
-    public string LessonsPanelStateCue => Cue(IsLessonsPanelOpen);
-
-    private static string Cue(bool selected) => selected ? "●" : "○";
 
     /// <summary>
     /// The badge beside the title: which session this is, and that only one engine is ever running.

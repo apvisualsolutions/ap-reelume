@@ -47,8 +47,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Text="{Binding Path}" />
       </StackPanel>
       <!--
-        A WrapPanel with a state circle on each, which is exactly what the theme and language pills
-        already are. Two things were wrong with three plain buttons in a horizontal stack.
+        A WrapPanel of option pills, the chosen one painted by theme-option.selected, which is exactly
+        what the theme and language pills are. Each carried a state circle beside its word until
+        2026-09-11, and the circle was the only thing that said which kind was chosen: no pill here
+        bound the chosen style. Two things were wrong with three plain buttons in a horizontal stack.
 
         Nothing read SelectedKind: the command set it, no view painted it, and the field starts at
         Local - so pressing USB changed the screen in no way at all, and there was never even an
@@ -63,33 +65,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
         <Button
             Classes="theme-option"
+            Classes.selected="{Binding IsLocalKind}"
             automation:AutomationProperties.Name="{DynamicResource RootKindLocal}"
             Command="{Binding SelectKindCommand}"
             CommandParameter="{x:Static discovery:RootKind.Local}">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding LocalStateCue}" />
-            <TextBlock Text="{DynamicResource RootKindLocal}" />
-          </StackPanel>
+          <TextBlock Text="{DynamicResource RootKindLocal}" />
         </Button>
         <Button
             Classes="theme-option"
+            Classes.selected="{Binding IsUsbKind}"
             automation:AutomationProperties.Name="{DynamicResource RootKindUsb}"
             Command="{Binding SelectKindCommand}"
             CommandParameter="{x:Static discovery:RootKind.Usb}">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding UsbStateCue}" />
-            <TextBlock Text="{DynamicResource RootKindUsb}" />
-          </StackPanel>
+          <TextBlock Text="{DynamicResource RootKindUsb}" />
         </Button>
         <Button
             Classes="theme-option"
+            Classes.selected="{Binding IsUncKind}"
             automation:AutomationProperties.Name="{DynamicResource RootKindUnc}"
             Command="{Binding SelectKindCommand}"
             CommandParameter="{x:Static discovery:RootKind.Unc}">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-            <TextBlock Classes="state-glyph" Text="{Binding UncStateCue}" />
-            <TextBlock Text="{DynamicResource RootKindUnc}" />
-          </StackPanel>
+          <TextBlock Text="{DynamicResource RootKindUnc}" />
         </Button>
       </WrapPanel>
       <!--
