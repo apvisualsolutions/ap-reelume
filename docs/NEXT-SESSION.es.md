@@ -1,5 +1,78 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-11: la cobertura cerrada, las píldoras sin círculo y el margen del prototipo
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+>
+> ### Lo que se cerró
+>
+> · **La puerta de cobertura que el 06 dejó roja por diseño.** El lector de la retirada tenía seis de
+>   ocho ramas en una guarda contra un NULL que tres agregados sin `GROUP BY` no pueden devolver; se
+>   quitó y queda en 100/100, con una prueba de carpeta vacía que falla si desaparece el `COALESCE`.
+>   **La limpieza de portadas del disco sólo la ejecutaba el paseo**: tiene prueba propia. `main`
+>   avanzó a ese commit con el verde leído — lo primero que llegaba a `main` en cinco días.
+> · **FsCheck 3.4.0**, la PR de Dependabot que llevaba diecinueve días sin registrar.
+> · **Las 27 píldoras de opción sin círculo**, a petición del propietario («aparece el selector del
+>   radial»). En 18 era la única señal; ahora la elegida lleva borde, relleno y semi-negrita en las
+>   27, como el prototipo en todos sus temas. La puerta de contraste mide ese borde en los cuatro.
+> · **El margen de página del prototipo en todos los destinos**: `padding:28px 32px 48px` como
+>   `PageMargin`, dentro de cada `ScrollViewer`; la portada en la línea del título con la técnica de
+>   la baldosa del prototipo (`padding:8px; margin:-8px`). Medido en píxeles: 32 donde había 48 y 56.
+>
+> ### `main` y la rama
+>
+> Cada fast-forward se hace **con la conclusión leída y nombrando el SHA**, nunca `HEAD`. Si al leer
+> esto `main` no coincide con la rama, el run del commit de cabeza es el que decide: `gh run list
+> --commit <sha de cabeza>`.
+>
+> ### Decisiones tomadas y NO ejecutadas
+>
+> · **Los 42 defectos de paridad, en el orden del propietario.** Sigue la sección «Biblioteca y
+>   escaneo» de Ajustes —cuántos elementos tiene cada raíz, «Escanear al iniciar», «Ignorar muestras
+>   y extras», la fila «Raíces de medios · N», la conmutación que cambió de nombre y las palabras de
+>   los distintivos y del botón de retirar—, y después ficha de película, atajos, editor,
+>   actualizaciones, **índice de Ajustes** (su columna de secciones empieza en 610 donde el prototipo
+>   la pone en 330), subtítulos, copias, privacidad, cursos y detección de segmentos. **El margen no
+>   era uno de los 42**, así que la cuenta sigue en 42.
+> · **La cifra de duración de un run**, decisión del propietario que sigue abierta (ver abajo, en el
+>   aviso del 06).
+>
+> ### Registrado y sin hacer
+>
+> · En la hoja de ruta: **el vigilante que sigue vivo tras retirar una carpeta** y **el escombro de
+>   las retiradas anteriores al 06** (sólo puede estar en bases de desarrollo: no hay versión
+>   publicada).
+> · Propuesta como tarea de fondo: que `preview-coverage-floors.ps1` avise también de los suelos que
+>   BAJAN, que hoy calla.
+> · **Una escena del paseo falló una vez en CI y puede ser un defecto real**: al cambiar de versión y
+>   elegir «Empezar de nuevo», la posición guardada fue 1:00 en vez de 0 (1:00 es la duración entera
+>   de la versión corta). Fue en la pasada instrumentada del commit del margen; el mismo commit la pasó
+>   dos veces en la puerta de accesibilidad y 8 de 8 en local, y no había fallado en ninguno de los
+>   cuarenta runs rojos desde el 28 de agosto. Se relanzó el trabajo con los artefactos ya bajados, y
+>   queda como tarea de fondo: **si se repite, es una carrera y alguien que empieza de nuevo podría
+>   encontrar su punto de reanudación en otro sitio**.
+>
+> ### Bloqueado por algo que no es código
+>
+> · `PRD-002`: el certificado comercial de firma. Es una compra.
+> · **El segundo cerebro responde pero su búsqueda semántica falla** (el servicio de vectores no
+>   conecta; la búsqueda por texto sí va). Es de la sesión de IT.
+>
+> ### Trampas medidas hoy
+>
+> · **La previsualización de cobertura sólo avisa de suelos que suben.** Quitar código cubierto bajó
+>   `LibraryViewModel` de 92 a 91 y no lo habría dicho: la cifra se reconstruyó con el Cobertura de
+>   CI como base. Y un archivo que sube sin llegar a 96 también es rojo: se llevó al listón.
+> · **Una compensación negativa que saca un control de su vista la rechaza `ViewOverflowTests`**, y
+>   con razón. La salida es meter el contenido de la vista y sacar la vista desde su anfitrión.
+> · **Las secciones de Ajustes van centradas en su columna**: tocarles un solo lado las descuadra.
+> · **`CrashResumeTests` falla en local si corre instrumentada y con la máquina cargada**; sola pasa.
+> · **No se muta el código con una suite corriendo en segundo plano**: la que compila después puede
+>   meter el binario mutado en su medición.
+> · **`replace_all` puede pegar atributos** si la cadena buscada acaba en espacio y la nueva no:
+>   se comprueba con un grep después.
+
 > ## AVISO AL FRENTE — 2026-09-06, cierre: retirar una carpeta borra de verdad, y el aviso dice cuánto
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main` y

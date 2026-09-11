@@ -1,5 +1,76 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-11: coverage closed, pills without a circle and the prototype's margin
+>
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here.
+>
+> ### What was closed
+>
+> · **The coverage gate the 6th left red by design.** The removal reader had six of eight branches in
+>   a guard against a NULL that three aggregates without `GROUP BY` cannot return; it was removed and
+>   the file is at 100/100, with an empty-folder test that fails if the `COALESCE` goes. **Deleting
+>   covers from disk was only ever run by the walk**: it has a test of its own. `main` moved to that
+>   commit with the green read — the first thing to reach `main` in five days.
+> · **FsCheck 3.4.0**, the Dependabot PR that had sat unregistered for nineteen days.
+> · **The 27 option pills without a circle**, at the owner's word («the radio selector shows up»). In
+>   18 it was the only signal; now the chosen one carries border, fill and semi-bold on all 27, as the
+>   prototype does in every theme. The contrast gate measures that border in all four.
+> · **The prototype's page margin on every destination**: `padding:28px 32px 48px` as `PageMargin`,
+>   inside each `ScrollViewer`; the cover on the title's line with the prototype's tile technique
+>   (`padding:8px; margin:-8px`). Measured in pixels: 32 where there were 48 and 56.
+>
+> ### `main` and the branch
+>
+> Every fast-forward is made **with the conclusion read and naming the SHA**, never `HEAD`. If `main`
+> does not match the branch when you read this, the head commit's run decides: `gh run list
+> --commit <head sha>`.
+>
+> ### Decisions taken and NOT carried out
+>
+> · **The 42 parity defects, in the owner's order.** Next is the settings «Library and scanning»
+>   section — how many items each root holds, «Scan at start», «Ignore samples and extras», the
+>   «Media roots · N» row, the toggle that changed name, and the words on the badges and on the remove
+>   button — then the movie card, shortcuts, editor, updates, **the settings index** (its section column
+>   starts at 610 where the prototype puts it at 330), subtitles, backups, privacy, courses and segment
+>   detection. **The margin was not one of the 42**, so the count stays at 42.
+> · **The run-duration figure**, the owner's decision, still open (see below, in the notice of the 6th).
+>
+> ### Registered and not done
+>
+> · In the roadmap: **the watcher that stays alive after a folder is removed** and **the debris of
+>   removals before the 6th** (it can only exist in development databases: nothing was published).
+> · Proposed as a background task: making `preview-coverage-floors.ps1` warn about floors that DROP,
+>   which it keeps quiet about today.
+> · **A walk scene failed once in CI and may be a real defect**: after switching version and choosing
+>   «Start over», the stored position was 1:00 instead of 0 (1:00 is the short version's whole
+>   length). It happened in the margin commit's instrumented pass; the same commit passed it twice in
+>   the accessibility gate and 8 of 8 locally, and it had not failed in any of the forty red runs since
+>   28 August. The job was rerun with the artefacts already downloaded, and it stays as a background
+>   task: **if it repeats, it is a race, and somebody who starts over could find their resume point
+>   somewhere else**.
+>
+> ### Blocked by something that is not code
+>
+> · `PRD-002`: the commercial signing certificate. It is a purchase.
+> · **The second brain answers but its semantic search fails** (the vector service does not connect;
+>   text search works). It belongs to the IT session.
+>
+> ### Traps measured today
+>
+> · **The coverage preview only warns about floors that rise.** Removing covered code dropped
+>   `LibraryViewModel` from 92 to 91 and it would not have said so: the figure was rebuilt from CI's
+>   Cobertura as the baseline. And a file that rises without reaching 96 is red too: it was taken to
+>   the bar.
+> · **A negative offset that pulls a control out of its view is refused by `ViewOverflowTests`**, and
+>   rightly. The way out is to inset the view's content and pull the view out from its host.
+> · **The settings sections are centred in their column**: touching one side sets them apart.
+> · **`CrashResumeTests` fails locally when run instrumented on a loaded machine**; alone it passes.
+> · **Do not mutate code with a suite running in the background**: the one that builds next can take
+>   the mutated binary into its measurement.
+> · **`replace_all` can glue attributes** when the searched string ends in a space and the new one does
+>   not: check with a grep afterwards.
+
 > ## READ THIS FIRST — 2026-09-06, closing: removing a folder really deletes, and the notice says how much
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main` and
