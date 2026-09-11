@@ -17,7 +17,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <UserControl.Resources>
     <home:ResourceKeyConverter x:Key="CatalogResourceKey" />
   </UserControl.Resources>
-  <Grid>
+  <!--
+    Everything here sits one card gutter in from the view's edge, and the grid of cards takes it back
+    (LibraryGridSurface), so a cover starts on the same line as the title and the filters: the
+    prototype's tile is `padding:8px; margin:-8px` for exactly that. The page places this view one
+    gutter out in turn, so the title lands on the page's 32 px and nothing reaches outside the view.
+  -->
+  <Grid Margin="{DynamicResource PosterGutterX}">
     <Grid IsVisible="{Binding IsBrowsing}" RowDefinitions="Auto,Auto,Auto,*,Auto">
       <!--
         The prototype's header is one line: the name, how many are under it, and the search box against
@@ -421,9 +427,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
         rather than a ListBox because a row is not something to select: the card inside it is a
         button, which is what the keyboard reaches and what the walk presses.
       -->
+      <!--
+        NegativePosterGutterX takes back the gutter the view's content is inset by, so the grid spans
+        the view's full width and its first cover starts where the title starts. The columns are
+        counted over this surface, which is exactly right: the padding outside the first and the last
+        card is gutter, not room for another card.
+      -->
       <ScrollViewer
           x:Name="LibraryGridSurface"
           Grid.Row="3"
+          Margin="{DynamicResource NegativePosterGutterX}"
           HorizontalScrollBarVisibility="Disabled"
           IsVisible="{Binding !IsSearchWithoutResults}"
           SizeChanged="OnGridSurfaceSizeChanged">

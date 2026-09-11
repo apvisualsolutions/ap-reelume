@@ -352,7 +352,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Grid
         Grid.Row="1"
         Grid.Column="1"
-        Margin="48"
+        Margin="{DynamicResource PageMargin}"
         IsVisible="{Binding IsPrimaryContentVisible}"
         RowDefinitions="Auto,Auto,*">
       <TextBlock
@@ -421,7 +421,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
         RowDefinitions="Auto,Auto,*"
         IsVisible="{Binding IsSettingsVisible}">
       <TextBlock
-          Margin="48,32,48,0"
+          Margin="32,28,32,0"
           FontSize="{DynamicResource FontSizeTitle}"
           FontWeight="SemiBold"
           Foreground="{DynamicResource TextPrimaryBrush}"
@@ -432,7 +432,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             x:Name="SettingsIndex"
             Classes="side-list"
             MinWidth="200"
-            Margin="48,24,0,24"
+            Margin="32,24,0,24"
             VerticalAlignment="Top"
             SelectedValue="{Binding CurrentSettingsSection}"
             SelectedValueBinding="{ReflectionBinding Tag}"
@@ -588,7 +588,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
-        Margin="48"
         IsVisible="{Binding IsLibraryListVisible}">
       <!--
         The bottom margin is a control's right to be pressed. Measured on 2026-08-22 in the walk's
@@ -600,12 +599,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
         A stack whose last child ends flush with the viewport edge is one layout change away from
         this every time; the folder panel above it grew by 25 px and that was the whole distance.
+
+        Since 2026-09-11 that room is the page's own bottom, 48 of PageMargin, and the page sits
+        INSIDE the ScrollViewer rather than around it - the prototype's single scrolling container
+        with `padding:28px 32px 48px`. It was Margin="48" on the ScrollViewer plus 24 here.
       -->
-      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
+      <StackPanel Margin="{DynamicResource PageMargin}" Spacing="{DynamicResource Space24}">
         <ContentControl IsVisible="{Binding ShowsOnboarding}">
           <onboarding:RootOnboardingView DataContext="{Binding Onboarding}" />
         </ContentControl>
-        <library:LibraryView DataContext="{Binding Library}" />
+        <library:LibraryView DataContext="{Binding Library}" Margin="{DynamicResource NegativePosterGutterX}" />
         <!--
           The three title tools used to be here, under the library: a row of buttons acting on a card
           that might not even be open. They moved into the cards themselves on 2026-08-25, which is
@@ -620,9 +623,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
-        Margin="48"
         IsVisible="{Binding IsEditorVisible}">
-      <StackPanel Margin="0,0,0,24" MaxWidth="1080" HorizontalAlignment="Left" Spacing="{DynamicResource Space16}">
+      <StackPanel Margin="{DynamicResource PageMargin}" MaxWidth="1080" HorizontalAlignment="Left" Spacing="{DynamicResource Space16}">
         <Button
             x:Name="EditorBackAction"
             Classes="link-action"
@@ -675,9 +677,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
-        Margin="48"
         IsVisible="{Binding IsReviewVisible}">
-      <StackPanel Spacing="{DynamicResource Space24}">
+      <StackPanel Margin="{DynamicResource PageMargin}" Spacing="{DynamicResource Space24}">
         <review:ReviewInboxView DataContext="{Binding ReviewInbox}" />
       </StackPanel>
     </ScrollViewer>
@@ -689,9 +690,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
-        Margin="48"
         IsVisible="{Binding IsDuplicatesVisible}">
-      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
+      <StackPanel Margin="{DynamicResource PageMargin}" Spacing="{DynamicResource Space24}">
         <review:DuplicatesOverviewView DataContext="{Binding DuplicatesOverview}" />
         <ContentControl IsVisible="{Binding HasDuplicates}">
           <review:DuplicateReviewView DataContext="{Binding Duplicates}" />
@@ -708,9 +708,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <ScrollViewer
         Grid.Row="1"
         Grid.Column="1"
-        Margin="48"
         IsVisible="{Binding IsCoursesVisible}">
-      <StackPanel Margin="0,0,0,24" Spacing="{DynamicResource Space24}">
+      <StackPanel Margin="{DynamicResource PageMargin}" Spacing="{DynamicResource Space24}">
         <courses:CoursesView DataContext="{Binding Courses}" />
         <ContentControl IsVisible="{Binding HasCourseDetails}">
           <courses:CourseDetailsView DataContext="{Binding CourseDetails}" />
