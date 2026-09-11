@@ -130,6 +130,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <x:Double x:Key="PosterCardWidth">148</x:Double>
       <x:Double x:Key="PosterCardHeight">222</x:Double>
       <!--
+        The card's border, the prototype's `border:1px solid transparent` on its tile. A token and not
+        a literal on the card's style because the library counts columns with it too: a card is
+        PosterCardWidth plus the padding and this on each side. Until 2026-09-11 the count left it
+        out, so every card was 2 px wider than the count believed, and at 1600 px the ninth cover of
+        every row ran 9 px into the page's right margin. Button.poster-card holds it in every state,
+        and LibraryView reads this same Thickness rather than a number of its own.
+      -->
+      <Thickness x:Key="PosterCardBorderThickness">1</Thickness>
+      <!--
         The cover's own corner, and the only radius in this application that a preference moves.
 
         It is written apart from the two above because of what was measured on 2026-09-01:
@@ -2664,6 +2673,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="CornerRadius" Value="12" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
+    <!--
+      One pixel on each side whatever the state, because the column count reads this number.
+      Button:focus-visible gives every button 2 px, and on a card the brush stays this style's
+      Transparent, so the extra pixel drew nothing and grew the focused card by 2 px, pushing the rest
+      of its row along. Later in this file than that selector, so this one wins.
+    -->
+    <Setter Property="BorderThickness" Value="{DynamicResource PosterCardBorderThickness}" />
     <Setter Property="Padding" Value="{DynamicResource PosterCardPadding}" />
     <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
