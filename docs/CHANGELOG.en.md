@@ -299,6 +299,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The option pills drew a radio button inside the pill, and in eighteen of them it was the only
+  thing saying which one was chosen.** The library's filters, the appearance page's theme, density,
+  corners and language, the folder kind on the first run and in the add dialog, and the player's tabs
+  carried a `●` or a `○` before the word. The prototype draws one on no pill and in no theme: it marks
+  the chosen one with its border, its fill and its weight. Now the application does too, on all
+  twenty-seven.
+
+  **Taking it away and nothing else would have left eighteen with no state**: the appearance rows and
+  the folder-kind pills never bound the chosen style, so the circle was their only signal and, for
+  one, the five theme pills were drawn alike. Now every row paints the one in force and moves with
+  it.
+
+  **And in high contrast it is still said without colour**: there the two fills are the same white or
+  the same black, but the chosen pill carries a border the others do not — 8.6:1 in high contrast
+  light and 16.8:1 in dark — over a semi-bold word, which is how the prototype settles it in its two
+  high contrast modes. The accessibility check that counted seven circles now requires that border
+  with its contrast in all four themes, and every pill in the program to bind the chosen style.
+
 - **The notice that says how much removing a folder loses carried a guard that would have hidden an
   error.** It counts titles, marks and minutes with three questions to the database that always
   answer a number, and it still had a defence for an answer of "nothing", which it turned into a

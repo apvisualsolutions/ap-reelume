@@ -1939,10 +1939,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </Style>
 
   <!--
-    The open one, said twice: the accent fill and border, and the state glyph its content carries.
-    Both high contrast dictionaries resolve AccentSubtleBrush and Transparent to surfaces a person
-    cannot tell apart, so the glyph is the whole signal there - the same reason theme-option.selected
-    is never alone either.
+    The open one: the accent fill and border and the semi-bold word, as the prototype's pbtn draws
+    it, with no circle beside the word since 2026-09-11. Both high contrast dictionaries resolve
+    AccentSubtleBrush and Transparent to surfaces a person cannot tell apart, and the resting pill has
+    an edge of its own here, so what says which panel is open without colour is the weight of the
+    word and the column itself, which opens beside the picture with that same name as its heading -
+    PlayerPanelColumnTests reads it there.
   -->
   <Style Selector="Button.player-pill.selected">
     <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />
@@ -2800,11 +2802,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
     The chosen one of a group of pills, which is the prototype's seg(true): the subtle accent as fill
     and the accent itself as border, against seg(false)'s plain fill and no border at all.
 
-    It is the second signal and never the only one. Every pill wearing this also carries the state
-    glyph beside its label, because both high contrast dictionaries resolve AccentSubtleBrush and
-    ControlFillBrush to the same white or the same black - the fill says nothing there, and the glyph
-    is what is left. That is the same reason the navigation rail spends a bar and a glyph rather than
-    a colour, and it is regla 6 of this tree read as a rule about signals rather than about numbers.
+    The border is the signal that does not depend on colour, and it is the only thing that says it:
+    since 2026-09-11 no pill carries a circle beside its word. Both high contrast dictionaries resolve
+    AccentSubtleBrush and ControlFillBrush to the same white or the same black, so the fill says
+    nothing there - but the chosen pill still has an edge the others do not, and the semi-bold word
+    on top of it, which is exactly how the prototype draws its two high contrast modes. The circle
+    that stood beside every word until then read as a radio button dropped inside a pill, and the
+    prototype never drew one. ContrastTokenTests holds the edge to 3:1 against the surfaces a pill
+    sits on, in all four themes, and every pill in the tree to binding this class.
   -->
   <Style Selector="Button.theme-option.selected">
     <Setter Property="Background" Value="{DynamicResource AccentSubtleBrush}" />

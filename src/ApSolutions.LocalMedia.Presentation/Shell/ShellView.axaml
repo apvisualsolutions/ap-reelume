@@ -871,10 +871,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource PlayerPanelAudio}"
                 Command="{Binding TogglePlayerPanelCommand}"
                 CommandParameter="{x:Static shell:PlayerPanel.Audio}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding AudioPanelStateCue}" />
-                <TextBlock Text="{DynamicResource PlayerPanelAudio}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource PlayerPanelAudio}" />
             </Button>
             <Button
                 Classes="player-pill"
@@ -883,10 +880,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource PlayerPanelSubtitles}"
                 Command="{Binding TogglePlayerPanelCommand}"
                 CommandParameter="{x:Static shell:PlayerPanel.Subtitles}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding SubtitlePanelStateCue}" />
-                <TextBlock Text="{DynamicResource PlayerPanelSubtitles}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource PlayerPanelSubtitles}" />
             </Button>
             <Button
                 Classes="player-pill"
@@ -895,10 +889,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource PlayerPanelVideo}"
                 Command="{Binding TogglePlayerPanelCommand}"
                 CommandParameter="{x:Static shell:PlayerPanel.Video}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding VideoPanelStateCue}" />
-                <TextBlock Text="{DynamicResource PlayerPanelVideo}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource PlayerPanelVideo}" />
             </Button>
             <Button
                 Classes="player-pill"
@@ -907,10 +898,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource PlayerPanelMarkers}"
                 Command="{Binding TogglePlayerPanelCommand}"
                 CommandParameter="{x:Static shell:PlayerPanel.Markers}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding MarkerPanelStateCue}" />
-                <TextBlock Text="{DynamicResource PlayerPanelMarkers}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource PlayerPanelMarkers}" />
             </Button>
             <Button
                 Classes="player-pill"
@@ -919,10 +907,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource PlayerVersionsTitle}"
                 Command="{Binding TogglePlayerPanelCommand}"
                 CommandParameter="{x:Static shell:PlayerPanel.Versions}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding VersionsPanelStateCue}" />
-                <TextBlock Text="{DynamicResource PlayerVersionsTitle}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource PlayerVersionsTitle}" />
             </Button>
             <!--
               «Lecciones» (CRS-004), and it is the sixth pill rather than a sixth subject: the other
@@ -940,10 +925,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 automation:AutomationProperties.Name="{DynamicResource PlayerLessonsPanelTitle}"
                 Command="{Binding TogglePlayerPanelCommand}"
                 CommandParameter="{x:Static shell:PlayerPanel.Lessons}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding LessonsPanelStateCue}" />
-                <TextBlock Text="{DynamicResource PlayerLessonsPanelTitle}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource PlayerLessonsPanelTitle}" />
             </Button>
             <!--
               The two mode buttons that used to sit here are in the transport bar now, which is where

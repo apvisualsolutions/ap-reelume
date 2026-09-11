@@ -299,6 +299,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Las píldoras de opción dibujaban un botón de opción dentro de la píldora, y en dieciocho de ellas
+  era lo único que decía cuál estaba elegida.** Los filtros de la Biblioteca, el tema, la densidad,
+  las esquinas y el idioma de Apariencia, el tipo de carpeta de la primera ejecución y del diálogo de
+  añadir, y las pestañas del reproductor llevaban un `●` o un `○` delante de la palabra. El prototipo
+  no lo dibuja en ninguna píldora ni en ningún tema: marca la elegida con su borde, su relleno y su
+  peso. Ahora la aplicación también, en las veintisiete.
+
+  **Quitarlo sin más habría dejado dieciocho sin estado**: las de Apariencia y las del tipo de
+  carpeta nunca enlazaron el estilo de elegida, así que el círculo era su única señal y, por ejemplo,
+  las cinco de tema se dibujaban iguales. Ahora cada fila pinta la que está en vigor y se mueve con
+  ella.
+
+  **Y en alto contraste se sigue diciendo sin color**: allí los dos rellenos son el mismo blanco o el
+  mismo negro, pero la elegida lleva un borde que las demás no tienen —8,6:1 de contraste en alto
+  contraste claro y 16,8:1 en oscuro— y va en semi-negrita, que es como lo resuelve el prototipo en
+  sus dos altos contrastes. La comprobación de accesibilidad que contaba siete círculos exige ahora
+  ese borde con su contraste en los cuatro temas, y que toda píldora del programa enlace el estilo de
+  elegida.
+
 - **El aviso de cuánto se pierde al retirar una carpeta llevaba una protección que habría callado un
   error.** Cuenta títulos, marcas y minutos con tres preguntas a la base de datos que siempre
   contestan un número, y aun así tenía una defensa por si contestaban «nada», que convertía esa

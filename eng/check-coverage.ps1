@@ -417,7 +417,15 @@ try {
     # y NO entra: seis de sus ocho ramas eran una guarda contra un NULL que tres agregados sin GROUP BY
     # no pueden devolver, y quitarla lo deja en 100/100. Una prueba de carpeta vacía es la que falla si
     # el COALESCE que lo impide desaparece.
-    $debtRatchet = 189
+    #
+    # 187 el mismo 2026-09-11, y baja por mejora, que es el único camino: LibraryViewModel.cs y
+    # AppearanceSettingsViewModel.cs llegan al listón y salen de la lista. Lo que lo destapó fue quitar
+    # los círculos de las 27 píldoras de opción: con ellos se fueron ramas CUBIERTAS, y el primero caía
+    # de 92 a 91 en ramas — la trampa de mover código, que la previsualización no avisa porque sólo
+    # lista suelos que suben. La salida fue cubrir lo que nadie tomaba (una segunda ficha del mismo
+    # tipo, pedir más sin cursor, fijar el filtro o el orden que ya se tiene, comandos que rechazan un
+    # valor ajeno y avisos sin nadie escuchando), no rebajar ningún suelo.
+    $debtRatchet = 187
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

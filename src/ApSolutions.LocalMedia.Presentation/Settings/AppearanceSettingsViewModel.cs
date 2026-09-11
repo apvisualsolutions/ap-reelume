@@ -52,15 +52,26 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
 
     public ThemePreference CurrentPreference => _themeService.CurrentPreference;
 
-    public string SystemStateCue => GetStateCue(ThemePreference.System);
+    /// <summary>
+    /// Which theme pill is the one in force, as a flag the chosen style reads.
+    /// </summary>
+    /// <remarks>
+    /// These were five strings holding a <c>●</c> or a <c>○</c>, and the circle was the only thing on
+    /// this row that said which theme was on: no pill bound the chosen style, so all five were drawn
+    /// alike. On 2026-09-11 the owner read the circle as a radio button dropped inside a pill, which
+    /// is what the prototype never draws, and the answer is the one the accent swatches already got:
+    /// the chosen pill's own border and fill. A border is a shape, so it still says it in both high
+    /// contrast dictionaries, where the two fills are one colour.
+    /// </remarks>
+    public bool IsSystemTheme => CurrentPreference == ThemePreference.System;
 
-    public string HighContrastLightStateCue => GetStateCue(ThemePreference.HighContrastLight);
+    public bool IsLightTheme => CurrentPreference == ThemePreference.Light;
 
-    public string HighContrastDarkStateCue => GetStateCue(ThemePreference.HighContrastDark);
+    public bool IsDarkTheme => CurrentPreference == ThemePreference.Dark;
 
-    public string LightStateCue => GetStateCue(ThemePreference.Light);
+    public bool IsHighContrastLightTheme => CurrentPreference == ThemePreference.HighContrastLight;
 
-    public string DarkStateCue => GetStateCue(ThemePreference.Dark);
+    public bool IsHighContrastDarkTheme => CurrentPreference == ThemePreference.HighContrastDark;
 
     /// <summary>
     /// Which of the two reduced-motion sentences the page shows, as a key rather than as words.
@@ -76,9 +87,9 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
 
     public string CurrentLanguage => _languageService?.Current ?? "es";
 
-    public string SpanishStateCue => CurrentLanguage == "es" ? "●" : "○";
+    public bool IsSpanish => CurrentLanguage == "es";
 
-    public string EnglishStateCue => CurrentLanguage == "en" ? "●" : "○";
+    public bool IsEnglish => CurrentLanguage == "en";
 
     public ICommand ApplyThemeCommand { get; }
 
@@ -103,8 +114,8 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
     /// Which swatch is the one in force, as a flag the style reads rather than a glyph on top of it.
     /// </summary>
     /// <remarks>
-    /// It was a glyph — the same ● and ○ every pill row in this tree carries — and the owner was
-    /// right that it does not belong here: a circle drawn inside a circle of colour reads as a radio
+    /// It was a glyph — the same ● and ○ every pill row in this tree carried until 2026-09-11, when
+    /// they came off for the same reason — and the owner was right that it does not belong here: a circle drawn inside a circle of colour reads as a radio
     /// button somebody dropped on a swatch. The prototype says it with the swatch's own edge, a ring
     /// of the page's ink around the chosen one, and that is geometry too: a border is a shape, so it
     /// survives both high contrast dictionaries exactly as the glyph did.
@@ -208,17 +219,17 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
         set => Update(options => options with { Rounding = value });
     }
 
-    public string CompactCue => Cue(Density == InterfaceDensity.Compact);
+    public bool IsCompact => Density == InterfaceDensity.Compact;
 
-    public string ComfortableCue => Cue(Density == InterfaceDensity.Comfortable);
+    public bool IsComfortable => Density == InterfaceDensity.Comfortable;
 
-    public string RoomyCue => Cue(Density == InterfaceDensity.Roomy);
+    public bool IsRoomy => Density == InterfaceDensity.Roomy;
 
-    public string SharpCue => Cue(Rounding == CornerRounding.Sharp);
+    public bool IsSharp => Rounding == CornerRounding.Sharp;
 
-    public string SoftCue => Cue(Rounding == CornerRounding.Soft);
+    public bool IsSoft => Rounding == CornerRounding.Soft;
 
-    public string VeryRoundCue => Cue(Rounding == CornerRounding.VeryRound);
+    public bool IsVeryRound => Rounding == CornerRounding.VeryRound;
 
     /// <summary>The minimum and maximum of the cover slider, from the record that owns them.</summary>
     public static double MinimumCoverWidth => AppearanceOptions.MinimumCoverWidth;
@@ -246,11 +257,11 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
         _appearance?.Reapply();
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FollowsWindowsTheme)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentPreference)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SystemStateCue)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighContrastLightStateCue)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighContrastDarkStateCue)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LightStateCue)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DarkStateCue)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSystemTheme)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLightTheme)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDarkTheme)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsHighContrastLightTheme)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsHighContrastDarkTheme)));
     }
 
     private void ApplyLanguage(string language)
@@ -262,14 +273,9 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
 
         service.Apply(language);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentLanguage)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SpanishStateCue)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EnglishStateCue)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSpanish)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEnglish)));
     }
-
-    private string GetStateCue(ThemePreference preference) =>
-        CurrentPreference == preference ? "●" : "○";
-
-    private static string Cue(bool selected) => selected ? "●" : "○";
 
     private bool IsAccent(int index) =>
         string.Equals(AccentPalette.Presets[index], Options.Accent, StringComparison.OrdinalIgnoreCase);
@@ -308,12 +314,12 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
             nameof(Animations),
             nameof(Density),
             nameof(Rounding),
-            nameof(CompactCue),
-            nameof(ComfortableCue),
-            nameof(RoomyCue),
-            nameof(SharpCue),
-            nameof(SoftCue),
-            nameof(VeryRoundCue),
+            nameof(IsCompact),
+            nameof(IsComfortable),
+            nameof(IsRoomy),
+            nameof(IsSharp),
+            nameof(IsSoft),
+            nameof(IsVeryRound),
             nameof(AccentHex),
             nameof(IsFirstAccent),
             nameof(IsSecondAccent),
@@ -326,11 +332,11 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
             nameof(AccentSaturation),
             nameof(AccentLightness),
             nameof(CurrentPreference),
-            nameof(SystemStateCue),
-            nameof(LightStateCue),
-            nameof(DarkStateCue),
-            nameof(HighContrastLightStateCue),
-            nameof(HighContrastDarkStateCue),
+            nameof(IsSystemTheme),
+            nameof(IsLightTheme),
+            nameof(IsDarkTheme),
+            nameof(IsHighContrastLightTheme),
+            nameof(IsHighContrastDarkTheme),
             nameof(ReducedMotionNoticeKey),
         })
         {

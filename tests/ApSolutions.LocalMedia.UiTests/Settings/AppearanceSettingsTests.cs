@@ -211,6 +211,62 @@ public sealed class AppearanceSettingsTests
         viewModel.ApplyLanguageCommand.Execute("en");
     }
 
+    /// <summary>
+    /// A value that is not a command's own is refused when it is executed, not only when it is asked
+    /// about, and the language row still moves with nobody listening to the page.
+    /// </summary>
+    /// <remarks>
+    /// The test above builds the page without a language service, so its three language
+    /// announcements returned before running at all: their null half was the one branch of this file
+    /// the whole suite never took. With a service behind it the row's two flags are what is read back,
+    /// because they are what the pills paint since the circles came off on 2026-09-11.
+    /// </remarks>
+    [Fact]
+    public void A_refused_value_changes_nothing_and_the_language_moves_with_nobody_listening()
+    {
+        var theme = new RecordingTheme();
+        var language = new RecordingLanguage("es");
+        var viewModel = new AppearanceSettingsViewModel(theme, language);
+
+        viewModel.ApplyThemeCommand.Execute("not a theme");
+        viewModel.ApplyLanguageCommand.Execute(42);
+        Assert.Empty(theme.Applied);
+        Assert.Empty(language.Applied);
+        Assert.True(viewModel.IsSpanish);
+
+        viewModel.ApplyLanguageCommand.Execute("en");
+
+        Assert.Equal(["en"], language.Applied);
+        Assert.True(viewModel.IsEnglish);
+        Assert.False(viewModel.IsSpanish);
+    }
+
+    private sealed class RecordingTheme : IThemeService
+    {
+        public List<ThemePreference> Applied { get; } = [];
+
+        public ThemePreference CurrentPreference => Applied.Count > 0 ? Applied[^1] : ThemePreference.System;
+
+        public ThemeVariant PlayerThemeVariant => ThemeVariant.Dark;
+
+        public bool AnimationsEnabled => true;
+
+        public TimeSpan MotionDuration => TimeSpan.FromMilliseconds(150);
+
+        public void Apply(ThemePreference preference) => Applied.Add(preference);
+
+        public bool TryApplyBackdrop(Window window) => false;
+    }
+
+    private sealed class RecordingLanguage(string current) : ApSolutions.LocalMedia.Presentation.Language.ILanguageService
+    {
+        public List<string> Applied { get; } = [];
+
+        public string Current => Applied.Count > 0 ? Applied[^1] : current;
+
+        public void Apply(string language) => Applied.Add(language);
+    }
+
     private sealed class StubTheme(bool animations) : IThemeService
     {
         public ThemePreference CurrentPreference => ThemePreference.System;

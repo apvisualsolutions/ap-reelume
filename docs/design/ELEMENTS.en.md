@@ -87,8 +87,15 @@ same way.**
 
 ### Option pill
 
-32 tall in the prototype, `ControlHeight` here, pill radius, `0 15` padding, and **always** a state
-glyph (`●` chosen, `○` not chosen) as well as the colour.
+32 tall in the prototype, `ControlHeight` here, pill radius, `0 15` padding, and **no glyph** beside
+the word: the chosen one says it with its border and its weight as well as the colour.
+
+**Until 2026-09-11 this section asked for «always a state glyph» (`●` chosen, `○` not chosen), and
+the prototype draws one on no pill and in no theme.** The owner read it for what it looked like — a
+radio button dropped inside a pill — and measured on the prototype's captures, in light and in both
+high contrasts, the chosen pill stands apart by the border the others do not have. That is a shape
+and not a colour, so it survives both high contrast dictionaries exactly as the glyph did; it is the
+same answer the accent swatches had already been given.
 
 | State | Fill | Border | Ink | Weight |
 | --- | --- | --- | --- | --- |
@@ -138,7 +145,7 @@ the row reads `● Normal · 1×`.
 
 The mark is not decoration beside the wash and the border: on both high contrasts the selected row's
 fill and the resting fill are the same colour, so the mark is the only thing left saying which one is
-in force — the same reason the appearance pills carry a state glyph and the rail carries a bar.
+in force — the same reason the chosen pill carries a border and the rail carries a bar.
 
 ### Menu row
 
@@ -375,8 +382,8 @@ What this tree draws differently from the prototype, and why.
   square target comes out round and a wide one comes out a pill with a single number.
 - **The focus border's accent moves one step away from the theme's accent** when the two coincide. It
   is written into the test rather than asserted downwards.
-- **In the two high contrasts the fill says nothing** and the second sign says it: the pill's glyph,
-  the rail's bar, the menu row's border.
+- **In the two high contrasts the fill says nothing** and the second sign says it: the chosen pill's
+  border, the rail's bar, the menu row's border.
 - **The access-denied notice does not carry the «Permisos» button the prototype draws.** That button
   opens Windows' settings for the resource, and that is starting a system process: it lives in the
   host layer, the one place in this tree with `Process.Start`, and would bring its own attack

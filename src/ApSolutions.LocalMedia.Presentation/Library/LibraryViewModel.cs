@@ -91,9 +91,6 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsEveryKind));
             OnPropertyChanged(nameof(IsMoviesOnly));
             OnPropertyChanged(nameof(IsShowsOnly));
-            OnPropertyChanged(nameof(EveryKindStateCue));
-            OnPropertyChanged(nameof(MoviesOnlyStateCue));
-            OnPropertyChanged(nameof(ShowsOnlyStateCue));
             OnPropertyChanged(nameof(IsFiltersDirty));
             _clearSearch.RaiseCanExecuteChanged();
             return LoadAsync(CancellationToken.None);
@@ -195,9 +192,6 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsEveryKind));
                 OnPropertyChanged(nameof(IsMoviesOnly));
                 OnPropertyChanged(nameof(IsShowsOnly));
-                OnPropertyChanged(nameof(EveryKindStateCue));
-                OnPropertyChanged(nameof(MoviesOnlyStateCue));
-                OnPropertyChanged(nameof(ShowsOnlyStateCue));
                 OnPropertyChanged(nameof(IsFiltersDirty));
             }
         }
@@ -255,23 +249,6 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     public bool IsMoviesOnly => TypeFilter == CatalogFilter.Movie;
 
     public bool IsShowsOnly => TypeFilter == CatalogFilter.Show;
-
-    /// <summary>
-    /// The selected pill says so twice: the accent fill, and this glyph.
-    /// </summary>
-    /// <remarks>
-    /// The same pair the theme and language pills already spend, and the reason is the same one the
-    /// four themes force — in either high contrast dictionary the accent fill and the resting fill are
-    /// the same white or the same black, so a pill that said "selected" in colour alone would say
-    /// nothing at all there.
-    /// </remarks>
-    public string EveryKindStateCue => Cue(IsEveryKind);
-
-    public string MoviesOnlyStateCue => Cue(IsMoviesOnly);
-
-    public string ShowsOnlyStateCue => Cue(IsShowsOnly);
-
-    private static string Cue(bool selected) => selected ? "●" : "○";
 
     /// <summary>Applies as it is chosen, same shape and same reason as <see cref="StatusFilter"/>.</summary>
     public CatalogSort Sort

@@ -64,33 +64,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsSystemTheme}"
                 automation:AutomationProperties.Name="{DynamicResource ThemeSystem}"
                 Command="{Binding ApplyThemeCommand}"
                 CommandParameter="{x:Static theme:ThemePreference.System}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding SystemStateCue}" />
-                <TextBlock Text="{DynamicResource ThemeSystem}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource ThemeSystem}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsLightTheme}"
                 automation:AutomationProperties.Name="{DynamicResource ThemeLight}"
                 Command="{Binding ApplyThemeCommand}"
                 CommandParameter="{x:Static theme:ThemePreference.Light}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding LightStateCue}" />
-                <TextBlock Text="{DynamicResource ThemeLight}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource ThemeLight}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsDarkTheme}"
                 automation:AutomationProperties.Name="{DynamicResource ThemeDark}"
                 Command="{Binding ApplyThemeCommand}"
                 CommandParameter="{x:Static theme:ThemePreference.Dark}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding DarkStateCue}" />
-                <TextBlock Text="{DynamicResource ThemeDark}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource ThemeDark}" />
             </Button>
             <!--
               The fourth and fifth pills, chosen rather than only inherited — the owner revoked the
@@ -101,23 +95,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
             -->
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsHighContrastLightTheme}"
                 automation:AutomationProperties.Name="{DynamicResource ThemeHighContrastLight}"
                 Command="{Binding ApplyThemeCommand}"
                 CommandParameter="{x:Static theme:ThemePreference.HighContrastLight}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding HighContrastLightStateCue}" />
-                <TextBlock Text="{DynamicResource ThemeHighContrastLight}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource ThemeHighContrastLight}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsHighContrastDarkTheme}"
                 automation:AutomationProperties.Name="{DynamicResource ThemeHighContrastDark}"
                 Command="{Binding ApplyThemeCommand}"
                 CommandParameter="{x:Static theme:ThemePreference.HighContrastDark}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding HighContrastDarkStateCue}" />
-                <TextBlock Text="{DynamicResource ThemeHighContrastDark}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource ThemeHighContrastDark}" />
             </Button>
           </WrapPanel>
         </StackPanel>
@@ -159,9 +149,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
       <!--
         The accent, as the prototype draws it: six circular swatches and the value beside them in a
-        fixed-width face. Each swatch carries the state glyph as well as its fill — in either high
-        contrast dictionary the six fills resolve to the same colour, so the glyph is the whole
-        signal there, which is the same reason every pill row in this tree carries one.
+        fixed-width face. The chosen swatch is ringed, which is a shape and so survives both high
+        contrast dictionaries, where the six fills resolve to the same colour. It carried a state
+        glyph until the owner read it as a radio button dropped on a swatch, and every pill row in
+        this tree lost the same circle for the same reason on 2026-09-11.
 
         The six hexadecimals are written here and in AccentPalette.Presets, and that is not two
         sources: the swatch has to paint the colour it stands for, and a Background bound through a
@@ -388,33 +379,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsCompact}"
                 automation:AutomationProperties.Name="{DynamicResource AppearanceDensityCompact}"
                 Command="{Binding ApplyDensityCommand}"
                 CommandParameter="{x:Static theme:InterfaceDensity.Compact}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding CompactCue}" />
-                <TextBlock Text="{DynamicResource AppearanceDensityCompact}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource AppearanceDensityCompact}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsComfortable}"
                 automation:AutomationProperties.Name="{DynamicResource AppearanceDensityComfortable}"
                 Command="{Binding ApplyDensityCommand}"
                 CommandParameter="{x:Static theme:InterfaceDensity.Comfortable}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding ComfortableCue}" />
-                <TextBlock Text="{DynamicResource AppearanceDensityComfortable}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource AppearanceDensityComfortable}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsRoomy}"
                 automation:AutomationProperties.Name="{DynamicResource AppearanceDensityRoomy}"
                 Command="{Binding ApplyDensityCommand}"
                 CommandParameter="{x:Static theme:InterfaceDensity.Roomy}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding RoomyCue}" />
-                <TextBlock Text="{DynamicResource AppearanceDensityRoomy}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource AppearanceDensityRoomy}" />
             </Button>
           </WrapPanel>
         </StackPanel>
@@ -450,33 +435,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsSharp}"
                 automation:AutomationProperties.Name="{DynamicResource AppearanceRoundingSharp}"
                 Command="{Binding ApplyRoundingCommand}"
                 CommandParameter="{x:Static theme:CornerRounding.Sharp}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding SharpCue}" />
-                <TextBlock Text="{DynamicResource AppearanceRoundingSharp}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource AppearanceRoundingSharp}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsSoft}"
                 automation:AutomationProperties.Name="{DynamicResource AppearanceRoundingSoft}"
                 Command="{Binding ApplyRoundingCommand}"
                 CommandParameter="{x:Static theme:CornerRounding.Soft}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding SoftCue}" />
-                <TextBlock Text="{DynamicResource AppearanceRoundingSoft}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource AppearanceRoundingSoft}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsVeryRound}"
                 automation:AutomationProperties.Name="{DynamicResource AppearanceRoundingVeryRound}"
                 Command="{Binding ApplyRoundingCommand}"
                 CommandParameter="{x:Static theme:CornerRounding.VeryRound}">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding VeryRoundCue}" />
-                <TextBlock Text="{DynamicResource AppearanceRoundingVeryRound}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource AppearanceRoundingVeryRound}" />
             </Button>
           </WrapPanel>
         </StackPanel>
@@ -575,23 +554,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsSpanish}"
                 automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
                 Command="{Binding ApplyLanguageCommand}"
                 CommandParameter="es">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding SpanishStateCue}" />
-                <TextBlock Text="{DynamicResource LanguageSpanish}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource LanguageSpanish}" />
             </Button>
             <Button
                 Classes="theme-option"
+                Classes.selected="{Binding IsEnglish}"
                 automation:AutomationProperties.Name="{DynamicResource LanguageEnglish}"
                 Command="{Binding ApplyLanguageCommand}"
                 CommandParameter="en">
-              <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-                <TextBlock Classes="state-glyph" Text="{Binding EnglishStateCue}" />
-                <TextBlock Text="{DynamicResource LanguageEnglish}" />
-              </StackPanel>
+              <TextBlock Text="{DynamicResource LanguageEnglish}" />
             </Button>
           </WrapPanel>
         </StackPanel>

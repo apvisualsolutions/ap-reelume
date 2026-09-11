@@ -85,8 +85,15 @@ Aquí está la distinción que más se equivoca: **un menú y un desplegable no 
 
 ### Píldora de opción
 
-Alto 32 en el prototipo, `ControlHeight` aquí, radio de píldora, relleno `0 15`, y **siempre** un
-glifo de estado (`●` elegida, `○` sin elegir) además del color.
+Alto 32 en el prototipo, `ControlHeight` aquí, radio de píldora, relleno `0 15`, y **ningún glifo**
+junto a la palabra: la elegida lo dice con su borde y su peso además del color.
+
+**Hasta el 2026-09-11 este apartado pedía «siempre un glifo de estado» (`●` elegida, `○` sin
+elegir), y el prototipo no lo dibuja en ninguna píldora ni en ningún tema.** El propietario lo leyó
+como lo que parecía —un botón de opción metido dentro de una píldora— y medido en las capturas del
+prototipo, en claro y en los dos altos contrastes, la elegida se distingue por el borde que las
+demás no tienen. Eso es una forma y no un color, así que sobrevive a los dos diccionarios de alto
+contraste igual que el glifo; es la misma respuesta que ya habían recibido las muestras de acento.
 
 | Estado | Relleno | Borde | Tinta | Peso |
 | --- | --- | --- | --- | --- |
@@ -137,8 +144,7 @@ es `● Normal · 1×`.
 
 La marca no es adorno junto al lavado y el borde: en los dos contrastes altos el relleno de la fila
 elegida y el de reposo son el mismo color, así que la marca es lo único que queda diciendo cuál está
-en vigor — la misma razón por la que las píldoras de apariencia llevan glifo de estado y el rail
-lleva barra.
+en vigor — la misma razón por la que la píldora elegida lleva borde y el rail lleva barra.
 
 ### Fila de menú
 
@@ -376,8 +382,8 @@ Lo que este árbol dibuja distinto del prototipo, y por qué.
   así que un objetivo cuadrado sale círculo y uno ancho sale píldora con un solo número.
 - **El acento del borde de foco se aparta un paso del acento del tema** cuando coinciden. Está escrito
   en la prueba y no afirmado a la baja.
-- **En los dos altos contrastes el relleno no dice nada** y lo dice el segundo signo: el glifo de la
-  píldora, la barra del rail, el borde de la fila de menú.
+- **En los dos altos contrastes el relleno no dice nada** y lo dice el segundo signo: el borde de la
+  píldora elegida, la barra del rail, el borde de la fila de menú.
 - **El aviso de acceso denegado no lleva el botón «Permisos» que el prototipo dibuja.** Ese botón
   abre los ajustes de Windows para ese recurso, y eso es arrancar un proceso del sistema: vive en la
   capa del anfitrión, que es el único sitio de este árbol con `Process.Start`, y traería su propia

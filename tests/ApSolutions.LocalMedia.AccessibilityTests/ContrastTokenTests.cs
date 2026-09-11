@@ -298,22 +298,60 @@ public sealed class ContrastTokenTests
             setter => setter.Attribute("Property")?.Value == "BorderThickness"
                 && setter.Attribute("Value")?.Value.Contains("FocusStrokeThickness", StringComparison.Ordinal) is true);
 
-        var appearancePath = System.IO.Path.Combine(
+        // The chosen pill's cue that is not a colour is its edge and its weight: seg(false) draws no
+        // border and seg(true) draws the accent, over a semi-bold word. Until 2026-09-11 this counted
+        // seven circles on the appearance page instead, and the circle was the whole signal in
+        // eighteen of the tree's twenty-seven pills, because those never bound the chosen style at
+        // all. The circles came off at the owner's word — «aparece el selector del radial» — and the
+        // prototype never drew one, not even in its two high contrast modes, where the edge says it.
+        Assert.Equal("Transparent", Setter(document, "Button.theme-option", "BorderBrush"));
+        Assert.Contains(
+            "AccentBrush",
+            Setter(document, "Button.theme-option.selected", "BorderBrush"),
+            StringComparison.Ordinal);
+        Assert.Equal("SemiBold", Setter(document, "Button.theme-option.selected", "FontWeight"));
+        Assert.Equal("SemiBold", Setter(document, "Button.player-pill.selected", "FontWeight"));
+
+        // An edge nobody can see is not a cue: against every surface a pill sits on, in all four
+        // themes. The shell is held a test above; the appearance rows and the add dialog are cards.
+        var themes = LoadThemeBrushes();
+        foreach (var theme in ThemeNames)
+        {
+            AssertContrastAtLeast(
+                themes[theme],
+                "AccentBrush",
+                "CardSurfaceBrush",
+                NonTextMinimum,
+                $"{theme} the chosen pill's edge on a card");
+        }
+
+        // And every pill in the tree binds the chosen class, so no row is left with no way to say
+        // which one is on. The floor keeps an empty sweep from passing for a clean one.
+        var presentationRoot = System.IO.Path.Combine(
             RepositoryLayout.Root,
             "src",
-            "ApSolutions.LocalMedia.Presentation",
-            "Settings",
-            "AppearanceSettingsView.axaml");
-        var appearance = XDocument.Load(appearancePath);
-        var stateCueBindings = appearance.Descendants()
-            .Attributes()
-            .Where(attribute => attribute.Name.LocalName == "Text"
-                && attribute.Value.Contains("StateCue", StringComparison.Ordinal))
+            "ApSolutions.LocalMedia.Presentation");
+        var pills = Directory.EnumerateFiles(presentationRoot, "*.axaml", SearchOption.AllDirectories)
+            .SelectMany(file => XDocument.Load(file).Descendants()
+                .Where(element => element.Attribute("Classes")?.Value.Split(' ') is { } classes
+                    && (classes.Contains("theme-option") || classes.Contains("player-pill")))
+                .Select(element => (File: System.IO.Path.GetFileName(file), Element: element)))
             .ToArray();
-        // Five theme choices — both high contrasts became pickable on 2026-08-23 — plus the two
-        // language choices BUG-011 added; every option carries its non-color cue.
-        Assert.Equal(7, stateCueBindings.Length);
+        Assert.True(pills.Length >= 27, $"only {pills.Length} option pills were found in the markup.");
+        Assert.Empty(pills
+            .Where(pill => pill.Element.Attribute("Classes.selected") is null)
+            .Select(pill => $"{pill.File}: {pill.Element.Attributes().FirstOrDefault(
+                attribute => attribute.Name.LocalName == "AutomationProperties.Name")?.Value}"));
     }
+
+    /// <summary>The value one setter writes under one selector, from the token dictionary itself.</summary>
+    private static string Setter(XDocument document, string selector, string property) =>
+        document.Descendants()
+            .Where(element => element.Name.LocalName == "Style"
+                && element.Attribute("Selector")?.Value == selector)
+            .SelectMany(style => style.Elements())
+            .First(setter => setter.Attribute("Property")?.Value == property)
+            .Attribute("Value")!.Value;
 
     [Fact]
     public void Mica_high_contrast_and_Windows_motion_detection_are_isolated_to_the_Windows_host()

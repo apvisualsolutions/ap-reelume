@@ -42,6 +42,13 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// with its words when it became 64 px of pictograms, while the scan's pulsing dot joined them. The
 /// floor below is what the count is held to; it is not a census.
 /// </para>
+/// <para>
+/// <b>Ten since 2026-09-11, and the ones that left were never states.</b> Every option pill carried a
+/// <c>●</c> or a <c>○</c> beside its word to say whether it was the chosen one, and the owner read it
+/// as a radio button dropped inside a pill; the prototype never draws one. The pills say it with their
+/// own edge now (<see cref="OptionPillTests"/>), and what stays here is what these circles are for:
+/// the progress of something watched, and the scan that is running.
+/// </para>
 /// </remarks>
 public sealed class StateGlyphTests
 {
@@ -52,9 +59,9 @@ public sealed class StateGlyphTests
     /// Every block that paints a circle wears the class, and the class is the token.
     /// </summary>
     /// <remarks>
-    /// The count is asserted first: the navigation rail and the appearance pills paint theirs through a
-    /// binding, so with no data context they are empty strings — a test that only looked for the
-    /// literal would find three of thirteen and call it done.
+    /// The count is asserted first: some of these paint theirs through a binding, so with no data
+    /// context they are empty strings — a test that only looked for the literal would find a few of
+    /// ten and call it done.
     /// </remarks>
     [AvaloniaFact]
     public void Every_state_circle_wears_one_class_and_that_class_is_the_token()
@@ -64,8 +71,8 @@ public sealed class StateGlyphTests
 
         var marked = scope.Blocks.Where(block => block.Classes.Contains("state-glyph")).ToArray();
         Assert.True(
-            marked.Length >= 13,
-            $"only {marked.Length} blocks wear state-glyph, and thirteen paint one of the three circles.");
+            marked.Length >= 10,
+            $"only {marked.Length} blocks wear state-glyph, and ten paint one of the three circles.");
         Assert.All(marked, block => Assert.Equal(expected, block.FontSize));
 
         var literals = scope.Blocks

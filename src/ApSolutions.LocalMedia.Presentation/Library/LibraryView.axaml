@@ -244,9 +244,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
           have not started" was expressible in the query the whole time and unreachable from the
           screen. Registered and never fed, in its filter-shaped form.
 
-          Each pill says which one is on twice: the accent fill from theme-option.selected, and the
-          glyph beside the label. In either high contrast dictionary the two fills are the same
-          colour, so the glyph is not decoration there - it is the whole signal.
+          The chosen pill says so with its own edge, fill and weight from theme-option.selected, and
+          nothing beside the word. It carried a circle too until 2026-09-11, on the reading that in
+          either high contrast dictionary the two fills are one colour - true, and beside the point:
+          the chosen pill still has a border the others do not, which is exactly how the prototype
+          says it in both high contrasts, and the circle read as a radio button dropped in a pill.
         -->
         <StackPanel
             Orientation="Horizontal"
@@ -258,10 +260,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.Name="{DynamicResource LibraryFilterAll}"
               Command="{Binding SelectTypeCommand}"
               CommandParameter="{x:Static catalog:CatalogFilter.None}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding EveryKindStateCue}" />
-              <TextBlock Text="{DynamicResource LibraryFilterAll}" />
-            </StackPanel>
+            <TextBlock Text="{DynamicResource LibraryFilterAll}" />
           </Button>
           <Button
               Classes="theme-option"
@@ -269,10 +268,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.Name="{DynamicResource LibraryFilterMovies}"
               Command="{Binding SelectTypeCommand}"
               CommandParameter="{x:Static catalog:CatalogFilter.Movie}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding MoviesOnlyStateCue}" />
-              <TextBlock Text="{DynamicResource LibraryFilterMovies}" />
-            </StackPanel>
+            <TextBlock Text="{DynamicResource LibraryFilterMovies}" />
           </Button>
           <Button
               Classes="theme-option"
@@ -280,10 +276,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.Name="{DynamicResource LibraryFilterShows}"
               Command="{Binding SelectTypeCommand}"
               CommandParameter="{x:Static catalog:CatalogFilter.Show}">
-            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space8}">
-              <TextBlock Classes="state-glyph" Text="{Binding ShowsOnlyStateCue}" />
-              <TextBlock Text="{DynamicResource LibraryFilterShows}" />
-            </StackPanel>
+            <TextBlock Text="{DynamicResource LibraryFilterShows}" />
           </Button>
         </StackPanel>
         <!--

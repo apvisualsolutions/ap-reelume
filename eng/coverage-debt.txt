@@ -314,7 +314,6 @@ src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml               
 src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                      100  90
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml.cs                         100  78
-src/ApSolutions.LocalMedia.Presentation/Library/LibraryViewModel.cs                           98  92
 src/ApSolutions.LocalMedia.Presentation/Library/ManualReassignmentViewModel.cs                94  70
 src/ApSolutions.LocalMedia.Presentation/Library/PosterArtView.axaml                          100  50
 src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml                         100  50
@@ -367,7 +366,6 @@ src/ApSolutions.LocalMedia.Presentation/Review/DuplicateReviewViewModel.cs      
 src/ApSolutions.LocalMedia.Presentation/Review/DuplicatesOverviewView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Review/ReviewInboxView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsView.axaml                100  50
-src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsViewModel.cs              100  89
 src/ApSolutions.LocalMedia.Presentation/Settings/DiagnosticsPreviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsView.axaml                 100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PlaybackSettingsView.axaml                  100  50

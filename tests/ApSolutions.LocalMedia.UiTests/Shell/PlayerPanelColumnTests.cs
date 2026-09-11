@@ -82,10 +82,14 @@ public sealed class PlayerPanelColumnTests
                 .Select(block => block.Text ?? string.Empty),
             StringComparer.Ordinal);
 
-        // And the glyph on the pill, which is the second signal: in either high contrast dictionary
-        // the accent fill and the resting fill are the same colour, so the fill alone says nothing.
-        Assert.Equal("●", viewModel.MarkerPanelStateCue);
-        Assert.Equal("○", viewModel.AudioPanelStateCue);
+        // And the pill that opened it is the one painted as open, and the only one: in either high
+        // contrast dictionary the accent fill and the resting fill are one colour, so what says it
+        // there is the heading above, which is why that is read first.
+        Assert.Equal(
+            ["Marcadores"],
+            view.GetVisualDescendants().OfType<Button>()
+                .Where(button => button.Classes.Contains("player-pill") && button.Classes.Contains("selected"))
+                .Select(button => Avalonia.Automation.AutomationProperties.GetName(button) ?? string.Empty));
 
         viewModel.TogglePlayerPanelCommand.Execute(PlayerPanel.Markers);
         Dispatcher.UIThread.RunJobs();

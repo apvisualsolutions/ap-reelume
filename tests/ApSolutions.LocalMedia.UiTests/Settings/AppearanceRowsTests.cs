@@ -49,7 +49,7 @@ public sealed class AppearanceRowsTests
         // Every row again on every change, because they are not independent: what the page shows
         // for one of them can move when another does.
         Assert.Contains(nameof(page.AccentHex), announced);
-        Assert.Contains(nameof(page.CompactCue), announced);
+        Assert.Contains(nameof(page.IsCompact), announced);
     }
 
     [Theory]
@@ -64,8 +64,8 @@ public sealed class AppearanceRowsTests
 
         Assert.Equal(density, page.Density);
         Assert.Equal(
-            1,
-            new[] { page.CompactCue, page.ComfortableCue, page.RoomyCue }.Count(cue => cue == "●"));
+            [density == InterfaceDensity.Compact, density == InterfaceDensity.Comfortable, density == InterfaceDensity.Roomy],
+            new[] { page.IsCompact, page.IsComfortable, page.IsRoomy });
     }
 
     [Theory]
@@ -80,8 +80,8 @@ public sealed class AppearanceRowsTests
 
         Assert.Equal(rounding, page.Rounding);
         Assert.Equal(
-            1,
-            new[] { page.SharpCue, page.SoftCue, page.VeryRoundCue }.Count(cue => cue == "●"));
+            [rounding == CornerRounding.Sharp, rounding == CornerRounding.Soft, rounding == CornerRounding.VeryRound],
+            new[] { page.IsSharp, page.IsSoft, page.IsVeryRound });
     }
 
     [Fact]
