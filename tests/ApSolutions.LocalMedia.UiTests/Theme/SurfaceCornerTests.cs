@@ -133,6 +133,13 @@ public sealed class SurfaceCornerTests
             + "4 — but by OptionRowShapeTests, which measures the Border that actually draws the "
             + "corner rather than the RadioButton that names the row. Repeating the pairing here "
             + "would be a second copy of one number, which is how two of three end up agreeing."),
+        ("ProgressBar.poster-track",
+            "the rule across a cover, and its corner is a zero: the prototype's track and fill have "
+            + "no radius of their own (:312 and :2417) and what rounds their ends is the cover they "
+            + "lie in, at the 9 px its hairline leaves of the 10. The setter exists because the base "
+            + "ControlTheme rounds them instead — counted in pixels on 2026-09-12, a 42 % fill "
+            + "measured 57 px of accent where the prototype draws 61 — so pairing it with a number "
+            + "out of the design would be pairing it with a number the design does not write."),
         ("Border.thread-notice",
             "what the last mark did, inside the course thread's card. The prototype has no such "
             + "surface: there a mark raises a toast and this tree has no toast, so there is no "
@@ -380,14 +387,19 @@ public sealed class SurfaceCornerTests
     /// over the shell. Two sites out, one in.
     /// </para>
     /// <para>
-    /// A ratchet and not an assertion of 86: passing at 78 while claiming 86 would be a gate lying
+    /// <b>78 to 77 on 2026-09-12</b>, by subtraction again: the unavailable badge grew a second form
+    /// — the veil a cover asks for — and its corner moved out of the markup and into the two styles
+    /// that tell the two forms apart, where one of them sets it to zero.
+    /// </para>
+    /// <para>
+    /// A ratchet and not an assertion of 86: passing at 77 while claiming 86 would be a gate lying
     /// about its own progress, so it fails in both directions and says which.
     /// </para>
     /// </remarks>
     [Fact]
     public void The_corners_written_in_the_views_themselves_do_not_grow()
     {
-        const int ratchet = 78;
+        const int ratchet = 77;
 
         var sites = Directory
             .EnumerateFiles(Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories)

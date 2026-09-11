@@ -31,6 +31,7 @@ and a name here would be a second announcement of the same card.
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:converters="clr-namespace:Avalonia.Data.Converters;assembly=Avalonia.Base"
     xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
     xmlns:library="clr-namespace:ApSolutions.LocalMedia.Presentation.Library"
     Width="{DynamicResource PosterCardWidth}"
@@ -82,14 +83,71 @@ and a name here would be a second announcement of the same card.
     <Style Selector="Path.kind-glyph.show">
       <Setter Property="Data" Value="{DynamicResource IconShow}" />
     </Style>
+
+    <!--
+      THE CARD AS THE RAILS DRAW IT, which is where these numbers have always been. They are setters
+      and not attributes because the library's tile overrides three of them, and an attribute is a
+      local value that no style can reach past.
+    -->
+    <Style Selector="library|PosterCardView StackPanel#CardStack">
+      <Setter Property="Spacing" Value="{DynamicResource DensityGutter}" />
+    </Style>
+    <Style Selector="library|PosterCardView StackPanel#CoverCaption">
+      <Setter Property="Spacing" Value="{DynamicResource Space8}" />
+    </Style>
+    <Style Selector="library|PosterCardView TextBlock#CardMeta,
+                     library|PosterCardView TextBlock#CardStatus,
+                     library|PosterCardView StackPanel#CardEpisodes > TextBlock">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
+    </Style>
+
+    <!--
+      THE CARD AS THE LIBRARY'S GRID DRAWS IT — the prototype's tile, measured in its own capture on
+      2026-09-12 and written here line by line: 10 px from the cover to the title, and three lines
+      stacked with nothing between them, whose line boxes are 1.5 times their size and whose third
+      one starts 3 px lower (design/AP Reelume.dc.html:307 and :316-320).
+
+      The rails keep what they had, and that is not laziness: the prototype draws ITS rails
+      differently too — a gap of 8, a title at 13 and a subtitle at 11, with no status line at all -
+      so the tile's numbers would be the wrong numbers there.
+
+      The layout rounding goes off on the caption, and that is the whole reason the rhythm was 5 px
+      out before this. Avalonia rounds each control's desired size UP to a whole pixel, so line
+      boxes of 20,25 and 17,25 measured 21 and 18 and the three lines took 60 px where the prototype
+      stacks them in 57,75. With the rounding off they stack exactly as the browser stacks them, and
+      the text still lands on whole pixels because Skia snaps a baseline on its own.
+    -->
+    <Style Selector="library|PosterCardView.grid-tile StackPanel#CardStack">
+      <Setter Property="Spacing" Value="10" />
+    </Style>
+    <Style Selector="library|PosterCardView.grid-tile StackPanel#CoverCaption">
+      <Setter Property="Spacing" Value="0" />
+      <Setter Property="UseLayoutRounding" Value="False" />
+    </Style>
+    <Style Selector="library|PosterCardView.grid-tile StackPanel#CoverCaption :is(TextBlock)">
+      <Setter Property="UseLayoutRounding" Value="False" />
+    </Style>
+    <Style Selector="library|PosterCardView.grid-tile TextBlock#CardTitle">
+      <Setter Property="FontSize" Value="13.5" />
+      <Setter Property="LineHeight" Value="20.25" />
+    </Style>
+    <Style Selector="library|PosterCardView.grid-tile TextBlock#CardMeta,
+                     library|PosterCardView.grid-tile TextBlock#CardStatus,
+                     library|PosterCardView.grid-tile StackPanel#CardEpisodes > TextBlock">
+      <Setter Property="FontSize" Value="11.5" />
+      <Setter Property="LineHeight" Value="17.25" />
+    </Style>
+    <Style Selector="library|PosterCardView.grid-tile TextBlock#CardStatus,
+                     library|PosterCardView.grid-tile StackPanel#CardEpisodes">
+      <Setter Property="Margin" Value="0,3,0,0" />
+    </Style>
   </UserControl.Styles>
   <!--
-    The gutter and not the fixed step: the Appearance page's density row is what decides how much
-    room a cover and the words under it take, and this is the gap it means. Compact, comfortable and
-    roomy write 4, 8 and 16 into it — 8 is what this card was drawn with, so a profile with nothing
-    stored is unchanged.
+    What separates the cover from the words under it: the density gutter in a rail, and the
+    prototype's fixed 10 in the library's grid, which is a gap its own density never changes. Both
+    live in the styles above.
   -->
-  <StackPanel Spacing="{DynamicResource DensityGutter}">
+  <StackPanel x:Name="CardStack">
     <!--
     The hairline and not the control border: this rectangle separates a card from the one beside it
     and is not something to press, so it is the 1.8:1 brush the token split was made for.
@@ -111,6 +169,12 @@ and a name here would be a second announcement of the same card.
         PosterArtOpacity is 0 in the two high contrasts, where the card falls back to the fill and
         the initials it has always had: a hue picked by a hash is a contrast ratio nobody decided.
         -->
+        <!--
+        The artwork, in a panel of its own since 2026-09-12 so that the chip can read it: what the
+        chip blurs is a brush of THIS panel, and a brush of the whole cover would be a brush of the
+        chip itself.
+        -->
+        <Panel x:Name="CoverArt">
         <library:PosterArtView x:Name="PosterArtSurface" Title="{Binding Title}" />
         <!--
           The cover, when there is one. Until 2026-09-04 there was nowhere here to put it: the
@@ -141,77 +205,102 @@ and a name here would be a second announcement of the same card.
             IsVisible="{Binding !HasPoster}"
             Text="{Binding Initials}"
             automation:AutomationProperties.AccessibilityView="Raw" />
-        <!--
-        Three px and not the theme's four, and at the foot of the artwork rather than under the
-        title: it is a rule across the poster, not a control to read. MinHeight goes with Height
-        because the base ControlTheme sets a minimum of its own and Height alone measures 4.
-
-        MinWidth is the same shape and was measured here: the base theme gives a ProgressBar 200, so
-        stretching inside a 148 px poster produced a bar 54 px wider than the picture it belongs to,
-        clipped rather than fitted. The setter that names a number is not always the one that
-        decides it.
-        -->
-        <ProgressBar
-            Height="3"
-            MinHeight="3"
-            MinWidth="0"
-            VerticalAlignment="Bottom"
-            Background="{DynamicResource ControlFillBrush}"
-            Foreground="{DynamicResource AccentBrush}"
-            IsVisible="{Binding HasKnownProgress}"
-            Maximum="1"
-            Value="{Binding CompletedFraction}"
-            automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+        </Panel>
         <!--
         The kind chip, top left of the cover, which is where the prototype puts it and what it puts
         there: one word on a dark tint, over the artwork rather than under it. Announced Raw - the
         button around this card already says the title, and a reader that heard "Film, El Faro de
         Piedra, 2019, not started" would be hearing the shelf read out along with the book.
+
+        THE TINT IS A CHILD AND SO IS WHAT IS BEHIND IT, blurred: the prototype's chip carries
+        backdrop-filter: blur(8px), and Avalonia has no backdrop filter at all — its BlurEffect
+        blurs the element's own layer and its acrylic only tints, both read in its source on
+        2026-09-12. What it does have is a brush of another visual, and here the backdrop is the
+        card's own artwork, which this card owns: a brush of CoverArt, the chip's own box taken out
+        of it, mirrored outwards the way the filter specification says a backdrop blur mirrors, and
+        blurred at a radius that Skia turns into the same sigma the 8 px of CSS asks for.
+
+        The rects are written by the code behind because only it knows how wide the word makes the
+        chip, and the bleed is three sigma: what is blurred is a box of the artwork larger than the
+        chip on every side, and the pill clips it back.
         -->
         <Border
+            x:Name="KindChip"
             Margin="8"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Classes="poster-chip"
-            IsVisible="{Binding HasKind}">
-          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space4}">
-            <Path
-                Classes="icon size-12 kind-glyph"
-                Classes.show="{Binding IsShow}"
-                VerticalAlignment="Center"
-                Stroke="{DynamicResource PosterChipInkBrush}" />
-            <TextBlock
-                x:Name="KindWord"
-                VerticalAlignment="Center"
-                FontSize="{DynamicResource FontSizeCaption}"
-                Text="{Binding KindKey, Converter={StaticResource CardWord}}"
-                automation:AutomationProperties.AccessibilityView="Raw" />
-          </StackPanel>
+            IsVisible="{Binding HasKind}"
+            SizeChanged="OnKindChipSizeChanged">
+          <Panel>
+            <Border x:Name="ChipBackdrop">
+              <Border.Effect>
+                <BlurEffect Radius="26" />
+              </Border.Effect>
+            </Border>
+            <Border Background="{DynamicResource PosterChipSurfaceBrush}" />
+            <StackPanel x:Name="KindWords" Orientation="Horizontal">
+              <Path
+                  Classes="icon size-12 kind-glyph"
+                  Classes.show="{Binding IsShow}"
+                  VerticalAlignment="Center"
+                  Stroke="{DynamicResource PosterChipInkBrush}" />
+              <TextBlock
+                  x:Name="KindWord"
+                  VerticalAlignment="Center"
+                  Text="{Binding KindKey, Converter={StaticResource CardWord}}"
+                  automation:AutomationProperties.AccessibilityView="Raw" />
+            </StackPanel>
+          </Panel>
         </Border>
         <!--
-        An unreachable medium says so INSIDE the cover, along its foot, which is where the prototype
-        writes it. It used to sit under the card, where it pushed the title of that card below the
-        titles beside it - the same ragged edge the caption's single line exists to prevent. It is
-        the same control the detail cards and the episode row mount; only its place moved.
+        An unreachable medium veils the cover it stands for and says so across its foot, which is
+        what the prototype paints at :311. It was a pill in the corner until 2026-09-12 — before
+        that, a pill UNDER the card, where it pushed that card's title below the titles beside it.
+        It is the same control the detail cards and the episode row mount, in the form a cover asks
+        for: the veil lives inside UnavailableBadge, so there is still one place that says this.
+
+        Its place in the stack is the prototype's too: over the chip, which it dims, and under the
+        rule, which goes on saying how far in you are.
         -->
-        <library:UnavailableBadge
-            Margin="6"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Bottom" />
+        <library:UnavailableBadge Classes="cover-veil" />
         <!--
-        And a tick, top right, for something seen to the end.
+        At the foot of the artwork rather than under the title: it is a rule across the poster, not a
+        control to read. Its three numbers and its two colours live in poster-track, next to the
+        other two bars this application draws, with what each of them cost to find written there.
+        -->
+        <ProgressBar
+            Classes="poster-track"
+            VerticalAlignment="Bottom"
+            IsVisible="{Binding HasKnownProgress}"
+            Maximum="1"
+            Value="{Binding CompletedFraction}"
+            automation:AutomationProperties.Name="{DynamicResource HomeResumeProgressLabel}" />
+        <!--
+        And a tick, top right, for something seen to the end: 20 across at 6 px from the cover's
+        inside, which is 7 from its outer edge, with a 13 px check — the prototype's numbers, at
+        :313. It drew 22 at 8 until 2026-09-12, when the two were counted in pixels side by side.
+
+        It is absent, not dimmed, when the medium is out of reach, which is the prototype's own
+        condition (done: … && av, at :2416). The veil owns the cover then, and a tick above it would
+        be the card saying two things at once about the same title.
         -->
         <Border
-            Width="22"
-            Height="22"
-            Margin="8"
+            Width="20"
+            Height="20"
+            Margin="6"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Background="{DynamicResource AccentBrush}"
-            CornerRadius="{DynamicResource CornerRadiusPill}"
-            IsVisible="{Binding IsWatched}">
+            CornerRadius="{DynamicResource CornerRadiusPill}">
+          <Border.IsVisible>
+            <MultiBinding Converter="{x:Static converters:BoolConverters.And}">
+              <Binding Path="IsWatched" />
+              <Binding Path="IsAvailable" />
+            </MultiBinding>
+          </Border.IsVisible>
           <Path
-              Classes="icon size-14"
+              Classes="icon size-13"
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
               Stroke="{DynamicResource AccentTextBrush}"
@@ -228,7 +317,6 @@ and a name here would be a second announcement of the same card.
     -->
     <StackPanel
         x:Name="CoverCaption"
-        Spacing="{DynamicResource Space8}"
         IsVisible="{DynamicResource CoverTitlesVisible}">
     <!--
     One line and no more, ended by an ellipsis: a second line pushed the caption of one card below
@@ -236,6 +324,7 @@ and a name here would be a second announcement of the same card.
     The full title is still announced - the button around the card carries it as its name.
     -->
     <TextBlock
+        x:Name="CardTitle"
         FontWeight="SemiBold"
         Text="{Binding Title}"
         TextTrimming="CharacterEllipsis"
@@ -246,29 +335,28 @@ and a name here would be a second announcement of the same card.
     second is a status for a film and a count for a series, never both.
     -->
     <TextBlock
-        FontSize="{DynamicResource FontSizeCaption}"
+        x:Name="CardMeta"
         Foreground="{DynamicResource TextSecondaryBrush}"
         IsVisible="{Binding HasMeta}"
         Text="{Binding MetaText}"
         TextTrimming="CharacterEllipsis"
         TextWrapping="NoWrap" />
     <TextBlock
-        FontSize="{DynamicResource FontSizeCaption}"
+        x:Name="CardStatus"
         Foreground="{DynamicResource TextSecondaryBrush}"
         IsVisible="{Binding !CountsEpisodes}"
         Text="{Binding StatusKey, Converter={StaticResource CardWord}}"
         TextTrimming="CharacterEllipsis"
         TextWrapping="NoWrap" />
     <StackPanel
+        x:Name="CardEpisodes"
         Orientation="Horizontal"
         Spacing="{DynamicResource Space4}"
         IsVisible="{Binding CountsEpisodes}">
       <TextBlock
-          FontSize="{DynamicResource FontSizeCaption}"
           Foreground="{DynamicResource TextSecondaryBrush}"
           Text="{Binding EpisodeCountText}" />
       <TextBlock
-          FontSize="{DynamicResource FontSizeCaption}"
           Foreground="{DynamicResource TextSecondaryBrush}"
           Text="{DynamicResource CatalogEpisodesSuffix}" />
     </StackPanel>

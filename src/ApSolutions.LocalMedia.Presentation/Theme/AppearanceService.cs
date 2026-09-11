@@ -275,6 +275,15 @@ public sealed class AppearanceService : IAppearanceService
             InterfaceDensity.Roomy => 16.0,
             _ => 8.0,
         };
+        // The prototype changes two gaps with its density and not one: 12/10, 18/16 and 26/22, rows
+        // first (design/AP Reelume.dc.html:3549). The gutter above is half the column one; this is
+        // the row one whole, and the library's grid takes the tiles' padding out of it.
+        _application.Resources["DensityRowGap"] = options.Density switch
+        {
+            InterfaceDensity.Compact => 12.0,
+            InterfaceDensity.Roomy => 26.0,
+            _ => 18.0,
+        };
         _application.Resources["DensityGutter"] = gutter;
         _application.Resources["PosterCardPadding"] = new Thickness(gutter);
         _application.Resources["PosterGutterX"] = new Thickness(gutter, 0, gutter, 0);
