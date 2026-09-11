@@ -22,8 +22,33 @@ public sealed partial class LibraryView : UserControl
     public static readonly StyledProperty<double> GutterProperty =
         AvaloniaProperty.Register<LibraryView, double>(nameof(Gutter), 8);
 
+    /// <summary>The room between two rows of covers, which the density row chooses separately.</summary>
+    /// <remarks>
+    /// The prototype gives its grid two gaps, not one — 12/10, 18/16 and 26/22 by density
+    /// (<c>design/AP Reelume.dc.html:3549</c>) — and the row gap is the larger of each pair.
+    /// </remarks>
+    public static readonly StyledProperty<double> RowGapProperty =
+        AvaloniaProperty.Register<LibraryView, double>(nameof(RowGap), 18);
+
+    /// <summary>
+    /// The padding the prototype's tile carries on every side, which its density never changes.
+    /// </summary>
+    /// <remarks>
+    /// It stays 8 above and below a card here for that reason, while the sides follow the density
+    /// gutter until the horizontal half of that difference is closed: measured on 2026-09-12, the
+    /// filter row sat 21 px above the first cover at the comfortable density and 29 at the roomy
+    /// one, where the prototype leaves 17 at all three.
+    /// </remarks>
+    private const double TilePadding = 8;
+
     /// <summary>The cover height last written for this grid, so an unchanged one is not rewritten.</summary>
     private double _coverHeight = double.NaN;
+
+    /// <summary>The tile's box as last written, for the same reason: a resource rewritten with the
+    /// value it already had still notifies every card under it.</summary>
+    private Thickness _cardPadding = new(double.NaN);
+
+    private Thickness _rowSpacing = new(double.NaN);
 
     public LibraryView()
     {
@@ -40,6 +65,9 @@ public sealed partial class LibraryView : UserControl
     /// <summary>The chosen density's gutter, as the theme has it where this view stands.</summary>
     public double Gutter => GetValue(GutterProperty);
 
+    /// <summary>The chosen density's row gap, as the theme has it where this view stands.</summary>
+    public double RowGap => GetValue(RowGapProperty);
+
     /// <summary>
     /// A new cover size or density recounts the grid, because nothing else would.
     /// </summary>
@@ -53,7 +81,9 @@ public sealed partial class LibraryView : UserControl
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == MinimumCoverProperty || change.Property == GutterProperty)
+        if (change.Property == MinimumCoverProperty
+            || change.Property == GutterProperty
+            || change.Property == RowGapProperty)
         {
             Recount();
         }
@@ -92,6 +122,25 @@ public sealed partial class LibraryView : UserControl
         {
             _coverHeight = height;
             LibraryGridSurface.Resources["PosterCardHeight"] = height;
+        }
+
+        // The tile's own box, for this grid and nothing else: the gutter at the sides, the
+        // prototype's fixed 8 above and below, and what is left of the row gap once both cards have
+        // spent theirs. At the compact density that last one is negative — the prototype's tiles
+        // overlap there too, by the same 4 px, because its gap of 12 is narrower than the 16 two
+        // tiles of padding take.
+        var padding = new Thickness(Gutter, TilePadding, Gutter, TilePadding);
+        if (padding != _cardPadding)
+        {
+            _cardPadding = padding;
+            LibraryGridSurface.Resources["LibraryCardPadding"] = padding;
+        }
+
+        var spacing = new Thickness(0, 0, 0, RowGap - (2 * TilePadding));
+        if (spacing != _rowSpacing)
+        {
+            _rowSpacing = spacing;
+            LibraryGridSurface.Resources["LibraryRowSpacing"] = spacing;
         }
     }
 

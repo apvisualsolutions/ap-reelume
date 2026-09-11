@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Library;
 using ApSolutions.LocalMedia.TestSupport;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
@@ -54,11 +55,83 @@ public sealed class UnavailableBadgeTests
         Assert.True(
             border.BorderThickness.Top > 0,
             "The badge has no border, so its only signal is the fill colour.");
-        Assert.Contains(
+
+        // The glyph, which is a geometry since 2026-09-12 and was the ⚠ character before it: this
+        // tree carried twenty-seven Segoe glyphs into line drawings on 2026-08-24 and left this one
+        // behind, a solid pictogram from another alphabet beside thirty-five stroked ones.
+        var glyph = Assert.Single(badge.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Path>());
+
+        // The instance, not its ToString: StreamGeometry does not override it — measured by
+        // reflection on Avalonia 12.1.1, the declaring type is Object — so comparing two of them as
+        // text compares "Avalonia.Media.StreamGeometry" with itself and passes for the star, the
+        // marker or the clock. Found by the gate audit of this same batch.
+        Assert.Same(ResourceValue("IconWarning"), glyph.Data);
+        Assert.DoesNotContain(
             badge.GetVisualDescendants().OfType<TextBlock>(),
             block => block.Text == "⚠");
 
         window.Close();
+    }
+
+    /// <summary>
+    /// Over a cover it is a veil, not a pill: the whole picture dimmed, with the word in white at
+    /// its foot.
+    /// </summary>
+    /// <remarks>
+    /// One control and two forms, which is what the prototype does — a veil over a cover (<c>:311</c>)
+    /// and a tint in a row — and what keeps the sentence in one place. The form is asserted here and
+    /// where it lands is asserted in pixels, in <c>PosterCardShapeTests</c>: a badge that says the
+    /// right thing in the wrong corner passes every assertion made about its own markup.
+    /// </remarks>
+    [AvaloniaFact]
+    public void On_a_cover_the_badge_is_a_veil_with_a_white_word_at_its_foot()
+    {
+        Assert.NotNull(Avalonia.Application.Current);
+        App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
+
+        var badge = new UnavailableBadge
+        {
+            Classes = { "cover-veil" },
+            DataContext = new UnavailableStub(false),
+        };
+        var window = new Window { Width = 200, Height = 300, Content = badge };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var surface = Assert.Single(
+            badge.GetVisualDescendants().OfType<Border>(),
+            candidate => candidate.Background is ISolidColorBrush);
+        Assert.Equal(
+            ThemeColour("PosterVeilBrush"),
+            Assert.IsAssignableFrom<ISolidColorBrush>(surface.Background).Color);
+        Assert.Equal(new Thickness(0), surface.BorderThickness);
+        Assert.Equal(new Thickness(8), surface.Padding);
+        Assert.Equal(new CornerRadius(0), surface.CornerRadius);
+
+        // The veil fills what it is put in; the pill sat in the middle of it.
+        Assert.Equal(badge.Bounds.Height, surface.Bounds.Height);
+
+        var word = Assert.Single(
+            badge.GetVisualDescendants().OfType<TextBlock>(),
+            block => block.Text == Resource("MediaUnavailable"));
+        Assert.Equal(ResourceValue("FontSizeFootnote"), word.FontSize);
+        Assert.Equal(FontWeight.SemiBold, word.FontWeight);
+        Assert.Equal(TextWrapping.Wrap, word.TextWrapping);
+        Assert.Equal(
+            ThemeColour("PosterChipInkBrush"),
+            Assert.IsAssignableFrom<ISolidColorBrush>(word.Foreground).Color);
+
+        window.Close();
+    }
+
+    private static string Resource(string key) => Assert.IsType<string>(ResourceValue(key));
+
+    private static object ResourceValue(string key)
+    {
+        Assert.True(
+            Avalonia.Application.Current!.TryFindResource(key, out var value),
+            $"{key} is not declared, so nothing can paint it.");
+        return value!;
     }
 
     /// <summary>

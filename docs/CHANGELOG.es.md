@@ -319,6 +319,39 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Las filas de la Biblioteca salían unos 5 px más altas que las del diseño, y las tres líneas bajo
+  cada portada demasiado separadas.** El diseño deja 10 px de la portada al título, apila las tres
+  líneas una tras otra —con 3 px sólo antes de la última— y separa las filas 18; el programa dejaba
+  8, metía 8 px entre cada línea y separaba las filas 16. Medido en píxeles a los dos anchos de
+  referencia: ahora la primera portada empieza **17 px bajo los filtros**, como en el diseño y en las
+  tres densidades, y cada fila avanza exactamente lo que avanza la suya —309 px a 1600 y 321 a 1500—.
+
+  **Dos cosas lo tenían escondido.** La primera: el programa redondea hacia arriba el alto de cada
+  línea de texto, así que unas líneas de 20,25 y 17,25 px ocupaban 21 y 18 y el pie de cada tarjeta
+  crecía 2,25 px; ese redondeo se apaga sólo ahí. La segunda: los carriles de Inicio comparten esta
+  tarjeta y el diseño los dibuja distintos —hueco de 8, título más pequeño y ninguna línea de
+  estado—, así que los números nuevos entran sólo en la rejilla y los carriles se quedan como
+  estaban.
+
+- **Las cuatro marcas que van sobre la portada ya son las del diseño.** El distintivo de tipo
+  («Película», «Serie») pasa a 10,5 px en seminegrita sobre un tinte más ligero **y con el arte
+  desenfocado detrás**; la marca de visto mide 20 px a 7 del borde —antes 22 a 9— y **desaparece
+  cuando el medio no está**, como en el diseño; la barra de progreso deja de ser una placa gris
+  opaca y pasa a ser blanco al 25 % sobre la imagen, de borde a borde y con las puntas rectas, donde
+  antes perdía 4 px por cada lado; y «No disponible» deja de ser una píldora ámbar en una esquina
+  para velar la portada entera con su palabra en blanco al pie, que es como el diseño dice que un
+  disco no está.
+
+  **El desenfoque no existe en el marco sobre el que está hecha la aplicación** —consultado su
+  código fuente: sólo sabe difuminar el propio elemento, no lo que hay detrás—, así que se dibuja con
+  un pincel del arte de la propia tarjeta, recortado por el distintivo y repetido en espejo hacia
+  fuera, que es como la norma de CSS define un desenfoque de fondo. Medido: la trama diagonal del
+  arte pierde el **97,6 %** de su detalle bajo el distintivo.
+
+  **Y el velo lleva un 2 % más de opacidad que el diseño, a propósito**: con el valor del diseño, su
+  palabra blanca sobre una portada blanca —la peor que puede llegar— se queda en 4,33:1 y la norma de
+  accesibilidad pide 4,5; con éste da 4,65:1, y los dos velos no se distinguen uno al lado del otro.
+
 - **En tema oscuro, con tres de los seis colores de acento, el borde de la opción elegida no se
   distinguía bien de su tarjeta**: se quedaba entre 2,78 y 2,86:1, por debajo del 3:1 que pide la
   norma de accesibilidad. El programa ajusta cada acento para que se lea sobre la página, y las

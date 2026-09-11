@@ -180,6 +180,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
       -->
       <x:Double x:Key="AccentTintOpacity">0.156</x:Double>
       <x:Double x:Key="DensityGutter">8</x:Double>
+      <!--
+        The row gap, which the prototype gives its grid separately from the column one: 12/10, 18/16
+        and 26/22 by density (:3549). Only the library's grid reads it, and it reads it as a number
+        rather than a gap because the tiles have already spent 8 px of it each - what the row carries
+        is the remainder, and at the compact density that is less than nothing.
+      -->
+      <x:Double x:Key="DensityRowGap">18</x:Double>
       <Thickness x:Key="PosterCardPadding">8</Thickness>
       <Thickness x:Key="PosterGutterX">8,0,8,0</Thickness>
       <Thickness x:Key="NegativePosterGutterX">-8,0,-8,0</Thickness>
@@ -331,7 +338,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
             ControlFillBrush - which is measured, one test below.
           -->
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
-          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
+          <!--
+            The three marks that live ON a cover carry the same colours in all four dictionaries, and
+            that is the prototype's own answer: its chip, its veil and its track are literals (:310,
+            :311, :312) untouched by its theme tokens, because what they sit on is artwork rather
+            than a theme surface. A themed value here would be a colour chosen against a background
+            that is not there.
+
+            The veil is the one number that is not the prototype's: it asks for .55 and this is .57
+            (#91 against #8C). Measured on 2026-09-12 over the worst cover there is, a white one: at
+            .55 the white 11 px word reads 4,33:1 and WCAG asks 4,5 of text that small; at .57 it
+            reads 4,65:1, and the two veils cannot be told apart side by side.
+          -->
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PosterChipSurfaceBrush" Color="#9E090C10" />
+          <SolidColorBrush x:Key="PosterVeilBrush" Color="#91090C10" />
+          <SolidColorBrush x:Key="PosterProgressTrackBrush" Color="#40FFFFFF" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#E9EEF4" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
@@ -571,7 +593,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#94A3B8" />
           <x:Double x:Key="PosterArtOpacity">1</x:Double>
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#E6FFFFFF" />
-          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PosterChipSurfaceBrush" Color="#9E090C10" />
+          <SolidColorBrush x:Key="PosterVeilBrush" Color="#91090C10" />
+          <SolidColorBrush x:Key="PosterProgressTrackBrush" Color="#40FFFFFF" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#050608" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#12151B" />
@@ -809,7 +834,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
           <x:Double x:Key="PosterArtOpacity">0</x:Double>
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#101828" />
-          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PosterChipSurfaceBrush" Color="#9E090C10" />
+          <SolidColorBrush x:Key="PosterVeilBrush" Color="#91090C10" />
+          <SolidColorBrush x:Key="PosterProgressTrackBrush" Color="#40FFFFFF" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#FFFFFF" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#FFFFFF" />
@@ -1036,7 +1064,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <SolidColorBrush x:Key="PlayerTextSecondaryBrush" Color="#FFFFFF" />
           <x:Double x:Key="PosterArtOpacity">0</x:Double>
           <SolidColorBrush x:Key="PosterInitialsBrush" Color="#F8FAFC" />
-          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#EDF1F6" />
+          <SolidColorBrush x:Key="PosterChipInkBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="PosterChipSurfaceBrush" Color="#9E090C10" />
+          <SolidColorBrush x:Key="PosterVeilBrush" Color="#91090C10" />
+          <SolidColorBrush x:Key="PosterProgressTrackBrush" Color="#40FFFFFF" />
           <SolidColorBrush x:Key="PosterRingBrush" Color="#21FFFFFF" />
           <SolidColorBrush x:Key="NavigationSurfaceBrush" Color="#000000" />
           <SolidColorBrush x:Key="CardSurfaceBrush" Color="#000000" />
@@ -1835,15 +1866,36 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
   </Style>
 
+  <!--
+    THE KIND CHIP over a cover - «Película» or «Serie», top left, which is kindBadge at :2374 of the
+    design. Everything here is that line read out: 3px 9px 3px 7px of padding, a gap of 5, 10,5 px in
+    600 with a hair of letter spacing, and a line at 1.5 like every other line in the prototype.
+
+    It carries no padding of its own since 2026-09-12 and its words carry it as a margin instead: the
+    tint and the blurred back of the chip are children now, and a padding would have inset the two
+    of them by 7 px inside their own pill.
+  -->
   <Style Selector="Border.poster-chip">
-    <Setter Property="Padding" Value="7,2" />
+    <Setter Property="Padding" Value="0" />
     <!--
       The pill, and it read as the small 4 until 2026-09-03: kindBadge is a capsule over the cover in
       the prototype, not a rounded box. SurfaceCornerTests reads the number out of the design.
     -->
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusPill}" />
-    <Setter Property="Background" Value="#B8090C10" />
-    <Setter Property="TextElement.Foreground" Value="#EDF1F6" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource PosterChipInkBrush}" />
+  </Style>
+
+  <Style Selector="Border.poster-chip StackPanel#KindWords">
+    <Setter Property="Margin" Value="7,3,9,3" />
+    <Setter Property="Spacing" Value="5" />
+  </Style>
+
+  <Style Selector="Border.poster-chip TextBlock#KindWord">
+    <Setter Property="FontSize" Value="10.5" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LineHeight" Value="15.75" />
+    <Setter Property="LetterSpacing" Value="0.105" />
   </Style>
 
   <!--
@@ -1875,6 +1927,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <Setter Property="Width" Value="12" />
     <Setter Property="Height" Value="12" />
     <Setter Property="StrokeThickness" Value="0.8" />
+  </Style>
+
+  <Style Selector="Path.icon.size-13">
+    <Setter Property="Width" Value="13" />
+    <Setter Property="Height" Value="13" />
+    <Setter Property="StrokeThickness" Value="0.87" />
   </Style>
 
   <Style Selector="Path.icon.size-14">
@@ -3110,6 +3168,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
   <Style Selector="ProgressBar.confidence.pending">
     <Setter Property="Foreground" Value="{DynamicResource WarningBorderBrush}" />
+  </Style>
+
+  <!--
+    THE RULE ACROSS A COVER, which is a bar in name only: 3 px at the foot of the artwork, white at a
+    quarter for what is left and the accent for what is watched (design/AP Reelume.dc.html:312 and
+    :2417). MinHeight and MinWidth go with the height because the base ControlTheme sets minimums of
+    its own - 200 px wide inside a 148 px poster, measured in PosterCardView.
+
+    Its ends are square, and that is the one thing here that had to be said out loud: the base theme
+    rounds them, and counted in pixels on 2026-09-12 a 42 % fill measured 57 px of accent where the
+    prototype draws 61. What rounds this bar is the cover it lies in, at the 9 px its hairline leaves
+    of the 10.
+  -->
+  <Style Selector="ProgressBar.poster-track">
+    <Setter Property="Height" Value="3" />
+    <Setter Property="MinHeight" Value="3" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource PosterProgressTrackBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
   </Style>
 
   <!--

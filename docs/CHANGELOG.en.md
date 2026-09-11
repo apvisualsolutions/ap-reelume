@@ -319,6 +319,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The library's rows came out about 5 px taller than the design's, and the three lines under every
+  cover too far apart.** The design leaves 10 px from the cover to the title, stacks the three lines
+  one after another — with 3 px before the last one alone — and separates its rows by 18; the program
+  left 8, put 8 px between each line and separated its rows by 16. Measured in pixels at both
+  reference widths: the first cover now starts **17 px below the filters**, as in the design and at
+  all three densities, and every row steps exactly as far as the design's — 309 px at 1600 and 321 at
+  1500.
+
+  **Two things had it hidden.** The first: the program rounds every line of text up to a whole pixel,
+  so lines of 20.25 and 17.25 px took 21 and 18 and the foot of each card grew by 2.25 px; that
+  rounding is now off there alone. The second: Home's rails share this card and the design draws them
+  differently — a gap of 8, a smaller title and no status line — so the new numbers reach the grid
+  only and the rails stay as they were.
+
+- **The four marks over a cover are the design's now.** The kind badge («Película», «Serie») becomes
+  10.5 px semibold over a lighter tint **with the artwork blurred behind it**; the watched tick is
+  20 px at 7 from the edge — it was 22 at 9 — and **it goes away when the medium is not there**, as in
+  the design; the progress bar stops being an opaque grey plate and becomes white at 25 % over the
+  picture, edge to edge and with square ends, where it used to lose 4 px at each one; and «No
+  disponible» stops being an amber pill in a corner and veils the whole cover with its word in white
+  along the foot, which is how the design says a drive is gone.
+
+  **The framework the application is built on has no backdrop blur** — read in its own source: it can
+  blur the element itself, not what is behind it — so it is drawn with a brush of the card's own
+  artwork, clipped by the badge and mirrored outwards, which is how the CSS standard defines a
+  backdrop blur. Measured: the artwork's diagonal hatch loses **97.6 %** of its detail under the
+  badge.
+
+  **And the veil carries 2 % more opacity than the design, on purpose**: with the design's value its
+  white word over a white cover — the worst that can arrive — stays at 4.33:1 where the accessibility
+  standard asks 4.5; with this one it reads 4.65:1, and the two veils cannot be told apart side by
+  side.
+
 - **In the dark theme, with three of the six accent colours, the chosen option's border did not
   stand out enough from its card**: it stayed between 2.78 and 2.86:1, below the 3:1 the
   accessibility standard asks for. The program adjusts every accent to read on the page, and the

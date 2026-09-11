@@ -1,5 +1,105 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-12: la tarjeta de la Biblioteca, con su ritmo y sus cuatro marcas
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+>
+> ### Lo que se cerró
+>
+> · **El ritmo vertical de la tarjeta, entero y en las tres densidades.** 17 px de los filtros a la
+>   primera portada —donde había 21, 17 y 29 según la densidad—, 10 de la portada al título, las tres
+>   líneas apiladas como el prototipo las apila (cajas de 20,25 y 17,25, la última 3 px más abajo) y
+>   un paso de fila que es el suyo: 309 px a 1600 y 321 a 1500. El prototipo se midió el mismo día
+>   con Chrome **sin cabeza**, con el DOM y con los píxeles, a los dos anchos y en las tres
+>   densidades, y los dos instrumentos coinciden al píxel.
+> · **Las cuatro marcas sobre la portada.** Chip de tipo a 10,5 px seminegrita sobre un tinte al
+>   `.62` **con el arte desenfocado detrás**; marca de visto de 20 a 7 px del borde y **ausente
+>   cuando el medio no está**, como en el prototipo; pista de progreso de blanco al 25 % sobre el
+>   arte, de borde a borde y con las puntas rectas; y el «No disponible» pasa de píldora ámbar a
+>   **velo sobre toda la portada** con su palabra en blanco al pie. El orden de pintado es el suyo:
+>   el velo atenúa el chip y la pista va encima del velo.
+> · **El desenfoque se emula, y la vía salió de la fuente de Avalonia**: no hay desenfoque de fondo
+>   dentro de la ventana, así que el chip pinta un pincel del arte de su propia tarjeta, su caja
+>   recortada de él y repetida **en espejo** hacia fuera —el `edgeMode="mirror"` que pide la norma de
+>   filtros— con un radio que Skia convierte en el sigma de los 8 px de CSS. Medido: la trama del
+>   arte pierde el **97,6 %** de su detalle bajo el chip.
+> · **El velo lleva `.57` y no el `.55` del prototipo**, con su número al lado: sobre una portada
+>   blanca, su palabra de 11 px se queda en 4,33:1 con el valor del prototipo y da 4,65:1 con éste.
+>   Es una cesión por contraste y tiene prueba con control negativo.
+> · **El glifo del aviso pasa a ser geometría** (llevaba el carácter «⚠», el último de otro alfabeto),
+>   y el trinquete de esquinas bajó de 78 a 77.
+> · **Los carriles de Inicio no se tocaron**: el prototipo los dibuja distintos, así que los números
+>   nuevos entran por una clase que sólo pone la rejilla.
+> · **La auditoría de puertas encontró seis huecos**, cinco con la forma de siempre —una comprobación
+>   que no podía fallar—: el glifo del aviso comparado **como texto** (y `StreamGeometry` no
+>   sobrescribe `ToString`, así que pasaba cualquier geometría), el hueco de fila por densidad que
+>   **nadie medía** porque las pruebas de ritmo lo inyectan, el check de la marca **invisible** para
+>   la medición del disco, una sola dirección vigilada de las dos formas de la tarjeta, la tinta del
+>   chip no atada al pincel que usa, y el sitio del fondo desenfocado. Los seis corregidos y cada uno
+>   visto fallar con su mutación.
+>
+> ### `main` y la rama
+>
+> Cada fast-forward se hace **con la conclusión leída y nombrando el SHA**, nunca `HEAD`. Si al leer
+> esto `main` no coincide con la rama, el run del commit de cabeza es el que decide: `gh run list
+> --commit <sha de cabeza>`.
+>
+> ### Lo que contestó el propietario, y lo que sigue
+>
+> · **El orden**: la Biblioteca primero —hecha— y **`PLY-016` después**. Es lo siguiente.
+> · **Para verificar `PLY-016`**: enciende la Súper resolución RTX en NVIDIA App; la gráfica integrada
+>   **ya estaba activada en la BIOS** y se midió: Windows ve la RTX 5070 y la UHD 770, las dos en
+>   orden. **No autorizó la máquina AMD en la nube**, así que AMD queda sin verificar y eso choca con
+>   la regla de publicación: es decisión de gasto suya y hay que volver a plantearla cuando PLY-016
+>   llegue a su parte de AMD.
+> · **`PLY-016` arranca midiendo**, no diseñando: qué formato de entrada aceptan las extensiones de
+>   NVIDIA e Intel, con `CheckVideoProcessorFormat` y una prueba de píxel. Un `S_OK` no prueba nada.
+>
+> ### Registrado y sin hacer
+>
+> · **La puerta del presupuesto de fotograma de la Biblioteca mide una pantalla quieta.** Desplaza el
+>   primer `ScrollViewer` de la vista, que es el de la caja de búsqueda. Pidiendo `LibraryGridSurface`
+>   por nombre, el p95 sale **51,5 ms** contra el presupuesto de **16,7** —el desenfoque del chip son
+>   2,2 de esos; sin él, 49,3—. Los 0,6019 y 0,9010 ms de `C2-library-gate.md` y los 0,77 de
+>   `C6-experience-gate.md` son ese fotograma estático. **Se dejó sin tocar a propósito**: 16,7 ms es
+>   un criterio del MVP y qué se hace con una promesa que nunca se midió es del propietario. Hay tarea
+>   de fondo con los números.
+> · **La familia tipográfica**: el prototipo pide `Segoe UI Variable Text` y la aplicación dibuja
+>   `Segoe UI`. El tema declara una familia compuesta `Inter, $Default` y **Inter no está referenciada
+>   como paquete**, así que resuelve al predeterminado del sistema; dos sitios del árbol dicen «Inter a
+>   14 px» y son falsos. Afecta a todo el texto: tanda propia.
+> · **La mitad horizontal de la densidad** (huecos de columna 10/16/22 contra 8/16/32), **los filtros
+>   a 36 de alto donde el prototipo pone 32**, la fila de avisos que ocupa 12 px vacía con un
+>   comentario que dice 0, y el hover de la tarjeta en alto contraste, deducido y sin medir.
+>
+> ### Bloqueado por algo que no es código
+>
+> · `PRD-002`: el certificado comercial de firma. Es una compra.
+> · La verificación de AMD en `PLY-016`: no hay tarjeta y la máquina en la nube no está autorizada.
+>
+> ### Trampas medidas hoy
+>
+> · **La captura del arnés viene en `Rgba8888`, no en BGRA**, y un lector que suponga BGRA intercambia
+>   rojo y azul. Todo lo medido en píxeles hasta hoy era gris, blanco o verde, que sobreviven al
+>   intercambio; el velo, que es `9,12,16`, no: leía un alfa de 0,488 donde pinta 0,569.
+> · **Avalonia redondea hacia arriba el tamaño deseado de cada control**: cajas de línea de 20,25 y
+>   17,25 medían 21 y 18 y el pie crecía 2,25 px por fila. Se apaga el redondeo sólo en el pie.
+> · **`LineHeight` reparte el sobrante como CSS**, mitad arriba y mitad abajo: medido, +2,29 baja la
+>   tinta 1 px y +6,04 la baja 3.
+> · **Un atributo gana a un `Setter`**, y el estilo que pierde no deja rastro: el velo se aplicó, se
+>   perdió, y lo que se pintó fue la píldora estirada de lado a lado.
+> · **`Space8` es un número y un `Padding` es un grosor**: el `Setter` revienta al cargar la vista.
+> · **La misma palabra no tinta igual en dos tipografías**, aunque su métrica vertical sea idéntica:
+>   «Vidrio Templado» tinta 13 filas aquí y 15 en el prototipo. Las cajas se comparan exactas y la
+>   tinta con dos píxeles de holgura.
+> · **La caja del color exacto de un disco suavizado miente** —un círculo de 20 px lee 18—: se mide
+>   por área y centroide, sin umbral.
+> · **El azul del texto secundario es 117**, así que un umbral de 110 no lo ve: el barrido encontró
+>   una portada, un título y nada más.
+> · **Una línea de texto fina puede tener un hueco de dos filas** donde el trazo suavizado queda por
+>   encima del umbral.
+
 > ## AVISO AL FRENTE — 2026-09-11, tarde: la rejilla fluida, la mejora de vídeo ampliada y VLC 3 ya reescala
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

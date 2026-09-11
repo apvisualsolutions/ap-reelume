@@ -1,5 +1,104 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-12: the library card, with its rhythm and its four marks
+>
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here.
+>
+> ### What was closed
+>
+> · **The card's vertical rhythm, whole and at all three densities.** 17 px from the filters to the
+>   first cover — where there were 21, 17 and 29 by density — 10 from the cover to the title, the
+>   three lines stacked the way the prototype stacks them (boxes of 20.25 and 17.25, the last one 3 px
+>   lower) and a row step that is its own: 309 px at 1600 and 321 at 1500. The prototype was measured
+>   the same day with **headless** Chrome, in the DOM and in pixels, at both widths and all three
+>   densities, and the two instruments agree to the pixel.
+> · **The four marks over a cover.** The kind chip at 10.5 px semibold over a `.62` tint **with the
+>   artwork blurred behind it**; the watched tick 20 across at 7 px from the edge and **absent when
+>   the medium is not there**, as in the prototype; a progress track of white at 25 % over the
+>   artwork, edge to edge and square-ended; and «No disponible» goes from an amber pill to a **veil
+>   over the whole cover** with its word in white along the foot. The painting order is the
+>   prototype's: the veil dims the chip and the track goes over the veil.
+> · **The blur is emulated, and the way came out of Avalonia's source**: there is no backdrop blur
+>   inside a window, so the chip paints a brush of its own card's artwork, its own box taken out of it
+>   and **mirrored** outwards — the `edgeMode="mirror"` the filter standard asks for — at a radius
+>   Skia turns into the sigma CSS's 8 px means. Measured: the artwork's hatch loses **97.6 %** of its
+>   detail under the chip.
+> · **The veil carries `.57` and not the prototype's `.55`**, with its number beside it: over a white
+>   cover its 11 px word stays at 4.33:1 with the prototype's value and reads 4.65:1 with this one.
+>   It is a contrast trade and it has a test with a negative control.
+> · **The notice's glyph becomes a geometry** (it carried the «⚠» character, the last one from another
+>   alphabet), and the corner ratchet came down from 78 to 77.
+> · **Home's rails were not touched**: the prototype draws them differently, so the new numbers arrive
+>   through a class only the grid puts on.
+> · **The gate audit found six holes**, five of them with the usual shape — a check that could not
+>   fail: the notice's glyph compared **as text** (and `StreamGeometry` does not override `ToString`,
+>   so any geometry passed), the density's row gap that **nothing measured** because the rhythm tests
+>   inject it, the tick's check **invisible** to the disc's measurement, only one direction guarded of
+>   the card's two forms, the chip's ink not tied to the brush it uses, and the blurred backdrop's
+>   place. All six fixed, and each one seen failing under its mutation.
+>
+> ### `main` and the branch
+>
+> Every fast-forward is made **with the conclusion read and the SHA named**, never `HEAD`. If `main`
+> does not match the branch when this is read, the run of the head commit decides: `gh run list
+> --commit <head sha>`.
+>
+> ### What the owner answered, and what comes next
+>
+> · **The order**: the Library first — done — and **`PLY-016` next**. That is what follows.
+> · **To verify `PLY-016`**: he is switching RTX Video Super Resolution on in the NVIDIA App; the
+>   integrated graphics **were already enabled in the BIOS** and it was measured: Windows sees the RTX
+>   5070 and the UHD 770, both in order. **He did not authorise the AMD machine in the cloud**, so AMD
+>   stays unverified and that collides with the publishing rule: it is his spending decision and it
+>   has to be put to him again when PLY-016 reaches its AMD half.
+> · **`PLY-016` starts by measuring**, not designing: which input formats NVIDIA's and Intel's
+>   extensions accept, with `CheckVideoProcessorFormat` and a pixel test. An `S_OK` proves nothing.
+>
+> ### Registered and not done
+>
+> · **The library's frame budget gate measures a screen that never moves.** It scrolls the view's
+>   first `ScrollViewer`, which is the search box's. Asking for `LibraryGridSurface` by name, the p95
+>   reads **51.5 ms** against a budget of **16.7** — the chip's blur is 2.2 of those; without it,
+>   49.3. The 0.6019 and 0.9010 ms in `C2-library-gate.md` and the 0.77 in `C6-experience-gate.md`
+>   are that static frame. **It was left alone on purpose**: 16.7 ms is an MVP criterion and what to
+>   do with a promise nobody ever measured is the owner's. There is a background task with the
+>   numbers.
+> · **The typeface family**: the prototype asks for `Segoe UI Variable Text` and the application draws
+>   `Segoe UI`. The theme declares a composite family `Inter, $Default` and **Inter is not referenced
+>   as a package**, so it resolves to the system default; two places in the tree say «Inter at 14 px»
+>   and both are false. It reaches every word: a batch of its own.
+> · **The horizontal half of the density** (column gaps of 10/16/22 against 8/16/32), **the filters at
+>   36 tall where the prototype puts 32**, the notices row that takes 12 px while empty with a comment
+>   that says 0, and the card's hover in high contrast, deduced and unmeasured.
+>
+> ### Blocked by something that is not code
+>
+> · `PRD-002`: the commercial signing certificate. It is a purchase.
+> · AMD's verification in `PLY-016`: there is no card and the cloud machine is not authorised.
+>
+> ### Traps measured today
+>
+> · **The harness's capture arrives as `Rgba8888`, not BGRA**, and a reader that assumes BGRA swaps
+>   red and blue. Everything measured in pixels until today was grey, white or green, which survive
+>   the swap; the veil, at `9,12,16`, does not: it read an alpha of 0.488 where it paints 0.569.
+> · **Avalonia rounds every control's desired size up**: line boxes of 20.25 and 17.25 measured 21 and
+>   18 and the caption grew 2.25 px per row. The rounding goes off in the caption alone.
+> · **`LineHeight` distributes its extra leading the way CSS does**, half above and half below:
+>   measured, +2.29 moves the ink down 1 px and +6.04 moves it 3.
+> · **An attribute beats a `Setter`**, and the style that loses leaves no trace: the veil applied,
+>   lost, and what was painted was the pill stretched from side to side.
+> · **`Space8` is a number and a `Padding` is a thickness**: the setter throws as the view loads.
+> · **The same word does not ink the same in two typefaces**, even with identical vertical metrics:
+>   «Vidrio Templado» inks 13 rows here and 15 in the prototype. The boxes are compared exactly and
+>   the ink with two pixels of slack.
+> · **The exact-colour box of an antialiased disc lies** — a 20 px circle reads 18 — so it is measured
+>   by area and centroid, with no threshold.
+> · **The secondary text's blue channel is 117**, so a threshold of 110 cannot see it: the scan found
+>   a cover, a title and nothing else.
+> · **A thin line of text can carry a two row hole** where an antialiased stroke lands above the
+>   threshold.
+
 > ## READ THIS FIRST — 2026-09-11, afternoon: the fluid grid, the video enhancement widened, and VLC 3 already upscales
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main`,

@@ -47,6 +47,18 @@ public sealed class UiThreadBudgetTests
         };
         window.Show();
         Dispatcher.UIThread.RunJobs();
+        // ⚠ THIS IS NOT THE GRID, and it was measured on 2026-09-12: the first ScrollViewer in this
+        // view is the search box's — the Fluent TextBox template carries one and the header row is
+        // visited before the grid — so these sixty frames are sixty frames of a library that never
+        // moves. Asking for LibraryGridSurface by name instead reads a p95 of 51,5 ms against this
+        // budget of 16,7, of which the kind chip's blur is 2,2; without the blur it is 49,3. The
+        // 0,6 and 0,77 ms that C2 and C6 record as evidence are this static frame.
+        //
+        // It is left as it stands, and loudly, because the number it certifies is an MVP criterion:
+        // 16,7 ms is 60 frames a second promised to somebody scrolling, and what to do with a
+        // promise this tree has never measured — renegotiate it, or earn it — is the owner's call
+        // and not a line to quietly rewrite here. Registered with its numbers in
+        // docs/evidence/stable/audit-poster-card-rhythm.md.
         var scroller = view.GetVisualDescendants().OfType<ScrollViewer>().First();
         var frameIndex = 0;
         var samples = UiFrameBudgetProbe.Measure(() =>

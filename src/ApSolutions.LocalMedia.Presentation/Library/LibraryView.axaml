@@ -14,6 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:show="clr-namespace:ApSolutions.LocalMedia.Presentation.Show"
     x:DataType="library:LibraryViewModel"
     MinimumCover="{DynamicResource PosterCardWidth}"
+    RowGap="{DynamicResource DensityRowGap}"
     Gutter="{DynamicResource DensityGutter}"
     automation:AutomationProperties.Name="{DynamicResource LibraryAccessibleName}">
   <UserControl.Resources>
@@ -237,10 +238,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
         a width because a WrapPanel gives its children what they ask for, and a TextBox asks for
         almost nothing.
       -->
+      <!--
+        Eight under the filters and not twelve, so that the first cover lands 17 px below them, which
+        is what the prototype leaves at every width and every density (its section gap of 16, less
+        the 8 the tile reaches up by, plus its border and its padding). The card's own 8 px of
+        padding and its 1 px border make up the rest; it drew 21 here until 2026-09-12.
+      -->
       <WrapPanel
           x:Name="LibraryFilterSurface"
           Grid.Row="2"
-          Margin="0,16,0,12"
+          Margin="0,16,0,8"
           ItemSpacing="{DynamicResource Space12}"
           LineSpacing="{DynamicResource Space8}">
         <!--
@@ -473,17 +480,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <!--
-                No spacing here and no margin under the row: the card button's own 8 px padding is the
-                whole gap, 8 from one card and 8 from the next, horizontally and vertically alike.
-                One source for it is what lets the column count be arithmetic - a second gap on top
-                of the padding is a number the counting would have to know about.
+                The card button's own padding is most of the gap, 8 from one card and 8 from the
+                next, and what the row carries under it is the rest of the prototype's row gap: 2 px
+                at the comfortable density, 10 at the roomy one, and -4 at the compact one, where
+                its tiles overlap too. The sides are still the padding alone, which is what lets the
+                column count stay arithmetic.
 
                 The row is a PosterRowPanel and not a StackPanel since 2026-09-11: it shares the row
                 out into equal cells with every edge on a pixel, the way the browser lays out the
                 prototype's tracks, and the card stretches across its cell. That is why the button
                 says Stretch here rather than in its style, which Home's rails share.
               -->
-              <ItemsControl ItemsSource="{Binding}">
+              <ItemsControl ItemsSource="{Binding}" Margin="{DynamicResource LibraryRowSpacing}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
                     <library:PosterRowPanel />
@@ -491,16 +499,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="library:CatalogItemViewModel">
+                    <!--
+                      The card is the button's whole content, with no panel around it: a StackPanel
+                      there took the 1 px the theme gives every panel inside a button, which is an
+                      optical correction for a word on a button and not for a poster under one.
+
+                      Its padding is this grid's own - the gutter at the sides and the prototype's
+                      fixed 8 above and below - because the tile's vertical padding is what puts the
+                      first cover 17 px under the filters at every density.
+                    -->
                     <Button
                         Classes="poster-card"
+                        Padding="{DynamicResource LibraryCardPadding}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Stretch"
                         Click="OnCatalogItemClick"
                         automation:AutomationProperties.Name="{Binding Title}"
                         automation:AutomationProperties.HelpText="{Binding AvailabilityKey, Converter={StaticResource CatalogResourceKey}}">
-                      <StackPanel Spacing="{DynamicResource Space8}">
-                        <library:PosterCardView />
-                      </StackPanel>
+                      <library:PosterCardView Classes="grid-tile" />
                     </Button>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
