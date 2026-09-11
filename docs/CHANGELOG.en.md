@@ -223,6 +223,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The Library stretches its covers to fill every row, as the design does.** Until today every
+  cover was a fixed 148 px, so a 1600 px wide screen fitted eight and left about 160 px empty on the
+  right; the design stretches its own and fits nine. The grid now counts its columns with the
+  design's own rule and shares the width out among them to the pixel, the way a browser does: nine
+  covers of 147 and 148 at 1600, eight of 155 and 156 at 1500, and the same margin on both sides.
+  The cover size you choose under Appearance becomes the minimum, as in the design, and the grid
+  reflows when you change it, or the density, without anyone touching the window. Home's rails do not
+  change.
+
+  **Measured in pixels, not deduced**: the application was drawn in memory at 1500 and 1600 px and
+  every cover landed where it should, at 125, 150 and 175 % scaling too.
+
+- **The picture enhancement for low-resolution videos will cover any video below your screen's
+  resolution**, not only those under 720p: a 720p or 1080p series watched on a 4K screen too. And it
+  will be complete: the vendor's own super resolution on NVIDIA, Intel and AMD cards, and an upscaler
+  that works on any other. It does not wait for VLC 4, which today exists only as unsupported test
+  builds, nor does it need to: the VLC version already installed carries the three vendors' super
+  resolution, although only in its own video window, and what is left is bringing it into the
+  application's. It is not built yet; what there is, is the decision.
+
 - **The property-testing library moves to FsCheck 3.4.0**, the bump Dependabot had been proposing since
   23 August and nobody had picked up. Its notes only change the xUnit adapter, which this project does
   not use; the domain tests pass the same on the new version, checked in the binary that loads rather

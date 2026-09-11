@@ -122,6 +122,21 @@ now; documented so the gap is never silent:
   correcta a largo plazo; exige esperar a LibVLCSharp estable 4.x y re-evaluar toda la
   disciplina nativa del motor. / The right long-term route; requires stable LibVLCSharp 4 and
   re-validating the engine's native discipline.
+
+  **Corregido el 2026-09-11: la premisa era falsa.** `d3d11-upscale-mode=super` existe en VLC 3:
+  NVIDIA e Intel desde 3.0.19 y AMD (AMF) desde 3.0.21, según las notas de versión de VideoLAN, y
+  el `libdirect3d11_plugin.dll` de la 3.0.23.1 que este proyecto instala contiene la opción, el modo
+  `super`, el componente `AMFHQScaler`, `amfrt64.dll` y el mensaje «turning VSR» —contado en binario,
+  con una cadena inventada al lado que da cero—. Lo que sí es cierto es que sólo actúa en la salida
+  `direct3d11` de VLC, que dibuja en una ventana nativa y no pasa por los callbacks de esta
+  aplicación. VLC 4 no hace falta; el plan de `PLY-016` parte de aquí. / **Corrected on 2026-09-11:
+  the premise was false.** `d3d11-upscale-mode=super` exists in VLC 3 — NVIDIA and Intel since
+  3.0.19 and AMD (AMF) since 3.0.21 per VideoLAN's release notes — and the 3.0.23.1
+  `libdirect3d11_plugin.dll` this project installs carries the option, the `super` mode, the
+  `AMFHQScaler` component, `amfrt64.dll` and the «turning VSR» message, counted in binary next to a
+  made-up string that counts zero. What is true is that it only acts in VLC's `direct3d11` output,
+  which draws into a native window and does not go through this application's callbacks. VLC 4 is
+  not needed; the `PLY-016` plan starts from here.
 - **Realce administrado sobre los fotogramas BGRA** (unsharp mask propio en el sink del motor,
   antes de publicar cada fotograma): el único camino por sesión que funciona con VLC 3 en esta
   ruta, porque los píxeles ya están en memoria del proceso; cuesta CPU por fotograma (a 480p,

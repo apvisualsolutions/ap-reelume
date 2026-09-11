@@ -4,56 +4,140 @@
 using ApSolutions.LocalMedia.Presentation.Commands;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 
 namespace ApSolutions.LocalMedia.Presentation.Library;
 
 public sealed partial class LibraryView : UserControl
 {
+    /// <summary>The narrowest a cover may be, which is the size chosen on the Appearance page.</summary>
+    /// <remarks>
+    /// Bound in the markup to <c>PosterCardWidth</c>, and resolved here, above the grid's surface,
+    /// where that token still means the chosen size and not the automatic width the cards are given.
+    /// </remarks>
+    public static readonly StyledProperty<double> MinimumCoverProperty =
+        AvaloniaProperty.Register<LibraryView, double>(nameof(MinimumCover), 148);
+
+    /// <summary>Half the room between two covers, which is what the density row chooses.</summary>
+    public static readonly StyledProperty<double> GutterProperty =
+        AvaloniaProperty.Register<LibraryView, double>(nameof(Gutter), 8);
+
+    /// <summary>The cover height last written for this grid, so an unchanged one is not rewritten.</summary>
+    private double _coverHeight = double.NaN;
+
     public LibraryView()
     {
         InitializeComponent();
     }
 
+    /// <summary>The chosen cover size, as the theme has it where this view stands.</summary>
+    /// <remarks>
+    /// Read-only here because only the markup's binding writes it, and it does so through the
+    /// property itself: a setter nothing called was a line no test could reach.
+    /// </remarks>
+    public double MinimumCover => GetValue(MinimumCoverProperty);
+
+    /// <summary>The chosen density's gutter, as the theme has it where this view stands.</summary>
+    public double Gutter => GetValue(GutterProperty);
+
     /// <summary>
-    /// Tells the model how many cards fit across, which is the only pixel in this whole grid.
+    /// A new cover size or density recounts the grid, because nothing else would.
     /// </summary>
     /// <remarks>
-    /// The width and the padding are read from the theme rather than written here: the card paints
-    /// <c>PosterCardWidth</c> and this divides by it, and a number written in both places would
-    /// disagree the first time one of them moved.
+    /// With fixed cards a new size changed every card and the resize that followed recounted. A
+    /// fluid card takes its width from its cell and its height from this view, so a new minimum
+    /// changes no size by itself, and a new density takes a gutter in and gives it back around the
+    /// surface. Two properties rather than every resource change, because the Appearance page writes
+    /// a dozen tokens at a time and the property system only reports the ones that moved.
     /// </remarks>
-    private void OnGridSurfaceSizeChanged(object? sender, SizeChangedEventArgs e)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == MinimumCoverProperty || change.Property == GutterProperty)
+        {
+            Recount();
+        }
+    }
+
+    private void OnGridSurfaceSizeChanged(object? sender, SizeChangedEventArgs e) => Recount();
+
+    /// <summary>
+    /// Tells the model how many columns fit across, and the cards how tall a cover is in them —
+    /// the only two pixels in this whole grid.
+    /// </summary>
+    /// <remarks>
+    /// The border is read from the theme rather than written here, and the cover and the gutter
+    /// arrive through their properties, so no number lives in two places. The height is only
+    /// written when it changes, because a resource written again notifies every card under it
+    /// whether or not it moved.
+    /// </remarks>
+    private void Recount()
     {
         if (DataContext is not LibraryViewModel viewModel)
         {
             return;
         }
 
-        viewModel.Columns = ColumnsThatFit(
-            e.NewSize.Width,
-            Scalar(this, "PosterCardWidth", 148),
-            Scalar(this, "DensityGutter", 8),
-            Scalar(this, "PosterCardBorderThickness", 1));
+        var available = LibraryGridSurface.Bounds.Width;
+        var columns = ColumnsThatFit(available, MinimumCover, Gutter);
+        viewModel.Columns = columns;
+
+        var height = CoverHeight(
+            available,
+            columns,
+            Gutter,
+            Scalar(this, "PosterCardBorderThickness", 1),
+            LayoutHelper.GetLayoutScale(LibraryGridSurface));
+        if (height != _coverHeight)
+        {
+            _coverHeight = height;
+            LibraryGridSurface.Resources["PosterCardHeight"] = height;
+        }
     }
 
     /// <summary>
-    /// How many cards fit across a width, counting what each card carries on its two sides.
+    /// How tall a cover is in this grid: one and a half times the width its cell leaves it, on a
+    /// device pixel.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The padding counts twice because it is on both sides of every card, and that is the whole
-    /// gap: one card's right padding plus the next one's left. Counting the card alone put eight
-    /// columns into 1352 px on 2026-08-22 and drew the eighth 72 px past the edge.
+    /// The cell is the width shared out equally; the cover is the cell less a gutter and a border on
+    /// each side, which is the prototype's tile with <c>padding:8px; border:1px</c>. It is one height
+    /// for the whole grid, taken from the unsnapped cell the way a browser takes an
+    /// <c>aspect-ratio</c> from the unsnapped track, even though the cells themselves come out a
+    /// pixel apart.
     /// </para>
     /// <para>
-    /// The border counts twice for the same reason, and leaving it out was the same mistake a size
-    /// smaller: every card was 2 px wider than this believed, so within two pixels per column of one
-    /// more card it counted a column that did not fit. At 1600 px that drew the ninth cover of every
-    /// row 9 px into the page's right margin, measured on 2026-09-11.
+    /// Half away from zero, like the cell edges in <see cref="PosterRowPanel"/>; and never below
+    /// zero, which is what a surface not yet measured would otherwise ask for.
     /// </para>
     /// </remarks>
-    public static int ColumnsThatFit(double available, double cardWidth, double cardPadding, double cardBorder) =>
-        Math.Max(1, (int)(available / (cardWidth + (cardPadding * 2) + (cardBorder * 2))));
+    public static double CoverHeight(double available, int columns, double gutter, double border, double scale) =>
+        Math.Max(
+            0,
+            Math.Round(((available / columns) - (gutter * 2) - (border * 2)) * 1.5 * scale, MidpointRounding.AwayFromZero)
+                / scale);
+
+    /// <summary>
+    /// How many columns the prototype's grid lays out across a width: as many tiles of the chosen
+    /// cover and its gutter as fit, every one at least that wide.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The prototype writes <c>repeat(auto-fill, minmax(148px, 1fr))</c>, and its tile is
+    /// <c>border:1px; padding:8px; margin:-8px</c>: the 148 is the tile with its border inside, and
+    /// the cover is two pixels narrower. So the border is not counted here — it is inside the
+    /// minimum — and the gutter is, twice, because this surface spans the one the first and the last
+    /// tile reach out by. A column costs 148 + 2 × 8 = 164.
+    /// </para>
+    /// <para>
+    /// Until 2026-09-11 the card was a fixed 148 with its border outside it, and this divided by the
+    /// 166 a card measured: at 1600 px, the width the design is drawn at, it laid out eight and left
+    /// 160 px of nothing where the prototype stretches nine to fill the row.
+    /// </para>
+    /// </remarks>
+    public static int ColumnsThatFit(double available, double minimumCover, double gutter) =>
+        Math.Max(1, (int)(available / (minimumCover + (gutter * 2))));
 
     /// <summary>
     /// A scalar token's value, or the fallback when there is no theme around to ask.

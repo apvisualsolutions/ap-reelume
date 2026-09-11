@@ -1,5 +1,94 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-11, tarde: la rejilla fluida, la mejora de vídeo ampliada y VLC 3 ya reescala
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+>
+> ### Lo que se cerró
+>
+> · **La rejilla fluida de la Biblioteca**, que el propietario puso la primera del orden de paridad.
+>   La cuenta divide por 164 —el mínimo del prototipo incluye el borde— y `PosterRowPanel`, nuevo,
+>   reparte cada fila en celdas con los bordes ajustados al píxel como el navegador (mitad lejos de
+>   cero). Las tarjetas llenan su celda por dos sobrescrituras en la superficie de la rejilla y el alto
+>   sale de la celda. **Medido en píxeles, en memoria, a 1500 y 1600**: 8 y 9 portadas, 33 px a cada
+>   lado, y anchos y altos idénticos a los del prototipo, que se midió aparte con Chrome sin cabeza. La
+>   cuenta sigue a Apariencia sin redimensionar, e Inicio no cambia. Evidencia en
+>   [audit-fluid-library-grid.md](evidence/stable/audit-fluid-library-grid.md).
+> · **La auditoría de puertas (`gate-auditor`) encontró siete huecos**, todos de la misma forma: la
+>   regla se comprobaba en la función de cálculo o con los ajustes por defecto, y nadie leía lo que el
+>   panel dibujaba ni lo que cambiaba después. Corregidos, y cada uno visto fallar con su mutación.
+> · **`PLY-016` ampliado por el propietario**: cualquier vídeo por debajo de la resolución de la
+>   pantalla (720p y 1080p en 4K), **completo** con la superresolución de NVIDIA, Intel y AMD y un
+>   reescalador portátil en el resto. Y su regla nueva, escrita en la hoja de ruta: **«todas las
+>   mejoras deben ser aplicadas cuanto antes o no habrá release»**.
+> · **Una premisa falsa, corregida con fecha**: la superresolución no exige VLC 4. La 3.0.23.1 que se
+>   instala la trae —NVIDIA e Intel desde 3.0.19, AMD desde 3.0.21—, comprobado en el binario; pero
+>   sólo en su salida `direct3d11`, que dibuja en una ventana nativa y no pasa por nuestros callbacks.
+>
+> ### `main` y la rama
+>
+> Cada fast-forward se hace **con la conclusión leída y nombrando el SHA**, nunca `HEAD`. Si al leer
+> esto `main` no coincide con la rama, el run del commit de cabeza es el que decide: `gh run list
+> --commit <sha de cabeza>`.
+>
+> ### Decisiones tomadas y NO ejecutadas
+>
+> · **`PLY-016`, completo y cuanto antes.** La vía investigada, pendiente de diseñar: replicar
+>   `modules/video_output/win32/d3d11_scaler.cpp` de VLC (LGPL-2.1+) en nuestra cadena —fotograma
+>   (hoy UYVY convertido a BGRA en CPU) → textura D3D11 en el adaptador de Avalonia → procesador de
+>   vídeo con la extensión de NVIDIA o la VPE de Intel, o AMF `HQScaler` en AMD → textura compartida
+>   importada en la composición— y FSR 1 (MIT) portado a SkSL para las demás tarjetas. El SDK «RTX
+>   Video» de NVIDIA se descarta por su licencia. **Riesgo n.º 1**: qué formato de entrada aceptan las
+>   extensiones; se mide antes que nada. **Y un S_OK no prueba nada**: el indicador sólo se afirma
+>   comparando píxeles con la función encendida y apagada. Todo en la memoria del proyecto
+>   (`ap-reelume-superresolucion-vlc3`).
+> · **Lo registrado al medir contra el prototipo, al orden inmediato por la regla del propietario**:
+>   el ritmo vertical de la tarjeta, que va junto (18 contra 20, 8 contra 10, y las tres líneas bajo
+>   la portada separadas 8 px); cuatro diferencias de forma (pista del progreso, velo de «no
+>   disponible», chip de tipo, marca de visto); la densidad; los rieles de Inicio; el esqueleto; la
+>   decodificación a 148; el desplazamiento al redimensionar.
+> · **Los 42 defectos de paridad**, en el orden del propietario: sigue «Biblioteca y escaneo».
+>
+> ### Lo que espera al propietario, con su recomendación
+>
+> · **Para verificar `PLY-016`**: encender la «Súper resolución de vídeo RTX» en NVIDIA App (viene
+>   apagada y apagada no hace nada); activar la gráfica integrada del i7 en la BIOS; y autorizar una
+>   máquina con tarjeta AMD en la nube —Azure NVads V710 v5, unos 0,11 $/h en spot o 0,62 en normal, o
+>   AWS g4ad—, que se pide a la sesión de IT. Recomendación: sí a las tres.
+> · **El orden**: recomendación, terminar la Biblioteca —ritmo vertical y forma de la tarjeta, una
+>   tanda corta en la pantalla que se acaba de medir— y después `PLY-016`.
+>
+> ### Registrado y sin hacer
+>
+> · Dos tareas de fondo propuestas: **reaplicar la apariencia al cambiar de idioma** (leído en el
+>   código, sin reproducir) y **que la previsualización de cobertura vea los archivos fuera de la lista
+>   que caen bajo el listón**.
+>
+> ### Bloqueado por algo que no es código
+>
+> · `PRD-002`: el certificado comercial de firma. Es una compra.
+> · La verificación de AMD en `PLY-016`: no hay tarjeta AMD; es la decisión de gasto de arriba.
+>
+> ### Trampas medidas hoy
+>
+> · **El shell sin modelo deja visibles todos los destinos a la vez**: da igual para el layout y es
+>   fatal para contar píxeles. La primera captura encontró dos portadas; se monta con modelo y se
+>   navega.
+> · **Una columna a 4 px del borde cae en la esquina de 10**: leyó 229 donde hay 233.
+> · **`LayoutHelper.RoundLayoutValue` redondea la mitad al par** y el navegador lejos de cero.
+> · **La previsualización de cobertura calló ante `LibraryView.axaml.cs` a 95,8 %**, un archivo
+>   antiguo fuera de la lista: dos accesores `set` que nadie llamaba. La puerta de CI lo habría
+>   rechazado con `Floor`. Se quitaron: el compilador de XAML acepta enlazar una propiedad de sólo
+>   lectura.
+> · **Una prueba de cálculo que toca una clase con propiedades de Avalonia va en `[AvaloniaFact]`**:
+>   su constructor estático registra propiedades, y la suite da a cada prueba su propia aplicación.
+> · **Un agente lanzó `chrome.exe --version` sin `--headless`** y pudo abrir una pestaña en el Chrome
+>   del propietario. Al lanzar un agente que use Chrome, exigir el modo sin cabeza en toda orden.
+> · **`tools\parity\proto-library-dark.png` es la captura clara de 1500**: el nombre engaña.
+> · **«147 y 148 alternos» a 1600 era falso**: nueve celdas con 3 px de resto dan una ancha de cada
+>   tres. Lo cazó el prototipo y ahora lo fija una prueba.
+
 > ## AVISO AL FRENTE — 2026-09-11: la cobertura cerrada, las píldoras sin círculo y el margen del prototipo
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

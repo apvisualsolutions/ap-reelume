@@ -224,6 +224,26 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La Biblioteca estira sus portadas hasta llenar cada fila, como el diseño.** Hasta hoy cada
+  portada medía 148 px fijos, así que en una pantalla de 1600 de ancho cabían ocho y a la derecha
+  quedaban unos 160 px vacíos; el diseño estira las suyas y mete nueve. Ahora la rejilla cuenta las
+  columnas con la misma regla que el diseño y reparte el ancho entre ellas al píxel, como lo reparte
+  un navegador: nueve portadas de 147 y 148 a 1600, ocho de 155 y 156 a 1500, y el mismo margen a los
+  dos lados. El tamaño de portada que eliges en Apariencia pasa a ser el mínimo, como en el diseño, y
+  la rejilla se reacomoda al cambiarlo, o al cambiar la densidad, sin tener que tocar la ventana. Los
+  rieles de Inicio no cambian.
+
+  **Medido en píxeles, no deducido**: la aplicación se dibujó en memoria a 1500 y 1600 px y cada
+  portada cayó donde debía, también a 125, 150 y 175 % de escala.
+
+- **La mejora de imagen para vídeos de poca resolución cubrirá cualquier vídeo por debajo de la de
+  tu pantalla**, no sólo los de menos de 720p: una serie en 720p o 1080p vista en una pantalla 4K
+  también. Y será completa: la superresolución del propio fabricante en las tarjetas NVIDIA, Intel y
+  AMD, y un reescalador que funcione en cualquier otra. No espera a VLC 4, que hoy sólo existe en
+  versiones de prueba sin soporte, ni le hace falta: la versión de VLC que ya se instala trae la
+  superresolución de los tres fabricantes, aunque sólo en su propia ventana de vídeo, y lo que queda
+  es llevarla a la de la aplicación. Todavía no está construida; lo que hay es la decisión.
+
 - **La librería de pruebas por propiedades sube a FsCheck 3.4.0**, la subida que Dependabot proponía
   desde el 23 de agosto y nadie había recogido. Sus notas sólo cambian el adaptador para xUnit, que
   este proyecto no usa; las pruebas del dominio pasan igual sobre la versión nueva, comprobada en el

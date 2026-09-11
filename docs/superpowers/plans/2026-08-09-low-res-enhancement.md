@@ -35,6 +35,10 @@ evidencia bilingüe → changelogs ES/EN → un commit → push con `main` en fa
    super-resolución por GPU (NVIDIA VSR / Intel, `d3d11-upscale-mode`) exige VLC 4.x y LibVLCSharp
    estable sigue en 3.x; cambiar de motor (mpv/madVR) es otra decisión de arquitectura. Ambas
    quedan como opciones futuras con su coste nombrado.
+   **Corregido el 2026-09-11: la super-resolución no exige VLC 4.** Está en VLC 3 desde 3.0.19
+   (NVIDIA e Intel) y 3.0.21 (AMD), y en el binario 3.0.23.1 que se instala; pero sólo en la salida
+   `direct3d11` de VLC, que dibuja en su propia ventana. Ver la corrección en
+   [la evidencia del spike](../../evidence/stable/PLY16-low-res-spike.md).
 5. **Diseño de la implementación (fase 2, con lo que sobreviva del spike):**
    - `LowResolutionEnhancementPolicy` (Domain): un medio califica cuando su altura es conocida y
      **menor de 720**; la política produce la cadena de opciones aprobada. Constantes con tests.

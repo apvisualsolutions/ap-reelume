@@ -1,5 +1,93 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-11, afternoon: the fluid grid, the video enhancement widened, and VLC 3 already upscales
+>
+> **First look at the tree, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here.
+>
+> ### What was closed
+>
+> · **The Library's fluid grid**, which the owner put first in the parity order. The count divides
+>   by 164 — the prototype's minimum holds the border — and `PosterRowPanel`, new, shares each row out
+>   into cells with their edges snapped to the pixel as a browser does (half away from zero). The cards
+>   fill their cells through two overrides on the grid's surface, and the height comes from the cell.
+>   **Measured in pixels, in memory, at 1500 and 1600**: 8 and 9 covers, 33 px on each side, and
+>   widths and heights identical to the prototype's, measured separately with headless Chrome. The
+>   count follows Appearance without a resize, and Home does not change. Evidence in
+>   [audit-fluid-library-grid.md](evidence/stable/audit-fluid-library-grid.md).
+> · **The gate audit (`gate-auditor`) found seven gaps**, all of one shape: the rule was checked in
+>   the arithmetic function or with the default settings, and nobody read what the panel drew or what
+>   changed afterwards. Fixed, and each one seen failing under its mutation.
+> · **`PLY-016` widened by the owner**: any video below the screen's resolution (720p and 1080p on
+>   4K), **complete**, with NVIDIA's, Intel's and AMD's super resolution and a portable upscaler
+>   everywhere else. And his new rule, written in the roadmap: **«every improvement has to be applied
+>   as soon as possible or there will be no release»**.
+> · **A false premise, corrected with its date**: super resolution does not need VLC 4. The 3.0.23.1
+>   this project installs carries it — NVIDIA and Intel since 3.0.19, AMD since 3.0.21 —, checked in
+>   the binary; but only in its `direct3d11` output, which draws into a native window and does not go
+>   through our callbacks.
+>
+> ### `main` and the branch
+>
+> Every fast-forward is made **with the conclusion read and naming the SHA**, never `HEAD`. If `main`
+> does not match the branch when you read this, the run of the head commit decides:
+> `gh run list --commit <head sha>`.
+>
+> ### Decisions taken and NOT carried out
+>
+> · **`PLY-016`, complete and as soon as possible.** The route researched, still to be designed:
+>   replicate VLC's `modules/video_output/win32/d3d11_scaler.cpp` (LGPL-2.1+) in our own chain — the
+>   frame (UYVY converted to BGRA on the CPU today) → a D3D11 texture on Avalonia's adapter → the video
+>   processor with NVIDIA's extension or Intel's VPE, or AMF `HQScaler` on AMD → a shared texture
+>   imported into the composition — and FSR 1 (MIT) ported to SkSL for every other card. NVIDIA's
+>   «RTX Video» SDK is ruled out by its licence. **Risk number one**: which input format the
+>   extensions accept; it is measured first. **And an S_OK proves nothing**: the indicator can only be
+>   asserted by comparing pixels with the feature on and off. All of it is in the project memory
+>   (`ap-reelume-superresolucion-vlc3`).
+> · **What was registered measuring against the prototype, to the immediate order under the owner's
+>   rule**: the card's vertical rhythm, which goes together (18 against 20, 8 against 10, and the three
+>   lines under the cover spaced 8 px apart); four differences of shape (the progress track, the
+>   «unavailable» veil, the kind chip, the watched mark); the density; Home's rails; the skeleton;
+>   posters decoded at 148; the scroll position moving on resize.
+> · **The 42 parity defects**, in the owner's order: «Library and scanning» is next.
+>
+> ### What waits for the owner, with its recommendation
+>
+> · **To verify `PLY-016`**: switch on «RTX Video Super Resolution» in the NVIDIA App (it comes off,
+>   and off it does nothing); enable the i7's integrated graphics in the BIOS; and authorise a cloud
+>   machine with an AMD card — Azure NVads V710 v5, about 0.11 $/h spot or 0.62 on demand, or AWS
+>   g4ad —, asked of the IT session. Recommendation: yes to all three.
+> · **The order**: recommendation, finish the Library — the card's vertical rhythm and shape, a short
+>   batch on the screen just measured — and then `PLY-016`.
+>
+> ### Registered and not done
+>
+> · Two background tasks proposed: **reapply the appearance when the language changes** (read in the
+>   code, not reproduced) and **make the coverage preview see files off the list that drop under the
+>   bar**.
+>
+> ### Blocked by something that is not code
+>
+> · `PRD-002`: the commercial signing certificate. It is a purchase.
+> · Verifying AMD for `PLY-016`: there is no AMD card; it is the spending decision above.
+>
+> ### Traps measured today
+>
+> · **The shell with no model leaves every destination visible at once**: harmless for layout, fatal
+>   for counting pixels. The first capture found two covers; mount it with a model and navigate.
+> · **A column 4 px from the edge falls into the 10 px corner**: it read 229 where there are 233.
+> · **`LayoutHelper.RoundLayoutValue` rounds half to even** and the browser away from zero.
+> · **The coverage preview said nothing about `LibraryView.axaml.cs` at 95.8 %**, an old file off the
+>   list: two `set` accessors nobody called. The CI gate would have refused it with `Floor`. They were
+>   removed: the XAML compiler accepts binding a read-only property.
+> · **An arithmetic test that touches a class with Avalonia properties goes in `[AvaloniaFact]`**: its
+>   static constructor registers properties, and the suite gives every test its own application.
+> · **An agent ran `chrome.exe --version` without `--headless`** and may have opened a tab in the
+>   owner's Chrome. When launching an agent that uses Chrome, require headless on every command.
+> · **`tools\parity\proto-library-dark.png` is the light 1500 capture**: the name misleads.
+> · **«147 and 148 alternating» at 1600 was false**: nine cells with 3 px left over give one wide cell
+>   in every three. The prototype caught it and a test now pins it.
+
 > ## READ THIS FIRST — 2026-09-11: coverage closed, pills without a circle and the prototype's margin
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main`,

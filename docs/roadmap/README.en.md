@@ -23,6 +23,20 @@ What counts as "everything", so the rule is checkable rather than an intention:
 `pwsh -NoProfile -File eng/list-pending.ps1` answers how much is left at any moment, and separates
 the two categories on its own.
 
+**And on 2026-09-11 the owner hardened it: «every improvement has to be applied as soon as possible
+or there will be no release».** An improvement that is found or registered goes to the immediate
+order, not to a list with no date. It was said while widening `PLY-016`, the picture enhancement for
+low-resolution videos: it covers any video below the screen's resolution — 720p or 1080p on a 4K one
+— and **complete**, with the vendor's own super resolution on NVIDIA, Intel and AMD and a portable
+upscaler everywhere else. **It does not wait for VLC 4**: that day VideoLAN published 3.0.23 as
+stable and 4 only as an «unstable», unsupported nightly build, and the package feed held no 4 at all.
+**And it is not needed**: the 3.0.23 this project installs already carries the three vendors' super
+resolution in its D3D11 output — NVIDIA and Intel since 3.0.19 and AMD since 3.0.21, checked in the
+binary — although it only acts in VLC's own window and not in this application's composition, which
+draws its controls over the video. Bringing it into that composition, and the portable upscaler for
+every other card, is the work of `PLY-016`; August's claim that it needed VLC 4 was false and is
+corrected in its evidence.
+
 **What this rule turns into a publishing blocker, worth knowing early:** `PRD-002` cannot reach
 `VERIFIED` without the **commercial signing certificate**, because its cycle was verified on a
 re-signed copy and the unsigned artifact cannot repeat it — which chains it to `REL-001`.
@@ -138,14 +152,24 @@ was the geometric defect round four left standing — so the count does not move
 
 **Measuring it at 1600 px uncovered another, closed the same day**: the grid did not count each
 card's 1 px border and at that width took a column that did not fit, so the last cover ate 9 px of
-the right margin. **And it left one registered that is missing: the fluid grid.** The prototype
-stretches its cells to fill the width — at 1600, nine covers of about 147 — and the application uses
-a fixed 148 card that fits eight times at 1600, with about 160 px free on the right. The code said it
-could not be done because «Avalonia has no aspect ratio», and that was false: `Viewbox` scales
-keeping the proportion, and a panel can compute the height from the width. **It is work, and its
-place in the parity order is the owner's to set**; the recommendation is to put it first, because it
-is the most visible difference the library has left at the canonical width. All of it is in
-[the margin's evidence](../evidence/stable/audit-page-margin.md).
+the right margin. **And it left one registered that was missing: the fluid grid, closed on
+2026-09-11 too** as soon as the owner put it first in the parity order. The application used a fixed
+148 card that fitted eight times at 1600, with about 160 px free on the right; it now counts its
+columns with the prototype's rule and shares the width out to the pixel, as a browser does: nine
+covers of 147 and 148 at 1600, eight of 155 and 156 at 1500, and 33 px inside the page on each side,
+counted in pixels. All of it is in [the grid's evidence](../evidence/stable/audit-fluid-library-grid.md).
+**It was not one of the 42**, so the count does not move.
+
+**And measuring it against the prototype left seven by name, which under the owner's rule of the
+same day — «every improvement has to be applied as soon as possible or there will be no release» —
+go to the immediate order and not to «later»**: the card's vertical rhythm, fixed in one go — from
+the last line to the next cover 18 against 20, from the cover to the title 8 against 10, and the
+three lines under the cover spaced 8 px apart where the prototype stacks them —; four differences of
+shape on the card — the progress track, the «unavailable» veil, the kind chip and the watched mark —;
+the density, which only matches the prototype at comfortable; Home's two rails, which the prototype
+draws as a fluid grid with a 132 minimum; the first load's skeleton; posters decoded at 148, now drawn
+up to about 187; and the scroll position that moves on resize. **And one that is not about parity**: switching language wipes
+the chosen appearance until a restart, read in the code and still to be reproduced.
 
 **And one that was not in the count either, raised by the owner the same day and closed**: the
 twenty-seven option pills drew a radio button inside, and in eighteen it was the only thing saying

@@ -23,6 +23,20 @@ Qué cuenta como «todo», para que la regla sea comprobable y no una intención
 `pwsh -NoProfile -File eng/list-pending.ps1` contesta en cualquier momento cuánto falta, y separa
 las dos categorías por su cuenta.
 
+**Y el 2026-09-11 el propietario la endureció: «todas las mejoras deben ser aplicadas cuanto antes o
+no habrá release».** Una mejora que se descubre o se registra va al orden inmediato, no a una lista
+sin plazo. Lo dijo al ampliar `PLY-016`, la mejora de imagen para vídeos de poca resolución: cubre
+cualquier vídeo por debajo de la resolución de la pantalla —720p o 1080p en una 4K— y **completa**,
+con la superresolución del propio fabricante en NVIDIA, Intel y AMD y un reescalador portátil en el
+resto. **No espera a VLC 4**: ese día VideoLAN publicaba como estable la 3.0.23 y la 4 sólo como
+compilación nocturna «inestable» y sin soporte, y el canal de paquetes no tenía ninguna 4. **Y no
+hace falta**: la 3.0.23 que se instala ya trae la superresolución de los tres fabricantes en su salida
+D3D11 —NVIDIA e Intel desde la 3.0.19 y AMD desde la 3.0.21, comprobado en el binario—, aunque sólo
+actúa en la ventana propia de VLC y no en la composición de esta aplicación, que dibuja sus controles
+encima del vídeo. Llevarla a esa composición, y el reescalador portátil para las demás tarjetas, es
+el trabajo de `PLY-016`; la afirmación de agosto de que exigía VLC 4 era falsa y está corregida en su
+evidencia.
+
 **Lo que esta regla convierte en bloqueo de publicación, y conviene saberlo pronto:** `PRD-002` no
 puede llegar a `VERIFIED` sin el **certificado comercial de firma**, porque su ciclo se verificó
 sobre una copia resellada y el artefacto sin firmar no puede repetirlo — lo que lo encadena a
@@ -140,14 +154,25 @@ defecto geométrico que dejó la vuelta cuatro—, así que la cuenta no se muev
 
 **Medirlo a 1600 px destapó otro, cerrado el mismo día**: la rejilla no contaba el borde de 1 px de
 cada tarjeta y a ese ancho metía una columna que no cabía, así que la última portada se comía 9 px del
-margen derecho. **Y dejó registrado uno que falta: la rejilla fluida.** El prototipo estira sus
-celdas hasta llenar el ancho —a 1600, nueve portadas de unos 147— y la aplicación usa una tarjeta
-fija de 148 que a 1600 cabe ocho veces, con unos 160 px libres a la derecha. El código decía que no
-podía hacerse porque «Avalonia no tiene relación de aspecto», y era falso: `Viewbox` escala
-conservando la proporción y un panel puede calcular el alto a partir del ancho. **Es trabajo, y su
-sitio en el orden de paridad lo pone el propietario**; la recomendación es ponerlo el primero, porque
-es la diferencia más visible que le queda a la Biblioteca en el ancho canónico. Todo, en
-[la evidencia del margen](../evidence/stable/audit-page-margin.md).
+margen derecho. **Y dejó registrado uno que faltaba: la rejilla fluida, cerrada también el
+2026-09-11** en cuanto el propietario la puso la primera del orden de paridad. La aplicación usaba
+una tarjeta fija de 148 que a 1600 cabía ocho veces, con unos 160 px libres a la derecha; ahora
+cuenta las columnas con la regla del prototipo y reparte el ancho al píxel, como el navegador: nueve
+portadas de 147 y 148 a 1600, ocho de 155 y 156 a 1500, y 33 px dentro de la página a cada lado,
+contados en píxeles. Todo, en [la evidencia de la rejilla](../evidence/stable/audit-fluid-library-grid.md).
+**No era uno de los 42**, así que la cuenta no se mueve.
+
+**Y al medirla contra el prototipo quedaron siete con nombre, que según la regla del propietario del
+mismo día —«todas las mejoras deben ser aplicadas cuanto antes o no habrá release»— van al orden
+inmediato y no a «después»**: el ritmo vertical de la tarjeta, que se corrige de una vez —de la
+última línea a la portada siguiente 18 contra 20, de la portada al título 8 contra 10, y las tres
+líneas bajo la portada separadas 8 px donde el prototipo las apila—; cuatro diferencias de forma en la
+tarjeta —la pista del progreso, el velo de «no disponible», el chip de tipo y la marca de visto—; la
+densidad, que sólo coincide con el prototipo en la cómoda; los dos rieles de Inicio, que el prototipo
+pinta como rejilla fluida de mínimo 132; el esqueleto de la primera carga; la decodificación de
+portadas a 148, que ahora se dibujan hasta unos 187; y el desplazamiento que se mueve al
+redimensionar. **Y uno que no es de paridad**: cambiar
+de idioma borra la apariencia elegida hasta reiniciar, leído en el código y pendiente de reproducir.
 
 **Y uno que tampoco estaba en la cuenta, señalado por el propietario el mismo día y cerrado**: las
 veintisiete píldoras de opción dibujaban un botón de opción dentro, y en dieciocho era lo único que

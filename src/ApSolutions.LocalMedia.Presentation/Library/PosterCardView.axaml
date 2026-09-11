@@ -6,16 +6,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
 The 2:3 card, and the one piece the redesign repeats most: the library grid and the three rails on
 Home all show it, so it is a view of its own rather than four templates that would drift apart.
 
-Its size is written rather than fluid, and PosterCardWidth x PosterCardHeight is exactly 2:3. The
-grid decides how many fit on a row, and that is why the two numbers are tokens: the grid divides its
-width by the first one.
+Its size is two tokens, PosterCardWidth x PosterCardHeight, exactly 2:3 as declared, and who sets
+them depends on where the card is. Home's rails take them as declared: the chosen cover size. The
+library grid overrides both on its own surface, width to automatic and height to one and a half
+times the width its cell leaves the cover, so its cards stretch to fill the row the way the
+prototype's minmax(148px, 1fr) tracks do - nine covers of about 147 at 1600 px. The chip, the tick
+and the words keep their size when a cover stretches, as they do in the prototype; that is why the
+height comes from the grid and not from a Viewbox, which would scale them with it.
 
 This used to say a card could not stretch because "Avalonia has no aspect ratio", and that was
 false, found on 2026-09-11 when the owner asked for the documentation to be consulted: there is no
-property like CSS's aspect-ratio, but a Viewbox scales its content keeping its proportion - its
-default, Stretch="Uniform" - and a panel can set the height from the width. The prototype's grid IS
-fluid, nine covers of about 147 filling 1600 px where this card lays out eight; that is registered in
-the roadmap as work, not as a limit of the framework.
+property like CSS's aspect-ratio, but the height can be set from the width, and here the grid does.
 
 There is no artwork here and there is not going to be in 0.2.0: the application ships with no TMDB
 token, so the initials are not a placeholder waiting for a picture, they are what the card shows.
@@ -47,6 +48,11 @@ and a name here would be a second announcement of the same card.
       WrapPanel keeps all of them. Eight entries against either would decode and drop the same
       pictures on every pass, so this holds a screenful and the scroll either side of it: about
       17 MB full, at this width.
+
+      Since 2026-09-11 the library's covers stretch past 148 - 147 to 156 at 1500 and 1600 px, and
+      up to about 187 at the narrowest window - so a picture there is drawn a little larger than it
+      was decoded. That is registered with its numbers and not decided here: following the fluid
+      width would decode every picture again on each resize, because the cache keys on the width.
     -->
     <library:CachedPosterConverter
         x:Key="GridPoster"
