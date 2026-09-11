@@ -277,6 +277,8 @@ public sealed class AppearanceService : IAppearanceService
         };
         _application.Resources["DensityGutter"] = gutter;
         _application.Resources["PosterCardPadding"] = new Thickness(gutter);
+        _application.Resources["PosterGutterX"] = new Thickness(gutter, 0, gutter, 0);
+        _application.Resources["NegativePosterGutterX"] = new Thickness(-gutter, 0, -gutter, 0);
 
         // 2:3 exactly, which is what the card is drawn at and what the token file says in the two
         // numbers it declares: a width chosen without its height would stretch every cover.

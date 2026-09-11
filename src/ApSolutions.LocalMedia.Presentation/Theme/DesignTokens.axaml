@@ -53,6 +53,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <x:Double x:Key="Space16">16</x:Double>
       <x:Double x:Key="Space24">24</x:Double>
       <!--
+        The page, as the prototype writes it once for every destination: `padding:28px 32px 48px`
+        on the one scrolling container all its pages share. It is a Thickness and not a step of the
+        scale above, which the paragraph before that scale explains; it is a token and not a literal
+        because it is one decision spent by every destination, and until 2026-09-11 it was written
+        as Margin="48" on each of them — 48 where the prototype puts 32 beside the rail and 28
+        under the title bar, measured on seven of its pages, all of them opening at x = 96.
+
+        It goes on the content INSIDE each ScrollViewer and not on the ScrollViewer, which is where
+        the prototype puts it too: the scroll bar keeps to the window's edge, and a child that has to
+        reach past the page's edge by a few pixels - the library's cards, see NegativePosterGutterX -
+        is still inside the viewport instead of clipped by it.
+      -->
+      <Thickness x:Key="PageMargin">32,28,32,48</Thickness>
+      <!--
         Two radii for the whole application, spent by all 37 CornerRadius sites in src/. Thirty of
         them were literals: 8 eighteen times, 4 five times, and 6, 10 and 12 seven times between them.
 
@@ -141,10 +155,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
         DensityGutter and PosterCardPadding are one decision written twice because two readers need
         two types: the library counts columns with the number and the card's own style needs a
         Thickness. They are written together, from one value, in Write.
+
+        PosterGutterX and NegativePosterGutterX are the same decision twice more, sideways only. The
+        prototype's tile is `padding:8px; margin:-8px`: it reaches out of its cell by exactly the
+        padding it carries, so the cover starts where the page's title starts. Here the library view
+        insets its own content by PosterGutterX and lets its grid span the full width with
+        NegativePosterGutterX, and the page places the view with NegativePosterGutterX in turn - so
+        no view reaches outside its own bounds, which is what ViewOverflowTests holds every view to,
+        and the covers still land on the title's edge. Without them the covers started one gutter to
+        the right of everything above them: 56 px from the rail against the prototype's 32, of which
+        48 were the page and 8 were this.
       -->
       <x:Double x:Key="AccentTintOpacity">0.156</x:Double>
       <x:Double x:Key="DensityGutter">8</x:Double>
       <Thickness x:Key="PosterCardPadding">8</Thickness>
+      <Thickness x:Key="PosterGutterX">8,0,8,0</Thickness>
+      <Thickness x:Key="NegativePosterGutterX">-8,0,-8,0</Thickness>
       <sys:Boolean x:Key="CoverTitlesVisible">True</sys:Boolean>
       <x:Double x:Key="TextControlPlaceholderOpacity">1</x:Double>
       <!--

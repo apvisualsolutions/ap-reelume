@@ -299,6 +299,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Pages started 48 px from the side menu where the prototype puts 32, and the library's covers at
+  56.** The prototype uses one padding for all its pages — 28 under the title bar, 32 on the sides,
+  48 at the bottom — measured on seven of them, and the program wrote 48 on each; home, the other way
+  round, stayed at 24. Now they all open where the prototype does, and the library's first cover
+  starts on the same line as the title and the filters, with the prototype's own technique: each card
+  carries 8 px around its picture and reaches out of its place by those same 8.
+
+  **The first attempt was rightly refused by one of the program's checks**: it pulled the grid 8 px
+  outside its view, and the check that stops any control being drawn outside its place caught it in
+  both languages. The good version insets the library's content by those 8 px and leaves the grid at
+  its full width, so nothing reaches outside its view. All three values follow the density chosen on
+  the appearance page, which is what decides that margin: 4, 8 or 16.
+
+  Settings moves its title and its index, but not its sections: where that column starts is the
+  settings-index defect, which has its turn.
+
 - **The option pills drew a radio button inside the pill, and in eighteen of them it was the only
   thing saying which one was chosen.** The library's filters, the appearance page's theme, density,
   corners and language, the folder kind on the first run and in the add dialog, and the player's tabs

@@ -299,6 +299,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Las páginas empezaban a 48 px del menú lateral donde el prototipo pone 32, y las portadas de la
+  Biblioteca a 56.** El prototipo usa un único relleno para todas sus páginas —28 bajo la barra de
+  título, 32 a los lados, 48 abajo—, medido en siete de ellas, y el programa escribía 48 en cada
+  una; Inicio, al revés, se quedaba en 24. Ahora todas abren donde el prototipo, y la primera portada
+  de la Biblioteca empieza en la misma línea que el título y los filtros, con la técnica del propio
+  prototipo: cada tarjeta lleva un margen de 8 px alrededor de la imagen y se sale de su sitio esos
+  mismos 8.
+
+  **El primer intento lo rechazó con razón una comprobación del programa**: sacaba la rejilla 8 px
+  fuera de su vista, y la comprobación que impide que ningún control se dibuje fuera de su sitio lo
+  cazó en los dos idiomas. La versión buena mete el contenido de la Biblioteca esos 8 px y deja la
+  rejilla a su ancho, de modo que nada se sale de su vista. Los tres valores siguen a la densidad que
+  se elige en Apariencia, que es la que decide ese margen: 4, 8 o 16.
+
+  Ajustes mueve su título y su índice, pero no sus secciones: dónde empieza esa columna es el
+  defecto del índice de Ajustes, que tiene su turno.
+
 - **Las píldoras de opción dibujaban un botón de opción dentro de la píldora, y en dieciocho de ellas
   era lo único que decía cuál estaba elegida.** Los filtros de la Biblioteca, el tema, la densidad,
   las esquinas y el idioma de Apariencia, el tipo de carpeta de la primera ejecución y del diálogo de

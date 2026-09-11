@@ -47,6 +47,8 @@ public sealed class AppearanceServiceTests
         Assert.Equal(222d, application.Resources["PosterCardHeight"]);
         Assert.Equal(8d, application.Resources["DensityGutter"]);
         Assert.Equal(new Thickness(8), application.Resources["PosterCardPadding"]);
+        Assert.Equal(new Thickness(8, 0, 8, 0), application.Resources["PosterGutterX"]);
+        Assert.Equal(new Thickness(-8, 0, -8, 0), application.Resources["NegativePosterGutterX"]);
         Assert.Equal(new CornerRadius(10), application.Resources["PosterCornerRadius"]);
         Assert.Equal(true, application.Resources["CoverTitlesVisible"]);
     }
@@ -72,6 +74,11 @@ public sealed class AppearanceServiceTests
         Assert.Equal(0.078, (double)application.Resources["AccentTintOpacity"]!, 3);
         Assert.Equal(16d, application.Resources["DensityGutter"]);
         Assert.Equal(new Thickness(16), application.Resources["PosterCardPadding"]);
+
+        // The library's content steps in by that same gutter and its grid and the view step back out,
+        // or roomy covers would start 16 px right of the title.
+        Assert.Equal(new Thickness(16, 0, 16, 0), application.Resources["PosterGutterX"]);
+        Assert.Equal(new Thickness(-16, 0, -16, 0), application.Resources["NegativePosterGutterX"]);
         Assert.Equal(200d, application.Resources["PosterCardWidth"]);
         Assert.Equal(300d, application.Resources["PosterCardHeight"]);
         Assert.Equal(new CornerRadius(18), application.Resources["PosterCornerRadius"]);
@@ -384,6 +391,8 @@ public sealed class AppearanceServiceTests
             "AccentTintOpacity",
             "DensityGutter",
             "PosterCardPadding",
+            "PosterGutterX",
+            "NegativePosterGutterX",
             "PosterCardWidth",
             "PosterCardHeight",
             "PosterCornerRadius",

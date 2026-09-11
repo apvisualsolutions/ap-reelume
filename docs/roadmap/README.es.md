@@ -130,11 +130,20 @@ enumera lo que se pierde. Es la única de las cuarenta y tres que prometía algo
 de quien usa el programa, y su decisión está en
 [ADR-0011](../adr/0011-a-destructive-question-floats-and-blocks.md). Quedan **42**.
 
-**Y el siguiente de esa misma pantalla es el más rentable de todos**: el margen entre el riel y la
-primera tarjeta, **56 px contra los 32 del prototipo**. Una sola cifra que disuelve tres defectos
-aparentes, porque los 8 px de tarjeta y los 32 de contenido desplazado son su consecuencia
-aritmética. **El ancho de tarjeta no se toca**: la rejilla del prototipo es fluida y a 1600 px —su
-ancho canónico— pone nueve de 145, menos que la aplicación.
+**El margen entre el riel y la primera tarjeta está cerrado desde el 2026-09-11, y no era una sola
+cifra**, como decía este párrafo: el prototipo escribe un único relleno de página —28 bajo la barra,
+32 a los lados, 48 abajo— para todos sus destinos, y la aplicación ponía 48 en cada uno; la portada
+llevaba además los 8 px de su baldosa sin compensar, 56 en total. Ahora las páginas abren a 32 y la
+portada en la línea del título, con la técnica del propio prototipo, en
+[la evidencia del margen](../evidence/stable/audit-page-margin.md). **No era uno de los 42** —era el
+defecto geométrico que dejó la vuelta cuatro—, así que la cuenta no se mueve. **El ancho de tarjeta
+no se toca**: la rejilla del prototipo es fluida y a 1600 px —su ancho canónico— pone nueve de 145,
+menos que la aplicación.
+
+**Y uno que tampoco estaba en la cuenta, señalado por el propietario el mismo día y cerrado**: las
+veintisiete píldoras de opción dibujaban un botón de opción dentro, y en dieciocho era lo único que
+decía cuál estaba elegida. El prototipo no lo dibuja en ninguna; ahora la elegida lo dice con su
+borde, en [su evidencia](../evidence/stable/audit-option-pills-without-a-circle.md).
 
 **Un aviso que describe un estado ocupa sitio; uno que narra un suceso flota**, y está escrito en
 [ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). Se decidió porque nadie lo había
@@ -152,6 +161,16 @@ pendiente, la fila queda con el candado puesto, y no se guarda el estado anterio
 aceptar ya reescribió los metadatos del título sin copia de lo que había. El prototipo promete por
 escrito «puedes cambiarla después», así que la promesa queda registrada y la decisión se toma con
 ese número delante, no antes.
+
+**Y dos defectos que dejó a la vista la retirada de carpetas, registrados el 2026-09-06 y sin
+corregir.** El primero: tras retirar una carpeta, su vigilante sigue vivo hasta cerrar el programa,
+porque el servicio que vigila sabe empezar con una carpeta y parar todas, pero no dejar de vigilar
+una. No puede deshacer el borrado, y cada cambio en esa carpeta produce una excepción que se calla,
+que es la clase de fallo que esta casa no deja pasar. El segundo: cada retirada hecha antes del
+2026-09-06 dejó su catálogo en la base, marcado como disponible y sin carpeta que lo sostenga.
+**Ese escombro sólo puede existir en bases de desarrollo**, porque no se ha publicado ninguna
+versión —el repositorio no tiene releases ni etiquetas—, y eso es lo que decide si hace falta una
+migración o basta con escribir por qué no.
 
 
 ## Las tres versiones

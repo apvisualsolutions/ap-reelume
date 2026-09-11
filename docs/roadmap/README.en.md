@@ -128,11 +128,20 @@ be lost. It is the only one of the forty-three that promised something false abo
 person using the program, and its decision is in
 [ADR-0011](../adr/0011-a-destructive-question-floats-and-blocks.md). **42** remain.
 
-**And the next on that same screen is the most profitable of all**: the margin between the rail and
-the first card, **56 px against the prototype's 32**. One figure that dissolves three apparent
-defects, because the 8 px of card and the 32 of shifted content are its arithmetic consequence. **The
-card width is not touched**: the prototype's grid is fluid, and at 1600 px — its canonical width — it
-puts nine of 145, fewer than the application.
+**The margin between the rail and the first card is closed since 2026-09-11, and it was not a single
+figure**, as this paragraph said: the prototype writes one page padding — 28 under the bar, 32 on
+the sides, 48 at the bottom — for all its destinations, and the application put 48 on each of them;
+the cover also carried its tile's 8 px uncompensated, 56 in all. Pages now open at 32 and the cover on
+the title's line, with the prototype's own technique, in
+[the margin's evidence](../evidence/stable/audit-page-margin.md). **It was not one of the 42** — it
+was the geometric defect round four left standing — so the count does not move. **The card width is
+not touched**: the prototype's grid is fluid, and at 1600 px — its canonical width — it puts nine of
+145, fewer than the application.
+
+**And one that was not in the count either, raised by the owner the same day and closed**: the
+twenty-seven option pills drew a radio button inside, and in eighteen it was the only thing saying
+which one was chosen. The prototype draws it on none; now the chosen one says so with its border, in
+[its evidence](../evidence/stable/audit-option-pills-without-a-circle.md).
 
 **A notice describing a state takes space; one narrating an event floats**, and it is written in
 [ADR-0010](../adr/0010-a-state-takes-space-and-an-event-floats.md). It was decided because nobody
@@ -150,6 +159,16 @@ entry to pending, the row keeps its decision locked, and no previous state is st
 moreover, accepting has already rewritten the title's metadata with no copy of what was there. The
 prototype promises in writing «you can change it later», so the promise is on record and the decision
 is taken with that number in front of it, not before.
+
+**And two defects that removing a folder brought into view, registered on 2026-09-06 and not yet
+fixed.** The first: after a folder is removed, its watcher stays alive until the program closes,
+because the watching service knows how to start on a folder and how to stop them all, but not how to
+stop watching one. It cannot undo the deletion, and every change in that folder raises an exception
+that is swallowed, which is the kind of failure this house does not let through. The second: every
+removal made before 2026-09-06 left its catalogue in the database, marked available with no folder
+behind it. **That debris can only exist in development databases**, because no version has ever been
+published — the repository has no releases and no tags — and that is what decides whether a
+migration is needed or writing down why not is enough.
 
 
 ## The three releases
