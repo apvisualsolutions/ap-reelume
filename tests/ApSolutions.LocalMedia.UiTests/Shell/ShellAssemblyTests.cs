@@ -24,7 +24,10 @@ using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Shell;
@@ -85,6 +88,37 @@ public sealed class ShellAssemblyTests
         shell.BeginAddMedia();
         Assert.True(shell.IsAddingRoot);
         Assert.False(shell.MarkCourse.IsCourse);
+    }
+
+    /// <summary>The add dialog lights the half that is chosen, and only that one.</summary>
+    /// <remarks>
+    /// The gate that said every pill binds its chosen style read that the binding was written, not
+    /// what it pointed at: a gate audit on 2026-09-11 swapped the two bindings of this dialog, every
+    /// choice lit the other half, and nothing failed. Each pill is pressed through its own command.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_add_dialog_lights_the_half_that_is_chosen_and_only_that_one()
+    {
+        var shell = new ShellViewModel(new NavigationService(), FullSurfaces());
+        var view = new AddRootDialogView { DataContext = shell };
+        var window = new Window { Width = 900, Height = 700, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var pills = view.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(button => button.Classes.Contains("theme-option") && button.IsEffectivelyVisible)
+            .ToArray();
+        Assert.Equal(2, pills.Length);
+
+        foreach (var pill in pills)
+        {
+            pill.Command!.Execute(pill.CommandParameter);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal([pill], pills.Where(candidate => candidate.Classes.Contains("selected")));
+        }
+
+        window.Close();
     }
 
     /// <summary>A composition with no course store leaves the dialog its root half and nothing else.</summary>

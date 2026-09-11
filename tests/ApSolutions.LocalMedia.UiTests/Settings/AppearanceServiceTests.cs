@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Globalization;
+
 using ApSolutions.LocalMedia.Application.Settings;
 using ApSolutions.LocalMedia.Domain.Appearance;
 using ApSolutions.LocalMedia.Presentation.Theme;
@@ -131,6 +133,59 @@ public sealed class AppearanceServiceTests
         // cannot leave the interface painted with nothing.
         service.Apply(service.Current with { Accent = "not a colour" });
         Assert.Equal("#B23A48", service.Current.Accent);
+    }
+
+    /// <summary>
+    /// Every preset's accent, and its ink, read on the cards as well as on the page, in both themes.
+    /// </summary>
+    /// <remarks>
+    /// The derivation walked the accent until it read on the page, and the chosen pills sit on cards.
+    /// In the dark theme a card is lighter than the page, so three presets that cleared 3:1 on the
+    /// page drew the chosen pill's border at 2,78 to 2,86:1 on its card — measured by a gate audit on
+    /// 2026-09-11, two of them in pixels, while <c>ContrastTokenTests</c>, reading the dictionary's own accent, said
+    /// 7,61. In these two themes the dictionary's accent is not what the application paints; this is.
+    /// </remarks>
+    [AvaloniaFact]
+    public void Every_preset_accent_reads_on_the_cards_as_well_as_on_the_page()
+    {
+        var application = Avalonia.Application.Current!;
+        using var scope = new ResourceScope(application);
+        var service = Build(new InMemoryStore());
+        var previous = application.RequestedThemeVariant;
+        var failures = new List<string>();
+        try
+        {
+            foreach (var variant in new[] { ThemeVariant.Light, ThemeVariant.Dark })
+            {
+                application.RequestedThemeVariant = variant;
+                service.Reapply();
+                foreach (var preset in AccentPalette.Presets)
+                {
+                    service.Apply(service.Current with { Accent = preset });
+                    var accent = Hex(application, "AccentBrush");
+                    var ink = Hex(application, "AccentInkBrush");
+                    foreach (var key in new[] { "ShellSurfaceBrush", "CardSurfaceBrush" })
+                    {
+                        var surface = Hex(application, key);
+                        var shape = AccentPalette.Contrast(accent, surface);
+                        var words = AccentPalette.Contrast(ink, surface);
+                        if (shape < 3.0 || words < 4.5)
+                        {
+                            failures.Add(string.Create(
+                                CultureInfo.InvariantCulture,
+                                $"{variant} {preset} on {key} {surface}: accent {accent} {shape:0.00}:1, ink {ink} {words:0.00}:1"));
+                        }
+                    }
+                }
+            }
+        }
+        finally
+        {
+            application.RequestedThemeVariant = previous;
+            service.Reapply();
+        }
+
+        Assert.Empty(failures);
     }
 
     [AvaloniaFact]

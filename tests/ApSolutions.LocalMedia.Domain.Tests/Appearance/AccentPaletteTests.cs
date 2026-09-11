@@ -92,6 +92,35 @@ public sealed class AccentPaletteTests
         Assert.True(AccentPalette.Contrast("#0B4A78", "#08090C") < 3.0);
     }
 
+    /// <summary>
+    /// An accent that reads on the page and not on the cards raised over it is walked until it reads
+    /// on both, and so is its ink.
+    /// </summary>
+    /// <remarks>
+    /// The dark theme's card is lighter than its page, and the chosen pills sit on cards. The
+    /// prototype's green, walked until it read on the page alone, drew the chosen pill's border at
+    /// 2,86:1 on its card — measured in pixels on 2026-09-11. The first half asserts that premise, so
+    /// the day this green reads on the card unaided the test says so instead of passing for nothing.
+    /// </remarks>
+    [Fact]
+    public void An_accent_that_reads_on_the_page_and_not_on_its_cards_is_walked_until_it_reads_on_both()
+    {
+        const string page = "#08090C";
+        const string card = "#12151B";
+
+        var pageOnly = AccentPalette.Derive("#2D6A4F", page);
+        Assert.True(AccentPalette.Contrast(pageOnly.Accent, page) >= 3.0);
+        Assert.True(
+            AccentPalette.Contrast(pageOnly.Accent, card) < 3.0,
+            "this green now reads on the card without help, so the case below would prove nothing.");
+
+        var both = AccentPalette.Derive("#2D6A4F", page, card);
+        Assert.True(AccentPalette.Contrast(both.Accent, page) >= 3.0);
+        Assert.True(AccentPalette.Contrast(both.Accent, card) >= 3.0);
+        Assert.True(AccentPalette.Contrast(both.Ink, card) >= 4.5);
+        Assert.True(AccentPalette.Contrast(both.Ink, both.Subtle) >= 4.5);
+    }
+
     [Fact]
     public void Grey_and_the_two_ends_of_the_scale_are_colours_too()
     {

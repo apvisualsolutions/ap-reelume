@@ -107,8 +107,14 @@ public sealed class LibraryFilterRowTests
     /// Setting the filters or the order the page already holds announces nothing, so nothing drawn
     /// from them is asked to redraw — the kind pills among them — and no query runs again.
     /// </summary>
+    /// <remarks>
+    /// The page is loaded first. Before its first load the refresh is guarded off whatever the
+    /// setters do, so "no query ran" held for that reason and not for this one: a gate audit on
+    /// 2026-09-11 moved the sort's refresh outside its no-change guard, which re-queries on every
+    /// assignment of the same order, and this stayed green.
+    /// </remarks>
     [Fact]
-    public void Setting_what_the_page_already_holds_announces_nothing()
+    public async Task Setting_what_the_page_already_holds_announces_nothing()
     {
         var service = new RecordingQueryService(new CatalogPage([], null));
         var viewModel = new LibraryViewModel(service)
@@ -116,14 +122,18 @@ public sealed class LibraryFilterRowTests
             Filters = CatalogFilter.Movie | CatalogFilter.Available,
             Sort = CatalogSort.Year,
         };
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        var loaded = service.Queries.Count;
+        Assert.True(loaded > 0, "the page never queried, so nothing below could have run again.");
         var announced = new List<string?>();
         viewModel.PropertyChanged += (_, args) => announced.Add(args.PropertyName);
 
         viewModel.Filters = CatalogFilter.Movie | CatalogFilter.Available;
         viewModel.Sort = CatalogSort.Year;
+        viewModel.StatusFilter = CatalogFilter.Available;
 
         Assert.Empty(announced);
-        Assert.Empty(service.Queries);
+        Assert.Equal(loaded, service.Queries.Count);
     }
 
     /// <summary>The three flags the three kind pills paint as chosen, in the order they are drawn.</summary>
