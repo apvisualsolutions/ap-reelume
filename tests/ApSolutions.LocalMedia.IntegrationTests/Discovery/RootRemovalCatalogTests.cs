@@ -182,6 +182,38 @@ public sealed class RootRemovalCatalogTests
     }
 
     /// <summary>
+    /// A folder added a moment ago and not yet scanned is the one case where the minutes watched
+    /// have no rows to add up, and SUM over no rows is NULL in SQL. The COALESCE in the reader's
+    /// statement is what turns that into the zero the question prints; the reader has no branch of
+    /// its own for a NULL, so this is the probe that fails if the COALESCE ever goes.
+    /// </summary>
+    [Fact]
+    public async Task A_folder_with_nothing_in_it_promises_to_take_nothing()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(
+            directory.DatabasePath,
+            TestContext.Current.CancellationToken);
+        var roots = new LibraryRootRepository(factory);
+        var empty = await AddRootAsync(roots, @"C:\Empty");
+
+        // The folder that stays has a film, marks and minutes, so the three zeros cannot come from
+        // an empty database or from a reader that ignores which folder it was asked about.
+        var other = await AddRootAsync(roots, @"D:\Other");
+        var film = Guid.NewGuid();
+        await SeedFilmAsync(factory, other.Id, film, "Volver al Mar", @"D:\Other\volver.mkv");
+        await SeedWatchStateAsync(factory, film, film, TimeSpan.FromMinutes(90));
+        await SeedPersonalStateAsync(factory, film, film);
+
+        var summary = await new SummarizeLibraryRootRemoval(new LibraryRootRemovalReader(factory))
+            .ExecuteAsync(empty.Id, TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, summary.TitleCount);
+        Assert.Equal(0, summary.MarkCount);
+        Assert.Equal(TimeSpan.Zero, summary.Progress);
+    }
+
+    /// <summary>
     /// What the library draws: identified titles, plus the scanned files that are neither an
     /// identified title nor an episode of one. Written out here rather than shared with the reader,
     /// so the assertion is not the reader agreeing with itself.
