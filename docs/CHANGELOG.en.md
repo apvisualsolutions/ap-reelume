@@ -223,6 +223,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The property-testing library moves to FsCheck 3.4.0**, the bump Dependabot had been proposing since
+  23 August and nobody had picked up. Its notes only change the xUnit adapter, which this project does
+  not use; the domain tests pass the same on the new version, checked in the binary that loads rather
+  than in the number requested. Nothing that installs is touched.
+
 - **"Looking like the prototype" now means "being no worse than the prototype".** Until today the
   rule was to be identical, and that turned every place where the program **does more** than the
   sketch drew into a problem: the keyboard shortcuts, which can be changed here and are fixed there;

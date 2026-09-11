@@ -224,6 +224,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La librería de pruebas por propiedades sube a FsCheck 3.4.0**, la subida que Dependabot proponía
+  desde el 23 de agosto y nadie había recogido. Sus notas sólo cambian el adaptador para xUnit, que
+  este proyecto no usa; las pruebas del dominio pasan igual sobre la versión nueva, comprobada en el
+  binario que se carga y no en el número pedido. No toca nada de lo que se instala.
+
 - **«Parecerse al prototipo» pasa a significar «no ser peor que el prototipo».** Hasta hoy la regla
   era ser idéntico, y eso convertía en problema cada sitio donde el programa **hace más** de lo que
   el boceto dibujaba: los atajos de teclado, que aquí se pueden cambiar y allí están fijos; el
