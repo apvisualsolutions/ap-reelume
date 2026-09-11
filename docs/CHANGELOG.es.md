@@ -294,6 +294,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El aviso de cuánto se pierde al retirar una carpeta llevaba una protección que habría callado un
+  error.** Cuenta títulos, marcas y minutos con tres preguntas a la base de datos que siempre
+  contestan un número, y aun así tenía una defensa por si contestaban «nada», que convertía esa
+  respuesta en un cero. Ése sería el peor sitio para un error callado: la pregunta que autoriza
+  borrar diría «0 títulos» mientras se borraban. La defensa se quita —ningún caso real podía
+  llegar a ella— y una prueba con una carpeta recién añadida y vacía es la que falla si desaparece lo
+  que hace que una suma de minutos sin filas valga cero.
+
+  **Y la limpieza de portadas que acompaña a esa retirada no tenía prueba propia.** Borrar del disco
+  las portadas de los títulos que se van es lo único de ese camino que borra ficheros, y sólo lo
+  ejecutaba el recorrido automático de la interfaz cuando llegaba a pulsar la confirmación. Ahora una
+  prueba escribe la portada elegida y la descargada de dos títulos, retira uno y comprueba que se van
+  las suyas y ninguna del otro. Dos errores provocados a propósito la hacen fallar: olvidar las
+  descargadas, y borrar de más, que se habría llevado la portada que alguien eligió para un título
+  que se queda.
+
 - **El repositorio, que es público, publicaba el nombre de un servidor interno de la empresa y una
   ruta de la unidad de red de la oficina.** Estaba en el fichero que declara las herramientas del
   entorno de desarrollo, versionado y en la rama principal desde el 5 de septiembre. Ese fichero

@@ -294,6 +294,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The notice that says how much removing a folder loses carried a guard that would have hidden an
+  error.** It counts titles, marks and minutes with three questions to the database that always
+  answer a number, and it still had a defence for an answer of "nothing", which it turned into a
+  zero. That would be the worst place for a quiet error: the question that authorises deleting would
+  say "0 titles" while they were being deleted. The guard goes — no real case could reach it — and a
+  test with a freshly added, empty folder is the one that fails if whatever makes a sum of minutes
+  over no rows worth zero ever disappears.
+
+  **And the cover clean-up that goes with that removal had no test of its own.** Deleting the covers
+  of the titles that leave is the only part of that path that deletes files, and only the autonomous
+  interface walk ran it, when it got as far as pressing the confirmation. A test now writes the
+  chosen and the downloaded cover of two titles, removes one, and checks that its covers go and none
+  of the other's do. Two deliberately introduced errors make it fail: forgetting the downloaded ones,
+  and deleting too much, which would have taken the cover somebody chose for a title that stays.
+
 - **The repository, which is public, was publishing the name of an internal company server and a path
   on the office's network drive.** It sat in the file declaring the development environment's tools,
   versioned and on the main branch since 5 September. That file again declares only Avalonia's public

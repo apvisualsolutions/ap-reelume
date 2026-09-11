@@ -432,6 +432,70 @@ public sealed class ArtworkCacheTests
             "9f2c4a1b8e7d6053f4a2b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8.png"));
     }
 
+    /// <summary>
+    /// Removing a folder deletes the covers of the titles it took, and only theirs.
+    /// </summary>
+    /// <remarks>
+    /// This is the one member of the store that deletes files, and until 2026-09-11 nothing ran the
+    /// real one on purpose: every test that reaches a removal hands in a double, and the only run of
+    /// this code was the autonomous walk pressing the confirmation. Both covers are written through
+    /// the store's own import and download, so a folder named one way on the way in and another on
+    /// the way out would leave them behind and fail here. The second title is the other half: a
+    /// removal that reached past its own folder would take a person's chosen image with it.
+    /// </remarks>
+    [Fact]
+    public async Task Removing_a_title_deletes_its_own_covers_and_nobody_elses()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var source = Path.Combine(directory.Path, "elegida.png");
+        await File.WriteAllBytesAsync(source, [3, 1, 4, 1], TestContext.Current.CancellationToken);
+        var handler = new ArtworkHandler([
+            Response(HttpStatusCode.OK, "leaving"),
+            Response(HttpStatusCode.OK, "staying"),
+        ]);
+        using var client = new HttpClient(handler);
+        var cache = new ArtworkCache(directory.Path, client);
+        var leaving = new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000e1"));
+        var staying = new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000e2"));
+        var poster = new Uri("https://image.tmdb.org/t/p/w500/poster.jpg");
+
+        var leavingCover = await cache.ImportPersonalAsync(
+            leaving,
+            source,
+            "Portada elegida",
+            TestContext.Current.CancellationToken);
+        var leavingPoster = await cache.CacheRemoteAsync(
+            leaving,
+            poster,
+            "Póster remoto",
+            previous: null,
+            TestContext.Current.CancellationToken);
+        var stayingCover = await cache.ImportPersonalAsync(
+            staying,
+            source,
+            "Portada elegida",
+            TestContext.Current.CancellationToken);
+        var stayingPoster = await cache.CacheRemoteAsync(
+            staying,
+            poster,
+            "Póster remoto",
+            previous: null,
+            TestContext.Current.CancellationToken);
+
+        await cache.RemoveTitleAsync(leaving, TestContext.Current.CancellationToken);
+
+        // Both halves of the title that left are gone, folder and all.
+        Assert.False(Directory.Exists(Path.GetDirectoryName(leavingCover.Path)));
+        Assert.False(Directory.Exists(Path.GetDirectoryName(leavingPoster.Path)));
+        Assert.Null(cache.FindPersonal(leaving, Path.GetFileName(leavingCover.Path)));
+        Assert.Null(cache.Find(leaving, poster));
+
+        // The title that stayed keeps both of its own, found by the same questions the cards ask.
+        Assert.Equal(stayingCover.Path, cache.FindPersonal(staying, Path.GetFileName(stayingCover.Path)));
+        Assert.Equal(stayingPoster.Path, cache.Find(staying, poster));
+        Assert.Equal("staying", await File.ReadAllTextAsync(stayingPoster.Path, TestContext.Current.CancellationToken));
+    }
+
     private static HttpResponseMessage Response(
         HttpStatusCode status,
         string body,

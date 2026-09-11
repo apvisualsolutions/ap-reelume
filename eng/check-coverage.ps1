@@ -410,6 +410,13 @@ try {
     # -los dos topes del deslizador, leer la duracion con la cuenta atras apagada, y escribirla en
     # ese mismo estado-, y con sus tres pruebas quedo en 100/100. Un archivo sale de esta lista
     # mejorando, y uno nuevo solo entra cuando no puede mejorar.
+    #
+    # 189 también el 2026-09-11, y quieto porque dos movimientos se anulan: RemoveLibraryRoot.cs sale
+    # al llegar a 100/100 —se fue la bandera muerta que decidía no borrar— y RootRemoveDialog.axaml
+    # entra con los 100/50 de toda vista nueva. Su lector, LibraryRootRemovalReader.cs, midió 100/62
+    # y NO entra: seis de sus ocho ramas eran una guarda contra un NULL que tres agregados sin GROUP BY
+    # no pueden devolver, y quitarla lo deja en 100/100. Una prueba de carpeta vacía es la que falla si
+    # el COALESCE que lo impide desaparece.
     $debtRatchet = 189
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 

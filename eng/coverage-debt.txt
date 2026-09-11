@@ -230,7 +230,6 @@ src/ApSolutions.LocalMedia.Application/Discovery/AddLibraryRoot.cs              
 src/ApSolutions.LocalMedia.Application/Discovery/IRootWatcher.cs                              88 100
 src/ApSolutions.LocalMedia.Application/Discovery/ISafeFileRenamer.cs                          53 100
 src/ApSolutions.LocalMedia.Application/Discovery/ReconcileScanResults.cs                      95  83
-src/ApSolutions.LocalMedia.Application/Discovery/RemoveLibraryRoot.cs                        100  50
 src/ApSolutions.LocalMedia.Application/Discovery/RootWatchCoordinator.cs                      96  89
 src/ApSolutions.LocalMedia.Application/Events/CatalogEvents.cs                                93 100
 src/ApSolutions.LocalMedia.Application/Home/GetHome.cs                                        99  91
@@ -272,7 +271,7 @@ src/ApSolutions.LocalMedia.Infrastructure/FileSystem/SafeFileRenamer.cs         
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/WindowsPathNormalizer.cs                 75  58
 src/ApSolutions.LocalMedia.Infrastructure/Media/LibVlcMediaProbe.cs                           96  71
 src/ApSolutions.LocalMedia.Infrastructure/Media/LocalSegmentFeatureExtractor.cs               91  97
-src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            99  86
+src/ApSolutions.LocalMedia.Infrastructure/Metadata/ArtworkCache.cs                            99  87
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/MetadataCandidateSource.cs                 98  91
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/SqliteMetadataCache.cs                     78  72
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbMetadataProvider.cs                    97  76
@@ -330,6 +329,7 @@ src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsViewModel.cs          
 src/ApSolutions.LocalMedia.Presentation/Navigation/NavigationService.cs                       83  75
 src/ApSolutions.LocalMedia.Presentation/Onboarding/AddRootDialogView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
+src/ApSolutions.LocalMedia.Presentation/Onboarding/RootRemoveDialog.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        99  88
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50

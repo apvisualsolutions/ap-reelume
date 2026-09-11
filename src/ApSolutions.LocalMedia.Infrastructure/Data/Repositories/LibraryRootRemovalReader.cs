@@ -99,9 +99,12 @@ public sealed class LibraryRootRemovalReader : ILibraryRootRemovalReader
         await using var command = connection.CreateCommand();
         command.CommandText = sql;
         command.Parameters.AddWithValue("$id", id.Value.ToString("D"));
+        // No NULL can reach this line: the three statements are aggregates without a GROUP BY, which
+        // always answer one row, two of them are COUNTs and the third is wrapped in a COALESCE. A
+        // guard for NULL here was three branches nothing could take, and the day a statement did
+        // answer NULL it would have printed a quiet zero on the question that authorises deleting
+        // data. That day throws instead.
         var value = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-        return value is null or DBNull
-            ? 0
-            : Convert.ToInt64(value, System.Globalization.CultureInfo.InvariantCulture);
+        return Convert.ToInt64(value, System.Globalization.CultureInfo.InvariantCulture);
     }
 }
