@@ -81,6 +81,79 @@ public sealed class AudioOutputViewTests
         Assert.False(viewModel.IsLayoutAvailable(AudioChannelLayout.Stereo));
     }
 
+    /// <summary>Choosing the device already chosen changes nothing and applies nothing again.</summary>
+    /// <remarks>
+    /// The four tests from here down cover the five branches the coverage gate measured untaken on
+    /// 2026-09-11, each with both of its halves in the same test: when reports are merged each line
+    /// keeps the best of them, not their union, so a half taken here and the other half taken only by
+    /// the walk would read as half for ever.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task Choosing_the_device_already_chosen_changes_nothing()
+    {
+        var viewModel = new AudioOutputViewModel(new FakeCatalog([Receiver, Headset]));
+        await viewModel.LoadAsync(Headset.Id, TestContext.Current.CancellationToken);
+        var receiver = viewModel.Devices.Single(option => option.Device.Id == Receiver.Id);
+
+        var announced = new List<string?>();
+        viewModel.PropertyChanged += (_, args) => announced.Add(args.PropertyName);
+        viewModel.SelectedDevice = receiver;
+        Assert.Contains(nameof(AudioOutputViewModel.SelectedDevice), announced);
+
+        announced.Clear();
+        viewModel.SelectedDevice = receiver;
+        Assert.Empty(announced);
+        Assert.Same(receiver, viewModel.SelectedDevice);
+    }
+
+    /// <summary>With nothing applied the layout in effect is stereo, and with a device it is its own.</summary>
+    [AvaloniaFact]
+    public async Task With_nothing_applied_the_layout_in_effect_is_stereo()
+    {
+        var silent = new AudioOutputViewModel(new FakeCatalog([]));
+        await silent.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Equal(AudioChannelLayout.Stereo, silent.EffectiveLayout);
+
+        var receiver = new AudioOutputViewModel(new FakeCatalog([Receiver]));
+        await receiver.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+        receiver.SelectedLayout = AudioChannelLayout.Surround71;
+        Assert.Equal(AudioChannelLayout.Surround71, receiver.EffectiveLayout);
+    }
+
+    /// <summary>An endpoint that declares no layout at all is offered as stereo, not as nothing.</summary>
+    [AvaloniaFact]
+    public async Task An_endpoint_that_declares_no_layout_is_offered_as_stereo()
+    {
+        var bare = new AudioOutputDevice("endpoint-bare", "Altavoz", [], IsDefault: false, IsAvailable: true);
+        var viewModel = new AudioOutputViewModel(new FakeCatalog([Receiver, bare]));
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal("2.0", viewModel.Devices.Single(option => option.Device.Id == bare.Id).Capabilities);
+        Assert.Equal("7.1", viewModel.Devices.Single(option => option.Device.Id == Receiver.Id).Capabilities);
+    }
+
+    /// <summary>The two commands act on what is theirs and leave anything else where it was.</summary>
+    [AvaloniaFact]
+    public async Task The_two_commands_refuse_what_is_not_theirs()
+    {
+        var viewModel = new AudioOutputViewModel(
+            new FakeCatalog([Receiver, Headset]),
+            new FakeConfigurator([AudioChannelLayout.Stereo, AudioChannelLayout.Surround51]));
+        await viewModel.LoadAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        viewModel.ChooseLayoutCommand.Execute("surround51");
+        Assert.Equal(AudioChannelLayout.Surround51, viewModel.SelectedLayout);
+        viewModel.ChooseLayoutCommand.Execute("quadraphonic");
+        viewModel.ChooseLayoutCommand.Execute(null);
+        Assert.Equal(AudioChannelLayout.Surround51, viewModel.SelectedLayout);
+
+        var headset = viewModel.Devices.Single(option => option.Device.Id == Headset.Id);
+        viewModel.ChooseDeviceCommand.Execute(headset);
+        Assert.Same(headset, viewModel.SelectedDevice);
+        viewModel.ChooseDeviceCommand.Execute(Receiver.Id);
+        Assert.Same(headset, viewModel.SelectedDevice);
+    }
+
     [AvaloniaFact]
     public async Task A_stored_device_that_is_gone_falls_back_and_the_view_says_it()
     {

@@ -329,7 +329,6 @@ src/ApSolutions.LocalMedia.Presentation/Onboarding/AddRootDialogView.axaml      
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootOnboardingView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Onboarding/RootRemoveDialog.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputView.axaml                         100  50
-src/ApSolutions.LocalMedia.Presentation/Player/AudioOutputViewModel.cs                        99  88
 src/ApSolutions.LocalMedia.Presentation/Player/DetectedMarkerReviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LessonsPanelView.axaml                        100  50
 src/ApSolutions.LocalMedia.Presentation/Player/LooseFileBanner.axaml                         100  50
