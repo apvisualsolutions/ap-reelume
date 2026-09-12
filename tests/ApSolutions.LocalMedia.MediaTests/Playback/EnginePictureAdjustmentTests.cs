@@ -62,6 +62,52 @@ public sealed class EnginePictureAdjustmentTests
     }
 
     [Fact]
+    public async Task A_lowered_gamma_darkens_the_frames_instead_of_lifting_them()
+    {
+        // The control the test above needs, and an audit found it missing: an engine that ignored
+        // its argument and applied a gamma of its own passed «raised gamma lifts» perfectly, because
+        // 1.6 was the only value anything ever asked for.
+        Assert.SkipWhen(MediaToolchain.EncoderPath is null, MediaToolchain.MissingEncoderReason);
+        var path = await MediaToolchain.EnsureSampleAsync(
+            SampleRelativePath, SampleRecipe, TestContext.Current.CancellationToken);
+
+        var plain = await MeanBrightnessAsync(path, PictureAdjustment.Neutral);
+        var darkened = await MeanBrightnessAsync(
+            path, new PictureAdjustment(Brightness: 0d, Contrast: 1d, Gamma: 0.6d));
+
+        Assert.True(
+            darkened < plain * 0.9,
+            $"the picture went from a mean of {plain:F1} to {darkened:F1} with the gamma BELOW one.");
+    }
+
+    [Fact]
+    public async Task What_was_asked_for_is_what_the_engine_reports_and_what_it_carries()
+    {
+        // Two holes an audit measured on 2026-09-12, and neither was visible from the pixels.
+        // Dropping the assignment left the getter answering Neutral for ever while the picture was
+        // adjusted anyway — a control bound to it would spring back on its own. And building the
+        // table unconditionally cost a lookup per pixel at the default setting with every test
+        // green, because an identity table and no table produce the same bytes.
+        await using var factory = LibVlcFactory.CreateHeadless();
+        await using var engine = new LibVlcMediaPlayerEngine(factory);
+
+        Assert.True(engine.PictureAdjustment.IsNeutral);
+        Assert.False(engine.CarriesPictureLookup);
+
+        var asked = new PictureAdjustment(Brightness: 0.1d, Contrast: 1.2d, Gamma: 1.6d);
+        engine.PictureAdjustment = asked;
+
+        Assert.Equal(asked, engine.PictureAdjustment);
+        Assert.True(engine.CarriesPictureLookup);
+
+        engine.PictureAdjustment = PictureAdjustment.Neutral;
+
+        Assert.False(
+            engine.CarriesPictureLookup,
+            "going back to neutral left a table behind, so the default is paying for a lookup that changes nothing.");
+    }
+
+    [Fact]
     public async Task An_absent_adjustment_is_refused_rather_than_stored_as_nothing()
     {
         // Null would sail through the property and then throw from the frame callback instead —
@@ -111,9 +157,12 @@ public sealed class EnginePictureAdjustmentTests
             var total = 0L;
             var counted = 0;
 
-            // Every sixteenth pixel, which is plenty for a mean over a third of a million of them
-            // and keeps this off the decoder's thread for longer than a frame lasts.
-            for (var at = 0; at + 3 < span.Length; at += 64)
+            // Every seventeenth pixel, and the odd number is the whole point: at every sixteenth —
+            // which this was — the stride lands on the FIRST luma of every packed pair, for ever.
+            // Measured on 2026-09-12: a conversion that adjusted only the first luma of each pair
+            // returned the identical 149.2 through this collector, and that defect paints vertical
+            // bands down the whole screen. An odd stride alternates between the two halves.
+            for (var at = 0; at + 3 < span.Length; at += 68)
             {
                 total += span[at] + span[at + 1] + span[at + 2];
                 counted += 3;

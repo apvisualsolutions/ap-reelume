@@ -263,13 +263,26 @@ public sealed class PackedYuvConverterTests
         return table;
     }
 
-    [Fact]
-    public void A_lookup_table_that_is_not_256_levels_is_refused()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(64)]
+    [InlineData(255)]
+    // And one too LONG, which is the half an audit found unmeasured on 2026-09-12: with only short
+    // tables tried, the guard can be loosened to «shorter than 256» and a table of 512 is then
+    // ignored in silence rather than refused — the caller gets the picture it did not ask for and
+    // no error anywhere.
+    [InlineData(257)]
+    [InlineData(512)]
+    public void A_lookup_table_that_is_not_256_levels_is_refused(int length)
     {
         // A short table is an indexed read off the end of it, which reads whatever follows in
         // memory and paints it — silently, and differently every run.
-        Assert.ThrowsAny<ArgumentException>(() => PackedYuvConverter.UyvyToBgra(
-            new byte[4], new byte[8], 2, 1, 4, 8, Bt601, new byte[64]));
+        var thrown = Assert.ThrowsAny<ArgumentException>(() => PackedYuvConverter.UyvyToBgra(
+            new byte[4], new byte[8], 2, 1, 4, 8, Bt601, new byte[length]));
+
+        // And it names the buffer that is wrong, like the two guards above it. Without this the
+        // name can be swapped for «source» and nothing notices.
+        Assert.Equal("lumaLookup", thrown.ParamName);
     }
 
     [Fact]

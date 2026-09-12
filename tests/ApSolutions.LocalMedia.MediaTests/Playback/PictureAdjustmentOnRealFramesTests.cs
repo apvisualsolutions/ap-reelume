@@ -82,8 +82,14 @@ public sealed class PictureAdjustmentOnRealFramesTests
 
         // And nothing clipped: a lift that pushes the bright end to white trades shadows for
         // highlights, which looks worse and not better.
+        //
+        // The budget counts PIXELS and so does Saturated, which is what this got wrong until an
+        // audit measured it: dividing the byte length by 100 made the real bar four per cent of the
+        // picture while the message said one. A diagnostic nobody runs is exactly where a number
+        // four times looser than it claims survives.
+        var pixels = lifted.Length / PackedYuvConverter.DestinationBytesPerPixel;
         Assert.True(
-            Saturated(lifted) < Saturated(plain) + (lifted.Length / 100),
+            Saturated(lifted) < Saturated(plain) + (pixels / 100),
             "the lift pushed more than a hundredth of the picture to pure white.");
     }
 
