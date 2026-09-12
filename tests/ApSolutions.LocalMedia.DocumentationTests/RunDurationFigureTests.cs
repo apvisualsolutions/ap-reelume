@@ -8,7 +8,7 @@ using ApSolutions.LocalMedia.TestSupport;
 namespace ApSolutions.LocalMedia.DocumentationTests;
 
 /// <summary>
-/// How long a CI run takes is quoted in four places, and they have to say the same thing.
+/// How long a CI run takes is written in exactly one place, and this is what keeps it there.
 /// </summary>
 /// <remarks>
 /// The figure was measured once, on 2026-08-30, over the twelve complete runs of that day: 42.7
@@ -18,10 +18,18 @@ namespace ApSolutions.LocalMedia.DocumentationTests;
 /// and <c>eng/watch-ci.ps1</c> still said 55-80. The last one had been corrected in the other two
 /// places on 2026-08-31 by somebody who did not think to look outside <c>*.md</c>.
 /// <para>
-/// <b>What this gate is, said plainly, because a gate that seems to check more than it does is
-/// worse than none.</b> It cannot tell whether 42-53 is true; it can only tell whether the tree
-/// agrees with itself. Four copies saying 55-80 would pass. What it removes is the failure that
-/// actually happened twice — one copy corrected and the others left behind.
+/// <b>This gate used to compare the copies against each other, and on 2026-09-12 the owner settled
+/// what to do instead.</b> Copies that agree are not copies that are right — three saying 55-80
+/// would have passed — and the figure moved four times in five days, so every correction was three
+/// edits and a chance to miss one. It now lives in <c>eng/watch-ci.ps1</c> and nowhere else, because
+/// that is the one place with work for it: the watcher's heartbeat and ceiling are set from it. The
+/// gate below stops a second copy from ever appearing, which is the failure that actually happened,
+/// twice.
+/// </para>
+/// <para>
+/// <b>What it still cannot tell you is whether the figure is true.</b> One copy saying 55-80 would
+/// pass. That question has an answer now and it is not a test:
+/// <c>pwsh -NoProfile -File eng/measure-ci-time.ps1</c>.
 /// </para>
 /// <para>
 /// The one thing it does check against something real is the script's own defaults, which its
@@ -30,7 +38,7 @@ namespace ApSolutions.LocalMedia.DocumentationTests;
 /// gives up on runs that were going to finish.
 /// </para>
 /// <para>
-/// It sweeps rather than listing files, so a fifth place that quotes the figure is covered the day
+/// It sweeps rather than listing files, so a second place that quotes the figure is caught the day
 /// it is written. <c>docs/</c> is deliberately outside the sweep: the changelog, the evidence and
 /// the handover are dated records, and 55-80 is correct in them for ever.
 /// </para>
@@ -63,7 +71,7 @@ public sealed class RunDurationFigureTests
     /// Without it the pattern also caught "esa cifra decía 55-80 minutos" — a changelog or a guide
     /// recording that the figure used to say something else. A document has to be able to name the
     /// old number; that is what a correction is made of. Requiring "takes"/"tarda" reads only
-    /// sentences that assert the duration now, and every one of the four live quotations is
+    /// sentences that assert the duration now, and the one live quotation left is
     /// phrased that way. Measured 2026-09-02: four matches, all of them the figure, and none of the
     /// neighbouring ranges — 33-55 for the Verify step, dates like 2026-09-02, the decimals 42.7
     /// and 52.6 — came back with them.
@@ -77,31 +85,38 @@ public sealed class RunDurationFigureTests
         RegexOptions.IgnoreCase,
         TimeSpan.FromSeconds(5));
 
+    /// <summary>The one place allowed to say it, because its own defaults are set from it.</summary>
+    private const string TheOnlyPlace = "eng/watch-ci.ps1";
+
     [Fact]
-    public void Every_place_that_says_how_long_a_run_takes_says_the_same_thing()
+    public void Only_the_watcher_says_how_long_a_run_takes()
     {
         var quotes = Quotations();
 
         Assert.True(
-            quotes.Count >= 3,
-            $"Only {quotes.Count} place(s) quote how long a run takes, and there were four. Either "
-            + "the figure was removed from most of them or the pattern stopped matching it, and a "
-            + "gate that matches nothing passes for ever.");
-
-        var distinct = quotes
-            .Select(quote => quote.Range)
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(range => range, StringComparer.Ordinal)
-            .ToArray();
+            quotes.Count > 0,
+            $"Nothing in the tree says how long a run takes, and {TheOnlyPlace} has to: its "
+            + "heartbeat and its ceiling are set from that figure, and a reader with neither the "
+            + "number nor the reason cannot tell a healthy silence from a stuck one. Either the "
+            + "figure was deleted or the pattern stopped matching it, and a gate that matches "
+            + "nothing passes for ever.");
 
         Assert.True(
-            distinct.Length == 1,
-            $"The tree quotes {distinct.Length} different durations for one run ({string.Join(", ", distinct)}). "
-            + "One of them is stale, and there is no way to tell which from the outside:"
+            quotes.Count == 1,
+            $"{quotes.Count} places say how long a run takes, and there is room for one. The figure "
+            + "moved four times in five days and every copy is a copy that can be left behind — "
+            + $"which happened twice. Say it in {TheOnlyPlace} and point everywhere else at "
+            + "eng/measure-ci-time.ps1, which measures it instead of remembering it:"
             + Environment.NewLine
             + string.Join(
                 Environment.NewLine,
                 quotes.Select(quote => $"    {quote.Document}:{quote.Line} says {quote.Range}")));
+
+        Assert.True(
+            quotes[0].Document == TheOnlyPlace,
+            $"The only place quoting the figure is {quotes[0].Document}, not {TheOnlyPlace}. It "
+            + "belongs with the defaults it sets, or the next person to change one will not find "
+            + "the other.");
     }
 
     /// <summary>
@@ -112,7 +127,18 @@ public sealed class RunDurationFigureTests
     [Fact]
     public void The_watcher_defaults_still_bracket_the_duration_they_were_set_from()
     {
-        var quote = Quotations()[0];
+        var quotes = Quotations();
+
+        // Its own floor rather than its sister's: without this it dies on an index instead of
+        // saying what is wrong, and if the surviving copy were somewhere else it would bracket the
+        // watcher's settings against a figure the watcher does not carry.
+        Assert.True(
+            quotes.Count == 1 && quotes[0].Document == TheOnlyPlace,
+            $"This brackets {TheOnlyPlace}'s own settings, so the figure has to be its own: found "
+            + $"{quotes.Count} quotation(s), the first in "
+            + $"{(quotes.Count == 0 ? "nowhere" : quotes[0].Document)}.");
+
+        var quote = quotes[0];
         var script = File.ReadAllText(RepositoryLayout.PathFromRoot("eng/watch-ci.ps1"));
 
         var heartbeat = DefaultOf(script, "HeartbeatMinutes");
@@ -200,36 +226,54 @@ public sealed class RunDurationFigureTests
         return found;
     }
 
+    /// <summary>
+    /// Where a stale copy of the figure could hide: prose, hooks, skills, scripts and workflow
+    /// files, anywhere in the checkout.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This used to say it swept and did not.</b> It read two files by name, then <c>.claude</c>
+    /// filtered to <c>.md</c> and <c>.sh</c>, then <c>eng</c>'s top level filtered to <c>.ps1</c>.
+    /// An audit on 2026-09-12 put a live present-tense copy in <c>README.es.md</c> and another in
+    /// <c>eng/README-sandbox.md</c> and the gate stayed green on all four tests — with two stale
+    /// second copies sitting in the tree. Everything outside those three roots was invisible,
+    /// <c>.github/</c> and <c>.claude/settings.json</c> included, and settings.json is where two of
+    /// this repository's hooks live inline.
+    /// </para>
+    /// <para>
+    /// <b><c>.cs</c> is left out on purpose and it is the one hole left.</b> The pattern's own
+    /// fixtures are C# string literals in this very file — «A run in this repository takes 55-80
+    /// minutes» is asserted three lines below to prove the pattern is awake — so sweeping <c>.cs</c>
+    /// would force the gate to exclude itself, and a gate with a hole shaped like its own filename
+    /// is where the next stale copy goes. The figure has no business in compiled code.
+    /// </para>
+    /// <para>
+    /// <c>docs/</c> stays out for the original reason: the changelog, the evidence and the handover
+    /// are dated records, and 55-80 is correct in them for ever.
+    /// </para>
+    /// </remarks>
     private static IEnumerable<string> Documents()
     {
-        yield return RepositoryLayout.PathFromRoot("CLAUDE.md");
-        yield return RepositoryLayout.PathFromRoot("CONTRIBUTING.md");
+        string[] readable = [".md", ".sh", ".ps1", ".psm1", ".json", ".yml", ".yaml", ".txt"];
+        string[] skipped = ["docs", ".git", "bin", "obj", "artifacts", "node_modules", "worktrees"];
 
         foreach (var path in Directory.EnumerateFiles(
-            RepositoryLayout.PathFromRoot(".claude"),
+            RepositoryLayout.Root,
             "*.*",
             SearchOption.AllDirectories))
         {
-            if (IsInsideAnotherCheckout(path))
+            var segments = Path.GetRelativePath(RepositoryLayout.Root, path)
+                .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            if (segments.Length > 1
+                && segments[..^1].Any(segment => skipped.Contains(segment, StringComparer.OrdinalIgnoreCase)))
             {
                 continue;
             }
 
-            // The hooks quote it too, and the hooks are where the stale copy was hiding: a sweep
-            // that only reads *.md would have passed on the day this was written.
-            if (path.EndsWith(".md", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".sh", StringComparison.OrdinalIgnoreCase))
+            if (readable.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase))
             {
                 yield return path;
             }
-        }
-
-        foreach (var path in Directory.EnumerateFiles(
-            RepositoryLayout.PathFromRoot("eng"),
-            "*.ps1",
-            SearchOption.TopDirectoryOnly))
-        {
-            yield return path;
         }
     }
 

@@ -58,18 +58,27 @@
     So the default no longer names a branch. A run belongs to a commit, not to a reference, and
     the commit is what is asked for. -Branch stays for when a branch really is the question.
 
-    A run in this repository takes 49-57 minutes: the seven complete runs of 2026-09-03 gave 48.9
-    for the fastest and 56.6 for the slowest of the six healthy ones. AND ONE OF THE SEVEN TOOK 86.2,
-    against a job ceiling of 90 — under four minutes from dying on the clock with nothing broken. The
-    six healthy ones fit inside eight minutes of each other, so that seventh is a different thing
-    rather than the tail of a spread: measured the same day, its integration suite alone went from
-    11.8 minutes to 27 while every other suite stayed normal. The defaults below are set from the
-    healthy range.
+    A run in this repository takes 38-54 minutes: the ten complete green runs up to 2026-09-12 gave
+    38.2 for the fastest and 53.8 for the slowest, measured with eng/measure-ci-time.ps1. THIS IS
+    THE ONLY PLACE THE FIGURE IS WRITTEN, and that is the point of it being here: the two defaults
+    below are set from it, so it has work to do. Every other copy went stale — the tree carried
+    three of them at once — and a test now fails if a second one appears anywhere.
 
-    This line said 55-80 until 2026-09-02 and 42-53 until 2026-09-03, copied each time from an era
-    nobody re-measured. It is held by a test that compares the four places quoting it, which can say
-    they agree and never that they are true — so the number still has to be measured again, and this
-    is the second time in four days that it moved when somebody did.
+    WHAT THIS FIGURE IS NOT is the number a ceiling watches, and confusing the two produced a false
+    finding on 2026-09-12. `timeout-minutes` belongs to a JOB and only starts counting when a runner
+    picks the job up. The run of 2026-09-11 read 94.4 minutes end to end and its job took 50: the
+    other 44 were spent queueing. This docstring used to say "one of the seven took 86.2 against a
+    job ceiling of 90 — under four minutes from dying on the clock", and that comparison was between
+    two different clocks. eng/measure-ci-time.ps1 now answers it job by job.
+
+    The defaults below only have to bracket the wall clock, which is what this script waits on: a
+    heartbeat under the fastest run so a healthy run is never silent, and a ceiling over the slowest
+    so it does not give up on runs that finish.
+
+    This line said 55-80 until 2026-09-02, 42-53 until 2026-09-03 and 49-57 until 2026-09-12, copied
+    each time from an era nobody re-measured. The test that held it compared the copies to each
+    other, which can say they agree and never that they are true; there is one copy now, so the only
+    question left is whether it was measured — and it is measured by running the script.
 
 .PARAMETER Sha
     The commit to watch. A short prefix is enough: it is resolved to the full forty characters

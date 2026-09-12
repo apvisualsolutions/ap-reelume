@@ -89,18 +89,21 @@ Cubre los cinco desenlaces. Un bucle escrito en el momento pregunta por `status 
 **calla en todo lo demás** — un push que no disparó el flujo, un `gh` con la sesión caducada, un run
 encolado. Un vigía callado es indistinguible de un run que sigue.
 
-**Un run tarda 49-57 minutos cuando va bien, y uno de siete llegó a 86.** Esta línea dijo «55-80» hasta el 2026-08-31, y después «42-53» hasta el 2026-09-03, copiada cada vez de una época
-anterior y nunca vuelta a medir, mientras `CLAUDE.md` ya llevaba la cifra corregida sobre doce runs.
-Es el defecto de la casa aplicado a un número: **una cifra que nadie vuelve a medir acaba
-justificando la decisión equivocada.** Si vuelves a citarla, mídela.
+**Cuánto tarda un run no se escribe aquí: se mide.** `pwsh -NoProfile -File eng/measure-ci-time.ps1`.
+Esta línea llevó la cifra dentro y la tuvo mal tres veces —«55-80», «42-53», «49-57»—, cada una
+correcta el día que alguien la midió y ninguna correcta después, mientras otras copias del árbol
+decían otra cosa. Es el defecto de la casa aplicado a un número: **una cifra que nadie vuelve a medir
+acaba justificando la decisión equivocada.**
 
-**Y medirla no es opcional, porque hoy las tres copias están desfasadas.** El 2026-09-05
-`eng/measure-ci-time.ps1` dio **mediana de 42 minutos** sobre los diez últimos verdes, no 49-57. La
-cifra no se corrigió aquí a propósito: `RunDurationFigureTests` exige que las **cuatro** copias del
-árbol digan lo mismo, así que corregir una sola pone la puerta roja — y corregir las cuatro a un
-número que volverá a caducar es lo que esta misma línea lleva tres veces haciendo.
-**Es una decisión del propietario**, escrita en el relevo: o la puerta pasa a comparar contra el
-guion, o las cuatro copias se sustituyen por él.
+**Desde el 2026-09-12 la cifra vive en un solo sitio, el propio vigía**, porque ahí sus dos ajustes
+—cada cuánto late y cuándo se rinde— se calculan de ella. `RunDurationFigureTests` pasó de exigir que
+las cuatro copias coincidieran a **exigir que no haya una segunda**: comparar copias entre sí puede
+decir que están de acuerdo, nunca que están bien.
+
+**Y el margen no se lee del reloj del run.** El corte es de cada **trabajo** y sólo empieza a contar
+cuando una máquina lo coge: un run del 2026-09-11 marcó 94,4 minutos de reloj de pared con su trabajo
+en 50, porque pasó 44 esperando. Leer ese 94,4 contra el techo de 90 dio «el margen está en negativo»
+en un relevo, y era falso. El guion lo contesta trabajo a trabajo.
 
 ## 5. Leer la conclusión — y saber cuáles de esos rojos NO son tuyos
 

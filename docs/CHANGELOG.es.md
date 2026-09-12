@@ -10,6 +10,22 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Antes de construir la cadena de mejora se resolvió si alguien podría ver que funciona, y la
+  respuesta cambia dónde van las comprobaciones.** El arnés con el que este repositorio cuenta
+  píxeles **sí** ve la capa donde la cadena termina: una marca dibujada por la composición llega a la
+  captura como exactamente 4 000 píxeles para un rectángulo de 100 × 40, sostenido por una escena que
+  no debe enseñar nada y otra que sí. Lo que no puede es ejecutar la importación de la tarjeta
+  gráfica, y lo dice en vez de colgarse. Así que las comprobaciones se parten: lo que decide —qué
+  imagen, de qué tamaño, en qué orientación— se comprueba ahí, y lo que habla con la tarjeta se
+  comprueba leyendo la imagen de vuelta desde ella. Sin medir esto antes, una comprobación podría
+  haber pasado por no ver nada.
+
+- **Y la documentación de Avalonia resultó estar equivocada sobre las tres llamadas que la cadena
+  necesita**, medido contra la librería que se distribuye en vez de razonado: uno de los dos métodos
+  que nombra no existe en ninguna parte, el segundo tampoco, y el tercero toma tres argumentos donde
+  la documentación pasa uno. La ruta real queda escrita junto con lo que la parte de Windows ya trae,
+  que basta para construir encima.
+
 - **La mejora de imagen para vídeo de poca resolución ya está medida, y una de sus tres partes
   funciona.** La tarjeta integrada Intel de este equipo **reescala con su propia superresolución**:
   cambia el 54,6 % de la imagen al encenderla, con su control en cero. Y el formato que la aplicación
@@ -46,6 +62,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
   persona ya tiene y se invoca por una interfaz de Direct3D.
 
 ### Corregido
+
+- **Cuánto tarda un run de CI estaba escrito en tres sitios a la vez, los tres desfasados, y ahora
+  está en uno.** La cifra se movió cuatro veces en cinco días — cada corrección eran tres ediciones y
+  una ocasión de olvidar una, y se olvidó dos veces. Vive junto a los dos ajustes que se calculan de
+  ella y en ningún otro sitio; la comprobación que preguntaba si las copias coincidían ahora impide
+  que exista una segunda, porque unas copias de acuerdo no son unas copias correctas. Todo lo demás
+  apunta a la herramienta que la mide.
+
+- **La herramienta que dice cuánto le queda a CI antes de cortarse contaba como trabajo el tiempo
+  esperando máquina, y llegó a decir que no quedaba nada.** Un run del 11 de septiembre marcó 94,4
+  minutos contra un corte de 90 y se anotó como «el margen está en negativo»; de esos 94, **44 fueron
+  cola**, y el trabajo en sí duró 50. El corte pertenece a cada tarea y sólo empieza a contar cuando
+  una máquina la coge, así que se comparaban dos relojes distintos. Ahora se mide tarea a tarea y
+  contra el techo de cada una: con el mismo run dentro de la ventana, el margen real es de **36,3
+  minutos** y no salta ningún aviso. Importa más de lo que parece porque la herramienta **avisa
+  sola** por debajo de diez minutos, y su propio aviso pide medir antes de subir el techo: alimentada
+  con una cola, exigía justo el cambio contra el que argumenta.
 
 - **El color de todo vídeo HD, que se decodificaba con la matriz de definición estándar.** De 720
   líneas para arriba se usa otra desde que existe la alta definición, y decodificar con la que no es

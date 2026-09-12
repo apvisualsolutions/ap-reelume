@@ -114,5 +114,5 @@ printf '  Monitor(command: "pwsh -NoProfile -File eng/watch-ci.ps1 -Sha %s 2>&1"
 if [ -n "$refspec" ] && [ "${refspec%%:*}" != "HEAD" ]; then
   printf 'OJO: ese SHA es HEAD de este arbol, y el push nombra «%s». Si no son el mismo commit, el vigia contestara «NO RUN EXISTS» con razon: comprueba con `git rev-parse %s` y arma el vigia sobre ESE.\n' "$refspec" "${refspec%%:*}" >&2
 fi
-printf 'Un run tarda 49-57 min y el guion late cada 30, asi que su silencio inicial es normal y NO prueba que este armado. Sin el verde leido, main no avanza.\n' >&2
+printf 'El guion late cada 30 min y un run dura bastante mas, asi que su silencio inicial es normal y NO prueba que este armado. La cifra no se guarda aqui —caduco tres veces—: se mide con eng/measure-ci-time.ps1. Sin el verde leido, main no avanza.\n' >&2
 exit 2

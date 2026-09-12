@@ -76,6 +76,62 @@ function Get-Minutes {
     return [Math]::Round((([datetime]$Run.updatedAt) - ([datetime]$Run.createdAt)).TotalMinutes, 1)
 }
 
+function Get-JobMinutes {
+    <#
+        Lo que tardó cada TRABAJO, que no es lo que tardó el run. Entre que un run se crea y que una
+        máquina lo coge puede pasar casi una hora —44 minutos el 2026-09-11, medidos—, y esa espera
+        va dentro del reloj del run y fuera del reloj del trabajo. `timeout-minutes` cuenta el
+        segundo, así que el margen se calcula sobre éste o se está restando la cola de GitHub.
+    #>
+    param([long]$RunId)
+
+    $raw = & gh run view $RunId --json jobs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "No se pudieron leer los trabajos del run ${RunId}; su margen se omite: $raw"
+        return @()
+    }
+
+    return ($raw | ConvertFrom-Json).jobs
+    | Where-Object { $_.startedAt -and $_.completedAt -and ([datetime]$_.completedAt) -gt ([datetime]$_.startedAt) }
+    | ForEach-Object {
+        [pscustomobject]@{
+            Name    = $_.name
+            Minutes = [Math]::Round((([datetime]$_.completedAt) - ([datetime]$_.startedAt)).TotalMinutes, 1)
+        }
+    }
+}
+
+function Get-JobCeilings {
+    <#
+        El techo de cada trabajo, leído del propio flujo. Las claves de trabajo van a dos espacios y
+        su `timeout-minutes` a cuatro; el de un paso va a ocho. Eso separa uno de otro sin analizar
+        YAML, y es lo que faltaba: la versión anterior cogía la PRIMERA coincidencia del fichero,
+        que resulta ser el techo del trabajo x64 sólo por el orden en que alguien lo escribió.
+    #>
+    param([string]$Path)
+
+    $ceilings = [ordered]@{}
+    $job = $null
+    foreach ($line in (Get-Content -Path $Path)) {
+        if ($line -match '^  (?<job>[A-Za-z0-9_-]+):\s*$') {
+            $job = $Matches['job']
+            continue
+        }
+
+        if ($line -match '^  [A-Za-z0-9_-]+:') {
+            $job = $null
+            continue
+        }
+
+        if ($job -and $line -match '^    timeout-minutes:\s*(?<value>\d+)\s*$') {
+            $ceilings[$job] = [int]$Matches['value']
+            $job = $null
+        }
+    }
+
+    return $ceilings
+}
+
 function Get-SuiteMinutes {
     param([long]$RunId)
 
@@ -159,26 +215,75 @@ $fastest = $green[0].Minutes
 $slowest = $green[-1].Minutes
 $median = $green[[int][Math]::Floor($green.Count / 2)].Minutes
 
-Write-Output "Sobre los $($green.Count) verde(s): más rápido $fastest min · mediana $median min · más lento $slowest min."
+Write-Output "Sobre los $($green.Count) verde(s), reloj de pared —incluye la espera de máquina—: más rápido $fastest min · mediana $median min · más lento $slowest min."
 if ($green.Count -lt $rows.Count) {
     Write-Output 'Los rojos salen en la tabla pero NO en esa banda: un run que falla se para donde falló.'
 }
 
 Write-Output ''
 
-# El corte del flujo. Se lee del propio flujo en vez de escribirlo aquí, porque un segundo sitio con
-# el mismo número es un sitio que puede discrepar.
+# El corte NO mide el reloj de arriba, y confundirlos costó un hallazgo falso el 2026-09-12: se
+# escribió «el margen está en negativo, 94,4 min contra un corte de 90» sobre un run que había
+# pasado 44 minutos esperando máquina y cuyo trabajo duró 50. `timeout-minutes` es de un TRABAJO y
+# sólo empieza a contar cuando una máquina lo coge, así que el margen se calcula trabajo a trabajo.
+# El propio `ci.yml` ya lo decía en un comentario; este guion no lo sabía.
+#
+# Los techos se leen del flujo en vez de escribirse aquí, porque un segundo sitio con el mismo
+# número es un sitio que puede discrepar.
 $workflow = Join-Path $PSScriptRoot '..' '.github' 'workflows' 'ci.yml'
 if (Test-Path $workflow) {
-    $timeout = [regex]::Match((Get-Content -Raw $workflow), 'timeout-minutes:\s*(?<value>\d+)')
-    if ($timeout.Success) {
-        $cut = [int]$timeout.Groups['value'].Value
-        $margin = [Math]::Round($cut - $slowest, 1)
-        Write-Output "El flujo se corta a los $cut min, así que el peor de estos deja $margin min de margen."
-        if ($margin -lt 10) {
-            Write-Output 'AVISO: menos de diez minutos de margen. Un sorteo malo daría un rojo por reloj'
-            Write-Output '       con nada roto, y eso se lee como un atasco. Mide antes de subir el techo:'
-            Write-Output '       un run sano acercándose al corte significa que el trabajo ha crecido.'
+    $ceilings = Get-JobCeilings -Path $workflow
+    if ($ceilings.Count -eq 0) {
+        Write-Output 'AVISO: ci.yml no declara ningún techo por trabajo, así que no hay margen que dar.'
+        Write-Output '       O el flujo cambió de forma o esta lectura se quedó atrás; míralo antes de fiarte.'
+        Write-Output ''
+    }
+    else {
+        Write-Output 'El corte no mide ese reloj: es de cada TRABAJO y sólo cuenta desde que una máquina'
+        Write-Output 'lo coge, así que la espera en cola no le resta margen. Trabajo a trabajo:'
+        Write-Output ''
+
+        $worst = [ordered]@{}
+        foreach ($row in $green) {
+            foreach ($job in @(Get-JobMinutes -RunId $row.Run)) {
+                if (-not $worst.Contains($job.Name) -or $job.Minutes -gt $worst[$job.Name]) {
+                    $worst[$job.Name] = $job.Minutes
+                }
+            }
+        }
+
+        if ($worst.Count -eq 0) {
+            Write-Output '  No se pudo leer ningún trabajo, así que no hay margen medido. Sin esto la cifra'
+            Write-Output '  de arriba es lo que esperas, no lo que el corte vigila.'
+        }
+
+        $tight = $false
+        foreach ($name in $worst.Keys) {
+            $minutes = $worst[$name]
+            if (-not $ceilings.Contains($name)) {
+                Write-Output "  $name  más lento $minutes min · sin techo declarado en ci.yml"
+                continue
+            }
+
+            $cut = $ceilings[$name]
+            $margin = [Math]::Round($cut - $minutes, 1)
+            Write-Output "  $name  techo $cut min · más lento $minutes min · margen $margin min"
+            if ($margin -lt 10) { $tight = $true }
+        }
+
+        # Un techo declarado que ningún run tocó también se dice: un trabajo que dejó de correr es
+        # justo lo que un margen callado no distingue de un trabajo holgado.
+        foreach ($name in $ceilings.Keys) {
+            if (-not $worst.Contains($name)) {
+                Write-Output "  $name  techo $($ceilings[$name]) min · no corrió en ninguno de estos runs"
+            }
+        }
+
+        if ($tight) {
+            Write-Output ''
+            Write-Output 'AVISO: menos de diez minutos de margen en un trabajo. Un sorteo malo daría un rojo'
+            Write-Output '       por reloj con nada roto, y eso se lee como un atasco. Mide antes de subir el'
+            Write-Output '       techo: un trabajo sano acercándose al corte significa que creció el trabajo.'
         }
 
         Write-Output ''

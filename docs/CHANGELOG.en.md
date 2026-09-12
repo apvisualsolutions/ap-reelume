@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Before building the enhancement chain, the question of whether anybody could see it working was
+  settled — and the answer changes where the checks go.** The harness this repository uses to count
+  pixels **can** see the layer where the chain ends: a mark drawn through the composition arrives at
+  the capture as exactly 4 000 pixels for a 100 × 40 rectangle, held by a scene that must show
+  nothing and another that must show something. What it cannot do is run the graphics-card import at
+  all, and it says so rather than hanging. So the checks split: what decides — which picture, what
+  size, which way up — is checked there, and what talks to the card is checked by reading the picture
+  back off it. Without measuring this first, a check could have passed by seeing nothing.
+
+- **And Avalonia's own documentation turned out to be wrong about the three calls the chain needs**,
+  measured against the shipped library rather than argued about: one of the two methods it names does
+  not exist anywhere, nor does the second, and the third takes three arguments where the
+  documentation passes one. The real route is written down with what the Windows side already
+  provides, which is enough to build on.
+
 - **Picture enhancement for low-resolution video is now measured, and one of its three parts works.**
   This machine's integrated Intel card **enlarges with its own super resolution**: it changes 54.6 %
   of the picture when switched on, with its control at zero. And the format the application already
@@ -46,6 +61,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   already has, and is called through a Direct3D interface.
 
 ### Fixed
+
+- **How long a CI run takes was written in three places at once, all of them stale, and now it is
+  written in one.** The figure moved four times in five days — every correction was three edits and a
+  chance to miss one, which happened twice. It lives with the two settings that are calculated from
+  it and nowhere else; the check that used to ask whether the copies agreed now refuses to let a
+  second one exist, because copies that agree are not copies that are right. Everywhere else points
+  at the tool that measures it.
+
+- **The tool that says how much room CI has before it is cut off was counting time spent waiting for
+  a machine as work, and got as far as reporting none left.** A run on 11 September read 94.4 minutes
+  against a 90-minute cut and was written down as «the margin is in the negative»; of those 94, **44
+  were queueing**, and the job itself took 50. The cut belongs to each job and only starts counting
+  once a machine picks it up, so two different clocks were being compared. It now measures job by job
+  against each one's own ceiling: with that same run inside the window, the real margin is **36.3
+  minutes** and nothing warns. It matters more than the arithmetic because the tool **warns by
+  itself** below ten minutes, and its own warning asks you to measure before raising the ceiling —
+  fed a queue, it demanded exactly the change it argues against.
 
 - **The colour of every HD video, which was decoded with the standard-definition matrix.** From 720
   lines up a different one has been used for as long as high definition has existed, and decoding
