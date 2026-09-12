@@ -12,6 +12,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.UiTests.Player;
@@ -73,17 +74,25 @@ public sealed class VideoUpscaleQualityTests
     }
 
     /// <summary>
-    /// And that nobody quietly set one, because a mode set without measuring is the shortcut this
-    /// file exists to refuse.
+    /// And that nobody quietly set one on the surface <b>the application actually draws</b>.
     /// </summary>
+    /// <remarks>
+    /// This used to build a bare <c>VideoFrameView</c> with no parent and no template, which is the
+    /// one place a mode would never be set. Measured 2026-09-12: adding
+    /// <c>RenderOptions.BitmapInterpolationMode="HighQuality"</c> to the surface in
+    /// <c>PlayerView.axaml</c> left all 1340 tests in this suite green.
+    /// </remarks>
     [AvaloniaFact]
-    public void The_video_surface_asks_for_no_particular_filter()
+    public void The_surface_the_player_really_draws_asks_for_no_particular_filter()
     {
-        var surface = new VideoFrameView();
+        var view = new PlayerView();
+        var surface = view.GetVisualDescendants().OfType<VideoFrameView>().SingleOrDefault()
+            ?? view.FindControl<VideoFrameView>("VideoSurface");
+        Assert.NotNull(surface);
 
         Assert.Equal(
             BitmapInterpolationMode.Unspecified,
-            RenderOptions.GetBitmapInterpolationMode(surface));
+            RenderOptions.GetBitmapInterpolationMode(surface!));
     }
 
     /// <summary>How many pixels across the edge come back neither black nor white.</summary>

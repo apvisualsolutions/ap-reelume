@@ -298,6 +298,12 @@ public sealed class UpscaleFormatArithmeticTests
     [InlineData(18109378L, 5L, 44, 0, true, 0, UpscaleVerdict.Untrustworthy)]
     // The positive control failed: the processor drew nothing, so any zero is meaningless.
     [InlineData(0L, 0L, 1, 0, true, 0, UpscaleVerdict.Untrustworthy)]
+    // The exact boundary, and it is the failure that actually happens: the output is BGRA with
+    // opaque alpha, so a blt that drew nothing comes back as two values — 0 and 255 — and nothing
+    // else. With no case here, loosening the guard to «< 2» left fifty tests green.
+    [InlineData(0L, 0L, 2, 0, true, 0, UpscaleVerdict.Untrustworthy)]
+    // And the one either side of it, so the boundary is pinned from both directions.
+    [InlineData(18109378L, 0L, 3, 0, true, 0, UpscaleVerdict.Works)]
     // A draw that failed, and three readbacks of different lengths.
     [InlineData(0L, 0L, 44, -1, true, 0, UpscaleVerdict.Untrustworthy)]
     [InlineData(33177600L, 0L, 44, 0, false, 0, UpscaleVerdict.Untrustworthy)]
@@ -312,7 +318,39 @@ public sealed class UpscaleFormatArithmeticTests
     {
         var pixels = new UpscalePixelComparison(differing, control, 33177600L, distinct, worstBlt, agree);
 
-        Assert.Equal(expected, D3d11UpscaleFormats.Verdict(pixels, new VendorExtensionOutcome(onResult, 0, 0)));
+        Assert.Equal(
+            expected,
+            D3d11UpscaleFormats.Verdict(pixels, new VendorExtensionOutcome(onResult, 0, 0, true, false)));
+    }
+
+    /// <summary>
+    /// A headline computed from two draws that were configured the same way is not a measurement,
+    /// whatever number it carries. Three separate mutations produced exactly that and every test
+    /// stayed green while Intel's 18 109 378 fell to zero.
+    /// </summary>
+    [Theory]
+    // Both «on», both «off», and the shape a deleted call leaves behind.
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    public void A_headline_from_two_identical_configurations_is_never_believed(bool on, bool off)
+    {
+        var pixels = new UpscalePixelComparison(18109378L, 0L, 33177600L, 44, 0, true);
+
+        Assert.Equal(
+            UpscaleVerdict.Untrustworthy,
+            D3d11UpscaleFormats.Verdict(pixels, new VendorExtensionOutcome(0, 0, 0, on, off)));
+    }
+
+    /// <summary>
+    /// The controls are asked before the extension is, and the order is what tells a card with a
+    /// broken readback apart from one that simply has nothing to ask.
+    /// </summary>
+    [Fact]
+    public void A_broken_readback_is_untrustworthy_even_when_there_is_no_extension_to_ask_about()
+    {
+        var broken = new UpscalePixelComparison(0L, 7L, 33177600L, 44, 0, true);
+
+        Assert.Equal(UpscaleVerdict.Untrustworthy, D3d11UpscaleFormats.Verdict(broken, null));
     }
 
     /// <summary>The two cases with nothing to read, told apart from each other and from a failure.</summary>
@@ -325,30 +363,65 @@ public sealed class UpscaleFormatArithmeticTests
         Assert.Equal(UpscaleVerdict.NotAsked, D3d11UpscaleFormats.Verdict(sound, null));
     }
 
-    /// <summary>What the report carries about each adapter, kept whole.</summary>
+    /// <summary>
+    /// The line a person reads a month later. It carries the <b>verdict</b>, which is the whole
+    /// reason the classification exists: the report used to carry nineteen columns of numbers and
+    /// not one of them said «inconclusive», so the RTX 5070's line read `differing=0` and nothing
+    /// else.
+    /// </summary>
     [Fact]
-    public void An_adapter_answer_keeps_every_part_it_was_built_with()
+    public void The_line_a_person_reads_says_what_happened_before_it_says_a_number()
     {
-        var filters = new StandardFilterOutcome(0x30u, ["NOISE_REDUCTION", "EDGE_ENHANCEMENT"], 8084664L);
-        var probe = new AdapterUpscaleProbe(
+        var nvidia = UpscaleProbeReport.Describe(Probe(
+            new VendorExtensionOutcome(0, 0, 0, true, false),
+            new UpscalePixelComparison(0L, 0L, 33177600L, 6, 0, true)));
+        var intel = UpscaleProbeReport.Describe(Probe(
+            new VendorExtensionOutcome(0, 0, 0, true, false),
+            new UpscalePixelComparison(18109378L, 0L, 33177600L, 44, 0, true)));
+
+        Assert.Contains("Inconclusive", nvidia, StringComparison.Ordinal);
+        Assert.Contains("differing=0", nvidia, StringComparison.Ordinal);
+        Assert.Contains("Works", intel, StringComparison.Ordinal);
+        Assert.Contains("differing=18109378", intel, StringComparison.Ordinal);
+        // The filters are the floor under the feature, so they are in the line whatever the vendor
+        // extension did.
+        Assert.Contains("EDGE_ENHANCEMENT", nvidia, StringComparison.Ordinal);
+        Assert.Contains("edge=8084664", nvidia, StringComparison.Ordinal);
+    }
+
+    /// <summary>An adapter that never got that far says so, rather than reading as a refusal.</summary>
+    [Fact]
+    public void An_adapter_with_no_video_processor_says_so_in_its_own_line()
+    {
+        var line = UpscaleProbeReport.Describe(new AdapterUpscaleProbe(
+            "Microsoft Basic Render Driver",
+            0x1414u,
+            GpuVendor.Unknown,
+            new Dictionary<string, uint>(StringComparer.Ordinal),
+            null,
+            null,
+            null,
+            null,
+            "this driver exposes no ID3D11VideoDevice."));
+
+        Assert.Contains("NotRun", line, StringComparison.Ordinal);
+        Assert.Contains("no ID3D11VideoDevice", line, StringComparison.Ordinal);
+        Assert.DoesNotContain("Refused", line, StringComparison.Ordinal);
+    }
+
+    private static AdapterUpscaleProbe Probe(
+        VendorExtensionOutcome extension,
+        UpscalePixelComparison pixels) =>
+        new(
             "NVIDIA GeForce RTX 5070",
             0x10DEu,
             GpuVendor.Nvidia,
             new Dictionary<string, uint>(StringComparer.Ordinal) { ["YUY2"] = 3u },
             "YUY2",
-            new VendorExtensionOutcome(0, 0, 0),
-            filters,
-            new UpscalePixelComparison(0L, 0L, 33177600L, 6, 0, true),
+            extension,
+            new StandardFilterOutcome(0x30u, ["NOISE_REDUCTION", "EDGE_ENHANCEMENT"], 8084664L),
+            pixels,
             null);
-
-        Assert.Equal(GpuVendor.Nvidia, probe.Vendor);
-        Assert.Equal("YUY2", probe.PreferredInput);
-        Assert.Equal(0x30u, probe.Filters!.FilterCaps);
-        Assert.Equal(8084664L, probe.Filters.EdgeEnhancementDifferingBytes);
-        Assert.Equal(33177600L, probe.Pixels!.TotalBytes);
-        Assert.Equal(0u, probe.Extension!.RefusedFunction);
-        Assert.Null(probe.Note);
-    }
 
     private static Dictionary<string, uint> Accepting(IEnumerable<string> names)
     {
