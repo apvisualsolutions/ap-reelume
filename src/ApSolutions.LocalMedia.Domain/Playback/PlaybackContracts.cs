@@ -425,6 +425,26 @@ public interface IVideoFrameSource
 }
 
 /// <summary>
+/// Implemented by engines that can change how the picture looks on the way out: brightness,
+/// contrast and gamma, as <see cref="PictureAdjustment"/> describes them.
+/// </summary>
+/// <remarks>
+/// Separate from <see cref="IMediaPlayerEngine"/> and not folded into it, for the reason every
+/// interface here is separate: an engine that draws into a native window of its own has no pixels
+/// to adjust, and a contract it cannot honour is a contract that lies. It sits beside
+/// <see cref="IVideoFrameSource"/> because the two answer the same question — this engine decodes
+/// into memory — from opposite ends.
+/// </remarks>
+public interface IPictureAdjustable
+{
+    /// <summary>
+    /// How the picture is adjusted from the next frame onwards.
+    /// <see cref="PictureAdjustment.Neutral"/> leaves it exactly as it arrived.
+    /// </summary>
+    PictureAdjustment PictureAdjustment { get; set; }
+}
+
+/// <summary>
 /// Implemented by engines that choose a track on their own, so a surface can follow the choice
 /// instead of guessing it.
 /// </summary>

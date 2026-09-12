@@ -50,7 +50,11 @@ public sealed class FeatureCoverageTests
         // luma between 28 and 69 out of 235 across five scenes. That picture is not soft, it is
         // crushed into black — and PLY-016, the row being built at the time, promises sharpness when
         // enlarging. A whole feature was being built for a defect he does not have.
-        Assert.Equal(73, FeatureMatrix.Rows.Count);
+        // 74 the same evening, and this one was found by counting rather than by looking: the owner
+        // asked for a way to put any group of options back the way it came, and the whole
+        // application turned out to have TWO reset controls — the speed's «back to 1x» and one
+        // title's «restore the provider's fields». Not a single settings section can be undone.
+        Assert.Equal(74, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,
