@@ -252,4 +252,125 @@ public static class D3d11UpscaleFormats
 
     /// <summary>Broadcast black and white in bands three and five pixels wide, which never line up.</summary>
     private static byte Luma(int x, int y) => ((x / 3) + (y / 5)) % 2 == 0 ? (byte)235 : (byte)16;
+
+    /// <summary>
+    /// What a card's answer means, decided here rather than in a person's head.
+    /// </summary>
+    /// <remarks>
+    /// It was prose in an evidence document until 2026-09-12, which is how «inconclusive» becomes
+    /// «it does not work» a month later. The distinction that matters is the last one: a card that
+    /// accepted the request and moved nothing has not refused anything — NVIDIA's driver accepts and
+    /// ignores while the feature is off in its own application — so it is never reported as a
+    /// failure.
+    /// </remarks>
+    public static UpscaleVerdict Verdict(UpscalePixelComparison? pixels, VendorExtensionOutcome? extension)
+    {
+        if (pixels is null)
+        {
+            return UpscaleVerdict.NotRun;
+        }
+
+        // The controls first: a measurement that failed its own controls says nothing about the card.
+        if (pixels.WorstBltResult < 0
+            || !pixels.ReadbacksAgreeInLength
+            || pixels.ControlDifferingBytes != 0
+            || pixels.DistinctValues <= 2)
+        {
+            return UpscaleVerdict.Untrustworthy;
+        }
+
+        if (extension is null)
+        {
+            return UpscaleVerdict.NotAsked;
+        }
+
+        if (extension.OnResult < 0)
+        {
+            return UpscaleVerdict.Refused;
+        }
+
+        return pixels.DifferingBytes > 0 ? UpscaleVerdict.Works : UpscaleVerdict.Inconclusive;
+    }
 }
+
+/// <summary>What the measurement concluded about one card's vendor super resolution.</summary>
+public enum UpscaleVerdict
+{
+    /// <summary>No picture was sent through this card's processor.</summary>
+    NotRun,
+
+    /// <summary>The measurement failed one of its own controls, so it says nothing either way.</summary>
+    Untrustworthy,
+
+    /// <summary>This card has no vendor extension to ask, so none was asked.</summary>
+    NotAsked,
+
+    /// <summary>The driver refused the request outright.</summary>
+    Refused,
+
+    /// <summary>Accepted and changed nothing, which is what an unswitched feature looks like.</summary>
+    Inconclusive,
+
+    /// <summary>Accepted and the picture changed.</summary>
+    Works,
+}
+
+/// <summary>
+/// What a card answered when it was asked to enlarge a picture, and whether a pixel moved.
+/// </summary>
+/// <param name="DifferingBytes">Bytes that differ between the extension switched on and switched off.</param>
+/// <param name="ControlDifferingBytes">
+/// Bytes that differ between two runs with the extension switched off. It has to be zero: a readback
+/// that disagrees with itself cannot say anything about the run that mattered.
+/// </param>
+/// <param name="DistinctValues">
+/// How many different byte values the picture that came out carries. The positive control, and the
+/// probe is worthless without it: a <c>VideoProcessorBlt</c> that drew nothing at all leaves three
+/// identical black readbacks, which counts zero differences and zero control differences exactly
+/// like a super resolution that ran and changed nothing.
+/// </param>
+/// <param name="WorstBltResult">
+/// The worst of the three draws, not the first. Two of them used to be thrown away, and a pair of
+/// failed «off» draws leaves the output texture untouched: zero differences, zero control, and a
+/// report that reads «the super resolution did nothing».
+/// </param>
+/// <param name="ReadbacksAgreeInLength">
+/// Whether the three readbacks came back the same size. A failed <c>Map</c> returns nothing, and the
+/// difference count then answers the longer length — which in the control reads correctly as «these
+/// disagree» and in the headline reads as «the whole picture changed».
+/// </param>
+public sealed record UpscalePixelComparison(
+    long DifferingBytes,
+    long ControlDifferingBytes,
+    long TotalBytes,
+    int DistinctValues,
+    int WorstBltResult,
+    bool ReadbacksAgreeInLength);
+
+/// <summary>
+/// Both halves of the vendor's switch. The «off» call is recorded because the measurement is the
+/// difference between the two: without it the headline number silently becomes zero.
+/// </summary>
+public sealed record VendorExtensionOutcome(int OnResult, int OffResult, uint RefusedFunction);
+
+/// <summary>
+/// What a processor offers without anybody switching anything on: the standard Direct3D filters it
+/// declares, and whether asking for edge enhancement changes the picture.
+/// </summary>
+public sealed record StandardFilterOutcome(
+    uint FilterCaps,
+    IReadOnlyList<string> Offered,
+    long EdgeEnhancementDifferingBytes);
+
+/// <summary>Everything one adapter answered about enlarging pictures.</summary>
+public sealed record AdapterUpscaleProbe(
+    string Description,
+    uint VendorId,
+    GpuVendor Vendor,
+    IReadOnlyDictionary<string, uint> FormatSupport,
+    string? PreferredInput,
+    VendorExtensionOutcome? Extension,
+    StandardFilterOutcome? Filters,
+    UpscalePixelComparison? Pixels,
+    string? Note);
+

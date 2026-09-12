@@ -7,65 +7,6 @@ using System.Runtime.InteropServices;
 namespace ApSolutions.LocalMedia.Windows.Playback;
 
 /// <summary>
-/// What a card answered when it was asked to enlarge a picture, and whether a pixel moved.
-/// </summary>
-/// <param name="DifferingBytes">Bytes that differ between the extension switched on and switched off.</param>
-/// <param name="ControlDifferingBytes">
-/// Bytes that differ between two runs with the extension switched off. It has to be zero: a readback
-/// that disagrees with itself cannot say anything about the run that mattered.
-/// </param>
-/// <param name="DistinctValues">
-/// How many different byte values the picture that came out carries. The positive control, and the
-/// probe is worthless without it: a <c>VideoProcessorBlt</c> that drew nothing at all leaves three
-/// identical black readbacks, which counts zero differences and zero control differences exactly
-/// like a super resolution that ran and changed nothing.
-/// </param>
-/// <param name="WorstBltResult">
-/// The worst of the three draws, not the first. Two of them used to be thrown away, and a pair of
-/// failed «off» draws leaves the output texture untouched: zero differences, zero control, and a
-/// report that reads «the super resolution did nothing».
-/// </param>
-/// <param name="ReadbacksAgreeInLength">
-/// Whether the three readbacks came back the same size. A failed <c>Map</c> returns nothing, and the
-/// difference count then answers the longer length — which in the control reads correctly as «these
-/// disagree» and in the headline reads as «the whole picture changed».
-/// </param>
-public sealed record UpscalePixelComparison(
-    long DifferingBytes,
-    long ControlDifferingBytes,
-    long TotalBytes,
-    int DistinctValues,
-    int WorstBltResult,
-    bool ReadbacksAgreeInLength);
-
-/// <summary>
-/// Both halves of the vendor's switch. The «off» call is recorded because the measurement is the
-/// difference between the two: without it the headline number silently becomes zero.
-/// </summary>
-public sealed record VendorExtensionOutcome(int OnResult, int OffResult, uint RefusedFunction);
-
-/// <summary>
-/// What a processor offers without anybody switching anything on: the standard Direct3D filters it
-/// declares, and whether asking for edge enhancement changes the picture.
-/// </summary>
-public sealed record StandardFilterOutcome(
-    uint FilterCaps,
-    IReadOnlyList<string> Offered,
-    long EdgeEnhancementDifferingBytes);
-
-/// <summary>Everything one adapter answered about enlarging pictures.</summary>
-public sealed record AdapterUpscaleProbe(
-    string Description,
-    uint VendorId,
-    GpuVendor Vendor,
-    IReadOnlyDictionary<string, uint> FormatSupport,
-    string? PreferredInput,
-    VendorExtensionOutcome? Extension,
-    StandardFilterOutcome? Filters,
-    UpscalePixelComparison? Pixels,
-    string? Note);
-
-/// <summary>
 /// PLY-016's measurement: asks every video adapter in this machine which picture formats its video
 /// processor takes, whether it accepts the vendor's super-resolution extension, and — the only part
 /// that proves anything — whether the picture that comes out differs with the extension on and off.
