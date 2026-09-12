@@ -11,7 +11,10 @@
   `tests/ApSolutions.LocalMedia.Domain.Tests/Continuity/PreferenceResolutionTests.cs`,
   `tests/ApSolutions.LocalMedia.Application.Tests/Playback/ApplyPlaybackPreferencesTests.cs`,
   `tests/ApSolutions.LocalMedia.IntegrationTests/Playback/PlaybackPreferenceRepositoryTests.cs`,
-  `tests/ApSolutions.LocalMedia.IntegrationTests/Data/MigrationHistoryTests.cs`
+  `tests/ApSolutions.LocalMedia.IntegrationTests/Data/MigrationHistoryTests.cs`,
+  `tests/ApSolutions.LocalMedia.UiTests/Player/PictureAdjustmentViewModelTests.cs`,
+  `tests/ApSolutions.LocalMedia.UiTests/Player/PlayerSettingsMenuTests.cs`,
+  `tests/ApSolutions.LocalMedia.AccessibilityTests/EndToEnd/AssembledPhysicalWalkTests.cs`
 
 ## Veredicto / Verdict
 
@@ -170,9 +173,64 @@ dejaría morir el ajuste en silencio y ninguna prueba lo diría. Ahora hay un mo
 reenvía todo `IMediaPlayerEngine` y **se deja atrás** esa interfaz, que es exactamente lo que un
 decorador haría sin querer.
 
+## El engranaje, y las cuatro puertas que cazaron algo real
+
+El panel vive donde el `ADR-0012` lo puso: un botón de engranaje en la barra abre una lista dibujada
+**dentro de la banda del transporte**, y elegir «Imagen» la sustituye por los tres mandos. La banda
+crece hacia arriba mientras está abierta y devuelve la altura al cerrarse.
+
+**Dentro de la banda y no flotando sobre el vídeo, y eso se decidió midiendo.** Un panel de 380 px
+alineado abajo a la derecha del panel raíz cae **encima del extremo derecho de la propia barra** —
+justo sobre los botones con los que alguien lo cerraría—. Dentro de la banda no puede solaparse con
+nada, porque la banda lo mide como un hijo más.
+
+El ámbito es **la serie para un episodio y el archivo para todo lo demás**, que es exactamente el par
+que `ApplyPlaybackPreferences` lee al abrir. Si las dos mitades no coincidieran, el panel escribiría
+en una fila que nadie vuelve a mirar.
+
+| Puerta | Qué encontró |
+| --- | --- |
+| `PlayerViewDesignTests` | el contenedor del panel era hijo directo del reproductor **sin superficie propia**, así que su texto se habría leído contra el fondo del vídeo en un tema claro |
+| `SurfaceCornerTests` | la esquina estaba escrita en el marcado, donde el trinquete está al tope: se pareó con una clase de estilo, que es el único sitio que ese trinquete no cuenta |
+| `LeadingActionTests` | las dos vistas nuevas no tenían decidida su acción líder — ninguna la tiene, y el porqué está escrito en la tabla |
+| `CommandNotificationTests` | los cuatro comandos del engranaje tiran sus suscripciones; su silencio es seguro porque ninguno pregunta nada, y ahora está escrito con su predicado |
+
+### Y seis puertas ciegas más, que `gate-auditor` encontró en lo anterior
+
+| Mutación que sobrevivía | Por qué nadie la veía | Qué la caza ahora |
+| --- | --- | --- |
+| Tirar los dos parámetros de ámbito y guardarlo todo en la fila global | las cinco pruebas construían el ViewModel **sin ámbito**, así que todas tocaban `Global` | una teoría con `Series` y `File`, que además comprueba que la fila global sigue vacía |
+| Construir la preferencia de cero al guardar, en vez de leerla | ninguna prueba ponía un campo vecino en la fila, y borrarlos todos no cambiaba nada visible | una fila con volumen y velocidad dentro, afirmados después de guardar |
+| Apuntar los dos niveles a `IsOpen` en vez de a sus banderas | «el segundo sustituye al primero» se afirmaba sobre el modelo, y **los dos niveles dibujados a la vez dejaban 1.354 pruebas y el paseo entero en verde** | montar la vista y leer `IsEffectivelyVisible` de cada nivel |
+| Cambiar la esquina de la clase a la píldora (999) | la tabla de superficies sólo pregunta si una clase **declara** esquina, no cuál | una prueba que mide la esquina construida contra el token medio |
+| Quitar la guarda de `NaN` del recorte | la teoría tenía dos filas, −9 y 9, y `Math.Clamp` las atrapa sin la guarda | una tercera fila, `NaN`, que es la única que justifica la guarda |
+| **Que el panel no cargue nunca lo guardado** | `LoadAsync` no tenía **ningún llamante** en todo `src/` | abrir el engranaje es lo que lee, y una prueba cuenta que lee **una sola vez** |
+
+**La última es la peor y es el defecto de la casa otra vez**: el motor ya llevaba el ajuste guardado
+—lo pone el caso de uso al abrir—, así que el panel se habría abierto en neutro sobre una película ya
+ajustada, con tres mandos contradiciendo a la pantalla, y el primer toque habría escrito ese neutro
+encima de lo elegido. La salida no fue acordarse de llamar a la carga: fue que **abrir el engranaje
+sea lo que carga**, para que no haya nada que recordar.
+
+### La trampa del paseo, que vale para cualquier deslizador
+
+**El clic del recorrido automático cae en el centro del mando, y el centro del brillo ES su valor
+neutro.** Un `Slider` de −1 a 1 con el neutro en 0 contesta al clic central con el valor que ya
+tenía, así que el arnés lee «no ha pasado nada» de un control que funciona perfectamente, lo reintenta
+ocho veces y falla. Lo mismo le pasa al contraste, cuyo rango 0,5–2 tiene el neutro justo en medio.
+
+La escena manda cada mando a su extremo antes de pulsarlo, que es lo mismo que hace la de la
+velocidad antes de pulsar «Volver a 1×». Medido: la escena pasó de fallar en 1 m 12 s —ocho intentos—
+a pasar en 10 s.
+
+**Y el botón de restaurar se movió a la cabecera del grupo por la misma razón.** Debajo de los tres
+mandos, aparecer y desaparecer cambiaba la altura del panel y movía justo los controles que el ratón
+iba a pulsar. Al lado de una frase de dos líneas no cambia nada.
+
 ## Lo que queda
 
-- El control en pantalla: el panel de imagen dentro del engranaje del reproductor (`ADR-0012`).
 - El coste por fotograma medido contra un presupuesto, que el criterio de la fila promete y todavía
   no tiene ni una cifra de tiempo.
+- Los suelos de cobertura de las dos vistas nuevas, que sólo pueden salir del artefacto de un run de
+  CI: aquí el trinquete informa y no bloquea, y el fichero no se edita a mano.
 - El juicio final sobre el valor por defecto, que es del propietario y se firma por el ojo.

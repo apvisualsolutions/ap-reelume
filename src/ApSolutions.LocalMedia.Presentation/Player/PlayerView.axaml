@@ -197,6 +197,32 @@ SPDX-License-Identifier: GPL-3.0-or-later
         automation:AutomationProperties.Name="{DynamicResource PlayerTransportName}">
       <StackPanel Spacing="{DynamicResource Space8}">
         <!--
+          The gear's panel, and it is the FIRST child of the band rather than a sibling floating over
+          the picture: a panel bottom-aligned in the root Panel lands on top of the bar's own right
+          hand — measured against the 380 px it asks for — and covers the very buttons somebody needs
+          to close it. Inside the band it makes the band taller while it is open and gives the height
+          back when it is not, which is what the shape it copies does.
+
+          It travels with the band into the small window and stands down with it there, and the
+          player's model shuts the gear on the way, so nothing is left open with no button to close it.
+        -->
+        <Border
+            x:Name="PlayerSettingsSurface"
+            Classes="player-overlay"
+            Width="380"
+            HorizontalAlignment="Right"
+            Margin="0,0,0,8"
+            TextElement.Foreground="{DynamicResource PlayerTextBrush}"
+            IsVisible="{Binding Settings.IsOpen, FallbackValue=False}">
+          <ContentControl x:Name="PlayerSettingsHost" Content="{Binding Settings}">
+            <ContentControl.ContentTemplate>
+              <DataTemplate DataType="player:PlayerSettingsMenuViewModel">
+                <player:PlayerSettingsMenuView />
+              </DataTemplate>
+            </ContentControl.ContentTemplate>
+          </ContentControl>
+        </Border>
+        <!--
           The scrubber and the two clocks come first and take the whole width, which is the row this
           application never had. It is declared here rather than beside the buttons because a bar
           that shares a line with them is a bar as wide as whatever they left over.

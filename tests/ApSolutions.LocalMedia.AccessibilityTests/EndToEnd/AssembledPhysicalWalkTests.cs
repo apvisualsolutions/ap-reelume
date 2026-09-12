@@ -2931,6 +2931,87 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking «back to 1×» never brought the session back to normal speed");
         Assert.Equal(1.0, transport.SpeedMultiplier);
 
+        // The gear, and everything behind it (PLY-018, ADR-0012). It is pressed from the bar and read
+        // off the player's own model, and it is here rather than in a scene of its own because the
+        // panel makes the band taller while it is open: opening it moves every button beside it, the
+        // same way «Volver a 1×» appearing does, and a scene that left it open would be pressing the
+        // mode buttons where they used to be.
+        var settings = host.ViewModel.Player!.Player.Settings;
+        Assert.NotNull(settings);
+        var picture = settings!.Picture;
+        Assert.NotNull(picture);
+
+        await PressAsync(
+            host,
+            "PlayerSettingsAction",
+            () => settings.IsOpen,
+            "clicking the gear never opened the settings over the picture");
+        Assert.True(settings.IsOpen);
+
+        await PressAsync(
+            host,
+            "PlayerSettingsGroupPicture",
+            () => settings.Group,
+            "clicking «Imagen» never replaced the list with the picture group");
+        Assert.Equal(PlayerSettingsGroup.Picture, settings.Group);
+
+        // The three controls, each read off the value it sets. Every one of them is sent to the end
+        // of its own range first, and that is the scene rather than the test: a click lands in the
+        // middle of a slider, and the middle of brightness IS its neutral — so a press there would
+        // set the value it already had and the walk would read «nothing happened» from a control
+        // working perfectly. The engine is written to on the way, asserted in
+        // PictureAdjustmentViewModelTests against a target that records, since there is no engine
+        // behind this harness to ask.
+        picture!.Brightness = PictureAdjustment.MinimumBrightness;
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "PictureBrightnessLabel",
+            () => picture.Brightness,
+            "dragging the brightness never changed the brightness the session carries");
+
+        picture.Contrast = PictureAdjustment.MinimumContrast;
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "PictureContrastLabel",
+            () => picture.Contrast,
+            "dragging the contrast never changed the contrast the session carries");
+
+        picture.Gamma = PictureAdjustment.MinimumGamma;
+        Dispatcher.UIThread.RunJobs();
+        await PressAsync(
+            host,
+            "PictureGammaLabel",
+            () => picture.Gamma,
+            "dragging the gamma never changed the gamma the session carries");
+        Assert.False(picture.IsNeutral, "none of the three controls moved, so the reset has nothing to do.");
+
+        // «Restaurar valores por defecto» (UX-010), which is absent while there is nothing to come
+        // back from — so the three above are what puts it on the screen, and pressing it takes it off
+        // again. The same grammar the speed reset follows, and the same reason the scene has to spend
+        // something before it can press the thing that gives it back.
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => picture.IsNeutral,
+            "clicking «restore default values» never put the picture back the way it came");
+        Assert.True(picture.IsNeutral);
+
+        await PressAsync(
+            host,
+            "PlayerSettingsBackAction",
+            () => settings.Group,
+            "clicking back never returned the gear to its list of groups");
+        Assert.Equal(PlayerSettingsGroup.None, settings.Group);
+
+        await PressAsync(
+            host,
+            "PlayerSettingsCloseAction",
+            () => settings.IsOpen,
+            "clicking close never gave the band's height back to the picture");
+        Assert.False(settings.IsOpen);
+
         // The bar's own two mode buttons, which is where the owner looked for them on 2026-08-25 and
         // where they were not. Pressed from the bar and read off the shell's mode, because a button
         // that only changed its own look would leave the picture exactly where it was. There is one

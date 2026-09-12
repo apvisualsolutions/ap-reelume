@@ -27,6 +27,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
   porque un número negativo convertido a byte no es cero, es lo que quede tras la vuelta. Medido al
   quitarla, no supuesto.
 
+  **Y ahora se toca y se recuerda.** Un engranaje nuevo en la barra del reproductor abre una lista
+  dibujada sobre el vídeo, y elegir «Imagen» la sustituye por los tres mandos, con su «Restaurar
+  valores por defecto» al lado. Lo que elijas se guarda solo, sin botón de guardar: para una serie,
+  la serie entera; para una película, esa película. Así los diez episodios oscuros se arreglan una
+  vez, y la siguiente película empieza como viene.
+
+  **El panel se dibuja sobre el vídeo y no flota en un menú emergente**, y el motivo no es de gusto:
+  dentro de un emergente el recorrido automático que prueba la aplicación no alcanza nada, así que
+  poner ahí los ajustes del reproductor los dejaría a todos sin nadie que los pruebe.
+
 - **La fuerza del realce de imagen ya la decide código que alguien puede comprobar.** Estaba escrita
   dentro del único archivo del proyecto que no se mide, así que ninguna prueba podía llegar a ella.
   Ahora es una regla aparte con siete casos: se pide el máximo —el único valor con una medición

@@ -27,6 +27,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   out **white**, because a negative number cast to a byte is not zero, it is whatever the wrap
   leaves behind. Measured by removing it, not assumed.
 
+  **And now it can be reached, and it is remembered.** A new gear on the player's bar opens a list
+  drawn over the video, and choosing «Picture» replaces it with the three controls and their
+  «Restore default values» beside them. What you choose stores itself, with no save button: for a
+  show, the whole show; for a film, that film. So ten dark episodes are fixed once, and the next
+  film starts as it comes.
+
+  **The panel is drawn over the video rather than floated in a popup menu**, and that is not taste:
+  nothing inside a popup is reachable by the automated walk that tests this application, so putting
+  the player's settings there would leave every one of them with nobody testing it.
+
 - **How strong the picture enhancement is asked to be is now decided by code somebody can check.**
   It was written inside the one file in the project that is not measured, so no test could reach it.
   It is a separate rule now, with seven cases: the maximum is asked for — the only value with a

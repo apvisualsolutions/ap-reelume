@@ -2959,6 +2959,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
     A name that describes its first caller rather than its shape is a name that invites the second
     caller to write a duplicate instead.
   -->
+  <!--
+    The gear's panel over the picture (ADR-0012). Its corner lives here and not in the view, which is
+    what SurfaceCornerTests asks for in so many words: this file is the one place the ratchet does not
+    count, so a surface paired with a class costs no site at all while the same four lines written
+    into a view cost one.
+  -->
+  <Style Selector="Border.player-overlay">
+    <Setter Property="Background" Value="{DynamicResource PlayerChromeBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource PlayerHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusMedium}" />
+    <Setter Property="Padding" Value="16" />
+  </Style>
+
   <Style Selector="Border.row-box">
     <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ShellHairlineBrush}" />

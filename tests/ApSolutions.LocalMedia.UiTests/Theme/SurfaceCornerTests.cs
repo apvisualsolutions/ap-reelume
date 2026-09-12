@@ -146,6 +146,15 @@ public sealed class SurfaceCornerTests
             + "design element to pair it with and inventing one would be a number nobody read. What "
             + "the design DID decide is the card behind it, and that is what moved this notice off "
             + "the accent's wash and onto the card's own surface on 2026-09-03."),
+        ("Border.player-overlay",
+            "the gear's panel over the picture (ADR-0012, 2026-09-12). The prototype has no such "
+            + "surface: its player settings are a popup menu, and that container is precisely what "
+            + "this tree cannot copy, because nothing inside a Flyout is reachable by the autonomous "
+            + "walk. So there is no design element to pair it with, and inventing one would be a "
+            + "number nobody read. It takes the medium token, which is what the four notices already "
+            + "drawn over the picture take — the next episode, the resume offer, the version "
+            + "question and the status — so the panel matches its own neighbours rather than an "
+            + "element of the design that does not exist."),
     ];
 
     /// <summary>Every surface draws the corner its prototype element draws.</summary>
@@ -186,6 +195,33 @@ public sealed class SurfaceCornerTests
         Assert.True(
             offenders.Count == 0,
             "A surface draws the corner its prototype element draws: " + string.Join("; ", offenders));
+    }
+
+    /// <summary>
+    /// The gear's panel draws the same corner as the notices it sits among.
+    /// </summary>
+    /// <remarks>
+    /// Its row in <see cref="Unpaired"/> says so in words — «it takes the medium token, which is what
+    /// the four notices already drawn over the picture take» — and a reason written and not measured
+    /// is a reason nobody has to keep: swapping the class to the pill token left every one of the
+    /// 1354 interface tests green. The list above only asks whether a surface DECLARES a corner, so
+    /// which one it declares is asked here.
+    /// </remarks>
+    [AvaloniaFact]
+    public void The_gears_panel_draws_the_corner_the_notices_beside_it_draw()
+    {
+        var application = Avalonia.Application.Current!;
+        using var scope = new ResourceScope(application);
+        _ = new AppearanceService(application, new EmptyStore(), new FixedTheme(), new NoBackdrop());
+
+        var drawn = Corner("Border.player-overlay");
+        var medium = Assert.IsType<CornerRadius>(
+            application.FindResource(application.ActualThemeVariant, "CornerRadiusMedium"));
+
+        Assert.Equal(medium.TopLeft, drawn.TopLeft);
+        Assert.Equal(drawn.TopLeft, drawn.TopRight);
+        Assert.Equal(drawn.TopLeft, drawn.BottomLeft);
+        Assert.Equal(drawn.TopLeft, drawn.BottomRight);
     }
 
     /// <summary>
