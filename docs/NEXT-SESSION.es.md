@@ -14,13 +14,26 @@
 >   decodificador: **el rojo puro salía 231 en vez de 253**. La elección vive ahora en `Domain`
 >   (`YuvMatrixPolicy`) y el conversor recibe los coeficientes en vez de llevarlos dentro. El vídeo de
 >   definición estándar no se mueve, que es el resultado que se buscaba para él.
-> · **No abre fila de alcance, y se comprobó por qué**: ninguna fila de `docs/FEATURES.md` promete
->   fidelidad de color. **Ése es el hueco que dejó vivir el defecto** — no había nada escrito que
->   contradecir. Abrir `PLY-017` es un cambio de alcance y por tanto decisión del propietario.
+> · **Y por eso nació `PLY-017`, decidido por el propietario el 2026-09-12**: ninguna fila de
+>   `docs/FEATURES.md` prometía fidelidad de color, y **ése es el hueco que dejó vivir el defecto** —
+>   no había nada escrito que contradecir. Va a `STABLE` y no a `MVP` a propósito: el manifiesto del
+>   MVP es un registro cerrado de 46 compromisos con las tareas que los construyeron, y una fila que
+>   nace hoy no tiene tarea que nombrar. Inventarle una falsearía el registro, y la puerta lo exige
+>   por escrito.
 > · **No se le puede pasar un espacio de color declarado, y es deliberado.** LibVLC 3 no lo expone y
 >   `ffprobe` es una herramienta de pruebas que no está en la máquina de quien usa la aplicación. Un
 >   parámetro para un dato que nadie suministra es una puerta que nadie cruza, que es el defecto de la
 >   casa. `YuvMatrixPolicy` es el único sitio que cambiará el día que algo pueda leerlo.
+> · **Y VLC TAMPOCO mueve un píxel con la superresolución, que es lo que zanja el tercio de NVIDIA.**
+>   La clave fue el cuarto modo: `--d3d11-upscale-mode` acepta `linear`, `point`, `processor` y
+>   `super`, y **`processor` usa el procesador de vídeo SIN la extensión del fabricante** mientras
+>   `super` la añade. Ese par la aísla. **Cero bytes entre los dos**, con dos pasadas del mismo modo
+>   dando cero exacto. Y cae con ello la última hipótesis viva —que la superresolución sólo actuara al
+>   presentar en pantalla—, porque VLC presenta.
+> · **La primera comparación dio 50 % y estuvo a punto de escribirse como «VLC sí mejora».** Era
+>   `linear` contra `super`, y `linear` **ni siquiera crea escalador**: va por un sampler. Ese 50 %
+>   mide el procesador de vídeo frente a no usarlo — **que es la mejora que la cadena SÍ va a tener en
+>   la RTX**, con un desvío medio de 15 niveles. Lo destapó el registro de VLC, no el número.
 > · **El cero de NVIDIA, medido contra cuatro combinaciones en vez de una, y sigue en cero.** Formato
 >   (`YUY2` y `NV12`) por contenido (bandas duras y una imagen con degradado, textura fina y croma
 >   vivo). **Y pesa más que antes, porque Intel mueve MÁS con la imagen de detalle** —22 455 544
@@ -55,9 +68,6 @@
 >
 > ### Pendiente del propietario, con recomendación delante
 >
-> · **Cuándo se puede abrir VLC** para comparar píxeles, que es lo único que falta de NVIDIA. Su
->   registro ya dice «turning VSR ON»; falta saber si mueve algo. Necesita su ventana visible unos
->   segundos, dos veces, y no hay pantalla libre.
 > · **La cifra de duración de CI en el aviso de post-push.** Recomendado: dejarla en **un solo sitio**,
 >   el del propio vigía, y que `RunDurationFigureTests` pase de «las cuatro copias coinciden» a
 >   «nadie la escribe fuera de ahí», conservando lo que sí vale — que el latido salte antes de que
