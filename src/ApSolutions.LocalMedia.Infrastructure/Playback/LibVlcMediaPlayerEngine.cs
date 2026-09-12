@@ -64,6 +64,7 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     private int _visibleHeight;
     private int _packedStride;
     private int _frameStride;
+    private YuvColourMatrix _frameMatrix;
     private object? _formatCallback;
     private object? _cleanupCallback;
     private object? _lockCallback;
@@ -505,6 +506,10 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
                 return;
             }
 
+            // The matrix is not asked about separately, and that is measured rather than assumed:
+            // it is written beside _packedFrame in the format callback and cleared beside it, so a
+            // second guard here is a branch nothing can take — coverlet reported it at zero hits —
+            // and the file's branch floor has one branch of margin to spare.
             if (_packedFrame is not { } packed)
             {
                 return;
@@ -519,7 +524,8 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
                 _visibleWidth,
                 _visibleHeight,
                 _packedStride,
-                _frameStride);
+                _frameStride,
+                _frameMatrix);
             handler(this, new VideoFrameEventArgs(managed, _visibleWidth, _visibleHeight, _frameStride));
         });
 
@@ -569,6 +575,11 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
         _frameBuffer = Marshal.AllocHGlobal(_packedStride * _frameHeight);
         _packedFrame = new byte[_packedStride * _frameHeight];
         _managedFrame = new byte[_frameStride * _visibleHeight];
+
+        // Once per playback and not once per frame, because the geometry is what decides and this is
+        // where the geometry is settled. The height asked is the published one rather than the
+        // decoder's aligned buffer: what a person sees is 1080 rows, not the 1088 LibVLC offered.
+        _frameMatrix = YuvMatrixPolicy.For(_visibleHeight);
         return 1;
     }
 

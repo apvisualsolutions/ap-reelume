@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.Domain.Playback;
+
 namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 
 /// <summary>
@@ -19,8 +21,15 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// </para>
 /// <para>
 /// The price is this conversion and half the horizontal chroma resolution, which is what every
-/// hardware overlay has always used. The coefficients are the integer BT.601 full-swing ones; the
-/// picture is limited-range, so luma is offset by 16 and both chroma planes by 128.
+/// hardware overlay has always used. The picture is limited-range, so luma is offset by 16 and both
+/// chroma planes by 128, and the coefficients that scale what is left carry the 255/219 and 255/224
+/// gains of that range.
+/// </para>
+/// <para>
+/// Which coefficients is not this class's decision, and until 2026-09-12 it was nobody's: BT.601 was
+/// written in here and every high definition picture — which is BT.709 — came out wrong, pure red
+/// landing 22 levels short. The matrix now arrives as an argument, from
+/// <see cref="YuvMatrixPolicy"/>, and this class does the arithmetic and no choosing.
 /// </para>
 /// </remarks>
 public static class PackedYuvConverter
@@ -42,13 +51,15 @@ public static class PackedYuvConverter
     /// </summary>
     /// <param name="source">The packed picture, at least <paramref name="sourceStride"/> per row.</param>
     /// <param name="destination">The BGRA picture, at least <paramref name="destinationStride"/> per row.</param>
+    /// <param name="matrix">The coefficients the picture was encoded with, chosen by the caller.</param>
     public static void UyvyToBgra(
         ReadOnlySpan<byte> source,
         Span<byte> destination,
         int width,
         int height,
         int sourceStride,
-        int destinationStride)
+        int destinationStride,
+        YuvColourMatrix matrix)
     {
         // The width is paired rather than merely positive: the format carries one chroma sample for
         // every two pixels, so an odd width names a pixel with no partner. Refusing it here is what
@@ -77,18 +88,18 @@ public static class PackedYuvConverter
                 var firstLuma = read[at + 1] - 16;
                 var v = read[at + 2] - 128;
                 var secondLuma = read[at + 3] - 16;
-                WritePixel(write[(pair * 8)..], firstLuma, u, v);
-                WritePixel(write[((pair * 8) + 4)..], secondLuma, u, v);
+                WritePixel(write[(pair * 8)..], firstLuma, u, v, matrix);
+                WritePixel(write[((pair * 8) + 4)..], secondLuma, u, v, matrix);
             }
         }
     }
 
-    private static void WritePixel(Span<byte> destination, int luma, int u, int v)
+    private static void WritePixel(Span<byte> destination, int luma, int u, int v, YuvColourMatrix matrix)
     {
-        var scaled = 298 * luma;
-        destination[0] = Clamp((scaled + (516 * u) + 128) >> 8);
-        destination[1] = Clamp((scaled - (100 * u) - (208 * v) + 128) >> 8);
-        destination[2] = Clamp((scaled + (409 * v) + 128) >> 8);
+        var scaled = matrix.Luma * luma;
+        destination[0] = Clamp((scaled + (matrix.BlueFromU * u) + 128) >> 8);
+        destination[1] = Clamp((scaled - (matrix.GreenFromU * u) - (matrix.GreenFromV * v) + 128) >> 8);
+        destination[2] = Clamp((scaled + (matrix.RedFromV * v) + 128) >> 8);
         destination[3] = 255;
     }
 
