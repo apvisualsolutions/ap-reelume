@@ -293,7 +293,7 @@ preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecha
 **entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
 contesta `[]`.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **185** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **187** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -319,8 +319,14 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **185** <!--medido:trinquete-de-deuda-->
-desde
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **187** <!--medido:trinquete-de-deuda-->
+desde el 2026-09-13, cuando **subió en dos** por las dos vistas del engranaje del reproductor: un
+`.axaml` mide 100/50 y eso no es deuda, es la única rama que el compilador de Avalonia genera. **Y
+los dos ViewModels que llegaron con ellas NO entraron**, que es la otra mitad de la regla: el run los
+midió a 100/95 y 98/90, así que podían mejorar y se cubrieron. La rama que faltaba en el del ajuste
+de imagen la nombró el JSON de coverlet —línea 190, el aviso de cambio al que nadie se había
+suscrito— después de que dos intentos a ojo no dieran con ella.
+Antes estuvo en **185** desde
 el 2026-09-11, cuando bajó por mejora tres veces el mismo día. Primero a 187: quitar los círculos de
 las píldoras de opción se llevó ramas cubiertas de dos ViewModels, y en vez de rebajar sus suelos se
 cubrió lo que faltaba hasta que los dos llegaron al listón y salieron. Después a 186: la cuenta de

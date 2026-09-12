@@ -116,6 +116,31 @@ public sealed class PlayerSettingsMenuTests
     }
 
     /// <summary>
+    /// The three ways of asking for the state something is already in, which all answer by doing
+    /// nothing: closing what is shut, opening the group that is open, and handing the open command
+    /// something that is not a group at all — a `CommandParameter` typo in markup reaches exactly
+    /// that last one, and a gear that jumped somewhere on it would be worse than one that sat still.
+    /// </summary>
+    [Fact]
+    public void Asking_for_the_state_it_is_already_in_changes_nothing()
+    {
+        var menu = new PlayerSettingsMenuViewModel();
+
+        menu.CloseCommand.Execute(null);
+        Assert.False(menu.IsOpen);
+
+        menu.ToggleCommand.Execute(null);
+        menu.OpenGroupCommand.Execute(PlayerSettingsGroup.Picture);
+        menu.OpenGroupCommand.Execute(PlayerSettingsGroup.Picture);
+        Assert.Equal(PlayerSettingsGroup.Picture, menu.Group);
+
+        menu.BackCommand.Execute(null);
+        menu.OpenGroupCommand.Execute("Picture");
+        Assert.Equal(PlayerSettingsGroup.None, menu.Group);
+        Assert.True(menu.IsListVisible);
+    }
+
+    /// <summary>
     /// Opening the gear is what reads the stored adjustment, and the panel shows it rather than the
     /// neutral it was built at. Without this the gear opened at neutral over a film the engine was
     /// already adjusting, and the first touch of a control wrote that neutral over what somebody had
