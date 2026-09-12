@@ -27,12 +27,16 @@ namespace ApSolutions.LocalMedia.Windows.Playback;
 /// <c>CreateVideoProcessorEnumerator</c> — which is called first — sits at 10.
 /// </para>
 /// <para>
-/// Excluded from coverage as a whole, and that is the seam rule 10 asks for rather than an exception
-/// to it: everything that decides anything lives in <see cref="D3d11UpscaleFormats"/> and is measured
-/// there on any machine. What is left here can only fail if Windows or a display driver fails.
+/// <b>Not excluded from coverage, and that was tried first.</b> Everything that decides anything
+/// lives in <see cref="D3d11UpscaleFormats"/> and is measured there on any machine, so marking this
+/// class <c>[ExcludeFromCodeCoverage]</c> looked like rule 10's seam. It would have made this the
+/// first file in the tree excluded whole, the coverage preview refused it as «not measured», and an
+/// earlier attempt had already been rejected by CI at 45/100 because the data records then living
+/// beside it were not excluded and the gate measures per file. What is left is what rule 10 names as
+/// its other half: a file that depends on hardware a hosted runner does not have, which belongs in
+/// <c>eng/coverage-debt.txt</c> with its reason — the eighth of its kind.
 /// </para>
 /// </remarks>
-[ExcludeFromCodeCoverage]
 public static class WindowsVideoUpscaleProbe
 {
     private const int DxgiErrorNotFound = unchecked((int)0x887A0002);
@@ -302,10 +306,11 @@ public static class WindowsVideoUpscaleProbe
                 devices.VideoContext, processor, ref OutputColorSpace);
 
             var onResult = SetExtension(
-                devices.VideoContext, processor, vendor, enable: true, out var refusedFunction);
+                devices.VideoContext, processor, vendor, enable: true, out var refusedFunction, out var onRequested);
             var withExtension = Draw(devices, processor, inputView, outputView, output, staging, targetWidth, targetHeight);
 
-            var offResult = SetExtension(devices.VideoContext, processor, vendor, enable: false, out _);
+            var offResult = SetExtension(
+                devices.VideoContext, processor, vendor, enable: false, out _, out var offRequested);
             var without = Draw(devices, processor, inputView, outputView, output, staging, targetWidth, targetHeight);
             var controlRun = Draw(devices, processor, inputView, outputView, output, staging, targetWidth, targetHeight);
 
@@ -333,7 +338,7 @@ public static class WindowsVideoUpscaleProbe
                 support,
                 preferred,
                 vendor is GpuVendor.Nvidia or GpuVendor.Intel
-                    ? new VendorExtensionOutcome(onResult, offResult, refusedFunction)
+                    ? new VendorExtensionOutcome(onResult, offResult, refusedFunction, onRequested, offRequested)
                     : null,
                 filters,
                 pixels,
@@ -413,19 +418,30 @@ public static class WindowsVideoUpscaleProbe
         return created < 0 ? $"CreateTexture2D refused the staging copy: 0x{created:X8}" : null;
     }
 
+    /// <summary>
+    /// Sends the vendor's switch, and reports <b>what it asked for</b> alongside what came back.
+    /// The flag is read from the payload actually handed to the driver rather than from the
+    /// parameter, so a caller that passes the same value twice cannot look like one that did not.
+    /// </summary>
     private static int SetExtension(
         nint videoContext,
         nint processor,
         GpuVendor vendor,
         bool enable,
-        out uint refusedFunction)
+        out uint refusedFunction,
+        out bool requested)
     {
         refusedFunction = 0;
+        requested = false;
         var setStreamExtension = Com.Method<SetStreamExtensionFn>(videoContext, 39);
         switch (vendor)
         {
             case GpuVendor.Nvidia:
                 var payload = D3d11UpscaleFormats.NvidiaStreamExtension(enable);
+
+                // Read back out of the bytes on their way to the driver, not off the parameter:
+                // what is recorded has to be what was sent.
+                requested = payload[8] != 0;
                 var guid = D3d11UpscaleFormats.NvidiaExtension;
                 var pinned = GCHandle.Alloc(payload, GCHandleType.Pinned);
                 try
@@ -442,7 +458,12 @@ public static class WindowsVideoUpscaleProbe
                 var setOutputExtension = Com.Method<SetOutputExtensionFn>(videoContext, 19);
                 var intelGuid = D3d11UpscaleFormats.IntelExtension;
                 var last = 0;
-                foreach (var call in D3d11UpscaleFormats.IntelSuperResolutionCalls(enable))
+                var intelCalls = D3d11UpscaleFormats.IntelSuperResolutionCalls(enable);
+
+                // The scaling call is the one that means «super resolution»; the other two set up the
+                // interface. Read from the calls themselves for the same reason as NVIDIA's.
+                requested = intelCalls.Any(call => call.Function == 0x37u && call.Value != 0u);
+                foreach (var call in intelCalls)
                 {
                     // Intel's payload carries a POINTER to the parameter rather than the parameter,
                     // which is what a size of eight instead of sixteen gets wrong. Measured on this

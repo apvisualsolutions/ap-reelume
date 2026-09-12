@@ -120,10 +120,41 @@ public sealed class WindowsVideoUpscaleProbeTests
         foreach (var probe in vendors)
         {
             Assert.NotNull(probe.Extension);
+
+            // WHAT WAS SENT, not what came back. Asserting the result codes was the previous
+            // version of this test and it did not bite: switching the second call to «on»,
+            // deleting it, and deleting the first all return S_OK and all left the suite green
+            // while Intel's headline fell from 18 109 378 to zero — measured 2026-09-12.
             Assert.True(
-                probe.Extension!.OffResult >= 0,
-                $"'{probe.Description}' never got its extension switched back off (0x{probe.Extension.OffResult:X8}), "
-                + "so the two draws being compared had the same configuration.");
+                probe.Extension!.ComparesTwoConfigurations,
+                $"'{probe.Description}' drew both pictures with the switch in the same position "
+                + $"(on={probe.Extension.OnRequested}, off={probe.Extension.OffRequested}), so its "
+                + "headline number is one draw measured against itself.");
+            Assert.True(probe.Extension.OffResult >= 0, $"0x{probe.Extension.OffResult:X8} switching it back off.");
+        }
+    }
+
+    /// <summary>
+    /// A card that measured its own picture is never reported as a refusal, and one that could not
+    /// is never reported as a success. The verdict is production's and not this test's.
+    /// </summary>
+    [Fact]
+    public void Every_adapter_is_given_the_verdict_its_own_numbers_earn()
+    {
+        foreach (var probe in Probe())
+        {
+            var verdict = D3d11UpscaleFormats.Verdict(probe.Pixels, probe.Extension);
+            var line = UpscaleProbeReport.Describe(probe);
+
+            Assert.Contains(verdict.ToString(), line, StringComparison.Ordinal);
+            if (probe.Pixels is null)
+            {
+                Assert.Equal(UpscaleVerdict.NotRun, verdict);
+            }
+            else
+            {
+                Assert.NotEqual(UpscaleVerdict.NotRun, verdict);
+            }
         }
     }
 
@@ -140,21 +171,22 @@ public sealed class WindowsVideoUpscaleProbeTests
 
         foreach (var probe in measured)
         {
-            // The names have to come from the bitmask and agree with it, or the report is listing
-            // filters nobody asked the card about.
-            Assert.Equal(
-                D3d11UpscaleFormats.OfferedFilters(probe.Filters!.FilterCaps),
-                probe.Filters.Offered);
+            // The capabilities have to have been READ. Comparing the names against
+            // OfferedFilters(FilterCaps) was the previous version of this and it compared the
+            // function with itself: throwing away GetVideoProcessorCaps' answer left the whole
+            // floor — «filters=[] edge=-1» on both cards — with 105 tests green.
+            Assert.True(
+                probe.Filters!.FilterCaps != 0,
+                $"'{probe.Description}' has a video processor that declares no filter at all, which is "
+                + "what an unread capabilities struct looks like.");
 
             // Offered and measured means the picture has to change; offered and unchanged would be
             // a filter that reports itself and does nothing, which is the defect this house is
             // named after.
-            if (probe.Filters.Offered.Contains("EDGE_ENHANCEMENT"))
-            {
-                Assert.True(
-                    probe.Filters.EdgeEnhancementDifferingBytes > 0,
-                    $"'{probe.Description}' offers edge enhancement and changed not one byte with it at maximum.");
-            }
+            Assert.Contains("EDGE_ENHANCEMENT", probe.Filters.Offered);
+            Assert.True(
+                probe.Filters.EdgeEnhancementDifferingBytes > 0,
+                $"'{probe.Description}' offers edge enhancement and changed not one byte with it at maximum.");
         }
     }
 
@@ -224,17 +256,14 @@ public sealed class WindowsVideoUpscaleProbeTests
             FormattableString.Invariant(
                 $"{SourceWidth}x{SourceHeight} -> {decision.TargetWidth}x{decision.TargetHeight}, {probes.Count} adapter(s)."),
         };
-        summary.AddRange(probes.Select(probe => FormattableString.Invariant(
-            $"{probe.Description} [{probe.Vendor}] input={probe.PreferredInput ?? "none"}")
-            + $" extension_on={Hresult(probe.Extension?.OnResult)} extension_off={Hresult(probe.Extension?.OffResult)}"
-            + FormattableString.Invariant($" differing={Number(probe.Pixels?.DifferingBytes)}")
+        // The verdict first, from production. The columns after it are the numbers it was read from.
+        summary.AddRange(probes.Select(probe => UpscaleProbeReport.Describe(probe)
+            + $" | extension_on={Hresult(probe.Extension?.OnResult)} extension_off={Hresult(probe.Extension?.OffResult)}"
+            + FormattableString.Invariant($" requested_on={probe.Extension?.OnRequested} off={probe.Extension?.OffRequested}")
             + FormattableString.Invariant($" control={Number(probe.Pixels?.ControlDifferingBytes)}")
             + FormattableString.Invariant($" total={Number(probe.Pixels?.TotalBytes)}")
             + FormattableString.Invariant($" distinct={Number(probe.Pixels?.DistinctValues)}")
-            + $" worst_blt={Hresult(probe.Pixels?.WorstBltResult)}"
-            + $" filters=[{(probe.Filters is null ? "not run" : string.Join(' ', probe.Filters.Offered))}]"
-            + FormattableString.Invariant($" edge={Number(probe.Filters?.EdgeEnhancementDifferingBytes)}")
-            + $" note={probe.Note ?? "-"}"));
+            + $" worst_blt={Hresult(probe.Pixels?.WorstBltResult)}"));
         File.WriteAllLines(Path.Combine(directory, "d3d11-upscale-probe.txt"), summary);
     }
 

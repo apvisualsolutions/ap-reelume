@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Globalization;
+
 namespace ApSolutions.LocalMedia.Windows.Playback;
 
 /// <summary>The card behind the video processor, which decides which super resolution to ask for.</summary>
@@ -270,11 +272,21 @@ public static class D3d11UpscaleFormats
             return UpscaleVerdict.NotRun;
         }
 
-        // The controls first: a measurement that failed its own controls says nothing about the card.
+        // The controls first, and the order is load-bearing: asking about the extension before them
+        // reports a card whose readback is broken as «nothing to ask» instead of as untrustworthy.
+        //
+        // «Two distinct byte values» is the black frame a blt that drew nothing leaves behind — the
+        // output is BGRA with opaque alpha, so it comes back as 0 and 255 and nothing else.
         if (pixels.WorstBltResult < 0
             || !pixels.ReadbacksAgreeInLength
             || pixels.ControlDifferingBytes != 0
             || pixels.DistinctValues <= 2)
+        {
+            return UpscaleVerdict.Untrustworthy;
+        }
+
+        // A comparison of one draw against itself is not a measurement whatever its number says.
+        if (extension is not null && !extension.ComparesTwoConfigurations)
         {
             return UpscaleVerdict.Untrustworthy;
         }
@@ -290,6 +302,38 @@ public static class D3d11UpscaleFormats
         }
 
         return pixels.DifferingBytes > 0 ? UpscaleVerdict.Works : UpscaleVerdict.Inconclusive;
+    }
+}
+
+/// <summary>
+/// One adapter's answer, written the way a person reads it a month later.
+/// </summary>
+/// <remarks>
+/// This lives in production and not in the test that writes the file, and that is the point: the
+/// report carried nineteen columns of numbers and <b>not one of them was the verdict</b>, so the
+/// classification only ever ran inside the test that checked the classification. Registered and
+/// never fed, which is the defect this repository is named after.
+/// </remarks>
+public static class UpscaleProbeReport
+{
+    /// <summary>The one line per adapter that says what happened, verdict first.</summary>
+    public static string Describe(AdapterUpscaleProbe probe)
+    {
+        ArgumentNullException.ThrowIfNull(probe);
+
+        var verdict = D3d11UpscaleFormats.Verdict(probe.Pixels, probe.Extension);
+        var filters = probe.Filters is null ? "not run" : string.Join(' ', probe.Filters.Offered);
+        var differing = probe.Pixels is null
+            ? "not run"
+            : probe.Pixels.DifferingBytes.ToString(CultureInfo.InvariantCulture);
+        var edge = probe.Filters is null
+            ? "not run"
+            : probe.Filters.EdgeEnhancementDifferingBytes.ToString(CultureInfo.InvariantCulture);
+
+        return FormattableString.Invariant(
+            $"{probe.Description} [{probe.Vendor}] {verdict} input={probe.PreferredInput ?? "none"} ")
+            + FormattableString.Invariant($"differing={differing} filters=[{filters}] edge={edge}")
+            + (probe.Note is null ? string.Empty : $" note={probe.Note}");
     }
 }
 
@@ -351,7 +395,27 @@ public sealed record UpscalePixelComparison(
 /// Both halves of the vendor's switch. The «off» call is recorded because the measurement is the
 /// difference between the two: without it the headline number silently becomes zero.
 /// </summary>
-public sealed record VendorExtensionOutcome(int OnResult, int OffResult, uint RefusedFunction);
+/// <param name="OnRequested">
+/// What the «on» call actually asked for, and <paramref name="OffRequested"/> what the «off» one
+/// did. <b>The two flags are the measurement, not the two result codes.</b> Recording only the
+/// codes left three separate mutations green — switching the second call to «on», deleting it, and
+/// deleting the first — while Intel's headline fell from 18 109 378 differing bytes to a silent
+/// zero: every one of them makes the probe compare a draw against itself, and every one of them
+/// still returns <c>S_OK</c>.
+/// </param>
+public sealed record VendorExtensionOutcome(
+    int OnResult,
+    int OffResult,
+    uint RefusedFunction,
+    bool OnRequested,
+    bool OffRequested)
+{
+    /// <summary>
+    /// Whether the two draws being compared were configured differently at all. False means the
+    /// headline number is one draw measured against itself, whatever it says.
+    /// </summary>
+    public bool ComparesTwoConfigurations => OnRequested != OffRequested;
+}
 
 /// <summary>
 /// What a processor offers without anybody switching anything on: the standard Direct3D filters it
