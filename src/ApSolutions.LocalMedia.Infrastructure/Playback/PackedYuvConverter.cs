@@ -53,6 +53,12 @@ public static class PackedYuvConverter
     /// <param name="source">The packed picture, at least <paramref name="sourceStride"/> per row.</param>
     /// <param name="destination">The BGRA picture, at least <paramref name="destinationStride"/> per row.</param>
     /// <param name="matrix">The coefficients the picture was encoded with, chosen by the caller.</param>
+    /// <param name="lumaLookup">
+    /// The 256 levels each incoming luma is turned into before anything else happens, from
+    /// <see cref="PictureAdjustment"/>, or empty to leave it alone. It rides on this loop rather
+    /// than getting one of its own because the loop already walks every pixel: what it adds is one
+    /// indexed read out of a table that fits in level-one cache.
+    /// </param>
     public static void UyvyToBgra(
         ReadOnlySpan<byte> source,
         Span<byte> destination,
@@ -60,7 +66,8 @@ public static class PackedYuvConverter
         int height,
         int sourceStride,
         int destinationStride,
-        YuvColourMatrix matrix)
+        YuvColourMatrix matrix,
+        ReadOnlySpan<byte> lumaLookup = default)
     {
         // The width is paired rather than merely positive: the format carries one chroma sample for
         // every two pixels, so an odd width names a pixel with no partner. Refusing it here is what
@@ -77,6 +84,16 @@ public static class PackedYuvConverter
                 nameof(source));
         }
 
+        // A table of any other size is an indexed read off the end of it, which paints whatever
+        // follows in memory and does so differently every run. Empty means «leave the luma alone».
+        if (lumaLookup.Length is not (0 or 256))
+        {
+            throw new ArgumentException(
+                "A luma lookup has one entry per level or none at all.",
+                nameof(lumaLookup));
+        }
+
+        var adjusted = lumaLookup.Length == 256;
         var pairs = width / 2;
         for (var row = 0; row < height; row++)
         {
@@ -86,9 +103,9 @@ public static class PackedYuvConverter
             {
                 var at = pair * 4;
                 var u = read[at] - 128;
-                var firstLuma = read[at + 1] - 16;
+                var firstLuma = (adjusted ? lumaLookup[read[at + 1]] : read[at + 1]) - 16;
                 var v = read[at + 2] - 128;
-                var secondLuma = read[at + 3] - 16;
+                var secondLuma = (adjusted ? lumaLookup[read[at + 3]] : read[at + 3]) - 16;
                 WritePixel(write[(pair * 8)..], firstLuma, u, v, matrix);
                 WritePixel(write[((pair * 8) + 4)..], secondLuma, u, v, matrix);
             }
