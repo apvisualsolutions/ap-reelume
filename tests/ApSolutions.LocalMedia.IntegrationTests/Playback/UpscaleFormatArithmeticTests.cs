@@ -282,6 +282,74 @@ public sealed class UpscaleFormatArithmeticTests
         long expected) =>
         Assert.Equal(expected, D3d11UpscaleFormats.CountDifferences(first, second));
 
+    /// <summary>
+    /// What a card's answer means. This lived as prose in an evidence document, which is how
+    /// «inconclusive» quietly becomes «it does not work» a month later.
+    /// </summary>
+    [Theory]
+    // Accepted and the picture changed: the only case that is a success.
+    [InlineData(18109378L, 0L, 44, 0, true, 0, UpscaleVerdict.Works)]
+    // Accepted and nothing moved. NVIDIA's driver does exactly this while the feature is off in its
+    // own application, so it is never reported as a failure.
+    [InlineData(0L, 0L, 6, 0, true, 0, UpscaleVerdict.Inconclusive)]
+    // Refused outright, which IS an answer about the card.
+    [InlineData(0L, 0L, 44, 0, true, -2147467259, UpscaleVerdict.Refused)]
+    // The negative control failed: the readback disagrees with itself.
+    [InlineData(18109378L, 5L, 44, 0, true, 0, UpscaleVerdict.Untrustworthy)]
+    // The positive control failed: the processor drew nothing, so any zero is meaningless.
+    [InlineData(0L, 0L, 1, 0, true, 0, UpscaleVerdict.Untrustworthy)]
+    // A draw that failed, and three readbacks of different lengths.
+    [InlineData(0L, 0L, 44, -1, true, 0, UpscaleVerdict.Untrustworthy)]
+    [InlineData(33177600L, 0L, 44, 0, false, 0, UpscaleVerdict.Untrustworthy)]
+    public void What_a_card_answered_is_read_the_same_way_every_time(
+        long differing,
+        long control,
+        int distinct,
+        int worstBlt,
+        bool agree,
+        int onResult,
+        UpscaleVerdict expected)
+    {
+        var pixels = new UpscalePixelComparison(differing, control, 33177600L, distinct, worstBlt, agree);
+
+        Assert.Equal(expected, D3d11UpscaleFormats.Verdict(pixels, new VendorExtensionOutcome(onResult, 0, 0)));
+    }
+
+    /// <summary>The two cases with nothing to read, told apart from each other and from a failure.</summary>
+    [Fact]
+    public void A_card_that_sent_no_picture_and_one_with_no_extension_are_different_answers()
+    {
+        var sound = new UpscalePixelComparison(0L, 0L, 33177600L, 44, 0, true);
+
+        Assert.Equal(UpscaleVerdict.NotRun, D3d11UpscaleFormats.Verdict(null, null));
+        Assert.Equal(UpscaleVerdict.NotAsked, D3d11UpscaleFormats.Verdict(sound, null));
+    }
+
+    /// <summary>What the report carries about each adapter, kept whole.</summary>
+    [Fact]
+    public void An_adapter_answer_keeps_every_part_it_was_built_with()
+    {
+        var filters = new StandardFilterOutcome(0x30u, ["NOISE_REDUCTION", "EDGE_ENHANCEMENT"], 8084664L);
+        var probe = new AdapterUpscaleProbe(
+            "NVIDIA GeForce RTX 5070",
+            0x10DEu,
+            GpuVendor.Nvidia,
+            new Dictionary<string, uint>(StringComparer.Ordinal) { ["YUY2"] = 3u },
+            "YUY2",
+            new VendorExtensionOutcome(0, 0, 0),
+            filters,
+            new UpscalePixelComparison(0L, 0L, 33177600L, 6, 0, true),
+            null);
+
+        Assert.Equal(GpuVendor.Nvidia, probe.Vendor);
+        Assert.Equal("YUY2", probe.PreferredInput);
+        Assert.Equal(0x30u, probe.Filters!.FilterCaps);
+        Assert.Equal(8084664L, probe.Filters.EdgeEnhancementDifferingBytes);
+        Assert.Equal(33177600L, probe.Pixels!.TotalBytes);
+        Assert.Equal(0u, probe.Extension!.RefusedFunction);
+        Assert.Null(probe.Note);
+    }
+
     private static Dictionary<string, uint> Accepting(IEnumerable<string> names)
     {
         var support = D3d11UpscaleFormats.Battery.ToDictionary(
