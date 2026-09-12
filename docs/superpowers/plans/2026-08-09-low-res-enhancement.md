@@ -84,6 +84,34 @@ evidencia bilingüe → changelogs ES/EN → un commit → push con `main` en fa
       this path. Reopening PLY-016 goes through one of the named alternatives, each with its
       cost, as an owner scope decision.
 
+- [ ] **Fase 3 — la cadena D3D11, reabierta por el propietario el 2026-09-11** y ampliada a los tres
+      fabricantes sin esperar a VLC 4. Su bloqueo se resolvió el 2026-09-12 —
+      [PLY16-gpu-composition-harness.md](../../evidence/stable/PLY16-gpu-composition-harness.md) — y
+      lo que queda por construir son cuatro eslabones, en este orden porque cada uno se mide sin el
+      siguiente:
+
+  1. **`UYVY` → `YUY2` al subir.** No es un cambio de lo que se le pide al decodificador: pedir
+     `YUY2` **es una regresión ya medida** —el 2026-08-25 perdía el subtítulo entero, cero bytes de
+     diferencia contra 61 687 con `UYVY`— y DXGI no tiene formato `UYVY`. Es aritmética pura, va
+     junto a `PackedYuvConverter` y se prueba sin tarjeta. **Y quita trabajo**: hoy ese mismo bucle
+     ya convierte cada píxel a `BGRA`, así que la línea base del coste no es cero, es lo que
+     desaparece.
+  2. **La textura y el procesador de vídeo**, con el realce de bordes estándar que las dos tarjetas
+     declaran y que mueve el 24,4 % de la imagen en ambas. Se mide leyendo la textura de vuelta con
+     una textura de staging, que es lo que `WindowsVideoUpscaleProbe` ya hace.
+  3. **La importación en la composición**, por `TryGetCompositionGpuInterop` →
+     `ImportImage(D3D11TextureNtHandle)` → `UpdateWithKeyedMutexAsync(image, acquire, release)`. La
+     documentación de Avalonia nombra otras tres llamadas y **ninguna existe**; la ruta buena está
+     medida en el ensamblado. El arnés headless no puede correr esto —contesta que no hay interop—,
+     así que lo que se prueba aquí es lo que decide, con un visual de composición por software.
+  4. **FSR 1 en SkSL** para las tarjetas sin superresolución propia, y **AMD**, que sigue escrita y
+     sin verificar por falta de máquina.
+
+  **Y una pregunta previa que nada del árbol contesta hoy**: qué motor gráfico elige la aplicación
+  real. `Program.cs` usa `UsePlatformDetect()`, la importación D3D11 vive en la ruta ANGLE, y ningún
+  test monta el anfitrión de verdad — el paseo «físico» también es headless. Decidir dónde vive esa
+  sonda es lo primero del eslabón 3.
+
 ## Riesgos nombrados
 
 - Los filtros de vídeo de VLC 3 pueden no surtir efecto en la ruta D3D11 (por eso el spike mide

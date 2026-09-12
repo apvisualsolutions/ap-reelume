@@ -103,6 +103,37 @@ más en ese guion manual, o un ejecutable de diagnóstico que abra una ventana, 
 compositor y escriba qué contestó. Lo segundo es lo que convierte la respuesta en una medición
 repetible; lo primero no cuesta nada y depende de que alguien lo mire.
 
+## Y la primera pieza de la cadena no es la que el plan decía
+
+**«Textura YUY2 en el adaptador» no puede empezar por pedirle YUY2 a LibVLC**, y el motivo ya está
+medido en el árbol. `LibVlcMediaPlayerEngine.OnVideoFormat` pide **`UYVY`** y las dos decisiones que
+hay ahí son de carga:
+
+1. **El formato lo eligen los subtítulos, y `YUY2` ya se probó y falló.** La medición está en el
+   docstring de `PackedYuvConverter`, del 2026-08-25 y contra un episodio real: con `RV32`, `RGBA`,
+   `ARGB`, `RV24`, **`YUY2`**, `VYUY` y `YVYU`, **ni un byte** del fotograma publicado cambió al
+   encender un subtítulo que cubría toda la película; con `UYVY` cambiaron 61 687 y la línea se veía
+   en la imagen escrita a disco. La salida en memoria le dice al núcleo que puede quedarse los
+   subpictures para los demás formatos, y la retrollamada de pantalla que LibVLC entrega a una
+   aplicación gestionada no tiene parámetro para recibirlos. **Pedir `YUY2` no es una opción con
+   coste: es una regresión ya medida.**
+2. **La geometría pedida tiene que diferir de la del origen.** Medido el 2026-08-25: pedir el tamaño
+   exacto sacó el subtítulo del fotograma, de 76 439 bytes distintos a **cero**. El núcleo de VLC
+   compone el subpicture dentro de la imagen sólo cuando la geometría que le piden no coincide con la
+   del origen; si coincide, se lo entrega al módulo de pantalla, y una retrollamada gestionada no
+   tiene parámetro donde recibirlo.
+
+`UYVY` y `YUY2` son el mismo 4:2:2 empaquetado con los bytes al revés, y **DXGI no tiene formato
+`UYVY`** —sí `YUY2`, el 107 que la sonda ya usó—. Así que la primera pieza es **la conversión de
+`UYVY` a `YUY2` al subir la textura**, no un cambio de lo que se le pide al decodificador.
+
+**Y eso hace que la cadena quite trabajo en vez de añadirlo, que es lo contrario de lo que se
+temía.** Hoy `PackedYuvConverter` ya recorre **todos** los píxeles para pasar de `UYVY` a `BGRA` en
+la CPU. Cambiar esa conversión por un intercambio de bytes —o por una subida directa con el orden
+corregido en el sombreador— es estrictamente menos trabajo del procesador que lo de ahora. El riesgo
+que el plan nombraba —«el coste de la subida contra los presupuestos de reproducción»— sigue
+teniendo que medirse, pero su línea base no es cero: es el coste de la conversión que desaparece.
+
 ## La lección, que vale más que el dato
 
 **La documentación de un fabricante es el primer paso, no el último.** Aquí acertó al nombrar la
