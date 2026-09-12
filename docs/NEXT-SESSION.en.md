@@ -85,6 +85,22 @@
 >
 > ### Registered and not done
 >
+> · **THE COLOUR IS WRONG ON EVERY HD VIDEO, and it is a defect apart from `PLY-016`.**
+>   `PackedYuvConverter` decodes with a fixed **BT.601** matrix — 298/516/409/100/208 — and **nothing
+>   in the tree looks at the source's colour space**. Every video from 720p upwards arrives in
+>   **BT.709**. Measured on 2026-09-12 by encoding in 709 and decoding with today's matrix: **pure red
+>   comes out 234 instead of 255 — 21 levels — pure green picks up 20 of red and 10 of blue**, and a
+>   skin tone drifts by 3 to 5. The standard answer is to pick the matrix by frame height — 709 from
+>   720 up, 601 below — and to prefer whatever colour space the source declares; there is precedent
+>   for reading colour metadata in `LibVlcVideoCapabilities.WithColourTransfer`.
+> · **And what is NOT the problem, measured before touching it.** Faced with «it still looks bad», the
+>   first guess was that scaling uses Avalonia's default filter — `LowQuality` — and that asking for
+>   `HighQuality` would be a one-liner. **Rasterised, the two give the same four-pixel ramp**
+>   (`1,34,93,162,221,254` against `31,95,159,223`), and the «high» one comes out a shade **softer**.
+>   The softness of an enlarged picture is not a setting somebody forgot to flip: it is what enlarging
+>   without a real upscaler looks like, and removing it is `PLY-016`'s job and nobody else's. Archived
+>   with its positive control in `VideoUpscaleQualityTests`, which goes red the day one of the modes
+>   really is sharper.
 > · **LibVLC 3.0.23.1 does not export `libvlc_video_set_output_callbacks`** (measured in the binary,
 >   with two positive controls and one negative). There is no way to receive a card texture from
 >   VLC 3: the frame **always** goes through system memory. What drawing subtitles ourselves buys is

@@ -85,6 +85,22 @@
 >
 > ### Registrado y sin hacer
 >
+> · **EL COLOR ESTÁ MAL EN TODO VÍDEO HD, y es un defecto aparte de `PLY-016`.**
+>   `PackedYuvConverter` decodifica con la matriz **BT.601** fija —298/516/409/100/208— y **nada en el
+>   árbol mira el espacio de color del origen**. Todo vídeo de 720p para arriba viene en **BT.709**.
+>   Medido el 2026-09-12 codificando en 709 y decodificando con la matriz de hoy: **el rojo puro sale
+>   234 en vez de 255 —21 niveles—, el verde puro se lleva 20 de rojo y 10 de azul**, y un tono de
+>   piel se desvía entre 3 y 5. La salida estándar es elegir la matriz por la altura del fotograma
+>   —709 de 720 para arriba, 601 por debajo— y preferir el espacio que declare el origen; hay
+>   precedente de leer metadatos de color en `LibVlcVideoCapabilities.WithColourTransfer`.
+> · **Y lo que NO es el problema, medido antes de tocarlo.** Ante «se sigue viendo mal», la primera
+>   sospecha fue que el escalado usa el filtro por defecto de Avalonia —`LowQuality`— y que pedir
+>   `HighQuality` sería una línea. **Rasterizado, los dos dan la misma rampa de cuatro píxeles**
+>   (`1,34,93,162,221,254` contra `31,95,159,223`), y el de «alta» sale una pizca **más blando**. La
+>   blandura de una imagen ampliada no es un ajuste que a alguien se le olvidó: es lo que se ve al
+>   ampliar sin un reescalador de verdad, y quitarla es trabajo de `PLY-016` y de nadie más.
+>   Archivado con su control positivo en `VideoUpscaleQualityTests`, que se pone rojo el día que uno
+>   de los modos sí sea más nítido.
 > · **`LibVLC 3.0.23.1 no exporta `libvlc_video_set_output_callbacks`** (medido en el binario, con dos
 >   controles positivos y uno negativo). No hay forma de recibir de VLC 3 una textura de la tarjeta:
 >   el fotograma **siempre** pasa por memoria del sistema. Lo que gana dibujar los subtítulos nosotros
