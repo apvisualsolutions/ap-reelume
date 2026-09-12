@@ -10,6 +10,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Dark video can be lifted, and that was the defect actually getting in the way.** A real episode
+  from the owner's own library was measured and the answer was not the one being built: the picture
+  is not soft, it is crushed into black. Across five scenes of the same file the mean brightness ran
+  from 28 to 69 out of 235, and in one of them the brightest point anywhere on screen was 97. There
+  is now brightness, contrast and gamma during playback, and with them the curtains, the armour and
+  the texture of the cloth come back from what used to be one flat smear.
+
+  **Leaving it as it comes changes absolutely nothing**, and that is measured on the pixels rather
+  than on the intent: the table that carries all three controls is the exact identity at its neutral
+  value, so the picture comes out byte for byte as it did. The arithmetic is FFmpeg's `eq` filter on
+  purpose, because the comparison the owner looked at and approved was produced by that filter.
+
+  **And a guard that looked merely defensive turned out to catch a visible defect**: without it,
+  lowering brightness far enough put 255 in the shadow end and 1 right beside it — the shadows came
+  out **white**, because a negative number cast to a byte is not zero, it is whatever the wrap
+  leaves behind. Measured by removing it, not assumed.
+
 - **How strong the picture enhancement is asked to be is now decided by code somebody can check.**
   It was written inside the one file in the project that is not measured, so no test could reach it.
   It is a separate rule now, with seven cases: the maximum is asked for — the only value with a

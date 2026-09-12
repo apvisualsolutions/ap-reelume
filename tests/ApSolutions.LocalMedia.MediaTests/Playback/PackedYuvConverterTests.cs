@@ -195,6 +195,84 @@ public sealed class PackedYuvConverterTests
             Bt601));
 
     [Fact]
+    public void An_identity_table_leaves_the_conversion_byte_for_byte_as_it_was()
+    {
+        // PLY-018's acceptance criterion, measured on the pixels rather than on the policy. The
+        // table here is written out rather than asked of PictureAdjustment on purpose: what this
+        // file tests is the conversion, and «the neutral setting builds the identity» is a claim
+        // about the policy, measured where the policy lives.
+        const int Width = 4;
+        const int Height = 2;
+        var packed = new byte[Width * PackedYuvConverter.SourceBytesPerPixel * Height];
+        for (var at = 0; at < packed.Length; at++)
+        {
+            packed[at] = (byte)(16 + (at * 7 % 220));
+        }
+
+        var without = new byte[Width * PackedYuvConverter.DestinationBytesPerPixel * Height];
+        var with = new byte[without.Length];
+
+        PackedYuvConverter.UyvyToBgra(packed, without, Width, Height, 8, 16, Bt601);
+        PackedYuvConverter.UyvyToBgra(packed, with, Width, Height, 8, 16, Bt601, Identity());
+
+        Assert.Equal(without, with);
+    }
+
+    [Fact]
+    public void The_table_it_is_given_is_the_one_applied_to_the_luma()
+    {
+        // The control the test above needs: without it, a conversion that ignored the table
+        // entirely would pass «the identity changes nothing» perfectly. A doubling table is used
+        // instead of a real curve because what is under test is «the table is read», not the shape
+        // of any particular one.
+        const int Width = 2;
+        var doubled = new byte[256];
+        for (var level = 0; level < doubled.Length; level++)
+        {
+            doubled[level] = (byte)Math.Min(255, level * 2);
+        }
+
+        var shadow = new byte[] { 128, 40, 128, 40 };
+        var plain = new byte[8];
+        var lifted = new byte[8];
+
+        PackedYuvConverter.UyvyToBgra(shadow, plain, Width, 1, 4, 8, Bt601);
+        PackedYuvConverter.UyvyToBgra(shadow, lifted, Width, 1, 4, 8, Bt601, doubled);
+
+        // Grey in, grey out, so all three channels move together: luma 40 is barely above broadcast
+        // black and 80 is a low mid tone.
+        Assert.True(
+            lifted[0] > plain[0] + 40,
+            $"the shadow only went from {plain[0]} to {lifted[0]}");
+        Assert.Equal(lifted[0], lifted[1]);
+        Assert.Equal(lifted[1], lifted[2]);
+
+        // And the second pixel of the pair too, which is the half a loop that reads one luma and
+        // reuses it would leave behind.
+        Assert.Equal(lifted[0], lifted[4]);
+    }
+
+    private static byte[] Identity()
+    {
+        var table = new byte[256];
+        for (var level = 0; level < table.Length; level++)
+        {
+            table[level] = (byte)level;
+        }
+
+        return table;
+    }
+
+    [Fact]
+    public void A_lookup_table_that_is_not_256_levels_is_refused()
+    {
+        // A short table is an indexed read off the end of it, which reads whatever follows in
+        // memory and paints it — silently, and differently every run.
+        Assert.ThrowsAny<ArgumentException>(() => PackedYuvConverter.UyvyToBgra(
+            new byte[4], new byte[8], 2, 1, 4, 8, Bt601, new byte[64]));
+    }
+
+    [Fact]
     public void The_pairs_are_swapped_into_the_order_Direct3D_names_for_YUY2()
     {
         // UYVY as LibVLC publishes it is U, Y0, V, Y1; YUY2 as dxgiformat.h names it is Y0, U, Y1,

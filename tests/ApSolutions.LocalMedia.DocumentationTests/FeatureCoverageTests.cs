@@ -44,7 +44,13 @@ public sealed class FeatureCoverageTests
         // agreeing is the point. They disagreed all day precisely because five rows were invisible to
         // one of them. This number and verify-docs.ps1's are measured after the change, never written
         // ahead of it.
-        Assert.Equal(72, FeatureMatrix.Rows.Count);
+        // 73 the evening of 2026-09-12, and the reason is worth keeping: the owner asked why the
+        // video still looked bad, and measuring his own file answered that the matrix had no row for
+        // it. A real episode of his came in at 720x404 in a 2003 codec at 1.5 Mbit/s, with a mean
+        // luma between 28 and 69 out of 235 across five scenes. That picture is not soft, it is
+        // crushed into black — and PLY-016, the row being built at the time, promises sharpness when
+        // enlarging. A whole feature was being built for a defect he does not have.
+        Assert.Equal(73, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,

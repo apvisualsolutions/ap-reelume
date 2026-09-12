@@ -55,6 +55,12 @@ $featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
 $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
+# 73 since 2026-09-12 (evening), when PLY-018 was opened against POST_STABLE: the owner's own
+# library turned out to be the case nothing covered. A real episode measured 720x404 in a 2003 codec
+# at 1.5 Mbit/s, and its mean luma across five scenes ran between 28 and 69 out of 235 — the picture
+# is not soft, it is crushed into black, and no row promised a person could do anything about that.
+# Upscaling was being built for a defect the owner does not have.
+#
 # 72 since 2026-09-12, when PLY-017 was opened against STABLE and not MVP: the MVP manifest is a
 # closed record of 46 commitments with the tasks that built them, and a row born today has no task to
 # name — inventing one would falsify the record. The colour defect showed that NO row promised a
@@ -68,8 +74,8 @@ $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*
 # CRS-007 (filtering the courses grid). The count is asserted rather than left open so that a row
 # added to the matrix has to be added here too, which is where somebody notices that the manifest and
 # the localised documents need it as well.
-if ($featureIds.Count -ne 72) {
-    $errors.Add("Expected 72 feature IDs, found $($featureIds.Count).")
+if ($featureIds.Count -ne 73) {
+    $errors.Add("Expected 73 feature IDs, found $($featureIds.Count).")
 }
 if ($mvpIds.Count -ne 46) {
     $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")

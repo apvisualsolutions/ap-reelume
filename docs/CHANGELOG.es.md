@@ -10,6 +10,23 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El vídeo oscuro se puede aclarar, y era el defecto que de verdad molestaba.** Se midió un
+  episodio real de la biblioteca del propietario y la respuesta no era la que se estaba
+  construyendo: la imagen no está borrosa, está aplastada en negro. En cinco escenas del mismo
+  archivo el brillo medio iba de 28 a 69 sobre 235, y en una de ellas el punto más claro de toda la
+  pantalla era 97. Ahora hay brillo, contraste y gamma en la reproducción, y con ellos vuelven las
+  cortinas, la armadura y la textura de la ropa que antes eran una mancha.
+
+  **Dejarlo como viene no cambia absolutamente nada**, y eso está medido sobre los píxeles y no
+  sobre la intención: la tabla que aplica los tres controles es la identidad exacta en su valor
+  neutro, así que la imagen sale byte a byte como salía. La aritmética es la del filtro `eq` de
+  ffmpeg a propósito, porque la comparación que el propietario miró y aprobó la produjo ese filtro.
+
+  **Y una guarda que parecía defensiva resultó cazar un defecto visible**: sin ella, bajar el brillo
+  lo suficiente ponía 255 en la zona oscura y 1 justo al lado — las sombras salían **blancas**,
+  porque un número negativo convertido a byte no es cero, es lo que quede tras la vuelta. Medido al
+  quitarla, no supuesto.
+
 - **La fuerza del realce de imagen ya la decide código que alguien puede comprobar.** Estaba escrita
   dentro del único archivo del proyecto que no se mide, así que ninguna prueba podía llegar a ella.
   Ahora es una regla aparte con siete casos: se pide el máximo —el único valor con una medición
