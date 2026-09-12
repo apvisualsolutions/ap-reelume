@@ -1,0 +1,255 @@
+// SPDX-FileCopyrightText: 2026 AP Solutions
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+namespace ApSolutions.LocalMedia.Windows.Playback;
+
+/// <summary>The card behind the video processor, which decides which super resolution to ask for.</summary>
+public enum GpuVendor
+{
+    Unknown,
+    Nvidia,
+    Intel,
+    Amd,
+}
+
+/// <summary>A picture format the video processor is asked about, by the name used in its report.</summary>
+public sealed record VideoProcessorFormat(string Name, uint DxgiFormat);
+
+/// <summary>
+/// Everything PLY-016's scaler decides without touching a graphics card: which card it is talking
+/// to, what the processor's answer actually said, which format this pipeline should hand over, and
+/// the exact bytes each vendor's extension expects.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Split from <see cref="WindowsVideoUpscaleProbe"/> on purpose. The COM half cannot run where there
+/// is no video device — a hosted runner has none — and a file that mixes the two reads at whatever
+/// coverage the runner's hardware allows. This half runs everywhere, so it is the half that is
+/// asserted.
+/// </para>
+/// <para>
+/// The vendor identifiers, the extension GUIDs and the payloads below are VLC's, from
+/// <c>modules/video_output/win32/d3d11_scaler.cpp</c> (LGPL-2.1-or-later). The DXGI values were read
+/// from <c>dxgiformat.h</c> of the 10.0.26100.0 Windows SDK on 2026-09-12.
+/// </para>
+/// </remarks>
+public static class D3d11UpscaleFormats
+{
+    /// <summary>NVIDIA's video processor extension, which carries RTX Video Super Resolution.</summary>
+    public static Guid NvidiaExtension { get; } = new("d43ce1b3-1f4b-48ac-baee-c3c25375e6f7");
+
+    /// <summary>Intel's Video Processing Engine extension.</summary>
+    public static Guid IntelExtension { get; } = new("edd1d4b9-8659-4cbc-a4d6-9831a2163ac3");
+
+    /// <summary>
+    /// Every format worth asking about, in the order the report lists them. Asking about a format
+    /// this pipeline could never produce still earns its row: it is what tells a later reader that
+    /// the question was asked and answered, rather than never asked.
+    /// </summary>
+    public static IReadOnlyList<VideoProcessorFormat> Battery { get; } =
+    [
+        new("NV12", 103u),
+        new("P010", 104u),
+        new("YUY2", 107u),
+        new("AYUV", 100u),
+        new("B8G8R8A8_UNORM", 87u),
+        new("R8G8B8A8_UNORM", 28u),
+        new("R10G10B10A2_UNORM", 24u),
+        new("R16G16B16A16_FLOAT", 10u),
+    ];
+
+    /// <summary>
+    /// The formats this pipeline can hand over, cheapest first. LibVLC already produces UYVY, and
+    /// YUY2 is those same bytes with each pair swapped — no colour conversion at all. NV12 costs a
+    /// planar conversion but is the processor's own currency. BGRA costs the conversion being paid
+    /// today and twice the bytes across the bus, so it comes last.
+    /// </summary>
+    private static readonly string[] PreferenceOrder =
+        ["YUY2", "NV12", "B8G8R8A8_UNORM", "R8G8B8A8_UNORM"];
+
+    /// <summary>The card that reports <paramref name="pciVendorId"/> on the bus.</summary>
+    public static GpuVendor VendorOf(uint pciVendorId) => pciVendorId switch
+    {
+        0x10DEu => GpuVendor.Nvidia,
+        0x8086u => GpuVendor.Intel,
+        0x1002u or 0x1022u => GpuVendor.Amd,
+        _ => GpuVendor.Unknown,
+    };
+
+    /// <summary>
+    /// Whether the processor takes this format in. Read from the flags and never from the result
+    /// code: <c>CheckVideoProcessorFormat</c> answers <c>S_OK</c> for a format it refuses and says
+    /// so in the flags, so a probe that trusts the return value reports everything as available.
+    /// </summary>
+    public static bool AcceptsAsInput(uint formatSupportFlags) => (formatSupportFlags & 0x1u) != 0;
+
+    /// <summary>Whether the processor can write this format out.</summary>
+    public static bool AcceptsAsOutput(uint formatSupportFlags) => (formatSupportFlags & 0x2u) != 0;
+
+    /// <summary>
+    /// The format to hand the processor, given what it answered, or <see langword="null"/> when it
+    /// takes nothing this pipeline can make. A format it accepts only as output is not an answer.
+    /// </summary>
+    public static string? PreferredInput(IReadOnlyDictionary<string, uint> formatSupport)
+    {
+        ArgumentNullException.ThrowIfNull(formatSupport);
+
+        return PreferenceOrder.FirstOrDefault(
+            name => formatSupport.TryGetValue(name, out var flags) && AcceptsAsInput(flags));
+    }
+
+    /// <summary>
+    /// NVIDIA's stream extension payload: version 1, method 2 — RTX Video Super Resolution — and
+    /// the switch. Three unsigned numbers, in that order.
+    /// </summary>
+    public static byte[] NvidiaStreamExtension(bool enable)
+    {
+        var payload = new byte[12];
+        BitConverter.TryWriteBytes(payload.AsSpan(0), 1u);
+        BitConverter.TryWriteBytes(payload.AsSpan(4), 2u);
+        BitConverter.TryWriteBytes(payload.AsSpan(8), enable ? 1u : 0u);
+        return payload;
+    }
+
+    /// <summary>
+    /// Intel's, which is three calls rather than one payload: the interface version, the mode, and
+    /// the scaling. Switching off is not the same call with a zero — the mode leaves pre-processing
+    /// and the scaling goes back to its default — and the pair is what makes an off measurable.
+    /// </summary>
+    /// <remarks>
+    /// <b><see cref="ExtensionCall.OnOutput"/> is the half that is easy to get wrong, and getting it wrong
+    /// looks exactly like a card that cannot do this.</b> The first two go through
+    /// <c>VideoProcessorSetOutputExtension</c> and only the third through
+    /// <c>VideoProcessorSetStreamExtension</c> — Chromium's <c>ToggleIntelVpSuperResolution</c> in
+    /// <c>ui/gl/swap_chain_presenter.cc</c>. Measured here on 2026-09-12: sending the version call
+    /// down the stream entry point is refused with <c>E_FAIL</c> on hardware that supports the
+    /// interface perfectly well.
+    /// </remarks>
+    public static IReadOnlyList<ExtensionCall> IntelSuperResolutionCalls(bool enable) =>
+    [
+        new(0x01u, 0x0003u, OnOutput: true),
+        new(0x20u, enable ? 0x1u : 0x0u, OnOutput: true),
+        new(0x37u, enable ? 0x2u : 0x0u, OnOutput: false),
+    ];
+
+    /// <summary>One call into a vendor extension: which function, what value, and down which door.</summary>
+    public sealed record ExtensionCall(uint Function, uint Value, bool OnOutput);
+
+    /// <summary>A filter every Direct3D 11 video processor may offer, by its own name and number.</summary>
+    public sealed record VideoProcessorFilter(string Name, uint Index, uint CapBit);
+
+    /// <summary>
+    /// The two standard filters that do anything for a picture being enlarged, and the reason they
+    /// matter more than any vendor's name: <b>they belong to Direct3D, not to a graphics card
+    /// company, so nobody has to switch anything on for them to run.</b> Every other filter in the
+    /// enumeration adjusts colour — brightness, contrast, hue, saturation — which is not this
+    /// feature's business.
+    /// </summary>
+    public static IReadOnlyList<VideoProcessorFilter> StandardFilters { get; } =
+    [
+        new("NOISE_REDUCTION", 4u, 0x10u),
+        new("EDGE_ENHANCEMENT", 5u, 0x20u),
+    ];
+
+    /// <summary>
+    /// Which of <see cref="StandardFilters"/> a processor says it offers, read from the
+    /// <c>FilterCaps</c> bitmask of its capabilities.
+    /// </summary>
+    public static IReadOnlyList<string> OfferedFilters(uint filterCaps) =>
+        [.. StandardFilters.Where(filter => (filterCaps & filter.CapBit) != 0).Select(filter => filter.Name)];
+
+    /// <summary>
+    /// The picture the probe sends through the scaler, laid out as <paramref name="format"/> wants
+    /// it and identical every run.
+    /// </summary>
+    /// <remarks>
+    /// Hard edges at a small scale, because that is what a super resolution has anything to do with:
+    /// an even field of one colour comes out of a scaler that did nothing looking exactly like it
+    /// came out of one that did everything. Colour is left flat for the same reason — what these
+    /// models rebuild is detail, and detail lives in the luma.
+    /// </remarks>
+    public static byte[] TestPattern(string format, int width, int height, out int pitch)
+    {
+        switch (format)
+        {
+            case "YUY2":
+                pitch = width * 2;
+                var packed = new byte[pitch * height];
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        var at = (y * pitch) + (x * 2);
+                        packed[at] = Luma(x, y);
+                        packed[at + 1] = 128;
+                    }
+                }
+
+                return packed;
+
+            case "NV12":
+                pitch = width;
+                var planar = new byte[width * height * 3 / 2];
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        planar[(y * width) + x] = Luma(x, y);
+                    }
+                }
+
+                Array.Fill(planar, (byte)128, width * height, planar.Length - (width * height));
+                return planar;
+
+            case "B8G8R8A8_UNORM":
+            case "R8G8B8A8_UNORM":
+                pitch = width * 4;
+                var rgba = new byte[pitch * height];
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        var at = (y * pitch) + (x * 4);
+                        var value = Luma(x, y);
+                        rgba[at] = value;
+                        rgba[at + 1] = value;
+                        rgba[at + 2] = value;
+                        rgba[at + 3] = 255;
+                    }
+                }
+
+                return rgba;
+
+            default:
+                throw new NotSupportedException(
+                    $"'{format}' is not a format this pipeline sends, so no picture is drawn for it.");
+        }
+    }
+
+    /// <summary>
+    /// How many bytes of two readbacks differ. Two of different lengths are as different as two
+    /// pictures get: answering zero there would read as «nothing changed», which is the one wrong
+    /// answer this measurement can give.
+    /// </summary>
+    public static long CountDifferences(ReadOnlySpan<byte> first, ReadOnlySpan<byte> second)
+    {
+        if (first.Length != second.Length)
+        {
+            return Math.Max(first.Length, second.Length);
+        }
+
+        var differing = 0L;
+        for (var at = 0; at < first.Length; at++)
+        {
+            if (first[at] != second[at])
+            {
+                differing++;
+            }
+        }
+
+        return differing;
+    }
+
+    /// <summary>Broadcast black and white in bands three and five pixels wide, which never line up.</summary>
+    private static byte Luma(int x, int y) => ((x / 3) + (y / 5)) % 2 == 0 ? (byte)235 : (byte)16;
+}
