@@ -90,6 +90,11 @@ evidencia bilingüe → changelogs ES/EN → un commit → push con `main` en fa
       lo que queda por construir son cuatro eslabones, en este orden porque cada uno se mide sin el
       siguiente:
 
+  0. **Ya construido y probado, no lo rehagas**: `D3d11UpscaleFormats.PreferredInput` elige el
+     formato más barato entre los que el procesador acepta, y `UpscaleFormatArithmeticTests` lo ata
+     con su control negativo. Sabe que `YUY2` es el preferido y por qué. Lo que **no** existe en el
+     árbol es la conversión de bytes ni la subida — comprobado buscando `UyvyToYuy2`, `ToYuy2` y
+     `SwapPairs` en `src/` y `tests/`, cero coincidencias.
   1. **`UYVY` → `YUY2` al subir.** No es un cambio de lo que se le pide al decodificador: pedir
      `YUY2` **es una regresión ya medida** —el 2026-08-25 perdía el subtítulo entero, cero bytes de
      diferencia contra 61 687 con `UYVY`— y DXGI no tiene formato `UYVY`. Es aritmética pura, va

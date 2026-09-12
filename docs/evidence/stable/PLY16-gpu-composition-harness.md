@@ -127,6 +127,12 @@ hay ahí son de carga:
 `UYVY`** —sí `YUY2`, el 107 que la sonda ya usó—. Así que la primera pieza es **la conversión de
 `UYVY` a `YUY2` al subir la textura**, no un cambio de lo que se le pide al decodificador.
 
+**Y la mitad que ya está hecha, para que nadie la rehaga**: `D3d11UpscaleFormats.PreferredInput`
+elige el formato más barato entre los que el procesador acepta, y `UpscaleFormatArithmeticTests` lo
+ata con su control negativo — ya sabe que `YUY2` es el preferido y por qué. Lo que **no** existe es
+la conversión ni la subida: buscados `UyvyToYuy2`, `ToYuy2` y `SwapPairs` en `src/` y `tests/`, cero
+coincidencias.
+
 **Y eso hace que la cadena quite trabajo en vez de añadirlo, que es lo contrario de lo que se
 temía.** Hoy `PackedYuvConverter` ya recorre **todos** los píxeles para pasar de `UYVY` a `BGRA` en
 la CPU. Cambiar esa conversión por un intercambio de bytes —o por una subida directa con el orden

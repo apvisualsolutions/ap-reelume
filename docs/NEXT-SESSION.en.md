@@ -1,5 +1,73 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-12, close: `PLY-016`'s blocker is answered, and the CI margin was never negative
+>
+> **Look at the tree first; it outranks this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. No commit number is written here.
+> **The previous handover said main and the branch were level and they were not** — two commits sat
+> unpushed. Read, do not assume.
+>
+> ### What closed
+>
+> · **The pixel harness CAN see the composition layer, so `PLY-016`'s gate is not born blind.** A
+>   `CompositionSolidColorVisual` of 100 × 40 reaches `CaptureRenderedFrame` as **exactly 4 000
+>   pixels** — held by an empty scene that must show nothing, and proved by inverting the assertion
+>   and watching it name the number with the binary's hash confirmed changed. What the harness does
+>   **not** have is the GPU import: `TryGetCompositionGpuInterop()` answers null, and *answers*
+>   rather than hanging. So the gate splits: what decides is measured there, what talks to the card
+>   is measured by reading the texture back.
+> · **Avalonia's documentation is wrong in three places, measured on the assembly.**
+>   `compositor.ImportGpuImage` and `compositor.ImportGpuSemaphore` **do not exist anywhere** in
+>   12.1.1, and `UpdateWithKeyedMutexAsync` takes three arguments where the docs pass one. The real
+>   route is `TryGetCompositionGpuInterop()` → `ImportImage(handle, properties)` →
+>   `UpdateWithKeyedMutexAsync(image, acquire, release)`. Consulting the documentation stops you
+>   inventing an API; it does **not** stop you getting the signature wrong. The assembly does, for
+>   one reflection call.
+> · **The CI margin was never negative, and the tool that said so was reading the wrong clock.**
+>   That 94.4-minute run is real and green — 44 of those minutes were spent **waiting for a
+>   machine**, and its job took 50 against a ceiling of 90. `timeout-minutes` belongs to a job and
+>   only starts when a runner takes it. `measure-ci-time.ps1` now reports job by job against each
+>   one's own ceiling: **36.3 minutes of margin** with that same run inside the window, and no
+>   warning. `ci.yml` already said so in a comment.
+> · **The duration figure now lives in one place, the watcher**, where its heartbeat and ceiling are
+>   calculated from it. `RunDurationFigureTests` went from «the copies agree» to «there is no
+>   second one».
+>
+> ### Traps measured this time, and the first is the worst kind
+>
+> · **RED HERE AND GREEN IN CI, from a decimal separator.** An assertion of mine searched the whole
+>   script output for «94.4». `Format-Table` renders that cell in the machine's culture: `94,400`
+>   here and **`94.400` on the runner**, which contains the substring. Measured in three cultures.
+>   PowerShell's string interpolation is invariant, so the fix is to assert on the interpolated
+>   **line** and never on the whole output.
+> · **`gate-auditor` found six blind gates in tests written the same hour to catch exactly that.**
+>   The worst survived turning «the slowest job» into «the fastest», because every scene held a
+>   single run and a one-element maximum never compares. All six are closed and each was re-muted.
+>   **Write the second scene before you trust the accumulator.**
+> · **A sweep that says it sweeps and reads three paths by hand.** Two live stale copies were
+>   planted where it did not look and all four tests stayed green.
+> · **`YUY2` is a measured regression, not a trade-off.** Asking LibVLC for it drops the subtitle
+>   entirely — zero differing bytes against 61 687 with `UYVY`, measured 2026-08-25.
+>
+> ### Decided and NOT executed
+>
+> · **`PLY-016`'s first link is the `UYVY` → `YUY2` swap on upload**, not a change to what the
+>   decoder is asked for. Written up in the plan with the other three links in order. It **removes**
+>   processor work rather than adding it: that loop already touches every pixel today.
+>   **And do not rebuild the format choice — it exists**: `D3d11UpscaleFormats.PreferredInput` picks
+>   the cheapest accepted format and `UpscaleFormatArithmeticTests` holds it with a negative control.
+>   What is absent is the byte swap and the upload, checked by searching `src/` and `tests/` for
+>   `UyvyToYuy2`, `ToYuy2` and `SwapPairs`: zero hits.
+> · **Where the real-backend probe lives is undecided.** Nothing in the tree runs the real Win32
+>   host — the «physical» walk is headless too, checked by searching for `UsePlatformDetect` in
+>   `tests/` and `eng/`. Either a line in the manual walkthrough or a small diagnostic executable.
+>
+> ### Still blocked by something that is not code
+>
+> · `PRD-002` needs the commercial signing certificate; `PRD-003` needs ARM64 hardware, which the
+>   free GitHub runners now cover for the matrix. `REL-004` needs the trademark check. AMD's super
+>   resolution stays written and unverifiable for want of a card.
+
 > ## READ THIS FIRST — 2026-09-12, evening: HD colour fixed, and NVIDIA's zero has run out of excuses
 >
 > **Look at the tree first; it overrules this document**: `git log --oneline -1 main`,

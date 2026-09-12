@@ -1,5 +1,71 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-12, cierre: el bloqueo de `PLY-016` contestado, y el margen de CI nunca estuvo en negativo
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+> **El relevo anterior decía que `main` y la rama estaban al día y no lo estaban** — había dos
+> commits sin empujar. Se lee, no se supone.
+>
+> ### Lo que se cerró
+>
+> · **El arnés de píxeles SÍ ve la capa de composición, así que la puerta de `PLY-016` no nace
+>   ciega.** Un `CompositionSolidColorVisual` de 100 × 40 llega a `CaptureRenderedFrame` como
+>   **exactamente 4 000 píxeles** — sostenido por una escena vacía que debe callar, y probado
+>   invirtiendo la aserción y viéndola nombrar el número, con la huella del binario comprobada. Lo
+>   que el arnés **no** tiene es la importación GPU: `TryGetCompositionGpuInterop()` contesta nulo, y
+>   *contesta* en vez de colgarse. Así que la puerta se parte: lo que decide se mide ahí, y lo que
+>   habla con la tarjeta leyendo la textura de vuelta.
+> · **La documentación de Avalonia está mal en tres sitios, medido en el ensamblado.**
+>   `compositor.ImportGpuImage` y `compositor.ImportGpuSemaphore` **no existen en ninguna parte** de
+>   la 12.1.1, y `UpdateWithKeyedMutexAsync` toma tres argumentos donde la documentación pasa uno. La
+>   ruta real es `TryGetCompositionGpuInterop()` → `ImportImage(handle, properties)` →
+>   `UpdateWithKeyedMutexAsync(image, acquire, release)`. Consultar la documentación evita inventarse
+>   una API; **no** evita equivocarse de firma. El ensamblado sí, por una llamada de reflexión.
+> · **El margen de CI nunca estuvo en negativo, y la herramienta que lo dijo leía el reloj
+>   equivocado.** Ese run de 94,4 minutos es real y verde: 44 de esos minutos fueron **esperando
+>   máquina**, y su trabajo duró 50 contra un techo de 90. `timeout-minutes` es de un trabajo y sólo
+>   cuenta desde que una máquina lo coge. `measure-ci-time.ps1` informa ahora trabajo a trabajo
+>   contra el techo de cada uno: **36,3 minutos de margen** con ese mismo run dentro de la ventana, y
+>   ningún aviso. El propio `ci.yml` ya lo decía en un comentario.
+> · **La cifra de duración vive ahora en un solo sitio, el vigía**, donde su latido y su techo se
+>   calculan de ella. `RunDurationFigureTests` pasó de «las copias coinciden» a «no hay una segunda».
+>
+> ### Trampas medidas hoy, y la primera es de la peor clase
+>
+> · **ROJA AQUÍ Y VERDE EN CI, por un separador decimal.** Una aserción mía buscaba «94.4» en toda la
+>   salida del guion. `Format-Table` pinta esa celda en el idioma de la máquina: `94,400` aquí y
+>   **`94.400` en el runner**, que contiene la subcadena. Medido en tres idiomas. La interpolación de
+>   PowerShell es invariante, así que se afirma sobre **la línea** interpolada y nunca sobre la salida
+>   entera.
+> · **`gate-auditor` encontró seis puertas ciegas en pruebas escritas esa misma hora para cazar justo
+>   eso.** La peor sobrevivía a cambiar «el trabajo más lento» por «el más rápido», porque todas las
+>   escenas tenían un solo run y un máximo de un elemento nunca compara. Las seis cerradas y cada una
+>   vuelta a mutar. **Escribe la segunda escena antes de fiarte del acumulador.**
+> · **Un barrido que dice barrer y lee tres rutas a mano.** Se plantaron dos copias caducadas donde no
+>   miraba y las cuatro pruebas siguieron verdes.
+> · **`YUY2` es una regresión medida, no una cesión.** Pedírselo a LibVLC tira el subtítulo entero —
+>   cero bytes de diferencia contra 61 687 con `UYVY`, medido el 2026-08-25.
+>
+> ### Decidido y NO ejecutado
+>
+> · **El primer eslabón de `PLY-016` es el cambio de `UYVY` a `YUY2` al subir**, no un cambio de lo
+>   que se le pide al decodificador. Escrito en el plan con los otros tres en orden. **Quita** trabajo
+>   del procesador en vez de añadirlo: ese bucle ya recorre cada píxel hoy.
+>   **Y la elección de formato NO se rehace, ya existe**: `D3d11UpscaleFormats.PreferredInput` escoge
+>   el más barato de los que el procesador acepta y `UpscaleFormatArithmeticTests` la ata con su
+>   control negativo. Lo que falta es el intercambio de bytes y la subida, comprobado buscando
+>   `UyvyToYuy2`, `ToYuy2` y `SwapPairs` en `src/` y `tests/`: cero coincidencias.
+> · **Dónde vive la sonda del motor gráfico real está sin decidir.** Nada del árbol monta el anfitrión
+>   de verdad — el paseo «físico» también es headless, comprobado buscando `UsePlatformDetect` en
+>   `tests/` y `eng/`. O una línea en el guion manual, o un ejecutable de diagnóstico pequeño.
+>
+> ### Sigue bloqueado por algo que no es código
+>
+> · `PRD-002` pide el certificado comercial de firma; `PRD-003` pide máquina ARM64, que los runners
+>   gratis de GitHub ya cubren para la matriz. `REL-004` pide la comprobación de marca. La
+>   superresolución de AMD sigue escrita y no verificable por falta de tarjeta.
+
 > ## AVISO AL FRENTE — 2026-09-12, noche: el color HD corregido, y el cero de NVIDIA ya no admite excusas
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
