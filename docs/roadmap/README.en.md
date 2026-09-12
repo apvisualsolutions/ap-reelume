@@ -41,6 +41,16 @@ corrected in its evidence.
 `VERIFIED` without the **commercial signing certificate**, because its cycle was verified on a
 re-signed copy and the unsigned artifact cannot repeat it — which chains it to `REL-001`.
 
+**And since 2026-09-12 there is a second one, and it is about money: `PLY-016`'s AMD half.** Put to
+the owner with its recommendation — switch RTX Video Super Resolution on in the NVIDIA App, enable
+the i7's integrated graphics, and authorise a machine with an AMD card in the cloud, around
+$0.11/h on spot or $0.62 on demand — he authorised the first two and **not the third**. The first two
+are measured: Windows sees the RTX 5070 and the UHD 770. With no AMD machine its super resolution can
+be written and **cannot be verified**, and a switch that says «on» without any pixels compared is
+exactly what that row forbids. So `PLY-016` will only reach `VERIFIED` in two thirds until that
+spending decision is made: it is the owner's, it goes back to him once AMD's chain is written, and
+the recommendation is still yes — these are a few hours of a machine, not a purchase.
+
 **And `PRD-003` stopped being what this line said, on 2026-09-04.** It said it depended on «a
 Windows 11 ARM64 machine that does not exist here». There is one and it is free: GitHub offers
 hosted Windows 11 ARM64 runners — `windows-11-arm` — **free and unlimited on public repositories**,

@@ -42,6 +42,16 @@ puede llegar a `VERIFIED` sin el **certificado comercial de firma**, porque su c
 sobre una copia resellada y el artefacto sin firmar no puede repetirlo — lo que lo encadena a
 `REL-001`.
 
+**Y desde el 2026-09-12 hay un segundo, y es de gasto: la mitad de AMD de `PLY-016`.** Puesta la
+tarea al propietario con su recomendación —encender la Súper resolución RTX en NVIDIA App, activar la
+gráfica integrada del i7 y autorizar una máquina con tarjeta AMD en la nube, unos 0,11 $/h en spot o
+0,62 en normal—, autorizó las dos primeras y **no la tercera**. Las dos primeras están medidas:
+Windows ve la RTX 5070 y la UHD 770. Sin máquina AMD, su superresolución se puede escribir y **no se
+puede verificar**, y un indicador que dice «encendido» sin haber comparado píxeles es exactamente lo
+que esa fila prohíbe. Así que `PLY-016` sólo llegará a `VERIFIED` en dos terceras partes hasta que esa
+decisión de gasto se tome: es del propietario, se le vuelve a plantear cuando la cadena de AMD esté
+escrita, y la recomendación sigue siendo sí — son horas sueltas de una máquina, no una compra.
+
 **Y `PRD-003` dejó de ser lo que esta línea decía, el 2026-09-04.** Decía que dependía de «una
 máquina Windows 11 ARM64 que no hay». La hay y es gratis: GitHub ofrece runners hospedados de
 Windows 11 ARM64 —`windows-11-arm`—, **gratis e ilimitados en repositorios públicos**, y éste lo es
