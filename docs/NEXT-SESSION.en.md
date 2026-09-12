@@ -1,5 +1,51 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-13: `PLY-018` can be reached now, and the whole of `UX-010` is the next batch
+>
+> **Read the tree first; it outranks this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. No commit number is written here. At the close
+> `main` and the branch were level, and every fast-forward was made on a green CI conclusion read.
+>
+> ### What was closed
+>
+> · **The picture adjustment is remembered**, in `PlaybackPreference.Picture` with the three scopes
+>   that already existed. Migration `0023`, three `REAL NULL` columns read **at the end** of the
+>   repository's list because that read is positional. The decision that governs the rest: **a stored
+>   neutral is NOT a silence** — `NULL` lets the next scope answer, a neutral means somebody undid it
+>   there — and that is why the migration backfills nothing.
+> · **The player's gear, with the picture panel inside it.** A two-level list drawn **inside the
+>   transport band**, with its «Restore default values». The scope is the series for an episode and
+>   the file for anything else.
+> · **The `ADR-0012` amendment** with those three measured refinements, and the notice that «the
+>   fourteen» is unverified.
+>
+> ### Traps measured, and two of them are expensive
+>
+> · **`LoadAsync` had NO caller at all**, so the panel would have opened at neutral over a film the
+>   engine was already adjusting, and the first touch would have erased what was chosen. The fix was
+>   not remembering to call it: **opening the gear is what loads**.
+> · **«The second level replaces the first» was asserted on the model.** With both levels drawn at
+>   once over the video, **1354 tests and the whole walk stayed green**. What is drawn is measured on
+>   the built tree, not on a `bool`.
+> · **The walk's click lands in the middle of a control, and the middle of brightness IS its
+>   neutral.** A slider whose neutral sits mid-range answers a click with the value it already had.
+> · **A panel floating bottom-right covers the bar's own right-hand end**, which is why it lives
+>   inside the band.
+> · **A button that appears and goes under a set of controls moves them under the mouse**: the reset
+>   went into the group's heading row.
+>
+> ### Decided and NOT executed
+>
+> · **The whole of `UX-010`**, which the owner chose to do complete: the fourteen reset buttons with
+>   their confirmation where data is involved, the three sections that move down from Settings, and
+>   the closed-list gate that fails from both sides.
+> · **The inventory measured at the close**: nine groups of options in Settings and four or five in
+>   the player. The exact count is decided when the list is written.
+> · **The per-frame cost of the adjustment**, which `PLY-018`'s criterion promises and which has no
+>   time figure at all.
+> · **Speed is not persisted**, found in passing: `ControlPlayback` keeps it in memory and it dies
+>   with the application.
+
 > ## READ THIS FIRST — 2026-09-12, evening: the wrong feature was being built, and the owner's own file said so
 >
 > **Read the tree first; it outranks this document**: `git log --oneline -1 main`,

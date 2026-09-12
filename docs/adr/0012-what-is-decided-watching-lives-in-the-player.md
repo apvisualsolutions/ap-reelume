@@ -67,6 +67,34 @@ mismo literal.
   falla. Sin las dos mitades, el próximo panel nace sin botón y nadie se entera, que es exactamente
   cómo se llegó a tener dos en toda la aplicación.
 
+### Enmienda del 2026-09-12 (noche), al construirlo
+
+Tres precisiones, y las tres salen de medir en vez de razonar. No cambian la decisión: la afinan
+donde estaba escrita en general.
+
+- **«Dibujado sobre el vídeo» es dentro de la banda del transporte, no flotando sobre la imagen.**
+  Un panel de 380 px alineado abajo a la derecha del panel raíz cae **encima del extremo derecho de
+  la propia barra** —justo sobre los botones con los que alguien lo cerraría—, porque la barra
+  también está alineada abajo. Dentro de la banda no puede solaparse con nada: la banda lo mide como
+  un hijo más, crece mientras está abierto y devuelve la altura al cerrarse, que es además lo que
+  hace la forma que se copia.
+- **El ámbito de un grupo del engranaje es la serie para un episodio y el archivo para todo lo
+  demás.** Es el mismo par que `ApplyPlaybackPreferences` lee al abrir, y las dos mitades tienen que
+  coincidir o el panel escribiría en una fila que nadie vuelve a mirar. Coincide además con lo que
+  una persona quiere: diez episodios oscuros de una serie son una decisión, y una película es la
+  suya.
+- **La barra conserva parar y los dos saltos.** La frase «la barra queda con reproducir, volumen,
+  engranaje, miniatura y pantalla completa» enumera lo que queda **de los controles que esta decisión
+  mueve** —los cinco botones de panel y la velocidad—, y nada en el razonamiento de arriba pide
+  quitar controles de transporte. Quitarlos sería una pérdida que ninguna sección de este documento
+  justifica.
+
+**Y una cifra de este documento está por comprobar**: «los catorce». El estilo de subtítulos y los
+atajos se cuentan aquí como dos de los cinco grupos del reproductor **y** como dos de las nueve
+secciones de Ajustes, cuando hoy viven sólo en Ajustes. El recuento real se mide al escribir la lista
+cerrada de `UX-010`, y si no es catorce se corrigen este documento, la regla 11 de `CLAUDE.md` y la
+fila de la matriz.
+
 ### Alternativas consideradas
 
 - **Un menú emergente, como el de YouTube.** Rechazada por el mecanismo: deja el contenido fuera del
@@ -111,6 +139,27 @@ move inside the gear. The gate cannot judge the criterion, so what it requires i
 decision**: a closed list classifies every group into one of the two places and fails on an
 unclassified one. The button's gate is symmetric — a group off the list fails, and a listed group
 without its button fails.
+
+### Amendment of 2026-09-12 (evening), while building it
+
+Three refinements, all three measured rather than reasoned. They do not change the decision.
+
+- **«Drawn over the video» means inside the transport band, not floating over the picture.** A 380 px
+  panel aligned to the bottom right of the root panel lands **on top of the bar's own right-hand
+  end** — over the very buttons somebody would close it with — because the bar is bottom-aligned too.
+  Inside the band it cannot overlap anything: the band measures it as one more child, grows while it
+  is open and gives the height back when it is not.
+- **A gear group's scope is the series for an episode and the file for anything else**, which is the
+  same pair `ApplyPlaybackPreferences` reads on the way in. The two sides have to agree or the panel
+  would write into a row nothing ever looks at.
+- **The bar keeps stop and the two skips.** The sentence listing what the bar is left with enumerates
+  what remains **of the controls this decision moves**, and nothing in the reasoning asks for
+  transport controls to go.
+
+**And one figure here is unverified**: «the fourteen». Subtitle style and shortcuts are counted both
+as player groups and as two of the nine settings sections, while today they live only in Settings.
+The real count is measured when `UX-010`'s closed list is written, and if it is not fourteen this
+document, rule 11 and the matrix row are corrected.
 
 ### Alternatives considered
 

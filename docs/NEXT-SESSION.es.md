@@ -1,5 +1,54 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-13: `PLY-018` ya se puede tocar, y `UX-010` entera es la tanda siguiente
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. Al
+> cerrar, `main` y la rama quedaron al día, y cada fast-forward se hizo con CI en verde leído.
+>
+> ### Lo que se cerró
+>
+> · **El ajuste de imagen se recuerda**, en `PlaybackPreference.Picture` con los tres ámbitos que ya
+>   existían. Migración `0023`, tres columnas `REAL NULL` leídas **al final** de la lista del
+>   repositorio porque su lectura es posicional. La decisión que gobierna todo: **un neutro guardado
+>   NO es un silencio** — `NULL` deja contestar al ámbito siguiente, un neutro significa que alguien
+>   lo deshizo ahí—, y por eso la migración no rellena las filas ya almacenadas.
+> · **El engranaje del reproductor, con el panel de imagen dentro.** Lista de dos niveles dibujada
+>   **dentro de la banda del transporte**, con su «Restaurar valores por defecto». El ámbito es la
+>   serie para un episodio y el archivo para todo lo demás.
+> · **La enmienda del `ADR-0012`** con esas tres precisiones medidas, y el aviso de que «los catorce»
+>   está por comprobar.
+>
+> ### Trampas medidas, y dos son de las caras
+>
+> · **`LoadAsync` no tenía NINGÚN llamante**, así que el panel habría abierto en neutro sobre una
+>   película ya ajustada y el primer toque habría borrado lo elegido. La salida no fue acordarse de
+>   llamarlo: **abrir el engranaje es lo que carga**. El defecto de la casa dentro de la pieza cuyo
+>   único trabajo es enseñar un valor guardado.
+> · **«El segundo nivel sustituye al primero» se afirmaba sobre el modelo.** Con los dos niveles
+>   dibujados a la vez sobre el vídeo, **1.354 pruebas y el paseo entero seguían en verde**. Lo que
+>   se dibuja se mide en el árbol montado, no en un `bool` del ViewModel.
+> · **El clic del paseo cae en el centro del mando, y el centro del brillo ES su valor neutro.** Un
+>   deslizador cuyo neutro está en medio de su rango contesta al clic con el valor que ya tenía. La
+>   escena manda cada mando a su extremo antes de pulsarlo.
+> · **Un panel flotando abajo a la derecha tapa el extremo derecho de la propia barra.** Por eso vive
+>   dentro de la banda.
+> · **El botón que aparece y desaparece bajo unos mandos los mueve bajo el ratón**: el de restaurar
+>   se puso en la cabecera del grupo, donde aparecer no cambia la altura.
+>
+> ### Decidido y NO ejecutado
+>
+> · **`UX-010` entera**, que el propietario eligió hacer completa: los catorce botones de restaurar
+>   con su confirmación donde hay datos de por medio —raíces de medios y copias—, las tres secciones
+>   que bajan de Ajustes al reproductor, y la puerta de lista cerrada que falla por los dos lados.
+> · **El inventario medido al cerrar**: nueve grupos de opciones en Ajustes y cuatro o cinco en el
+>   reproductor. El recuento exacto se decide al escribir la lista, y si no es catorce se corrigen el
+>   ADR, la regla 11 y la fila de la matriz.
+> · **El coste por fotograma del ajuste**, que el criterio de `PLY-018` promete y no tiene ni una
+>   cifra de tiempo.
+> · **La velocidad no se persiste**, encontrado de paso: `ControlPlayback` la guarda en memoria y
+>   muere al cerrar la aplicación. No es alcance de `PLY-018`.
+
 > ## AVISO AL FRENTE — 2026-09-12, noche: se estaba construyendo la pieza equivocada, y lo dijo el archivo del propietario
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
