@@ -36,10 +36,19 @@ después.
 - **La matriz física de `PLY-003` no se ha vuelto a ejecutar** sobre la segunda clase de adaptador.
   Este ADR dice que la publicación estable es su momento natural, y ese momento ahora es posible sin
   comprar nada.
+- **Y nada de este árbol monta el anfitrión real de Windows**, añadido esa misma noche. Buscar
+  `UsePlatformDetect` en `tests/` y en `eng/` no devuelve nada: el paseo «físico» de
+  `AccessibilityTests` también es headless, y lo dice en su propia cabecera. Así que qué motor
+  gráfico elige la aplicación que se distribuye —`Program.cs` pide detección de plataforma, y Windows
+  ofrece software, ANGLE, WGL y Vulkan— **no lo establece ninguna puerta**, y la importación de
+  textura D3D11 que `PLY-016` necesita vive en la ruta de ANGLE. La decisión de contestarlo con un
+  ejecutable de diagnóstico pequeño, en vez de con otra línea del guion manual, es de Engineering,
+  tomada el 2026-09-12 y sin ejecutar; abre una ventana de verdad, así que pide la máquina del
+  propietario cuando no esté trabajando.
 
 No se toca la decisión: `PLY-003` sigue `VERIFIED` por lo que se demostró en su día. Lo que se
 corrige es un hecho del contexto que, sin esta nota, seguiría diciendo que aquí no hay gráficos
-integrados.
+integrados — y, ahora, que algo del árbol ejercita el anfitrión real.
 
 ### Contexto
 
@@ -137,10 +146,19 @@ afterwards.
   composed subtitle. So no vendor's decode path is exercised, not only Intel's.
 - **`PLY-003`'s physical matrix has not been re-run** on the second class of adapter. This ADR names
   the stable release as its natural moment, and that moment is now possible without buying anything.
+- **And nothing in this tree runs the real Windows host at all**, added the same evening. Searching
+  `tests/` and `eng/` for `UsePlatformDetect` returns nothing: the «physical» walk of
+  `AccessibilityTests` is headless too, and says so in its own header. So which graphics backend the
+  shipped application picks — `Program.cs` asks for platform detection, and Windows offers software,
+  ANGLE, WGL and Vulkan — is **not established by any gate**, and the D3D11 texture import
+  `PLY-016` needs lives on the ANGLE route. The decision to answer it with a small diagnostic
+  executable rather than another line of the manual walkthrough is Engineering's, taken 2026-09-12
+  and not yet carried out; it opens a real window, so it needs the owner's machine when he is not
+  working.
 
 The decision is untouched: `PLY-003` stays `VERIFIED` on what was demonstrated at the time. What is
 corrected is a fact in the context that would otherwise keep saying there are no integrated graphics
-here.
+here — and, now, that something in the tree exercises the real host.
 
 ### Context
 
