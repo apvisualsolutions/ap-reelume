@@ -26,6 +26,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   application **cannot** switch NVIDIA's super resolution on by itself: no such setting exists in the
   vendor's public header, and it appears by name neither in the registry nor in its configuration.
 
+- **NVIDIA's zero is now measured against four combinations instead of one, and it is still zero.**
+  The first measurement varied the switch and nothing else, so its zero meant «with this format and
+  this picture». The two things it never varied are the two a vendor's model would care about: the
+  input format, because both VLC and Chromium hand the card a different one; and the content, because
+  these are networks trained on compressed video and hard synthetic bands with flat colour give them
+  nothing to rebuild. Neither explains it. **And the zero is worth more now, because the Intel card
+  moves MORE with the detailed picture** — 22 455 544 bytes against 18 109 378 — so the instrument
+  does respond to content.
+
+  Two more things ruled out the same day: this machine's driver **passes** the version check VLC
+  requires before calling, and VLC 3.0.23 playing a 480p video on this very card logs «turning VSR
+  ON» without a single error. What VLC has not said yet is whether it moves a pixel.
+
+  **And the SDK licence, re-read at its source**: it grants a non-sublicensable licence and forbids
+  modifying, distributing and creating derivative works, which is what GPL-3.0 requires the freedom
+  to do — so the SDK cannot ship inside this application. **But what it forbids is shipping the SDK,
+  and this chain does not ship it**: the video processor extension lives in the driver the person
+  already has, and is called through a Direct3D interface.
+
 ### Fixed
 
 - **The colour of every HD video, which was decoded with the standard-definition matrix.** From 720

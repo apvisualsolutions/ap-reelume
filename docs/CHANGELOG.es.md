@@ -26,6 +26,25 @@ evidencia, es [FEATURES.md](FEATURES.md).
   **no puede** encender la superresolución de NVIDIA por su cuenta: no existe ese ajuste en la
   cabecera pública del fabricante, ni aparece por su nombre en el registro ni en su configuración.
 
+- **El cero de NVIDIA ya está medido contra cuatro combinaciones en vez de una, y sigue siendo cero.**
+  La primera medición varió el interruptor y nada más, así que su cero decía «con este formato y esta
+  imagen». Las dos cosas que no varió son las dos que un modelo del fabricante miraría: el formato que
+  se le entrega, porque VLC y Chromium le dan otro distinto; y el contenido, porque son redes
+  entrenadas sobre vídeo comprimido y unas bandas duras con color plano no les dan nada que
+  reconstruir. Ninguna de las dos lo explica. **Y el cero vale más ahora, porque la tarjeta Intel
+  mueve MÁS con la imagen de detalle** —22 455 544 bytes frente a 18 109 378—, así que el instrumento
+  sí responde al contenido.
+
+  Dos descartes más del mismo día: el controlador de esta máquina **pasa** la comprobación de versión
+  que VLC exige antes de llamar, y VLC 3.0.23 reproduciendo un vídeo de 480p en esta misma tarjeta
+  anota «turning VSR ON» sin un solo error. Lo que VLC no ha dicho todavía es si mueve un píxel.
+
+  **Y la licencia del SDK, releída en su fuente**: concede una licencia no sublicenciable y prohíbe
+  modificar, distribuir y crear obras derivadas, que es justo lo que `GPL-3.0` exige poder hacer, así
+  que el SDK no puede viajar dentro de esta aplicación. **Pero lo que prohíbe es distribuir el SDK, y
+  esta cadena no lo distribuye**: la extensión del procesador de vídeo vive en el controlador que la
+  persona ya tiene y se invoca por una interfaz de Direct3D.
+
 ### Corregido
 
 - **El color de todo vídeo HD, que se decodificaba con la matriz de definición estándar.** De 720

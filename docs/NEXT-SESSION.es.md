@@ -1,5 +1,84 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-12, noche: el color HD corregido, y el cero de NVIDIA ya no admite excusas
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+> **`main` y la rama quedaron al día y en el mismo commit**, y los dos fast-forward de la tanda se
+> hicieron con la conclusión de CI leída, nunca supuesta.
+>
+> ### Lo que se cerró
+>
+> · **EL COLOR DE TODO VÍDEO HD, que era un defecto real y está corregido.** Se decodificaba con la
+>   matriz BT.601 fija; de 720 líneas para arriba se usa BT.709. Medido sobre los bytes que entrega el
+>   decodificador: **el rojo puro salía 231 en vez de 253**. La elección vive ahora en `Domain`
+>   (`YuvMatrixPolicy`) y el conversor recibe los coeficientes en vez de llevarlos dentro. El vídeo de
+>   definición estándar no se mueve, que es el resultado que se buscaba para él.
+> · **No abre fila de alcance, y se comprobó por qué**: ninguna fila de `docs/FEATURES.md` promete
+>   fidelidad de color. **Ése es el hueco que dejó vivir el defecto** — no había nada escrito que
+>   contradecir. Abrir `PLY-017` es un cambio de alcance y por tanto decisión del propietario.
+> · **No se le puede pasar un espacio de color declarado, y es deliberado.** LibVLC 3 no lo expone y
+>   `ffprobe` es una herramienta de pruebas que no está en la máquina de quien usa la aplicación. Un
+>   parámetro para un dato que nadie suministra es una puerta que nadie cruza, que es el defecto de la
+>   casa. `YuvMatrixPolicy` es el único sitio que cambiará el día que algo pueda leerlo.
+> · **El cero de NVIDIA, medido contra cuatro combinaciones en vez de una, y sigue en cero.** Formato
+>   (`YUY2` y `NV12`) por contenido (bandas duras y una imagen con degradado, textura fina y croma
+>   vivo). **Y pesa más que antes, porque Intel mueve MÁS con la imagen de detalle** —22 455 544
+>   frente a 18 109 378—, así que el instrumento sí responde al contenido.
+> · **Tres descartes más de NVIDIA**: el controlador **pasa** la comprobación de versión que VLC exige
+>   (32.0.16.1656 → 161 656 contra 153 000); Chromium no comprueba formato, resolución ni escala, sólo
+>   el fabricante y **si el equipo va con batería**; y la licencia del SDK, releída en su fuente,
+>   prohíbe **empaquetarlo** pero no llamar a una interfaz de Direct3D del controlador — **la vía que
+>   este proyecto usa queda abierta**.
+>
+> ### Trampas medidas hoy, y la primera casi escribe un hallazgo falso
+>
+> · **UNA ETIQUETA NO ES UNA MUESTRA.** `ffmpeg -colorspace bt709` **sólo escribe la etiqueta**: el
+>   filtro que genera el color produce BT.601 y ffmpeg no reconvierte nada. `ffprobe` contestó
+>   `color_space=bt709` tan tranquilo, las dos muestras llegaron al decodificador con **los mismos
+>   bytes**, y se dio por demostrado que LibVLC normalizaba el color. Es falso. Se fuerza con
+>   `-vf format=rgb24,scale=out_color_matrix=bt709:out_range=tv` y **se comprueba leyendo el YUV crudo
+>   de dentro**, que es lo que `ffprobe` no hace. Hay una guarda que compara las dos muestras y falla
+>   si coinciden.
+> · **UN PRIMARIO SATURADO NO MIDE UN COEFICIENTE.** Doblar el de azul dejaba `MediaTests` **165/165
+>   en verde**: negro y blanco llevan croma a 128 —todo coeficiente multiplica cero— y un primario
+>   puro clava dos canales en 0 o 255. La salida son filas que **no saturan ningún canal**, buscadas
+>   midiendo qué da cada candidato con la matriz correcta y con la contraria.
+> · **Elegir la matriz del búfer del decodificador en vez de la imagen pasaba entero**, porque las dos
+>   muestras eran múltiplos de 16 y las dos alturas coincidían. Hace falta una de **1280×716**, que
+>   H.264 codifica en un búfer de 720 y recorta.
+> · **`--no-playlist-autostart` impide que VLC reproduzca**, y su ventana nunca llegó a abrirse. La
+>   captura salió con el escritorio del propietario dentro —borrada— y el «control positivo» de contar
+>   valores distintos **no distingue un vídeo de un escritorio**. Un control tiene que poder fallar.
+> · **El monitor secundario mide 3840×2160, no 2560×1440**: sin conciencia de DPI la lectura miente, y
+>   **es donde el propietario trabaja**.
+>
+> ### Pendiente del propietario, con recomendación delante
+>
+> · **Cuándo se puede abrir VLC** para comparar píxeles, que es lo único que falta de NVIDIA. Su
+>   registro ya dice «turning VSR ON»; falta saber si mueve algo. Necesita su ventana visible unos
+>   segundos, dos veces, y no hay pantalla libre.
+> · **La cifra de duración de CI en el aviso de post-push.** Recomendado: dejarla en **un solo sitio**,
+>   el del propio vigía, y que `RunDurationFigureTests` pase de «las cuatro copias coinciden» a
+>   «nadie la escribe fuera de ahí», conservando lo que sí vale — que el latido salte antes de que
+>   termine el run más rápido y el techo esté sobre el más lento. Quitarla de un sitio pone la puerta
+>   roja, comprobado.
+> · **Si el color merece fila propia en la matriz**, ahora que se sabe que ninguna lo cubría.
+>
+> ### Lo siguiente, y un bloqueo que conviene resolver ANTES de construir
+>
+> 1. **La cadena de `PLY-016`**: textura `YUY2` → procesador de vídeo → textura compartida importada
+>    en la composición. **Pero antes hay que resolver cómo se mide el píxel de una ruta GPU**: la
+>    documentación de Avalonia avisa de que `RenderTargetBitmap` usa render por software y que los
+>    controles con interop «pueden no renderizarse correctamente» capturados así — que es exactamente
+>    el arnés de este repositorio. Si no se resuelve primero, la puerta nace ciega.
+> 2. **La documentación nombra `compositor.ImportGpuImage(...)`**, no `TryGetCompositionGpuInterop`,
+>    que es lo que el relevo anterior dice haber medido en el ensamblado. Una de las dos está mal: se
+>    comprueba en el ensamblado antes de escribir código.
+> 3. **El margen de CI está en negativo**: el run más lento de los diez últimos tardó **94,4 min** con
+>    el corte en **90**, y sus suites sumaban unos 40. El tiempo se va fuera de las pruebas.
+> 4. **FSR 1 en SkSL** para las demás tarjetas, y **AMD**, que sigue escrita y no verificable.
+
 > ## AVISO AL FRENTE — 2026-09-12, tarde: `PLY-016` tiene un tercio MEDIDO, y el instrumento está probado
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

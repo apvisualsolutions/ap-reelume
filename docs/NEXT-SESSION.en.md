@@ -1,5 +1,85 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-12, evening: HD colour fixed, and NVIDIA's zero has run out of excuses
+>
+> **Look at the tree first; it overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here.
+> **`main` and the branch ended level, on the same commit**, and both fast-forwards were made with
+> CI's conclusion read rather than assumed.
+>
+> ### What was closed
+>
+> · **THE COLOUR OF EVERY HD VIDEO, which was a real defect and is fixed.** It was decoded with the
+>   fixed BT.601 matrix; from 720 lines up BT.709 is what is used. Measured on the bytes the decoder
+>   hands out: **pure red came out 231 instead of 253**. The choice now lives in `Domain`
+>   (`YuvMatrixPolicy`) and the converter receives the coefficients instead of carrying them. Standard
+>   definition video does not move, which is the result that was wanted for it.
+> · **It opens no scope row, and why was checked**: no row of `docs/FEATURES.md` promises colour
+>   fidelity. **That is the gap that let the defect live** — there was nothing written to contradict.
+>   Opening `PLY-017` is a scope change and therefore the owner's decision.
+> · **No declared colour space can be passed in, and that is deliberate.** LibVLC 3 does not expose it
+>   and `ffprobe` is a test tool that is not on the machine of whoever runs the application. A
+>   parameter for a value nobody supplies is a door nobody walks through, which is this house's
+>   characteristic defect. `YuvMatrixPolicy` is the one place that will change the day anything can
+>   read it.
+> · **NVIDIA's zero, measured against four combinations instead of one, and still zero.** Format
+>   (`YUY2` and `NV12`) by content (hard bands, and a picture with gradient, fine texture and moving
+>   colour). **And it weighs more than before, because Intel moves MORE with the detailed picture** —
+>   22 455 544 against 18 109 378 — so the instrument does respond to content.
+> · **Three more NVIDIA rule-outs**: the driver **passes** the version check VLC requires
+>   (32.0.16.1656 → 161 656 against 153 000); Chromium checks neither format, resolution nor scale,
+>   only the vendor and **whether the machine is on battery**; and the SDK licence, re-read at its
+>   source, forbids **shipping it** but not calling a Direct3D interface of the driver — **the route
+>   this project uses stays open**.
+>
+> ### Traps measured today, and the first nearly recorded a false finding
+>
+> · **A LABEL IS NOT A SAMPLE.** `ffmpeg -colorspace bt709` **only writes the label**: the filter that
+>   generates the colour produces BT.601 and ffmpeg reconverts nothing. `ffprobe` happily answered
+>   `color_space=bt709`, both samples reached the decoder with **the same bytes**, and it was taken as
+>   proven that LibVLC normalises colour. It is false. Force it with
+>   `-vf format=rgb24,scale=out_color_matrix=bt709:out_range=tv` and **check by reading the raw YUV
+>   inside**, which is what `ffprobe` does not do. A guard compares the two samples and fails if they
+>   agree.
+> · **A SATURATED PRIMARY DOES NOT MEASURE A COEFFICIENT.** Doubling the blue one left `MediaTests`
+>   **165/165 green**: black and white carry chroma at 128 — every coefficient multiplies zero — and a
+>   pure primary pins two channels at 0 or 255. The answer is rows that **saturate no channel**, found
+>   by measuring what each candidate gives with the right matrix and with the wrong one.
+> · **Choosing the matrix from the decoder's buffer instead of the picture passed entirely**, because
+>   both samples were multiples of 16 and the two heights agreed. One of **1280×716** is needed, which
+>   H.264 encodes in a 720-line buffer and crops.
+> · **`--no-playlist-autostart` stops VLC playing**, and its window never opened. The capture came out
+>   with the owner's desktop inside — deleted — and the «positive control» of counting distinct values
+>   **cannot tell a video from a desktop**. A control has to be able to fail.
+> · **The secondary monitor measures 3840×2160, not 2560×1440**: without DPI awareness the reading
+>   lies, and **it is where the owner works**.
+>
+> ### Waiting on the owner, recommendation first
+>
+> · **When VLC may be opened** to compare pixels, which is all that is left of NVIDIA. Its log already
+>   says «turning VSR ON»; what is missing is whether it moves anything. It needs its window visible
+>   for a few seconds, twice, and there is no free screen.
+> · **The CI duration figure in the post-push notice.** Recommended: keep it in **one place only**,
+>   the watcher's own, and move `RunDurationFigureTests` from «all four copies agree» to «nobody
+>   writes it outside there», keeping what does matter — that the heartbeat fires before even the
+>   fastest run ends and the ceiling sits above the slowest. Removing it from one place turns the gate
+>   red; measured.
+> · **Whether colour deserves a row of its own**, now that it is known no row covered it.
+>
+> ### Next, and a blocker worth solving BEFORE building
+>
+> 1. **`PLY-016`'s chain**: `YUY2` texture → video processor → shared texture imported into the
+>    composition. **But first, how a GPU path's pixel is measured has to be solved**: Avalonia's
+>    documentation warns that `RenderTargetBitmap` uses software rendering and that controls with
+>    interop «may not render correctly» captured that way — which is exactly this repository's
+>    harness. Unsolved, the gate is born blind.
+> 2. **The documentation names `compositor.ImportGpuImage(...)`**, not `TryGetCompositionGpuInterop`,
+>    which is what the previous handover says it measured in the assembly. One of the two is wrong:
+>    check the assembly before writing code.
+> 3. **CI's margin is negative**: the slowest of the last ten runs took **94.4 min** against a **90**
+>    minute cut-off, and its suites summed about 40. The time goes outside the tests.
+> 4. **FSR 1 in SkSL** for every other card, and **AMD**, still written and unverifiable.
+
 > ## READ THIS FIRST — 2026-09-12, afternoon: a third of `PLY-016` is MEASURED, and the instrument is proven
 >
 > **Look at the tree first; it outranks this document**: `git log --oneline -1 main`,
